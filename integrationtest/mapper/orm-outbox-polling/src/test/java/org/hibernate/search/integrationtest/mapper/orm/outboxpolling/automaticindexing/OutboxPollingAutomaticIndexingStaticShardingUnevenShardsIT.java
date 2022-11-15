@@ -21,15 +21,15 @@ import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.PerSessionFactoryIndexingCountHelper;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.data.Percentage;
 
@@ -38,25 +38,25 @@ import org.assertj.core.data.Percentage;
  * where each nodes are assigned a different number of shards (some 1, some 0, some more than 1, ...).
  */
 @TestForIssue(jiraKey = "HSEARCH-4141")
-public class OutboxPollingAutomaticIndexingStaticShardingUnevenShardsIT {
+class OutboxPollingAutomaticIndexingStaticShardingUnevenShardsIT {
 
 	public static final int TOTAL_SHARD_COUNT = 7;
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
-	@Rule
-	public StaticCounters counters = new StaticCounters();
+	@RegisterExtension
+	public StaticCounters counters = StaticCounters.create();
 
 	private final PerSessionFactoryIndexingCountHelper indexingCountHelper =
 			new PerSessionFactoryIndexingCountHelper( counters );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setup(
 				"create-drop",
 				true, Collections.singletonList( 0 ) // 1 shard
@@ -103,7 +103,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingUnevenShardsIT {
 	}
 
 	@Test
-	public void workDistribution() {
+	void workDistribution() {
 		SessionFactory sessionFactory = indexingCountHelper.sessionFactory( 0 );
 
 		int entityCount = 1000;

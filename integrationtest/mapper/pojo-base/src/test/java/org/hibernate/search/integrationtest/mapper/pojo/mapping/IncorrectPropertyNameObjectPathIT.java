@@ -19,25 +19,25 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class IncorrectPropertyNameObjectPathIT {
+class IncorrectPropertyNameObjectPathIT {
 	private static final String BROKEN_PATH_WITH_DOTS = "broken.path.with.dots";
-	@Rule
-	public BackendMock defaultBackendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock defaultBackendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock(
 			MethodHandles.lookup(),
 			defaultBackendMock
 	);
 
 	@Test
-	public void brokenPathWithDotsThrowsException() {
+	void brokenPathWithDotsThrowsException() {
 		assertThatThrownBy( () -> {
 			setupHelper.start()
 					.withAnnotatedEntityType( Person.class, Person.ENTITY_NAME )

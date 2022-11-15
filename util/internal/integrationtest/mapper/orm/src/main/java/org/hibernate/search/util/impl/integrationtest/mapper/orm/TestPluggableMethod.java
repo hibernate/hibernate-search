@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 /**
  * A representation of a method defined in a test class in order to be called from test infrastructure
- * (e.g. a {@link org.junit.rules.TestRule}).
+ * (e.g. a {@link org.junit.jupiter.api.extension.Extension}).
  */
 class TestPluggableMethod<T> {
 

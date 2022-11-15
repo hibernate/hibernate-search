@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -69,18 +69,17 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dial
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
-import org.hibernate.search.util.impl.test.rule.Retry;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.RetryExtension;
 
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.http.Fault;
 import com.github.tomakehurst.wiremock.http.Request;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.github.tomakehurst.wiremock.matching.MatchResult;
 import com.github.tomakehurst.wiremock.matching.RequestMatcherExtension;
 import com.google.gson.GsonBuilder;
@@ -110,30 +109,31 @@ import org.apache.http.ssl.SSLContexts;
 import org.apache.logging.log4j.Level;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.elasticsearch.client.RestClient;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.DefaultElasticsearchClientFactoryTest")
-public class ElasticsearchClientFactoryImplIT {
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+class ElasticsearchClientFactoryImplIT {
 
 	// Some tests in here are flaky, for some reason once in a while wiremock takes a very long time to answer
 	// even though no delay was configured.
 	// The exact reason is unknown though, so just try multiple times...
-	@Rule
-	public Retry retry;
 
+	@RegisterExtension
 	private final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
-	private final WireMockRule wireMockRule1 = new WireMockRule( wireMockConfig().port( 0 )
-			.httpsPort( 0 ) /* Automatic port selection */ );
+	@RegisterExtension
+	private final WireMockExtension wireMockRule1 = WireMockExtension.newInstance()
+			.options( wireMockConfig().dynamicPort().dynamicHttpsPort() )
+			.build();
 
-	private final WireMockRule wireMockRule2 =
-			new WireMockRule( wireMockConfig().port( 0 ).httpsPort( 0 ) /* Automatic port selection */ );
+	@RegisterExtension
+	private final WireMockExtension wireMockRule2 = WireMockExtension.newInstance()
+			.options( wireMockConfig().dynamicPort().dynamicHttpsPort() )
+			.build();
 
+	@RegisterExtension
 	private final TestConfigurationProvider testConfigurationProvider = new TestConfigurationProvider();
 
 	private final ThreadPoolProviderImpl threadPoolProvider = new ThreadPoolProviderImpl(
@@ -142,12 +142,8 @@ public class ElasticsearchClientFactoryImplIT {
 	private final ScheduledExecutorService timeoutExecutorService =
 			threadPoolProvider.newScheduledExecutor( 1, "Timeout - " );
 
-	public ElasticsearchClientFactoryImplIT() {
-		this.retry = Retry.withOtherRules( logged, wireMockRule1, wireMockRule2, testConfigurationProvider );
-	}
-
-	@After
-	public void cleanup() {
+	@AfterEach
+	void cleanup() {
 		timeoutExecutorService.shutdownNow();
 		threadPoolProvider.close();
 
@@ -157,9 +153,9 @@ public class ElasticsearchClientFactoryImplIT {
 		wireMockRule2.resetAll();
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2274")
-	public void simple_http() {
+	void simple_http() {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessage";
 		String responseBody = "{ \"foo\": \"bar\" }";
@@ -183,8 +179,8 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
-	public void simple_httpClientConfigurer() throws Exception {
+	@RetryExtension.TestWithRetry
+	void simple_httpClientConfigurer() throws Exception {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessage";
 		String responseBody = "{ \"foo\": \"bar\" }";
@@ -216,9 +212,9 @@ public class ElasticsearchClientFactoryImplIT {
 		verify( responseInterceptor, times( 1 ) ).process( any(), any() );
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-4099")
-	public void uris_http() {
+	void uris_http() {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessage";
 		String responseBody = "{ \"foo\": \"bar\" }";
@@ -246,9 +242,9 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-4051")
-	public void pathPrefix_http() {
+	void pathPrefix_http() {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessage";
 		String responseBody = "{ \"foo\": \"bar\" }";
@@ -276,9 +272,9 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-4099")
-	public void pathPrefix_uris() {
+	void pathPrefix_uris() {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessage";
 		String responseBody = "{ \"foo\": \"bar\" }";
@@ -307,9 +303,9 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2274")
-	public void simple_https() {
+	void simple_https() {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessage";
 		String responseBody = "{ \"foo\": \"bar\" }";
@@ -338,9 +334,9 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2274")
-	public void uris_https() {
+	void uris_https() {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessage";
 		String responseBody = "{ \"foo\": \"bar\" }";
@@ -368,8 +364,8 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
-	public void error() {
+	@RetryExtension.TestWithRetry
+	void error() {
 		String payload = "{ \"foo\": \"bar\" }";
 		String responseBody = "{ \"error\": \"ErrorMessageExplainingTheError\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
@@ -386,8 +382,8 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
-	public void unparseable() {
+	@RetryExtension.TestWithRetry
+	void unparseable() {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
@@ -411,8 +407,8 @@ public class ElasticsearchClientFactoryImplIT {
 				.isInstanceOf( JsonSyntaxException.class );
 	}
 
-	@Test
-	public void timeout_read() {
+	@RetryExtension.TestWithRetry
+	void timeout_read() {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
@@ -438,8 +434,8 @@ public class ElasticsearchClientFactoryImplIT {
 				.isInstanceOf( IOException.class );
 	}
 
-	@Test
-	public void timeout_request() {
+	@RetryExtension.TestWithRetry
+	void timeout_request() {
 		String payload = "{ \"foo\": \"bar\" }";
 
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
@@ -473,9 +469,9 @@ public class ElasticsearchClientFactoryImplIT {
 	 * we don't trigger timeouts just because requests spend a long time waiting;
 	 * timeouts are only related to how long the *server* takes to answer.
 	 */
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2836")
-	public void cloggedClient_noTimeout_read() {
+	void cloggedClient_noTimeout_read() {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/long" ) )
 				.willReturn( elasticsearchResponse()
@@ -510,9 +506,9 @@ public class ElasticsearchClientFactoryImplIT {
 	 * Verify that when a request timeout is set, and when the client is clogged (many pending requests),
 	 * we do trigger timeouts just because requests spend a long time waiting.
 	 */
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2836")
-	public void cloggedClient_timeout_request() {
+	void cloggedClient_timeout_request() {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/long" ) )
 				.willReturn( elasticsearchResponse()
@@ -549,9 +545,9 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2235")
-	public void multipleHosts() {
+	void multipleHosts() {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
@@ -575,8 +571,8 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
-	public void multipleURIs() {
+	@RetryExtension.TestWithRetry
+	void multipleURIs() {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
@@ -600,9 +596,9 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2469")
-	public void multipleHosts_failover_serverError() {
+	void multipleHosts_failover_serverError() {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
@@ -638,9 +634,9 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2469")
-	public void multipleHosts_failover_timeout() {
+	void multipleHosts_failover_timeout() {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
@@ -687,9 +683,9 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2469")
-	public void multipleHosts_failover_fault() {
+	void multipleHosts_failover_fault() {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
@@ -725,10 +721,10 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2449")
-	public void discovery_http() {
-		String nodesInfoResult = dummyNodeInfoResponse( wireMockRule1.port(), wireMockRule2.port() );
+	void discovery_http() {
+		String nodesInfoResult = dummyNodeInfoResponse( wireMockRule1.getPort(), wireMockRule2.getPort() );
 
 		wireMockRule1.stubFor( get( urlPathMatching( "/_nodes.*" ) )
 				.andMatching( httpProtocol() )
@@ -779,10 +775,10 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2736")
-	public void discovery_https() {
-		String nodesInfoResult = dummyNodeInfoResponse( wireMockRule1.httpsPort(), wireMockRule2.httpsPort() );
+	void discovery_https() {
+		String nodesInfoResult = dummyNodeInfoResponse( wireMockRule1.getHttpsPort(), wireMockRule2.getHttpsPort() );
 
 		wireMockRule1.stubFor( get( urlPathMatching( "/_nodes.*" ) )
 				.andMatching( httpsProtocol() )
@@ -854,14 +850,14 @@ public class ElasticsearchClientFactoryImplIT {
 		};
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2453")
-	public void authentication() {
+	void authentication() {
 		assumeFalse(
+				ElasticsearchTestHostConnectionConfiguration.get().isAws(),
 				"This test only is only relevant if Elasticsearch request are *NOT* automatically" +
 						" augmented with an \"Authentication:\" header." +
-						" \"Authentication:\" headers are added by the AWS integration in particular.",
-				ElasticsearchTestHostConnectionConfiguration.get().isAws()
+						" \"Authentication:\" headers are added by the AWS integration in particular."
 		);
 		String username = "ironman";
 		String password = "j@rV1s";
@@ -884,9 +880,9 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2453")
-	public void authentication_error() {
+	void authentication_error() {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessageUnauthorized";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType/_search" ) )
@@ -903,9 +899,9 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2453")
-	public void authentication_http_password() {
+	void authentication_http_password() {
 		String username = "ironman";
 		String password = "j@rV1s";
 
@@ -921,8 +917,8 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
-	public void uriAndProtocol() {
+	@RetryExtension.TestWithRetry
+	void uriAndProtocol() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
 			properties.accept( ElasticsearchBackendSettings.URIS, "http://is-not-called:12345" );
 			properties.accept( ElasticsearchBackendSettings.PROTOCOL, "http" );
@@ -939,8 +935,8 @@ public class ElasticsearchClientFactoryImplIT {
 				);
 	}
 
-	@Test
-	public void uriAndHosts() {
+	@RetryExtension.TestWithRetry
+	void uriAndHosts() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
 			properties.accept( ElasticsearchBackendSettings.URIS, "http://is-not-called:12345" );
 			properties.accept( ElasticsearchBackendSettings.HOSTS, "not-called-either:234" );
@@ -957,8 +953,8 @@ public class ElasticsearchClientFactoryImplIT {
 				);
 	}
 
-	@Test
-	public void differentProtocolsOnUris() {
+	@RetryExtension.TestWithRetry
+	void differentProtocolsOnUris() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
 			properties.accept( ElasticsearchBackendSettings.URIS, "http://is-not-called:12345, https://neather-is:12345" );
 		};
@@ -972,8 +968,8 @@ public class ElasticsearchClientFactoryImplIT {
 				);
 	}
 
-	@Test
-	public void emptyListOfUris() {
+	@RetryExtension.TestWithRetry
+	void emptyListOfUris() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
 			properties.accept( ElasticsearchBackendSettings.URIS, Collections.emptyList() );
 		};
@@ -985,8 +981,8 @@ public class ElasticsearchClientFactoryImplIT {
 				);
 	}
 
-	@Test
-	public void emptyListOfHosts() {
+	@RetryExtension.TestWithRetry
+	void emptyListOfHosts() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
 			properties.accept( ElasticsearchBackendSettings.HOSTS, Collections.emptyList() );
 		};
@@ -998,8 +994,8 @@ public class ElasticsearchClientFactoryImplIT {
 				);
 	}
 
-	@Test
-	public void clientInstance() throws IOException {
+	@RetryExtension.TestWithRetry
+	void clientInstance() throws IOException {
 		try ( RestClient myRestClient = RestClient.builder( HttpHost.create( httpUrisFor( wireMockRule1 ) ) ).build() ) {
 			String payload = "{ \"foo\": \"bar\" }";
 			String statusMessage = "StatusMessage";
@@ -1030,8 +1026,8 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
-	public void maxKeepAliveNegativeValue() {
+	@RetryExtension.TestWithRetry
+	void maxKeepAliveNegativeValue() {
 		assertThatThrownBy( () -> createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.MAX_KEEP_ALIVE, -1 );
@@ -1043,17 +1039,17 @@ public class ElasticsearchClientFactoryImplIT {
 				);
 	}
 
-	@Test
-	public void maxKeepAliveConnectionIsNotClosed() throws InterruptedException {
+	@RetryExtension.TestWithRetry
+	void maxKeepAliveConnectionIsNotClosed() throws InterruptedException {
 		maxKeepAliveConnection( 100000, 1 );
 	}
 
-	@Test
-	public void maxKeepAliveConnectionIsClosed() throws InterruptedException {
+	@RetryExtension.TestWithRetry
+	void maxKeepAliveConnectionIsClosed() throws InterruptedException {
 		maxKeepAliveConnection( 10, 2 );
 	}
 
-	public void maxKeepAliveConnection(long time, int connections) throws InterruptedException {
+	void maxKeepAliveConnection(long time, int connections) throws InterruptedException {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessage";
 		String responseBody = "{ \"foo\": \"bar\" }";
@@ -1200,27 +1196,27 @@ public class ElasticsearchClientFactoryImplIT {
 		return builder.build();
 	}
 
-	private static String httpHostAndPortFor(WireMockRule... rules) {
-		return Arrays.stream( rules )
-				.map( rule -> "localhost:" + rule.port() )
+	private static String httpHostAndPortFor(WireMockExtension... extensions) {
+		return Arrays.stream( extensions )
+				.map( extension -> "localhost:" + extension.getPort() )
 				.collect( Collectors.joining( "," ) );
 	}
 
-	private static String httpsHostAndPortFor(WireMockRule... rules) {
-		return Arrays.stream( rules )
-				.map( rule -> "localhost:" + rule.httpsPort() )
+	private static String httpsHostAndPortFor(WireMockExtension... extensions) {
+		return Arrays.stream( extensions )
+				.map( extension -> "localhost:" + extension.getHttpsPort() )
 				.collect( Collectors.joining( "," ) );
 	}
 
-	private static String httpUrisFor(WireMockRule... rules) {
-		return Arrays.stream( rules )
-				.map( rule -> "http://localhost:" + rule.port() )
+	private static String httpUrisFor(WireMockExtension... extensions) {
+		return Arrays.stream( extensions )
+				.map( extension -> "http://localhost:" + extension.getPort() )
 				.collect( Collectors.joining( "," ) );
 	}
 
-	private static String httpsUrisFor(WireMockRule... rules) {
-		return Arrays.stream( rules )
-				.map( rule -> "https://localhost:" + rule.httpsPort() )
+	private static String httpsUrisFor(WireMockExtension... extensions) {
+		return Arrays.stream( extensions )
+				.map( extension -> "https://localhost:" + extension.getHttpsPort() )
 				.collect( Collectors.joining( "," ) );
 	}
 

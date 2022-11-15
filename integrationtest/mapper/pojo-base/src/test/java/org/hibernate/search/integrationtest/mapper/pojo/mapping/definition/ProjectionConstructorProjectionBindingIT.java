@@ -27,28 +27,28 @@ import org.hibernate.search.mapper.pojo.search.definition.mapping.annotation.Pro
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test common use cases of the {@link ProjectionBinding} annotation.
  */
 @SuppressWarnings("unused")
 @TestForIssue(jiraKey = "HSEARCH-4574")
-public class ProjectionConstructorProjectionBindingIT {
+class ProjectionConstructorProjectionBindingIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
@@ -57,7 +57,7 @@ public class ProjectionConstructorProjectionBindingIT {
 	}
 
 	@Test
-	public void simple() {
+	void simple() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -124,7 +124,7 @@ public class ProjectionConstructorProjectionBindingIT {
 	}
 
 	@Test
-	public void missingBinderReference() {
+	void missingBinderReference() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -154,7 +154,7 @@ public class ProjectionConstructorProjectionBindingIT {
 	}
 
 	@Test
-	public void params() {
+	void params() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -213,7 +213,7 @@ public class ProjectionConstructorProjectionBindingIT {
 	}
 
 	@Test
-	public void params_paramNotDefined() {
+	void params_paramNotDefined() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -244,7 +244,7 @@ public class ProjectionConstructorProjectionBindingIT {
 	}
 
 	@Test
-	public void params_paramDefinedTwice() {
+	void params_paramDefinedTwice() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -280,7 +280,7 @@ public class ProjectionConstructorProjectionBindingIT {
 	}
 
 	@Test
-	public void params_programmaticMapping() {
+	void params_programmaticMapping() {
 
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {

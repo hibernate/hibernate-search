@@ -22,15 +22,15 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.google.gson.JsonObject;
 
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-public class ElasticsearchProjectionDslIT {
+class ElasticsearchProjectionDslIT {
 
 	private static final int ASIMOV_ID = 1;
 	private static final int MARTINEZ_ID = 2;
@@ -40,19 +40,19 @@ public class ElasticsearchProjectionDslIT {
 	private static final int BOOK3_ID = 3;
 	private static final int BOOK4_ID = 4;
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = setupHelper.start().setup( Book.class, Author.class, EmbeddableGeoPoint.class );
 		initData();
 	}
 
 	@Test
-	public void source() {
+	void source() {
 		withinSearchSession( searchSession -> {
 			// tag::elasticsearch-source[]
 			List<JsonObject> hits = searchSession.search( Book.class )
@@ -66,7 +66,7 @@ public class ElasticsearchProjectionDslIT {
 	}
 
 	@Test
-	public void explanation() {
+	void explanation() {
 		withinSearchSession( searchSession -> {
 			// tag::elasticsearch-explanation[]
 			List<JsonObject> hits = searchSession.search( Book.class )
@@ -80,7 +80,7 @@ public class ElasticsearchProjectionDslIT {
 	}
 
 	@Test
-	public void jsonHit() {
+	void jsonHit() {
 		withinSearchSession( searchSession -> {
 			// tag::elasticsearch-jsonHit[]
 			List<JsonObject> hits = searchSession.search( Book.class )

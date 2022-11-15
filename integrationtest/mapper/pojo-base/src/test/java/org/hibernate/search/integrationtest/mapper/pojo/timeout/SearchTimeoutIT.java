@@ -21,36 +21,36 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SearchTimeoutIT {
+class SearchTimeoutIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private SearchMapping mapping;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectSchema( INDEX_NAME, b -> b.field( "keyword", String.class ) );
 		mapping = setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
-	public void truncateAfter() {
+	void truncateAfter() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchQuery<EntityReference> query = session.search( IndexedEntity.class )
 					.selectEntityReference()
@@ -70,7 +70,7 @@ public class SearchTimeoutIT {
 	}
 
 	@Test
-	public void failAfter() {
+	void failAfter() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchQuery<EntityReference> query = session.search( IndexedEntity.class )
 					.selectEntityReference()

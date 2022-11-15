@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.indexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.time.Year;
 import java.util.Map;
@@ -26,24 +26,24 @@ import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJob;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class HibernateOrmJakartaBatchIT extends AbstractHibernateOrmMassIndexingIT {
+class HibernateOrmJakartaBatchIT extends AbstractHibernateOrmMassIndexingIT {
 
 	private static final int JOB_TIMEOUT_MS = 30_000;
 	private static final int THREAD_SLEEP = 1000;
 
-	@Before
-	public void checkAssumptions() {
+	@BeforeEach
+	void checkAssumptions() {
 		assumeTrue(
-				"This test only makes sense if the backend supports explicit purge",
-				BackendConfigurations.simple().supportsExplicitPurge()
+				BackendConfigurations.simple().supportsExplicitPurge(),
+				"This test only makes sense if the backend supports explicit purge"
 		);
 	}
 
 	@Test
-	public void simple() throws Exception {
+	void simple() throws Exception {
 		// tag::simple[]
 		Properties jobProps = MassIndexingJob.parameters() // <1>
 				.forEntities( Book.class, Author.class ) // <2>
@@ -63,7 +63,7 @@ public class HibernateOrmJakartaBatchIT extends AbstractHibernateOrmMassIndexing
 	}
 
 	@Test
-	public void reindexOnly() throws Exception {
+	void reindexOnly() throws Exception {
 		// tag::reindexOnly[]
 		Properties jobProps = MassIndexingJob.parameters() // <1>
 				.forEntities( Author.class ) // <2>

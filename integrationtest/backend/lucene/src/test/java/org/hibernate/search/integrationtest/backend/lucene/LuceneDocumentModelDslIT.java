@@ -12,23 +12,23 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class LuceneDocumentModelDslIT {
+class LuceneDocumentModelDslIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private StubMappedIndex index;
 
 	@Test
-	public void unknownAnalyzer() {
+	void unknownAnalyzer() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					ctx.createTypeFactory().asString()
@@ -44,7 +44,7 @@ public class LuceneDocumentModelDslIT {
 	}
 
 	@Test
-	public void unknownNormalizer() {
+	void unknownNormalizer() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					ctx.createTypeFactory().asString()
@@ -60,7 +60,7 @@ public class LuceneDocumentModelDslIT {
 	}
 
 	@Test
-	public void unknownSearchAnalyzer() {
+	void unknownSearchAnalyzer() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					ctx.createTypeFactory().asString()

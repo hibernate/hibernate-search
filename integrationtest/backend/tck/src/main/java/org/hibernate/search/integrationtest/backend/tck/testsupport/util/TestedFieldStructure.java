@@ -11,8 +11,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import org.hibernate.search.integrationtest.backend.tck.search.sort.FieldSortBaseIT;
-
 /**
  * Represents the structure of a tested field: located at the root or in a nested document,
  * single-valued or multi-valued, ...
@@ -25,7 +23,7 @@ import org.hibernate.search.integrationtest.backend.tck.search.sort.FieldSortBas
  * You need set up your test to create one field per structure,
  * and then query the "fieldStructure" object in your test instance to target a different field
  * based on that.
- * See for example {@link FieldSortBaseIT}.
+ * See for example {@code org.hibernate.search.integrationtest.backend.tck.search.sort.FieldSortBaseIT}.
  */
 public class TestedFieldStructure {
 

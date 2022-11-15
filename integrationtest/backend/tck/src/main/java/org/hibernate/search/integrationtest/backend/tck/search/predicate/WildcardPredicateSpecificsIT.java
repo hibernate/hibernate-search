@@ -18,18 +18,18 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.Analyz
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class WildcardPredicateSpecificsIT {
+class WildcardPredicateSpecificsIT {
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
@@ -57,15 +57,15 @@ public class WildcardPredicateSpecificsIT {
 	private static final String TERM_MATCHING_PATTERN_2 = "iNTroSPEctiOn";
 	private static final String TERM_MATCHING_PATTERN_2_AND_3 = "Internationalization";
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	private static final DataSet dataSet = new DataSet();
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		BulkIndexer indexer = index.bulkIndexer();
@@ -75,7 +75,7 @@ public class WildcardPredicateSpecificsIT {
 
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testWildcardQuery")
-	public void matchSingleToken() {
+	void matchSingleToken() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 		Function<String, SearchQueryFinalStep<DocumentReference>> createQuery = queryString -> scope.query()
@@ -93,7 +93,7 @@ public class WildcardPredicateSpecificsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3612")
-	public void normalizeMatchingExpression() {
+	void normalizeMatchingExpression() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().normalizedField.relativeFieldName;
 		Function<String, SearchQueryFinalStep<DocumentReference>> createQuery = queryString -> scope.query()
@@ -111,7 +111,7 @@ public class WildcardPredicateSpecificsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3844") // Used to throw NPE
-	public void nonAnalyzedField() {
+	void nonAnalyzedField() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().nonAnalyzedField.relativeFieldName;
 		Function<String, SearchQueryFinalStep<DocumentReference>> createQuery = queryString -> scope.query()
@@ -134,7 +134,7 @@ public class WildcardPredicateSpecificsIT {
 	}
 
 	@Test
-	public void emptyString() {
+	void emptyString() {
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 
 		assertThatQuery( index.query()

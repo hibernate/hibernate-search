@@ -17,24 +17,24 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ScaledNumberField;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class DefaultDecimalScaleMappingIT {
+class DefaultDecimalScaleMappingIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
-	public void mapping() {
+	void mapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "scaled", BigDecimal.class, f -> f.defaultDecimalScale( 7 ) )
 				.field( "unscaled", BigDecimal.class, f -> f.defaultDecimalScale( 0 ) )
@@ -52,7 +52,7 @@ public class DefaultDecimalScaleMappingIT {
 	}
 
 	@Test
-	public void bigIntegerIdMapping() {
+	void bigIntegerIdMapping() {
 		backendMock.expectSchema( IdWithScale.NAME, b -> b
 				.field( "id", BigInteger.class, f -> f.defaultDecimalScale( 0 ) )
 				.field( "other", BigInteger.class, f -> f.defaultDecimalScale( 0 ) )
@@ -64,7 +64,7 @@ public class DefaultDecimalScaleMappingIT {
 	}
 
 	@Test
-	public void bigDecimalIdMapping() {
+	void bigDecimalIdMapping() {
 		backendMock.expectSchema( DecimalIdWithScale.NAME, b -> b
 				.field( "id", BigDecimal.class, f -> f.defaultDecimalScale( 2 ) )
 		);

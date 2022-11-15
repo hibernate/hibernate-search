@@ -13,16 +13,16 @@ import java.util.Arrays;
 
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.ExplicitDocIdSetIterator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.ConjunctionUtils;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.BitSet;
 
-public class ChildDocIdsTest {
+class ChildDocIdsTest {
 
 	@Test
-	public void nextChild_withoutArg() throws IOException {
+	void nextChild_withoutArg() throws IOException {
 		ChildDocIds childDocs = new ChildDocIds( bitSet( 2, 7, 10, 14, 20 ), docIdSetIterator( 4, 6, 9, 17, 18 ) );
 		assertThat( childDocs.advanceExactParent( 2 ) ).isFalse();
 
@@ -53,7 +53,7 @@ public class ChildDocIdsTest {
 	}
 
 	@Test
-	public void nextChild_withArg() throws IOException {
+	void nextChild_withArg() throws IOException {
 		ChildDocIds childDocs = new ChildDocIds( bitSet( 2, 20 ), docIdSetIterator( 4, 6, 9, 17, 18 ) );
 		assertThat( childDocs.advanceExactParent( 2 ) ).isFalse();
 
@@ -66,7 +66,7 @@ public class ChildDocIdsTest {
 	}
 
 	@Test
-	public void joinedNextChild() throws IOException {
+	void joinedNextChild() throws IOException {
 		DocIdSetIterator other = docIdSetIterator( 1, 5, 6, 8, 18, 20, 26, 28, 31, 36 );
 		ChildDocIds childDocs = new ChildDocIds( bitSet( 2, 20, 24, 30, 35, 37 ),
 				ConjunctionUtils.intersectIterators(

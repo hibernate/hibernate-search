@@ -16,32 +16,31 @@ import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.test.runner.nested.Nested;
-import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.provider.Arguments;
 
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 
-@RunWith(NestedRunner.class)
-public class FieldProjectionBaseIT {
+//CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
+// cannot make a private constructor.
+class FieldProjectionBaseIT {
+	//CHECKSTYLE:ON
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static <F> FieldProjectionTestValues<F> testValues(FieldTypeDescriptor<F> fieldType) {
 		return new FieldProjectionTestValues<>( fieldType );
 	}
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start()
 				.withIndexes( InObjectProjectionIT.mainIndex, InObjectProjectionIT.missingLevel1Index,
 						InObjectProjectionIT.missingLevel1SingleValuedFieldIndex,
@@ -67,37 +66,10 @@ public class FieldProjectionBaseIT {
 				compositeForEachMissingLevel2SingleValuedFieldIndexer );
 	}
 
-	@Test
-	public void takariCpSuiteWorkaround() {
-		// Workaround to get Takari-CPSuite to run this test.
-	}
-
 	@Nested
-	@RunWith(Parameterized.class)
-	public static class InObjectProjectionIT<F>
+	class InObjectProjectionIT<F>
 			extends AbstractProjectionInObjectProjectionIT<F, F, FieldProjectionTestValues<F>> {
 		private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = FieldTypeDescriptor.getAll();
-		private static final List<DataSet<?, ?, ?>> dataSets = new ArrayList<>();
-		private static final List<Object[]> parameters = new ArrayList<>();
-		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
-				for ( ObjectStructure singleValuedObjectStructure : new ObjectStructure[] {
-						ObjectStructure.FLATTENED,
-						ObjectStructure.NESTED } ) {
-					ObjectStructure multiValuedObjectStructure =
-							ObjectStructure.NESTED.equals( singleValuedObjectStructure )
-									|| TckConfiguration.get().getBackendFeatures()
-											.reliesOnNestedDocumentsForMultiValuedObjectProjection()
-													? ObjectStructure.NESTED
-													: ObjectStructure.FLATTENED;
-					DataSet<?, ?, ?> dataSet =
-							new DataSet<>( testValues( fieldType ), singleValuedObjectStructure, multiValuedObjectStructure );
-					dataSets.add( dataSet );
-					parameters.add( new Object[] { dataSet } );
-				}
-			}
-		}
-
 		private static final SimpleMappedIndex<IndexBinding> mainIndex =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "main" );
@@ -114,15 +86,32 @@ public class FieldProjectionBaseIT {
 				SimpleMappedIndex.of( root -> new MissingLevel2SingleValuedFieldIndexBinding( root, supportedFieldTypes ) )
 						.name( "missingLevel2Field1" );
 
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
-			return parameters;
+		private static final List<DataSet<?, ?, ?>> dataSets = new ArrayList<>();
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+				for ( ObjectStructure singleValuedObjectStructure : new ObjectStructure[] {
+						ObjectStructure.FLATTENED,
+						ObjectStructure.NESTED } ) {
+					ObjectStructure multiValuedObjectStructure =
+							ObjectStructure.NESTED.equals( singleValuedObjectStructure )
+									|| TckConfiguration.get().getBackendFeatures()
+											.reliesOnNestedDocumentsForMultiValuedObjectProjection()
+													? ObjectStructure.NESTED
+													: ObjectStructure.FLATTENED;
+					DataSet<?, ?, ?> dataSet =
+							new DataSet<>( testValues( fieldType ), singleValuedObjectStructure, multiValuedObjectStructure );
+					dataSets.add( dataSet );
+					parameters.add( Arguments.of( mainIndex, missingLevel1Index, missingLevel1SingleValuedFieldIndex,
+							missingLevel2Index,
+							missingLevel2SingleValuedFieldIndex,
+							dataSet ) );
+				}
+			}
 		}
 
-		public InObjectProjectionIT(DataSet<F, F, FieldProjectionTestValues<F>> dataSet) {
-			super( mainIndex, missingLevel1Index, missingLevel1SingleValuedFieldIndex, missingLevel2Index,
-					missingLevel2SingleValuedFieldIndex,
-					dataSet );
+		public static List<? extends Arguments> params() {
+			return parameters;
 		}
 
 		@Override
@@ -133,13 +122,13 @@ public class FieldProjectionBaseIT {
 
 		@Override
 		protected ProjectionFinalStep<F> singleValuedProjection(SearchProjectionFactory<?, ?> f,
-				String absoluteFieldPath) {
+				String absoluteFieldPath, DataSet<F, F, FieldProjectionTestValues<F>> dataSet) {
 			return f.field( absoluteFieldPath, dataSet.fieldType.getJavaType() );
 		}
 
 		@Override
 		protected ProjectionFinalStep<List<F>> multiValuedProjection(SearchProjectionFactory<?, ?> f,
-				String absoluteFieldPath) {
+				String absoluteFieldPath, DataSet<F, F, FieldProjectionTestValues<F>> dataSet) {
 			return f.field( absoluteFieldPath, dataSet.fieldType.getJavaType() ).multi();
 		}
 

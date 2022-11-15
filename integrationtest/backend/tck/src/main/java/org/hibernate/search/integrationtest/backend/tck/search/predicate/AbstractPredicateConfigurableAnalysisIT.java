@@ -17,7 +17,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPredicateSimpleAnalysisIT {
 
@@ -29,7 +29,7 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 	}
 
 	@Test
-	public void analyzerOverride() {
+	void analyzerOverride() {
 		String whitespaceAnalyzedField = index.binding().whitespaceAnalyzedField.relativeFieldName;
 		String whitespaceLowercaseAnalyzedField = index.binding().whitespaceLowercaseAnalyzedField.relativeFieldName;
 		String whitespaceLowercaseSearchAnalyzedField =
@@ -67,7 +67,7 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 	}
 
 	@Test
-	public void analyzerOverride_withNormalizer() {
+	void analyzerOverride_withNormalizer() {
 		String whitespaceAnalyzedField = index.binding().whitespaceAnalyzedField.relativeFieldName;
 
 		assertThatThrownBy( () -> index.query()
@@ -80,7 +80,7 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 	}
 
 	@Test
-	public void analyzerOverride_notExistingName() {
+	void analyzerOverride_notExistingName() {
 		String whitespaceAnalyzedField = index.binding().whitespaceAnalyzedField.relativeFieldName;
 
 		assertThatThrownBy( () -> index.query()
@@ -93,7 +93,7 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 	}
 
 	@Test
-	public void skipAnalysis() {
+	void skipAnalysis() {
 		String absoluteFieldPath = index.binding().whitespaceLowercaseAnalyzedField.relativeFieldName;
 
 		assertThatQuery( index.query()
@@ -115,7 +115,7 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 	}
 
 	@Test
-	public void analyzerOverride_normalizedStringField() {
+	void analyzerOverride_normalizedStringField() {
 		String absoluteFieldPath = index.binding().normalizedStringField.relativeFieldName;
 
 		assertThatQuery( index.query()
@@ -128,7 +128,7 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-2534", "HSEARCH-3042" })
-	public void analyzerOverride_queryOnlyAnalyzer() {
+	void analyzerOverride_queryOnlyAnalyzer() {
 		String absoluteFieldPath = index.binding().whitespaceLowercaseAnalyzedField.relativeFieldName;
 		String ngramFieldPath = index.binding().ngramSearchAnalyzedField.relativeFieldName;
 
@@ -154,7 +154,7 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 	}
 
 	@Test
-	public void multiIndex_incompatibleAnalyzer_overrideAnalyzer() {
+	void multiIndex_incompatibleAnalyzer_overrideAnalyzer() {
 		StubMappingScope scope = index.createScope( incompatibleSearchAnalyzerIndex );
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 
@@ -168,7 +168,7 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 	}
 
 	@Test
-	public void multiIndex_incompatibleAnalyzer_skipAnalysis() {
+	void multiIndex_incompatibleAnalyzer_skipAnalysis() {
 		StubMappingScope scope = index.createScope( incompatibleSearchAnalyzerIndex );
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 

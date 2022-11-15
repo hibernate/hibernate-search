@@ -16,32 +16,32 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendFeatures;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.google.gson.JsonObject;
 
 /**
  * Test the property types defined on Elasticsearch server
  */
-public class ElasticsearchFieldTypesIT {
+class ElasticsearchFieldTypesIT {
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public final ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
+	@RegisterExtension
+	public final ElasticsearchClientSpy clientSpy = ElasticsearchClientSpy.create();
 
 	private final StubMappedIndex index = StubMappedIndex.ofNonRetrievable( IndexBinding::new );
 
 	@Test
-	public void test() {
+	void test() {
 		if ( ElasticsearchTckBackendFeatures.supportsVersionCheck() ) {
 			clientSpy.expectNext(
 					ElasticsearchRequest.get().build(),

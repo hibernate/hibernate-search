@@ -15,12 +15,12 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 
@@ -28,19 +28,19 @@ import org.apache.logging.log4j.Level;
  * Check that a failing boot correctly propagates exceptions,
  * despite the complex asynchronous code used during boot.
  */
-public class ShutdownFailureIT {
+class ShutdownFailureIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
+	@RegisterExtension
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
-	public void logException() {
+	void logException() {
 		backendMock.expectAnySchema( FailingIndexedEntity.NAME );
 		SessionFactory sessionFactory = ormSetupHelper.start().setup( FailingIndexedEntity.class );
 

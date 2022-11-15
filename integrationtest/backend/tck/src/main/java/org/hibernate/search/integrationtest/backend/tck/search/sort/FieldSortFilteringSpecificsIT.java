@@ -24,57 +24,50 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests behavior related to
  * {@link org.hibernate.search.engine.search.sort.dsl.SortFilterStep#filter(Function) filtering}
  * that is not tested in {@link FieldSortBaseIT}.
  */
-@RunWith(Parameterized.class)
-public class FieldSortFilteringSpecificsIT<F> {
+class FieldSortFilteringSpecificsIT<F> {
 
 	private static Stream<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
 		return FieldTypeDescriptor.getAll().stream()
 				.filter( typeDescriptor -> typeDescriptor.isFieldSortSupported() );
 	}
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] parameters() {
-		List<Object[]> parameters = new ArrayList<>();
+	public static List<? extends Arguments> params() {
+		List<Arguments> parameters = new ArrayList<>();
 		supportedTypeDescriptors().forEach( fieldTypeDescriptor -> {
-			parameters.add( new Object[] { fieldTypeDescriptor } );
+			parameters.add( Arguments.of( fieldTypeDescriptor ) );
 		} );
-		return parameters.toArray( new Object[0][] );
+		return parameters;
 	}
 
-	@ClassRule
-	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 	}
 
-	private final FieldTypeDescriptor<F> fieldTypeDescriptor;
-
-	public FieldSortFilteringSpecificsIT(FieldTypeDescriptor<F> fieldTypeDescriptor) {
-		this.fieldTypeDescriptor = fieldTypeDescriptor;
-	}
-
-	@Test
-	public void nonNested() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void nonNested(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		String fieldPath = index.binding().flattenedObject.relativeFieldName + "."
 				+ index.binding().flattenedObject.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 
@@ -89,8 +82,9 @@ public class FieldSortFilteringSpecificsIT<F> {
 				);
 	}
 
-	@Test
-	public void invalidNestedPath_parent() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void invalidNestedPath_parent(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		String fieldPath = index.binding().nestedObject1.relativeFieldName + "."
 				+ index.binding().nestedObject1.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 		String fieldInParentPath = index.binding().fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
@@ -106,8 +100,9 @@ public class FieldSortFilteringSpecificsIT<F> {
 								+ " are allowed here." );
 	}
 
-	@Test
-	public void invalidNestedPath_sibling() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void invalidNestedPath_sibling(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		String fieldPath = index.binding().nestedObject1.relativeFieldName + "."
 				+ index.binding().nestedObject1.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 		String fieldInSiblingPath = index.binding().nestedObject2.relativeFieldName + "."

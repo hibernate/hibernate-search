@@ -24,7 +24,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractPredicateScaleCheckingIT {
 
@@ -44,7 +44,7 @@ public abstract class AbstractPredicateScaleCheckingIT {
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIndex() {
+	void multiIndex_withCompatibleIndex() {
 		StubMappingScope scope = index.createScope( compatibleIndex );
 
 		assertThatQuery( scope.query()
@@ -63,7 +63,7 @@ public abstract class AbstractPredicateScaleCheckingIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIndex() {
+	void multiIndex_withIncompatibleIndex() {
 		StubMappingScope scope = index.createScope( incompatibleIndex );
 
 		assertThatThrownBy( () -> predicate( scope.predicate(), bigDecimalFieldPath(), dataSet.bigDecimal0 ) )

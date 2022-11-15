@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.testsupport;
 
+import static org.hibernate.search.test.util.impl.JunitJupiterContextHelper.extensionContext;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,19 +22,25 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.configuration.V5MigrationHelperTestLuceneBackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
-import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendSetupStrategy;
+import org.hibernate.search.util.impl.integrationtest.common.extension.MappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmAssertionHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleEntityManagerFactoryBuilder;
+
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
 public final class V5MigrationHelperJPASetupHelper
 		extends
 		MappingSetupHelper<V5MigrationHelperJPASetupHelper.SetupContext,
 				SimpleEntityManagerFactoryBuilder,
 				SimpleEntityManagerFactoryBuilder,
-				EntityManagerFactory> {
+				EntityManagerFactory>
+		implements TestRule {
 
 	public static V5MigrationHelperJPASetupHelper create() {
 		return new V5MigrationHelperJPASetupHelper(
@@ -43,7 +51,7 @@ public final class V5MigrationHelperJPASetupHelper
 	private final OrmAssertionHelper assertionHelper;
 
 	private V5MigrationHelperJPASetupHelper(BackendSetupStrategy backendSetupStrategy) {
-		super( backendSetupStrategy );
+		super( backendSetupStrategy, Type.METHOD );
 		this.assertionHelper = new OrmAssertionHelper( backendSetupStrategy );
 	}
 
@@ -60,6 +68,23 @@ public final class V5MigrationHelperJPASetupHelper
 	@Override
 	protected void close(EntityManagerFactory toClose) {
 		toClose.close();
+	}
+
+	@Override
+	public Statement apply(Statement base, Description description) {
+		ExtensionContext context = extensionContext( description );
+		return new Statement() {
+			@Override
+			public void evaluate() throws Throwable {
+				beforeAll( context );
+				try {
+					base.evaluate();
+				}
+				finally {
+					afterAll( context );
+				}
+			}
+		};
 	}
 
 	public final class SetupContext

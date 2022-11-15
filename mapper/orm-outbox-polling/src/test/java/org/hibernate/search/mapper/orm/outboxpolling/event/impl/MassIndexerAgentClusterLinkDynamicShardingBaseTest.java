@@ -12,17 +12,14 @@ import java.util.UUID;
 
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentType;
-import org.hibernate.search.util.impl.test.runner.nested.Nested;
-import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Nested;
 
 /**
  * Base tests of {@link OutboxPollingMassIndexerAgentClusterLink}
  * with event processors using dynamic sharding.
  */
-@RunWith(NestedRunner.class)
-public class MassIndexerAgentClusterLinkDynamicShardingBaseTest {
+class MassIndexerAgentClusterLinkDynamicShardingBaseTest {
 
 	abstract static class AbstractBaseTest extends AbstractMassIndexerAgentClusterLinkBaseTest {
 
@@ -56,7 +53,7 @@ public class MassIndexerAgentClusterLinkDynamicShardingBaseTest {
 	// but should go through the waiting state first.
 	// See comments in OutboxPollingMassIndexerAgentClusterLink.
 	@Nested
-	public static class NotRegisteredTest extends AbstractBaseTest {
+	public class NotRegisteredTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
 			defineSelfNotCreatedYet();
@@ -74,7 +71,7 @@ public class MassIndexerAgentClusterLinkDynamicShardingBaseTest {
 	}
 
 	@Nested
-	public static class SuspendedTest extends AbstractBaseTest {
+	public class SuspendedTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
 			defineSelfCreatedAndStillPresent( AgentState.SUSPENDED );
@@ -92,7 +89,7 @@ public class MassIndexerAgentClusterLinkDynamicShardingBaseTest {
 	}
 
 	@Nested
-	public static class WaitingTest extends AbstractBaseTest {
+	public class WaitingTest extends AbstractBaseTest {
 
 		@Override
 		protected void defineSelf() {
@@ -113,7 +110,7 @@ public class MassIndexerAgentClusterLinkDynamicShardingBaseTest {
 	}
 
 	@Nested
-	public static class RunningTest extends AbstractBaseTest {
+	public class RunningTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
 			defineSelfCreatedAndStillPresent( AgentState.RUNNING );

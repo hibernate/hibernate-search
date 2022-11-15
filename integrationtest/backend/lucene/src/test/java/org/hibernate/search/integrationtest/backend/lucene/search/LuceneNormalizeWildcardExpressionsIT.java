@@ -14,26 +14,25 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.search.predicate.WildcardPredicateSpecificsIT;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
- * Extends {@link WildcardPredicateSpecificsIT},
+ * Extends {@code org.hibernate.search.integrationtest.backend.tck.search.predicate.WildcardPredicateSpecificsIT},
  * verifying the normalization of the terms to match in wildcard/prefix predicates,
  * when an analyzer (not just a normalizer) has been defined on the target field.
  * <p>
  * This case seems to be not already supported for the current version of Elasticsearch server.
  */
 @TestForIssue(jiraKey = "HSEARCH-3612")
-public class LuceneNormalizeWildcardExpressionsIT {
+class LuceneNormalizeWildcardExpressionsIT {
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
@@ -52,19 +51,19 @@ public class LuceneNormalizeWildcardExpressionsIT {
 	private static final String TEXT_MATCHING_PATTERN_3 = "A had to call the landlord.";
 	private static final String TEXT_MATCHING_PATTERN_2_AND_3 = "I had some interaction with that lad.";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndex( index ).setup();
 		initData();
 	}
 
 	@Test
-	public void wildcard_normalizeMatchingExpression() {
+	void wildcard_normalizeMatchingExpression() {
 		StubMappingScope scope = index.createScope();
 		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
 				.where( f -> f.wildcard().field( "analyzed" ).matching( queryString ) )
@@ -81,7 +80,7 @@ public class LuceneNormalizeWildcardExpressionsIT {
 	}
 
 	@Test
-	public void wildcard_tokenizeMatchingExpression() {
+	void wildcard_tokenizeMatchingExpression() {
 		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.wildcard().field( "analyzed" ).matching( PATTERN_1_AND_2 ) )

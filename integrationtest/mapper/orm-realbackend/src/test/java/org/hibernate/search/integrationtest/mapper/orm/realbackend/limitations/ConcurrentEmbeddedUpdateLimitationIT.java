@@ -40,8 +40,8 @@ import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.awaitility.Awaitility;
 import org.awaitility.core.ThrowingRunnable;
@@ -49,16 +49,16 @@ import org.awaitility.core.ThrowingRunnable;
 /**
  * See "limitations-parallel-embedded-update" in the documentation.
  */
-public class ConcurrentEmbeddedUpdateLimitationIT {
+class ConcurrentEmbeddedUpdateLimitationIT {
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private SessionFactory sessionFactory;
 	private boolean synchronizationAsync;
 
 	@Test
-	public void indexingStrategySession() throws Throwable {
+	void indexingStrategySession() throws Throwable {
 		synchronizationAsync = false;
 		sessionFactory = setupHelper.start()
 				// This is absolutely necessary to avoid false positives in this test
@@ -85,7 +85,7 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 	}
 
 	@Test
-	public void indexingStrategyOutbox() throws Throwable {
+	void indexingStrategyOutbox() throws Throwable {
 		synchronizationAsync = true;
 		sessionFactory = setupHelper.start()
 				.withProperty( "hibernate.search.coordination.strategy", "outbox-polling" )

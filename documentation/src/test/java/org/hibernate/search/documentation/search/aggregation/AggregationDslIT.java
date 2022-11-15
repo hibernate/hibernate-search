@@ -32,30 +32,30 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class AggregationDslIT {
+class AggregationDslIT {
 
 	private static final int BOOK1_ID = 1;
 	private static final int BOOK2_ID = 2;
 	private static final int BOOK3_ID = 3;
 	private static final int BOOK4_ID = 4;
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = setupHelper.start().setup( Book.class, BookEdition.class );
 		initData();
 	}
 
 	@Test
-	public void entryPoint() {
+	void entryPoint() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint-lambdas[]
 			SearchSession searchSession = /* ... */ // <1>
@@ -110,7 +110,7 @@ public class AggregationDslIT {
 	}
 
 	@Test
-	public void terms() {
+	void terms() {
 		withinSearchSession( searchSession -> {
 			// tag::terms[]
 			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" );
@@ -253,7 +253,7 @@ public class AggregationDslIT {
 	}
 
 	@Test
-	public void range() {
+	void range() {
 		withinSearchSession( searchSession -> {
 			// tag::range[]
 			AggregationKey<Map<Range<Double>, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
@@ -385,7 +385,7 @@ public class AggregationDslIT {
 	}
 
 	@Test
-	public void filter() {
+	void filter() {
 		withinSearchSession( searchSession -> {
 			// tag::filter[]
 			AggregationKey<Map<Range<Double>, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );

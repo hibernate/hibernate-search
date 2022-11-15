@@ -26,30 +26,30 @@ import org.hibernate.search.mapper.orm.outboxpolling.cfg.HibernateOrmMapperOutbo
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.ListAssert;
 
-public class OutboxPollingAutomaticIndexingProcessingOrderIT {
+class OutboxPollingAutomaticIndexingProcessingOrderIT {
 
 	private static final String OUTBOX_EVENT_TABLE_NAME =
 			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE;
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
 	@Test
-	public void invalid() {
+	void invalid() {
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 		assertThatThrownBy( () -> ormSetupHelper.start()
 				.withProperty( "hibernate.search.coordination.event_processor.order", "someinvalidstring" )
@@ -63,7 +63,7 @@ public class OutboxPollingAutomaticIndexingProcessingOrderIT {
 	}
 
 	@Test
-	public void default_randomUuid() {
+	void default_randomUuid() {
 		StatementSpy spy = new StatementSpy();
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 		SessionFactory sessionFactory = ormSetupHelper.start()
@@ -85,7 +85,7 @@ public class OutboxPollingAutomaticIndexingProcessingOrderIT {
 	}
 
 	@Test
-	public void default_timeUuid() {
+	void default_timeUuid() {
 		StatementSpy spy = new StatementSpy();
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 		SessionFactory sessionFactory = ormSetupHelper.start()
@@ -99,7 +99,7 @@ public class OutboxPollingAutomaticIndexingProcessingOrderIT {
 	}
 
 	@Test
-	public void auto_randomUuid() {
+	void auto_randomUuid() {
 		StatementSpy spy = new StatementSpy();
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 		SessionFactory sessionFactory = ormSetupHelper.start()
@@ -122,7 +122,7 @@ public class OutboxPollingAutomaticIndexingProcessingOrderIT {
 	}
 
 	@Test
-	public void auto_timeUuid() {
+	void auto_timeUuid() {
 		StatementSpy spy = new StatementSpy();
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 		SessionFactory sessionFactory = ormSetupHelper.start()
@@ -137,7 +137,7 @@ public class OutboxPollingAutomaticIndexingProcessingOrderIT {
 	}
 
 	@Test
-	public void none() {
+	void none() {
 		StatementSpy spy = new StatementSpy();
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 		SessionFactory sessionFactory = ormSetupHelper.start()
@@ -152,7 +152,7 @@ public class OutboxPollingAutomaticIndexingProcessingOrderIT {
 	}
 
 	@Test
-	public void time() {
+	void time() {
 		StatementSpy spy = new StatementSpy();
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 		SessionFactory sessionFactory = ormSetupHelper.start()
@@ -166,7 +166,7 @@ public class OutboxPollingAutomaticIndexingProcessingOrderIT {
 	}
 
 	@Test
-	public void id() {
+	void id() {
 		StatementSpy spy = new StatementSpy();
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 		SessionFactory sessionFactory = ormSetupHelper.start()

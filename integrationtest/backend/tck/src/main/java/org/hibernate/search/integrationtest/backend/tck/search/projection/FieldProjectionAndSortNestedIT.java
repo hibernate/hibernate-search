@@ -20,30 +20,30 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-4584")
-public class FieldProjectionAndSortNestedIT {
+class FieldProjectionAndSortNestedIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void before() {
+	@BeforeEach
+	void before() {
 		setupHelper.start().withIndex( index ).setup();
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		index.index( "1", doc -> {
 			doc.addValue( index.binding().year, 1845 );
 

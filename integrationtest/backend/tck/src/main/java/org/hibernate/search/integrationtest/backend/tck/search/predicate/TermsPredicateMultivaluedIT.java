@@ -19,22 +19,21 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.Boolea
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-public class TermsPredicateMultivaluedIT<F> {
+class TermsPredicateMultivaluedIT<F> {
 
 	private static final List<FieldTypeDescriptor<?>> types = new ArrayList<>();
 	private static final List<TypeValues<?>> typeValuesSet = new ArrayList<>();
-	private static final List<Object[]> parameters = new ArrayList<>();
+	private static final List<Arguments> parameters = new ArrayList<>();
 
 	private static final String DOC_ID = "my_only_document";
 
@@ -49,18 +48,18 @@ public class TermsPredicateMultivaluedIT<F> {
 			types.add( type );
 			TypeValues<?> typeValues = new TypeValues<>( type );
 			typeValuesSet.add( typeValues );
-			parameters.add( new Object[] { typeValues } );
+			parameters.add( Arguments.of( typeValues.values ) );
 		}
 	}
 
 	private static final SimpleMappedIndex<IndexBinding> index =
 			SimpleMappedIndex.of( root -> new IndexBinding( root, types ) ).name( "simpleField" );
 
-	@ClassRule
-	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndexes( index ).setup();
 		BulkIndexer indexer = index.bulkIndexer();
 		indexer.add( DOC_ID, doc -> {
@@ -71,19 +70,13 @@ public class TermsPredicateMultivaluedIT<F> {
 		indexer.join();
 	}
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<Object[]> parameters() {
+	public static List<? extends Arguments> params() {
 		return parameters;
 	}
 
-	private final TermsPredicateTestValues<F> values;
-
-	public TermsPredicateMultivaluedIT(TypeValues<F> typeValues) {
-		this.values = typeValues.values;
-	}
-
-	@Test
-	public void matchingAny_rightTerms() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void matchingAny_rightTerms(TermsPredicateTestValues<F> values) {
 		String path = index.binding().field.get( values.fieldType() ).relativeFieldName;
 		for ( int i = 0; i < values.size(); i++ ) {
 			F term = values.matchingArg( i );
@@ -92,8 +85,9 @@ public class TermsPredicateMultivaluedIT<F> {
 		}
 	}
 
-	@Test
-	public void matchingAny_wrongTerms() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void matchingAny_wrongTerms(TermsPredicateTestValues<F> values) {
 		String path = index.binding().field.get( values.fieldType() ).relativeFieldName;
 		for ( int i = 0; i < values.nonMatchingArgsSize(); i++ ) {
 			F term = values.nonMatchingArg( i );
@@ -102,8 +96,9 @@ public class TermsPredicateMultivaluedIT<F> {
 		}
 	}
 
-	@Test
-	public void matchingAll_someTerms() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void matchingAll_someTerms(TermsPredicateTestValues<F> values) {
 		String path = index.binding().field.get( values.fieldType() ).relativeFieldName;
 
 		F firstTerm = null;
@@ -122,8 +117,9 @@ public class TermsPredicateMultivaluedIT<F> {
 				.hasDocRefHitsAnyOrder( index.typeName(), DOC_ID );
 	}
 
-	@Test
-	public void matchingAll_allTerms() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void matchingAll_allTerms(TermsPredicateTestValues<F> values) {
 		String path = index.binding().field.get( values.fieldType() ).relativeFieldName;
 
 		F firstTerm = null;
@@ -142,8 +138,9 @@ public class TermsPredicateMultivaluedIT<F> {
 				.hasDocRefHitsAnyOrder( index.typeName(), DOC_ID );
 	}
 
-	@Test
-	public void matchingAll_oneWrongTerm() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void matchingAll_oneWrongTerm(TermsPredicateTestValues<F> values) {
 		String path = index.binding().field.get( values.fieldType() ).relativeFieldName;
 
 		F firstTerm = null;

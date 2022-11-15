@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import org.hibernate.BaseSessionEventListener;
 import org.hibernate.Session;

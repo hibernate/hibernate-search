@@ -22,19 +22,15 @@ import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @SuppressWarnings({ "unchecked", "rawtypes" }) // Raw types are the only way to mock parameterized types
-public class ElasticsearchDefaultWorkSequenceBuilderTest {
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+class ElasticsearchDefaultWorkSequenceBuilderTest {
 
 	@Mock
 	private ElasticsearchWorkExecutionContext contextMock;
@@ -42,7 +38,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest {
 	private final List<Object> mocks = new ArrayList<>();
 
 	@Test
-	public void simple() {
+	void simple() {
 		NonBulkableWork<Object> work1 = work( 1 );
 		NonBulkableWork<Object> work2 = work( 2 );
 
@@ -100,7 +96,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest {
 	}
 
 	@Test
-	public void bulk() {
+	void bulk() {
 		NonBulkableWork<Object> work1 = work( 1 );
 		BulkableWork<Object> work2 = bulkableWork( 2 );
 		BulkableWork<Object> work3 = bulkableWork( 3 );
@@ -199,7 +195,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest {
 	}
 
 	@Test
-	public void newSequenceOnReset() {
+	void newSequenceOnReset() {
 		NonBulkableWork<Void> work1 = work( 1 );
 		NonBulkableWork<Void> work2 = work( 2 );
 
@@ -254,7 +250,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest {
 	}
 
 	@Test
-	public void error_work() {
+	void error_work() {
 		NonBulkableWork<Object> work0 = work( 0 );
 		NonBulkableWork<Void> work1 = work( 1 );
 		NonBulkableWork<Object> work2 = work( 2 );
@@ -315,7 +311,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest {
 	}
 
 	@Test
-	public void error_bulk_work() {
+	void error_bulk_work() {
 		BulkableWork<Void> work1 = bulkableWork( 1 );
 		BulkableWork<Void> work2 = bulkableWork( 2 );
 		BulkableWork<Void> work3 = bulkableWork( 3 );
@@ -385,7 +381,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest {
 	}
 
 	@Test
-	public void error_bulk_result() {
+	void error_bulk_result() {
 		BulkableWork<Void> work1 = bulkableWork( 1 );
 		BulkableWork<Void> work2 = bulkableWork( 2 );
 		BulkableWork<Void> work3 = bulkableWork( 3 );
@@ -467,7 +463,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest {
 	}
 
 	@Test
-	public void error_bulk_resultExtraction_singleFailure() {
+	void error_bulk_resultExtraction_singleFailure() {
 		BulkableWork<Object> work1 = bulkableWork( 1 );
 		BulkableWork<Void> work2 = bulkableWork( 2 );
 		BulkableWork<Object> work3 = bulkableWork( 3 );
@@ -546,7 +542,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest {
 	}
 
 	@Test
-	public void error_bulk_resultExtraction_multipleFailures() {
+	void error_bulk_resultExtraction_multipleFailures() {
 		BulkableWork<Object> work1 = bulkableWork( 1 );
 		BulkableWork<Object> work2 = bulkableWork( 2 );
 		NonBulkableWork<Object> work3 = work( 3 );
@@ -617,7 +613,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest {
 	}
 
 	@Test
-	public void error_bulk_resultExtraction_future_singleFailure() {
+	void error_bulk_resultExtraction_future_singleFailure() {
 		BulkableWork<Object> work1 = bulkableWork( 1 );
 		BulkableWork<Void> work2 = bulkableWork( 2 );
 		BulkableWork<Object> work3 = bulkableWork( 3 );
@@ -696,7 +692,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest {
 	}
 
 	@Test
-	public void error_bulk_resultExtraction_future_multipleFailures() {
+	void error_bulk_resultExtraction_future_multipleFailures() {
 		BulkableWork<Object> work1 = bulkableWork( 1 );
 		BulkableWork<Object> work2 = bulkableWork( 2 );
 		NonBulkableWork<Object> work3 = work( 3 );
@@ -777,7 +773,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest {
 	 * and in the worst case could even deadlock.
 	 */
 	@Test
-	public void intertwinedSequenceExecution() {
+	void intertwinedSequenceExecution() {
 		NonBulkableWork<Object> work1 = work( 1 );
 		NonBulkableWork<Object> work2 = work( 2 );
 		NonBulkableWork<Object> work3 = work( 3 );

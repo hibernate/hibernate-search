@@ -19,21 +19,18 @@ import org.hibernate.search.documentation.mapper.orm.binding.propertybridge.para
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-public class PropertyBridgeBridgedElementIT {
-	@Parameterized.Parameters(name = "{0}")
-	public static List<?> params() {
+class PropertyBridgeBridgedElementIT {
+	public static List<? extends Arguments> params() {
 		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
-				BackendConfigurations.simple(),
 				mapping -> {
 					//tag::programmatic[]
 					TypeMappingStep invoiceMapping = mapping.type( Invoice.class );
@@ -43,19 +40,21 @@ public class PropertyBridgeBridgedElementIT {
 				} );
 	}
 
-	@Parameterized.Parameter
-	@Rule
-	public DocumentationSetupHelper setupHelper;
-
+	@RegisterExtension
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
+			BackendConfigurations.simple() );
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	public void init(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		setupHelper.withAnnotationProcessingEnabled( annotationProcessingEnabled )
+				.withMappingConfigurer( mappingContributor );
 		entityManagerFactory = setupHelper.start().setup( Invoice.class );
 	}
 
-	@Test
-	public void smoke() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void smoke(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Invoice invoice = new Invoice();
 			invoice.getLineItems()

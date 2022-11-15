@@ -31,54 +31,42 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expect
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexNode;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test default value bridges for the {@code @GenericField} annotation.
  */
-@RunWith(Parameterized.class)
-public class FieldDefaultBridgeBaseIT<V, F> {
+class FieldDefaultBridgeBaseIT<V, F> {
 	private static final String FIELD_NAME = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_FIELD_NAME;
 	private static final String FIELD_INDEXNULLAS_NAME =
 			DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_FIELD_INDEXNULLAS_NAME;
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[] types() {
+	public static List<? extends Arguments> params() {
 		return PropertyTypeDescriptor.getAll().stream()
-				.map( type -> new Object[] { type, type.getDefaultValueBridgeExpectations() } )
-				.toArray();
+				.map( type -> Arguments.of( type, type.getDefaultValueBridgeExpectations() ) )
+				.collect( Collectors.toList() );
 	}
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	private final PropertyTypeDescriptor<V, F> typeDescriptor;
-	private final DefaultValueBridgeExpectations<V, F> expectations;
 	private SearchMapping mapping;
 	private StubIndexNode index1Field;
 	private StubIndexNode index2Field;
 
-	public FieldDefaultBridgeBaseIT(PropertyTypeDescriptor<V, F> typeDescriptor,
-			DefaultValueBridgeExpectations<V, F> expectations) {
-		this.typeDescriptor = typeDescriptor;
-		this.expectations = expectations;
-	}
-
-	@Before
-	public void setup() {
+	public void setup(PropertyTypeDescriptor<V, F> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
 		backendMock.expectSchema(
 				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME, b -> {
 					b.field( FIELD_NAME, expectations.getIndexFieldJavaType() );
@@ -110,11 +98,13 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void indexing() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void indexing(PropertyTypeDescriptor<V, F> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
+		setup( typeDescriptor, expectations );
 		try ( SearchSession session = mapping.createSession() ) {
 			int id = 0;
-			for ( V propertyValue : getPropertyValues() ) {
+			for ( V propertyValue : getPropertyValues( typeDescriptor ) ) {
 				Object entity = expectations.instantiateTypeWithValueBridge1( id, propertyValue );
 				session.indexingPlan().add( entity );
 				++id;
@@ -124,7 +114,7 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 					DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME
 			);
 			id = 0;
-			for ( F expectedFieldValue : getDocumentFieldValues() ) {
+			for ( F expectedFieldValue : getDocumentFieldValues( typeDescriptor ) ) {
 				expectationSetter.add( String.valueOf( id ), b -> {
 					b.field( FIELD_NAME, expectedFieldValue );
 
@@ -139,8 +129,10 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void projection() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projection(PropertyTypeDescriptor<V, F> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
+		setup( typeDescriptor, expectations );
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchQuery<V> query = session.search( expectations.getTypeWithValueBridge1() )
 					.select( f -> f.field( FIELD_NAME, typeDescriptor.getBoxedJavaType() ) )
@@ -151,18 +143,20 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 					DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME,
 					StubSearchWorkBehavior.of(
 							2L,
-							getDocumentFieldValues().toArray()
+							getDocumentFieldValues( typeDescriptor ).toArray()
 					)
 			);
 
 			assertThat( query.fetchAll().hits() )
-					.containsExactlyElementsOf( getProjectionValues() );
+					.containsExactlyElementsOf( getProjectionValues( typeDescriptor ) );
 		}
 	}
 
 	// Test behavior that backends expect from our bridges when using the DSLs
-	@Test
-	public void dslConverter() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void dslConverter(PropertyTypeDescriptor<V, F> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
+		setup( typeDescriptor, expectations );
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		DslConverter<V, ?> dslConverter =
@@ -188,8 +182,8 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 				dslConverter.unknownTypeToDocumentValue( null, toDocumentConvertContext )
 		)
 				.isNull();
-		Iterator<F> fieldValuesIterator = getDocumentFieldValues().iterator();
-		for ( V propertyValue : getPropertyValues() ) {
+		Iterator<F> fieldValuesIterator = getDocumentFieldValues( typeDescriptor ).iterator();
+		for ( V propertyValue : getPropertyValues( typeDescriptor ) ) {
 			F fieldValue = fieldValuesIterator.next();
 			assertThat(
 					dslConverter.toDocumentValue( propertyValue, toDocumentConvertContext )
@@ -210,8 +204,10 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 	}
 
 	// Test behavior that backends expect from our bridges when using projections
-	@Test
-	public void projectionConverter() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projectionConverter(PropertyTypeDescriptor<V, F> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
+		setup( typeDescriptor, expectations );
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		ProjectionConverter<F, V> projectionConverter =
@@ -253,8 +249,8 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 					projectionConverter.fromDocumentValue( null, fromDocumentConvertContext )
 			)
 					.isNull();
-			Iterator<V> projectionValuesIterator = getProjectionValues().iterator();
-			for ( F fieldValue : getDocumentFieldValues() ) {
+			Iterator<V> projectionValuesIterator = getProjectionValues( typeDescriptor ).iterator();
+			for ( F fieldValue : getDocumentFieldValues( typeDescriptor ) ) {
 				V projectionValue = projectionValuesIterator.next();
 				assertThat(
 						projectionConverter.fromDocumentValue( fieldValue, fromDocumentConvertContext )
@@ -264,7 +260,7 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 		}
 	}
 
-	private List<V> getPropertyValues() {
+	private List<V> getPropertyValues(PropertyTypeDescriptor<V, F> typeDescriptor) {
 		List<V> propertyValues = new ArrayList<>( typeDescriptor.values().entityModelValues );
 		if ( typeDescriptor.isNullable() ) {
 			propertyValues.add( null );
@@ -272,7 +268,7 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 		return propertyValues;
 	}
 
-	private List<V> getProjectionValues() {
+	private List<V> getProjectionValues(PropertyTypeDescriptor<V, F> typeDescriptor) {
 		List<V> values = typeDescriptor.values().entityModelValues.stream()
 				.map( typeDescriptor::toProjectedValue )
 				.collect( Collectors.toList() );
@@ -282,7 +278,7 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 		return values;
 	}
 
-	private List<F> getDocumentFieldValues() {
+	private List<F> getDocumentFieldValues(PropertyTypeDescriptor<V, F> typeDescriptor) {
 		List<F> documentFieldValues = new ArrayList<>( typeDescriptor.values().documentFieldValues );
 		if ( typeDescriptor.isNullable() ) {
 			documentFieldValues.add( null );

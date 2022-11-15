@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.junit.Assert.assertFalse;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,27 +24,27 @@ import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-1710")
-public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
+class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectAnySchema( Group.INDEX );
 		backendMock.expectAnySchema( Post.INDEX );
 
@@ -58,7 +57,7 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		with( sessionFactory ).runInTransaction( session -> {
 			Group group = new Group();
 			group.setId( 1 );
@@ -96,10 +95,10 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 			// The posts should not be initialized
 			assertThat( group.getPosts() )
 					.isInstanceOf( PersistentCollection.class )
-					.satisfies( p -> assertFalse(
-							"The posts should not be initialized",
-							Hibernate.isInitialized( p )
-					) );
+					.satisfies( p -> assertThat( Hibernate.isInitialized( p ) )
+							.as( "The posts should not be initialized" )
+							.isFalse()
+					);
 
 			group.setSomeField( "updatedValue" );
 
@@ -116,10 +115,10 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 		Group group = groupFromModifyingTransaction.get();
 		assertThat( group.getPosts() )
 				.isInstanceOf( PersistentCollection.class )
-				.satisfies( p -> assertFalse(
-						"The posts should not be initialized by Hibernate Search",
-						Hibernate.isInitialized( p )
-				) );
+				.satisfies( p -> assertThat( Hibernate.isInitialized( p ) )
+						.as( "The posts should not be initialized by Hibernate Search" )
+						.isFalse()
+				);
 	}
 
 	@Entity(name = "Group_")

@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalize;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,55 +36,54 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests behavior specific to the terms aggregation on supported field types.
  * <p>
  * Behavior common to all single-field aggregations is tested in {@link SingleFieldAggregationBaseIT}.
  */
-@RunWith(Parameterized.class)
-public class TermsAggregationSpecificsIT<F> {
+class TermsAggregationSpecificsIT<F> {
 
 	private static final String AGGREGATION_NAME = "aggregationName";
 
-	private static Set<FieldTypeDescriptor<?>> supportedFieldTypes;
-	private static List<DataSet<?>> dataSets;
+	private static final Set<FieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
+	private static final List<DataSet<?>> dataSets = new ArrayList<>();
+	private static final List<Arguments> parameters = new ArrayList<>();
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] parameters() {
-		supportedFieldTypes = new LinkedHashSet<>();
-		dataSets = new ArrayList<>();
-		List<Object[]> parameters = new ArrayList<>();
+	static {
 		AggregationDescriptor aggregationDescriptor = TermsAggregationDescriptor.INSTANCE;
 		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
 			if ( aggregationDescriptor.getSingleFieldAggregationExpectations( fieldType ).isSupported() ) {
 				supportedFieldTypes.add( fieldType );
 				DataSet<?> dataSet = new DataSet<>( fieldType );
 				dataSets.add( dataSet );
-				parameters.add( new Object[] { fieldType, dataSet } );
+				parameters.add( Arguments.of( fieldType, dataSet ) );
 			}
 		}
-		return parameters.toArray( new Object[0][] );
 	}
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public static List<? extends Arguments> params() {
+		return parameters;
+	}
+
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		for ( DataSet<?> dataSet : dataSets ) {
@@ -92,22 +91,15 @@ public class TermsAggregationSpecificsIT<F> {
 		}
 	}
 
-	private final FieldTypeDescriptor<F> fieldType;
-	private final DataSet<F> dataSet;
-
-	public TermsAggregationSpecificsIT(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
-		this.fieldType = fieldType;
-		this.dataSet = dataSet;
-	}
-
-	@Test
-	public void superClassFieldType() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void superClassFieldType(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		Class<? super F> superClass = fieldType.getJavaType().getSuperclass();
 
-		doTestSuperClassFieldType( superClass );
+		doTestSuperClassFieldType( superClass, fieldType, dataSet );
 	}
 
-	private <S> void doTestSuperClassFieldType(Class<S> superClass) {
+	private <S> void doTestSuperClassFieldType(Class<S> superClass, FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<S, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -123,15 +115,16 @@ public class TermsAggregationSpecificsIT<F> {
 						// All documents should be mentioned in the aggregation, even those excluded by the limit/offset
 						containsInAnyOrder( c -> {
 							dataSet.documentIdPerTerm.forEach( (key, value) -> c.accept( key, (long) value.size() ) );
-						} )
+						}, fieldType )
 				);
 	}
 
 	/**
 	 * Check that defining a predicate will affect the aggregation result.
 	 */
-	@Test
-	public void predicate() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void predicate(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -153,15 +146,16 @@ public class TermsAggregationSpecificsIT<F> {
 						// Only document 0 should be taken into account by the aggregation
 						containsInAnyOrder( c -> {
 							c.accept( firstTermEntry.getKey(), 2L );
-						} )
+						}, fieldType )
 				);
 	}
 
 	/**
 	 * Check that defining a limit and offset will <strong>not</strong> affect the aggregation result.
 	 */
-	@Test
-	public void limitAndOffset() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void limitAndOffset(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -176,13 +170,14 @@ public class TermsAggregationSpecificsIT<F> {
 						// All documents should be mentioned in the aggregation, even those excluded by the limit/offset
 						containsInAnyOrder( c -> {
 							dataSet.documentIdPerTerm.forEach( (key, value) -> c.accept( key, (long) value.size() ) );
-						} )
+						}, fieldType )
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testDefaultSortOrderIsCount")
-	public void order_default() {
+	void order_default(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -200,13 +195,14 @@ public class TermsAggregationSpecificsIT<F> {
 							for ( F value : dataSet.valuesInDescendingDocumentCountOrder ) {
 								c.accept( value, (long) dataSet.documentIdPerTerm.get( value ).size() );
 							}
-						} )
+						}, fieldType )
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testCountSortOrderDesc")
-	public void orderByCountDescending() {
+	void orderByCountDescending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -226,13 +222,14 @@ public class TermsAggregationSpecificsIT<F> {
 							for ( F value : dataSet.valuesInDescendingDocumentCountOrder ) {
 								c.accept( value, (long) dataSet.documentIdPerTerm.get( value ).size() );
 							}
-						} )
+						}, fieldType )
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testCountSortOrderAsc")
-	public void orderByCountAscending() {
+	void orderByCountAscending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		assumeNonDefaultOrdersSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -254,12 +251,13 @@ public class TermsAggregationSpecificsIT<F> {
 							for ( F value : dataSet.valuesInAscendingDocumentCountOrder ) {
 								c.accept( value, (long) dataSet.documentIdPerTerm.get( value ).size() );
 							}
-						} )
+						}, fieldType )
 				);
 	}
 
-	@Test
-	public void orderByTermDescending() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void orderByTermDescending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		assumeNonDefaultOrdersSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -281,13 +279,14 @@ public class TermsAggregationSpecificsIT<F> {
 							for ( F value : dataSet.valuesInDescendingOrder ) {
 								c.accept( value, (long) dataSet.documentIdPerTerm.get( value ).size() );
 							}
-						} )
+						}, fieldType )
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testAlphabeticalSortOrder")
-	public void orderByTermAscending() {
+	void orderByTermAscending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		assumeNonDefaultOrdersSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -309,13 +308,14 @@ public class TermsAggregationSpecificsIT<F> {
 							for ( F value : dataSet.valuesInAscendingOrder ) {
 								c.accept( value, (long) dataSet.documentIdPerTerm.get( value ).size() );
 							}
-						} )
+						}, fieldType )
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testZeroCountsExcluded")
-	public void minDocumentCount_positive() {
+	void minDocumentCount_positive(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -338,13 +338,14 @@ public class TermsAggregationSpecificsIT<F> {
 									c.accept( key, (long) documentCount );
 								}
 							} );
-						} )
+						}, fieldType )
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testZeroCountsIncluded")
-	public void minDocumentCount_zero() {
+	void minDocumentCount_zero(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -374,12 +375,13 @@ public class TermsAggregationSpecificsIT<F> {
 								c.accept( e.getKey(), (long) e.getValue().size() );
 							} );
 							c.accept( firstTermEntry.getKey(), 0L );
-						} )
+						}, fieldType )
 				);
 	}
 
-	@Test
-	public void minDocumentCount_zero_noMatch() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void minDocumentCount_zero_noMatch(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -403,12 +405,13 @@ public class TermsAggregationSpecificsIT<F> {
 							for ( F value : dataSet.valuesInAscendingOrder ) {
 								c.accept( value, 0L );
 							}
-						} )
+						}, fieldType )
 				);
 	}
 
-	@Test
-	public void minDocumentCount_zero_noMatch_orderByTermDescending() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void minDocumentCount_zero_noMatch_orderByTermDescending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		assumeNonDefaultOrdersSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -435,12 +438,13 @@ public class TermsAggregationSpecificsIT<F> {
 							for ( F value : dataSet.valuesInDescendingOrder ) {
 								c.accept( value, 0L );
 							}
-						} )
+						}, fieldType )
 				);
 	}
 
-	@Test
-	public void minDocumentCount_negative() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void minDocumentCount_negative(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		assertThatThrownBy( () -> index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
@@ -450,10 +454,11 @@ public class TermsAggregationSpecificsIT<F> {
 				.hasMessageContaining( "must be positive or zero" );
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-776")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testMaxFacetCounts")
-	public void maxTermCount_positive() {
+	void maxTermCount_positive(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -475,7 +480,7 @@ public class TermsAggregationSpecificsIT<F> {
 							F valueWithMostDocuments = dataSet.valuesInDescendingDocumentCountOrder.get( 0 );
 							c.accept( valueWithMostDocuments,
 									(long) dataSet.documentIdPerTerm.get( valueWithMostDocuments ).size() );
-						} )
+						}, fieldType )
 				);
 	}
 
@@ -483,8 +488,9 @@ public class TermsAggregationSpecificsIT<F> {
 	 * Test maxTermCount with a non-default sort by ascending term value.
 	 * The returned terms should be the "lowest" dataSet.values.
 	 */
-	@Test
-	public void maxTermCount_positive_orderByTermAscending() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void maxTermCount_positive_orderByTermAscending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		assumeNonDefaultOrdersSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -508,12 +514,13 @@ public class TermsAggregationSpecificsIT<F> {
 						containsInAnyOrder( c -> {
 							F lowestValue = dataSet.valuesInAscendingOrder.get( 0 );
 							c.accept( lowestValue, (long) dataSet.documentIdPerTerm.get( lowestValue ).size() );
-						} )
+						}, fieldType )
 				);
 	}
 
-	@Test
-	public void maxTermCount_positive_orderByCountAscending() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void maxTermCount_positive_orderByCountAscending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		assumeNonDefaultOrdersSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -538,12 +545,13 @@ public class TermsAggregationSpecificsIT<F> {
 							F valueWithLeastDocuments = dataSet.valuesInAscendingDocumentCountOrder.get( 0 );
 							c.accept( valueWithLeastDocuments,
 									(long) dataSet.documentIdPerTerm.get( valueWithLeastDocuments ).size() );
-						} )
+						}, fieldType )
 				);
 	}
 
-	@Test
-	public void maxTermCount_zero() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void maxTermCount_zero(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		assertThatThrownBy( () -> index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
@@ -553,8 +561,9 @@ public class TermsAggregationSpecificsIT<F> {
 				.hasMessageContaining( "must be strictly positive" );
 	}
 
-	@Test
-	public void maxTermCount_negative() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void maxTermCount_negative(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		assertThatThrownBy( () -> index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
@@ -564,9 +573,10 @@ public class TermsAggregationSpecificsIT<F> {
 				.hasMessageContaining( "must be strictly positive" );
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4544")
-	public void maxTermCount_integerMaxValue() {
+	void maxTermCount_integerMaxValue(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -582,16 +592,17 @@ public class TermsAggregationSpecificsIT<F> {
 							for ( F value : dataSet.valuesInDescendingOrder ) {
 								c.accept( value, (long) dataSet.documentIdPerTerm.get( value ).size() );
 							}
-						} )
+						}, fieldType )
 				);
 	}
 
 	// This is interesting even if we already test Integer.MAX_VALUE (see above),
 	// because Lucene has some hardcoded limits for PriorityQueue sizes,
 	// somewhere around 2147483631, which is lower than Integer.MAX_VALUE.
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4544")
-	public void maxTermCount_veryLarge() {
+	void maxTermCount_veryLarge(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -607,7 +618,7 @@ public class TermsAggregationSpecificsIT<F> {
 							for ( F value : dataSet.valuesInDescendingOrder ) {
 								c.accept( value, (long) dataSet.documentIdPerTerm.get( value ).size() );
 							}
-						} )
+						}, fieldType )
 				);
 	}
 
@@ -617,13 +628,14 @@ public class TermsAggregationSpecificsIT<F> {
 
 	private void assumeNonDefaultOrdersSupported() {
 		assumeTrue(
-				"Non-default orders are not supported for terms aggregations with this backend",
-				TckConfiguration.get().getBackendFeatures().nonDefaultOrderInTermsAggregations()
+				TckConfiguration.get().getBackendFeatures().nonDefaultOrderInTermsAggregations(),
+				"Non-default orders are not supported for terms aggregations with this backend"
 		);
 	}
 
 	@SuppressWarnings("unchecked")
-	private <K, V> Consumer<Map<F, V>> containsExactly(Consumer<BiConsumer<F, V>> expectationBuilder) {
+	private <K, V> Consumer<Map<F, V>> containsExactly(Consumer<BiConsumer<F, V>> expectationBuilder,
+			FieldTypeDescriptor<F> fieldType) {
 		List<Map.Entry<F, V>> expected = new ArrayList<>();
 		expectationBuilder.accept( (k, v) -> expected.add( entry( fieldType.toExpectedDocValue( k ), v ) ) );
 		return actual -> assertThat( normalize( actual ) )
@@ -631,7 +643,8 @@ public class TermsAggregationSpecificsIT<F> {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <K, V> Consumer<Map<K, V>> containsInAnyOrder(Consumer<BiConsumer<F, V>> expectationBuilder) {
+	private <K, V> Consumer<Map<K, V>> containsInAnyOrder(Consumer<BiConsumer<F, V>> expectationBuilder,
+			FieldTypeDescriptor<F> fieldType) {
 		List<Map.Entry<F, V>> expected = new ArrayList<>();
 		expectationBuilder.accept( (k, v) -> expected.add( entry( fieldType.toExpectedDocValue( k ), v ) ) );
 		return actual -> assertThat( normalize( actual ).entrySet() )

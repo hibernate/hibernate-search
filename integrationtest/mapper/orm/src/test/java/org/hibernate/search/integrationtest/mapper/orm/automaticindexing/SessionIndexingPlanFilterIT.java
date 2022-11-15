@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -17,13 +18,13 @@ import java.util.Map;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
+class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 
 	@Test
-	public void directPersistUpdateDelete() {
-		setupHolder.runInTransaction( session -> {
+	void directPersistUpdateDelete() {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
 
 			IndexedEntity entity1 = new IndexedEntity();
@@ -43,7 +44,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
 
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
@@ -52,7 +53,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
 
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
@@ -66,8 +67,8 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void directPersistUpdateDeleteOfNotDisabledEntity() {
-		setupHolder.runInTransaction( session -> {
+	void directPersistUpdateDeleteOfNotDisabledEntity() {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
 
 			IndexedEntity entity0 = new IndexedEntity();
@@ -99,7 +100,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
 
 			OtherIndexedEntity entity1 = session.get( OtherIndexedEntity.class, 10 );
@@ -113,7 +114,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
 
 			IndexedEntity entity0 = session.get( IndexedEntity.class, 1 );
@@ -132,9 +133,9 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void hierarchyFiltering() {
+	void hierarchyFiltering() {
 		// exclude all except one specific class.
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( EntityA.class )
 					.include( Entity2A.class ) );
 
@@ -149,7 +150,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		backendMock.verifyExpectationsMet();
 
 		// exclude all except one class branch.
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( EntityA.class )
 					.include( Entity1A.class ) );
 
@@ -166,7 +167,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		backendMock.verifyExpectationsMet();
 
 		// only include - should include all since no excludes.
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.include( Entity1A.class ) );
 
 			session.persist( new EntityA( 100, "test" ) );
@@ -187,8 +188,8 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void sameClassFails() {
-		setupHolder.runInTransaction( session -> {
+	void sameClassFails() {
+		with( sessionFactory ).runInTransaction( session -> {
 			assertThatThrownBy( () -> Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( EntityA.class )
 					.include( EntityA.class ) )
 			).isInstanceOf( SearchException.class )
@@ -212,8 +213,8 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void sameNameFails() {
-		setupHolder.runInTransaction( session -> {
+	void sameNameFails() {
+		with( sessionFactory ).runInTransaction( session -> {
 			assertThatThrownBy( () -> Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.include( EntityA.INDEX )
 							.exclude( EntityA.INDEX )
@@ -229,11 +230,11 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void applicationFilterDisableAll() {
-		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+	void applicationFilterDisableAll() {
+		Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> ctx.exclude( EntityA.class )
 		);
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			session.persist( new EntityA( 1, "test" ) );
 			session.persist( new Entity1A( 2, "test" ) );
 			session.persist( new Entity1B( 3, "test" ) );
@@ -241,7 +242,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.include( Entity2A.class ) );
 
 			session.persist( new EntityA( 10, "test" ) );
@@ -256,12 +257,12 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void applicationFilterExcludeSessionInclude() {
-		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+	void applicationFilterExcludeSessionInclude() {
+		Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> ctx.exclude( Entity2A.class )
 		);
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.include( Entity2A.class ) );
 
 			session.persist( new Entity2A( 40, "test" ) );
@@ -273,13 +274,13 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void applicationFilterIncludeOneSubtypeSessionIncludesAnother() {
-		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+	void applicationFilterIncludeOneSubtypeSessionIncludesAnother() {
+		Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> ctx.exclude( EntityA.class )
 						.include( Entity1B.class )
 		);
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.include( Entity2A.class ) );
 
 			session.persist( new Entity1B( 30, "test" ) );
@@ -294,8 +295,8 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void filterByMappedSuperclass() {
-		setupHolder.runInTransaction( session -> {
+	void filterByMappedSuperclass() {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( SuperClass.class ) );
 
 			session.persist( new EntityFromSuperclass( 100, "test" ) );
@@ -304,8 +305,8 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void filterByNotIndexedEntity() {
-		setupHolder.runInTransaction( session -> {
+	void filterByNotIndexedEntity() {
+		with( sessionFactory ).runInTransaction( session -> {
 			assertThatThrownBy( () -> Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( SimpleNotIndexedEntity.class )
 			)
@@ -319,8 +320,8 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void filterByRandomClass() {
-		setupHolder.runInTransaction( session -> {
+	void filterByRandomClass() {
+		with( sessionFactory ).runInTransaction( session -> {
 			assertThatThrownBy( () -> Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( NotAnEntity.class )
 			)
@@ -334,8 +335,8 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void filterByNotIndexedEntityFormSupertypeWithIndexedSubtype() {
-		setupHolder.runInTransaction( session -> {
+	void filterByNotIndexedEntityFormSupertypeWithIndexedSubtype() {
+		with( sessionFactory ).runInTransaction( session -> {
 			assertThatThrownBy( () -> Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( NotIndexedEntityFromSuperclass.class )
 			)
@@ -349,8 +350,8 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void filterByIndexedTypeNotAnEntity() {
-		setupHolder.runInTransaction( session -> {
+	void filterByIndexedTypeNotAnEntity() {
+		with( sessionFactory ).runInTransaction( session -> {
 			assertThatThrownBy( () -> Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( IndexedNotAnEntity.class )
 			)
@@ -364,8 +365,8 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void filterByIntegerShouldFail() {
-		setupHolder.runInTransaction( session -> {
+	void filterByIntegerShouldFail() {
+		with( sessionFactory ).runInTransaction( session -> {
 			assertThatThrownBy( () -> Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.include( Integer.class )
 			)
@@ -376,7 +377,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type"
 					);
 		} );
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			assertThatThrownBy( () -> Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( Integer.class )
 			)
@@ -390,8 +391,8 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void filterBySomeString() {
-		setupHolder.runInTransaction( session -> {
+	void filterBySomeString() {
+		with( sessionFactory ).runInTransaction( session -> {
 			String name = "this is not a name that should work";
 			assertThatThrownBy( () -> Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( name )
@@ -417,8 +418,8 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void filterByContainedEntityWontAffectContainingOnes() {
-		setupHolder.runInTransaction( session -> {
+	void filterByContainedEntityWontAffectContainingOnes() {
+		with( sessionFactory ).runInTransaction( session -> {
 			// to prepare data we ignore containing/indexed entity
 			Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( IndexedEntity.class )
@@ -441,7 +442,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			// now disable contained entity to not produce updates on containing:
 			Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( ContainedEntity.class )
@@ -450,7 +451,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 			entity1.setIndexedField( "updatedValue" );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( IndexedEntity.class )
 			);
@@ -465,8 +466,8 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void filterByInterfaceMustFail() {
-		setupHolder.runInTransaction( session -> {
+	void filterByInterfaceMustFail() {
+		with( sessionFactory ).runInTransaction( session -> {
 			assertThatThrownBy( () -> Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( InterfaceA.class )
 			)
@@ -489,8 +490,8 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void excludeByNameOfNotIndexedSupertype() {
-		setupHolder.runInTransaction( session -> {
+	void excludeByNameOfNotIndexedSupertype() {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( NotIndexedEntity.NAME ) );
 
 			session.persist( new IndexedSubtypeOfNotIndexedEntity( 40, "test", "test" ) );
@@ -500,8 +501,8 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 
 	// Maps are used to represent dynamic types and we want to make sure that passing a Map won't work.
 	@Test
-	public void filterByMapInterfaceMustFail() {
-		setupHolder.runInTransaction( session -> {
+	void filterByMapInterfaceMustFail() {
+		with( sessionFactory ).runInTransaction( session -> {
 			assertThatThrownBy( () -> Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( Map.class )
 			)
@@ -515,8 +516,8 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void dynamicTypeByNameDirectPersistUpdateDelete() {
-		setupHolder.runInTransaction( session -> {
+	void dynamicTypeByNameDirectPersistUpdateDelete() {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( DYNAMIC_BASE_TYPE_A ) );
 
 			Map<String, Object> entity1 = new HashMap<>();
@@ -534,7 +535,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( DYNAMIC_BASE_TYPE_A ) );
 
 			@SuppressWarnings("unchecked")
@@ -543,7 +544,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( DYNAMIC_BASE_TYPE_A ) );
 
 			session.remove( session.get( DYNAMIC_SUBTYPE_B, 1 ) );
@@ -554,11 +555,11 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void dynamicTypeByNameApplicationDisableAllSessionEnableSubtype() {
-		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+	void dynamicTypeByNameApplicationDisableAllSessionEnableSubtype() {
+		Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> ctx.exclude( DYNAMIC_BASE_TYPE_A )
 		);
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.include( DYNAMIC_SUBTYPE_B ) );
 
 			Map<String, Object> entity1 = new HashMap<>();
@@ -582,8 +583,8 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void excludeByNameOfNotIndexedSupertypeDynamicTypes() {
-		setupHolder.runInTransaction( session -> {
+	void excludeByNameOfNotIndexedSupertypeDynamicTypes() {
+		with( sessionFactory ).runInTransaction( session -> {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( DYNAMIC_NOT_INDEXED_BASE_TYPE_A ) );
 
 			Map<String, Object> entity1 = new HashMap<>();
@@ -596,8 +597,8 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void excludeByNameOfNotIndexedSupertypeThatHasNoIndexedOrContainedSubtypesDynamicTypes() {
-		setupHolder.runInTransaction( session -> {
+	void excludeByNameOfNotIndexedSupertypeThatHasNoIndexedOrContainedSubtypesDynamicTypes() {
+		with( sessionFactory ).runInTransaction( session -> {
 			assertThatThrownBy( () -> Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( DYNAMIC_NOT_INDEXED_BASE_TYPE_B )
 			)

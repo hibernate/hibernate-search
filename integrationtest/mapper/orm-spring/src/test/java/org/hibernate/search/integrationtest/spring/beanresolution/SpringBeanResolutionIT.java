@@ -24,15 +24,15 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,7 @@ import org.springframework.stereotype.Component;
  * exactly as many times as expected.
  */
 @TestForIssue(jiraKey = { "HSEARCH-1316", "HSEARCH-3171" })
-public class SpringBeanResolutionIT {
+class SpringBeanResolutionIT {
 
 	@Configuration
 	@EnableAutoConfiguration
@@ -84,17 +84,17 @@ public class SpringBeanResolutionIT {
 		}
 	}
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
-	public StaticCounters counters = new StaticCounters();
+	@RegisterExtension
+	public StaticCounters counters = StaticCounters.create();
 
 	@Test
-	public void singleton_byType() {
+	void singleton_byType() {
 		doTest(
 				ExpectedScope.SINGLETON, UnnamedSingletonBean.KEYS,
 				BeanReference.of( UnnamedSingletonBean.class )
@@ -102,7 +102,7 @@ public class SpringBeanResolutionIT {
 	}
 
 	@Test
-	public void singleton_byName() {
+	void singleton_byName() {
 		doTest(
 				ExpectedScope.SINGLETON, NamedSingletonBean.KEYS,
 				BeanReference.of( InterfaceDefinedByMapper.class, NamedSingletonBean.NAME )
@@ -110,7 +110,7 @@ public class SpringBeanResolutionIT {
 	}
 
 	@Test
-	public void prototype_byType() {
+	void prototype_byType() {
 		doTest(
 				ExpectedScope.PROTOTYPE, UnnamedPrototypeBean.KEYS,
 				BeanReference.of( UnnamedPrototypeBean.class )
@@ -118,7 +118,7 @@ public class SpringBeanResolutionIT {
 	}
 
 	@Test
-	public void prototype_byName() {
+	void prototype_byName() {
 		doTest(
 				ExpectedScope.PROTOTYPE, NamedPrototypeBean.KEYS,
 				BeanReference.of( InterfaceDefinedByMapper.class, NamedPrototypeBean.NAME )

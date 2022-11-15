@@ -27,16 +27,16 @@ import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 
@@ -53,21 +53,21 @@ import org.assertj.core.api.InstanceOfAssertFactories;
 		"org.hibernate.search.test.integration.wildfly.cdi.CDIInjectionIT",
 		"org.hibernate.search.test.integration.wildfly.cdi.CDIInjectionLifecycleEventsIT"
 })
-public class CdiBeanResolutionIT {
+class CdiBeanResolutionIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
-	public StaticCounters counters = new StaticCounters();
+	@RegisterExtension
+	public StaticCounters counters = StaticCounters.create();
 
 	private SeContainer cdiContainer;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		final SeContainerInitializer cdiInitializer = SeContainerInitializer.newInstance()
 				.disableDiscovery()
 				.addBeanClasses(
@@ -80,15 +80,15 @@ public class CdiBeanResolutionIT {
 		this.cdiContainer = cdiInitializer.initialize();
 	}
 
-	@After
-	public void tearDown() {
+	@AfterEach
+	void tearDown() {
 		if ( cdiContainer != null ) {
 			cdiContainer.close();
 		}
 	}
 
 	@Test
-	public void singleton_byType() {
+	void singleton_byType() {
 		doTest(
 				ExpectedScope.SINGLETON, UnnamedSingletonBean.KEYS,
 				BeanReference.of( UnnamedSingletonBean.class )
@@ -96,7 +96,7 @@ public class CdiBeanResolutionIT {
 	}
 
 	@Test
-	public void singleton_byName() {
+	void singleton_byName() {
 		doTest(
 				ExpectedScope.SINGLETON, NamedSingletonBean.KEYS,
 				BeanReference.of( InterfaceDefinedByMapper.class, NamedSingletonBean.NAME )
@@ -104,7 +104,7 @@ public class CdiBeanResolutionIT {
 	}
 
 	@Test
-	public void dependent_byType() {
+	void dependent_byType() {
 		doTest(
 				ExpectedScope.DEPENDENT, UnnamedDependentBean.KEYS,
 				BeanReference.of( UnnamedDependentBean.class )
@@ -112,7 +112,7 @@ public class CdiBeanResolutionIT {
 	}
 
 	@Test
-	public void dependent_byName() {
+	void dependent_byName() {
 		doTest(
 				ExpectedScope.DEPENDENT, NamedDependentBean.KEYS,
 				BeanReference.of( InterfaceDefinedByMapper.class, NamedDependentBean.NAME )

@@ -17,26 +17,26 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class GenericPropertyIT {
+class GenericPropertyIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private SearchMapping mapping;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "genericProperty", b2 -> b2
 						/*
@@ -55,7 +55,7 @@ public class GenericPropertyIT {
 	}
 
 	@Test
-	public void index() {
+	void index() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.id = 1;

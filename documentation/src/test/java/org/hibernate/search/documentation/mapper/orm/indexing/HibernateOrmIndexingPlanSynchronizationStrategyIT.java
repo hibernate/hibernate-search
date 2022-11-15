@@ -21,21 +21,21 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyNames;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class HibernateOrmIndexingPlanSynchronizationStrategyIT {
+class HibernateOrmIndexingPlanSynchronizationStrategyIT {
 	private static final String BOOK1_TITLE = "I, Robot";
 
 	private static final String BOOK2_TITLE = "The Caves of Steel";
 
 	private static final String BOOK3_TITLE = "The Robots of Dawn";
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	@Test
-	public void synchronizationStrategyOverride() {
+	void synchronizationStrategyOverride() {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,

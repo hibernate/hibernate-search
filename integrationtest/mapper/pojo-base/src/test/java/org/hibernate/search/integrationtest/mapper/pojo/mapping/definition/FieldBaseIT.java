@@ -21,13 +21,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test common use cases of the {@code @*Field} annotations.
@@ -40,19 +40,19 @@ import org.junit.Test;
  * Does not test uses of container value extractors, which are tested in {@link FieldContainerExtractorBaseIT}
  * (and others, see javadoc on that class).
  */
-public class FieldBaseIT {
+class FieldBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void valueBridge_default_noMatch() {
+	void valueBridge_default_noMatch() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -74,7 +74,7 @@ public class FieldBaseIT {
 
 	@Test
 	@SuppressWarnings("rawtypes")
-	public void valueBridge_default_noMatch_enumSuperClassRaw() {
+	void valueBridge_default_noMatch_enumSuperClassRaw() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -94,7 +94,7 @@ public class FieldBaseIT {
 	}
 
 	@Test
-	public void valueBridge_default_noMatch_enumSuperClassWithWildcard() {
+	void valueBridge_default_noMatch_enumSuperClassWithWildcard() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -115,7 +115,7 @@ public class FieldBaseIT {
 	}
 
 	@Test
-	public void valueBridge_default_noMatch_enumSuperClassWithParameters() {
+	void valueBridge_default_noMatch_enumSuperClassWithParameters() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -141,7 +141,7 @@ public class FieldBaseIT {
 	}
 
 	@Test
-	public void valueBridge_invalidInputType() {
+	void valueBridge_invalidInputType() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -161,7 +161,7 @@ public class FieldBaseIT {
 	}
 
 	@Test
-	public void valueBridge_invalidInputType_implicitContainerExtractor() {
+	void valueBridge_invalidInputType_implicitContainerExtractor() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -197,7 +197,7 @@ public class FieldBaseIT {
 	}
 
 	@Test
-	public void valueBridge_valueBinder() {
+	void valueBridge_valueBinder() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -224,7 +224,7 @@ public class FieldBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3243")
-	public void valueBridge_implicitInputType_generic() {
+	void valueBridge_implicitInputType_generic() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -262,7 +262,7 @@ public class FieldBaseIT {
 	}
 
 	@Test
-	public void indexNullAs() {
+	void indexNullAs() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -302,7 +302,7 @@ public class FieldBaseIT {
 	}
 
 	@Test
-	public void indexNullAs_noParsing() {
+	void indexNullAs_noParsing() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId

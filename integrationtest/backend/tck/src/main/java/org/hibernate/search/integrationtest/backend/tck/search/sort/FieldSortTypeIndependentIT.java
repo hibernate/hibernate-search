@@ -12,14 +12,14 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests related to behavior independent from the field type
@@ -28,20 +28,20 @@ import org.junit.Test;
  * Behavior that is specific to the field type is tested elsewhere,
  * e.g. {@link FieldSortBaseIT} and {@link FieldSortUnsupportedTypesIT}.
  */
-public class FieldSortTypeIndependentIT {
+class FieldSortTypeIndependentIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndex( index ).setup();
 	}
 
 	@Test
-	public void unknownField() {
+	void unknownField() {
 		StubMappingScope scope = index.createScope();
 
 		String absoluteFieldPath = "unknownField";
@@ -60,7 +60,7 @@ public class FieldSortTypeIndependentIT {
 	}
 
 	@Test
-	public void objectField_nested() {
+	void objectField_nested() {
 		StubMappingScope scope = index.createScope();
 
 		String absoluteFieldPath = index.binding().nestedObject.relativeFieldName;
@@ -75,7 +75,7 @@ public class FieldSortTypeIndependentIT {
 	}
 
 	@Test
-	public void objectField_flattened() {
+	void objectField_flattened() {
 		StubMappingScope scope = index.createScope();
 
 		String absoluteFieldPath = index.binding().flattenedObject.relativeFieldName;

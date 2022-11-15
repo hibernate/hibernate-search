@@ -18,33 +18,31 @@ import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-import org.assertj.core.api.AssertionsForClassTypes;
+class HighlightProjectionTypeIndependentIT {
 
-public class HighlightProjectionTypeIndependentIT {
-
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 	private static final SimpleMappedIndex<NestedIndexBinding> nestedIndex =
 			SimpleMappedIndex.of( NestedIndexBinding::new ).name( "nestedIndex" );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).withIndex( nestedIndex ).setup();
 	}
 
 	@Test
-	public void unknownField() {
+	void unknownField() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy(
@@ -59,7 +57,7 @@ public class HighlightProjectionTypeIndependentIT {
 	}
 
 	@Test
-	public void objectField_nested() {
+	void objectField_nested() {
 		String fieldPath = index.binding().nestedObject.relativeFieldName;
 		StubMappingScope scope = index.createScope();
 
@@ -70,7 +68,7 @@ public class HighlightProjectionTypeIndependentIT {
 	}
 
 	@Test
-	public void objectField_flattened() {
+	void objectField_flattened() {
 		String fieldPath = index.binding().flattenedObject.relativeFieldName;
 		StubMappingScope scope = index.createScope();
 
@@ -81,8 +79,8 @@ public class HighlightProjectionTypeIndependentIT {
 	}
 
 	@Test
-	public void highlighterNullName() {
-		AssertionsForClassTypes.assertThatThrownBy(
+	void highlighterNullName() {
+		assertThatThrownBy(
 				() -> index.createScope().query().select(
 						f -> f.highlight( "string1" )
 				).where( f -> f.matchAll() )
@@ -95,8 +93,8 @@ public class HighlightProjectionTypeIndependentIT {
 	}
 
 	@Test
-	public void highlighterEmptyName() {
-		AssertionsForClassTypes.assertThatThrownBy(
+	void highlighterEmptyName() {
+		assertThatThrownBy(
 				() -> index.createScope().query().select(
 						f -> f.highlight( "string1" )
 				).where( f -> f.matchAll() )
@@ -109,8 +107,8 @@ public class HighlightProjectionTypeIndependentIT {
 	}
 
 	@Test
-	public void highlighterSameName() {
-		AssertionsForClassTypes.assertThatThrownBy(
+	void highlighterSameName() {
+		assertThatThrownBy(
 				() -> index.createScope().query().select(
 						f -> f.highlight( "string1" )
 				).where( f -> f.matchAll() )
@@ -124,8 +122,8 @@ public class HighlightProjectionTypeIndependentIT {
 	}
 
 	@Test
-	public void cannotHighlightNestedObjectStructureFields() {
-		AssertionsForClassTypes.assertThatThrownBy( () -> nestedIndex.createScope().query().select(
+	void cannotHighlightNestedObjectStructureFields() {
+		assertThatThrownBy( () -> nestedIndex.createScope().query().select(
 				f -> f.highlight( "nested.nestedString" )
 		).where( f -> f.matchAll() )
 				.toQuery() ).isInstanceOf( SearchException.class )

@@ -18,24 +18,24 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.SchemaManagementWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.SchemaManagementWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public abstract class AbstractSchemaManagementStrategyIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
-	public void noIndexedType() {
+	void noIndexedType() {
 		SchemaManagementStrategyName strategyName = getStrategyName();
 		SessionFactory sessionFactory = setupHelper.start()
 				.withProperty(
@@ -52,7 +52,7 @@ public abstract class AbstractSchemaManagementStrategyIT {
 	}
 
 	@Test
-	public void success() {
+	void success() {
 		expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
 		expectWork( IndexedEntity2.NAME, CompletableFuture.completedFuture( null ) );
 
@@ -68,7 +68,7 @@ public abstract class AbstractSchemaManagementStrategyIT {
 	}
 
 	@Test
-	public void exception_single() {
+	void exception_single() {
 		RuntimeException exception = new RuntimeException( "My exception" );
 
 		expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
@@ -82,7 +82,7 @@ public abstract class AbstractSchemaManagementStrategyIT {
 	}
 
 	@Test
-	public void exception_multiple() {
+	void exception_multiple() {
 		RuntimeException exception1 = new RuntimeException( "My exception 1" );
 		RuntimeException exception2 = new RuntimeException( "My exception 2" );
 		expectWork( IndexedEntity1.NAME, exceptionFuture( exception1 ) );

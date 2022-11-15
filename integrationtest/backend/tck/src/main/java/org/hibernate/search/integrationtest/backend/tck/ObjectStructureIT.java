@@ -21,16 +21,16 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ObjectStructureIT {
+class ObjectStructureIT {
 
 	private static final String EXPECTED_NESTED_MATCH_ID = "nestedQueryShouldMatchId";
 	private static final String EXPECTED_NON_NESTED_MATCH_ID = "nonNestedQueryShouldMatchId";
@@ -45,20 +45,20 @@ public class ObjectStructureIT {
 	private static final Integer NON_MATCHING_INTEGER = 442;
 	private static final LocalDate NON_MATCHING_LOCAL_DATE = LocalDate.of( 2018, 2, 15 );
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
-	public void index_error_invalidFieldForDocumentElement_root() {
+	void index_error_invalidFieldForDocumentElement_root() {
 		assertThatThrownBy( () -> index.index( "willNotWork", document -> {
 			DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
 			flattenedObject.addValue( index.binding().string, "willNotWork" );
@@ -72,7 +72,7 @@ public class ObjectStructureIT {
 	}
 
 	@Test
-	public void index_error_invalidFieldForDocumentElement_flattened() {
+	void index_error_invalidFieldForDocumentElement_flattened() {
 		assertThatThrownBy( () -> index.index( "willNotWork",
 				document -> document.addValue( index.binding().flattenedObject.string, "willNotWork" ) ) )
 				.isInstanceOf( SearchException.class )
@@ -83,7 +83,7 @@ public class ObjectStructureIT {
 	}
 
 	@Test
-	public void index_error_invalidFieldForDocumentElement_nested() {
+	void index_error_invalidFieldForDocumentElement_nested() {
 		assertThatThrownBy( () -> index.index( "willNotWork",
 				document -> document.addValue( index.binding().nestedObject.string, "willNotWork" ) ) )
 				.isInstanceOf( SearchException.class )
@@ -94,7 +94,7 @@ public class ObjectStructureIT {
 	}
 
 	@Test
-	public void search_match() {
+	void search_match() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -123,7 +123,7 @@ public class ObjectStructureIT {
 	}
 
 	@Test
-	public void search_range() {
+	void search_range() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -159,7 +159,7 @@ public class ObjectStructureIT {
 	}
 
 	@Test
-	public void search_error_nonNestedField() {
+	void search_error_nonNestedField() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.predicate().nested( "flattenedObject" )
@@ -171,7 +171,7 @@ public class ObjectStructureIT {
 	}
 
 	@Test
-	public void search_error_nonObjectField() {
+	void search_error_nonObjectField() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.predicate().nested( "flattenedObject.string" )
@@ -182,7 +182,7 @@ public class ObjectStructureIT {
 	}
 
 	@Test
-	public void search_error_missingField() {
+	void search_error_missingField() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.predicate().nested( "doesNotExist" )

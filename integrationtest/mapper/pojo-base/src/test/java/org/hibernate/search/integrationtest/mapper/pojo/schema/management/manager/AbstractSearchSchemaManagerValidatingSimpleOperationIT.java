@@ -15,13 +15,13 @@ import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 		extends AbstractSearchSchemaManagerSimpleOperationIT {
 
 	@Test
-	public void failure_single() {
+	void failure_single() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchSchemaManager manager = searchSession
 					.scope( Object.class )
@@ -42,7 +42,7 @@ public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 	}
 
 	@Test
-	public void failure_multiple() {
+	void failure_multiple() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchSchemaManager manager = searchSession
 					.scope( Object.class )
@@ -68,7 +68,7 @@ public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 	}
 
 	@Test
-	public void failure_exception() {
+	void failure_exception() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchSchemaManager manager = searchSession
 					.scope( Object.class )

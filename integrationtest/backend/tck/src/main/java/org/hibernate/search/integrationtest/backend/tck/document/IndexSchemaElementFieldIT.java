@@ -16,13 +16,13 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test the behavior of implementations of {@link IndexSchemaElement} when defining fields.
@@ -31,15 +31,15 @@ import org.junit.Test;
  * since this would require backend-specific code to inspect that schema.
  * However, in search and projection tests, we check that defined fields behave correctly at runtime.
  */
-public class IndexSchemaElementFieldIT {
+class IndexSchemaElementFieldIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private StubMappedIndex index;
 
 	@Test
-	public void nullFieldName() {
+	void nullFieldName() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -100,7 +100,7 @@ public class IndexSchemaElementFieldIT {
 	}
 
 	@Test
-	public void emptyFieldName() {
+	void emptyFieldName() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -159,7 +159,7 @@ public class IndexSchemaElementFieldIT {
 	}
 
 	@Test
-	public void dotInFieldName() {
+	void dotInFieldName() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -238,7 +238,7 @@ public class IndexSchemaElementFieldIT {
 	}
 
 	@Test
-	public void nameCollision_fields() {
+	void nameCollision_fields() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -273,7 +273,7 @@ public class IndexSchemaElementFieldIT {
 	}
 
 	@Test
-	public void nameCollision_objectFields() {
+	void nameCollision_objectFields() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -308,7 +308,7 @@ public class IndexSchemaElementFieldIT {
 	}
 
 	@Test
-	public void nameCollision_fieldAndObjectField() {
+	void nameCollision_fieldAndObjectField() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -343,7 +343,7 @@ public class IndexSchemaElementFieldIT {
 	}
 
 	@Test
-	public void missingToReferenceCall() {
+	void missingToReferenceCall() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -373,7 +373,7 @@ public class IndexSchemaElementFieldIT {
 	}
 
 	@Test
-	public void multipleToReferenceCall() {
+	void multipleToReferenceCall() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();

@@ -28,24 +28,24 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ProjectionConverterIT {
-	@Rule
+class ProjectionConverterIT {
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = setupHelper.start().setup( Order.class );
 		initData();
 	}
 
 	@Test
-	public void projectionConverterEnabled() {
+	void projectionConverterEnabled() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -62,7 +62,7 @@ public class ProjectionConverterIT {
 	}
 
 	@Test
-	public void projectionConverterDisabled() {
+	void projectionConverterDisabled() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 

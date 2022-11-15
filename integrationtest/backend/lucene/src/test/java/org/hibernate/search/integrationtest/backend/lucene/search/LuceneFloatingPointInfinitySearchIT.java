@@ -22,34 +22,34 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptio
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class LuceneFloatingPointInfinitySearchIT<F> {
+class LuceneFloatingPointInfinitySearchIT<F> {
 
 	private static final String AGGREGATION_NAME = "aggregationName";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndex( index ).setup();
 		initData();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3685")
-	public void float_infinityIncluded() {
+	void float_infinityIncluded() {
 		String fieldPath = index.binding().floatFieldModel.relativeFieldName;
 
 		AggregationKey<Map<Range<Float>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -75,7 +75,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3685")
-	public void float_infinityExcluded() {
+	void float_infinityExcluded() {
 		String fieldPath = index.binding().floatFieldModel.relativeFieldName;
 
 		AggregationKey<Map<Range<Float>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -109,7 +109,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3685")
-	public void double_infinityIncluded() {
+	void double_infinityIncluded() {
 		String fieldPath = index.binding().doubleFieldModel.relativeFieldName;
 
 		AggregationKey<Map<Range<Double>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -135,7 +135,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3685")
-	public void double_infinityExcluded() {
+	void double_infinityExcluded() {
 		String fieldPath = index.binding().doubleFieldModel.relativeFieldName;
 
 		AggregationKey<Map<Range<Double>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );

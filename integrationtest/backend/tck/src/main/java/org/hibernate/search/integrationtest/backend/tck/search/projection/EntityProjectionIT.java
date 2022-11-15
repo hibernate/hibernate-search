@@ -29,24 +29,24 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.mockito.Mockito;
 
 @SuppressWarnings("unchecked") // Mocking parameterized types
-public class EntityProjectionIT extends AbstractEntityProjectionIT {
+class EntityProjectionIT extends AbstractEntityProjectionIT {
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new )
 			.name( "main" );
@@ -63,8 +63,8 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 		super( mainIndex, multiIndex1, multiIndex2, multiIndex3, multiIndex4 );
 	}
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndexes( mainIndex, multiIndex1, multiIndex2, multiIndex3, multiIndex4 ).setup();
 
 		final BulkIndexer mainIndexer = mainIndex.bulkIndexer();
@@ -89,7 +89,7 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 	// it should not try to retrieve fields from the object, but from the root.
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4579")
-	public void projectionRegistryFallback_noLoadingAvailable_withProjectionRegistryEntry_inObjectProjection_ignoresObjectContext() {
+	void projectionRegistryFallback_noLoadingAvailable_withProjectionRegistryEntry_inObjectProjection_ignoresObjectContext() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 
@@ -157,7 +157,7 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4574")
-	public void expectedType_exact() {
+	void expectedType_exact() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 		StubEntity doc1LoadedEntity = new StubEntity( doc1Reference );
@@ -191,7 +191,7 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4574")
-	public void expectedType_superType() {
+	void expectedType_superType() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 		StubEntity doc1LoadedEntity = new StubEntity( doc1Reference );
@@ -225,7 +225,7 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4574")
-	public void expectedType_invalid() {
+	void expectedType_invalid() {
 		SearchLoadingContext<StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 

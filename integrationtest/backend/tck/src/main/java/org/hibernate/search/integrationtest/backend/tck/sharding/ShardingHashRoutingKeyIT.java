@@ -12,7 +12,7 @@ import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
  * A basic test for hash-based sharding with explicit routing keys.
  */
 @PortedFromSearch5(original = "org.hibernate.search.test.shards.ShardsTest")
-public class ShardingHashRoutingKeyIT extends AbstractShardingRoutingKeyIT {
+class ShardingHashRoutingKeyIT extends AbstractShardingRoutingKeyIT {
 
 	private static final int SHARD_COUNT = 3;
 

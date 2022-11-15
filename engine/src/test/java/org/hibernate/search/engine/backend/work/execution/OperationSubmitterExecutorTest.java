@@ -23,16 +23,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class OperationSubmitterExecutorTest {
+class OperationSubmitterExecutorTest {
 
 	private SimpleScheduledExecutor executor;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		this.executor = new SimpleScheduledExecutor() {
 			private BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>( 1 );
 			private ThreadPoolExecutor delegate = new ThreadPoolExecutor( 1, 1,
@@ -65,13 +65,13 @@ public class OperationSubmitterExecutorTest {
 		};
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@AfterEach
+	void tearDown() throws Exception {
 		this.executor.shutdownNow();
 	}
 
 	@Test
-	public void blockingOperationSubmitterBlocksTheOperation() throws InterruptedException {
+	void blockingOperationSubmitterBlocksTheOperation() throws InterruptedException {
 		BlockingTask blockingTask = new BlockingTask();
 		executor.submit( blockingTask );
 		executor.submit( blockingTask );
@@ -99,14 +99,14 @@ public class OperationSubmitterExecutorTest {
 
 
 	@Test
-	public void nonBlockingOperationSubmitterThrowsException() {
+	void nonBlockingOperationSubmitterThrowsException() {
 		// rejecting submitter would just fail with exception all the time as our executor is blocking
 		assertThatThrownBy( () -> OperationSubmitter.rejecting().submitToExecutor( executor, () -> {}, r -> {}, (e, t) -> {} ) )
 				.isInstanceOf( RejectedExecutionException.class );
 	}
 
 	@Test
-	public void nonBlockingOperationSubmitterWorksOk() throws InterruptedException {
+	void nonBlockingOperationSubmitterWorksOk() throws InterruptedException {
 		AtomicBoolean check = new AtomicBoolean( false );
 		// if executor implements offer() rejecting can finish successfully:
 		OperationSubmitter.rejecting().submitToExecutor(
@@ -148,7 +148,7 @@ public class OperationSubmitterExecutorTest {
 	}
 
 	@Test
-	public void offloadingSubmitterOffloads() throws Exception {
+	void offloadingSubmitterOffloads() throws Exception {
 		BlockingTask blockingTask = new BlockingTask();
 		executor.submit( blockingTask );
 
@@ -161,7 +161,7 @@ public class OperationSubmitterExecutorTest {
 	}
 
 	@Test
-	public void offloadingSubmitterFailsToOffloadExceptionInProducer() throws Exception {
+	void offloadingSubmitterFailsToOffloadExceptionInProducer() throws Exception {
 		BlockingTask blockingTask = new BlockingTask();
 		executor.submit( blockingTask );
 
@@ -180,7 +180,7 @@ public class OperationSubmitterExecutorTest {
 	}
 
 	@Test
-	public void offloadingSubmitterFailsToOffloadExceptionInAction() throws Exception {
+	void offloadingSubmitterFailsToOffloadExceptionInAction() throws Exception {
 		BlockingTask blockingTask = new BlockingTask();
 		executor.submit( blockingTask );
 

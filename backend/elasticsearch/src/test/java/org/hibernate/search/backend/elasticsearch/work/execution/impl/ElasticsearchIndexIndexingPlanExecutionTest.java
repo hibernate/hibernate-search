@@ -31,23 +31,19 @@ import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @SuppressWarnings("unchecked") // Raw types are the only way to mock parameterized types
-public class ElasticsearchIndexIndexingPlanExecutionTest {
+class ElasticsearchIndexIndexingPlanExecutionTest {
 
 	private static final String TYPE_NAME = "SomeTypeName";
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	@Mock
 	private ElasticsearchSerialWorkOrchestrator orchestratorMock;
@@ -57,14 +53,14 @@ public class ElasticsearchIndexIndexingPlanExecutionTest {
 
 	private final List<SingleDocumentIndexingWork> workMocks = new ArrayList<>();
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		when( entityReferenceFactoryMock.createEntityReference( eq( TYPE_NAME ), any() ) )
 				.thenAnswer( invocation -> entityReference( invocation.getArgument( 1 ) ) );
 	}
 
 	@Test
-	public void success() {
+	void success() {
 		// Work futures: we will complete them
 		ArgumentCaptor<CompletableFuture<Void>> work1FutureCaptor = futureCaptor();
 		ArgumentCaptor<CompletableFuture<Void>> work2FutureCaptor = futureCaptor();
@@ -111,7 +107,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest {
 	}
 
 	@Test
-	public void failure_work() {
+	void failure_work() {
 		RuntimeException work1Exception = new RuntimeException( "work1" );
 
 		// Work futures: we will complete them
@@ -161,7 +157,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest {
 	}
 
 	@Test
-	public void failure_multipleWorks() {
+	void failure_multipleWorks() {
 		RuntimeException work1Exception = new RuntimeException( "work1" );
 		RuntimeException work3Exception = new RuntimeException( "work3" );
 
@@ -221,7 +217,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3851")
-	public void failure_multipleWorksAndCreateEntityReference() {
+	void failure_multipleWorksAndCreateEntityReference() {
 		RuntimeException work1Exception = new RuntimeException( "work1" );
 		RuntimeException work3Exception = new RuntimeException( "work3" );
 

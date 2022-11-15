@@ -17,15 +17,15 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class OperationSubmitterQueueTest {
+class OperationSubmitterQueueTest {
 
 	private BlockingQueue<Integer> queue;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		this.queue = new ArrayBlockingQueue<>( 2 );
 
 		OperationSubmitter.blocking().submitToQueue( queue, 1, i -> {}, (e, t) -> {} );
@@ -33,7 +33,7 @@ public class OperationSubmitterQueueTest {
 	}
 
 	@Test
-	public void blockingOperationSubmitterBlocksTheOperation() throws InterruptedException {
+	void blockingOperationSubmitterBlocksTheOperation() throws InterruptedException {
 		CompletableFuture<Boolean> future = CompletableFuture.supplyAsync( () -> {
 			try {
 				OperationSubmitter.blocking().submitToQueue( queue, 3, i -> {}, (e, t) -> {} );
@@ -57,14 +57,14 @@ public class OperationSubmitterQueueTest {
 
 
 	@Test
-	public void nonBlockingOperationSubmitterThrowsException() {
+	void nonBlockingOperationSubmitterThrowsException() {
 		Integer element = 3;
 		assertThatThrownBy( () -> OperationSubmitter.rejecting().submitToQueue( queue, element, i -> {}, (e, t) -> {} ) )
 				.isInstanceOf( RejectedExecutionException.class );
 	}
 
 	@Test
-	public void offloadingSubmitterOffloads() throws Exception {
+	void offloadingSubmitterOffloads() throws Exception {
 		// we won't submit to the queue but just make sure that work got offloaded
 		AtomicBoolean worked = new AtomicBoolean( false );
 		OperationSubmitter.offloading( Runnable::run ).submitToQueue( queue, 1, i -> { worked.set( true ); }, (e, t) -> {} );
@@ -73,7 +73,7 @@ public class OperationSubmitterQueueTest {
 	}
 
 	@Test
-	public void offloadingSubmitterFailsToOffloadExceptionInProducer() throws Exception {
+	void offloadingSubmitterFailsToOffloadExceptionInProducer() throws Exception {
 		AtomicBoolean worked = new AtomicBoolean( false );
 		OperationSubmitter.offloading( Runnable::run ).submitToQueue( queue, 1,
 				i -> { throw new IllegalStateException( "fail" ); },

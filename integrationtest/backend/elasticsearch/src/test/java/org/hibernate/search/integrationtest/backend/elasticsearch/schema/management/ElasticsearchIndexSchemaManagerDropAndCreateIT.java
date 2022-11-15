@@ -15,26 +15,26 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests related to dropping, then creating the index.
  */
-public class ElasticsearchIndexSchemaManagerDropAndCreateIT {
+class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticSearchClient = TestElasticsearchClient.create();
 
 	private final StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> root.field( "field", f -> f.asString() )
 			.toReference()
@@ -42,7 +42,7 @@ public class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3759")
-	public void alreadyExists() {
+	void alreadyExists() {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
@@ -84,7 +84,7 @@ public class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3759")
-	public void doesNotExist() {
+	void doesNotExist() {
 		elasticSearchClient.index( index.name() ).ensureDoesNotExist();
 
 		assertThat( elasticSearchClient.index( index.name() ).exists() ).isFalse();

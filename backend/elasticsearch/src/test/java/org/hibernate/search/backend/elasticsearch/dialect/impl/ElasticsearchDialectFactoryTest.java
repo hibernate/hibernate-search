@@ -22,15 +22,14 @@ import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch81ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.ElasticsearchProtocolDialect;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-public class ElasticsearchDialectFactoryTest {
+class ElasticsearchDialectFactoryTest {
 
 	private enum ExpectedOutcome {
 		UNSUPPORTED,
@@ -38,8 +37,7 @@ public class ElasticsearchDialectFactoryTest {
 		SUCCESS
 	}
 
-	@Parameterized.Parameters(name = "{0} {1}/{2} => {3}")
-	public static List<Object[]> params() {
+	public static List<? extends Arguments> params() {
 		return Arrays.asList(
 				unsupported( ElasticsearchDistributionName.ELASTIC, "0.90.12" ),
 				unsupported( ElasticsearchDistributionName.ELASTIC, "0.90.12" ),
@@ -353,65 +351,58 @@ public class ElasticsearchDialectFactoryTest {
 		);
 	}
 
-	private static Object[] unsupported(ElasticsearchDistributionName distribution, String configuredVersionString) {
-		return new Object[] {
-				distribution,
-				configuredVersionString,
-				null,
-				ExpectedOutcome.UNSUPPORTED,
-				null,
-				null
-		};
+	private static Arguments unsupported(ElasticsearchDistributionName distribution, String configuredVersionString) {
+		return Arguments.of(
+				distribution, configuredVersionString, null, ExpectedOutcome.UNSUPPORTED, null, null
+		);
 	}
 
-	private static Object[] successWithWarning(ElasticsearchDistributionName distribution,
+	private static Arguments successWithWarning(ElasticsearchDistributionName distribution,
 			String configuredVersionString, String actualVersionString,
 			Class<? extends ElasticsearchModelDialect> expectedModelDialectClass,
 			Class<? extends ElasticsearchProtocolDialect> expectedProtocolDialectClass) {
-		return new Object[] {
-				distribution,
-				configuredVersionString,
-				actualVersionString,
-				ExpectedOutcome.SUCCESS_WITH_WARNING,
-				expectedModelDialectClass,
-				expectedProtocolDialectClass
-		};
+		return Arguments.of(
+				distribution, configuredVersionString, actualVersionString,
+				ExpectedOutcome.SUCCESS_WITH_WARNING, expectedModelDialectClass, expectedProtocolDialectClass
+		);
 	}
 
-	private static Object[] success(ElasticsearchDistributionName distribution,
+	private static Arguments success(ElasticsearchDistributionName distribution,
 			String configuredVersionString, String actualVersionString,
 			Class<? extends ElasticsearchModelDialect> expectedModelDialectClass,
 			Class<? extends ElasticsearchProtocolDialect> expectedProtocolDialectClass) {
-		return new Object[] {
-				distribution,
-				configuredVersionString,
-				actualVersionString,
-				ExpectedOutcome.SUCCESS,
-				expectedModelDialectClass,
-				expectedProtocolDialectClass
-		};
+		return Arguments.of(
+				distribution, configuredVersionString, actualVersionString,
+				ExpectedOutcome.SUCCESS, expectedModelDialectClass, expectedProtocolDialectClass
+		);
 	}
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	private final ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
 
-	@Parameterized.Parameter
 	public ElasticsearchDistributionName distributionName;
-	@Parameterized.Parameter(1)
 	public String configuredVersionString;
-	@Parameterized.Parameter(2)
 	public String actualVersionString;
-	@Parameterized.Parameter(3)
-	public ExpectedOutcome expectedOutcome;
-	@Parameterized.Parameter(4)
 	public Class<? extends ElasticsearchModelDialect> expectedModelDialectClass;
-	@Parameterized.Parameter(5)
 	public Class<? extends ElasticsearchProtocolDialect> expectedProtocolDialectClass;
 
-	@Test
-	public void test() {
+	@ParameterizedTest(name = "{0} {1}/{2} => {3}")
+	@MethodSource("params")
+	void test(ElasticsearchDistributionName distributionName,
+			String configuredVersionString,
+			String actualVersionString,
+			ExpectedOutcome expectedOutcome,
+			Class<? extends ElasticsearchModelDialect> expectedModelDialectClass,
+			Class<? extends ElasticsearchProtocolDialect> expectedProtocolDialectClass
+	) {
+		this.distributionName = distributionName;
+		this.configuredVersionString = configuredVersionString;
+		this.actualVersionString = actualVersionString;
+		this.expectedModelDialectClass = expectedModelDialectClass;
+		this.expectedProtocolDialectClass = expectedProtocolDialectClass;
+
 		switch ( expectedOutcome ) {
 			case UNSUPPORTED:
 				testUnsupported();

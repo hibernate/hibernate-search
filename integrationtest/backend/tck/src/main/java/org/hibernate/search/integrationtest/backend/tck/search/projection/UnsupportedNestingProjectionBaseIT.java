@@ -14,30 +14,30 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class UnsupportedNestingProjectionBaseIT {
+class UnsupportedNestingProjectionBaseIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
 			.name( "my-index" );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndexes( index ).setup();
 		initData();
 	}
 
 	@Test
-	public void id() {
+	void id() {
 		assertThatThrownBy( () -> index.createScope().query()
 				.select( f -> f.object( "nested" ).from(
 						f.id()
@@ -54,7 +54,7 @@ public class UnsupportedNestingProjectionBaseIT {
 	}
 
 	@Test
-	public void entity() {
+	void entity() {
 		assertThatThrownBy( () -> index.createScope().query()
 				.select( f -> f.object( "nested" ).from(
 						f.entity()
@@ -71,7 +71,7 @@ public class UnsupportedNestingProjectionBaseIT {
 	}
 
 	@Test
-	public void entityReference() {
+	void entityReference() {
 		assertThatThrownBy( () -> index.createScope().query()
 				.select( f -> f.object( "nested" ).from(
 						f.entityReference()
@@ -88,7 +88,7 @@ public class UnsupportedNestingProjectionBaseIT {
 	}
 
 	@Test
-	public void documentReference() {
+	void documentReference() {
 		assertThatThrownBy( () -> index.createScope().query()
 				.select( f -> f.object( "nested" ).from(
 						f.documentReference()
@@ -105,7 +105,7 @@ public class UnsupportedNestingProjectionBaseIT {
 	}
 
 	@Test
-	public void score() {
+	void score() {
 		assertThatThrownBy( () -> index.createScope().query()
 				.select( f -> f.object( "nested" ).from(
 						f.score()

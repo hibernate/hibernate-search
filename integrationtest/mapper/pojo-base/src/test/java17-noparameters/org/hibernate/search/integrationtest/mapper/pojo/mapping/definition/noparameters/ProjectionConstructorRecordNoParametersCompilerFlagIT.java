@@ -19,19 +19,22 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ProjectionConstructorRecordNoParametersCompilerFlagIT extends AbstractProjectionConstructorIT {
+class ProjectionConstructorRecordNoParametersCompilerFlagIT extends AbstractProjectionConstructorIT {
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	@Before
-	public void sourcesCompiledWithoutParametersFlag() {
+	@BeforeEach
+	void sourcesCompiledWithoutParametersFlag() {
 		assertThat( ConstructorWithParameters.class.getDeclaredConstructors()[0].getParameters() )
 				.withFailMessage( "This test only works if compiled *without* the '-parameters' compiler flag." )
 				.extracting( Parameter::isNamePresent )
@@ -39,7 +42,7 @@ public class ProjectionConstructorRecordNoParametersCompilerFlagIT extends Abstr
 	}
 
 	@Test
-	public void typeLevelAnnotation() {
+	void typeLevelAnnotation() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -78,7 +81,7 @@ public class ProjectionConstructorRecordNoParametersCompilerFlagIT extends Abstr
 	}
 
 	@Test
-	public void constructorLevelAnnotation_canonical() {
+	void constructorLevelAnnotation_canonical() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId

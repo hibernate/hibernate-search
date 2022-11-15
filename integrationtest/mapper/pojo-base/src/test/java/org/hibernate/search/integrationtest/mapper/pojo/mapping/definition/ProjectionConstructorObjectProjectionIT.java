@@ -28,20 +28,20 @@ import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureRe
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-4574")
-public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionConstructorIT {
+class ProjectionConstructorObjectProjectionIT extends AbstractProjectionConstructorIT {
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock )
 					// We don't care about reindexing here and don't want to configure association inverse sides
 					.disableAssociationReindexing();
 
 	@Test
-	public void noArg() {
+	void noArg() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -111,7 +111,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 	}
 
 	@Test
-	public void path() {
+	void path() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -182,7 +182,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 	}
 
 	@Test
-	public void invalidType() {
+	void invalidType() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -238,7 +238,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 	}
 
 	@Test
-	public void nonMatchingIncludePaths() {
+	void nonMatchingIncludePaths() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -294,7 +294,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 	}
 
 	@Test
-	public void nonMatchingExcludePaths() {
+	void nonMatchingExcludePaths() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -350,7 +350,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 	}
 
 	@Test
-	public void inObjectField() {
+	void inObjectField() {
 		class ContainedLevel2 {
 			@DocumentId
 			public Integer id;
@@ -453,7 +453,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 	}
 
 	@Test
-	public void inObjectField_filteredOut() {
+	void inObjectField_filteredOut() {
 		class ContainedLevel2 {
 			@DocumentId
 			public Integer id;
@@ -545,7 +545,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 	}
 
 	@Test
-	public void inObjectField_multiValued_filteredOut() {
+	void inObjectField_multiValued_filteredOut() {
 		class ContainedLevel2 {
 			@DocumentId
 			public Integer id;
@@ -637,7 +637,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 	}
 
 	@Test
-	public void multiValued_list() {
+	void multiValued_list() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -727,7 +727,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 	}
 
 	@Test
-	public void multiValued_collection() {
+	void multiValued_collection() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -817,7 +817,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 	}
 
 	@Test
-	public void multiValued_iterable() {
+	void multiValued_iterable() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -907,7 +907,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 	}
 
 	@Test
-	public void multiValued_set() {
+	void multiValued_set() {
 		class Contained {
 			@DocumentId
 			public Integer id;

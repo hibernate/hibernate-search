@@ -18,24 +18,16 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleF
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public abstract class AbstractPredicateSearchableIT {
 
-	private final SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex;
-	private final SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex;
-	private final FieldTypeDescriptor<?> fieldType;
-
-	protected AbstractPredicateSearchableIT(SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	void unsearchable(SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
 			SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex,
 			FieldTypeDescriptor<?> fieldType) {
-		this.searchableYesIndex = searchableYesIndex;
-		this.searchableNoIndex = searchableNoIndex;
-		this.fieldType = fieldType;
-	}
-
-	@Test
-	public void unsearchable() {
 		SearchPredicateFactory f = searchableNoIndex.createScope().predicate();
 
 		String fieldPath = searchableNoIndex.binding().field.get( fieldType ).relativeFieldName;
@@ -48,8 +40,11 @@ public abstract class AbstractPredicateSearchableIT {
 				);
 	}
 
-	@Test
-	public void multiIndex_incompatibleSearchable() {
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	void multiIndex_incompatibleSearchable(SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
+			SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex,
+			FieldTypeDescriptor<?> fieldType) {
 		SearchPredicateFactory f = searchableYesIndex.createScope( searchableNoIndex ).predicate();
 
 		String fieldPath = searchableYesIndex.binding().field.get( fieldType ).relativeFieldName;

@@ -16,28 +16,28 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests related to the mapping when updating indexes and field templates are defined.
  */
-public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
+class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticSearchClient = TestElasticsearchClient.create();
 
 	@Test
-	public void nothingToDo() {
+	void nothingToDo() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate1", f -> f.asInteger() )
 					.matchingPathGlob( "*_t1" );
@@ -108,7 +108,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 	}
 
 	@Test
-	public void missing() {
+	void missing() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
 			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
@@ -162,7 +162,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 	}
 
 	@Test
-	public void extra() {
+	void extra() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
 			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
@@ -224,7 +224,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 	}
 
 	@Test
-	public void wrongOrder() {
+	void wrongOrder() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
 			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
@@ -282,7 +282,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 	}
 
 	@Test
-	public void duplicate() {
+	void duplicate() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
 		} );
@@ -326,7 +326,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 	}
 
 	@Test
-	public void attribute_pathMatch_missing() {
+	void attribute_pathMatch_missing() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.objectFieldTemplate( "myTemplate", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_suffix" );
@@ -368,7 +368,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 	}
 
 	@Test
-	public void attribute_pathMatch_invalid() {
+	void attribute_pathMatch_invalid() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.objectFieldTemplate( "myTemplate", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_suffix" );
@@ -411,7 +411,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 	}
 
 	@Test
-	public void attribute_pathMatch_extra() {
+	void attribute_pathMatch_extra() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate", f -> f.asString() );
 		} );
@@ -451,7 +451,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 	}
 
 	@Test
-	public void attribute_matchMappingType_missing() {
+	void attribute_matchMappingType_missing() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.objectFieldTemplate( "myTemplate", ObjectStructure.NESTED );
 		} );
@@ -492,7 +492,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 	}
 
 	@Test
-	public void attribute_matchMappingType_invalid() {
+	void attribute_matchMappingType_invalid() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.objectFieldTemplate( "myTemplate", ObjectStructure.NESTED );
 		} );
@@ -534,7 +534,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 	}
 
 	@Test
-	public void attribute_matchMappingType_extra() {
+	void attribute_matchMappingType_extra() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate", f -> f.asString() );
 		} );
@@ -575,7 +575,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 	}
 
 	@Test
-	public void attribute_extra() {
+	void attribute_extra() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate", f -> f.asString() );
 		} );
@@ -616,7 +616,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 	}
 
 	@Test
-	public void mapping_invalid() {
+	void mapping_invalid() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate", f -> f.asString() );
 		} );

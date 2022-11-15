@@ -54,14 +54,13 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingHin
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @SuppressWarnings("unchecked") // Mocking parameterized types
 public abstract class AbstractEntityProjectionIT {
 
@@ -71,9 +70,6 @@ public abstract class AbstractEntityProjectionIT {
 	protected static final String TEXT_VALUE_1_2 = "some text 1_2";
 
 	protected static final ProjectionMappedTypeContext mainTypeContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	private final SimpleMappedIndex<IndexBinding> mainIndex;
 	private final SimpleMappedIndex<IndexBinding> multiIndex1;
@@ -96,7 +92,7 @@ public abstract class AbstractEntityProjectionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3578")
-	public void entityLoading() {
+	void entityLoading() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 		StubEntity doc1LoadedEntity = new StubEntity( doc1Reference );
@@ -141,7 +137,7 @@ public abstract class AbstractEntityProjectionIT {
 	}
 
 	@Test
-	public void entityLoading_timeout() {
+	void entityLoading_timeout() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 		StubEntity doc1LoadedEntity = new StubEntity( doc1Reference );
@@ -187,7 +183,7 @@ public abstract class AbstractEntityProjectionIT {
 	}
 
 	@Test
-	public void noEntityLoading() {
+	void noEntityLoading() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = select( scope.query() )
@@ -202,7 +198,7 @@ public abstract class AbstractEntityProjectionIT {
 	}
 
 	@Test
-	public void entityLoading_callGetProjectionHitMapperEveryTime() {
+	void entityLoading_callGetProjectionHitMapperEveryTime() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 
@@ -247,7 +243,7 @@ public abstract class AbstractEntityProjectionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void entityLoading_failed_skipHit() {
+	void entityLoading_failed_skipHit() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 		StubEntity doc2LoadedObject = new StubEntity( doc2Reference );
@@ -280,7 +276,7 @@ public abstract class AbstractEntityProjectionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4579")
-	public void noLoadingAvailable_noProjectionRegistryEntry_fails() {
+	void noLoadingAvailable_noProjectionRegistryEntry_fails() {
 		ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
 
 		SearchLoadingContext<DocumentReference> loadingContextMock =
@@ -324,7 +320,7 @@ public abstract class AbstractEntityProjectionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4579")
-	public void projectionRegistryFallback_withLoadingAvailable_doesNotCheckProjectionRegistry() {
+	void projectionRegistryFallback_withLoadingAvailable_doesNotCheckProjectionRegistry() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 		StubEntity doc1LoadedEntity = new StubEntity( doc1Reference );
@@ -363,7 +359,7 @@ public abstract class AbstractEntityProjectionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4579")
-	public void projectionRegistryFallback_noLoadingAvailable_withProjectionRegistryEntry_usesProjectionRegistry() {
+	void projectionRegistryFallback_noLoadingAvailable_withProjectionRegistryEntry_usesProjectionRegistry() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 
@@ -417,7 +413,7 @@ public abstract class AbstractEntityProjectionIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4579")
-	public void projectionRegistryFallback_multiType() {
+	void projectionRegistryFallback_multiType() {
 		DocumentReference type1Doc1Reference = reference( multiIndex1.typeName(), DOCUMENT_1_ID );
 		DocumentReference type1Doc2Reference = reference( multiIndex1.typeName(), DOCUMENT_2_ID );
 		DocumentReference type2Doc1Reference = reference( multiIndex2.typeName(), DOCUMENT_1_ID );

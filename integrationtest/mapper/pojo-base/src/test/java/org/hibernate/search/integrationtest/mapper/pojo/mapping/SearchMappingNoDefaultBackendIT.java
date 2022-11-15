@@ -21,27 +21,26 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SearchMappingNoDefaultBackendIT {
+class SearchMappingNoDefaultBackendIT {
 
 	private static final String BACKEND_1_NAME = "stubBackend1";
 	private static final String BACKEND_2_NAME = "stubBackend2";
 
-	@ClassRule
-	public static BackendMock backend1Mock = new BackendMock();
+	@RegisterExtension
+	public static BackendMock backend1Mock = BackendMock.createGlobal();
 
-	@ClassRule
-	public static BackendMock backend2Mock = new BackendMock();
+	@RegisterExtension
+	public static BackendMock backend2Mock = BackendMock.createGlobal();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper;
 
 	private SearchMapping mapping;
@@ -54,8 +53,8 @@ public class SearchMappingNoDefaultBackendIT {
 				null, namedBackendMocks );
 	}
 
-	@Before
-	public void before() {
+	@BeforeEach
+	void before() {
 		backend1Mock.expectAnySchema( Person.INDEX_NAME );
 		backend2Mock.expectAnySchema( Pet.ENTITY_NAME );
 		mapping = setupHelper.start()
@@ -69,7 +68,7 @@ public class SearchMappingNoDefaultBackendIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4656")
-	public void backend_default_nonExisting() {
+	void backend_default_nonExisting() {
 		assertThatThrownBy( () -> mapping.backend() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -81,7 +80,7 @@ public class SearchMappingNoDefaultBackendIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4656")
-	public void backend_byName_invalidName() {
+	void backend_byName_invalidName() {
 		assertThatThrownBy( () -> mapping.backend( "invalid" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(

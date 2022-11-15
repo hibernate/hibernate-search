@@ -8,47 +8,47 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.schema.manage
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendFeatures;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests related to index custom mapping when updating indexes.
  */
 @TestForIssue(jiraKey = "HSEARCH-4253")
-public class ElasticsearchIndexSchemaManagerUpdateCustomMappingIT {
+class ElasticsearchIndexSchemaManagerUpdateCustomMappingIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticsearchClient = TestElasticsearchClient.create();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	@Before
-	public void checkAssumption() {
+	@BeforeEach
+	void checkAssumption() {
 		assumeTrue(
-				"This test only is only relevant if we are allowed to open/close Elasticsearch indexes.",
-				ElasticsearchTckBackendFeatures.supportsIndexClosingAndOpening()
+				ElasticsearchTckBackendFeatures.supportsIndexClosingAndOpening(),
+				"This test only is only relevant if we are allowed to open/close Elasticsearch indexes."
 		);
 	}
 
 	@Test
-	public void noOverlapping() {
+	void noOverlapping() {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
@@ -167,7 +167,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomMappingIT {
 	}
 
 	@Test
-	public void illegalUpdate() {
+	void illegalUpdate() {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +

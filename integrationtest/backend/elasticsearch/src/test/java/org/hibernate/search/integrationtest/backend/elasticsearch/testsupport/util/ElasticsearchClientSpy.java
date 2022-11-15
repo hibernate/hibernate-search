@@ -23,38 +23,38 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
-import org.hibernate.search.util.impl.integrationtest.common.rule.CallQueue;
+import org.hibernate.search.util.impl.integrationtest.common.extension.CallQueue;
 
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
-public class ElasticsearchClientSpy implements TestRule {
+public class ElasticsearchClientSpy implements BeforeEachCallback, AfterEachCallback {
 	private final AtomicInteger createdClientCount = new AtomicInteger();
 	private final AtomicInteger requestCount = new AtomicInteger();
-	private final CallQueue<ElasticsearchClientSubmitCall> expectations = new CallQueue<>( new CallQueue.Settings() {
-		@Override
-		public boolean allowDuplicates() {
-			return false;
-		}
-	} );
+	private final CallQueue<ElasticsearchClientSubmitCall> expectations = new CallQueue<>( () -> false );
+
+	private ElasticsearchClientSpy() {
+	}
+
+	public static ElasticsearchClientSpy create() {
+		return new ElasticsearchClientSpy();
+	}
 
 	@Override
-	public Statement apply(Statement base, Description description) {
-		return new Statement() {
-			@Override
-			public void evaluate() throws Throwable {
-				setup();
-				try {
-					base.evaluate();
-					verifyExpectationsMet();
-				}
-				finally {
-					resetExpectations();
-					tearDown();
-				}
-			}
-		};
+	public void beforeEach(ExtensionContext context) {
+		setup();
+	}
+
+	@Override
+	public void afterEach(ExtensionContext context) {
+		try {
+			verifyExpectationsMet();
+		}
+		finally {
+			resetExpectations();
+			tearDown();
+		}
 	}
 
 	private void setup() {

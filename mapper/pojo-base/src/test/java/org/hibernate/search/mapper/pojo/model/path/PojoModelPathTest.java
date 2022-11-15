@@ -18,12 +18,12 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtrac
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class PojoModelPathTest {
+class PojoModelPathTest {
 
 	@Test
-	public void ofProperty() {
+	void ofProperty() {
 		assertThat( PojoModelPath.ofProperty( "foo" ) )
 				.satisfies( isPath( "foo" ) );
 
@@ -44,7 +44,7 @@ public class PojoModelPathTest {
 	}
 
 	@Test
-	public void ofValue_property() {
+	void ofValue_property() {
 		assertThat( PojoModelPath.ofValue( "foo" ) )
 				.satisfies( isPath( "foo", ContainerExtractorPath.defaultExtractors() ) );
 
@@ -60,7 +60,7 @@ public class PojoModelPathTest {
 	}
 
 	@Test
-	public void ofValue_propertyAndContainerExtractorPath() {
+	void ofValue_propertyAndContainerExtractorPath() {
 		assertThat(
 				PojoModelPath.ofValue( "foo", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) ) )
 				.satisfies( isPath( "foo", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) ) );
@@ -84,7 +84,7 @@ public class PojoModelPathTest {
 	}
 
 	@Test
-	public void parse() {
+	void parse() {
 		assertThat( PojoModelPath.parse( "foo" ) )
 				.satisfies( isPath(
 						"foo", ContainerExtractorPath.defaultExtractors()
@@ -118,7 +118,7 @@ public class PojoModelPathTest {
 	}
 
 	@Test
-	public void builder() {
+	void builder() {
 		PojoModelPath.Builder builder = PojoModelPath.builder();
 		builder.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION )
 				.property( "bar" ).valueWithoutExtractors()
@@ -153,7 +153,7 @@ public class PojoModelPathTest {
 	}
 
 	@Test
-	public void builder_missingContainerExtractorPath_middle() {
+	void builder_missingContainerExtractorPath_middle() {
 		PojoModelPath.Builder builder = PojoModelPath.builder();
 		builder.property( "foo" ).property( "bar" ).value( BuiltinContainerExtractors.MAP_KEY );
 		assertThat( builder.toValuePath() )
@@ -164,7 +164,7 @@ public class PojoModelPathTest {
 	}
 
 	@Test
-	public void builder_missingContainerExtractorPath_end() {
+	void builder_missingContainerExtractorPath_end() {
 		PojoModelPath.Builder builder = PojoModelPath.builder();
 		builder.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION ).property( "bar" );
 		assertThat( builder.toValuePath() )
@@ -183,7 +183,7 @@ public class PojoModelPathTest {
 	}
 
 	@Test
-	public void builder_missingPropertyName() {
+	void builder_missingPropertyName() {
 		assertThat( PojoModelPath.builder().toValuePathOrNull() ).isNull();
 
 		assertThat( PojoModelPath.builder().toPropertyPathOrNull() ).isNull();
@@ -222,7 +222,7 @@ public class PojoModelPathTest {
 	}
 
 	@Test
-	public void builder_chainedContainerExtractors() {
+	void builder_chainedContainerExtractors() {
 		PojoModelPath.Builder builder = PojoModelPath.builder();
 		builder.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION ).value( BuiltinContainerExtractors.ITERABLE )
 				.property( "bar" ).value( BuiltinContainerExtractors.MAP_KEY );
@@ -237,7 +237,7 @@ public class PojoModelPathTest {
 	}
 
 	@Test
-	public void builder_chainedContainerExtractors_defaultExtractors() {
+	void builder_chainedContainerExtractors_defaultExtractors() {
 		assertThat( PojoModelPath.builder().property( "foo" )
 				.valueWithoutExtractors().valueWithDefaultExtractors()
 				.toValuePath()
@@ -265,7 +265,7 @@ public class PojoModelPathTest {
 	}
 
 	@Test
-	public void relativize_correctPrefix() {
+	void relativize_correctPrefix() {
 		assertThat( PojoModelPath.builder()
 				.property( "foo" )
 				.property( "bar" )
@@ -342,7 +342,7 @@ public class PojoModelPathTest {
 	}
 
 	@Test
-	public void relativize_self() {
+	void relativize_self() {
 		assertThat( PojoModelPath.builder()
 				.property( "foo" )
 				.toValuePath()
@@ -378,7 +378,7 @@ public class PojoModelPathTest {
 	}
 
 	@Test
-	public void relativize_unrelated() {
+	void relativize_unrelated() {
 		assertThat( PojoModelPath.builder()
 				.property( "foo" )
 				.toValuePath()

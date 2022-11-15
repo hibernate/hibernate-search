@@ -19,26 +19,26 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class AnnotationMappingGeoPointBindingIT {
+class AnnotationMappingGeoPointBindingIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private SearchMapping mapping;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectSchema( GeoPointOnTypeEntity.INDEX, b -> b
 				.field( "homeLocation", GeoPoint.class, b2 -> b2.projectable( Projectable.YES ).sortable( Sortable.YES ) )
 				.field( "workLocation", GeoPoint.class,
@@ -68,7 +68,7 @@ public class AnnotationMappingGeoPointBindingIT {
 	}
 
 	@Test
-	public void index() {
+	void index() {
 		try ( SearchSession session = mapping.createSession() ) {
 			GeoPointOnTypeEntity entity1 = new GeoPointOnTypeEntity();
 			entity1.id = 1;

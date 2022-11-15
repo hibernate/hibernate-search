@@ -9,8 +9,9 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.schema.manage
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
@@ -18,19 +19,18 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings
 import org.hibernate.search.backend.elasticsearch.index.DynamicMapping;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import com.google.gson.Gson;
 
@@ -38,20 +38,20 @@ import com.google.gson.Gson;
  * Tests for the dynamic mapping attribute,
  * for all creating schema management operations.
  */
-@RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-3122")
-public class ElasticsearchIndexSchemaManagerDynamicMappingIT {
+class ElasticsearchIndexSchemaManagerDynamicMappingIT {
 
-	@Parameters(name = "With operation {0}")
-	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> operations() {
-		return ElasticsearchIndexSchemaManagerOperation.creating();
+	public static List<? extends Arguments> params() {
+		return ElasticsearchIndexSchemaManagerOperation.creating().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticSearchClient = TestElasticsearchClient.create();
 
 	private final StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 		root.field( "field", f -> f.asString() ).toReference();
@@ -62,48 +62,48 @@ public class ElasticsearchIndexSchemaManagerDynamicMappingIT {
 	} );
 
 	private final Gson gson = new Gson();
-	private final ElasticsearchIndexSchemaManagerOperation operation;
 
-	public ElasticsearchIndexSchemaManagerDynamicMappingIT(ElasticsearchIndexSchemaManagerOperation operation) {
-		this.operation = operation;
-	}
-
-	@Test
-	public void dynamicMapping_default() {
-		setupAndInspectIndex( null );
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void dynamicMapping_default(ElasticsearchIndexSchemaManagerOperation operation) {
+		setupAndInspectIndex( null, operation );
 		String mapping = elasticSearchClient.index( index.name() ).type().getMapping();
 
 		verifyDynamicMapping( mapping, DynamicMapping.STRICT );
 	}
 
-	@Test
-	public void dynamicMapping_strict() {
-		setupAndInspectIndex( DynamicMapping.STRICT.externalRepresentation() );
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void dynamicMapping_strict(ElasticsearchIndexSchemaManagerOperation operation) {
+		setupAndInspectIndex( DynamicMapping.STRICT.externalRepresentation(), operation );
 		String mapping = elasticSearchClient.index( index.name() ).type().getMapping();
 
 		verifyDynamicMapping( mapping, DynamicMapping.STRICT );
 	}
 
-	@Test
-	public void dynamicMapping_false() {
-		setupAndInspectIndex( DynamicMapping.FALSE.externalRepresentation() );
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void dynamicMapping_false(ElasticsearchIndexSchemaManagerOperation operation) {
+		setupAndInspectIndex( DynamicMapping.FALSE.externalRepresentation(), operation );
 		String mapping = elasticSearchClient.index( index.name() ).type().getMapping();
 
 		verifyDynamicMapping( mapping, DynamicMapping.FALSE );
 	}
 
-	@Test
-	public void dynamicMapping_true() {
-		setupAndInspectIndex( DynamicMapping.TRUE.externalRepresentation() );
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void dynamicMapping_true(ElasticsearchIndexSchemaManagerOperation operation) {
+		setupAndInspectIndex( DynamicMapping.TRUE.externalRepresentation(), operation );
 		String mapping = elasticSearchClient.index( index.name() ).type().getMapping();
 
 		verifyDynamicMapping( mapping, DynamicMapping.TRUE );
 	}
 
-	@Test
-	public void dynamicMapping_invalid() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void dynamicMapping_invalid(ElasticsearchIndexSchemaManagerOperation operation) {
 		assertThatThrownBy(
-				() -> setupAndInspectIndex( "invalid" )
+				() -> setupAndInspectIndex( "invalid", operation )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
@@ -112,7 +112,7 @@ public class ElasticsearchIndexSchemaManagerDynamicMappingIT {
 				.hasMessageContaining( "Valid values are: [true, false, strict]" );
 	}
 
-	private void setupAndInspectIndex(String dynamicMapping) {
+	private void setupAndInspectIndex(String dynamicMapping, ElasticsearchIndexSchemaManagerOperation operation) {
 		SearchSetupHelper.SetupContext setupContext = setupHelper.start()
 				.withBackendProperty(
 						// Don't contribute any analysis definitions, validation of those is tested in another test class

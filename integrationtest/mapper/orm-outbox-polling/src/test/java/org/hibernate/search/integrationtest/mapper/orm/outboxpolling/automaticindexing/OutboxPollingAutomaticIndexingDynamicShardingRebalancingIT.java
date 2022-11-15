@@ -28,20 +28,20 @@ import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport
 import org.hibernate.search.mapper.orm.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test of automatic rebalancing for dynamic sharding with the outbox-polling coordination strategy.
  */
 @TestForIssue(jiraKey = "HSEARCH-4140")
-public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
+class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 
 	// Use a low polling interval, pulse interval and batch size when testing rebalancing
 	// so that we can observe rebalancing on a reasonably small timescale.
@@ -52,15 +52,15 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 	// or agents will be likely to expire while processing a single batch.
 	private static final int PULSE_EXPIRATION = 5000;
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
-	@Rule
-	public StaticCounters counters = new StaticCounters();
+	@RegisterExtension
+	public StaticCounters counters = StaticCounters.create();
 
 	private final PerSessionFactoryIndexingCountHelper indexingCountHelper =
 			new PerSessionFactoryIndexingCountHelper( counters );
@@ -102,7 +102,7 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 	}
 
 	@Test
-	public void agentLeft() {
+	void agentLeft() {
 		setup();
 
 		SessionFactory sessionFactory = indexingCountHelper.sessionFactory( 0 );
@@ -151,7 +151,7 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 	}
 
 	@Test
-	public void agentExpired() {
+	void agentExpired() {
 		setup();
 
 		SessionFactory sessionFactory = indexingCountHelper.sessionFactory( 0 );
@@ -194,7 +194,7 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 	}
 
 	@Test
-	public void agentJoined() {
+	void agentJoined() {
 		setup();
 
 		SessionFactory sessionFactory = indexingCountHelper.sessionFactory( 0 );

@@ -38,8 +38,8 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
@@ -51,7 +51,7 @@ import org.junit.rules.MethodRule;
 public class ProgrammaticMappingSmokeIT {
 
 	@ClassRule
-	public static BackendMock backendMock = new BackendMock();
+	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );

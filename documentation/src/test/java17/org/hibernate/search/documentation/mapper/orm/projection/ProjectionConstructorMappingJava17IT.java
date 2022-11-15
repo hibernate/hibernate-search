@@ -19,22 +19,21 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.IdProjectionBinder;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test that the simple mapping defined in Book works as expected.
  */
-@RunWith(Parameterized.class)
-public class ProjectionConstructorMappingJava17IT {
+class ProjectionConstructorMappingJava17IT {
 
 	private static final int ASIMOV_ID = 1;
 	private static final int MARTINEZ_ID = 2;
@@ -44,15 +43,14 @@ public class ProjectionConstructorMappingJava17IT {
 	private static final int BOOK3_ID = 3;
 	private static final int BOOK4_ID = 4;
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<?> params() {
+	public static List<? extends Arguments> params() {
 		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
-				BackendConfigurations.simple(),
 				// Since we disable classpath scanning in tests for performance reasons,
 				// we need to register annotated projection types explicitly.
 				// This wouldn't be needed in a typical application.
 				CollectionHelper.asSet( MyBookProjection.class, MyBookProjection.Author.class,
-						MyAuthorProjectionClassMultiConstructor.class, MyAuthorProjectionRecordMultiConstructor.class ),
+						MyAuthorProjectionClassMultiConstructor.class, MyAuthorProjectionRecordMultiConstructor.class
+				),
 				mapping -> {
 					TypeMappingStep bookMapping = mapping.type( Book.class );
 					bookMapping.indexed();
@@ -96,20 +94,22 @@ public class ProjectionConstructorMappingJava17IT {
 		);
 	}
 
-	@Parameterized.Parameter
-	@Rule
-	public DocumentationSetupHelper setupHelper;
-
+	@RegisterExtension
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
+			BackendConfigurations.simple() );
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	public void init(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		setupHelper.withAnnotationProcessingEnabled( annotationProcessingEnabled )
+				.withMappingConfigurer( mappingContributor );
 		entityManagerFactory = setupHelper.start().setup( Book.class, Author.class );
 		initData();
 	}
 
-	@Test
-	public void simple() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void simple(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -171,8 +171,10 @@ public class ProjectionConstructorMappingJava17IT {
 		} );
 	}
 
-	@Test
-	public void multiConstructor_class() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiConstructor_class(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -191,8 +193,10 @@ public class ProjectionConstructorMappingJava17IT {
 		} );
 	}
 
-	@Test
-	public void multiConstructor_record() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiConstructor_record(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 

@@ -17,8 +17,8 @@ import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * This abstract class implements one test method for each "external" situation that
@@ -40,8 +40,8 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 
 	OutboxPollingMassIndexerAgentClusterLink link;
 
-	@Before
-	public final void initLink() {
+	@BeforeEach
+	final void initLink() {
 		link = new OutboxPollingMassIndexerAgentClusterLink(
 				SELF_REF.name, failureHandlerMock, clockMock,
 				POLLING_INTERVAL, PULSE_INTERVAL, PULSE_EXPIRATION
@@ -120,21 +120,21 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 
 	protected abstract MassIndexerAgentClusterLinkPulseExpectations onClusterWith3NodesAll3NodesSuspended();
 
-	@Before
-	public void initPulseMocks() {
+	@BeforeEach
+	void initPulseMocks() {
 		when( repositoryMock.findAllOrderById() ).thenAnswer( ignored -> repositoryMockHelper.allAgentsInIdOrder() );
 		when( clockMock.instant() ).thenReturn( NOW );
 	}
 
 	@Test
-	public void noOtherAgent() {
+	void noOtherAgent() {
 		repositoryMockHelper.defineOtherAgents();
 
 		onNoOtherAgents().verify( link.pulse( contextMock ) );
 	}
 
 	@Test
-	public void clusterWith3Nodes_someExpired() {
+	void clusterWith3Nodes_someExpired() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -152,7 +152,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	@Test
-	public void clusterWith3Nodes_someSuspended_someWaiting() {
+	void clusterWith3Nodes_someSuspended_someWaiting() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -165,7 +165,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	@Test
-	public void clusterWith3Nodes_someSuspended_someRunning() {
+	void clusterWith3Nodes_someSuspended_someRunning() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -178,7 +178,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	@Test
-	public void clusterWith3Nodes_someWaiting_someRunning() {
+	void clusterWith3Nodes_someWaiting_someRunning() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -191,7 +191,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	@Test
-	public void clusterWith3Nodes_someSuspended_someWaiting_someRunning() {
+	void clusterWith3Nodes_someSuspended_someWaiting_someRunning() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.SUSPENDED,
 						isOtherStatic() ? otherShardAssignmentIn4NodeCluster( 1 ) : null )
@@ -204,7 +204,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	@Test
-	public void clusterWith3Nodes_allSuspended() {
+	void clusterWith3Nodes_allSuspended() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.SUSPENDED,
 						isOtherStatic() ? otherShardAssignmentIn4NodeCluster( 1 ) : null )
@@ -217,7 +217,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	@Test
-	public void clusterWith3Nodes_allWaiting() {
+	void clusterWith3Nodes_allWaiting() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -230,7 +230,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	@Test
-	public void clusterWith3Nodes_allRunning() {
+	void clusterWith3Nodes_allRunning() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -243,7 +243,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	@Test
-	public void clusterWith3Nodes_someExpired_massIndexingAgent_running() {
+	void clusterWith3Nodes_someExpired_massIndexingAgent_running() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -263,7 +263,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	@Test
-	public void clusterWith3Nodes_someSuspended_someRunning_massIndexingAgent_running() {
+	void clusterWith3Nodes_someSuspended_someRunning_massIndexingAgent_running() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -279,7 +279,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	@Test
-	public void clusterWith3Nodes_allSuspended_massIndexingAgent_running() {
+	void clusterWith3Nodes_allSuspended_massIndexingAgent_running() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.SUSPENDED,
 						isOtherStatic() ? otherShardAssignmentIn4NodeCluster( 1 ) : null )
@@ -295,7 +295,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	@Test
-	public void clusterWith3Nodes_allSuspended_massIndexingAgent_suspended() {
+	void clusterWith3Nodes_allSuspended_massIndexingAgent_suspended() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.SUSPENDED,
 						isOtherStatic() ? otherShardAssignmentIn4NodeCluster( 1 ) : null )
@@ -312,7 +312,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	@Test
-	public void clusterWith3Nodes_allSuspended_massIndexingAgent_waiting() {
+	void clusterWith3Nodes_allSuspended_massIndexingAgent_waiting() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.SUSPENDED,
 						isOtherStatic() ? otherShardAssignmentIn4NodeCluster( 1 ) : null )
@@ -329,7 +329,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	@Test
-	public void clusterWith3Nodes_allSuspended_massIndexingAgent_expired() {
+	void clusterWith3Nodes_allSuspended_massIndexingAgent_expired() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.SUSPENDED,
 						isOtherStatic() ? otherShardAssignmentIn4NodeCluster( 1 ) : null )
@@ -348,7 +348,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	@Test
-	public void clusterWith3Nodes_allRunning_massIndexingAgent_running() {
+	void clusterWith3Nodes_allRunning_massIndexingAgent_running() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -362,7 +362,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	@Test
-	public void clusterWith3Nodes_allRunning_massIndexingAgent_suspended() {
+	void clusterWith3Nodes_allRunning_massIndexingAgent_suspended() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -379,7 +379,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	@Test
-	public void clusterWith3Nodes_allRunning_massIndexingAgent_waiting() {
+	void clusterWith3Nodes_allRunning_massIndexingAgent_waiting() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -396,7 +396,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	@Test
-	public void clusterWith3Nodes_allRunning_massIndexingAgent_expired() {
+	void clusterWith3Nodes_allRunning_massIndexingAgent_expired() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), otherType(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )

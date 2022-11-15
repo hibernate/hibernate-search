@@ -25,34 +25,34 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SearchQueryFetchIT {
+class SearchQueryFetchIT {
 
 	private static final int DOCUMENT_COUNT = 200;
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
-	public void fetchAll() {
+	void fetchAll() {
 		assertThatResult( matchAllQuerySortByField().fetchAll() )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
@@ -71,7 +71,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetch_limit() {
+	void fetch_limit() {
 		assertThatResult( matchAllQuerySortByField().fetch( null ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
@@ -90,7 +90,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetch_offset_limit() {
+	void fetch_offset_limit() {
 		assertThatResult( matchAllQuerySortByField().fetch( 1, null ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
@@ -122,7 +122,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetch_offset_limit_exceedsMaxValue() {
+	void fetch_offset_limit_exceedsMaxValue() {
 		assertThatThrownBy( () -> matchAllQuerySortByField().fetch( 1, Integer.MAX_VALUE ) )
 				// error message will depend on the specific backend
 				.isInstanceOf( SearchException.class );
@@ -135,7 +135,7 @@ public class SearchQueryFetchIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4019")
-	public void fetch_offset_limit_defaultSort() {
+	void fetch_offset_limit_defaultSort() {
 		assertThatResult( matchAllQuerySortByDefault().fetch( 1, null ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsAnyOrder( builder -> {
@@ -167,7 +167,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetchAllHits() {
+	void fetchAllHits() {
 		assertThatHits( matchAllQuerySortByField().fetchAllHits() )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
@@ -184,7 +184,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetchHits_limit() {
+	void fetchHits_limit() {
 		assertThatHits( matchAllQuerySortByField().fetchHits( null ) )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
@@ -200,7 +200,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetchHits_offset_limit_fieldSort() {
+	void fetchHits_offset_limit_fieldSort() {
 		assertThatHits( matchAllQuerySortByField().fetchHits( 1, null ) )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 1; i < DOCUMENT_COUNT; i++ ) {
@@ -233,7 +233,7 @@ public class SearchQueryFetchIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4019")
-	public void fetchHits_offset_limit_defaultSort() {
+	void fetchHits_offset_limit_defaultSort() {
 		assertThatHits( matchAllQuerySortByDefault().fetchHits( 1, null ) )
 				.hasDocRefHitsAnyOrder( builder -> {
 					for ( int i = 1; i < DOCUMENT_COUNT; i++ ) {
@@ -260,7 +260,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetchTotalHitCount() {
+	void fetchTotalHitCount() {
 		assertThat( matchAllQuerySortByField().fetchTotalHitCount() ).isEqualTo( DOCUMENT_COUNT );
 		assertThat( matchAllQuerySortByField().toQuery().fetchTotalHitCount() ).isEqualTo( DOCUMENT_COUNT );
 
@@ -270,7 +270,7 @@ public class SearchQueryFetchIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3511")
-	public void fetchTotalHitCount_offset_limit() {
+	void fetchTotalHitCount_offset_limit() {
 		SearchQuery<DocumentReference> query = matchAllQuerySortByField().toQuery();
 
 		// Using an offset/limit should not affect later counts
@@ -282,7 +282,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetchTotalHitCount_withProjection() {
+	void fetchTotalHitCount_withProjection() {
 		assertThat( index.query()
 				.select( f -> f.field( "integer", Integer.class ) )
 				.where( f -> f.matchAll() )
@@ -309,7 +309,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetchSingleHit() {
+	void fetchSingleHit() {
 		Optional<DocumentReference> result = matchOneQuery( 4 ).fetchSingleHit();
 		assertThat( result ).isNotEmpty();
 		assertThat( normalize( result.get() ) )
@@ -325,7 +325,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetch_limitAndOffset_reuseQuery() {
+	void fetch_limitAndOffset_reuseQuery() {
 		SearchQuery<DocumentReference> query = matchAllQuerySortByField().toQuery();
 		assertThatResult( query.fetch( 1, null ) ).fromQuery( query )
 				.hasTotalHitCount( DOCUMENT_COUNT )
@@ -362,7 +362,7 @@ public class SearchQueryFetchIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3389")
-	public void maxResults_zero() {
+	void maxResults_zero() {
 		assertThatResult( matchAllQuerySortByField().fetch( 0, 0 ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasNoHits();

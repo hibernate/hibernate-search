@@ -834,15 +834,6 @@
                     </configuration>
                     <dependencies>
                         <!--
-                             Force tests to execute with JUnit 4
-                             See http://maven.apache.org/surefire/maven-failsafe-plugin/examples/junit.html
-                         -->
-                        <dependency>
-                            <groupId>org.apache.maven.surefire</groupId>
-                            <artifactId>surefire-junit47</artifactId>
-                            <version>${version.surefire.plugin}</version>
-                        </dependency>
-                        <!--
                              maven-surefire-plugin and maven-failsafe-plugin use an older version of ASM
                              that cannot handle Java 15+ bytecode.
                              Let's upgrade that dependency and hope for the best;
@@ -884,15 +875,6 @@
                         <failIfNoTests>true</failIfNoTests>
                     </configuration>
                     <dependencies>
-                        <!--
-                             Force tests to execute with JUnit 4
-                             See http://maven.apache.org/surefire/maven-failsafe-plugin/examples/junit.html
-                         -->
-                        <dependency>
-                            <groupId>org.apache.maven.surefire</groupId>
-                            <artifactId>surefire-junit47</artifactId>
-                            <version>${version.surefire.plugin}</version>
-                        </dependency>
                         <!--
                              maven-surefire-plugin and maven-failsafe-plugin use an older version of ASM
                              that cannot handle Java 15+ bytecode.

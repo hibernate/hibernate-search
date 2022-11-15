@@ -28,14 +28,14 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class MassIndexingMonitorIT {
+class MassIndexingMonitorIT {
 
 	public static final String TITLE_1 = "Oliver Twist";
 	public static final String AUTHOR_1 = "Charles Dickens";
@@ -44,17 +44,17 @@ public class MassIndexingMonitorIT {
 	public static final String TITLE_3 = "Frankenstein";
 	public static final String AUTHOR_3 = "Mary Shelley";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
-	public StaticCounters staticCounters = new StaticCounters();
+	@RegisterExtension
+	public StaticCounters staticCounters = StaticCounters.create();
 
 	@Test
-	public void simple() {
+	void simple() {
 		SessionFactory sessionFactory = setup( null );
 
 		with( sessionFactory ).runNoTransaction( session -> {

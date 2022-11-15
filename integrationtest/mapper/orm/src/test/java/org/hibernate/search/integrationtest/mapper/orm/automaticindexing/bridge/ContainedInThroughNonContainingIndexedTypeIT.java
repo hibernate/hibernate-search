@@ -23,13 +23,13 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContex
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyBinding;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests a corner case that is not covered by
@@ -38,18 +38,18 @@ import org.junit.Test;
  * This should not matter given the current implementation, but better safe than sorry.
  */
 @TestForIssue(jiraKey = "HSEARCH-2496")
-public class ContainedInThroughNonContainingIndexedTypeIT {
+class ContainedInThroughNonContainingIndexedTypeIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectAnySchema( Containing.INDEX );
 		backendMock.expectAnySchema( Contained.INDEX );
 
@@ -62,7 +62,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		with( sessionFactory ).runInTransaction( session -> {
 			Containing containing = new Containing();
 			containing.setId( 1 );

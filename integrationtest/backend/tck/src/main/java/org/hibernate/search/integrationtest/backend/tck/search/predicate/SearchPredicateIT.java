@@ -24,17 +24,17 @@ import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SearchPredicateIT {
+class SearchPredicateIT {
 
 	private static final String DOCUMENT_1 = "doc1";
 	private static final String DOCUMENT_2 = "doc2";
@@ -43,8 +43,8 @@ public class SearchPredicateIT {
 	private static final String STRING_1 = "Irving";
 	private static final String STRING_2 = "Auster";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
@@ -53,15 +53,15 @@ public class SearchPredicateIT {
 			// What matters here is that is a different index.
 			SimpleMappedIndex.of( IndexBinding::new ).name( "other" );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndexes( mainIndex, otherIndex ).setup();
 
 		initData();
 	}
 
 	@Test
-	public void where_searchPredicate() {
+	void where_searchPredicate() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchPredicate predicate = scope.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
@@ -75,7 +75,7 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void where_lambda() {
+	void where_lambda() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -87,7 +87,7 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void reuseRootPredicateInstance_onScopeTargetingSameIndexes() {
+	void reuseRootPredicateInstance_onScopeTargetingSameIndexes() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchPredicate predicate = scope
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
@@ -126,7 +126,7 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void reuseRootPredicateInstance_onScopeTargetingDifferentIndexes() {
+	void reuseRootPredicateInstance_onScopeTargetingDifferentIndexes() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchPredicate predicate = scope
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
@@ -154,7 +154,7 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void reuseNonRootPredicateInstance_onScopeTargetingSameIndexes() {
+	void reuseNonRootPredicateInstance_onScopeTargetingSameIndexes() {
 		StubMappingScope scope = mainIndex.createScope();
 		final SearchPredicate predicate = scope
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
@@ -202,7 +202,7 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void reuseNonRootPredicateInstance_onScopeTargetingDifferentIndexes() {
+	void reuseNonRootPredicateInstance_onScopeTargetingDifferentIndexes() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchPredicate predicate = scope
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
@@ -230,7 +230,7 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void extension() {
+	void extension() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query;
 
@@ -307,21 +307,21 @@ public class SearchPredicateIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void toAbsolutePath() {
+	void toAbsolutePath() {
 		assertThat( mainIndex.createScope().predicate().toAbsolutePath( "string" ) )
 				.isEqualTo( "string" );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void toAbsolutePath_withRoot() {
+	void toAbsolutePath_withRoot() {
 		assertThat( mainIndex.createScope().predicate().withRoot( "flattened" ).toAbsolutePath( "string" ) )
 				.isEqualTo( "flattened.string" );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void toAbsolutePath_null() {
+	void toAbsolutePath_null() {
 		assertThatThrownBy( () -> mainIndex.createScope().predicate().toAbsolutePath( null ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'relativeFieldPath' must not be null" );
@@ -329,7 +329,7 @@ public class SearchPredicateIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void toAbsolutePath_withRoot_null() {
+	void toAbsolutePath_withRoot_null() {
 		assertThatThrownBy( () -> mainIndex.createScope().predicate().withRoot( "flattened" ).toAbsolutePath( null ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'relativeFieldPath' must not be null" );

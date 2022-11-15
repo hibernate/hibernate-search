@@ -27,30 +27,30 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = { "HSEARCH-1293", "HSEARCH-3667" })
 @PortedFromSearch5(original = "org.hibernate.search.test.envers.SearchAndEnversIntegrationTest")
-public class EnversIT {
+class EnversIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class )
 				.objectField( "contained", b2 -> b2
@@ -67,7 +67,7 @@ public class EnversIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		// Initial insert
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity indexed = new IndexedEntity();

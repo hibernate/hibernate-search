@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.testsupport.textbuilder;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests WordDictionary and WordInventor,
@@ -30,8 +29,8 @@ public class TextProductionTest {
 		String randomPeriod = wi.nextPeriod();
 		// randomPeriod will be some random sentence like "Qoswo, orrmi ag ybwp bbtb kw qgtqaon lyhk nbv: qrqm flyui hyshm jmpqyb qmolml fjxw gnumocv Twwg."
 		// but exact string contents depends on environment
-		assertNotNull( randomPeriod );
-		assertTrue( randomPeriod.length() > 0 );
+		assertThat( randomPeriod ).isNotNull();
+		assertThat( randomPeriod ).isNotEmpty();
 	}
 
 }

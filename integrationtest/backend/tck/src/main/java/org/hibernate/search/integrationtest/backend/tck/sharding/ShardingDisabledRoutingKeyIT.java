@@ -11,7 +11,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 /**
  * A basic test for disabled sharding with explicit routing keys.
  */
-public class ShardingDisabledRoutingKeyIT extends AbstractShardingRoutingKeyIT {
+class ShardingDisabledRoutingKeyIT extends AbstractShardingRoutingKeyIT {
 
 	public ShardingDisabledRoutingKeyIT() {
 		// Use more than one routing key

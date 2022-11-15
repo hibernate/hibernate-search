@@ -11,6 +11,7 @@ import static org.hibernate.search.integrationtest.backend.tck.testsupport.util.
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
@@ -28,49 +29,45 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPoi
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Basic tests for value field type descriptor features, for every relevant field type.
  */
-@RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-3589")
-public class IndexValueFieldTypeDescriptorBaseIT {
+class IndexValueFieldTypeDescriptorBaseIT {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<FieldTypeDescriptor<?>> parameters() {
-		return FieldTypeDescriptor.getAll();
+	public static List<? extends Arguments> params() {
+		return FieldTypeDescriptor.getAll().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+	private SimpleMappedIndex<IndexBinding> index;
 
-	private final FieldTypeDescriptor<?> fieldType;
-
-	public IndexValueFieldTypeDescriptorBaseIT(FieldTypeDescriptor<?> fieldType) {
-		this.fieldType = fieldType;
-	}
-
-	@Before
-	public void setup() {
+	public void init(FieldTypeDescriptor<?> fieldType) {
+		index = SimpleMappedIndex.of(
+				root -> new IndexBinding( root, fieldType ) );
 		setupHelper.start().withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.NONE )
 				.setup();
 	}
 
-	@Test
-	public void isSearchable() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void isSearchable(FieldTypeDescriptor<?> fieldType) {
+		init( fieldType );
 		assertThat( getTypeDescriptor( "default" ) )
 				.returns( true, IndexValueFieldTypeDescriptor::searchable );
 		assertThat( getTypeDescriptor( "searchable" ) )
@@ -79,14 +76,16 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 				.returns( false, IndexValueFieldTypeDescriptor::searchable );
 	}
 
-	@Test
-	public void isSortable() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void isSortable(FieldTypeDescriptor<?> fieldType) {
+		init( fieldType );
 		boolean projectable = TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault();
 
 		assertThat( getTypeDescriptor( "default" ) )
 				.returns( GeoPointFieldTypeDescriptor.INSTANCE.equals( fieldType ) ? projectable : false,
 						IndexValueFieldTypeDescriptor::sortable );
-		if ( isSortSupported() ) {
+		if ( isSortSupported( fieldType ) ) {
 			assertThat( getTypeDescriptor( "sortable" ) )
 					.returns( true, IndexValueFieldTypeDescriptor::sortable );
 		}
@@ -95,8 +94,10 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 						IndexValueFieldTypeDescriptor::sortable );
 	}
 
-	@Test
-	public void isProjectable() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void isProjectable(FieldTypeDescriptor<?> fieldType) {
+		init( fieldType );
 		boolean projectable = TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault();
 		assertThat( getTypeDescriptor( "default" ) )
 				.returns( projectable, IndexValueFieldTypeDescriptor::projectable );
@@ -106,11 +107,13 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 				.returns( false, IndexValueFieldTypeDescriptor::projectable );
 	}
 
-	@Test
-	public void isAggregable() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void isAggregable(FieldTypeDescriptor<?> fieldType) {
+		init( fieldType );
 		assertThat( getTypeDescriptor( "default" ) )
 				.returns( false, IndexValueFieldTypeDescriptor::aggregable );
-		if ( isAggregationSupported() ) {
+		if ( isAggregationSupported( fieldType ) ) {
 			assertThat( getTypeDescriptor( "aggregable" ) )
 					.returns( true, IndexValueFieldTypeDescriptor::aggregable );
 		}
@@ -118,8 +121,10 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 				.returns( false, IndexValueFieldTypeDescriptor::aggregable );
 	}
 
-	@Test
-	public void dslArgumentClass() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void dslArgumentClass(FieldTypeDescriptor<?> fieldType) {
+		init( fieldType );
 		assertThat( getTypeDescriptor( "default" ) )
 				.returns( fieldType.getJavaType(), IndexValueFieldTypeDescriptor::dslArgumentClass );
 		assertThat( getTypeDescriptor( "dslConverter" ) )
@@ -128,8 +133,10 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 				.returns( fieldType.getJavaType(), IndexValueFieldTypeDescriptor::dslArgumentClass );
 	}
 
-	@Test
-	public void projectedValueClass() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projectedValueClass(FieldTypeDescriptor<?> fieldType) {
+		init( fieldType );
 		assertThat( getTypeDescriptor( "default" ) )
 				.returns( fieldType.getJavaType(), IndexValueFieldTypeDescriptor::projectedValueClass );
 		assertThat( getTypeDescriptor( "dslConverter" ) )
@@ -138,8 +145,10 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 				.returns( ValueWrapper.class, IndexValueFieldTypeDescriptor::projectedValueClass );
 	}
 
-	@Test
-	public void valueClass() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void valueClass(FieldTypeDescriptor<?> fieldType) {
+		init( fieldType );
 		assertThat( getTypeDescriptor( "default" ) )
 				.returns( fieldType.getJavaType(), IndexValueFieldTypeDescriptor::valueClass );
 		assertThat( getTypeDescriptor( "dslConverter" ) )
@@ -148,8 +157,10 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 				.returns( fieldType.getJavaType(), IndexValueFieldTypeDescriptor::valueClass );
 	}
 
-	@Test
-	public void searchAnalyzerName() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void searchAnalyzerName(FieldTypeDescriptor<?> fieldType) {
+		init( fieldType );
 		IndexValueFieldTypeDescriptor typeDescriptor = getTypeDescriptor( "default" );
 
 		Optional<String> searchAnalyzerName = typeDescriptor.searchAnalyzerName();
@@ -162,8 +173,10 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 		}
 	}
 
-	@Test
-	public void normalizerName() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void normalizerName(FieldTypeDescriptor<?> fieldType) {
+		init( fieldType );
 		IndexValueFieldTypeDescriptor typeDescriptor = getTypeDescriptor( "default" );
 
 		Optional<String> normalizerName = typeDescriptor.normalizerName();
@@ -182,16 +195,16 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 		return fieldDescriptor.type();
 	}
 
-	private boolean isSortSupported() {
+	private boolean isSortSupported(FieldTypeDescriptor<?> fieldType) {
 		return fieldType.isFieldSortSupported();
 	}
 
-	private boolean isAggregationSupported() {
+	private boolean isAggregationSupported(FieldTypeDescriptor<?> fieldType) {
 		return TermsAggregationDescriptor.INSTANCE.getSingleFieldAggregationExpectations( fieldType ).isSupported();
 	}
 
 	private class IndexBinding {
-		IndexBinding(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root, FieldTypeDescriptor<?> fieldType) {
 			mapper( fieldType, ignored -> {} ).map( root, "default" );
 
 			mapper( fieldType, c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() ) )
@@ -201,13 +214,13 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 
 			mapper( fieldType, c -> c.searchable( Searchable.YES ) ).map( root, "searchable" );
 			mapper( fieldType, c -> c.searchable( Searchable.NO ) ).map( root, "nonSearchable" );
-			if ( isSortSupported() ) {
+			if ( isSortSupported( fieldType ) ) {
 				mapper( fieldType, c -> c.sortable( Sortable.YES ) ).map( root, "sortable" );
 			}
 			mapper( fieldType, c -> c.sortable( Sortable.NO ) ).map( root, "nonSortable" );
 			mapper( fieldType, c -> c.projectable( Projectable.YES ) ).map( root, "projectable" );
 			mapper( fieldType, c -> c.projectable( Projectable.NO ) ).map( root, "nonProjectable" );
-			if ( isAggregationSupported() ) {
+			if ( isAggregationSupported( fieldType ) ) {
 				mapper( fieldType, c -> c.aggregable( Aggregable.YES ) ).map( root, "aggregable" );
 			}
 			mapper( fieldType, c -> c.aggregable( Aggregable.NO ) ).map( root, "nonAggregable" );

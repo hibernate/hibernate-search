@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEqualsIgnoringUnknownFields;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,28 +27,28 @@ import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendFeatures;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchBootstrapIT {
+class ElasticsearchBootstrapIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public ElasticsearchClientSpy elasticsearchClientSpy = new ElasticsearchClientSpy();
+	@RegisterExtension
+	public ElasticsearchClientSpy elasticsearchClientSpy = ElasticsearchClientSpy.create();
 
-	@Rule
-	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticsearchClient = TestElasticsearchClient.create();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
@@ -58,7 +58,7 @@ public class ElasticsearchBootstrapIT {
 	 * and that the Elasticsearch client starts in the second phase of bootstrap in that case.
 	 */
 	@Test
-	public void explicitModelDialect() {
+	void explicitModelDialect() {
 		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
 				.withBackendProperty(
 						ElasticsearchBackendSettings.VERSION, ElasticsearchTestDialect.getActualVersion().toString()
@@ -94,9 +94,11 @@ public class ElasticsearchBootstrapIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3841")
-	public void noVersionCheck_missingVersion() {
-		assumeTrue( "This test only makes sense if version checks are supported",
-				ElasticsearchTckBackendFeatures.supportsVersionCheck() );
+	void noVersionCheck_missingVersion() {
+		assumeTrue(
+				ElasticsearchTckBackendFeatures.supportsVersionCheck(),
+				"This test only makes sense if version checks are supported"
+		);
 
 		assertThatThrownBy(
 				() -> setupHelper.start()
@@ -128,11 +130,13 @@ public class ElasticsearchBootstrapIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3841")
-	public void noVersionCheck_incompleteVersion() {
+	void noVersionCheck_incompleteVersion() {
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
 
-		assumeTrue( "This test only makes sense if the Elasticsearch version has both a major and minor number",
-				actualVersion.majorOptional().isPresent() && actualVersion.minor().isPresent() );
+		assumeTrue(
+				actualVersion.majorOptional().isPresent() && actualVersion.minor().isPresent(),
+				"This test only makes sense if the Elasticsearch version has both a major and minor number"
+		);
 		String versionWithMajorOnly = actualVersion.distribution() + ":" + actualVersion.majorOptional().getAsInt();
 
 		assertThatThrownBy(
@@ -171,7 +175,7 @@ public class ElasticsearchBootstrapIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3841", "HSEARCH-4214" })
-	public void noVersionCheck_completeVersion() {
+	void noVersionCheck_completeVersion() {
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
 
 		String configuredVersion;
@@ -216,7 +220,7 @@ public class ElasticsearchBootstrapIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4214")
-	public void noVersionCheck_versionOverrideOnStart_incompatibleVersion() {
+	void noVersionCheck_versionOverrideOnStart_incompatibleVersion() {
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
 
 		String configuredVersionOnBackendCreation;
@@ -278,11 +282,13 @@ public class ElasticsearchBootstrapIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4214")
-	public void noVersionCheck_versionOverrideOnStart_compatibleVersion() {
+	void noVersionCheck_versionOverrideOnStart_compatibleVersion() {
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
 
-		assumeTrue( "This test only makes sense if the Elasticsearch version has both a major and minor number",
-				actualVersion.majorOptional().isPresent() && actualVersion.minor().isPresent() );
+		assumeTrue(
+				actualVersion.majorOptional().isPresent() && actualVersion.minor().isPresent(),
+				"This test only makes sense if the Elasticsearch version has both a major and minor number"
+		);
 		String versionWithMajorOnly = actualVersion.distribution() + ":" + actualVersion.majorOptional().getAsInt();
 		String versionWithMajorAndMinorOnly = actualVersion.distribution() + ":"
 				+ actualVersion.majorOptional().getAsInt() + "." + actualVersion.minor().getAsInt();
@@ -321,7 +327,7 @@ public class ElasticsearchBootstrapIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-4435" })
-	public void noVersionCheck_customSettingsAndMapping() {
+	void noVersionCheck_customSettingsAndMapping() {
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
 
 		String configuredVersion;

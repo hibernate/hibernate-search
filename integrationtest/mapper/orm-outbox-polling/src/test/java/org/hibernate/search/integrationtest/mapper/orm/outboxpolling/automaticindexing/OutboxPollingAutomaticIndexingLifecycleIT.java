@@ -23,37 +23,37 @@ import org.hibernate.search.mapper.orm.outboxpolling.cfg.impl.HibernateOrmMapper
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class OutboxPollingAutomaticIndexingLifecycleIT {
+class OutboxPollingAutomaticIndexingLifecycleIT {
 
 	// The value doesn't matter, we just need to be sure that's the one that was configured.
 	private static final long BATCH_SIZE =
 			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_BATCH_SIZE;
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
 	private final OutboxEventFilter eventFilter = new OutboxEventFilter();
 
-	@Before
-	public void cleanUp() {
+	@BeforeEach
+	void cleanUp() {
 		SessionFactory sessionFactory = setupWithCleanup();
 		sessionFactory.close();
 	}
 
 	@Test
-	public void stopWhileOutboxEventsIsBeingProcessed() {
+	void stopWhileOutboxEventsIsBeingProcessed() {
 		SessionFactory sessionFactory = setup();
 		backendMock.verifyExpectationsMet();
 		int size = 10000;
@@ -107,7 +107,7 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 	}
 
 	@Test
-	public void processCreateUpdateDelete() {
+	void processCreateUpdateDelete() {
 		SessionFactory sessionFactory = setup();
 		backendMock.verifyExpectationsMet();
 

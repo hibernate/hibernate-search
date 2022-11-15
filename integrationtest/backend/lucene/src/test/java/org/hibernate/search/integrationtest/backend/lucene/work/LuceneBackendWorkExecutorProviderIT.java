@@ -17,32 +17,29 @@ import org.hibernate.search.backend.lucene.work.spi.LuceneWorkExecutorProvider;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.common.execution.spi.DelegatingSimpleScheduledExecutor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-public class LuceneBackendWorkExecutorProviderIT {
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
+class LuceneBackendWorkExecutorProviderIT {
 
 	@Mock
 	private LuceneWorkExecutorProvider backendWorkExecutorProvider;
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Test
-	public void test() {
+	void test() {
 		when( backendWorkExecutorProvider.writeExecutor( any() ) ).thenReturn(
 				new DelegatingSimpleScheduledExecutor( new ScheduledThreadPoolExecutor( 1 ), true )
 		);

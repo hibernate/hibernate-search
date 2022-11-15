@@ -15,14 +15,14 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.acme.ClassNotInHibernateSearchPackage;
 
-public class RuntimeHelperTest {
+class RuntimeHelperTest {
 
 	@Test
-	public void callerClassWalker() {
+	void callerClassWalker() {
 		Optional<Class<?>> caller = RuntimeHelper.callerClassWalker().walk( Stream::findFirst );
 		assertThat( caller )
 				.contains( RuntimeHelperTest.class );
@@ -33,7 +33,7 @@ public class RuntimeHelperTest {
 	}
 
 	@Test
-	public void firstNonJdkCaller() {
+	void firstNonJdkCaller() {
 		Supplier<Optional<Class<?>>> called = new Supplier<Optional<Class<?>>>() {
 			@Override
 			public Optional<Class<?>> get() {
@@ -48,7 +48,7 @@ public class RuntimeHelperTest {
 
 	// StackWalker ignores lambda by default, so this is important
 	@Test
-	public void firstNonJdkCaller_lambda() {
+	void firstNonJdkCaller_lambda() {
 		Supplier<Optional<Class<?>>> called = () -> RuntimeHelper.firstNonSelfNonJdkCaller();
 		assertThat( Delegate.<Optional<Class<?>>>call( called ) )
 				.contains( Delegate.class );
@@ -57,7 +57,7 @@ public class RuntimeHelperTest {
 	}
 
 	@Test
-	public void isHibernateSearch() {
+	void isHibernateSearch() {
 		assertThat( RuntimeHelper.isHibernateSearch( Delegate.class ) )
 				.isTrue();
 		assertThat( RuntimeHelper.isHibernateSearch( ClassNotInHibernateSearchPackage.class ) )

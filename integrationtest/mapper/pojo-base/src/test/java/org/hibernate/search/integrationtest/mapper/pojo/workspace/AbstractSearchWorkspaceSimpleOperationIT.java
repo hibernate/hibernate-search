@@ -20,24 +20,24 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 	private static final String BACKEND2_NAME = "stubBackend2";
 
-	@Rule
-	public BackendMock defaultBackendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock defaultBackendMock = BackendMock.create();
 
-	@Rule
-	public BackendMock backend2Mock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backend2Mock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper;
 
 	private SearchMapping mapping;
@@ -49,8 +49,8 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 				defaultBackendMock, namedBackendMocks );
 	}
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		defaultBackendMock.expectAnySchema( IndexedEntity1.INDEX_NAME );
 		backend2Mock.expectAnySchema( IndexedEntity2.INDEX_NAME );
 
@@ -59,7 +59,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void async_success() {
+	void async_success() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchWorkspace workspace = session.workspace( IndexedEntity1.class );
 
@@ -76,7 +76,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void async_failure() {
+	void async_failure() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchWorkspace workspace = session.workspace( IndexedEntity1.class );
 
@@ -94,7 +94,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void sync_success() {
+	void sync_success() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchWorkspace workspace = session.workspace( IndexedEntity1.class );
 
@@ -108,7 +108,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void sync_failure() {
+	void sync_failure() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchWorkspace workspace = session.workspace( IndexedEntity1.class );
 
@@ -126,7 +126,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void multiIndexMultiBackend() {
+	void multiIndexMultiBackend() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchWorkspace workspace = session.workspace();
 
@@ -149,7 +149,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void outOfSession() {
+	void outOfSession() {
 		SearchWorkspace workspace;
 		try ( SearchSession session = mapping.createSession() ) {
 			workspace = session.workspace( IndexedEntity1.class );
@@ -167,7 +167,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void fromMappingWithoutSession() {
+	void fromMappingWithoutSession() {
 		SearchWorkspace workspace = mapping
 				.scope( IndexedEntity1.class ).workspace();
 

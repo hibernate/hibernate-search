@@ -17,32 +17,32 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-3947")
-public class LuceneNoLimitSearchIT {
+class LuceneNoLimitSearchIT {
 
 	public static final int INDEX_SIZE = 100_000;
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 		initData();
 	}
 
 	@Test
-	public void fetchAll() {
+	void fetchAll() {
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.match().field( "field" ).matching( "739" ) )
 				.toQuery();
@@ -55,7 +55,7 @@ public class LuceneNoLimitSearchIT {
 	}
 
 	@Test
-	public void fetchAll_lessThan100Matches() {
+	void fetchAll_lessThan100Matches() {
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.range().field( "field" ).between( "73979", "73997" ) )
 				.toQuery();
@@ -66,7 +66,7 @@ public class LuceneNoLimitSearchIT {
 	}
 
 	@Test
-	public void fetchAll_between100And10000Matches() {
+	void fetchAll_between100And10000Matches() {
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.range().field( "field" ).between( "73937", "79397" ) )
 				.toQuery();
@@ -77,7 +77,7 @@ public class LuceneNoLimitSearchIT {
 	}
 
 	@Test
-	public void fetchAll_moreThan10000Matches() {
+	void fetchAll_moreThan10000Matches() {
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.range().field( "field" ).between( "37973", "73937" ) )
 				.toQuery();
@@ -88,7 +88,7 @@ public class LuceneNoLimitSearchIT {
 	}
 
 	@Test
-	public void fetchAll_totalHitCountThreshold() {
+	void fetchAll_totalHitCountThreshold() {
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.match().field( "field" ).matching( "739" ) )
 				.totalHitCountThreshold( 5 )
@@ -102,7 +102,7 @@ public class LuceneNoLimitSearchIT {
 	}
 
 	@Test
-	public void fetchAllHits() {
+	void fetchAllHits() {
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.match().field( "field" ).matching( "739" ) )
 				.toQuery();

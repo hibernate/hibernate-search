@@ -31,23 +31,23 @@ import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test that defining a routing bridge that generates (mutable) routing keys works as expected
  * with a full setup (real mapper + real backend).
  */
-public class RoutingBridgeConditionalIndexingIT {
+class RoutingBridgeConditionalIndexingIT {
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = setupHelper.start()
 				.withProperty( HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,
 						IndexingPlanSynchronizationStrategyNames.READ_SYNC )
@@ -55,7 +55,7 @@ public class RoutingBridgeConditionalIndexingIT {
 	}
 
 	@Test
-	public void testLifecycle() {
+	void testLifecycle() {
 		assertThat( searchAllIds() ).isEmpty();
 
 		with( entityManagerFactory ).runInTransaction( entityManager -> {

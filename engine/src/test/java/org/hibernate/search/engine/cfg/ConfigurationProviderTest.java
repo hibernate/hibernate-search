@@ -27,20 +27,20 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 
-public class ConfigurationProviderTest {
+class ConfigurationProviderTest {
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
-	public void smoke() {
+	void smoke() {
 		ConfigurationPropertySource propertySource = fromMap( asMap( "someKey", "foo" ) )
 				.withFallback( fallback( resolver(), global() ) );
 		assertThat( propertySource.get( "someKey" ) )
@@ -53,7 +53,7 @@ public class ConfigurationProviderTest {
 	}
 
 	@Test
-	public void scopeChange() {
+	void scopeChange() {
 		BeanResolver resolver = resolver(
 				scope -> {
 					if ( scope.matchExact( "global" ) ) {
@@ -87,7 +87,7 @@ public class ConfigurationProviderTest {
 	}
 
 	@Test
-	public void maskAndFallbackForScope() {
+	void maskAndFallbackForScope() {
 		BeanResolver resolver = resolver(
 				scope -> {
 					if ( scope.matchExact( "global" ) ) {
@@ -120,7 +120,7 @@ public class ConfigurationProviderTest {
 	}
 
 	@Test
-	public void multipleProviders() {
+	void multipleProviders() {
 		class ConfigurationProviderA implements ConfigurationProvider {
 
 			@Override
@@ -187,7 +187,7 @@ public class ConfigurationProviderTest {
 	}
 
 	@Test
-	public void almostRealisticScenario() {
+	void almostRealisticScenario() {
 		BeanResolver resolver = resolver(
 				scope -> {
 					if ( scope.matchExact( "global" ) ) {

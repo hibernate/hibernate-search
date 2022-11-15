@@ -11,8 +11,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -48,12 +48,12 @@ import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationPr
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -68,7 +68,7 @@ import com.google.gson.stream.JsonWriter;
  */
 @TestForIssue(jiraKey = "HSEARCH-2849")
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.client.ElasticsearchContentLengthIT")
-public class ElasticsearchContentLengthIT {
+class ElasticsearchContentLengthIT {
 
 	private static final JsonObject BODY_PART = JsonParser.parseString( "{ \"foo\": \"bar\" }" ).getAsJsonObject();
 
@@ -90,11 +90,12 @@ public class ElasticsearchContentLengthIT {
 
 	private static final int BUFFER_LIMIT = 1024;
 
-	@Rule
-	public WireMockRule wireMockRule =
-			new WireMockRule( wireMockConfig().port( 0 ).httpsPort( 0 ) /* Automatic port selection */ );
+	@RegisterExtension
+	private final WireMockExtension wireMockRule = WireMockExtension.newInstance()
+			.options( wireMockConfig().dynamicPort().dynamicHttpsPort() )
+			.build();
 
-	@Rule
+	@RegisterExtension
 	public TestConfigurationProvider testConfigurationProvider = new TestConfigurationProvider();
 
 	private final ThreadPoolProviderImpl threadPoolProvider = new ThreadPoolProviderImpl(
@@ -104,8 +105,8 @@ public class ElasticsearchContentLengthIT {
 	private ScheduledExecutorService timeoutExecutorService =
 			threadPoolProvider.newScheduledExecutor( 1, "Timeout - " );
 
-	@After
-	public void cleanup() {
+	@AfterEach
+	void cleanup() {
 		timeoutExecutorService.shutdownNow();
 		threadPoolProvider.close();
 
@@ -115,7 +116,7 @@ public class ElasticsearchContentLengthIT {
 	}
 
 	@Test
-	public void tinyPayload() throws Exception {
+	void tinyPayload() throws Exception {
 		wireMockRule.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
@@ -130,7 +131,7 @@ public class ElasticsearchContentLengthIT {
 	}
 
 	@Test
-	public void payloadJustBelowBufferSize() throws Exception {
+	void payloadJustBelowBufferSize() throws Exception {
 		wireMockRule.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
@@ -151,11 +152,11 @@ public class ElasticsearchContentLengthIT {
 	 * we can "stream" it to the remote cluster, and avoid storing it entirely in memory.
 	 */
 	@Test
-	public void payloadJustAboveBufferSize_noRequestPostProcessing() throws Exception {
+	void payloadJustAboveBufferSize_noRequestPostProcessing() throws Exception {
 		assumeFalse(
+				ElasticsearchTestHostConnectionConfiguration.get().isAws(),
 				"This test only is only relevant if Elasticsearch request are *NOT* post-processed." +
-						" Elasticsearch requests are post-processed by the AWS integration in particular.",
-				ElasticsearchTestHostConnectionConfiguration.get().isAws()
+						" Elasticsearch requests are post-processed by the AWS integration in particular."
 		);
 		wireMockRule.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
@@ -179,11 +180,11 @@ public class ElasticsearchContentLengthIT {
 	 * we have to store it entirely in memory, so chunked transfer does not make sense.
 	 */
 	@Test
-	public void payloadJustAboveBufferSize_requestPostProcessing() throws Exception {
+	void payloadJustAboveBufferSize_requestPostProcessing() throws Exception {
 		assumeTrue(
+				ElasticsearchTestHostConnectionConfiguration.get().isAws(),
 				"This test only is only relevant if Elasticsearch request are post-processed." +
-						" Elasticsearch requests are post-processed by the AWS integration in particular.",
-				ElasticsearchTestHostConnectionConfiguration.get().isAws()
+						" Elasticsearch requests are post-processed by the AWS integration in particular."
 		);
 		wireMockRule.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
@@ -243,8 +244,8 @@ public class ElasticsearchContentLengthIT {
 		return builder.build();
 	}
 
-	private static String httpUriFor(WireMockRule rule) {
-		return "http://localhost:" + rule.port();
+	private static String httpUriFor(WireMockExtension extension) {
+		return "http://localhost:" + extension.getPort();
 	}
 
 	private static UrlPathPattern urlPathLike(String path) {

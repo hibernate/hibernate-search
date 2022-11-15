@@ -28,14 +28,13 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @SuppressWarnings("unchecked") // Mocking parameterized types
 public abstract class AbstractEntityReferenceProjectionIT {
 
@@ -43,9 +42,6 @@ public abstract class AbstractEntityReferenceProjectionIT {
 	private static final String DOCUMENT_2_ID = "2";
 
 	private static final ProjectionMappedTypeContext mainTypeContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	private final StubMappedIndex mainIndex;
 
@@ -57,7 +53,7 @@ public abstract class AbstractEntityReferenceProjectionIT {
 			SearchQuerySelectStep<?, R, E, LOS, ?, ?> step);
 
 	@Test
-	public void test() {
+	void test() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 		EntityReference doc1EntityReference = StubEntity.reference( doc1Reference );

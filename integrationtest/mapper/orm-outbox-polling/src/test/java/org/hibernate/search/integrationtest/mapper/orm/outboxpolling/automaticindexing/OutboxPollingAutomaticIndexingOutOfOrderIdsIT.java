@@ -31,16 +31,16 @@ import org.hibernate.search.mapper.orm.outboxpolling.cfg.impl.HibernateOrmMapper
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
+class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
 	private static final String OUTBOX_EVENT_UPDATE_ID_AND_TIME =
 			"UPDATE HSEARCH_OUTBOX_EVENT SET ID = ?, PROCESSAFTER = ? WHERE ID = ?";
@@ -50,17 +50,17 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
 	private final OutboxEventFilter eventFilter = new OutboxEventFilter();
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
 	private SessionFactory sessionFactory;
 
-	@Before
-	public void before() {
+	@BeforeEach
+	void before() {
 		backendMock.expectAnySchema( IndexedEntity.INDEX )
 				.expectAnySchema( RoutedIndexedEntity.NAME );
 		sessionFactory = ormSetupHelper.start()
@@ -76,7 +76,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 	}
 
 	@Test
-	public void processCreateUpdateDelete() {
+	void processCreateUpdateDelete() {
 		// An entity is created, updated, then deleted in separate transactions,
 		// but the delete event has ID 1, the update event has ID 2, and the add event has ID 3.
 
@@ -145,7 +145,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 	}
 
 	@Test
-	public void processDeleteRecreate_rightOrder() {
+	void processDeleteRecreate_rightOrder() {
 		// An entity is deleted, then re-created in separate transactions.
 
 		int id = 1;
@@ -179,7 +179,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 	}
 
 	@Test
-	public void processDeleteRecreate_outOfOrder() {
+	void processDeleteRecreate_outOfOrder() {
 		// An entity is deleted, then re-created in separate transactions,
 		// but the add event has ID 1, the and the delete event has ID 2.
 
@@ -240,7 +240,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 	}
 
 	@Test
-	public void processDifferentRoutesUpdates() {
+	void processDifferentRoutesUpdates() {
 		// An entity is updated twice in two separate transactions,
 		// resulting in two events with different routing keys
 
@@ -287,7 +287,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 	}
 
 	@Test
-	public void processDifferentRoutesUpdates_outOfOrder() {
+	void processDifferentRoutesUpdates_outOfOrder() {
 		// An entity is updated twice in two separate transactions,
 		// resulting in two events with different routing keys,
 		// but the second update event has ID 1, and the first update has ID 2.

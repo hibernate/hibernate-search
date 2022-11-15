@@ -25,26 +25,26 @@ import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescript
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SearchMappingIndexedEntitiesIT {
+class SearchMappingIndexedEntitiesIT {
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = setupHelper.start().setup( Book.class );
 	}
 
 	@Test
-	public void indexedEntities() {
+	void indexedEntities() {
 		//tag::indexedEntities[]
 		SearchMapping mapping = /* ... */ // <1>
 				//end::indexedEntities[]
@@ -74,7 +74,7 @@ public class SearchMappingIndexedEntitiesIT {
 	}
 
 	@Test
-	public void indexMetamodel() {
+	void indexMetamodel() {
 		SearchMapping mapping = Search.mapping( entityManagerFactory );
 		//tag::indexMetamodel[]
 		SearchIndexedEntity<Book> bookEntity = mapping.indexedEntity( Book.class ); // <1>

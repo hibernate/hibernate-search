@@ -18,7 +18,7 @@ import org.hibernate.search.engine.search.predicate.definition.PredicateDefiniti
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinitionContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -26,14 +26,14 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class NamedPredicateMultiIndexCompatibilityIT {
+class NamedPredicateMultiIndexCompatibilityIT {
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
@@ -45,8 +45,8 @@ public class NamedPredicateMultiIndexCompatibilityIT {
 			SimpleMappedIndex.of( IncompatibleIndexBinding::new ).name( "incompatible" );
 	protected static final DataSet dataSet = new DataSet();
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start()
 				.withIndexes( index, compatibleIndex, missingPredicateIndex, incompatibleIndex )
 				.setup();
@@ -59,7 +59,7 @@ public class NamedPredicateMultiIndexCompatibilityIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4166")
-	public void multiIndex_withCompatibleIndex() {
+	void multiIndex_withCompatibleIndex() {
 		StubMappingScope scope = index.createScope( compatibleIndex );
 
 		assertThatQuery( scope.query()
@@ -72,7 +72,7 @@ public class NamedPredicateMultiIndexCompatibilityIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4166")
-	public void multiIndex_withMissingPredicateIndex() {
+	void multiIndex_withMissingPredicateIndex() {
 		StubMappingScope scope = index.createScope( missingPredicateIndex );
 
 		assertThatThrownBy( () -> scope.predicate().named( "my-predicate" ) )
@@ -89,7 +89,7 @@ public class NamedPredicateMultiIndexCompatibilityIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4166")
-	public void multiIndex_withIncompatibleIndex() {
+	void multiIndex_withIncompatibleIndex() {
 		StubMappingScope scope = index.createScope( incompatibleIndex );
 
 		assertThatThrownBy( () -> scope.predicate().named( "my-predicate" ) )

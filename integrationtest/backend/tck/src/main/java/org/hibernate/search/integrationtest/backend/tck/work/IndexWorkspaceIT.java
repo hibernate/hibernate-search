@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.work;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.Collections;
 
@@ -21,13 +21,13 @@ import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperati
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSession;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Verify that the work executor operations:
@@ -37,35 +37,39 @@ import org.junit.Test;
  * {@link IndexWorkspace#refresh(OperationSubmitter, UnsupportedOperationBehavior)}
  * work properly, in every backends.
  */
-public class IndexWorkspaceIT {
+class IndexWorkspaceIT {
 
 	private static final String TENANT_1 = "tenant1";
 	private static final String TENANT_2 = "tenant2";
 
 	private static final int NUMBER_OF_BOOKS = 200;
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public SearchSetupHelper multiTenancySetupHelper =
-			new SearchSetupHelper( TckBackendHelper::createMultiTenancyBackendSetupStrategy );
+	@RegisterExtension
+	public final SearchSetupHelper multiTenancySetupHelper =
+			SearchSetupHelper.create( TckBackendHelper::createMultiTenancyBackendSetupStrategy );
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
+	@BeforeEach
+	void initSessionContexts() {
+	}
+
+	@BeforeEach
 	public void checkAssumptions() {
 		assumeTrue(
-				"This test only makes sense if the backend supports explicit purge, mergeSegments, flush and refresh",
 				TckConfiguration.get().getBackendFeatures().supportsExplicitPurge()
 						&& TckConfiguration.get().getBackendFeatures().supportsExplicitMergeSegments()
 						&& TckConfiguration.get().getBackendFeatures().supportsExplicitFlush()
-						&& TckConfiguration.get().getBackendFeatures().supportsExplicitRefresh()
+						&& TckConfiguration.get().getBackendFeatures().supportsExplicitRefresh(),
+				"This test only makes sense if the backend supports explicit purge, mergeSegments, flush and refresh"
 		);
 	}
 
 	@Test
-	public void runMergeSegmentsPurgeAndFlushAndRefreshInSequence() {
+	void runMergeSegmentsPurgeAndFlushAndRefreshInSequence() {
 		setupHelper.start().withIndex( index ).setup();
 		StubSession noTenantSessionContext = index.mapping().session();
 
@@ -89,7 +93,7 @@ public class IndexWorkspaceIT {
 	}
 
 	@Test
-	public void runMergeSegmentsPurgeAndFlushAndRefreshWithMultiTenancy() {
+	void runMergeSegmentsPurgeAndFlushAndRefreshWithMultiTenancy() {
 		multiTenancySetupHelper.start().withIndex( index ).withMultiTenancy().setup();
 		StubSession tenant1SessionContext = index.mapping().session( TENANT_1 );
 		StubSession tenant2SessionContext = index.mapping().session( TENANT_2 );

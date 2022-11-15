@@ -15,17 +15,17 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 
-public class FailureReportIT {
+class FailureReportIT {
 
 	private static final String FAILURE_LOG_INTRODUCTION = "Hibernate Search encountered a failure during bootstrap;"
 			+ " continuing for now to list all problems,"
@@ -37,13 +37,13 @@ public class FailureReportIT {
 					+ "\n"
 					+ "    Standalone POJO mapping: \n";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
@@ -52,7 +52,7 @@ public class FailureReportIT {
 	 * and check that every failure is reported, and that failures are grouped into a single list.
 	 */
 	@Test
-	public void multipleFailuresSameContext() {
+	void multipleFailuresSameContext() {
 		final String indexName = "indexName";
 		@Indexed(index = indexName)
 		class IndexedEntity {
@@ -108,7 +108,7 @@ public class FailureReportIT {
 	 * and check that every failure is reported.
 	 */
 	@Test
-	public void multipleFailuresMultipleProperties() {
+	void multipleFailuresMultipleProperties() {
 		final String indexName = "indexName";
 		@Indexed(index = indexName)
 		class IndexedEntity {
@@ -167,7 +167,7 @@ public class FailureReportIT {
 	 * and check that every failure is reported.
 	 */
 	@Test
-	public void multipleFailuresMultipleTypes() {
+	void multipleFailuresMultipleTypes() {
 		final String indexName1 = "indexName1";
 		@Indexed(index = indexName1)
 		class IndexedEntity1 {
@@ -229,7 +229,7 @@ public class FailureReportIT {
 	}
 
 	@Test
-	public void failuresFromBackend() {
+	void failuresFromBackend() {
 		final String indexName = "indexName";
 		@Indexed(index = indexName)
 		class IndexedEntity {

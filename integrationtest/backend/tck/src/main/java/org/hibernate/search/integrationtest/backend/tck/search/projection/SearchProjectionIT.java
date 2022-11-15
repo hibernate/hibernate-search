@@ -41,27 +41,27 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 /**
  * Generic tests for projections. More specific tests can be found in other classes, such as {@link FieldProjectionSingleValuedBaseIT}.
  */
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @SuppressWarnings("unchecked") // Mocking parameterized types
-public class SearchProjectionIT {
+class SearchProjectionIT {
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
@@ -70,11 +70,8 @@ public class SearchProjectionIT {
 
 	private static final ProjectionMappedTypeContext mainTypeContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
 
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
-
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
@@ -83,15 +80,15 @@ public class SearchProjectionIT {
 			// What matters here is that is a different index.
 			SimpleMappedIndex.of( IndexBinding::new ).name( "other" );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndexes( mainIndex, otherIndex ).setup();
 
 		initData();
 	}
 
 	@Test
-	public void noProjections() {
+	void noProjections() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
@@ -103,7 +100,7 @@ public class SearchProjectionIT {
 	}
 
 	@Test
-	public void references_noLoadingContext() {
+	void references_noLoadingContext() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<List<?>> query;
@@ -138,7 +135,7 @@ public class SearchProjectionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3395")
-	public void references() {
+	void references() {
 		DocumentReference document1Reference = reference( mainIndex.typeName(), DOCUMENT_1 );
 		DocumentReference document2Reference = reference( mainIndex.typeName(), DOCUMENT_2 );
 		DocumentReference document3Reference = reference( mainIndex.typeName(), DOCUMENT_3 );
@@ -208,7 +205,7 @@ public class SearchProjectionIT {
 	}
 
 	@Test
-	public void score() {
+	void score() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<Float> query = scope.query()
@@ -233,7 +230,7 @@ public class SearchProjectionIT {
 	 * Test projection on the score when we do not sort by score.
 	 */
 	@Test
-	public void score_noScoreSort() {
+	void score_noScoreSort() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<Float> query = scope.query()
@@ -253,7 +250,7 @@ public class SearchProjectionIT {
 	}
 
 	@Test
-	public void constant_nonNull() {
+	void constant_nonNull() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		String constantValue = "foo";
@@ -282,7 +279,7 @@ public class SearchProjectionIT {
 	}
 
 	@Test
-	public void constant_null() {
+	void constant_null() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatQuery( scope.query()
@@ -310,7 +307,7 @@ public class SearchProjectionIT {
 	}
 
 	@Test
-	public void constant_root() {
+	void constant_root() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		String constantValue = "foo";
@@ -331,7 +328,7 @@ public class SearchProjectionIT {
 	 * and also multiple field projections.
 	 */
 	@Test
-	public void mixed() {
+	void mixed() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<List<?>> query;
@@ -374,7 +371,7 @@ public class SearchProjectionIT {
 	 * and also multiple field projections, using nested fields too.
 	 */
 	@Test
-	public void mixed_withNestedFields() {
+	void mixed_withNestedFields() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<List<?>> query;
@@ -423,7 +420,7 @@ public class SearchProjectionIT {
 	}
 
 	@Test
-	public void reuseProjectionInstance_onScopeTargetingSameIndexes() {
+	void reuseProjectionInstance_onScopeTargetingSameIndexes() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchProjection<String> projection = scope.projection()
 				.field( mainIndex.binding().string1Field.relativeFieldName, String.class ).toProjection();
@@ -470,7 +467,7 @@ public class SearchProjectionIT {
 	}
 
 	@Test
-	public void reuseProjectionInstance_onScopeTargetingDifferentIndexes() {
+	void reuseProjectionInstance_onScopeTargetingDifferentIndexes() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchProjection<String> projection = scope.projection()
 				.field( mainIndex.binding().string1Field.relativeFieldName, String.class ).toProjection();
@@ -500,7 +497,7 @@ public class SearchProjectionIT {
 	}
 
 	@Test
-	public void extension() {
+	void extension() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<String> query;
 
@@ -581,21 +578,21 @@ public class SearchProjectionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void toAbsolutePath() {
+	void toAbsolutePath() {
 		assertThat( mainIndex.createScope().projection().toAbsolutePath( "string" ) )
 				.isEqualTo( "string" );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void toAbsolutePath_withRoot() {
+	void toAbsolutePath_withRoot() {
 		assertThat( mainIndex.createScope().projection().withRoot( "nested" ).toAbsolutePath( "inner" ) )
 				.isEqualTo( "nested.inner" );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void toAbsolutePath_null() {
+	void toAbsolutePath_null() {
 		assertThatThrownBy( () -> mainIndex.createScope().projection().toAbsolutePath( null ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'relativeFieldPath' must not be null" );
@@ -603,7 +600,7 @@ public class SearchProjectionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void toAbsolutePath_withRoot_null() {
+	void toAbsolutePath_withRoot_null() {
 		assertThatThrownBy( () -> mainIndex.createScope().projection().withRoot( "nested" ).toAbsolutePath( null ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'relativeFieldPath' must not be null" );

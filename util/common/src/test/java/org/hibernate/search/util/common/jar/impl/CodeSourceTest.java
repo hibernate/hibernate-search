@@ -27,13 +27,12 @@ import java.util.stream.Stream;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.function.ThrowingConsumer;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import org.springframework.boot.loader.jar.JarFile;
 
-public class CodeSourceTest {
+class CodeSourceTest {
 
 	private static final String META_INF_FILE_RELATIVE_PATH = "META-INF/someFile.txt";
 	private static final byte[] META_INF_FILE_CONTENT = "This is some content".getBytes( StandardCharsets.UTF_8 );
@@ -41,11 +40,11 @@ public class CodeSourceTest {
 	private static final String SIMPLE_CLASS_RELATIVE_PATH = SimpleClass.class.getName().replaceAll(
 			"\\.", "/" ) + ".class";
 
-	@Rule
-	public TemporaryFolder temporaryFolder = new TemporaryFolder();
+	@TempDir
+	public Path temporaryFolder;
 
 	@Test
-	public void directory() throws Exception {
+	void directory() throws Exception {
 		Path dirPath = createDir( root -> {
 			addMetaInfFile( root );
 			addSimpleClass( root );
@@ -81,7 +80,7 @@ public class CodeSourceTest {
 	}
 
 	@Test
-	public void jar_fileScheme() throws Exception {
+	void jar_fileScheme() throws Exception {
 		Path jarPath = createJar( root -> {
 			addMetaInfFile( root );
 			addSimpleClass( root );
@@ -117,7 +116,7 @@ public class CodeSourceTest {
 	}
 
 	@Test
-	public void jar_jarScheme_classesInRoot() throws Exception {
+	void jar_jarScheme_classesInRoot() throws Exception {
 		Path jarPath = createJar( root -> {
 			addMetaInfFile( root );
 			addSimpleClass( root );
@@ -159,7 +158,7 @@ public class CodeSourceTest {
 	// See https://docs.spring.io/spring-boot/docs/2.2.13.RELEASE/maven-plugin//repackage-mojo.html
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4724")
-	public void jar_jarScheme_springBoot_classesInSubDirectory() throws Exception {
+	void jar_jarScheme_springBoot_classesInSubDirectory() throws Exception {
 		String classesDirRelativeString = "BOOT-INF/classes";
 		Path jarPath = createJar( root -> {
 			addMetaInfFile( root );
@@ -208,7 +207,7 @@ public class CodeSourceTest {
 	// See https://docs.spring.io/spring-boot/docs/2.2.13.RELEASE/maven-plugin//repackage-mojo.html
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4724")
-	public void jar_jarScheme_springBoot_classesInSubJarInSubDirectory() throws Exception {
+	void jar_jarScheme_springBoot_classesInSubJarInSubDirectory() throws Exception {
 		String innerJarInOuterJarRelativePathString = "BOOT-INF/lib/inner.jar";
 		// For some reason inner JAR entries in the outer JAR must not be compressed, otherwise classloading will fail.
 		Path outerJarPath = createJar(
@@ -276,12 +275,12 @@ public class CodeSourceTest {
 	}
 
 	@Test
-	public void jar_jarScheme_specialCharacter() throws Exception {
+	void jar_jarScheme_specialCharacter() throws Exception {
 		Path initialJarPath = createJar( root -> {
 			addMetaInfFile( root );
 			addSimpleClass( root );
 		} );
-		Path parentDirWithSpecialChar = temporaryFolder.newFolder().toPath()
+		Path parentDirWithSpecialChar = Files.createTempDirectory( temporaryFolder, "hsearch" )
 				.resolve( "parentnamewith%40special@char" );
 		Files.createDirectories( parentDirWithSpecialChar );
 		Path jarPath = Files.copy(
@@ -316,12 +315,12 @@ public class CodeSourceTest {
 	}
 
 	@Test
-	public void jar_fileScheme_specialCharacter() throws Exception {
+	void jar_fileScheme_specialCharacter() throws Exception {
 		Path initialJarPath = createJar( root -> {
 			addMetaInfFile( root );
 			addSimpleClass( root );
 		} );
-		Path parentDirWithSpecialChar = temporaryFolder.newFolder().toPath()
+		Path parentDirWithSpecialChar = Files.createTempDirectory( temporaryFolder, "hsearch" )
 				.resolve( "parentnamewith%40special@char" );
 		Files.createDirectories( parentDirWithSpecialChar );
 		Path jarPath = Files.copy(
@@ -354,12 +353,12 @@ public class CodeSourceTest {
 	}
 
 	@Test
-	public void directory_specialCharacter() throws Exception {
+	void directory_specialCharacter() throws Exception {
 		Path initialDirPath = createDir( root -> {
 			addMetaInfFile( root );
 			addSimpleClass( root );
 		} );
-		Path parentDirWithSpecialChar = temporaryFolder.newFolder().toPath()
+		Path parentDirWithSpecialChar = Files.createTempDirectory( temporaryFolder, "hsearch" )
 				.resolve( "parentnamewith%40special@char" );
 		Files.createDirectories( parentDirWithSpecialChar );
 		Path dirPath = Files.move(
@@ -392,7 +391,7 @@ public class CodeSourceTest {
 	}
 
 	private Path createDir(ThrowingConsumer<Path, IOException> contributor) throws IOException {
-		Path dirPath = temporaryFolder.newFolder().toPath();
+		Path dirPath = Files.createTempDirectory( temporaryFolder, "hsearch" );
 		contributor.accept( dirPath );
 		return dirPath;
 	}

@@ -20,26 +20,26 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-4358")
-public class OutboxPollingAutomaticIndexingWhileMassIndexingIT {
+class OutboxPollingAutomaticIndexingWhileMassIndexingIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPollingAndMassIndexing() );
 
 	@Test
-	public void singleTenant() throws InterruptedException {
+	void singleTenant() throws InterruptedException {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) ) );
 
@@ -106,7 +106,7 @@ public class OutboxPollingAutomaticIndexingWhileMassIndexingIT {
 	}
 
 	@Test
-	public void multiTenant() throws InterruptedException {
+	void multiTenant() throws InterruptedException {
 		String tenant1Id = "tenant1";
 		String tenant2Id = "tenant2";
 

@@ -19,20 +19,14 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public abstract class AbstractPredicateUnsupportedTypeIT {
 
-	private final SimpleMappedIndex<IndexBinding> index;
-	private final FieldTypeDescriptor<?> fieldType;
-
-	protected AbstractPredicateUnsupportedTypeIT(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?> fieldType) {
-		this.index = index;
-		this.fieldType = fieldType;
-	}
-
-	@Test
-	public void unsupported() {
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("params")
+	void unsupported(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?> fieldType) {
 		SearchPredicateFactory f = index.createScope().predicate();
 
 		String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;

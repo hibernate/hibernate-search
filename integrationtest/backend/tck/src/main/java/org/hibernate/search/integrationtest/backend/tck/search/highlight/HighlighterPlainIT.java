@@ -18,9 +18,9 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class HighlighterPlainIT extends AbstractHighlighterIT {
+class HighlighterPlainIT extends AbstractHighlighterIT {
 
 	@Override
 	HighlighterPlainOptionsStep highlighter(SearchHighlighterFactory factory) {
@@ -50,7 +50,7 @@ public class HighlighterPlainIT extends AbstractHighlighterIT {
 	}
 
 	@Test
-	public void plainFragmenterSimple() {
+	void plainFragmenterSimple() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -70,7 +70,7 @@ public class HighlighterPlainIT extends AbstractHighlighterIT {
 	}
 
 	@Test
-	public void plainFragmenterSpan() {
+	void plainFragmenterSpan() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(

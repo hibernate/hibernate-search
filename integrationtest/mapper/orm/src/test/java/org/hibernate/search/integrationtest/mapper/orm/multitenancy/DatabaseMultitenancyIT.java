@@ -18,24 +18,24 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-4034")
 @PortedFromSearch5(original = "org.hibernate.search.test.batchindexing.DatabaseMultitenancyTest")
-public class DatabaseMultitenancyIT {
+class DatabaseMultitenancyIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	/**
@@ -62,8 +62,8 @@ public class DatabaseMultitenancyIT {
 
 	private SessionFactory sessionFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectSchema( Clock.INDEX, b -> b.field( "brand", String.class ) );
 		sessionFactory = ormSetupHelper
 				.start()
@@ -77,25 +77,25 @@ public class DatabaseMultitenancyIT {
 	}
 
 	@Test
-	public void shouldOnlyFindMetamecModels() {
+	void shouldOnlyFindMetamecModels() {
 		List<Clock> list = searchAll( METAMEC_TID, METAMEC_MODELS );
 		assertThat( list ).containsExactlyInAnyOrder( METAMEC_MODELS );
 	}
 
 	@Test
-	public void shouldOnlyFindGeochronModels() {
+	void shouldOnlyFindGeochronModels() {
 		List<Clock> list = searchAll( GEOCHRON_TID, GEOCHRON_MODELS );
 		assertThat( list ).containsExactlyInAnyOrder( GEOCHRON_MODELS );
 	}
 
 	@Test
-	public void shouldMatchOnlyElementsFromOneTenant() {
+	void shouldMatchOnlyElementsFromOneTenant() {
 		List<Clock> list = searchModel( "model", GEOCHRON_TID, GEOCHRON_MODELS );
 		assertThat( list ).containsExactlyInAnyOrder( GEOCHRON_MODELS );
 	}
 
 	@Test
-	public void searchReferences() {
+	void searchReferences() {
 		assertThat( searchReferences( GEOCHRON_TID, GEOCHRON_MODELS ) ).hasSize( GEOCHRON_MODELS.length );
 	}
 

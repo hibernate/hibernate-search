@@ -9,49 +9,49 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.schema.manage
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendFeatures;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests related to index custom settings when updating indexes.
  */
 @TestForIssue(jiraKey = "HSEARCH-3934")
-public class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
+class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticsearchClient = TestElasticsearchClient.create();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	@Before
-	public void checkAssumption() {
+	@BeforeEach
+	void checkAssumption() {
 		assumeTrue(
-				"This test only is only relevant if we are allowed to open/close Elasticsearch indexes.",
-				ElasticsearchTckBackendFeatures.supportsIndexClosingAndOpening()
+				ElasticsearchTckBackendFeatures.supportsIndexClosingAndOpening(),
+				"This test only is only relevant if we are allowed to open/close Elasticsearch indexes."
 		);
 	}
 
 	@Test
-	public void nothingToDo() {
+	void nothingToDo() {
 		elasticsearchClient.index( index.name() ).deleteAndCreate( "index",
 				" { " +
 						"   'number_of_shards': '3', " +
@@ -110,7 +110,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 	}
 
 	@Test
-	public void change_analysis() {
+	void change_analysis() {
 		elasticsearchClient.index( index.name() ).deleteAndCreate( "index",
 				" { " +
 						"   'number_of_shards': '3', " +
@@ -169,7 +169,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 	}
 
 	@Test
-	public void change_numberOfShards() {
+	void change_numberOfShards() {
 		elasticsearchClient.index( index.name() ).deleteAndCreate( "index",
 				" { " +
 						"   'number_of_shards': '7', " +
@@ -203,7 +203,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 	}
 
 	@Test
-	public void change_maxResultWindow() {
+	void change_maxResultWindow() {
 		elasticsearchClient.index( index.name() ).deleteAndCreate( "index", "{ 'max_result_window': '20000' }" );
 
 		setupAndUpdateIndex( "max-result-window.json" );
@@ -215,7 +215,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 	}
 
 	@Test
-	public void set_maxResultWindow() {
+	void set_maxResultWindow() {
 		elasticsearchClient.index( index.name() ).deleteAndCreate( "index", "{ }" );
 
 		setupAndUpdateIndex( "max-result-window.json" );

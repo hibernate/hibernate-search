@@ -31,9 +31,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.SearchTimeoutException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubNextScrollWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubNextScrollWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
@@ -55,7 +55,7 @@ public class ToHibernateOrmScrollableResultsIT {
 	private static final int DEFAULT_FETCH_SIZE = 100;
 
 	@ClassRule
-	public static BackendMock backendMock = new BackendMock();
+	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );

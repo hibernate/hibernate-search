@@ -21,34 +21,34 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests behavior related to
  * {@link org.hibernate.search.engine.search.sort.dsl.SortFilterStep#filter(Function) filtering}
  * that is not tested in {@link DistanceSortBaseIT}.
  */
-public class DistanceSortFilteringSpecificsIT {
+class DistanceSortFilteringSpecificsIT {
 
-	@ClassRule
-	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 	}
 
 	@Test
-	public void nonNested() {
+	void nonNested() {
 		String fieldPath = index.binding().flattenedObject.relativeFieldName + ".geoPoint";
 
 		assertThatThrownBy(
@@ -63,7 +63,7 @@ public class DistanceSortFilteringSpecificsIT {
 	}
 
 	@Test
-	public void invalidNestedPath_parent() {
+	void invalidNestedPath_parent() {
 		String fieldPath = index.binding().nestedObject1.relativeFieldName + ".geoPoint";
 		String fieldInParentPath = "geoPoint";
 
@@ -80,7 +80,7 @@ public class DistanceSortFilteringSpecificsIT {
 	}
 
 	@Test
-	public void invalidNestedPath_sibling() {
+	void invalidNestedPath_sibling() {
 		String fieldPath = index.binding().nestedObject1.relativeFieldName + ".geoPoint";
 		String fieldInSiblingPath = index.binding().nestedObject2.relativeFieldName + ".geoPoint";
 

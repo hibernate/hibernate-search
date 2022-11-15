@@ -24,35 +24,35 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.data.Pair;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test the fallback to projection constructors for the "default projection" (no select() call)
  * when no loader is registered for the loaded type.
  */
 @TestForIssue(jiraKey = "HSEARCH-4579")
-public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
+class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 
 	private static final String ENTITY_NAME = "entity_name";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	protected final StubLoadingContext loadingContext = new StubLoadingContext();
 
 	@Test
-	public void withoutLoadingStrategy_withoutProjectionConstructor() {
+	void withoutLoadingStrategy_withoutProjectionConstructor() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -96,7 +96,7 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 	}
 
 	@Test
-	public void withoutLoadingStrategy_withProjectionConstructor() {
+	void withoutLoadingStrategy_withProjectionConstructor() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -144,7 +144,7 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 
 
 	@Test
-	public void withLoadingStrategy_withProjectionConstructor() {
+	void withLoadingStrategy_withProjectionConstructor() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -214,7 +214,7 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 	}
 
 	@Test
-	public void multiType() {
+	void multiType() {
 		class Model {
 			@Indexed
 			class IndexedEntityWithLoadingStrategy {

@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.integrationtest.jakarta.batch.util;
 
-import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.BACKEND_TYPE;
+import static org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration.BACKEND_TYPE;
 
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchBackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneBackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
 
 public final class BackendConfigurations {
 

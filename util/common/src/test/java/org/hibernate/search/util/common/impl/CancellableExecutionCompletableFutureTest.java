@@ -17,19 +17,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
 
-public class CancellableExecutionCompletableFutureTest {
+class CancellableExecutionCompletableFutureTest {
 
 	private ExecutorService executorService;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		executorService = new ThreadPoolExecutor(
 				1, 1,
 				0L,
@@ -38,15 +38,15 @@ public class CancellableExecutionCompletableFutureTest {
 		);
 	}
 
-	@After
-	public void cleanup() {
+	@AfterEach
+	void cleanup() {
 		if ( executorService != null ) {
 			executorService.shutdownNow();
 		}
 	}
 
 	@Test
-	public void runnable_success() {
+	void runnable_success() {
 		AtomicBoolean finished = new AtomicBoolean( false );
 		CompletableFuture<Void> future = new CancellableExecutionCompletableFuture<>(
 				() -> finished.set( true ),
@@ -59,7 +59,7 @@ public class CancellableExecutionCompletableFutureTest {
 	}
 
 	@Test
-	public void runnable_runtimeException() {
+	void runnable_runtimeException() {
 		AtomicBoolean finished = new AtomicBoolean( false );
 		RuntimeException exception = new RuntimeException( "Some message" );
 		CompletableFuture<Void> future = new CancellableExecutionCompletableFuture<>(
@@ -80,7 +80,7 @@ public class CancellableExecutionCompletableFutureTest {
 	}
 
 	@Test
-	public void runnable_error() {
+	void runnable_error() {
 		AtomicBoolean finished = new AtomicBoolean( false );
 		Error error = new Error( "Some message" );
 		CompletableFuture<Void> future = new CancellableExecutionCompletableFuture<>(
@@ -101,7 +101,7 @@ public class CancellableExecutionCompletableFutureTest {
 	}
 
 	@Test
-	public void runnable_cancel() throws InterruptedException {
+	void runnable_cancel() throws InterruptedException {
 		AtomicBoolean started = new AtomicBoolean( false );
 		AtomicBoolean finished = new AtomicBoolean( false );
 		CompletableFuture<Void> future = new CancellableExecutionCompletableFuture<>(

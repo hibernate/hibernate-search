@@ -19,13 +19,15 @@ import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.apache.logging.log4j.Level;
 
@@ -34,11 +36,14 @@ import org.apache.logging.log4j.Level;
  */
 public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPojoIndexingOperationIT {
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
-	@Test
-	public void simple() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void simple(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId,
+			MyRoutingBinder routingBinder, IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
@@ -50,8 +55,11 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 		}
 	}
 
-	@Test
-	public void providedId() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void providedId(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId,
+			MyRoutingBinder routingBinder, IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
@@ -63,8 +71,12 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 		}
 	}
 
-	@Test
-	public void providedId_providedRoutes_currentAndNoPrevious() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void providedId_providedRoutes_currentAndNoPrevious(DocumentCommitStrategy commitStrategy,
+			DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder,
+			IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
@@ -103,8 +115,12 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 		}
 	}
 
-	@Test
-	public void providedId_providedRoutes_currentAndPrevious() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void providedId_providedRoutes_currentAndPrevious(DocumentCommitStrategy commitStrategy,
+			DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder,
+			IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
@@ -148,9 +164,13 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 		}
 	}
 
-	@Test
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4538")
-	public void providedId_providedRoutes_noCurrentAndPrevious() {
+	void providedId_providedRoutes_noCurrentAndPrevious(DocumentCommitStrategy commitStrategy,
+			DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder,
+			IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
@@ -211,9 +231,12 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 		}
 	}
 
-	@Test
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void previouslyIndexedWithDifferentRoute() {
+	void previouslyIndexedWithDifferentRoute(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			String tenantId, MyRoutingBinder routingBinder, IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		assumeImplicitRoutingEnabled();
 
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
@@ -241,9 +264,12 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 		}
 	}
 
-	@Test
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void previouslyIndexedWithMultipleRoutes() {
+	void previouslyIndexedWithMultipleRoutes(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			String tenantId, MyRoutingBinder routingBinder, IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		assumeImplicitRoutingEnabled();
 
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
@@ -273,9 +299,12 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 		}
 	}
 
-	@Test
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void notIndexed_notPreviouslyIndexed() {
+	void notIndexed_notPreviouslyIndexed(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			String tenantId, MyRoutingBinder routingBinder, IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		assumeImplicitRoutingEnabled();
 
 		try ( SearchSession session = createSession() ) {
@@ -288,9 +317,13 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 		}
 	}
 
-	@Test
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void notIndexed_previouslyIndexedWithDifferentRoute() {
+	void notIndexed_previouslyIndexedWithDifferentRoute(DocumentCommitStrategy commitStrategy,
+			DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder,
+			IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		assumeImplicitRoutingEnabled();
 
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
@@ -314,9 +347,13 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 		}
 	}
 
-	@Test
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void notIndexed_previouslyIndexedWithMultipleRoutes() {
+	void notIndexed_previouslyIndexedWithMultipleRoutes(DocumentCommitStrategy commitStrategy,
+			DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder,
+			IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		assumeImplicitRoutingEnabled();
 
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
@@ -345,9 +382,12 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 		}
 	}
 
-	@Test
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void runtimeException() {
+	void runtimeException(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId,
+			MyRoutingBinder routingBinder, IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		RuntimeException exception = new RuntimeException();
 
@@ -365,8 +405,11 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 		assertExceptionalSituation( work, exception );
 	}
 
-	@Test
-	public void error() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void error(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId,
+			MyRoutingBinder routingBinder, IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		Error error = new Error();
 

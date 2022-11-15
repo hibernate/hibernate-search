@@ -16,28 +16,28 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class GettingStartedWithoutHibernateSearchIT {
+class GettingStartedWithoutHibernateSearchIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = Persistence.createEntityManagerFactory( "GettingStartedWithoutHibernateSearchIT" );
 	}
 
-	@After
-	public void cleanup() {
+	@AfterEach
+	void cleanup() {
 		if ( entityManagerFactory != null ) {
 			entityManagerFactory.close();
 		}
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		AtomicReference<Integer> bookIdHolder = new AtomicReference<>();
 
 		with( entityManagerFactory ).runInTransaction( entityManager -> {

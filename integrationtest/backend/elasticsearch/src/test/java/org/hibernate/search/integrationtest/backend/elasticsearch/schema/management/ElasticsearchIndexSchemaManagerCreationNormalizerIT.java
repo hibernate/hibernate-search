@@ -8,54 +8,49 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.schema.manage
 
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
-import java.util.EnumSet;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexSchemaManagerNormalizerITAnalysisConfigurer;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests related to normalizers when creating indexes,
  * for all index-creating schema management operations.
  */
-@RunWith(Parameterized.class)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchAnalyzerDefinitionCreationIT")
-public class ElasticsearchIndexSchemaManagerCreationNormalizerIT {
+class ElasticsearchIndexSchemaManagerCreationNormalizerIT {
 
-	@Parameters(name = "With operation {0}")
-	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> operations() {
-		return ElasticsearchIndexSchemaManagerOperation.creating();
+	public static List<? extends Arguments> params() {
+		return ElasticsearchIndexSchemaManagerOperation.creating().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticSearchClient = TestElasticsearchClient.create();
 
 	private final StubMappedIndex mainIndex = StubMappedIndex.withoutFields().name( "main" );
 	private final StubMappedIndex otherIndex = StubMappedIndex.withoutFields().name( "other" );
 
-	private final ElasticsearchIndexSchemaManagerOperation operation;
-
-	public ElasticsearchIndexSchemaManagerCreationNormalizerIT(ElasticsearchIndexSchemaManagerOperation operation) {
-		this.operation = operation;
-	}
-
-	@Test
-	public void success_simple() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void success_simple(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticSearchClient.index( mainIndex.name() )
 				.ensureDoesNotExist();
 
@@ -93,8 +88,9 @@ public class ElasticsearchIndexSchemaManagerCreationNormalizerIT {
 				elasticSearchClient.index( mainIndex.name() ).settings( "index.analysis" ).get() );
 	}
 
-	@Test
-	public void success_multiIndex() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void success_multiIndex(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticSearchClient.index( mainIndex.name() )
 				.ensureDoesNotExist();
 		elasticSearchClient.index( otherIndex.name() )

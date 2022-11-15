@@ -16,43 +16,43 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractAllAwareConfigurationPropertySourceTest {
 
 	@Test
-	public void get_missing() {
+	void get_missing() {
 		ConfigurationPropertySource propertySource = createPropertySource( "ignored", "foo" );
 		assertThat( propertySource.get( "someKey" ) ).isEmpty();
 	}
 
 	@Test
-	public void get_string() {
+	void get_string() {
 		ConfigurationPropertySource propertySource = createPropertySource( "someKey", "foo" );
 		assertThat( (Optional<Object>) propertySource.get( "someKey" ) ).contains( "foo" );
 	}
 
 	@Test
-	public void resolve_missing() {
+	void resolve_missing() {
 		ConfigurationPropertySource propertySource = createPropertySource( "ignored", "foo" );
 		assertThat( propertySource.resolve( "someKey" ) ).contains( "someKey" );
 	}
 
 	@Test
-	public void resolve_present() {
+	void resolve_present() {
 		ConfigurationPropertySource propertySource = createPropertySource( "someKey", "foo" );
 		assertThat( propertySource.resolve( "someKey" ) ).contains( "someKey" );
 	}
 
 	@Test
-	public void resolveAll_empty() {
+	void resolveAll_empty() {
 		AllAwareConfigurationPropertySource propertySource = createPropertySource( b -> {} );
 		assertThat( propertySource.resolveAll( (k, v) -> false ) ).isEmpty();
 	}
 
 	@Test
-	public void resolveAll_keyPredicate() {
+	void resolveAll_keyPredicate() {
 		AllAwareConfigurationPropertySource propertySource = createPropertySource( b -> {
 			b.accept( "someKey.someSubKey1", "foo" );
 			b.accept( "someKey.someSubKey2", "bar" );
@@ -64,7 +64,7 @@ public abstract class AbstractAllAwareConfigurationPropertySourceTest {
 	}
 
 	@Test
-	public void resolveAll_keyAndValuePredicate() {
+	void resolveAll_keyAndValuePredicate() {
 		AllAwareConfigurationPropertySource propertySource = createPropertySource( b -> {
 			b.accept( "someKey.someSubKey1", "foo" );
 			b.accept( "someKey.someSubKey2", "bar" );

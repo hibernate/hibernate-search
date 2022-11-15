@@ -8,17 +8,17 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class EntityReferenceProjectionIT extends AbstractEntityReferenceProjectionIT {
+class EntityReferenceProjectionIT extends AbstractEntityReferenceProjectionIT {
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final StubMappedIndex mainIndex = StubMappedIndex.withoutFields();
 
@@ -26,8 +26,8 @@ public class EntityReferenceProjectionIT extends AbstractEntityReferenceProjecti
 		super( mainIndex );
 	}
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( mainIndex ).setup();
 
 		BulkIndexer indexer = mainIndex.bulkIndexer();

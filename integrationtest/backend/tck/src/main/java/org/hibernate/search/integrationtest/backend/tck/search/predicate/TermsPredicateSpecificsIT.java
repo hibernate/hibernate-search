@@ -19,23 +19,23 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class TermsPredicateSpecificsIT {
+class TermsPredicateSpecificsIT {
 
 	// it should be more than the default max clause count of the boolean queries
 	private static final int LOT_OF_TERMS_SIZE = 2000;
 	private static final String DOC_ID = "id0";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 	private final List<String> lotsOfTerms = new ArrayList<>();
@@ -49,8 +49,8 @@ public class TermsPredicateSpecificsIT {
 		}
 	}
 
-	@Before
-	public void before() {
+	@BeforeEach
+	void before() {
 		setupHelper.start().withIndex( index ).setup();
 		BulkIndexer indexer = index.bulkIndexer();
 		indexer.add( "id0", f -> {
@@ -70,7 +70,7 @@ public class TermsPredicateSpecificsIT {
 	}
 
 	@Test
-	public void emptyTerms_matchingAny() {
+	void emptyTerms_matchingAny() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.query()
@@ -81,7 +81,7 @@ public class TermsPredicateSpecificsIT {
 	}
 
 	@Test
-	public void emptyTerms_matchingAll() {
+	void emptyTerms_matchingAll() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.query()
@@ -92,7 +92,7 @@ public class TermsPredicateSpecificsIT {
 	}
 
 	@Test
-	public void lotsOfTerms_matchingAny() {
+	void lotsOfTerms_matchingAny() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query().where(
@@ -105,7 +105,7 @@ public class TermsPredicateSpecificsIT {
 	}
 
 	@Test
-	public void analyzedField_termIsNotAnalyzed() {
+	void analyzedField_termIsNotAnalyzed() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query().where(
@@ -123,7 +123,7 @@ public class TermsPredicateSpecificsIT {
 	}
 
 	@Test
-	public void normalizedField_termIsNotNormalized() {
+	void normalizedField_termIsNotNormalized() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query().where(
@@ -146,7 +146,7 @@ public class TermsPredicateSpecificsIT {
 	}
 
 	@Test
-	public void lowercaseWhitespaceAnalyzedField_termIsNotNormalized() {
+	void lowercaseWhitespaceAnalyzedField_termIsNotNormalized() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query().where(

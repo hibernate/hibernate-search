@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,35 +31,33 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleF
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests behavior related to type checking and type conversion of
  * projections on field value.
  */
-@RunWith(Parameterized.class)
-public class FieldProjectionTypeCheckingAndConversionIT<F> {
+class FieldProjectionTypeCheckingAndConversionIT<F> {
 
 	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = FieldTypeDescriptor.getAll();
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] parameters() {
-		List<Object[]> parameters = new ArrayList<>();
+	public static List<? extends Arguments> params() {
+		List<Arguments> parameters = new ArrayList<>();
 		for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
-			parameters.add( new Object[] { fieldType } );
+			parameters.add( Arguments.of( fieldType ) );
 		}
-		return parameters.toArray( new Object[0][] );
+		return parameters;
 	}
 
 	private static final String DOCUMENT_1 = "1";
@@ -71,8 +69,8 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
 	private static final String MISSING_FIELD_INDEX_DOCUMENT_1 = "missing_field_1";
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
@@ -85,8 +83,8 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 	private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
 			SimpleMappedIndex.of( IncompatibleIndexBinding::new ).name( "incompatible" );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start()
 				.withIndexes( mainIndex, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex, incompatibleIndex )
 				.setup();
@@ -94,14 +92,9 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 		initData();
 	}
 
-	private final FieldTypeDescriptor<F> fieldType;
-
-	public FieldProjectionTypeCheckingAndConversionIT(FieldTypeDescriptor<F> fieldType) {
-		this.fieldType = fieldType;
-	}
-
-	@Test
-	public void validSuperClass() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void validSuperClass(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = mainIndex.createScope();
 
 		Class<? super F> closestSuperClass = fieldType.getJavaType().getSuperclass();
@@ -111,22 +104,23 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 		final Class<? super F> validSuperClass = closestSuperClass;
 
 		assertThatQuery( scope.query()
-				.select( f -> f.field( getFieldPath(), validSuperClass ) )
+				.select( f -> f.field( getFieldPath( fieldType ), validSuperClass ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasHitsAnyOrder(
-						getFieldValue( 1 ),
-						getFieldValue( 2 ),
-						getFieldValue( 3 ),
+						getFieldValue( 1, fieldType ),
+						getFieldValue( 2, fieldType ),
+						getFieldValue( 3, fieldType ),
 						null // Empty document
 				);
 	}
 
-	@Test
-	public void invalidProjectionType_projectionConverterEnabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void invalidProjectionType_projectionConverterEnabled(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = mainIndex.createScope();
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldType );
 
 		Class<?> wrongType = FieldTypeDescriptor.getIncompatible( fieldType ).getJavaType();
 
@@ -140,11 +134,12 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 				);
 	}
 
-	@Test
-	public void invalidProjectionType_projectionConverterDisabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void invalidProjectionType_projectionConverterDisabled(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = mainIndex.createScope();
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldType );
 
 		Class<?> wrongType = FieldTypeDescriptor.getIncompatible( fieldType ).getJavaType();
 
@@ -158,11 +153,12 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 				);
 	}
 
-	@Test
-	public void nonProjectable() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void nonProjectable(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = mainIndex.createScope();
 
-		String fieldPath = getNonProjectableFieldPath();
+		String fieldPath = getNonProjectableFieldPath( fieldType );
 
 		assertThatThrownBy( () -> scope.projection()
 				.field( fieldPath, fieldType.getJavaType() ).toProjection() )
@@ -173,15 +169,16 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 				);
 	}
 
-	@Test
-	public void projectableDefault() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projectableDefault(FieldTypeDescriptor<F> fieldType) {
 		assumeFalse(
-				"Skipping this test as the backend makes fields projectable by default.",
-				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault(),
+				"Skipping this test as the backend makes fields projectable by default."
 		);
 		StubMappingScope scope = mainIndex.createScope();
 
-		String fieldPath = getNonProjectableFieldPath();
+		String fieldPath = getNonProjectableFieldPath( fieldType );
 
 		assertThatThrownBy( () -> scope.projection()
 				.field( fieldPath, fieldType.getJavaType() ).toProjection() )
@@ -192,9 +189,10 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3391")
-	public void multiValuedField_singleValuedProjection() {
+	void multiValuedField_singleValuedProjection(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = mainIndex.createScope();
 
 		String fieldPath = mainIndex.binding().fieldWithMultipleValuesModels.get( fieldType ).relativeFieldName;
@@ -209,9 +207,10 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3391")
-	public void singleValuedFieldInMultiValuedObjectField_flattened_singleValuedProjection() {
+	void singleValuedFieldInMultiValuedObjectField_flattened_singleValuedProjection(FieldTypeDescriptor<F> fieldType) {
 		String fieldPath = mainIndex.binding().flattenedObjectWithMultipleValues.relativeFieldName
 				+ "." + mainIndex.binding().flattenedObjectWithMultipleValues.fieldModels.get( fieldType ).relativeFieldName;
 
@@ -227,9 +226,10 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3391")
-	public void singleValuedFieldInMultiValuedObjectField_nested_singleValuedProjection() {
+	void singleValuedFieldInMultiValuedObjectField_nested_singleValuedProjection(FieldTypeDescriptor<F> fieldType) {
 		String fieldPath = mainIndex.binding().nestedObjectWithMultipleValues.relativeFieldName
 				+ "." + mainIndex.binding().nestedObjectWithMultipleValues.fieldModels.get( fieldType ).relativeFieldName;
 
@@ -245,65 +245,69 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 				);
 	}
 
-	@Test
-	public void withProjectionConverters_projectionConverterEnabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withProjectionConverters_projectionConverterEnabled(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = mainIndex.createScope();
 
-		String fieldPath = getFieldWithConverterPath();
+		String fieldPath = getFieldWithConverterPath( fieldType );
 
 		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath, ValueWrapper.class ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasHitsAnyOrder(
-						new ValueWrapper<>( getFieldValue( 1 ) ),
-						new ValueWrapper<>( getFieldValue( 2 ) ),
-						new ValueWrapper<>( getFieldValue( 3 ) ),
+						new ValueWrapper<>( getFieldValue( 1, fieldType ) ),
+						new ValueWrapper<>( getFieldValue( 2, fieldType ) ),
+						new ValueWrapper<>( getFieldValue( 3, fieldType ) ),
 						new ValueWrapper<>( null )
 				);
 	}
 
-	@Test
-	public void withProjectionConverters_projectionConverterDisabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withProjectionConverters_projectionConverterDisabled(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = mainIndex.createScope();
 
-		String fieldPath = getFieldWithConverterPath();
+		String fieldPath = getFieldWithConverterPath( fieldType );
 
 		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath, fieldType.getJavaType(), ValueConvert.NO ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasHitsAnyOrder(
-						getFieldValue( 1 ),
-						getFieldValue( 2 ),
-						getFieldValue( 3 ),
+						getFieldValue( 1, fieldType ),
+						getFieldValue( 2, fieldType ),
+						getFieldValue( 3, fieldType ),
 						null // Empty document
 				);
 	}
 
-	@Test
-	public void withProjectionConverters_projectionConverterDisabled_withoutType() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withProjectionConverters_projectionConverterDisabled_withoutType(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = mainIndex.createScope();
 
-		String fieldPath = getFieldWithConverterPath();
+		String fieldPath = getFieldWithConverterPath( fieldType );
 
 		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath, ValueConvert.NO ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasHitsAnyOrder(
-						getFieldValue( 1 ),
-						getFieldValue( 2 ),
-						getFieldValue( 3 ),
+						getFieldValue( 1, fieldType ),
+						getFieldValue( 2, fieldType ),
+						getFieldValue( 3, fieldType ),
 						null // Empty document
 				);
 	}
 
-	@Test
-	public void invalidProjectionType_withProjectionConverter() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void invalidProjectionType_withProjectionConverter(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = mainIndex.createScope();
 
-		String fieldPath = getFieldWithConverterPath();
+		String fieldPath = getFieldWithConverterPath( fieldType );
 
 		assertThatThrownBy( () -> scope.projection()
 				.field( fieldPath, String.class )
@@ -316,47 +320,50 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 				);
 	}
 
-	@Test
-	public void multiIndex_withCompatibleIndex_noProjectionConverter() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_withCompatibleIndex_noProjectionConverter(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
 		assertThatQuery( scope.query()
-				.select( f -> f.field( getFieldPath(), fieldType.getJavaType() ) )
+				.select( f -> f.field( getFieldPath( fieldType ), fieldType.getJavaType() ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasHitsAnyOrder(
-						getFieldValue( 1 ),
-						getFieldValue( 2 ),
-						getFieldValue( 3 ),
+						getFieldValue( 1, fieldType ),
+						getFieldValue( 2, fieldType ),
+						getFieldValue( 3, fieldType ),
 						null, // Empty document
-						getFieldValue( 1 ) // From the "compatible" index
+						getFieldValue( 1, fieldType ) // From the "compatible" index
 				);
 	}
 
-	@Test
-	public void multiIndex_withCompatibleIndex_projectionConverterEnabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_withCompatibleIndex_projectionConverterEnabled(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
-		String fieldPath = getFieldWithConverterPath();
+		String fieldPath = getFieldWithConverterPath( fieldType );
 
 		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath, ValueWrapper.class ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasHitsAnyOrder(
-						new ValueWrapper<>( getFieldValue( 1 ) ),
-						new ValueWrapper<>( getFieldValue( 2 ) ),
-						new ValueWrapper<>( getFieldValue( 3 ) ),
+						new ValueWrapper<>( getFieldValue( 1, fieldType ) ),
+						new ValueWrapper<>( getFieldValue( 2, fieldType ) ),
+						new ValueWrapper<>( getFieldValue( 3, fieldType ) ),
 						new ValueWrapper<>( null ), // Empty document
-						new ValueWrapper<>( getFieldValue( 1 ) ) // From the "compatible" index
+						new ValueWrapper<>( getFieldValue( 1, fieldType ) ) // From the "compatible" index
 				);
 	}
 
-	@Test
-	public void multiIndex_withRawFieldCompatibleIndex_projectionConverterEnabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_withRawFieldCompatibleIndex_projectionConverterEnabled(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
-		String fieldPath = getFieldWithConverterPath();
+		String fieldPath = getFieldWithConverterPath( fieldType );
 
 		assertThatThrownBy( () -> scope.projection().field( fieldPath ) )
 				.isInstanceOf( SearchException.class )
@@ -366,70 +373,74 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 				);
 	}
 
-	@Test
-	public void multiIndex_withRawFieldCompatibleIndex_projectionConverterDisabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_withRawFieldCompatibleIndex_projectionConverterDisabled(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
-		String fieldPath = getFieldWithConverterPath();
+		String fieldPath = getFieldWithConverterPath( fieldType );
 
 		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath, fieldType.getJavaType(), ValueConvert.NO ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasHitsAnyOrder(
-						getFieldValue( 1 ),
-						getFieldValue( 2 ),
-						getFieldValue( 3 ),
+						getFieldValue( 1, fieldType ),
+						getFieldValue( 2, fieldType ),
+						getFieldValue( 3, fieldType ),
 						null, // Empty document
-						getFieldValue( 1 ) // From the "compatible" index
+						getFieldValue( 1, fieldType ) // From the "compatible" index
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4173")
-	public void multiIndex_withMissingFieldIndex_projectionConverterEnabled() {
+	void multiIndex_withMissingFieldIndex_projectionConverterEnabled(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
 
-		String fieldPath = getFieldWithConverterPath();
+		String fieldPath = getFieldWithConverterPath( fieldType );
 
 		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath, ValueWrapper.class ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasHitsAnyOrder(
-						new ValueWrapper<F>( getFieldValue( 1 ) ),
-						new ValueWrapper<F>( getFieldValue( 2 ) ),
-						new ValueWrapper<F>( getFieldValue( 3 ) ),
+						new ValueWrapper<F>( getFieldValue( 1, fieldType ) ),
+						new ValueWrapper<F>( getFieldValue( 2, fieldType ) ),
+						new ValueWrapper<F>( getFieldValue( 3, fieldType ) ),
 						new ValueWrapper<F>( null ), // Empty document
 						new ValueWrapper<F>( null ) // From the "missing field" index
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4173")
-	public void multiIndex_withMissingFieldIndex_projectionConverterDisabled() {
+	void multiIndex_withMissingFieldIndex_projectionConverterDisabled(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
 
-		String fieldPath = getFieldWithConverterPath();
+		String fieldPath = getFieldWithConverterPath( fieldType );
 
 		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath, fieldType.getJavaType(), ValueConvert.NO ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasHitsAnyOrder(
-						getFieldValue( 1 ),
-						getFieldValue( 2 ),
-						getFieldValue( 3 ),
+						getFieldValue( 1, fieldType ),
+						getFieldValue( 2, fieldType ),
+						getFieldValue( 3, fieldType ),
 						null, // Empty document
 						null // From the "missing field" index
 				);
 	}
 
-	@Test
-	public void multiIndex_withIncompatibleIndex_projectionConverterEnabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_withIncompatibleIndex_projectionConverterEnabled(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldType );
 
 		assertThatThrownBy( () -> scope.projection().field( fieldPath ) )
 				.isInstanceOf( SearchException.class )
@@ -439,11 +450,12 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 				);
 	}
 
-	@Test
-	public void multiIndex_withIncompatibleIndex_projectionConverterDisabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_withIncompatibleIndex_projectionConverterDisabled(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldType );
 
 		assertThatThrownBy( () -> scope.projection().field( fieldPath, ValueConvert.NO ) )
 				.isInstanceOf( SearchException.class )
@@ -453,8 +465,9 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 				);
 	}
 
-	@Test
-	public void multiIndex_withIncompatibleIndex_inNestedObject() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_withIncompatibleIndex_inNestedObject(FieldTypeDescriptor<F> fieldType) {
 		StubMappingScope scope = incompatibleIndex.createScope( mainIndex );
 
 		String fieldPath = mainIndex.binding().nestedObject.relativeFieldName + "."
@@ -468,23 +481,23 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 				);
 	}
 
-	private String getFieldPath() {
+	private String getFieldPath(FieldTypeDescriptor<F> fieldType) {
 		return mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
 	}
 
-	private String getFieldWithConverterPath() {
+	private String getFieldWithConverterPath(FieldTypeDescriptor<F> fieldType) {
 		return mainIndex.binding().fieldWithConverterModels.get( fieldType ).relativeFieldName;
 	}
 
-	private String getNonProjectableFieldPath() {
+	private String getNonProjectableFieldPath(FieldTypeDescriptor<F> fieldType) {
 		return mainIndex.binding().fieldWithProjectionDisabledModels.get( fieldType ).relativeFieldName;
 	}
 
-	private String getProjectableDefaultFieldPath() {
+	private String getProjectableDefaultFieldPath(FieldTypeDescriptor<F> fieldType) {
 		return mainIndex.binding().fieldWithProjectionDisabledModels.get( fieldType ).relativeFieldName;
 	}
 
-	private F getFieldValue(int documentNumber) {
+	private F getFieldValue(int documentNumber, FieldTypeDescriptor<F> fieldType) {
 		return getFieldValue( fieldType, documentNumber );
 	}
 

@@ -27,7 +27,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPoi
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
@@ -35,11 +35,11 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class MatchPredicateFuzzyIT {
+class MatchPredicateFuzzyIT {
 
 	private static final List<FieldTypeDescriptor<?>> unsupportedFieldTypes = FieldTypeDescriptor.getAll().stream()
 			.filter( fieldType -> !String.class.equals( fieldType.getJavaType() )
@@ -47,15 +47,15 @@ public class MatchPredicateFuzzyIT {
 					&& !GeoPointFieldTypeDescriptor.INSTANCE.equals( fieldType ) )
 			.collect( Collectors.toList() );
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	private static final DataSet dataSet = new DataSet();
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		BulkIndexer bulkIndexer = index.bulkIndexer();
@@ -65,7 +65,7 @@ public class MatchPredicateFuzzyIT {
 
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testFuzzyQuery")
-	public void fuzzy() {
+	void fuzzy() {
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 		Function<String, SearchQueryFinalStep<DocumentReference>> createQuery = text -> index.query()
 				.where( f -> f.match()
@@ -86,7 +86,7 @@ public class MatchPredicateFuzzyIT {
 
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testFuzzyQuery")
-	public void maxEditDistance() {
+	void maxEditDistance() {
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 		BiFunction<String, Integer, SearchQueryFinalStep<DocumentReference>> createQuery =
 				(text, maxEditDistance) -> index.query()
@@ -128,7 +128,7 @@ public class MatchPredicateFuzzyIT {
 
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testFuzzyQuery")
-	public void exactPrefixLength() {
+	void exactPrefixLength() {
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 		BiFunction<String, Integer, SearchQueryFinalStep<DocumentReference>> createQuery =
 				(text, exactPrefixLength) -> index.query()
@@ -169,7 +169,7 @@ public class MatchPredicateFuzzyIT {
 	}
 
 	@Test
-	public void normalizedStringField() {
+	void normalizedStringField() {
 		String absoluteFieldPath = index.binding().normalizedStringField.relativeFieldName;
 		Function<String, SearchQueryFinalStep<DocumentReference>> createQuery;
 
@@ -199,7 +199,7 @@ public class MatchPredicateFuzzyIT {
 
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testFuzzyQueryOnMultipleFields")
-	public void multipleFields() {
+	void multipleFields() {
 		String absoluteFieldPath1 = index.binding().analyzedStringField.relativeFieldName;
 		String absoluteFieldPath2 = index.binding().analyzedString2Field.relativeFieldName;
 		Function<String, SearchQueryFinalStep<DocumentReference>> createQuery;
@@ -218,7 +218,7 @@ public class MatchPredicateFuzzyIT {
 	}
 
 	@Test
-	public void unsupportedFieldType() {
+	void unsupportedFieldType() {
 		SearchPredicateFactory f = index.createScope().predicate();
 
 		for ( FieldTypeDescriptor<?> fieldType : unsupportedFieldTypes ) {
@@ -256,7 +256,7 @@ public class MatchPredicateFuzzyIT {
 	}
 
 	@Test
-	public void invalidMaxEditDistance() {
+	void invalidMaxEditDistance() {
 		SearchPredicateFactory f = index.createScope().predicate();
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 
@@ -274,7 +274,7 @@ public class MatchPredicateFuzzyIT {
 	}
 
 	@Test
-	public void invalidPrefixLength() {
+	void invalidPrefixLength() {
 		SearchPredicateFactory f = index.createScope().predicate();
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 
@@ -286,7 +286,7 @@ public class MatchPredicateFuzzyIT {
 	}
 
 	@Test
-	public void analyzerOverride() {
+	void analyzerOverride() {
 		String whitespaceAnalyzedField = index.binding().whitespaceAnalyzedField.relativeFieldName;
 		String whitespaceLowercaseAnalyzedField = index.binding().whitespaceLowercaseAnalyzedField.relativeFieldName;
 		String whitespaceLowercaseSearchAnalyzedField =
@@ -323,7 +323,7 @@ public class MatchPredicateFuzzyIT {
 	}
 
 	@Test
-	public void skipAnalysis() {
+	void skipAnalysis() {
 		String absoluteFieldPath = index.binding().whitespaceLowercaseAnalyzedField.relativeFieldName;
 
 		assertThatQuery( index.query()

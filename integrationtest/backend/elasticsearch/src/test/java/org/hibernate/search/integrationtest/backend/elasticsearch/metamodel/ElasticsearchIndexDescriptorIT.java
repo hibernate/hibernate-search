@@ -16,30 +16,30 @@ import org.hibernate.search.backend.elasticsearch.metamodel.ElasticsearchIndexDe
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchIndexDescriptorIT {
+class ElasticsearchIndexDescriptorIT {
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.NONE )
 				.setup();
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		ElasticsearchIndexDescriptor indexDescriptor = index.toApi()
 				.unwrap( ElasticsearchIndexManager.class ).descriptor();
 
@@ -49,7 +49,7 @@ public class ElasticsearchIndexDescriptorIT {
 	}
 
 	@Test
-	public void implicitFields() {
+	void implicitFields() {
 		IndexDescriptor indexDescriptor = index.toApi().descriptor();
 
 		Optional<IndexFieldDescriptor> valueFieldDescriptorOptional = indexDescriptor.field( "string" );

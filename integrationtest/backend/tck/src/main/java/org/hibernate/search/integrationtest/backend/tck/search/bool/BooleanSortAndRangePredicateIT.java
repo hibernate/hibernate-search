@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.bool;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.function.Function;
@@ -21,24 +20,22 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
-import org.hibernate.search.integrationtest.backend.tck.search.predicate.RangePredicateSpecificsIT;
-import org.hibernate.search.integrationtest.backend.tck.search.sort.FieldSortBaseIT;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests sorting and ranging behaviour querying a boolean type field
- *
- * @see FieldSortBaseIT
- * @see RangePredicateSpecificsIT
+ * <p>
+ * See {@code org.hibernate.search.integrationtest.backend.tck.search.sort.FieldSortBaseIT}
+ * {@code org.hibernate.search.integrationtest.backend.tck.search.predicate.RangePredicateSpecificsIT}
  */
-public class BooleanSortAndRangePredicateIT {
+class BooleanSortAndRangePredicateIT {
 
 	public static final String FIELD_PATH = "boolean";
 
@@ -48,13 +45,13 @@ public class BooleanSortAndRangePredicateIT {
 	public static final String DOCUMENT_4 = "4";
 	public static final String DOCUMENT_5 = "5";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		initData();
@@ -77,7 +74,7 @@ public class BooleanSortAndRangePredicateIT {
 	}
 
 	@Test
-	public void sortByFieldQuery() {
+	void sortByFieldQuery() {
 		// Default order
 		SearchQuery<DocumentReference> query = sortQuery( c -> c.field( FIELD_PATH ).missing().last() );
 		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE, null );
@@ -96,26 +93,26 @@ public class BooleanSortAndRangePredicateIT {
 	}
 
 	@Test
-	public void rangePredicateAtLeast() {
+	void rangePredicateAtLeast() {
 		SearchQuery<DocumentReference> query = rangeQuery( f -> f.range().field( FIELD_PATH ).atLeast( Boolean.TRUE ) );
 		assertHasHitsWithBooleanProperties( query, Boolean.TRUE, Boolean.TRUE );
 	}
 
 	@Test
-	public void rangePredicateAtMost() {
+	void rangePredicateAtMost() {
 		SearchQuery<DocumentReference> query = rangeQuery( f -> f.range().field( FIELD_PATH ).atMost( Boolean.FALSE ) );
 		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE );
 	}
 
 	@Test
-	public void rangePredicateBetween() {
+	void rangePredicateBetween() {
 		SearchQuery<DocumentReference> query = rangeQuery( f -> f.range().field( FIELD_PATH )
 				.between( Boolean.FALSE, Boolean.FALSE ) );
 		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE );
 	}
 
 	@Test
-	public void rangeBetweenAndSortByField() {
+	void rangeBetweenAndSortByField() {
 		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.range().field( FIELD_PATH ).between( Boolean.FALSE, Boolean.TRUE ) )
@@ -127,19 +124,19 @@ public class BooleanSortAndRangePredicateIT {
 
 	private void assertHasHitsWithBooleanProperties(SearchQuery<DocumentReference> query, Boolean... expectedPropertyValues) {
 		List<DocumentReference> hits = query.fetchAll().hits();
-		assertEquals( expectedPropertyValues.length, hits.size() );
+		assertThat( hits ).hasSize( expectedPropertyValues.length );
 
 		for ( int i = 0; i < expectedPropertyValues.length; i++ ) {
 			Boolean expectedPropertyValue = expectedPropertyValues[i];
 
 			if ( expectedPropertyValue == Boolean.TRUE ) {
-				assertTrue( isTrueDocument( hits.get( i ) ) );
+				assertThat( isTrueDocument( hits.get( i ) ) ).isTrue();
 			}
 			else if ( expectedPropertyValue == Boolean.FALSE ) {
-				assertTrue( isFalseDocument( hits.get( i ) ) );
+				assertThat( isFalseDocument( hits.get( i ) ) ).isTrue();
 			}
 			else {
-				assertTrue( isNullDocument( hits.get( i ) ) );
+				assertThat( isNullDocument( hits.get( i ) ) ).isTrue();
 			}
 		}
 	}

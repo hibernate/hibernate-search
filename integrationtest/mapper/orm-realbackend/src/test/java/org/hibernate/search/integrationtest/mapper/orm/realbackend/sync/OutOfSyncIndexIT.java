@@ -22,24 +22,24 @@ import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test behavior when the index becomes out of sync with the database.
  */
-public class OutOfSyncIndexIT {
+class OutOfSyncIndexIT {
 
 	private static final int NUMBER_OF_BOOKS = 8;
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void before() {
+	@BeforeEach
+	void before() {
 		entityManagerFactory = setupHelper.start()
 				.withProperty( HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,
 						IndexingPlanSynchronizationStrategyNames.READ_SYNC )
@@ -50,7 +50,7 @@ public class OutOfSyncIndexIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void search_skipDeletedEntitiesInHits() {
+	void search_skipDeletedEntitiesInHits() {
 		// Check that document counts are identical
 		int entityCount = entityCount();
 		int indexedEntityCount = BookCreatorUtils.documentsCount( entityManagerFactory ).intValue();

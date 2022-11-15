@@ -20,25 +20,25 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaCollector;
 import org.hibernate.search.engine.common.schema.management.SchemaExport;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexSchemaManagerAnalyzerITAnalysisConfigurer;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.io.TempDir;
 
-public class ElasticsearchIndexSchemaManagerExporterIT {
+class ElasticsearchIndexSchemaManagerExporterIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
-	@Rule
-	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
+	@TempDir
+	Path temporaryFolder;
 
 	private final StubMappedIndex mainIndex = StubMappedIndex.withoutFields().name( "main" );
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		setupHelper.start()
 				.withBackendProperty(
 						ElasticsearchIndexSettings.ANALYSIS_CONFIGURER,
@@ -50,8 +50,8 @@ public class ElasticsearchIndexSchemaManagerExporterIT {
 	}
 
 	@Test
-	public void export() throws IOException {
-		Path directory = temporaryFolder.newFolder().toPath();
+	void export() throws IOException {
+		Path directory = temporaryFolder;
 		String testIndexName = "test";
 		mainIndex.schemaManager().exportExpectedSchema( new IndexSchemaCollector() {
 			@Override

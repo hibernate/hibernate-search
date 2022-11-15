@@ -9,10 +9,6 @@ package org.hibernate.search.engine.mapper.mapping.building.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.common.impl.CollectionHelper.asSet;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
@@ -37,18 +33,17 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-public class TreeNestingContextTest {
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
+class TreeNestingContextTest {
 	private static final BiFunction<MappingElement, String, SearchException> CYCLIC_RECURSION_EXCEPTION_FACTORY =
 			(mappingElement, cyclicRecursionPath) -> new SearchException(
 					cyclicRecursionMessage( mappingElement, cyclicRecursionPath ) );
@@ -56,9 +51,6 @@ public class TreeNestingContextTest {
 	private static String cyclicRecursionMessage(MappingElement mappingElement, String cyclicRecursionPath) {
 		return "Cyclic recursion! Root = " + mappingElement.toString() + ", path = " + cyclicRecursionPath;
 	}
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	@Mock(strictness = Mock.Strictness.LENIENT)
 	private MappableTypeModel typeModel1Mock;
@@ -84,8 +76,8 @@ public class TreeNestingContextTest {
 	@Mock
 	private TreeNestingContext.NestedContextBuilder<Object> nestedContextBuilderMock;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		when( typeModel1Mock.name() ).thenReturn( "typeModel1Mock" );
 		when( typeModel2Mock.name() ).thenReturn( "typeModel2Mock" );
 		when( typeModel3Mock.name() ).thenReturn( "typeModel3Mock" );
@@ -93,7 +85,7 @@ public class TreeNestingContextTest {
 	}
 
 	@Test
-	public void noFilter() {
+	void noFilter() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		checkFooBarIncluded( "", rootContext );
@@ -105,7 +97,7 @@ public class TreeNestingContextTest {
 	}
 
 	@Test
-	public void nestComposed_noFilter() {
+	void nestComposed_noFilter() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
@@ -130,7 +122,7 @@ public class TreeNestingContextTest {
 	}
 
 	@Test
-	public void nestComposed_noFilter_detectCycle_direct() {
+	void nestComposed_noFilter_detectCycle_direct() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		String relativePrefix = "level1.prefix1_";
@@ -160,7 +152,7 @@ public class TreeNestingContextTest {
 	}
 
 	@Test
-	public void nestComposed_noFilter_detectCycle_indirect() {
+	void nestComposed_noFilter_detectCycle_indirect() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		String level1RelativePrefix = "level1.prefix1_";
@@ -192,7 +184,7 @@ public class TreeNestingContextTest {
 	}
 
 	@Test
-	public void nestComposed_noFilter_multiLevelPrefix() {
+	void nestComposed_noFilter_multiLevelPrefix() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		ArgumentCaptor<TreeNestingContext> nestedContextCapture =
@@ -219,9 +211,9 @@ public class TreeNestingContextTest {
 		inOrder.verify( nestedContextBuilderMock ).appendObject( "level3" );
 		inOrder.verify( nestedContextBuilderMock ).build( nestedContextCapture.capture() );
 		verifyNoOtherInteractionsAndReset();
-		assertNotNull( actualReturn );
-		assertTrue( actualReturn.isPresent() );
-		assertSame( expectedReturn, actualReturn.get() );
+		assertThat( actualReturn ).isNotNull()
+				.isPresent()
+				.get().isSameAs( expectedReturn );
 
 		TreeNestingContext level3Context = nestedContextCapture.getValue();
 
@@ -230,7 +222,7 @@ public class TreeNestingContextTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2552")
-	public void nestComposed_includePaths() {
+	void nestComposed_includePaths() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
@@ -315,7 +307,7 @@ public class TreeNestingContextTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3136")
-	public void nestComposed_includePaths_tracking() {
+	void nestComposed_includePaths_tracking() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
@@ -564,7 +556,7 @@ public class TreeNestingContextTest {
 	 */
 
 	@Test
-	public void nestComposed_excludePaths_tracking() {
+	void nestComposed_excludePaths_tracking() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> excludePaths = new HashSet<>();
@@ -777,7 +769,7 @@ public class TreeNestingContextTest {
 	 */
 
 	@Test
-	public void nestComposed_excludePaths_depth1_excludeLevel2() {
+	void nestComposed_excludePaths_depth1_excludeLevel2() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> excludePaths = new HashSet<>();
@@ -855,7 +847,7 @@ public class TreeNestingContextTest {
 	 */
 
 	@Test
-	public void nestComposed_excludePaths_sameFieldDifferentLevels() {
+	void nestComposed_excludePaths_sameFieldDifferentLevels() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> excludePaths = new HashSet<>();
@@ -903,7 +895,7 @@ public class TreeNestingContextTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2194")
-	public void nestComposed_noFilterThenIncludePaths() {
+	void nestComposed_noFilterThenIncludePaths() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		// First level of composition: no filter
@@ -923,7 +915,7 @@ public class TreeNestingContextTest {
 	}
 
 	@Test
-	public void nestComposed_depth0() {
+	void nestComposed_depth0() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		// Depth == 0 => only include paths if they are explicitly included.
@@ -936,7 +928,7 @@ public class TreeNestingContextTest {
 	}
 
 	@Test
-	public void nestComposed_depth1() {
+	void nestComposed_depth1() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		// Depth == 1 => implicitly include all fields at the first level,
@@ -963,7 +955,7 @@ public class TreeNestingContextTest {
 	}
 
 	@Test
-	public void nestComposed_depth3_overridden() {
+	void nestComposed_depth3_overridden() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		// Depth == 3 => allow three levels of nesting with filter composition, including level1,
@@ -1032,7 +1024,7 @@ public class TreeNestingContextTest {
 	}
 
 	@Test
-	public void nestComposed_includePaths_depth1() {
+	void nestComposed_includePaths_depth1() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
@@ -1106,7 +1098,7 @@ public class TreeNestingContextTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3136")
-	public void nestComposed_includePaths_depth1_tracking() {
+	void nestComposed_includePaths_depth1_tracking() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
@@ -1202,7 +1194,7 @@ public class TreeNestingContextTest {
 	}
 
 	@Test
-	public void nestComposed_includePaths_nestComposed_includePaths() {
+	void nestComposed_includePaths_nestComposed_includePaths() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
@@ -1243,7 +1235,7 @@ public class TreeNestingContextTest {
 	}
 
 	@Test
-	public void nestComposed_includePaths_nestComposed_depth1AndIncludePaths() {
+	void nestComposed_includePaths_nestComposed_depth1AndIncludePaths() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
@@ -1277,7 +1269,7 @@ public class TreeNestingContextTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3684")
-	public void nestComposed_includePaths_nestComposed_depth2AndIncludePaths() {
+	void nestComposed_includePaths_nestComposed_depth2AndIncludePaths() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
@@ -1325,7 +1317,7 @@ public class TreeNestingContextTest {
 				.thenReturn( expectedReturn );
 		Object actualReturn = context.nest( relativeFieldName, leafFactoryMock );
 		verifyNoOtherInteractionsAndReset();
-		assertSame( expectedReturn, actualReturn );
+		assertThat( expectedReturn ).isSameAs( actualReturn );
 	}
 
 	private void checkLeafExcluded(String expectedPrefixedName, TreeNestingContext context,
@@ -1335,7 +1327,7 @@ public class TreeNestingContextTest {
 				.thenReturn( expectedReturn );
 		Object actualReturn = context.nest( relativeFieldName, leafFactoryMock );
 		verifyNoOtherInteractionsAndReset();
-		assertSame( expectedReturn, actualReturn );
+		assertThat( expectedReturn ).isSameAs( actualReturn );
 	}
 
 	private TreeNestingContext checkCompositeIncluded(String expectedPrefixedName,
@@ -1350,7 +1342,7 @@ public class TreeNestingContextTest {
 				.thenReturn( expectedReturn );
 		Object actualReturn = context.nest( relativeFieldName, compositeFactoryMock );
 		verifyNoOtherInteractionsAndReset();
-		assertSame( expectedReturn, actualReturn );
+		assertThat( expectedReturn ).isSameAs( actualReturn );
 
 		// Also check that dynamic leaves will be included
 		checkDynamicIncluded( "", nestedContextCapture.getValue() );
@@ -1375,7 +1367,7 @@ public class TreeNestingContextTest {
 				.thenReturn( expectedReturn );
 		Object actualReturn = context.nest( relativeFieldName, compositeFactoryMock );
 		verifyNoOtherInteractionsAndReset();
-		assertSame( expectedReturn, actualReturn );
+		assertThat( expectedReturn ).isSameAs( actualReturn );
 
 		if ( recurse ) {
 			// Also check that leaves will be excluded
@@ -1390,7 +1382,7 @@ public class TreeNestingContextTest {
 				.thenReturn( expectedReturn );
 		Object actualReturn = context.nestUnfiltered( unfilteredFactoryMock );
 		verifyNoOtherInteractionsAndReset();
-		assertSame( expectedReturn, actualReturn );
+		assertThat( expectedReturn ).isSameAs( actualReturn );
 	}
 
 	private void checkDynamicExcluded(String expectedPrefix, TreeNestingContext context) {
@@ -1399,7 +1391,7 @@ public class TreeNestingContextTest {
 				.thenReturn( expectedReturn );
 		Object actualReturn = context.nestUnfiltered( unfilteredFactoryMock );
 		verifyNoOtherInteractionsAndReset();
-		assertSame( expectedReturn, actualReturn );
+		assertThat( expectedReturn ).isSameAs( actualReturn );
 	}
 
 	private TreeNestingContext checkSimpleComposedFilterIncluded(String expectedObjectName,
@@ -1426,13 +1418,15 @@ public class TreeNestingContextTest {
 				pathTracker, nestedContextBuilderMock,
 				CYCLIC_RECURSION_EXCEPTION_FACTORY
 		);
-		assertNotNull( "Expected .nestComposed() to return a non-null result", actualReturn );
-		assertTrue( "Expected the composed filter to be included in " + context, actualReturn.isPresent() );
+		assertThat( actualReturn ).as( "Expected .nestComposed() to return a non-null result" )
+				.isNotNull()
+				.as( "Expected the composed filter to be included in " + context )
+				.isPresent();
 		InOrder inOrder = inOrder( nestedContextBuilderMock );
 		inOrder.verify( nestedContextBuilderMock ).appendObject( expectedObjectName );
 		inOrder.verify( nestedContextBuilderMock ).build( nestedContextCapture.capture() );
 		verifyNoOtherInteractionsAndReset();
-		assertSame( expectedReturn, actualReturn.get() );
+		assertThat( expectedReturn ).isSameAs( actualReturn.get() );
 
 		return nestedContextCapture.getValue();
 	}
@@ -1451,8 +1445,10 @@ public class TreeNestingContextTest {
 		Optional<Object> actualReturn = context.nestComposed( new StubMappingElement( definingTypeModel, relativePrefix ),
 				relativePrefix, definition, pathTracker, nestedContextBuilderMock, CYCLIC_RECURSION_EXCEPTION_FACTORY );
 		verifyNoOtherInteractionsAndReset();
-		assertNotNull( "Expected .nestComposed() to return a non-null result", actualReturn );
-		assertFalse( "Expected the composed filter to be excluded from " + context, actualReturn.isPresent() );
+		assertThat( actualReturn ).as( "Expected .nestComposed() to return a non-null result" )
+				.isNotNull()
+				.as( "Expected the composed filter to be excluded from " + context )
+				.isEmpty();
 	}
 
 	private void checkFooBarIncluded(String expectedPrefix, TreeNestingContext context) {

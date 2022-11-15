@@ -15,29 +15,28 @@ import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.test.runner.nested.Nested;
-import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
-import org.junit.AssumptionViolatedException;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.provider.Arguments;
 
-@RunWith(NestedRunner.class)
-public class ExistsPredicateBaseIT {
+//CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
+// cannot make a private constructor.
+class ExistsPredicateBaseIT {
+	//CHECKSTYLE:ON
 
 	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = FieldTypeDescriptor.getAll();
 
-	@ClassRule
-	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start()
 				.withIndexes(
 						SingleFieldIT.index,
@@ -91,94 +90,80 @@ public class ExistsPredicateBaseIT {
 		return new ExistsPredicateTestValues<>( fieldType );
 	}
 
-	@Test
-	public void takariCpSuiteWorkaround() {
-		// Workaround to get Takari-CPSuite to run this test.
-	}
-
 	@Nested
-	@RunWith(Parameterized.class)
-	public static class SingleFieldIT<F> extends AbstractPredicateSingleFieldIT<ExistsPredicateTestValues<F>> {
-		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
-		private static final List<Object[]> parameters = new ArrayList<>();
-		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
-				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
-				dataSets.add( dataSet );
-				parameters.add( new Object[] { dataSet } );
-			}
-		}
+	class SingleFieldIT<F> extends AbstractPredicateSingleFieldIT<ExistsPredicateTestValues<F>> {
 
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "singleField" );
+		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
+				dataSets.add( dataSet );
+				parameters.add( Arguments.of( index, dataSet ) );
+			}
+		}
 
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
+		public static List<? extends Arguments> params() {
 			return parameters;
 		}
 
-		public SingleFieldIT(DataSet<F, ExistsPredicateTestValues<F>> dataSet) {
-			super( index, dataSet );
-		}
-
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+				DataSet<?, ExistsPredicateTestValues<F>> dataSet) {
 			return f.exists().field( fieldPath );
 		}
 	}
 
 	@Nested
-	@RunWith(Parameterized.class)
-	public static class ScoreIT<F> extends AbstractPredicateScoreIT {
+	class ScoreIT<F> extends AbstractPredicateScoreIT {
+
+		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
+				.name( "score" );
 		private static final List<DataSet<?>> dataSets = new ArrayList<>();
-		private static final List<Object[]> parameters = new ArrayList<>();
+		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
 			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
 				DataSet<?> dataSet = new DataSet<>( fieldType );
 				dataSets.add( dataSet );
-				parameters.add( new Object[] { dataSet } );
+				parameters.add( Arguments.of( index, dataSet ) );
 			}
 		}
 
-		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
-				.name( "score" );
-
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
+		public static List<? extends Arguments> params() {
 			return parameters;
 		}
 
-		protected final DataSet<F> dataSet;
-
-		public ScoreIT(DataSet<F> dataSet) {
-			super( index, dataSet );
-			this.dataSet = dataSet;
-		}
-
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal) {
-			return f.exists().field( fieldPath( matchingDocOrdinal ) );
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
+				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
+			return f.exists().field( fieldPath( matchingDocOrdinal, dataSet ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal,
-				float boost) {
-			return f.exists().field( fieldPath( matchingDocOrdinal ) ).boost( boost );
+				float boost, AbstractPredicateDataSet dataSet,
+				StubMappedIndex index) {
+			return f.exists().field( fieldPath( matchingDocOrdinal, dataSet ) ).boost( boost );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal) {
-			return f.exists().field( fieldPath( matchingDocOrdinal ) ).constantScore();
+		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal,
+				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
+			return f.exists().field( fieldPath( matchingDocOrdinal, dataSet ) ).constantScore();
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
-				int matchingDocOrdinal, float boost) {
-			return f.exists().field( fieldPath( matchingDocOrdinal ) ).constantScore().boost( boost );
+				int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
+				StubMappedIndex index) {
+			return f.exists().field( fieldPath( matchingDocOrdinal, dataSet ) ).constantScore().boost( boost );
 		}
 
-		private String fieldPath(int matchingDocOrdinal) {
+		@SuppressWarnings("unchecked")
+		private String fieldPath(int matchingDocOrdinal, AbstractPredicateDataSet dataSet) {
 			SimpleFieldModelsByType field;
 			switch ( matchingDocOrdinal ) {
 				case 0:
@@ -190,7 +175,7 @@ public class ExistsPredicateBaseIT {
 				default:
 					throw new IllegalStateException( "This test only works with up to two documents" );
 			}
-			return field.get( dataSet.fieldType ).relativeFieldName;
+			return field.get( ( (DataSet<F>) dataSet ).fieldType ).relativeFieldName;
 		}
 
 		private static class IndexBinding {
@@ -222,18 +207,7 @@ public class ExistsPredicateBaseIT {
 	}
 
 	@Nested
-	@RunWith(Parameterized.class)
-	public static class InObjectFieldIT<F> extends AbstractPredicateFieldInObjectFieldIT<ExistsPredicateTestValues<F>> {
-		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
-		private static final List<Object[]> parameters = new ArrayList<>();
-		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
-				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
-				dataSets.add( dataSet );
-				parameters.add( new Object[] { dataSet } );
-			}
-		}
-
+	class InObjectFieldIT<F> extends AbstractPredicateFieldInObjectFieldIT<ExistsPredicateTestValues<F>> {
 		private static final SimpleMappedIndex<IndexBinding> mainIndex =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "nesting" );
@@ -242,17 +216,23 @@ public class ExistsPredicateBaseIT {
 				SimpleMappedIndex.of( root -> new MissingFieldIndexBinding( root, supportedFieldTypes ) )
 						.name( "nesting_missingField" );
 
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
+		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
+				dataSets.add( dataSet );
+				parameters.add( Arguments.of( mainIndex, missingFieldIndex, dataSet ) );
+			}
+		}
+
+		public static List<? extends Arguments> params() {
 			return parameters;
 		}
 
-		public InObjectFieldIT(DataSet<F, ExistsPredicateTestValues<F>> dataSet) {
-			super( mainIndex, missingFieldIndex, dataSet );
-		}
-
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+				DataSet<?, ExistsPredicateTestValues<F>> dataSet) {
 			if ( matchingDocOrdinal != 0 ) {
 				throw new IllegalStateException( "This predicate can only match the first document" );
 			}
@@ -261,7 +241,7 @@ public class ExistsPredicateBaseIT {
 	}
 
 	@Nested
-	public static class InvalidFieldIT extends AbstractPredicateInvalidFieldIT {
+	class InvalidFieldIT extends AbstractPredicateInvalidFieldIT {
 		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
 				.name( "invalidField" );
 
@@ -271,12 +251,12 @@ public class ExistsPredicateBaseIT {
 
 		@Override
 		public void objectField_flattened() {
-			throw new AssumptionViolatedException( "The 'exists' predicate actually can be used on object fields" );
+			throw new org.opentest4j.TestAbortedException( "The 'exists' predicate actually can be used on object fields" );
 		}
 
 		@Override
 		public void objectField_nested() {
-			throw new AssumptionViolatedException( "The 'exists' predicate actually can be used on object fields" );
+			throw new org.opentest4j.TestAbortedException( "The 'exists' predicate actually can be used on object fields" );
 		}
 
 		@Override
@@ -291,14 +271,7 @@ public class ExistsPredicateBaseIT {
 	}
 
 	@Nested
-	@RunWith(Parameterized.class)
-	public static class SearchableIT extends AbstractPredicateSearchableIT {
-		private static final List<Object[]> parameters = new ArrayList<>();
-		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
-				parameters.add( new Object[] { fieldType } );
-			}
-		}
+	class SearchableIT extends AbstractPredicateSearchableIT {
 
 		private static final SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex =
 				SimpleMappedIndex.of( root -> new SearchableYesIndexBinding( root, supportedFieldTypes ) )
@@ -308,18 +281,23 @@ public class ExistsPredicateBaseIT {
 				SimpleMappedIndex.of( root -> new SearchableNoIndexBinding( root, supportedFieldTypes ) )
 						.name( "searchableNo" );
 
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+				parameters.add( Arguments.of( searchableYesIndex, searchableNoIndex, fieldType ) );
+			}
+		}
+
+		public static List<? extends Arguments> params() {
 			return parameters;
 		}
 
-		public SearchableIT(FieldTypeDescriptor<?> fieldType) {
-			super( searchableYesIndex, searchableNoIndex, fieldType );
-		}
-
 		@Override
-		public void unsearchable() {
-			throw new AssumptionViolatedException( "The 'exists' predicate actually can be used on unsearchable fields" );
+		public void unsearchable(SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
+				SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex,
+				FieldTypeDescriptor<?> fieldType) {
+			throw new org.opentest4j.TestAbortedException(
+					"The 'exists' predicate actually can be used on unsearchable fields" );
 		}
 
 		@Override
@@ -334,24 +312,8 @@ public class ExistsPredicateBaseIT {
 	}
 
 	@Nested
-	@RunWith(Parameterized.class)
-	public static class TypeCheckingNoConversionIT<F>
+	class TypeCheckingNoConversionIT<F>
 			extends AbstractPredicateTypeCheckingNoConversionIT<ExistsPredicateTestValues<F>> {
-		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
-		private static final List<Object[]> parameters = new ArrayList<>();
-		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
-				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
-				dataSets.add( dataSet );
-				parameters.add( new Object[] { dataSet } );
-			}
-		}
-
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
-			return parameters;
-		}
-
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_main" );
@@ -376,25 +338,42 @@ public class ExistsPredicateBaseIT {
 				SimpleMappedIndex.of( root -> new IncompatibleIndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_incompatible" );
 
-		public TypeCheckingNoConversionIT(DataSet<F, ExistsPredicateTestValues<F>> dataSet) {
-			super( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex, incompatibleIndex, dataSet );
+		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
+				dataSets.add( dataSet );
+				parameters.add( Arguments.of( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex,
+						incompatibleIndex, dataSet ) );
+			}
+		}
+
+		public static List<? extends Arguments> params() {
+			return parameters;
 		}
 
 		@Override
-		public void multiIndex_withIncompatibleIndex() {
-			throw new AssumptionViolatedException( "The 'exists' predicate actually can be used when a field relies"
+		public void multiIndex_withIncompatibleIndex(SimpleMappedIndex<IndexBinding> index,
+				SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+				SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+				SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+				SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+				DataSet<?, ExistsPredicateTestValues<F>> dataSet) {
+			throw new org.opentest4j.TestAbortedException( "The 'exists' predicate actually can be used when a field relies"
 					+ " on different codecs in different indexes" );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+				DataSet<?, ExistsPredicateTestValues<F>> dataSet) {
 			return f.exists().field( fieldPath );
 		}
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
-				int matchingDocOrdinal) {
-			throw new AssumptionViolatedException( "The 'exists' predicate can only target one field at a time" );
+				int matchingDocOrdinal, DataSet<?, ExistsPredicateTestValues<F>> dataSet) {
+			throw new org.opentest4j.TestAbortedException( "The 'exists' predicate can only target one field at a time" );
 		}
 
 		@Override
@@ -404,7 +383,7 @@ public class ExistsPredicateBaseIT {
 	}
 
 	@Nested
-	public static class ScaleCheckingIT extends AbstractPredicateScaleCheckingIT {
+	class ScaleCheckingIT extends AbstractPredicateScaleCheckingIT {
 		private static final DataSet dataSet = new DataSet();
 
 		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
@@ -421,7 +400,7 @@ public class ExistsPredicateBaseIT {
 
 		@Override
 		public void multiIndex_withIncompatibleIndex() {
-			throw new AssumptionViolatedException( "The 'exists' predicate actually can be used when a field relies"
+			throw new org.opentest4j.TestAbortedException( "The 'exists' predicate actually can be used when a field relies"
 					+ " on different codecs in different indexes" );
 		}
 

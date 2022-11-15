@@ -21,26 +21,26 @@ import org.hibernate.search.engine.search.predicate.definition.PredicateDefiniti
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinitionContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class PredicateDefinitionContextIT {
+class PredicateDefinitionContextIT {
 
 	private static final String DOCUMENT_1 = "document1";
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		BulkIndexer indexer = index.bulkIndexer();
@@ -49,7 +49,7 @@ public class PredicateDefinitionContextIT {
 	}
 
 	@Test
-	public void param() {
+	void param() {
 		Object[] givenParams = new Object[] { "string", new Object(), 5L, Optional.empty() };
 		Object[] receivedParams = new Object[givenParams.length];
 
@@ -72,7 +72,7 @@ public class PredicateDefinitionContextIT {
 	}
 
 	@Test
-	public void param_absent() {
+	void param_absent() {
 		Object[] expectedParams = new Object[] { Optional.empty() };
 		Object[] actualParams = new Object[1];
 
@@ -88,7 +88,7 @@ public class PredicateDefinitionContextIT {
 	}
 
 	@Test
-	public void param_nullName() {
+	void param_nullName() {
 		assertThatThrownBy( () -> index.createScope().predicate().named( "stub-predicate" )
 				.param( "impl", (PredicateDefinition) context -> {
 					context.param( null, String.class );
@@ -100,7 +100,7 @@ public class PredicateDefinitionContextIT {
 	}
 
 	@Test
-	public void missingParam() {
+	void missingParam() {
 		assertThatThrownBy( () -> index.createScope().predicate().named( "stub-predicate" )
 				.param( "impl", (PredicateDefinition) context -> {
 					context.param( "missing", String.class );

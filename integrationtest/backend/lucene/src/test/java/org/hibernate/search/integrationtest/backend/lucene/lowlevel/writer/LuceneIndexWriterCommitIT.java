@@ -11,6 +11,8 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
@@ -19,20 +21,19 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.awaitility.Awaitility;
 
-@RunWith(Parameterized.class)
-public class LuceneIndexWriterCommitIT {
+class LuceneIndexWriterCommitIT {
 
 	/*
 	 * Pick a value that is:
@@ -42,35 +43,27 @@ public class LuceneIndexWriterCommitIT {
 	 */
 	private static final int NON_ZERO_DELAY = 1000;
 
-	@Parameterized.Parameters(name = "I/O strategy {0}, commit_interval {1}")
-	public static Object[][] strategies() {
-		return new Object[][] {
-				{ "debug", null },
-				{ null, null },
-				{ null, 0 },
-				{ null, NON_ZERO_DELAY },
-				{ "near-real-time", null },
-				{ "near-real-time", 0 },
-				{ "near-real-time", NON_ZERO_DELAY }
-		};
+	public static List<? extends Arguments> params() {
+		return Arrays.asList(
+				Arguments.of( "debug", null ),
+				Arguments.of( null, null ),
+				Arguments.of( null, 0 ),
+				Arguments.of( null, NON_ZERO_DELAY ),
+				Arguments.of( "near-real-time", null ),
+				Arguments.of( "near-real-time", 0 ),
+				Arguments.of( "near-real-time", NON_ZERO_DELAY )
+		);
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	private final String ioStrategyName;
-	private final Integer commitInterval;
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	public LuceneIndexWriterCommitIT(String ioStrategyName, Integer commitInterval) {
-		this.ioStrategyName = ioStrategyName;
-		this.commitInterval = commitInterval;
-	}
-
-	@Test
-	public void commitStrategyNone() throws IOException {
-		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP );
+	@ParameterizedTest(name = "I/O strategy {0}, commit_interval {1}")
+	@MethodSource("params")
+	void commitStrategyNone(String ioStrategyName, Integer commitInterval) throws IOException {
+		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP, ioStrategyName, commitInterval );
 
 		// Initially our document is not in the index
 		assertThat( countDocsOnDisk() ).isEqualTo( 0 );
@@ -95,9 +88,10 @@ public class LuceneIndexWriterCommitIT {
 		} );
 	}
 
-	@Test
-	public void commitStrategyForce() throws IOException {
-		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP );
+	@ParameterizedTest(name = "I/O strategy {0}, commit_interval {1}")
+	@MethodSource("params")
+	void commitStrategyForce(String ioStrategyName, Integer commitInterval) throws IOException {
+		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP, ioStrategyName, commitInterval );
 
 		// Initially our document is not in the index
 		assertThat( countDocsOnDisk() ).isEqualTo( 0 );
@@ -117,9 +111,13 @@ public class LuceneIndexWriterCommitIT {
 	/**
 	 * Test that changes are actually committed when closing the integration.
 	 */
-	@Test
-	public void integrationClose() throws IOException {
-		StubMapping mapping = setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY );
+	@ParameterizedTest(name = "I/O strategy {0}, commit_interval {1}")
+	@MethodSource("params")
+	void integrationClose(String ioStrategyName, Integer commitInterval) throws IOException {
+		StubMapping mapping = setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY,
+				ioStrategyName,
+				commitInterval
+		);
 
 		// Initially our document is not in the index
 		assertThat( countDocsOnDisk() ).isEqualTo( 0 );
@@ -152,7 +150,8 @@ public class LuceneIndexWriterCommitIT {
 		);
 	}
 
-	private StubMapping setup(StubMappingSchemaManagementStrategy schemaManagementStrategy) {
+	private StubMapping setup(StubMappingSchemaManagementStrategy schemaManagementStrategy, String ioStrategyName,
+			Integer commitInterval) {
 		return setupHelper.start()
 				.withSchemaManagement( schemaManagementStrategy )
 				.withIndex( index )

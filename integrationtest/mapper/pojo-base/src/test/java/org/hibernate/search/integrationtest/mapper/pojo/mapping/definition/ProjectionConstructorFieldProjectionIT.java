@@ -30,18 +30,18 @@ import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureRe
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-4574")
-public class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstructorIT {
+class ProjectionConstructorFieldProjectionIT extends AbstractProjectionConstructorIT {
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void noArg() {
+	void noArg() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -83,7 +83,7 @@ public class ProjectionConstructorFieldProjectionIT extends AbstractProjectionCo
 	}
 
 	@Test
-	public void path() {
+	void path() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -125,7 +125,7 @@ public class ProjectionConstructorFieldProjectionIT extends AbstractProjectionCo
 	}
 
 	@Test
-	public void valueConvert() {
+	void valueConvert() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -171,7 +171,7 @@ public class ProjectionConstructorFieldProjectionIT extends AbstractProjectionCo
 	}
 
 	@Test
-	public void supertype() {
+	void supertype() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -213,7 +213,7 @@ public class ProjectionConstructorFieldProjectionIT extends AbstractProjectionCo
 	}
 
 	@Test
-	public void primitiveType() {
+	void primitiveType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -255,7 +255,7 @@ public class ProjectionConstructorFieldProjectionIT extends AbstractProjectionCo
 	}
 
 	@Test
-	public void inObjectField() {
+	void inObjectField() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -325,7 +325,7 @@ public class ProjectionConstructorFieldProjectionIT extends AbstractProjectionCo
 	}
 
 	@Test
-	public void inObjectField_filteredOut() {
+	void inObjectField_filteredOut() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -398,7 +398,7 @@ public class ProjectionConstructorFieldProjectionIT extends AbstractProjectionCo
 	}
 
 	@Test
-	public void inObjectField_multiValued_filteredOut() {
+	void inObjectField_multiValued_filteredOut() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -471,7 +471,7 @@ public class ProjectionConstructorFieldProjectionIT extends AbstractProjectionCo
 	}
 
 	@Test
-	public void multiValued_list() {
+	void multiValued_list() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -522,7 +522,7 @@ public class ProjectionConstructorFieldProjectionIT extends AbstractProjectionCo
 	}
 
 	@Test
-	public void multiValued_collection() {
+	void multiValued_collection() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -573,7 +573,7 @@ public class ProjectionConstructorFieldProjectionIT extends AbstractProjectionCo
 	}
 
 	@Test
-	public void multiValued_iterable() {
+	void multiValued_iterable() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -624,7 +624,7 @@ public class ProjectionConstructorFieldProjectionIT extends AbstractProjectionCo
 	}
 
 	@Test
-	public void multiValued_set() {
+	void multiValued_set() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId

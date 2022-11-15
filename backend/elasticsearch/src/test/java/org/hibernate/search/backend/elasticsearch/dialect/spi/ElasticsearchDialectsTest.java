@@ -13,15 +13,13 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-public class ElasticsearchDialectsTest {
+class ElasticsearchDialectsTest {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<Object[]> params() {
+	public static List<? extends Arguments> params() {
 		return Arrays.asList(
 				// Unsupported versions may still be precise enough
 				params( "0.90.12", true, true, false ),
@@ -47,39 +45,36 @@ public class ElasticsearchDialectsTest {
 		);
 	}
 
-	private static Object[] params(String versionString,
+	private static Arguments params(String versionString,
 			boolean isPreciseEnoughForBootstrap, boolean isPreciseEnoughForStart, boolean isVersionCheckImpossible) {
-		return new Object[] {
+		return Arguments.of(
 				ElasticsearchVersion.of( versionString ),
 				isPreciseEnoughForBootstrap,
 				isPreciseEnoughForStart,
 				isVersionCheckImpossible
-		};
+		);
 	}
 
-	@Parameterized.Parameter
-	public ElasticsearchVersion version;
-	@Parameterized.Parameter(1)
-	public boolean isPreciseEnoughForBootstrap;
-	@Parameterized.Parameter(2)
-	public boolean isPreciseEnoughForStart;
-	@Parameterized.Parameter(3)
-	public boolean isVersionCheckImpossible;
-
-	@Test
-	public void isPreciseEnoughForBootstrap() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void isPreciseEnoughForBootstrap(ElasticsearchVersion version, boolean isPreciseEnoughForBootstrap,
+			boolean isPreciseEnoughForStart, boolean isVersionCheckImpossible) {
 		assertThat( ElasticsearchDialects.isPreciseEnoughForBootstrap( version ) )
 				.isEqualTo( isPreciseEnoughForBootstrap );
 	}
 
-	@Test
-	public void isPreciseEnoughForStart() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void isPreciseEnoughForStart(ElasticsearchVersion version, boolean isPreciseEnoughForBootstrap,
+			boolean isPreciseEnoughForStart, boolean isVersionCheckImpossible) {
 		assertThat( ElasticsearchDialects.isPreciseEnoughForStart( version ) )
 				.isEqualTo( isPreciseEnoughForStart );
 	}
 
-	@Test
-	public void isVersionCheckImpossible() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void isVersionCheckImpossible(ElasticsearchVersion version, boolean isPreciseEnoughForBootstrap,
+			boolean isPreciseEnoughForStart, boolean isVersionCheckImpossible) {
 		assertThat( ElasticsearchDialects.isVersionCheckImpossible( version ) )
 				.isEqualTo( isVersionCheckImpossible );
 	}

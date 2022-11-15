@@ -10,19 +10,19 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
-import org.hibernate.search.util.impl.integrationtest.common.rule.SchemaManagementWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.SchemaManagementWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 
-public class SchemaManagementStrategyDropAndCreateAndDropIT extends AbstractSchemaManagementStrategyIT {
+class SchemaManagementStrategyDropAndCreateAndDropIT extends AbstractSchemaManagementStrategyIT {
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Override
@@ -31,7 +31,7 @@ public class SchemaManagementStrategyDropAndCreateAndDropIT extends AbstractSche
 	}
 
 	@Test
-	public void close_drop_exception_single() {
+	void close_drop_exception_single() {
 		expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
 		expectWork( IndexedEntity2.NAME, CompletableFuture.completedFuture( null ) );
 
@@ -53,7 +53,7 @@ public class SchemaManagementStrategyDropAndCreateAndDropIT extends AbstractSche
 	}
 
 	@Test
-	public void close_drop_exception_multiple() {
+	void close_drop_exception_multiple() {
 		expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
 		expectWork( IndexedEntity2.NAME, CompletableFuture.completedFuture( null ) );
 

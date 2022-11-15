@@ -8,7 +8,7 @@ package org.hibernate.search.util.common.reflect.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
@@ -25,33 +25,26 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 
-@RunWith(Parameterized.class)
-public class ValueCreateHandleTest {
+class ValueCreateHandleTest {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<Object[]> params() {
+	public static List<? extends Arguments> params() {
 		MethodHandles.Lookup lookup = MethodHandles.lookup();
-		return Arrays.asList( new Object[][] {
-				{ ValueHandleFactory.usingMethodHandle( lookup ) },
-				{ ValueHandleFactory.usingJavaLangReflect() }
-		} );
+		return Arrays.asList(
+				Arguments.of( ValueHandleFactory.usingMethodHandle( lookup ) ),
+				Arguments.of( ValueHandleFactory.usingJavaLangReflect() )
+		);
 	}
 
-	private final ValueHandleFactory factory;
-
-	public ValueCreateHandleTest(ValueHandleFactory factory) {
-		this.factory = factory;
-	}
-
-	@Test
-	public void privateConstructor() throws Exception {
-		testValueCreateHandleSuccess( PrivateConstructorClass.class, PrivateConstructorClass::getValue );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void privateConstructor(ValueHandleFactory factory) throws Exception {
+		testValueCreateHandleSuccess( PrivateConstructorClass.class, PrivateConstructorClass::getValue, factory );
 	}
 
 	public static class PrivateConstructorClass {
@@ -70,9 +63,12 @@ public class ValueCreateHandleTest {
 		}
 	}
 
-	@Test
-	public void packagePrivateConstructor() throws Exception {
-		testValueCreateHandleSuccess( PackagePrivateConstructorClass.class, PackagePrivateConstructorClass::getValue );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void packagePrivateConstructor(ValueHandleFactory factory) throws Exception {
+		testValueCreateHandleSuccess( PackagePrivateConstructorClass.class, PackagePrivateConstructorClass::getValue,
+				factory
+		);
 	}
 
 	public static class PackagePrivateConstructorClass {
@@ -91,9 +87,10 @@ public class ValueCreateHandleTest {
 		}
 	}
 
-	@Test
-	public void protectedConstructor() throws Exception {
-		testValueCreateHandleSuccess( ProtectedConstructorClass.class, ProtectedConstructorClass::getValue );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void protectedConstructor(ValueHandleFactory factory) throws Exception {
+		testValueCreateHandleSuccess( ProtectedConstructorClass.class, ProtectedConstructorClass::getValue, factory );
 	}
 
 	public static class ProtectedConstructorClass {
@@ -112,9 +109,10 @@ public class ValueCreateHandleTest {
 		}
 	}
 
-	@Test
-	public void publicConstructor() throws Exception {
-		testValueCreateHandleSuccess( PublicConstructorClass.class, PublicConstructorClass::getValue );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void publicConstructor(ValueHandleFactory factory) throws Exception {
+		testValueCreateHandleSuccess( PublicConstructorClass.class, PublicConstructorClass::getValue, factory );
 	}
 
 	public static class PublicConstructorClass {
@@ -133,8 +131,9 @@ public class ValueCreateHandleTest {
 		}
 	}
 
-	@Test
-	public void failure_error() throws Exception {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void failure_error(ValueHandleFactory factory) throws Exception {
 		Constructor<?> constructor = ErrorConstructorClass.class.getDeclaredConstructor( String.class );
 
 		ValueCreateHandle<?> valueCreateHandle = factory.createForConstructor( constructor );
@@ -150,8 +149,9 @@ public class ValueCreateHandleTest {
 		}
 	}
 
-	@Test
-	public void failure_runtimeException() throws Exception {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void failure_runtimeException(ValueHandleFactory factory) throws Exception {
 		Constructor<?> constructor = RuntimeExceptionConstructorClass.class.getDeclaredConstructor( Object.class, int.class );
 
 		ValueCreateHandle<?> valueCreateHandle = factory.createForConstructor( constructor );
@@ -173,13 +173,14 @@ public class ValueCreateHandleTest {
 		}
 	}
 
-	@Test
-	public void failure_illegalAccessException() throws Exception {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void failure_illegalAccessException(ValueHandleFactory factory) throws Exception {
 		assumeFalse(
+				factory.getClass().getSimpleName().contains( "MethodHandle" ),
 				"Cannot test IllegalAccessException with MethodHandles: "
 						+ " if we don't use setAccessible(true), we can't create the handle,"
-						+ " and if we do use setAccessible(true), the handle has full access to the constructor.",
-				factory.getClass().getSimpleName().contains( "MethodHandle" )
+						+ " and if we do use setAccessible(true), the handle has full access to the constructor."
 		);
 
 		Constructor<?> constructor = IllegalAccessExceptionConstructorClass.class.getDeclaredConstructor( String.class );
@@ -200,8 +201,9 @@ public class ValueCreateHandleTest {
 		}
 	}
 
-	@Test
-	public void failure_instantiationException() throws Exception {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void failure_instantiationException(ValueHandleFactory factory) throws Exception {
 		Constructor<?> constructor = InstantiationExceptionConstructorClass.class.getDeclaredConstructor( String.class );
 
 		ValueCreateHandle<?> valueCreateHandle = factory.createForConstructor( constructor );
@@ -220,8 +222,9 @@ public class ValueCreateHandleTest {
 		}
 	}
 
-	@Test
-	public void failure_secondFailureInToString_runtimeException() throws Exception {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void failure_secondFailureInToString_runtimeException(ValueHandleFactory factory) throws Exception {
 		Constructor<?> constructor = RuntimeExceptionConstructorClass.class.getDeclaredConstructor( Object.class, int.class );
 
 		ValueCreateHandle<?> valueCreateHandle = factory.createForConstructor( constructor );
@@ -244,7 +247,8 @@ public class ValueCreateHandleTest {
 				.hasSuppressedException( toStringRuntimeException );
 	}
 
-	private <T> void testValueCreateHandleSuccess(Class<T> clazz, Function<T, String> getter)
+	private <T> void testValueCreateHandleSuccess(Class<T> clazz, Function<T, String> getter,
+			ValueHandleFactory factory)
 			throws IllegalAccessException, NoSuchMethodException {
 		Constructor<T> constructor = clazz.getDeclaredConstructor( String.class );
 		setAccessible( constructor );
@@ -264,7 +268,7 @@ public class ValueCreateHandleTest {
 		ValueCreateHandle<T> equalValueCreateHandle = factory.createForConstructor( constructor );
 		ValueCreateHandle<T> differentConstructorValueCreateHandle = factory.createForConstructor( otherConstructor );
 		assertThat( valueCreateHandle ).isEqualTo( equalValueCreateHandle );
-		assertThat( valueCreateHandle.hashCode() ).isEqualTo( equalValueCreateHandle.hashCode() );
+		assertThat( valueCreateHandle ).hasSameHashCodeAs( equalValueCreateHandle );
 		assertThat( valueCreateHandle ).isNotEqualTo( differentConstructorValueCreateHandle );
 	}
 

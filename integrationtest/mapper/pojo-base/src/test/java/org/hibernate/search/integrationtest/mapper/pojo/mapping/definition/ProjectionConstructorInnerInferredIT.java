@@ -27,18 +27,18 @@ import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureRe
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-3927")
-public class ProjectionConstructorInnerInferredIT extends AbstractProjectionConstructorIT {
+class ProjectionConstructorInnerInferredIT extends AbstractProjectionConstructorIT {
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void value() {
+	void value() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -85,7 +85,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 	}
 
 	@Test
-	public void value_multiValued_list() {
+	void value_multiValued_list() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -136,7 +136,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 	}
 
 	@Test
-	public void value_multiValued_collection() {
+	void value_multiValued_collection() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -187,7 +187,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 	}
 
 	@Test
-	public void value_multiValued_iterable() {
+	void value_multiValued_iterable() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -238,7 +238,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 	}
 
 	@Test
-	public void value_multiValued_set() {
+	void value_multiValued_set() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -275,7 +275,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 	}
 
 	@Test
-	public void object() {
+	void object() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -350,7 +350,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 	// If an inner projection type is not included in any Jandex index on startup,
 	// Hibernate Search can still get on its feet thanks to annotated type discovery.
 	@Test
-	public void object_annotatedTypeDiscovery() {
+	void object_annotatedTypeDiscovery() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -425,7 +425,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 	}
 
 	@Test
-	public void object_multiValued_list() {
+	void object_multiValued_list() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -515,7 +515,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 	}
 
 	@Test
-	public void object_multiValued_collection() {
+	void object_multiValued_collection() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -605,7 +605,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 	}
 
 	@Test
-	public void object_multiValued_iterable() {
+	void object_multiValued_iterable() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -695,7 +695,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 	}
 
 	@Test
-	public void object_multiValued_set() {
+	void object_multiValued_set() {
 		class Contained {
 			@DocumentId
 			public Integer id;

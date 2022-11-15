@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
+import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.junit.Assert.fail;
 
 import java.io.Serializable;
 
@@ -29,12 +29,12 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Integration tests checking that we get the expected access type for properties when using annotation mapping.
@@ -44,18 +44,18 @@ import org.junit.Test;
  * Note that more thorough testing is performed in {@code HibernateOrmBootstrapIntrospectorAccessTypeTest},
  * including tests of access type on an embeddable that is only ever mentioned in an element collection.
  */
-public class AnnotationMappingAccessTypeIT {
+class AnnotationMappingAccessTypeIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "fieldWithNonDefaultFieldAccess", String.class )
 				.field( "fieldWithDefaultFieldAccess", String.class )
@@ -87,7 +87,7 @@ public class AnnotationMappingAccessTypeIT {
 	}
 
 	@Test
-	public void index() {
+	void index() {
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.id = 1;

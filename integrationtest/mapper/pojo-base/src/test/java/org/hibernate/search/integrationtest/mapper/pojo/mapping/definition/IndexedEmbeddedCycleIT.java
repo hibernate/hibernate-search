@@ -22,37 +22,37 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test various cases of the {@code @IndexedEmbedded} leading to potential cycles, which are either broken by some
  * attribute of an {@code @IndexedEmbedded} or lead to an exception letting the user know that there's a cycle.
  */
 @SuppressWarnings({ "unused", "deprecation" }) // deprecated IndexedEmbedded#prefix
-public class IndexedEmbeddedCycleIT {
+class IndexedEmbeddedCycleIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock(
 			MethodHandles.lookup(), backendMock );
 
-	@Rule
-	public StaticCounters counters = new StaticCounters();
+	@RegisterExtension
+	public StaticCounters counters = StaticCounters.create();
 
 
 	@Test
-	public void cycle_brokenByExcludePaths() {
+	void cycle_brokenByExcludePaths() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
@@ -139,7 +139,7 @@ public class IndexedEmbeddedCycleIT {
 	}
 
 	@Test
-	public void cycle_brokenByExcludePathsWithPrefixEndingWithDot() {
+	void cycle_brokenByExcludePathsWithPrefixEndingWithDot() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
@@ -226,7 +226,7 @@ public class IndexedEmbeddedCycleIT {
 	}
 
 	@Test
-	public void cycle_brokenByExcludePathsWithPrefixWithMultipleDotsAndEndingWithDot() {
+	void cycle_brokenByExcludePathsWithPrefixWithMultipleDotsAndEndingWithDot() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
@@ -327,7 +327,7 @@ public class IndexedEmbeddedCycleIT {
 	}
 
 	@Test
-	public void cycle_cannotBeBrokenByExcludePathsWithPrefixNoDot() {
+	void cycle_cannotBeBrokenByExcludePathsWithPrefixNoDot() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
@@ -380,7 +380,7 @@ public class IndexedEmbeddedCycleIT {
 	}
 
 	@Test
-	public void cycle_brokenByExcludePaths_deeply() {
+	void cycle_brokenByExcludePaths_deeply() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
@@ -482,7 +482,7 @@ public class IndexedEmbeddedCycleIT {
 	}
 
 	@Test
-	public void cycle_brokenByExcludePaths_deeply_nonRoot() {
+	void cycle_brokenByExcludePaths_deeply_nonRoot() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
@@ -589,7 +589,7 @@ public class IndexedEmbeddedCycleIT {
 	}
 
 	@Test
-	public void cycle_brokenByExcludePathsSomewhereMidCycle_deeply_nonRoot() {
+	void cycle_brokenByExcludePathsSomewhereMidCycle_deeply_nonRoot() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
@@ -702,7 +702,7 @@ public class IndexedEmbeddedCycleIT {
 	}
 
 	@Test
-	public void cycle() {
+	void cycle() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
@@ -737,7 +737,7 @@ public class IndexedEmbeddedCycleIT {
 	}
 
 	@Test
-	public void cycle_nonRoot() {
+	void cycle_nonRoot() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
@@ -778,7 +778,7 @@ public class IndexedEmbeddedCycleIT {
 	}
 
 	@Test
-	public void cycle_irrelevantExcludePaths() {
+	void cycle_irrelevantExcludePaths() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
@@ -815,7 +815,7 @@ public class IndexedEmbeddedCycleIT {
 	}
 
 	@Test
-	public void cycle_nonRoot_irrelevantExcludePaths() {
+	void cycle_nonRoot_irrelevantExcludePaths() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
@@ -859,7 +859,7 @@ public class IndexedEmbeddedCycleIT {
 	}
 
 	@Test
-	public void cycle_selfReferenceBreaksEventuallyWithExclude() {
+	void cycle_selfReferenceBreaksEventuallyWithExclude() {
 		@Indexed(index = INDEX_NAME)
 		class EntityA {
 			@DocumentId
@@ -929,7 +929,7 @@ public class IndexedEmbeddedCycleIT {
 	}
 
 	@Test
-	public void cycle_selfReferenceWontBreak_excludeSomePropertyNotInCycle() {
+	void cycle_selfReferenceWontBreak_excludeSomePropertyNotInCycle() {
 		@Indexed(index = INDEX_NAME)
 		class EntityA {
 			@DocumentId

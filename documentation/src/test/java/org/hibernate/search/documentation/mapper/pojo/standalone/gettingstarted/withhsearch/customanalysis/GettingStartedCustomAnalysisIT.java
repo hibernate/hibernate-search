@@ -18,22 +18,22 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class GettingStartedCustomAnalysisIT {
+class GettingStartedCustomAnalysisIT {
 
-	@Rule
+	@RegisterExtension
 	public TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 
 	private CloseableSearchMapping searchMapping;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		if ( BackendConfiguration.isLucene() ) {
 			// tag::setup-lucene[]
 			CloseableSearchMapping searchMapping = SearchMapping.builder()
@@ -80,15 +80,15 @@ public class GettingStartedCustomAnalysisIT {
 		}
 	}
 
-	@After
-	public void cleanup() {
+	@AfterEach
+	void cleanup() {
 		if ( searchMapping != null ) {
 			searchMapping.close();
 		}
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		Integer bookId = 2;
 		try ( SearchSession session = searchMapping.createSession() ) {
 			Author author = new Author();

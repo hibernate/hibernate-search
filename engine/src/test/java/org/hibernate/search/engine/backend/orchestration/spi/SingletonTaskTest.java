@@ -20,12 +20,12 @@ import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.awaitility.Awaitility;
 
 @TestForIssue(jiraKey = "HSEARCH-4363")
-public class SingletonTaskTest {
+class SingletonTaskTest {
 
 	private final TestWorker worker = new TestWorker();
 	private final TestFailureHandler failureHandler = new TestFailureHandler();
@@ -35,7 +35,7 @@ public class SingletonTaskTest {
 	);
 
 	@Test
-	public void stopWhileBlockingWorkInProgress() throws Exception {
+	void stopWhileBlockingWorkInProgress() throws Exception {
 		testSubject.ensureScheduled();
 
 		Awaitility.await().until( () -> worker.started );

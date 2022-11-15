@@ -13,16 +13,16 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class OrPredicateSpecificsIT {
+class OrPredicateSpecificsIT {
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
@@ -52,27 +52,27 @@ public class OrPredicateSpecificsIT {
 	private static final Integer FIELD4_VALUE3 = 42_000; // Different from document 1
 	private static final Integer FIELD5_VALUE3 = 142_000; // Different from document 1
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
-	public void empty() {
+	void empty() {
 		assertThatQuery( index.query()
 				.where( f -> f.or() ) )
 				.hasNoHits();
 	}
 
 	@Test
-	public void or() {
+	void or() {
 		assertThatQuery( index.query()
 				.where( f -> f.or( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
@@ -86,7 +86,7 @@ public class OrPredicateSpecificsIT {
 	}
 
 	@Test
-	public void or_separatePredicateObject() {
+	void or_separatePredicateObject() {
 		StubMappingScope scope = index.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE1 )
@@ -104,7 +104,7 @@ public class OrPredicateSpecificsIT {
 	}
 
 	@Test
-	public void nested() {
+	void nested() {
 		assertThatQuery( index.query()
 				.where( f -> f.or(
 						f.and( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ),
@@ -114,7 +114,7 @@ public class OrPredicateSpecificsIT {
 	}
 
 	@Test
-	public void add() {
+	void add() {
 		assertThatQuery( index.query()
 				.where( f -> f.or()
 						.add( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) ) )
@@ -128,7 +128,7 @@ public class OrPredicateSpecificsIT {
 	}
 
 	@Test
-	public void add_separatePredicateObject() {
+	void add_separatePredicateObject() {
 		StubMappingScope scope = index.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE1 )
@@ -149,7 +149,7 @@ public class OrPredicateSpecificsIT {
 	}
 
 	@Test
-	public void add_function() {
+	void add_function() {
 		assertThatQuery( index.query()
 				.where( f -> f.or()
 						.add( f2 -> f2.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) ) )
@@ -163,7 +163,7 @@ public class OrPredicateSpecificsIT {
 	}
 
 	@Test
-	public void with() {
+	void with() {
 		assertThatQuery( index.query()
 				.where( f -> f.or()
 						.with( or -> or.add( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) ) ) )
@@ -177,7 +177,7 @@ public class OrPredicateSpecificsIT {
 	}
 
 	@Test
-	public void hasClause() {
+	void hasClause() {
 		StubMappingScope scope = index.createScope();
 
 		assertThat(

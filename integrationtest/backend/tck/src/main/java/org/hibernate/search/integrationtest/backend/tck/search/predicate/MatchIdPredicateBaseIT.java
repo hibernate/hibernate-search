@@ -6,30 +6,33 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
-import org.hibernate.search.util.impl.test.runner.nested.Nested;
-import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.provider.Arguments;
 
-@RunWith(NestedRunner.class)
-public class MatchIdPredicateBaseIT {
+//CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
+// cannot make a private constructor.
+class MatchIdPredicateBaseIT {
+	//CHECKSTYLE:ON
 
-	@ClassRule
-	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start()
 				.withIndexes(
 						InObjectFieldIT.mainIndex, InObjectFieldIT.missingFieldIndex,
@@ -47,13 +50,8 @@ public class MatchIdPredicateBaseIT {
 		inObjectFieldMainIndexer.join( inObjectFieldMissingFieldIndexer, scoreIndexer );
 	}
 
-	@Test
-	public void takariCpSuiteWorkaround() {
-		// Workaround to get Takari-CPSuite to run this test.
-	}
-
 	@Nested
-	public static class InObjectFieldIT extends AbstractPredicateInObjectFieldIT {
+	class InObjectFieldIT extends AbstractPredicateInObjectFieldIT {
 		private static final DataSet dataSet = new DataSet();
 
 		private static final SimpleMappedIndex<IndexBinding> mainIndex =
@@ -64,14 +62,14 @@ public class MatchIdPredicateBaseIT {
 				SimpleMappedIndex.of( root -> new MissingFieldIndexBinding( root, FieldTypeDescriptor.getAll() ) )
 						.name( "nesting_missingField" );
 
-		public InObjectFieldIT() {
-			super( mainIndex, missingFieldIndex, dataSet );
+		public static List<? extends Arguments> params() {
+			return Arrays.asList( Arguments.of( mainIndex, missingFieldIndex, dataSet ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
-				int matchingDocOrdinal) {
-			return f.id().matching( dataSet.docId( matchingDocOrdinal ) );
+				int matchingDocOrdinal, AbstractPredicateDataSet dataSet) {
+			return f.id().matching( InObjectFieldIT.dataSet.docId( matchingDocOrdinal ) );
 		}
 
 		private static class DataSet extends AbstractPredicateDataSet {
@@ -91,35 +89,39 @@ public class MatchIdPredicateBaseIT {
 	}
 
 	@Nested
-	public static class ScoreIT extends AbstractPredicateScoreIT {
+	class ScoreIT extends AbstractPredicateScoreIT {
 		private static final DataSet dataSet = new DataSet();
 
 		private static final StubMappedIndex index = StubMappedIndex.withoutFields().name( "score" );
 
-		public ScoreIT() {
-			super( index, dataSet );
+		public static List<? extends Arguments> params() {
+			return Arrays.asList( Arguments.of( index, dataSet ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal) {
-			return f.id().matching( dataSet.docId( matchingDocOrdinal ) );
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
+				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
+			return f.id().matching( ScoreIT.dataSet.docId( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal,
-				float boost) {
-			return f.id().matching( dataSet.docId( matchingDocOrdinal ) ).boost( boost );
+				float boost, AbstractPredicateDataSet dataSet,
+				StubMappedIndex index) {
+			return f.id().matching( ScoreIT.dataSet.docId( matchingDocOrdinal ) ).boost( boost );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal) {
-			return f.id().matching( dataSet.docId( matchingDocOrdinal ) ).constantScore();
+		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal,
+				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
+			return f.id().matching( ScoreIT.dataSet.docId( matchingDocOrdinal ) ).constantScore();
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
-				int matchingDocOrdinal, float boost) {
-			return f.id().matching( dataSet.docId( matchingDocOrdinal ) ).constantScore().boost( boost );
+				int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
+				StubMappedIndex index) {
+			return f.id().matching( ScoreIT.dataSet.docId( matchingDocOrdinal ) ).constantScore().boost( boost );
 		}
 
 		private static class DataSet extends AbstractPredicateDataSet {

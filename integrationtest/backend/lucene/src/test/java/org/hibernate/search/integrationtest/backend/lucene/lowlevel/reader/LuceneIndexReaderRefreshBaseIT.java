@@ -9,6 +9,9 @@ package org.hibernate.search.integrationtest.backend.lucene.lowlevel.reader;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -18,18 +21,17 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.awaitility.Awaitility;
 
-@RunWith(Parameterized.class)
-public class LuceneIndexReaderRefreshBaseIT {
+class LuceneIndexReaderRefreshBaseIT {
 
 	/*
 	 * Pick a value that is:
@@ -43,34 +45,26 @@ public class LuceneIndexReaderRefreshBaseIT {
 	 * These parameters should not have any effect on the test.
 	 * They are here to check that we get the same behavior independently from these parameters.
 	 */
-	@Parameterized.Parameters(name = "Commit strategy {0}, commit_interval {1}")
-	public static Object[][] strategies() {
-		return new Object[][] {
-				{ DocumentCommitStrategy.NONE, null },
-				{ DocumentCommitStrategy.FORCE, null },
-				{ DocumentCommitStrategy.NONE, 0 },
-				{ DocumentCommitStrategy.FORCE, 0 },
-				{ DocumentCommitStrategy.NONE, NON_ZERO_DELAY },
-				{ DocumentCommitStrategy.FORCE, NON_ZERO_DELAY }
-		};
+	public static List<? extends Arguments> params() {
+		return Arrays.asList(
+				Arguments.of( DocumentCommitStrategy.NONE, null ),
+				Arguments.of( DocumentCommitStrategy.FORCE, null ),
+				Arguments.of( DocumentCommitStrategy.NONE, 0 ),
+				Arguments.of( DocumentCommitStrategy.FORCE, 0 ),
+				Arguments.of( DocumentCommitStrategy.NONE, NON_ZERO_DELAY ),
+				Arguments.of( DocumentCommitStrategy.FORCE, NON_ZERO_DELAY )
+		);
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	private final DocumentCommitStrategy commitStrategy;
-	private final Integer commitInterval;
-
-	public LuceneIndexReaderRefreshBaseIT(DocumentCommitStrategy commitStrategy, Integer commitInterval) {
-		this.commitStrategy = commitStrategy;
-		this.commitInterval = commitInterval;
-	}
-
-	@Test
-	public void ioStrategyDefault_refreshIntervalDefault() {
-		setup( null, null );
+	@ParameterizedTest(name = "Commit strategy {0}, commit_interval {1}")
+	@MethodSource("params")
+	void ioStrategyDefault_refreshIntervalDefault(DocumentCommitStrategy commitStrategy, Integer commitInterval) {
+		setup( null, null, commitInterval );
 
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.match().field( "text" ).matching( "text1" ) )
@@ -89,9 +83,10 @@ public class LuceneIndexReaderRefreshBaseIT {
 		assertThatQuery( query ).hasTotalHitCount( 1 );
 	}
 
-	@Test
-	public void ioStrategyDefault_refreshIntervalZero() {
-		setup( null, 0 );
+	@ParameterizedTest(name = "Commit strategy {0}, commit_interval {1}")
+	@MethodSource("params")
+	void ioStrategyDefault_refreshIntervalZero(DocumentCommitStrategy commitStrategy, Integer commitInterval) {
+		setup( null, 0, commitInterval );
 
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.match().field( "text" ).matching( "text1" ) )
@@ -110,9 +105,11 @@ public class LuceneIndexReaderRefreshBaseIT {
 		assertThatQuery( query ).hasTotalHitCount( 1 );
 	}
 
-	@Test
-	public void ioStrategyDefault_refreshIntervalPositive_refreshStrategyNone() {
-		setup( null, NON_ZERO_DELAY );
+	@ParameterizedTest(name = "Commit strategy {0}, commit_interval {1}")
+	@MethodSource("params")
+	void ioStrategyDefault_refreshIntervalPositive_refreshStrategyNone(DocumentCommitStrategy commitStrategy,
+			Integer commitInterval) {
+		setup( null, NON_ZERO_DELAY, commitInterval );
 
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.match().field( "text" ).matching( "text1" ) )
@@ -134,9 +131,11 @@ public class LuceneIndexReaderRefreshBaseIT {
 		Awaitility.await().untilAsserted( () -> assertThatQuery( query ).hasTotalHitCount( 1 ) );
 	}
 
-	@Test
-	public void ioStrategyDefault_refreshIntervalPositive_refreshStrategyForce() {
-		setup( null, NON_ZERO_DELAY );
+	@ParameterizedTest(name = "Commit strategy {0}, commit_interval {1}")
+	@MethodSource("params")
+	void ioStrategyDefault_refreshIntervalPositive_refreshStrategyForce(DocumentCommitStrategy commitStrategy,
+			Integer commitInterval) {
+		setup( null, NON_ZERO_DELAY, commitInterval );
 
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.match().field( "text" ).matching( "text1" ) )
@@ -155,9 +154,10 @@ public class LuceneIndexReaderRefreshBaseIT {
 		assertThatQuery( query ).hasTotalHitCount( 1 );
 	}
 
-	@Test
-	public void ioStrategyDebug() {
-		setup( "debug", null );
+	@ParameterizedTest(name = "Commit strategy {0}, commit_interval {1}")
+	@MethodSource("params")
+	void ioStrategyDebug(DocumentCommitStrategy commitStrategy, Integer commitInterval) {
+		setup( "debug", null, commitInterval );
 
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.match().field( "text" ).matching( "text1" ) )
@@ -176,7 +176,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 		assertThatQuery( query ).hasTotalHitCount( 1 );
 	}
 
-	private void setup(String ioStrategyName, Integer refreshIntervalMs) {
+	private void setup(String ioStrategyName, Integer refreshIntervalMs, Integer commitInterval) {
 		setupHelper.start()
 				.withIndex( index )
 				.withBackendProperty( LuceneIndexSettings.IO_STRATEGY, ioStrategyName )

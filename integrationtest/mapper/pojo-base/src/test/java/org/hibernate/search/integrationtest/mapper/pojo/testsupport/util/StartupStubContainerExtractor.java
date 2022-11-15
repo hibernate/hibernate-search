@@ -11,7 +11,7 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerExtractionContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
 /**
  * A stub container value extractors for use in tests where the extractor is only used on startup.

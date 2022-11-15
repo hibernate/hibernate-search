@@ -12,11 +12,11 @@ import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
 import org.hibernate.search.util.common.impl.CollectionHelper;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 @TestForIssue(jiraKey = "HSEARCH-4621")
-public class SearchWorkspacePurgeRoutingKeyIT extends AbstractSearchWorkspaceSimpleOperationIT {
+class SearchWorkspacePurgeRoutingKeyIT extends AbstractSearchWorkspaceSimpleOperationIT {
 
 	private final Set<String> ROUTING_KEYS = CollectionHelper.asLinkedHashSet( "key1", "key2" );
 

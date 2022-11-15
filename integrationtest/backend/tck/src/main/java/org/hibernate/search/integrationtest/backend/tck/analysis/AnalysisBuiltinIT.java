@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -18,51 +19,48 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SingleFieldDocumentBuilder;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test indexing and searching with built-in analyzer definitions.
  * See {@link AnalyzerNames}.
  */
-@RunWith(Parameterized.class)
-public class AnalysisBuiltinIT {
+class AnalysisBuiltinIT {
 
-	@Parameterized.Parameters
-	public static List<SearchSetupHelper> params() {
+	public static List<? extends Arguments> params() {
 		return Arrays.asList(
 				// Test with no analysis configurer whatsoever
-				new SearchSetupHelper( TckBackendHelper::createAnalysisNotConfiguredBackendSetupStrategy ),
+				Arguments.of( (Function<TckBackendHelper,
+						TckBackendSetupStrategy<?>>) TckBackendHelper::createAnalysisNotConfiguredBackendSetupStrategy ),
 				// Test with an analysis configurer that does not override the defaults but defines other analyzers
-				new SearchSetupHelper( TckBackendHelper::createAnalysisCustomBackendSetupStrategy )
+				Arguments.of( (Function<TckBackendHelper,
+						TckBackendSetupStrategy<?>>) TckBackendHelper::createAnalysisCustomBackendSetupStrategy )
 		);
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper;
-
+	@RegisterExtension
+	public SearchSetupHelper setupHelper = SearchSetupHelper.create();
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	public AnalysisBuiltinIT(SearchSetupHelper setupHelper) {
-		this.setupHelper = setupHelper;
-	}
-
-	@Before
-	public void setup() {
+	public void init(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
+		this.setupHelper.with( setupStrategyFunction );
 		setupHelper.start().withIndex( index ).setup();
 	}
 
-	@Test
-	public void analyzer_default() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void analyzer_default(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
+		init( setupStrategyFunction );
 		SimpleFieldModel<String> field = index.binding().defaultAnalyzer;
 		initData( field );
 
@@ -83,8 +81,10 @@ public class AnalysisBuiltinIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), "7" );
 	}
 
-	@Test
-	public void analyzer_standard() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void analyzer_standard(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
+		init( setupStrategyFunction );
 		SimpleFieldModel<String> field = index.binding().standardAnalyzer;
 		initData( field );
 
@@ -105,8 +105,10 @@ public class AnalysisBuiltinIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), "7" );
 	}
 
-	@Test
-	public void analyzer_simple() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void analyzer_simple(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
+		init( setupStrategyFunction );
 		SimpleFieldModel<String> field = index.binding().simpleAnalyzer;
 		initData( field );
 
@@ -127,8 +129,10 @@ public class AnalysisBuiltinIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), "7" );
 	}
 
-	@Test
-	public void analyzer_whitespace() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void analyzer_whitespace(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
+		init( setupStrategyFunction );
 		SimpleFieldModel<String> field = index.binding().whitespaceAnalyzer;
 		initData( field );
 
@@ -149,8 +153,10 @@ public class AnalysisBuiltinIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), "7" );
 	}
 
-	@Test
-	public void analyzer_stop() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void analyzer_stop(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
+		init( setupStrategyFunction );
 		SimpleFieldModel<String> field = index.binding().stopAnalyzer;
 		initData( field );
 
@@ -171,8 +177,10 @@ public class AnalysisBuiltinIT {
 				.hasNoHits();
 	}
 
-	@Test
-	public void analyzer_keyword() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void analyzer_keyword(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
+		init( setupStrategyFunction );
 		SimpleFieldModel<String> field = index.binding().keywordAnalyzer;
 		initData( field );
 

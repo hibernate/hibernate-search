@@ -15,14 +15,18 @@ import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
+import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests of individual operations in {@link org.hibernate.search.mapper.pojo.work.spi.PojoIndexer}
@@ -31,8 +35,11 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-4153")
 public abstract class AbstractPojoIndexerDeleteNullEntityIT extends AbstractPojoIndexingOperationIT {
 
-	@Test
-	public void simple() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void simple(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId,
+			MyRoutingBinder routingBinder, IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
 
@@ -47,8 +54,11 @@ public abstract class AbstractPojoIndexerDeleteNullEntityIT extends AbstractPojo
 		}
 	}
 
-	@Test
-	public void nullProvidedId() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void nullProvidedId(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId,
+			MyRoutingBinder routingBinder, IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
 
@@ -59,8 +69,12 @@ public abstract class AbstractPojoIndexerDeleteNullEntityIT extends AbstractPojo
 		}
 	}
 
-	@Test
-	public void providedId_providedRoutes_currentAndNoPrevious() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void providedId_providedRoutes_currentAndNoPrevious(DocumentCommitStrategy commitStrategy,
+			DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder,
+			IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
@@ -77,8 +91,12 @@ public abstract class AbstractPojoIndexerDeleteNullEntityIT extends AbstractPojo
 		}
 	}
 
-	@Test
-	public void providedId_providedRoutes_currentAndPrevious() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void providedId_providedRoutes_currentAndPrevious(DocumentCommitStrategy commitStrategy,
+			DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder,
+			IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
@@ -108,8 +126,11 @@ public abstract class AbstractPojoIndexerDeleteNullEntityIT extends AbstractPojo
 		}
 	}
 
-	@Test
-	public void runtimeException() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void runtimeException(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId,
+			MyRoutingBinder routingBinder, IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		RuntimeException exception = new RuntimeException();
 		try ( SearchSession session = createSession() ) {
@@ -125,8 +146,11 @@ public abstract class AbstractPojoIndexerDeleteNullEntityIT extends AbstractPojo
 		}
 	}
 
-	@Test
-	public void error() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void error(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId,
+			MyRoutingBinder routingBinder, IndexingPlanSynchronizationStrategy strategy) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder, strategy );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		Error error = new Error();
 		try ( SearchSession session = createSession() ) {

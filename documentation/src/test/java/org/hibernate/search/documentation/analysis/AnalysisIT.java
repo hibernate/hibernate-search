@@ -7,7 +7,7 @@
 package org.hibernate.search.documentation.analysis;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.isLucene;
+import static org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration.isLucene;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import jakarta.persistence.Entity;
@@ -23,16 +23,16 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigur
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class AnalysisIT {
+class AnalysisIT {
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	@Test
-	public void simple() {
+	void simple() {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withProperties(
 						isLucene()
@@ -93,7 +93,7 @@ public class AnalysisIT {
 	}
 
 	@Test
-	public void default_override() {
+	void default_override() {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withProperties(
 						isLucene()

@@ -22,30 +22,30 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test adding default value bridges so that custom types are supported by the {@code @GenericField} annotation.
  */
 @TestForIssue(jiraKey = "HSEARCH-3096")
-public class FieldDefaultBridgeAdditionIT {
+class FieldDefaultBridgeAdditionIT {
 	private static final String INDEX_NAME = "indexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void exactType() {
+	void exactType() {
 		Consumer<BridgesConfigurationContext> configurer = b -> b.exactType( CustomClass.class )
 				.valueBridge( new CustomClassBridge() );
 
@@ -59,7 +59,7 @@ public class FieldDefaultBridgeAdditionIT {
 	}
 
 	@Test
-	public void subTypesOf() {
+	void subTypesOf() {
 		Consumer<BridgesConfigurationContext> configurer = b -> b.subTypesOf( CustomClass.class )
 				.valueBinder( bindingContext -> {
 					Class<?> rawType = bindingContext.bridgedElement().rawType();
@@ -86,7 +86,7 @@ public class FieldDefaultBridgeAdditionIT {
 	}
 
 	@Test
-	public void strictSubTypesOf() {
+	void strictSubTypesOf() {
 		Consumer<BridgesConfigurationContext> configurer = b -> b.strictSubTypesOf( CustomClass.class )
 				.valueBinder( bindingContext -> {
 					Class<?> rawType = bindingContext.bridgedElement().rawType();

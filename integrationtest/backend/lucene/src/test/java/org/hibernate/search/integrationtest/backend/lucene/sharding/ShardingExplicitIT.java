@@ -19,7 +19,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
@@ -29,7 +29,7 @@ import org.apache.lucene.search.TopDocs;
 /**
  * A basic test for explicit sharding with explicit routing keys.
  */
-public class ShardingExplicitIT extends AbstractShardingRoutingKeyIT {
+class ShardingExplicitIT extends AbstractShardingRoutingKeyIT {
 
 	protected static TckBackendSetupStrategy<?> explicitShardingBackendSetupStrategy(Set<String> shardIds) {
 		return new LuceneTckBackendSetupStrategy()
@@ -49,7 +49,7 @@ public class ShardingExplicitIT extends AbstractShardingRoutingKeyIT {
 	}
 
 	@Test
-	public void indexReaderAccessor() throws Exception {
+	void indexReaderAccessor() throws Exception {
 		StubMappingScope scope = index.createScope();
 
 		try ( IndexReader indexReader = scope.extension( LuceneExtension.get() ).openIndexReader() ) {

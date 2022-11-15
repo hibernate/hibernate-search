@@ -20,12 +20,12 @@ import org.hibernate.search.util.impl.test.reflect.TypeCapture;
 import org.hibernate.search.util.impl.test.reflect.WildcardTypeCapture;
 import org.hibernate.search.util.impl.test.reflect.WildcardTypeCapture.Of;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ReflectionUtilsTest {
+class ReflectionUtilsTest {
 
 	@Test
-	public void simple() {
+	void simple() {
 		new AssertWithType<String>() {
 		}
 				.resolveRawTypeTo( String.class )
@@ -61,7 +61,7 @@ public class ReflectionUtilsTest {
 	}
 
 	@Test
-	public void genericArgument() {
+	void genericArgument() {
 		new AssertWithType<Iterable<CustomGenericType<String, Integer>>>() {
 		}
 				.resolveRawTypeTo( Iterable.class )
@@ -75,7 +75,7 @@ public class ReflectionUtilsTest {
 
 	@Test
 	@SuppressWarnings("rawtypes")
-	public void rawType() {
+	void rawType() {
 		new AssertWithType<Iterable>() {
 		}
 				.resolveRawTypeTo( Iterable.class )
@@ -87,7 +87,7 @@ public class ReflectionUtilsTest {
 	}
 
 	@Test
-	public <T> void unboundedTypeVariable() {
+	<T> void unboundedTypeVariable() {
 		// Type variable as the tested type
 		new AssertWithType<T>() {
 		}
@@ -112,7 +112,7 @@ public class ReflectionUtilsTest {
 	}
 
 	@Test
-	public <T extends CustomGenericInterface<Integer, String>> void singleUpperBoundTypeVariable() {
+	<T extends CustomGenericInterface<Integer, String>> void singleUpperBoundTypeVariable() {
 		// Type variable as the tested type
 		new AssertWithType<T>() {
 		}
@@ -137,7 +137,7 @@ public class ReflectionUtilsTest {
 	}
 
 	@Test
-	public <T extends CustomGenericInterface<Integer, String> & Collection<Double>> void multipleUpperBoundsTypeVariable() {
+	<T extends CustomGenericInterface<Integer, String> & Collection<Double>> void multipleUpperBoundsTypeVariable() {
 		// Type variable as the tested type
 		new AssertWithType<T>() {
 		}
@@ -162,7 +162,7 @@ public class ReflectionUtilsTest {
 	}
 
 	@Test
-	public void unboundedWildcard() {
+	void unboundedWildcard() {
 		// Wildcard as the tested type
 		new AssertWithWildcardType<Of<?>>() {
 		}
@@ -182,7 +182,7 @@ public class ReflectionUtilsTest {
 	}
 
 	@Test
-	public void singleUpperBoundWildcard() {
+	void singleUpperBoundWildcard() {
 		// Wildcard as the tested type
 		new AssertWithWildcardType<Of<? extends CustomGenericInterface<Integer, String>>>() {
 		}
@@ -207,7 +207,7 @@ public class ReflectionUtilsTest {
 	}
 
 	@Test
-	public <T> void unboundedTypeVariableUpperBoundWildcard() {
+	<T> void unboundedTypeVariableUpperBoundWildcard() {
 		// Wildcard as the tested type
 		new AssertWithWildcardType<Of<? extends T>>() {
 		}
@@ -232,7 +232,7 @@ public class ReflectionUtilsTest {
 	}
 
 	@Test
-	public <T extends CustomGenericInterface<Integer, String>> void boundedTypeVariableUpperBoundWildcard() {
+	<T extends CustomGenericInterface<Integer, String>> void boundedTypeVariableUpperBoundWildcard() {
 		// Wildcard as the tested type
 		new AssertWithWildcardType<Of<? extends T>>() {
 		}

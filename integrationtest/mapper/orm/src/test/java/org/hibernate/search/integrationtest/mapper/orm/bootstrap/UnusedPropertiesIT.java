@@ -16,33 +16,33 @@ import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 
-public class UnusedPropertiesIT {
+class UnusedPropertiesIT {
 	private static final String KEY_UNUSED = "hibernate.search.indexes.myIndex.foo";
 	private static final String KEY_UNUSED_BUT_EMPTY_VALUE = "hibernate.search.indexes.myIndex.emptyValue";
 	private static final String KEY_UNUSED_BUT_BLANK_VALUE = "hibernate.search.indexes.myIndex.blankValue";
 	private static final String KEY_UNUSED_BUT_NULL_VALUE = "hibernate.search.indexes.myIndex.nullValue";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
-	public void checkDisabled_unusedProperty() {
+	void checkDisabled_unusedProperty() {
 		logged.expectMessage( "some properties in the given configuration are not used" )
 				.never();
 		logged.expectEvent( Level.INFO, "Configuration property tracking is disabled" )
@@ -58,7 +58,7 @@ public class UnusedPropertiesIT {
 	}
 
 	@Test
-	public void checkEnabledByDefault_unusedProperty() {
+	void checkEnabledByDefault_unusedProperty() {
 		logged.expectEvent( Level.WARN,
 				"Invalid configuration passed to Hibernate Search",
 				"some properties in the given configuration are not used",
@@ -83,7 +83,7 @@ public class UnusedPropertiesIT {
 	}
 
 	@Test
-	public void checkEnabledExplicitly_noUnusedProperty() {
+	void checkEnabledExplicitly_noUnusedProperty() {
 		/*
 		 * Check that the "configuration property tracking strategy" property is considered used.
 		 * This is a corner case worth testing, since the property may legitimately be accessed before

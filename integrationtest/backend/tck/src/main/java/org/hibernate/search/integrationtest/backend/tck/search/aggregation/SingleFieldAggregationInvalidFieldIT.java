@@ -19,62 +19,52 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.AggregationScenario;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.SupportedSingleFieldAggregationExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.IntegerFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TypeAssertionHelper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests behavior of all single-field aggregations (range, terms, ...)
  * when invalid fields are targeted.
  */
-@RunWith(Parameterized.class)
-public class SingleFieldAggregationInvalidFieldIT<F> {
+class SingleFieldAggregationInvalidFieldIT<F> {
 
 	private static final IntegerFieldTypeDescriptor FIELD_TYPE = IntegerFieldTypeDescriptor.INSTANCE;
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] parameters() {
-		List<Object[]> parameters = new ArrayList<>();
+	public static List<? extends Arguments> params() {
+		List<Arguments> parameters = new ArrayList<>();
 		for ( AggregationDescriptor aggregationDescriptor : AggregationDescriptor.getAll() ) {
 			Optional<? extends SupportedSingleFieldAggregationExpectations<?>> expectations =
 					aggregationDescriptor.getSingleFieldAggregationExpectations( FIELD_TYPE ).getSupported();
-			parameters.add( new Object[] { expectations.get() } );
+			parameters.add( Arguments.of( expectations.get() ) );
 		}
-		return parameters.toArray( new Object[0][] );
+		return parameters;
 	}
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 	}
 
-	private final SupportedSingleFieldAggregationExpectations<F> expectations;
-	private final FieldTypeDescriptor<F> fieldType;
-
-	public SingleFieldAggregationInvalidFieldIT(SupportedSingleFieldAggregationExpectations<F> expectations) {
-		this.expectations = expectations;
-		this.fieldType = expectations.fieldType();
-	}
-
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(
 			original = "org.hibernate.search.test.query.facet.FacetUnknownFieldFailureTest.testUnknownFieldNameThrowsException")
-	public void unknownField() {
+	void unknownField(SupportedSingleFieldAggregationExpectations<F> expectations) {
 		String fieldPath = "unknownField";
 
 		AggregationScenario<?> scenario = expectations.simple();
@@ -86,9 +76,10 @@ public class SingleFieldAggregationInvalidFieldIT<F> {
 				.hasMessageContaining( index.name() );
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testNullFieldNameThrowsException")
-	public void nullFieldPath() {
+	void nullFieldPath(SupportedSingleFieldAggregationExpectations<F> expectations) {
 		// Try to pass a "null" field type
 		AggregationScenario<?> scenario = expectations.simple();
 
@@ -98,11 +89,13 @@ public class SingleFieldAggregationInvalidFieldIT<F> {
 				.hasMessageContaining( "must not be null" );
 	}
 
-	@Test
-	public void objectField_nested() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void objectField_nested(SupportedSingleFieldAggregationExpectations<F> expectations) {
 		String fieldPath = index.binding().nestedObject.relativeFieldName;
 
-		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.identity( fieldType ) );
+		AggregationScenario<?> scenario =
+				expectations.withFieldType( TypeAssertionHelper.identity( expectations.fieldType() ) );
 
 		assertThatThrownBy( () -> scenario.setup( index.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
@@ -110,11 +103,13 @@ public class SingleFieldAggregationInvalidFieldIT<F> {
 						"Cannot use 'aggregation:" + expectations.aggregationName() + "' on field '" + fieldPath + "'" );
 	}
 
-	@Test
-	public void objectField_flattened() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void objectField_flattened(SupportedSingleFieldAggregationExpectations<F> expectations) {
 		String fieldPath = index.binding().flattenedObject.relativeFieldName;
 
-		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.identity( fieldType ) );
+		AggregationScenario<?> scenario =
+				expectations.withFieldType( TypeAssertionHelper.identity( expectations.fieldType() ) );
 
 		assertThatThrownBy( () -> scenario.setup( index.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )

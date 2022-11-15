@@ -8,51 +8,46 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.schema.manage
 
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
-import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.types.Norms;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests related to the mapping when creating indexes,
  * for all index-creating schema management operations.
  */
-@RunWith(Parameterized.class)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.Elasticsearch5SchemaCreationIT")
-public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
+class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 
-	@Parameters(name = "With operation {0}")
-	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> operations() {
-		return ElasticsearchIndexSchemaManagerOperation.creating();
+	public static List<? extends Arguments> params() {
+		return ElasticsearchIndexSchemaManagerOperation.creating().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticSearchClient = TestElasticsearchClient.create();
 
-	private final ElasticsearchIndexSchemaManagerOperation operation;
-
-	public ElasticsearchIndexSchemaManagerCreationMappingBaseIT(ElasticsearchIndexSchemaManagerOperation operation) {
-		this.operation = operation;
-	}
-
-	@Test
-	public void dateField() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void dateField(ElasticsearchIndexSchemaManagerOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> root.field( "myField", f -> f.asLocalDate() )
 				.toReference()
 		);
@@ -60,7 +55,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		elasticSearchClient.index( index.name() )
 				.ensureDoesNotExist();
 
-		setupAndCreateIndex( index );
+		setupAndCreateIndex( index, operation );
 
 		assertJsonEquals(
 				ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations(
@@ -75,8 +70,9 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		);
 	}
 
-	@Test
-	public void booleanField() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void booleanField(ElasticsearchIndexSchemaManagerOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> root.field( "myField", f -> f.asBoolean() )
 				.toReference()
 		);
@@ -84,7 +80,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		elasticSearchClient.index( index.name() )
 				.ensureDoesNotExist();
 
-		setupAndCreateIndex( index );
+		setupAndCreateIndex( index, operation );
 
 		assertJsonEquals(
 				ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations(
@@ -97,8 +93,9 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		);
 	}
 
-	@Test
-	public void keywordField() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void keywordField(ElasticsearchIndexSchemaManagerOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> root.field( "myField", f -> f.asString() )
 				.toReference()
 		);
@@ -106,7 +103,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		elasticSearchClient.index( index.name() )
 				.ensureDoesNotExist();
 
-		setupAndCreateIndex( index );
+		setupAndCreateIndex( index, operation );
 
 		assertJsonEquals(
 				ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations(
@@ -119,8 +116,9 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		);
 	}
 
-	@Test
-	public void textField() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void textField(ElasticsearchIndexSchemaManagerOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
 				root -> root.field( "myField", f -> f.asString().analyzer( "standard" ) )
 						.toReference()
@@ -129,7 +127,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		elasticSearchClient.index( index.name() )
 				.ensureDoesNotExist();
 
-		setupAndCreateIndex( index );
+		setupAndCreateIndex( index, operation );
 
 		assertJsonEquals(
 				ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations(
@@ -142,8 +140,9 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		);
 	}
 
-	@Test
-	public void textField_noNorms() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void textField_noNorms(ElasticsearchIndexSchemaManagerOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
 				root -> root.field( "myField", f -> f.asString().analyzer( "standard" ).norms( Norms.NO ) )
 						.toReference()
@@ -152,7 +151,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		elasticSearchClient.index( index.name() )
 				.ensureDoesNotExist();
 
-		setupAndCreateIndex( index );
+		setupAndCreateIndex( index, operation );
 
 		assertJsonEquals(
 				ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations(
@@ -166,7 +165,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		);
 	}
 
-	private void setupAndCreateIndex(StubMappedIndex index) {
+	private void setupAndCreateIndex(StubMappedIndex index, ElasticsearchIndexSchemaManagerOperation operation) {
 		setupHelper.start()
 				.withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )

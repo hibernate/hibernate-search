@@ -18,36 +18,30 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.test.runner.nested.Nested;
-import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-@RunWith(NestedRunner.class)
-public class ObjectProjectionBaseIT {
+//CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
+// cannot make a private constructor.
+class ObjectProjectionBaseIT {
+	//CHECKSTYLE:ON
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( FromAsIT.index ).setup();
 
 		BulkIndexer fromAsIndexer = FromAsIT.index.bulkIndexer();
 		FromAsIT.dataSet.contribute( FromAsIT.index, fromAsIndexer );
 
 		fromAsIndexer.join();
-	}
-
-	@Test
-	public void takariCpSuiteWorkaround() {
-		// Workaround to get Takari-CPSuite to run this test.
 	}
 
 	private static ObjectStructure requiredObjectStructure(boolean multivalued) {
@@ -58,7 +52,7 @@ public class ObjectProjectionBaseIT {
 	}
 
 	@Nested
-	public static class FromAsIT extends AbstractCompositeProjectionFromAsIT<FromAsIT.IndexBinding> {
+	class FromAsIT extends AbstractCompositeProjectionFromAsIT<FromAsIT.IndexBinding> {
 
 		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
 				.name( "fromAs" );

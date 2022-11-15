@@ -8,19 +8,19 @@ package org.hibernate.search.backend.lucene.search.highlighter.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.highlight.DefaultEncoder;
 import org.apache.lucene.search.uhighlight.Passage;
 
-public class LuceneUnifiedSearchHighlighterPassageFormatterWithEncoderTest {
+class LuceneUnifiedSearchHighlighterPassageFormatterWithEncoderTest {
 
 	private LuceneUnifiedSearchHighlighter.PassageFormatterWithEncoder formatter =
 			new LuceneUnifiedSearchHighlighter.PassageFormatterWithEncoder(
 					"<em>", "</em>", new DefaultEncoder() );
 
 	@Test
-	public void simple() {
+	void simple() {
 		String text = "The quick brown fox jumps right over the little lazy dog";
 
 		Passage[] passages = new Passage[1];
@@ -39,7 +39,7 @@ public class LuceneUnifiedSearchHighlighterPassageFormatterWithEncoderTest {
 	}
 
 	@Test
-	public void multiplePassages() {
+	void multiplePassages() {
 		String text = "The quick brown fox jumps right over the little lazy dog. The five boxing wizards jump quickly";
 
 		Passage[] passages = new Passage[2];
@@ -70,7 +70,7 @@ public class LuceneUnifiedSearchHighlighterPassageFormatterWithEncoderTest {
 	}
 
 	@Test
-	public void overlappingPassagesInFormatterFullyIncluded() {
+	void overlappingPassagesInFormatterFullyIncluded() {
 		String text = "The quick brown fox jumps right over the little lazy dog";
 
 		Passage[] passages = new Passage[1];
@@ -98,7 +98,7 @@ public class LuceneUnifiedSearchHighlighterPassageFormatterWithEncoderTest {
 	}
 
 	@Test
-	public void overlappingPassagesInFormatterPartialOverlapping() {
+	void overlappingPassagesInFormatterPartialOverlapping() {
 		String text = "The quick brown fox jumps right over the little lazy dog";
 
 		Passage[] passages = new Passage[1];

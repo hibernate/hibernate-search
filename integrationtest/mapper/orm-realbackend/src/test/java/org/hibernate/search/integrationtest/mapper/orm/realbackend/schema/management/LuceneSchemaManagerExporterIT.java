@@ -23,15 +23,15 @@ import org.hibernate.search.integrationtest.mapper.orm.realbackend.util.Book;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.io.TempDir;
 
-public class LuceneSchemaManagerExporterIT {
+class LuceneSchemaManagerExporterIT {
 
-	@Rule
-	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
-	@Rule
+	@TempDir
+	public Path temporaryFolder;
+	@RegisterExtension
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withMultipleBackends(
 			BackendConfigurations.simple(),
 			Map.of( Article.BACKEND_NAME, BackendConfigurations.simple() )
@@ -40,10 +40,10 @@ public class LuceneSchemaManagerExporterIT {
 	private EntityManagerFactory entityManagerFactory;
 
 	@Test
-	public void lucene() throws IOException {
+	void lucene() throws IOException {
 		entityManagerFactory = setupHelper.start().setup( Book.class, Article.class );
 
-		Path directory = temporaryFolder.newFolder().toPath();
+		Path directory = temporaryFolder;
 		Search.mapping( entityManagerFactory ).scope( Object.class ).schemaManager().exportExpectedSchema( directory );
 
 		String bookIndex = readString(

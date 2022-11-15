@@ -29,9 +29,9 @@ import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Smoke test for the Standalone POJO mapper with a real backend
@@ -41,9 +41,9 @@ import org.junit.Test;
  * but it requires developers to explicitly provide association metadata
  * using {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide}.
  */
-public class EntityAsGraphSmokeIT {
+class EntityAsGraphSmokeIT {
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withSingleBackend(
 					MethodHandles.lookup(), BackendConfigurations.simple() );
@@ -52,8 +52,8 @@ public class EntityAsGraphSmokeIT {
 
 	private final Map<String, IndexedEntity> simulatedIndexedEntityDatastore = new HashMap<>();
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		mapping = setupHelper.start()
 				.withAnnotatedTypes( ContainedNonEntity.class, IndexedEntity.class, ContainedEntity.class )
 				.withConfiguration( b -> b
@@ -65,7 +65,7 @@ public class EntityAsGraphSmokeIT {
 	}
 
 	@Test
-	public void indexAndSearch() {
+	void indexAndSearch() {
 		IndexedEntity indexed1 = new IndexedEntity( "1", "some interesting text" );
 		ContainedEntity containedEntity1_1 = new ContainedEntity( "1_1", "some contained entity text" );
 		containedEntity1_1.containing = indexed1;

@@ -25,36 +25,36 @@ import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @SuppressWarnings("unused")
-public class IndexedBaseIT {
+class IndexedBaseIT {
 
-	@Rule
-	public BackendMock defaultBackendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock defaultBackendMock = BackendMock.create();
 
-	@Rule
-	public BackendMock backend2Mock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backend2Mock = BackendMock.create();
 
-	@Rule
-	public BackendMock backend3Mock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backend3Mock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), defaultBackendMock );
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper multiBackendSetupHelper;
 
-	@Rule
-	public StaticCounters staticCounters = new StaticCounters();
+	@RegisterExtension
+	public StaticCounters staticCounters = StaticCounters.create();
 
 	public IndexedBaseIT() {
 		Map<String, BackendMock> namedBackendMocks = new LinkedHashMap<>();
@@ -67,7 +67,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3705")
-	public void implicitIndexName_defaultEntityName() {
+	void implicitIndexName_defaultEntityName() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -86,7 +86,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3705")
-	public void implicitIndexName_explicitEntityName() {
+	void implicitIndexName_explicitEntityName() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -108,7 +108,7 @@ public class IndexedBaseIT {
 	}
 
 	@Test
-	public void explicitIndexName() {
+	void explicitIndexName() {
 		@Indexed(index = "explicitIndexName")
 		class IndexedEntity {
 			@DocumentId
@@ -126,7 +126,7 @@ public class IndexedBaseIT {
 	}
 
 	@Test
-	public void nonDefaultBackend() {
+	void nonDefaultBackend() {
 		@Indexed(index = "index", backend = "backend2")
 		class IndexedEntity {
 			@DocumentId
@@ -144,7 +144,7 @@ public class IndexedBaseIT {
 	}
 
 	@Test
-	public void multiBackend() {
+	void multiBackend() {
 		@Indexed(index = "index1", backend = "backend2")
 		class IndexedEntity1 {
 			@DocumentId
@@ -173,7 +173,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1231")
-	public void inheritance() {
+	void inheritance() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -207,7 +207,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1231")
-	public void inheritance_abstract() {
+	void inheritance_abstract() {
 		@Indexed
 		abstract class AbstractIndexedEntity {
 			@DocumentId
@@ -250,7 +250,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1231")
-	public void inheritance_abstract_subclass() {
+	void inheritance_abstract_subclass() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -304,7 +304,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1231")
-	public void inheritance_disabled() {
+	void inheritance_disabled() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -335,7 +335,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1231")
-	public void inheritance_explicitAttributes() {
+	void inheritance_explicitAttributes() {
 		@Indexed(backend = "backend2", index = "parentClassIndex")
 		class IndexedEntity {
 			@DocumentId
@@ -370,7 +370,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1231")
-	public void inheritance_override_backend() {
+	void inheritance_override_backend() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -405,7 +405,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1231")
-	public void inheritance_override_index() {
+	void inheritance_override_index() {
 		@Indexed(index = "parentClassIndex")
 		class IndexedEntity {
 			@DocumentId
@@ -439,7 +439,7 @@ public class IndexedBaseIT {
 	}
 
 	@Test
-	public void error_indexedWithoutEntityMetadata() {
+	void error_indexedWithoutEntityMetadata() {
 		@Indexed
 		class IndexedWithoutEntityMetadata {
 			@DocumentId
@@ -466,7 +466,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void routingBinder() {
+	void routingBinder() {
 		@Indexed(routingBinder = @RoutingBinderRef(type = StaticCounterRoutingBinder.class))
 		class IndexedEntity {
 			@DocumentId
@@ -483,7 +483,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void routingBinder_failure() {
+	void routingBinder_failure() {
 		@Indexed(routingBinder = @RoutingBinderRef(type = FailingRoutingBinder.class))
 		class IndexedEntity {
 			@DocumentId
@@ -498,7 +498,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4006")
-	public void moreTypesTargetSameIndex() {
+	void moreTypesTargetSameIndex() {
 		@Indexed(index = "indexName")
 		class IndexedEntityA {
 			@DocumentId

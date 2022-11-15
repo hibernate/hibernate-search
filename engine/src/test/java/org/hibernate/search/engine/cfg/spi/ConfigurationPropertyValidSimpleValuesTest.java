@@ -23,23 +23,20 @@ import java.util.function.Function;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-@RunWith(Parameterized.class)
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @SuppressWarnings({ "unchecked", "rawtypes" }) // Raw types are the only way to mock parameterized types
-public class ConfigurationPropertyValidSimpleValuesTest<T> {
+class ConfigurationPropertyValidSimpleValuesTest<T> {
 
-	@Parameterized.Parameters(name = "{2}")
-	public static Object[][] data() {
-		return new Object[][] {
+	public static List<? extends Arguments> params() {
+		return Arrays.asList(
 				params( KeyContext::asString, "string", "string" ),
 				params( KeyContext::asIntegerPositiveOrZeroOrNegative, "42", 42 ),
 				params( KeyContext::asIntegerPositiveOrZeroOrNegative, "0", 0 ),
@@ -54,33 +51,21 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> {
 						c -> c.as( MyPropertyType.class, MyPropertyType::new ),
 						"string", new MyPropertyType( "string" )
 				)
-		};
+		);
 	}
 
-	private static <T> Object[] params(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+	private static <T> Arguments params(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
 			String stringValue, T expectedValue) {
-		return new Object[] { testedMethod, stringValue, expectedValue };
+		return Arguments.of( testedMethod, stringValue, expectedValue );
 	}
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	@Mock
 	private ConfigurationPropertySource sourceMock;
 
-	private final Function<KeyContext, OptionalPropertyContext<T>> testedMethod;
-	private final String stringValue;
-	private final T expectedValue;
-
-	public ConfigurationPropertyValidSimpleValuesTest(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	void withDefault(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
 			String stringValue, T expectedValue) {
-		this.testedMethod = testedMethod;
-		this.stringValue = stringValue;
-		this.expectedValue = expectedValue;
-	}
-
-	@Test
-	public void withDefault() {
 		String key = "withDefault";
 		ConfigurationProperty<T> property =
 				testedMethod.apply(
@@ -110,8 +95,10 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> {
 		assertThat( result ).isEqualTo( expectedValue );
 	}
 
-	@Test
-	public void withoutDefault() {
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	void withoutDefault(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+			String stringValue, T expectedValue) {
 		String key = "withoutDefault";
 		ConfigurationProperty<Optional<T>> property =
 				testedMethod.apply(
@@ -140,8 +127,10 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> {
 		assertThat( result ).contains( expectedValue );
 	}
 
-	@Test
-	public void withoutDefault_getOrThrow() {
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	void withoutDefault_getOrThrow(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+			String stringValue, T expectedValue) {
 		String key = "withoutDefault_getOrThrow";
 		String resolvedKey = "some.prefix." + key;
 		OptionalConfigurationProperty<T> property =
@@ -167,8 +156,10 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> {
 		assertThat( result ).isEqualTo( expectedValue );
 	}
 
-	@Test
-	public void multiValued() {
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	void multiValued(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+			String stringValue, T expectedValue) {
 		String key = "multiValued";
 		ConfigurationProperty<Optional<List<T>>> property =
 				testedMethod.apply(
@@ -214,8 +205,10 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> {
 		assertThat( result.get() ).containsExactly( expectedValue, expectedValue );
 	}
 
-	@Test
-	public void substitute_function() {
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	void substitute_function(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+			String stringValue, T expectedValue) {
 		String key = "substitute_function";
 		OptionalConfigurationProperty<T> property = testedMethod.apply( ConfigurationProperty.forKey( key ) )
 				.substitute( v -> {
@@ -258,8 +251,10 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> {
 		assertThat( result ).contains( expectedValue );
 	}
 
-	@Test
-	public void substitute_literals() {
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	void substitute_literals(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+			String stringValue, T expectedValue) {
 		String key = "substitute_literals";
 		OptionalConfigurationProperty<T> property = testedMethod.apply( ConfigurationProperty.forKey( key ) )
 				.substitute( MyEnum.VALUE1, expectedValue )
@@ -292,8 +287,10 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> {
 		assertThat( result ).contains( expectedValue );
 	}
 
-	@Test
-	public void substitute_literals_withDefault() {
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	void substitute_literals_withDefault(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+			String stringValue, T expectedValue) {
 		String key = "substitute_literals_withDefault";
 		ConfigurationProperty<T> property = testedMethod.apply( ConfigurationProperty.forKey( key ) )
 				.substitute( MyEnum.VALUE1, expectedValue )
@@ -327,8 +324,10 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> {
 		assertThat( result ).isEqualTo( expectedValue );
 	}
 
-	@Test
-	public void substitute_literals_multiValued() {
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	void substitute_literals_multiValued(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+			String stringValue, T expectedValue) {
 		String key = "substitute_literals_multiValued";
 		OptionalConfigurationProperty<List<T>> property = testedMethod.apply( ConfigurationProperty.forKey( key ) )
 				.substitute( MyEnum.VALUE1, expectedValue )

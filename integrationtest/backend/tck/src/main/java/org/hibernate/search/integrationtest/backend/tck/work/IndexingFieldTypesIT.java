@@ -12,6 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -20,15 +21,14 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test indexing with various values.
@@ -37,35 +37,32 @@ import org.junit.runners.Parameterized;
  *
  * @param <F> The type of field values.
  */
-@RunWith(Parameterized.class)
-public class IndexingFieldTypesIT<F> {
+class IndexingFieldTypesIT<F> {
 
 	private static final List<FieldTypeDescriptor<?>> supportedTypeDescriptors = FieldTypeDescriptor.getAll();
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<FieldTypeDescriptor<?>> parameters() {
-		return supportedTypeDescriptors;
+	public static List<? extends Arguments> params() {
+		return supportedTypeDescriptors.stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+	private SimpleMappedIndex<IndexBinding> index;
 
-	private final FieldTypeDescriptor<F> typeDescriptor;
-
-	public IndexingFieldTypesIT(FieldTypeDescriptor<F> typeDescriptor) {
-		this.typeDescriptor = typeDescriptor;
-	}
-
-	@Before
-	public void setup() {
+	public void init(FieldTypeDescriptor<F> typeDescriptor) {
+		index = SimpleMappedIndex.of(
+				root -> new IndexBinding( root, typeDescriptor ) );
 		setupHelper.start().withIndex( index ).setup();
 	}
 
-	@Test
-	public void withReference() {
-		List<F> values = new ArrayList<>( this.typeDescriptor.getIndexableValues().getSingle() );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withReference(FieldTypeDescriptor<F> typeDescriptor) {
+		init( typeDescriptor );
+		List<F> values = new ArrayList<>( typeDescriptor.getIndexableValues().getSingle() );
 		values.add( null ); // Also test null
 		List<IdAndValue<F>> expectedDocuments = new ArrayList<>();
 
@@ -100,9 +97,11 @@ public class IndexingFieldTypesIT<F> {
 		assertThatQuery( query ).hasHitsAnyOrder( expectedDocuments );
 	}
 
-	@Test
-	public void withPath() {
-		List<F> values = new ArrayList<>( this.typeDescriptor.getIndexableValues().getSingle() );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withPath(FieldTypeDescriptor<F> typeDescriptor) {
+		init( typeDescriptor );
+		List<F> values = new ArrayList<>( typeDescriptor.getIndexableValues().getSingle() );
 		values.add( null ); // Also test null
 		List<IdAndValue<F>> expectedDocuments = new ArrayList<>();
 
@@ -137,9 +136,11 @@ public class IndexingFieldTypesIT<F> {
 		assertThatQuery( query ).hasHitsAnyOrder( expectedDocuments );
 	}
 
-	@Test
-	public void dynamic_withPath() {
-		List<F> values = new ArrayList<>( this.typeDescriptor.getIndexableValues().getSingle() );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void dynamic_withPath(FieldTypeDescriptor<F> typeDescriptor) {
+		init( typeDescriptor );
+		List<F> values = new ArrayList<>( typeDescriptor.getIndexableValues().getSingle() );
 		values.add( null ); // Also test null
 		List<IdAndValue<F>> expectedDocuments = new ArrayList<>();
 
@@ -178,7 +179,7 @@ public class IndexingFieldTypesIT<F> {
 	private class IndexBinding {
 		final SimpleFieldModel<F> fieldModel;
 
-		IndexBinding(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root, FieldTypeDescriptor<F> typeDescriptor) {
 			this.fieldModel = SimpleFieldModel.mapper( typeDescriptor, c -> c.projectable( Projectable.YES ) )
 					.map( root, "field" );
 			supportedTypeDescriptors.forEach( fieldType -> {

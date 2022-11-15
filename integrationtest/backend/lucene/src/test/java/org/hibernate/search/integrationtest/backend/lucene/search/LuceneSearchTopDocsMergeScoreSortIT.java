@@ -17,13 +17,13 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TopDocs;
@@ -37,7 +37,7 @@ import org.apache.lucene.search.TopFieldDocs;
  * <p>
  * This is a use case in Infinispan, in particular.
  */
-public class LuceneSearchTopDocsMergeScoreSortIT {
+class LuceneSearchTopDocsMergeScoreSortIT {
 
 	private static final String SEGMENT_0 = "seg0";
 	private static final String SEGMENT_1 = "seg1";
@@ -49,20 +49,20 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 	private static final String SEGMENT_1_DOC_1 = "1_1";
 	private static final String SEGMENT_1_DOC_NON_MATCHING = "1_nonMatching";
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
-	public void desc() {
+	void desc() {
 		LuceneSearchQuery<DocumentReference> segment0Query = matchTextSortedByScoreQuery( SortOrder.DESC, SEGMENT_0 );
 		LuceneSearchQuery<DocumentReference> segment1Query = matchTextSortedByScoreQuery( SortOrder.DESC, SEGMENT_1 );
 		LuceneSearchResult<DocumentReference> segment0Result = segment0Query.fetch( 10 );
@@ -86,7 +86,7 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 	// 1. to be sure the above didn't just pass by chance;
 	// 2. because the TopDocs merging method is not the same in that case.
 	@Test
-	public void asc() {
+	void asc() {
 		LuceneSearchQuery<DocumentReference> segment0Query = matchTextSortedByScoreQuery( SortOrder.ASC, SEGMENT_0 );
 		LuceneSearchQuery<DocumentReference> segment1Query = matchTextSortedByScoreQuery( SortOrder.ASC, SEGMENT_1 );
 		LuceneSearchResult<DocumentReference> segment0Result = segment0Query.fetch( 10 );

@@ -29,7 +29,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
  * Error cases are not tested here but in {@link FieldContainerExtractorBaseIT}.
  */
 @TestForIssue(jiraKey = "HSEARCH-2554")
-public class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExtractorIT {
+class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExtractorIT {
 
 	public FieldContainerExtractorImplicitIT() {
 		super( new ImplicitContainerExtractorTestModelProvider() );

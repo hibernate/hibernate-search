@@ -14,7 +14,7 @@ import java.util.function.Predicate;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
 public class ElasticsearchTestDialect {
@@ -36,7 +36,7 @@ public class ElasticsearchTestDialect {
 			String versionString = "";
 
 			if ( distribution != ElasticsearchDistributionName.AMAZON_OPENSEARCH_SERVERLESS ) {
-				try ( TestElasticsearchClient client = new TestElasticsearchClient() ) {
+				try ( TestElasticsearchClient client = TestElasticsearchClient.create() ) {
 					client.open( new TestConfigurationProvider(), Optional.empty() );
 					versionString = client.getActualVersion();
 					if ( versionString != null ) {

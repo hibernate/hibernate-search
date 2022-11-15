@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.test;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONCompare;

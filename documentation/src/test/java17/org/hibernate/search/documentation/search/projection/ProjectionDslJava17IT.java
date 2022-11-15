@@ -22,6 +22,7 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
@@ -38,14 +39,16 @@ import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.ScoreP
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-@RunWith(Parameterized.class)
-public class ProjectionDslJava17IT {
+class ProjectionDslJava17IT {
 
 	private static final int ASIMOV_ID = 1;
 	private static final int MARTINEZ_ID = 2;
@@ -55,10 +58,9 @@ public class ProjectionDslJava17IT {
 	private static final int BOOK3_ID = 3;
 	private static final int BOOK4_ID = 4;
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<?> params() {
+
+	public static List<? extends Arguments> params() {
 		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
-				BackendConfigurations.simple(),
 				// Since we disable classpath scanning in tests for performance reasons,
 				// we need to register annotated projection types explicitly.
 				// This wouldn't be needed in a typical application.
@@ -205,20 +207,22 @@ public class ProjectionDslJava17IT {
 		);
 	}
 
-	@Parameterized.Parameter
-	@Rule
-	public DocumentationSetupHelper setupHelper;
+	@RegisterExtension
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	public void init(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		setupHelper.withAnnotationProcessingEnabled( annotationProcessingEnabled )
+				.withMappingConfigurer( mappingContributor );
 		entityManagerFactory = setupHelper.start().setup( Book.class, Author.class, EmbeddableGeoPoint.class );
 		initData();
 	}
 
-	@Test
-	public void entryPoint_mapped_record() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void entryPoint_mapped_record(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -243,8 +247,10 @@ public class ProjectionDslJava17IT {
 		} );
 	}
 
-	@Test
-	public void composite_mapped_record() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void composite_mapped_record(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		withinSearchSession( searchSession -> {
 			// tag::composite-mapped-record[]
 			List<MyBookProjection> hits = searchSession.search( Book.class )
@@ -260,7 +266,8 @@ public class ProjectionDslJava17IT {
 									book.getId(),
 									book.getTitle(),
 									book.getAuthors().stream()
-											.map( author -> new MyBookProjection.Author( author.getFirstName(), author.getLastName() ) )
+											.map( author -> new MyBookProjection.Author( author.getFirstName(),
+													author.getLastName() ) )
 											.collect( Collectors.toList() )
 							) )
 							.collect( Collectors.toList() )
@@ -268,8 +275,10 @@ public class ProjectionDslJava17IT {
 		} );
 	}
 
-	@Test
-	public void object_mapped_record() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void object_mapped_record(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		withinSearchSession( searchSession -> {
 			// tag::object-mapped-record[]
 			List<List<MyAuthorProjection>> hits = searchSession.search( Book.class )
@@ -290,8 +299,10 @@ public class ProjectionDslJava17IT {
 		} );
 	}
 
-	@Test
-	public void projectionConstructor_id() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projectionConstructor_id(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -312,8 +323,10 @@ public class ProjectionDslJava17IT {
 		} );
 	}
 
-	@Test
-	public void projectionConstructor_field() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projectionConstructor_field(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -336,8 +349,10 @@ public class ProjectionDslJava17IT {
 		} );
 	}
 
-	@Test
-	public void projectionConstructor_score() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projectionConstructor_score(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -361,8 +376,10 @@ public class ProjectionDslJava17IT {
 		} );
 	}
 
-	@Test
-	public void projectionConstructor_documentReference() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projectionConstructor_documentReference(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -385,8 +402,10 @@ public class ProjectionDslJava17IT {
 		} );
 	}
 
-	@Test
-	public void projectionConstructor_entity() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projectionConstructor_entity(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -409,8 +428,10 @@ public class ProjectionDslJava17IT {
 		} );
 	}
 
-	@Test
-	public void projectionConstructor_entityReference() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projectionConstructor_entityReference(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -432,8 +453,10 @@ public class ProjectionDslJava17IT {
 		} );
 	}
 
-	@Test
-	public void projectionConstructor_object() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projectionConstructor_object(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -449,7 +472,8 @@ public class ProjectionDslJava17IT {
 									book.getAuthors().stream()
 											.map( a -> new MyAuthorProjection( a.getFirstName(), a.getLastName() ) )
 											.collect( Collectors.toList() ),
-									new MyAuthorProjection( book.getMainAuthor().getFirstName(), book.getMainAuthor().getLastName() ),
+									new MyAuthorProjection( book.getMainAuthor().getFirstName(),
+											book.getMainAuthor().getLastName() ),
 									book.getTitle()
 							) )
 							.collect( Collectors.toList() )
@@ -457,8 +481,10 @@ public class ProjectionDslJava17IT {
 		} );
 	}
 
-	@Test
-	public void projectionConstructor_composite() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projectionConstructor_composite(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -479,8 +505,10 @@ public class ProjectionDslJava17IT {
 		} );
 	}
 
-	@Test
-	public void projectionConstructor_highlight() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projectionConstructor_highlight(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 

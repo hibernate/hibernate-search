@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.common.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
@@ -36,27 +36,24 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 // We have to use raw types to mock methods returning generic types with wildcards
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public class IndexManagerBuildingStateHolderTest {
+class IndexManagerBuildingStateHolderTest {
 
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
-
-	@Rule
+	@RegisterExtension
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Mock
@@ -88,8 +85,8 @@ public class IndexManagerBuildingStateHolderTest {
 
 	private final List<Object> verifiedMocks = new ArrayList<>();
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		Collections.addAll( verifiedMocks,
 				rootFailureCollectorMock, backendFailureCollectorMock,
 				backendFactoryMock, backendMock, indexManagerBuilderMock, indexRootBuilderMock
@@ -97,7 +94,7 @@ public class IndexManagerBuildingStateHolderTest {
 	}
 
 	@Test
-	public void defaultBackend_noNameSet() {
+	void defaultBackend_noNameSet() {
 		ArgumentCaptor<ConfigurationPropertySource> backendPropertySourceCapture =
 				ArgumentCaptor.forClass( ConfigurationPropertySource.class );
 		ArgumentCaptor<ConfigurationPropertySource> indexPropertySourceCapture =
@@ -160,7 +157,7 @@ public class IndexManagerBuildingStateHolderTest {
 	}
 
 	@Test
-	public void explicitBackend() {
+	void explicitBackend() {
 		ArgumentCaptor<ConfigurationPropertySource> backendPropertySourceCapture =
 				ArgumentCaptor.forClass( ConfigurationPropertySource.class );
 		ArgumentCaptor<ConfigurationPropertySource> indexPropertySourceCapture =
@@ -230,7 +227,7 @@ public class IndexManagerBuildingStateHolderTest {
 	}
 
 	@Test
-	public void error_missingBackendType_nullType() {
+	void error_missingBackendType_nullType() {
 		String keyPrefix = "somePrefix.";
 
 		ArgumentCaptor<Throwable> throwableCaptor = ArgumentCaptor.forClass( Throwable.class );
@@ -259,11 +256,12 @@ public class IndexManagerBuildingStateHolderTest {
 						"Unable to resolve backend type",
 						"configuration property 'somePrefix.backend.type' is not set,"
 								+ " and there isn't any backend in the classpath",
-						"Check that you added the desired backend to your project's dependencies" );
+						"Check that you added the desired backend to your project's dependencies"
+				);
 	}
 
 	@Test
-	public void error_missingBackendType_emptyType() {
+	void error_missingBackendType_emptyType() {
 		String keyPrefix = "somePrefix.";
 
 		ArgumentCaptor<Throwable> throwableCaptor = ArgumentCaptor.forClass( Throwable.class );
@@ -292,11 +290,12 @@ public class IndexManagerBuildingStateHolderTest {
 						"Unable to resolve backend type",
 						"configuration property 'somePrefix.backend.type' is not set,"
 								+ " and there isn't any backend in the classpath",
-						"Check that you added the desired backend to your project's dependencies" );
+						"Check that you added the desired backend to your project's dependencies"
+				);
 	}
 
 	@Test
-	public void differentTenancyModeNamedBackend() {
+	void differentTenancyModeNamedBackend() {
 		assertThatThrownBy( () -> {
 			BackendsInfo result = new BackendsInfo();
 			result.collect( Optional.of( "backend-name" ), TenancyMode.MULTI_TENANCY );
@@ -307,7 +306,7 @@ public class IndexManagerBuildingStateHolderTest {
 	}
 
 	@Test
-	public void differentTenancyModeDefaultBackend() {
+	void differentTenancyModeDefaultBackend() {
 		assertThatThrownBy( () -> {
 			BackendsInfo result = new BackendsInfo();
 			result.collect( Optional.empty(), TenancyMode.SINGLE_TENANCY );

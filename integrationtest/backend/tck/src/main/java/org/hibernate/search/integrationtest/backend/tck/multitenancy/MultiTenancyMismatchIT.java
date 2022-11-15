@@ -14,32 +14,32 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSession;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test that the backend correctly throws exception
  * when the mapper requires multi-tenancy but it is disabled in the backend,
  * and vice-versa.
  */
-public class MultiTenancyMismatchIT {
+class MultiTenancyMismatchIT {
 
 	public static final String TENANT_1 = "tenant_1";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Test
-	public void multiTenancyDisabled_requiredByTheMapper() {
+	void multiTenancyDisabled_requiredByTheMapper() {
 		assertThatThrownBy( () -> setupHelper.start()
 				.withIndex( index )
 				.withBackendProperty( "multi_tenancy.strategy", "none" )
@@ -56,7 +56,7 @@ public class MultiTenancyMismatchIT {
 	}
 
 	@Test
-	public void multiTenancyEnabled_disabledInTheMapper() {
+	void multiTenancyEnabled_disabledInTheMapper() {
 		assertThatThrownBy( () -> setupHelper.start()
 				.withIndex( index )
 				.withBackendProperty( "multi_tenancy.strategy", "discriminator" )
@@ -72,7 +72,7 @@ public class MultiTenancyMismatchIT {
 	}
 
 	@Test
-	public void using_multi_tenancy_for_query_while_disabled_throws_exception() {
+	void using_multi_tenancy_for_query_while_disabled_throws_exception() {
 		StubMapping mapping = setupHelper.start().withIndex( index ).setup();
 
 		StubMappingScope scope = index.createScope();
@@ -90,7 +90,7 @@ public class MultiTenancyMismatchIT {
 	}
 
 	@Test
-	public void using_multi_tenancy_for_add_while_disabled_throws_exception() {
+	void using_multi_tenancy_for_add_while_disabled_throws_exception() {
 		StubMapping mapping = setupHelper.start().withIndex( index ).setup();
 
 		StubSession tenant1Session = mapping.session( TENANT_1 );
@@ -108,7 +108,7 @@ public class MultiTenancyMismatchIT {
 	}
 
 	@Test
-	public void using_multi_tenancy_for_update_while_disabled_throws_exception() {
+	void using_multi_tenancy_for_update_while_disabled_throws_exception() {
 		StubMapping mapping = setupHelper.start().withIndex( index ).setup();
 
 		StubSession tenant1Session = mapping.session( TENANT_1 );
@@ -126,7 +126,7 @@ public class MultiTenancyMismatchIT {
 	}
 
 	@Test
-	public void using_multi_tenancy_for_delete_while_disabled_throws_exception() {
+	void using_multi_tenancy_for_delete_while_disabled_throws_exception() {
 		StubMapping mapping = setupHelper.start().withIndex( index ).setup();
 
 		StubSession tenant1Session = mapping.session( TENANT_1 );

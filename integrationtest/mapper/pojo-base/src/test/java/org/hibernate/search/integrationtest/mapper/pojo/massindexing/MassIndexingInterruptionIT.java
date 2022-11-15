@@ -26,13 +26,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.ThreadSpy;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.ThreadSpy;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
@@ -40,27 +40,27 @@ import org.awaitility.Awaitility;
 /**
  * Test interruption of a currently executing {@link MassIndexer}.
  */
-public class MassIndexingInterruptionIT {
+class MassIndexingInterruptionIT {
 
 	public static final String TITLE_1 = "Oliver Twist";
 	public static final String AUTHOR_1 = "Charles Dickens";
 
-	@Rule
-	public final BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public final BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public final StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	@Rule
-	public ThreadSpy threadSpy = new ThreadSpy();
+	@RegisterExtension
+	public ThreadSpy threadSpy = ThreadSpy.create();
 
 	private SearchMapping mapping;
 
 	private final StubLoadingContext loadingContext = new StubLoadingContext();
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectAnySchema( Book.INDEX );
 
 		mapping = setupHelper.start()
@@ -77,7 +77,7 @@ public class MassIndexingInterruptionIT {
 	}
 
 	@Test
-	public void interrupt_mainThread() {
+	void interrupt_mainThread() {
 		int expectedThreadCount = 1 // Workspace
 				+ 1 // ID loading
 				+ 1; // Entity loading
@@ -122,7 +122,7 @@ public class MassIndexingInterruptionIT {
 	}
 
 	@Test
-	public void interrupt_entityLoading() {
+	void interrupt_entityLoading() {
 		int expectedThreadCount = 1 // Workspace
 				+ 1 // ID loading
 				+ 1; // Entity loading
@@ -163,7 +163,7 @@ public class MassIndexingInterruptionIT {
 	}
 
 	@Test
-	public void cancel() {
+	void cancel() {
 		int expectedThreadCount = 1 // Coordinator
 				+ 1 // Workspace
 				+ 1 // ID loading

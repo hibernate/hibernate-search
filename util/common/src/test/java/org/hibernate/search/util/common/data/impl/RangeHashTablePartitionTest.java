@@ -15,10 +15,9 @@ import java.util.stream.IntStream;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.assertj.core.api.AbstractIntegerAssert;
 
@@ -26,33 +25,23 @@ import org.assertj.core.api.AbstractIntegerAssert;
  * Tests that the partition of the integer space in {@link RangeHashTable}
  * is fair and consistent across all relevant methods.
  */
-@RunWith(Parameterized.class)
-public class RangeHashTablePartitionTest {
+class RangeHashTablePartitionTest {
 
-	@Parameterized.Parameters(name = "{0} buckets")
-	public static List<Integer> params() {
-		return IntStream.range( 1, 50 ).boxed().collect( Collectors.toList() );
+	public static List<? extends Arguments> params() {
+		return IntStream.range( 1, 50 )
+				.mapToObj( i -> Arguments.of( i ) )
+				.collect( Collectors.toList() );
 	}
 
-	@Parameterized.Parameter
-	public int size;
+	// The hash function is not used in this test
+	RangeCompatibleHashFunction irrelevantFunction = key -> {
+		throw new IllegalStateException( "This method should not be called in this test" );
+	};
 
-	private RangeHashTable<Void> hashTable;
-
-	@Before
-	public void setup() {
-		// The hash function is not used in this test
-		RangeCompatibleHashFunction irrelevantFunction = new RangeCompatibleHashFunction() {
-			@Override
-			public int hash(CharSequence key) {
-				throw new IllegalStateException( "This method should not be called in this test" );
-			}
-		};
-		hashTable = new RangeHashTable<>( irrelevantFunction, size );
-	}
-
-	@Test
-	public void fullSpaceCoverage() {
+	@ParameterizedTest(name = "{0} buckets")
+	@MethodSource("params")
+	void fullSpaceCoverage(int size) {
+		RangeHashTable<Void> hashTable = new RangeHashTable<>( irrelevantFunction, size );
 		Range<Integer> first = hashTable.rangeForBucket( 0 );
 		assertThat( first.lowerBoundInclusion() )
 				.isEqualTo( RangeBoundInclusion.INCLUDED );
@@ -92,8 +81,10 @@ public class RangeHashTablePartitionTest {
 				.isEmpty(); // Means Integer.MAX_VALUE
 	}
 
-	@Test
-	public void uniformRangeWidth() {
+	@ParameterizedTest(name = "{0} buckets")
+	@MethodSource("params")
+	void uniformRangeWidth(int size) {
+		RangeHashTable<Void> hashTable = new RangeHashTable<>( irrelevantFunction, size );
 		long integerSpaceWidth = ( (long) Integer.MAX_VALUE ) - Integer.MIN_VALUE + 1;
 		long expectedWidth = integerSpaceWidth / size;
 
@@ -116,30 +107,32 @@ public class RangeHashTablePartitionTest {
 	 * {@code hashTable.rangeForBucket( i )},
 	 * {@code computeIndexForHash(<hash value>)} returns {@code i}.
 	 */
-	@Test
-	public void consistentComputeIndexAndRanges() {
+	@ParameterizedTest(name = "{0} buckets")
+	@MethodSource("params")
+	void consistentComputeIndexAndRanges(int size) {
+		RangeHashTable<Void> hashTable = new RangeHashTable<>( irrelevantFunction, size );
 		for ( int i = 0; i < size; i++ ) {
 			Range<Integer> range = hashTable.rangeForBucket( i );
 			int lowerBoundValue = range.lowerBoundValue().orElse( Integer.MIN_VALUE );
 			int upperBoundValue = range.upperBoundValue().orElse( Integer.MAX_VALUE );
 			if ( range.lowerBoundInclusion() == RangeBoundInclusion.INCLUDED ) {
-				assertComputeIndexForHash( lowerBoundValue )
+				assertComputeIndexForHash( hashTable, lowerBoundValue )
 						.isEqualTo( i );
 			}
-			assertComputeIndexForHash( lowerBoundValue + 1 )
+			assertComputeIndexForHash( hashTable, lowerBoundValue + 1 )
 					.isEqualTo( i );
-			assertComputeIndexForHash( (int) ( lowerBoundValue + rangeWidth( range ) / 2 ) )
+			assertComputeIndexForHash( hashTable, (int) ( lowerBoundValue + rangeWidth( range ) / 2 ) )
 					.isEqualTo( i );
-			assertComputeIndexForHash( upperBoundValue - 1 )
+			assertComputeIndexForHash( hashTable, upperBoundValue - 1 )
 					.isEqualTo( i );
 			if ( range.upperBoundInclusion() == RangeBoundInclusion.INCLUDED ) {
-				assertComputeIndexForHash( upperBoundValue )
+				assertComputeIndexForHash( hashTable, upperBoundValue )
 						.isEqualTo( i );
 			}
 		}
 	}
 
-	private AbstractIntegerAssert<?> assertComputeIndexForHash(int hash) {
+	private AbstractIntegerAssert<?> assertComputeIndexForHash(RangeHashTable<Void> hashTable, int hash) {
 		return assertThat( hashTable.computeIndexForHash( hash ) )
 				.as( "computeIndexForHash(" + hash + ")" );
 	}

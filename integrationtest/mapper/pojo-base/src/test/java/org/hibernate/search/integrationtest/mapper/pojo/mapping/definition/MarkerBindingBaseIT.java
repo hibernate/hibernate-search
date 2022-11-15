@@ -26,27 +26,27 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.MarkerBind
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.TypeBinding;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class MarkerBindingBaseIT {
+class MarkerBindingBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
 	private static PojoModelType extractedModelType;
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock(
 			MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void withParams_annotationMapping() {
+	void withParams_annotationMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {} );
 		setupHelper.start().expectCustomBeans().setup( AnnotatedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -55,7 +55,7 @@ public class MarkerBindingBaseIT {
 	}
 
 	@Test
-	public void withParams_programmaticMapping() {
+	void withParams_programmaticMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {} );
 		setupHelper.start()
 				.withConfiguration( builder -> {

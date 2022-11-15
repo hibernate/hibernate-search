@@ -10,59 +10,56 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.io.IOException;
-import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-public class LuceneIndexSchemaManagerCreationOrPreservationIT {
+class LuceneIndexSchemaManagerCreationOrPreservationIT {
 
-	@Parameterized.Parameters(name = "With operation {0}")
-	public static EnumSet<LuceneIndexSchemaManagerOperation> operations() {
-		return LuceneIndexSchemaManagerOperation.creatingOrPreserving();
+	public static List<? extends Arguments> params() {
+		return LuceneIndexSchemaManagerOperation.creatingOrPreserving().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	private final LuceneIndexSchemaManagerOperation operation;
-
-	public LuceneIndexSchemaManagerCreationOrPreservationIT(LuceneIndexSchemaManagerOperation operation) {
-		this.operation = operation;
-	}
-
-	@Test
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3759")
-	public void doesNotExist() throws IOException {
+	void doesNotExist(LuceneIndexSchemaManagerOperation operation) throws IOException {
 		assertThat( indexExists() ).isFalse();
 
 		setup();
-		createOrPreserve();
+		createOrPreserve( operation );
 
 		assertThat( indexExists() ).isTrue();
 	}
 
-	@Test
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3759")
-	public void alreadyExists() throws IOException {
+	void alreadyExists(LuceneIndexSchemaManagerOperation operation) throws IOException {
 		assertThat( indexExists() ).isFalse();
 
 		setup();
-		createOrPreserve();
+		createOrPreserve( operation );
 
 		assertThat( indexExists() ).isTrue();
 
@@ -72,7 +69,7 @@ public class LuceneIndexSchemaManagerCreationOrPreservationIT {
 
 		assertThat( countDocsOnDisk() ).isEqualTo( 1 );
 
-		createOrPreserve();
+		createOrPreserve( operation );
 
 		assertThat( indexExists() ).isTrue();
 		assertThat( countDocsOnDisk() ).isEqualTo( 1 );
@@ -89,7 +86,7 @@ public class LuceneIndexSchemaManagerCreationOrPreservationIT {
 		);
 	}
 
-	private void createOrPreserve() {
+	private void createOrPreserve(LuceneIndexSchemaManagerOperation operation) {
 		Futures.unwrappedExceptionJoin( operation.apply( index.schemaManager(), OperationSubmitter.blocking() ) );
 	}
 

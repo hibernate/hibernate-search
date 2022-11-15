@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.indexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.Arrays;
 
@@ -25,20 +25,20 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class HibernateOrmManualIndexingIT {
+class HibernateOrmManualIndexingIT {
 
 	private static final int NUMBER_OF_BOOKS = 1000;
 	private static final int BATCH_SIZE = 100;
 	private static final int INIT_DATA_TRANSACTION_SIZE = 500;
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	@Test
-	public void persist_automaticIndexing_periodicFlushClear() {
+	void persist_automaticIndexing_periodicFlushClear() {
 		EntityManagerFactory entityManagerFactory = setup( true );
 
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
@@ -69,7 +69,7 @@ public class HibernateOrmManualIndexingIT {
 	}
 
 	@Test
-	public void persist_automaticIndexing_periodicFlushExecuteClear() {
+	void persist_automaticIndexing_periodicFlushExecuteClear() {
 		EntityManagerFactory entityManagerFactory = setup( true );
 
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
@@ -104,7 +104,7 @@ public class HibernateOrmManualIndexingIT {
 	}
 
 	@Test
-	public void persist_automaticIndexing_multipleTransactions() {
+	void persist_automaticIndexing_multipleTransactions() {
 		EntityManagerFactory entityManagerFactory = setup( true );
 
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
@@ -134,7 +134,7 @@ public class HibernateOrmManualIndexingIT {
 	}
 
 	@Test
-	public void addOrUpdate() {
+	void addOrUpdate() {
 		int numberOfBooks = 10;
 		EntityManagerFactory entityManagerFactory = setup( false );
 		initBooksAndAuthors( entityManagerFactory, numberOfBooks );
@@ -167,7 +167,7 @@ public class HibernateOrmManualIndexingIT {
 	}
 
 	@Test
-	public void delete() {
+	void delete() {
 		int numberOfBooks = 10;
 		EntityManagerFactory entityManagerFactory = setup( true );
 		initBooksAndAuthors( entityManagerFactory, numberOfBooks );
@@ -200,7 +200,7 @@ public class HibernateOrmManualIndexingIT {
 	}
 
 	@Test
-	public void workspace() {
+	void workspace() {
 		int numberOfBooks = 10;
 		EntityManagerFactory entityManagerFactory = setup( true );
 		initBooksAndAuthors( entityManagerFactory, numberOfBooks );
@@ -232,9 +232,11 @@ public class HibernateOrmManualIndexingIT {
 	}
 
 	@Test
-	public void purge() {
-		assumeTrue( "This test only makes sense if the backend supports explicit purges",
-				BackendConfigurations.simple().supportsExplicitPurge() );
+	void purge() {
+		assumeTrue(
+				BackendConfigurations.simple().supportsExplicitPurge(),
+				"This test only makes sense if the backend supports explicit purges"
+		);
 
 		int numberOfBooks = 10;
 		EntityManagerFactory entityManagerFactory = setup( true );

@@ -15,14 +15,14 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TotalHits;
@@ -35,17 +35,17 @@ import org.apache.lucene.search.TotalHits;
  * <p>
  * This is a use case in Infinispan, in particular.
  */
-public class LuceneSearchTopDocsTotalHitCountOnMatchAllDocsIT {
+class LuceneSearchTopDocsTotalHitCountOnMatchAllDocsIT {
 
 	private static final int DOCUMENT_COUNT = 2000;
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		index.bulkIndexer()
@@ -59,7 +59,7 @@ public class LuceneSearchTopDocsTotalHitCountOnMatchAllDocsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4068") // The regression was spotted early, while introducing it in HSEARCH-4068
-	public void matchAllDocs_sortByScoreDesc() {
+	void matchAllDocs_sortByScoreDesc() {
 		LuceneSearchResult<DocumentReference> result = index.query().extension( LuceneExtension.get() )
 				.where( f -> f.matchAll() )
 				.fetch( 10 );

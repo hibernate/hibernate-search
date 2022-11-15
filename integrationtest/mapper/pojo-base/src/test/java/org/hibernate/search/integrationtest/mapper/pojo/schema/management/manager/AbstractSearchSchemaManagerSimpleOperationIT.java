@@ -17,28 +17,28 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.SchemaManagementWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.SchemaManagementWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 
-	@Rule
-	public final BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public final BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public final StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	protected SearchMapping mapping;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectAnySchema( IndexedEntity1.NAME );
 		backendMock.expectAnySchema( IndexedEntity2.NAME );
 
@@ -49,7 +49,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	}
 
 	@Test
-	public void success_fromMapping_single() {
+	void success_fromMapping_single() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchSchemaManager manager = searchSession
 					.scope( IndexedEntity1.class )
@@ -61,7 +61,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	}
 
 	@Test
-	public void success_fromMapping_all() {
+	void success_fromMapping_all() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchSchemaManager manager = searchSession
 					.scope( Object.class )
@@ -74,7 +74,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	}
 
 	@Test
-	public void success_fromSession_single() {
+	void success_fromSession_single() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchSchemaManager manager = searchSession
 					.schemaManager( IndexedEntity1.class );
@@ -85,7 +85,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	}
 
 	@Test
-	public void success_fromSession_all() {
+	void success_fromSession_all() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchSchemaManager manager = searchSession
 					.schemaManager();
@@ -97,7 +97,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	}
 
 	@Test
-	public void exception_single() {
+	void exception_single() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchSchemaManager manager = searchSession
 					.scope( Object.class )
@@ -116,7 +116,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	}
 
 	@Test
-	public void exception_multiple() {
+	void exception_multiple() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchSchemaManager manager = searchSession
 					.scope( Object.class )

@@ -11,29 +11,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerImpl;
 import org.hibernate.search.backend.lucene.index.impl.Shard;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
 import org.hibernate.search.integrationtest.backend.lucene.sharding.AbstractSettingsPerShardIT;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.LiveIndexWriterConfig;
 
 @TestForIssue(jiraKey = "HSEARCH-3636")
-public class LuceneIndexWriterSettingsPerShardIT extends AbstractSettingsPerShardIT {
+class LuceneIndexWriterSettingsPerShardIT extends AbstractSettingsPerShardIT {
 
-	public LuceneIndexWriterSettingsPerShardIT(String ignoredLabel, SearchSetupHelper setupHelper, List<String> shardIds) {
-		super( ignoredLabel, setupHelper, shardIds );
-	}
-
-	@Test
-	public void test() {
+	@ParameterizedTest(name = "{0} - {2}")
+	@MethodSource("params")
+	void test(String ignoredLabel, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
+			List<String> shardIds) {
+		init( ignoredLabel, setupStrategyFunction, shardIds );
 		setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), LuceneIndexSettings.IO_WRITER_MAX_BUFFERED_DOCS, "420" )
 				.withIndexProperty( index.name(),

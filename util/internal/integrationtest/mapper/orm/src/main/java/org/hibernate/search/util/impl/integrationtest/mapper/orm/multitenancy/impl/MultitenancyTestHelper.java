@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl;
 
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.dialect.H2Dialect;
@@ -35,8 +35,10 @@ public class MultitenancyTestHelper {
 	}
 
 	private void attachTo(SimpleSessionFactoryBuilder builder) {
-		assumeTrue( "This test relies on multi-tenancy, which can currently only be set up with H2",
-				DialectContext.getDialect() instanceof H2Dialect );
+		assumeTrue(
+				DialectContext.getDialect() instanceof H2Dialect,
+				"This test relies on multi-tenancy, which can currently only be set up with H2"
+		);
 
 		// Force our own schema management tool which creates the schema for all tenants.
 		builder.onServiceRegistryBuilder( srb -> srb.addInitiator(

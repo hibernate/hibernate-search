@@ -10,7 +10,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.MappingAssertionHelper;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendSetupStrategy;
 
 public class OrmAssertionHelper extends MappingAssertionHelper<EntityManagerFactory> {
 	public OrmAssertionHelper(BackendSetupStrategy backendSetupStrategy) {

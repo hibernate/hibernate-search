@@ -20,8 +20,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneTestIndexesPathConfiguration;
 
-import org.junit.AssumptionViolatedException;
-
 import org.jboss.logging.Logger;
 
 import org.apache.lucene.store.Directory;
@@ -82,7 +80,7 @@ public class LuceneTckBackendAccessor implements TckBackendAccessor {
 		 * The refresh in the Lucene backend actually doesn't touch the index at all,
 		 * so we don't have any way to trigger failures.
 		 */
-		throw new AssumptionViolatedException( "Cannot simulate flush/merge/refresh failures for the Lucene backend" );
+		throw new org.opentest4j.TestAbortedException( "Cannot simulate flush/merge/refresh failures for the Lucene backend" );
 	}
 
 	public Directory openDirectory(String indexName) throws IOException {

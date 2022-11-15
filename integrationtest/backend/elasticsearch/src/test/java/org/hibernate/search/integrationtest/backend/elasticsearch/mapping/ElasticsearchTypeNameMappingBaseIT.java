@@ -13,30 +13,32 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.mappingWithoutAnyProperty;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import com.google.gson.JsonObject;
 
 /**
  * Test the base functionality of type name mapping strategies.
  */
-@RunWith(Parameterized.class)
-public class ElasticsearchTypeNameMappingBaseIT {
+class ElasticsearchTypeNameMappingBaseIT {
 
 	private static final String ID_1 = "id_1";
 	private static final String ID_2 = "id_2";
@@ -46,38 +48,29 @@ public class ElasticsearchTypeNameMappingBaseIT {
 		NO
 	}
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] configurations() {
-		return new Object[][] {
-				{ null, mappingWithDiscriminatorProperty( "_entity_type" ), IrregularIndexNameSupport.YES },
-				{ "index-name", mappingWithoutAnyProperty(), IrregularIndexNameSupport.NO },
-				{ "discriminator", mappingWithDiscriminatorProperty( "_entity_type" ), IrregularIndexNameSupport.YES }
-		};
+	public static List<? extends Arguments> params() {
+		return Arrays.asList(
+				Arguments.of( null, mappingWithDiscriminatorProperty( "_entity_type" ), IrregularIndexNameSupport.YES ),
+				Arguments.of( "index-name", mappingWithoutAnyProperty(), IrregularIndexNameSupport.NO ),
+				Arguments.of( "discriminator", mappingWithDiscriminatorProperty( "_entity_type" ),
+						IrregularIndexNameSupport.YES )
+		);
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticsearchClient = TestElasticsearchClient.create();
 
 	private final StubMappedIndex index1 = StubMappedIndex.withoutFields().name( "index1" );
 	private final StubMappedIndex index2 = StubMappedIndex.withoutFields().name( "index2" );
 
-	private final String strategyName;
-	private final JsonObject expectedMappingContent;
-	private final IrregularIndexNameSupport irregularIndexNameSupport;
-
-	public ElasticsearchTypeNameMappingBaseIT(String strategyName, JsonObject expectedMappingContent,
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void singleIndexScope(String strategyName, JsonObject expectedMappingContent,
 			IrregularIndexNameSupport irregularIndexNameSupport) {
-		this.strategyName = strategyName;
-		this.expectedMappingContent = expectedMappingContent;
-		this.irregularIndexNameSupport = irregularIndexNameSupport;
-	}
-
-	@Test
-	public void singleIndexScope() {
-		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP );
+		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP, strategyName );
 		assertThatQuery(
 				index1.createScope().query().where( f -> f.matchAll() ).toQuery()
 		)
@@ -87,9 +80,11 @@ public class ElasticsearchTypeNameMappingBaseIT {
 				);
 	}
 
-	@Test
-	public void multiIndexScope() {
-		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndexScope(String strategyName, JsonObject expectedMappingContent,
+			IrregularIndexNameSupport irregularIndexNameSupport) {
+		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP, strategyName );
 
 		assertThatQuery(
 				index1.createScope( index2 ).query().where( f -> f.matchAll() ).toQuery()
@@ -102,10 +97,13 @@ public class ElasticsearchTypeNameMappingBaseIT {
 				);
 	}
 
-	@Test
-	public void irregularIndexName_correctNamingSchemeAndIncorrectUniqueKey_singleIndexScope() {
-		createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases();
-		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void irregularIndexName_correctNamingSchemeAndIncorrectUniqueKey_singleIndexScope(String strategyName,
+			JsonObject expectedMappingContent,
+			IrregularIndexNameSupport irregularIndexNameSupport) {
+		createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases( expectedMappingContent );
+		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, strategyName );
 
 		SearchQuery<DocumentReference> query = index1.createScope().query()
 				.where( f -> f.matchAll() )
@@ -119,10 +117,13 @@ public class ElasticsearchTypeNameMappingBaseIT {
 				);
 	}
 
-	@Test
-	public void irregularIndexName_correctNamingSchemeAndIncorrectUniqueKey_multiIndexScope() {
-		createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases();
-		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void irregularIndexName_correctNamingSchemeAndIncorrectUniqueKey_multiIndexScope(String strategyName,
+			JsonObject expectedMappingContent,
+			IrregularIndexNameSupport irregularIndexNameSupport) {
+		createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases( expectedMappingContent );
+		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, strategyName );
 
 		SearchQuery<DocumentReference> query = index1.createScope( index2 ).query()
 				.where( f -> f.matchAll() )
@@ -143,10 +144,13 @@ public class ElasticsearchTypeNameMappingBaseIT {
 		}
 	}
 
-	@Test
-	public void irregularIndexName_incorrectNamingScheme_singleIndexScope() {
-		createIndexesWithIncorrectNamingSchemeAndCorrectAliases();
-		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void irregularIndexName_incorrectNamingScheme_singleIndexScope(String strategyName,
+			JsonObject expectedMappingContent,
+			IrregularIndexNameSupport irregularIndexNameSupport) {
+		createIndexesWithIncorrectNamingSchemeAndCorrectAliases( expectedMappingContent );
+		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, strategyName );
 
 		SearchQuery<DocumentReference> query = index1.createScope().query()
 				.where( f -> f.matchAll() )
@@ -160,10 +164,12 @@ public class ElasticsearchTypeNameMappingBaseIT {
 				);
 	}
 
-	@Test
-	public void irregularIndexName_incorrectNamingScheme_multiIndexScope() {
-		createIndexesWithIncorrectNamingSchemeAndCorrectAliases();
-		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void irregularIndexName_incorrectNamingScheme_multiIndexScope(String strategyName, JsonObject expectedMappingContent,
+			IrregularIndexNameSupport irregularIndexNameSupport) {
+		createIndexesWithIncorrectNamingSchemeAndCorrectAliases( expectedMappingContent );
+		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, strategyName );
 
 		SearchQuery<DocumentReference> query = index1.createScope( index2 ).query()
 				.where( f -> f.matchAll() )
@@ -184,7 +190,8 @@ public class ElasticsearchTypeNameMappingBaseIT {
 		}
 	}
 
-	private void createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases() {
+	private void createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases(
+			JsonObject expectedMappingContent) {
 		URLEncodedString index1PrimaryName = IndexNames.encodeName( index1.name() + "-000001-somesuffix-000001" );
 		URLEncodedString index1WriteAlias = defaultWriteAlias( index1.name() );
 		URLEncodedString index1ReadAlias = defaultReadAlias( index1.name() );
@@ -199,7 +206,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 				.type().putMapping( expectedMappingContent );
 	}
 
-	private void createIndexesWithIncorrectNamingSchemeAndCorrectAliases() {
+	private void createIndexesWithIncorrectNamingSchemeAndCorrectAliases(JsonObject expectedMappingContent) {
 		URLEncodedString index1PrimaryName = IndexNames.encodeName( index1.name() + "-somesuffix" );
 		URLEncodedString index1WriteAlias = defaultWriteAlias( index1.name() );
 		URLEncodedString index1ReadAlias = defaultReadAlias( index1.name() );
@@ -214,7 +221,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 				.type().putMapping( expectedMappingContent );
 	}
 
-	private void setup(StubMappingSchemaManagementStrategy schemaManagementStrategy) {
+	private void setup(StubMappingSchemaManagementStrategy schemaManagementStrategy, String strategyName) {
 		setupHelper.start()
 				.withSchemaManagement( schemaManagementStrategy )
 				.withBackendProperty(

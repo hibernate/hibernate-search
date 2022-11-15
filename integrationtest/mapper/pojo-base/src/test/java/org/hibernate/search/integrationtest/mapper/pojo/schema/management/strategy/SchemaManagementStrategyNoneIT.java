@@ -13,23 +13,23 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SchemaManagementStrategyNoneIT {
+class SchemaManagementStrategyNoneIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public final StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void none() {
+	void none() {
 		CloseableSearchMapping mapper = setup();
 		// Nothing should have happened
 		backendMock.verifyExpectationsMet();

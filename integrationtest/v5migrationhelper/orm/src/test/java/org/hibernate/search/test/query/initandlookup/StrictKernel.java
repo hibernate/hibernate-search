@@ -16,7 +16,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingBinderRef;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.StaticIndexingSwitch;
+import org.hibernate.search.test.testsupport.StaticIndexingSwitch;
 
 /**
  * @author Emmanuel Bernard

@@ -24,22 +24,22 @@ import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.schema.management.SearchSchemaCollector;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchHibernateOrmSchemaManagerIT {
+class ElasticsearchHibernateOrmSchemaManagerIT {
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
 			BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		this.entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
@@ -50,7 +50,7 @@ public class ElasticsearchHibernateOrmSchemaManagerIT {
 	}
 
 	@Test
-	public void walkingTheSchemaWithExtension() {
+	void walkingTheSchemaWithExtension() {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			SearchSchemaManager schemaManager = searchSession.schemaManager();

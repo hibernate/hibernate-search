@@ -21,19 +21,19 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class BridgeResolverIT {
+class BridgeResolverIT {
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
@@ -43,7 +43,7 @@ public class BridgeResolverIT {
 	}
 
 	@Test
-	public void smoke() {
+	void smoke() {
 		MyProductId book1Id = new MyProductId( "oreilly", "14425" );
 		ISBN book1Isbn = ISBN.parse( "978-0-58-600835-5" );
 		MyProductId book2Id = new MyProductId( "largevue", "84784-484-44" );

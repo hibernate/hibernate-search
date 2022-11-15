@@ -17,33 +17,33 @@ import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ScopeExtensionIT {
+class ScopeExtensionIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectAnySchema( Author.NAME );
 		sessionFactory = ormSetupHelper.start().setup( Author.class );
 		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		with( sessionFactory ).runNoTransaction( session -> {
 			IndexScope indexScope = Search.session( session ).scope( Author.class )
 					.extension( original -> original );

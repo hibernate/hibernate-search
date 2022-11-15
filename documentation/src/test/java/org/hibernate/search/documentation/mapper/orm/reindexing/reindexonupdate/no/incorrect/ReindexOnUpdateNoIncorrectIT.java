@@ -16,25 +16,25 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ReindexOnUpdateNoIncorrectIT {
+class ReindexOnUpdateNoIncorrectIT {
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper =
 			DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = setupHelper.start().setup( Sensor.class );
 	}
 
 	@Test
-	public void missingReindexOnUpdateNo() {
+	void missingReindexOnUpdateNo() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			for ( int i = 0; i < 2000; ++i ) {
 				Sensor sensor = new Sensor();

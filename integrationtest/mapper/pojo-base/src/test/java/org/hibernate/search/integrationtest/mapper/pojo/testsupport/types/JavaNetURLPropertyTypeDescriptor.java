@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.net.MalformedURLException;
 import java.net.URI;

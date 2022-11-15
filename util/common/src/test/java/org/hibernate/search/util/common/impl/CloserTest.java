@@ -16,12 +16,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class CloserTest {
+class CloserTest {
 
 	@Test
-	public void nullCloseable() throws IOException {
+	void nullCloseable() throws IOException {
 		// Should not do anything, in particular should not throw any NPE
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.push( Closeable::close, null );
@@ -29,7 +29,7 @@ public class CloserTest {
 	}
 
 	@Test
-	public void extract_nullSupplier() throws IOException {
+	void extract_nullSupplier() throws IOException {
 		Supplier<Closeable> supplier = null;
 		// Should not do anything, in particular should not throw any NPE
 		try ( Closer<IOException> closer = new Closer<>() ) {
@@ -38,7 +38,7 @@ public class CloserTest {
 	}
 
 	@Test
-	public void extract_nullCloseable() throws IOException {
+	void extract_nullCloseable() throws IOException {
 		Supplier<Closeable> supplier = () -> null;
 		// Should not do anything, in particular should not throw any NPE
 		try ( Closer<IOException> closer = new Closer<>() ) {
@@ -47,7 +47,7 @@ public class CloserTest {
 	}
 
 	@Test
-	public void javaIOCloseable() {
+	void javaIOCloseable() {
 		IOException exception1 = new IOException();
 		RuntimeException exception2 = new IllegalStateException();
 		@SuppressWarnings("resource")
@@ -66,7 +66,7 @@ public class CloserTest {
 	}
 
 	@Test
-	public void extract_javaIOCloseable() {
+	void extract_javaIOCloseable() {
 		IOException exception1 = new IOException();
 		RuntimeException exception2 = new IllegalStateException();
 		@SuppressWarnings("resource")
@@ -86,7 +86,7 @@ public class CloserTest {
 	}
 
 	@Test
-	public void autoCloseable() {
+	void autoCloseable() {
 		Exception exception1 = new Exception();
 		RuntimeException exception2 = new IllegalStateException();
 		@SuppressWarnings("resource")
@@ -105,7 +105,7 @@ public class CloserTest {
 	}
 
 	@Test
-	public void extract_autoCloseable() {
+	void extract_autoCloseable() {
 		Exception exception1 = new Exception();
 		RuntimeException exception2 = new IllegalStateException();
 		@SuppressWarnings("resource")
@@ -125,7 +125,7 @@ public class CloserTest {
 	}
 
 	@Test
-	public void runtimeException() {
+	void runtimeException() {
 		RuntimeException exception1 = new RuntimeException();
 		RuntimeException exception2 = new IllegalStateException();
 		RuntimeException exception3 = new UnsupportedOperationException();
@@ -143,7 +143,7 @@ public class CloserTest {
 	}
 
 	@Test
-	public void extract_runtimeException() {
+	void extract_runtimeException() {
 		RuntimeException exception1 = new RuntimeException();
 		RuntimeException exception2 = new IllegalStateException();
 		RuntimeException exception3 = new UnsupportedOperationException();
@@ -164,7 +164,7 @@ public class CloserTest {
 	}
 
 	@Test
-	public void nonFailingCloseables() {
+	void nonFailingCloseables() {
 		RuntimeException exception1 = new RuntimeException();
 		RuntimeException exception2 = new RuntimeException();
 		RuntimeException exception3 = new RuntimeException();
@@ -185,7 +185,7 @@ public class CloserTest {
 	}
 
 	@Test
-	public void customCloseable() {
+	void customCloseable() {
 		MyException1 exception1 = new MyException1();
 		RuntimeException exception2 = new IllegalStateException();
 		@SuppressWarnings("resource")
@@ -204,7 +204,7 @@ public class CloserTest {
 	}
 
 	@Test
-	public void iterable() {
+	void iterable() {
 		IOException exception1 = new IOException();
 		RuntimeException exception2 = new IllegalStateException();
 		IOException exception3 = new IOException();
@@ -230,7 +230,7 @@ public class CloserTest {
 	}
 
 	@Test
-	public void nullIterable() {
+	void nullIterable() {
 		assertThatCode( () -> {
 			try ( Closer<IOException> closer = new Closer<>() ) {
 				closer.pushAll( Closeable::close, (List<Closeable>) null );
@@ -240,7 +240,7 @@ public class CloserTest {
 	}
 
 	@Test
-	public void extract_iterable() {
+	void extract_iterable() {
 		IOException exception1 = new IOException();
 		RuntimeException exception2 = new IllegalStateException();
 		IOException exception3 = new IOException();
@@ -266,7 +266,7 @@ public class CloserTest {
 	}
 
 	@Test
-	public void extract_nullIterable() {
+	void extract_nullIterable() {
 		assertThatCode( () -> {
 			try ( Closer<IOException> closer = new Closer<>() ) {
 				closer.pushAll( Closeable::close, (List<Supplier<Closeable>>) null, Supplier::get );
@@ -276,7 +276,7 @@ public class CloserTest {
 	}
 
 	@Test
-	public void split() {
+	void split() {
 		MyException1 exception1 = new MyException1();
 		MyException2 exception2 = new MyException2();
 		IOException exception3 = new IOException();
@@ -302,7 +302,7 @@ public class CloserTest {
 	}
 
 	@Test
-	public void split_transitive() {
+	void split_transitive() {
 		MyException1 exception1 = new MyException1();
 		MyException2 exception2 = new MyException2();
 		IOException exception3 = new IOException();

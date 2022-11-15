@@ -11,12 +11,12 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link OutboxPollingEventProcessorClusterLink#leaveCluster(AgentClusterLinkContextProvider)}.
  */
-public class EventProcessorClusterLinkLeaveClusterTest extends AbstractEventProcessorClusterLinkTest {
+class EventProcessorClusterLinkLeaveClusterTest extends AbstractEventProcessorClusterLinkTest {
 	final OutboxPollingEventProcessorClusterLink setupLink() {
 		return new OutboxPollingEventProcessorClusterLink(
 				SELF_REF.name, failureHandlerMock, clockMock, shardAssignmentProviderStub,
@@ -26,13 +26,13 @@ public class EventProcessorClusterLinkLeaveClusterTest extends AbstractEventProc
 	}
 
 	@Test
-	public void didNotJoin() {
+	void didNotJoin() {
 		OutboxPollingEventProcessorClusterLink link = setupLink();
 		link.leaveCluster( contextMock );
 	}
 
 	@Test
-	public void joined_found() {
+	void joined_found() {
 		OutboxPollingEventProcessorClusterLink link = setupLink();
 		defineSelfNotCreatedYet( link );
 		repositoryMockHelper.defineOtherAgents();
@@ -46,7 +46,7 @@ public class EventProcessorClusterLinkLeaveClusterTest extends AbstractEventProc
 	}
 
 	@Test
-	public void joined_notFound() {
+	void joined_notFound() {
 		OutboxPollingEventProcessorClusterLink link = setupLink();
 		defineSelfNotCreatedYet( link );
 		repositoryMockHelper.defineOtherAgents();

@@ -23,16 +23,16 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigur
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class LuceneAnalysisIT {
+class LuceneAnalysisIT {
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	@Test
-	public void advanced() {
+	void advanced() {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withBackendProperty(
 						LuceneBackendSettings.ANALYSIS_CONFIGURER,
@@ -69,7 +69,7 @@ public class LuceneAnalysisIT {
 	}
 
 	@Test
-	public void luceneClasses() {
+	void luceneClasses() {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withBackendProperty(
 						LuceneBackendSettings.ANALYSIS_CONFIGURER,
@@ -103,7 +103,7 @@ public class LuceneAnalysisIT {
 	}
 
 	@Test
-	public void similarity() {
+	void similarity() {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withBackendProperty(
 						LuceneBackendSettings.ANALYSIS_CONFIGURER,

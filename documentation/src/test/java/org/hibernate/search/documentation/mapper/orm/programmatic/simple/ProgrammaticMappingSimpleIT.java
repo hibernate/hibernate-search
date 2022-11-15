@@ -19,19 +19,19 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ProgrammaticMappingSimpleIT {
+class ProgrammaticMappingSimpleIT {
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
@@ -41,7 +41,7 @@ public class ProgrammaticMappingSimpleIT {
 	}
 
 	@Test
-	public void simple() {
+	void simple() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book = new Book();
 			book.setId( 1 );

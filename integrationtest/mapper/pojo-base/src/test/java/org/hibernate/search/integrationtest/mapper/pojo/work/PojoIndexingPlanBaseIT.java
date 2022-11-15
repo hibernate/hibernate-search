@@ -28,17 +28,16 @@ import org.hibernate.search.mapper.pojo.standalone.loading.SelectionEntityLoader
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 /**
@@ -48,25 +47,23 @@ import org.mockito.quality.Strictness;
  * see {@code org.hibernate.search.integrationtest.mapper.orm.session.SearchIndexingPlanBaseIT}
  * in particular.
  */
-public class PojoIndexingPlanBaseIT {
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
+class PojoIndexingPlanBaseIT {
 
-	@Rule
-	public final BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public final BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public final StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	@Mock
 	private SelectionEntityLoader<IndexedEntity> loaderMock;
 
 	private SearchMapping mapping;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "value", String.class )
 				.objectField( "contained", b2 -> b2
@@ -84,7 +81,7 @@ public class PojoIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void simple() {
+	void simple() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity( 1 );
 			IndexedEntity entity2 = new IndexedEntity( 2 );
@@ -119,7 +116,7 @@ public class PojoIndexingPlanBaseIT {
 	 * Test the state inside indexing plans.
 	 */
 	@Test
-	public void state() {
+	void state() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity;
 
@@ -191,7 +188,7 @@ public class PojoIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void dirtyPaths_root() {
+	void dirtyPaths_root() {
 		IndexedEntity indexed = new IndexedEntity( 1 );
 
 		// Update with relevant dirty path
@@ -227,7 +224,7 @@ public class PojoIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void dirtyPaths_contained() {
+	void dirtyPaths_contained() {
 		IndexedEntity indexed = new IndexedEntity( 1 );
 		ContainedEntity contained = new ContainedEntity( 2 );
 		indexed.contained = contained;
@@ -286,7 +283,7 @@ public class PojoIndexingPlanBaseIT {
 	 * Test when the entity is null and must be loaded.
 	 */
 	@Test
-	public void nullEntity() {
+	void nullEntity() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity( 1 );
 			IndexedEntity entity2 = new IndexedEntity( 2 );
@@ -323,7 +320,7 @@ public class PojoIndexingPlanBaseIT {
 	 * Test the state inside indexing plans when the entity is null and must be loaded.
 	 */
 	@Test
-	public void nullEntity_state() {
+	void nullEntity_state() {
 		List<Integer> idsToLoad = new ArrayList<>();
 		List<IndexedEntity> loadedEntities = new ArrayList<>();
 
@@ -414,7 +411,7 @@ public class PojoIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void failure() {
+	void failure() {
 		RuntimeException simulatedFailure = new RuntimeException( "Indexing failure" );
 		assertThatThrownBy( () -> {
 			try ( SearchSession session = mapping.createSession() ) {

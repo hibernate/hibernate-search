@@ -11,54 +11,54 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Mincong Huang
  */
-public class SerializationUtilTest {
+class SerializationUtilTest {
 
 	@Test
-	public void serializeAndDeserialize() throws Exception {
+	void serializeAndDeserialize() throws Exception {
 		Object i = SerializationUtil.deserialize( SerializationUtil.serialize( 1 ) );
 		assertThat( (Integer) i ).isEqualTo( 1 );
 	}
 
 	@Test
-	public void deserializeInt_fromInt() throws Exception {
+	void deserializeInt_fromInt() throws Exception {
 		int i = SerializationUtil.parseIntegerParameter( "My parameter", "1" );
 		assertThat( i ).isEqualTo( 1 );
 	}
 
 	@Test
-	public void deserializeInt_fromDouble() throws Exception {
+	void deserializeInt_fromDouble() throws Exception {
 		assertThatThrownBy( () -> SerializationUtil.parseIntegerParameter( "My parameter", "1.0" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid value for job parameter 'My parameter': '1.0'." );
 	}
 
 	@Test
-	public void deserializeInt_fromOther() throws Exception {
+	void deserializeInt_fromOther() throws Exception {
 		assertThatThrownBy( () -> SerializationUtil.parseIntegerParameter( "My parameter", "foo" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid value for job parameter 'My parameter': 'foo'." );
 	}
 
 	@Test
-	public void deserializeInt_missing() throws Exception {
+	void deserializeInt_missing() throws Exception {
 		assertThatThrownBy( () -> SerializationUtil.parseIntegerParameter( "My parameter", null ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid value for job parameter 'My parameter': 'null'." );
 	}
 
 	@Test
-	public void deserializeInt_defaultValue() throws Exception {
+	void deserializeInt_defaultValue() throws Exception {
 		int i = SerializationUtil.parseIntegerParameterOptional( "My parameter", null, 1 );
 		assertThat( i ).isEqualTo( 1 );
 	}
 
 	@Test
-	public void deserializeBoolean_fromLowerCase() throws Exception {
+	void deserializeBoolean_fromLowerCase() throws Exception {
 		boolean t = SerializationUtil.parseBooleanParameterOptional( "My parameter 1", "true", false );
 		boolean f = SerializationUtil.parseBooleanParameterOptional( "My parameter 2", "false", true );
 		assertThat( t ).isTrue();
@@ -66,7 +66,7 @@ public class SerializationUtilTest {
 	}
 
 	@Test
-	public void deserializeBoolean_fromUpperCase() throws Exception {
+	void deserializeBoolean_fromUpperCase() throws Exception {
 		boolean t = SerializationUtil.parseBooleanParameterOptional( "My parameter 1", "TRUE", false );
 		boolean f = SerializationUtil.parseBooleanParameterOptional( "My parameter 2", "FALSE", true );
 		assertThat( t ).isTrue();
@@ -74,7 +74,7 @@ public class SerializationUtilTest {
 	}
 
 	@Test
-	public void deserializeBoolean_fromIrregularCase() throws Exception {
+	void deserializeBoolean_fromIrregularCase() throws Exception {
 		boolean t = SerializationUtil.parseBooleanParameterOptional( "My parameter 1", "TruE", false );
 		boolean f = SerializationUtil.parseBooleanParameterOptional( "My parameter 2", "FalSe", true );
 		assertThat( t ).as( "Case should be ignored." ).isTrue();
@@ -82,7 +82,7 @@ public class SerializationUtilTest {
 	}
 
 	@Test
-	public void deserializeBoolean_fromMissing() throws Exception {
+	void deserializeBoolean_fromMissing() throws Exception {
 		boolean t = SerializationUtil.parseBooleanParameterOptional( "My parameter 1", null, true );
 		boolean f = SerializationUtil.parseBooleanParameterOptional( "My parameter 2", null, false );
 		assertThat( t ).as( "Default value should be returned." ).isTrue();
@@ -90,7 +90,7 @@ public class SerializationUtilTest {
 	}
 
 	@Test
-	public void deserializeBoolean_fromOthers() throws Exception {
+	void deserializeBoolean_fromOthers() throws Exception {
 		for ( String value : new String[] { "", "0", "1", "t", "f" } ) {
 			assertThatThrownBy( () -> SerializationUtil.parseBooleanParameterOptional( "My parameter", value, true ) )
 					.isInstanceOf( SearchException.class )

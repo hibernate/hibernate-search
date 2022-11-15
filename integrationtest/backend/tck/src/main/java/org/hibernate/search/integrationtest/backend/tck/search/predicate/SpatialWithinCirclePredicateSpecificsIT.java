@@ -11,15 +11,15 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class SpatialWithinCirclePredicateSpecificsIT extends AbstractSpatialWithinPredicateIT {
+class SpatialWithinCirclePredicateSpecificsIT extends AbstractSpatialWithinPredicateIT {
 
 	private static final GeoPoint METRO_HOTEL_DE_VILLE = GeoPoint.of( 45.7673396, 4.833743 );
 	private static final GeoPoint METRO_GARIBALDI = GeoPoint.of( 45.7515926, 4.8514779 );
 
 	@Test
-	public void matchMultipleDocuments() {
+	void matchMultipleDocuments() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.spatial().within()
 						.field( "geoPoint" )

@@ -17,16 +17,16 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class PhrasePredicateSpecificsIT {
+class PhrasePredicateSpecificsIT {
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
@@ -44,15 +44,15 @@ public class PhrasePredicateSpecificsIT {
 	private static final String PHRASE_1_TEXT_SLOP_3_MATCH = "In the big house, the fox was quick.";
 	private static final String PHRASE_1_TEXT_SLOP_NO_MATCH = "Completely unrelated phrase.";
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	private static final DataSet dataSet = new DataSet();
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndexes( index ).setup();
 
 		BulkIndexer indexer = index.bulkIndexer();
@@ -62,7 +62,7 @@ public class PhrasePredicateSpecificsIT {
 
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testPhraseQuery")
-	public void phrase() {
+	void phrase() {
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 
 		assertThatQuery( index.query()
@@ -71,7 +71,7 @@ public class PhrasePredicateSpecificsIT {
 	}
 
 	@Test
-	public void nonAnalyzedField() {
+	void nonAnalyzedField() {
 		String absoluteFieldPath = index.binding().nonAnalyzedField.relativeFieldName;
 
 		assertThatQuery( index.query()
@@ -85,7 +85,7 @@ public class PhrasePredicateSpecificsIT {
 
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testPhraseQuery")
-	public void singleTerm() {
+	void singleTerm() {
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 
 		assertThatQuery( index.query()
@@ -95,7 +95,7 @@ public class PhrasePredicateSpecificsIT {
 
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testPhraseQuery")
-	public void slop() {
+	void slop() {
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 		Function<Integer, SearchQueryFinalStep<DocumentReference>> createQuery = slop -> index.query()
 				.where( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1 ).slop( slop ) );

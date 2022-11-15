@@ -29,15 +29,15 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.io.TempDir;
 
-public class ElasticsearchSchemaManagerExporterIT {
+class ElasticsearchSchemaManagerExporterIT {
 
-	@Rule
-	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
-	@Rule
+	@TempDir
+	public Path temporaryFolder;
+	@RegisterExtension
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withMultipleBackends(
 			BackendConfigurations.simple(),
 			Map.of( Article.BACKEND_NAME, BackendConfigurations.simple() )
@@ -46,7 +46,7 @@ public class ElasticsearchSchemaManagerExporterIT {
 	private EntityManagerFactory entityManagerFactory;
 
 	@Test
-	public void elasticsearch() throws IOException {
+	void elasticsearch() throws IOException {
 		assumeFalse(
 				"Older versions of Elasticsearch would not match the mappings",
 				isActualVersion(
@@ -64,7 +64,7 @@ public class ElasticsearchSchemaManagerExporterIT {
 				.withBackendProperty( Article.BACKEND_NAME, ElasticsearchBackendSettings.VERSION, version )
 				.setup( Book.class, Article.class );
 
-		Path directory = temporaryFolder.newFolder().toPath();
+		Path directory = temporaryFolder;
 		Search.mapping( entityManagerFactory ).scope( Object.class ).schemaManager().exportExpectedSchema( directory );
 
 		assertJsonEqualsIgnoringUnknownFields(

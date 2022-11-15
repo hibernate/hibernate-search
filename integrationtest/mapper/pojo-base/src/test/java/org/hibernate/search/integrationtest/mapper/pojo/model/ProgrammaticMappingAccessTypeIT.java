@@ -12,12 +12,12 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Programm
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Integration tests checking that we get the expected access type for properties when using programmatic mapping,
@@ -25,19 +25,19 @@ import org.junit.Test;
  * <p>
  * Similar to {@link AnnotationMappingAccessTypeIT}, which tests annotation mapping.
  */
-public class ProgrammaticMappingAccessTypeIT {
+class ProgrammaticMappingAccessTypeIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private SearchMapping mapping;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "propertyWithGetterAndFieldDeclaredInParent", String.class )
 				.field( "propertyWithFieldDeclaredInParent", String.class )
@@ -73,7 +73,7 @@ public class ProgrammaticMappingAccessTypeIT {
 	}
 
 	@Test
-	public void index() {
+	void index() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.id = 1;

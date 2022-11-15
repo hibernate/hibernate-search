@@ -28,23 +28,23 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.MarkerBind
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyBinding;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class AnnotationMappingDiscoveryIT {
+class AnnotationMappingDiscoveryIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void discoveryEnabled() {
+	void discoveryEnabled() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "annotationMappedEmbedded", b2 -> b2
 						/*
@@ -89,7 +89,7 @@ public class AnnotationMappingDiscoveryIT {
 	}
 
 	@Test
-	public void discoveryDisabled() {
+	void discoveryDisabled() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "annotationMappedEmbedded", b2 -> {
 					/*

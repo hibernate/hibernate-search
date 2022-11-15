@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractPredicateInvalidFieldIT {
 
@@ -27,7 +27,7 @@ public abstract class AbstractPredicateInvalidFieldIT {
 	}
 
 	@Test
-	public void unknownField() {
+	void unknownField() {
 		SearchPredicateFactory f = index.createScope().predicate();
 
 		assertThatThrownBy( () -> tryPredicate( f, "unknown_field" ) )
@@ -37,7 +37,7 @@ public abstract class AbstractPredicateInvalidFieldIT {
 	}
 
 	@Test
-	public void objectField_nested() {
+	void objectField_nested() {
 		SearchPredicateFactory f = index.createScope().predicate();
 
 		String fieldPath = index.binding().nested.relativeFieldName;
@@ -48,7 +48,7 @@ public abstract class AbstractPredicateInvalidFieldIT {
 	}
 
 	@Test
-	public void objectField_flattened() {
+	void objectField_flattened() {
 		SearchPredicateFactory f = index.createScope().predicate();
 
 		String fieldPath = index.binding().flattened.relativeFieldName;

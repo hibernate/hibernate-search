@@ -10,10 +10,8 @@ import java.util.UUID;
 
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentType;
-import org.hibernate.search.util.impl.test.runner.nested.Nested;
-import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Nested;
 
 /**
  * Base tests of {@link OutboxPollingEventProcessorClusterLink}
@@ -21,8 +19,7 @@ import org.junit.runner.RunWith;
  * with a total shard count of 4,
  * self being static.
  */
-@RunWith(NestedRunner.class)
-public class EventProcessorClusterLinkMixedSharding4ShardSelfDynamicBaseTest {
+class EventProcessorClusterLinkMixedSharding4ShardSelfDynamicBaseTest {
 
 	abstract static class AbstractBaseTest extends AbstractEventProcessorClusterLinkBaseTest {
 
@@ -71,7 +68,7 @@ public class EventProcessorClusterLinkMixedSharding4ShardSelfDynamicBaseTest {
 	// must not start running immediately on the first pulse,
 	// but should go through the waiting state first.
 	// See comments in OutboxPollingEventProcessorClusterLink.
-	public static class NotRegisteredTest extends AbstractBaseTest {
+	public class NotRegisteredTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
 			defineSelfNotCreatedYet();
@@ -89,7 +86,7 @@ public class EventProcessorClusterLinkMixedSharding4ShardSelfDynamicBaseTest {
 	}
 
 	@Nested
-	public static class SuspendedTest extends AbstractBaseTest {
+	public class SuspendedTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
 			defineSelfCreatedAndStillPresent( AgentState.SUSPENDED, null );
@@ -107,7 +104,7 @@ public class EventProcessorClusterLinkMixedSharding4ShardSelfDynamicBaseTest {
 	}
 
 	@Nested
-	public static class WaitingIn4NodeClusterTest extends AbstractBaseTest {
+	public class WaitingIn4NodeClusterTest extends AbstractBaseTest {
 
 		@Override
 		protected void defineSelf() {
@@ -127,7 +124,7 @@ public class EventProcessorClusterLinkMixedSharding4ShardSelfDynamicBaseTest {
 	}
 
 	@Nested
-	public static class RunningIn4NodeClusterTest extends AbstractBaseTest {
+	public class RunningIn4NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
 			defineSelfCreatedAndStillPresent( AgentState.RUNNING, selfShardAssignmentIn4NodeCluster() );

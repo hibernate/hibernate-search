@@ -29,18 +29,14 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ValueBridgeToIndexed
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-public class HibernateOrmExtensionTest {
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
+class HibernateOrmExtensionTest {
 
 	@Mock
 	private HibernateOrmMappingContextMock mappingContext;
@@ -48,7 +44,7 @@ public class HibernateOrmExtensionTest {
 	private HibernateOrmSessionContextMock sessionContext;
 
 	@Test
-	public void identifierBridge() {
+	void identifierBridge() {
 		IdentifierBridgeToDocumentIdentifierContext toDocumentContext =
 				new IdentifierBridgeToDocumentIdentifierContextImpl( mappingContext );
 		assertThat( toDocumentContext.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
@@ -59,25 +55,25 @@ public class HibernateOrmExtensionTest {
 	}
 
 	@Test
-	public void routingBridge() {
+	void routingBridge() {
 		RoutingBridgeRouteContext context = new SessionBasedBridgeOperationContext( sessionContext );
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
 	}
 
 	@Test
-	public void typeBridge() {
+	void typeBridge() {
 		TypeBridgeWriteContext context = new SessionBasedBridgeOperationContext( sessionContext );
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
 	}
 
 	@Test
-	public void propertyBridge() {
+	void propertyBridge() {
 		PropertyBridgeWriteContext context = new SessionBasedBridgeOperationContext( sessionContext );
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
 	}
 
 	@Test
-	public void valueBridge() {
+	void valueBridge() {
 		ValueBridgeToIndexedValueContext toIndexedValueContext = new ValueBridgeToIndexedValueContextImpl( mappingContext );
 		assertThat( toIndexedValueContext.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
 
@@ -87,7 +83,7 @@ public class HibernateOrmExtensionTest {
 
 	@Test
 	@SuppressWarnings("deprecation")
-	public void toDocumentFieldValueConverter() {
+	void toDocumentFieldValueConverter() {
 		org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext context =
 				new ToDocumentValueConvertContextImpl( mappingContext );
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
@@ -95,14 +91,14 @@ public class HibernateOrmExtensionTest {
 
 	@Test
 	@SuppressWarnings("deprecation")
-	public void toDocumentValueConverter() {
+	void toDocumentValueConverter() {
 		ToDocumentValueConvertContext context = new ToDocumentValueConvertContextImpl( mappingContext );
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
 	}
 
 	@Test
 	@SuppressWarnings("deprecation")
-	public void fromDocumentFieldValueConverter() {
+	void fromDocumentFieldValueConverter() {
 		org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext context =
 				new FromDocumentValueConvertContextImpl( sessionContext );
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
@@ -110,7 +106,7 @@ public class HibernateOrmExtensionTest {
 
 	@Test
 	@SuppressWarnings("deprecation")
-	public void fromDocumentValueConverter() {
+	void fromDocumentValueConverter() {
 		FromDocumentValueConvertContext context = new FromDocumentValueConvertContextImpl( sessionContext );
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
 	}

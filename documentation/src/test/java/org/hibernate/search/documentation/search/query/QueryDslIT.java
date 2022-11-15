@@ -38,11 +38,11 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.stat.Statistics;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class QueryDslIT {
+class QueryDslIT {
 
 	private static final int BOOK1_ID = 1;
 	private static final int BOOK2_ID = 2;
@@ -54,13 +54,13 @@ public class QueryDslIT {
 	private static final int ASSOCIATE1_ID = 1;
 	private static final int ASSOCIATE2_ID = 2;
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = setupHelper.start()
 				.withProperty( AvailableSettings.JAKARTA_SHARED_CACHE_MODE, SharedCacheMode.ENABLE_SELECTIVE.name() )
 				.setup( Book.class, Manager.class, Associate.class );
@@ -68,7 +68,7 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void entryPoint() {
+	void entryPoint() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint[]
 			// Not shown: open a transaction if relevant
@@ -95,7 +95,7 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void targetingMultipleEntityTypes() {
+	void targetingMultipleEntityTypes() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::targeting-multiple[]
@@ -117,7 +117,7 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void targetingByEntityName() {
+	void targetingByEntityName() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::targeting-entityName[]
@@ -142,7 +142,7 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void fetchingBasics() {
+	void fetchingBasics() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-searchResult[]
@@ -197,7 +197,7 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void fetchingAllHits() {
+	void fetchingAllHits() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-all-searchResult[]
@@ -228,7 +228,7 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void pagination() {
+	void pagination() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-pagination-searchResult[]
@@ -256,7 +256,7 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void scrolling() {
+	void scrolling() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			List<Integer> collectedIds = new ArrayList<>();
@@ -289,7 +289,7 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void searchQuery() {
+	void searchQuery() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::searchQuery[]
@@ -322,7 +322,7 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void tookAndTimedOut() {
+	void tookAndTimedOut() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::took-timedOut[]
@@ -344,7 +344,7 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void truncateAfter() {
+	void truncateAfter() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::truncateAfter[]
@@ -365,7 +365,7 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void failAfter() {
+	void failAfter() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::failAfter[]
@@ -385,7 +385,7 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void cacheLookupStrategy() {
+	void cacheLookupStrategy() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Statistics statistics = entityManagerFactory.unwrap( SessionFactory.class ).getStatistics();
 			statistics.setStatisticsEnabled( true );
@@ -411,7 +411,7 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void fetchSize() {
+	void fetchSize() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -430,7 +430,7 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void resultTotal() {
+	void resultTotal() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-resultTotal[]
@@ -453,7 +453,7 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void resultTotal_totalHitCountThreshold() {
+	void resultTotal_totalHitCountThreshold() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-totalHitCountThreshold[]
@@ -473,7 +473,7 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void graph() {
+	void graph() {
 		// By default associates are not loaded
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );

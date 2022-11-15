@@ -20,23 +20,22 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.NormalizedDocRefHit;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-public class RangePredicateSpecificsIT<F> {
+class RangePredicateSpecificsIT<F> {
 	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = new ArrayList<>();
 	private static final List<DataSet<?>> dataSets = new ArrayList<>();
-	private static final List<Object[]> parameters = new ArrayList<>();
+	private static final List<Arguments> parameters = new ArrayList<>();
 	static {
 		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
 			if ( !GeoPointFieldTypeDescriptor.INSTANCE.equals( fieldType )
@@ -48,22 +47,21 @@ public class RangePredicateSpecificsIT<F> {
 		for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
 			DataSet<?> dataSet = new DataSet<>( new RangePredicateTestValues<>( fieldType ) );
 			dataSets.add( dataSet );
-			parameters.add( new Object[] { dataSet } );
+			parameters.add( Arguments.of( dataSet ) );
 		}
 	}
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<Object[]> parameters() {
+	public static List<? extends Arguments> params() {
 		return parameters;
 	}
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		BulkIndexer bulkIndexer = index.bulkIndexer();
@@ -71,218 +69,230 @@ public class RangePredicateSpecificsIT<F> {
 		bulkIndexer.join();
 	}
 
-	private final DataSet<F> dataSet;
-
-	public RangePredicateSpecificsIT(DataSet<F> dataSet) {
-		this.dataSet = dataSet;
-	}
-
-	@Test
-	public void atLeast() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void atLeast(DataSet<F> dataSet) {
 		int docOrdinal = 1;
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( defaultDslConverterFieldPath() )
-						.atLeast( value( docOrdinal ) ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( docOrdinal, null ) );
+				.where( f -> f.range().field( defaultDslConverterFieldPath( dataSet ) )
+						.atLeast( value( docOrdinal, dataSet ) ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( docOrdinal, null, dataSet ) );
 	}
 
-	@Test
-	public void atLeast_withDslConverter_valueConvertDefault() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void atLeast_withDslConverter_valueConvertDefault(DataSet<F> dataSet) {
 		int docOrdinal = 1;
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( customDslConverterFieldPath() )
-						.atLeast( wrappedValue( docOrdinal ) ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( docOrdinal, null ) );
+				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
+						.atLeast( wrappedValue( docOrdinal, dataSet ) ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( docOrdinal, null, dataSet ) );
 	}
 
-	@Test
-	public void atLeast_withDslConverter_valueConvertNo() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void atLeast_withDslConverter_valueConvertNo(DataSet<F> dataSet) {
 		int docOrdinal = 1;
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( customDslConverterFieldPath() )
-						.atLeast( value( docOrdinal ), ValueConvert.NO ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( docOrdinal, null ) );
+				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
+						.atLeast( value( docOrdinal, dataSet ), ValueConvert.NO ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( docOrdinal, null, dataSet ) );
 	}
 
-	@Test
-	public void greaterThan() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void greaterThan(DataSet<F> dataSet) {
 		int docOrdinal = 1;
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( defaultDslConverterFieldPath() )
-						.greaterThan( value( docOrdinal ) ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( docOrdinal + 1, null ) );
+				.where( f -> f.range().field( defaultDslConverterFieldPath( dataSet ) )
+						.greaterThan( value( docOrdinal, dataSet ) ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( docOrdinal + 1, null, dataSet ) );
 	}
 
-	@Test
-	public void greaterThan_withDslConverter_valueConvertDefault() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void greaterThan_withDslConverter_valueConvertDefault(DataSet<F> dataSet) {
 		int docOrdinal = 1;
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( customDslConverterFieldPath() )
-						.greaterThan( wrappedValue( docOrdinal ) ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( docOrdinal + 1, null ) );
+				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
+						.greaterThan( wrappedValue( docOrdinal, dataSet ) ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( docOrdinal + 1, null, dataSet ) );
 	}
 
-	@Test
-	public void greaterThan_withDslConverter_valueConvertNo() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void greaterThan_withDslConverter_valueConvertNo(DataSet<F> dataSet) {
 		int docOrdinal = 1;
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( customDslConverterFieldPath() )
-						.greaterThan( value( docOrdinal ), ValueConvert.NO ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( docOrdinal + 1, null ) );
+				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
+						.greaterThan( value( docOrdinal, dataSet ), ValueConvert.NO ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( docOrdinal + 1, null, dataSet ) );
 	}
 
-	@Test
-	public void atMost() {
-		int docOrdinal = docCount() - 2;
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void atMost(DataSet<F> dataSet) {
+		int docOrdinal = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( defaultDslConverterFieldPath() )
-						.atMost( value( docOrdinal ) ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( null, docOrdinal ) );
+				.where( f -> f.range().field( defaultDslConverterFieldPath( dataSet ) )
+						.atMost( value( docOrdinal, dataSet ) ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( null, docOrdinal, dataSet ) );
 	}
 
-	@Test
-	public void atMost_withDslConverter_valueConvertDefault() {
-		int docOrdinal = docCount() - 2;
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void atMost_withDslConverter_valueConvertDefault(DataSet<F> dataSet) {
+		int docOrdinal = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( customDslConverterFieldPath() )
-						.atMost( wrappedValue( docOrdinal ) ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( null, docOrdinal ) );
+				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
+						.atMost( wrappedValue( docOrdinal, dataSet ) ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( null, docOrdinal, dataSet ) );
 	}
 
-	@Test
-	public void atMost_withDslConverter_valueConvertNo() {
-		int docOrdinal = docCount() - 2;
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void atMost_withDslConverter_valueConvertNo(DataSet<F> dataSet) {
+		int docOrdinal = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( customDslConverterFieldPath() )
-						.atMost( value( docOrdinal ), ValueConvert.NO ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( null, docOrdinal ) );
+				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
+						.atMost( value( docOrdinal, dataSet ), ValueConvert.NO ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( null, docOrdinal, dataSet ) );
 	}
 
-	@Test
-	public void lessThan() {
-		int docOrdinal = docCount() - 2;
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void lessThan(DataSet<F> dataSet) {
+		int docOrdinal = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( defaultDslConverterFieldPath() )
-						.lessThan( value( docOrdinal ) ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( null, docOrdinal - 1 ) );
+				.where( f -> f.range().field( defaultDslConverterFieldPath( dataSet ) )
+						.lessThan( value( docOrdinal, dataSet ) ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( null, docOrdinal - 1, dataSet ) );
 	}
 
-	@Test
-	public void lessThan_withDslConverter_valueConvertDefault() {
-		int docOrdinal = docCount() - 2;
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void lessThan_withDslConverter_valueConvertDefault(DataSet<F> dataSet) {
+		int docOrdinal = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( customDslConverterFieldPath() )
-						.lessThan( wrappedValue( docOrdinal ) ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( null, docOrdinal - 1 ) );
+				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
+						.lessThan( wrappedValue( docOrdinal, dataSet ) ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( null, docOrdinal - 1, dataSet ) );
 	}
 
-	@Test
-	public void lessThan_withDslConverter_valueConvertNo() {
-		int docOrdinal = docCount() - 2;
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void lessThan_withDslConverter_valueConvertNo(DataSet<F> dataSet) {
+		int docOrdinal = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( customDslConverterFieldPath() )
-						.lessThan( value( docOrdinal ), ValueConvert.NO ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( null, docOrdinal - 1 ) );
+				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
+						.lessThan( value( docOrdinal, dataSet ), ValueConvert.NO ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( null, docOrdinal - 1, dataSet ) );
 	}
 
-	@Test
-	public void between() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void between(DataSet<F> dataSet) {
 		int lowerValueNumber = 1;
-		int upperValueNumber = docCount() - 2;
+		int upperValueNumber = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( defaultDslConverterFieldPath() )
-						.between( value( lowerValueNumber ), value( upperValueNumber ) ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber, upperValueNumber ) );
+				.where( f -> f.range().field( defaultDslConverterFieldPath( dataSet ) )
+						.between( value( lowerValueNumber, dataSet ), value( upperValueNumber, dataSet ) ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber, upperValueNumber, dataSet ) );
 	}
 
-	@Test
-	public void between_withDslConverter_valueConvertDefault() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void between_withDslConverter_valueConvertDefault(DataSet<F> dataSet) {
 		int lowerValueNumber = 1;
-		int upperValueNumber = docCount() - 2;
+		int upperValueNumber = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( customDslConverterFieldPath() )
-						.between( wrappedValue( lowerValueNumber ), wrappedValue( upperValueNumber ) ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber, upperValueNumber ) );
+				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
+						.between( wrappedValue( lowerValueNumber, dataSet ), wrappedValue( upperValueNumber, dataSet ) ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber, upperValueNumber, dataSet ) );
 	}
 
-	@Test
-	public void between_withDslConverter_valueConvertNo() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void between_withDslConverter_valueConvertNo(DataSet<F> dataSet) {
 		int lowerValueNumber = 1;
-		int upperValueNumber = docCount() - 2;
+		int upperValueNumber = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( customDslConverterFieldPath() )
-						.between( value( lowerValueNumber ), value( upperValueNumber ),
+				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
+						.between( value( lowerValueNumber, dataSet ), value( upperValueNumber, dataSet ),
 								ValueConvert.NO ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber, upperValueNumber ) );
+				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber, upperValueNumber, dataSet ) );
 	}
 
-	@Test
-	public void between_boundInclusion() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void between_boundInclusion(DataSet<F> dataSet) {
 		int lowerValueNumber = 1;
-		int upperValueNumber = docCount() - 2;
+		int upperValueNumber = docCount( dataSet ) - 2;
 
 		// Default is including both bounds
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( defaultDslConverterFieldPath() )
-						.between( value( lowerValueNumber ), value( upperValueNumber ) ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber, upperValueNumber ) );
+				.where( f -> f.range().field( defaultDslConverterFieldPath( dataSet ) )
+						.between( value( lowerValueNumber, dataSet ), value( upperValueNumber, dataSet ) ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber, upperValueNumber, dataSet ) );
 
 		// explicit exclusion for the lower bound
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( defaultDslConverterFieldPath() )
-						.between( value( lowerValueNumber ), RangeBoundInclusion.EXCLUDED,
-								value( upperValueNumber ), RangeBoundInclusion.INCLUDED ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber + 1, upperValueNumber ) );
+				.where( f -> f.range().field( defaultDslConverterFieldPath( dataSet ) )
+						.between( value( lowerValueNumber, dataSet ), RangeBoundInclusion.EXCLUDED,
+								value( upperValueNumber, dataSet ), RangeBoundInclusion.INCLUDED ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber + 1, upperValueNumber, dataSet ) );
 
 		// explicit exclusion for the upper bound
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( defaultDslConverterFieldPath() )
-						.between( value( lowerValueNumber ), RangeBoundInclusion.INCLUDED,
-								value( upperValueNumber ), RangeBoundInclusion.EXCLUDED ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber, upperValueNumber - 1 ) );
+				.where( f -> f.range().field( defaultDslConverterFieldPath( dataSet ) )
+						.between( value( lowerValueNumber, dataSet ), RangeBoundInclusion.INCLUDED,
+								value( upperValueNumber, dataSet ), RangeBoundInclusion.EXCLUDED ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber, upperValueNumber - 1, dataSet ) );
 
 		// explicit inclusion for both bounds
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( defaultDslConverterFieldPath() )
-						.between( value( lowerValueNumber ), RangeBoundInclusion.INCLUDED,
-								value( upperValueNumber ), RangeBoundInclusion.INCLUDED ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber, upperValueNumber ) );
+				.where( f -> f.range().field( defaultDslConverterFieldPath( dataSet ) )
+						.between( value( lowerValueNumber, dataSet ), RangeBoundInclusion.INCLUDED,
+								value( upperValueNumber, dataSet ), RangeBoundInclusion.INCLUDED ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber, upperValueNumber, dataSet ) );
 
 		// explicit exclusion for both bounds
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( defaultDslConverterFieldPath() )
-						.between( value( lowerValueNumber ), RangeBoundInclusion.EXCLUDED,
-								value( upperValueNumber ), RangeBoundInclusion.EXCLUDED ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber + 1, upperValueNumber - 1 ) );
+				.where( f -> f.range().field( defaultDslConverterFieldPath( dataSet ) )
+						.between( value( lowerValueNumber, dataSet ), RangeBoundInclusion.EXCLUDED,
+								value( upperValueNumber, dataSet ), RangeBoundInclusion.EXCLUDED ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( lowerValueNumber + 1, upperValueNumber - 1, dataSet ) );
 	}
 
-	@Test
-	public void between_nullBounds() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void between_nullBounds(DataSet<F> dataSet) {
 		int lowerDocOrdinal = 1;
-		int upperDocOrdinal = docCount() - 2;
+		int upperDocOrdinal = docCount( dataSet ) - 2;
 
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( defaultDslConverterFieldPath() )
-						.between( value( lowerDocOrdinal ), null ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( lowerDocOrdinal, null ) );
+				.where( f -> f.range().field( defaultDslConverterFieldPath( dataSet ) )
+						.between( value( lowerDocOrdinal, dataSet ), null ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( lowerDocOrdinal, null, dataSet ) );
 
 		assertThatQuery( index.query()
-				.where( f -> f.range().field( defaultDslConverterFieldPath() )
-						.between( null, value( upperDocOrdinal ) ) ) )
-				.hasDocRefHitsAnyOrder( docIdRange( null, upperDocOrdinal ) );
+				.where( f -> f.range().field( defaultDslConverterFieldPath( dataSet ) )
+						.between( null, value( upperDocOrdinal, dataSet ) ) ) )
+				.hasDocRefHitsAnyOrder( docIdRange( null, upperDocOrdinal, dataSet ) );
 	}
 
-	private String defaultDslConverterFieldPath() {
+	private String defaultDslConverterFieldPath(DataSet<F> dataSet) {
 		return index.binding().defaultDslConverterField.get( dataSet.fieldType ).relativeFieldName;
 	}
 
-	private String customDslConverterFieldPath() {
+	private String customDslConverterFieldPath(DataSet<F> dataSet) {
 		return index.binding().customDslConverterField.get( dataSet.fieldType ).relativeFieldName;
 	}
 
-	private Consumer<NormalizedDocRefHit.Builder> docIdRange(Integer firstIncludedOrNull, Integer lastIncludedOrNull) {
+	private Consumer<NormalizedDocRefHit.Builder> docIdRange(Integer firstIncludedOrNull, Integer lastIncludedOrNull,
+			DataSet<F> dataSet) {
 		int firstIncluded = firstIncludedOrNull == null ? 0 : firstIncludedOrNull;
-		int lastIncluded = lastIncludedOrNull == null ? docCount() - 1 : lastIncludedOrNull;
+		int lastIncluded = lastIncludedOrNull == null ? docCount( dataSet ) - 1 : lastIncludedOrNull;
 		return b -> {
 			for ( int i = firstIncluded; i <= lastIncluded; i++ ) {
 				b.doc( index.typeName(), dataSet.docId( i ) );
@@ -290,15 +300,15 @@ public class RangePredicateSpecificsIT<F> {
 		};
 	}
 
-	private F value(int docOrdinal) {
+	private F value(int docOrdinal, DataSet<F> dataSet) {
 		return dataSet.values.matchingValue( docOrdinal );
 	}
 
-	private ValueWrapper<F> wrappedValue(int docOrdinal) {
-		return new ValueWrapper<>( value( docOrdinal ) );
+	private ValueWrapper<F> wrappedValue(int docOrdinal, DataSet<F> dataSet) {
+		return new ValueWrapper<>( value( docOrdinal, dataSet ) );
 	}
 
-	private int docCount() {
+	private int docCount(DataSet<F> dataSet) {
 		return dataSet.values.size();
 	}
 

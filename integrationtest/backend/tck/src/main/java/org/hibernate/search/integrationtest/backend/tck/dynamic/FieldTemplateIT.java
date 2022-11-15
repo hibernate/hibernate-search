@@ -31,17 +31,17 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldLocation;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests for fields defined through field templates.
@@ -56,16 +56,14 @@ import org.junit.runners.Parameterized;
  * We do not test all features (sorts, aggregations, ...) because we expect the backend
  * to rely on the same generic code for all features.
  */
-@RunWith(Parameterized.class)
-public class FieldTemplateIT {
+class FieldTemplateIT {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] parameters() {
-		List<Object[]> parameters = new ArrayList<>();
+	public static List<? extends Arguments> params() {
+		List<Arguments> parameters = new ArrayList<>();
 		for ( TestedFieldStructure fieldStructure : TestedFieldStructure.all() ) {
-			parameters.add( new Object[] { fieldStructure } );
+			parameters.add( Arguments.of( fieldStructure ) );
 		}
-		return parameters.toArray( new Object[0][] );
+		return parameters;
 	}
 
 	private static final String DOCUMENT_1 = "1";
@@ -73,20 +71,16 @@ public class FieldTemplateIT {
 
 	private static final String EMPTY = "empty";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	private final TestedFieldStructure fieldStructure;
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private SimpleMappedIndex<IndexBinding> index;
 
-	public FieldTemplateIT(TestedFieldStructure fieldStructure) {
-		this.fieldStructure = fieldStructure;
-	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3273")
-	public void simple() {
+	void simple(TestedFieldStructure fieldStructure) {
 		Consumer<IndexSchemaElement> templatesBinder = root -> {
 			IndexSchemaFieldTemplateOptionsStep<?> step =
 					root.fieldTemplate( "myTemplate", f -> f.asString() );
@@ -95,36 +89,39 @@ public class FieldTemplateIT {
 			}
 		};
 		StubMapping mapping =
-				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
+				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder,
+						fieldStructure
+				);
 
 		// Index a few documents
 		index.bulkIndexer()
 				.add( EMPTY, document -> {} )
-				.add( DOCUMENT_1, document -> initDocument( document, "foo",
+				.add( DOCUMENT_1, document -> initDocument( document, fieldStructure, "foo",
 						"matchedValue", "notMatchedValue1", "notMatchedValue2" ) )
-				.add( DOCUMENT_2, document -> initDocument( document, "foo",
+				.add( DOCUMENT_2, document -> initDocument( document, fieldStructure, "foo",
 						"notMatchedValue1", "notMatchedValue1", "matchedValue" ) )
 				.join();
 
 		// Check that documents are indexed and the dynamic field can be searched
 		assertThatQuery( query(
-				f -> f.match().field( getFieldPath( "foo" ) ).matching( "matchedValue" ) )
+				f -> f.match().field( getFieldPath( "foo", fieldStructure ) ).matching( "matchedValue" ), fieldStructure )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
 		mapping.close();
-		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder );
+		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder, fieldStructure );
 
 		assertThatQuery( query(
-				f -> f.match().field( getFieldPath( "foo" ) ).matching( "matchedValue" ) )
+				f -> f.match().field( getFieldPath( "foo", fieldStructure ) ).matching( "matchedValue" ), fieldStructure )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3273")
-	public void matchingPathGlob() {
+	void matchingPathGlob(TestedFieldStructure fieldStructure) {
 		Consumer<IndexSchemaElement> templatesBinder = root -> {
 			IndexSchemaFieldTemplateOptionsStep<?> step = root.fieldTemplate( "stringTemplate", f -> f.asString() )
 					.matchingPathGlob( "*_str" );
@@ -139,44 +136,47 @@ public class FieldTemplateIT {
 		};
 
 		StubMapping mapping =
-				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
+				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder,
+						fieldStructure
+				);
 
 		// Index a few documents
 		index.bulkIndexer()
 				.add( EMPTY, document -> {} )
-				.add( DOCUMENT_1, document -> initDocument( document, "foo_str",
+				.add( DOCUMENT_1, document -> initDocument( document, fieldStructure, "foo_str",
 						"matchedValue", "notMatchedValue1", "notMatchedValue2" ) )
-				.add( DOCUMENT_2, document -> initDocument( document, "foo_int",
+				.add( DOCUMENT_2, document -> initDocument( document, fieldStructure, "foo_int",
 						42, 52, 56 ) )
 				.join();
 
 		// Check that documents are indexed and the dynamic fields can be searched
 		assertThatQuery( query(
-				f -> f.match().field( getFieldPath( "foo_str" ) ).matching( "matchedValue" ) )
+				f -> f.match().field( getFieldPath( "foo_str", fieldStructure ) ).matching( "matchedValue" ), fieldStructure )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 		assertThatQuery( query(
-				f -> f.match().field( getFieldPath( "foo_int" ) ).matching( 42 ) )
+				f -> f.match().field( getFieldPath( "foo_int", fieldStructure ) ).matching( 42 ), fieldStructure )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
 		mapping.close();
-		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder );
+		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder, fieldStructure );
 
 		assertThatQuery( query(
-				f -> f.match().field( getFieldPath( "foo_str" ) ).matching( "matchedValue" ) )
+				f -> f.match().field( getFieldPath( "foo_str", fieldStructure ) ).matching( "matchedValue" ), fieldStructure )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 		assertThatQuery( query(
-				f -> f.match().field( getFieldPath( "foo_int" ) ).matching( 42 ) )
+				f -> f.match().field( getFieldPath( "foo_int", fieldStructure ) ).matching( 42 ), fieldStructure )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3273")
-	public void matchingPathGlob_precedence_firstDeclared() {
+	void matchingPathGlob_precedence_firstDeclared(TestedFieldStructure fieldStructure) {
 		Consumer<IndexSchemaElement> templatesBinder = root -> {
 			IndexSchemaFieldTemplateOptionsStep<?> step = root.fieldTemplate( "stringTemplate", f -> f.asString() )
 					.matchingPathGlob( "*_str_int" );
@@ -196,48 +196,55 @@ public class FieldTemplateIT {
 		};
 
 		StubMapping mapping =
-				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
+				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder,
+						fieldStructure
+				);
 
 		// Index a few documents
 		index.bulkIndexer()
 				.add( EMPTY, document -> {} )
-				.add( DOCUMENT_1, document -> initDocument( document, "foo_str_int",
+				.add( DOCUMENT_1, document -> initDocument( document, fieldStructure, "foo_str_int",
 						"42", "notMatchedValue1", "notMatchedValue2" ) )
-				.add( DOCUMENT_2, document -> initDocument( document, "foo_int",
+				.add( DOCUMENT_2, document -> initDocument( document, fieldStructure, "foo_int",
 						42, 52, 56 ) )
 				.join();
 
 		// Check that dynamic fields have the correct type
 		assertThatQuery( query(
-				f -> f.range().field( getFieldPath( "foo_str_int" ) )
-						.between( "3000", "5000" ) )
+				f -> f.range().field( getFieldPath( "foo_str_int", fieldStructure ) )
+						.between( "3000", "5000" ),
+				fieldStructure )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 		assertThatQuery( query(
-				f -> f.range().field( getFieldPath( "foo_int" ) )
-						.between( 41, 43 ) )
+				f -> f.range().field( getFieldPath( "foo_int", fieldStructure ) )
+						.between( 41, 43 ),
+				fieldStructure )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
 		mapping.close();
-		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder );
+		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder, fieldStructure );
 
 		assertThatQuery( query(
-				f -> f.range().field( getFieldPath( "foo_str_int" ) )
-						.between( "3000", "5000" ) )
+				f -> f.range().field( getFieldPath( "foo_str_int", fieldStructure ) )
+						.between( "3000", "5000" ),
+				fieldStructure )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 		assertThatQuery( query(
-				f -> f.range().field( getFieldPath( "foo_int" ) )
-						.between( 41, 43 ) )
+				f -> f.range().field( getFieldPath( "foo_int", fieldStructure ) )
+						.between( 41, 43 ),
+				fieldStructure )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4500")
-	public void parentTemplate_wrongType() {
+	void parentTemplate_wrongType(TestedFieldStructure fieldStructure) {
 		Consumer<IndexSchemaElement> templatesBinder = root -> {
 			root.fieldTemplate( "template1", f -> f.asString() );
 			IndexSchemaFieldTemplateOptionsStep<?> step =
@@ -247,29 +254,30 @@ public class FieldTemplateIT {
 				step.multiValued();
 			}
 		};
-		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
+		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder, fieldStructure );
 
 		assertThatThrownBy( () -> index.createIndexer().add( referenceProvider( DOCUMENT_1 ),
-				document -> initDocument( document, "parent.foo",
+				document -> initDocument( document, fieldStructure, "parent.foo",
 						"matchedValue", "notMatchedValue1", "notMatchedValue2"
 				),
 				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE, OperationSubmitter.blocking()
 		) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Unable to resolve field '" + getFieldPath( "parent.foo" ) + "'",
-						"Invalid type: field '" + getFieldPath( "parent" ) + "' is not composite"
+						"Unable to resolve field '" + getFieldPath( "parent.foo", fieldStructure ) + "'",
+						"Invalid type: field '" + getFieldPath( "parent", fieldStructure ) + "' is not composite"
 				);
 	}
 
 	private SearchQuery<DocumentReference> query(
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor,
+			TestedFieldStructure fieldStructure) {
 		return index.createScope().query()
 				.where( f -> {
 					if ( fieldStructure.isInNested() ) {
-						return f.nested( getParentFieldPath() )
+						return f.nested( getParentFieldPath( fieldStructure ) )
 								.add( predicateContributor )
-								.add( f.match().field( getFieldPath( "discriminator" ) )
+								.add( f.match().field( getFieldPath( "discriminator", fieldStructure ) )
 										.matching( "included" ) );
 					}
 					else {
@@ -279,8 +287,8 @@ public class FieldTemplateIT {
 				.toQuery();
 	}
 
-	private String getFieldPath(String relativeFieldName) {
-		String parentFieldPath = getParentFieldPath();
+	private String getFieldPath(String relativeFieldName, TestedFieldStructure fieldStructure) {
+		String parentFieldPath = getParentFieldPath( fieldStructure );
 		if ( parentFieldPath.isEmpty() ) {
 			return relativeFieldName;
 		}
@@ -289,7 +297,7 @@ public class FieldTemplateIT {
 		}
 	}
 
-	private String getParentFieldPath() {
+	private String getParentFieldPath(TestedFieldStructure fieldStructure) {
 		IndexBinding binding = index.binding();
 		switch ( fieldStructure.location ) {
 			case ROOT:
@@ -307,15 +315,15 @@ public class FieldTemplateIT {
 	}
 
 	private StubMapping setup(StubMappingSchemaManagementStrategy schemaManagementStrategy,
-			Consumer<IndexSchemaElement> templatesBinder) {
-		this.index = SimpleMappedIndex.of( root -> new IndexBinding( root, templatesBinder ) );
+			Consumer<IndexSchemaElement> templatesBinder, TestedFieldStructure fieldStructure) {
+		this.index = SimpleMappedIndex.of( root -> new IndexBinding( root, templatesBinder, fieldStructure ) );
 
 		return setupHelper.start().withIndex( index )
 				.withSchemaManagement( schemaManagementStrategy )
 				.setup();
 	}
 
-	private <T> void initDocument(DocumentElement document, String fieldName,
+	private <T> void initDocument(DocumentElement document, TestedFieldStructure fieldStructure, String fieldName,
 			T value1, T value2, T excludedValue) {
 		IndexBinding binding = index.binding();
 		switch ( fieldStructure.location ) {
@@ -366,13 +374,14 @@ public class FieldTemplateIT {
 		final FlattenedObjectBinding flattenedObject;
 		final NestedObjectBinding nestedObject;
 
-		IndexBinding(IndexSchemaElement root, Consumer<IndexSchemaElement> templatesBinder) {
+		IndexBinding(IndexSchemaElement root, Consumer<IndexSchemaElement> templatesBinder,
+				TestedFieldStructure fieldStructure) {
 			if ( fieldStructure.location.equals( IndexFieldLocation.ROOT ) ) {
 				templatesBinder.accept( root );
 			}
 
-			flattenedObject = new FlattenedObjectBinding( root, "flattenedObject", templatesBinder );
-			nestedObject = new NestedObjectBinding( root, "nestedObject", templatesBinder );
+			flattenedObject = new FlattenedObjectBinding( root, "flattenedObject", templatesBinder, fieldStructure );
+			nestedObject = new NestedObjectBinding( root, "nestedObject", templatesBinder, fieldStructure );
 		}
 	}
 
@@ -381,7 +390,7 @@ public class FieldTemplateIT {
 		final IndexObjectFieldReference self;
 
 		private FlattenedObjectBinding(IndexSchemaElement parent, String relativeFieldName,
-				Consumer<IndexSchemaElement> templatesBinder) {
+				Consumer<IndexSchemaElement> templatesBinder, TestedFieldStructure fieldStructure) {
 			this.relativeFieldName = relativeFieldName;
 
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectStructure.FLATTENED );
@@ -402,7 +411,7 @@ public class FieldTemplateIT {
 		final SecondLevelNestedObjectBinding nestedObject;
 
 		private NestedObjectBinding(IndexSchemaElement parent, String relativeFieldName,
-				Consumer<IndexSchemaElement> templatesBinder) {
+				Consumer<IndexSchemaElement> templatesBinder, TestedFieldStructure fieldStructure) {
 			this.relativeFieldName = relativeFieldName;
 
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectStructure.NESTED );
@@ -416,7 +425,8 @@ public class FieldTemplateIT {
 			discriminator = objectField.field( "discriminator", f -> f.asString() ).toReference();
 
 			nestedObject = new SecondLevelNestedObjectBinding( objectField, "nestedObject",
-					templatesBinder );
+					templatesBinder, fieldStructure
+			);
 		}
 	}
 
@@ -427,7 +437,7 @@ public class FieldTemplateIT {
 		final IndexFieldReference<String> discriminator;
 
 		private SecondLevelNestedObjectBinding(IndexSchemaElement parent, String relativeFieldName,
-				Consumer<IndexSchemaElement> templatesBinder) {
+				Consumer<IndexSchemaElement> templatesBinder, TestedFieldStructure fieldStructure) {
 			this.relativeFieldName = relativeFieldName;
 
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectStructure.NESTED );

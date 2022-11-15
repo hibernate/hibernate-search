@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.assertion;
 
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendSetupStrategy;
 
 import org.awaitility.Awaitility;
 

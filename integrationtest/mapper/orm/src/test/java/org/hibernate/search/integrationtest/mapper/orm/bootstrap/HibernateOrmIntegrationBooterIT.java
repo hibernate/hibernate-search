@@ -41,33 +41,30 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.Fail;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-public class HibernateOrmIntegrationBooterIT {
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
+class HibernateOrmIntegrationBooterIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
 	private final List<AutoCloseable> toClose = new ArrayList<>();
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Mock
 	private ValueReadHandle<Integer> idValueReadHandleMock;
@@ -78,8 +75,8 @@ public class HibernateOrmIntegrationBooterIT {
 	@Mock
 	private ValueHandleFactory valueHandleFactoryMock;
 
-	@After
-	public void cleanup() throws Exception {
+	@AfterEach
+	void cleanup() throws Exception {
 		try ( Closer<Exception> closer = new Closer<>() ) {
 			closer.pushAll( AutoCloseable::close, toClose );
 		}
@@ -87,7 +84,7 @@ public class HibernateOrmIntegrationBooterIT {
 
 	@Test
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void twoPhaseBoot() throws Exception {
+	void twoPhaseBoot() throws Exception {
 		CompletableFuture<BackendMappingHandle> mappingHandlePromise = new CompletableFuture<>();
 		HibernateOrmIntegrationBooter booter = createBooter( mappingHandlePromise, IndexedEntity.class );
 		Map<String, Object> booterGeneratedProperties = new LinkedHashMap<>();

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.testsupport.concurrency;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Fail.fail;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

@@ -24,31 +24,31 @@ import org.hibernate.search.engine.search.highlighter.dsl.HighlighterTagSchema;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class HighlightingDslIT {
+class HighlightingDslIT {
 
 	private static final int BOOK1_ID = 1;
 	private static final int BOOK2_ID = 2;
 	private static final int BOOK3_ID = 3;
 	private static final int BOOK4_ID = 4;
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
 			BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = setupHelper.start().setup( Book.class );
 		initData();
 	}
 
 	@Test
-	public void entryPoint() {
+	void entryPoint() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::basics[]
 			SearchSession searchSession = /* ... */ // <1>
@@ -68,7 +68,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void composite() {
+	void composite() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -93,7 +93,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void veryBasicConfig() {
+	void veryBasicConfig() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -118,7 +118,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void basicConfig() {
+	void basicConfig() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -144,7 +144,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void variousHighlighterTypesPlain() {
+	void variousHighlighterTypesPlain() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -163,7 +163,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void variousHighlighterTypesUnified() {
+	void variousHighlighterTypesUnified() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -182,7 +182,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void variousHighlighterTypesFvh() {
+	void variousHighlighterTypesFvh() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -202,7 +202,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void basicTags() {
+	void basicTags() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -222,7 +222,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void fvhTags() {
+	void fvhTags() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -256,7 +256,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void fvhSchema() {
+	void fvhSchema() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -274,7 +274,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void fvhSchemaAlternative() {
+	void fvhSchemaAlternative() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -303,7 +303,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void encoder() {
+	void encoder() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -323,7 +323,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void noMatchSize() {
+	void noMatchSize() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -346,7 +346,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void fragmentSize() {
+	void fragmentSize() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -371,7 +371,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void order() {
+	void order() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -397,7 +397,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void fragmenter() {
+	void fragmenter() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -417,7 +417,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void scannerDsl() {
+	void scannerDsl() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -448,7 +448,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void scannerLambda() {
+	void scannerLambda() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -478,7 +478,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void scannerCharacters() {
+	void scannerCharacters() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -507,7 +507,7 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void phraseLimit() {
+	void phraseLimit() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 

@@ -32,27 +32,27 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ScaledNumberFieldIT {
+class ScaledNumberFieldIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void defaultAttributes() {
+	void defaultAttributes() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -69,7 +69,7 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void name() {
+	void name() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -86,7 +86,7 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void name_invalid_dot() {
+	void name_invalid_dot() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -107,7 +107,7 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void validDecimalScales_bigDecimals() {
+	void validDecimalScales_bigDecimals() {
 
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
@@ -131,7 +131,7 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void validDecimalScales_bigIntegers() {
+	void validDecimalScales_bigIntegers() {
 
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
@@ -155,7 +155,7 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void defaultBridge_invalidFieldType() {
+	void defaultBridge_invalidFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -184,7 +184,7 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void searchable() {
+	void searchable() {
 
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
@@ -211,7 +211,7 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void aggregable() {
+	void aggregable() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -237,7 +237,7 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void customBridge_implicitFieldType() {
+	void customBridge_implicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -254,7 +254,7 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void customBridge_explicitFieldType() {
+	void customBridge_explicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -272,7 +272,7 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void customBridge_withParams_annotationMapping() {
+	void customBridge_withParams_annotationMapping() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -316,7 +316,7 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void customBridge_withParams_programmaticMapping() {
+	void customBridge_withParams_programmaticMapping() {
 		class IndexedEntity {
 			Integer id;
 			WrappedValue wrap;
@@ -365,7 +365,7 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void customBridge_implicitFieldType_invalid() {
+	void customBridge_implicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -392,7 +392,7 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void customBridge_explicitFieldType_invalid() {
+	void customBridge_explicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -421,7 +421,7 @@ public class ScaledNumberFieldIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3243")
-	public void customBridge_implicitFieldType_generic() {
+	void customBridge_implicitFieldType_generic() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId

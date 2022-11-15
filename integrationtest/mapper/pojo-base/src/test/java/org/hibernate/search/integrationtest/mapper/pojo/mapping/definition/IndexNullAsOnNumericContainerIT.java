@@ -15,12 +15,12 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests a corner case that used to not work well in Search 5
@@ -29,17 +29,17 @@ import org.junit.Test;
  * would result in indexNullAs being interpreted as a string rather than the numeric type.
  */
 @TestForIssue(jiraKey = "HSEARCH-2663")
-public class IndexNullAsOnNumericContainerIT {
+class IndexNullAsOnNumericContainerIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void test() {
+	void test() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				// Check that the field has type Integer and has an Integer indexNullAs value
 				.field( "integerList", Integer.class, b2 -> b2.indexNullAs( 42 ).multiValued( true ) )

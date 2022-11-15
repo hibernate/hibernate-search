@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.sharding;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,27 +20,27 @@ import java.util.Map;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * A basic test for hash-based sharding with document IDs (without routing keys).
  */
 @PortedFromSearch5(original = "org.hibernate.search.test.shards.ShardsTest")
-public class ShardingHashDocumentIdIT extends AbstractShardingIT {
+class ShardingHashDocumentIdIT extends AbstractShardingIT {
 
 	private static final int SHARD_COUNT = 3;
 	// Create more document than shards, so that multiple documents end up in the same shard, like in real life
 	private static final int ESTIMATED_DOCUMENT_COUNT_PER_SHARD = 100;
 	private static final int TOTAL_DOCUMENT_COUNT = SHARD_COUNT * ESTIMATED_DOCUMENT_COUNT_PER_SHARD;
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper(
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create(
 			tckBackendHelper -> tckBackendHelper.createHashBasedShardingBackendSetupStrategy( SHARD_COUNT )
 	);
 
@@ -51,8 +51,8 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 		super( RoutingMode.DOCUMENT_IDS );
 	}
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		// Do not provide explicit routing keys when indexing; the backend should fall back to using IDs
@@ -69,7 +69,7 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3314")
-	public void search() {
+	void search() {
 		// No routing key => all documents should be returned
 		assertThatQuery( index.createScope().query()
 				.where( f -> f.matchAll() )
@@ -104,7 +104,7 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3824")
-	public void purgeWithRoutingKey() {
+	void purgeWithRoutingKey() {
 		assumePurgeSupported();
 
 		Iterator<String> iterator = docIds.iterator();
@@ -124,8 +124,8 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 
 	private void assumePurgeSupported() {
 		assumeTrue(
-				"This test only makes sense if the backend supports explicit purge",
-				TckConfiguration.get().getBackendFeatures().supportsExplicitPurge()
+				TckConfiguration.get().getBackendFeatures().supportsExplicitPurge(),
+				"This test only makes sense if the backend supports explicit purge"
 		);
 	}
 

@@ -12,9 +12,9 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubNextScrollWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubNextScrollWorkBehavior;
 
-public class SearchQueryEntityLoadingScrollingIT extends SearchQueryEntityLoadingBaseIT {
+class SearchQueryEntityLoadingScrollingIT extends SearchQueryEntityLoadingBaseIT {
 
 	@Override
 	protected <T2> List<T2> getHits(List<String> targetIndexes, SearchQuery<T2> query,

@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
@@ -15,20 +16,19 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.test.runner.nested.Nested;
-import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.provider.Arguments;
 
-@RunWith(NestedRunner.class)
-public class SpatialWithinPolygonPredicateBaseIT {
+//CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
+// cannot make a private constructor.
+class SpatialWithinPolygonPredicateBaseIT {
+	//CHECKSTYLE:ON
 
 	private static final GeoPointFieldTypeDescriptor supportedFieldType;
 	private static final List<FieldTypeDescriptor<GeoPoint>> supportedFieldTypes = new ArrayList<>();
@@ -43,11 +43,11 @@ public class SpatialWithinPolygonPredicateBaseIT {
 		}
 	}
 
-	@ClassRule
-	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start()
 				.withIndexes(
 						SingleFieldIT.index, MultiFieldIT.index,
@@ -103,64 +103,63 @@ public class SpatialWithinPolygonPredicateBaseIT {
 				GeoPoint.of( 0.0, 1.0 ), GeoPoint.of( 0.0, 0.0 ) );
 	}
 
-	@Test
-	public void takariCpSuiteWorkaround() {
-		// Workaround to get Takari-CPSuite to run this test.
-	}
-
 	@Nested
-	public static class SingleFieldIT extends AbstractPredicateSingleFieldIT<SpatialWithinPolygonPredicateTestValues> {
+	class SingleFieldIT extends AbstractPredicateSingleFieldIT<SpatialWithinPolygonPredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinPolygonPredicateTestValues> dataSet = new DataSet<>( testValues() );
 
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "singleField" );
 
-		public SingleFieldIT() {
-			super( index, dataSet );
+		public static List<? extends Arguments> params() {
+			return Arrays.asList( Arguments.of( index, dataSet ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+				DataSet<?, SpatialWithinPolygonPredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath )
-					.polygon( dataSet.values.matchingArg( matchingDocOrdinal ) );
+					.polygon( SingleFieldIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
 
 	@Nested
-	public static class MultiFieldIT extends AbstractPredicateMultiFieldIT<SpatialWithinPolygonPredicateTestValues> {
+	class MultiFieldIT extends AbstractPredicateMultiFieldIT<SpatialWithinPolygonPredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinPolygonPredicateTestValues> dataSet = new DataSet<>( testValues() );
 
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "multiField" );
 
-		public MultiFieldIT() {
-			super( index, dataSet );
+		public static List<? extends Arguments> params() {
+			return Arrays.asList( Arguments.of( index, dataSet ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory f, String fieldPath,
-				String otherFieldPath, int matchingDocOrdinal) {
+				String otherFieldPath, int matchingDocOrdinal, DataSet<?, SpatialWithinPolygonPredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).field( otherFieldPath )
-					.polygon( dataSet.values.matchingArg( matchingDocOrdinal ) );
+					.polygon( MultiFieldIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths, int matchingDocOrdinal) {
-			return f.spatial().within().fields( fieldPaths ).polygon( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths, int matchingDocOrdinal,
+				DataSet<?, SpatialWithinPolygonPredicateTestValues> dataSet) {
+			return f.spatial().within().fields( fieldPaths )
+					.polygon( MultiFieldIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory f, String fieldPath,
-				String[] fieldPaths, int matchingDocOrdinal) {
+				String[] fieldPaths, int matchingDocOrdinal,
+				DataSet<?, SpatialWithinPolygonPredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).fields( fieldPaths )
-					.polygon( dataSet.values.matchingArg( matchingDocOrdinal ) );
+					.polygon( MultiFieldIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
 
 	@Nested
-	public static class InObjectFieldIT
+	class InObjectFieldIT
 			extends AbstractPredicateFieldInObjectFieldIT<SpatialWithinPolygonPredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinPolygonPredicateTestValues> dataSet =
 				new DataSet<>( testValues() );
@@ -173,80 +172,86 @@ public class SpatialWithinPolygonPredicateBaseIT {
 				SimpleMappedIndex.of( root -> new MissingFieldIndexBinding( root, supportedFieldTypes ) )
 						.name( "nesting_missingField" );
 
-		public InObjectFieldIT() {
-			super( mainIndex, missingFieldIndex, dataSet );
+		public static List<? extends Arguments> params() {
+			return Arrays.asList( Arguments.of( mainIndex, missingFieldIndex, dataSet ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
-			return f.spatial().within().field( fieldPath ).polygon( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+				DataSet<?, SpatialWithinPolygonPredicateTestValues> dataSet) {
+			return f.spatial().within().field( fieldPath )
+					.polygon( InObjectFieldIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
 
 	@Nested
-	public static class ScoreIT extends AbstractPredicateFieldScoreIT<SpatialWithinPolygonPredicateTestValues> {
+	class ScoreIT extends AbstractPredicateFieldScoreIT<SpatialWithinPolygonPredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinPolygonPredicateTestValues> dataSet = new DataSet<>( testValues() );
 
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "score" );
 
-		public ScoreIT() {
-			super( index, dataSet );
+		public static List<? extends Arguments> params() {
+			return Arrays.asList( Arguments.of( index, dataSet ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
-			return f.spatial().within().field( fieldPath ).polygon( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+				DataSet<?, SpatialWithinPolygonPredicateTestValues> dataSet) {
+			return f.spatial().within().field( fieldPath ).polygon( ScoreIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, String[] fieldPaths,
-				int matchingDocOrdinal) {
+				int matchingDocOrdinal, DataSet<?, SpatialWithinPolygonPredicateTestValues> dataSet) {
 			return f.spatial().within().fields( fieldPaths )
-					.polygon( dataSet.values.matchingArg( matchingDocOrdinal ) ).constantScore();
+					.polygon( ScoreIT.dataSet.values.matchingArg( matchingDocOrdinal ) ).constantScore();
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory f, String[] fieldPaths,
-				int matchingDocOrdinal, float predicateBoost) {
+				int matchingDocOrdinal, float predicateBoost, DataSet<?, SpatialWithinPolygonPredicateTestValues> dataSet) {
 			return f.spatial().within().fields( fieldPaths )
-					.polygon( dataSet.values.matchingArg( matchingDocOrdinal ) ).boost( predicateBoost );
+					.polygon( ScoreIT.dataSet.values.matchingArg( matchingDocOrdinal ) ).boost( predicateBoost );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory f,
-				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost) {
+				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost,
+				DataSet<?, SpatialWithinPolygonPredicateTestValues> dataSet) {
 			return f.spatial().within().fields( fieldPaths )
-					.polygon( dataSet.values.matchingArg( matchingDocOrdinal ) )
+					.polygon( ScoreIT.dataSet.values.matchingArg( matchingDocOrdinal ) )
 					.constantScore().boost( predicateBoost );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory f, String fieldPath,
-				float fieldBoost, int matchingDocOrdinal) {
+				float fieldBoost, int matchingDocOrdinal, DataSet<?, SpatialWithinPolygonPredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).boost( fieldBoost )
-					.polygon( dataSet.values.matchingArg( matchingDocOrdinal ) );
+					.polygon( ScoreIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory f,
-				String fieldPath, float fieldBoost, int matchingDocOrdinal) {
+				String fieldPath, float fieldBoost, int matchingDocOrdinal,
+				DataSet<?, SpatialWithinPolygonPredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).boost( fieldBoost )
-					.polygon( dataSet.values.matchingArg( matchingDocOrdinal ) )
+					.polygon( ScoreIT.dataSet.values.matchingArg( matchingDocOrdinal ) )
 					.constantScore();
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(SearchPredicateFactory f,
-				String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost) {
+				String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost,
+				DataSet<?, SpatialWithinPolygonPredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).boost( fieldBoost )
-					.polygon( dataSet.values.matchingArg( matchingDocOrdinal ) ).boost( predicateBoost );
+					.polygon( ScoreIT.dataSet.values.matchingArg( matchingDocOrdinal ) ).boost( predicateBoost );
 		}
 	}
 
 	@Nested
-	public static class InvalidFieldIT extends AbstractPredicateInvalidFieldIT {
+	class InvalidFieldIT extends AbstractPredicateInvalidFieldIT {
 		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
 				.name( "invalidField" );
 
@@ -268,26 +273,20 @@ public class SpatialWithinPolygonPredicateBaseIT {
 	}
 
 	@Nested
-	@RunWith(Parameterized.class)
-	public static class UnsupportedTypeIT extends AbstractPredicateUnsupportedTypeIT {
-		private static final List<Object[]> parameters = new ArrayList<>();
-		static {
-			for ( FieldTypeDescriptor<?> fieldType : unsupportedFieldTypes ) {
-				parameters.add( new Object[] { fieldType } );
-			}
-		}
-
+	class UnsupportedTypeIT extends AbstractPredicateUnsupportedTypeIT {
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, unsupportedFieldTypes ) )
 						.name( "unsupportedType" );
 
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
-			return parameters;
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : unsupportedFieldTypes ) {
+				parameters.add( Arguments.of( index, fieldType ) );
+			}
 		}
 
-		public UnsupportedTypeIT(FieldTypeDescriptor<?> fieldType) {
-			super( index, fieldType );
+		public static List<? extends Arguments> params() {
+			return parameters;
 		}
 
 		@Override
@@ -304,7 +303,7 @@ public class SpatialWithinPolygonPredicateBaseIT {
 	}
 
 	@Nested
-	public static class SearchableIT extends AbstractPredicateSearchableIT {
+	class SearchableIT extends AbstractPredicateSearchableIT {
 		private static final SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex =
 				SimpleMappedIndex.of( root -> new SearchableYesIndexBinding( root, supportedFieldTypes ) )
 						.name( "searchableYes" );
@@ -313,8 +312,8 @@ public class SpatialWithinPolygonPredicateBaseIT {
 				SimpleMappedIndex.of( root -> new SearchableNoIndexBinding( root, supportedFieldTypes ) )
 						.name( "searchableNo" );
 
-		public SearchableIT() {
-			super( searchableYesIndex, searchableNoIndex, supportedFieldType );
+		public static List<? extends Arguments> params() {
+			return Arrays.asList( Arguments.of( searchableYesIndex, searchableNoIndex, supportedFieldType ) );
 		}
 
 		@Override
@@ -331,13 +330,13 @@ public class SpatialWithinPolygonPredicateBaseIT {
 	}
 
 	@Nested
-	public static class ArgumentCheckingIT extends AbstractPredicateArgumentCheckingIT {
+	class ArgumentCheckingIT extends AbstractPredicateArgumentCheckingIT {
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "argumentChecking" );
 
-		public ArgumentCheckingIT() {
-			super( index, supportedFieldType );
+		public static List<? extends Arguments> params() {
+			return Arrays.asList( Arguments.of( index, supportedFieldType ) );
 		}
 
 		@Override
@@ -347,7 +346,7 @@ public class SpatialWithinPolygonPredicateBaseIT {
 	}
 
 	@Nested
-	public static class TypeCheckingNoConversionIT
+	class TypeCheckingNoConversionIT
 			extends AbstractPredicateTypeCheckingNoConversionIT<SpatialWithinPolygonPredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinPolygonPredicateTestValues> dataSet = new DataSet<>( testValues() );
 
@@ -367,20 +366,25 @@ public class SpatialWithinPolygonPredicateBaseIT {
 				SimpleMappedIndex.of( root -> new IncompatibleIndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_incompatible" );
 
-		public TypeCheckingNoConversionIT() {
-			super( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex, incompatibleIndex, dataSet );
+		public static List<? extends Arguments> params() {
+			return Arrays.asList(
+					Arguments.of( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex, incompatibleIndex,
+							dataSet
+					) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
-			return f.spatial().within().field( fieldPath ).polygon( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+				DataSet<?, SpatialWithinPolygonPredicateTestValues> dataSet) {
+			return f.spatial().within().field( fieldPath )
+					.polygon( TypeCheckingNoConversionIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
-				int matchingDocOrdinal) {
+				int matchingDocOrdinal, DataSet<?, SpatialWithinPolygonPredicateTestValues> dataSet) {
 			return f.spatial().within().field( field0Path ).field( field1Path )
-					.polygon( dataSet.values.matchingArg( matchingDocOrdinal ) );
+					.polygon( TypeCheckingNoConversionIT.dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override

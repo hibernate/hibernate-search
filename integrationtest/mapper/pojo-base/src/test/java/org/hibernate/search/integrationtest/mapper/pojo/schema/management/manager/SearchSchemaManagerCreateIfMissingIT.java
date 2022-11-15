@@ -7,10 +7,10 @@
 package org.hibernate.search.integrationtest.mapper.pojo.schema.management.manager;
 
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
-import org.hibernate.search.util.impl.integrationtest.common.rule.SchemaManagementWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.SchemaManagementWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 
-public class SearchSchemaManagerCreateIfMissingIT extends AbstractSearchSchemaManagerSimpleOperationIT {
+class SearchSchemaManagerCreateIfMissingIT extends AbstractSearchSchemaManagerSimpleOperationIT {
 
 	@Override
 	protected void execute(SearchSchemaManager manager) {

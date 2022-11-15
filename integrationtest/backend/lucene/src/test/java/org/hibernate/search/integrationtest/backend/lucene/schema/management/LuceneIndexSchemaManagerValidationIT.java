@@ -13,25 +13,25 @@ import java.io.IOException;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class LuceneIndexSchemaManagerValidationIT {
+class LuceneIndexSchemaManagerValidationIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3759")
-	public void doesNotExist() throws IOException {
+	void doesNotExist() throws IOException {
 		assertThat( indexExists() ).isFalse();
 
 		setup();
@@ -55,7 +55,7 @@ public class LuceneIndexSchemaManagerValidationIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3759")
-	public void alreadyExists() throws IOException {
+	void alreadyExists() throws IOException {
 		assertThat( indexExists() ).isFalse();
 
 		setup();

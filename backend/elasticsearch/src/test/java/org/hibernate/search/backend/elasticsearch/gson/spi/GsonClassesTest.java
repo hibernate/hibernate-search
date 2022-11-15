@@ -23,8 +23,8 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.test.jar.JandexTestUtils;
 import org.hibernate.search.util.impl.test.logging.Log;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.ClassInfo;
@@ -35,13 +35,13 @@ import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
 
-public class GsonClassesTest {
+class GsonClassesTest {
 
 	private static Index gsonIndex;
 	private static Index backendElasticsearchIndex;
 
-	@BeforeClass
-	public static void index() throws IOException {
+	@BeforeAll
+	static void index() throws IOException {
 		gsonIndex = readOrBuildIndex( codeSourceLocation( Gson.class )
 				.orElseThrow( () -> new AssertionFailure( "Could not find Gson JAR?" ) ) );
 		backendElasticsearchIndex = readOrBuildIndex( codeSourceLocation( ElasticsearchExtension.class )
@@ -49,7 +49,7 @@ public class GsonClassesTest {
 	}
 
 	@Test
-	public void testNoMissingGsonAnnotatedClass() {
+	void testNoMissingGsonAnnotatedClass() {
 		Set<DotName> gsonAnnotations = findRuntimeAnnotations( gsonIndex );
 
 		Set<DotName> annotatedClasses = new HashSet<>();
@@ -69,7 +69,7 @@ public class GsonClassesTest {
 	}
 
 	@Test
-	public void testNoMissingGsonContractImplementations() {
+	void testNoMissingGsonContractImplementations() {
 		List<DotName> gsonContracts = Arrays.asList(
 				DotName.createSimple( TypeAdapterFactory.class.getName() ),
 				DotName.createSimple( TypeAdapter.class.getName() )

@@ -10,12 +10,12 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 
 import java.util.Arrays;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test the DSL when the id of the entity is stored as a different type.
@@ -24,34 +24,34 @@ import org.junit.Test;
  * as a string with the prefix `document`. In the DSL the user will still use the integer type when
  * looking for entities matching an id.
  */
-public class MatchIdPredicateConverterIT {
+class MatchIdPredicateConverterIT {
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
 	private static final String DOCUMENT_3 = "document3";
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final StubMappedIndex index = StubMappedIndex.ofAdvancedNonRetrievable( ctx -> ctx
 			.idDslConverter( Integer.class, (value, context) -> "document" + value ) );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
-	public void match_id() {
+	void match_id() {
 		assertThatQuery( index.query()
 				.where( f -> f.id().matching( 1 ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
-	public void match_multiple_ids() {
+	void match_multiple_ids() {
 		assertThatQuery( index.query()
 				.where( f -> f.id()
 						.matching( 1 )
@@ -60,7 +60,7 @@ public class MatchIdPredicateConverterIT {
 	}
 
 	@Test
-	public void match_any_and_match_single_id() {
+	void match_any_and_match_single_id() {
 		assertThatQuery( index.query()
 				.where( f -> f.id()
 						.matching( 2 )
@@ -69,7 +69,7 @@ public class MatchIdPredicateConverterIT {
 	}
 
 	@Test
-	public void match_any_single_id() {
+	void match_any_single_id() {
 		assertThatQuery( index.query()
 				.where( f -> f.id()
 						.matchingAny( Arrays.asList( 1 ) ) ) )
@@ -77,7 +77,7 @@ public class MatchIdPredicateConverterIT {
 	}
 
 	@Test
-	public void match_any_ids() {
+	void match_any_ids() {
 		assertThatQuery( index.query()
 				.where( f -> f.id()
 						.matchingAny( Arrays.asList( 1, 3 ) ) ) )

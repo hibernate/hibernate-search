@@ -28,17 +28,17 @@ import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescript
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldLocation;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.assertj.core.api.Assertions;
 
@@ -48,41 +48,34 @@ import org.assertj.core.api.Assertions;
  * Tests for type-related features are located in {@link IndexValueFieldTypeDescriptorBaseIT}
  * and {@link IndexObjectFieldTypeDescriptorBaseIT}.
  */
-@RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-3589")
-public class IndexFieldDescriptorIT {
+class IndexFieldDescriptorIT {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] parameters() {
-		List<Object[]> parameters = new ArrayList<>();
+	public static List<? extends Arguments> params() {
+		List<Arguments> parameters = new ArrayList<>();
 		for ( TestedFieldStructure fieldStructure : TestedFieldStructure.all() ) {
-			parameters.add( new Object[] { fieldStructure } );
+			parameters.add( Arguments.of( fieldStructure ) );
 		}
-		return parameters.toArray( new Object[0][] );
+		return parameters;
 	}
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.NONE )
 				.setup();
 	}
 
-	private final TestedFieldStructure fieldStructure;
-
-	public IndexFieldDescriptorIT(TestedFieldStructure fieldStructure) {
-		this.fieldStructure = fieldStructure;
-	}
-
-	@Test
-	public void valueField() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void valueField(TestedFieldStructure fieldStructure) {
 		IndexDescriptor indexDescriptor = index.toApi().descriptor();
-		IndexFieldDescriptor baseFieldDescriptor = indexDescriptor.field( getAbsoluteFieldPath() ).get();
+		IndexFieldDescriptor baseFieldDescriptor = indexDescriptor.field( getAbsoluteFieldPath( fieldStructure ) ).get();
 
 		// Basic getters
 		assertThat( baseFieldDescriptor )
@@ -94,12 +87,12 @@ public class IndexFieldDescriptorIT {
 		assertThatThrownBy( fieldDescriptor::toObjectField )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Invalid type: field '" + getAbsoluteFieldPath() + "' is not an object field"
+						"Invalid type: field '" + getAbsoluteFieldPath( fieldStructure ) + "' is not an object field"
 				);
 
 		assertThat( fieldDescriptor )
-				.returns( getRelativeFieldName(), IndexFieldDescriptor::relativeName )
-				.returns( getAbsoluteFieldPath(), IndexFieldDescriptor::absolutePath )
+				.returns( getRelativeFieldName( fieldStructure ), IndexFieldDescriptor::relativeName )
+				.returns( getAbsoluteFieldPath( fieldStructure ), IndexFieldDescriptor::absolutePath )
 				.returns( fieldStructure.isMultiValued(), IndexFieldDescriptor::multiValued )
 				// In this specific test, we decided that nested fields are multi-valued, while flattened fields are not.
 				// That's just a detail though: the two characteristics are not usually related.
@@ -112,10 +105,11 @@ public class IndexFieldDescriptorIT {
 		assertThat( type ).isNotNull();
 	}
 
-	@Test
-	public void parent() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void parent(TestedFieldStructure fieldStructure) {
 		IndexDescriptor indexDescriptor = index.toApi().descriptor();
-		IndexFieldDescriptor childFieldDescriptor = indexDescriptor.field( getAbsoluteFieldPath() ).get();
+		IndexFieldDescriptor childFieldDescriptor = indexDescriptor.field( getAbsoluteFieldPath( fieldStructure ) ).get();
 
 		IndexCompositeElementDescriptor elementDescriptor = childFieldDescriptor.parent();
 		assertThat( elementDescriptor ).isNotNull();
@@ -151,7 +145,7 @@ public class IndexFieldDescriptorIT {
 		assertThatThrownBy( fieldDescriptor::toValueField )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Invalid type: field '" + getParentAbsoluteFieldPath() + "' is not a value field"
+						"Invalid type: field '" + getParentAbsoluteFieldPath( fieldStructure ) + "' is not a value field"
 				);
 
 		// Basic getters
@@ -159,8 +153,8 @@ public class IndexFieldDescriptorIT {
 				.returns( true, IndexFieldDescriptor::isObjectField )
 				.returns( false, IndexFieldDescriptor::isValueField );
 		assertThat( fieldDescriptor )
-				.returns( getParentRelativeFieldName(), IndexFieldDescriptor::relativeName )
-				.returns( getParentAbsoluteFieldPath(), IndexFieldDescriptor::absolutePath )
+				.returns( getParentRelativeFieldName( fieldStructure ), IndexFieldDescriptor::relativeName )
+				.returns( getParentAbsoluteFieldPath( fieldStructure ), IndexFieldDescriptor::absolutePath )
 				// In this specific test, we decided that nested fields are multi-valued, while flattened fields are not.
 				// That's just a detail though: the two characteristics are not usually related.
 				.returns( fieldStructure.isInNested(), IndexFieldDescriptor::multiValued )
@@ -178,7 +172,7 @@ public class IndexFieldDescriptorIT {
 		@SuppressWarnings("unchecked") // Workaround for assertThat(Map) not taking wildcard type into account like assertThat(Collection) does
 		Map<String, IndexFieldDescriptor> castChildrenByName = (Map<String, IndexFieldDescriptor>) childrenByName;
 		assertThat( castChildrenByName )
-				.contains( entry( getRelativeFieldName(), childFieldDescriptor ) );
+				.contains( entry( getRelativeFieldName( fieldStructure ), childFieldDescriptor ) );
 
 		switch ( fieldStructure.location ) {
 			case IN_FLATTENED:
@@ -246,7 +240,7 @@ public class IndexFieldDescriptorIT {
 		}
 	}
 
-	private String getRelativeFieldName() {
+	private String getRelativeFieldName(TestedFieldStructure fieldStructure) {
 		if ( fieldStructure.isSingleValued() ) {
 			return "myField";
 		}
@@ -255,17 +249,17 @@ public class IndexFieldDescriptorIT {
 		}
 	}
 
-	private String getAbsoluteFieldPath() {
-		String parentFieldPath = getParentAbsoluteFieldPath();
+	private String getAbsoluteFieldPath(TestedFieldStructure fieldStructure) {
+		String parentFieldPath = getParentAbsoluteFieldPath( fieldStructure );
 		if ( parentFieldPath.isEmpty() ) {
-			return getRelativeFieldName();
+			return getRelativeFieldName( fieldStructure );
 		}
 		else {
-			return parentFieldPath + "." + getRelativeFieldName();
+			return parentFieldPath + "." + getRelativeFieldName( fieldStructure );
 		}
 	}
 
-	private String getParentAbsoluteFieldPath() {
+	private String getParentAbsoluteFieldPath(TestedFieldStructure fieldStructure) {
 		IndexBinding binding = index.binding();
 		switch ( fieldStructure.location ) {
 			case ROOT:
@@ -282,7 +276,7 @@ public class IndexFieldDescriptorIT {
 		}
 	}
 
-	private String getParentRelativeFieldName() {
+	private String getParentRelativeFieldName(TestedFieldStructure fieldStructure) {
 		IndexBinding binding = index.binding();
 		switch ( fieldStructure.location ) {
 			case ROOT:

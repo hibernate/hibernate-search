@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -18,68 +19,64 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingElement;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test the basic behavior of implementations of {@link DocumentElement}
  * when referencing dynamic fields using their name.
  */
-@RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-3273")
-public class DocumentElementDynamicFieldNameIT<F> {
+class DocumentElementDynamicFieldNameIT<F> {
 
 	private static List<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
 		return FieldTypeDescriptor.getAll();
 	}
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<FieldTypeDescriptor<?>> parameters() {
-		return supportedTypeDescriptors();
+	public static List<? extends Arguments> params() {
+		return supportedTypeDescriptors().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.ofAdvanced( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
-	}
-
-	private final FieldTypeDescriptor<F> fieldType;
-
-	public DocumentElementDynamicFieldNameIT(FieldTypeDescriptor<F> fieldType) {
-		this.fieldType = fieldType;
 	}
 
 	/**
 	 * Test that DocumentElement.addValue does not throw any exception when passing a non-null value.
 	 */
-	@Test
-	public void addValue_nonNull() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addValue_nonNull(FieldTypeDescriptor<F> fieldType) {
 		executeAdd( "1", document -> {
-			setNonNullValue( document );
+			setNonNullValue( document, fieldType );
 		} );
 	}
 
 	/**
 	 * Test that DocumentElement.addValue does not throw any exception when passing a null value.
 	 */
-	@Test
-	public void addValue_null() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addValue_null(FieldTypeDescriptor<F> fieldType) {
 		executeAdd( "1", document -> {
-			setNullValue( document );
+			setNullValue( document, fieldType );
 		} );
 	}
 
@@ -87,40 +84,42 @@ public class DocumentElementDynamicFieldNameIT<F> {
 	 * Test that DocumentElement.addObject does not throw any exception,
 	 * add that DocumentElement.addValue does not throw an exception for returned objects.
 	 */
-	@Test
-	public void addObject() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addObject(FieldTypeDescriptor<F> fieldType) {
 		executeAdd( "1", document -> {
-			setNullValue( document );
+			setNullValue( document, fieldType );
 
 			DocumentElement flattenedObject = document.addObject( "flattenedObject" );
-			setNonNullValue( flattenedObject );
+			setNonNullValue( flattenedObject, fieldType );
 			flattenedObject = document.addObject( "flattenedObject" );
-			setNullValue( flattenedObject );
+			setNullValue( flattenedObject, fieldType );
 			DocumentElement flattenedObjectSecondLevelObject =
 					flattenedObject.addObject( "flattenedObject" );
-			setNonNullValue( flattenedObjectSecondLevelObject );
+			setNonNullValue( flattenedObjectSecondLevelObject, fieldType );
 			flattenedObjectSecondLevelObject = flattenedObject.addObject( "nestedObject" );
-			setNullValue( flattenedObjectSecondLevelObject );
+			setNullValue( flattenedObjectSecondLevelObject, fieldType );
 
 			DocumentElement nestedObject = document.addObject( "nestedObject" );
-			setNonNullValue( nestedObject );
+			setNonNullValue( nestedObject, fieldType );
 			nestedObject = document.addObject( "nestedObject" );
-			setNullValue( nestedObject );
+			setNullValue( nestedObject, fieldType );
 			DocumentElement nestedObjectSecondLevelObject =
 					nestedObject.addObject( "flattenedObject" );
-			setNonNullValue( nestedObjectSecondLevelObject );
+			setNonNullValue( nestedObjectSecondLevelObject, fieldType );
 			nestedObjectSecondLevelObject = nestedObject.addObject( "nestedObject" );
-			setNullValue( nestedObjectSecondLevelObject );
+			setNullValue( nestedObjectSecondLevelObject, fieldType );
 		} );
 	}
 
 	/**
 	 * Test that DocumentElement.addNullObject does not throw any exception.
 	 */
-	@Test
-	public void addNullObject() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addNullObject(FieldTypeDescriptor<F> fieldType) {
 		executeAdd( "1", document -> {
-			setNullValue( document );
+			setNullValue( document, fieldType );
 
 			DocumentElement flattenedObject = document.addObject( "flattenedObject" );
 			document.addNullObject( "flattenedObject" );
@@ -143,29 +142,31 @@ public class DocumentElementDynamicFieldNameIT<F> {
 	 * adding a value to a dynamic field on an object field that excludes all static children
 	 * (due to IndexedEmbedded filters).
 	 */
-	@Test
-	public void add_excludedFields() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void add_excludedFields(FieldTypeDescriptor<F> fieldType) {
 		executeAdd( "1", document -> {
 			DocumentElement excludingObject = document.addObject( "excludingObject" );
-			setNonNullValue( excludingObject );
+			setNonNullValue( excludingObject, fieldType );
 			excludingObject = document.addObject( "excludingObject" );
-			setNullValue( excludingObject );
+			setNullValue( excludingObject, fieldType );
 
 			DocumentElement flattenedSecondLevelObject =
 					excludingObject.addObject( "flattenedObject" );
-			setNonNullValue( flattenedSecondLevelObject );
+			setNonNullValue( flattenedSecondLevelObject, fieldType );
 			flattenedSecondLevelObject = excludingObject.addObject( "flattenedObject" );
-			setNullValue( flattenedSecondLevelObject );
+			setNullValue( flattenedSecondLevelObject, fieldType );
 
 			DocumentElement nestedSecondLevelObject = excludingObject.addObject( "nestedObject" );
-			setNullValue( nestedSecondLevelObject );
+			setNullValue( nestedSecondLevelObject, fieldType );
 			nestedSecondLevelObject = excludingObject.addObject( "nestedObject" );
-			setNullValue( nestedSecondLevelObject );
+			setNullValue( nestedSecondLevelObject, fieldType );
 		} );
 	}
 
-	@Test
-	public void addValue_unknownField() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addValue_unknownField(FieldTypeDescriptor<F> fieldType) {
 		assertThatThrownBy( () -> executeAdd( "1", document -> {
 			document.addValue( "unknownField", null );
 		} ) )
@@ -176,8 +177,9 @@ public class DocumentElementDynamicFieldNameIT<F> {
 				);
 	}
 
-	@Test
-	public void addObject_unknownField() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addObject_unknownField(FieldTypeDescriptor<F> fieldType) {
 		assertThatThrownBy( () -> executeAdd( "1", document -> {
 			document.addObject( "unknownField" );
 		} ) )
@@ -188,8 +190,9 @@ public class DocumentElementDynamicFieldNameIT<F> {
 				);
 	}
 
-	@Test
-	public void addNullObject_unknownField() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addNullObject_unknownField(FieldTypeDescriptor<F> fieldType) {
 		assertThatThrownBy( () -> executeAdd( "1", document -> {
 			document.addNullObject( "unknownField" );
 		} ) )
@@ -200,12 +203,13 @@ public class DocumentElementDynamicFieldNameIT<F> {
 				);
 	}
 
-	@Test
-	public void addValue_invalidType() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addValue_invalidType(FieldTypeDescriptor<F> fieldType) {
 		FieldTypeDescriptor<?> invalidType = FieldTypeDescriptor.getIncompatible( fieldType );
 		Object valueWithInvalidType = invalidType.getIndexableValues().getSingle().get( 0 );
 
-		String relativeFieldName = getRelativeFieldName();
+		String relativeFieldName = getRelativeFieldName( fieldType );
 
 		assertThatThrownBy( () -> executeAdd( "1", document -> {
 			document.addValue( relativeFieldName, valueWithInvalidType );
@@ -219,19 +223,19 @@ public class DocumentElementDynamicFieldNameIT<F> {
 				);
 	}
 
-	private void setNonNullValue(DocumentElement document) {
-		document.addValue( getRelativeFieldName(), fieldType.getIndexableValues().getSingle().get( 0 ) );
+	private void setNonNullValue(DocumentElement document, FieldTypeDescriptor<F> fieldType) {
+		document.addValue( getRelativeFieldName( fieldType ), fieldType.getIndexableValues().getSingle().get( 0 ) );
 	}
 
-	private void setNullValue(DocumentElement document) {
-		document.addValue( getRelativeFieldName(), null );
+	private void setNullValue(DocumentElement document, FieldTypeDescriptor<F> fieldType) {
+		document.addValue( getRelativeFieldName( fieldType ), null );
 	}
 
 	private void executeAdd(String id, Consumer<DocumentElement> documentContributor) {
 		index.index( id, documentContributor::accept );
 	}
 
-	private String getRelativeFieldName() {
+	private String getRelativeFieldName(FieldTypeDescriptor<F> fieldType) {
 		// Matches the template defined in IndexBinding
 		return "foo_" + fieldType.getUniqueName();
 	}

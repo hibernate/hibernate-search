@@ -32,7 +32,7 @@ import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test explicit container value extractors for the {@code @GenericField} annotation.
@@ -40,14 +40,14 @@ import org.junit.Test;
  * Error cases are not tested here but in {@link FieldContainerExtractorBaseIT}.
  */
 @TestForIssue(jiraKey = "HSEARCH-2554")
-public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExtractorIT {
+class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExtractorIT {
 
 	public FieldContainerExtractorExplicitIT() {
 		super( new ExplicitContainerExtractorTestModelProvider() );
 	}
 
 	@Test
-	public void mapKeys() {
+	void mapKeys() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -73,7 +73,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 	}
 
 	@Test
-	public void chain_mapListKeys() {
+	void chain_mapListKeys() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -101,7 +101,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 	}
 
 	@Test
-	public void containerBridge() {
+	void containerBridge() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId

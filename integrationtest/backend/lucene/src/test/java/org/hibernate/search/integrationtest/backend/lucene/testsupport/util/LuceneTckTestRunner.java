@@ -6,20 +6,24 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
-import org.junit.extensions.cpsuite.ClasspathSuite;
-import org.junit.runner.RunWith;
+import org.junit.platform.suite.api.IncludeClassNamePatterns;
+import org.junit.platform.suite.api.SelectPackages;
+import org.junit.platform.suite.api.Suite;
+import org.junit.platform.suite.api.SuiteDisplayName;
 
 /**
  * Helper for running specific TCK tests against the Lucene backend from the IDE.
  *
- *<p>Adapt the classpath filter as needed to run a single test or an entire test package.
+ * <p>Adapt the classpath filter as needed to run a single test or an entire test package.
  *
  * @author Gunnar Morling
  */
-@RunWith(ClasspathSuite.class)
-@ClasspathSuite.ClassnameFilters({
-		"!.*\\$.*", // Exclude nested tests, typically used with NestedRunner
-		".*\\.tck\\..*"
-})
+@Suite
+@SuiteDisplayName("Lucene TCK tests Runner")
+// Defines a "root" package, subpackages are included. Use Include/Exclude ClassNamePatterns annotations to limit the executed tests:
+@SelectPackages("org.hibernate.search.integrationtest.backend.tck")
+// Default class pattern does not include IT tests, hence we want to customize it a bit:
+@IncludeClassNamePatterns({ ".*Test", ".*IT" })
 public class LuceneTckTestRunner {
+
 }

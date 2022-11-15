@@ -22,35 +22,30 @@ import org.hibernate.dialect.H2Dialect;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 
-import org.junit.After;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.params.provider.Arguments;
 
-@RunWith(Parameterized.class)
 public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStrategyTest {
 
-	@Parameterized.Parameters(name = "Reflection strategy = {0}")
-	public static List<Object[]> data() {
-		return Arrays.asList( new Object[][] {
-				{ ValueHandleFactory.usingJavaLangReflect() },
-				{ ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() ) }
-		} );
+	public static List<? extends Arguments> params() {
+		return Arrays.asList(
+				Arguments.of( ValueHandleFactory.usingJavaLangReflect() ),
+				Arguments.of( ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() ) )
+		);
 	}
 
 	private final List<AutoCloseable> toClose = new ArrayList<>();
 
-	@Parameterized.Parameter
-	public ValueHandleFactory valueHandleFactory;
-
-	@After
-	public void cleanup() throws Exception {
+	@AfterEach
+	void cleanup() throws Exception {
 		try ( Closer<Exception> closer = new Closer<>() ) {
 			closer.pushAll( AutoCloseable::close, toClose );
 		}
 	}
 
 	@SuppressWarnings("deprecation") // There's no other way to access the reflection manager
-	final HibernateOrmBootstrapIntrospector createIntrospector(Class<?>... entityClasses) {
+	final HibernateOrmBootstrapIntrospector createIntrospector(ValueHandleFactory valueHandleFactory,
+			Class<?>... entityClasses) {
 		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
 		// Some properties that are not relevant to our test, but necessary to create the Metadata
 		registryBuilder.applySetting( AvailableSettings.DIALECT, H2Dialect.class );

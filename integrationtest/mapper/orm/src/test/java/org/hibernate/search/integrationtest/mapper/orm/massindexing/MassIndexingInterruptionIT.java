@@ -28,13 +28,13 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.ThreadSpy;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.ThreadSpy;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
@@ -42,24 +42,24 @@ import org.awaitility.Awaitility;
 /**
  * Test interruption of a currently executing {@link MassIndexer}.
  */
-public class MassIndexingInterruptionIT {
+class MassIndexingInterruptionIT {
 
 	public static final String TITLE_1 = "Oliver Twist";
 	public static final String AUTHOR_1 = "Charles Dickens";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
-	public ThreadSpy threadSpy = new ThreadSpy();
+	@RegisterExtension
+	public ThreadSpy threadSpy = ThreadSpy.create();
 
 	private SessionFactory sessionFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectAnySchema( Book.INDEX );
 
 		sessionFactory = ormSetupHelper.start()
@@ -73,7 +73,7 @@ public class MassIndexingInterruptionIT {
 	}
 
 	@Test
-	public void interrupt_mainThread() {
+	void interrupt_mainThread() {
 		int expectedThreadCount = 1 // Workspace
 				+ 1 // ID loading
 				+ 1; // Entity loading
@@ -118,7 +118,7 @@ public class MassIndexingInterruptionIT {
 	}
 
 	@Test
-	public void interrupt_entityLoading() {
+	void interrupt_entityLoading() {
 		int expectedThreadCount = 1 // Workspace
 				+ 1 // ID loading
 				+ 1; // Entity loading
@@ -159,7 +159,7 @@ public class MassIndexingInterruptionIT {
 	}
 
 	@Test
-	public void cancel() {
+	void cancel() {
 		int expectedThreadCount = 1 // Coordinator
 				+ 1 // Workspace
 				+ 1 // ID loading

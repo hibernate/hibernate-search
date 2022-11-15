@@ -17,22 +17,22 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests for the legacy syntax of nested predicate definition.
  */
 @SuppressWarnings("deprecation")
-public class NestedPredicateLegacyIT {
+class NestedPredicateLegacyIT {
 
 	private static final String DOCUMENT_1 = "nestedQueryShouldMatchId";
 	private static final String DOCUMENT_2 = "nonNestedQueryShouldMatchId";
@@ -51,22 +51,22 @@ public class NestedPredicateLegacyIT {
 	private static final String NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 = "secondNonMatchingWord";
 	private static final String NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 = "secondNonMatchingWord";
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new );
 	private static final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex =
 			SimpleMappedIndex.of( MissingFieldIndexBinding::new ).name( "missingField" );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndexes( mainIndex, missingFieldIndex ).setup();
 
 		initData();
 	}
 
 	@Test
-	public void search_nestedOnTwoLevels() {
+	void search_nestedOnTwoLevels() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.and(
@@ -97,7 +97,7 @@ public class NestedPredicateLegacyIT {
 	}
 
 	@Test
-	public void search_nestedOnTwoLevels_onlySecondLevel() {
+	void search_nestedOnTwoLevels_onlySecondLevel() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.and(
 						// This is referred to as "condition 1" in the data initialization method
@@ -126,7 +126,7 @@ public class NestedPredicateLegacyIT {
 	}
 
 	@Test
-	public void search_nestedOnTwoLevels_conditionOnFirstLevel() {
+	void search_nestedOnTwoLevels_conditionOnFirstLevel() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.and(
@@ -150,7 +150,7 @@ public class NestedPredicateLegacyIT {
 	}
 
 	@Test
-	public void search_nestedOnTwoLevels_separatePredicates() {
+	void search_nestedOnTwoLevels_separatePredicates() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().nested().objectField( "nestedObject.nestedObject" )
@@ -189,7 +189,7 @@ public class NestedPredicateLegacyIT {
 	}
 
 	@Test
-	public void invalidNestedPath_parent() {
+	void invalidNestedPath_parent() {
 		String objectFieldPath = "nestedObject";
 		String fieldInParentPath = "string";
 
@@ -213,7 +213,7 @@ public class NestedPredicateLegacyIT {
 	}
 
 	@Test
-	public void invalidNestedPath_sibling() {
+	void invalidNestedPath_sibling() {
 		String objectFieldPath = "nestedObject";
 		String fieldInSiblingPath = "nestedObject2.string";
 
@@ -242,7 +242,7 @@ public class NestedPredicateLegacyIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4173")
-	public void multiIndex_missingNestedField() {
+	void multiIndex_missingNestedField() {
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
 		SearchPredicateFactory f = scope.predicate();
 		SearchPredicate nestedPredicate = f.nested().objectField( "nestedObject" )

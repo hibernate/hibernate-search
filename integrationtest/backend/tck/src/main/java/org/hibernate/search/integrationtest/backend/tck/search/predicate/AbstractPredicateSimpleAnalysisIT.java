@@ -29,7 +29,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for simple analysis support in predicates,
@@ -54,7 +54,7 @@ public abstract class AbstractPredicateSimpleAnalysisIT {
 
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.SimpleQueryStringDSLTest.testEmptyQueryString")
-	public void emptyStringBeforeAnalysis() {
+	void emptyStringBeforeAnalysis() {
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, index.binding().analyzedStringField.relativeFieldName, "" ) ) )
 				.hasNoHits();
@@ -63,14 +63,14 @@ public abstract class AbstractPredicateSimpleAnalysisIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2700")
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.SimpleQueryStringDSLTest.testBlankQueryString")
-	public void blankStringBeforeAnalysis() {
+	void blankStringBeforeAnalysis() {
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, index.binding().analyzedStringField.relativeFieldName, "   " ) ) )
 				.hasNoHits();
 	}
 
 	@Test
-	public void noTokenAfterAnalysis() {
+	void noTokenAfterAnalysis() {
 		assertThatQuery( index.query()
 				// Use a stopword, which should be removed by the analysis
 				.where( f -> predicate( f, index.binding().analyzedStringField.relativeFieldName, "a" ) ) )
@@ -78,7 +78,7 @@ public abstract class AbstractPredicateSimpleAnalysisIT {
 	}
 
 	@Test
-	public void multiIndex_incompatibleAnalyzer() {
+	void multiIndex_incompatibleAnalyzer() {
 		StubMappingScope scope = index.createScope( incompatibleSearchAnalyzerIndex );
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 
@@ -97,7 +97,7 @@ public abstract class AbstractPredicateSimpleAnalysisIT {
 	}
 
 	@Test
-	public void multiIndex_incompatibleAnalyzer_searchAnalyzer() {
+	void multiIndex_incompatibleAnalyzer_searchAnalyzer() {
 		StubMappingScope scope = index.createScope( compatibleSearchAnalyzerIndex );
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 

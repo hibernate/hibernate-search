@@ -11,7 +11,7 @@ import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
 public class MyFailureHandler implements FailureHandler {
 	// end::include[]

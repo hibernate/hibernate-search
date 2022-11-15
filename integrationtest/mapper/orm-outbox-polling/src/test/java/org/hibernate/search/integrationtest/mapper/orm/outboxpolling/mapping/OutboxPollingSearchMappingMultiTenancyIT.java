@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.outboxpolling.mapping;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -19,26 +20,31 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.outboxpolling.OutboxPollingExtension;
 import org.hibernate.search.mapper.orm.outboxpolling.mapping.OutboxPollingSearchMapping;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-public class OutboxPollingSearchMappingMultiTenancyIT {
+class OutboxPollingSearchMappingMultiTenancyIT {
+
 	private static final String TENANT_1_ID = "tenant1";
 	private static final String TENANT_2_ID = "tenant2";
 	private static final String TENANT_3_ID = "tenant3";
 
-	@Parameterized.Parameters(name = "entity = {0}")
-	public static Object[][] params() {
-		return new Object[][] {
-				{
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
+
+	@RegisterExtension
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
+			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
+
+	public static List<? extends Arguments> params() {
+		return Arrays.asList(
+				Arguments.of(
 						IndexedMultiTenantEntity.INDEX,
 						IndexedMultiTenantEntity.class,
 						(BiConsumer<Session, Integer>) (session, id) -> {
@@ -49,8 +55,8 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 						},
 						(Consumer<OrmSetupHelper.SetupContext>) context -> context.tenants( false, TENANT_1_ID, TENANT_2_ID,
 								TENANT_3_ID )
-				},
-				{
+				),
+				Arguments.of(
 						IndexedEntity.INDEX,
 						IndexedEntity.class,
 						(BiConsumer<Session, Integer>) (session, id) -> {
@@ -62,36 +68,17 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 						(Consumer<OrmSetupHelper.SetupContext>) context -> {
 							context.tenants( TENANT_1_ID, TENANT_2_ID, TENANT_3_ID );
 						}
-				},
-		};
+				)
+		);
 	}
-
-	@Rule
-	public BackendMock backendMock = new BackendMock();
-
-	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
-			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
 	private SessionFactory sessionFactory;
 	private OutboxPollingSearchMapping searchMapping;
 	private AbortedEventsGenerator abortedEventsGenerator1;
 	private AbortedEventsGenerator abortedEventsGenerator2;
 
-	@Parameterized.Parameter(0)
-	public String indexName;
-
-	@Parameterized.Parameter(1)
-	public Class<?> indexedEntity;
-
-	@Parameterized.Parameter(2)
-	public BiConsumer<Session, Integer> entityCreator;
-
-	@Parameterized.Parameter(3)
-	public Consumer<OrmSetupHelper.SetupContext> tenantConfigurer;
-
-	@Before
-	public void before() {
+	void init(String indexName, Class<?> indexedEntity, BiConsumer<Session, Integer> entityCreator,
+			Consumer<OrmSetupHelper.SetupContext> tenantConfigurer) {
 		backendMock.expectSchema( indexName, b -> b.field( "indexedField", String.class ) );
 		OrmSetupHelper.SetupContext setupContext = ormSetupHelper.start();
 		tenantConfigurer.accept( setupContext );
@@ -106,8 +93,11 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 				new AbortedEventsGenerator( sessionFactory, backendMock, TENANT_2_ID, indexName, entityCreator );
 	}
 
-	@Test
-	public void countAbortedEvents_noTenantIdSpecified() {
+	@ParameterizedTest(name = "entity = {0}")
+	@MethodSource("params")
+	void ountAbortedEvents_noTenantIdSpecified(String indexName, Class<?> indexedEntity,
+			BiConsumer<Session, Integer> entityCreator, Consumer<OrmSetupHelper.SetupContext> tenantConfigurer) {
+		init( indexName, indexedEntity, entityCreator, tenantConfigurer );
 		assertThatThrownBy( () -> searchMapping.countAbortedEvents() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -116,8 +106,11 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 				);
 	}
 
-	@Test
-	public void countAbortedEvents_wrongTenantId() {
+	@ParameterizedTest(name = "entity = {0}")
+	@MethodSource("params")
+	void countAbortedEvents_wrongTenantId(String indexName, Class<?> indexedEntity,
+			BiConsumer<Session, Integer> entityCreator, Consumer<OrmSetupHelper.SetupContext> tenantConfigurer) {
+		init( indexName, indexedEntity, entityCreator, tenantConfigurer );
 		assertThatThrownBy( () -> searchMapping.countAbortedEvents( "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -126,8 +119,11 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 				);
 	}
 
-	@Test
-	public void reprocessAbortedEvents_noTenantIdSpecified() {
+	@ParameterizedTest(name = "entity = {0}")
+	@MethodSource("params")
+	void reprocessAbortedEvents_noTenantIdSpecified(String indexName, Class<?> indexedEntity,
+			BiConsumer<Session, Integer> entityCreator, Consumer<OrmSetupHelper.SetupContext> tenantConfigurer) {
+		init( indexName, indexedEntity, entityCreator, tenantConfigurer );
 		assertThatThrownBy( () -> searchMapping.reprocessAbortedEvents() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -136,8 +132,11 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 				);
 	}
 
-	@Test
-	public void reprocessAbortedEvents_wrongTenantId() {
+	@ParameterizedTest(name = "entity = {0}")
+	@MethodSource("params")
+	void reprocessAbortedEvents_wrongTenantId(String indexName, Class<?> indexedEntity,
+			BiConsumer<Session, Integer> entityCreator, Consumer<OrmSetupHelper.SetupContext> tenantConfigurer) {
+		init( indexName, indexedEntity, entityCreator, tenantConfigurer );
 		assertThatThrownBy( () -> searchMapping.reprocessAbortedEvents( "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -146,8 +145,11 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 				);
 	}
 
-	@Test
-	public void clearAllAbortedEvents_noTenantIdSpecified() {
+	@ParameterizedTest(name = "entity = {0}")
+	@MethodSource("params")
+	void clearAllAbortedEvents_noTenantIdSpecified(String indexName, Class<?> indexedEntity,
+			BiConsumer<Session, Integer> entityCreator, Consumer<OrmSetupHelper.SetupContext> tenantConfigurer) {
+		init( indexName, indexedEntity, entityCreator, tenantConfigurer );
 		assertThatThrownBy( () -> searchMapping.clearAllAbortedEvents() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -156,8 +158,11 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 				);
 	}
 
-	@Test
-	public void clearAllAbortedEvents_wrongTenantId() {
+	@ParameterizedTest(name = "entity = {0}")
+	@MethodSource("params")
+	void clearAllAbortedEvents_wrongTenantId(String indexName, Class<?> indexedEntity,
+			BiConsumer<Session, Integer> entityCreator, Consumer<OrmSetupHelper.SetupContext> tenantConfigurer) {
+		init( indexName, indexedEntity, entityCreator, tenantConfigurer );
 		assertThatThrownBy( () -> searchMapping.clearAllAbortedEvents( "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -166,8 +171,11 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 				);
 	}
 
-	@Test
-	public void clearAllAbortedEvents() {
+	@ParameterizedTest(name = "entity = {0}")
+	@MethodSource("params")
+	void clearAllAbortedEvents(String indexName, Class<?> indexedEntity,
+			BiConsumer<Session, Integer> entityCreator, Consumer<OrmSetupHelper.SetupContext> tenantConfigurer) {
+		init( indexName, indexedEntity, entityCreator, tenantConfigurer );
 		assertThat( searchMapping.countAbortedEvents( TENANT_1_ID ) ).isZero();
 		assertThat( searchMapping.countAbortedEvents( TENANT_2_ID ) ).isZero();
 		assertThat( searchMapping.countAbortedEvents( TENANT_3_ID ) ).isZero();
@@ -186,8 +194,11 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 		assertThat( searchMapping.countAbortedEvents( TENANT_3_ID ) ).isZero();
 	}
 
-	@Test
-	public void reprocessAbortedEvents() {
+	@ParameterizedTest(name = "entity = {0}")
+	@MethodSource("params")
+	void reprocessAbortedEvents(String indexName, Class<?> indexedEntity,
+			BiConsumer<Session, Integer> entityCreator, Consumer<OrmSetupHelper.SetupContext> tenantConfigurer) {
+		init( indexName, indexedEntity, entityCreator, tenantConfigurer );
 		assertThat( searchMapping.countAbortedEvents( TENANT_1_ID ) ).isZero();
 		assertThat( searchMapping.countAbortedEvents( TENANT_2_ID ) ).isZero();
 		assertThat( searchMapping.countAbortedEvents( TENANT_3_ID ) ).isZero();

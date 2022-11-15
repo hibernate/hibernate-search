@@ -15,26 +15,22 @@ import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFie
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContextExtension;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 /**
  * Test that implementations of the legacy interface {@link ToDocumentFieldValueConverter}
  * can be used transparently as a {@link ToDocumentValueConverter}.
  */
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @SuppressWarnings("deprecation")
-public class ToDocumentFieldValueConverterTest {
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+class ToDocumentFieldValueConverterTest {
 
 	@Test
-	public void fromDocumentFieldValue() {
+	void fromDocumentFieldValue() {
 		BackendMappingContext mappingContextMock = Mockito.mock( BackendMappingContext.class );
 		ToDocumentValueConvertContextImpl convertContext = new ToDocumentValueConvertContextImpl( mappingContextMock );
 
@@ -64,7 +60,7 @@ public class ToDocumentFieldValueConverterTest {
 	}
 
 	@Test
-	public void isCompatibleWith_default() {
+	void isCompatibleWith_default() {
 		class DefaultCompatibilityConverter implements ToDocumentFieldValueConverter<Integer, String> {
 			@Override
 			public String convert(Integer value, ToDocumentFieldValueConvertContext context) {
@@ -82,7 +78,7 @@ public class ToDocumentFieldValueConverterTest {
 	}
 
 	@Test
-	public void isCompatibleWith_custom() {
+	void isCompatibleWith_custom() {
 		class CustomCompatibilityConverter implements ToDocumentFieldValueConverter<Integer, String> {
 			@Override
 			public String convert(Integer value, ToDocumentFieldValueConvertContext context) {

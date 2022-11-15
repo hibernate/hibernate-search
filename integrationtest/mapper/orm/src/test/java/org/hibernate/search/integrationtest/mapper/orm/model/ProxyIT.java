@@ -19,26 +19,26 @@ import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ProxyIT {
+class ProxyIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectSchema( EntityWithPropertyAccessTypeForId.INDEX, b -> b
 				.field( "text", String.class )
 		);
@@ -59,7 +59,7 @@ public class ProxyIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-383")
-	public void proxyAccess() {
+	void proxyAccess() {
 		with( sessionFactory ).runInTransaction( session -> {
 			EntityWithPropertyAccessTypeForId entity1 = new EntityWithPropertyAccessTypeForId();
 			entity1.id = 1;

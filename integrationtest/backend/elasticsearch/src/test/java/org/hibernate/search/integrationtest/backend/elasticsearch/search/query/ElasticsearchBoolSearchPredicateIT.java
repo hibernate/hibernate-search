@@ -13,27 +13,27 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchBoolSearchPredicateIT {
+class ElasticsearchBoolSearchPredicateIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndex( index ).setup();
 	}
 
 	@Test
-	public void resultingQueryOptimization() {
+	void resultingQueryOptimization() {
 		SearchPredicateFactory f = index.createScope().predicate();
 
 		assertJsonEqualsIgnoringUnknownFields(
@@ -129,7 +129,7 @@ public class ElasticsearchBoolSearchPredicateIT {
 	}
 
 	@Test
-	public void resultingQueryOptimizationWithBoost() {
+	void resultingQueryOptimizationWithBoost() {
 		SearchPredicateFactory f = index.createScope().predicate();
 
 		assertJsonEqualsIgnoringUnknownFields(
@@ -179,7 +179,7 @@ public class ElasticsearchBoolSearchPredicateIT {
 	}
 
 	@Test
-	public void nested() {
+	void nested() {
 		String expectedQueryJson = "{" +
 				"  \"query\": {" +
 				"    \"bool\": {" +
@@ -256,7 +256,7 @@ public class ElasticsearchBoolSearchPredicateIT {
 	}
 
 	@Test
-	public void onlyNested() {
+	void onlyNested() {
 		//bool query remains as there are > 1 clause
 		assertJsonEqualsIgnoringUnknownFields(
 				"{" +

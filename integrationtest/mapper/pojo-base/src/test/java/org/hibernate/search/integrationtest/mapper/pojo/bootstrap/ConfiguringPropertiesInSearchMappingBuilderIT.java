@@ -31,25 +31,25 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMappingBuilder;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.util.impl.integrationtest.common.bean.ForbiddenBeanProvider;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 
-public class ConfiguringPropertiesInSearchMappingBuilderIT {
+class ConfiguringPropertiesInSearchMappingBuilderIT {
 
-	@Rule
-	public BackendMock backend = new BackendMock();
+	@RegisterExtension
+	public BackendMock backend = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
-	public void propertyFileOverridden() {
+	void propertyFileOverridden() {
 		test( b -> {
 			try ( Reader properties = new InputStreamReader(
 					getClass().getClassLoader().getResourceAsStream( "standalone-test.properties" ),
@@ -69,7 +69,7 @@ public class ConfiguringPropertiesInSearchMappingBuilderIT {
 	}
 
 	@Test
-	public void propertyFileOverrides() {
+	void propertyFileOverrides() {
 		test( b -> {
 			// this should get overridden by the config value from the property file:
 			b.property(

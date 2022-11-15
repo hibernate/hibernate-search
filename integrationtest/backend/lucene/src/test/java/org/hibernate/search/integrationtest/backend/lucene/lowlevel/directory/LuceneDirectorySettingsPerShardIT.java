@@ -10,33 +10,40 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerImpl;
 import org.hibernate.search.backend.lucene.index.impl.Shard;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
 import org.hibernate.search.integrationtest.backend.lucene.sharding.AbstractSettingsPerShardIT;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.FSDirectory;
 
 @TestForIssue(jiraKey = "HSEARCH-3636")
-public class LuceneDirectorySettingsPerShardIT extends AbstractSettingsPerShardIT {
+class LuceneDirectorySettingsPerShardIT extends AbstractSettingsPerShardIT {
 
-	public LuceneDirectorySettingsPerShardIT(String ignoredLabel, SearchSetupHelper setupHelper, List<String> shardIds) {
-		super( ignoredLabel, setupHelper, shardIds );
-	}
+	@TempDir
+	public Path temporaryFolder;
 
-	@Test
-	public void test() {
-		Path root1Directory = temporaryFolder.getRoot().toPath();
-		Path shard0Directory = root1Directory.resolve( index.name() ).resolve( shardIds.get( 0 ) );
-		Path shard1Directory = root1Directory.resolve( index.name() ).resolve( shardIds.get( 1 ) );
-		Path root2Directory = temporaryFolder.getRoot().toPath();
-		Path shard2Directory = root2Directory.resolve( index.name() ).resolve( shardIds.get( 2 ) );
+	@TempDir
+	public Path anotherTemporaryFolder;
+
+	@ParameterizedTest(name = "{0} - {2}")
+	@MethodSource("params")
+	void test(String ignoredLabel, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
+			List<String> shardIds) {
+		init( ignoredLabel, setupStrategyFunction, shardIds );
+		Path shard0Directory = temporaryFolder.resolve( index.name() ).resolve( shardIds.get( 0 ) );
+		Path shard1Directory = temporaryFolder.resolve( index.name() ).resolve( shardIds.get( 1 ) );
+		Path shard2Directory = anotherTemporaryFolder.resolve( index.name() ).resolve( shardIds.get( 2 ) );
 
 		assertThat( shard0Directory ).doesNotExist();
 		assertThat( shard1Directory ).doesNotExist();
@@ -44,8 +51,9 @@ public class LuceneDirectorySettingsPerShardIT extends AbstractSettingsPerShardI
 
 		setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), "directory.type", "local-filesystem" )
-				.withIndexProperty( index.name(), "directory.root", root1Directory.toString() )
-				.withIndexProperty( index.name(), "shards." + shardIds.get( 2 ) + ".directory.root", root2Directory.toString() )
+				.withIndexProperty( index.name(), "directory.root", temporaryFolder.toAbsolutePath().toString() )
+				.withIndexProperty( index.name(), "shards." + shardIds.get( 2 ) + ".directory.root",
+						anotherTemporaryFolder.toAbsolutePath().toString() )
 				.withIndexProperty( index.name(), "shards." + shardIds.get( 3 ) + ".directory.type", "local-heap" )
 				.setup();
 

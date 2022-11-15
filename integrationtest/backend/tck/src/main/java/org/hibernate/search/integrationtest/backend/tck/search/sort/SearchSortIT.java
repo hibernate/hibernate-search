@@ -33,21 +33,21 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Generic tests for sorts. More specific tests can be found in other classes,
  * such as {@link FieldSortBaseIT} or {@link DistanceSortBaseIT}.
  */
-public class SearchSortIT {
+class SearchSortIT {
 
 	private static final int INDEX_ORDER_CHECKS = 10;
 
@@ -56,8 +56,8 @@ public class SearchSortIT {
 	private static final String THIRD_ID = "3";
 	private static final String EMPTY_ID = "empty";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
@@ -66,8 +66,8 @@ public class SearchSortIT {
 			// What matters here is that is a different index.
 			SimpleMappedIndex.of( IndexBinding::new ).name( "other" );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndexes( mainIndex, otherIndex ).setup();
 
 		initData();
@@ -83,7 +83,7 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void byIndexOrder() {
+	void byIndexOrder() {
 		/*
 		 * We don't really know in advance what the index order is, but we want it to be consistent.
 		 * Thus we just test that the order stays the same over several calls.
@@ -103,7 +103,7 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void byDefault_score() {
+	void byDefault_score() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatQuery( scope.query()
@@ -118,7 +118,7 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void byScore() {
+	void byScore() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query;
 
@@ -148,7 +148,7 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void separateSort() {
+	void separateSort() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query;
 
@@ -176,7 +176,7 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void reuseSortInstance_onScopeTargetingSameIndexes() {
+	void reuseSortInstance_onScopeTargetingSameIndexes() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchSort sort = scope
 				.sort().field( "string" ).asc().missing().last().toSort();
@@ -219,7 +219,7 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void reuseSortInstance_onScopeTargetingDifferentIndexes() {
+	void reuseSortInstance_onScopeTargetingDifferentIndexes() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchSort sort = scope
 				.sort().field( "string" ).asc().missing().last().toSort();
@@ -249,7 +249,7 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void extension() {
+	void extension() {
 		SearchQuery<DocumentReference> query;
 
 		// Mandatory extension, supported
@@ -367,21 +367,21 @@ public class SearchSortIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void toAbsolutePath() {
+	void toAbsolutePath() {
 		assertThat( mainIndex.createScope().sort().toAbsolutePath( "string" ) )
 				.isEqualTo( "string" );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void toAbsolutePath_withRoot() {
+	void toAbsolutePath_withRoot() {
 		assertThat( mainIndex.createScope().sort().withRoot( "flattened" ).toAbsolutePath( "string" ) )
 				.isEqualTo( "flattened.string" );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void toAbsolutePath_null() {
+	void toAbsolutePath_null() {
 		assertThatThrownBy( () -> mainIndex.createScope().sort().toAbsolutePath( null ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'relativeFieldPath' must not be null" );
@@ -389,7 +389,7 @@ public class SearchSortIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void toAbsolutePath_withRoot_null() {
+	void toAbsolutePath_withRoot_null() {
 		assertThatThrownBy( () -> mainIndex.createScope().sort().withRoot( "flattened" ).toAbsolutePath( null ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'relativeFieldPath' must not be null" );

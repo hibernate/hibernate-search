@@ -19,23 +19,23 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
 
-public class CustomDirectoryIT extends AbstractDirectoryIT {
+class CustomDirectoryIT extends AbstractDirectoryIT {
 
-	@Rule
-	public StaticCounters staticCounters = new StaticCounters();
+	@RegisterExtension
+	public StaticCounters staticCounters = StaticCounters.create();
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.DirectoryLifecycleTest.testLifecycle")
-	public void valid() {
+	void valid() {
 		setup( CustomDirectoryProvider.class, c -> c.expectCustomBeans()
 				.withBackendProperty( "directory." + CustomDirectoryProvider.CONFIGURATION_PROPERTY_KEY_RADICAL,
 						CustomDirectoryProvider.CONFIGURATION_PROPERTY_EXPECTED_VALUE ) );
@@ -58,7 +58,7 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
-	public void invalid() {
+	void invalid() {
 		String invalidDirectoryType = "someInvalidDirectoryType";
 		assertThatThrownBy( () -> setup( "someInvalidDirectoryType", c -> c.expectCustomBeans() ) )
 				.isInstanceOf( SearchException.class )

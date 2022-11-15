@@ -11,55 +11,50 @@ import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.hasValidationFailureReport;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
 
-import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportChecker;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Basic tests related to the mapping when validating indexes,
  * for all index-validating schema management operations.
  */
-@RunWith(Parameterized.class)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.Elasticsearch5SchemaValidationIT")
-public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
+class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 
-	@Parameterized.Parameters(name = "With operation {0}")
-	public static EnumSet<ElasticsearchIndexSchemaManagerValidationOperation> operations() {
-		return ElasticsearchIndexSchemaManagerValidationOperation.all();
+	public static List<? extends Arguments> params() {
+		return ElasticsearchIndexSchemaManagerValidationOperation.all().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticSearchClient = TestElasticsearchClient.create();
 
-	private final ElasticsearchIndexSchemaManagerValidationOperation operation;
-
-	public ElasticsearchIndexSchemaManagerValidationMappingBaseIT(
-			ElasticsearchIndexSchemaManagerValidationOperation operation) {
-		this.operation = operation;
-	}
-
-	@Test
-	public void success_1() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void success_1(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.field( "myField", f -> f.asLocalDate() )
 					.toReference();
@@ -82,13 +77,14 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 				)
 		);
 
-		setupAndValidate( index );
+		setupAndValidate( index, operation );
 
 		// If we get here, it means validation passed (no exception was thrown)
 	}
 
-	@Test
-	public void success_2() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void success_2(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.field( "myField", f -> f.asBoolean() )
 					.toReference();
@@ -108,13 +104,14 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 				)
 		);
 
-		setupAndValidate( index );
+		setupAndValidate( index, operation );
 
 		// If we get here, it means validation passed (no exception was thrown)
 	}
 
-	@Test
-	public void success_3() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void success_3(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.field(
 					"myField",
@@ -138,11 +135,12 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 				)
 		);
 
-		setupAndValidate( index );
+		setupAndValidate( index, operation );
 	}
 
-	@Test
-	public void attribute_field_notPresent() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void attribute_field_notPresent(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
 				root -> root.field( "myField", f -> f.asInteger() ).toReference()
 		);
@@ -161,15 +159,17 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 				index,
 				hasValidationFailureReport()
 						.indexFieldContext( "myField" )
-						.failure( "Missing property mapping" )
+						.failure( "Missing property mapping" ),
+				operation
 		);
 	}
 
 	/**
 	 * Tests that mappings that are more powerful than requested will pass validation.
 	 */
-	@Test
-	public void property_attribute_leniency() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void property_attribute_leniency(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.field( "myField", f -> f.asLong() )
 					.toReference();
@@ -193,11 +193,12 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 				)
 		);
 
-		setupAndValidate( index );
+		setupAndValidate( index, operation );
 	}
 
-	@Test
-	public void floatAndDouble_nullValue() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void floatAndDouble_nullValue(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.field( "float", f -> f.asFloat().indexNullAs( 1.7F ) ).toReference();
 			root.field( "double", f -> f.asDouble().indexNullAs( 1.7 ) ).toReference();
@@ -217,11 +218,12 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 				)
 		);
 
-		setupAndValidate( index );
+		setupAndValidate( index, operation );
 	}
 
-	@Test
-	public void floatAndDouble_nullValue_invalids() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void floatAndDouble_nullValue_invalids(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.field( "float", f -> f.asFloat().indexNullAs( 1.7F ) ).toReference();
 			root.field( "double", f -> f.asDouble().indexNullAs( 1.7 ) ).toReference();
@@ -248,12 +250,14 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 						.failure( "Invalid value. Expected '1.7', actual is '1.9'" )
 						.indexFieldContext( "float" )
 						.mappingAttributeContext( "null_value" )
-						.failure( "Invalid value. Expected '1.7', actual is '1.9'" )
+						.failure( "Invalid value. Expected '1.7', actual is '1.9'" ),
+				operation
 		);
 	}
 
-	@Test
-	public void floatAndDouble_nullValue_invalids_notNumbers() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void floatAndDouble_nullValue_invalids_notNumbers(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.field( "float", f -> f
 					.extension( ElasticsearchExtension.get() )
@@ -286,15 +290,17 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 						.failure( "Invalid value. Expected '\"BBB\"', actual is '1.9'" )
 						.indexFieldContext( "float" )
 						.mappingAttributeContext( "null_value" )
-						.failure( "Invalid value. Expected '\"AAA\"', actual is '1.9'" )
+						.failure( "Invalid value. Expected '\"AAA\"', actual is '1.9'" ),
+				operation
 		);
 	}
 
 	/**
 	 * Tests that properties within properties are correctly represented in the failure report.
 	 */
-	@Test
-	public void nestedProperty_attribute_invalid() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void nestedProperty_attribute_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			IndexSchemaObjectField objectField =
 					root.objectField( "myObjectField" );
@@ -326,12 +332,14 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 				hasValidationFailureReport()
 						.indexFieldContext( "myObjectField.myField" )
 						.mappingAttributeContext( "index" )
-						.failure( "Invalid value. Expected 'true', actual is 'false'" )
+						.failure( "Invalid value. Expected 'true', actual is 'false'" ),
+				operation
 		);
 	}
 
-	@Test
-	public void multipleErrors() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void multipleErrors(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.field( "myField", f -> f.asString() )
 					.toReference();
@@ -361,17 +369,19 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 						.mappingAttributeContext( "type" )
 						.failure(
 								"Invalid value. Expected 'keyword', actual is 'integer'"
-						)
+						),
+				operation
 		);
 	}
 
-	private void setupAndValidateExpectingFailure(StubMappedIndex index, FailureReportChecker failureReportChecker) {
-		assertThatThrownBy( () -> setupAndValidate( index ) )
+	private void setupAndValidateExpectingFailure(StubMappedIndex index, FailureReportChecker failureReportChecker,
+			ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		assertThatThrownBy( () -> setupAndValidate( index, operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( failureReportChecker );
 	}
 
-	private void setupAndValidate(StubMappedIndex index) {
+	private void setupAndValidate(StubMappedIndex index, ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(

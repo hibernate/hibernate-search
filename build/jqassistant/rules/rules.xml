@@ -696,7 +696,7 @@
                     -[:ANNOTATED_BY]->()-[:OF_TYPE]->(testAnnotation:Type)
             WHERE
                 NOT artifact:IntegrationTest
-                AND testAnnotation.fqn = "org.junit.Test"
+                AND (testAnnotation.fqn = "org.junit.Test" OR testAnnotation.fqn = "org.junit.jupiter.api.Test" OR testAnnotation.fqn = "org.junit.jupiter.params.ParameterizedTest")
                 AND NOT type.name ENDS WITH "Test"
                 AND NOT type:SuppressJQAssistant
             RETURN DISTINCT
@@ -748,8 +748,7 @@
         <requiresConcept refId="hsearch:HibernateSearch" />
         <description>
             Nested test types should be annotated with @Nested in order to be actually executed
-            when their surrounding type (hopefully annotated with @RunWith(NestedInner.class))
-            is executed.
+            when their surrounding type is executed.
             Exceptions are only allowed for:
             - Abstract test classes.
         </description>
@@ -765,7 +764,7 @@
             // The Nested annotation
             OPTIONAL MATCH (nestedTestType:Type)-[:ANNOTATED_BY]->()-[:OF_TYPE]->(nestedAnnotation:Type)
             WHERE
-                nestedAnnotation.fqn = "org.hibernate.search.util.impl.test.runner.nested.Nested"
+                nestedAnnotation.fqn = "org.junit.jupiter.api.Nested"
             WITH nestedTestType, nestedAnnotation
             WHERE
                 nestedAnnotation IS NULL

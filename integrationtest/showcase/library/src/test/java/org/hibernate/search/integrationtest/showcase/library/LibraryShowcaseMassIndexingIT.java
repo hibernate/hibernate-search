@@ -14,24 +14,21 @@ import org.hibernate.search.integrationtest.showcase.library.service.DocumentSer
 import org.hibernate.search.integrationtest.showcase.library.service.TestDataService;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @TestPropertySource(properties = {
 		"spring.jpa.properties.hibernate.search.indexing.listeners.enabled=false"
 })
 @ActiveProfiles(resolver = TestActiveProfilesResolver.class)
-public class LibraryShowcaseMassIndexingIT {
+class LibraryShowcaseMassIndexingIT {
 
 	private static final int NUMBER_OF_BOOKS = 200;
 
@@ -44,13 +41,13 @@ public class LibraryShowcaseMassIndexingIT {
 	@Autowired
 	private TestDataService testDataService;
 
-	@Before
-	public void initData() {
+	@BeforeEach
+	void initData() {
 		testDataService.initBooksDataSet( NUMBER_OF_BOOKS );
 	}
 
-	@After
-	public void cleanUpData() {
+	@AfterEach
+	void cleanUpData() {
 		// we're cleaning the data manually,
 		// in order to have a class level application context,
 		// to support the job of ExpectedLog4jLog
@@ -58,7 +55,7 @@ public class LibraryShowcaseMassIndexingIT {
 	}
 
 	@Test
-	public void testMassIndexing() {
+	void testMassIndexing() {
 		assertThat( documentService.countIndexed() ).isZero();
 		MassIndexer indexer = adminService.createMassIndexer();
 		try {

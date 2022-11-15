@@ -13,12 +13,12 @@ import java.time.Year;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ParseUtilsTest {
+class ParseUtilsTest {
 
 	@Test
-	public void parseYear() {
+	void parseYear() {
 		assertThat( ParseUtils.parseYear( "2001" ) ).isEqualTo( Year.of( 2001 ) );
 		assertThat( ParseUtils.parseYear( "1999" ) ).isEqualTo( Year.of( 1999 ) );
 		assertThat( ParseUtils.parseYear( "1769" ) ).isEqualTo( Year.of( 1769 ) );
@@ -34,7 +34,7 @@ public class ParseUtilsTest {
 	}
 
 	@Test
-	public void parseGeoPoint() {
+	void parseGeoPoint() {
 		GeoPoint geoPoint = ParseUtils.parseGeoPoint( "12.123, -24.234" );
 		assertThat( geoPoint ).isEqualTo( GeoPoint.of( 12.123, -24.234 ) );
 

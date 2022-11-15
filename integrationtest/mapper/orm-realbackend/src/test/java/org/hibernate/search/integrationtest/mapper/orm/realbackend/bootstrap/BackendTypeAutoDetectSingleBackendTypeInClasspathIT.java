@@ -7,8 +7,8 @@
 package org.hibernate.search.integrationtest.mapper.orm.realbackend.bootstrap;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.BACKEND_TYPE;
-import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.IS_IDE;
+import static org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration.BACKEND_TYPE;
+import static org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration.IS_IDE;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -19,20 +19,20 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Checks that Hibernate Search will auto-detect the backend type when the property "hibernate.search.backend.type" is not set
  * and there is only one backend in the classpath.
  */
-public class BackendTypeAutoDetectSingleBackendTypeInClasspathIT {
+class BackendTypeAutoDetectSingleBackendTypeInClasspathIT {
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	@Test
-	public void backendType_autoDetect() {
+	void backendType_autoDetect() {
 		if ( IS_IDE ) {
 			throw new IllegalStateException( "Tests seem to be running from an IDE."
 					+ " This test cannot run from the IDE"
