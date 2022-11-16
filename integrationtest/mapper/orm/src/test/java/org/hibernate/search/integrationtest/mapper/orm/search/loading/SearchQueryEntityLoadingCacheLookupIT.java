@@ -32,6 +32,7 @@ import org.hibernate.stat.Statistics;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.rules.MethodRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -66,7 +67,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	@Rule
 	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	@Rule
+	@RegisterExtension
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	private final EntityLoadingCacheLookupStrategy defaultCacheLookupStrategy;

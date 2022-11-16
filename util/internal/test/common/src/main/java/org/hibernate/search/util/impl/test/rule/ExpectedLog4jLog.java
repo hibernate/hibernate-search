@@ -13,13 +13,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.util.impl.test.rule.log4j.Log4j2ConfigurationAccessor;
 import org.hibernate.search.util.impl.test.rule.log4j.LogChecker;
 import org.hibernate.search.util.impl.test.rule.log4j.LogExpectation;
-import org.hibernate.search.util.impl.test.rule.log4j.Log4j2ConfigurationAccessor;
 import org.hibernate.search.util.impl.test.rule.log4j.TestAppender;
 
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.rules.TestRule;
-import org.junit.runners.model.Statement;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
@@ -29,7 +31,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.StringDescription;
 import org.hamcrest.TypeSafeMatcher;
 
-public class ExpectedLog4jLog implements TestRule {
+public class ExpectedLog4jLog implements BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
 	private static final String DEFAULT_LOGGER_NAME = "org.hibernate.search";
 
@@ -53,14 +55,31 @@ public class ExpectedLog4jLog implements TestRule {
 
 	private final List<LogExpectation> expectations = new ArrayList<>();
 	private TestAppender currentAppender;
+	private Log4j2ConfigurationAccessor programmaticConfig;
 
 	private ExpectedLog4jLog(String loggerName) {
 		this.loggerName = loggerName;
 	}
 
 	@Override
-	public Statement apply(Statement base, org.junit.runner.Description description) {
-		return new ExpectedLogStatement( base );
+	public void beforeTestExecution(ExtensionContext context) {
+		programmaticConfig = new Log4j2ConfigurationAccessor( loggerName );
+		TestAppender appender = new TestAppender( "TestAppender" );
+		programmaticConfig.addAppender( appender );
+
+		for ( LogExpectation expectation : ExpectedLog4jLog.this.expectations ) {
+			appender.addChecker( expectation.createChecker() );
+		}
+		ExpectedLog4jLog.this.currentAppender = appender;
+	}
+
+	@Override
+	public void afterTestExecution(ExtensionContext context) {
+		programmaticConfig.removeAppender();
+		Set<LogChecker> failingCheckers = currentAppender.getFailingCheckers();
+		if ( !failingCheckers.isEmpty() ) {
+			fail( buildFailureMessage( failingCheckers ) );
+		}
 	}
 
 	/**
@@ -196,37 +215,6 @@ public class ExpectedLog4jLog implements TestRule {
 				return messageMatcher.matches( item.getMessage().getFormattedMessage() );
 			}
 		};
-	}
-
-	private class ExpectedLogStatement extends Statement {
-
-		private final Statement next;
-
-		ExpectedLogStatement(Statement base) {
-			next = base;
-		}
-
-		@Override
-		public void evaluate() throws Throwable {
-			Log4j2ConfigurationAccessor programmaticConfig = new Log4j2ConfigurationAccessor( loggerName );
-			TestAppender appender = new TestAppender( "TestAppender" );
-			programmaticConfig.addAppender( appender );
-
-			for ( LogExpectation expectation : ExpectedLog4jLog.this.expectations ) {
-				appender.addChecker( expectation.createChecker() );
-			}
-			ExpectedLog4jLog.this.currentAppender = appender;
-			try {
-				next.evaluate();
-			}
-			finally {
-				programmaticConfig.removeAppender();
-			}
-			Set<LogChecker> failingCheckers = appender.getFailingCheckers();
-			if ( !failingCheckers.isEmpty() ) {
-				fail( buildFailureMessage( failingCheckers ) );
-			}
-		}
 	}
 
 	private static String buildFailureMessage(Set<LogChecker> failingCheckers) {

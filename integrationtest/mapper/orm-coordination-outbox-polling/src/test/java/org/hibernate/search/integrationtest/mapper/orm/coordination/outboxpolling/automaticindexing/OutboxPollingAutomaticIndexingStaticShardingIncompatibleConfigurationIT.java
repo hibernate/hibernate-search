@@ -26,6 +26,7 @@ import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test for static sharding where some nodes are configured in an incompatible way.
@@ -40,7 +41,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingIncompatibleConfigurati
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	private void setup(String hbm2ddlAction, TestFailureHandler failureHandler, int totalShardCount, List<Integer> assignedShardIndices) {

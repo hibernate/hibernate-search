@@ -23,8 +23,8 @@ import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.io.TempDir;
 
 import org.apache.logging.log4j.Level;
@@ -35,7 +35,7 @@ import org.apache.lucene.store.NIOFSDirectory;
 
 public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT {
 
-	@Rule
+	@RegisterExtension
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@TempDir

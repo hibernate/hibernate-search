@@ -25,10 +25,10 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.mapper.mapping.building.spi.BackendsInfo;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
+import org.hibernate.search.engine.mapper.mapping.building.spi.BackendsInfo;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
@@ -36,30 +36,35 @@ import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.quality.Strictness;
 
 // We have to use raw types to mock methods returning generic types with wildcards
 @SuppressWarnings({ "unchecked", "rawtypes" })
+@ExtendWith(MockitoExtension.class)
 public class IndexManagerBuildingStateHolderTest {
 
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
-	@Rule
+	@RegisterExtension
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
-	@Mock
+	@Mock(strictness = Mock.Strictness.STRICT_STUBS)
 	private RootBuildContext rootBuildContextMock;
 
-	@Mock(answer = Answers.CALLS_REAL_METHODS)
+	@Mock(strictness = Mock.Strictness.STRICT_STUBS, answer = Answers.CALLS_REAL_METHODS)
 	private ConfigurationPropertySource configurationSourceMock;
 
 	@Mock(strictness = Mock.Strictness.LENIENT, answer = Answers.CALLS_REAL_METHODS)
@@ -260,7 +265,8 @@ public class IndexManagerBuildingStateHolderTest {
 						"Unable to resolve backend type",
 						"configuration property 'somePrefix.backend.type' is not set,"
 								+ " and there isn't any backend in the classpath",
-						"Check that you added the desired backend to your project's dependencies" );
+						"Check that you added the desired backend to your project's dependencies"
+				);
 	}
 
 	@Test
@@ -293,7 +299,8 @@ public class IndexManagerBuildingStateHolderTest {
 						"Unable to resolve backend type",
 						"configuration property 'somePrefix.backend.type' is not set,"
 								+ " and there isn't any backend in the classpath",
-						"Check that you added the desired backend to your project's dependencies" );
+						"Check that you added the desired backend to your project's dependencies"
+				);
 	}
 
 	@Test

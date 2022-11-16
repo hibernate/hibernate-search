@@ -33,9 +33,10 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.Rule;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 
@@ -55,7 +56,7 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 	@Rule
 	public final StaticCounters counters = new StaticCounters();
 
-	@Rule
+	@RegisterExtension
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	private final StubExtendedBeanManager extendedBeanManager = new StubExtendedBeanManager();
