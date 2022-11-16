@@ -54,14 +54,16 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingHin
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
+@ExtendWith(MockitoExtension.class)
 @SuppressWarnings("unchecked") // Mocking parameterized types
 public abstract class AbstractEntityProjectionIT {
 
@@ -71,9 +73,6 @@ public abstract class AbstractEntityProjectionIT {
 	protected static final String TEXT_VALUE_1_2 = "some text 1_2";
 
 	protected static final ProjectionMappedTypeContext mainTypeContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	private final SimpleMappedIndex<IndexBinding> mainIndex;
 	private final SimpleMappedIndex<IndexBinding> multiIndex1;

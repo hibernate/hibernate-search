@@ -28,14 +28,15 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.MethodRule;
 
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 /**
@@ -43,6 +44,8 @@ import org.mockito.quality.Strictness;
  *
  * @author Mincong Huang
  */
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
+@ExtendWith(MockitoExtension.class)
 public class EntityReaderComponentIT {
 
 	private static final List<Company> COMPANIES = Arrays.asList(
@@ -56,9 +59,6 @@ public class EntityReaderComponentIT {
 			ReusableOrmSetupHolder.withSingleBackend( BackendConfigurations.simple() );
 	@Rule
 	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	private EntityManagerFactory emf;
 

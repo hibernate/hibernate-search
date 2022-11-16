@@ -20,18 +20,20 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import com.google.gson.JsonObject;
 import org.apache.http.HttpHost;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
+@ExtendWith(MockitoExtension.class)
 @RunWith(Parameterized.class)
 public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
 
@@ -52,9 +54,6 @@ public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
 				{ "opensearch", "1.0.1", ElasticsearchDistributionName.OPENSEARCH, 1, 0, 1, null }
 		};
 	}
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	private final String distributionString;
 	private final String versionString;
@@ -107,7 +106,8 @@ public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
 						"Unable to detect the Elasticsearch version running on the cluster",
 						"Invalid Elasticsearch distribution name",
 						"'" + invalidDistributionName.toLowerCase( Locale.ROOT ) + "'",
-						"Valid names are: [elastic, opensearch]" );
+						"Valid names are: [elastic, opensearch]"
+				);
 	}
 
 	@Test
@@ -120,7 +120,8 @@ public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
 						"Unable to detect the Elasticsearch version running on the cluster",
 						"Invalid Elasticsearch version",
 						"'" + invalidVersionString.toLowerCase( Locale.ROOT ) + "'",
-						"Expected format is 'x.y.z-qualifier'" );
+						"Expected format is 'x.y.z-qualifier'"
+				);
 	}
 
 	private void doMock(String theDistributionString, String theVersionString) {
