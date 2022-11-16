@@ -14,21 +14,16 @@ import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.TemporaryFolder;
 
 import org.apache.lucene.store.ByteBuffersDirectory;
 
 public class LuceneLocalHeapDirectoryIT extends AbstractBuiltInDirectoryIT {
 
-	@Rule
-	public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.RamDirectoryTest.localHeap")
-	public void test() {
+	void test() {
 		setup( c -> c );
 
 		checkIndexingAndQuerying();

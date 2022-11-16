@@ -27,7 +27,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.io.TempDir;
 
 import org.apache.lucene.store.ByteBuffersDirectory;
 
@@ -37,8 +37,11 @@ public class MultiDirectoryIT {
 	private static final String DOCUMENT_2 = "2";
 	private static final String DOCUMENT_3 = "3";
 
-	@Rule
-	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+	@TempDir
+	public Path temporaryFolder;
+
+	@TempDir
+	public Path anotherTemporaryFolder;
 
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -53,12 +56,10 @@ public class MultiDirectoryIT {
 			.name( "index4" );
 
 	@Test
-	public void test() throws IOException {
-		Path root1Directory = temporaryFolder.getRoot().toPath();
-		Path index1Directory = root1Directory.resolve( index1.name() );
-		Path index2Directory = root1Directory.resolve( index2.name() );
-		Path root2Directory = temporaryFolder.getRoot().toPath();
-		Path index3Directory = root2Directory.resolve( index3.name() );
+	void test() throws IOException {
+		Path index1Directory = temporaryFolder.resolve( index1.name() );
+		Path index2Directory = temporaryFolder.resolve( index2.name() );
+		Path index3Directory = anotherTemporaryFolder.resolve( index3.name() );
 
 		assertThat( index1Directory ).doesNotExist();
 		assertThat( index2Directory ).doesNotExist();
@@ -68,9 +69,9 @@ public class MultiDirectoryIT {
 				.withIndexes( index1, index2, index3, index4 )
 				// Default: FS, root 1
 				.withBackendProperty( LuceneIndexSettings.DIRECTORY_TYPE, "local-filesystem" )
-				.withBackendProperty( LuceneIndexSettings.DIRECTORY_ROOT, root1Directory.toString() )
+				.withBackendProperty( LuceneIndexSettings.DIRECTORY_ROOT, temporaryFolder.toAbsolutePath().toString() )
 				// Index 3: FS, root 2
-				.withIndexProperty( index3.name(), LuceneIndexSettings.DIRECTORY_ROOT, root2Directory.toString() )
+				.withIndexProperty( index3.name(), LuceneIndexSettings.DIRECTORY_ROOT, anotherTemporaryFolder.toAbsolutePath().toString() )
 				// Index 4: heap
 				.withIndexProperty( index4.name(), LuceneIndexSettings.DIRECTORY_TYPE, "local-heap" )
 				.setup();

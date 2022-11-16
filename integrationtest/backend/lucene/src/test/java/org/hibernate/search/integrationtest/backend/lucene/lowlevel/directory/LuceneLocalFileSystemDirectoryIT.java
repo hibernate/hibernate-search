@@ -25,6 +25,7 @@ import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import org.apache.logging.log4j.Level;
 import org.apache.lucene.store.Directory;
@@ -37,21 +38,23 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 	@Rule
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
+	@TempDir
+	Path temporaryFolder;
+
 	/**
 	 * Test that the index is created in the configured root.
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
-	public void root() throws IOException {
-		Path rootDirectory = temporaryFolder.getRoot().toPath();
-		Path indexDirectory = rootDirectory.resolve( index.name() );
+	void root() throws IOException {
+		Path indexDirectory = temporaryFolder.resolve( index.name() );
 
 		assertThat( indexDirectory )
 				.doesNotExist();
 
 		setup( c -> c.withBackendProperty(
 				LuceneIndexSettings.DIRECTORY_ROOT,
-				temporaryFolder.getRoot().getAbsolutePath()
+				temporaryFolder.toAbsolutePath()
 		) );
 
 		assertThat( indexDirectory )
@@ -69,14 +72,14 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
-	public void filesystemAccessStrategy_default() {
+	void filesystemAccessStrategy_default() {
 		// The actual class used here is OS-dependent
 		testFileSystemAccessStrategy( null, FSDirectory.class, false );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
-	public void filesystemAccessStrategy_auto() {
+	void filesystemAccessStrategy_auto() {
 		// The actual class used here is OS-dependent
 		testFileSystemAccessStrategy( "auto", FSDirectory.class, false );
 	}
@@ -85,28 +88,28 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testSimpleDirectoryType")
 	@SuppressWarnings("deprecation")
-	public void filesystemAccessStrategy_simple() {
+	void filesystemAccessStrategy_simple() {
 		testFileSystemAccessStrategy( "simple", org.apache.lucene.store.SimpleFSDirectory.class, true );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testNIODirectoryType")
-	public void filesystemAccessStrategy_nio() {
+	void filesystemAccessStrategy_nio() {
 		testFileSystemAccessStrategy( "nio", NIOFSDirectory.class, false );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testMMapDirectoryType")
-	public void filesystemAccessStrategy_mmap() {
+	void filesystemAccessStrategy_mmap() {
 		testFileSystemAccessStrategy( "mmap", MMapDirectory.class, false );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testInvalidDirectoryType")
-	public void filesystemAccessStrategy_invalid() {
+	void filesystemAccessStrategy_invalid() {
 		assertThatThrownBy( () -> setup( c -> c.withBackendProperty(
 				LuceneIndexSettings.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY,
 				"some_invalid_name"

@@ -19,6 +19,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.FSDirectory;
@@ -26,17 +27,21 @@ import org.apache.lucene.store.FSDirectory;
 @TestForIssue(jiraKey = "HSEARCH-3636")
 public class LuceneDirectorySettingsPerShardIT extends AbstractSettingsPerShardIT {
 
+	@TempDir
+	public Path temporaryFolder;
+
+	@TempDir
+	public Path anotherTemporaryFolder;
+
 	public LuceneDirectorySettingsPerShardIT(String ignoredLabel, SearchSetupHelper setupHelper, List<String> shardIds) {
 		super( ignoredLabel, setupHelper, shardIds );
 	}
 
 	@Test
-	public void test() {
-		Path root1Directory = temporaryFolder.getRoot().toPath();
-		Path shard0Directory = root1Directory.resolve( index.name() ).resolve( shardIds.get( 0 ) );
-		Path shard1Directory = root1Directory.resolve( index.name() ).resolve( shardIds.get( 1 ) );
-		Path root2Directory = temporaryFolder.getRoot().toPath();
-		Path shard2Directory = root2Directory.resolve( index.name() ).resolve( shardIds.get( 2 ) );
+	void test() {
+		Path shard0Directory = temporaryFolder.resolve( index.name() ).resolve( shardIds.get( 0 ) );
+		Path shard1Directory = temporaryFolder.resolve( index.name() ).resolve( shardIds.get( 1 ) );
+		Path shard2Directory = anotherTemporaryFolder.resolve( index.name() ).resolve( shardIds.get( 2 ) );
 
 		assertThat( shard0Directory ).doesNotExist();
 		assertThat( shard1Directory ).doesNotExist();
@@ -44,8 +49,8 @@ public class LuceneDirectorySettingsPerShardIT extends AbstractSettingsPerShardI
 
 		setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), "directory.type", "local-filesystem" )
-				.withIndexProperty( index.name(), "directory.root", root1Directory.toString() )
-				.withIndexProperty( index.name(), "shards." + shardIds.get( 2 ) + ".directory.root", root2Directory.toString() )
+				.withIndexProperty( index.name(), "directory.root", temporaryFolder.toAbsolutePath().toString() )
+				.withIndexProperty( index.name(), "shards." + shardIds.get( 2 ) + ".directory.root", anotherTemporaryFolder.toAbsolutePath().toString() )
 				.withIndexProperty( index.name(), "shards." + shardIds.get( 3 ) + ".directory.type", "local-heap" )
 				.setup();
 

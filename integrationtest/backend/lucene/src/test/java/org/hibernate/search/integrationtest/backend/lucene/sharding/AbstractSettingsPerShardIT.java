@@ -16,8 +16,6 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
 import org.junit.Rule;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -44,12 +42,8 @@ public abstract class AbstractSettingsPerShardIT {
 
 	public final String strategy;
 
-	public final SearchSetupHelper setupHelper;
-
-	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
-
 	@Rule
-	public final RuleChain rules;
+	public final SearchSetupHelper setupHelper;
 
 	public final List<String> shardIds;
 
@@ -57,7 +51,6 @@ public abstract class AbstractSettingsPerShardIT {
 		this.strategy = strategy;
 		this.setupHelper = setupHelper;
 		this.shardIds = shardIds;
-		this.rules = RuleChain.outerRule( temporaryFolder ).around( setupHelper );
 	}
 
 	protected final String routingKey(int i) {
