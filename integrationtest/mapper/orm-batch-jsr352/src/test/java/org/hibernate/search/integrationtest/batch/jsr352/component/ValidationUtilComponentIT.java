@@ -28,7 +28,7 @@ import org.junit.rules.MethodRule;
 /**
  * @author Mincong Huang
  */
-public class ValidationUtilComponentIT {
+class ValidationUtilComponentIT {
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder =
@@ -37,13 +37,13 @@ public class ValidationUtilComponentIT {
 	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
 	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	void setup(OrmSetupHelper.SetupContext setupContext) {
 		setupContext.withAnnotatedTypes( Company.class, Person.class )
 				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false );
 	}
 
 	@Test
-	public void validateEntityTypes_whenAllTypesAreAvailableInEMF() throws Exception {
+	void validateEntityTypes_whenAllTypesAreAvailableInEMF() throws Exception {
 		String serializedEntityTypes = Stream
 				.of( Company.class, Person.class )
 				.map( Class::getName )
@@ -53,7 +53,7 @@ public class ValidationUtilComponentIT {
 	}
 
 	@Test
-	public void validateEntityTypes_whenContainingNonIndexedTypes() throws Exception {
+	void validateEntityTypes_whenContainingNonIndexedTypes() throws Exception {
 		String serializedEntityTypes = Stream
 				.of( Company.class, Person.class, NotIndexed.class )
 				.map( Class::getName )
@@ -65,54 +65,58 @@ public class ValidationUtilComponentIT {
 						+ NotIndexed.class.getName() + ". Check whether they are annotated with '@Indexed'." );
 	}
 
-	@Test(expected = SearchException.class)
-	public void validatePositive_valueIsNegative() throws Exception {
-		ValidationUtil.validatePositive( "MyParameter", -1 );
-	}
-
-	@Test(expected = SearchException.class)
-	public void validatePositive_valueIsZero() throws Exception {
-		ValidationUtil.validatePositive( "MyParameter", 0 );
+	@Test
+	void validatePositive_valueIsNegative() throws Exception {
+		assertThatThrownBy( () -> ValidationUtil.validatePositive( "MyParameter", -1 ) )
+				.isInstanceOf( SearchException.class );
 	}
 
 	@Test
-	public void validatePositive_valueIsPositive() throws Exception {
+	void validatePositive_valueIsZero() throws Exception {
+		assertThatThrownBy( () -> ValidationUtil.validatePositive( "MyParameter", 0 ) )
+				.isInstanceOf( SearchException.class );
+	}
+
+	@Test
+	void validatePositive_valueIsPositive() throws Exception {
 		ValidationUtil.validatePositive( "MyParameter", 1 );
 		// ok
 	}
 
 	@Test
-	public void validateCheckpointInterval_lessThanRowsPerPartition() throws Exception {
+	void validateCheckpointInterval_lessThanRowsPerPartition() throws Exception {
 		ValidationUtil.validateCheckpointInterval( 99, 100 );
 		// ok
 	}
 
 	@Test
-	public void validateCheckpointInterval_equalToRowsPerPartition() {
+	void validateCheckpointInterval_equalToRowsPerPartition() {
 		ValidationUtil.validateCheckpointInterval( 100, 100 );
 		// ok
 	}
 
-	@Test(expected = SearchException.class)
-	public void validateCheckpointInterval_greaterThanRowsPerPartition() throws Exception {
-		ValidationUtil.validateCheckpointInterval( 101, 100 );
+	@Test
+	void validateCheckpointInterval_greaterThanRowsPerPartition() throws Exception {
+		assertThatThrownBy( () -> ValidationUtil.validateCheckpointInterval( 101, 100 ) )
+				.isInstanceOf( SearchException.class );
 	}
 
 	@Test
-	public void validateSessionClearInterval_lessThanCheckpointInterval() throws Exception {
+	void validateSessionClearInterval_lessThanCheckpointInterval() throws Exception {
 		ValidationUtil.validateSessionClearInterval( 99, 100 );
 		// ok
 	}
 
 	@Test
-	public void validateSessionClearInterval_equalToCheckpointInterval() {
+	void validateSessionClearInterval_equalToCheckpointInterval() {
 		ValidationUtil.validateSessionClearInterval( 100, 100 );
 		// ok
 	}
 
-	@Test(expected = SearchException.class)
-	public void validateSessionClearInterval_greaterThanCheckpointInterval() throws Exception {
-		ValidationUtil.validateSessionClearInterval( 101, 100 );
+	@Test
+	void validateSessionClearInterval_greaterThanCheckpointInterval() throws Exception {
+		assertThatThrownBy( () -> ValidationUtil.validateSessionClearInterval( 101, 100 ) )
+				.isInstanceOf( SearchException.class );
 	}
 
 	private static class NotIndexed {

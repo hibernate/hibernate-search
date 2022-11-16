@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Mincong Huang
  */
-public class MassIndexingJobParametersBuilderTest {
+class MassIndexingJobParametersBuilderTest {
 
 	private static final String SESSION_FACTORY_NAME = "someUniqueString";
 
@@ -40,7 +40,7 @@ public class MassIndexingJobParametersBuilderTest {
 	private static final CacheMode CACHE_MODE = CacheMode.GET;
 
 	@Test
-	public void testJobParamsAll() throws IOException {
+	void testJobParamsAll() throws IOException {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( String.class, Integer.class )
 				.entityManagerFactoryReference( SESSION_FACTORY_NAME )
@@ -78,7 +78,7 @@ public class MassIndexingJobParametersBuilderTest {
 	}
 
 	@Test
-	public void testForEntities_notNull() throws IOException {
+	void testForEntities_notNull() throws IOException {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( Integer.class, String.class )
 				.entityManagerFactoryReference( SESSION_FACTORY_NAME )
@@ -86,13 +86,11 @@ public class MassIndexingJobParametersBuilderTest {
 
 		String entityTypes = props.getProperty( MassIndexingJobParameters.ENTITY_TYPES );
 		List<String> entityNames = Arrays.asList( entityTypes.split( "," ) );
-		entityNames.forEach( entityName -> entityName = entityName.trim() );
-		assertThat( entityNames.contains( Integer.class.getName() ) ).isTrue();
-		assertThat( entityNames.contains( String.class.getName() ) ).isTrue();
+		assertThat( entityNames ).contains( Integer.class.getName(), String.class.getName() );
 	}
 
 	@Test
-	public void testForEntity_notNull() throws IOException {
+	void testForEntity_notNull() throws IOException {
 		Properties props = MassIndexingJob.parameters()
 				.forEntity( Integer.class )
 				.build();
@@ -103,27 +101,31 @@ public class MassIndexingJobParametersBuilderTest {
 		assertThat( entityNames.contains( Integer.class.getName() ) );
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testForEntity_null() {
-		MassIndexingJob.parameters().forEntity( null );
-	}
-
-	@Test(expected = NullPointerException.class)
-	public void testRestrictedBy_stringNull() {
-		MassIndexingJob.parameters().forEntity( String.class ).restrictedBy( (String) null );
-	}
-
-	@Test(expected = SearchException.class)
-	public void testSessionClearInterval_greaterThanCheckpointInterval() {
-		MassIndexingJob.parameters()
-				.forEntity( UnusedEntity.class )
-				.sessionClearInterval( 5 )
-				.checkpointInterval( 4 )
-				.build();
+	@Test
+	void testForEntity_null() {
+		assertThatThrownBy( () -> MassIndexingJob.parameters().forEntity( null ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
-	public void testSessionClearInterval_defaultGreaterThanCheckpointInterval() {
+	void testRestrictedBy_stringNull() {
+		assertThatThrownBy(
+				() -> MassIndexingJob.parameters().forEntity( String.class ).restrictedBy( (String) null ) )
+				.isInstanceOf( NullPointerException.class );
+	}
+
+	@Test
+	void testSessionClearInterval_greaterThanCheckpointInterval() {
+		assertThatThrownBy( () -> MassIndexingJob.parameters()
+				.forEntity( UnusedEntity.class )
+				.sessionClearInterval( 5 )
+				.checkpointInterval( 4 )
+				.build() )
+				.isInstanceOf( SearchException.class );
+	}
+
+	@Test
+	void testSessionClearInterval_defaultGreaterThanCheckpointInterval() {
 		MassIndexingJob.parameters()
 				.forEntity( UnusedEntity.class )
 				.checkpointInterval( MassIndexingJobParameters.Defaults.SESSION_CLEAR_INTERVAL_DEFAULT_RAW - 1 )
@@ -131,25 +133,27 @@ public class MassIndexingJobParametersBuilderTest {
 		// ok, session clear interval will default to the value of checkpointInterval
 	}
 
-	@Test(expected = SearchException.class)
-	public void testSessionClearInterval_greaterThanDefaultCheckpointInterval() {
-		MassIndexingJob.parameters()
+	@Test
+	void testSessionClearInterval_greaterThanDefaultCheckpointInterval() {
+		assertThatThrownBy( () -> MassIndexingJob.parameters()
 				.forEntity( UnusedEntity.class )
 				.sessionClearInterval( MassIndexingJobParameters.Defaults.CHECKPOINT_INTERVAL_DEFAULT_RAW + 1 )
-				.build();
-	}
-
-	@Test(expected = SearchException.class)
-	public void testCheckpointInterval_greaterThanRowsPerPartitions() {
-		MassIndexingJob.parameters()
-				.forEntity( UnusedEntity.class )
-				.checkpointInterval( 5 )
-				.rowsPerPartition( 4 )
-				.build();
+				.build() )
+				.isInstanceOf( SearchException.class );
 	}
 
 	@Test
-	public void testCheckpointInterval_defaultGreaterThanRowsPerPartitions() {
+	void testCheckpointInterval_greaterThanRowsPerPartitions() {
+		assertThatThrownBy( () -> MassIndexingJob.parameters()
+				.forEntity( UnusedEntity.class )
+				.checkpointInterval( 5 )
+				.rowsPerPartition( 4 )
+				.build() )
+				.isInstanceOf( SearchException.class );
+	}
+
+	@Test
+	void testCheckpointInterval_defaultGreaterThanRowsPerPartitions() {
 		MassIndexingJob.parameters()
 				.forEntity( UnusedEntity.class )
 				.rowsPerPartition( MassIndexingJobParameters.Defaults.CHECKPOINT_INTERVAL_DEFAULT_RAW - 1 )
@@ -157,16 +161,17 @@ public class MassIndexingJobParametersBuilderTest {
 		// ok, checkpoint interval will default to the value of rowsPerPartition
 	}
 
-	@Test(expected = SearchException.class)
-	public void testCheckpointInterval_greaterThanDefaultRowsPerPartitions() {
-		MassIndexingJob.parameters()
+	@Test
+	void testCheckpointInterval_greaterThanDefaultRowsPerPartitions() {
+		assertThatThrownBy( () -> MassIndexingJob.parameters()
 				.forEntity( UnusedEntity.class )
 				.checkpointInterval( MassIndexingJobParameters.Defaults.ROWS_PER_PARTITION + 1 )
-				.build();
+				.build() )
+				.isInstanceOf( SearchException.class );
 	}
 
 	@Test
-	public void testTenantId_null() throws Exception {
+	void testTenantId_null() throws Exception {
 		assertThatThrownBy( () -> MassIndexingJob.parameters()
 				.forEntity( UnusedEntity.class )
 				.tenantId( null ) )
@@ -175,7 +180,7 @@ public class MassIndexingJobParametersBuilderTest {
 	}
 
 	@Test
-	public void testTenantId_empty() throws Exception {
+	void testTenantId_empty() throws Exception {
 		assertThatThrownBy( () -> MassIndexingJob.parameters()
 				.forEntity( UnusedEntity.class )
 				.tenantId( "" ) )
@@ -184,7 +189,7 @@ public class MassIndexingJobParametersBuilderTest {
 	}
 
 	@Test
-	public void testIdFetchSize() throws Exception {
+	void testIdFetchSize() throws Exception {
 		for ( int allowedValue : Arrays.asList( Integer.MAX_VALUE, 0, Integer.MIN_VALUE ) ) {
 			MassIndexingJob.parameters()
 					.forEntity( UnusedEntity.class )
@@ -193,7 +198,7 @@ public class MassIndexingJobParametersBuilderTest {
 	}
 
 	@Test
-	public void testEntityFetchSize() throws Exception {
+	void testEntityFetchSize() throws Exception {
 		for ( int allowedValue : Arrays.asList( Integer.MAX_VALUE, 0, Integer.MIN_VALUE ) ) {
 			MassIndexingJob.parameters()
 					.forEntity( UnusedEntity.class )
