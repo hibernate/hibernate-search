@@ -62,11 +62,9 @@ import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationPr
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
-import org.hibernate.search.util.impl.test.rule.Retry;
+import org.hibernate.search.util.impl.test.rule.RetryExtension;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -102,8 +100,6 @@ public class ElasticsearchClientFactoryImplIT {
 	// Some tests in here are flaky, for some reason once in a while wiremock takes a very long time to answer
 	// even though no delay was configured.
 	// The exact reason is unknown though, so just try multiple times...
-	@Rule
-	public Retry retry;
 
 	@RegisterExtension
 	private final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
@@ -121,10 +117,6 @@ public class ElasticsearchClientFactoryImplIT {
 	private final ScheduledExecutorService timeoutExecutorService =
 			threadPoolProvider.newScheduledExecutor( 1, "Timeout - " );
 
-	public ElasticsearchClientFactoryImplIT() {
-		this.retry = Retry.withOtherRules( logged, wireMockRule1, wireMockRule2, testConfigurationProvider );
-	}
-
 	@AfterEach
 	public void cleanup() {
 		timeoutExecutorService.shutdownNow();
@@ -136,7 +128,7 @@ public class ElasticsearchClientFactoryImplIT {
 		wireMockRule2.resetAll();
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2274")
 	public void simple_http() {
 		String payload = "{ \"foo\": \"bar\" }";
@@ -162,7 +154,7 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	public void simple_httpClientConfigurer() throws Exception {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessage";
@@ -195,7 +187,7 @@ public class ElasticsearchClientFactoryImplIT {
 		verify( responseInterceptor, times( 1 ) ).process( any(), any() );
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-4099")
 	public void uris_http() {
 		String payload = "{ \"foo\": \"bar\" }";
@@ -225,7 +217,7 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-4051")
 	public void pathPrefix_http() {
 		String payload = "{ \"foo\": \"bar\" }";
@@ -255,7 +247,7 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-4099")
 	public void pathPrefix_uris() {
 		String payload = "{ \"foo\": \"bar\" }";
@@ -286,7 +278,7 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2274")
 	public void simple_https() {
 		String payload = "{ \"foo\": \"bar\" }";
@@ -317,7 +309,7 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2274")
 	public void uris_https() {
 		String payload = "{ \"foo\": \"bar\" }";
@@ -347,7 +339,7 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	public void error() {
 		String payload = "{ \"foo\": \"bar\" }";
 		String responseBody = "{ \"error\": \"ErrorMessageExplainingTheError\" }";
@@ -365,7 +357,7 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	public void unparseable() {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
@@ -390,7 +382,7 @@ public class ElasticsearchClientFactoryImplIT {
 				.isInstanceOf( JsonSyntaxException.class );
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	public void timeout_read() {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
@@ -417,7 +409,7 @@ public class ElasticsearchClientFactoryImplIT {
 				.isInstanceOf( IOException.class );
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	public void timeout_request() {
 		String payload = "{ \"foo\": \"bar\" }";
 
@@ -452,7 +444,7 @@ public class ElasticsearchClientFactoryImplIT {
 	 * we don't trigger timeouts just because requests spend a long time waiting;
 	 * timeouts are only related to how long the *server* takes to answer.
 	 */
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2836")
 	public void cloggedClient_noTimeout_read() {
 		String payload = "{ \"foo\": \"bar\" }";
@@ -489,7 +481,7 @@ public class ElasticsearchClientFactoryImplIT {
 	 * Verify that when a request timeout is set, and when the client is clogged (many pending requests),
 	 * we do trigger timeouts just because requests spend a long time waiting.
 	 */
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2836")
 	public void cloggedClient_timeout_request() {
 		String payload = "{ \"foo\": \"bar\" }";
@@ -528,7 +520,7 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2235")
 	public void multipleHosts() {
 		String payload = "{ \"foo\": \"bar\" }";
@@ -554,7 +546,7 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	public void multipleURIs() {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
@@ -579,7 +571,7 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2469")
 	public void multipleHosts_failover_serverError() {
 		String payload = "{ \"foo\": \"bar\" }";
@@ -617,7 +609,7 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2469")
 	public void multipleHosts_failover_timeout() {
 		String payload = "{ \"foo\": \"bar\" }";
@@ -666,7 +658,7 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2469")
 	public void multipleHosts_failover_fault() {
 		String payload = "{ \"foo\": \"bar\" }";
@@ -704,7 +696,7 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2449")
 	public void discovery_http() {
 		String nodesInfoResult = dummyNodeInfoResponse( wireMockRule1.port(), wireMockRule2.port() );
@@ -758,7 +750,7 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2736")
 	public void discovery_https() {
 		String nodesInfoResult = dummyNodeInfoResponse( wireMockRule1.httpsPort(), wireMockRule2.httpsPort() );
@@ -833,7 +825,7 @@ public class ElasticsearchClientFactoryImplIT {
 		};
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2453")
 	public void authentication() {
 		assumeFalse(
@@ -863,7 +855,7 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2453")
 	public void authentication_error() {
 		String payload = "{ \"foo\": \"bar\" }";
@@ -882,7 +874,7 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2453")
 	public void authentication_http_password() {
 		String username = "ironman";
@@ -900,7 +892,7 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	public void uriAndProtocol() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
 			properties.accept( ElasticsearchBackendSettings.URIS, "http://is-not-called:12345" );
@@ -918,7 +910,7 @@ public class ElasticsearchClientFactoryImplIT {
 				);
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	public void uriAndHosts() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
 			properties.accept( ElasticsearchBackendSettings.URIS, "http://is-not-called:12345" );
@@ -936,7 +928,7 @@ public class ElasticsearchClientFactoryImplIT {
 				);
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	public void differentProtocolsOnUris() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
 			properties.accept( ElasticsearchBackendSettings.URIS, "http://is-not-called:12345, https://neather-is:12345" );
@@ -951,7 +943,7 @@ public class ElasticsearchClientFactoryImplIT {
 				);
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	public void emptyListOfUris() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
 			properties.accept( ElasticsearchBackendSettings.URIS, Collections.emptyList() );
@@ -964,7 +956,7 @@ public class ElasticsearchClientFactoryImplIT {
 				);
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	public void emptyListOfHosts() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
 			properties.accept( ElasticsearchBackendSettings.HOSTS, Collections.emptyList() );
@@ -977,7 +969,7 @@ public class ElasticsearchClientFactoryImplIT {
 				);
 	}
 
-	@Test
+	@RetryExtension.TestWithRetry
 	public void clientInstance() throws IOException {
 		try ( RestClient myRestClient = RestClient.builder( HttpHost.create( httpUrisFor( wireMockRule1 ) ) ).build() ) {
 			String payload = "{ \"foo\": \"bar\" }";
