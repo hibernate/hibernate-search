@@ -45,12 +45,13 @@ import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationPr
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.Rule;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -87,9 +88,10 @@ public class ElasticsearchContentLengthIT {
 
 	private static final int BUFFER_LIMIT = 1024;
 
-	@Rule
-	public WireMockRule wireMockRule =
-			new WireMockRule( wireMockConfig().port( 0 ).httpsPort( 0 ) /* Automatic port selection */ );
+	@RegisterExtension
+	private final WireMockExtension wireMockRule = WireMockExtension.newInstance()
+			.options( wireMockConfig().dynamicPort().dynamicHttpsPort() )
+			.build();
 
 	@Rule
 	public TestConfigurationProvider testConfigurationProvider = new TestConfigurationProvider();
@@ -238,8 +240,8 @@ public class ElasticsearchContentLengthIT {
 		return builder.build();
 	}
 
-	private static String httpUriFor(WireMockRule rule) {
-		return "http://localhost:" + rule.port();
+	private static String httpUriFor(WireMockExtension extension) {
+		return "http://localhost:" + extension.getPort();
 	}
 
 	private static UrlPathPattern urlPathLike(String path) {

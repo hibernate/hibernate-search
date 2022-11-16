@@ -72,7 +72,7 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.http.Fault;
 import com.github.tomakehurst.wiremock.http.Request;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.github.tomakehurst.wiremock.matching.MatchResult;
 import com.github.tomakehurst.wiremock.matching.RequestMatcherExtension;
 import com.google.gson.GsonBuilder;
@@ -104,10 +104,15 @@ public class ElasticsearchClientFactoryImplIT {
 	@RegisterExtension
 	private final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
-	private final WireMockRule wireMockRule1 = new WireMockRule( wireMockConfig().port( 0 )
-			.httpsPort( 0 ) /* Automatic port selection */ );
+	@RegisterExtension
+	private final WireMockExtension wireMockRule1 = WireMockExtension.newInstance()
+			.options( wireMockConfig().dynamicPort().dynamicHttpsPort() )
+			.build();
 
-	private final WireMockRule wireMockRule2 = new WireMockRule( wireMockConfig().port( 0 ).httpsPort( 0 ) /* Automatic port selection */ );
+	@RegisterExtension
+	private final WireMockExtension wireMockRule2 = WireMockExtension.newInstance()
+			.options( wireMockConfig().dynamicPort().dynamicHttpsPort() )
+			.build();
 
 	private final TestConfigurationProvider testConfigurationProvider = new TestConfigurationProvider();
 
@@ -699,7 +704,7 @@ public class ElasticsearchClientFactoryImplIT {
 	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2449")
 	public void discovery_http() {
-		String nodesInfoResult = dummyNodeInfoResponse( wireMockRule1.port(), wireMockRule2.port() );
+		String nodesInfoResult = dummyNodeInfoResponse( wireMockRule1.getPort(), wireMockRule2.getPort() );
 
 		wireMockRule1.stubFor( get( urlPathMatching( "/_nodes.*" ) )
 				.andMatching( httpProtocol() )
@@ -753,7 +758,7 @@ public class ElasticsearchClientFactoryImplIT {
 	@RetryExtension.TestWithRetry
 	@TestForIssue(jiraKey = "HSEARCH-2736")
 	public void discovery_https() {
-		String nodesInfoResult = dummyNodeInfoResponse( wireMockRule1.httpsPort(), wireMockRule2.httpsPort() );
+		String nodesInfoResult = dummyNodeInfoResponse( wireMockRule1.getHttpsPort(), wireMockRule2.getHttpsPort() );
 
 		wireMockRule1.stubFor( get( urlPathMatching( "/_nodes.*" ) )
 				.andMatching( httpsProtocol() )
@@ -1067,27 +1072,27 @@ public class ElasticsearchClientFactoryImplIT {
 		return builder.build();
 	}
 
-	private static String httpHostAndPortFor(WireMockRule ... rules) {
-		return Arrays.stream( rules )
-				.map( rule -> "localhost:" + rule.port() )
+	private static String httpHostAndPortFor(WireMockExtension ... extensions) {
+		return Arrays.stream( extensions )
+				.map( extension -> "localhost:" + extension.getPort() )
 				.collect( Collectors.joining( "," ) );
 	}
 
-	private static String httpsHostAndPortFor(WireMockRule ... rules) {
-		return Arrays.stream( rules )
-				.map( rule -> "localhost:" + rule.httpsPort() )
+	private static String httpsHostAndPortFor(WireMockExtension ... extensions) {
+		return Arrays.stream( extensions )
+				.map( extension -> "localhost:" + extension.getHttpsPort() )
 				.collect( Collectors.joining( "," ) );
 	}
 
-	private static String httpUrisFor(WireMockRule ... rules) {
-		return Arrays.stream( rules )
-				.map( rule -> "http://localhost:" + rule.port() )
+	private static String httpUrisFor(WireMockExtension ... extensions) {
+		return Arrays.stream( extensions )
+				.map( extension -> "http://localhost:" + extension.getPort() )
 				.collect( Collectors.joining( "," ) );
 	}
 
-	private static String httpsUrisFor(WireMockRule ... rules) {
-		return Arrays.stream( rules )
-				.map( rule -> "https://localhost:" + rule.httpsPort() )
+	private static String httpsUrisFor(WireMockExtension ... extensions) {
+		return Arrays.stream( extensions )
+				.map( extension -> "https://localhost:" + extension.getHttpsPort() )
 				.collect( Collectors.joining( "," ) );
 	}
 
