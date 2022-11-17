@@ -26,6 +26,7 @@ import org.hibernate.search.util.impl.test.JsonHelper;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
@@ -33,8 +34,8 @@ public class ElasticsearchCustomLayoutStrategyIT {
 	@Rule
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
-	@Rule
-	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticsearchClient = TestElasticsearchClient.create();
 
 	@Test
 	public void smoke() {

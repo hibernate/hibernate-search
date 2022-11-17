@@ -47,8 +47,8 @@ public class ElasticsearchBootstrapIT {
 	@RegisterExtension
 	public ElasticsearchClientSpy elasticsearchClientSpy = ElasticsearchClientSpy.create();
 
-	@Rule
-	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticsearchClient = TestElasticsearchClient.create();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 

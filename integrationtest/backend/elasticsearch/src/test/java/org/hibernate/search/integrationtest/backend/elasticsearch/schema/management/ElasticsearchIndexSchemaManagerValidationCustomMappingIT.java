@@ -23,6 +23,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSch
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -41,8 +42,8 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	@Rule
-	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticsearchClient = TestElasticsearchClient.create();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 	private final ElasticsearchIndexSchemaManagerValidationOperation operation;

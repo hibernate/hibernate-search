@@ -23,7 +23,7 @@ class ElasticsearchTckBackendSetupStrategy extends TckBackendSetupStrategy<Elast
 
 	@Override
 	public TckBackendAccessor createBackendAccessor(TestConfigurationProvider configurationProvider) {
-		TestElasticsearchClient client = new TestElasticsearchClient();
+		TestElasticsearchClient client = TestElasticsearchClient.create();
 		client.open( configurationProvider );
 		return new ElasticsearchTckBackendAccessor( client );
 	}

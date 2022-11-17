@@ -26,6 +26,7 @@ import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests related to the mapping when updating indexes.
@@ -40,8 +41,8 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	@Rule
-	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticSearchClient = TestElasticsearchClient.create();
 
 	@Test
 	public void nothingToDo_1() {

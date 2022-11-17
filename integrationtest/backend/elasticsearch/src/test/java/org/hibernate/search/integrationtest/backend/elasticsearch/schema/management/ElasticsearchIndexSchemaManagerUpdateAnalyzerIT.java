@@ -19,9 +19,10 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedInde
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests related to analyzers when updating indexes.
@@ -32,8 +33,8 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	@Rule
-	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticSearchClient = TestElasticsearchClient.create();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 

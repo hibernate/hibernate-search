@@ -26,13 +26,14 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.google.gson.JsonParser;
 
 public class ElasticsearchCustomIndexMappingIT {
 
-	@Rule
-	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticsearchClient = TestElasticsearchClient.create();
 
 	@Rule
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(

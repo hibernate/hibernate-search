@@ -48,6 +48,9 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.Elas
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -58,15 +61,23 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class TestElasticsearchClient implements TestRule, Closeable {
+public class TestElasticsearchClient implements TestRule, BeforeTestExecutionCallback, AfterTestExecutionCallback, Closeable {
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
+	private TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 	private ThreadPoolProviderImpl threadPoolProvider;
 	private ScheduledExecutorService timeoutExecutorService;
 	private ElasticsearchClientImplementor client;
 
 	private final List<URLEncodedString> createdIndicesNames = new ArrayList<>();
+
+	private TestElasticsearchClient() {
+	}
+
+	public static TestElasticsearchClient create() {
+		return new TestElasticsearchClient();
+	}
 
 	public ElasticsearchTestDialect getDialect() {
 		return dialect;
@@ -477,6 +488,22 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 			aliases = new JsonObject();
 		}
 		return aliases.toString();
+	}
+
+	@Override
+	public void beforeTestExecution(ExtensionContext context) throws Exception {
+		configurationProvider.beforeTestExecution( context );
+
+		open( configurationProvider );
+	}
+
+	@Override
+	public void afterTestExecution(ExtensionContext context) throws Exception {
+		// Using the closer like this allows to suppress exceptions thrown by the 'finally' block.
+		try ( Closer<IOException> closer = new Closer<>() ) {
+			close( closer );
+		}
+		configurationProvider.afterTestExecution( context );
 	}
 
 	@Override

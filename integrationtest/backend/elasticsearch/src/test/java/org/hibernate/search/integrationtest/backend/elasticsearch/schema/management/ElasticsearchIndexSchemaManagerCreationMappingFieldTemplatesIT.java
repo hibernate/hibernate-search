@@ -24,6 +24,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSch
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -43,8 +44,8 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	@Rule
-	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticSearchClient = TestElasticsearchClient.create();
 
 	private final ElasticsearchIndexSchemaManagerOperation operation;
 

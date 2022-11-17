@@ -24,9 +24,10 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedInde
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests related to index custom settings when updating indexes.
@@ -37,8 +38,8 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	@Rule
-	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticsearchClient = TestElasticsearchClient.create();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 

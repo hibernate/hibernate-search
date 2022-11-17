@@ -19,6 +19,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test the base functionality of type name mapping strategies.
@@ -29,8 +30,8 @@ public class ElasticsearchIndexNamingBaseIT {
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	@Rule
-	public final TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public final TestElasticsearchClient elasticsearchClient = TestElasticsearchClient.create();
 
 	private final StubMappedIndex index1 = StubMappedIndex.withoutFields().name( "index1" );
 	private final StubMappedIndex index2 = StubMappedIndex.withoutFields().name( "index2" );

@@ -24,6 +24,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSch
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests related to the mapping when updating indexes and field templates are defined.
@@ -33,8 +34,8 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	@Rule
-	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticSearchClient = TestElasticsearchClient.create();
 
 	@Test
 	public void nothingToDo() {

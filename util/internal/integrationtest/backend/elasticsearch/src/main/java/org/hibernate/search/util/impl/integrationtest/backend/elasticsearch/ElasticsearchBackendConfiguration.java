@@ -17,7 +17,7 @@ import org.junit.rules.TestRule;
 
 public class ElasticsearchBackendConfiguration extends BackendConfiguration {
 
-	protected final TestElasticsearchClient testElasticsearchClient = new TestElasticsearchClient();
+	protected final TestElasticsearchClient testElasticsearchClient = TestElasticsearchClient.create();
 
 	@Override
 	public String toString() {

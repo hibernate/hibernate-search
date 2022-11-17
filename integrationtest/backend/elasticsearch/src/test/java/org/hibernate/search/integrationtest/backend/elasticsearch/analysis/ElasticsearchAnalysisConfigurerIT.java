@@ -24,6 +24,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class ElasticsearchAnalysisConfigurerIT {
 
@@ -35,8 +36,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	@Rule
-	public final TestElasticsearchClient client = new TestElasticsearchClient();
+	@RegisterExtension
+	public final TestElasticsearchClient client = TestElasticsearchClient.create();
 
 	@Test
 	public void error_invalidReference() {

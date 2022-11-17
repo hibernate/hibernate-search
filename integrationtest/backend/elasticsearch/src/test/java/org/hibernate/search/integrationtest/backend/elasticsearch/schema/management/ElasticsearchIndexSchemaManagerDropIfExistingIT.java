@@ -22,6 +22,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests related to dropping the index.
@@ -31,8 +32,8 @@ public class ElasticsearchIndexSchemaManagerDropIfExistingIT {
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	@Rule
-	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticSearchClient = TestElasticsearchClient.create();
 
 	private final StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
 		root.field( "field", f -> f.asString() )
