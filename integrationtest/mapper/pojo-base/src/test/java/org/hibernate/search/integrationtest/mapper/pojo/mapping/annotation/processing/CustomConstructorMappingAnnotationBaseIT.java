@@ -56,8 +56,8 @@ public class CustomConstructorMappingAnnotationBaseIT {
 	@Rule
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	@Rule
-	public StaticCounters counters = new StaticCounters();
+	@RegisterExtension
+	public StaticCounters counters = StaticCounters.create();
 
 	/**
 	 * Basic test checking that a simple constructor mapping will be applied as expected.

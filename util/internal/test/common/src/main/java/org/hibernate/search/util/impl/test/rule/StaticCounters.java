@@ -9,18 +9,18 @@ package org.hibernate.search.util.impl.test.rule;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 /**
  * Rule useful when mocks are not an option, for instance because objects are instantiated using reflection.
  * This rule ensures static counters are set to zero before the test,
  * allows to increment them from static methods, and allows to check the counters from the rule itself.
  */
-public final class StaticCounters implements TestRule {
+public final class StaticCounters implements BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
-	private static final StaticCounters DUMMY_INSTANCE = new StaticCounters();
+	private static final StaticCounters DUMMY_INSTANCE = create();
 	private static StaticCounters activeInstance = null;
 
 	public static final class Key {
@@ -45,29 +45,29 @@ public final class StaticCounters implements TestRule {
 		}
 	}
 
+	public static StaticCounters create() {
+		return new StaticCounters();
+	}
+	private StaticCounters() {
+	}
+
 	private final Map<Key, Integer> counters = new ConcurrentHashMap<>();
 
 	@Override
-	public Statement apply(Statement base, Description description) {
-		return new Statement() {
-			@Override
-			public void evaluate() throws Throwable {
-				counters.clear();
-				if ( activeInstance != null ) {
-					throw new IllegalStateException( "Using StaticCounters twice in a single test is forbidden."
-							+ " Make sure you added one (and only one)"
-							+ " '@Rule public StaticCounter counters = new StaticCounters()' to your test." );
-				}
-				activeInstance = StaticCounters.this;
-				try {
-					base.evaluate();
-				}
-				finally {
-					activeInstance = null;
-					counters.clear();
-				}
-			}
-		};
+	public void beforeTestExecution(ExtensionContext context) {
+		counters.clear();
+		if ( activeInstance != null ) {
+			throw new IllegalStateException( "Using StaticCounters twice in a single test is forbidden."
+					+ " Make sure you added one (and only one)"
+					+ " '@RegisterExtension public StaticCounter counters = StaticCounters.create()' to your test." );
+		}
+		activeInstance = StaticCounters.this;
+	}
+
+	@Override
+	public void afterTestExecution(ExtensionContext context) {
+		activeInstance = null;
+		counters.clear();
 	}
 
 	public void increment(Key key) {

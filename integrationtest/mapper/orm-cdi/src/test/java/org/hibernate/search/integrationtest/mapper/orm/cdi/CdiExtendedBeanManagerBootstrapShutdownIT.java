@@ -33,7 +33,6 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -50,11 +49,11 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 	@RegisterExtension
 	public final BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public final OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
-	public final StaticCounters counters = new StaticCounters();
+	@RegisterExtension
+	public final StaticCounters counters = StaticCounters.create();
 
 	@RegisterExtension
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();

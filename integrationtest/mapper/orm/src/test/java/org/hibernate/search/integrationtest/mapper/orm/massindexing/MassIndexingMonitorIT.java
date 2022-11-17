@@ -31,7 +31,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -47,11 +46,11 @@ public class MassIndexingMonitorIT {
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
-	public StaticCounters staticCounters = new StaticCounters();
+	@RegisterExtension
+	public StaticCounters staticCounters = StaticCounters.create();
 
 	@Test
 	public void simple() {

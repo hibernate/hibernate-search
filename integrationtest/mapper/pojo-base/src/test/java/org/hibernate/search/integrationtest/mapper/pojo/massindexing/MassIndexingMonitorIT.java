@@ -49,8 +49,8 @@ public class MassIndexingMonitorIT {
 	@Rule
 	public final StandalonePojoMappingSetupHelper setupHelper
 			= StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
-	@Rule
-	public StaticCounters staticCounters = new StaticCounters();
+	@RegisterExtension
+	public StaticCounters staticCounters = StaticCounters.create();
 
 	private final StubLoadingContext loadingContext = new StubLoadingContext();
 
