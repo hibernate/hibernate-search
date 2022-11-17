@@ -49,15 +49,21 @@ import org.hibernate.search.util.impl.test.function.ThrowingConsumer;
 import org.hibernate.search.util.impl.test.function.ThrowingFunction;
 
 import org.hibernate.testing.junit4.CustomParameterized;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.Extension;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
 import org.jboss.logging.Logger;
+
+import org.opentest4j.TestAbortedException;
 
 /**
  * A test rule to create a {@link SessionFactory} and reuse it across test methods,
@@ -69,14 +75,14 @@ import org.jboss.logging.Logger;
  * <p>
  * Usage with BackendMock:
  * <pre>{@code
- * 	@ClassRule
- * 	public static BackendMock backendMock = new BackendMock();
+ * 	@RegisterExtension
+ * 	public static BackendMock backendMock = BackendMock.createGlobal();
  *
- * 	@ClassRule
+ * 	@RegisterExtension
  * 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
  *
- * 	@Rule
- * 	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+ * 	@RegisterExtension
+ * 	public Extension setupHolderMethodExtension = setupHolder.methodExtension();
  *
  * 	@ReusableOrmSetupHolder.Setup
  * 	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
@@ -87,12 +93,12 @@ import org.jboss.logging.Logger;
  * <p>
  * Usage with real backends:
  * <pre>{@code
- *  @ClassRule
+ *  @RegisterExtension
  *  public static ReusableOrmSetupHolder setupHolder =
  *  		ReusableOrmSetupHolder.withSingleBackend( BackendConfigurations.simple() );
  *
- * 	@Rule
- * 	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+ *  @RegisterExtension
+ * 	public Extension setupHolderMethodExtension = setupHolder.methodExtension();
  *
  * 	@ReusableOrmSetupHolder.Setup
  * 	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
@@ -101,7 +107,7 @@ import org.jboss.logging.Logger;
  * 	}
  * }</pre>
  */
-public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Session, Transaction> {
+public class ReusableOrmSetupHolder implements TestRule, BeforeAllCallback, AfterAllCallback, PersistenceRunner<Session, Transaction> {
 	private static final Logger log = Logger.getLogger( ReusableOrmSetupHolder.class.getName() );
 
 	/**
@@ -195,13 +201,37 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 
 	// We need the class rule and test rule to be two separate objects, unfortunately.
 	// See
-	public MethodRule methodRule() {
-		return new MethodRule() {
-			@Override
-			public Statement apply(Statement base, FrameworkMethod method, Object target) {
-				return methodStatement( base, target );
+	public Extension methodExtension() {
+		return new MethodExtension();
+	}
+
+	private class MethodExtension implements BeforeEachCallback, AfterEachCallback {
+		@Override
+		public void beforeEach(ExtensionContext context) {
+			inMethodStatement = true;
+			setupSessionFactory( context );
+		}
+
+		@Override
+		public void afterEach(ExtensionContext context) {
+			try {
+				// if an abort exception was encountered we don't want to verify anything and just cleanup expectations and fail:
+				if ( context.getExecutionException().map( ex -> ex instanceof TestAbortedException ).orElse( Boolean.FALSE ) ) {
+					throw (TestAbortedException) context.getExecutionException().get();
+				}
+				// Since BackendMock is used as a ClassRule,
+				// we must explicitly force the verify/reset after each test method.
+				for ( BackendMock backendMock : allBackendMocks ) {
+					backendMock.verifyExpectationsMet();
+				}
 			}
-		};
+			finally {
+				inMethodStatement = false;
+				for ( BackendMock backendMock : allBackendMocks ) {
+					backendMock.resetExpectations();
+				}
+			}
+		}
 	}
 
 	public ReusableOrmSetupHolder coordinationStrategy(CoordinationStrategyExpectations coordinationStrategyExpectations) {
@@ -266,6 +296,24 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 		return classStatement( base, description );
 	}
 
+	@Override
+	public void afterAll(ExtensionContext context) throws Exception {
+		try ( Closer<Exception> closer = new Closer<>() ) {
+			inClassStatement = false;
+			// Do this in the closer in order to preserve the original exception.
+			closer.push( ReusableOrmSetupHolder::tearDownSessionFactory, ReusableOrmSetupHolder.this );
+		}
+		finally {
+			setupHelper.afterTestExecution( context );
+		}
+	}
+
+	@Override
+	public void beforeAll(ExtensionContext context) {
+		setupHelper.beforeTestExecution( context );
+		inClassStatement = true;
+	}
+
 	private Statement classStatement(Statement base, Description description) {
 		Statement wrapped = new Statement() {
 			@Override
@@ -286,39 +334,15 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 		return setupHelper.apply( wrapped, description );
 	}
 
-	private Statement methodStatement(Statement base, Object testInstance) {
-		return new Statement() {
-			@Override
-			public void evaluate() throws Throwable {
-				try {
-					setupSessionFactory( testInstance );
-					inMethodStatement = true;
-					base.evaluate();
-					// Since BackendMock is used as a ClassRule,
-					// we must explicitly force the verify/reset after each test method.
-					for ( BackendMock backendMock : allBackendMocks ) {
-						backendMock.verifyExpectationsMet();
-					}
-				}
-				finally {
-					inMethodStatement = false;
-					for ( BackendMock backendMock : allBackendMocks ) {
-						backendMock.resetExpectations();
-					}
-				}
-			}
-		};
-	}
-
-	private void setupSessionFactory(Object testInstance) {
+	private void setupSessionFactory(ExtensionContext context) {
 		if ( !inClassStatement ) {
 			throw new Error( "This usage of " + getClass().getSimpleName() + " is invalid and may result"
 					+ " in the session factory not being closed."
-					+ " Did you use the rule as explained in the javadoc, with both a @ClassRule and a @Rule,"
+					+ " Did you use the extension as explained in the javadoc, with a @RegisterExtension"
 					+ " on two separate fields?" );
 		}
 
-		Collection<?> testParams = testParams( testInstance );
+		Collection<?> testParams = testParams( context );
 
 		if ( sessionFactory != null ) {
 			if ( testParams.equals( testParamsForSessionFactory ) ) {
@@ -341,7 +365,7 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 
 		OrmSetupHelper.SetupContext setupContext = setupHelper.start();
 		config = new DataClearConfigImpl();
-		TestCustomSetup customSetup = new TestCustomSetup( testInstance );
+		TestCustomSetup customSetup = new TestCustomSetup( context );
 		customSetup.callSetupMethods( setupContext, config );
 		sessionFactory = setupContext.setup().unwrap( SessionFactoryImplementor.class );
 		testParamsForSessionFactory = testParams;
@@ -360,7 +384,8 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 		}
 	}
 
-	private Collection<?> testParams(Object testInstance) {
+	private Collection<?> testParams(ExtensionContext context) {
+		Object testInstance = context.getRequiredTestInstance();
 		@SuppressWarnings("rawtypes")
 		List<TestPluggableMethod<Collection>> setupParamsMethods = TestPluggableMethod.createAll( SetupParams.class,
 				testInstance.getClass(), Collection.class, Collections.emptyList() );
@@ -611,8 +636,8 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 
 		private final Object testInstance;
 
-		TestCustomSetup(Object testInstance) {
-			this.testInstance = testInstance;
+		TestCustomSetup(ExtensionContext context) {
+			this.testInstance = context.getRequiredTestInstance();
 			this.setupMethods = TestPluggableMethod.createAll( Setup.class, testInstance.getClass(), void.class, KEYS );
 		}
 

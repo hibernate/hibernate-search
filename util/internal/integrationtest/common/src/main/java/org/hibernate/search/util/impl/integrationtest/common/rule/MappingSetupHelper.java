@@ -20,12 +20,16 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.AbstractSetupContext, B, R> implements TestRule {
+public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.AbstractSetupContext, B, R> implements TestRule,
+		BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
 	private final TestConfigurationProvider configurationProvider;
 	private final BackendSetupStrategy backendSetupStrategy;
@@ -55,6 +59,29 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 	@Override
 	public Statement apply(Statement base, Description description) {
 		return statement( base, description );
+	}
+
+	@Override
+	public void beforeTestExecution(ExtensionContext context) {
+		configurationProvider.beforeTestExecution( context );
+		init();
+	}
+
+	@Override
+	public void afterTestExecution(ExtensionContext context) throws Exception {
+		try ( Closer<Exception> closer = new Closer<>() ) {
+			// Make sure to close the last-created resource first,
+			// to avoid problems e.g. if starting multiple ORM SessionFactories
+			// where only the first one creates/drops the schema:
+			// in that case the other SessionFactories must be closed before the first one,
+			// to avoid any SQL queries after the schema was dropped.
+			Collections.reverse( toClose );
+			closer.pushAll( MappingSetupHelper.this::close, toClose );
+			toClose.clear();
+		}
+		finally {
+			configurationProvider.afterTestExecution( context );
+		}
 	}
 
 	protected abstract C createSetupContext();

@@ -56,12 +56,10 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetu
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SlowerLoadingListener;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.rules.MethodRule;
 
 /**
  * Test entity loading when executing a search query
@@ -72,11 +70,11 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	@RegisterExtension
 	public static BackendMock backendMock = BackendMock.createGlobal();
 
-	@ClassRule
+	@RegisterExtension
 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+	@RegisterExtension
+	public Extension setupHolderMethodRule = setupHolder.methodExtension();
 
 	@Override
 	protected BackendMock backendMock() {

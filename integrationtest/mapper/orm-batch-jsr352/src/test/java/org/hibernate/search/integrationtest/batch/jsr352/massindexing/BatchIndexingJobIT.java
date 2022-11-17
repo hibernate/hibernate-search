@@ -28,12 +28,12 @@ import javax.persistence.criteria.Root;
 import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
 import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.StepProgress;
-import org.hibernate.search.integrationtest.batch.jsr352.util.BackendConfigurations;
-import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.CompanyGroup;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Person;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.WhoAmI;
+import org.hibernate.search.integrationtest.batch.jsr352.util.BackendConfigurations;
+import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -45,10 +45,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetu
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.extension.Extension;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * @author Mincong Huang
@@ -70,11 +69,12 @@ public class BatchIndexingJobIT {
 
 	private static final String MAIN_STEP_NAME = "produceLuceneDoc";
 
-	@ClassRule
+	@RegisterExtension
 	public static ReusableOrmSetupHolder setupHolder =
 			ReusableOrmSetupHolder.withSingleBackend( BackendConfigurations.simple() );
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+
+	@RegisterExtension
+	public Extension setupHolderMethodRule = setupHolder.methodExtension();
 
 	private EntityManagerFactory emf;
 	private JobOperator jobOperator;

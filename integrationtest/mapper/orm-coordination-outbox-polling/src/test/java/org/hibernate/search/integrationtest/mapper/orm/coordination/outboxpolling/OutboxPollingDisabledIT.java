@@ -26,11 +26,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStr
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.rules.MethodRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -55,11 +53,12 @@ public class OutboxPollingDisabledIT {
 	@RegisterExtension
 	public static BackendMock backendMock = BackendMock.createGlobal();
 
-	@ClassRule
+	@RegisterExtension
 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.defaults() );
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+
+	@RegisterExtension
+	public Extension setupHolderMethodRule = setupHolder.methodExtension();
 
 	@Parameterized.Parameter
 	public boolean hibernateSearchEnabled;

@@ -24,22 +24,21 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.extension.Extension;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 	private static final String BACKEND2_NAME = "stubBackend2";
 
-	@ClassRule
-	public static BackendMock defaultBackendMock = BackendMock.create();
+	@RegisterExtension
+	public static BackendMock defaultBackendMock = BackendMock.createGlobal();
 
-	@ClassRule
-	public static BackendMock backend2Mock = BackendMock.create();
+	@RegisterExtension
+	public static BackendMock backend2Mock = BackendMock.createGlobal();
 
-	@ClassRule
+	@RegisterExtension
 	public static ReusableOrmSetupHolder setupHolder;
 	static {
 		Map<String, BackendMock> namedBackendMocks = new LinkedHashMap<>();
@@ -47,8 +46,8 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 		setupHolder = ReusableOrmSetupHolder.withBackendMocks( defaultBackendMock, namedBackendMocks );
 	}
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+	@RegisterExtension
+	public Extension setupHolderMethodRule = setupHolder.methodExtension();
 
 	@ReusableOrmSetupHolder.Setup
 	public void setup(OrmSetupHelper.SetupContext setupContext) {

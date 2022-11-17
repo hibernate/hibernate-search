@@ -26,24 +26,23 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.extension.Extension;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class SearchMappingNoDefaultBackendIT {
 
 	private static final String BACKEND_1_NAME = "stubBackend1";
 	private static final String BACKEND_2_NAME = "stubBackend2";
 
-	@ClassRule
-	public static BackendMock backend1Mock = BackendMock.create();
+	@RegisterExtension
+	public static BackendMock backend1Mock = BackendMock.createGlobal();
 
-	@ClassRule
-	public static BackendMock backend2Mock = BackendMock.create();
+	@RegisterExtension
+	public static BackendMock backend2Mock = BackendMock.createGlobal();
 
-	@ClassRule
+	@RegisterExtension
 	public static ReusableOrmSetupHolder setupHolder;
 	static {
 		Map<String, BackendMock> namedBackendMocks = new LinkedHashMap<>();
@@ -52,8 +51,8 @@ public class SearchMappingNoDefaultBackendIT {
 		setupHolder = ReusableOrmSetupHolder.withBackendMocks( null, namedBackendMocks );
 	}
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+	@RegisterExtension
+	public Extension setupHolderMethodRule = setupHolder.methodExtension();
 
 	private SearchMapping mapping;
 
