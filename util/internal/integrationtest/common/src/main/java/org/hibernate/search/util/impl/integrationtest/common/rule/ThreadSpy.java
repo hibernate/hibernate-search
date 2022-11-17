@@ -18,9 +18,9 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 /**
  * Spy on the threads created by Hibernate Search.
@@ -29,23 +29,24 @@ import org.junit.runners.model.Statement;
  * then set {@link EngineSpiSettings#THREAD_PROVIDER} to the result of {@link ThreadSpy#getThreadProvider()}
  * when starting Hibernate Search.
  */
-public class ThreadSpy implements TestRule {
+public class ThreadSpy implements BeforeTestExecutionCallback, AfterTestExecutionCallback {
 	private List<Thread> createdThreads = Collections.synchronizedList( new ArrayList<>() );
 
+	private ThreadSpy() {
+	}
+
+	public static ThreadSpy create() {
+		return new ThreadSpy();
+	}
+
 	@Override
-	public Statement apply(Statement base, Description description) {
-		return new Statement() {
-			@Override
-			public void evaluate() throws Throwable {
-				setup();
-				try {
-					base.evaluate();
-				}
-				finally {
-					tearDown();
-				}
-			}
-		};
+	public void afterTestExecution(ExtensionContext context) {
+		tearDown();
+	}
+
+	@Override
+	public void beforeTestExecution(ExtensionContext context) {
+		setup();
 	}
 
 	public BeanReference<ThreadProvider> getThreadProvider() {
