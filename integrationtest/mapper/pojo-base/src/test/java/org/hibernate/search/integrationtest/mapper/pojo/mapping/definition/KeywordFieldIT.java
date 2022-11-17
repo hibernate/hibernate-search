@@ -16,27 +16,28 @@ import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
-import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
-import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
-import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test common use cases of the {@link KeywordField} annotation.
@@ -53,8 +54,8 @@ public class KeywordFieldIT {
 	private static final String INDEX_NAME = "IndexName";
 	private static final String NORMALIZER_NAME = "myNormalizer";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );

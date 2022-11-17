@@ -12,9 +12,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.List;
 
-import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
-import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
-import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractionContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
@@ -25,13 +22,17 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerEx
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test error cases when applying container value extractors in the {@code @GenericField} annotation.
@@ -44,8 +45,8 @@ public class FieldContainerExtractorBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );

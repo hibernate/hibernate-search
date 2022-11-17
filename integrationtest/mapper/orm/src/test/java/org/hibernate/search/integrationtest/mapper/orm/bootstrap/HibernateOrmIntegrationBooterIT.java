@@ -45,10 +45,10 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.Fail;
 import org.mockito.Mock;
@@ -64,8 +64,8 @@ public class HibernateOrmIntegrationBooterIT {
 
 	private final List<AutoCloseable> toClose = new ArrayList<>();
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Mock
 	private ValueReadHandle<Integer> idValueReadHandleMock;

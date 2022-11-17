@@ -58,8 +58,8 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 		return result;
 	}
 
-	@ClassRule
-	public static BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.createGlobal();
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );

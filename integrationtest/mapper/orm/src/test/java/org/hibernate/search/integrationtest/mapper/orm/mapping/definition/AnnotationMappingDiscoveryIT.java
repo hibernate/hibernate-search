@@ -19,11 +19,11 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
-import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -39,11 +39,12 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class AnnotationMappingDiscoveryIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );

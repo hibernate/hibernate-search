@@ -25,7 +25,10 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubMassLoadingStrategy;
-import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.standalone.loading.LoadingTypeGroup;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassEntityLoader;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassEntitySink;
@@ -35,20 +38,18 @@ import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingOptions;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.ThreadSpy;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
@@ -62,8 +63,8 @@ public abstract class AbstractMassIndexingFailureIT {
 	public static final String TITLE_3 = "Frankenstein";
 	public static final String AUTHOR_3 = "Mary Shelley";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public final StandalonePojoMappingSetupHelper setupHelper

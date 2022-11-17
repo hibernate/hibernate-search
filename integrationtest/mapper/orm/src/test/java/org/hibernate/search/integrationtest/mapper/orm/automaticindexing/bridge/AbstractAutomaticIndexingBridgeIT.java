@@ -35,6 +35,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * An abstract base for tests dealing with automatic indexing based on Hibernate ORM entity events when
@@ -42,8 +43,8 @@ import org.junit.jupiter.api.Test;
  */
 public abstract class AbstractAutomaticIndexingBridgeIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );

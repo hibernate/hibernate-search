@@ -51,10 +51,11 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.SlowerLoadingLi
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.TimeoutLoadingListener;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.rules.MethodRule;
 
 /**
@@ -74,8 +75,8 @@ public class SearchQueryBaseIT {
 	private static final String TITLE_AVENUE_OF_MYSTERIES = "Avenue of Mysteries";
 	private static final String AUTHOR_AVENUE_OF_MYSTERIES = "John Irving";
 
-	@ClassRule
-	public static BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.createGlobal();
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );

@@ -17,8 +17,6 @@ import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
-import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
-import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotatedType;
@@ -27,14 +25,17 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test common use cases of (custom) type mapping annotations.
@@ -45,8 +46,8 @@ public class CustomTypeMappingAnnotationBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );

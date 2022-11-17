@@ -7,8 +7,8 @@
 package org.hibernate.search.integrationtest.mapper.orm.hibernateormapis;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.runInTransaction;
 import static org.assertj.core.api.Assertions.fail;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.runInTransaction;
 
 import java.lang.reflect.Proxy;
 import java.util.concurrent.CompletableFuture;
@@ -38,6 +38,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.rules.MethodRule;
 
 /**
@@ -56,8 +57,8 @@ public class ToSearchSessionFromSessionProxyIT {
 			SharedSessionContract.class
 	};
 
-	@ClassRule
-	public static BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.createGlobal();
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );

@@ -29,6 +29,7 @@ import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -39,8 +40,8 @@ import org.mockito.quality.Strictness;
 @ExtendWith(MockitoExtension.class)
 abstract class AbstractPojoReindexingResolutionFailureIT {
 
-	@Rule
-	public final BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public final BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public final StandalonePojoMappingSetupHelper setupHelper =

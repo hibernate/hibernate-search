@@ -28,7 +28,6 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.PropertyTypeDescriptor;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
-import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
@@ -38,10 +37,12 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -58,8 +59,8 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 				.toArray();
 	}
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );

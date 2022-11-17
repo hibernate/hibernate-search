@@ -32,6 +32,7 @@ import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test of automatic rebalancing for dynamic sharding with the outbox-polling coordination strategy.
@@ -48,8 +49,8 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 	// or agents will be likely to expire while processing a single batch.
 	private static final int PULSE_EXPIRATION = 5000;
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )

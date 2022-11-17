@@ -30,6 +30,7 @@ import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 
 // This does not work because Hibernate ORM doesn't support instantiating records
@@ -37,8 +38,8 @@ import org.junit.jupiter.api.Test;
 @Disabled
 public class IndexedEmbeddedRecordIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );

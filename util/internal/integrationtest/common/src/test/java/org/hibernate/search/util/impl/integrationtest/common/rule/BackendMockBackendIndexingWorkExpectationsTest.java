@@ -19,8 +19,8 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.AbstractThrowableAssert;
 
@@ -28,8 +28,8 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 
 	private static final String INDEX_NAME = "indexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4287")

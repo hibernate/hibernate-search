@@ -36,10 +36,11 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBa
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.rules.MethodRule;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -53,8 +54,8 @@ public class ToHibernateOrmScrollableResultsIT {
 	private static final int ENTITY_COUNT = 1000;
 	private static final int DEFAULT_FETCH_SIZE = 100;
 
-	@ClassRule
-	public static BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.createGlobal();
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );

@@ -27,9 +27,10 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests a corner case that is not covered by
@@ -40,8 +41,8 @@ import org.junit.jupiter.api.Test;
 @TestForIssue(jiraKey = "HSEARCH-2496")
 public class ContainedInThroughNonContainingIndexedTypeIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );

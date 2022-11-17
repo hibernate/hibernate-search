@@ -13,32 +13,33 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
-import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
-import org.hibernate.search.mapper.pojo.standalone.common.impl.EntityReferenceImpl;
-import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
-import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
-import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
+import org.hibernate.search.mapper.pojo.standalone.common.impl.EntityReferenceImpl;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test common use cases of the {@code @DocumentId} annotation.
@@ -50,8 +51,8 @@ public class DocumentIdBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );

@@ -34,8 +34,8 @@ public class AutomaticIndexingEnabledIT {
 			+ "'hibernate.search.automatic_indexing.strategy' is deprecated;"
 			+ " use 'hibernate.search.automatic_indexing.enabled' instead";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );

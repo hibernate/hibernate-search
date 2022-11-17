@@ -23,8 +23,8 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -37,9 +37,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.rules.MethodRule;
 
@@ -50,10 +50,10 @@ public class SearchMappingIT {
 	private static final String BACKEND_2_NAME = "stubBackend2";
 
 	@ClassRule
-	public static BackendMock defaultBackendMock = new BackendMock();
+	public static BackendMock defaultBackendMock = BackendMock.create();
 
 	@ClassRule
-	public static BackendMock backend2Mock = new BackendMock();
+	public static BackendMock backend2Mock = BackendMock.create();
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder;

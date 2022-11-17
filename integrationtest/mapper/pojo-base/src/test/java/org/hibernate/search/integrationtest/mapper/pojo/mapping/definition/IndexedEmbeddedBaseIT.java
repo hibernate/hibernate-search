@@ -24,9 +24,6 @@ import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.AnnotationMappingSmokeIT;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.ProgrammaticMappingSmokeIT;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubBridge;
-import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
-import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
-import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge;
@@ -34,10 +31,10 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LatitudeMark
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LongitudeMarker;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
-import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -47,16 +44,20 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test common use cases of the {@code @IndexedEmbedded} annotation.
@@ -73,8 +74,8 @@ public class IndexedEmbeddedBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );

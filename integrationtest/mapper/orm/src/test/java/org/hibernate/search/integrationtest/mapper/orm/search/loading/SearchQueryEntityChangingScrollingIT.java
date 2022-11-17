@@ -33,15 +33,16 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubNextScrollWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class SearchQueryEntityChangingScrollingIT {
 
 	public static final String NEW_NAME = "new-name";
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );

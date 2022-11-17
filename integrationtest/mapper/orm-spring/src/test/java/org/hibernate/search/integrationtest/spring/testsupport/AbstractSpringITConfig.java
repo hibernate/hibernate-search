@@ -29,7 +29,7 @@ public abstract class AbstractSpringITConfig {
 
 	@Bean
 	public BackendMock backendMock() {
-		return new BackendMock().ignoreSchema();
+		return BackendMock.create().ignoreSchema();
 	}
 
 	@Bean

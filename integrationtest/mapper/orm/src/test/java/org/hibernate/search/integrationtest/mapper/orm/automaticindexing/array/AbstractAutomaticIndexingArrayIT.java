@@ -13,6 +13,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetu
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.rules.MethodRule;
 
 /**
@@ -21,8 +22,8 @@ import org.junit.rules.MethodRule;
  */
 public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexField> {
 
-	@ClassRule
-	public static BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.createGlobal();
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );

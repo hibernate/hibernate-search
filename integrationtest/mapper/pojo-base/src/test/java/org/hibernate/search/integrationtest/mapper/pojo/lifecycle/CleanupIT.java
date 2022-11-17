@@ -13,8 +13,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubContainerExtractor;
-import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
@@ -33,16 +33,17 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubBridge;
-import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
+import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManagerBuilder;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test that all resources are closed as expected upon shutdown, or when startup fails.
@@ -56,8 +57,8 @@ public class CleanupIT {
 			StartupStubContainerExtractor.createKeys();
 	private static final StartupStubBridge.CounterKeys VALUE_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );

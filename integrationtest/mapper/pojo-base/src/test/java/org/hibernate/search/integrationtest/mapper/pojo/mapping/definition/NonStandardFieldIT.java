@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
@@ -24,10 +23,12 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendExtension;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test common use cases of the {@link NonStandardField} annotation.
@@ -43,8 +44,8 @@ public class NonStandardFieldIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );

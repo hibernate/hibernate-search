@@ -33,6 +33,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Check that we correctly populate the metamodel when ORM generates a {@link org.hibernate.mapping.Backref}
@@ -43,8 +44,8 @@ import org.junit.jupiter.api.Test;
 @TestForIssue(jiraKey = "HSEARCH-4156")
 public class BackRefPropertyIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );

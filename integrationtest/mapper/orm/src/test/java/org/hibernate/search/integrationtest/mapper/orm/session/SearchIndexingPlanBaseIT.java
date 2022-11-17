@@ -29,9 +29,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.rules.MethodRule;
 
@@ -41,10 +41,10 @@ public class SearchIndexingPlanBaseIT {
 	private static final String BACKEND2_NAME = "stubBackend2";
 
 	@ClassRule
-	public static BackendMock defaultBackendMock = new BackendMock();
+	public static BackendMock defaultBackendMock = BackendMock.create();
 
 	@ClassRule
-	public static BackendMock backend2Mock = new BackendMock();
+	public static BackendMock backend2Mock = BackendMock.create();
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder;

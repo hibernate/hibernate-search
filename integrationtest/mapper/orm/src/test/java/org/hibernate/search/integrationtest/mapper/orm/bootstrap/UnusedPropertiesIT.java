@@ -32,8 +32,8 @@ public class UnusedPropertiesIT {
 	private static final String KEY_UNUSED_BUT_BLANK_VALUE = "hibernate.search.indexes.myIndex.blankValue";
 	private static final String KEY_UNUSED_BUT_NULL_VALUE = "hibernate.search.indexes.myIndex.nullValue";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );

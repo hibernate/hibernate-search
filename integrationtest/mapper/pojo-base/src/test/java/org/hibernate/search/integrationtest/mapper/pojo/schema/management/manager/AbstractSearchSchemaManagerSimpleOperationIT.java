@@ -6,30 +6,31 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.schema.management.manager;
 
-import java.lang.invoke.MethodHandles;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
-import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
+
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.SchemaManagementWorkBehavior;
-import org.junit.jupiter.api.BeforeEach;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 
-	@Rule
-	public final BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public final BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public final StandalonePojoMappingSetupHelper setupHelper

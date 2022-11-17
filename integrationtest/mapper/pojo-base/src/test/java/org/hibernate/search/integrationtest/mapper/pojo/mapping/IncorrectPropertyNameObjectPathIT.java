@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 public class IncorrectPropertyNameObjectPathIT {
 	private static final String BROKEN_PATH_WITH_DOTS = "broken.path.with.dots";
 	@Rule
-	public BackendMock defaultBackendMock = new BackendMock();
+	public BackendMock defaultBackendMock = BackendMock.create();
 
 	@Rule
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock(

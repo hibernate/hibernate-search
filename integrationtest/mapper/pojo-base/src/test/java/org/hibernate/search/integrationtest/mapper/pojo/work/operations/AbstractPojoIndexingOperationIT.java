@@ -29,6 +29,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.Sta
 import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -61,8 +62,8 @@ public abstract class AbstractPojoIndexingOperationIT {
 		return params;
 	}
 
-	@Rule
-	public final BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public final BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public final StandalonePojoMappingSetupHelper setupHelper =

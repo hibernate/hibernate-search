@@ -23,19 +23,20 @@ import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 	private static final String BACKEND2_NAME = "stubBackend2";
 
-	@Rule
-	public BackendMock defaultBackendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock defaultBackendMock = BackendMock.create();
 
-	@Rule
-	public BackendMock backend2Mock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backend2Mock = BackendMock.create();
 
 	@Rule
 	public StandalonePojoMappingSetupHelper setupHelper;

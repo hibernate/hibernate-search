@@ -31,6 +31,7 @@ import org.hibernate.search.util.impl.test.data.Pair;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test the fallback to projection constructors for the "default projection" (no select() call)
@@ -41,8 +42,8 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 
 	private static final String ENTITY_NAME = "entity_name";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public StandalonePojoMappingSetupHelper setupHelper =

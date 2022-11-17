@@ -53,8 +53,8 @@ public class BootstrapLogsIT {
 					+ "||^GenerationTarget encountered exception accepting command:.*"
 	);
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );

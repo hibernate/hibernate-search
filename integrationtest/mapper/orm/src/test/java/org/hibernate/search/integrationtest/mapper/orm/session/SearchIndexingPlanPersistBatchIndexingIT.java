@@ -21,6 +21,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.rules.MethodRule;
 
 /**
@@ -37,8 +38,8 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 	// Make sure that entity count is not a multiple of batch size, to test for corner cases
 	private static final int ENTITY_COUNT = BATCH_SIZE * 200 + BATCH_SIZE / 2;
 
-	@ClassRule
-	public static BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.createGlobal();
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );

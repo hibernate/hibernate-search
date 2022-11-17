@@ -18,20 +18,21 @@ import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubMassLoadingStrategy;
-import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
-import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
-import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
-import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class MassIndexingMonitorIT {
 
@@ -42,8 +43,8 @@ public class MassIndexingMonitorIT {
 	public static final String TITLE_3 = "Frankenstein";
 	public static final String AUTHOR_3 = "Mary Shelley";
 
-	@Rule
-	public final BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public final BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public final StandalonePojoMappingSetupHelper setupHelper

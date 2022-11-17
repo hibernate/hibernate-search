@@ -32,10 +32,11 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.rules.MethodRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -63,8 +64,8 @@ public class MassIndexingBaseIT {
 	public static final String TITLE_4 = "The Fellowship Of The Ring";
 	public static final String AUTHOR_4 = "J. R. R. Tolkien";
 
-	@ClassRule
-	public static BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.createGlobal();
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );

@@ -24,11 +24,12 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public abstract class AbstractSchemaManagementStrategyIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withBackendMock( backendMock );

@@ -30,8 +30,8 @@ import org.apache.logging.log4j.Level;
 @TestForIssue(jiraKey = "HSEARCH-4117")
 public class DuplicateGetterIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public StandalonePojoMappingSetupHelper setupHelper =

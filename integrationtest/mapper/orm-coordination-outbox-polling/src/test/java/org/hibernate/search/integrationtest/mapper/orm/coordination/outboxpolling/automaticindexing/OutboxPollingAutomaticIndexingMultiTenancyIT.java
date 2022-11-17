@@ -27,6 +27,7 @@ import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.data.Percentage;
 
@@ -41,8 +42,8 @@ public class OutboxPollingAutomaticIndexingMultiTenancyIT {
 	private static final String TENANT_2_ID = "tenant2";
 	private static final String TENANT_3_ID = "tenant3";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withBackendMock( backendMock )

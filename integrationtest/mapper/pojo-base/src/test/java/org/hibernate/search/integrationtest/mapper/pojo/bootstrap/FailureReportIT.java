@@ -37,8 +37,8 @@ public class FailureReportIT {
 			+ "\n"
 			+ "    Standalone POJO mapping: \n";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();

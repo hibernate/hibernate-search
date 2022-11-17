@@ -25,9 +25,10 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStr
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests highly concurrent background processing of events,
@@ -43,8 +44,8 @@ public class OutboxPollingAutomaticIndexingConcurrencyIT {
 	// Experimentation showed that larger batch sizes tend to reproduce the deadlock more reliably.
 	public static final int ENTITY_UPDATE_BATCH_SIZE = 500;
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )

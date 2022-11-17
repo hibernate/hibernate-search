@@ -22,6 +22,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Simple test to check that automatic indexing works correctly when multi-tenancy is enabled.
@@ -35,8 +36,8 @@ public class AutomaticIndexingMultiTenancyIT {
 	private static final String TENANT_1_ID = "tenant1";
 	private static final String TENANT_2_ID = "tenant2";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withBackendMock( backendMock );

@@ -47,8 +47,8 @@ import org.apache.logging.log4j.Level;
 @TestForIssue(jiraKey = { "HSEARCH-3938" })
 public class CdiExtendedBeanManagerBootstrapShutdownIT {
 
-	@Rule
-	public final BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public final BackendMock backendMock = BackendMock.create();
 
 	@Rule
 	public final OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
