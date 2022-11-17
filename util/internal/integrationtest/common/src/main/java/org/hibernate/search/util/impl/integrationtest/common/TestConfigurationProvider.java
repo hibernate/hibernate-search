@@ -24,16 +24,29 @@ import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolve
 import org.hibernate.search.engine.environment.classpath.spi.DefaultServiceResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-public final class TestConfigurationProvider implements TestRule {
+public final class TestConfigurationProvider implements TestRule, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
 	private static final String STARTUP_TIMESTAMP = new SimpleDateFormat( "yyyy-MM-dd-HH-mm-ss.SSS", Locale.ROOT )
 			.format( new Date() );
 
 	private String testId;
+
+	@Override
+	public void beforeTestExecution(ExtensionContext context) {
+		testId = context.getDisplayName().replaceAll( "[^A-Za-z0-9_+().\\[\\]=]+", "_" );
+	}
+
+	@Override
+	public void afterTestExecution(ExtensionContext context) {
+		testId = null;
+	}
 
 	@Override
 	public Statement apply(Statement base, Description description) {

@@ -45,7 +45,6 @@ import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationPr
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -93,7 +92,7 @@ public class ElasticsearchContentLengthIT {
 			.options( wireMockConfig().dynamicPort().dynamicHttpsPort() )
 			.build();
 
-	@Rule
+	@RegisterExtension
 	public TestConfigurationProvider testConfigurationProvider = new TestConfigurationProvider();
 
 	private final ThreadPoolProviderImpl threadPoolProvider = new ThreadPoolProviderImpl(

@@ -114,6 +114,7 @@ public class ElasticsearchClientFactoryImplIT {
 			.options( wireMockConfig().dynamicPort().dynamicHttpsPort() )
 			.build();
 
+	@RegisterExtension
 	private final TestConfigurationProvider testConfigurationProvider = new TestConfigurationProvider();
 
 	private final ThreadPoolProviderImpl threadPoolProvider = new ThreadPoolProviderImpl(
