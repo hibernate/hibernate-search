@@ -35,16 +35,19 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchWork;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-public class BackendMock implements TestRule, BeforeTestExecutionCallback, AfterTestExecutionCallback,
-		BeforeAllCallback, AfterAllCallback {
+import org.opentest4j.TestAbortedException;
+
+public class BackendMock implements TestRule, BeforeEachCallback, AfterEachCallback, BeforeAllCallback, AfterAllCallback {
 
 	public enum Type {
 		CLASS,
@@ -89,21 +92,21 @@ public class BackendMock implements TestRule, BeforeTestExecutionCallback, After
 	@Override
 	public void afterAll(ExtensionContext context) {
 		if ( Type.CLASS.equals( type ) ) {
-			doAfter();
+			doAfter( context );
 		}
 	}
 
 	@Override
-	public void beforeTestExecution(ExtensionContext context) {
+	public void beforeEach(ExtensionContext context) {
 		if ( Type.METHOD.equals( type ) ) {
 			doBefore();
 		}
 	}
 
 	@Override
-	public void afterTestExecution(ExtensionContext context) {
+	public void afterEach(ExtensionContext context) {
 		if ( Type.METHOD.equals( type ) ) {
-			doAfter();
+			doAfter( context );
 		}
 	}
 
@@ -111,8 +114,12 @@ public class BackendMock implements TestRule, BeforeTestExecutionCallback, After
 		started = true;
 	}
 
-	private void doAfter() {
+	private void doAfter(ExtensionContext context) {
 		try {
+			if ( context.getExecutionException().map( e -> e instanceof TestAbortedException ).orElse( Boolean.FALSE ) ) {
+				// test was aborted - hence let's not do verification. cleanups will happen in finally block.
+				return;
+			}
 			// Workaround for a problem in Hibernate ORM's CustomRunner
 			// (used by BytecodeEnhancerRunner in particular)
 			// which applies class rules twices, resulting in "started" being false
