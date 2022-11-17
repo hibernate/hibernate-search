@@ -49,7 +49,7 @@ public class MassIndexingInterruptionIT {
 	@RegisterExtension
 	public final BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public final StandalonePojoMappingSetupHelper setupHelper
 			= StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 

@@ -47,11 +47,11 @@ public class IndexedBaseIT {
 	@Rule
 	public BackendMock backend3Mock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), defaultBackendMock );
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper multiBackendSetupHelper;
 
 	@RegisterExtension

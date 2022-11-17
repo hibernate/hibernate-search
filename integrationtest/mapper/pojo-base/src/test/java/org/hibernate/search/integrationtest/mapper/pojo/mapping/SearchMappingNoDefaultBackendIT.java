@@ -25,23 +25,22 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class SearchMappingNoDefaultBackendIT {
 
 	private static final String BACKEND_1_NAME = "stubBackend1";
 	private static final String BACKEND_2_NAME = "stubBackend2";
 
-	@ClassRule
-	public static BackendMock backend1Mock = BackendMock.create();
+	@RegisterExtension
+	public static BackendMock backend1Mock = BackendMock.createGlobal();
 
-	@ClassRule
-	public static BackendMock backend2Mock = BackendMock.create();
+	@RegisterExtension
+	public static BackendMock backend2Mock = BackendMock.createGlobal();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper;
 
 	private SearchMapping mapping;

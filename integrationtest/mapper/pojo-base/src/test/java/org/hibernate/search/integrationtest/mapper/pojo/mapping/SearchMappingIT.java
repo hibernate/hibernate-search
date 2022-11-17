@@ -36,9 +36,9 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 
@@ -46,13 +46,13 @@ public class SearchMappingIT {
 
 	private static final String BACKEND_2_NAME = "stubBackend2";
 
-	@Rule
+	@RegisterExtension
 	public BackendMock defaultBackendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public BackendMock backend2Mock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper;
 
 	private SearchMapping mapping;
