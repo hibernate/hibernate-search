@@ -18,14 +18,15 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class ElasticsearchBootstrapFailureIT {
 
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	@Rule
-	public ElasticsearchClientSpy elasticsearchClientSpy = new ElasticsearchClientSpy();
+	@RegisterExtension
+	public ElasticsearchClientSpy elasticsearchClientSpy = ElasticsearchClientSpy.create();
 
 	/**
 	 * Check the reported failure when we fail to connect to the Elasticsearch cluster.
