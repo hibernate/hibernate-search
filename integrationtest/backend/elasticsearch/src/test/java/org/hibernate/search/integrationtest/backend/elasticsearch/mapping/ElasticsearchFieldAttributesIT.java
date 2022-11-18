@@ -23,7 +23,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -33,8 +32,8 @@ public class ElasticsearchFieldAttributesIT {
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@RegisterExtension
 	public ElasticsearchClientSpy clientSpy = ElasticsearchClientSpy.create();

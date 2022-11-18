@@ -22,8 +22,8 @@ import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * A basic test for hash-based sharding with document IDs (without routing keys).
@@ -36,8 +36,8 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 	private static final int ESTIMATED_DOCUMENT_COUNT_PER_SHARD = 100;
 	private static final int TOTAL_DOCUMENT_COUNT = SHARD_COUNT * ESTIMATED_DOCUMENT_COUNT_PER_SHARD;
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper(
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create(
 			tckBackendHelper -> tckBackendHelper.createHashBasedShardingBackendSetupStrategy( SHARD_COUNT )
 	);
 

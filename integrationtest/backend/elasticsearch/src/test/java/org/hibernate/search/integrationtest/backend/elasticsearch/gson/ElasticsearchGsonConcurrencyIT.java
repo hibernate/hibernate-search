@@ -16,8 +16,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Reproducer for HSEARCH-3725,
@@ -51,8 +51,8 @@ public class ElasticsearchGsonConcurrencyIT {
 	// This must be at least 2, but you don't need more than the number of CPU cores.
 	private static final int INDEX_COUNT_PER_ATTEMPT = 4;
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@Test
 	public void repeatedlyStartMultipleIndexesSerializingWithGsonInParallel() throws IOException {

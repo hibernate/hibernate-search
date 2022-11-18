@@ -15,7 +15,7 @@ import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.extension.Extension;
 
 public abstract class BackendConfiguration {
 
@@ -55,7 +55,7 @@ public abstract class BackendConfiguration {
 		return "lucene".equals( BACKEND_TYPE );
 	}
 
-	public Optional<TestRule> testRule() {
+	public Optional<Extension> extension() {
 		return Optional.empty();
 	}
 

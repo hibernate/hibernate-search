@@ -26,8 +26,8 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class TermsPredicateSpecificsIT {
 
@@ -35,8 +35,8 @@ public class TermsPredicateSpecificsIT {
 	private static final int LOT_OF_TERMS_SIZE = 2000;
 	private static final String DOC_ID = "id0";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 	private final List<String> lotsOfTerms = new ArrayList<>();

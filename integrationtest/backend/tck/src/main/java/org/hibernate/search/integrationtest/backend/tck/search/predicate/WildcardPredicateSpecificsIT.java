@@ -26,8 +26,8 @@ import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.ClassRule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class WildcardPredicateSpecificsIT {
 
@@ -56,8 +56,8 @@ public class WildcardPredicateSpecificsIT {
 	private static final String TERM_MATCHING_PATTERN_2 = "iNTroSPEctiOn";
 	private static final String TERM_MATCHING_PATTERN_2_AND_3 = "Internationalization";
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

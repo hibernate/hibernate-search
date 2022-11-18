@@ -22,8 +22,8 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.ClassRule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TopDocs;
@@ -49,8 +49,8 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 	private static final String SEGMENT_1_DOC_1 = "1_1";
 	private static final String SEGMENT_1_DOC_NON_MATCHING = "1_nonMatching";
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

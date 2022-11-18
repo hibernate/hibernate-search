@@ -20,8 +20,8 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
@@ -36,8 +36,8 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSession;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -67,7 +67,7 @@ public class IndexIndexingPlanIT {
 		};
 	}
 
-	@Rule
+	@RegisterExtension
 	public final SearchSetupHelper setupHelper;
 
 	private final String tenantId;
@@ -80,7 +80,7 @@ public class IndexIndexingPlanIT {
 
 	public IndexIndexingPlanIT(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
 			String tenantId) {
-		this.setupHelper = new SearchSetupHelper( setupStrategyFunction );
+		this.setupHelper = SearchSetupHelper.create( setupStrategyFunction );
 		this.tenantId = tenantId;
 		this.label = label;
 	}

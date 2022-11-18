@@ -23,8 +23,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.awaitility.Awaitility;
 
@@ -34,13 +34,13 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 
 	private static final Integer DOCUMENT_COUNT = 50;
 
-	@Rule
+	@RegisterExtension
 	public final SearchSetupHelper setupHelper;
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	protected AbstractIndexWorkspaceSimpleOperationIT() {
-		this( new SearchSetupHelper() );
+		this( SearchSetupHelper.create() );
 	}
 
 	protected AbstractIndexWorkspaceSimpleOperationIT(SearchSetupHelper setupHelper) {

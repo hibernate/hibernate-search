@@ -27,8 +27,8 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests for object fields defined through field templates.
@@ -49,8 +49,8 @@ public class ObjectFieldTemplateIT {
 	private static final String FIRSTNAME_2 = "ty";
 	private static final String LASTNAME_2 = "frank";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private SimpleMappedIndex<IndexBinding> index;
 

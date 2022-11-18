@@ -43,9 +43,9 @@ import org.hibernate.search.util.impl.test.data.Triplet;
 import org.hibernate.search.util.impl.test.runner.nested.Nested;
 import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
-import org.junit.ClassRule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
 
 import org.mockito.Mockito;
@@ -62,8 +62,8 @@ import org.mockito.quality.Strictness;
 @RunWith(NestedRunner.class)
 public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractCompositeProjectionFromAsIT.AbstractIndexBinding> {
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
 

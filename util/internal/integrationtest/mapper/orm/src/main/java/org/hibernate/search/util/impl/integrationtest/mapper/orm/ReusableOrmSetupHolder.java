@@ -304,13 +304,13 @@ public class ReusableOrmSetupHolder implements TestRule, BeforeAllCallback, Afte
 			closer.push( ReusableOrmSetupHolder::tearDownSessionFactory, ReusableOrmSetupHolder.this );
 		}
 		finally {
-			setupHelper.afterTestExecution( context );
+			setupHelper.afterEach( context );
 		}
 	}
 
 	@Override
 	public void beforeAll(ExtensionContext context) {
-		setupHelper.beforeTestExecution( context );
+		setupHelper.beforeEach( context );
 		inClassStatement = true;
 	}
 

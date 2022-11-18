@@ -20,8 +20,8 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
@@ -29,7 +29,7 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.AbstractSetupContext, B, R> implements TestRule,
-		BeforeTestExecutionCallback, AfterTestExecutionCallback {
+		BeforeEachCallback, AfterEachCallback {
 
 	private final TestConfigurationProvider configurationProvider;
 	private final BackendSetupStrategy backendSetupStrategy;
@@ -62,13 +62,13 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 	}
 
 	@Override
-	public void beforeTestExecution(ExtensionContext context) {
-		configurationProvider.beforeTestExecution( context );
+	public void beforeEach(ExtensionContext context) {
+		configurationProvider.beforeEach( context );
 		init();
 	}
 
 	@Override
-	public void afterTestExecution(ExtensionContext context) throws Exception {
+	public void afterEach(ExtensionContext context) throws Exception {
 		try ( Closer<Exception> closer = new Closer<>() ) {
 			// Make sure to close the last-created resource first,
 			// to avoid problems e.g. if starting multiple ORM SessionFactories
@@ -80,7 +80,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 			toClose.clear();
 		}
 		finally {
-			configurationProvider.afterTestExecution( context );
+			configurationProvider.afterEach( context );
 		}
 	}
 

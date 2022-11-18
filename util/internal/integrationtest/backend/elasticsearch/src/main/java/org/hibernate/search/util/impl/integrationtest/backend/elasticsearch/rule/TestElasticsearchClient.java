@@ -491,8 +491,8 @@ public class TestElasticsearchClient implements TestRule, BeforeTestExecutionCal
 	}
 
 	@Override
-	public void beforeTestExecution(ExtensionContext context) throws Exception {
-		configurationProvider.beforeTestExecution( context );
+	public void beforeTestExecution(ExtensionContext context) {
+		configurationProvider.beforeEach( context );
 
 		open( configurationProvider );
 	}
@@ -503,7 +503,7 @@ public class TestElasticsearchClient implements TestRule, BeforeTestExecutionCal
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			close( closer );
 		}
-		configurationProvider.afterTestExecution( context );
+		configurationProvider.afterEach( context );
 	}
 
 	@Override

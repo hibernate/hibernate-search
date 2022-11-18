@@ -15,8 +15,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class TermsPredicateAnalyzedFieldIT {
 
@@ -24,8 +24,8 @@ public class TermsPredicateAnalyzedFieldIT {
 	private static final String[] TOKENS = { "be", "have", "do", "say", "will", "would", "get" };
 	private static final String[] NOT_PRESENT_TOKENS = { "go", "make", "can", "time" };
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
 

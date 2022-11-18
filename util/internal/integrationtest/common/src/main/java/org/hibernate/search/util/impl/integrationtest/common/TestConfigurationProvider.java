@@ -24,14 +24,17 @@ import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolve
 import org.hibernate.search.engine.environment.classpath.spi.DefaultServiceResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-public final class TestConfigurationProvider implements TestRule, BeforeTestExecutionCallback, AfterTestExecutionCallback {
+public final class TestConfigurationProvider implements TestRule, BeforeAllCallback, AfterAllCallback,
+		BeforeEachCallback, AfterEachCallback {
 
 	private static final String STARTUP_TIMESTAMP = new SimpleDateFormat( "yyyy-MM-dd-HH-mm-ss.SSS", Locale.ROOT )
 			.format( new Date() );
@@ -39,13 +42,23 @@ public final class TestConfigurationProvider implements TestRule, BeforeTestExec
 	private String testId;
 
 	@Override
-	public void beforeTestExecution(ExtensionContext context) {
-		testId = context.getDisplayName().replaceAll( "[^A-Za-z0-9_+().\\[\\]=]+", "_" );
+	public void afterAll(ExtensionContext context) {
+		afterEach( context );
 	}
 
 	@Override
-	public void afterTestExecution(ExtensionContext context) {
+	public void beforeAll(ExtensionContext context) {
+		beforeEach( context );
+	}
+
+	@Override
+	public void afterEach(ExtensionContext context) {
 		testId = null;
+	}
+
+	@Override
+	public void beforeEach(ExtensionContext context) {
+		testId = context.getDisplayName().replaceAll( "[^A-Za-z0-9_+().\\[\\]=]+", "_" );
 	}
 
 	@Override

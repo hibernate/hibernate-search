@@ -27,15 +27,15 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * An abstract base for sharding tests with explicit routing keys.
  */
 public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 
-	@Rule
+	@RegisterExtension
 	public final SearchSetupHelper setupHelper;
 
 	private final Set<String> routingKeys;
@@ -47,7 +47,7 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 	public AbstractShardingRoutingKeyIT(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
 			Set<String> routingKeys) {
 		super( RoutingMode.EXPLICIT_ROUTING_KEYS );
-		this.setupHelper = new SearchSetupHelper( setupStrategyFunction );
+		this.setupHelper = SearchSetupHelper.create( setupStrategyFunction );
 		this.routingKeys = routingKeys;
 		documentCountPerRoutingKey = 100;
 		totalDocumentCount = routingKeys.size() * documentCountPerRoutingKey;

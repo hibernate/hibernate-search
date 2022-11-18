@@ -20,8 +20,8 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -36,8 +36,8 @@ public class LuceneIndexRestartFromPreviousIntegrationIT {
 	@Parameterized.Parameter
 	public String directoryType;
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBindingV1> indexV1 = SimpleMappedIndex.of( IndexBindingV1::new );
 	private final SimpleMappedIndex<IndexBindingV2> indexV2 = SimpleMappedIndex.of( IndexBindingV2::new );

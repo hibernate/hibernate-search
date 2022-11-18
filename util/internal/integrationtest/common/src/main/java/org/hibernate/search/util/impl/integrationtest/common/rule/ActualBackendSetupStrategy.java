@@ -16,6 +16,7 @@ import java.util.concurrent.CompletionStage;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 
+import org.junit.jupiter.api.extension.Extension;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 
@@ -45,14 +46,15 @@ class ActualBackendSetupStrategy implements BackendSetupStrategy {
 	public Optional<TestRule> getTestRule() {
 		RuleChain ruleChain = null;
 		for ( BackendConfiguration configuration : allConfigurations ) {
-			Optional<TestRule> rule = configuration.testRule();
+			Optional<Extension> rule = configuration.extension();
 			if ( !rule.isPresent() ) {
 				continue;
 			}
 			if ( ruleChain == null ) {
 				ruleChain = RuleChain.emptyRuleChain();
 			}
-			ruleChain = ruleChain.around( rule.get() );
+			// TODO: fix me
+//			ruleChain = ruleChain.around( rule.get() );
 		}
 		return Optional.ofNullable( ruleChain );
 	}

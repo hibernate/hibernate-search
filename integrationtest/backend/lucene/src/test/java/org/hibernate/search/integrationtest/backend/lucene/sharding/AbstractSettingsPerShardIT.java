@@ -15,7 +15,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -31,9 +31,10 @@ public abstract class AbstractSettingsPerShardIT {
 		Set<String> explicitShardIds = CollectionHelper.asImmutableSet( "first", "second", "other", "yetanother" );
 
 		return new Object[][] {
-				{ "hash", new SearchSetupHelper( helper -> helper.createHashBasedShardingBackendSetupStrategy( 4 ) ),
+				{ "hash", SearchSetupHelper.create( helper -> helper.createHashBasedShardingBackendSetupStrategy( 4 ) ),
 						new ArrayList<>( hashShardIds ) },
-				{ "explicit", new SearchSetupHelper( ignored -> ShardingExplicitIT.explicitShardingBackendSetupStrategy( explicitShardIds ) ),
+				{ "explicit",
+						SearchSetupHelper.create( ignored -> ShardingExplicitIT.explicitShardingBackendSetupStrategy( explicitShardIds ) ),
 						new ArrayList<>( explicitShardIds ) }
 		};
 	}
@@ -42,7 +43,7 @@ public abstract class AbstractSettingsPerShardIT {
 
 	public final String strategy;
 
-	@Rule
+	@RegisterExtension
 	public final SearchSetupHelper setupHelper;
 
 	public final List<String> shardIds;

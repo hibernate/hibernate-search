@@ -17,16 +17,16 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.SingleFieldDocumentBuilder;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SingleFieldDocumentBuilder;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -41,13 +41,13 @@ public class AnalysisBuiltinIT {
 	public static List<SearchSetupHelper> params() {
 		return Arrays.asList(
 				// Test with no analysis configurer whatsoever
-				new SearchSetupHelper( TckBackendHelper::createAnalysisNotConfiguredBackendSetupStrategy ),
+				SearchSetupHelper.create( TckBackendHelper::createAnalysisNotConfiguredBackendSetupStrategy ),
 				// Test with an analysis configurer that does not override the defaults but defines other analyzers
-				new SearchSetupHelper( TckBackendHelper::createAnalysisCustomBackendSetupStrategy )
+				SearchSetupHelper.create( TckBackendHelper::createAnalysisCustomBackendSetupStrategy )
 		);
 	}
 
-	@Rule
+	@RegisterExtension
 	public final SearchSetupHelper setupHelper;
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );

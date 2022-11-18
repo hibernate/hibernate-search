@@ -29,8 +29,8 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class SearchMultiIndexIT {
 
@@ -64,8 +64,8 @@ public class SearchMultiIndexIT {
 
 	private static final String DOCUMENT_2_1_2 = "2_1_2";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding_1_1> index_1_1 =
 			SimpleMappedIndex.of( IndexBinding_1_1::new ).backendName( BACKEND_1 ).name( "index_1_1" );

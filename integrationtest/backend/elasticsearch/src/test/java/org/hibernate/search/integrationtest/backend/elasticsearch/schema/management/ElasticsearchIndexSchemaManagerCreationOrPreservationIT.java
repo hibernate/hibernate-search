@@ -24,7 +24,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSch
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
@@ -43,8 +42,8 @@ public class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 		return ElasticsearchIndexSchemaManagerOperation.creatingOrPreserving();
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@RegisterExtension
 	public TestElasticsearchClient elasticSearchClient = TestElasticsearchClient.create();

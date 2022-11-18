@@ -13,7 +13,7 @@ import java.util.Optional;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.extension.Extension;
 
 public class ElasticsearchBackendConfiguration extends BackendConfiguration {
 
@@ -25,7 +25,7 @@ public class ElasticsearchBackendConfiguration extends BackendConfiguration {
 	}
 
 	@Override
-	public Optional<TestRule> testRule() {
+	public Optional<Extension> extension() {
 		return Optional.of( testElasticsearchClient );
 	}
 

@@ -37,6 +37,7 @@ import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.bean.ForbiddenBeanProvider;
+import org.hibernate.search.util.impl.integrationtest.common.rule.ComposedExtension;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingImpl;
@@ -44,35 +45,97 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIni
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingKey;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
-import org.junit.rules.RuleChain;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.Extension;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 
-public class SearchSetupHelper implements TestRule {
+public class SearchSetupHelper implements AfterAllCallback, AfterEachCallback, AfterTestExecutionCallback,
+		BeforeAllCallback, BeforeEachCallback, BeforeTestExecutionCallback, TestExecutionExceptionHandler {
 
+	private enum Type {
+		CLASS,
+		METHOD;
+	}
 	private final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final TestConfigurationProvider configurationProvider;
-	private final TckBackendSetupStrategy<?> setupStrategy;
-	private final TestRule delegateRule;
+	private final Type type;
+	private TckBackendSetupStrategy<?> setupStrategy;
+	private ComposedExtension delegate;
 
 	private final List<SearchIntegrationEnvironment> environments = new ArrayList<>();
 	private final List<SearchIntegrationPartialBuildState> integrationPartialBuildStates = new ArrayList<>();
 	private final List<StubMappingImpl> mappings = new ArrayList<>();
 	private TckBackendAccessor backendAccessor;
 
-	public SearchSetupHelper() {
-		this( TckBackendHelper::createDefaultBackendSetupStrategy );
+	public static SearchSetupHelper create() {
+		return new SearchSetupHelper( Type.METHOD, TckBackendHelper::createDefaultBackendSetupStrategy );
 	}
 
-	public SearchSetupHelper(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
+	public static SearchSetupHelper createGlobal() {
+		return new SearchSetupHelper( Type.CLASS, TckBackendHelper::createDefaultBackendSetupStrategy );
+	}
+
+	public static SearchSetupHelper create(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
+		return new SearchSetupHelper( Type.METHOD, setupStrategyFunction );
+	}
+
+	public static SearchSetupHelper createGlobal(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
+		return new SearchSetupHelper( Type.CLASS, setupStrategyFunction );
+	}
+
+	public SearchSetupHelper(Type type, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
 		this.configurationProvider = new TestConfigurationProvider();
+		this.type = type;
+		init( setupStrategyFunction );
+	}
+
+	private void init(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
 		this.setupStrategy = setupStrategyFunction.apply( TckConfiguration.get().getBackendHelper() );
-		Optional<TestRule> setupStrategyTestRule = setupStrategy.testRule();
-		this.delegateRule = setupStrategyTestRule
-				.<TestRule>map( rule -> RuleChain.outerRule( configurationProvider ).around( rule ) )
-				.orElse( configurationProvider );
+		Optional<Extension> setupStrategyTestExtension = setupStrategy.extension();
+
+		ComposedExtension.FullExtension ownActions = new ComposedExtension.FullExtension(
+				afterAllContext -> {
+					if ( Type.CLASS.equals( type ) ) {
+						cleanUp();
+					}
+				},
+				afterEachContext -> {
+					if ( Type.METHOD.equals( type ) ) {
+						cleanUp();
+					}
+				},
+				afterTestExecutionContext -> { },
+				beforeAllContext -> { },
+				beforeEachContext -> { },
+				beforeTestExecutionContext -> { },
+				(testExecutionExceptionContext, throwable) -> {
+					// When used as a @ClassRule, exceptions are not properly reported by JUnit.
+					// Log them so that we have something in the logs, at least.
+					log.warn(
+							"Exception thrown by test and caught by SearchSetupHelper rule: " + throwable.getMessage(), throwable );
+					throw throwable;
+				}
+
+		);
+
+		this.delegate = new ComposedExtension(
+				ownActions,
+				setupStrategyTestExtension
+						.<Extension>map( extension -> new ComposedExtension( extension, configurationProvider ) )
+						.orElse( configurationProvider )
+		);
+	}
+
+	public SearchSetupHelper with(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
+		init( setupStrategyFunction );
+		return this;
 	}
 
 	public SetupContext start() {
@@ -104,32 +167,38 @@ public class SearchSetupHelper implements TestRule {
 	}
 
 	@Override
-	public Statement apply(Statement base, Description description) {
-		return statement( base, description );
+	public void afterAll(ExtensionContext context) throws Exception {
+		delegate.afterAll( context );
 	}
 
-	private Statement statement(final Statement base, final Description description) {
-		Statement wrapped = new Statement() {
-			@Override
-			public void evaluate() throws Throwable {
-				// Using the closer like this allows to suppress exceptions thrown by the 'finally' block.
-				try ( Closer<IOException> closer = new Closer<>() ) {
-					try {
-						base.evaluate();
-					}
-					catch (RuntimeException e) {
-						// When used as a @ClassRule, exceptions are not properly reported by JUnit.
-						// Log them so that we have something in the logs, at least.
-						log.warn( "Exception thrown by test and caught by SearchSetupHelper rule: " + e.getMessage(), e );
-						throw e;
-					}
-					finally {
-						cleanUp( closer );
-					}
-				}
-			}
-		};
-		return delegateRule.apply( wrapped, description );
+	@Override
+	public void afterEach(ExtensionContext context) throws Exception {
+		delegate.afterEach( context );
+	}
+
+	@Override
+	public void afterTestExecution(ExtensionContext context) throws Exception {
+		delegate.afterTestExecution( context );
+	}
+
+	@Override
+	public void beforeAll(ExtensionContext context) throws Exception {
+		delegate.beforeAll( context );
+	}
+
+	@Override
+	public void beforeEach(ExtensionContext context) throws Exception {
+		delegate.beforeEach( context );
+	}
+
+	@Override
+	public void beforeTestExecution(ExtensionContext context) throws Exception {
+		delegate.beforeTestExecution( context );
+	}
+
+	@Override
+	public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
+		delegate.handleTestExecutionException( context, throwable );
 	}
 
 	public void cleanUp() throws IOException {
@@ -168,7 +237,8 @@ public class SearchSetupHelper implements TestRule {
 		SetupContext(String defaultBackendName, AllAwareConfigurationPropertySource basePropertySource) {
 			this.unusedPropertyChecker = ConfigurationPropertyChecker.create();
 			this.propertySource = unusedPropertyChecker.wrap( basePropertySource )
-					.withOverride( unusedPropertyChecker.wrap( AllAwareConfigurationPropertySource.fromMap( overriddenProperties ) ) );
+					.withOverride( unusedPropertyChecker.wrap(
+							AllAwareConfigurationPropertySource.fromMap( overriddenProperties ) ) );
 		}
 
 		public SetupContext expectCustomBeans() {
@@ -203,10 +273,11 @@ public class SearchSetupHelper implements TestRule {
 
 		public SetupContext withIndexProperty(String backendName, String indexName, String keyRadical, Object value) {
 			return withBackendProperty( backendName,
-					BackendSettings.INDEXES + "." + indexName + "." + keyRadical, value );
+					BackendSettings.INDEXES + "." + indexName + "." + keyRadical, value
+			);
 		}
 
-		public SetupContext withIndexes(StubMappedIndex ... mappedIndexes) {
+		public SetupContext withIndexes(StubMappedIndex... mappedIndexes) {
 			return withIndexes( Arrays.asList( mappedIndexes ) );
 		}
 
@@ -241,7 +312,7 @@ public class SearchSetupHelper implements TestRule {
 							.build();
 			environments.add( environment );
 
-			SearchIntegration.Builder integrationBuilder = (previousMapping.isPresent()) ?
+			SearchIntegration.Builder integrationBuilder = ( previousMapping.isPresent() ) ?
 					previousMapping.get().integration().restartBuilder( environment ) :
 					SearchIntegration.builder( environment );
 
@@ -255,7 +326,8 @@ public class SearchSetupHelper implements TestRule {
 
 			return overrides -> {
 				SearchIntegrationFinalizer finalizer =
-						integrationPartialBuildState.finalizer( propertySource.withOverride( overrides ), unusedPropertyChecker );
+						integrationPartialBuildState.finalizer(
+								propertySource.withOverride( overrides ), unusedPropertyChecker );
 				StubMappingImpl mapping = finalizer.finalizeMapping(
 						mappingKey,
 						(context, partialMapping) -> partialMapping.finalizeMapping( schemaManagementStrategy )
@@ -288,4 +360,5 @@ public class SearchSetupHelper implements TestRule {
 		StubMapping doSecondPhase(ConfigurationPropertySource overrides);
 
 	}
+
 }
