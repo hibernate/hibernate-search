@@ -24,8 +24,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -94,7 +94,7 @@ public class ProjectionConstructorMappingJava17IT {
 	}
 
 	@Parameterized.Parameter
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper;
 
 	private EntityManagerFactory entityManagerFactory;

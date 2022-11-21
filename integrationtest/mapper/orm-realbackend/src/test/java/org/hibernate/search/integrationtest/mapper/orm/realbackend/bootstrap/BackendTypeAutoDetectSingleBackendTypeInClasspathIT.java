@@ -19,8 +19,8 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Checks that Hibernate Search will auto-detect the backend type when the property "hibernate.search.backend.type" is not set
@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
  */
 public class BackendTypeAutoDetectSingleBackendTypeInClasspathIT {
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	@Test

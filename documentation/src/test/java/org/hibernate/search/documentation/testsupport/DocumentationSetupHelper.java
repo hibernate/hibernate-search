@@ -108,7 +108,7 @@ public final class DocumentationSetupHelper
 	private DocumentationSetupHelper(BackendSetupStrategy backendSetupStrategy,
 			Boolean annotationProcessingEnabled,
 			HibernateOrmSearchMappingConfigurer defaultMappingConfigurer) {
-		super( backendSetupStrategy );
+		super( backendSetupStrategy, Type.METHOD );
 		this.annotationProcessingEnabled = annotationProcessingEnabled;
 		this.defaultMappingConfigurer = defaultMappingConfigurer;
 	}

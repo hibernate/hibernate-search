@@ -17,33 +17,82 @@ import java.util.function.UnaryOperator;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 
+import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 
-public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.AbstractSetupContext, B, R> implements TestRule,
-		BeforeEachCallback, AfterEachCallback {
+public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.AbstractSetupContext, B, R> implements
+		AfterAllCallback, AfterEachCallback, AfterTestExecutionCallback,
+		BeforeAllCallback, BeforeEachCallback, BeforeTestExecutionCallback, TestExecutionExceptionHandler {
 
+	protected enum Type {
+		CLASS,
+		METHOD;
+	}
 	private final TestConfigurationProvider configurationProvider;
 	private final BackendSetupStrategy backendSetupStrategy;
-	private final TestRule delegateRule;
+	private final ComposedExtension delegate;
 
 	private final List<R> toClose = new ArrayList<>();
 
-	protected MappingSetupHelper(BackendSetupStrategy backendSetupStrategy) {
+	private Type type;
+
+	protected MappingSetupHelper(BackendSetupStrategy backendSetupStrategy, Type t) {
+		this.type = t;
 		this.configurationProvider = new TestConfigurationProvider();
 		this.backendSetupStrategy = backendSetupStrategy;
-		Optional<TestRule> setupStrategyTestRule = backendSetupStrategy.getTestRule();
-		this.delegateRule = setupStrategyTestRule
-				.<TestRule>map( rule -> RuleChain.outerRule( configurationProvider ).around( rule ) )
-				.orElse( configurationProvider );
+		Optional<Extension> setupStrategyTestExtension = backendSetupStrategy.getTestRule();
+		ComposedExtension.FullExtension ownActions = new ComposedExtension.FullExtension(
+				afterAllContext -> {
+					if ( Type.CLASS.equals( type ) ) {
+						cleanUp();
+					}
+				},
+				afterEachContext -> {
+					if ( Type.METHOD.equals( type ) ) {
+						cleanUp();
+					}
+				},
+				afterTestExecutionContext -> { },
+				beforeAllContext -> {
+					if ( Type.CLASS.equals( type ) ) {
+						init();
+					}
+				},
+				beforeEachContext -> {
+					if ( Type.METHOD.equals( type ) ) {
+						init();
+					}
+				},
+				beforeTestExecutionContext -> { },
+				(testExecutionExceptionContext, throwable) -> { }
+		);
+
+		this.delegate = new ComposedExtension(
+				ownActions,
+				setupStrategyTestExtension
+						.<Extension>map( extension -> new ComposedExtension( extension, configurationProvider ) )
+						.orElse( configurationProvider )
+		);
+	}
+
+	protected Type switchType(Type type) {
+		Contracts.assertNotNull( type, "Cannot use null type" );
+		Type old = this.type;
+
+		this.type = type;
+
+		return old;
 	}
 
 	@Override
@@ -57,18 +106,41 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 	}
 
 	@Override
-	public Statement apply(Statement base, Description description) {
-		return statement( base, description );
-	}
-
-	@Override
-	public void beforeEach(ExtensionContext context) {
-		configurationProvider.beforeEach( context );
-		init();
+	public void afterAll(ExtensionContext context) throws Exception {
+		delegate.afterAll( context );
 	}
 
 	@Override
 	public void afterEach(ExtensionContext context) throws Exception {
+		delegate.afterEach( context );
+	}
+
+	@Override
+	public void afterTestExecution(ExtensionContext context) throws Exception {
+		delegate.afterTestExecution( context );
+	}
+
+	@Override
+	public void beforeAll(ExtensionContext context) throws Exception {
+		delegate.beforeAll( context );
+	}
+
+	@Override
+	public void beforeEach(ExtensionContext context) throws Exception {
+		delegate.beforeEach( context );
+	}
+
+	@Override
+	public void beforeTestExecution(ExtensionContext context) throws Exception {
+		delegate.beforeTestExecution( context );
+	}
+
+	@Override
+	public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
+		delegate.handleTestExecutionException( context, throwable );
+	}
+
+	private void cleanUp() throws Exception {
 		try ( Closer<Exception> closer = new Closer<>() ) {
 			// Make sure to close the last-created resource first,
 			// to avoid problems e.g. if starting multiple ORM SessionFactories
@@ -79,9 +151,6 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 			closer.pushAll( MappingSetupHelper.this::close, toClose );
 			toClose.clear();
 		}
-		finally {
-			configurationProvider.afterEach( context );
-		}
 	}
 
 	protected abstract C createSetupContext();
@@ -90,31 +159,6 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 	}
 
 	protected abstract void close(R toClose) throws Exception;
-
-	private Statement statement(Statement base, Description description) {
-		Statement wrapped = new Statement() {
-			@Override
-			public void evaluate() throws Throwable {
-				try ( Closer<Exception> closer = new Closer<>() ) {
-					try {
-						init();
-						base.evaluate();
-					}
-					finally {
-						// Make sure to close the last-created resource first,
-						// to avoid problems e.g. if starting multiple ORM SessionFactories
-						// where only the first one creates/drops the schema:
-						// in that case the other SessionFactories must be closed before the first one,
-						// to avoid any SQL queries after the schema was dropped.
-						Collections.reverse( toClose );
-						closer.pushAll( MappingSetupHelper.this::close, toClose );
-						toClose.clear();
-					}
-				}
-			}
-		};
-		return delegateRule.apply( wrapped, description );
-	}
 
 	public abstract class AbstractSetupContext {
 

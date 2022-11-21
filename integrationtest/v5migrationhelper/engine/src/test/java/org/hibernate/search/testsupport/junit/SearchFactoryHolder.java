@@ -52,9 +52,11 @@ public class SearchFactoryHolder implements TestRule {
 
 	@Override
 	public Statement apply(Statement base, Description description) {
-		Statement wrapped = new Statement() {
+		Statement statement = new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
+				// TODO: fixme
+				setupHelper.beforeTestExecution( null );
 				try {
 					mapping = setupHelper.start()
 							.withProperties( configuration )
@@ -65,10 +67,11 @@ public class SearchFactoryHolder implements TestRule {
 				finally {
 					mapping = null;
 					searchIntegrator = null;
+					setupHelper.afterTestExecution( null );
 				}
 			}
 		};
-		return setupHelper.apply( wrapped, description );
+		return statement;
 	}
 
 	public SearchFactoryHolder withProperty(String key, Object value) {

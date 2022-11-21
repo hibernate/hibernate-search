@@ -14,11 +14,11 @@ import java.util.concurrent.CompletionStage;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.extension.Extension;
 
 public interface BackendSetupStrategy {
 
-	default Optional<TestRule> getTestRule() {
+	default Optional<Extension> getTestRule() {
 		return Optional.empty();
 	}
 

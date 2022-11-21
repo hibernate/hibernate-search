@@ -38,8 +38,8 @@ import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.stat.Statistics;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class QueryDslIT {
 
@@ -53,7 +53,7 @@ public class QueryDslIT {
 	private static final int ASSOCIATE1_ID = 1;
 	private static final int ASSOCIATE2_ID = 2;
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;

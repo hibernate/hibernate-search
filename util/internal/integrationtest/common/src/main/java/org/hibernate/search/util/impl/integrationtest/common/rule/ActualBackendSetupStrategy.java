@@ -17,8 +17,6 @@ import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationPr
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 
 import org.junit.jupiter.api.extension.Extension;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TestRule;
 
 class ActualBackendSetupStrategy implements BackendSetupStrategy {
 	private final BackendConfiguration defaultBackendConfiguration;
@@ -43,20 +41,21 @@ class ActualBackendSetupStrategy implements BackendSetupStrategy {
 	}
 
 	@Override
-	public Optional<TestRule> getTestRule() {
-		RuleChain ruleChain = null;
+	public Optional<Extension> getTestRule() {
+		Extension finalExtension = null;
 		for ( BackendConfiguration configuration : allConfigurations ) {
-			Optional<Extension> rule = configuration.extension();
-			if ( !rule.isPresent() ) {
+			Optional<Extension> extension = configuration.extension();
+			if ( !extension.isPresent() ) {
 				continue;
 			}
-			if ( ruleChain == null ) {
-				ruleChain = RuleChain.emptyRuleChain();
+			if ( finalExtension == null ) {
+				finalExtension = extension.get();
 			}
-			// TODO: fix me
-//			ruleChain = ruleChain.around( rule.get() );
+			else {
+				finalExtension = new ComposedExtension( extension.get(), finalExtension );
+			}
 		}
-		return Optional.ofNullable( ruleChain );
+		return Optional.ofNullable( finalExtension );
 	}
 
 	@Override

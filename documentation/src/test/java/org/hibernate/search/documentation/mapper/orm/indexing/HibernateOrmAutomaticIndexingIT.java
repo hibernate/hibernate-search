@@ -21,8 +21,8 @@ import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexi
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class HibernateOrmAutomaticIndexingIT {
 	private static final String BOOK1_TITLE = "I, Robot";
@@ -31,7 +31,7 @@ public class HibernateOrmAutomaticIndexingIT {
 
 	private static final String BOOK3_TITLE = "The Robots of Dawn";
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	@Test

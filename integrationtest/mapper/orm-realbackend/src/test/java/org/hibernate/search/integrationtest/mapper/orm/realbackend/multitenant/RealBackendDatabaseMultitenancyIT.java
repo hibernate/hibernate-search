@@ -25,8 +25,8 @@ import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureRe
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.AssertionAndAssumptionViolationFallThrough;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class RealBackendDatabaseMultitenancyIT {
 
@@ -35,7 +35,7 @@ public class RealBackendDatabaseMultitenancyIT {
 	public static final String TENANT_TEXT_1 = "I'm in the TENANT 1";
 	public static final String TENANT_TEXT_2 = "I'm in the TENANT 2";
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private SessionFactory sessionFactory;

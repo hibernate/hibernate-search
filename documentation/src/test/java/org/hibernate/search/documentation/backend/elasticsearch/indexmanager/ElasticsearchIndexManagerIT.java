@@ -10,8 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.search.backend.elasticsearch.metamodel.ElasticsearchIndexDescriptor;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
+import org.hibernate.search.backend.elasticsearch.metamodel.ElasticsearchIndexDescriptor;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.index.IndexManager;
@@ -19,12 +19,12 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class ElasticsearchIndexManagerIT {
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper =
 			DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 

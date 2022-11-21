@@ -22,8 +22,8 @@ import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureRe
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -43,7 +43,7 @@ public class BackendTypeAutoDetectMultipleBackendTypesInClasspathIT {
 		};
 	}
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper;
 
 	private final String expectedBackendType;

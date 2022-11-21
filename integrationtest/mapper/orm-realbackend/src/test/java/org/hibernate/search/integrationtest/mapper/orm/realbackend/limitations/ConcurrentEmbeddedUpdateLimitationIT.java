@@ -38,8 +38,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.awaitility.Awaitility;
 import org.awaitility.core.ThrowingRunnable;
@@ -49,7 +49,7 @@ import org.awaitility.core.ThrowingRunnable;
  */
 public class ConcurrentEmbeddedUpdateLimitationIT {
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private SessionFactory sessionFactory;

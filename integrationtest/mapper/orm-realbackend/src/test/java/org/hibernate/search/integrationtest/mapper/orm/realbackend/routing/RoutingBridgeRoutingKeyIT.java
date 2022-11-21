@@ -30,8 +30,8 @@ import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test that defining a routing bridge that generates (mutable) routing keys works as expected
@@ -42,7 +42,7 @@ public class RoutingBridgeRoutingKeyIT {
 	// Use high enough shard count that it's unlikely that our two routing keys end up in the same shard
 	private static final int SHARD_COUNT = 64;
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.hashBasedSharding( SHARD_COUNT ) );
 
 	private EntityManagerFactory entityManagerFactory;

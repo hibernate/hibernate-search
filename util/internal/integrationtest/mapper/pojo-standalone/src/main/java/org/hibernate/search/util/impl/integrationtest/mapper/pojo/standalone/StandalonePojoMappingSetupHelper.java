@@ -23,8 +23,8 @@ import org.hibernate.search.util.impl.integrationtest.common.bean.ForbiddenBeanP
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 
 public final class StandalonePojoMappingSetupHelper
 		extends MappingSetupHelper<StandalonePojoMappingSetupHelper.SetupContext, SearchMappingBuilder, CloseableSearchMapping> {
@@ -66,7 +66,7 @@ public final class StandalonePojoMappingSetupHelper
 
 	private StandalonePojoMappingSetupHelper(MethodHandles.Lookup lookup, BackendSetupStrategy backendSetupStrategy,
 			SchemaManagementStrategyName schemaManagementStrategyName) {
-		super( backendSetupStrategy );
+		super( backendSetupStrategy, Type.METHOD );
 		this.lookup = lookup;
 		this.schemaManagementStrategyName = schemaManagementStrategyName;
 	}

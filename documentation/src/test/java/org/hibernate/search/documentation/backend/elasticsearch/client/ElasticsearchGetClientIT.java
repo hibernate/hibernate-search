@@ -19,8 +19,8 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
@@ -28,7 +28,7 @@ import org.elasticsearch.client.RestClient;
 
 public class ElasticsearchGetClientIT {
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper =
 			DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 

@@ -21,14 +21,14 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.analysis.Analyzer;
 
 public class LuceneGetAnalyzerIT {
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper =
 			DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
