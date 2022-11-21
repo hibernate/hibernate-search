@@ -248,7 +248,7 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	@Override
 	public boolean supportsMatchOnScaledNumericLossOfPrecision() {
 		// https://github.com/elastic/elasticsearch/issues/91246
-		// Hopefully this will get fixed in 8.5.1.
-		return !isBetween( actualVersion, "elastic:8.5.0", "elastic:8.5.0" );
+		// Hopefully this will get fixed in 8.5.3.
+		return !isBetween( actualVersion, "elastic:8.5.0", "elastic:8.5.2" );
 	}
 }
