@@ -321,7 +321,7 @@
         <version.com.microsoft.sqlserver.mssql-jdbc>9.2.1.jre11</version.com.microsoft.sqlserver.mssql-jdbc>
 
         <!-- >>> Performance tests -->
-        <version.org.openjdk.jmh>1.35</version.org.openjdk.jmh>
+        <version.org.openjdk.jmh>1.36</version.org.openjdk.jmh>
 
         <!-- >>> JSR 352: JBatch runtime -->
         <version.com.ibm.jbatch>1.0</version.com.ibm.jbatch>
