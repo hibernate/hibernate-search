@@ -40,13 +40,11 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.data.Pair;
 import org.hibernate.search.util.impl.test.data.Triplet;
-import org.hibernate.search.util.impl.test.runner.nested.Nested;
-import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
 
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -59,7 +57,6 @@ import org.mockito.quality.Strictness;
  */
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
-@RunWith(NestedRunner.class)
 public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractCompositeProjectionFromAsIT.AbstractIndexBinding> {
 
 	@RegisterExtension

@@ -761,7 +761,7 @@
             // The Nested annotation
             OPTIONAL MATCH (nestedTestType:Type)-[:ANNOTATED_BY]->()-[:OF_TYPE]->(nestedAnnotation:Type)
             WHERE
-                nestedAnnotation.fqn = "org.hibernate.search.util.impl.test.runner.nested.Nested"
+                nestedAnnotation.fqn = "org.junit.jupiter.api.Nested"
             WITH nestedTestType, nestedAnnotation
             WHERE
                 nestedAnnotation IS NULL

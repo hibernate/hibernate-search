@@ -6,16 +6,12 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.work.operations;
 
-import org.hibernate.search.util.impl.test.runner.nested.Nested;
-import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
-
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Nested;
 
 /**
  * Test behavior of "addOrUpdateOrDelete" when the entity is absent upon loading,
  * this resulting in a "delete".
  */
-@RunWith(NestedRunner.class)
 public class PojoIndexingAddOrUpdateOrDeleteEntityAbsentIT {
 
 	private static final PojoIndexingOperationScenario SCENARIO = new PojoIndexingAddOrUpdateOrDeleteScenario( BackendIndexingOperation.DELETE ) {
