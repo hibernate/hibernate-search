@@ -36,17 +36,6 @@
             <artifactId>${jdbc.driver.artifactId}</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.takari.junit</groupId>
-            <artifactId>takari-cpsuite</artifactId>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
     </dependencies>
 
     <build>

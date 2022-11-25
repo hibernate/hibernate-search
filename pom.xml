@@ -300,7 +300,8 @@
         <!-- >>> Common -->
         <version.log4j>2.19.0</version.log4j>
         <version.junit>4.13.2</version.junit>
-        <junit-jupiter>5.9.1</junit-jupiter>
+        <junit-jupiter.version>5.9.1</junit-jupiter.version>
+        <junit-platform-suite-engine.version>1.9.1</junit-platform-suite-engine.version>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
 
         <version.org.hamcrest>2.2</version.org.hamcrest>
@@ -1117,20 +1118,27 @@
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>
-                <version>${junit-jupiter}</version>
+                <version>${junit-jupiter.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-api</artifactId>
-                <version>${junit-jupiter}</version>
+                <version>${junit-jupiter.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.junit.vintage</groupId>
                 <artifactId>junit-vintage-engine</artifactId>
-                <version>${junit-jupiter}</version>
+                <version>${junit-jupiter.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-suite-engine</artifactId>
+                <version>${junit-platform-suite-engine.version}</version>
+            </dependency>
+
             <!--
                 Manage the upgrade from Hamcrest 1.x to 2.x:
                 http://hamcrest.org/JavaHamcrest/distributables#upgrading-from-hamcrest-1x
@@ -1149,11 +1157,6 @@
                 <groupId>org.hamcrest</groupId>
                 <artifactId>hamcrest-library</artifactId>
                 <version>${version.org.hamcrest}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.takari.junit</groupId>
-                <artifactId>takari-cpsuite</artifactId>
-                <version>${version.io.takari.junit}</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
