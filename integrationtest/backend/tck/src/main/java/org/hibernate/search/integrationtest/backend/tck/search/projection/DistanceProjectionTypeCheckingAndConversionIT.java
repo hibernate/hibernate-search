@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableGeoPointWithDistanceFromCenterValues.CENTER_POINT_1;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -100,8 +100,8 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 	@Test
 	public void projectableDefault() {
 		assumeFalse(
-				"Skipping this test as the backend makes fields projectable by default.",
-				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault(),
+				"Skipping this test as the backend makes fields projectable by default."
 		);
 		StubMappingScope scope = mainIndex.createScope();
 

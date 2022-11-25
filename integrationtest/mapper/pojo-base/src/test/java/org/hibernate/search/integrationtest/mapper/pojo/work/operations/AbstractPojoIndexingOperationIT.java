@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.work.operations;
 
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.when;
 
 import java.lang.invoke.MethodHandles;
@@ -122,9 +122,11 @@ public abstract class AbstractPojoIndexingOperationIT {
 	protected abstract boolean isImplicitRoutingEnabled();
 
 	protected final void assumeImplicitRoutingEnabled() {
-		assumeTrue( "This test only makes sense when a routing bridge is configured and "
-				+ "the operation takes the routing bridge into account",
-				isImplicitRoutingEnabled() );
+		assumeTrue(
+				isImplicitRoutingEnabled(),
+				"This test only makes sense when a routing bridge is configured and "
+						+ "the operation takes the routing bridge into account"
+		);
 	}
 
 	protected final SearchSession createSession() {

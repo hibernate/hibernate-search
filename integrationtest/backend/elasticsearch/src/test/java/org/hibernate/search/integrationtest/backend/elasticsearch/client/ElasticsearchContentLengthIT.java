@@ -11,8 +11,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -151,9 +151,9 @@ public class ElasticsearchContentLengthIT {
 	@Test
 	public void payloadJustAboveBufferSize_noRequestPostProcessing() throws Exception {
 		assumeFalse(
+				ElasticsearchTestHostConnectionConfiguration.get().isAws(),
 				"This test only is only relevant if Elasticsearch request are *NOT* post-processed." +
-						" Elasticsearch requests are post-processed by the AWS integration in particular.",
-				ElasticsearchTestHostConnectionConfiguration.get().isAws()
+						" Elasticsearch requests are post-processed by the AWS integration in particular."
 		);
 		wireMockRule.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
@@ -179,9 +179,9 @@ public class ElasticsearchContentLengthIT {
 	@Test
 	public void payloadJustAboveBufferSize_requestPostProcessing() throws Exception {
 		assumeTrue(
+				ElasticsearchTestHostConnectionConfiguration.get().isAws(),
 				"This test only is only relevant if Elasticsearch request are post-processed." +
-						" Elasticsearch requests are post-processed by the AWS integration in particular.",
-				ElasticsearchTestHostConnectionConfiguration.get().isAws()
+						" Elasticsearch requests are post-processed by the AWS integration in particular."
 		);
 		wireMockRule.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );

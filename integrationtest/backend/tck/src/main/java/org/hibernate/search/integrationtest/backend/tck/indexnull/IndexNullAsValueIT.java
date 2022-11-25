@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.indexnull;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -65,8 +65,8 @@ public class IndexNullAsValueIT {
 	@Test
 	public void indexNullAsValue_spatial() {
 		assumeTrue(
-				"indexNullAs on a GeoPoint field must be supported",
-				TckConfiguration.get().getBackendFeatures().geoPointIndexNullAs()
+				TckConfiguration.get().getBackendFeatures().geoPointIndexNullAs(),
+				"indexNullAs on a GeoPoint field must be supported"
 		);
 
 		setUp();

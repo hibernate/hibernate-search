@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -372,9 +372,9 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			if ( javaVersionString != null && !javaVersionString.trim().isEmpty() ) {
 				boolean oldJavaVersion = javaVersionString.startsWith( "1." );
 				assumeTrue(
+						!( oldJavaVersion && env.getDialect() instanceof H2Dialect ),
 						"The H2 actual maximum available precision depends on operating system and JVM and can be 3 (milliseconds) or higher. " +
-								"Higher precision is not available before Java 9.",
-						!( oldJavaVersion && env.getDialect() instanceof H2Dialect )
+								"Higher precision is not available before Java 9."
 				);
 			}
 

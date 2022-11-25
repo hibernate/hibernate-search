@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,10 +95,10 @@ public class FieldSortDynamicFieldIT<F> {
 	@TestForIssue(jiraKey = "HSEARCH-4531")
 	public void neverPopulated(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		assumeTrue(
-				"This backend doesn't support sorts on a field of type '" + fieldTypeDescriptor
-						+ "' that is missing from some of the target indexes.",
 				TckConfiguration.get().getBackendFeatures()
-						.supportsFieldSortWhenFieldMissingInSomeTargetIndexes( fieldTypeDescriptor.getJavaType() )
+						.supportsFieldSortWhenFieldMissingInSomeTargetIndexes( fieldTypeDescriptor.getJavaType() ),
+				"This backend doesn't support sorts on a field of type '" + fieldTypeDescriptor
+						+ "' that is missing from some of the target indexes."
 		);
 
 		String neverPopulatedFieldPath = neverPopulatedFieldPath( fieldTypeDescriptor );

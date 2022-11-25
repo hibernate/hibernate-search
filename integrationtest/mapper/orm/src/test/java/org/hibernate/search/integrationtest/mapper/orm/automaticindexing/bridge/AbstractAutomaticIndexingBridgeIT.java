@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.bridge;
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -676,8 +676,8 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 		PropertyBinder binder = createContainingEntityMultiValuedPropertyBinder();
 
 		assumeTrue(
-				"Multi-valued property bridges must be supported",
-				binder != null
+				binder != null,
+				"Multi-valued property bridges must be supported"
 		);
 
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b

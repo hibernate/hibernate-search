@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.client.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

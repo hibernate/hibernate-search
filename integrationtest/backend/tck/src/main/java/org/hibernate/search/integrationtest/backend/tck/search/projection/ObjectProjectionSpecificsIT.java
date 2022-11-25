@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -87,8 +87,8 @@ public class ObjectProjectionSpecificsIT {
 	@Test
 	public void multiValuedObjectField_flattened_unsupported() {
 		assumeTrue(
-				"This test is only relevant if the backend relies on nested documents to implement object projections on multi-valued fields",
-				TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForMultiValuedObjectProjection()
+				TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForMultiValuedObjectProjection(),
+				"This test is only relevant if the backend relies on nested documents to implement object projections on multi-valued fields"
 		);
 		SearchProjectionFactory<?, ?> f = index.createScope().projection();
 		assertThatThrownBy( () -> f.object( "flattenedLevel1" ) )

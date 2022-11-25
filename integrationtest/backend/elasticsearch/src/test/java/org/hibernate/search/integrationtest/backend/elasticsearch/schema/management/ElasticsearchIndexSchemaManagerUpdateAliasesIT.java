@@ -11,7 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultWriteAlias;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isAtMost;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
@@ -134,10 +134,10 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 	@Test
 	public void writeAlias_invalid_isWriteIndex() {
 		assumeFalse(
+				isAtMost( ElasticsearchTestDialect.getActualVersion(), "elastic:6.3" ),
 				"This test only is only relevant for Elasticsearch versions supporting the is_write_index" +
 						" attribute in alias definitions." +
-						" These operations are not available on ES 6.3 and below in particular.",
-				isAtMost( ElasticsearchTestDialect.getActualVersion(), "elastic:6.3" )
+						" These operations are not available on ES 6.3 and below in particular."
 		);
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()

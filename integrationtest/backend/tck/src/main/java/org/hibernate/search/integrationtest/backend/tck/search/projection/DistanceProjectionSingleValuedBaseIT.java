@@ -14,7 +14,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Te
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators.APPROX_MILES_COMPARATOR;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators.APPROX_M_COMPARATOR;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -345,8 +345,10 @@ public class DistanceProjectionSingleValuedBaseIT {
 	public void factoryWithRoot(TestedFieldStructure fieldStructure, DataSet dataSet) {
 		AbstractObjectBinding parentObjectBinding = mainIndex.binding().getParentObject( fieldStructure );
 
-		assumeTrue( "This test is only relevant when the field is located on an object field",
-				parentObjectBinding.absolutePath != null );
+		assumeTrue(
+				parentObjectBinding.absolutePath != null,
+				"This test is only relevant when the field is located on an object field"
+		);
 
 		assertThatQuery( mainIndex.query()
 				.select( f -> f.withRoot( parentObjectBinding.absolutePath )

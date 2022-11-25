@@ -9,7 +9,7 @@ package org.hibernate.search.util.common.reflect.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
@@ -150,10 +150,10 @@ public class ValueReadHandleTest {
 	@MethodSource("params")
 	void failure_method_illegalAccessException(ValueHandleFactory factory) throws Exception {
 		assumeFalse(
+				factory.getClass().getSimpleName().contains( "MethodHandle" ),
 				"Cannot test IllegalAccessException with MethodHandles: "
 						+ " if we don't use setAccessible(true), we can't create the handle,"
-						+ " and if we do use setAccessible(true), the handle has full access to the field/method.",
-				factory.getClass().getSimpleName().contains( "MethodHandle" )
+						+ " and if we do use setAccessible(true), the handle has full access to the field/method."
 		);
 
 		Method method = EntityType.class.getDeclaredMethod( "illegalAccessExceptionThrowingMethod" );
@@ -173,10 +173,10 @@ public class ValueReadHandleTest {
 	@MethodSource("params")
 	void failure_field_illegalAccessException(ValueHandleFactory factory) throws Exception {
 		assumeFalse(
+				factory.getClass().getSimpleName().contains( "MethodHandle" ),
 				"Cannot test IllegalAccessException with MethodHandles: "
 						+ " if we don't use setAccessible(true), we can't create the handle,"
-						+ " and if we do use setAccessible(true), the handle has full access to the field/method.",
-				factory.getClass().getSimpleName().contains( "MethodHandle" )
+						+ " and if we do use setAccessible(true), the handle has full access to the field/method."
 		);
 
 		Field field = EntityType.class.getDeclaredField( "illegalAccessExceptionThrowingField" );

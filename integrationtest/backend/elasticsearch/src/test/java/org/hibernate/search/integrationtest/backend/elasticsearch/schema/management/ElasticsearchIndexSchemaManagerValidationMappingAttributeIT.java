@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingAndCommaForInitialization;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.hasValidationFailureReport;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -358,8 +358,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		List<String> nextFormats = elasticSearchClient.getDialect().getAllLocalDateDefaultMappingFormats()
 				.stream().skip( 1 ).collect( Collectors.toList() );
 		assumeFalse(
-				"Skipping this test as we don't have a type with multiple default formats in " + ElasticsearchTestDialect.getActualVersion(),
-				nextFormats.isEmpty()
+				nextFormats.isEmpty(),
+				"Skipping this test as we don't have a type with multiple default formats in " + ElasticsearchTestDialect.getActualVersion()
 		);
 
 		elasticSearchClient.index( index.name() ).deleteAndCreate();

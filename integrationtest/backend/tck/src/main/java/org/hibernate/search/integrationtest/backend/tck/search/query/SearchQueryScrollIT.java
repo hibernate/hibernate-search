@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.List;
 import java.util.Locale;
@@ -138,8 +138,8 @@ public class SearchQueryScrollIT {
 	@Test
 	public void resultTotal_totalHitCountThreshold() {
 		assumeTrue(
-				"This backend doesn't take totalHitsThreshold() into account for scrolls.",
-				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForScroll()
+				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForScroll(),
+				"This backend doesn't take totalHitsThreshold() into account for scrolls."
 		);
 
 		try ( SearchScroll<DocumentReference> scroll = matchAllWithConditionSortedByScoreQuery()
@@ -200,8 +200,8 @@ public class SearchQueryScrollIT {
 	@Test
 	public void resultTotal_totalHitCountThreshold_veryHigh() {
 		assumeTrue(
-				"This backend doesn't take totalHitsThreshold() into account for scrolls.",
-				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForScroll()
+				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForScroll(),
+				"This backend doesn't take totalHitsThreshold() into account for scrolls."
 		);
 
 		try ( SearchScroll<DocumentReference> scroll = matchAllWithConditionSortedByScoreQuery()

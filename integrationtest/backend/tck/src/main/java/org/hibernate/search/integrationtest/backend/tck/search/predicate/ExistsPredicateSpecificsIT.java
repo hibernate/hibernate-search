@@ -7,8 +7,8 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -160,8 +160,10 @@ public class ExistsPredicateSpecificsIT<F> {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
 	public void multiIndex_differentFieldType(DataSet<F> dataSet) {
-		assumeFalse( "This test is only relevant if the field type does not use norms",
-				dataSet.fieldType.equals( AnalyzedStringFieldTypeDescriptor.INSTANCE ) );
+		assumeFalse(
+				dataSet.fieldType.equals( AnalyzedStringFieldTypeDescriptor.INSTANCE ),
+				"This test is only relevant if the field type does not use norms"
+		);
 
 		StubMappingScope scope = mainIndex.createScope( differentFieldTypeIndex );
 
@@ -201,8 +203,10 @@ public class ExistsPredicateSpecificsIT<F> {
 	}
 
 	private void assumeDocValuesAllowed(DataSet<F> dataSet) {
-		assumeTrue( "This test is only relevant if the field type supports doc values",
-				supportedFieldTypesWithDocValues.contains( dataSet.fieldType ) );
+		assumeTrue(
+				supportedFieldTypesWithDocValues.contains( dataSet.fieldType ),
+				"This test is only relevant if the field type supports doc values"
+		);
 	}
 
 	private static class IndexBinding {

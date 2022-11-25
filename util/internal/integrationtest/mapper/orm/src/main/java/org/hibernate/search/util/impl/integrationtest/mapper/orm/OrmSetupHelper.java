@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -221,8 +221,8 @@ public final class OrmSetupHelper
 			withConfiguration( b -> b.onMetadata( metadataImplementor -> {
 				Dialect currentDialect = metadataImplementor.getDatabase().getDialect();
 				assumeFalse(
-						"Skipping test for dialect " + dialect.getName() + "; reason: " + reason,
-						dialect.isAssignableFrom( currentDialect.getClass() )
+						dialect.isAssignableFrom( currentDialect.getClass() ),
+						"Skipping test for dialect " + dialect.getName() + "; reason: " + reason
 				);
 			} ) );
 			return thisAsC();

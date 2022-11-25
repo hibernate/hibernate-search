@@ -16,7 +16,7 @@ public final class AssertionAndAssumptionViolationFallThrough {
 	public static Condition<Throwable> get() {
 		return new Condition<Throwable>(
 				(Throwable throwable) -> {
-					if ( throwable instanceof org.junit.internal.AssumptionViolatedException ) {
+					if ( throwable instanceof org.opentest4j.TestAbortedException ) {
 						throw (RuntimeException) throwable;
 					}
 					if ( throwable instanceof AssertionError ) {

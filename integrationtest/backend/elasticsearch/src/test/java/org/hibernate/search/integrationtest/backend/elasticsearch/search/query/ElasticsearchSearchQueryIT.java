@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.search.query;
 
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultReadAlias;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.encodeName;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -169,8 +169,8 @@ public class ElasticsearchSearchQueryIT {
 	public void trackTotalHits_fetch(Object layoutStrategy, URLEncodedString readName) {
 		init( layoutStrategy, readName );
 		assumeTrue(
-				"Run only if the Elasticsearch version supports `track_total_hits` parameter",
-				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForSearch()
+				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForSearch(),
+				"Run only if the Elasticsearch version supports `track_total_hits` parameter"
 		);
 
 		StubMappingScope scope = index.createScope();
@@ -197,8 +197,8 @@ public class ElasticsearchSearchQueryIT {
 	public void trackTotalHits_fetchHits(Object layoutStrategy, URLEncodedString readName) {
 		init( layoutStrategy, readName );
 		assumeTrue(
-				"Run only if the Elasticsearch version supports `track_total_hits` parameter",
-				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForSearch()
+				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForSearch(),
+				"Run only if the Elasticsearch version supports `track_total_hits` parameter"
 		);
 
 		StubMappingScope scope = index.createScope();

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.function.Consumer;
 import javax.persistence.Basic;
@@ -102,8 +102,10 @@ public class AutomaticIndexingBasicIT {
 
 	@Test
 	public void rollback_discardPreparedWorks() {
-		assumeTrue( "This test only makes sense if entities are processed in-session",
-				setupHolder.areEntitiesProcessedInSession() );
+		assumeTrue(
+				setupHolder.areEntitiesProcessedInSession(),
+				"This test only makes sense if entities are processed in-session"
+		);
 
 		setupHolder.runNoTransaction( session -> {
 			Transaction trx = session.beginTransaction();

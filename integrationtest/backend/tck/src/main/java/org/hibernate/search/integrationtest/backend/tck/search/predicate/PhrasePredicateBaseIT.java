@@ -19,7 +19,6 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.AssumptionViolatedException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -229,13 +228,13 @@ public class PhrasePredicateBaseIT {
 
 		@Override
 		public void analyzerOverride_queryOnlyAnalyzer() {
-			throw new AssumptionViolatedException(
+			throw new org.opentest4j.TestAbortedException(
 					"Skipping this test as ngram analyzers don't work well together with phrase predicates" );
 		}
 
 		@Override
 		public void analyzerOverride_normalizedStringField() {
-			throw new AssumptionViolatedException(
+			throw new org.opentest4j.TestAbortedException(
 					"Skipping this test as running an actual phrase query (with multiple tokens) will always fail on normalized fields" );
 		}
 

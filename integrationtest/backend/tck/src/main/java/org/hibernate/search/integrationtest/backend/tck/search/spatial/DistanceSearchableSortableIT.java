@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -66,8 +66,8 @@ public class DistanceSearchableSortableIT {
 	@Test
 	public void searchableNotSortable() {
 		assumeFalse(
-				"Skipping test for ES GeoPoint as those would become sortable by default in this case.",
-				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault(),
+				"Skipping test for ES GeoPoint as those would become sortable by default in this case."
 		);
 		StubMappingScope scope = index.createScope();
 		String fieldPath = "searchableNotSortable";
@@ -120,8 +120,8 @@ public class DistanceSearchableSortableIT {
 	@Test
 	public void searchableDefaultSortable() {
 		assumeFalse(
-				"Skipping test for ES GeoPoint as those would become sortable by default in this case.",
-				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault(),
+				"Skipping test for ES GeoPoint as those would become sortable by default in this case."
 		);
 		StubMappingScope scope = index.createScope();
 		String fieldPath = "searchableDefaultSortable";

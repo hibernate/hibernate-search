@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -306,8 +306,8 @@ public class ExistsPredicateObjectsSpecificsIT {
 
 	private void assumeFullMultiIndexCompatibilityCheck() {
 		assumeFalse(
-				"We do not test some Multi-indexing compatibility checks if the backend allows these",
-				TckConfiguration.get().getBackendFeatures().lenientOnMultiIndexesCompatibilityChecks()
+				TckConfiguration.get().getBackendFeatures().lenientOnMultiIndexesCompatibilityChecks(),
+				"We do not test some Multi-indexing compatibility checks if the backend allows these"
 		);
 	}
 

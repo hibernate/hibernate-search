@@ -20,7 +20,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
-import org.junit.AssumptionViolatedException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -254,12 +253,12 @@ public class ExistsPredicateBaseIT {
 
 		@Override
 		public void objectField_flattened() {
-			throw new AssumptionViolatedException( "The 'exists' predicate actually can be used on object fields" );
+			throw new org.opentest4j.TestAbortedException( "The 'exists' predicate actually can be used on object fields" );
 		}
 
 		@Override
 		public void objectField_nested() {
-			throw new AssumptionViolatedException( "The 'exists' predicate actually can be used on object fields" );
+			throw new org.opentest4j.TestAbortedException( "The 'exists' predicate actually can be used on object fields" );
 		}
 
 		@Override
@@ -299,7 +298,7 @@ public class ExistsPredicateBaseIT {
 		public void unsearchable(SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
 				SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex,
 				FieldTypeDescriptor<?> fieldType) {
-			throw new AssumptionViolatedException( "The 'exists' predicate actually can be used on unsearchable fields" );
+			throw new org.opentest4j.TestAbortedException( "The 'exists' predicate actually can be used on unsearchable fields" );
 		}
 
 		@Override
@@ -360,7 +359,7 @@ public class ExistsPredicateBaseIT {
 				SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 				SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
 				DataSet<?, ExistsPredicateTestValues<F>> dataSet) {
-			throw new AssumptionViolatedException( "The 'exists' predicate actually can be used when a field relies"
+			throw new org.opentest4j.TestAbortedException( "The 'exists' predicate actually can be used when a field relies"
 					+ " on different codecs in different indexes" );
 		}
 
@@ -373,7 +372,7 @@ public class ExistsPredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
 				int matchingDocOrdinal, DataSet<?, ExistsPredicateTestValues<F>> dataSet) {
-			throw new AssumptionViolatedException( "The 'exists' predicate can only target one field at a time" );
+			throw new org.opentest4j.TestAbortedException( "The 'exists' predicate can only target one field at a time" );
 		}
 
 		@Override
@@ -400,7 +399,7 @@ public class ExistsPredicateBaseIT {
 
 		@Override
 		public void multiIndex_withIncompatibleIndex() {
-			throw new AssumptionViolatedException( "The 'exists' predicate actually can be used when a field relies"
+			throw new org.opentest4j.TestAbortedException( "The 'exists' predicate actually can be used when a field relies"
 					+ " on different codecs in different indexes" );
 		}
 

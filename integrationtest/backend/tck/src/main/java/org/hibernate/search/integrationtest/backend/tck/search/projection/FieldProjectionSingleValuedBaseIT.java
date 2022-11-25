@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding.NO_ADDITIONAL_CONFIGURATION;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -195,8 +195,10 @@ public class FieldProjectionSingleValuedBaseIT<F> {
 			FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		AbstractObjectBinding parentObjectBinding = index.binding().getParentObject( fieldStructure );
 
-		assumeTrue( "This test is only relevant when the field is located on an object field",
-				parentObjectBinding.absolutePath != null );
+		assumeTrue(
+				parentObjectBinding.absolutePath != null,
+				"This test is only relevant when the field is located on an object field"
+		);
 
 		assertThatQuery( index.query()
 				.select( f -> f.withRoot( parentObjectBinding.absolutePath )

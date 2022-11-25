@@ -16,7 +16,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.AssumptionViolatedException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -264,7 +263,7 @@ public class SimpleQueryStringPredicateBaseIT {
 		@Override
 		public void constantScore_fieldLevelBoost(SimpleMappedIndex<IndexBinding> index,
 				DataSet<?, SimpleQueryStringPredicateTestValues> dataSet) {
-			throw new AssumptionViolatedException(
+			throw new org.opentest4j.TestAbortedException(
 					"The simpleQueryString predicate currently does not fail when using constantScore() + a field-level boost" );
 		}
 

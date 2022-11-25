@@ -10,8 +10,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues.CENTER_POINT;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -333,8 +333,8 @@ public class DistanceSortBaseIT {
 	public void medianWithNestedField(TestedFieldStructure fieldStructure, SortMode sortMode,
 			DataSet dataSetForAsc, DataSet dataSetForDesc) {
 		assumeTrue(
-				"This test is only relevant when using SortMode.MEDIAN in nested fields",
-				isMedianWithNestedField( sortMode, fieldStructure )
+				isMedianWithNestedField( sortMode, fieldStructure ),
+				"This test is only relevant when using SortMode.MEDIAN in nested fields"
 		);
 
 		String fieldPath = getFieldPath( fieldStructure );
@@ -356,8 +356,8 @@ public class DistanceSortBaseIT {
 	public void sum(TestedFieldStructure fieldStructure, SortMode sortMode,
 			DataSet dataSetForAsc, DataSet dataSetForDesc) {
 		assumeTrue(
-				"This test is only relevant when using SortMode.SUM",
-				isSum( sortMode )
+				isSum( sortMode ),
+				"This test is only relevant when using SortMode.SUM"
 		);
 
 		String fieldPath = getFieldPath( fieldStructure );
@@ -382,8 +382,10 @@ public class DistanceSortBaseIT {
 
 		AbstractObjectBinding parentObjectBinding = index.binding().getParentObject( fieldStructure );
 
-		assumeTrue( "This test is only relevant when the field is located on an object field",
-				parentObjectBinding.absolutePath != null );
+		assumeTrue(
+				parentObjectBinding.absolutePath != null,
+				"This test is only relevant when the field is located on an object field"
+		);
 
 		DataSet dataSet = dataSetForAsc;
 		assertThatQuery( index.query()
@@ -447,8 +449,8 @@ public class DistanceSortBaseIT {
 
 	private void assumeTestParametersWork(SortMode sortMode, TestedFieldStructure fieldStructure) {
 		assumeFalse(
-				"This combination is not expected to work",
-				isMedianWithNestedField( sortMode, fieldStructure ) || isSum( sortMode )
+				isMedianWithNestedField( sortMode, fieldStructure ) || isSum( sortMode ),
+				"This combination is not expected to work"
 		);
 	}
 

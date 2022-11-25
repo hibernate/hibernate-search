@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -308,10 +308,10 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 	@TestForIssue(jiraKey = "HSEARCH-4173")
 	public void multiIndex_withMissingFieldIndex_dslConverterEnabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		assumeTrue(
-				"This backend doesn't support sorts on a field of type '" + fieldTypeDescriptor
-						+ "' that is missing from some of the target indexes.",
 				TckConfiguration.get().getBackendFeatures()
-						.supportsFieldSortWhenFieldMissingInSomeTargetIndexes( fieldTypeDescriptor.getJavaType() )
+						.supportsFieldSortWhenFieldMissingInSomeTargetIndexes( fieldTypeDescriptor.getJavaType() ),
+				"This backend doesn't support sorts on a field of type '" + fieldTypeDescriptor
+						+ "' that is missing from some of the target indexes."
 		);
 
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
@@ -341,10 +341,10 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 	@TestForIssue(jiraKey = "HSEARCH-4173")
 	public void multiIndex_withMissingFieldIndex_dslConverterDisabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		assumeTrue(
-				"This backend doesn't support sorts on a field of type '" + fieldTypeDescriptor
-						+ "' that is missing from some of the target indexes.",
 				TckConfiguration.get().getBackendFeatures()
-						.supportsFieldSortWhenFieldMissingInSomeTargetIndexes( fieldTypeDescriptor.getJavaType() )
+						.supportsFieldSortWhenFieldMissingInSomeTargetIndexes( fieldTypeDescriptor.getJavaType() ),
+				"This backend doesn't support sorts on a field of type '" + fieldTypeDescriptor
+						+ "' that is missing from some of the target indexes."
 		);
 
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
@@ -378,14 +378,14 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 	@TestForIssue(jiraKey = "HSEARCH-4173")
 	public void multiIndex_withMissingFieldIndex_nested(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		assumeTrue(
-				"This backend doesn't support sorts on a field of type '" + fieldTypeDescriptor
-						+ "' that is missing from some of the target indexes.",
 				TckConfiguration.get().getBackendFeatures()
-						.supportsFieldSortWhenFieldMissingInSomeTargetIndexes( fieldTypeDescriptor.getJavaType() )
+						.supportsFieldSortWhenFieldMissingInSomeTargetIndexes( fieldTypeDescriptor.getJavaType() ),
+				"This backend doesn't support sorts on a field of type '" + fieldTypeDescriptor
+						+ "' that is missing from some of the target indexes."
 		);
 		assumeTrue(
-				"This backend doesn't support field sorts on a nested field that is missing from some of the target indexes.",
-				TckConfiguration.get().getBackendFeatures().supportsFieldSortWhenNestedFieldMissingInSomeTargetIndexes()
+				TckConfiguration.get().getBackendFeatures().supportsFieldSortWhenNestedFieldMissingInSomeTargetIndexes(),
+				"This backend doesn't support field sorts on a nested field that is missing from some of the target indexes."
 		);
 
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );

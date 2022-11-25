@@ -7,10 +7,11 @@
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assume.assumeNotNull;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.PropertyTypeDescriptor;
@@ -48,7 +49,7 @@ public class IndexNullAsErrorIT<V, F> {
 	void testParsingException(PropertyTypeDescriptor<V, F> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
 		String unparsableNullAsValue = expectations.getUnparsableNullAsValue();
 		// Null means "there's no value I can't parse". Useful for the String type.
-		assumeNotNull( unparsableNullAsValue );
+		assumeTrue( Objects.nonNull( unparsableNullAsValue ) );
 
 		assertThatThrownBy( () ->
 				setupHelper.start().withConfiguration( c -> {

@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -97,8 +97,8 @@ public class SearchQueryBaseIT {
 	@Test
 	public void resultTotal_totalHitCountThreshold() {
 		assumeTrue(
-				"This backend doesn't take totalHitsThreshold() into account.",
-				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForSearch()
+				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForSearch(),
+				"This backend doesn't take totalHitsThreshold() into account."
 		);
 
 		initData( 5000 );

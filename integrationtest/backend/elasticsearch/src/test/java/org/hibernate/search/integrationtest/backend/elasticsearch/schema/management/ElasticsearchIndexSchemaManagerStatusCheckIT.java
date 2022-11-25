@@ -8,8 +8,8 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.schema.manage
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,9 +55,11 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
 	public void indexMissing(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
-		assumeFalse( "The operation " + operation + " creates an index automatically."
-				+ " No point running this test.",
-				ElasticsearchIndexSchemaManagerOperation.creating().contains( operation ) );
+		assumeFalse(
+				ElasticsearchIndexSchemaManagerOperation.creating().contains( operation ),
+				"The operation " + operation + " creates an index automatically."
+						+ " No point running this test."
+		);
 
 		elasticSearchClient.index( index.name() ).ensureDoesNotExist();
 
@@ -69,9 +71,11 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
 	public void invalidIndexStatus_creatingIndex(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
-		assumeTrue( "The operation " + operation + " doesn't create an index automatically."
-				+ " No point running this test.",
-				ElasticsearchIndexSchemaManagerOperation.creating().contains( operation ) );
+		assumeTrue(
+				ElasticsearchIndexSchemaManagerOperation.creating().contains( operation ),
+				"The operation " + operation + " doesn't create an index automatically."
+						+ " No point running this test."
+		);
 
 		elasticSearchClient.index( index.name() ).ensureDoesNotExist();
 
@@ -85,9 +89,11 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
 	public void invalidIndexStatus_usingPreexistingIndex(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
-		assumeFalse( "The operation " + operation + " drops the existing index automatically."
-						+ " No point running this test.",
-				ElasticsearchIndexSchemaManagerOperation.dropping().contains( operation ) );
+		assumeFalse(
+				ElasticsearchIndexSchemaManagerOperation.dropping().contains( operation ),
+				"The operation " + operation + " drops the existing index automatically."
+						+ " No point running this test."
+		);
 
 		// Make sure automatically created indexes will never be green by requiring 5 replicas
 		// (more than the amount of ES nodes)

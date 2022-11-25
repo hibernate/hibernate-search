@@ -9,8 +9,8 @@ package org.hibernate.search.integrationtest.backend.tck.search.sort;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues.CENTER_POINT;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -98,8 +98,8 @@ public class DistanceSortTypeCheckingAndConversionIT {
 	@Test
 	public void unsortable() {
 		assumeFalse(
-				"Skipping test for ES GeoPoint as those would become sortable by default in this case.",
-				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault(),
+				"Skipping test for ES GeoPoint as those would become sortable by default in this case."
 		);
 		StubMappingScope scope = mainIndex.createScope();
 		String fieldPath = getNonSortableFieldPath();
@@ -154,8 +154,8 @@ public class DistanceSortTypeCheckingAndConversionIT {
 	@TestForIssue(jiraKey = "HSEARCH-4173")
 	public void multiIndex_withMissingFieldIndex() {
 		assumeTrue(
-				"This backend doesn't support distance sorts on a field that is missing from some of the target indexes.",
-				TckConfiguration.get().getBackendFeatures().supportsDistanceSortWhenFieldMissingInSomeTargetIndexes()
+				TckConfiguration.get().getBackendFeatures().supportsDistanceSortWhenFieldMissingInSomeTargetIndexes(),
+				"This backend doesn't support distance sorts on a field that is missing from some of the target indexes."
 		);
 
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
@@ -187,8 +187,8 @@ public class DistanceSortTypeCheckingAndConversionIT {
 	@TestForIssue(jiraKey = "HSEARCH-4173")
 	public void multiIndex_withMissingFieldIndex_nested() {
 		assumeTrue(
-				"This backend doesn't support distance sorts on a nested field that is missing from some of the target indexes.",
-				TckConfiguration.get().getBackendFeatures().supportsDistanceSortWhenNestedFieldMissingInSomeTargetIndexes()
+				TckConfiguration.get().getBackendFeatures().supportsDistanceSortWhenNestedFieldMissingInSomeTargetIndexes(),
+				"This backend doesn't support distance sorts on a nested field that is missing from some of the target indexes."
 		);
 
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );

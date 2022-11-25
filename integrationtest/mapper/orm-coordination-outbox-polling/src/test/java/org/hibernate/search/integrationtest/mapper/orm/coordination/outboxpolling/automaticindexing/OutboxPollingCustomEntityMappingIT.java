@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -258,10 +258,14 @@ public class OutboxPollingCustomEntityMappingIT {
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
-		assumeTrue( "This test only makes sense if the database supports schemas",
-				getNameQualifierSupport().supportsSchemas() );
-		assumeTrue( "This test only makes sense if the dialect supports creating schemas",
-				getDialect().canCreateSchema() );
+		assumeTrue(
+				getNameQualifierSupport().supportsSchemas(),
+				"This test only makes sense if the database supports schemas"
+		);
+		assumeTrue(
+				getDialect().canCreateSchema(),
+				"This test only makes sense if the dialect supports creating schemas"
+		);
 
 		int id = 1;
 		with( sessionFactory ).runInTransaction( session -> {

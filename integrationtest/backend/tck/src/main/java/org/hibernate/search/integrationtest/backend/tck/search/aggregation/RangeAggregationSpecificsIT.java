@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalize;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -500,8 +500,8 @@ public class RangeAggregationSpecificsIT<F> {
 
 	private void assumeNonCanonicalRangesSupported() {
 		assumeTrue(
-				"Non-canonical ranges are not supported for aggregations with this backend",
-				TckConfiguration.get().getBackendFeatures().nonCanonicalRangeInAggregations()
+				TckConfiguration.get().getBackendFeatures().nonCanonicalRangeInAggregations(),
+				"Non-canonical ranges are not supported for aggregations with this backend"
 		);
 	}
 

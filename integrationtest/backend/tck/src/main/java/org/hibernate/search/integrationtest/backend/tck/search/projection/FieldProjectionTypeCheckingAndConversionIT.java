@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -173,8 +173,8 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 	@MethodSource("params")
 	public void projectableDefault(FieldTypeDescriptor<F> fieldType) {
 		assumeFalse(
-				"Skipping this test as the backend makes fields projectable by default.",
-				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault(),
+				"Skipping this test as the backend makes fields projectable by default."
 		);
 		StubMappingScope scope = mainIndex.createScope();
 

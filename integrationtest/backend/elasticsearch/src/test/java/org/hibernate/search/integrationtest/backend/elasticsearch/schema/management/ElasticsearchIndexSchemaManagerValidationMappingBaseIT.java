@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingAndCommaForInitialization;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.hasValidationFailureReport;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -143,8 +143,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 	@MethodSource("params")
 	public void mapping_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		assumeTrue(
-				"Skipping this test as there is always a mapping (be it empty) in " + ElasticsearchTestDialect.getActualVersion(),
-				elasticSearchClient.getDialect().isEmptyMappingPossible()
+				elasticSearchClient.getDialect().isEmptyMappingPossible(),
+				"Skipping this test as there is always a mapping (be it empty) in " + ElasticsearchTestDialect.getActualVersion()
 		);
 
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {

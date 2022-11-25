@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl;
 
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.cfg.AvailableSettings;
@@ -47,8 +47,10 @@ public class MultitenancyTestHelper {
 
 		builder.onMetadata( metadataImplementor -> {
 			Dialect dialect = metadataImplementor.getDatabase().getDialect();
-			assumeTrue( "This test relies on multi-tenancy, which can currently only be set up with H2",
-					dialect instanceof H2Dialect );
+			assumeTrue(
+					dialect instanceof H2Dialect,
+					"This test relies on multi-tenancy, which can currently only be set up with H2"
+			);
 		} );
 	}
 

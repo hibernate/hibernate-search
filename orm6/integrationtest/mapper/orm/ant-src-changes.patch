@@ -73,9 +73,9 @@ index 2a43f25e1c..f8b1e3eb8f 100644
   */
  package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.onetoone.ownedbycontained;
  
-+import static org.junit.Assume.assumeTrue;
++import static org.junit.jupiter.api.Assumptions.assumeTrue;
  import static org.assertj.core.api.Assertions.assertThat;
- 
+
  import java.lang.reflect.Method;
 @@ -85,6 +86,57 @@ protected boolean isAssociationLazyOnContainingSide() {
  		return true;
@@ -128,8 +128,8 @@ index 2a43f25e1c..f8b1e3eb8f 100644
 +	}
 +
 +	private void notTestedBecauseOfHHH15606() {
-+		assumeTrue( "This test is disabled because of https://hibernate.atlassian.net/browse/HHH-15606",
-+				false );
++		assumeTrue( false,
++				"This test is disabled because of https://hibernate.atlassian.net/browse/HHH-15606" );
 +	}
 +
  	@Override
@@ -224,11 +224,11 @@ index 0fbdf16231..edf4fb86af 100644
   */
  package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.onetoone.ownedbycontaining;
  
-+import static org.junit.Assume.assumeTrue;
++import static org.junit.jupiter.api.Assumptions.assumeTrue;
  import static org.assertj.core.api.Assertions.assertThat;
- 
+
  import java.lang.reflect.Method;
-@@ -83,6 +84,57 @@ protected boolean isAssociationLazyOnContainingSide() {
+@@ -79,6 +81,57 @@ protected boolean isAssociationLazyOnContainingSide() {
  		return false;
  	}
  
@@ -279,8 +279,8 @@ index 0fbdf16231..edf4fb86af 100644
 +	}
 +
 +	private void notTestedBecauseOfHHH15606() {
-+		assumeTrue( "This test is disabled because of https://hibernate.atlassian.net/browse/HHH-15606",
-+				false );
++		assumeTrue( false,
++				"This test is disabled because of https://hibernate.atlassian.net/browse/HHH-15606" );
 +	}
 +
  	@Override
@@ -1268,7 +1268,7 @@ index 6af91cdb9f..34c4c1b092 100644
 +		assertThat( metamodel.getEntityDescriptor( IndexedEntity.class ).getPropertyNames() )
  				.contains( "_containing_fk_containingidBackref" )
  				.contains( "_containingIndexBackref" );
- 
+
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java
 index f3c50122f5..74e1a3d37c 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java

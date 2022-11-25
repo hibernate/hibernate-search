@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -114,8 +114,8 @@ public class SearchQueryTimeoutIT {
 	@Test
 	public void scroll_truncateAfter_slowQuery_smallTimeout() {
 		assumeTrue(
-				"The backend doesn't support truncateAfter() on scrolls",
-				TckConfiguration.get().getBackendFeatures().supportsTruncateAfterForScroll()
+				TckConfiguration.get().getBackendFeatures().supportsTruncateAfterForScroll(),
+				"The backend doesn't support truncateAfter() on scrolls"
 		);
 
 		SearchQuery<DocumentReference> query = startSlowQuery()

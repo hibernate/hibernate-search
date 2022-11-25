@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.work.operations;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.mapper.pojo.work.operations.BackendIndexingOperation.addWorkInfo;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,9 +54,9 @@ public abstract class AbstractPojoIndexingPlanOperationNullEntityIT extends Abst
 	void loadingDoesNotFindEntity(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
 		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		assumeTrue(
+				scenario().expectSkipOnEntityAbsentAfterImplicitLoading(),
 				"This test only makes sense when "
-						+ "the operation is automatically skipped when the entity is absent upon implicit loading",
-				scenario().expectSkipOnEntityAbsentAfterImplicitLoading()
+						+ "the operation is automatically skipped when the entity is absent upon implicit loading"
 		);
 
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();

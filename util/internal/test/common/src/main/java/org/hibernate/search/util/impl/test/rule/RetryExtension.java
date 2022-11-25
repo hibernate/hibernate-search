@@ -21,7 +21,6 @@ import java.util.Spliterator;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import org.junit.AssumptionViolatedException;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -116,7 +115,7 @@ public final class RetryExtension implements TestTemplateInvocationContextProvid
 
 	@Override
 	public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
-		if ( !AssumptionViolatedException.class.isAssignableFrom( throwable.getClass() ) ) {
+		if ( !TestAbortedException.class.isAssignableFrom( throwable.getClass() ) ) {
 			save( context, StoreKey.FAILED, true );
 
 			if ( Boolean.TRUE.equals( read( context, StoreKey.LAST_ITERATION, Boolean.class ) ) ) {

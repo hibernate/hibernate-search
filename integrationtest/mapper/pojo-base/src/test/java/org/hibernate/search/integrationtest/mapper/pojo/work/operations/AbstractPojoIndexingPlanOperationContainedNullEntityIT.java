@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.work.operations;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -129,9 +129,10 @@ public abstract class AbstractPojoIndexingPlanOperationContainedNullEntityIT ext
 	}
 
 	private void assumeImplicitLoading() {
-		assumeTrue( "This test only makes sense when "
-						+ "the operation automatically loads entities",
-				!isDelete() );
+		assumeTrue(
+				!isDelete(),
+				"This test only makes sense when the operation automatically loads entities"
+		);
 	}
 
 }

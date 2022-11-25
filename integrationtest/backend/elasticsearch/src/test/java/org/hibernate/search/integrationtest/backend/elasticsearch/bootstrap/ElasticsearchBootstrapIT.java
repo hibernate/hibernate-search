@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isAtMost;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEqualsIgnoringUnknownFields;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -122,12 +122,12 @@ public class ElasticsearchBootstrapIT {
 	@TestForIssue(jiraKey = "HSEARCH-3841")
 	public void noVersionCheck_incompleteVersion() {
 		assumeFalse(
+				isAtMost( ElasticsearchTestDialect.getActualVersion(), "elastic:5.6" ),
 				"This test only is only relevant" +
 						" for Elasticsearch major versions where all minor versions" +
 						" use the same model dialect." +
 						" It is not the case on ES 5 in particular, since 5.6 has a dialect" +
-						" but 5.0, 5.1, etc. don't have one.",
-				isAtMost( ElasticsearchTestDialect.getActualVersion(), "elastic:5.6" )
+						" but 5.0, 5.1, etc. don't have one."
 		);
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
 		String versionWithMajorOnly = actualVersion.distribution() + ":" + actualVersion.major();
@@ -203,12 +203,12 @@ public class ElasticsearchBootstrapIT {
 	@TestForIssue(jiraKey = "HSEARCH-4214")
 	public void noVersionCheck_versionOverrideOnStart_incompatibleVersion() {
 		assumeFalse(
+				isAtMost( ElasticsearchTestDialect.getActualVersion(), "elastic:5.6" ),
 				"This test only is only relevant" +
 						" for Elasticsearch major versions where all minor versions" +
 						" use the same model dialect." +
 						" It is not the case on ES 5 in particular, since 5.6 has a dialect" +
-						" but 5.0, 5.1, etc. don't have one.",
-				isAtMost( ElasticsearchTestDialect.getActualVersion(), "elastic:5.6" )
+						" but 5.0, 5.1, etc. don't have one."
 		);
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
 		String versionWithMajorOnly = actualVersion.distribution() + ":" + actualVersion.major();
@@ -257,12 +257,12 @@ public class ElasticsearchBootstrapIT {
 	@TestForIssue(jiraKey = "HSEARCH-4214")
 	public void noVersionCheck_versionOverrideOnStart_compatibleVersion() {
 		assumeFalse(
+				isAtMost( ElasticsearchTestDialect.getActualVersion(), "elastic:5.6" ),
 				"This test only is only relevant" +
 						" for Elasticsearch major versions where all minor versions" +
 						" use the same model dialect." +
 						" It is not the case on ES 5 in particular, since 5.6 has a dialect" +
-						" but 5.0, 5.1, etc. don't have one.",
-				isAtMost( ElasticsearchTestDialect.getActualVersion(), "elastic:5.6" )
+						" but 5.0, 5.1, etc. don't have one."
 		);
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
 		String versionWithMajorOnly = actualVersion.distribution() + ":" + actualVersion.major();

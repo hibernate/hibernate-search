@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.work;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,9 +147,9 @@ public class IndexingFieldTypesIT<F> {
 	public void dynamic_withPath(FieldTypeDescriptor<F> typeDescriptor) {
 		init( typeDescriptor );
 		assumeTrue(
-				"This backend does not support dynamic fields for this type",
 				TckConfiguration.get().getBackendFeatures()
-						.supportsValuesForDynamicField( typeDescriptor.getJavaType() )
+						.supportsValuesForDynamicField( typeDescriptor.getJavaType() ),
+				"This backend does not support dynamic fields for this type"
 		);
 
 		List<F> values = new ArrayList<>( typeDescriptor.getIndexableValues().getSingle() );
