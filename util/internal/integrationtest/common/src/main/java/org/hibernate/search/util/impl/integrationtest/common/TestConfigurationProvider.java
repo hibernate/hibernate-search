@@ -29,11 +29,8 @@ import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 
-public final class TestConfigurationProvider implements TestRule, BeforeAllCallback, AfterAllCallback,
+public final class TestConfigurationProvider implements BeforeAllCallback, AfterAllCallback,
 		BeforeEachCallback, AfterEachCallback {
 
 	private static final String STARTUP_TIMESTAMP = new SimpleDateFormat( "yyyy-MM-dd-HH-mm-ss.SSS", Locale.ROOT )
@@ -59,22 +56,6 @@ public final class TestConfigurationProvider implements TestRule, BeforeAllCallb
 	@Override
 	public void beforeEach(ExtensionContext context) {
 		testId = context.getDisplayName().replaceAll( "[^A-Za-z0-9_+().\\[\\]=]+", "_" );
-	}
-
-	@Override
-	public Statement apply(Statement base, Description description) {
-		return new Statement() {
-			@Override
-			public void evaluate() throws Throwable {
-				testId = description.getDisplayName().replaceAll( "[^A-Za-z0-9_+().\\[\\]=]+", "_" );
-				try {
-					base.evaluate();
-				}
-				finally {
-					testId = null;
-				}
-			}
-		};
 	}
 
 	public BeanResolver createBeanResolverForTest() {

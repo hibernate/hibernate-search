@@ -20,8 +20,8 @@ import org.hibernate.search.util.impl.test.rule.log4j.TestAppender;
 
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.rules.TestRule;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
@@ -36,7 +36,7 @@ public class ExpectedLog4jLog implements BeforeTestExecutionCallback, AfterTestE
 	private static final String DEFAULT_LOGGER_NAME = "org.hibernate.search";
 
 	/**
-	 * @return a {@linkplain TestRule rule} targeting the logger named '{@value DEFAULT_LOGGER_NAME}',
+	 * @return an {@linkplain Extension extension} targeting the logger named '{@value DEFAULT_LOGGER_NAME}',
 	 * that originally does not mandate any particular log to be produced (identical to behavior without this rule).
 	 */
 	public static ExpectedLog4jLog create() {
@@ -44,7 +44,7 @@ public class ExpectedLog4jLog implements BeforeTestExecutionCallback, AfterTestE
 	}
 
 	/**
-	 * @return a {@linkplain TestRule rule} targeting the logger whose name is given by {@code loggerName},
+	 * @return a {@linkplain Extension extension} targeting the logger whose name is given by {@code loggerName},
 	 * that originally does not mandate any particular log to be produced (identical to behavior without this rule).
 	 */
 	public static ExpectedLog4jLog create(String loggerName) {

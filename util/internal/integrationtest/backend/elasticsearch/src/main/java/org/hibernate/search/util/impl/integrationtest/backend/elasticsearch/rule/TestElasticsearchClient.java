@@ -51,9 +51,6 @@ import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationPr
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -61,7 +58,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class TestElasticsearchClient implements TestRule, BeforeTestExecutionCallback, AfterTestExecutionCallback, Closeable {
+public class TestElasticsearchClient implements BeforeTestExecutionCallback, AfterTestExecutionCallback, Closeable {
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
@@ -504,27 +501,6 @@ public class TestElasticsearchClient implements TestRule, BeforeTestExecutionCal
 			close( closer );
 		}
 		configurationProvider.afterEach( context );
-	}
-
-	@Override
-	public Statement apply(Statement base, Description description) {
-		TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
-		Statement wrapped = new Statement() {
-			@Override
-			public void evaluate() throws Throwable {
-				// Using the closer like this allows to suppress exceptions thrown by the 'finally' block.
-				try ( Closer<IOException> closer = new Closer<>() ) {
-					try {
-						open( configurationProvider );
-						base.evaluate();
-					}
-					finally {
-						close( closer );
-					}
-				}
-			}
-		};
-		return configurationProvider.apply( wrapped, description );
 	}
 
 	public void open(TestConfigurationProvider configurationProvider) {
