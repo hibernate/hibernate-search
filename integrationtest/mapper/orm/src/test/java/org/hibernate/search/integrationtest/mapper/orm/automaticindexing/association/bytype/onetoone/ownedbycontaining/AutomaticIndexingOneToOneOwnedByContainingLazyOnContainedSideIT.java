@@ -41,10 +41,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.hibernate.testing.bytecode.enhancement.BytecodeEnhancerRunner;
-import org.hibernate.testing.bytecode.enhancement.EnhancementOptions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test automatic indexing caused by single-valued association updates
@@ -52,8 +50,9 @@ import org.junit.runner.RunWith;
  * with a {@code @OneToOne} association owned by the containing side,
  * and with lazy associations on the contained side.
  */
-@RunWith(BytecodeEnhancerRunner.class) // So that we can have lazy *ToOne associations
-@EnhancementOptions(lazyLoading = true)
+//@RunWith(BytecodeEnhancerRunner.class) // So that we can have lazy *ToOne associations
+//@EnhancementOptions(lazyLoading = true)
+@Disabled("Need to replace `BytecodeEnhancerRunner` runner with a JUnit 5 extension.")
 public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT
 		extends AbstractAutomaticIndexingSingleValuedAssociationBaseIT<
 						AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT.IndexedEntity,

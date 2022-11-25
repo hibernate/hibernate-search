@@ -42,13 +42,13 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.hibernate.testing.bytecode.enhancement.BytecodeEnhancerRunner;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
 
-@RunWith(BytecodeEnhancerRunner.class)
+//@RunWith(BytecodeEnhancerRunner.class)
+@Disabled("Need to replace `BytecodeEnhancerRunner` runner with a JUnit 5 extension.")
 public class BytecodeEnhancementIT {
 
 	@RegisterExtension
