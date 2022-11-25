@@ -173,7 +173,9 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET = MessageConstants.MAPPER_POJO_ID_RANGE_MIN;
 
 	@Message(id = ID_OFFSET + 1,
-			value = "No default identifier bridge implementation for type '%1$s'. Use a custom bridge.")
+			value = "No default identifier bridge implementation for type '%1$s'." +
+					" Implement a custom bridge and assign it to the identifier property with @DocumentId(identifierBridge = ...)." +
+					" See the reference documentation for more information about bridges.")
 	SearchException unableToResolveDefaultIdentifierBridgeFromSourceType(
 			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> sourceType);
 

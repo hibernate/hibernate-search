@@ -130,7 +130,11 @@ public class DocumentIdDefaultBridgeAdditionIT {
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( indexedType.getName() )
 						.pathContext( ".id" )
-						.failure( "No default identifier bridge implementation for type", "Use a custom bridge" ) );
+						.failure(
+								"No default identifier bridge implementation for type",
+								"Implement a custom bridge and assign it to the identifier property with @DocumentId(identifierBridge = ...)",
+								"See the reference documentation for more information about bridges"
+						) );
 	}
 
 	@Indexed(index = INDEX_NAME)
