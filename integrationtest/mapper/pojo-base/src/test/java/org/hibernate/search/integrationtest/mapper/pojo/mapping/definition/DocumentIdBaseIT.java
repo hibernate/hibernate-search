@@ -70,8 +70,11 @@ public class DocumentIdBaseIT {
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.failure( "No default identifier bridge implementation for type '" + Object.class.getName() + "'",
-								"Use a custom bridge" ) );
+						.failure(
+								"No default identifier bridge implementation for type '" + Object.class.getName() + "'",
+								"Implement a custom bridge and assign it to the identifier property with @DocumentId(identifierBridge = ...)",
+								"See the reference documentation for more information about bridges"
+						) );
 	}
 
 	@Test
@@ -89,8 +92,11 @@ public class DocumentIdBaseIT {
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.failure( "No default identifier bridge implementation for type 'java.lang.Enum (java.lang.Enum<E>)'",
-								"Use a custom bridge" ) );
+						.failure(
+								"No default identifier bridge implementation for type 'java.lang.Enum (java.lang.Enum<E>)'",
+								"Implement a custom bridge and assign it to the identifier property with @DocumentId(identifierBridge = ...)",
+								"See the reference documentation for more information about bridges"
+						) );
 	}
 
 	@Test
@@ -107,8 +113,11 @@ public class DocumentIdBaseIT {
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.failure( "No default identifier bridge implementation for type 'java.lang.Enum<?>'",
-								"Use a custom bridge" )
+						.failure(
+								"No default identifier bridge implementation for type 'java.lang.Enum<?>'",
+								"Implement a custom bridge and assign it to the identifier property with @DocumentId(identifierBridge = ...)",
+								"See the reference documentation for more information about bridges"
+						)
 				);
 	}
 
@@ -126,9 +135,12 @@ public class DocumentIdBaseIT {
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.failure( "No default identifier bridge implementation for type 'java.lang.Enum<"
+						.failure(
+								"No default identifier bridge implementation for type 'java.lang.Enum<"
 										+ EnumForEnumSuperClassTest.class.getName() + ">'",
-								"Use a custom bridge" ) );
+								"Implement a custom bridge and assign it to the identifier property with @DocumentId(identifierBridge = ...)",
+								"See the reference documentation for more information about bridges"
+						) );
 	}
 
 	enum EnumForEnumSuperClassTest {
