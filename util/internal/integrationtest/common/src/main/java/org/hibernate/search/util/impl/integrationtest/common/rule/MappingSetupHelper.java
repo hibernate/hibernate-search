@@ -52,31 +52,24 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		this.configurationProvider = new TestConfigurationProvider();
 		this.backendSetupStrategy = backendSetupStrategy;
 		Optional<Extension> setupStrategyTestExtension = backendSetupStrategy.getTestRule();
-		ComposedExtension.FullExtension ownActions = new ComposedExtension.FullExtension(
-				afterAllContext -> {
+		ComposedExtension.FullExtension ownActions = new ComposedExtension.FullExtension.Builder()
+				.withAfterAll( afterAllContext -> {
 					if ( Type.CLASS.equals( type ) ) {
 						cleanUp();
 					}
-				},
-				afterEachContext -> {
+				} ).withAfterEach( afterEachContext -> {
 					if ( Type.METHOD.equals( type ) ) {
 						cleanUp();
 					}
-				},
-				afterTestExecutionContext -> { },
-				beforeAllContext -> {
+				} ).withBeforeAll( beforeAllContext -> {
 					if ( Type.CLASS.equals( type ) ) {
 						init();
 					}
-				},
-				beforeEachContext -> {
+				} ).withBeforeEach( beforeEachContext -> {
 					if ( Type.METHOD.equals( type ) ) {
 						init();
 					}
-				},
-				beforeTestExecutionContext -> { },
-				(testExecutionExceptionContext, throwable) -> { }
-		);
+				} ).build();
 
 		this.delegate = new ComposedExtension(
 				ownActions,

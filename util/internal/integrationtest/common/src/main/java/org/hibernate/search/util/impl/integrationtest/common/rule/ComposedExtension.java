@@ -168,5 +168,70 @@ public class ComposedExtension implements AfterAllCallback, AfterEachCallback, A
 		public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
 			testExecutionExceptionHandler.accept( context, throwable );
 		}
+
+		public static class Builder {
+
+			private static final ThrowingConsumer<ExtensionContext, Exception> DO_NOTHING = c -> { };
+			private static final ThrowingBiConsumer<ExtensionContext, Throwable, Throwable> JUST_RETHROW = (c, e) -> { throw e; };
+
+			private ThrowingConsumer<ExtensionContext, Exception> afterAllCallback = DO_NOTHING;
+			private ThrowingConsumer<ExtensionContext, Exception> afterEachCallback = DO_NOTHING;
+			private ThrowingConsumer<ExtensionContext, Exception> afterTestExecutionCallback = DO_NOTHING;
+			private ThrowingConsumer<ExtensionContext, Exception> beforeAllCallback = DO_NOTHING;
+			private ThrowingConsumer<ExtensionContext, Exception> beforeEachCallback = DO_NOTHING;
+			private ThrowingConsumer<ExtensionContext, Exception> beforeTestExecutionCallback = DO_NOTHING;
+			private ThrowingBiConsumer<ExtensionContext, Throwable, Throwable> testExecutionExceptionHandler = JUST_RETHROW;
+
+			public Builder withAfterAll(ThrowingConsumer<ExtensionContext, Exception> afterAllCallback) {
+				this.afterAllCallback = afterAllCallback;
+				return this;
+			}
+
+			public Builder withAfterEach(ThrowingConsumer<ExtensionContext, Exception> afterEachCallback) {
+				this.afterEachCallback = afterEachCallback;
+				return this;
+			}
+
+			public Builder withAfterTestExecution(
+					ThrowingConsumer<ExtensionContext, Exception> afterTestExecutionCallback) {
+				this.afterTestExecutionCallback = afterTestExecutionCallback;
+				return this;
+			}
+
+			public Builder withBeforeAll(ThrowingConsumer<ExtensionContext, Exception> beforeAllCallback) {
+				this.beforeAllCallback = beforeAllCallback;
+				return this;
+			}
+
+			public Builder withBeforeEach(ThrowingConsumer<ExtensionContext, Exception> beforeEachCallback) {
+				this.beforeEachCallback = beforeEachCallback;
+				return this;
+			}
+
+			public Builder withBeforeTestExecution(
+					ThrowingConsumer<ExtensionContext, Exception> beforeTestExecutionCallback) {
+				this.beforeTestExecutionCallback = beforeTestExecutionCallback;
+				return this;
+			}
+
+			public Builder withTestExecutionExceptionHandler(
+					ThrowingBiConsumer<ExtensionContext, Throwable, Throwable> testExecutionExceptionHandler) {
+				this.testExecutionExceptionHandler = testExecutionExceptionHandler;
+				return this;
+			}
+
+			public FullExtension build() {
+				return new FullExtension(
+						afterAllCallback,
+						afterEachCallback,
+						afterTestExecutionCallback,
+						beforeAllCallback,
+						beforeEachCallback,
+						beforeTestExecutionCallback,
+						testExecutionExceptionHandler
+				);
+			}
+		}
 	}
+
 }
