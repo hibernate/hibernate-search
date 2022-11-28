@@ -23,11 +23,11 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.util.impl.integrationtest.common.rule.CallQueue;
 
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-public class ElasticsearchClientSpy implements BeforeTestExecutionCallback, AfterTestExecutionCallback {
+public class ElasticsearchClientSpy implements BeforeEachCallback, AfterEachCallback {
 	private final AtomicInteger createdClientCount = new AtomicInteger();
 	private final AtomicInteger requestCount = new AtomicInteger();
 	private final CallQueue<ElasticsearchClientSubmitCall> expectations = new CallQueue<>( () -> false );
@@ -40,12 +40,12 @@ public class ElasticsearchClientSpy implements BeforeTestExecutionCallback, Afte
 	}
 
 	@Override
-	public void beforeTestExecution(ExtensionContext context) {
+	public void beforeEach(ExtensionContext context) {
 		setup();
 	}
 
 	@Override
-	public void afterTestExecution(ExtensionContext context) {
+	public void afterEach(ExtensionContext context) {
 		try {
 			verifyExpectationsMet();
 		}

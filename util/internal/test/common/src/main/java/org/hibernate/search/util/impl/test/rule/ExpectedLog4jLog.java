@@ -18,8 +18,8 @@ import org.hibernate.search.util.impl.test.rule.log4j.LogChecker;
 import org.hibernate.search.util.impl.test.rule.log4j.LogExpectation;
 import org.hibernate.search.util.impl.test.rule.log4j.TestAppender;
 
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
@@ -31,7 +31,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.StringDescription;
 import org.hamcrest.TypeSafeMatcher;
 
-public class ExpectedLog4jLog implements BeforeTestExecutionCallback, AfterTestExecutionCallback {
+public class ExpectedLog4jLog implements BeforeEachCallback, AfterEachCallback {
 
 	private static final String DEFAULT_LOGGER_NAME = "org.hibernate.search";
 
@@ -62,7 +62,7 @@ public class ExpectedLog4jLog implements BeforeTestExecutionCallback, AfterTestE
 	}
 
 	@Override
-	public void beforeTestExecution(ExtensionContext context) {
+	public void beforeEach(ExtensionContext context) {
 		programmaticConfig = new Log4j2ConfigurationAccessor( loggerName );
 		TestAppender appender = new TestAppender( "TestAppender" );
 		programmaticConfig.addAppender( appender );
@@ -74,7 +74,7 @@ public class ExpectedLog4jLog implements BeforeTestExecutionCallback, AfterTestE
 	}
 
 	@Override
-	public void afterTestExecution(ExtensionContext context) {
+	public void afterEach(ExtensionContext context) {
 		programmaticConfig.removeAppender();
 		Set<LogChecker> failingCheckers = currentAppender.getFailingCheckers();
 		if ( !failingCheckers.isEmpty() ) {

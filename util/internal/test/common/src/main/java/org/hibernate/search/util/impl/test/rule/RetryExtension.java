@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.TestTemplate;
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -32,7 +32,7 @@ import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider;
 
 import org.opentest4j.TestAbortedException;
 
-public final class RetryExtension implements TestTemplateInvocationContextProvider, BeforeTestExecutionCallback,
+public final class RetryExtension implements TestTemplateInvocationContextProvider, BeforeEachCallback,
 		TestExecutionExceptionHandler {
 
 	@Target({ ElementType.METHOD })
@@ -109,7 +109,7 @@ public final class RetryExtension implements TestTemplateInvocationContextProvid
 	}
 
 	@Override
-	public void beforeTestExecution(ExtensionContext context) {
+	public void beforeEach(ExtensionContext context) {
 		save( context, StoreKey.FAILED, false );
 	}
 

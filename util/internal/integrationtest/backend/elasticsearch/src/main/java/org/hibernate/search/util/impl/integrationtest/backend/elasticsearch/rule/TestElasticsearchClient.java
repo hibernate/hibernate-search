@@ -48,8 +48,8 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.Elas
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 import com.google.gson.GsonBuilder;
@@ -58,7 +58,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class TestElasticsearchClient implements BeforeTestExecutionCallback, AfterTestExecutionCallback, Closeable {
+public class TestElasticsearchClient implements BeforeEachCallback, AfterEachCallback, Closeable {
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
@@ -488,14 +488,14 @@ public class TestElasticsearchClient implements BeforeTestExecutionCallback, Aft
 	}
 
 	@Override
-	public void beforeTestExecution(ExtensionContext context) {
+	public void beforeEach(ExtensionContext context) {
 		configurationProvider.beforeEach( context );
 
 		open( configurationProvider );
 	}
 
 	@Override
-	public void afterTestExecution(ExtensionContext context) throws Exception {
+	public void afterEach(ExtensionContext context) throws Exception {
 		// Using the closer like this allows to suppress exceptions thrown by the 'finally' block.
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			close( closer );

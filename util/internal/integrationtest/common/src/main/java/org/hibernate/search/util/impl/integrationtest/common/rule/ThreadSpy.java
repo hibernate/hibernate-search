@@ -18,8 +18,8 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 /**
@@ -29,7 +29,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
  * then set {@link EngineSpiSettings#THREAD_PROVIDER} to the result of {@link ThreadSpy#getThreadProvider()}
  * when starting Hibernate Search.
  */
-public class ThreadSpy implements BeforeTestExecutionCallback, AfterTestExecutionCallback {
+public class ThreadSpy implements BeforeEachCallback, AfterEachCallback {
 	private List<Thread> createdThreads = Collections.synchronizedList( new ArrayList<>() );
 
 	private ThreadSpy() {
@@ -40,12 +40,12 @@ public class ThreadSpy implements BeforeTestExecutionCallback, AfterTestExecutio
 	}
 
 	@Override
-	public void afterTestExecution(ExtensionContext context) {
+	public void afterEach(ExtensionContext context) {
 		tearDown();
 	}
 
 	@Override
-	public void beforeTestExecution(ExtensionContext context) {
+	public void beforeEach(ExtensionContext context) {
 		setup();
 	}
 
