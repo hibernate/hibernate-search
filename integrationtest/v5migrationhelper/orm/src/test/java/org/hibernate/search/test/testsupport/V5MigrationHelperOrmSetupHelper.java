@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.testsupport;
 
+import static org.hibernate.search.test.util.impl.JunitJupiterContextHelper.extensionContext;
+
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -25,8 +27,14 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMap
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl.MultitenancyTestHelper;
 
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
+
 public final class V5MigrationHelperOrmSetupHelper
-		extends MappingSetupHelper<V5MigrationHelperOrmSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory> {
+		extends MappingSetupHelper<V5MigrationHelperOrmSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory>
+		implements TestRule {
 
 	public static V5MigrationHelperOrmSetupHelper create() {
 		return new V5MigrationHelperOrmSetupHelper(
@@ -46,6 +54,23 @@ public final class V5MigrationHelperOrmSetupHelper
 	@Override
 	protected void close(SessionFactory toClose) {
 		toClose.close();
+	}
+
+	@Override
+	public Statement apply(Statement base, Description description) {
+		ExtensionContext context = extensionContext( description );
+		return new Statement() {
+			@Override
+			public void evaluate() throws Throwable {
+				beforeAll( context );
+				try {
+					base.evaluate();
+				}
+				finally {
+					afterAll( context );
+				}
+			}
+		};
 	}
 
 	public final class SetupContext

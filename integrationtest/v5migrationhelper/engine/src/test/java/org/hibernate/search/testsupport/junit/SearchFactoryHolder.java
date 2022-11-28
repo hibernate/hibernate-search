@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.testsupport.junit;
 
+import static org.hibernate.search.test.util.impl.JunitJupiterContextHelper.extensionContext;
 import static org.junit.Assert.assertNull;
 
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.migration.V5MigrationStandalonePojoSearchIntegratorAdapter;
 
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -53,10 +55,11 @@ public class SearchFactoryHolder implements TestRule {
 	@Override
 	public Statement apply(Statement base, Description description) {
 		Statement statement = new Statement() {
+
 			@Override
 			public void evaluate() throws Throwable {
-				// TODO: fixme
-				setupHelper.beforeTestExecution( null );
+				ExtensionContext context = extensionContext( description );
+				setupHelper.beforeAll( context );
 				try {
 					mapping = setupHelper.start()
 							.withProperties( configuration )
@@ -67,7 +70,7 @@ public class SearchFactoryHolder implements TestRule {
 				finally {
 					mapping = null;
 					searchIntegrator = null;
-					setupHelper.afterTestExecution( null );
+					setupHelper.afterAll( context );
 				}
 			}
 		};
