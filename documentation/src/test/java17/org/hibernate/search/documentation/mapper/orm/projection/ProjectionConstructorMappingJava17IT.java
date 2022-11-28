@@ -19,10 +19,12 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -42,12 +44,12 @@ public class ProjectionConstructorMappingJava17IT {
 
 	public static List<? extends Arguments> params() {
 		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
-				BackendConfigurations.simple(),
 				// Since we disable classpath scanning in tests for performance reasons,
 				// we need to register annotated projection types explicitly.
 				// This wouldn't be needed in a typical application.
 				CollectionHelper.asSet( MyBookProjection.class, MyBookProjection.Author.class,
-						MyAuthorProjectionClassMultiConstructor.class, MyAuthorProjectionRecordMultiConstructor.class ),
+						MyAuthorProjectionClassMultiConstructor.class, MyAuthorProjectionRecordMultiConstructor.class
+				),
 				mapping -> {
 					TypeMappingStep bookMapping = mapping.type( Book.class );
 					bookMapping.indexed();
@@ -86,22 +88,25 @@ public class ProjectionConstructorMappingJava17IT {
 							.constructor( String.class, String.class )
 							.projectionConstructor();
 				}
-		).stream()
-				.map( Arguments::of )
-				.collect( Collectors.toList() );
+		);
 	}
 
+	@RegisterExtension
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
+			BackendConfigurations.simple() );
 	private EntityManagerFactory entityManagerFactory;
 
-	public void init(DocumentationSetupHelper setupHelper) {
+	public void init(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		setupHelper.withAnnotationProcessingEnabled( annotationProcessingEnabled )
+				.withMappingConfigurer( mappingContributor );
 		entityManagerFactory = setupHelper.start().setup( Book.class, Author.class );
 		initData();
 	}
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void simple(DocumentationSetupHelper setupHelper) {
-		init( setupHelper );
+	public void simple(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -162,8 +167,8 @@ public class ProjectionConstructorMappingJava17IT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void multiConstructor_class(DocumentationSetupHelper setupHelper) {
-		init( setupHelper );
+	public void multiConstructor_class(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -184,8 +189,8 @@ public class ProjectionConstructorMappingJava17IT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void multiConstructor_record(DocumentationSetupHelper setupHelper) {
-		init( setupHelper );
+	public void multiConstructor_record(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 

@@ -10,15 +10,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -27,7 +28,6 @@ public class IndexedEmbeddedOneLevelIT {
 
 	public static List<? extends Arguments> params() {
 		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
-				BackendConfigurations.simple(),
 				mapping -> {
 					//tag::programmatic[]
 					TypeMappingStep bookMapping = mapping.type( Book.class );
@@ -40,21 +40,24 @@ public class IndexedEmbeddedOneLevelIT {
 					authorMapping.property( "name" )
 							.fullTextField().analyzer( "name" );
 					//end::programmatic[]
-				} ).stream()
-				.map( Arguments::of )
-				.collect( Collectors.toList() );
+				} );
 	}
 
+	@RegisterExtension
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
+			BackendConfigurations.simple() );
 	private EntityManagerFactory entityManagerFactory;
 
-	public void init(DocumentationSetupHelper setupHelper) {
+	public void init(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		setupHelper.withAnnotationProcessingEnabled( annotationProcessingEnabled )
+				.withMappingConfigurer( mappingContributor );
 		entityManagerFactory = setupHelper.start().setup( Book.class, Author.class );
 	}
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void smoke(DocumentationSetupHelper setupHelper) {
-		init( setupHelper );
+	public void smoke(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book = new Book();
 			book.setId( 1 );

@@ -28,61 +28,30 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.Backen
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 
+import org.junit.jupiter.params.provider.Arguments;
+
 public final class DocumentationSetupHelper
 		extends MappingSetupHelper<DocumentationSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory> {
 
-	public static List<DocumentationSetupHelper> testParamsForBothAnnotationsAndProgrammatic(
-			BackendConfiguration backendConfiguration,
-			Consumer<ProgrammaticMappingConfigurationContext> programmaticMappingContributor) {
-		return testParamsForBothAnnotationsAndProgrammatic( backendConfiguration,
-				Collections.emptySet(), programmaticMappingContributor );
+	public static List<? extends Arguments> testParamsForBothAnnotationsAndProgrammatic(
+			Consumer<ProgrammaticMappingConfigurationContext> programmaticMappingContributor
+	) {
+		return testParamsForBothAnnotationsAndProgrammatic( Collections.emptySet(), programmaticMappingContributor );
 	}
 
-	public static List<DocumentationSetupHelper> testParamsForBothAnnotationsAndProgrammatic(
-			BackendConfiguration backendConfiguration,
+	public static List<? extends Arguments> testParamsForBothAnnotationsAndProgrammatic(
 			Set<Class<?>> additionalAnnotatedClasses,
 			Consumer<ProgrammaticMappingConfigurationContext> programmaticMappingContributor) {
-		return testParamsForBothAnnotationsAndProgrammatic(
-				BackendSetupStrategy.withSingleBackend( backendConfiguration ), backendConfiguration,
-				additionalAnnotatedClasses, programmaticMappingContributor );
-	}
-
-	public static List<DocumentationSetupHelper> testParamsForBothAnnotationsAndProgrammatic(
-			BackendConfiguration defaultBackendConfiguration,
-			Map<String, BackendConfiguration> namedBackendConfigurations,
-			Consumer<ProgrammaticMappingConfigurationContext> programmaticMappingContributor) {
-		return testParamsForBothAnnotationsAndProgrammatic( defaultBackendConfiguration, namedBackendConfigurations,
-				Collections.emptySet(), programmaticMappingContributor );
-	}
-
-	public static List<DocumentationSetupHelper> testParamsForBothAnnotationsAndProgrammatic(
-			BackendConfiguration defaultBackendConfiguration,
-			Map<String, BackendConfiguration> namedBackendConfigurations,
-			Set<Class<?>> additionalAnnotatedClasses,
-			Consumer<ProgrammaticMappingConfigurationContext> programmaticMappingContributor) {
-		return testParamsForBothAnnotationsAndProgrammatic(
-				BackendSetupStrategy.withMultipleBackends( defaultBackendConfiguration, namedBackendConfigurations ),
-				defaultBackendConfiguration,
-				additionalAnnotatedClasses, programmaticMappingContributor );
-	}
-
-	public static List<DocumentationSetupHelper> testParamsForBothAnnotationsAndProgrammatic(
-			BackendSetupStrategy backendSetupStrategy,
-			BackendConfiguration defaultBackendConfiguration,
-			Set<Class<?>> additionalAnnotatedClasses,
-			Consumer<ProgrammaticMappingConfigurationContext> programmaticMappingContributor) {
-		List<DocumentationSetupHelper> result = new ArrayList<>();
+		List<Arguments> result = new ArrayList<>();
 		// Annotation-based mapping
 		HibernateOrmSearchMappingConfigurer annotationMappingConfigurer =
 				additionalAnnotatedClasses.isEmpty() ? null
 						: context -> context.annotationMapping().add( additionalAnnotatedClasses );
-		result.add( new DocumentationSetupHelper( backendSetupStrategy,
-				null, annotationMappingConfigurer ) );
+		result.add( Arguments.of( null, annotationMappingConfigurer ) );
 		// Programmatic mapping
 		HibernateOrmSearchMappingConfigurer programmaticMappingConfigurer =
 				context -> programmaticMappingContributor.accept( context.programmaticMapping() );
-		result.add( new DocumentationSetupHelper( backendSetupStrategy,
-				false, programmaticMappingConfigurer ) );
+		result.add( Arguments.of( false, programmaticMappingConfigurer ) );
 		return result;
 	}
 
@@ -101,9 +70,17 @@ public final class DocumentationSetupHelper
 		);
 	}
 
-	private final Boolean annotationProcessingEnabled;
+	public static DocumentationSetupHelper withMultipleBackends(BackendConfiguration defaultBackendConfiguration,
+			Map<String, BackendConfiguration> namedBackendConfigurations) {
+		return new DocumentationSetupHelper(
+				BackendSetupStrategy.withMultipleBackends( defaultBackendConfiguration, namedBackendConfigurations ),
+				null, null
+		);
+	}
 
-	private final HibernateOrmSearchMappingConfigurer defaultMappingConfigurer;
+	private Boolean annotationProcessingEnabled;
+
+	private HibernateOrmSearchMappingConfigurer defaultMappingConfigurer;
 
 	private DocumentationSetupHelper(BackendSetupStrategy backendSetupStrategy,
 			Boolean annotationProcessingEnabled,
@@ -111,6 +88,21 @@ public final class DocumentationSetupHelper
 		super( backendSetupStrategy, Type.METHOD );
 		this.annotationProcessingEnabled = annotationProcessingEnabled;
 		this.defaultMappingConfigurer = defaultMappingConfigurer;
+	}
+
+	public DocumentationSetupHelper withMappingConfigurer(HibernateOrmSearchMappingConfigurer defaultMappingConfigurer) {
+		if ( this.defaultMappingConfigurer != null ) {
+			throw new IllegalStateException();
+		}
+		this.defaultMappingConfigurer = defaultMappingConfigurer;
+
+		return this;
+	}
+
+	public DocumentationSetupHelper withAnnotationProcessingEnabled(Boolean annotationProcessingEnabled) {
+		this.annotationProcessingEnabled = annotationProcessingEnabled;
+
+		return this;
 	}
 
 	@Override
