@@ -26,19 +26,6 @@
         <java-version.main.compiler.java_home>${java-version.test.compiler.java_home}</java-version.main.compiler.java_home>
         <java-version.main.compiler>${java-version.test.compiler}</java-version.main.compiler>
         <java-version.test.java17.add-main-source-phase.default>generate-sources</java-version.test.java17.add-main-source-phase.default>
-        <!--
-             Pass these properties as system properties to be able to switch to
-             a different database without re-compiling the hibernate.properties file
-             (which is located in a dependency of the integration tests modules)
-         -->
-        <failsafe.jvm.args.hibernate-orm>
-            -Dhibernate.dialect=${db.dialect}
-            -Dhibernate.connection.driver_class=${jdbc.driver}
-            -Dhibernate.connection.url=${jdbc.url}
-            -Dhibernate.connection.username=${jdbc.user}
-            -Dhibernate.connection.password=${jdbc.pass}
-            -Dhibernate.connection.isolation=${jdbc.isolation}
-        </failsafe.jvm.args.hibernate-orm>
 
         <!-- For some reason, the failsafe plugin uses the modulepath
              even when we didn't define a module-info.java,
@@ -47,11 +34,6 @@
              and Spring Boot ITs fail to detect configuration defined in the main (non-test) code.
              So, disable the modulepath explicitly. -->
         <failsafe.useModulePath>false</failsafe.useModulePath>
-        <!--
-            Enable elastic distribution container by default. If a simple `mvn clean install` is executed without any
-            additional parameters it will start ES container.
-        -->
-        <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
     </properties>
 
     <build>
@@ -69,257 +51,6 @@
                                     <compilerArg>-parameters</compilerArg>
                                 </compilerArgs>
                             </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>io.fabric8</groupId>
-                    <artifactId>docker-maven-plugin</artifactId>
-                    <version>${version.docker.maven.plugin}</version>
-                    <configuration>
-                        <skip>${test.containers.run.skip}</skip>
-                        <startParallel>true</startParallel>
-                        <images>
-                            <image>
-                                <name>${test.database.run.postgres.image.name}:${test.database.run.postgres.image.tag}</name>
-                                <alias>postgres</alias>
-                                <run>
-                                    <skip>${test.database.run.postgres.skip}</skip>
-                                    <env>
-                                        <POSTGRES_USER>hibernate_orm_test</POSTGRES_USER>
-                                        <POSTGRES_PASSWORD>hibernate_orm_test</POSTGRES_PASSWORD>
-                                        <POSTGRES_DB>hibernate_orm_test</POSTGRES_DB>
-                                    </env>
-                                    <ports>
-                                        <port>5432:5432</port>
-                                    </ports>
-                                    <log>
-                                        <prefix>PostgreSQL: </prefix>
-                                        <date>default</date>
-                                        <color>blue</color>
-                                    </log>
-                                    <wait>
-                                        <time>20000</time>
-                                        <!-- For some reason, Postgres will tell us it's ready *twice*,
-                                             and that's the truth the second time only.
-                                             See https://github.com/fabric8io/docker-maven-plugin/issues/628 -->
-                                        <log>(?s)ready to accept connections.*ready to accept connections</log>
-                                    </wait>
-                                </run>
-                            </image>
-                            <image>
-                                <name>${test.database.run.mariadb.image.name}:${test.database.run.mariadb.image.tag}</name>
-                                <alias>mariadb</alias>
-                                <run>
-                                    <skip>${test.database.run.mariadb.skip}</skip>
-                                    <cmd>--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci</cmd>
-                                    <env>
-                                        <MYSQL_USER>hibernate_orm_test</MYSQL_USER>
-                                        <MYSQL_PASSWORD>hibernate_orm_test</MYSQL_PASSWORD>
-                                        <MYSQL_DATABASE>hibernate_orm_test</MYSQL_DATABASE>
-                                        <MYSQL_RANDOM_ROOT_PASSWORD>true</MYSQL_RANDOM_ROOT_PASSWORD>
-                                    </env>
-                                    <ports>
-                                        <port>3306:3306</port>
-                                    </ports>
-                                    <log>
-                                        <prefix>MariaDB: </prefix>
-                                        <date>default</date>
-                                        <color>blue</color>
-                                    </log>
-                                    <!-- Speed things up a bit by not actually flushing writes to disk -->
-                                    <tmpfs>/var/lib/mysql</tmpfs>
-                                    <wait>
-                                        <time>20000</time>
-                                        <exec>
-                                            <postStart>mysqladmin ping -h localhost -u hibernate_orm_test -phibernate_orm_test</postStart>
-                                        </exec>
-                                    </wait>
-                                </run>
-                            </image>
-                            <image>
-                                <name>${test.database.run.mysql.image.name}:${test.database.run.mysql.image.tag}</name>
-                                <alias>mysql</alias>
-                                <run>
-                                    <skip>${test.database.run.mysql.skip}</skip>
-                                    <env>
-                                        <MYSQL_USER>hibernate_orm_test</MYSQL_USER>
-                                        <MYSQL_PASSWORD>hibernate_orm_test</MYSQL_PASSWORD>
-                                        <MYSQL_DATABASE>hibernate_orm_test</MYSQL_DATABASE>
-                                        <MYSQL_RANDOM_ROOT_PASSWORD>true</MYSQL_RANDOM_ROOT_PASSWORD>
-                                    </env>
-                                    <ports>
-                                        <port>3306:3306</port>
-                                    </ports>
-                                    <log>
-                                        <prefix>MySQL:</prefix>
-                                        <date>default</date>
-                                        <color>blue</color>
-                                    </log>
-                                    <!-- Speed things up a bit by not actually flushing writes to disk -->
-                                    <tmpfs>/var/lib/mysql</tmpfs>
-                                    <wait>
-                                        <time>20000</time>
-                                        <exec>
-                                            <postStart>mysqladmin ping -h localhost -u hibernate_orm_test -phibernate_orm_test</postStart>
-                                        </exec>
-                                    </wait>
-                                </run>
-                            </image>
-                            <image>
-                                <name>${test.database.run.db2.image.name}:${test.database.run.db2.image.tag}</name>
-                                <alias>db2</alias>
-                                <run>
-                                    <skip>${test.database.run.db2.skip}</skip>
-                                    <env>
-                                        <DB2INSTANCE>hreact</DB2INSTANCE>
-                                        <DB2INST1_PASSWORD>hreact</DB2INST1_PASSWORD>
-                                        <DBNAME>hreact</DBNAME>
-                                        <LICENSE>accept</LICENSE>
-                                        <!-- These help the DB2 container start faster -->
-                                        <AUTOCONFIG>false</AUTOCONFIG>
-                                        <ARCHIVE_LOGS>false</ARCHIVE_LOGS>
-                                        <PERSISTENT_HOME>false</PERSISTENT_HOME>
-                                    </env>
-                                    <ports>
-                                        <port>50005:50000</port>
-                                    </ports>
-                                    <log>
-                                        <prefix>DB2:</prefix>
-                                        <date>default</date>
-                                        <color>blue</color>
-                                    </log>
-                                    <network>
-                                        <mode>bridge</mode>
-                                    </network>
-                                    <privileged>true</privileged>
-                                    <wait>
-                                        <!-- good docs found at: http://dmp.fabric8.io/#build-healthcheck -->
-                                        <log>.*INSTANCE.*</log>
-                                        <!-- Unfortunately booting DB2 is slow, needs to set a generous (15m) timeout;
-                                         it generally starts in 2-3 minutes, but it's been occasionally slightly above 10m -->
-                                        <time>900000</time>
-                                        <!-- Kill the container, if it doesn't stop before this given time
-                                         duration since a graceful stop was issued -->
-                                        <kill>300000</kill>
-                                    </wait>
-                                </run>
-                            </image>
-                            <image>
-                                <name>${test.database.run.oracle.image.name}:${test.database.run.oracle.image.tag}</name>
-                                <alias>oracle</alias>
-                                <run>
-                                    <skip>${test.database.run.oracle.skip}</skip>
-                                    <env>
-                                        <ORACLE_PASSWORD>hibernate_orm_test</ORACLE_PASSWORD>
-                                    </env>
-                                    <ports>
-                                        <port>1521:1521</port>
-                                    </ports>
-                                    <log>
-                                        <prefix>Oracle Database: </prefix>
-                                        <date>default</date>
-                                        <color>blue</color>
-                                    </log>
-                                    <wait>
-                                        <!-- good docs found at: http://dmp.fabric8.io/#build-healthcheck -->
-                                        <!-- Unfortunately booting this is slow, needs to set a generous timeout: -->
-                                        <time>60000</time>
-                                        <log>DATABASE IS READY TO USE!</log>
-                                    </wait>
-                                </run>
-                            </image>
-                            <image>
-                                <name>${test.database.run.mssql.image.name}:${test.database.run.mssql.image.tag}</name>
-                                <alias>mssql</alias>
-                                <run>
-                                    <skip>${test.database.run.mssql.skip}</skip>
-                                    <env>
-                                        <ACCEPT_EULA>Y</ACCEPT_EULA>
-                                        <SA_PASSWORD>ActuallyRequired11Complexity</SA_PASSWORD>
-                                    </env>
-                                    <ports>
-                                        <port>1433:1433</port>
-                                    </ports>
-                                    <log>
-                                        <prefix>MS SQL Server: </prefix>
-                                        <date>default</date>
-                                        <color>blue</color>
-                                    </log>
-                                    <wait>
-                                        <log>SQL Server is now ready for client connections</log>
-                                        <!-- Unfortunately booting this is slow, needs to set a generous timeout: -->
-                                        <time>40000</time>
-                                    </wait>
-                                </run>
-                            </image>
-                            <image>
-                                <name>${test.database.run.cockroachdb.image.name}:${test.database.run.cockroachdb.image.tag}</name>
-                                <alias>cockroachdb</alias>
-                                <run>
-                                    <skip>${test.database.run.cockroachdb.skip}</skip>
-                                    <cmd>
-                                        <exec>
-                                            <arg>start-single-node</arg>
-                                            <arg>--insecure</arg>
-                                            <!-- Using in-memory storage to make things a bit faster -->
-                                            <arg>--store=type=mem,size=.5</arg>
-                                            <!--
-                                                See https://www.cockroachlabs.com/docs/v23.1/transaction-retry-error-reference.html#readwithinuncertaintyintervalerror.
-                                                Increasing this value will increase the time to recovery of failures as well as the frequency of uncertainty-based read restarts.
-                                                Default value is 500ms.
-                                            -->
-                                            <arg>--max-offset=100ms</arg>
-                                            <arg>--log=sinks: {stderr: {channels: [OPS]}}</arg>
-                                        </exec>
-                                    </cmd>
-                                    <ulimits>
-                                        <ulimit>
-                                            <name>nofile</name>
-                                            <hard>1956</hard>
-                                            <soft>1956</soft>
-                                        </ulimit>
-                                    </ulimits>
-                                    <env>
-                                        <POSTGRES_USER>hibernate_orm_test</POSTGRES_USER>
-                                        <POSTGRES_PASSWORD>hibernate_orm_test</POSTGRES_PASSWORD>
-                                        <POSTGRES_DB>hibernate_orm_test</POSTGRES_DB>
-                                    </env>
-                                    <ports>
-                                        <port>26257:26257</port>
-                                    </ports>
-                                    <log>
-                                        <prefix>CockroachDB: </prefix>
-                                        <date>default</date>
-                                        <color>blue</color>
-                                    </log>
-                                    <wait>
-                                        <log>CockroachDB node starting at</log>
-                                    </wait>
-                                </run>
-                            </image>
-                        </images>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>docker-start</id>
-                            <phase>pre-integration-test</phase>
-                            <goals>
-                                <!-- Stops all images currently running before starting them again.
-                                     Useful to stop processes still running from a previously failed integration test run.
-                                     Because this is invoked before the start goal,
-                                     this will stop all images defined in the configuration, not just those we will start.
-                                     -->
-                                <goal>stop</goal>
-                                <goal>start</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>docker-stop</id>
-                            <phase>post-integration-test</phase>
-                            <goals>
-                                <goal>stop</goal>
-                            </goals>
                         </execution>
                     </executions>
                 </plugin>
@@ -393,14 +124,11 @@
                 </property>
             </activation>
             <properties>
-                <db.dialect>org.hibernate.dialect.H2Dialect</db.dialect>
                 <jdbc.driver.groupId>com.h2database</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>h2</jdbc.driver.artifactId>
-                <jdbc.driver>org.h2.Driver</jdbc.driver>
-                <jdbc.url>jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1</jdbc.url>
-                <jdbc.user>sa</jdbc.user>
-                <jdbc.pass>sa</jdbc.pass>
-                <jdbc.isolation />
+                <failsafe.jvm.args.hibernate-orm>
+                    -Dorg.hibernate.search.integrationtest.orn.database=h2
+                </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
 
@@ -409,15 +137,11 @@
         <profile>
             <id>ci-postgresql</id>
             <properties>
-                <test.database.run.postgres.skip>${test.database.run.skip}</test.database.run.postgres.skip>
-                <db.dialect>org.hibernate.dialect.PostgreSQLDialect</db.dialect>
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-                <jdbc.driver>org.postgresql.Driver</jdbc.driver>
-                <jdbc.url>jdbc:postgresql://localhost:5432/hibernate_orm_test</jdbc.url>
-                <jdbc.user>hibernate_orm_test</jdbc.user>
-                <jdbc.pass>hibernate_orm_test</jdbc.pass>
-                <jdbc.isolation />
+                <failsafe.jvm.args.hibernate-orm>
+                    -Dorg.hibernate.search.integrationtest.orn.database=postgresql
+                </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
 
@@ -426,15 +150,11 @@
         <profile>
             <id>ci-mariadb</id>
             <properties>
-                <test.database.run.mariadb.skip>${test.database.run.skip}</test.database.run.mariadb.skip>
-                <db.dialect>org.hibernate.dialect.MariaDBDialect</db.dialect>
                 <jdbc.driver.groupId>org.mariadb.jdbc</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mariadb-java-client</jdbc.driver.artifactId>
-                <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
-                <jdbc.url>jdbc:mariadb://localhost/hibernate_orm_test</jdbc.url>
-                <jdbc.user>hibernate_orm_test</jdbc.user>
-                <jdbc.pass>hibernate_orm_test</jdbc.pass>
-                <jdbc.isolation />
+                <failsafe.jvm.args.hibernate-orm>
+                    -Dorg.hibernate.search.integrationtest.orn.database=mariadb
+                </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
 
@@ -443,15 +163,11 @@
         <profile>
             <id>ci-mysql</id>
             <properties>
-                <test.database.run.mysql.skip>${test.database.run.skip}</test.database.run.mysql.skip>
-                <db.dialect>org.hibernate.dialect.MySQLDialect</db.dialect>
                 <jdbc.driver.groupId>com.mysql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mysql-connector-j</jdbc.driver.artifactId>
-                <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
-                <jdbc.url>jdbc:mysql://localhost/hibernate_orm_test</jdbc.url>
-                <jdbc.user>hibernate_orm_test</jdbc.user>
-                <jdbc.pass>hibernate_orm_test</jdbc.pass>
-                <jdbc.isolation />
+                <failsafe.jvm.args.hibernate-orm>
+                    -Dorg.hibernate.search.integrationtest.orn.database=mysql
+                </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
 
@@ -460,15 +176,11 @@
         <profile>
             <id>ci-db2</id>
             <properties>
-                <test.database.run.db2.skip>${test.database.run.skip}</test.database.run.db2.skip>
-                <db.dialect>org.hibernate.dialect.DB2Dialect</db.dialect>
                 <jdbc.driver.groupId>com.ibm.db2</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>jcc</jdbc.driver.artifactId>
-                <jdbc.driver>com.ibm.db2.jcc.DB2Driver</jdbc.driver>
-                <jdbc.url>jdbc:db2://localhost:50005/hreact</jdbc.url>
-                <jdbc.user>hreact</jdbc.user>
-                <jdbc.pass>hreact</jdbc.pass>
-                <jdbc.isolation />
+                <failsafe.jvm.args.hibernate-orm>
+                    -Dorg.hibernate.search.integrationtest.orn.database=db2
+                </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
 
@@ -477,15 +189,11 @@
         <profile>
             <id>ci-oracle</id>
             <properties>
-                <test.database.run.oracle.skip>${test.database.run.skip}</test.database.run.oracle.skip>
-                <db.dialect>org.hibernate.dialect.OracleDialect</db.dialect>
                 <jdbc.driver.groupId>com.oracle.database.jdbc</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>ojdbc11</jdbc.driver.artifactId>
-                <jdbc.driver>oracle.jdbc.OracleDriver</jdbc.driver>
-                <jdbc.url>jdbc:oracle:thin:@localhost:1521/XE</jdbc.url>
-                <jdbc.user>SYSTEM</jdbc.user>
-                <jdbc.pass>hibernate_orm_test</jdbc.pass>
-                <jdbc.isolation />
+                <failsafe.jvm.args.hibernate-orm>
+                    -Dorg.hibernate.search.integrationtest.orn.database=oracle
+                </failsafe.jvm.args.hibernate-orm>
                 <!-- avoid `ORA-01882: timezone region not found` exception on CI -->
                 <failsafe.jvm.args.jdbc>-Doracle.jdbc.timezoneAsRegion=false</failsafe.jvm.args.jdbc>
             </properties>
@@ -496,14 +204,11 @@
         <profile>
             <id>ci-mssql</id>
             <properties>
-                <test.database.run.mssql.skip>${test.database.run.skip}</test.database.run.mssql.skip>
-                <db.dialect>org.hibernate.dialect.SQLServerDialect</db.dialect>
                 <jdbc.driver.groupId>com.microsoft.sqlserver</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mssql-jdbc</jdbc.driver.artifactId>
-                <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
-                <jdbc.url>jdbc:sqlserver://localhost:1433;databaseName=tempdb;encrypt=false</jdbc.url>
-                <jdbc.user>sa</jdbc.user>
-                <jdbc.pass>ActuallyRequired11Complexity</jdbc.pass>
+                <failsafe.jvm.args.hibernate-orm>
+                    -Dorg.hibernate.search.integrationtest.orn.database=mssql
+                </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
 
@@ -512,16 +217,12 @@
         <profile>
             <id>ci-cockroachdb</id>
             <properties>
-                <test.database.run.cockroachdb.skip>${test.database.run.skip}</test.database.run.cockroachdb.skip>
-                <db.dialect>org.hibernate.dialect.CockroachDialect</db.dialect>
                 <!-- CockroachDB uses the same client protocol as PostgreSQL (pgwire), so the driver is the same. -->
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-                <jdbc.driver>org.postgresql.Driver</jdbc.driver>
-                <jdbc.url>jdbc:postgresql://localhost:26257/defaultdb?sslmode=disable</jdbc.url>
-                <jdbc.user>root</jdbc.user>
-                <jdbc.pass></jdbc.pass>
-                <jdbc.isolation />
+                <failsafe.jvm.args.hibernate-orm>
+                    -Dorg.hibernate.search.integrationtest.orn.database=cockroachdb
+                </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
     </profiles>

@@ -46,6 +46,13 @@ public class OrmSetupHelper
 	private static final Map<String, Object> DEFAULT_PROPERTIES;
 
 	static {
+		Map<String, Object> defaults = new LinkedHashMap<>();
+
+		String jdbcUrl = System.getProperty( "hibernate.connection.url" );
+		if ( jdbcUrl == null || jdbcUrl.trim().isEmpty() ) {
+			DatabaseContainer.configuration();
+		}
+
 		// we don't need a ServiceLoader using a general-purpose aggregated class loader,
 		// since we expect the service impl in the direct dependent test module.
 		ServiceLoader<OrmSetupHelperConfig> serviceLoader = ServiceLoader.load( OrmSetupHelperConfig.class );
@@ -53,7 +60,6 @@ public class OrmSetupHelper
 		if ( iterator.hasNext() ) {
 			OrmSetupHelperConfig next = iterator.next();
 			DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS = next.coordinationStrategyExpectations();
-			Map<String, Object> defaults = new LinkedHashMap<>();
 			next.overrideHibernateSearchDefaults( defaults::put );
 			DEFAULT_PROPERTIES = Collections.unmodifiableMap( defaults );
 		}
