@@ -1192,6 +1192,12 @@
                 <version>${testcontainers.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>jdbc</artifactId>
+                <version>${testcontainers.version}</version>
+            </dependency>
+
+            <dependency>
                 <!-- Dependency management is necessary for Wiremock in particular (it has internal dependency divergence) -->
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
