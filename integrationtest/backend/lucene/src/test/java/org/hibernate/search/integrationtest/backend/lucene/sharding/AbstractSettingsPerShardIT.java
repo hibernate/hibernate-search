@@ -58,7 +58,7 @@ public abstract class AbstractSettingsPerShardIT {
 	public String strategy;
 
 	@RegisterExtension
-	public SearchSetupHelper setupHelper = SearchSetupHelper.create();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	public List<String> shardIds;
 

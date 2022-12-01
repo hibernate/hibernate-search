@@ -11,9 +11,14 @@ import static org.junit.platform.commons.util.AnnotationUtils.findAnnotation;
 import static org.junit.platform.commons.util.AnnotationUtils.isAnnotated;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+
+import org.hibernate.search.util.impl.test.extension.AbstractScopeTrackingExtension;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.engine.descriptor.ClassTestDescriptor;
 import org.junit.jupiter.engine.descriptor.MethodBasedTestDescriptor;
 import org.junit.jupiter.engine.descriptor.NestedClassTestDescriptor;
@@ -44,6 +49,7 @@ public class ParameterizedClassPostDiscoveryFilter implements org.junit.platform
 									+ " contains some methods annotated with @BeforeEach. " +
 									"Use @ParameterizedSetupBeforeTest instead." );
 				}
+				checkNonStaticOrmHelper( testClass );
 			}
 		}
 		// nested class inside a parameterized test -- we are not handling this option for now, so.... failing:
@@ -84,6 +90,22 @@ public class ParameterizedClassPostDiscoveryFilter implements org.junit.platform
 			}
 		}
 		return FilterResult.included( "This filter does not care about this case." );
+	}
+
+	private boolean checkNonStaticOrmHelper(Class<?> testClass) {
+		if ( Object.class.equals( testClass ) ) {
+			return false;
+		}
+		for ( Field field : testClass.getDeclaredFields() ) {
+			if ( isAnnotated( field, RegisterExtension.class )
+					&& AbstractScopeTrackingExtension.class.isAssignableFrom( field.getType() )
+					&& !Modifier.isStatic( field.getModifiers() ) ) {
+				throw new IllegalStateException( "Scope tracking extension " + field.getName()
+						+ " must be declared as static field in a @ParameterizedClass test " + testClass.getName() + "." );
+			}
+		}
+
+		return checkNonStaticOrmHelper( testClass.getSuperclass() );
 	}
 
 	private boolean hasParameterizedSetup(Class<?> testClass) {

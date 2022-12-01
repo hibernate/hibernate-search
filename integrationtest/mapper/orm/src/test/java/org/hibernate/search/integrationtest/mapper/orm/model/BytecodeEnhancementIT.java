@@ -54,10 +54,10 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 class BytecodeEnhancementIT {
 
 	@RegisterExtension
-	public BackendMock backendMock = BackendMock.create();
+	public static BackendMock backendMock = BackendMock.create();
 
 	@RegisterExtension
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 	private SessionFactory sessionFactory;
 
 	@ParameterizedSetup
