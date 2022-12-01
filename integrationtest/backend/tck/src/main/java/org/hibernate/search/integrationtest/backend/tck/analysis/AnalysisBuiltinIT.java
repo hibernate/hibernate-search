@@ -52,7 +52,7 @@ class AnalysisBuiltinIT {
 	}
 
 	@RegisterExtension
-	public SearchSetupHelper setupHelper = SearchSetupHelper.create();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@ParameterizedSetup

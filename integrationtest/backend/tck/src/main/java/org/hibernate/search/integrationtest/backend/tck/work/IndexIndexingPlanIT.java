@@ -75,7 +75,7 @@ class IndexIndexingPlanIT {
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@RegisterExtension
-	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 	private StubSession sessionContext;
 
 	@ParameterizedSetup
