@@ -185,9 +185,6 @@
 
         <!-- Test settings -->
 
-        <!-- Containers executions tests properties -->
-        <test.containers.run.skip>false</test.containers.run.skip>
-
         <!-- Lucene tests properties -->
 
         <!-- To skip all Lucene tests from the CLI -->

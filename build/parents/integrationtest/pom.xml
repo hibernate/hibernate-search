@@ -59,33 +59,6 @@
     </build>
 
     <profiles>
-        <!-- The profiles `skippingAllTests` and `skippingIntegrationTests` are currently duplicates,
-            as one can't trigger the profile activation on either/or property -->
-        <profile>
-            <id>skippingAllTests</id>
-            <activation>
-                <property>
-                    <name>skipTests</name>
-                </property>
-            </activation>
-            <properties>
-                <!-- This is to avoid starting containers for each module needing integration test -->
-                <test.containers.run.skip>true</test.containers.run.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>skippingIntegrationTests</id>
-            <activation>
-                <property>
-                    <name>skipITs</name>
-                </property>
-            </activation>
-            <properties>
-                <!-- This is to avoid starting containers for each module needing integration test -->
-                <test.containers.run.skip>true</test.containers.run.skip>
-            </properties>
-        </profile>
-
         <!-- =============================== -->
         <!-- Elasticsearch IT profiles       -->
         <!-- =============================== -->

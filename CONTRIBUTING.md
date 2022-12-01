@@ -223,8 +223,8 @@ and run unit tests and integration tests.
 ```
 
 Note: on Windows, you will need a Docker install able to run Linux containers.
-If you don't have that, you can skip the Elasticsearch tests and all container startups:
-`./mvnw clean install -Dtest.elasticsearch.skip=true -Dtest.containers.run.skip=true`.
+If you don't have that, you can skip the Elasticsearch tests and only run tests against H2 database (without using DB containers):
+`./mvnw clean install -Dtest.elasticsearch.skip=true`.
 
 Note: the produced JARs are compatible with Java 8 and later,
 regardless of the JDK used to build Hibernate Search.
@@ -344,12 +344,6 @@ you can skip all Elasticsearch tests (and thus the Elasticsearch container start
 
 ```bash
 ./mvnw clean install -Dtest.elasticsearch.skip=true
-```
-
-On Windows, you might need to also skip all docker container features:
-
-```bash
-./mvnw clean install -Dtest.elasticsearch.skip=true -Dtest.containers.run.skip=true
 ```
 
 Alternatively, you can prevent the build from launching an Elasticsearch server automatically

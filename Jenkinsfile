@@ -540,30 +540,6 @@ stage('Non-default environments') {
 					'''
 					String mavenDockerArgs = ""
 					def startedContainers = false
-					// DB2 setup is super slow (~5 to 15 minutes).
-					// We can't afford to do that once per module,
-					// so we start DB2 here, once and for all.
-					if ( buildEnv.dbName == 'db2' ) {
-						// Prevent the actual build from starting the DB container
-						mavenBuildAdditionalArgs += " -Dtest.database.run.db2.skip=true"
-						// Pick a module that doesn't normally execute the docker-maven-plugin,
-						// but that has the configuration necessary to start the DB container:
-						// that way, the maven-docker-plugin won't try to remove our container
-						// when we execute maven another time to run the tests.
-						// (This works because maven-docker-plugin filters containers to stop
-						// based on the Maven GAV coordinates of the Maven project that started that container,
-						// which are attached to the container thanks to a container label).
-						mavenDockerArgs = """ \
-								-pl build/parents/integrationtest \
-								-P$buildEnv.mavenProfile \
-								-Dtest.database.run.db2.skip=false \
-						"""
-						// Cleanup just in case some containers were left over from a previous build.
-						sh "mvn docker:stop $mavenDockerArgs"
-						pullContainerImages mavenDockerArgs
-						sh "mvn docker:start $mavenDockerArgs"
-						startedContainers = true
-					}
 					try {
 						mavenNonDefaultBuild buildEnv, """ \
 								-Pdist \
