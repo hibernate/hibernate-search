@@ -23,7 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class PropertyBridgeSimpleIT {
+class PropertyBridgeSimpleIT {
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
@@ -35,7 +35,7 @@ public class PropertyBridgeSimpleIT {
 	}
 
 	@Test
-	public void smoke() {
+	void smoke() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Invoice invoice = new Invoice();
 			invoice.getLineItems()

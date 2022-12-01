@@ -24,7 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ValueBridgeCompatibleIT {
+class ValueBridgeCompatibleIT {
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
@@ -36,7 +36,7 @@ public class ValueBridgeCompatibleIT {
 	}
 
 	@Test
-	public void smoke() {
+	void smoke() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book1 book1 = new Book1();
 			book1.setIsbn( ISBN.parse( "978-0-58-600835-5" ) );

@@ -27,7 +27,7 @@ import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 
-public class LuceneSimilarityIT {
+class LuceneSimilarityIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -36,7 +36,7 @@ public class LuceneSimilarityIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3777")
-	public void defaults() {
+	void defaults() {
 		setup( null );
 
 		LuceneIndexManagerImpl luceneIndexManager = index.unwrapForTests( LuceneIndexManagerImpl.class );
@@ -61,7 +61,7 @@ public class LuceneSimilarityIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3777")
 	@PortedFromSearch5(original = "org.hibernate.search.test.similarity.SimilarityTest")
-	public void custom() {
+	void custom() {
 		setup( new ClassicSimilarity() );
 
 		LuceneIndexManagerImpl luceneIndexManager = index.unwrapForTests( LuceneIndexManagerImpl.class );

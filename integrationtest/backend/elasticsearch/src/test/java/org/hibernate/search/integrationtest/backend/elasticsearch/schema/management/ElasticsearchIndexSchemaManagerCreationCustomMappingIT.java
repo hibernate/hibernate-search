@@ -50,7 +50,7 @@ public class ElasticsearchIndexSchemaManagerCreationCustomMappingIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void noOverlapping(ElasticsearchIndexSchemaManagerOperation operation) {
+	void noOverlapping(ElasticsearchIndexSchemaManagerOperation operation) {
 		setupAndCreateIndex( "no-overlapping.json", operation );
 		assertJsonEquals(
 				" { " +
@@ -119,7 +119,7 @@ public class ElasticsearchIndexSchemaManagerCreationCustomMappingIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void complexConflicts(ElasticsearchIndexSchemaManagerOperation operation) {
+	void complexConflicts(ElasticsearchIndexSchemaManagerOperation operation) {
 		setupAndCreateIndex( "complex-conflicts.json", operation );
 		assertJsonEquals(
 				" { " +

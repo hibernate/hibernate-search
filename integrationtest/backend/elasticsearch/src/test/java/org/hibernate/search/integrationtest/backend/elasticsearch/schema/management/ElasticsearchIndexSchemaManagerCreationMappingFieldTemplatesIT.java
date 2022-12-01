@@ -48,7 +48,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void rootFieldTemplates(ElasticsearchIndexSchemaManagerOperation operation) {
+	void rootFieldTemplates(ElasticsearchIndexSchemaManagerOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.objectFieldTemplate( "myTemplate1", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_obj" );
@@ -93,7 +93,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void nonRootFieldTemplates(ElasticsearchIndexSchemaManagerOperation operation) {
+	void nonRootFieldTemplates(ElasticsearchIndexSchemaManagerOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			IndexSchemaObjectField objectField = root.objectField( "staticObject" );
 			objectField.toReference();

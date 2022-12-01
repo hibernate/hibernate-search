@@ -36,7 +36,7 @@ public class TermsPredicateAnalyzedFieldIT {
 	}
 
 	@Test
-	public void matchingAny_rightTerms() {
+	void matchingAny_rightTerms() {
 		for ( String token : TOKENS ) {
 			assertThatQuery( index.query().where( f -> f.terms().field( "analyzedField" ).matchingAny( token ) ) )
 					.hasDocRefHitsAnyOrder( index.typeName(), DOC_ID );
@@ -44,7 +44,7 @@ public class TermsPredicateAnalyzedFieldIT {
 	}
 
 	@Test
-	public void matchingAny_wrongTerms() {
+	void matchingAny_wrongTerms() {
 		for ( String token : NOT_PRESENT_TOKENS ) {
 			assertThatQuery( index.query().where( f -> f.terms().field( "analyzedField" ).matchingAny( token ) ) )
 					.hasNoHits();
@@ -52,14 +52,14 @@ public class TermsPredicateAnalyzedFieldIT {
 	}
 
 	@Test
-	public void matchingAll_someTerms() {
+	void matchingAll_someTerms() {
 		assertThatQuery( index.query().where( f -> f.terms().field( "analyzedField" )
 				.matchingAll( TOKENS[0], TOKENS[1], TOKENS[3] ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOC_ID );
 	}
 
 	@Test
-	public void matchingAll_allTerms() {
+	void matchingAll_allTerms() {
 		assertThatQuery( index.query().where( f -> f
 				.terms().field( "analyzedField" )
 				.matchingAll( TOKENS[0], TOKENS[1], TOKENS[2], TOKENS[3], TOKENS[4], TOKENS[5], TOKENS[6] ) ) )
@@ -67,7 +67,7 @@ public class TermsPredicateAnalyzedFieldIT {
 	}
 
 	@Test
-	public void matchingAll_oneWrongTerm() {
+	void matchingAll_oneWrongTerm() {
 		assertThatQuery( index.query().where( f -> f
 				.terms().field( "analyzedField" )
 				.matchingAll( TOKENS[0], TOKENS[1], NOT_PRESENT_TOKENS[1] ) ) )

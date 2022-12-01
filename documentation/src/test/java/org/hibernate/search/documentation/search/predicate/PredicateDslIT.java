@@ -33,7 +33,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class PredicateDslIT {
+class PredicateDslIT {
 
 	private static final int ASIMOV_ID = 1;
 	private static final int MARTINEZ_ID = 2;
@@ -55,7 +55,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void entryPoint() {
+	void entryPoint() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint-lambdas[]
 			SearchSession searchSession = /* ... */ // <1>
@@ -95,7 +95,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void matchAll() {
+	void matchAll() {
 		withinSearchSession( searchSession -> {
 			// tag::matchAll[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -123,7 +123,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void matchNone() {
+	void matchNone() {
 		withinSearchSession( searchSession -> {
 			// tag::matchNone[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -137,7 +137,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void id() {
+	void id() {
 		// DO NOT USE THE BOOKX_ID CONSTANTS INSIDE TAGS BELOW:
 		// we don't want the constants to appear in the documentation.
 
@@ -168,7 +168,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void and() {
+	void and() {
 		withinSearchSession( searchSession -> {
 			// tag::and[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -241,7 +241,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void or() {
+	void or() {
 		withinSearchSession( searchSession -> {
 			// tag::or[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -280,7 +280,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void bool() {
+	void bool() {
 		withinSearchSession( searchSession -> {
 			// tag::bool-mustNot[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -387,7 +387,7 @@ public class PredicateDslIT {
 
 	@Test
 	@SuppressWarnings("deprecation")
-	public void bool_deprecated() {
+	void bool_deprecated() {
 		withinSearchSession( searchSession -> {
 			// tag::bool-dynamicParameters-deprecated[]
 			MySearchParameters searchParameters = getSearchParameters(); // <1>
@@ -416,7 +416,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void match() {
+	void match() {
 		withinSearchSession( searchSession -> {
 			// tag::match[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -431,7 +431,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void match_analysis() {
+	void match_analysis() {
 		withinSearchSession( searchSession -> {
 			// tag::match-normalized[]
 			List<Author> hits = searchSession.search( Author.class )
@@ -458,7 +458,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void match_fuzzy() {
+	void match_fuzzy() {
 		withinSearchSession( searchSession -> {
 			// tag::match-fuzzy[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -503,7 +503,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void multipleFields() {
+	void multipleFields() {
 		withinSearchSession( searchSession -> {
 			// tag::multipleFields-fieldOrField[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -532,7 +532,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void overrideAnalysis() {
+	void overrideAnalysis() {
 		withinSearchSession( searchSession -> {
 			// tag::overrideAnalysis-analyzer[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -563,7 +563,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void score() {
+	void score() {
 		withinSearchSession( searchSession -> {
 			// tag::score-constantScore[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -619,7 +619,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void range() {
+	void range() {
 		withinSearchSession( searchSession -> {
 			// tag::range-between[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -697,7 +697,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void phrase() {
+	void phrase() {
 		withinSearchSession( searchSession -> {
 			// tag::phrase[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -725,7 +725,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void simpleQueryString() {
+	void simpleQueryString() {
 		withinSearchSession( searchSession -> {
 			// tag::simpleQueryString-boolean[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -839,7 +839,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void exists() {
+	void exists() {
 		withinSearchSession( searchSession -> {
 			// tag::exists[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -864,7 +864,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void wildcard() {
+	void wildcard() {
 		withinSearchSession( searchSession -> {
 			// tag::wildcard[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -879,7 +879,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void regexp() {
+	void regexp() {
 		withinSearchSession( searchSession -> {
 			// tag::regexp[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -906,7 +906,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void terms_any() {
+	void terms_any() {
 		withinSearchSession( searchSession -> {
 			// tag::terms-any[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -921,7 +921,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void terms_all() {
+	void terms_all() {
 		withinSearchSession( searchSession -> {
 			// tag::terms-all[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -936,7 +936,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void nested() {
+	void nested() {
 		withinSearchSession( searchSession -> {
 			// tag::nested[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -954,7 +954,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void nested_implicit() {
+	void nested_implicit() {
 		withinSearchSession( searchSession -> {
 			// tag::nested-implicit-form[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -973,7 +973,7 @@ public class PredicateDslIT {
 
 	@Test
 	@SuppressWarnings("deprecation")
-	public void nested_deprecated() {
+	void nested_deprecated() {
 		withinSearchSession( searchSession -> {
 			// tag::nested-deprecated[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -992,7 +992,7 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void within() {
+	void within() {
 		withinSearchSession( searchSession -> {
 			// tag::within-circle[]
 			GeoPoint center = GeoPoint.of( 53.970000, 32.150000 );

@@ -72,22 +72,22 @@ public class IndexIndexerLargeDocumentsIT {
 	}
 
 	@Test
-	public void manyLargeDocuments_add() {
+	void manyLargeDocuments_add() {
 		doTest( MANY_LARGE_DOCUMENTS_COUNT, this::largeValue, Operation.ADD );
 	}
 
 	@Test
-	public void manyLargeDocuments_addOrUpdate() {
+	void manyLargeDocuments_addOrUpdate() {
 		doTest( MANY_LARGE_DOCUMENTS_COUNT, this::largeValue, Operation.ADD_OR_UPDATE );
 	}
 
 	@Test
-	public void oneVeryLargeDocuments_add() {
+	void oneVeryLargeDocuments_add() {
 		doTest( 1, this::veryLargeValue, Operation.ADD );
 	}
 
 	@Test
-	public void oneVeryLargeDocuments_addOrUpdate() {
+	void oneVeryLargeDocuments_addOrUpdate() {
 		doTest( 1, this::veryLargeValue, Operation.ADD_OR_UPDATE );
 	}
 

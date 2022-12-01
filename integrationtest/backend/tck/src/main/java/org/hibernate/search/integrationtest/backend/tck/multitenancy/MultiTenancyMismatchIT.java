@@ -39,7 +39,7 @@ public class MultiTenancyMismatchIT {
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Test
-	public void multiTenancyDisabled_requiredByTheMapper() {
+	void multiTenancyDisabled_requiredByTheMapper() {
 		assertThatThrownBy( () -> setupHelper.start()
 				.withIndex( index )
 				.withBackendProperty( "multi_tenancy.strategy", "none" )
@@ -56,7 +56,7 @@ public class MultiTenancyMismatchIT {
 	}
 
 	@Test
-	public void multiTenancyEnabled_disabledInTheMapper() {
+	void multiTenancyEnabled_disabledInTheMapper() {
 		assertThatThrownBy( () -> setupHelper.start()
 				.withIndex( index )
 				.withBackendProperty( "multi_tenancy.strategy", "discriminator" )
@@ -72,7 +72,7 @@ public class MultiTenancyMismatchIT {
 	}
 
 	@Test
-	public void using_multi_tenancy_for_query_while_disabled_throws_exception() {
+	void using_multi_tenancy_for_query_while_disabled_throws_exception() {
 		StubMapping mapping = setupHelper.start().withIndex( index ).setup();
 
 		StubMappingScope scope = index.createScope();
@@ -90,7 +90,7 @@ public class MultiTenancyMismatchIT {
 	}
 
 	@Test
-	public void using_multi_tenancy_for_add_while_disabled_throws_exception() {
+	void using_multi_tenancy_for_add_while_disabled_throws_exception() {
 		StubMapping mapping = setupHelper.start().withIndex( index ).setup();
 
 		StubSession tenant1Session = mapping.session( TENANT_1 );
@@ -108,7 +108,7 @@ public class MultiTenancyMismatchIT {
 	}
 
 	@Test
-	public void using_multi_tenancy_for_update_while_disabled_throws_exception() {
+	void using_multi_tenancy_for_update_while_disabled_throws_exception() {
 		StubMapping mapping = setupHelper.start().withIndex( index ).setup();
 
 		StubSession tenant1Session = mapping.session( TENANT_1 );
@@ -126,7 +126,7 @@ public class MultiTenancyMismatchIT {
 	}
 
 	@Test
-	public void using_multi_tenancy_for_delete_while_disabled_throws_exception() {
+	void using_multi_tenancy_for_delete_while_disabled_throws_exception() {
 		StubMapping mapping = setupHelper.start().withIndex( index ).setup();
 
 		StubSession tenant1Session = mapping.session( TENANT_1 );

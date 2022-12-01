@@ -43,7 +43,7 @@ public class LuceneIndexSchemaManagerCreationIT {
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3759")
-	public void simple(LuceneIndexSchemaManagerOperation operation) throws IOException {
+	void simple(LuceneIndexSchemaManagerOperation operation) throws IOException {
 		assertThat( indexExists() ).isFalse();
 
 		setup();

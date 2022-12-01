@@ -38,7 +38,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * i.e. reindexing without emptying the index, so that searches still return results while reindexing.
  */
 @TestForIssue(jiraKey = "HSEARCH-3791")
-public class ElasticsearchZeroDowntimeReindexingIT {
+class ElasticsearchZeroDowntimeReindexingIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -54,7 +54,7 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		IndexWorkspace workspace = index.createWorkspace();
 		IndexIndexer indexer = index.createIndexer();
 

@@ -107,7 +107,7 @@ public class SearchMultiIndexIT {
 	}
 
 	@Test
-	public void search_across_multiple_indexes() {
+	void search_across_multiple_indexes() {
 		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -121,7 +121,7 @@ public class SearchMultiIndexIT {
 	}
 
 	@Test
-	public void sort_across_multiple_indexes() {
+	void sort_across_multiple_indexes() {
 		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -148,7 +148,7 @@ public class SearchMultiIndexIT {
 	}
 
 	@Test
-	public void projection_across_multiple_indexes() {
+	void projection_across_multiple_indexes() {
 		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		SearchQuery<String> query = scope.query()
@@ -164,7 +164,7 @@ public class SearchMultiIndexIT {
 	}
 
 	@Test
-	public void field_in_one_index_only_is_supported() {
+	void field_in_one_index_only_is_supported() {
 		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		// Predicate
@@ -195,7 +195,7 @@ public class SearchMultiIndexIT {
 	}
 
 	@Test
-	public void unknown_field_throws_exception() {
+	void unknown_field_throws_exception() {
 		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		// Predicate
@@ -245,7 +245,7 @@ public class SearchMultiIndexIT {
 	}
 
 	@Test
-	public void search_with_incompatible_types_throws_exception() {
+	void search_with_incompatible_types_throws_exception() {
 		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		assertThatThrownBy(
@@ -272,7 +272,7 @@ public class SearchMultiIndexIT {
 	}
 
 	@Test
-	public void search_across_backends_throws_exception() {
+	void search_across_backends_throws_exception() {
 		assertThatThrownBy(
 				() -> index_1_1.createScope( index_2_1 ),
 				"search across multiple backends"

@@ -19,7 +19,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchBootstrapFailureIT {
+class ElasticsearchBootstrapFailureIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -32,7 +32,7 @@ public class ElasticsearchBootstrapFailureIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3621")
-	public void cannotConnect() {
+	void cannotConnect() {
 		assertThatThrownBy(
 				() -> setupHelper.start()
 						.withBackendProperty(

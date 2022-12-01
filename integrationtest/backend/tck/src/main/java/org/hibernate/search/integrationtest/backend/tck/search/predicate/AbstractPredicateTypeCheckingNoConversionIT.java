@@ -41,7 +41,7 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 	// DSL converters should be ignored
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void customDslConverter(SimpleMappedIndex<IndexBinding> index,
+	void customDslConverter(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -58,7 +58,7 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 	// DSL converters, and their incompatibility, should be ignored
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void multiFields_customDslConverter(SimpleMappedIndex<IndexBinding> index,
+	void multiFields_customDslConverter(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -82,7 +82,7 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void multiIndex_withCompatibleIndex(SimpleMappedIndex<IndexBinding> index,
+	void multiIndex_withCompatibleIndex(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -102,7 +102,7 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 	// DSL converters, and their incompatibility, should be ignored
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void multiIndex_withRawFieldCompatibleIndex(SimpleMappedIndex<IndexBinding> index,
+	void multiIndex_withRawFieldCompatibleIndex(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -157,7 +157,7 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 	// Fields with a different type *are* a problem, though.
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void multiIndex_withIncompatibleIndex(SimpleMappedIndex<IndexBinding> index,
+	void multiIndex_withIncompatibleIndex(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,

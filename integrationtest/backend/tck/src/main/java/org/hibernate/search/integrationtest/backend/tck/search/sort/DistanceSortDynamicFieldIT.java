@@ -62,7 +62,7 @@ public class DistanceSortDynamicFieldIT {
 	}
 
 	@Test
-	public void simple() {
+	void simple() {
 		String fieldPath = mainFieldPath();
 
 		assertThatQuery( matchNonEmptyQuery( f -> f.distance( fieldPath, CENTER_POINT ).asc() ) )

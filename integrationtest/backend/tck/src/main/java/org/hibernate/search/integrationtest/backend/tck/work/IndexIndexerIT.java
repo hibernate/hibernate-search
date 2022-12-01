@@ -69,7 +69,7 @@ public class IndexIndexerIT {
 
 	@ParameterizedTest(name = "commit: {0}, refresh: {1}")
 	@MethodSource("params")
-	public void success(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+	void success(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		IndexIndexer indexer = index.createIndexer();
 		CompletableFuture<?>[] tasks = new CompletableFuture<?>[NUMBER_OF_BOOKS];
 
@@ -148,7 +148,7 @@ public class IndexIndexerIT {
 
 	@ParameterizedTest(name = "commit: {0}, refresh: {1}")
 	@MethodSource("params")
-	public void add_failure(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+	void add_failure(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		IndexIndexer indexer = index.createIndexer();
 
 		// Trigger failures in the next operations
@@ -175,7 +175,7 @@ public class IndexIndexerIT {
 
 	@ParameterizedTest(name = "commit: {0}, refresh: {1}")
 	@MethodSource("params")
-	public void addOrUpdate_failure(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+	void addOrUpdate_failure(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		IndexIndexer indexer = index.createIndexer();
 
 		// Trigger failures in the next operations
@@ -202,7 +202,7 @@ public class IndexIndexerIT {
 
 	@ParameterizedTest(name = "commit: {0}, refresh: {1}")
 	@MethodSource("params")
-	public void delete_failure(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+	void delete_failure(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		IndexIndexer indexer = index.createIndexer();
 
 		// Trigger failures in the next operations

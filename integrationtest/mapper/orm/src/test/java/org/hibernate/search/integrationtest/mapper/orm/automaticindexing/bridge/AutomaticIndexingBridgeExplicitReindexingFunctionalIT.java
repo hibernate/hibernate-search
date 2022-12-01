@@ -46,7 +46,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * tests the feature works correctly but in a setup that wouldn't require this feature.
  */
 @TestForIssue(jiraKey = "HSEARCH-3297")
-public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
+class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -83,7 +83,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		// Init
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();

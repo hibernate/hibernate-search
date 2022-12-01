@@ -94,7 +94,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void defaults(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void defaults(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		initData( model, mapping );
 		testLoadingWithEntityGraph(
 				// Do not use any graph
@@ -107,7 +107,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void eager_fetch(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void eager_fetch(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		initData( model, mapping );
 		testLoadingWithEntityGraph(
 				// Use a graph that forces eager loading of all associations
@@ -121,7 +121,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void eager_load(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void eager_load(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		initData( model, mapping );
 		testLoadingWithEntityGraph(
 				// Use a graph that forces eager loading of all associations
@@ -135,7 +135,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void lazy_fetch(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void lazy_fetch(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		initData( model, mapping );
 		testLoadingWithEntityGraph(
 				// Use a graph that doesn't force loading of any association,
@@ -149,7 +149,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void lazy_load(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void lazy_load(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		initData( model, mapping );
 		testLoadingWithEntityGraph(
 				// Use a "lazy" graph that doesn't force loading of any association,
@@ -163,7 +163,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graphName_null(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void graphName_null(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		initData( model, mapping );
 		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction( session ->
 				Search.session( session ).search( model.getIndexedClass() )
@@ -178,7 +178,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graphName_invalid(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void graphName_invalid(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		initData( model, mapping );
 		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction( session ->
 				Search.session( session ).search( model.getIndexedClass() )
@@ -193,7 +193,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graphName_graphSemantic_null(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void graphName_graphSemantic_null(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		initData( model, mapping );
 		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction( session ->
 				Search.session( session ).search( model.getIndexedClass() )
@@ -208,7 +208,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graph_null(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void graph_null(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		initData( model, mapping );
 		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction( session ->
 				Search.session( session ).search( model.getIndexedClass() )
@@ -223,7 +223,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graph_graphSemantic_null(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void graph_graphSemantic_null(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		initData( model, mapping );
 		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction( session ->
 				Search.session( session ).search( model.getIndexedClass() )

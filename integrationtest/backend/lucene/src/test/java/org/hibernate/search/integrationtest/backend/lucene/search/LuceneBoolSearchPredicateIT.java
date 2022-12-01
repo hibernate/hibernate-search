@@ -20,7 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class LuceneBoolSearchPredicateIT {
+class LuceneBoolSearchPredicateIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -34,7 +34,7 @@ public class LuceneBoolSearchPredicateIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3535")
-	public void minimumShouldMatch_outOfBounds() {
+	void minimumShouldMatch_outOfBounds() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy(

@@ -28,7 +28,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-public class ElasticsearchAggregationDslIT {
+class ElasticsearchAggregationDslIT {
 
 	private static final int BOOK1_ID = 1;
 	private static final int BOOK2_ID = 2;
@@ -47,7 +47,7 @@ public class ElasticsearchAggregationDslIT {
 	}
 
 	@Test
-	public void elasticsearch() {
+	void elasticsearch() {
 		withinSearchSession( searchSession -> {
 			// tag::elasticsearch-fromJson-jsonObject[]
 			JsonObject jsonObject =

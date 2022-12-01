@@ -37,7 +37,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ActiveProfiles("jta")
 @PortedFromSearch5(original = "org.hibernate.search.test.integration.spring.jta.JtaAndSpringMoreComplexIT")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class JtaAndSpringMoreComplexIT {
+class JtaAndSpringMoreComplexIT {
 
 	@Autowired
 	@RegisterExtension
@@ -62,7 +62,7 @@ public class JtaAndSpringMoreComplexIT {
 	}
 
 	@Test
-	public void testMuffins() {
+	void testMuffins() {
 		Box box = new Box();
 		box.setContainerId( 1L );
 		box.setColor( "red-and-white" );
@@ -99,7 +99,7 @@ public class JtaAndSpringMoreComplexIT {
 	}
 
 	@Test
-	public void testDoughnuts() {
+	void testDoughnuts() {
 		Box box = new Box();
 		box.setContainerId( 2L );
 		box.setColor( "red-and-white" );

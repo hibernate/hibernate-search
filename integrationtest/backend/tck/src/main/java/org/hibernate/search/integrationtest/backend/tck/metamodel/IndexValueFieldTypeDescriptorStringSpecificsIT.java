@@ -42,7 +42,7 @@ public class IndexValueFieldTypeDescriptorStringSpecificsIT {
 	}
 
 	@Test
-	public void analyzerName() {
+	void analyzerName() {
 		assertThat( getTypeDescriptor( "noSearchAnalyzer" ).analyzerName() )
 				.contains( DefaultAnalysisDefinitions.ANALYZER_NGRAM.name );
 		assertThat( getTypeDescriptor( "searchAnalyzer" ).analyzerName() )
@@ -50,7 +50,7 @@ public class IndexValueFieldTypeDescriptorStringSpecificsIT {
 	}
 
 	@Test
-	public void searchAnalyzerName() {
+	void searchAnalyzerName() {
 		assertThat( getTypeDescriptor( "noSearchAnalyzer" ).searchAnalyzerName() )
 				.contains( DefaultAnalysisDefinitions.ANALYZER_NGRAM.name );
 		assertThat( getTypeDescriptor( "searchAnalyzer" ).searchAnalyzerName() )

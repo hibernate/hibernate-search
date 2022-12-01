@@ -32,7 +32,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.Sta
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class MarkerBindingBaseIT {
+class MarkerBindingBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -46,7 +46,7 @@ public class MarkerBindingBaseIT {
 			MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void withParams_annotationMapping() {
+	void withParams_annotationMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {
 		} );
 		setupHelper.start().expectCustomBeans().setup( AnnotatedEntity.class );
@@ -56,7 +56,7 @@ public class MarkerBindingBaseIT {
 	}
 
 	@Test
-	public void withParams_programmaticMapping() {
+	void withParams_programmaticMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {
 		} );
 		setupHelper.start()

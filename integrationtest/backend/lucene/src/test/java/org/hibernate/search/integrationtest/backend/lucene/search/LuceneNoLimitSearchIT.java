@@ -42,7 +42,7 @@ public class LuceneNoLimitSearchIT {
 	}
 
 	@Test
-	public void fetchAll() {
+	void fetchAll() {
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.match().field( "field" ).matching( "739" ) )
 				.toQuery();
@@ -55,7 +55,7 @@ public class LuceneNoLimitSearchIT {
 	}
 
 	@Test
-	public void fetchAll_lessThan100Matches() {
+	void fetchAll_lessThan100Matches() {
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.range().field( "field" ).between( "73979", "73997" ) )
 				.toQuery();
@@ -66,7 +66,7 @@ public class LuceneNoLimitSearchIT {
 	}
 
 	@Test
-	public void fetchAll_between100And10000Matches() {
+	void fetchAll_between100And10000Matches() {
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.range().field( "field" ).between( "73937", "79397" ) )
 				.toQuery();
@@ -77,7 +77,7 @@ public class LuceneNoLimitSearchIT {
 	}
 
 	@Test
-	public void fetchAll_moreThan10000Matches() {
+	void fetchAll_moreThan10000Matches() {
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.range().field( "field" ).between( "37973", "73937" ) )
 				.toQuery();
@@ -88,7 +88,7 @@ public class LuceneNoLimitSearchIT {
 	}
 
 	@Test
-	public void fetchAll_totalHitCountThreshold() {
+	void fetchAll_totalHitCountThreshold() {
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.match().field( "field" ).matching( "739" ) )
 				.totalHitCountThreshold( 5 )
@@ -102,7 +102,7 @@ public class LuceneNoLimitSearchIT {
 	}
 
 	@Test
-	public void fetchAllHits() {
+	void fetchAllHits() {
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.match().field( "field" ).matching( "739" ) )
 				.toQuery();

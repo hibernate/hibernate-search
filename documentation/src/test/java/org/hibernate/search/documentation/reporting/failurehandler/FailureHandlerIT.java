@@ -21,7 +21,7 @@ import org.hibernate.search.util.impl.test.rule.StaticCounters;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class FailureHandlerIT {
+class FailureHandlerIT {
 
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
@@ -30,7 +30,7 @@ public class FailureHandlerIT {
 	public StaticCounters staticCounters = StaticCounters.create();
 
 	@Test
-	public void smoke() {
+	void smoke() {
 		assertThat( staticCounters.get( MyFailureHandler.INSTANCES ) ).isEqualTo( 0 );
 
 		setupHelper.start()

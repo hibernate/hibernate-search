@@ -25,7 +25,7 @@ import org.awaitility.Awaitility;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TestForIssue(jiraKey = "HSEARCH-4363")
-public class SingletonTaskTest {
+class SingletonTaskTest {
 
 	private final TestWorker worker = new TestWorker();
 	private final TestFailureHandler failureHandler = new TestFailureHandler();
@@ -35,7 +35,7 @@ public class SingletonTaskTest {
 	);
 
 	@Test
-	public void stopWhileBlockingWorkInProgress() throws Exception {
+	void stopWhileBlockingWorkInProgress() throws Exception {
 		testSubject.ensureScheduled();
 
 		Awaitility.await().until( () -> worker.started );

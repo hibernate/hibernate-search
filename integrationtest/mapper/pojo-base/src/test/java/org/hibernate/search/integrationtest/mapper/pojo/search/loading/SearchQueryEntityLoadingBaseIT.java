@@ -15,13 +15,13 @@ import org.junit.jupiter.api.Test;
  * Basic tests of entity loading when executing a search query
  * when only a single type is involved.
  */
-public class SearchQueryEntityLoadingBaseIT extends AbstractSearchQueryEntityLoadingSingleTypeIT {
+class SearchQueryEntityLoadingBaseIT extends AbstractSearchQueryEntityLoadingSingleTypeIT {
 
 	/**
 	 * Test loading without any specific configuration.
 	 */
 	@Test
-	public void simple() {
+	void simple() {
 		final int entityCount = 3;
 
 		persistThatManyEntities( entityCount );
@@ -41,7 +41,7 @@ public class SearchQueryEntityLoadingBaseIT extends AbstractSearchQueryEntityLoa
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void notFound() {
+	void notFound() {
 		persistThatManyEntities( 2 );
 
 		testLoading(

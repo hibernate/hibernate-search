@@ -43,7 +43,7 @@ public class AutomaticIndexingOutOfTransactionIT {
 	}
 
 	@Test
-	public void add() {
+	void add() {
 		setupHolder.runNoTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "number1" );
 			session.persist( entity1 );
@@ -60,7 +60,7 @@ public class AutomaticIndexingOutOfTransactionIT {
 	}
 
 	@Test
-	public void clear() {
+	void clear() {
 		setupHolder.runNoTransaction( session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 

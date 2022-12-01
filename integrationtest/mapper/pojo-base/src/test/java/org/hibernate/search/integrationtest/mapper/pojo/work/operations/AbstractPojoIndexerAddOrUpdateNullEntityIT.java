@@ -27,7 +27,7 @@ public abstract class AbstractPojoIndexerAddOrUpdateNullEntityIT extends Abstrac
 
 	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
 	@MethodSource("params")
-	public void simple(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+	void simple(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
 		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();

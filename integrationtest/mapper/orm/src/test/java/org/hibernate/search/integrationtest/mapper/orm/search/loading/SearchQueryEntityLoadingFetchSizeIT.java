@@ -29,7 +29,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Test fetch size of entity loading when executing a search query
  * when only a single type is involved.
  */
-public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryEntityLoadingSingleTypeIT<T> {
+class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryEntityLoadingSingleTypeIT<T> {
 
 	public static List<? extends Arguments> params() {
 		List<Arguments> result = new ArrayList<>();
@@ -60,7 +60,7 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void defaults(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void defaults(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		init( model, mapping );
 		testLoadingFetchSize(
 				// Do not configure search.loading.fetch_size
@@ -77,7 +77,7 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void configurationProperty(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void configurationProperty(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		init( model, mapping );
 		testLoadingFetchSize(
 				// Configure search.loading.fetch_size with this value
@@ -96,7 +96,7 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void override_valid(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void override_valid(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		init( model, mapping );
 		testLoadingFetchSize(
 				// Configure search.loading.fetch_size with this value (will be ignored)
@@ -113,7 +113,7 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void override_invalid_0(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void override_invalid_0(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		init( model, mapping );
 		assertThatThrownBy( () -> testLoadingFetchSize(
 				// Do not configure search.loading.fetch_size
@@ -132,7 +132,7 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void override_invalid_negative(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void override_invalid_negative(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		init( model, mapping );
 		assertThatThrownBy( () -> testLoadingFetchSize(
 				// Do not configure search.loading.fetch_size
@@ -156,7 +156,7 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4150")
-	public void multipleStatements_lastWithFewerIds_eagerAssociations(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void multipleStatements_lastWithFewerIds_eagerAssociations(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		init( model, mapping );
 		testLoadingFetchSize(
 				// Set a fetch size lower than the number of entities

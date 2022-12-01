@@ -50,7 +50,7 @@ public class ElasticsearchIndexSchemaManagerCreationAnalyzerIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void success_simple(ElasticsearchIndexSchemaManagerOperation operation) {
+	void success_simple(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticSearchClient.index( mainIndex.name() )
 				.ensureDoesNotExist().registerForCleanup();
 
@@ -115,7 +115,7 @@ public class ElasticsearchIndexSchemaManagerCreationAnalyzerIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void success_multiIndex(ElasticsearchIndexSchemaManagerOperation operation) {
+	void success_multiIndex(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticSearchClient.index( mainIndex.name() )
 				.ensureDoesNotExist().registerForCleanup();
 		elasticSearchClient.index( otherIndex.name() )

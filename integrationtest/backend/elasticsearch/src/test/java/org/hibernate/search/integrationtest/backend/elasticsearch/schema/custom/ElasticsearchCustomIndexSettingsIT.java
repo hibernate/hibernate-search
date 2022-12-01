@@ -24,7 +24,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchCustomIndexSettingsIT {
+class ElasticsearchCustomIndexSettingsIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -32,7 +32,7 @@ public class ElasticsearchCustomIndexSettingsIT {
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Test
-	public void valid() {
+	void valid() {
 		setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
 						"custom-index-settings/valid.json"
@@ -47,7 +47,7 @@ public class ElasticsearchCustomIndexSettingsIT {
 	}
 
 	@Test
-	public void notExisting() {
+	void notExisting() {
 		assertThatThrownBy( () -> setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
 						"custom-index-settings/not-existing.json"
@@ -61,7 +61,7 @@ public class ElasticsearchCustomIndexSettingsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4438")
-	public void notParsable() {
+	void notParsable() {
 		assertThatThrownBy( () -> setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
 						"custom-index-settings/not-parsable.json"
@@ -75,7 +75,7 @@ public class ElasticsearchCustomIndexSettingsIT {
 	}
 
 	@Test
-	public void unknownSetting() {
+	void unknownSetting() {
 		assertThatThrownBy( () -> setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
 						"custom-index-settings/unknown-setting.json"

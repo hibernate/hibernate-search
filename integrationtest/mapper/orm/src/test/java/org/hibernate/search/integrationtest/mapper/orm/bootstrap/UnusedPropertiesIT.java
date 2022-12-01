@@ -25,7 +25,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 
-public class UnusedPropertiesIT {
+class UnusedPropertiesIT {
 	private static final String KEY_UNUSED = "hibernate.search.indexes.myIndex.foo";
 	private static final String KEY_UNUSED_BUT_EMPTY_VALUE = "hibernate.search.indexes.myIndex.emptyValue";
 	private static final String KEY_UNUSED_BUT_BLANK_VALUE = "hibernate.search.indexes.myIndex.blankValue";
@@ -41,7 +41,7 @@ public class UnusedPropertiesIT {
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
-	public void checkDisabled_unusedProperty() {
+	void checkDisabled_unusedProperty() {
 		logged.expectMessage( "some properties in the given configuration are not used" )
 				.never();
 		logged.expectEvent( Level.INFO, "Configuration property tracking is disabled" )
@@ -57,7 +57,7 @@ public class UnusedPropertiesIT {
 	}
 
 	@Test
-	public void checkEnabledByDefault_unusedProperty() {
+	void checkEnabledByDefault_unusedProperty() {
 		logged.expectEvent( Level.WARN,
 				"Invalid configuration passed to Hibernate Search",
 				"some properties in the given configuration are not used",
@@ -82,7 +82,7 @@ public class UnusedPropertiesIT {
 	}
 
 	@Test
-	public void checkEnabledExplicitly_noUnusedProperty() {
+	void checkEnabledExplicitly_noUnusedProperty() {
 		/*
 		 * Check that the "configuration property tracking strategy" property is considered used.
 		 * This is a corner case worth testing, since the property may legitimately be accessed before

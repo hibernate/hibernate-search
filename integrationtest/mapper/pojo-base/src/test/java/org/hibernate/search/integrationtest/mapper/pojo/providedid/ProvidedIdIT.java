@@ -33,7 +33,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.Sta
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ProvidedIdIT {
+class ProvidedIdIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -42,7 +42,7 @@ public class ProvidedIdIT {
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void indexAndSearch() {
+	void indexAndSearch() {
 		final String entityAndIndexName = "indexed";
 		@Indexed
 		class IndexedEntity {
@@ -88,7 +88,7 @@ public class ProvidedIdIT {
 	}
 
 	@Test
-	public void error_nullProvidedId() {
+	void error_nullProvidedId() {
 		final String entityAndIndexName = "indexed";
 		@Indexed
 		class IndexedEntity {

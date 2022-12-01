@@ -28,7 +28,7 @@ import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.FSDirectory;
 
 @TestForIssue(jiraKey = "HSEARCH-3636")
-public class LuceneDirectorySettingsPerShardIT extends AbstractSettingsPerShardIT {
+class LuceneDirectorySettingsPerShardIT extends AbstractSettingsPerShardIT {
 
 	@TempDir
 	public Path temporaryFolder;

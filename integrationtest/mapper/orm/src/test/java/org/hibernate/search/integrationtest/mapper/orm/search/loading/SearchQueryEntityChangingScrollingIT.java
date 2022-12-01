@@ -37,7 +37,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SearchQueryEntityChangingScrollingIT {
+class SearchQueryEntityChangingScrollingIT {
 
 	public static final String NEW_NAME = "new-name";
 	@RegisterExtension
@@ -56,7 +56,7 @@ public class SearchQueryEntityChangingScrollingIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		backendMock.inLenientMode( () -> with( sessionFactory ).runInTransaction( session -> {
 			for ( int i = 0; i < 12; i++ ) {
 				session.persist( new SimpleEntity( i ) );

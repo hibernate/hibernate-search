@@ -24,7 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class IndexedEmbeddedIncludePathsAndDepthIT {
+class IndexedEmbeddedIncludePathsAndDepthIT {
 
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
@@ -37,7 +37,7 @@ public class IndexedEmbeddedIncludePathsAndDepthIT {
 	}
 
 	@Test
-	public void smoke() {
+	void smoke() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Human human1 = new Human();
 			human1.setId( 1 );

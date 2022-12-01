@@ -74,7 +74,7 @@ abstract class AbstractPojoIndexingProcessorFailureIT {
 	}
 
 	@Test
-	public void getter() {
+	void getter() {
 		RootEntity root = new RootEntity();
 		root.id = 1;
 
@@ -108,7 +108,7 @@ abstract class AbstractPojoIndexingProcessorFailureIT {
 	}
 
 	@Test
-	public void nested_getter() {
+	void nested_getter() {
 		RootEntity root = new RootEntity();
 		root.id = 1;
 		NonRootEntity level1 = new NonRootEntity();

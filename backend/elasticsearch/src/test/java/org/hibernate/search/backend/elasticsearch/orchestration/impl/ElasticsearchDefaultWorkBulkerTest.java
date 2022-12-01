@@ -35,7 +35,7 @@ import org.mockito.quality.Strictness;
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("unchecked") // Raw types are the only way to mock parameterized types
-public class ElasticsearchDefaultWorkBulkerTest {
+class ElasticsearchDefaultWorkBulkerTest {
 
 	private static final int DEFAULT_MAX_BULK_SIZE = 10;
 
@@ -48,7 +48,7 @@ public class ElasticsearchDefaultWorkBulkerTest {
 			DocumentRefreshStrategy, NonBulkableWork<BulkResult>> bulkWorkFactoryMock;
 
 	@Test
-	public void simple() {
+	void simple() {
 		BulkableWork<Void> work1 = bulkableWorkMock( 1 );
 		BulkableWork<Void> work2 = bulkableWorkMock( 2 );
 		NonBulkableWork<BulkResult> bulkWork = workMock( 3 );
@@ -99,7 +99,7 @@ public class ElasticsearchDefaultWorkBulkerTest {
 	}
 
 	@Test
-	public void alwaysBulk() {
+	void alwaysBulk() {
 		BulkableWork<Void> work1 = bulkableWorkMock( 1 );
 		NonBulkableWork<BulkResult> bulkWork = workMock( 2 );
 
@@ -126,7 +126,7 @@ public class ElasticsearchDefaultWorkBulkerTest {
 	}
 
 	@Test
-	public void newBulkOnTooManyBulkedWorks() {
+	void newBulkOnTooManyBulkedWorks() {
 		List<BulkableWork<Void>> firstBulkWorks = new ArrayList<>();
 		for ( int i = 0 ; i < DEFAULT_MAX_BULK_SIZE ; ++i ) {
 			firstBulkWorks.add( bulkableWorkMock( i ) );
@@ -188,7 +188,7 @@ public class ElasticsearchDefaultWorkBulkerTest {
 	}
 
 	@Test
-	public void newBulkOnDifferentRefresh() {
+	void newBulkOnDifferentRefresh() {
 		BulkableWork<Void> work1 = bulkableWorkMock( 1 );
 		BulkableWork<Void> work2 = bulkableWorkMock( 2 );
 		BulkableWork<Void> work3 = bulkableWorkMock( 3 );

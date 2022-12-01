@@ -30,7 +30,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class DependencyRepeatableIT {
+class DependencyRepeatableIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -43,7 +43,7 @@ public class DependencyRepeatableIT {
 
 	@Test
 	@TestForIssue( jiraKey = "HSEARCH-4000" )
-	public void associationInverseSide() {
+	void associationInverseSide() {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.objectField( "keys", b2 -> b2
 						.multiValued( true )
@@ -76,7 +76,7 @@ public class DependencyRepeatableIT {
 
 	@Test
 	@TestForIssue( jiraKey = "HSEARCH-4000" )
-	public void indexingDependency() {
+	void indexingDependency() {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.objectField( "keys", b2 -> b2
 						.multiValued( true )

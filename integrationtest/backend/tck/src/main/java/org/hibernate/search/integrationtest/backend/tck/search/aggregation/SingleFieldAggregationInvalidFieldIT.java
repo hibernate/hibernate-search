@@ -90,7 +90,7 @@ public class SingleFieldAggregationInvalidFieldIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void objectField_nested(SupportedSingleFieldAggregationExpectations<F> expectations) {
+	void objectField_nested(SupportedSingleFieldAggregationExpectations<F> expectations) {
 		String fieldPath = index.binding().nestedObject.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.identity( expectations.fieldType() ) );
@@ -103,7 +103,7 @@ public class SingleFieldAggregationInvalidFieldIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void objectField_flattened(SupportedSingleFieldAggregationExpectations<F> expectations) {
+	void objectField_flattened(SupportedSingleFieldAggregationExpectations<F> expectations) {
 		String fieldPath = index.binding().flattenedObject.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.identity( expectations.fieldType() ) );

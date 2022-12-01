@@ -29,7 +29,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Tests related to index custom mapping when updating indexes.
  */
 @TestForIssue(jiraKey = "HSEARCH-4253")
-public class ElasticsearchIndexSchemaManagerUpdateCustomMappingIT {
+class ElasticsearchIndexSchemaManagerUpdateCustomMappingIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -48,7 +48,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomMappingIT {
 		);
 	}
 	@Test
-	public void noOverlapping() {
+	void noOverlapping() {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
@@ -165,7 +165,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomMappingIT {
 	}
 
 	@Test
-	public void illegalUpdate() {
+	void illegalUpdate() {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +

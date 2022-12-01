@@ -81,7 +81,7 @@ public class FieldSortDynamicFieldIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void simple(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void simple(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		String fieldPath = mainFieldPath( fieldTypeDescriptor );
 
 		assertThatQuery( matchNonEmptyQuery( f -> f.field( fieldPath ).asc() ) )

@@ -27,7 +27,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 
-public class MassIndexingMonitorIT {
+class MassIndexingMonitorIT {
 
 	private static final int NUMBER_OF_BOOKS = 200;
 	private static final int MASS_INDEXING_MONITOR_LOG_PERIOD = 50; // This is the default in the implementation, do not change this value
@@ -64,7 +64,7 @@ public class MassIndexingMonitorIT {
 	}
 
 	@Test
-	public void testMassIndexingMonitor() {
+	void testMassIndexingMonitor() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 					assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) ).isZero();
 

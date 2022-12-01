@@ -74,7 +74,7 @@ abstract class AbstractPojoReindexingResolutionFailureIT {
 	}
 
 	@Test
-	public void getter() {
+	void getter() {
 		NonRootEntity level1 = new NonRootEntity();
 
 		SimulatedFailure simulatedFailure = new SimulatedFailure();
@@ -106,7 +106,7 @@ abstract class AbstractPojoReindexingResolutionFailureIT {
 	}
 
 	@Test
-	public void nested_getter() {
+	void nested_getter() {
 		NonRootEntity level1 = new NonRootEntity();
 
 		SimulatedFailure simulatedFailure = new SimulatedFailure();

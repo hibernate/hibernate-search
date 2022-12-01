@@ -140,7 +140,7 @@ public abstract class AbstractEntityProjectionIT {
 	}
 
 	@Test
-	public void entityLoading_timeout() {
+	void entityLoading_timeout() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 		StubEntity doc1LoadedEntity = new StubEntity( doc1Reference );
@@ -186,7 +186,7 @@ public abstract class AbstractEntityProjectionIT {
 	}
 
 	@Test
-	public void noEntityLoading() {
+	void noEntityLoading() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = select( scope.query() )
@@ -201,7 +201,7 @@ public abstract class AbstractEntityProjectionIT {
 	}
 
 	@Test
-	public void entityLoading_callGetProjectionHitMapperEveryTime() {
+	void entityLoading_callGetProjectionHitMapperEveryTime() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 

@@ -70,14 +70,14 @@ public class MatchIdPredicateSpecificsIT {
 	}
 
 	@Test
-	public void matching() {
+	void matching() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.id().matching( DOCUMENT_1 ) ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
-	public void matching_then_matching() {
+	void matching_then_matching() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.id()
 						.matching( DOCUMENT_1 )
@@ -86,7 +86,7 @@ public class MatchIdPredicateSpecificsIT {
 	}
 
 	@Test
-	public void matching_then_matchingAny() {
+	void matching_then_matchingAny() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.id()
 						.matching( DOCUMENT_2 )
@@ -95,7 +95,7 @@ public class MatchIdPredicateSpecificsIT {
 	}
 
 	@Test
-	public void matchingAny_singleElement() {
+	void matchingAny_singleElement() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.id()
 						.matchingAny( Arrays.asList( DOCUMENT_1 ) ) ) )
@@ -103,7 +103,7 @@ public class MatchIdPredicateSpecificsIT {
 	}
 
 	@Test
-	public void matchingAny_multipleElements() {
+	void matchingAny_multipleElements() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.id()
 						.matchingAny( Arrays.asList( DOCUMENT_1, DOCUMENT_3 ) ) ) )
@@ -111,7 +111,7 @@ public class MatchIdPredicateSpecificsIT {
 	}
 
 	@Test
-	public void matchingAny_lotsOfTerms() {
+	void matchingAny_lotsOfTerms() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.id()
 						.matchingAny( lotsOfTerms ) ) )
@@ -119,7 +119,7 @@ public class MatchIdPredicateSpecificsIT {
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIdConverterIndexManager_dslConverterEnabled() {
+	void multiIndex_withCompatibleIdConverterIndexManager_dslConverterEnabled() {
 		StubMappingScope scope = mainIndex.createScope( compatibleIdConverterIndex );
 
 		assertThatQuery( scope.query()
@@ -131,7 +131,7 @@ public class MatchIdPredicateSpecificsIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIdConverterIndex_dslConverterEnabled() {
+	void multiIndex_withIncompatibleIdConverterIndex_dslConverterEnabled() {
 		SearchPredicateFactory f = mainIndex.createScope( incompatibleIdConverterIndex ).predicate();
 
 		assertThatThrownBy( () -> f.id().matching( new Object() /* Value does not matter */ ) )
@@ -146,7 +146,7 @@ public class MatchIdPredicateSpecificsIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIdConverterIndex_dslConverterDisabled() {
+	void multiIndex_withIncompatibleIdConverterIndex_dslConverterDisabled() {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIdConverterIndex );
 
 		assertThatQuery( scope.query()

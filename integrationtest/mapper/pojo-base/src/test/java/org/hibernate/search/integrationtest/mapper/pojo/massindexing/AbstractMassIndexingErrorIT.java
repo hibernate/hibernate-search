@@ -117,7 +117,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void indexing() {
+	void indexing() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "Indexing error";
@@ -138,7 +138,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void getId() {
+	void getId() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "getId error";
@@ -161,7 +161,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void getTitle() {
+	void getTitle() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "getTitle error";
@@ -183,7 +183,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void dropAndCreateSchema_exception() {
+	void dropAndCreateSchema_exception() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "DROP_AND_CREATE error";
@@ -202,7 +202,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void purge() {
+	void purge() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "PURGE error";
@@ -221,7 +221,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void mergeSegmentsBefore() {
+	void mergeSegmentsBefore() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "MERGE_SEGMENTS error";
@@ -241,7 +241,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void mergeSegmentsAfter() {
+	void mergeSegmentsAfter() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "MERGE_SEGMENTS error";
@@ -264,7 +264,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void flush() {
+	void flush() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "FLUSH error";
@@ -286,7 +286,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void refresh() {
+	void refresh() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "REFRESH error";

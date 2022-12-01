@@ -29,7 +29,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public class ElasticsearchQueryDslIT {
+class ElasticsearchQueryDslIT {
 
 	private static final int BOOK1_ID = 1;
 	private static final int BOOK2_ID = 2;
@@ -49,7 +49,7 @@ public class ElasticsearchQueryDslIT {
 	}
 
 	@Test
-	public void explain() {
+	void explain() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::explain-elasticsearch[]
@@ -73,7 +73,7 @@ public class ElasticsearchQueryDslIT {
 	}
 
 	@Test
-	public void json() {
+	void json() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::elasticsearch-requestTransformer[]

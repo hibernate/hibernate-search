@@ -48,7 +48,7 @@ public class SearchIndexingPlanNonEntityIdDocumentIdIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3203")
-	public void simple() {
+	void simple() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, 41, "number1" );
 			IndexedEntity entity2 = new IndexedEntity( 2, 42, "number2" );

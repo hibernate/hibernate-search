@@ -81,7 +81,7 @@ public class SearchMappingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void indexedEntity_byName() {
+	void indexedEntity_byName() {
 		SearchIndexedEntity<?> entity = mapping.indexedEntity( Person.JPA_ENTITY_NAME );
 		assertThat( entity )
 				.isNotNull()
@@ -92,7 +92,7 @@ public class SearchMappingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void indexedEntity_byName_notEntity() {
+	void indexedEntity_byName_notEntity() {
 		assertThatThrownBy( () -> mapping.indexedEntity( "invalid" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -111,7 +111,7 @@ public class SearchMappingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void indexedEntity_byName_notIndexed() {
+	void indexedEntity_byName_notIndexed() {
 		assertThatThrownBy( () -> mapping.indexedEntity( Toy.JPA_ENTITY_NAME ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -130,7 +130,7 @@ public class SearchMappingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void indexedEntity_byJavaClass() {
+	void indexedEntity_byJavaClass() {
 		SearchIndexedEntity<Person> entity = mapping.indexedEntity( Person.class );
 		assertThat( entity )
 				.isNotNull()
@@ -141,7 +141,7 @@ public class SearchMappingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void indexedEntity_byJavaClass_notEntity() {
+	void indexedEntity_byJavaClass_notEntity() {
 		assertThatThrownBy( () -> mapping.indexedEntity( String.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -157,7 +157,7 @@ public class SearchMappingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void indexedEntity_byJavaClass_notIndexed() {
+	void indexedEntity_byJavaClass_notIndexed() {
 		assertThatThrownBy( () -> mapping.indexedEntity( Toy.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -173,7 +173,7 @@ public class SearchMappingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void allIndexedEntities() {
+	void allIndexedEntities() {
 		Collection<? extends SearchIndexedEntity<?>> entities = mapping.allIndexedEntities();
 		assertThat( entities )
 				.extracting( SearchIndexedEntity::jpaName )
@@ -185,7 +185,7 @@ public class SearchMappingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3994")
-	public void scope_indexedEntities() {
+	void scope_indexedEntities() {
 		SearchScope<Object> objectScope = mapping.scope( Object.class );
 		Set<? extends SearchIndexedEntity<?>> objectEntities = objectScope.includedTypes();
 		assertThat( objectEntities )
@@ -214,21 +214,21 @@ public class SearchMappingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3640")
-	public void indexManager_customIndexName() {
+	void indexManager_customIndexName() {
 		IndexManager indexManager = mapping.indexManager( Person.INDEX_NAME );
 		checkIndexManager( Person.INDEX_NAME, indexManager );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3640")
-	public void indexManager_defaultIndexName() {
+	void indexManager_defaultIndexName() {
 		IndexManager indexManager = mapping.indexManager( Pet.JPA_ENTITY_NAME );
 		checkIndexManager( Pet.JPA_ENTITY_NAME, indexManager );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4656")
-	public void indexManager_invalidName() {
+	void indexManager_invalidName() {
 		assertThatThrownBy( () -> mapping.indexManager( "invalid" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -240,21 +240,21 @@ public class SearchMappingIT {
 
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3640", "HSEARCH-3950" })
-	public void backend_default() {
+	void backend_default() {
 		Backend backend = mapping.backend();
 		checkBackend( EventContexts.defaultBackend(), backend );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3640")
-	public void backend_byName() {
+	void backend_byName() {
 		Backend backend = mapping.backend( BACKEND_2_NAME );
 		checkBackend( EventContexts.fromBackendName( BACKEND_2_NAME ), backend );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4656")
-	public void backend_byName_invalidName() {
+	void backend_byName_invalidName() {
 		assertThatThrownBy( () -> mapping.backend( "invalid" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(

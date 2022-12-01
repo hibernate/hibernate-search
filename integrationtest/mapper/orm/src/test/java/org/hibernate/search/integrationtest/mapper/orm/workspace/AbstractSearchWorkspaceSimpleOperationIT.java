@@ -58,7 +58,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void async_success() {
+	void async_success() {
 		setupHolder.runNoTransaction( session -> {
 			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
@@ -75,7 +75,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void async_failure() {
+	void async_failure() {
 		setupHolder.runNoTransaction( session -> {
 			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
@@ -93,7 +93,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void sync_success() {
+	void sync_success() {
 		setupHolder.runNoTransaction( session -> {
 			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
@@ -107,7 +107,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void sync_failure() {
+	void sync_failure() {
 		setupHolder.runNoTransaction( session -> {
 			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
@@ -125,7 +125,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void multiIndexMultiBackend() {
+	void multiIndexMultiBackend() {
 		setupHolder.runNoTransaction( session -> {
 			SearchWorkspace workspace = Search.session( session ).workspace();
 
@@ -148,7 +148,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void outOfSession() {
+	void outOfSession() {
 		SearchWorkspace workspace;
 		try ( Session session = setupHolder.sessionFactory().openSession() ) {
 			workspace = Search.session( session ).workspace( IndexedEntity1.class );
@@ -166,7 +166,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void fromMappingWithoutSession() {
+	void fromMappingWithoutSession() {
 		SearchWorkspace workspace = Search.mapping( setupHolder.sessionFactory() )
 				.scope( IndexedEntity1.class ).workspace();
 

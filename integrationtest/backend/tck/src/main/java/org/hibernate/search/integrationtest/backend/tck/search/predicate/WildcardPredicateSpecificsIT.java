@@ -133,7 +133,7 @@ public class WildcardPredicateSpecificsIT {
 	}
 
 	@Test
-	public void emptyString() {
+	void emptyString() {
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 
 		assertThatQuery( index.query()

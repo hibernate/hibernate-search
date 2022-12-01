@@ -21,7 +21,7 @@ public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 		extends AbstractSearchSchemaManagerSimpleOperationIT {
 
 	@Test
-	public void failure_single() {
+	void failure_single() {
 		SearchSchemaManager manager = Search.mapping( setupHolder.sessionFactory() )
 				.scope( Object.class )
 				.schemaManager();
@@ -40,7 +40,7 @@ public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 	}
 
 	@Test
-	public void failure_multiple() {
+	void failure_multiple() {
 		SearchSchemaManager manager = Search.mapping( setupHolder.sessionFactory() )
 				.scope( Object.class )
 				.schemaManager();
@@ -64,7 +64,7 @@ public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 	}
 
 	@Test
-	public void failure_exception() {
+	void failure_exception() {
 		SearchSchemaManager manager = Search.mapping( setupHolder.sessionFactory() )
 				.scope( Object.class )
 				.schemaManager();

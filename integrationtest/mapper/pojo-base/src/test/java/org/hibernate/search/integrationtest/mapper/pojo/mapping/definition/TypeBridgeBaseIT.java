@@ -15,7 +15,6 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
-import org.hibernate.search.integrationtest.mapper.pojo.mapping.annotation.processing.CustomTypeMappingAnnotationBaseIT;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
@@ -44,10 +43,10 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * <p>
  * Does not test reindexing in depth; this is tested in {@code AutomaticIndexing*} tests in the ORM mapper.
  * <p>
- * Does not test custom annotations; this is tested in {@link CustomTypeMappingAnnotationBaseIT}.
+ * Does not test custom annotations; this is tested in {@code CustomTypeMappingAnnotationBaseIT}.
  */
 @SuppressWarnings("unused")
-public class TypeBridgeBaseIT {
+class TypeBridgeBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -65,7 +64,7 @@ public class TypeBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = {"HSEARCH-2055", "HSEARCH-2641"})
-	public void accessors() {
+	void accessors() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -131,7 +130,7 @@ public class TypeBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitDependencies() {
+	void explicitDependencies() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -189,7 +188,7 @@ public class TypeBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitDependencies_error_invalidProperty() {
+	void explicitDependencies_error_invalidProperty() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -222,7 +221,7 @@ public class TypeBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitReindexing() {
+	void explicitReindexing() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -295,7 +294,7 @@ public class TypeBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitReindexing_error_use_invalidProperty() {
+	void explicitReindexing_error_use_invalidProperty() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -333,7 +332,7 @@ public class TypeBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitReindexing_error_fromOtherEntity_invalidProperty() {
+	void explicitReindexing_error_fromOtherEntity_invalidProperty() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -367,7 +366,7 @@ public class TypeBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitReindexing_error_fromOtherEntity_bridgedElementNotEntityType() {
+	void explicitReindexing_error_fromOtherEntity_bridgedElementNotEntityType() {
 		class NotEntity {
 			String stringProperty;
 			public String getStringProperty() {
@@ -410,7 +409,7 @@ public class TypeBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitReindexing_error_fromOtherEntity_otherEntityTypeNotEntityType() {
+	void explicitReindexing_error_fromOtherEntity_otherEntityTypeNotEntityType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -445,7 +444,7 @@ public class TypeBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitReindexing_error_fromOtherEntity_inverseAssociationPathTargetsWrongType() {
+	void explicitReindexing_error_fromOtherEntity_inverseAssociationPathTargetsWrongType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -484,7 +483,7 @@ public class TypeBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void missingDependencyDeclaration() {
+	void missingDependencyDeclaration() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -515,7 +514,7 @@ public class TypeBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void inconsistentDependencyDeclaration() {
+	void inconsistentDependencyDeclaration() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -548,7 +547,7 @@ public class TypeBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void useRootOnly() {
+	void useRootOnly() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -630,7 +629,7 @@ public class TypeBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3324")
-	public void field() {
+	void field() {
 		class Contained {
 		}
 		@Indexed(index = INDEX_NAME)
@@ -673,7 +672,7 @@ public class TypeBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3324")
-	public void objectField() {
+	void objectField() {
 		class Contained {
 		}
 		@Indexed(index = INDEX_NAME)
@@ -726,7 +725,7 @@ public class TypeBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3273")
-	public void fieldTemplate() {
+	void fieldTemplate() {
 		class Contained {
 		}
 		@Indexed(index = INDEX_NAME)
@@ -774,7 +773,7 @@ public class TypeBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3273")
-	public void objectFieldTemplate() {
+	void objectFieldTemplate() {
 		class Contained {
 		}
 		@Indexed(index = INDEX_NAME)
@@ -831,7 +830,7 @@ public class TypeBridgeBaseIT {
 	}
 
 	@Test
-	public void accessors_incompatibleRequestedType() {
+	void accessors_incompatibleRequestedType() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -864,7 +863,7 @@ public class TypeBridgeBaseIT {
 	}
 
 	@Test
-	public void typeBridge_invalidInputType() {
+	void typeBridge_invalidInputType() {
 		@Indexed
 		@TypeBinding(binder = @TypeBinderRef(type = MyTargetTypeBridge.Binder.class))
 		class IndexedEntity {
@@ -908,7 +907,7 @@ public class TypeBridgeBaseIT {
 	 * Test for backward compatibility with 6.0.0.CR1 APIs
 	 */
 	@Test
-	public void typeBridge_noGenericType() {
+	void typeBridge_noGenericType() {
 		backendMock.expectSchema( INDEX_NAME, b -> b.field( "someField", String.class ) );
 		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( IndexedEntityWithRawTypeBridge.class );
 		backendMock.verifyExpectationsMet();
@@ -965,7 +964,7 @@ public class TypeBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4166")
-	public void namedPredicate() {
+	void namedPredicate() {
 		class Contained {
 		}
 		@Indexed(index = INDEX_NAME)
@@ -1010,7 +1009,7 @@ public class TypeBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4166")
-	public void namedPredicate_indexedEmbeddedIncludePaths() {
+	void namedPredicate_indexedEmbeddedIncludePaths() {
 		class Contained {
 		}
 		@Indexed(index = INDEX_NAME)

@@ -17,7 +17,6 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
-import org.hibernate.search.integrationtest.mapper.pojo.mapping.annotation.processing.CustomPropertyMappingAnnotationBaseIT;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
@@ -52,10 +51,10 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * <p>
  * Does not test reindexing in depth; this is tested in {@code AutomaticIndexing*} tests in the ORM mapper.
  * <p>
- * Does not test custom annotations; this is tested in {@link CustomPropertyMappingAnnotationBaseIT}.
+ * Does not test custom annotations; this is tested in {@code CustomPropertyMappingAnnotationBaseIT}.
  */
 @SuppressWarnings("unused")
-public class PropertyBridgeBaseIT {
+class PropertyBridgeBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -72,7 +71,7 @@ public class PropertyBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = {"HSEARCH-2055", "HSEARCH-2641"})
-	public void accessors() {
+	void accessors() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -137,7 +136,7 @@ public class PropertyBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitDependencies() {
+	void explicitDependencies() {
 		class Contained {
 			String stringProperty;
 		}
@@ -221,7 +220,7 @@ public class PropertyBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitDependencies_inacessibleObject() {
+	void explicitDependencies_inacessibleObject() {
 		backendMock.expectSchema( INDEX_NAME, b ->
 				b.field( "someField", String.class, b2 -> {
 					b2.analyzerName( "myAnalyzer" ); // For HSEARCH-2641
@@ -280,7 +279,7 @@ public class PropertyBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitDependencies_error_invalidProperty() {
+	void explicitDependencies_error_invalidProperty() {
 		class Contained {
 			String stringProperty;
 		}
@@ -313,7 +312,7 @@ public class PropertyBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitDependencies_error_invalidContainerExtractorPath() {
+	void explicitDependencies_error_invalidContainerExtractorPath() {
 		class Contained {
 			String stringProperty;
 		}
@@ -356,7 +355,7 @@ public class PropertyBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitReindexing() {
+	void explicitReindexing() {
 		backendMock.expectSchema( INDEX_NAME, b ->
 				b.field( "someField", String.class, b2 -> {
 					b2.analyzerName( "myAnalyzer" ); // For HSEARCH-2641
@@ -452,7 +451,7 @@ public class PropertyBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitReindexing_error_use_invalidProperty() {
+	void explicitReindexing_error_use_invalidProperty() {
 		assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
@@ -483,7 +482,7 @@ public class PropertyBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitReindexing_error_fromOtherEntity_invalidProperty() {
+	void explicitReindexing_error_fromOtherEntity_invalidProperty() {
 		assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
@@ -513,7 +512,7 @@ public class PropertyBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitReindexing_error_fromOtherEntity_invalidContainerExtractorPath() {
+	void explicitReindexing_error_fromOtherEntity_invalidContainerExtractorPath() {
 		assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
@@ -546,7 +545,7 @@ public class PropertyBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitReindexing_error_fromOtherEntity_bridgedElementNotEntityType() {
+	void explicitReindexing_error_fromOtherEntity_bridgedElementNotEntityType() {
 		assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
@@ -580,7 +579,7 @@ public class PropertyBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitReindexing_error_fromOtherEntity_otherEntityTypeNotEntityType() {
+	void explicitReindexing_error_fromOtherEntity_otherEntityTypeNotEntityType() {
 		assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
@@ -614,7 +613,7 @@ public class PropertyBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void explicitReindexing_error_fromOtherEntity_inverseAssociationPathTargetsWrongType() {
+	void explicitReindexing_error_fromOtherEntity_inverseAssociationPathTargetsWrongType() {
 		assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
@@ -647,7 +646,7 @@ public class PropertyBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void missingDependencyDeclaration() {
+	void missingDependencyDeclaration() {
 		class Contained {
 			String stringProperty;
 		}
@@ -683,7 +682,7 @@ public class PropertyBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	public void inconsistentDependencyDeclaration() {
+	void inconsistentDependencyDeclaration() {
 		class Contained {
 			String stringProperty;
 		}
@@ -722,7 +721,7 @@ public class PropertyBridgeBaseIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void useRootOnly() {
+	void useRootOnly() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -786,7 +785,7 @@ public class PropertyBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3324")
-	public void field() {
+	void field() {
 		class Contained {
 		}
 		@Indexed(index = INDEX_NAME)
@@ -826,7 +825,7 @@ public class PropertyBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3324")
-	public void objectField() {
+	void objectField() {
 		class Contained {
 		}
 		@Indexed(index = INDEX_NAME)
@@ -876,7 +875,7 @@ public class PropertyBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3273")
-	public void fieldTemplate() {
+	void fieldTemplate() {
 		class Contained {
 		}
 		@Indexed(index = INDEX_NAME)
@@ -921,7 +920,7 @@ public class PropertyBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3273")
-	public void objectFieldTemplate() {
+	void objectFieldTemplate() {
 		class Contained {
 		}
 		@Indexed(index = INDEX_NAME)
@@ -975,7 +974,7 @@ public class PropertyBridgeBaseIT {
 	}
 
 	@Test
-	public void accessors_incompatibleRequestedType() {
+	void accessors_incompatibleRequestedType() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -1009,7 +1008,7 @@ public class PropertyBridgeBaseIT {
 	}
 
 	@Test
-	public void propertyBridge_invalidInputType() {
+	void propertyBridge_invalidInputType() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -1050,7 +1049,7 @@ public class PropertyBridgeBaseIT {
 	 * Test for backward compatibility with 6.0.0.CR1 APIs
 	 */
 	@Test
-	public void propertyBridge_noGenericType() {
+	void propertyBridge_noGenericType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -1106,7 +1105,7 @@ public class PropertyBridgeBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4166")
-	public void namedPredicate() {
+	void namedPredicate() {
 		class Contained {
 		}
 		@Indexed(index = INDEX_NAME)

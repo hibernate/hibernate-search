@@ -131,7 +131,7 @@ public class MassIndexingConditionalExpressionsIT {
 	}
 
 	@Test
-	public void noHierarchy() {
+	void noHierarchy() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H0_Indexed.class );
@@ -157,7 +157,7 @@ public class MassIndexingConditionalExpressionsIT {
 	}
 
 	@Test
-	public void noHierarchy_withParams() {
+	void noHierarchy_withParams() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H0_Indexed.class );
@@ -184,7 +184,7 @@ public class MassIndexingConditionalExpressionsIT {
 	}
 
 	@Test
-	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot_conditionOnRoot() {
+	void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot_conditionOnRoot() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
@@ -214,7 +214,7 @@ public class MassIndexingConditionalExpressionsIT {
 	}
 
 	@Test
-	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot_conditionOnSubclass_rootField() {
+	void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot_conditionOnSubclass_rootField() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
@@ -244,7 +244,7 @@ public class MassIndexingConditionalExpressionsIT {
 	}
 
 	@Test
-	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot_conditionOnSubclass_subclassField() {
+	void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot_conditionOnSubclass_subclassField() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
@@ -274,7 +274,7 @@ public class MassIndexingConditionalExpressionsIT {
 	}
 
 	@Test
-	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
+	void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_B_Indexed.class );
@@ -304,7 +304,7 @@ public class MassIndexingConditionalExpressionsIT {
 	}
 
 	@Test
-	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
+	void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
@@ -357,7 +357,7 @@ public class MassIndexingConditionalExpressionsIT {
 	}
 
 	@Test
-	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot_withParams() {
+	void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot_withParams() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
@@ -409,7 +409,7 @@ public class MassIndexingConditionalExpressionsIT {
 	}
 
 	@Test
-	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
+	void rootIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_B_Indexed.class );
@@ -441,7 +441,7 @@ public class MassIndexingConditionalExpressionsIT {
 	}
 
 	@Test
-	public void sameFieldName_targetingEachClass() {
+	void sameFieldName_targetingEachClass() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H3_Root.class );
@@ -477,7 +477,7 @@ public class MassIndexingConditionalExpressionsIT {
 	}
 
 	@Test
-	public void sameFieldName_targetingInterface() {
+	void sameFieldName_targetingInterface() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H3_Root.class );
@@ -513,7 +513,7 @@ public class MassIndexingConditionalExpressionsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4266")
-	public void orCondition_filterIndexedTypeOnly() {
+	void orCondition_filterIndexedTypeOnly() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );

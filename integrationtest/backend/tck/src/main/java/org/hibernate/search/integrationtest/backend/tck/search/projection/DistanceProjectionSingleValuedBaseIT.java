@@ -116,7 +116,7 @@ public class DistanceProjectionSingleValuedBaseIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void simple(TestedFieldStructure fieldStructure, DataSet dataSet) {
+	void simple(TestedFieldStructure fieldStructure, DataSet dataSet) {
 		StubMappingScope scope = mainIndex.createScope();
 
 		String fieldPath = getFieldPath( fieldStructure );
@@ -171,7 +171,7 @@ public class DistanceProjectionSingleValuedBaseIT {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void duplicated(TestedFieldStructure fieldStructure, DataSet dataSet) {
+	void duplicated(TestedFieldStructure fieldStructure, DataSet dataSet) {
 		StubMappingScope scope = mainIndex.createScope();
 
 		String fieldPath = getFieldPath( fieldStructure );
@@ -257,7 +257,7 @@ public class DistanceProjectionSingleValuedBaseIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void unit_km(TestedFieldStructure fieldStructure, DataSet dataSet) {
+	void unit_km(TestedFieldStructure fieldStructure, DataSet dataSet) {
 		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatQuery( scope.query()
@@ -278,7 +278,7 @@ public class DistanceProjectionSingleValuedBaseIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void unit_miles(TestedFieldStructure fieldStructure, DataSet dataSet) {
+	void unit_miles(TestedFieldStructure fieldStructure, DataSet dataSet) {
 		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatQuery( scope.query()
@@ -299,7 +299,7 @@ public class DistanceProjectionSingleValuedBaseIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void several(TestedFieldStructure fieldStructure, DataSet dataSet) {
+	void several(TestedFieldStructure fieldStructure, DataSet dataSet) {
 		StubMappingScope scope = mainIndex.createScope();
 
 		ListAssert<Triplet<Double, Double, Double>> hitsAssert = assertThatQuery( scope.query()

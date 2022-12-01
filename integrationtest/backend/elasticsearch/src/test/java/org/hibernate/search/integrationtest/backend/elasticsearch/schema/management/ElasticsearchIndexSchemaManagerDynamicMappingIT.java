@@ -65,7 +65,7 @@ public class ElasticsearchIndexSchemaManagerDynamicMappingIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void dynamicMapping_default(ElasticsearchIndexSchemaManagerOperation operation) {
+	void dynamicMapping_default(ElasticsearchIndexSchemaManagerOperation operation) {
 		setupAndInspectIndex( null, operation );
 		String mapping = elasticSearchClient.index( index.name() ).type().getMapping();
 
@@ -74,7 +74,7 @@ public class ElasticsearchIndexSchemaManagerDynamicMappingIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void dynamicMapping_strict(ElasticsearchIndexSchemaManagerOperation operation) {
+	void dynamicMapping_strict(ElasticsearchIndexSchemaManagerOperation operation) {
 		setupAndInspectIndex( DynamicMapping.STRICT.externalRepresentation(), operation );
 		String mapping = elasticSearchClient.index( index.name() ).type().getMapping();
 
@@ -83,7 +83,7 @@ public class ElasticsearchIndexSchemaManagerDynamicMappingIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void dynamicMapping_false(ElasticsearchIndexSchemaManagerOperation operation) {
+	void dynamicMapping_false(ElasticsearchIndexSchemaManagerOperation operation) {
 		setupAndInspectIndex( DynamicMapping.FALSE.externalRepresentation(), operation );
 		String mapping = elasticSearchClient.index( index.name() ).type().getMapping();
 
@@ -92,7 +92,7 @@ public class ElasticsearchIndexSchemaManagerDynamicMappingIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void dynamicMapping_true(ElasticsearchIndexSchemaManagerOperation operation) {
+	void dynamicMapping_true(ElasticsearchIndexSchemaManagerOperation operation) {
 		setupAndInspectIndex( DynamicMapping.TRUE.externalRepresentation(), operation );
 		String mapping = elasticSearchClient.index( index.name() ).type().getMapping();
 
@@ -101,7 +101,7 @@ public class ElasticsearchIndexSchemaManagerDynamicMappingIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void dynamicMapping_invalid(ElasticsearchIndexSchemaManagerOperation operation) {
+	void dynamicMapping_invalid(ElasticsearchIndexSchemaManagerOperation operation) {
 		assertThatThrownBy(
 				() -> setupAndInspectIndex( "invalid", operation )
 		)

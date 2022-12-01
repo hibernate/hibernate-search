@@ -74,7 +74,7 @@ public class ElasticsearchIndexingIT {
 
 	@ParameterizedTest(name = "IndexLayoutStrategy = {0}")
 	@MethodSource("params")
-	public void addUpdateDelete_noRouting(Object layoutStrategy, URLEncodedString writeName) {
+	void addUpdateDelete_noRouting(Object layoutStrategy, URLEncodedString writeName) {
 		init( layoutStrategy, writeName );
 		Gson gson = new Gson();
 
@@ -128,7 +128,7 @@ public class ElasticsearchIndexingIT {
 
 	@ParameterizedTest(name = "IndexLayoutStrategy = {0}")
 	@MethodSource("params")
-	public void addUpdateDelete_routing(Object layoutStrategy, URLEncodedString writeName) {
+	void addUpdateDelete_routing(Object layoutStrategy, URLEncodedString writeName) {
 		init( layoutStrategy, writeName );
 		Gson gson = new Gson();
 

@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-1108")
-public class MappedSuperclassIT {
+class MappedSuperclassIT {
 
 	private static final String INDEX_NAME = "IndexedEntity";
 
@@ -57,7 +57,7 @@ public class MappedSuperclassIT {
 	}
 
 	@Test
-	public void index() {
+	void index() {
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
 			session.persist( indexedPojo );

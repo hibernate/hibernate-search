@@ -62,7 +62,7 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 	}
 
 	@Test
-	public void desc() {
+	void desc() {
 		LuceneSearchQuery<DocumentReference> segment0Query = matchTextSortedByScoreQuery( SortOrder.DESC, SEGMENT_0 );
 		LuceneSearchQuery<DocumentReference> segment1Query = matchTextSortedByScoreQuery( SortOrder.DESC, SEGMENT_1 );
 		LuceneSearchResult<DocumentReference> segment0Result = segment0Query.fetch( 10 );
@@ -86,7 +86,7 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 	// 1. to be sure the above didn't just pass by chance;
 	// 2. because the TopDocs merging method is not the same in that case.
 	@Test
-	public void asc() {
+	void asc() {
 		LuceneSearchQuery<DocumentReference> segment0Query = matchTextSortedByScoreQuery( SortOrder.ASC, SEGMENT_0 );
 		LuceneSearchQuery<DocumentReference> segment1Query = matchTextSortedByScoreQuery( SortOrder.ASC, SEGMENT_1 );
 		LuceneSearchResult<DocumentReference> segment0Result = segment0Query.fetch( 10 );

@@ -24,7 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class GettingStartedCustomAnalysisIT {
+class GettingStartedCustomAnalysisIT {
 
 	@RegisterExtension
 	public TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
@@ -77,7 +77,7 @@ public class GettingStartedCustomAnalysisIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		Integer bookId = 2;
 		try ( SearchSession session = searchMapping.createSession() ) {
 			Author author = new Author();

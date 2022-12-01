@@ -47,32 +47,32 @@ public class AnalysisBuiltinOverrideIT {
 	}
 
 	@Test
-	public void analyzer_default() {
+	void analyzer_default() {
 		verifyOverride( index.binding().defaultAnalyzer );
 	}
 
 	@Test
-	public void analyzer_standard() {
+	void analyzer_standard() {
 		verifyOverride( index.binding().standardAnalyzer );
 	}
 
 	@Test
-	public void analyzer_simple() {
+	void analyzer_simple() {
 		verifyOverride( index.binding().simpleAnalyzer );
 	}
 
 	@Test
-	public void analyzer_whitespace() {
+	void analyzer_whitespace() {
 		verifyOverride( index.binding().whitespaceAnalyzer );
 	}
 
 	@Test
-	public void analyzer_stop() {
+	void analyzer_stop() {
 		verifyOverride( index.binding().stopAnalyzer );
 	}
 
 	@Test
-	public void analyzer_keyword() {
+	void analyzer_keyword() {
 		verifyOverride( index.binding().keywordAnalyzer );
 	}
 

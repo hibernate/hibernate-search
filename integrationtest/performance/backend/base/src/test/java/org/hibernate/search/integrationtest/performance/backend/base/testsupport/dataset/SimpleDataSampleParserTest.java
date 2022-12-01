@@ -18,10 +18,10 @@ import org.junit.jupiter.api.Test;
 import com.google.common.io.CharSource;
 
 @SuppressJQAssistant(reason = "This really is a unit test, not an IT, so we want the 'Test' suffix")
-public class SimpleDataSampleParserTest {
+class SimpleDataSampleParserTest {
 
 	@Test
-	public void test() throws IOException {
+	void test() throws IOException {
 		List<SampleDataset.DataSample> samples = CharSource.wrap( "\n"
 						+ "This is the first real line\n"
 						+ "Followed by another one\n"

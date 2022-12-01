@@ -28,7 +28,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 /**
  * Test for {@link org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator#defaultReindexOnUpdate(ReindexOnUpdate)}.
  */
-public class DefaultReindexOnUpdateIT {
+class DefaultReindexOnUpdateIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -48,7 +48,7 @@ public class DefaultReindexOnUpdateIT {
 	 * then Hibernate Search will handle embedding *and* automatic reindexing.
 	 */
 	@Test
-	public void default_associationInverseSideKnown() {
+	void default_associationInverseSideKnown() {
 		backendMock.expectSchema( "ParentEntity", b -> b
 				.field( "value", String.class )
 				.objectField( "child", b2 -> b2
@@ -134,7 +134,7 @@ public class DefaultReindexOnUpdateIT {
 	 * then Hibernate Search bootstrap will fail.
 	 */
 	@Test
-	public void default_associationInverseSideUnknown() {
+	void default_associationInverseSideUnknown() {
 		assertThatThrownBy( () -> setupHelper.start()
 				.withConfiguration(
 						builder -> {
@@ -177,7 +177,7 @@ public class DefaultReindexOnUpdateIT {
 	 * then Hibernate Search will handle embedding, but not automatic reindexing.
 	 */
 	@Test
-	public void no_associationInverseSideUnknown() {
+	void no_associationInverseSideUnknown() {
 		backendMock.expectSchema( "ParentEntity", b -> b
 				.field( "value", String.class )
 				.objectField( "child", b2 -> b2

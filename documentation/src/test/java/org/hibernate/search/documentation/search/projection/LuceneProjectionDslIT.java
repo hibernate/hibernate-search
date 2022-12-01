@@ -26,7 +26,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
 
-public class LuceneProjectionDslIT {
+class LuceneProjectionDslIT {
 
 	private static final int ASIMOV_ID = 1;
 	private static final int MARTINEZ_ID = 2;
@@ -49,7 +49,7 @@ public class LuceneProjectionDslIT {
 	}
 
 	@Test
-	public void document() {
+	void document() {
 		withinSearchSession( searchSession -> {
 			// tag::lucene-document[]
 			List<Document> hits = searchSession.search( Book.class )
@@ -63,7 +63,7 @@ public class LuceneProjectionDslIT {
 	}
 
 	@Test
-	public void explanation() {
+	void explanation() {
 		withinSearchSession( searchSession -> {
 			// tag::lucene-explanation[]
 			List<Explanation> hits = searchSession.search( Book.class )

@@ -29,11 +29,11 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.LiveIndexWriterConfig;
 
 @TestForIssue(jiraKey = "HSEARCH-3636")
-public class LuceneIndexWriterSettingsPerShardIT extends AbstractSettingsPerShardIT {
+class LuceneIndexWriterSettingsPerShardIT extends AbstractSettingsPerShardIT {
 
 	@ParameterizedTest(name = "{0} - {2}")
 	@MethodSource("params")
-	public void test(String ignoredLabel, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction, List<String> shardIds) {
+	void test(String ignoredLabel, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction, List<String> shardIds) {
 		init( ignoredLabel, setupStrategyFunction, shardIds );
 		setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), LuceneIndexSettings.IO_WRITER_MAX_BUFFERED_DOCS, "420" )

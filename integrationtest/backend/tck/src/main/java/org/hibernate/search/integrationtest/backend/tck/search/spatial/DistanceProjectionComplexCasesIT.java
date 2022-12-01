@@ -33,7 +33,7 @@ public class DistanceProjectionComplexCasesIT extends AbstractSpatialWithinPredi
 	 * The main difference is that we're targeting multiple fields here.
 	 */
 	@Test
-	public void several() {
+	void several() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		ListAssert<List<?>> hitsAssert = assertThatQuery( scope.query()
@@ -80,7 +80,7 @@ public class DistanceProjectionComplexCasesIT extends AbstractSpatialWithinPredi
 	 * The main difference is that we're composing multiple sorts here.
 	 */
 	@Test
-	public void withDistanceSort() {
+	void withDistanceSort() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		GeoPoint center = GeoPoint.of( 45.749828, 4.854172 );
@@ -108,7 +108,7 @@ public class DistanceProjectionComplexCasesIT extends AbstractSpatialWithinPredi
 	 * This is relevant for Elasticsearch, which generates a name for computed values based on the field name.
 	 */
 	@Test
-	public void longFieldName() {
+	void longFieldName() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatQuery( scope.query()

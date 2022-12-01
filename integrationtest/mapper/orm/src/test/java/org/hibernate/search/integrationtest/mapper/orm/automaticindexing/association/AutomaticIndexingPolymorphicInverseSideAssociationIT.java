@@ -75,7 +75,7 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 	 * because of their concrete type.
 	 */
 	@Test
-	public void inversePathIgnoresUnrelatedTypes() {
+	void inversePathIgnoresUnrelatedTypes() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity indexedEntity = new IndexedEntity();
 			indexedEntity.setId( 1 );
@@ -142,7 +142,7 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 	 * the inverse side of this association may be defined differently depending on the concrete subtype.
 	 */
 	@Test
-	public void inversePathDependsOnConcreteType() {
+	void inversePathDependsOnConcreteType() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity indexedEntity1 = new IndexedEntity();
 			indexedEntity1.setId( 1 );

@@ -40,7 +40,7 @@ import org.awaitility.Awaitility;
 /**
  * Test interruption of a currently executing {@link MassIndexer}.
  */
-public class MassIndexingInterruptionIT {
+class MassIndexingInterruptionIT {
 
 	public static final String TITLE_1 = "Oliver Twist";
 	public static final String AUTHOR_1 = "Charles Dickens";
@@ -77,7 +77,7 @@ public class MassIndexingInterruptionIT {
 	}
 
 	@Test
-	public void interrupt_mainThread() {
+	void interrupt_mainThread() {
 		int expectedThreadCount = 1 // Workspace
 				+ 1 // ID loading
 				+ 1; // Entity loading
@@ -121,7 +121,7 @@ public class MassIndexingInterruptionIT {
 	}
 
 	@Test
-	public void interrupt_entityLoading() {
+	void interrupt_entityLoading() {
 		int expectedThreadCount = 1 // Workspace
 				+ 1 // ID loading
 				+ 1; // Entity loading
@@ -162,7 +162,7 @@ public class MassIndexingInterruptionIT {
 	}
 
 	@Test
-	public void cancel() {
+	void cancel() {
 		int expectedThreadCount = 1 // Coordinator
 				+ 1 // Workspace
 				+ 1 // ID loading

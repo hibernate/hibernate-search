@@ -52,7 +52,7 @@ import org.assertj.core.api.InstanceOfAssertFactories;
 		"org.hibernate.search.test.integration.wildfly.cdi.CDIInjectionIT",
 		"org.hibernate.search.test.integration.wildfly.cdi.CDIInjectionLifecycleEventsIT"
 })
-public class CdiBeanResolutionIT {
+class CdiBeanResolutionIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -87,7 +87,7 @@ public class CdiBeanResolutionIT {
 	}
 
 	@Test
-	public void singleton_byType() {
+	void singleton_byType() {
 		doTest(
 				ExpectedScope.SINGLETON, UnnamedSingletonBean.KEYS,
 				BeanReference.of( UnnamedSingletonBean.class )
@@ -95,7 +95,7 @@ public class CdiBeanResolutionIT {
 	}
 
 	@Test
-	public void singleton_byName() {
+	void singleton_byName() {
 		doTest(
 				ExpectedScope.SINGLETON, NamedSingletonBean.KEYS,
 				BeanReference.of( InterfaceDefinedByMapper.class, NamedSingletonBean.NAME )
@@ -103,7 +103,7 @@ public class CdiBeanResolutionIT {
 	}
 
 	@Test
-	public void dependent_byType() {
+	void dependent_byType() {
 		doTest(
 				ExpectedScope.DEPENDENT, UnnamedDependentBean.KEYS,
 				BeanReference.of( UnnamedDependentBean.class )
@@ -111,7 +111,7 @@ public class CdiBeanResolutionIT {
 	}
 
 	@Test
-	public void dependent_byName() {
+	void dependent_byName() {
 		doTest(
 				ExpectedScope.DEPENDENT, NamedDependentBean.KEYS,
 				BeanReference.of( InterfaceDefinedByMapper.class, NamedDependentBean.NAME )

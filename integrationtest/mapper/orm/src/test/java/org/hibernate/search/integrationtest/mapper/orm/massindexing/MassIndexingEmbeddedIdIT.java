@@ -40,7 +40,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 /**
  * Test mass indexing of an entity type using an {@link EmbeddedId}.
  */
-public class MassIndexingEmbeddedIdIT {
+class MassIndexingEmbeddedIdIT {
 
 	public static final String TITLE_1 = "Oliver Twist";
 	public static final String AUTHOR_1 = "Charles Dickens";
@@ -74,7 +74,7 @@ public class MassIndexingEmbeddedIdIT {
 	}
 
 	@Test
-	public void defaultMassIndexerStartAndWait() {
+	void defaultMassIndexerStartAndWait() {
 		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();

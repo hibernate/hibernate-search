@@ -24,7 +24,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
-public class LuceneBackendIT {
+class LuceneBackendIT {
 
 	@RegisterExtension
 	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
@@ -43,7 +43,7 @@ public class LuceneBackendIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void analyzer() {
+	void analyzer() {
 		assertThat( backend.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) )
 				.isNotEmpty()
 				.containsInstanceOf( StandardAnalyzer.class );
@@ -54,7 +54,7 @@ public class LuceneBackendIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void analyzer_missing() {
+	void analyzer_missing() {
 		assertThat( backend.analyzer( "unknown" ) ).isEmpty();
 		// Normalizers are not analyzers
 		assertThat( backend.analyzer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ) ).isEmpty();
@@ -62,7 +62,7 @@ public class LuceneBackendIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void normalizer() {
+	void normalizer() {
 		assertThat( backend.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ) )
 				.isNotEmpty()
 				.containsInstanceOf( HibernateSearchNormalizerWrapper.class );
@@ -70,7 +70,7 @@ public class LuceneBackendIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void normalizer_missing() {
+	void normalizer_missing() {
 		assertThat( backend.normalizer( "unknown" ) ).isEmpty();
 		// Analyzers are not normalizers
 		assertThat( backend.normalizer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) ).isEmpty();

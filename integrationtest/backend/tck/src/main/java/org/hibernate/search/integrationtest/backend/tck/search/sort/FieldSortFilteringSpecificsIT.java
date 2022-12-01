@@ -67,7 +67,7 @@ public class FieldSortFilteringSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void nonNested(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void nonNested(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		String fieldPath = index.binding().flattenedObject.relativeFieldName + "."
 				+ index.binding().flattenedObject.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 
@@ -84,7 +84,7 @@ public class FieldSortFilteringSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void invalidNestedPath_parent(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void invalidNestedPath_parent(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		String fieldPath = index.binding().nestedObject1.relativeFieldName + "."
 				+ index.binding().nestedObject1.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 		String fieldInParentPath = index.binding().fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
@@ -102,7 +102,7 @@ public class FieldSortFilteringSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void invalidNestedPath_sibling(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void invalidNestedPath_sibling(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		String fieldPath = index.binding().nestedObject1.relativeFieldName + "."
 				+ index.binding().nestedObject1.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 		String fieldInSiblingPath = index.binding().nestedObject2.relativeFieldName + "."

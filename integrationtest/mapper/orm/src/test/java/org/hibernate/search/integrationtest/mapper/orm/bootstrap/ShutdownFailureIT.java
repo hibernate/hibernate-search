@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Level;
  * Check that a failing boot correctly propagates exceptions,
  * despite the complex asynchronous code used during boot.
  */
-public class ShutdownFailureIT {
+class ShutdownFailureIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -40,7 +40,7 @@ public class ShutdownFailureIT {
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
-	public void logException() {
+	void logException() {
 		backendMock.expectAnySchema( FailingIndexedEntity.NAME );
 		SessionFactory sessionFactory = ormSetupHelper.start().setup( FailingIndexedEntity.class );
 

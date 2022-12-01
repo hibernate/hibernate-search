@@ -35,7 +35,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class TransientPropertyIT {
+class TransientPropertyIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -44,7 +44,7 @@ public class TransientPropertyIT {
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
-	public void withoutDerivedFrom() {
+	void withoutDerivedFrom() {
 		assertThatThrownBy(
 				() -> ormSetupHelper.start().setup( EntityWithoutDerivedFrom.class )
 		)
@@ -59,7 +59,7 @@ public class TransientPropertyIT {
 	}
 
 	@Test
-	public void withDerivedFrom() {
+	void withDerivedFrom() {
 		backendMock.expectSchema( EntityWithDerivedFrom.INDEX, b -> b
 				.field( "APlusB", Integer.class )
 		);
@@ -108,7 +108,7 @@ public class TransientPropertyIT {
 	}
 
 	@Test
-	public void withDerivedFromAndBridge() {
+	void withDerivedFromAndBridge() {
 		backendMock.expectSchema( EntityWithDerivedFromAndBridge.INDEX, b -> b
 				.field( "APlusB", Integer.class )
 		);

@@ -57,7 +57,7 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void success_defaultLayoutStrategy(ElasticsearchIndexSchemaManagerOperation operation) {
+	void success_defaultLayoutStrategy(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 
@@ -74,7 +74,7 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void success_noAliasLayoutStrategy(ElasticsearchIndexSchemaManagerOperation operation) {
+	void success_noAliasLayoutStrategy(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticsearchClient.indexNoAlias( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 
@@ -89,7 +89,7 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void success_customLayoutStrategy(ElasticsearchIndexSchemaManagerOperation operation) {
+	void success_customLayoutStrategy(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 
@@ -110,7 +110,7 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 	 */
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void migrationFrom6Beta4OrEarlier(ElasticsearchIndexSchemaManagerOperation operation) {
+	void migrationFrom6Beta4OrEarlier(ElasticsearchIndexSchemaManagerOperation operation) {
 		// Index layout of 6.0.0.Beta4 and before: aliases are missing,
 		// and the primary Elasticsearch index name is just the Hibernate Search index name.
 		URLEncodedString oldIndexName = encodeName( index.name() );

@@ -26,7 +26,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortedSetSortField;
 
-public class LuceneSortDslIT {
+class LuceneSortDslIT {
 
 	private static final int ASIMOV_ID = 1;
 	private static final int MARTINEZ_ID = 2;
@@ -48,7 +48,7 @@ public class LuceneSortDslIT {
 	}
 
 	@Test
-	public void fromLucene() {
+	void fromLucene() {
 		withinSearchSession( searchSession -> {
 			// tag::lucene-fromLuceneSort[]
 			List<Book> hits = searchSession.search( Book.class )

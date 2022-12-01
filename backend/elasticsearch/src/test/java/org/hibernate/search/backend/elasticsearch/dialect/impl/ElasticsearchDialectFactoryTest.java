@@ -500,7 +500,7 @@ public class ElasticsearchDialectFactoryTest {
 
 	@ParameterizedTest(name = "{0} {1}/{2} => {3}")
 	@MethodSource("params")
-	public void test(ElasticsearchDistributionName distributionName,
+	void test(ElasticsearchDistributionName distributionName,
 			String configuredVersionString,
 			String actualVersionString,
 			ExpectedOutcome expectedOutcome,

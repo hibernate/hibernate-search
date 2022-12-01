@@ -29,7 +29,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.google.gson.JsonParser;
 
-public class ElasticsearchCustomIndexMappingIT {
+class ElasticsearchCustomIndexMappingIT {
 
 	@RegisterExtension
 	public TestElasticsearchClient elasticsearchClient = TestElasticsearchClient.create();
@@ -39,7 +39,7 @@ public class ElasticsearchCustomIndexMappingIT {
 			BackendConfigurations.simple() );
 
 	@Test
-	public void smoke() throws Exception {
+	void smoke() throws Exception {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withBackendProperty(
 						ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MAPPING_FILE,

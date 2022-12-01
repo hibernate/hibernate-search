@@ -40,7 +40,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * and {@link FieldContainerExtractorExplicitIT}.
  */
 @TestForIssue(jiraKey = "HSEARCH-2554")
-public class FieldContainerExtractorBaseIT {
+class FieldContainerExtractorBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -51,7 +51,7 @@ public class FieldContainerExtractorBaseIT {
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void custom() {
+	void custom() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -113,7 +113,7 @@ public class FieldContainerExtractorBaseIT {
 	}
 
 	@Test
-	public void custom_error_undefined() {
+	void custom_error_undefined() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -136,7 +136,7 @@ public class FieldContainerExtractorBaseIT {
 	}
 
 	@Test
-	public void custom_error_cannotInferClassTypePattern() {
+	void custom_error_cannotInferClassTypePattern() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -172,7 +172,7 @@ public class FieldContainerExtractorBaseIT {
 	}
 
 	@Test
-	public void error_invalidContainerExtractorForType() {
+	void error_invalidContainerExtractorForType() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -194,7 +194,7 @@ public class FieldContainerExtractorBaseIT {
 	}
 
 	@Test
-	public void invalidContainerExtractorWithExtractNo() {
+	void invalidContainerExtractorWithExtractNo() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId

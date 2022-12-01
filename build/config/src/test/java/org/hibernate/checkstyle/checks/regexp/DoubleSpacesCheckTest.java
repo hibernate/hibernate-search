@@ -21,10 +21,10 @@ import com.puppycrawl.tools.checkstyle.api.FileText;
 /**
  * @author Davide D'Alto
  */
-public class DoubleSpacesCheckTest {
+class DoubleSpacesCheckTest {
 
 	@Test
-	public void testEmptyString() throws Exception {
+	void testEmptyString() throws Exception {
 		DoubleSpacesCheckMock check = new DoubleSpacesCheckMock();
 		check.setIgnoreStrings( true );
 		check.processLines( Arrays.asList( "" ) );
@@ -33,7 +33,7 @@ public class DoubleSpacesCheckTest {
 	}
 
 	@Test
-	public void testTwoSpaces() throws Exception {
+	void testTwoSpaces() throws Exception {
 		DoubleSpacesCheckMock check = new DoubleSpacesCheckMock();
 		check.setIgnoreStrings( true );
 		check.processLines( Arrays.asList( "  " ) );
@@ -42,7 +42,7 @@ public class DoubleSpacesCheckTest {
 	}
 
 	@Test
-	public void testTwoSpacesInsideString() throws Exception {
+	void testTwoSpacesInsideString() throws Exception {
 		DoubleSpacesCheckMock check = new DoubleSpacesCheckMock();
 		check.setIgnoreStrings( false );
 		check.processLines( Arrays.asList( "\"  \"" ) );
@@ -51,7 +51,7 @@ public class DoubleSpacesCheckTest {
 	}
 
 	@Test
-	public void testTwoSpacesInsideStringWhenStringAreIgnored() throws Exception {
+	void testTwoSpacesInsideStringWhenStringAreIgnored() throws Exception {
 		DoubleSpacesCheckMock check = new DoubleSpacesCheckMock();
 		check.setIgnoreStrings( true );
 		check.processLines( Arrays.asList( "\"  \"" ) );

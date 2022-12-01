@@ -30,7 +30,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * {@code @AnalyzerDiscriminator} from Hibernate Search 5.
  */
 @TestForIssue(jiraKey = "HSEARCH-3311")
-public class AlternativeBinderIT {
+class AlternativeBinderIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -41,7 +41,7 @@ public class AlternativeBinderIT {
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void smoke() {
+	void smoke() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -101,7 +101,7 @@ public class AlternativeBinderIT {
 	}
 
 	@Test
-	public void discriminator_missing() {
+	void discriminator_missing() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -126,7 +126,7 @@ public class AlternativeBinderIT {
 	}
 
 	@Test
-	public void discriminator_conflict() {
+	void discriminator_conflict() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId

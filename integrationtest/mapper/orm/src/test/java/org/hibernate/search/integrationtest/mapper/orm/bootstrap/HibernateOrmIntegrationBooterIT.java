@@ -58,7 +58,7 @@ import org.mockito.quality.Strictness;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
-public class HibernateOrmIntegrationBooterIT {
+class HibernateOrmIntegrationBooterIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -85,7 +85,7 @@ public class HibernateOrmIntegrationBooterIT {
 
 	@Test
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void twoPhaseBoot() throws Exception {
+	void twoPhaseBoot() throws Exception {
 		CompletableFuture<BackendMappingHandle> mappingHandlePromise = new CompletableFuture<>();
 		HibernateOrmIntegrationBooter booter = createBooter( mappingHandlePromise, IndexedEntity.class );
 		Map<String, Object> booterGeneratedProperties = new LinkedHashMap<>();

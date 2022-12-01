@@ -39,7 +39,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * but the main advantage is that associations are essentially ignored by Hibernate Search,
  * sparing developers from using {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide}.
  */
-public class EntityAsTreeSmokeIT {
+class EntityAsTreeSmokeIT {
 
 	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
@@ -63,7 +63,7 @@ public class EntityAsTreeSmokeIT {
 	}
 
 	@Test
-	public void indexAndSearch() {
+	void indexAndSearch() {
 		IndexedEntity indexed1 = new IndexedEntity( "1", "some interesting text" );
 		ContainedEntity containedEntity1_1 = new ContainedEntity( "1_1", "some contained entity text" );
 		containedEntity1_1.containing = indexed1;

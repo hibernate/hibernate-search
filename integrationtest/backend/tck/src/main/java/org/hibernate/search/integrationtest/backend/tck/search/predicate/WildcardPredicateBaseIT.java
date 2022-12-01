@@ -95,7 +95,7 @@ public class WildcardPredicateBaseIT {
 	}
 
 	@Test
-	public void takariCpSuiteWorkaround() {
+	void takariCpSuiteWorkaround() {
 		// Workaround to get Takari-CPSuite to run this test.
 	}
 

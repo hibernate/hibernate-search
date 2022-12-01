@@ -83,7 +83,7 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void byIndexOrder() {
+	void byIndexOrder() {
 		/*
 		 * We don't really know in advance what the index order is, but we want it to be consistent.
 		 * Thus we just test that the order stays the same over several calls.
@@ -103,7 +103,7 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void byDefault_score() {
+	void byDefault_score() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatQuery( scope.query()
@@ -118,7 +118,7 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void byScore() {
+	void byScore() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query;
 
@@ -148,7 +148,7 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void separateSort() {
+	void separateSort() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query;
 
@@ -176,7 +176,7 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void reuseSortInstance_onScopeTargetingSameIndexes() {
+	void reuseSortInstance_onScopeTargetingSameIndexes() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchSort sort = scope
 				.sort().field( "string" ).asc().missing().last().toSort();
@@ -219,7 +219,7 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void reuseSortInstance_onScopeTargetingDifferentIndexes() {
+	void reuseSortInstance_onScopeTargetingDifferentIndexes() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchSort sort = scope
 				.sort().field( "string" ).asc().missing().last().toSort();
@@ -251,7 +251,7 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void extension() {
+	void extension() {
 		SearchQuery<DocumentReference> query;
 
 		// Mandatory extension, supported

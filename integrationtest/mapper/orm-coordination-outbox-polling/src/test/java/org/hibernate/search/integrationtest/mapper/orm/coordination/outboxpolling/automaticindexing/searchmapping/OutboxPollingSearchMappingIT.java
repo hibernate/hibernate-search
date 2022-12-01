@@ -22,7 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class OutboxPollingSearchMappingIT {
+class OutboxPollingSearchMappingIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -47,7 +47,7 @@ public class OutboxPollingSearchMappingIT {
 	}
 
 	@Test
-	public void countAbortedEvents_tenantIdSpecified() {
+	void countAbortedEvents_tenantIdSpecified() {
 		assertThatThrownBy( () -> searchMapping.countAbortedEvents( "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -57,7 +57,7 @@ public class OutboxPollingSearchMappingIT {
 	}
 
 	@Test
-	public void reprocessAbortedEvents_tenantIdSpecified() {
+	void reprocessAbortedEvents_tenantIdSpecified() {
 		assertThatThrownBy( () -> searchMapping.reprocessAbortedEvents( "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -67,7 +67,7 @@ public class OutboxPollingSearchMappingIT {
 	}
 
 	@Test
-	public void clearAllAbortedEvents_tenantIdSpecified() {
+	void clearAllAbortedEvents_tenantIdSpecified() {
 		assertThatThrownBy( () -> searchMapping.clearAllAbortedEvents( "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -77,7 +77,7 @@ public class OutboxPollingSearchMappingIT {
 	}
 
 	@Test
-	public void clearAllAbortedEvents() {
+	void clearAllAbortedEvents() {
 		assertThat( searchMapping.countAbortedEvents() ).isZero();
 
 		abortedEventsGenerator.generateThreeAbortedEvents();
@@ -90,7 +90,7 @@ public class OutboxPollingSearchMappingIT {
 	}
 
 	@Test
-	public void reprocessAbortedEvents() {
+	void reprocessAbortedEvents() {
 		assertThat( searchMapping.countAbortedEvents() ).isZero();
 
 		abortedEventsGenerator.generateThreeAbortedEvents();

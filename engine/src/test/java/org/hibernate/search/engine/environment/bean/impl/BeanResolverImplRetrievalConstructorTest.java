@@ -42,7 +42,7 @@ import org.mockito.quality.Strictness;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
-public class BeanResolverImplRetrievalConstructorTest {
+class BeanResolverImplRetrievalConstructorTest {
 
 	@Mock
 	private ClassResolver classResolverMock;
@@ -91,7 +91,7 @@ public class BeanResolverImplRetrievalConstructorTest {
 	}
 
 	@Test
-	public void resolve_matchingReflection() {
+	void resolve_matchingReflection() {
 		// resolve(Class)
 		assertThat( beanResolver.resolve( ReflectionType1.class, BeanRetrieval.CONSTRUCTOR ) )
 				.extracting( BeanHolder::get ).isInstanceOf( ReflectionType1.class );
@@ -127,7 +127,7 @@ public class BeanResolverImplRetrievalConstructorTest {
 	}
 
 	@Test
-	public void resolve_noMatch() {
+	void resolve_noMatch() {
 		RuntimeException classNotFoundException = new RuntimeException( "cannot find class" );
 
 		// resolve(Class)

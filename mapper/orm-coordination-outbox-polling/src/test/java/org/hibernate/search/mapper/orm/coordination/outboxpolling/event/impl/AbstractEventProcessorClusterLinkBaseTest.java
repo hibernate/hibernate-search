@@ -169,14 +169,14 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 	}
 
 	@Test
-	public void noOtherAgent() {
+	void noOtherAgent() {
 		repositoryMockHelper.defineOtherAgents();
 
 		onNoOtherAgents().verify( link.pulse( contextMock ) );
 	}
 
 	@Test
-	public void clusterWith4Nodes_someExpired() {
+	void clusterWith4Nodes_someExpired() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -194,7 +194,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 	}
 
 	@Test
-	public void clusterWith4Nodes_someSuspended_someWaiting() {
+	void clusterWith4Nodes_someSuspended_someWaiting() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), other1Type(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -207,7 +207,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 	}
 
 	@Test
-	public void clusterWith4Nodes_someSuspended_someRunning() {
+	void clusterWith4Nodes_someSuspended_someRunning() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -220,7 +220,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 	}
 
 	@Test
-	public void clusterWith4Nodes_someWaiting_someRunning() {
+	void clusterWith4Nodes_someWaiting_someRunning() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), other1Type(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -233,7 +233,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 	}
 
 	@Test
-	public void clusterWith4Nodes_someSuspended_someWaiting_someRunning() {
+	void clusterWith4Nodes_someSuspended_someWaiting_someRunning() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), other1Type(), LATER, AgentState.SUSPENDED,
 						isOther1Static() ? otherShardAssignmentIn4NodeCluster( 1 ) : null )
@@ -246,7 +246,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 	}
 
 	@Test
-	public void clusterWith4Nodes_allSuspended() {
+	void clusterWith4Nodes_allSuspended() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), other1Type(), LATER, AgentState.SUSPENDED,
 						isOther1Static() ? otherShardAssignmentIn4NodeCluster( 1 ) : null )
@@ -259,7 +259,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 	}
 
 	@Test
-	public void clusterWith4Nodes_allWaiting() {
+	void clusterWith4Nodes_allWaiting() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), other1Type(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -272,7 +272,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 	}
 
 	@Test
-	public void clusterWith4Nodes_allRunning() {
+	void clusterWith4Nodes_allRunning() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -285,7 +285,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 	}
 
 	@Test
-	public void clusterWith4Nodes_someExpired_massIndexingAgent_running() {
+	void clusterWith4Nodes_someExpired_massIndexingAgent_running() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -305,7 +305,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 	}
 
 	@Test
-	public void clusterWith4Nodes_someSuspended_someRunning_massIndexingAgent_running() {
+	void clusterWith4Nodes_someSuspended_someRunning_massIndexingAgent_running() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -321,7 +321,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 	}
 
 	@Test
-	public void clusterWith4Nodes_allRunning_massIndexingAgent_running() {
+	void clusterWith4Nodes_allRunning_massIndexingAgent_running() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -335,7 +335,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 	}
 
 	@Test
-	public void clusterWith4Nodes_allRunning_massIndexingAgent_suspended() {
+	void clusterWith4Nodes_allRunning_massIndexingAgent_suspended() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -352,7 +352,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 	}
 
 	@Test
-	public void clusterWith4Nodes_allRunning_massIndexingAgent_waiting() {
+	void clusterWith4Nodes_allRunning_massIndexingAgent_waiting() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
@@ -369,7 +369,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 	}
 
 	@Test
-	public void clusterWith4Nodes_allRunning_massIndexingAgent_expired() {
+	void clusterWith4Nodes_allRunning_massIndexingAgent_expired() {
 		repositoryMockHelper.defineOtherAgents()
 				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )

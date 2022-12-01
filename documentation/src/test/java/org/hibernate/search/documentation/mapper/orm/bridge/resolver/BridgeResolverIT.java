@@ -24,7 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class BridgeResolverIT {
+class BridgeResolverIT {
 
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
@@ -42,7 +42,7 @@ public class BridgeResolverIT {
 	}
 
 	@Test
-	public void smoke() {
+	void smoke() {
 		MyProductId book1Id = new MyProductId( "oreilly", "14425" );
 		ISBN book1Isbn = ISBN.parse( "978-0-58-600835-5" );
 		MyProductId book2Id = new MyProductId( "largevue", "84784-484-44" );

@@ -169,7 +169,7 @@ public class MatchPredicateFuzzyIT {
 	}
 
 	@Test
-	public void normalizedStringField() {
+	void normalizedStringField() {
 		String absoluteFieldPath = index.binding().normalizedStringField.relativeFieldName;
 		Function<String, SearchQueryFinalStep<DocumentReference>> createQuery;
 
@@ -218,7 +218,7 @@ public class MatchPredicateFuzzyIT {
 	}
 
 	@Test
-	public void unsupportedFieldType() {
+	void unsupportedFieldType() {
 		SearchPredicateFactory f = index.createScope().predicate();
 
 		for ( FieldTypeDescriptor<?> fieldType : unsupportedFieldTypes ) {
@@ -253,7 +253,7 @@ public class MatchPredicateFuzzyIT {
 	}
 
 	@Test
-	public void invalidMaxEditDistance() {
+	void invalidMaxEditDistance() {
 		SearchPredicateFactory f = index.createScope().predicate();
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 
@@ -271,7 +271,7 @@ public class MatchPredicateFuzzyIT {
 	}
 
 	@Test
-	public void invalidPrefixLength() {
+	void invalidPrefixLength() {
 		SearchPredicateFactory f = index.createScope().predicate();
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 
@@ -283,7 +283,7 @@ public class MatchPredicateFuzzyIT {
 	}
 
 	@Test
-	public void analyzerOverride() {
+	void analyzerOverride() {
 		String whitespaceAnalyzedField = index.binding().whitespaceAnalyzedField.relativeFieldName;
 		String whitespaceLowercaseAnalyzedField = index.binding().whitespaceLowercaseAnalyzedField.relativeFieldName;
 		String whitespaceLowercaseSearchAnalyzedField = index.binding().whitespaceLowercaseSearchAnalyzedField.relativeFieldName;
@@ -319,7 +319,7 @@ public class MatchPredicateFuzzyIT {
 	}
 
 	@Test
-	public void skipAnalysis() {
+	void skipAnalysis() {
 		String absoluteFieldPath = index.binding().whitespaceLowercaseAnalyzedField.relativeFieldName;
 
 		assertThatQuery( index.query()

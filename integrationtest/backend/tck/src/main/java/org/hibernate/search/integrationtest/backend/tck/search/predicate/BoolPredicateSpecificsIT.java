@@ -70,14 +70,14 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void noClause() {
+	void noClause() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool() ) )
 				.hasNoHits();
 	}
 
 	@Test
-	public void must() {
+	void must() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
 						.must( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -100,7 +100,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void must_function() {
+	void must_function() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
 						.must( f2 -> f2.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -109,7 +109,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void must_separatePredicateObject() {
+	void must_separatePredicateObject() {
 		StubMappingScope scope = index.createScope();
 
 		SearchPredicate predicate = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
@@ -120,7 +120,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void should() {
+	void should() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
 						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -136,7 +136,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void should_function() {
+	void should_function() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
 						.should( f2 -> f2.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -146,7 +146,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void should_separatePredicateObject() {
+	void should_separatePredicateObject() {
 		StubMappingScope scope = index.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
@@ -161,7 +161,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void mustNot() {
+	void mustNot() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
 						.mustNot( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -177,7 +177,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void mustNot_function() {
+	void mustNot_function() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
 						.mustNot( f2 -> f2.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -186,7 +186,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void mustNot_separatePredicateObject() {
+	void mustNot_separatePredicateObject() {
 		StubMappingScope scope = index.createScope();
 
 		SearchPredicate predicate = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE2 ).toPredicate();
@@ -199,7 +199,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void filter() {
+	void filter() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
 						.filter( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -222,7 +222,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void filter_function() {
+	void filter_function() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
 						.filter( f2 -> f2.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -231,7 +231,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void filter_separatePredicateObject() {
+	void filter_separatePredicateObject() {
 		StubMappingScope scope = index.createScope();
 
 		SearchPredicate predicate = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
@@ -242,7 +242,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void should_mustNot() {
+	void should_mustNot() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
 						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -253,7 +253,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void must_mustNot() {
+	void must_mustNot() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
 						.must( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -270,7 +270,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void nested() {
+	void nested() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
 						.must( f.bool()
@@ -290,7 +290,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void must_should() {
+	void must_should() {
 		// A boolean predicate with must + should clauses:
 		// documents should match regardless of whether should clauses match.
 
@@ -314,7 +314,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void filter_should() {
+	void filter_should() {
 		// A boolean predicate with filter + should clauses:
 		// documents should match regardless of whether should clauses match.
 
@@ -338,7 +338,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void mustNot_should() {
+	void mustNot_should() {
 		// A boolean predicate with mustNot + should clauses:
 		// documents should match only if at least one should clause matches
 
@@ -364,7 +364,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void with() {
+	void with() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool().with( b -> {
 					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
@@ -395,7 +395,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void minimumShouldMatchNumber_positive() {
+	void minimumShouldMatchNumber_positive() {
 		// Expect default behavior (1 "should" clause has to match)
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
@@ -436,7 +436,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void minimumShouldMatchNumber_negative() {
+	void minimumShouldMatchNumber_negative() {
 		// Expect default behavior (1 "should" clause has to match)
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
@@ -468,7 +468,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void minimumShouldMatchPercent_positive() {
+	void minimumShouldMatchPercent_positive() {
 		// Expect default behavior (1 "should" clause has to match)
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
@@ -509,7 +509,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void minimumShouldMatchPercent_negative() {
+	void minimumShouldMatchPercent_negative() {
 		// Expect default behavior (1 "should" clause has to match)
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
@@ -541,7 +541,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void minimumShouldMatch_multipleConstraints() {
+	void minimumShouldMatch_multipleConstraints() {
 		Consumer<MinimumShouldMatchConditionStep<?>> minimumShouldMatchConstraints = b -> b
 				.ifMoreThan( 2 ).thenRequireNumber( -1 )
 				.ifMoreThan( 4 ).thenRequirePercent( 70 );
@@ -619,7 +619,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void minimumShouldMatch_multipleConstraints_0ceiling() {
+	void minimumShouldMatch_multipleConstraints_0ceiling() {
 		Consumer<MinimumShouldMatchConditionStep<?>> minimumShouldMatchConstraints = b -> b
 				// Test that we can set the "default" minimum by using a ceiling of 0
 				.ifMoreThan( 0 ).thenRequireNumber( 1 )
@@ -657,7 +657,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void minimumShouldMatch_error_negativeCeiling() {
+	void minimumShouldMatch_error_negativeCeiling() {
 		SearchPredicateFactory f = index.createScope().predicate();
 
 		assertThatThrownBy( () -> f.bool().minimumShouldMatch()
@@ -674,7 +674,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void minimumShouldMatch_error_multipleConflictingCeilings() {
+	void minimumShouldMatch_error_multipleConflictingCeilings() {
 		SearchPredicateFactory f = index.createScope().predicate();
 
 		assertThatThrownBy( () -> f.bool().minimumShouldMatch()
@@ -735,7 +735,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void minimumShouldMatch_default_withinFilter_mustNotSibling() {
+	void minimumShouldMatch_default_withinFilter_mustNotSibling() {
 		// Differently from must predicate,
 		// if the should has a sibling must-not inside a filter,
 		// the default minimum should match will be still 1.
@@ -750,7 +750,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	public void minimumShouldMatch_default_withinFilter_filterSibling() {
+	void minimumShouldMatch_default_withinFilter_filterSibling() {
 		// We're following here the Lucene's conventions.
 		// If the should has a sibling filter, even if the should is inside a filter,
 		// the default minimum should match will be 0.

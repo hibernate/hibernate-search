@@ -51,7 +51,7 @@ import org.mockito.quality.Strictness;
  */
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
-public class PojoIndexingPlanBaseIT {
+class PojoIndexingPlanBaseIT {
 
 	@RegisterExtension
 	public final BackendMock backendMock = BackendMock.create();
@@ -84,7 +84,7 @@ public class PojoIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void simple() {
+	void simple() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity( 1 );
 			IndexedEntity entity2 = new IndexedEntity( 2 );
@@ -119,7 +119,7 @@ public class PojoIndexingPlanBaseIT {
 	 * Test the state inside indexing plans.
 	 */
 	@Test
-	public void state() {
+	void state() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity;
 
@@ -191,7 +191,7 @@ public class PojoIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void dirtyPaths_root() {
+	void dirtyPaths_root() {
 		IndexedEntity indexed = new IndexedEntity( 1 );
 
 		// Update with relevant dirty path
@@ -227,7 +227,7 @@ public class PojoIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void dirtyPaths_contained() {
+	void dirtyPaths_contained() {
 		IndexedEntity indexed = new IndexedEntity( 1 );
 		ContainedEntity contained = new ContainedEntity( 2 );
 		indexed.contained = contained;
@@ -286,7 +286,7 @@ public class PojoIndexingPlanBaseIT {
 	 * Test when the entity is null and must be loaded.
 	 */
 	@Test
-	public void nullEntity() {
+	void nullEntity() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity( 1 );
 			IndexedEntity entity2 = new IndexedEntity( 2 );
@@ -323,7 +323,7 @@ public class PojoIndexingPlanBaseIT {
 	 * Test the state inside indexing plans when the entity is null and must be loaded.
 	 */
 	@Test
-	public void nullEntity_state() {
+	void nullEntity_state() {
 		List<Integer> idsToLoad = new ArrayList<>();
 		List<IndexedEntity> loadedEntities = new ArrayList<>();
 
@@ -414,7 +414,7 @@ public class PojoIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void failure() {
+	void failure() {
 		RuntimeException simulatedFailure = new RuntimeException( "Indexing failure" );
 		assertThatThrownBy( () -> {
 			try ( SearchSession session = mapping.createSession() ) {

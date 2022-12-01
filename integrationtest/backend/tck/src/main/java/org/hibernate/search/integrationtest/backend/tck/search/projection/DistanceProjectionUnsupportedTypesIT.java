@@ -58,7 +58,7 @@ public class DistanceProjectionUnsupportedTypesIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void notSupported(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void notSupported(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = getFieldPath( fieldTypeDescriptor );
 

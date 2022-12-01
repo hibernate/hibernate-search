@@ -93,7 +93,7 @@ public class AutomaticIndexingConcurrentModificationInDifferentTypeIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3857")
-	public void updateTriggeringReindexingOfPreviouslyUnknownEntityType() {
+	void updateTriggeringReindexingOfPreviouslyUnknownEntityType() {
 		setupHolder.runInTransaction( session -> {
 			ChildEntity entity1 = session.getReference( ChildEntity.class, 1 );
 			entity1.setName( "updated" );

@@ -39,7 +39,7 @@ public class LuceneIndexRestartFromPreviousIntegrationIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addNewFieldOnExistingIndex(String directoryType) {
+	void addNewFieldOnExistingIndex(String directoryType) {
 		StubMapping mappingV1 = setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY )
 				.withIndex( indexV1 )

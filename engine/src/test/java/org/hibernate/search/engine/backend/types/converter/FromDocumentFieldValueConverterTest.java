@@ -30,10 +30,10 @@ import org.mockito.quality.Strictness;
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("deprecation")
-public class FromDocumentFieldValueConverterTest {
+class FromDocumentFieldValueConverterTest {
 
 	@Test
-	public void fromDocumentFieldValue() {
+	void fromDocumentFieldValue() {
 		BackendSessionContext sessionContextMock = Mockito.mock( BackendSessionContext.class );
 		FromDocumentValueConvertContextImpl convertContext = new FromDocumentValueConvertContextImpl( sessionContextMock );
 
@@ -63,7 +63,7 @@ public class FromDocumentFieldValueConverterTest {
 	}
 
 	@Test
-	public void isCompatibleWith_default() {
+	void isCompatibleWith_default() {
 		class DefaultCompatibilityConverter implements FromDocumentFieldValueConverter<Integer, String> {
 			@Override
 			public String convert(Integer value, FromDocumentFieldValueConvertContext context) {
@@ -81,7 +81,7 @@ public class FromDocumentFieldValueConverterTest {
 	}
 
 	@Test
-	public void isCompatibleWith_custom() {
+	void isCompatibleWith_custom() {
 		class CustomCompatibilityConverter implements FromDocumentFieldValueConverter<Integer, String> {
 			@Override
 			public String convert(Integer value, FromDocumentFieldValueConvertContext context) {

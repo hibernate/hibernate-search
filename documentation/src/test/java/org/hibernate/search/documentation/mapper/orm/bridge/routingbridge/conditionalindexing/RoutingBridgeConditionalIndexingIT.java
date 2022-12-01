@@ -58,7 +58,7 @@ public class RoutingBridgeConditionalIndexingIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void test(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+	void test(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
 		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );

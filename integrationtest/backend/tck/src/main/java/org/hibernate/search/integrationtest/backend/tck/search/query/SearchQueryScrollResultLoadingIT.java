@@ -69,7 +69,7 @@ public class SearchQueryScrollResultLoadingIT {
 	}
 
 	@Test
-	public void resultLoadingOnScrolling() {
+	void resultLoadingOnScrolling() {
 		@SuppressWarnings("unchecked")
 		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
@@ -91,7 +91,7 @@ public class SearchQueryScrollResultLoadingIT {
 	}
 
 	@Test
-	public void resultLoadingOnScrolling_entityLoadingTimeout() {
+	void resultLoadingOnScrolling_entityLoadingTimeout() {
 		@SuppressWarnings("unchecked")
 		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
@@ -115,7 +115,7 @@ public class SearchQueryScrollResultLoadingIT {
 	}
 
 	@Test
-	public void resultLoadingOnScrolling_softTimeout() {
+	void resultLoadingOnScrolling_softTimeout() {
 		@SuppressWarnings("unchecked")
 		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );

@@ -43,14 +43,14 @@ public class MatchAllPredicateSpecificsIT {
 	}
 
 	@Test
-	public void matchAll() {
+	void matchAll() {
 		assertThatQuery( index.query()
 				.where( f -> f.matchAll() ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	@Test
-	public void except() {
+	void except() {
 		assertThatQuery( index.query()
 				.where( f -> f.matchAll().except( c2 -> c2.match().field( "string" ).matching( STRING_1 ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2, DOCUMENT_3 );
@@ -64,7 +64,7 @@ public class MatchAllPredicateSpecificsIT {
 	}
 
 	@Test
-	public void multipleExcepts() {
+	void multipleExcepts() {
 		assertThatQuery( index.query()
 				.where( f -> f.matchAll()
 						.except( f.match().field( "string" ).matching( STRING_1 ) )

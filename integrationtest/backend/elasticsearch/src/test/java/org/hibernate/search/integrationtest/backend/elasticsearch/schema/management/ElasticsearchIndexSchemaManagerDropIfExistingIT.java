@@ -26,7 +26,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 /**
  * Tests related to dropping the index.
  */
-public class ElasticsearchIndexSchemaManagerDropIfExistingIT {
+class ElasticsearchIndexSchemaManagerDropIfExistingIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -41,7 +41,7 @@ public class ElasticsearchIndexSchemaManagerDropIfExistingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3759")
-	public void alreadyExists() {
+	void alreadyExists() {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
@@ -63,7 +63,7 @@ public class ElasticsearchIndexSchemaManagerDropIfExistingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3759")
-	public void doesNotExist() {
+	void doesNotExist() {
 		elasticSearchClient.index( index.name() ).ensureDoesNotExist();
 
 		assertThat( elasticSearchClient.index( index.name() ).exists() ).isFalse();

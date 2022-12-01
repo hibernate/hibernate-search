@@ -32,7 +32,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * using a {@link HibernateSearchContextProviderService}
  * with an {@link EntityManager} owned by a different {@link SessionFactory}.
  */
-public class DifferentSessionFactoriesIT {
+class DifferentSessionFactoriesIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -50,7 +50,7 @@ public class DifferentSessionFactoriesIT {
 	}
 
 	@Test
-	public void tryToUseDifferentSessionFactories() {
+	void tryToUseDifferentSessionFactories() {
 		// mapping is taken from the alternative session factory
 		HibernateSearchContextProviderService contextProvider =
 				sessionFactoryAlt.unwrap( SessionFactoryImplementor.class )

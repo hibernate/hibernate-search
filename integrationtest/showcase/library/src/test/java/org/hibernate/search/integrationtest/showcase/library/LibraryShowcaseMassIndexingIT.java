@@ -55,7 +55,7 @@ public class LibraryShowcaseMassIndexingIT {
 	}
 
 	@Test
-	public void testMassIndexing() {
+	void testMassIndexing() {
 		assertThat( documentService.countIndexed() ).isZero();
 		MassIndexer indexer = adminService.createMassIndexer();
 		try {

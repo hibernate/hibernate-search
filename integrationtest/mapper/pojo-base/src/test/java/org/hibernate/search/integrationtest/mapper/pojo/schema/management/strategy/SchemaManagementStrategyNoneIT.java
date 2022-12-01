@@ -19,7 +19,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.Sta
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SchemaManagementStrategyNoneIT {
+class SchemaManagementStrategyNoneIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -29,7 +29,7 @@ public class SchemaManagementStrategyNoneIT {
 			= StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void none() {
+	void none() {
 		CloseableSearchMapping mapper = setup();
 		// Nothing should have happened
 		backendMock.verifyExpectationsMet();

@@ -29,7 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class StandalonePojoSelectionLoadingIT {
+class StandalonePojoSelectionLoadingIT {
 
 	@RegisterExtension
 	public TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
@@ -82,7 +82,7 @@ public class StandalonePojoSelectionLoadingIT {
 	}
 
 	@Test
-	public void test() throws InterruptedException {
+	void test() throws InterruptedException {
 		try ( SearchSession searchSession = searchMapping.createSession() ) {
 			assertThat( searchSession.search( Book.class )
 					.select( f -> f.id( String.class ) )

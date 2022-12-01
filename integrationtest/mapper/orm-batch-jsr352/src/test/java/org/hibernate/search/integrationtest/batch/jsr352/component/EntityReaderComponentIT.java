@@ -108,7 +108,7 @@ public class EntityReaderComponentIT {
 	}
 
 	@Test
-	public void testReadItem_withoutBoundary() throws Exception {
+	void testReadItem_withoutBoundary() throws Exception {
 		JobContextData jobData = new JobContextData();
 		jobData.setEntityManagerFactory( emf );
 		jobData.setEntityTypeDescriptors( Arrays.asList( JobTestUtil.createSimpleEntityTypeDescriptor( emf, Company.class ) ) );

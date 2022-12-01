@@ -20,7 +20,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 
-public class SchemaManagementStrategyDropAndCreateAndDropIT extends AbstractSchemaManagementStrategyIT {
+class SchemaManagementStrategyDropAndCreateAndDropIT extends AbstractSchemaManagementStrategyIT {
 
 	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
@@ -31,7 +31,7 @@ public class SchemaManagementStrategyDropAndCreateAndDropIT extends AbstractSche
 	}
 
 	@Test
-	public void close_drop_exception_single() {
+	void close_drop_exception_single() {
 		expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
 		expectWork( IndexedEntity2.NAME, CompletableFuture.completedFuture( null ) );
 
@@ -53,7 +53,7 @@ public class SchemaManagementStrategyDropAndCreateAndDropIT extends AbstractSche
 	}
 
 	@Test
-	public void close_drop_exception_multiple() {
+	void close_drop_exception_multiple() {
 		expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
 		expectWork( IndexedEntity2.NAME, CompletableFuture.completedFuture( null ) );
 

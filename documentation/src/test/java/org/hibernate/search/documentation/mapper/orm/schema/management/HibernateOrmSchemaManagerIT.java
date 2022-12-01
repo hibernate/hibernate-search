@@ -24,7 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class HibernateOrmSchemaManagerIT {
+class HibernateOrmSchemaManagerIT {
 
 	private static final int NUMBER_OF_BOOKS = 200;
 	private static final int INIT_DATA_TRANSACTION_SIZE = 100;
@@ -45,7 +45,7 @@ public class HibernateOrmSchemaManagerIT {
 	}
 
 	@Test
-	public void simple() {
+	void simple() {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				// tag::simple[]
@@ -67,7 +67,7 @@ public class HibernateOrmSchemaManagerIT {
 	}
 
 	@Test
-	public void selectType() {
+	void selectType() {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				SearchSession searchSession = Search.session( entityManager );

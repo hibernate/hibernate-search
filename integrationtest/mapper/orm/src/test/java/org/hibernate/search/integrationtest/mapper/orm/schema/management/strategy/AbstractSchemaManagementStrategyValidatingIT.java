@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 public abstract class AbstractSchemaManagementStrategyValidatingIT extends AbstractSchemaManagementStrategyIT {
 
 	@Test
-	public void failure_single() {
+	void failure_single() {
 		expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
 		expectWork( IndexedEntity2.NAME, failureCollector -> {
 			failureCollector.add( "My failure" );
@@ -33,7 +33,7 @@ public abstract class AbstractSchemaManagementStrategyValidatingIT extends Abstr
 	}
 
 	@Test
-	public void failure_multiple() {
+	void failure_multiple() {
 		expectWork( IndexedEntity1.NAME, failureCollector -> {
 			failureCollector.add( "My failure 1" );
 			return CompletableFuture.completedFuture( null );
@@ -53,7 +53,7 @@ public abstract class AbstractSchemaManagementStrategyValidatingIT extends Abstr
 	}
 
 	@Test
-	public void failure_exception() {
+	void failure_exception() {
 		RuntimeException exception = new RuntimeException( "My exception" );
 		expectWork( IndexedEntity1.NAME, failureCollector -> {
 			failureCollector.add( "My failure" );

@@ -40,27 +40,27 @@ public class ObjectProjectionSpecificsIT {
 	}
 
 	@Test
-	public void nullFieldPath() {
+	void nullFieldPath() {
 		assertThatThrownBy( () -> index.createScope().projection().object( null ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'objectFieldPath' must not be null" );
 	}
 
 	@Test
-	public void unknownFieldPath() {
+	void unknownFieldPath() {
 		assertThatThrownBy( () -> index.createScope().projection().object( "unknownField" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unknown field 'unknownField'" );
 	}
 
 	@Test
-	public void nonObjectFieldPath() {
+	void nonObjectFieldPath() {
 		assertThatThrownBy( () -> index.createScope().projection().object( "level1.field1" ) )
 				.hasMessageContainingAll( "Cannot use 'projection:object' on field 'level1.field1'" );
 	}
 
 	@Test
-	public void innerObjectProjectionOnFieldOutsideOuterObjectProjectionFieldTree() {
+	void innerObjectProjectionOnFieldOutsideOuterObjectProjectionFieldTree() {
 		assertThatThrownBy( () -> index.query()
 				.select( f -> f.object( "level1.level2" )
 						.from(
@@ -85,7 +85,7 @@ public class ObjectProjectionSpecificsIT {
 	}
 
 	@Test
-	public void multiValuedObjectField_flattened_unsupported() {
+	void multiValuedObjectField_flattened_unsupported() {
 		assumeTrue(
 				TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForMultiValuedObjectProjection(),
 				"This test is only relevant if the backend relies on nested documents to implement object projections on multi-valued fields"
@@ -101,7 +101,7 @@ public class ObjectProjectionSpecificsIT {
 	}
 
 	@Test
-	public void multiValuedObjectField_singleValuedObjectProjection() {
+	void multiValuedObjectField_singleValuedObjectProjection() {
 		SearchProjectionFactory<?, ?> f = index.createScope().projection();
 		assertThatThrownBy( () -> f.object( "level1" )
 						.from( f.field( "level1.field1" ) )
@@ -118,7 +118,7 @@ public class ObjectProjectionSpecificsIT {
 	}
 
 	@Test
-	public void singleValuedObjectField_effectivelyMultiValuedInContext() {
+	void singleValuedObjectField_effectivelyMultiValuedInContext() {
 		assertThatThrownBy( () -> index.query()
 				.select( f -> f.object( "level1WithSingleValuedLevel2.level2" )
 						.from( f.field( "level1WithSingleValuedLevel2.level2.field1" ) )

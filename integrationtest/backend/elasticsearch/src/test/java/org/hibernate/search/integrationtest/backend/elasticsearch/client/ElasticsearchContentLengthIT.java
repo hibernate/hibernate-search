@@ -65,7 +65,7 @@ import com.google.gson.stream.JsonWriter;
  */
 @TestForIssue(jiraKey = "HSEARCH-2849")
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.client.ElasticsearchContentLengthIT")
-public class ElasticsearchContentLengthIT {
+class ElasticsearchContentLengthIT {
 
 	private static final JsonObject BODY_PART = JsonParser.parseString( "{ \"foo\": \"bar\" }" ).getAsJsonObject();
 
@@ -113,7 +113,7 @@ public class ElasticsearchContentLengthIT {
 	}
 
 	@Test
-	public void tinyPayload() throws Exception {
+	void tinyPayload() throws Exception {
 		wireMockRule.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
@@ -128,7 +128,7 @@ public class ElasticsearchContentLengthIT {
 	}
 
 	@Test
-	public void payloadJustBelowBufferSize() throws Exception {
+	void payloadJustBelowBufferSize() throws Exception {
 		wireMockRule.stubFor( post( urlPathLike( "/myIndex/myType" ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
@@ -149,7 +149,7 @@ public class ElasticsearchContentLengthIT {
 	 * we can "stream" it to the remote cluster, and avoid storing it entirely in memory.
 	 */
 	@Test
-	public void payloadJustAboveBufferSize_noRequestPostProcessing() throws Exception {
+	void payloadJustAboveBufferSize_noRequestPostProcessing() throws Exception {
 		assumeFalse(
 				ElasticsearchTestHostConnectionConfiguration.get().isAws(),
 				"This test only is only relevant if Elasticsearch request are *NOT* post-processed." +
@@ -177,7 +177,7 @@ public class ElasticsearchContentLengthIT {
 	 * we have to store it entirely in memory, so chunked transfer does not make sense.
 	 */
 	@Test
-	public void payloadJustAboveBufferSize_requestPostProcessing() throws Exception {
+	void payloadJustAboveBufferSize_requestPostProcessing() throws Exception {
 		assumeTrue(
 				ElasticsearchTestHostConnectionConfiguration.get().isAws(),
 				"This test only is only relevant if Elasticsearch request are post-processed." +

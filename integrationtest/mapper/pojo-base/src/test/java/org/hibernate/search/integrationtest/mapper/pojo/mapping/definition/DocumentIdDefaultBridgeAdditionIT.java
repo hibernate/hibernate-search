@@ -33,7 +33,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Test adding default identifier bridges so that custom types are supported by the {@code @DocumentId} annotation.
  */
 @TestForIssue(jiraKey = "HSEARCH-3096")
-public class DocumentIdDefaultBridgeAdditionIT {
+class DocumentIdDefaultBridgeAdditionIT {
 	private static final String INDEX_NAME = "indexName";
 
 	@RegisterExtension
@@ -43,7 +43,7 @@ public class DocumentIdDefaultBridgeAdditionIT {
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void exactType() {
+	void exactType() {
 		Consumer<BridgesConfigurationContext> configurer = b -> b.exactType( CustomClass.class )
 				.identifierBridge( new CustomClassBridge() );
 
@@ -56,7 +56,7 @@ public class DocumentIdDefaultBridgeAdditionIT {
 	}
 
 	@Test
-	public void subTypesOf() {
+	void subTypesOf() {
 		Consumer<BridgesConfigurationContext> configurer = b -> b.subTypesOf( CustomClass.class )
 				.identifierBinder( bindingContext -> {
 					Class<?> rawType = bindingContext.bridgedElement().rawType();
@@ -81,7 +81,7 @@ public class DocumentIdDefaultBridgeAdditionIT {
 	}
 
 	@Test
-	public void strictSubTypesOf() {
+	void strictSubTypesOf() {
 		Consumer<BridgesConfigurationContext> configurer = b -> b.strictSubTypesOf( CustomClass.class )
 				.identifierBinder( bindingContext -> {
 					Class<?> rawType = bindingContext.bridgedElement().rawType();

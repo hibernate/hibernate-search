@@ -36,7 +36,7 @@ import org.assertj.core.data.Percentage;
  * where each nodes are assigned a different number of shards (some 1, some 0, some more than 1, ...).
  */
 @TestForIssue(jiraKey = "HSEARCH-4141")
-public class OutboxPollingAutomaticIndexingStaticShardingUnevenShardsIT {
+class OutboxPollingAutomaticIndexingStaticShardingUnevenShardsIT {
 
 	public static final int TOTAL_SHARD_COUNT = 7;
 
@@ -100,7 +100,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingUnevenShardsIT {
 	}
 
 	@Test
-	public void workDistribution() {
+	void workDistribution() {
 		SessionFactory sessionFactory = indexingCountHelper.sessionFactory( 0 );
 
 		int entityCount = 1000;

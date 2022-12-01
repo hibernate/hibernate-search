@@ -57,7 +57,7 @@ public class ReindexOnUpdateNoIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void reindexOnUpdateNo(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+	void reindexOnUpdateNo(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
 		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			for ( int i = 0 ; i < 2000 ; ++i ) {

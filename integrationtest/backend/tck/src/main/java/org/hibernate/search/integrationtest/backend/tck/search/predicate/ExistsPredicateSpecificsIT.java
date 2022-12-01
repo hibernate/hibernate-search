@@ -81,7 +81,7 @@ public class ExistsPredicateSpecificsIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void missing(DataSet<F> dataSet) {
+	void missing(DataSet<F> dataSet) {
 		String fieldPath = mainIndex.binding().fieldWithDefaults.get( dataSet.fieldType ).relativeFieldName;
 
 		assertThatQuery( mainIndex.query()
@@ -96,7 +96,7 @@ public class ExistsPredicateSpecificsIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void withDocValues(DataSet<F> dataSet) {
+	void withDocValues(DataSet<F> dataSet) {
 		assumeDocValuesAllowed( dataSet );
 
 		String fieldPath = mainIndex.binding().fieldWithDocValues.get( dataSet.fieldType ).relativeFieldName;
@@ -109,7 +109,7 @@ public class ExistsPredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void inFlattenedObject_withDocValues(DataSet<F> dataSet) {
+	void inFlattenedObject_withDocValues(DataSet<F> dataSet) {
 		assumeDocValuesAllowed( dataSet );
 
 		String fieldPath = mainIndex.binding().flattenedObject.relativeFieldName + "."
@@ -123,7 +123,7 @@ public class ExistsPredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void inNestedObject_withDocValues(DataSet<F> dataSet) {
+	void inNestedObject_withDocValues(DataSet<F> dataSet) {
 		assumeDocValuesAllowed( dataSet );
 
 		String fieldPath = mainIndex.binding().nestedObject.relativeFieldName + "."
@@ -141,7 +141,7 @@ public class ExistsPredicateSpecificsIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void inNestedPredicate_missing(DataSet<F> dataSet) {
+	void inNestedPredicate_missing(DataSet<F> dataSet) {
 		String fieldPath = mainIndex.binding().nestedObject.relativeFieldName + "."
 				+ mainIndex.binding().nestedObject.fieldWithDefaults.get( dataSet.fieldType ).relativeFieldName;
 
@@ -159,7 +159,7 @@ public class ExistsPredicateSpecificsIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void multiIndex_differentFieldType(DataSet<F> dataSet) {
+	void multiIndex_differentFieldType(DataSet<F> dataSet) {
 		assumeFalse(
 				dataSet.fieldType.equals( AnalyzedStringFieldTypeDescriptor.INSTANCE ),
 				"This test is only relevant if the field type does not use norms"
@@ -185,7 +185,7 @@ public class ExistsPredicateSpecificsIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void multiIndex_differentFieldType_withDocValues(DataSet<F> dataSet) {
+	void multiIndex_differentFieldType_withDocValues(DataSet<F> dataSet) {
 		assumeDocValuesAllowed( dataSet );
 
 		StubMappingScope scope = mainIndex.createScope( differentFieldTypeIndex );

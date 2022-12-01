@@ -137,7 +137,7 @@ public class ToJpaQueryIT {
 	}
 
 	@Test
-	public void toJpaQuery() {
+	void toJpaQuery() {
 		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
@@ -146,7 +146,7 @@ public class ToJpaQueryIT {
 	}
 
 	@Test
-	public void getResultList() {
+	void getResultList() {
 		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
@@ -171,7 +171,7 @@ public class ToJpaQueryIT {
 	}
 
 	@Test
-	public void getSingleResult() {
+	void getSingleResult() {
 		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
@@ -228,7 +228,7 @@ public class ToJpaQueryIT {
 	}
 
 	@Test
-	public void pagination() {
+	void pagination() {
 		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
@@ -255,7 +255,7 @@ public class ToJpaQueryIT {
 	}
 
 	@Test
-	public void timeout_dsl() {
+	void timeout_dsl() {
 		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery(
@@ -281,7 +281,7 @@ public class ToJpaQueryIT {
 	}
 
 	@Test
-	public void timeout_jpaHint() {
+	void timeout_jpaHint() {
 		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
@@ -304,7 +304,7 @@ public class ToJpaQueryIT {
 	}
 
 	@Test
-	public void timeout_override() {
+	void timeout_override() {
 		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery(
@@ -333,7 +333,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graph_jpaHint_fetch() {
+	void graph_jpaHint_fetch() {
 		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
@@ -370,7 +370,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graph_jpaHint_load() {
+	void graph_jpaHint_load() {
 		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
@@ -406,7 +406,7 @@ public class ToJpaQueryIT {
 	}
 
 	@Test
-	public void graph_override_jpaHint() {
+	void graph_override_jpaHint() {
 		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery(

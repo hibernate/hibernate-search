@@ -19,7 +19,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SchemaManagementStrategyNoneIT {
+class SchemaManagementStrategyNoneIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -28,7 +28,7 @@ public class SchemaManagementStrategyNoneIT {
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
-	public void none() {
+	void none() {
 		SessionFactory sessionFactory = setup();
 		// Nothing should have happened
 		backendMock.verifyExpectationsMet();

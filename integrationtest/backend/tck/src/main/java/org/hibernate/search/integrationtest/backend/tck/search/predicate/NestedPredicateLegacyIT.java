@@ -66,7 +66,7 @@ public class NestedPredicateLegacyIT {
 	}
 
 	@Test
-	public void search_nestedOnTwoLevels() {
+	void search_nestedOnTwoLevels() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.bool()
@@ -103,7 +103,7 @@ public class NestedPredicateLegacyIT {
 	}
 
 	@Test
-	public void search_nestedOnTwoLevels_onlySecondLevel() {
+	void search_nestedOnTwoLevels_onlySecondLevel() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.bool()
 						// This is referred to as "condition 1" in the data initialization method
@@ -138,7 +138,7 @@ public class NestedPredicateLegacyIT {
 	}
 
 	@Test
-	public void search_nestedOnTwoLevels_conditionOnFirstLevel() {
+	void search_nestedOnTwoLevels_conditionOnFirstLevel() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.bool()
@@ -166,7 +166,7 @@ public class NestedPredicateLegacyIT {
 	}
 
 	@Test
-	public void search_nestedOnTwoLevels_separatePredicates() {
+	void search_nestedOnTwoLevels_separatePredicates() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().nested().objectField( "nestedObject.nestedObject" )
@@ -207,7 +207,7 @@ public class NestedPredicateLegacyIT {
 	}
 
 	@Test
-	public void invalidNestedPath_parent() {
+	void invalidNestedPath_parent() {
 		String objectFieldPath = "nestedObject";
 		String fieldInParentPath = "string";
 
@@ -233,7 +233,7 @@ public class NestedPredicateLegacyIT {
 	}
 
 	@Test
-	public void invalidNestedPath_sibling() {
+	void invalidNestedPath_sibling() {
 		String objectFieldPath = "nestedObject";
 		String fieldInSiblingPath = "nestedObject2.string";
 

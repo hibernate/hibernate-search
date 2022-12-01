@@ -104,7 +104,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	@ParameterizedTest(name = "Default strategy: {2} - {0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void defaultStrategy(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping,
+	void defaultStrategy(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping,
 			EntityLoadingCacheLookupStrategy defaultCacheLookupStrategy) {
 		init( model, mapping, defaultCacheLookupStrategy );
 		if ( defaultCacheLookupStrategy == null ) {
@@ -128,7 +128,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	@ParameterizedTest(name = "Default strategy: {2} - {0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void overriddenStrategy_skip(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping,
+	void overriddenStrategy_skip(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping,
 			EntityLoadingCacheLookupStrategy defaultCacheLookupStrategy) {
 		init( model, mapping, defaultCacheLookupStrategy );
 		testLoadingCacheLookupExpectingSkipCacheLookup(
@@ -139,7 +139,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	@ParameterizedTest(name = "Default strategy: {2} - {0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void overriddenStrategy_persistenceContext(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping,
+	void overriddenStrategy_persistenceContext(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping,
 			EntityLoadingCacheLookupStrategy defaultCacheLookupStrategy) {
 		init( model, mapping, defaultCacheLookupStrategy );
 		testLoadingCacheLookupExpectingPersistenceContextOnlyLookup(
@@ -150,7 +150,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	@ParameterizedTest(name = "Default strategy: {2} - {0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void overriddenStrategy_2LC(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping,
+	void overriddenStrategy_2LC(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping,
 			EntityLoadingCacheLookupStrategy defaultCacheLookupStrategy) {
 		init( model, mapping, defaultCacheLookupStrategy );
 		testLoadingCacheLookupExpectingSecondLevelCacheLookup(
@@ -161,7 +161,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	@ParameterizedTest(name = "Default strategy: {2} - {0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void overriddenStrategy_skip_fullCacheHits(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping,
+	void overriddenStrategy_skip_fullCacheHits(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping,
 			EntityLoadingCacheLookupStrategy defaultCacheLookupStrategy) {
 		init( model, mapping, defaultCacheLookupStrategy );
 		testLoadingCacheLookup(
@@ -184,7 +184,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	@ParameterizedTest(name = "Default strategy: {2} - {0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void overriddenStrategy_persistenceContext_fullCacheHits(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping,
+	void overriddenStrategy_persistenceContext_fullCacheHits(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping,
 			EntityLoadingCacheLookupStrategy defaultCacheLookupStrategy) {
 		init( model, mapping, defaultCacheLookupStrategy );
 		assumeTrue(
@@ -212,7 +212,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	@ParameterizedTest(name = "Default strategy: {2} - {0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void overriddenStrategy_2LC_fullCacheHits(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping,
+	void overriddenStrategy_2LC_fullCacheHits(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping,
 			EntityLoadingCacheLookupStrategy defaultCacheLookupStrategy) {
 		init( model, mapping, defaultCacheLookupStrategy );
 		assumeTrue(

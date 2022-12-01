@@ -33,7 +33,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
 
-public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT {
+class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT {
 
 	@RegisterExtension
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();

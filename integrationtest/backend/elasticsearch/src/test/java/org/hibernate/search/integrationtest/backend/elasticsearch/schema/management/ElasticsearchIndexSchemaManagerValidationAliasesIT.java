@@ -60,7 +60,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void success_defaultLayoutStrategy(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void success_defaultLayoutStrategy(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
@@ -74,7 +74,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void success_noAliasLayoutStrategy(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void success_noAliasLayoutStrategy(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.indexNoAlias( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
@@ -88,7 +88,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void writeAlias_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void writeAlias_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( defaultPrimaryName( index.name() ), null, defaultReadAlias( index.name() ) )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
@@ -106,7 +106,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void writeAlias_invalid_filter(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void writeAlias_invalid_filter(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
@@ -130,7 +130,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void writeAlias_invalid_isWriteIndex(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void writeAlias_invalid_isWriteIndex(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		assumeFalse(
 				isAtMost( ElasticsearchTestDialect.getActualVersion(), "elastic:6.3" ),
 				"This test only is only relevant for Elasticsearch versions supporting the is_write_index" +
@@ -157,7 +157,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void readAlias_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void readAlias_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( defaultPrimaryName( index.name() ), defaultWriteAlias( index.name() ), null )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
@@ -175,7 +175,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void readAlias_invalid_filter(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void readAlias_invalid_filter(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );

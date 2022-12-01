@@ -29,7 +29,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-public class ElasticsearchCustomLayoutStrategyIT {
+class ElasticsearchCustomLayoutStrategyIT {
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
@@ -37,7 +37,7 @@ public class ElasticsearchCustomLayoutStrategyIT {
 	public TestElasticsearchClient elasticsearchClient = TestElasticsearchClient.create();
 
 	@Test
-	public void smoke() {
+	void smoke() {
 		URLEncodedString primaryIndexName = encodeName( Book.NAME + "-20171106-191900-000000000" );
 		elasticsearchClient.index( primaryIndexName, null, null )
 				.ensureDoesNotExist().registerForCleanup();

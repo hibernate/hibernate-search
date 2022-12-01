@@ -54,7 +54,7 @@ public class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void writeAliasTargetsMultipleIndexes(ElasticsearchIndexSchemaManagerOperation operation) {
+	void writeAliasTargetsMultipleIndexes(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate();
 		// The write alias for index 1 also targets a second index
@@ -76,7 +76,7 @@ public class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void readAliasTargetsMultipleIndexes(ElasticsearchIndexSchemaManagerOperation operation) {
+	void readAliasTargetsMultipleIndexes(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate();
 		// The read alias for index 1 also targets a second index
@@ -98,7 +98,7 @@ public class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void readAndWriteAliasTargetDifferentIndexes(ElasticsearchIndexSchemaManagerOperation operation) {
+	void readAndWriteAliasTargetDifferentIndexes(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate();
 		// The write alias for index 1 actually targets a different index

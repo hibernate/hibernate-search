@@ -49,7 +49,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 //@RunWith(BytecodeEnhancerRunner.class)
 @Disabled("Need to replace `BytecodeEnhancerRunner` runner with a JUnit 5 extension.")
-public class BytecodeEnhancementIT {
+class BytecodeEnhancementIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -108,7 +108,7 @@ public class BytecodeEnhancementIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3581")
-	public void test() {
+	void test() {
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			// This cast is necessary to work around https://hibernate.atlassian.net/browse/HHH-14006

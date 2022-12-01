@@ -21,7 +21,7 @@ import org.hibernate.search.util.impl.test.rule.StaticCounters;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchHttpClientConfigurerIT {
+class ElasticsearchHttpClientConfigurerIT {
 
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
@@ -31,7 +31,7 @@ public class ElasticsearchHttpClientConfigurerIT {
 	public StaticCounters staticCounters = StaticCounters.create();
 
 	@Test
-	public void smoke() {
+	void smoke() {
 		assertThat( staticCounters.get( HttpClientConfigurer.INSTANCES ) ).isZero();
 
 		setupHelper.start()

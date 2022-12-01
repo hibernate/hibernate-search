@@ -25,7 +25,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.Sta
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class IncorrectPropertyNameObjectPathIT {
+class IncorrectPropertyNameObjectPathIT {
 	private static final String BROKEN_PATH_WITH_DOTS = "broken.path.with.dots";
 	@RegisterExtension
 	public BackendMock defaultBackendMock = BackendMock.create();
@@ -37,7 +37,7 @@ public class IncorrectPropertyNameObjectPathIT {
 	);
 
 	@Test
-	public void brokenPathWithDotsThrowsException() {
+	void brokenPathWithDotsThrowsException() {
 		assertThatThrownBy( () -> {
 			setupHelper.start()
 					.withAnnotatedEntityType( Person.class, Person.ENTITY_NAME )

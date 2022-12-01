@@ -29,7 +29,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 /**
  * Test behavior when the index becomes out of sync with the database.
  */
-public class OutOfSyncIndexIT {
+class OutOfSyncIndexIT {
 
 	private static final int NUMBER_OF_BOOKS = 8;
 
@@ -50,7 +50,7 @@ public class OutOfSyncIndexIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void search_skipDeletedEntitiesInHits() {
+	void search_skipDeletedEntitiesInHits() {
 		// Check that document counts are identical
 		int entityCount = entityCount();
 		int indexedEntityCount = BookCreatorUtils.documentsCount( entityManagerFactory ).intValue();

@@ -20,7 +20,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedInde
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class LuceneDocumentModelDslIT {
+class LuceneDocumentModelDslIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -28,7 +28,7 @@ public class LuceneDocumentModelDslIT {
 	private StubMappedIndex index;
 
 	@Test
-	public void unknownAnalyzer() {
+	void unknownAnalyzer() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					ctx.createTypeFactory().asString()
@@ -44,7 +44,7 @@ public class LuceneDocumentModelDslIT {
 	}
 
 	@Test
-	public void unknownNormalizer() {
+	void unknownNormalizer() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					ctx.createTypeFactory().asString()
@@ -60,7 +60,7 @@ public class LuceneDocumentModelDslIT {
 	}
 
 	@Test
-	public void unknownSearchAnalyzer() {
+	void unknownSearchAnalyzer() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					ctx.createTypeFactory().asString()

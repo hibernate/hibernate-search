@@ -23,7 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class IdentifierBridgeOrmContextIT {
+class IdentifierBridgeOrmContextIT {
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
@@ -35,7 +35,7 @@ public class IdentifierBridgeOrmContextIT {
 	}
 
 	@Test
-	public void smoke() {
+	void smoke() {
 		// See MyDataValueBridge
 		entityManagerFactory.getProperties().put( "test.data.indexed", MyData.VALUE1 );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {

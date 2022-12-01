@@ -32,7 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ProjectionConverterIT {
+class ProjectionConverterIT {
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
@@ -45,7 +45,7 @@ public class ProjectionConverterIT {
 	}
 
 	@Test
-	public void projectionConverterEnabled() {
+	void projectionConverterEnabled() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -62,7 +62,7 @@ public class ProjectionConverterIT {
 	}
 
 	@Test
-	public void projectionConverterDisabled() {
+	void projectionConverterDisabled() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 

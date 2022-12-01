@@ -147,7 +147,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void indexing() {
+	void indexing() {
 		SessionFactory sessionFactory = setup();
 
 		String entityName = Book.NAME;
@@ -185,7 +185,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void getId() {
+	void getId() {
 		SessionFactory sessionFactory = setup();
 
 		String entityName = Book.NAME;
@@ -226,7 +226,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void getTitle() {
+	void getTitle() {
 		SessionFactory sessionFactory = setup();
 
 		String entityName = Book.NAME;
@@ -267,7 +267,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void dropAndCreateSchema_exception() {
+	void dropAndCreateSchema_exception() {
 		SessionFactory sessionFactory = setup();
 
 		String exceptionMessage = "DROP_AND_CREATE failure";
@@ -289,7 +289,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void purge() {
+	void purge() {
 		SessionFactory sessionFactory = setup();
 
 		String exceptionMessage = "PURGE failure";
@@ -315,7 +315,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void mergeSegmentsBefore() {
+	void mergeSegmentsBefore() {
 		SessionFactory sessionFactory = setup();
 
 		String exceptionMessage = "MERGE_SEGMENTS failure";
@@ -342,7 +342,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void mergeSegmentsAfter() {
+	void mergeSegmentsAfter() {
 		SessionFactory sessionFactory = setup();
 
 		String exceptionMessage = "MERGE_SEGMENTS failure";
@@ -372,7 +372,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void flush() {
+	void flush() {
 		SessionFactory sessionFactory = setup();
 
 		String exceptionMessage = "FLUSH failure";
@@ -401,7 +401,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void refresh() {
+	void refresh() {
 		SessionFactory sessionFactory = setup();
 
 		String exceptionMessage = "REFRESH failure";
@@ -431,7 +431,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void indexingAndFlush() {
+	void indexingAndFlush() {
 		SessionFactory sessionFactory = setup();
 
 		String entityName = Book.NAME;
@@ -479,7 +479,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void indexingAndRefresh() {
+	void indexingAndRefresh() {
 		SessionFactory sessionFactory = setup();
 
 		String entityName = Book.NAME;

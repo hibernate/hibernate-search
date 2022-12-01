@@ -137,7 +137,7 @@ public class SingleFieldAggregationBaseIT<F> {
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	public void aggregationObject(SupportedSingleFieldAggregationExpectations<F> expectations,
+	void aggregationObject(SupportedSingleFieldAggregationExpectations<F> expectations,
 			TestedFieldStructure fieldStructure, DataSet<F> dataSet) {
 		// Need a separate method to handle the scenario generics
 		doTest_aggregationObject( getSimpleScenario( expectations, fieldStructure ), dataSet, fieldStructure,

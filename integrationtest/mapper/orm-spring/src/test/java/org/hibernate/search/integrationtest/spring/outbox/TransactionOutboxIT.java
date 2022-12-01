@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @ActiveProfiles(profiles = { "outbox" })
-public class TransactionOutboxIT {
+class TransactionOutboxIT {
 
 	@Configuration
 	@EntityScan
@@ -58,7 +58,7 @@ public class TransactionOutboxIT {
 	private HelperService helperService;
 
 	@Test
-	public void persist() {
+	void persist() {
 		Integer id = 1;
 
 		backendMock.expectWorks( IndexedEntity.NAME )

@@ -86,7 +86,7 @@ public class IndexIndexingPlanIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void success(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction, String tenantId) {
+	void success(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction, String tenantId) {
 		init( label, setupStrategyFunction, tenantId );
 		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 
@@ -131,7 +131,7 @@ public class IndexIndexingPlanIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void discard(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction, String tenantId) {
+	void discard(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction, String tenantId) {
 		init( label, setupStrategyFunction, tenantId );
 		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 
@@ -152,7 +152,7 @@ public class IndexIndexingPlanIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void add_failure(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction, String tenantId) {
+	void add_failure(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction, String tenantId) {
 		init( label, setupStrategyFunction, tenantId );
 		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
@@ -178,7 +178,7 @@ public class IndexIndexingPlanIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addOrUpdate_failure(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction, String tenantId) {
+	void addOrUpdate_failure(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction, String tenantId) {
 		init( label, setupStrategyFunction, tenantId );
 
 		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
@@ -205,7 +205,7 @@ public class IndexIndexingPlanIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void delete_failure(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction, String tenantId) {
+	void delete_failure(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction, String tenantId) {
 		init( label, setupStrategyFunction, tenantId );
 
 		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );

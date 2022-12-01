@@ -35,7 +35,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * for all schema management operations that create missing indexes but leave existing indexes as-is.
  */
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchSchemaCreateStrategyIT")
-public class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
+class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 
 	public static List<? extends Arguments> params() {
 		return ElasticsearchIndexSchemaManagerOperation.creatingOrPreserving().stream()
@@ -57,7 +57,7 @@ public class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-2789")
-	public void alreadyExists(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
+	void alreadyExists(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
@@ -101,7 +101,7 @@ public class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-2789")
-	public void doesNotExist(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
+	void doesNotExist(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 

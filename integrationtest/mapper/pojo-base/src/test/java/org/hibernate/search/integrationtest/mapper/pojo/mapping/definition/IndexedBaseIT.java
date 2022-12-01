@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 @SuppressWarnings("unused")
-public class IndexedBaseIT {
+class IndexedBaseIT {
 
 	@RegisterExtension
 	public BackendMock defaultBackendMock = BackendMock.create();
@@ -67,7 +67,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3705")
-	public void implicitIndexName_defaultEntityName() {
+	void implicitIndexName_defaultEntityName() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -86,7 +86,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3705")
-	public void implicitIndexName_explicitEntityName() {
+	void implicitIndexName_explicitEntityName() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -108,7 +108,7 @@ public class IndexedBaseIT {
 	}
 
 	@Test
-	public void explicitIndexName() {
+	void explicitIndexName() {
 		@Indexed(index = "explicitIndexName")
 		class IndexedEntity {
 			@DocumentId
@@ -126,7 +126,7 @@ public class IndexedBaseIT {
 	}
 
 	@Test
-	public void nonDefaultBackend() {
+	void nonDefaultBackend() {
 		@Indexed(index = "index", backend = "backend2")
 		class IndexedEntity {
 			@DocumentId
@@ -144,7 +144,7 @@ public class IndexedBaseIT {
 	}
 
 	@Test
-	public void multiBackend() {
+	void multiBackend() {
 		@Indexed(index = "index1", backend = "backend2")
 		class IndexedEntity1 {
 			@DocumentId
@@ -173,7 +173,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1231")
-	public void inheritance() {
+	void inheritance() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -206,7 +206,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1231")
-	public void inheritance_abstract() {
+	void inheritance_abstract() {
 		@Indexed
 		abstract class AbstractIndexedEntity {
 			@DocumentId
@@ -248,7 +248,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1231")
-	public void inheritance_abstract_subclass() {
+	void inheritance_abstract_subclass() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -301,7 +301,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1231")
-	public void inheritance_disabled() {
+	void inheritance_disabled() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -331,7 +331,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1231")
-	public void inheritance_explicitAttributes() {
+	void inheritance_explicitAttributes() {
 		@Indexed(backend = "backend2", index = "parentClassIndex")
 		class IndexedEntity {
 			@DocumentId
@@ -365,7 +365,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1231")
-	public void inheritance_override_backend() {
+	void inheritance_override_backend() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -399,7 +399,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1231")
-	public void inheritance_override_index() {
+	void inheritance_override_index() {
 		@Indexed(index = "parentClassIndex")
 		class IndexedEntity {
 			@DocumentId
@@ -432,7 +432,7 @@ public class IndexedBaseIT {
 	}
 
 	@Test
-	public void error_indexedWithoutEntityMetadata() {
+	void error_indexedWithoutEntityMetadata() {
 		@Indexed
 		class IndexedWithoutEntityMetadata {
 			@DocumentId
@@ -459,7 +459,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void routingBinder() {
+	void routingBinder() {
 		@Indexed(routingBinder = @RoutingBinderRef(type = StaticCounterRoutingBinder.class))
 		class IndexedEntity {
 			@DocumentId
@@ -476,7 +476,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void routingBinder_failure() {
+	void routingBinder_failure() {
 		@Indexed(routingBinder = @RoutingBinderRef(type = FailingRoutingBinder.class))
 		class IndexedEntity {
 			@DocumentId
@@ -491,7 +491,7 @@ public class IndexedBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4006")
-	public void moreTypesTargetSameIndex() {
+	void moreTypesTargetSameIndex() {
 		@Indexed(index = "indexName")
 		class IndexedEntityA {
 			@DocumentId

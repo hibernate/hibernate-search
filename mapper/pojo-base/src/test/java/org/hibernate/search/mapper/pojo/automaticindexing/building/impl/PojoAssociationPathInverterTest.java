@@ -41,7 +41,7 @@ import org.mockito.quality.Strictness;
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class PojoAssociationPathInverterTest {
+class PojoAssociationPathInverterTest {
 
 	@Mock
 	private PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProviderMock;
@@ -49,7 +49,7 @@ public class PojoAssociationPathInverterTest {
 	private ContainerExtractorBinder extractorBinderMock;
 
 	@Test
-	public void detectInfiniteRecursion() {
+	void detectInfiniteRecursion() {
 		String originalSidePropertyName = "originalSideProperty";
 		String inverseSideProperty1Name = "inverseSideProperty1";
 		String inverseSideProperty2Name = "inverseSideProperty2";

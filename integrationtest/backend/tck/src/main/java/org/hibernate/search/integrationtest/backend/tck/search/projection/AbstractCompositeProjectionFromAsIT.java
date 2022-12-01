@@ -73,7 +73,7 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 	}
 
 	@Test
-	public void takariCpSuiteWorkaround() {
+	void takariCpSuiteWorkaround() {
 		// Workaround to get Takari-CPSuite to run this test.
 	}
 

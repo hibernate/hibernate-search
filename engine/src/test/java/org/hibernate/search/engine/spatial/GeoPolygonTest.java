@@ -13,10 +13,10 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-public class GeoPolygonTest {
+class GeoPolygonTest {
 
 	@Test
-	public void validPolygon() {
+	void validPolygon() {
 		GeoPolygon polygon = GeoPolygon.of( GeoPoint.of( 26, 23 ), GeoPoint.of( 26, 26 ), GeoPoint.of( 24, 26 ),
 				GeoPoint.of( 24, 23 ), GeoPoint.of( 26, 23 ) );
 		assertThat( polygon ).isNotNull();
@@ -27,7 +27,7 @@ public class GeoPolygonTest {
 	}
 
 	@Test
-	public void invalidPolygon() {
+	void invalidPolygon() {
 		assertThatThrownBy(
 				() -> GeoPolygon.of(
 						GeoPoint.of( 26, 23 ),

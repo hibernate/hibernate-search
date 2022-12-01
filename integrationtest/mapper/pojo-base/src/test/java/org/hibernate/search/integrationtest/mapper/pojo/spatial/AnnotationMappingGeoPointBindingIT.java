@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 
-public class AnnotationMappingGeoPointBindingIT {
+class AnnotationMappingGeoPointBindingIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -67,7 +67,7 @@ public class AnnotationMappingGeoPointBindingIT {
 	}
 
 	@Test
-	public void index() {
+	void index() {
 		try ( SearchSession session = mapping.createSession() ) {
 			GeoPointOnTypeEntity entity1 = new GeoPointOnTypeEntity();
 			entity1.id = 1;

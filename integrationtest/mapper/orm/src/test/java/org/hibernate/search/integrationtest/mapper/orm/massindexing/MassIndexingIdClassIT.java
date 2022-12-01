@@ -64,7 +64,7 @@ public class MassIndexingIdClassIT {
 	}
 
 	@Test
-	public void defaultMassIndexerStartAndWait() throws Exception {
+	void defaultMassIndexerStartAndWait() throws Exception {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();

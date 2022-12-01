@@ -28,7 +28,7 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
 
-public class LuceneQueryDslIT {
+class LuceneQueryDslIT {
 
 	private static final int BOOK1_ID = 1;
 	private static final int BOOK2_ID = 2;
@@ -48,7 +48,7 @@ public class LuceneQueryDslIT {
 	}
 
 	@Test
-	public void explain() {
+	void explain() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::explain-lucene[]
@@ -74,7 +74,7 @@ public class LuceneQueryDslIT {
 	}
 
 	@Test
-	public void lowLevel() {
+	void lowLevel() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::lucene-lowLevel[]

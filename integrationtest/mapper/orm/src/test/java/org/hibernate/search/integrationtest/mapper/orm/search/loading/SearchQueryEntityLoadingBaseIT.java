@@ -86,7 +86,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	 */
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
-	public void simple(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void simple(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		init( model, mapping );
 		final int entityCount = 3;
 
@@ -103,7 +103,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
-	public void simple_withVeryLargeTimeout(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void simple_withVeryLargeTimeout(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		init( model, mapping );
 		final int entityCount = 3;
 
@@ -121,7 +121,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
-	public void simple_entityLoadingTimeout(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void simple_entityLoadingTimeout(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		init( model, mapping );
 		final int entityCount = 3;
 
@@ -148,7 +148,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void notFound(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void notFound(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		init( model, mapping );
 		persistThatManyEntities( 2 );
 
@@ -172,7 +172,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	 */
 	@ParameterizedTest(name = "{0}, {1}")
 	@MethodSource("params")
-	public void initializeProxyFromPersistenceContext(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+	void initializeProxyFromPersistenceContext(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		init( model, mapping );
 		final int entityCount = 10;
 

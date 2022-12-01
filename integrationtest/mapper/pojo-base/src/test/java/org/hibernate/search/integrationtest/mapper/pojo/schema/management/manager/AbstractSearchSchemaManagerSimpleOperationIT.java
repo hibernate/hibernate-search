@@ -49,7 +49,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	}
 
 	@Test
-	public void success_fromMapping_single() {
+	void success_fromMapping_single() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchSchemaManager manager = searchSession
 					.scope( IndexedEntity1.class )
@@ -61,7 +61,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	}
 
 	@Test
-	public void success_fromMapping_all() {
+	void success_fromMapping_all() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchSchemaManager manager = searchSession
 					.scope( Object.class )
@@ -74,7 +74,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	}
 
 	@Test
-	public void success_fromSession_single() {
+	void success_fromSession_single() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchSchemaManager manager = searchSession
 					.schemaManager( IndexedEntity1.class );
@@ -85,7 +85,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	}
 
 	@Test
-	public void success_fromSession_all() {
+	void success_fromSession_all() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchSchemaManager manager = searchSession
 					.schemaManager();
@@ -97,7 +97,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	}
 
 	@Test
-	public void exception_single() {
+	void exception_single() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchSchemaManager manager = searchSession
 					.scope( Object.class )
@@ -116,7 +116,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 	}
 
 	@Test
-	public void exception_multiple() {
+	void exception_multiple() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchSchemaManager manager = searchSession
 					.scope( Object.class )

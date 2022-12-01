@@ -35,7 +35,7 @@ import org.apache.lucene.search.QueryCachingPolicy;
 import org.apache.lucene.search.Weight;
 import org.apache.lucene.util.Version;
 
-public class LuceneQueryCacheConfigurerIT {
+class LuceneQueryCacheConfigurerIT {
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
@@ -43,7 +43,7 @@ public class LuceneQueryCacheConfigurerIT {
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@Test
-	public void error_failingQueryCacheConfigurer() {
+	void error_failingQueryCacheConfigurer() {
 		setup( FailingQueryCacheConfigurer.class.getName() );
 		initData( 10 );
 
@@ -68,7 +68,7 @@ public class LuceneQueryCacheConfigurerIT {
 	}
 
 	@Test
-	public void error_failingQueryCachingPolicyConfigurer() {
+	void error_failingQueryCachingPolicyConfigurer() {
 		setup( FailingCachePolicyExceptionQueryCacheConfigurer.class.getName() );
 		initData( 10 );
 

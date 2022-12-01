@@ -19,7 +19,7 @@ public class SpatialWithinCirclePredicateSpecificsIT extends AbstractSpatialWith
 	private static final GeoPoint METRO_GARIBALDI = GeoPoint.of( 45.7515926, 4.8514779 );
 
 	@Test
-	public void matchMultipleDocuments() {
+	void matchMultipleDocuments() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.spatial().within()
 						.field( "geoPoint" )

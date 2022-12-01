@@ -40,7 +40,7 @@ public class FieldSortScaledSpecificsIT {
 	}
 
 	@Test
-	public void incompatibleDecimalScale() {
+	void incompatibleDecimalScale() {
 		StubMappingScope scope = mainIndex.createScope( incompatibleDecimalScaleIndex );
 
 		String fieldPath = "scaledBigDecimal";

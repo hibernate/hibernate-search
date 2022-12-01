@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-4141")
-public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT {
+class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -36,7 +36,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
 	@Test
-	public void totalCount_missing() {
+	void totalCount_missing() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.shards.assigned", "0" ) ) )
 				.isInstanceOf( SearchException.class )
@@ -46,7 +46,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 	}
 
 	@Test
-	public void totalCount_zero() {
+	void totalCount_zero() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "0" ) ) )
 				.isInstanceOf( SearchException.class )
@@ -56,7 +56,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 	}
 
 	@Test
-	public void totalCount_negative() {
+	void totalCount_negative() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "-1" ) ) )
 				.isInstanceOf( SearchException.class )
@@ -66,7 +66,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 	}
 
 	@Test
-	public void assigned_missing() {
+	void assigned_missing() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "10" ) ) )
 				.isInstanceOf( SearchException.class )
@@ -76,7 +76,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 	}
 
 	@Test
-	public void assigned_negative() {
+	void assigned_negative() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "10" )
 				.withProperty( "hibernate.search.coordination.event_processor.shards.assigned", "-1" ) ) )
@@ -88,7 +88,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 	}
 
 	@Test
-	public void assigned_equalToTotalCount() {
+	void assigned_equalToTotalCount() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "10" )
 				.withProperty( "hibernate.search.coordination.event_processor.shards.assigned", "10" ) ) )
@@ -101,7 +101,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 	}
 
 	@Test
-	public void assigned_greaterThanTotalCount() {
+	void assigned_greaterThanTotalCount() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "10" )
 				.withProperty( "hibernate.search.coordination.event_processor.shards.assigned", "11" ) ) )

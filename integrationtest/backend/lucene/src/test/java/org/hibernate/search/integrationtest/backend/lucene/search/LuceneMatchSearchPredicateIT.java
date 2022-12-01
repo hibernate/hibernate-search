@@ -20,7 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class LuceneMatchSearchPredicateIT {
+class LuceneMatchSearchPredicateIT {
 
 	private static final String TEST_TERM = "ThisWillBeLowercasedByTheNormalizer";
 
@@ -36,7 +36,7 @@ public class LuceneMatchSearchPredicateIT {
 	}
 
 	@Test
-	public void match_skipAnalysis_normalizedStringField() {
+	void match_skipAnalysis_normalizedStringField() {
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.match().field( "normalizedStringField" ).matching( TEST_TERM ) )
 				.toQuery();

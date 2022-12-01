@@ -59,7 +59,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	}
 
 	@Test
-	public void directMultiValuedAssociationUpdate_indexedEmbedded() {
+	void directMultiValuedAssociationUpdate_indexedEmbedded() {
 		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedIndexedEmbedded();
 		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbedded();
 		PropertyAccessor<TContained, String> field = _contained().indexedField();
@@ -871,7 +871,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	}
 
 	@Test
-	public void indirectMultiValuedAssociationUpdate_indexedEmbedded() {
+	void indirectMultiValuedAssociationUpdate_indexedEmbedded() {
 		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedIndexedEmbedded();
 		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbedded();
 		PropertyAccessor<TContained, String> field = _contained().indexedField();

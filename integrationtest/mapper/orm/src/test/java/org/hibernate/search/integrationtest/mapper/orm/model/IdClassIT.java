@@ -29,7 +29,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 /**
  * Tests behavior when an entity uses {@link javax.persistence.IdClass},
  */
-public class IdClassIT {
+class IdClassIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -40,7 +40,7 @@ public class IdClassIT {
 	// This used to fail with an NPE at bootstrap
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3874")
-	public void idClass_indexed() {
+	void idClass_indexed() {
 		assertThatThrownBy( () -> ormSetupHelper.start().setup( IdClassIndexed.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -55,7 +55,7 @@ public class IdClassIT {
 	// This used to fail with an NPE at bootstrap
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3874")
-	public void idClass_nonIndexed() {
+	void idClass_nonIndexed() {
 		backendMock.expectAnySchema( NonIdClassIndexed.NAME );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
@@ -76,7 +76,7 @@ public class IdClassIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4025")
-	public void idClass_indexed_WithDocumentId() {
+	void idClass_indexed_WithDocumentId() {
 		backendMock.expectAnySchema( IdClassIndexedWithDocumentId.NAME );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()

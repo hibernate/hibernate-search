@@ -57,7 +57,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void fetch_failAfter_slowQuery_smallTimeout() {
+	void fetch_failAfter_slowQuery_smallTimeout() {
 		SearchQuery<DocumentReference> query = startSlowQuery()
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
@@ -68,7 +68,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void fetchTotalHitCount_failAfter_slowQuery_smallTimeout() {
+	void fetchTotalHitCount_failAfter_slowQuery_smallTimeout() {
 		SearchQuery<DocumentReference> query = startSlowQuery()
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
@@ -79,7 +79,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void scroll_failAfter_slowQuery_smallTimeout() {
+	void scroll_failAfter_slowQuery_smallTimeout() {
 		SearchQuery<DocumentReference> query = startSlowQuery()
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
@@ -92,7 +92,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void fetch_truncateAfter_slowQuery_smallTimeout() {
+	void fetch_truncateAfter_slowQuery_smallTimeout() {
 		SearchResult<DocumentReference> result = startSlowQuery()
 				.truncateAfter( 1, TimeUnit.NANOSECONDS )
 				.fetch( 20 );
@@ -112,7 +112,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void scroll_truncateAfter_slowQuery_smallTimeout() {
+	void scroll_truncateAfter_slowQuery_smallTimeout() {
 		assumeTrue(
 				TckConfiguration.get().getBackendFeatures().supportsTruncateAfterForScroll(),
 				"The backend doesn't support truncateAfter() on scrolls"
@@ -134,7 +134,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void fetch_failAfter_fastQuery_largeTimeout() {
+	void fetch_failAfter_fastQuery_largeTimeout() {
 		SearchResult<DocumentReference> result = startFastQuery()
 				.failAfter( 1, TimeUnit.DAYS )
 				.fetch( 20 );
@@ -146,7 +146,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void fetchTotalHitCount_failAfter_fastQuery_largeTimeout() {
+	void fetchTotalHitCount_failAfter_fastQuery_largeTimeout() {
 		SearchQuery<DocumentReference> query = startFastQuery()
 				.failAfter( 1, TimeUnit.DAYS )
 				.toQuery();
@@ -155,7 +155,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void scroll_failAfter_fastQuery_largeTimeout() {
+	void scroll_failAfter_fastQuery_largeTimeout() {
 		SearchQuery<DocumentReference> query = startFastQuery()
 				.failAfter( 1, TimeUnit.DAYS )
 				.toQuery();
@@ -172,7 +172,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void fetch_truncateAfter_fastQuery_largeTimeout() {
+	void fetch_truncateAfter_fastQuery_largeTimeout() {
 		SearchResult<DocumentReference> result = startFastQuery()
 				.truncateAfter( 1, TimeUnit.DAYS )
 				.fetch( 20 );
@@ -182,7 +182,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void scroll_truncateAfter_fastQuery_largeTimeout() {
+	void scroll_truncateAfter_fastQuery_largeTimeout() {
 		SearchQuery<DocumentReference> query = startFastQuery()
 				.truncateAfter( 1, TimeUnit.DAYS )
 				.toQuery();

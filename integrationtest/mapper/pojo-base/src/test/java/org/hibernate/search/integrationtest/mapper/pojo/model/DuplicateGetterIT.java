@@ -27,7 +27,7 @@ import org.apache.logging.log4j.Level;
  * Test models with multiple getters for the same property.
  */
 @TestForIssue(jiraKey = "HSEARCH-4117")
-public class DuplicateGetterIT {
+class DuplicateGetterIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -40,7 +40,7 @@ public class DuplicateGetterIT {
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
-	public void duplicateGetter_unmapped() {
+	void duplicateGetter_unmapped() {
 		final String indexName = "indexName";
 		@Indexed(index = indexName)
 		class IndexedEntity {
@@ -69,7 +69,7 @@ public class DuplicateGetterIT {
 	}
 
 	@Test
-	public void duplicateGetter_mapped() {
+	void duplicateGetter_mapped() {
 		final String indexName = "indexName";
 		@Indexed(index = indexName)
 		class IndexedEntity {

@@ -23,7 +23,7 @@ public abstract class AbstractPredicateArgumentCheckingIT {
 
 	@ParameterizedTest(name = "{1}")
 	@MethodSource("params")
-	public void nullMatchingParam(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?> fieldType) {
+	void nullMatchingParam(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?> fieldType) {
 		SearchPredicateFactory f = index.createScope().predicate();
 
 		assertThatThrownBy( () -> tryPredicateWithNullMatchingParam( f, fieldPath( index, fieldType ) ) )

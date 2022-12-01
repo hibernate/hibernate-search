@@ -63,7 +63,7 @@ public class LuceneCleanupIT {
 
 	@ParameterizedTest(name = "commit_interval {0}, refresh_interval {0}")
 	@MethodSource("params")
-	public void test(Integer commitInterval, Integer refreshInterval) {
+	void test(Integer commitInterval, Integer refreshInterval) {
 		OpenResourceTracker tracker = new OpenResourceTracker();
 		StubMapping mapping = setup( tracker, commitInterval, refreshInterval );
 

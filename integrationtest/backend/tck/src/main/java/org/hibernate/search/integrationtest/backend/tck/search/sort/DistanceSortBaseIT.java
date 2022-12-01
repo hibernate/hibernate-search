@@ -112,7 +112,7 @@ public class DistanceSortBaseIT {
 
 	@ParameterizedTest(name = "{0} - {2} - {1}")
 	@MethodSource("params")
-	public void simple(TestedFieldStructure fieldStructure, SortMode sortMode,
+	void simple(TestedFieldStructure fieldStructure, SortMode sortMode,
 			DataSet dataSetForAsc, DataSet dataSetForDesc) {
 		assumeTestParametersWork( sortMode, fieldStructure );
 
@@ -170,7 +170,7 @@ public class DistanceSortBaseIT {
 
 	@ParameterizedTest(name = "{0} - {2} - {1}")
 	@MethodSource("params")
-	public void missingValue_explicit(TestedFieldStructure fieldStructure, SortMode sortMode,
+	void missingValue_explicit(TestedFieldStructure fieldStructure, SortMode sortMode,
 			DataSet dataSetForAsc, DataSet dataSetForDesc) {
 		assumeTestParametersWork( sortMode, fieldStructure );
 

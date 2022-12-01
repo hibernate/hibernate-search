@@ -52,7 +52,7 @@ public class CompositeSortIT {
 	}
 
 	@Test
-	public void byComposite() {
+	void byComposite() {
 		SearchQuery<DocumentReference> query;
 
 		query = simpleQuery( f -> f.composite( c -> {
@@ -85,7 +85,7 @@ public class CompositeSortIT {
 	}
 
 	@Test
-	public void byComposite_separateSort() {
+	void byComposite_separateSort() {
 		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query;
 
@@ -131,7 +131,7 @@ public class CompositeSortIT {
 	}
 
 	@Test
-	public void byComposite_empty() {
+	void byComposite_empty() {
 		SearchQuery<DocumentReference> query;
 
 		query = simpleQuery( f -> f.composite() );
@@ -142,7 +142,7 @@ public class CompositeSortIT {
 	}
 
 	@Test
-	public void then() {
+	void then() {
 		SearchQuery<DocumentReference> query;
 
 		query = simpleQuery( f -> f
@@ -175,7 +175,7 @@ public class CompositeSortIT {
 	}
 
 	@Test
-	public void then_flattened_nested() {
+	void then_flattened_nested() {
 		SearchQuery<DocumentReference> query;
 
 		String normalField = index.binding().identicalForFirstTwo.relativeFieldName;
@@ -219,7 +219,7 @@ public class CompositeSortIT {
 	}
 
 	@Test
-	public void then_flattened_nested_limit2() {
+	void then_flattened_nested_limit2() {
 		SearchQuery<DocumentReference> query;
 
 		String normalField = index.binding().identicalForFirstTwo.relativeFieldName;
@@ -240,7 +240,7 @@ public class CompositeSortIT {
 	}
 
 	@Test
-	public void then_flattened_nested_filterByPredicate() {
+	void then_flattened_nested_filterByPredicate() {
 		SearchQuery<DocumentReference> query;
 
 		String normalField = index.binding().identicalForFirstTwo.relativeFieldName;

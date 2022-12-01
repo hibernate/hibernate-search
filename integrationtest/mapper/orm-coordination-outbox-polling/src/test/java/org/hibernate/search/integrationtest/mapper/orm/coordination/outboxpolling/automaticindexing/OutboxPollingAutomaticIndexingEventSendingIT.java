@@ -92,7 +92,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 	}
 
 	@Test
-	public void insertUpdateDelete_indexed() {
+	void insertUpdateDelete_indexed() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
 			session.persist( indexedPojo );
@@ -132,7 +132,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
-	public void insertUpdateDelete_contained() {
+	void insertUpdateDelete_contained() {
 		setupHolder.runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			ContainedEntity contained = new ContainedEntity( 2, "initial" );
@@ -182,7 +182,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
-	public void insertUpdateDelete_indexedAndContained() {
+	void insertUpdateDelete_indexedAndContained() {
 		setupHolder.runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			IndexedAndContainedEntity indexedAndContained = new IndexedAndContainedEntity( 2, "initial" );
@@ -231,7 +231,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
-	public void updateIndexedEmbeddedField_contained() {
+	void updateIndexedEmbeddedField_contained() {
 		setupHolder.runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			ContainedEntity contained = new ContainedEntity( 2, "initial" );
@@ -275,7 +275,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
-	public void updateIndexedEmbeddedField_indexedAndContained() {
+	void updateIndexedEmbeddedField_indexedAndContained() {
 		setupHolder.runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			IndexedAndContainedEntity contained = new IndexedAndContainedEntity( 2, "initial" );
@@ -328,7 +328,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
-	public void updateNonIndexedEmbeddedField_contained() {
+	void updateNonIndexedEmbeddedField_contained() {
 		setupHolder.runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			ContainedEntity contained = new ContainedEntity( 2, "initial" );
@@ -372,7 +372,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
-	public void updateNonIndexedEmbeddedField_indexedAndContained() {
+	void updateNonIndexedEmbeddedField_indexedAndContained() {
 		setupHolder.runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			IndexedAndContainedEntity contained = new IndexedAndContainedEntity( 2, "initial" );
@@ -424,7 +424,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 	}
 
 	@Test
-	public void multipleInstances() {
+	void multipleInstances() {
 		for ( int i = 1; i <= 7; i++ ) {
 			IndexedEntity indexedPojo = new IndexedEntity( i, "Using some text here" );
 			setupHolder.runInTransaction( session -> {
@@ -443,7 +443,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 	}
 
 	@Test
-	public void multipleTypes() {
+	void multipleTypes() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
 			session.persist( indexedPojo );
@@ -464,7 +464,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 	}
 
 	@Test
-	public void routingKeys() {
+	void routingKeys() {
 		setupHolder.runInTransaction( session -> {
 			RoutedIndexedEntity indexedPojo = new RoutedIndexedEntity( 1, "Using some text here",
 					RoutedIndexedEntity.Status.FIRST );

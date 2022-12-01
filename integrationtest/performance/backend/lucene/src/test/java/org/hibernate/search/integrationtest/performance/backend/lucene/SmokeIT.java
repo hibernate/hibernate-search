@@ -21,10 +21,10 @@ import org.openjdk.jmh.runner.options.TimeValue;
  * <p>
  * See README to know how to run the benchmark from the command line to obtain more reliable results.
  */
-public class SmokeIT {
+class SmokeIT {
 
 	@Test
-	public void test() throws RunnerException {
+	void test() throws RunnerException {
 		Options opts = new OptionsBuilder()
 				.include( ".*" )
 				.warmupIterations( 0 )

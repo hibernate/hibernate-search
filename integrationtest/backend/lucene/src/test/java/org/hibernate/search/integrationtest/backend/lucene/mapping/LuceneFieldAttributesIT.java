@@ -32,7 +32,7 @@ import org.apache.lucene.analysis.payloads.TokenOffsetPayloadTokenFilterFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 
-public class LuceneFieldAttributesIT {
+class LuceneFieldAttributesIT {
 
 	private static final String ANALYZER_NAME = "my-analyzer";
 
@@ -61,7 +61,7 @@ public class LuceneFieldAttributesIT {
 	}
 
 	@Test
-	public void verifyNorms() {
+	void verifyNorms() {
 		Document document = loadDocument();
 
 		// norms false => omit-norms true
@@ -74,7 +74,7 @@ public class LuceneFieldAttributesIT {
 	}
 
 	@Test
-	public void verifyTermVector() {
+	void verifyTermVector() {
 		Document document = loadDocument();
 
 		IndexableField field = document.getField( "text" );

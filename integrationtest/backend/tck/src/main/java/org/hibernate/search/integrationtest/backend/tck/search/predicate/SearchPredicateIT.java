@@ -61,7 +61,7 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void where_searchPredicate() {
+	void where_searchPredicate() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchPredicate predicate = scope.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
@@ -75,7 +75,7 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void where_lambda() {
+	void where_lambda() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -87,7 +87,7 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void reuseRootPredicateInstance_onScopeTargetingSameIndexes() {
+	void reuseRootPredicateInstance_onScopeTargetingSameIndexes() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchPredicate predicate = scope
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
@@ -126,7 +126,7 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void reuseRootPredicateInstance_onScopeTargetingDifferentIndexes() {
+	void reuseRootPredicateInstance_onScopeTargetingDifferentIndexes() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchPredicate predicate = scope
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
@@ -156,7 +156,7 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void reuseNonRootPredicateInstance_onScopeTargetingSameIndexes() {
+	void reuseNonRootPredicateInstance_onScopeTargetingSameIndexes() {
 		StubMappingScope scope = mainIndex.createScope();
 		final SearchPredicate predicate = scope
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
@@ -204,7 +204,7 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void reuseNonRootPredicateInstance_onScopeTargetingDifferentIndexes() {
+	void reuseNonRootPredicateInstance_onScopeTargetingDifferentIndexes() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchPredicate predicate = scope
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
@@ -234,7 +234,7 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void extension() {
+	void extension() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query;
 

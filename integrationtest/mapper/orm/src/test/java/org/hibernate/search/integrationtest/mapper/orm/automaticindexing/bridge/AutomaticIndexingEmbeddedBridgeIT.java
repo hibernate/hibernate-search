@@ -44,7 +44,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Test automatic indexing based on Hibernate ORM entity events when
  * {@link TypeBridge}s or {@link PropertyBridge}s are embedded in an {@link IndexedEmbedded}.
  */
-public class AutomaticIndexingEmbeddedBridgeIT {
+class AutomaticIndexingEmbeddedBridgeIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -74,7 +74,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 	}
 
 	@Test
-	public void indirectValueUpdate_embeddedBridge() {
+	void indirectValueUpdate_embeddedBridge() {
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );

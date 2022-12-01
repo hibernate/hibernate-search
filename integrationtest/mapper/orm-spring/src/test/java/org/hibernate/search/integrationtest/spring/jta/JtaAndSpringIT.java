@@ -35,7 +35,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ActiveProfiles("jta")
 @PortedFromSearch5(original = "org.hibernate.search.test.integration.spring.jta.JtaAndSpringIT")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class JtaAndSpringIT {
+class JtaAndSpringIT {
 
 	@Autowired
 	@RegisterExtension
@@ -60,7 +60,7 @@ public class JtaAndSpringIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		Snert snert = new Snert();
 		snert.setId( 1L );
 		snert.setName( "dave" );

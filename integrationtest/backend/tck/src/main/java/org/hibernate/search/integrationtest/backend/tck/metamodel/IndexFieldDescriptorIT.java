@@ -73,7 +73,7 @@ public class IndexFieldDescriptorIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void valueField(TestedFieldStructure fieldStructure) {
+	void valueField(TestedFieldStructure fieldStructure) {
 		IndexDescriptor indexDescriptor = index.toApi().descriptor();
 		IndexFieldDescriptor baseFieldDescriptor = indexDescriptor.field( getAbsoluteFieldPath( fieldStructure ) ).get();
 
@@ -107,7 +107,7 @@ public class IndexFieldDescriptorIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void parent(TestedFieldStructure fieldStructure) {
+	void parent(TestedFieldStructure fieldStructure) {
 		IndexDescriptor indexDescriptor = index.toApi().descriptor();
 		IndexFieldDescriptor childFieldDescriptor = indexDescriptor.field( getAbsoluteFieldPath( fieldStructure ) ).get();
 

@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class GettingStartedCustomAnalysisIT {
+class GettingStartedCustomAnalysisIT {
 
 	private final String persistenceUnitName = "GettingStartedCustomAnalysisIT_" + BACKEND_TYPE;
 
@@ -48,7 +48,7 @@ public class GettingStartedCustomAnalysisIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		AtomicReference<Integer> bookIdHolder = new AtomicReference<>();
 
 		with( entityManagerFactory ).runInTransaction( entityManager -> {

@@ -35,7 +35,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 
 	@ParameterizedTest(name = "{2}")
 	@MethodSource("params")
-	public void flattenedX1(SimpleMappedIndex<IndexBinding> mainIndex,
+	void flattenedX1(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
 		assertThatQuery( mainIndex.query()
@@ -46,7 +46,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 
 	@ParameterizedTest(name = "{2}")
 	@MethodSource("params")
-	public void flattenedX2(SimpleMappedIndex<IndexBinding> mainIndex,
+	void flattenedX2(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
 		assertThatQuery( mainIndex.query()
@@ -57,7 +57,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 
 	@ParameterizedTest(name = "{2}")
 	@MethodSource("params")
-	public void nestedX1_explicit(SimpleMappedIndex<IndexBinding> mainIndex,
+	void nestedX1_explicit(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
 		assertThatQuery( mainIndex.query()
@@ -69,7 +69,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 
 	@ParameterizedTest(name = "{2}")
 	@MethodSource("params")
-	public void nestedX1_implicit(SimpleMappedIndex<IndexBinding> mainIndex,
+	void nestedX1_implicit(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
 		assertThatQuery( mainIndex.query()
@@ -80,7 +80,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 
 	@ParameterizedTest(name = "{2}")
 	@MethodSource("params")
-	public void nestedX2_explicit(SimpleMappedIndex<IndexBinding> mainIndex,
+	void nestedX2_explicit(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
 		assertThatQuery( mainIndex.query()
@@ -93,7 +93,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 
 	@ParameterizedTest(name = "{2}")
 	@MethodSource("params")
-	public void nestedX2_implicit(SimpleMappedIndex<IndexBinding> mainIndex,
+	void nestedX2_implicit(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
 		assertThatQuery( mainIndex.query()
@@ -104,7 +104,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 
 	@ParameterizedTest(name = "{2}")
 	@MethodSource("params")
-	public void nestedX2_explicit_implicit(SimpleMappedIndex<IndexBinding> mainIndex,
+	void nestedX2_explicit_implicit(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
 		assertThatQuery( mainIndex.query()
@@ -116,7 +116,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 
 	@ParameterizedTest(name = "{2}")
 	@MethodSource("params")
-	public void nestedX3_explicitX2_implicit(SimpleMappedIndex<IndexBinding> mainIndex,
+	void nestedX3_explicitX2_implicit(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
 		assertThatQuery( mainIndex.query()
@@ -129,7 +129,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 
 	@ParameterizedTest(name = "{2}")
 	@MethodSource("params")
-	public void nestedX3_explicit_implicitX2(SimpleMappedIndex<IndexBinding> mainIndex,
+	void nestedX3_explicit_implicitX2(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
 		assertThatQuery( mainIndex.query()
@@ -141,7 +141,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 
 	@ParameterizedTest(name = "{2}")
 	@MethodSource("params")
-	public void nestedFlattenedNested_implicit(SimpleMappedIndex<IndexBinding> mainIndex,
+	void nestedFlattenedNested_implicit(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
 		assertThatQuery( mainIndex.query()

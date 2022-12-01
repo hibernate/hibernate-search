@@ -47,7 +47,7 @@ public class DistanceProjectionTypeIndependentIT {
 	}
 
 	@Test
-	public void unknownField() {
+	void unknownField() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
@@ -62,7 +62,7 @@ public class DistanceProjectionTypeIndependentIT {
 	}
 
 	@Test
-	public void nullCenter() {
+	void nullCenter() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
@@ -77,7 +77,7 @@ public class DistanceProjectionTypeIndependentIT {
 	}
 
 	@Test
-	public void nullUnit() {
+	void nullUnit() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
@@ -92,7 +92,7 @@ public class DistanceProjectionTypeIndependentIT {
 	}
 
 	@Test
-	public void objectField_nested() {
+	void objectField_nested() {
 		String fieldPath = index.binding().nestedObject.relativeFieldName;
 		StubMappingScope scope = index.createScope();
 
@@ -103,7 +103,7 @@ public class DistanceProjectionTypeIndependentIT {
 	}
 
 	@Test
-	public void objectField_flattened() {
+	void objectField_flattened() {
 		String fieldPath = index.binding().flattenedObject.relativeFieldName;
 		StubMappingScope scope = index.createScope();
 

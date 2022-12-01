@@ -49,7 +49,7 @@ public class ElasticsearchIndexSchemaManagerCreationCustomSettingsIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void success_mergeWithNoOverlapping(ElasticsearchIndexSchemaManagerOperation operation) {
+	void success_mergeWithNoOverlapping(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 
@@ -116,7 +116,7 @@ public class ElasticsearchIndexSchemaManagerCreationCustomSettingsIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void success_mergeWithOverlapping(ElasticsearchIndexSchemaManagerOperation operation) {
+	void success_mergeWithOverlapping(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 
@@ -170,7 +170,7 @@ public class ElasticsearchIndexSchemaManagerCreationCustomSettingsIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void success_onlyCustomSettings(ElasticsearchIndexSchemaManagerOperation operation) {
+	void success_onlyCustomSettings(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 
@@ -209,7 +209,7 @@ public class ElasticsearchIndexSchemaManagerCreationCustomSettingsIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void maxResultWindow(ElasticsearchIndexSchemaManagerOperation operation) {
+	void maxResultWindow(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 

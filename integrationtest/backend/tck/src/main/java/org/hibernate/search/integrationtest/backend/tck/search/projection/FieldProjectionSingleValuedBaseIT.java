@@ -91,7 +91,7 @@ public class FieldProjectionSingleValuedBaseIT<F> {
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	public void simple(TestedFieldStructure fieldStructure,
+	void simple(TestedFieldStructure fieldStructure,
 			FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		StubMappingScope scope = index.createScope();
 
@@ -112,7 +112,7 @@ public class FieldProjectionSingleValuedBaseIT<F> {
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	public void noClass(TestedFieldStructure fieldStructure,
+	void noClass(TestedFieldStructure fieldStructure,
 			FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		StubMappingScope scope = index.createScope();
 
@@ -164,7 +164,7 @@ public class FieldProjectionSingleValuedBaseIT<F> {
 	 */
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	public void duplicated(TestedFieldStructure fieldStructure,
+	void duplicated(TestedFieldStructure fieldStructure,
 			FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		StubMappingScope scope = index.createScope();
 

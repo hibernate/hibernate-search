@@ -252,7 +252,7 @@ public class FieldSortBaseIT<F> {
 
 	@ParameterizedTest(name = "{0} - {2} - {1}")
 	@MethodSource("params")
-	public void missingValue_explicit(TestedFieldStructure fieldStructure,
+	void missingValue_explicit(TestedFieldStructure fieldStructure,
 			FieldTypeDescriptor<F> fieldType, SortMode sortMode,
 			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
 		assumeTestParametersWork( fieldStructure, fieldType, sortMode );

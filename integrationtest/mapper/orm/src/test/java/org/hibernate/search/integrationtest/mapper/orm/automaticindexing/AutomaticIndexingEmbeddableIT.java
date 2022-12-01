@@ -100,7 +100,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectEmbeddedUpdate_embeddedSingle() {
+	void indirectEmbeddedUpdate_embeddedSingle() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -204,7 +204,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_embeddedSingle() {
+	void indirectAssociationUpdate_embeddedSingle() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -286,7 +286,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectValueUpdate_embeddedSingle() {
+	void indirectValueUpdate_embeddedSingle() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -352,7 +352,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectEmbeddedUpdate_embeddedList() {
+	void indirectEmbeddedUpdate_embeddedList() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -456,7 +456,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_embeddedList() {
+	void indirectAssociationUpdate_embeddedList() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -561,7 +561,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectValueUpdate_embeddedList() {
+	void indirectValueUpdate_embeddedList() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -627,7 +627,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectEmbeddedUpdate_elementCollection() {
+	void indirectEmbeddedUpdate_elementCollection() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -737,7 +737,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_elementCollection() {
+	void indirectAssociationUpdate_elementCollection() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -848,7 +848,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectValueUpdate_elementCollection() {
+	void indirectValueUpdate_elementCollection() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -916,7 +916,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_inverseSideEmbedded() {
+	void indirectAssociationUpdate_inverseSideEmbedded() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -998,7 +998,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectValueUpdate_inverseSideEmbedded() {
+	void indirectValueUpdate_inverseSideEmbedded() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -1062,7 +1062,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectEmbeddedUpdate_bidirectionalEmbedded() {
+	void indirectEmbeddedUpdate_bidirectionalEmbedded() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -1168,7 +1168,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_bidirectionalEmbedded() {
+	void indirectAssociationUpdate_bidirectionalEmbedded() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -1252,7 +1252,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectValueUpdate_bidirectionalEmbedded() {
+	void indirectValueUpdate_bidirectionalEmbedded() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );

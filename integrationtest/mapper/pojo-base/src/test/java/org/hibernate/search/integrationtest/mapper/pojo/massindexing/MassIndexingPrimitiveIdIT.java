@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-3529")
-public class MassIndexingPrimitiveIdIT {
+class MassIndexingPrimitiveIdIT {
 
 	@RegisterExtension
 	public final BackendMock backendMock = BackendMock.create();
@@ -59,7 +59,7 @@ public class MassIndexingPrimitiveIdIT {
 	}
 
 	@Test
-	public void entityWithPrimitiveId() {
+	void entityWithPrimitiveId() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer()
 					// Simulate passing information to connect to a DB, ...

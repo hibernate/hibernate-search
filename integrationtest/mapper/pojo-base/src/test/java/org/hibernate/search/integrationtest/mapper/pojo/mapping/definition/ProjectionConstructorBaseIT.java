@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-3927")
-public class ProjectionConstructorBaseIT {
+class ProjectionConstructorBaseIT {
 
 	private static final String INDEX_NAME = "index_name";
 
@@ -49,7 +49,7 @@ public class ProjectionConstructorBaseIT {
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void typeLevelAnnotation() {
+	void typeLevelAnnotation() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -90,7 +90,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void typeLevelAnnotation_multipleConstructors() {
+	void typeLevelAnnotation_multipleConstructors() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -126,7 +126,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void constructorLevelAnnotation() {
+	void constructorLevelAnnotation() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -175,7 +175,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void abstractType() {
+	void abstractType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -212,7 +212,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void entityAndProjection() {
+	void entityAndProjection() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -251,7 +251,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void noArgConstructor() {
+	void noArgConstructor() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -296,7 +296,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void inferredInner_value_multiValued_list() {
+	void inferredInner_value_multiValued_list() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -339,7 +339,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void inferredInner_value_multiValued_collection() {
+	void inferredInner_value_multiValued_collection() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -382,7 +382,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void inferredInner_value_multiValued_iterable() {
+	void inferredInner_value_multiValued_iterable() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -425,7 +425,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void inferredInner_value_multiValued_set() {
+	void inferredInner_value_multiValued_set() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -461,7 +461,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void inferredInner_object() {
+	void inferredInner_object() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -521,7 +521,7 @@ public class ProjectionConstructorBaseIT {
 	// If an inner projection type is not included in any Jandex index on startup,
 	// Hibernate Search can still get on its feet thanks to annotated type discovery.
 	@Test
-	public void inferredInner_object_annotatedTypeDiscovery() {
+	void inferredInner_object_annotatedTypeDiscovery() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -581,7 +581,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void inferredInner_object_multiValued_list() {
+	void inferredInner_object_multiValued_list() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -655,7 +655,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void inferredInner_object_multiValued_collection() {
+	void inferredInner_object_multiValued_collection() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -729,7 +729,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void inferredInner_object_multiValued_iterable() {
+	void inferredInner_object_multiValued_iterable() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -803,7 +803,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void inferredInner_object_multiValued_set() {
+	void inferredInner_object_multiValued_set() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -856,7 +856,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void noProjectionConstructor() {
+	void noProjectionConstructor() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -897,7 +897,7 @@ public class ProjectionConstructorBaseIT {
 
 	// This can happen if the class is not included in any Jandex index on startup.
 	@Test
-	public void annotationNotProcessed() {
+	void annotationNotProcessed() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -941,7 +941,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructor() {
+	void inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructor() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -1009,7 +1009,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructor() {
+	void inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructor() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -1077,7 +1077,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void inheritance_sameConstructorParameters_bothClassesWithProjectionConstructor() {
+	void inheritance_sameConstructorParameters_bothClassesWithProjectionConstructor() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -1152,7 +1152,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void cycle() {
+	void cycle() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class Level1 {
@@ -1211,7 +1211,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void cycle_indirect() {
+	void cycle_indirect() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class Level1 {
@@ -1290,7 +1290,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void cycle_buried() {
+	void cycle_buried() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class Level1 {
@@ -1374,7 +1374,7 @@ public class ProjectionConstructorBaseIT {
 	// to the object field, while usually projection factories expect absolute paths
 	// (if everything works correctly they don't in this case, though).
 	@Test
-	public void nonRoot() {
+	void nonRoot() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -1429,7 +1429,7 @@ public class ProjectionConstructorBaseIT {
 	}
 
 	@Test
-	public void incompatibleProjectionWithExtraPropertiesMissing() {
+	void incompatibleProjectionWithExtraPropertiesMissing() {
 		class Author {
 			private Integer id;
 

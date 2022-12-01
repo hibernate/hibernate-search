@@ -123,7 +123,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void indexing() {
+	void indexing() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "Indexing error";
@@ -144,7 +144,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void getId() {
+	void getId() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "getId error";
@@ -167,7 +167,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void getTitle() {
+	void getTitle() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "getTitle error";
@@ -189,7 +189,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void dropAndCreateSchema_exception() {
+	void dropAndCreateSchema_exception() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "DROP_AND_CREATE error";
@@ -208,7 +208,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void purge() {
+	void purge() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "PURGE error";
@@ -227,7 +227,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void mergeSegmentsBefore() {
+	void mergeSegmentsBefore() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "MERGE_SEGMENTS error";
@@ -247,7 +247,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void mergeSegmentsAfter() {
+	void mergeSegmentsAfter() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "MERGE_SEGMENTS error";
@@ -270,7 +270,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void flush() {
+	void flush() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "FLUSH error";
@@ -292,7 +292,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void refresh() {
+	void refresh() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "REFRESH error";

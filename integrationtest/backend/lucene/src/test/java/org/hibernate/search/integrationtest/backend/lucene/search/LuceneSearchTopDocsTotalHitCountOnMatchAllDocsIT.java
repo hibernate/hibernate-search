@@ -59,7 +59,7 @@ public class LuceneSearchTopDocsTotalHitCountOnMatchAllDocsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4068") // The regression was spotted early, while introducing it in HSEARCH-4068
-	public void matchAllDocs_sortByScoreDesc() {
+	void matchAllDocs_sortByScoreDesc() {
 		LuceneSearchResult<DocumentReference> result = index.query().extension( LuceneExtension.get() )
 				.where( f -> f.matchAll() )
 				.fetch( 10 );

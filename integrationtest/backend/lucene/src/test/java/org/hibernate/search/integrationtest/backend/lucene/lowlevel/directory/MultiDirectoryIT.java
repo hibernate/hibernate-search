@@ -31,7 +31,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import org.apache.lucene.store.ByteBuffersDirectory;
 
-public class MultiDirectoryIT {
+class MultiDirectoryIT {
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";

@@ -30,7 +30,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.analysis.Analyzer;
 
-public class LuceneIndexManagerIT {
+class LuceneIndexManagerIT {
 
 	@RegisterExtension
 	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
@@ -49,7 +49,7 @@ public class LuceneIndexManagerIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void indexingAnalyzer() throws IOException {
+	void indexingAnalyzer() throws IOException {
 		Analyzer analyzer = indexApi.indexingAnalyzer();
 		assertThat( LuceneAnalysisUtils.analyze( analyzer, "whitespace_lowercase", "Foo Bar" ) )
 				.containsExactly( "foo", "bar" );
@@ -66,7 +66,7 @@ public class LuceneIndexManagerIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void searchAnalyzer() throws IOException {
+	void searchAnalyzer() throws IOException {
 		Analyzer analyzer = indexApi.searchAnalyzer();
 		assertThat( LuceneAnalysisUtils.analyze( analyzer, "whitespace_lowercase", "Foo Bar" ) )
 				.containsExactly( "foo", "bar" );
@@ -83,7 +83,7 @@ public class LuceneIndexManagerIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void computeSizeInBytes() {
+	void computeSizeInBytes() {
 		long initialSize = indexApi.computeSizeInBytes();
 		assertThat( initialSize ).isGreaterThanOrEqualTo( 0L );
 
@@ -104,7 +104,7 @@ public class LuceneIndexManagerIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void computeSizeInBytesAsync() {
+	void computeSizeInBytesAsync() {
 		CompletableFuture<Long> initialSizeFuture = indexApi.computeSizeInBytesAsync().toCompletableFuture();
 		await().untilAsserted( () -> assertThat( initialSizeFuture ).isCompleted() );
 		long initialSize = initialSizeFuture.join();

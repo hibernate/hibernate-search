@@ -48,7 +48,7 @@ public class DecimalScaleIT {
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@Test
-	public void noDecimalScale_bigDecimal() {
+	void noDecimalScale_bigDecimal() {
 		assertThatThrownBy( () ->
 				setupHelper.start()
 						.withIndex( StubMappedIndex.ofNonRetrievable(
@@ -62,7 +62,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void noDecimalScale_bigInteger() {
+	void noDecimalScale_bigInteger() {
 		assertThatThrownBy( () ->
 				setupHelper.start()
 						.withIndex( StubMappedIndex.ofNonRetrievable(
@@ -76,7 +76,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void positiveDecimalScale_bigInteger() {
+	void positiveDecimalScale_bigInteger() {
 		assertThatThrownBy( () ->
 				setupHelper.start()
 						.withIndex( StubMappedIndex.ofNonRetrievable(
@@ -90,7 +90,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_bigDecimal() {
+	void decimalScale_bigDecimal() {
 		SimpleMappedIndex<DecimalScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new DecimalScaleIndexBinding( root, 3 )
 		);
@@ -105,7 +105,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_zeroScale_bigDecimal() {
+	void decimalScale_zeroScale_bigDecimal() {
 		SimpleMappedIndex<DecimalScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new DecimalScaleIndexBinding( root, 0 )
 		);
@@ -120,7 +120,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_zeroScale_bigInteger() {
+	void decimalScale_zeroScale_bigInteger() {
 		SimpleMappedIndex<IntegerScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new IntegerScaleIndexBinding( root, 0 )
 		);
@@ -135,7 +135,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_negativeScale_bigDecimal() {
+	void decimalScale_negativeScale_bigDecimal() {
 		SimpleMappedIndex<DecimalScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new DecimalScaleIndexBinding( root, -3 )
 		);
@@ -150,7 +150,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_negativeScale_bigInteger() {
+	void decimalScale_negativeScale_bigInteger() {
 		SimpleMappedIndex<IntegerScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new IntegerScaleIndexBinding( root, -3 )
 		);
@@ -165,7 +165,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_largeScale_bigDecimal() {
+	void decimalScale_largeScale_bigDecimal() {
 		final int schemaDecimalScale = 275;
 
 		SimpleMappedIndex<DecimalScaleIndexBinding> index = SimpleMappedIndex.of(
@@ -202,7 +202,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_negativeScale_largeScale_bigDecimal() {
+	void decimalScale_negativeScale_largeScale_bigDecimal() {
 		final int schemaDecimalScale = -275;
 
 		SimpleMappedIndex<DecimalScaleIndexBinding> index = SimpleMappedIndex.of(
@@ -239,7 +239,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_negativeScale_largeScale_bigInteger() {
+	void decimalScale_negativeScale_largeScale_bigInteger() {
 		final int schemaDecimalScale = -275;
 
 		SimpleMappedIndex<IntegerScaleIndexBinding> index = SimpleMappedIndex.of(
@@ -276,7 +276,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_rounding_bigDecimal() {
+	void decimalScale_rounding_bigDecimal() {
 		SimpleMappedIndex<DecimalScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new DecimalScaleIndexBinding( root, 2 )
 		);
@@ -299,7 +299,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_rounding_bigInteger() {
+	void decimalScale_rounding_bigInteger() {
 		SimpleMappedIndex<IntegerScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new IntegerScaleIndexBinding( root, -4 )
 		);
@@ -322,7 +322,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_largeDecimal_bigDecimal() {
+	void decimalScale_largeDecimal_bigDecimal() {
 		SimpleMappedIndex<DecimalScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new DecimalScaleIndexBinding( root, 0 )
 		);
@@ -342,7 +342,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_largeDecimal_bigInteger() {
+	void decimalScale_largeDecimal_bigInteger() {
 		SimpleMappedIndex<IntegerScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new IntegerScaleIndexBinding( root, 0 )
 		);
@@ -362,7 +362,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_tooLargeDecimal_scale0_bigDecimal() {
+	void decimalScale_tooLargeDecimal_scale0_bigDecimal() {
 		SimpleMappedIndex<DecimalScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new DecimalScaleIndexBinding( root, 0 )
 		);
@@ -382,7 +382,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_tooLargeDecimal_scale0_bigDecimal_queryPredicateBuildTime() {
+	void decimalScale_tooLargeDecimal_scale0_bigDecimal_queryPredicateBuildTime() {
 		SimpleMappedIndex<DecimalScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new DecimalScaleIndexBinding( root, 0 )
 		);
@@ -408,7 +408,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_tooLargeDecimal_scale0_bigDecimal_lowerBound() {
+	void decimalScale_tooLargeDecimal_scale0_bigDecimal_lowerBound() {
 		SimpleMappedIndex<DecimalScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new DecimalScaleIndexBinding( root, 0 )
 		);
@@ -428,7 +428,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_tooLargeDecimal_scale0_bigInteger() {
+	void decimalScale_tooLargeDecimal_scale0_bigInteger() {
 		SimpleMappedIndex<IntegerScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new IntegerScaleIndexBinding( root, 0 )
 		);
@@ -448,7 +448,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_tooLargeDecimal_scale0_bigInteger_lowerBound() {
+	void decimalScale_tooLargeDecimal_scale0_bigInteger_lowerBound() {
 		SimpleMappedIndex<IntegerScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new IntegerScaleIndexBinding( root, 0 )
 		);
@@ -468,7 +468,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_tooLargeDecimal_scale0_bigInteger_lowerBound_queryPredicateBuildTime() {
+	void decimalScale_tooLargeDecimal_scale0_bigInteger_lowerBound_queryPredicateBuildTime() {
 		SimpleMappedIndex<IntegerScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new IntegerScaleIndexBinding( root, 0 )
 		);
@@ -494,7 +494,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_tooLargeDecimal_scale2_bigDecimal() {
+	void decimalScale_tooLargeDecimal_scale2_bigDecimal() {
 		SimpleMappedIndex<DecimalScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new DecimalScaleIndexBinding( root, 2 )
 		);
@@ -514,7 +514,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_tooLargeDecimal_scale2_bigDecimal_lowerBound() {
+	void decimalScale_tooLargeDecimal_scale2_bigDecimal_lowerBound() {
 		SimpleMappedIndex<DecimalScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new DecimalScaleIndexBinding( root, 2 )
 		);
@@ -534,7 +534,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_tooLargeDecimal_scale2_bigDecimal_lowerBound_queryPredicateBuildTime() {
+	void decimalScale_tooLargeDecimal_scale2_bigDecimal_lowerBound_queryPredicateBuildTime() {
 		SimpleMappedIndex<DecimalScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new DecimalScaleIndexBinding( root, 2 )
 		);
@@ -560,7 +560,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_tooLargeDecimal_scaleMinus2_bigInteger() {
+	void decimalScale_tooLargeDecimal_scaleMinus2_bigInteger() {
 		SimpleMappedIndex<IntegerScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new IntegerScaleIndexBinding( root, -2 )
 		);
@@ -580,7 +580,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_tooLargeDecimal_scaleMinus2_bigInteger_queryPredicateBuildTime() {
+	void decimalScale_tooLargeDecimal_scaleMinus2_bigInteger_queryPredicateBuildTime() {
 		SimpleMappedIndex<IntegerScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new IntegerScaleIndexBinding( root, -2 )
 		);
@@ -606,7 +606,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_tooLargeDecimal_scaleMinus2_bigInteger_lowerBound() {
+	void decimalScale_tooLargeDecimal_scaleMinus2_bigInteger_lowerBound() {
 		SimpleMappedIndex<IntegerScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new IntegerScaleIndexBinding( root, -2 )
 		);
@@ -626,7 +626,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void defaultDecimalScale_bigDecimal() {
+	void defaultDecimalScale_bigDecimal() {
 		SimpleMappedIndex<DefaultDecimalScaleIndexBinding> index = SimpleMappedIndex.ofAdvanced(
 				DefaultDecimalScaleIndexBinding::new
 		);
@@ -643,7 +643,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void defaultDecimalScale_bigInteger() {
+	void defaultDecimalScale_bigInteger() {
 		SimpleMappedIndex<DefaultIntegerScaleIndexBinding> index = SimpleMappedIndex.ofAdvanced(
 				DefaultIntegerScaleIndexBinding::new
 		);
@@ -660,7 +660,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_andDefaultDecimalScale_bigDecimal() {
+	void decimalScale_andDefaultDecimalScale_bigDecimal() {
 		SimpleMappedIndex<BothDecimalScaleIndexBinding> index = SimpleMappedIndex.ofAdvanced(
 				BothDecimalScaleIndexBinding::new
 		);
@@ -678,7 +678,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_andDefaultDecimalScale_bigInteger() {
+	void decimalScale_andDefaultDecimalScale_bigInteger() {
 		SimpleMappedIndex<BothIntegerScaleIndexBinding> index = SimpleMappedIndex.ofAdvanced(
 				BothIntegerScaleIndexBinding::new
 		);
@@ -696,7 +696,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_doesNotAffectProjections_bigDecimal() {
+	void decimalScale_doesNotAffectProjections_bigDecimal() {
 		SimpleMappedIndex<DecimalScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new DecimalScaleIndexBinding( root, 3 )
 		);
@@ -711,7 +711,7 @@ public class DecimalScaleIT {
 	}
 
 	@Test
-	public void decimalScale_doesNotAffectProjections_bigInteger() {
+	void decimalScale_doesNotAffectProjections_bigInteger() {
 		SimpleMappedIndex<IntegerScaleIndexBinding> index = SimpleMappedIndex.of(
 				root -> new IntegerScaleIndexBinding( root, -7 )
 		);

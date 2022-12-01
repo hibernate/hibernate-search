@@ -22,7 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class LuceneGetIndexSizeIT {
+class LuceneGetIndexSizeIT {
 
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper =
@@ -36,7 +36,7 @@ public class LuceneGetIndexSizeIT {
 	}
 
 	@Test
-	public void computeIndexSize() {
+	void computeIndexSize() {
 		//tag::computeIndexSize[]
 		SearchMapping mapping = /* ... */ // <1>
 				//end::computeIndexSize[]

@@ -48,7 +48,7 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void success() {
+	void success() {
 		setup();
 
 		IndexWorkspace workspace = index.createWorkspace();
@@ -64,7 +64,7 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void failure() {
+	void failure() {
 		setup();
 
 		IndexWorkspace workspace = index.createWorkspace();

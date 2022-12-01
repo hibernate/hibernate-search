@@ -73,7 +73,7 @@ public class ElasticsearchSearchQueryIT {
 
 	@ParameterizedTest(name = "IndexLayoutStrategy = {0}")
 	@MethodSource("params")
-	public void simple(Object layoutStrategy, URLEncodedString readName) {
+	void simple(Object layoutStrategy, URLEncodedString readName) {
 		init( layoutStrategy, readName );
 		StubMappingScope scope = index.createScope();
 
@@ -95,7 +95,7 @@ public class ElasticsearchSearchQueryIT {
 
 	@ParameterizedTest(name = "IndexLayoutStrategy = {0}")
 	@MethodSource("params")
-	public void defaultSourceFiltering(Object layoutStrategy, URLEncodedString readName) {
+	void defaultSourceFiltering(Object layoutStrategy, URLEncodedString readName) {
 		init( layoutStrategy, readName );
 		StubMappingScope scope = index.createScope();
 
@@ -117,7 +117,7 @@ public class ElasticsearchSearchQueryIT {
 
 	@ParameterizedTest(name = "IndexLayoutStrategy = {0}")
 	@MethodSource("params")
-	public void projection_sourceFiltering(Object layoutStrategy, URLEncodedString readName) {
+	void projection_sourceFiltering(Object layoutStrategy, URLEncodedString readName) {
 		init( layoutStrategy, readName );
 		StubMappingScope scope = index.createScope();
 
@@ -140,7 +140,7 @@ public class ElasticsearchSearchQueryIT {
 
 	@ParameterizedTest(name = "IndexLayoutStrategy = {0}")
 	@MethodSource("params")
-	public void routing(Object layoutStrategy, URLEncodedString readName) {
+	void routing(Object layoutStrategy, URLEncodedString readName) {
 		init( layoutStrategy, readName );
 		StubMappingScope scope = index.createScope();
 
@@ -166,7 +166,7 @@ public class ElasticsearchSearchQueryIT {
 
 	@ParameterizedTest(name = "IndexLayoutStrategy = {0}")
 	@MethodSource("params")
-	public void trackTotalHits_fetch(Object layoutStrategy, URLEncodedString readName) {
+	void trackTotalHits_fetch(Object layoutStrategy, URLEncodedString readName) {
 		init( layoutStrategy, readName );
 		assumeTrue(
 				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForSearch(),
@@ -194,7 +194,7 @@ public class ElasticsearchSearchQueryIT {
 
 	@ParameterizedTest(name = "IndexLayoutStrategy = {0}")
 	@MethodSource("params")
-	public void trackTotalHits_fetchHits(Object layoutStrategy, URLEncodedString readName) {
+	void trackTotalHits_fetchHits(Object layoutStrategy, URLEncodedString readName) {
 		init( layoutStrategy, readName );
 		assumeTrue(
 				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForSearch(),

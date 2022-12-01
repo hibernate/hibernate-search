@@ -40,7 +40,7 @@ public class SpatialWithinPolygonPredicateSpecificsIT extends AbstractSpatialWit
 	);
 
 	@Test
-	public void matchMultipleDocuments() {
+	void matchMultipleDocuments() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.spatial().within().field( "geoPoint" ).polygon( POLYGON_2 ) ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), IMOUTO_ID, CHEZ_MARGOTTE_ID );

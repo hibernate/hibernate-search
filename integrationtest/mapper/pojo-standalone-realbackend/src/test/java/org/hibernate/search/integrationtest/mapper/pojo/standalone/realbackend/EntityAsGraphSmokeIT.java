@@ -41,7 +41,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * but it requires developers to explicitly provide association metadata
  * using {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide}.
  */
-public class EntityAsGraphSmokeIT {
+class EntityAsGraphSmokeIT {
 
 	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
@@ -64,7 +64,7 @@ public class EntityAsGraphSmokeIT {
 	}
 
 	@Test
-	public void indexAndSearch() {
+	void indexAndSearch() {
 		IndexedEntity indexed1 = new IndexedEntity( "1", "some interesting text" );
 		ContainedEntity containedEntity1_1 = new ContainedEntity( "1_1", "some contained entity text" );
 		containedEntity1_1.containing = indexed1;

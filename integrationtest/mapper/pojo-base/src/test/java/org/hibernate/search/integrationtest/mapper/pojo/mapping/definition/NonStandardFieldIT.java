@@ -39,7 +39,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Does not test uses of container value extractors, which are tested in {@link FieldContainerExtractorBaseIT}
  * (and others, see javadoc on that class).
  */
-public class NonStandardFieldIT {
+class NonStandardFieldIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -50,7 +50,7 @@ public class NonStandardFieldIT {
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void defaultAttributes() {
+	void defaultAttributes() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
 			@DocumentId
@@ -67,7 +67,7 @@ public class NonStandardFieldIT {
 	}
 
 	@Test
-	public void name() {
+	void name() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
 			@DocumentId
@@ -85,7 +85,7 @@ public class NonStandardFieldIT {
 	}
 
 	@Test
-	public void name_invalid_dot() {
+	void name_invalid_dot() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
 			@DocumentId
@@ -106,7 +106,7 @@ public class NonStandardFieldIT {
 	}
 
 	@Test
-	public void customBridge_explicitFieldType() {
+	void customBridge_explicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -123,7 +123,7 @@ public class NonStandardFieldIT {
 	}
 
 	@Test
-	public void defaultBridge_invalidFieldType() {
+	void defaultBridge_invalidFieldType() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -148,7 +148,7 @@ public class NonStandardFieldIT {
 	}
 
 	@Test
-	public void customBridge_explicitFieldType_invalid() {
+	void customBridge_explicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -173,7 +173,7 @@ public class NonStandardFieldIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3243")
-	public void customBridge_implicitFieldType_generic() {
+	void customBridge_implicitFieldType_generic() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId

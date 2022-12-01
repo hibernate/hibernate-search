@@ -75,7 +75,7 @@ public class MultiTenancyBaseIT {
 	}
 
 	@Test
-	public void search_only_returns_elements_of_the_selected_tenant() {
+	void search_only_returns_elements_of_the_selected_tenant() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<?>> query = scope.query( tenant1SessionContext )
@@ -131,7 +131,7 @@ public class MultiTenancyBaseIT {
 	}
 
 	@Test
-	public void search_on_nested_object_only_returns_elements_of_the_tenant() {
+	void search_on_nested_object_only_returns_elements_of_the_tenant() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<?>> query = scope.query( tenant1SessionContext )
@@ -164,7 +164,7 @@ public class MultiTenancyBaseIT {
 	}
 
 	@Test
-	public void delete_only_deletes_elements_of_the_tenant() {
+	void delete_only_deletes_elements_of_the_tenant() {
 		IndexIndexingPlan plan = index.createIndexingPlan( tenant2SessionContext );
 
 		StubMappingScope scope = index.createScope();
@@ -215,7 +215,7 @@ public class MultiTenancyBaseIT {
 	}
 
 	@Test
-	public void update_only_updates_elements_of_the_tenant() {
+	void update_only_updates_elements_of_the_tenant() {
 		IndexIndexingPlan plan = index.createIndexingPlan( tenant2SessionContext );
 
 		StubMappingScope scope = index.createScope();
@@ -317,7 +317,7 @@ public class MultiTenancyBaseIT {
 	}
 
 	@Test
-	public void not_using_multi_tenancy_for_query_while_enabled_throws_exception() {
+	void not_using_multi_tenancy_for_query_while_enabled_throws_exception() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.query()
@@ -330,7 +330,7 @@ public class MultiTenancyBaseIT {
 	}
 
 	@Test
-	public void not_using_multi_tenancy_for_add_while_enabled_throws_exception() {
+	void not_using_multi_tenancy_for_add_while_enabled_throws_exception() {
 		assertThatThrownBy( () -> {
 			IndexIndexingPlan plan = index.createIndexingPlan();
 
@@ -351,7 +351,7 @@ public class MultiTenancyBaseIT {
 	}
 
 	@Test
-	public void not_using_multi_tenancy_for_update_while_enabled_throws_exception() {
+	void not_using_multi_tenancy_for_update_while_enabled_throws_exception() {
 		assertThatThrownBy( () -> {
 			IndexIndexingPlan plan = index.createIndexingPlan();
 
@@ -372,7 +372,7 @@ public class MultiTenancyBaseIT {
 	}
 
 	@Test
-	public void not_using_multi_tenancy_for_delete_while_enabled_throws_exception() {
+	void not_using_multi_tenancy_for_delete_while_enabled_throws_exception() {
 		assertThatThrownBy( () -> {
 			IndexIndexingPlan plan = index.createIndexingPlan();
 			plan.delete( referenceProvider( DOCUMENT_ID_1 ) );

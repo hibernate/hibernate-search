@@ -22,7 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class RoutingBridgeOrmContextIT {
+class RoutingBridgeOrmContextIT {
 
 	private static final int SHARD_COUNT = 4;
 
@@ -38,7 +38,7 @@ public class RoutingBridgeOrmContextIT {
 	}
 
 	@Test
-	public void smoke() {
+	void smoke() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// See MyDataPropertyBinder
 			entityManager.setProperty( "test.data.indexed", MyData.INDEXED );

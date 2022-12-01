@@ -27,7 +27,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Test enabling/disabling automatic indexing.
  */
 @TestForIssue(jiraKey = "HSEARCH-4268")
-public class AutomaticIndexingEnabledIT {
+class AutomaticIndexingEnabledIT {
 
 	private static final String DEPRECATED_STRATEGY_PROPERTY_MESSAGE = "Configuration property "
 			+ "'hibernate.search.automatic_indexing.strategy' is deprecated;"
@@ -56,7 +56,7 @@ public class AutomaticIndexingEnabledIT {
 	}
 
 	@Test
-	public void enabled_default() {
+	void enabled_default() {
 		logged.expectMessage( DEPRECATED_STRATEGY_PROPERTY_MESSAGE ).never();
 
 		SessionFactory sessionFactory = setup( null, null );
@@ -75,7 +75,7 @@ public class AutomaticIndexingEnabledIT {
 	}
 
 	@Test
-	public void enabled_explicit() {
+	void enabled_explicit() {
 		logged.expectMessage( DEPRECATED_STRATEGY_PROPERTY_MESSAGE ).never();
 
 		SessionFactory sessionFactory = setup( true, null );
@@ -94,7 +94,7 @@ public class AutomaticIndexingEnabledIT {
 	}
 
 	@Test
-	public void disabled() {
+	void disabled() {
 		logged.expectMessage( DEPRECATED_STRATEGY_PROPERTY_MESSAGE ).never();
 
 		SessionFactory sessionFactory = setup( false, null );
@@ -110,7 +110,7 @@ public class AutomaticIndexingEnabledIT {
 	}
 
 	@Test
-	public void legacy_strategy_none() {
+	void legacy_strategy_none() {
 		logged.expectMessage( DEPRECATED_STRATEGY_PROPERTY_MESSAGE ).once();
 
 		SessionFactory sessionFactory = setup( null, "none" );
@@ -126,7 +126,7 @@ public class AutomaticIndexingEnabledIT {
 	}
 
 	@Test
-	public void legacy_strategy_session() {
+	void legacy_strategy_session() {
 		logged.expectMessage( DEPRECATED_STRATEGY_PROPERTY_MESSAGE ).once();
 
 		SessionFactory sessionFactory = setup( null, "session" );

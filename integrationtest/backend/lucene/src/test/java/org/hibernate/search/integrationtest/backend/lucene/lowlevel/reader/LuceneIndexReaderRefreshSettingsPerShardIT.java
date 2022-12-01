@@ -29,7 +29,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.awaitility.Awaitility;
 
 @TestForIssue(jiraKey = "HSEARCH-3636")
-public class LuceneIndexReaderRefreshSettingsPerShardIT extends AbstractSettingsPerShardIT {
+class LuceneIndexReaderRefreshSettingsPerShardIT extends AbstractSettingsPerShardIT {
 
 	/*
 	 * Pick a value that is:
@@ -41,7 +41,7 @@ public class LuceneIndexReaderRefreshSettingsPerShardIT extends AbstractSettings
 
 	@ParameterizedTest(name = "{0} - {2}")
 	@MethodSource("params")
-	public void test(String ignoredLabel, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction, List<String> shardIds) {
+	void test(String ignoredLabel, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction, List<String> shardIds) {
 		init( ignoredLabel, setupStrategyFunction, shardIds );
 		setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), "io.refresh_interval", NON_ZERO_DELAY )

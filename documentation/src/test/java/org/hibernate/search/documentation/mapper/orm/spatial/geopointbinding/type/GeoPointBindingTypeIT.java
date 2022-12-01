@@ -56,7 +56,7 @@ public class GeoPointBindingTypeIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void smoke(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+	void smoke(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
 		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Author author = new Author();

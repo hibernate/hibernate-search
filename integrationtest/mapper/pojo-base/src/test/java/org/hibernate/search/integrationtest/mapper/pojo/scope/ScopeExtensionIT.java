@@ -24,7 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ScopeExtensionIT {
+class ScopeExtensionIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -43,7 +43,7 @@ public class ScopeExtensionIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		IndexScope indexScope = mapping.scope( IndexedEntity.class ).extension( original -> original );
 		assertThat( indexScope ).isInstanceOf( StubIndexScope.class );
 	}

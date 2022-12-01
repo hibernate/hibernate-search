@@ -29,7 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SearchMappingNoDefaultBackendIT {
+class SearchMappingNoDefaultBackendIT {
 
 	private static final String BACKEND_1_NAME = "stubBackend1";
 	private static final String BACKEND_2_NAME = "stubBackend2";
@@ -68,7 +68,7 @@ public class SearchMappingNoDefaultBackendIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4656")
-	public void backend_default_nonExisting() {
+	void backend_default_nonExisting() {
 		assertThatThrownBy( () -> mapping.backend() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -80,7 +80,7 @@ public class SearchMappingNoDefaultBackendIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4656")
-	public void backend_byName_invalidName() {
+	void backend_byName_invalidName() {
 		assertThatThrownBy( () -> mapping.backend( "invalid" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(

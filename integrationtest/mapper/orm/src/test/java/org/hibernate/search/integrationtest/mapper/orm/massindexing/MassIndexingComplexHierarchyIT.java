@@ -74,7 +74,7 @@ public class MassIndexingComplexHierarchyIT {
 	}
 
 	@Test
-	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
+	void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
@@ -101,7 +101,7 @@ public class MassIndexingComplexHierarchyIT {
 	}
 
 	@Test
-	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
+	void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_B_Indexed.class );
@@ -128,7 +128,7 @@ public class MassIndexingComplexHierarchyIT {
 	}
 
 	@Test
-	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
+	void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
@@ -171,7 +171,7 @@ public class MassIndexingComplexHierarchyIT {
 	}
 
 	@Test
-	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
+	void rootIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_B_Indexed.class );

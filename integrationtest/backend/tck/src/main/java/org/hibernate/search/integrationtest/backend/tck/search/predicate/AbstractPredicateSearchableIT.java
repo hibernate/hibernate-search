@@ -25,7 +25,7 @@ public abstract class AbstractPredicateSearchableIT {
 
 	@ParameterizedTest(name = "{2}")
 	@MethodSource("params")
-	public void unsearchable(SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
+	void unsearchable(SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
 			SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex,
 			FieldTypeDescriptor<?> fieldType) {
 		SearchPredicateFactory f = searchableNoIndex.createScope().predicate();
@@ -42,7 +42,7 @@ public abstract class AbstractPredicateSearchableIT {
 
 	@ParameterizedTest(name = "{2}")
 	@MethodSource("params")
-	public void multiIndex_incompatibleSearchable(SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
+	void multiIndex_incompatibleSearchable(SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex,
 			SimpleMappedIndex<SearchableNoIndexBinding> searchableNoIndex,
 			FieldTypeDescriptor<?> fieldType) {
 		SearchPredicateFactory f = searchableYesIndex.createScope( searchableNoIndex ).predicate();

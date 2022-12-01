@@ -30,7 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SearchMappingIndexedEntitiesIT {
+class SearchMappingIndexedEntitiesIT {
 
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
@@ -43,7 +43,7 @@ public class SearchMappingIndexedEntitiesIT {
 	}
 
 	@Test
-	public void indexedEntities() {
+	void indexedEntities() {
 		//tag::indexedEntities[]
 		SearchMapping mapping = /* ... */ // <1>
 				//end::indexedEntities[]
@@ -73,7 +73,7 @@ public class SearchMappingIndexedEntitiesIT {
 	}
 
 	@Test
-	public void indexMetamodel() {
+	void indexMetamodel() {
 		SearchMapping mapping = Search.mapping( entityManagerFactory );
 		//tag::indexMetamodel[]
 		SearchIndexedEntity<Book> bookEntity = mapping.indexedEntity( Book.class ); // <1>

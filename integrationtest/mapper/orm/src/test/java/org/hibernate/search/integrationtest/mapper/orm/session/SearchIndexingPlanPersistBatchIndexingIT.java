@@ -58,7 +58,7 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 	 * but requires a lot of memory (to store the indexing buffer).
 	 */
 	@Test
-	public void processPerBatch() {
+	void processPerBatch() {
 		setupHolder.runInTransaction( session -> {
 			// This is for test only and wouldn't be present in real code
 			int firstIdOfThisBatch = 0;
@@ -97,7 +97,7 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 	 * but a rollback of the transaction will leave the index out of sync.
 	 */
 	@Test
-	public void executePerBatch() {
+	void executePerBatch() {
 		setupHolder.runInTransaction( session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 

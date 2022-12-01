@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-4203") // See https://github.com/hibernate/hibernate-search/pull/2564#issuecomment-833808403
-public class LoadingStrategyInheritanceIT {
+class LoadingStrategyInheritanceIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -57,7 +57,7 @@ public class LoadingStrategyInheritanceIT {
 	}
 
 	@Test
-	public void addEntity_configurer_inheritance() throws InterruptedException {
+	void addEntity_configurer_inheritance() throws InterruptedException {
 		String rootEntityName = RootEntity.class.getSimpleName();
 		String derivedEntityName = DerivedEntity.class.getSimpleName();
 
@@ -111,7 +111,7 @@ public class LoadingStrategyInheritanceIT {
 
 	// Same as the test above, but with explicit names
 	@Test
-	public void addEntity_name_configurer_inheritance() throws InterruptedException {
+	void addEntity_name_configurer_inheritance() throws InterruptedException {
 		String rootEntityName = "customRootName";
 		String derivedEntityName = "customDerivedName";
 

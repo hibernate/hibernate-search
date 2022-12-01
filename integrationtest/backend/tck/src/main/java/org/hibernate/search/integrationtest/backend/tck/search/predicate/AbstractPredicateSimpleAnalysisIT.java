@@ -70,7 +70,7 @@ public abstract class AbstractPredicateSimpleAnalysisIT {
 	}
 
 	@Test
-	public void noTokenAfterAnalysis() {
+	void noTokenAfterAnalysis() {
 		assertThatQuery( index.query()
 				// Use a stopword, which should be removed by the analysis
 				.where( f -> predicate( f, index.binding().analyzedStringField.relativeFieldName, "a" ) ) )
@@ -78,7 +78,7 @@ public abstract class AbstractPredicateSimpleAnalysisIT {
 	}
 
 	@Test
-	public void multiIndex_incompatibleAnalyzer() {
+	void multiIndex_incompatibleAnalyzer() {
 		StubMappingScope scope = index.createScope( incompatibleSearchAnalyzerIndex );
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 
@@ -96,7 +96,7 @@ public abstract class AbstractPredicateSimpleAnalysisIT {
 	}
 
 	@Test
-	public void multiIndex_incompatibleAnalyzer_searchAnalyzer() {
+	void multiIndex_incompatibleAnalyzer_searchAnalyzer() {
 		StubMappingScope scope = index.createScope( compatibleSearchAnalyzerIndex );
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 

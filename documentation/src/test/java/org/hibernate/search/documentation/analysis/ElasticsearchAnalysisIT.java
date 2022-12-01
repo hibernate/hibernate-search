@@ -26,13 +26,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchAnalysisIT {
+class ElasticsearchAnalysisIT {
 
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	@Test
-	public void advanced() {
+	void advanced() {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withBackendProperty(
 						ElasticsearchIndexSettings.ANALYSIS_CONFIGURER,

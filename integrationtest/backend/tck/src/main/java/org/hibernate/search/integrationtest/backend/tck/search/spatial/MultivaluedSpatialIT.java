@@ -48,7 +48,7 @@ public class MultivaluedSpatialIT {
 	}
 
 	@Test
-	public void boundingBox() {
+	void boundingBox() {
 		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" ).boundingBox( AROUND_NORTH_WEST_BOX ) )

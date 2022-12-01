@@ -44,7 +44,7 @@ public abstract class AbstractPredicateScaleCheckingIT {
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIndex() {
+	void multiIndex_withCompatibleIndex() {
 		StubMappingScope scope = index.createScope( compatibleIndex );
 
 		assertThatQuery( scope.query()
@@ -63,7 +63,7 @@ public abstract class AbstractPredicateScaleCheckingIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIndex() {
+	void multiIndex_withIncompatibleIndex() {
 		StubMappingScope scope = index.createScope( incompatibleIndex );
 
 		assertThatThrownBy( () -> predicate( scope.predicate(), bigDecimalFieldPath(), dataSet.bigDecimal0 ) )

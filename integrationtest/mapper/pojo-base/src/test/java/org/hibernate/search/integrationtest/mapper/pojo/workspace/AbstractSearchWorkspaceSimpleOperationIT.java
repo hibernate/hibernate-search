@@ -59,7 +59,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void async_success() {
+	void async_success() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchWorkspace workspace = session.workspace( IndexedEntity1.class );
 
@@ -76,7 +76,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void async_failure() {
+	void async_failure() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchWorkspace workspace = session.workspace( IndexedEntity1.class );
 
@@ -94,7 +94,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void sync_success() {
+	void sync_success() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchWorkspace workspace = session.workspace( IndexedEntity1.class );
 
@@ -108,7 +108,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void sync_failure() {
+	void sync_failure() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchWorkspace workspace = session.workspace( IndexedEntity1.class );
 
@@ -126,7 +126,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void multiIndexMultiBackend() {
+	void multiIndexMultiBackend() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchWorkspace workspace = session.workspace();
 
@@ -149,7 +149,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void outOfSession() {
+	void outOfSession() {
 		SearchWorkspace workspace;
 		try ( SearchSession session = mapping.createSession() ) {
 			workspace = session.workspace( IndexedEntity1.class );
@@ -167,7 +167,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void fromMappingWithoutSession() {
+	void fromMappingWithoutSession() {
 		SearchWorkspace workspace = mapping
 				.scope( IndexedEntity1.class ).workspace();
 

@@ -58,7 +58,7 @@ public class NamedPredicateBaseIT {
 	}
 
 	@Test
-	public void root() {
+	void root() {
 		assertThatQuery( index.query()
 				.where( f -> f.named( "match-both-fields" )
 						.param( "value1", WORD_1 )
@@ -72,7 +72,7 @@ public class NamedPredicateBaseIT {
 	}
 
 	@Test
-	public void nested() {
+	void nested() {
 		assertThatQuery( index.query()
 				.where( f -> f.named( "nested.match-both-fields" )
 						.param( "value1", WORD_1 )
@@ -92,7 +92,7 @@ public class NamedPredicateBaseIT {
 	}
 
 	@Test
-	public void flattened() {
+	void flattened() {
 		assertThatQuery( index.query()
 				.where( f -> f.named( "flattened.match-both-fields" )
 						.param( "value1", WORD_1 )
@@ -111,7 +111,7 @@ public class NamedPredicateBaseIT {
 	}
 
 	@Test
-	public void nullPath() {
+	void nullPath() {
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThatThrownBy( () -> f.named( null ) )
 				.isInstanceOf( IllegalArgumentException.class )
@@ -119,7 +119,7 @@ public class NamedPredicateBaseIT {
 	}
 
 	@Test
-	public void unknownField() {
+	void unknownField() {
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThatThrownBy( () -> f.named( "unknown_field.my-predicate" ) )
 				.isInstanceOf( SearchException.class )
@@ -127,7 +127,7 @@ public class NamedPredicateBaseIT {
 	}
 
 	@Test
-	public void unknownPredicate_root() {
+	void unknownPredicate_root() {
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThatThrownBy( () -> f.named( "unknown-predicate" ) )
 				.isInstanceOf( SearchException.class )
@@ -135,7 +135,7 @@ public class NamedPredicateBaseIT {
 	}
 
 	@Test
-	public void unknownPredicate_objectField() {
+	void unknownPredicate_objectField() {
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThatThrownBy( () -> f.named( "nested.unknown-predicate" ) )
 				.isInstanceOf( SearchException.class )
@@ -143,7 +143,7 @@ public class NamedPredicateBaseIT {
 	}
 
 	@Test
-	public void unknownPredicate_valueField() {
+	void unknownPredicate_valueField() {
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThatThrownBy( () -> f.named( "field1.unknown-predicate" ) )
 				.isInstanceOf( SearchException.class )

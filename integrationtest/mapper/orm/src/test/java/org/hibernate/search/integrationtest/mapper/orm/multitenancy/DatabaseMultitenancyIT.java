@@ -30,7 +30,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-4034")
 @PortedFromSearch5(original = "org.hibernate.search.test.batchindexing.DatabaseMultitenancyTest")
-public class DatabaseMultitenancyIT {
+class DatabaseMultitenancyIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -77,25 +77,25 @@ public class DatabaseMultitenancyIT {
 	}
 
 	@Test
-	public void shouldOnlyFindMetamecModels() {
+	void shouldOnlyFindMetamecModels() {
 		List<Clock> list = searchAll( METAMEC_TID, METAMEC_MODELS );
 		assertThat( list ).containsExactlyInAnyOrder( METAMEC_MODELS );
 	}
 
 	@Test
-	public void shouldOnlyFindGeochronModels() {
+	void shouldOnlyFindGeochronModels() {
 		List<Clock> list = searchAll( GEOCHRON_TID, GEOCHRON_MODELS );
 		assertThat( list ).containsExactlyInAnyOrder( GEOCHRON_MODELS );
 	}
 
 	@Test
-	public void shouldMatchOnlyElementsFromOneTenant() {
+	void shouldMatchOnlyElementsFromOneTenant() {
 		List<Clock> list = searchModel( "model", GEOCHRON_TID, GEOCHRON_MODELS );
 		assertThat( list ).containsExactlyInAnyOrder( GEOCHRON_MODELS );
 	}
 
 	@Test
-	public void searchReferences() {
+	void searchReferences() {
 		List<EntityReference> entityReferences = searchReferences( GEOCHRON_TID, GEOCHRON_MODELS );
 		assertThat( entityReferences ).hasSize( GEOCHRON_MODELS.length );
 	}

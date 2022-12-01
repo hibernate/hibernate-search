@@ -45,7 +45,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  */
 @SuppressWarnings("unused")
 @TestForIssue(jiraKey = "HSEARCH-3108")
-public class RoutingBridgeBaseIT {
+class RoutingBridgeBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -56,7 +56,7 @@ public class RoutingBridgeBaseIT {
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void invalidTypeForRoutingBridge() {
+	void invalidTypeForRoutingBridge() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -79,7 +79,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void currentRoute_missing() {
+	void currentRoute_missing() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -139,7 +139,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void previousRoutes_missing() {
+	void previousRoutes_missing() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -214,7 +214,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void currentRoute_multiple() {
+	void currentRoute_multiple() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -274,7 +274,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void accessors() {
+	void accessors() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -353,7 +353,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void accessors_incompatibleRequestedType() {
+	void accessors_incompatibleRequestedType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -384,7 +384,7 @@ public class RoutingBridgeBaseIT {
 	 * Note that reindexing is tested in depth in the ORM mapper integration tests.
 	 */
 	@Test
-	public void explicitDependencies() {
+	void explicitDependencies() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -462,7 +462,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void explicitDependencies_error_invalidProperty() {
+	void explicitDependencies_error_invalidProperty() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -487,7 +487,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void missingDependencyDeclaration() {
+	void missingDependencyDeclaration() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -514,7 +514,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void inconsistentDependencyDeclaration() {
+	void inconsistentDependencyDeclaration() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -543,7 +543,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void useRootOnly() {
+	void useRootOnly() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -639,7 +639,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void params_annotationMapping() {
+	void params_annotationMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> { } );
 		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( AnnotatedRoutedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -656,7 +656,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void params_paramNotDefined() {
+	void params_paramNotDefined() {
 		assertThatThrownBy(
 				() -> setupHelper.start().expectCustomBeans().setup( AnnotatedRoutedNoParamEntity.class )
 		)
@@ -668,7 +668,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void params_paramDefinedTwice() {
+	void params_paramDefinedTwice() {
 		assertThatThrownBy(
 				() -> setupHelper.start().expectCustomBeans().setup( AnnotatedRoutedSameParamTwiceEntity.class )
 		)
@@ -682,7 +682,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void params_programmaticMapping() {
+	void params_programmaticMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> { } );
 		SearchMapping mapping = setupHelper.start().expectCustomBeans()
 				.withConfiguration( builder -> {

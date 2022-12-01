@@ -92,7 +92,7 @@ public class MassIndexingJobWithCompositeIdIT {
 
 	@Test
 	@Disabled("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
-	public void canHandleIdClass_strategyFull() throws Exception {
+	void canHandleIdClass_strategyFull() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithIdClass.class )
 				.rowsPerPartition( 13 ) // Ensure there're more than 1 partition, so that a WHERE clause is applied.
@@ -106,7 +106,7 @@ public class MassIndexingJobWithCompositeIdIT {
 
 	@Test
 	@Disabled("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
-	public void canHandleIdClass_strategyHql() throws Exception {
+	void canHandleIdClass_strategyHql() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithIdClass.class )
 				.restrictedBy( "select e from EntityWithIdClass e where e.month = 6" )
@@ -122,7 +122,7 @@ public class MassIndexingJobWithCompositeIdIT {
 
 	@Test
 	@Disabled("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
-	public void canHandleEmbeddedId_strategyFull() throws Exception {
+	void canHandleEmbeddedId_strategyFull() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithEmbeddedId.class )
 				.rowsPerPartition( 13 ) // Ensure there're more than 1 partition, so that a WHERE clause is applied.
@@ -138,7 +138,7 @@ public class MassIndexingJobWithCompositeIdIT {
 
 	@Test
 	@Disabled("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
-	public void canHandleEmbeddedId_strategyHql() throws Exception {
+	void canHandleEmbeddedId_strategyHql() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithEmbeddedId.class )
 				.restrictedBy( "select e from EntityWithIdClass e where e.embeddableDateId.month = 6" )

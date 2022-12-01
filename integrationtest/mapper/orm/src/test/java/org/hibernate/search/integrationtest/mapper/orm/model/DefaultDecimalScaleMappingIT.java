@@ -22,7 +22,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class DefaultDecimalScaleMappingIT {
+class DefaultDecimalScaleMappingIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -33,7 +33,7 @@ public class DefaultDecimalScaleMappingIT {
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
-	public void mapping() {
+	void mapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "scaled", BigDecimal.class, f -> f.defaultDecimalScale( 7 ) )
 				.field( "unscaled", BigDecimal.class, f -> f.defaultDecimalScale( 0 ) )

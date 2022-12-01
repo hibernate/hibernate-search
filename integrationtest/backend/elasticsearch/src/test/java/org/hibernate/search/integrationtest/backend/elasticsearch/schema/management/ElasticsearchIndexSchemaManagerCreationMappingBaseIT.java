@@ -47,7 +47,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void dateField(ElasticsearchIndexSchemaManagerOperation operation) {
+	void dateField(ElasticsearchIndexSchemaManagerOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
 				root.field( "myField", f -> f.asLocalDate() )
 					.toReference()
@@ -72,7 +72,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void booleanField(ElasticsearchIndexSchemaManagerOperation operation) {
+	void booleanField(ElasticsearchIndexSchemaManagerOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
 				root.field( "myField", f -> f.asBoolean() )
 						.toReference()
@@ -96,7 +96,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void keywordField(ElasticsearchIndexSchemaManagerOperation operation) {
+	void keywordField(ElasticsearchIndexSchemaManagerOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
 				root.field( "myField", f -> f.asString() )
 						.toReference()
@@ -120,7 +120,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void textField(ElasticsearchIndexSchemaManagerOperation operation) {
+	void textField(ElasticsearchIndexSchemaManagerOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
 				root.field( "myField", f -> f.asString().analyzer( "standard" ) )
 						.toReference()
@@ -144,7 +144,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void textField_noNorms(ElasticsearchIndexSchemaManagerOperation operation) {
+	void textField_noNorms(ElasticsearchIndexSchemaManagerOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
 				root.field( "myField", f -> f.asString().analyzer( "standard" ).norms( Norms.NO ) )
 						.toReference()

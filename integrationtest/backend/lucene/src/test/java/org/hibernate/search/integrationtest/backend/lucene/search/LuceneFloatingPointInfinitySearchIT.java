@@ -32,7 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class LuceneFloatingPointInfinitySearchIT<F> {
+class LuceneFloatingPointInfinitySearchIT<F> {
 
 	private static final String AGGREGATION_NAME = "aggregationName";
 
@@ -49,7 +49,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3685")
-	public void float_infinityIncluded() {
+	void float_infinityIncluded() {
 		String fieldPath = index.binding().floatFieldModel.relativeFieldName;
 
 		AggregationKey<Map<Range<Float>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -75,7 +75,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3685")
-	public void float_infinityExcluded() {
+	void float_infinityExcluded() {
 		String fieldPath = index.binding().floatFieldModel.relativeFieldName;
 
 		AggregationKey<Map<Range<Float>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -109,7 +109,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3685")
-	public void double_infinityIncluded() {
+	void double_infinityIncluded() {
 		String fieldPath = index.binding().doubleFieldModel.relativeFieldName;
 
 		AggregationKey<Map<Range<Double>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -135,7 +135,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3685")
-	public void double_infinityExcluded() {
+	void double_infinityExcluded() {
 		String fieldPath = index.binding().doubleFieldModel.relativeFieldName;
 
 		AggregationKey<Map<Range<Double>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );

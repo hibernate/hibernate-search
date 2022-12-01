@@ -40,7 +40,7 @@ import com.google.gson.JsonObject;
  * {@link ElasticsearchSearchRequestTransformer}
  * is used.
  */
-public class ElasticsearchSearchQueryRequestTransformerIT {
+class ElasticsearchSearchQueryRequestTransformerIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -62,7 +62,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 	}
 
 	@Test
-	public void path() {
+	void path() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
@@ -89,7 +89,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 	}
 
 	@Test
-	public void queryParameters() {
+	void queryParameters() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
@@ -118,7 +118,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 	}
 
 	@Test
-	public void body() {
+	void body() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )

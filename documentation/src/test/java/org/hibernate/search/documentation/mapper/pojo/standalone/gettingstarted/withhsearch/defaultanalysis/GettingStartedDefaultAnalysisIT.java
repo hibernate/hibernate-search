@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class GettingStartedDefaultAnalysisIT {
+class GettingStartedDefaultAnalysisIT {
 
 	@RegisterExtension
 	public TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
@@ -80,7 +80,7 @@ public class GettingStartedDefaultAnalysisIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		// tag::indexing[]
 		try ( SearchSession session = searchMapping.createSession() ) { // <1>
 			Author author = new Author(); // <2>

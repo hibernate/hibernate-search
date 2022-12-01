@@ -71,7 +71,7 @@ public class HibernateOrmSimpleMappingIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void sort(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+	void sort(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
 		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
@@ -91,7 +91,7 @@ public class HibernateOrmSimpleMappingIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void projection_simple(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+	void projection_simple(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
 		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );

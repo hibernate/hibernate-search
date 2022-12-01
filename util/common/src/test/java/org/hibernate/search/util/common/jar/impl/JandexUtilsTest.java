@@ -26,7 +26,7 @@ import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.Index;
 
-public class JandexUtilsTest {
+class JandexUtilsTest {
 	private static final String META_INF_JANDEX_INDEX = "META-INF/jandex.idx";
 
 	private static final URL JUNIT_JAR_URL = JarUtils.codeSourceLocation( Test.class )

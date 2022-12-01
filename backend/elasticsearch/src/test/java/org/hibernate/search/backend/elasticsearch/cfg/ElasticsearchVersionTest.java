@@ -20,10 +20,10 @@ import org.junit.jupiter.api.Test;
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.ObjectArrayAssert;
 
-public class ElasticsearchVersionTest {
+class ElasticsearchVersionTest {
 
 	@Test
-	public void of_string() {
+	void of_string() {
 		assertComponents( ElasticsearchVersion.of( "7" ) )
 				.containsExactly( ElasticsearchDistributionName.ELASTIC, 7, null, null, null );
 		assertComponents( ElasticsearchVersion.of( "7.0" ) )
@@ -63,7 +63,7 @@ public class ElasticsearchVersionTest {
 	}
 
 	@Test
-	public void of_string_forceLowercase() {
+	void of_string_forceLowercase() {
 		assertComponents( ElasticsearchVersion.of( "7.0.0-Beta1" ) )
 				.containsExactly( ElasticsearchDistributionName.ELASTIC, 7, 0, 0, "beta1" );
 		assertComponents( ElasticsearchVersion.of( "ELASTIC:7.0.0-Beta1" ) )
@@ -73,7 +73,7 @@ public class ElasticsearchVersionTest {
 	}
 
 	@Test
-	public void of_string_invalid() {
+	void of_string_invalid() {
 		assertThatThrownBy( () -> ElasticsearchVersion.of( "7_0" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Invalid Elasticsearch version",
@@ -98,7 +98,7 @@ public class ElasticsearchVersionTest {
 	}
 
 	@Test
-	public void of_distributionNameAndString() {
+	void of_distributionNameAndString() {
 		assertComponents( ElasticsearchVersion.of( ElasticsearchDistributionName.ELASTIC, "7" ) )
 				.containsExactly( ElasticsearchDistributionName.ELASTIC, 7, null, null, null );
 		assertComponents( ElasticsearchVersion.of( ElasticsearchDistributionName.ELASTIC, "7.0" ) )
@@ -135,7 +135,7 @@ public class ElasticsearchVersionTest {
 	}
 
 	@Test
-	public void of_distributionNameAndString_invalid() {
+	void of_distributionNameAndString_invalid() {
 		assertThatThrownBy( () -> ElasticsearchVersion.of( ElasticsearchDistributionName.ELASTIC, "7_0" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Invalid Elasticsearch version",
@@ -154,7 +154,7 @@ public class ElasticsearchVersionTest {
 	}
 
 	@Test
-	public void exactMatch_elasticsearch() {
+	void exactMatch_elasticsearch() {
 		assertMatch( "5.6.0", ElasticsearchDistributionName.ELASTIC, "5.6.0" ).isTrue();
 		assertMatch( "5.6.1", ElasticsearchDistributionName.ELASTIC, "5.6.1" ).isTrue();
 		assertMatch( "6.0.0", ElasticsearchDistributionName.ELASTIC, "6.0.0" ).isTrue();
@@ -169,7 +169,7 @@ public class ElasticsearchVersionTest {
 	}
 
 	@Test
-	public void exactMatch_opensearch() {
+	void exactMatch_opensearch() {
 		assertMatch( "opensearch:1.0.0-beta1", ElasticsearchDistributionName.OPENSEARCH, "1.0.0-beta1" ).isTrue();
 		assertMatch( "opensearch:1.0.0-rc1", ElasticsearchDistributionName.OPENSEARCH, "1.0.0-rc1" ).isTrue();
 		assertMatch( "opensearch:1.0.0-rc2", ElasticsearchDistributionName.OPENSEARCH, "1.0.0-rc2" ).isTrue();
@@ -184,7 +184,7 @@ public class ElasticsearchVersionTest {
 	}
 
 	@Test
-	public void lenientMatch_elasticsearch() {
+	void lenientMatch_elasticsearch() {
 		assertMatch( "5", ElasticsearchDistributionName.ELASTIC, "5.6.0" ).isTrue();
 		assertMatch( "5", ElasticsearchDistributionName.ELASTIC, "5.6.1" ).isTrue();
 		assertMatch( "5", ElasticsearchDistributionName.ELASTIC, "5.7.1" ).isTrue();
@@ -218,7 +218,7 @@ public class ElasticsearchVersionTest {
 	}
 
 	@Test
-	public void lenientMatch_opensearch() {
+	void lenientMatch_opensearch() {
 		assertMatch( "opensearch:1", ElasticsearchDistributionName.OPENSEARCH, "1.0.0-rc1" ).isTrue();
 		assertMatch( "opensearch:1", ElasticsearchDistributionName.OPENSEARCH, "1.0.0" ).isTrue();
 		assertMatch( "opensearch:1", ElasticsearchDistributionName.OPENSEARCH, "1.0.1" ).isTrue();
@@ -241,7 +241,7 @@ public class ElasticsearchVersionTest {
 	}
 
 	@Test
-	public void nonMatching_elastic() {
+	void nonMatching_elastic() {
 		assertMatch( "5.6.0", ElasticsearchDistributionName.ELASTIC, "5.5.0" ).isFalse();
 		assertMatch( "5.6.0", ElasticsearchDistributionName.ELASTIC, "5.7.0" ).isFalse();
 		assertMatch( "5.6.0", ElasticsearchDistributionName.ELASTIC, "6.0.0" ).isFalse();
@@ -280,7 +280,7 @@ public class ElasticsearchVersionTest {
 	}
 
 	@Test
-	public void nonMatching_opensearch() {
+	void nonMatching_opensearch() {
 		assertMatch( "opensearch:1.0.0", ElasticsearchDistributionName.OPENSEARCH, "1.1.0" ).isFalse();
 		assertMatch( "opensearch:1.0", ElasticsearchDistributionName.OPENSEARCH, "1.1.0" ).isFalse();
 		assertMatch( "opensearch:1.1.0", ElasticsearchDistributionName.OPENSEARCH, "1.0.0" ).isFalse();
@@ -291,7 +291,7 @@ public class ElasticsearchVersionTest {
 	}
 
 	@Test
-	public void nonMatching_elasticAndOpensearch() {
+	void nonMatching_elasticAndOpensearch() {
 		assertMatch( "7.0.0", ElasticsearchDistributionName.OPENSEARCH, "7.0.0" ).isFalse();
 		assertMatch( "7.0", ElasticsearchDistributionName.OPENSEARCH, "7.0.0" ).isFalse();
 		assertMatch( "7", ElasticsearchDistributionName.OPENSEARCH, "7.0.0" ).isFalse();

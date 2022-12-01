@@ -27,7 +27,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
 
-public class CustomDirectoryIT extends AbstractDirectoryIT {
+class CustomDirectoryIT extends AbstractDirectoryIT {
 
 	@RegisterExtension
 	public StaticCounters staticCounters = StaticCounters.create();
@@ -35,7 +35,7 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.DirectoryLifecycleTest.testLifecycle")
-	public void valid() {
+	void valid() {
 		setup( CustomDirectoryProvider.class, c -> c.expectCustomBeans()
 				.withBackendProperty( "directory." + CustomDirectoryProvider.CONFIGURATION_PROPERTY_KEY_RADICAL,
 						CustomDirectoryProvider.CONFIGURATION_PROPERTY_EXPECTED_VALUE ) );
@@ -58,7 +58,7 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
-	public void invalid() {
+	void invalid() {
 		String invalidDirectoryType = "someInvalidDirectoryType";
 		assertThatThrownBy( () -> setup( "someInvalidDirectoryType", c -> c.expectCustomBeans() ) )
 				.isInstanceOf( SearchException.class )

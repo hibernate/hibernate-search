@@ -60,7 +60,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void objectOnLevel1AndObjectOnLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
+	void objectOnLevel1AndObjectOnLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
 			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
 			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,
@@ -233,7 +233,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void objectOnLevel1AndNoLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
+	void objectOnLevel1AndNoLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
 			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
 			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,
@@ -331,7 +331,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void objectOnLevel1AndFlattenedLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
+	void objectOnLevel1AndFlattenedLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
 			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
 			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,
@@ -481,7 +481,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void objectOnSingleValuedLevel1AndNoLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
+	void objectOnSingleValuedLevel1AndNoLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
 			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
 			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,
@@ -539,7 +539,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void noLevel1AndObjectOnLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
+	void noLevel1AndObjectOnLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
 			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
 			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,
@@ -634,7 +634,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void flattenedLevel1AndObjectOnLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
+	void flattenedLevel1AndObjectOnLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
 			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
 			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,
@@ -773,7 +773,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void fieldOutsideObjectFieldTree(SimpleMappedIndex<IndexBinding> mainIndex,
+	void fieldOutsideObjectFieldTree(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
 			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
 			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,
@@ -808,7 +808,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void singleValuedField_effectivelyMultiValuedInContext(SimpleMappedIndex<IndexBinding> mainIndex,
+	void singleValuedField_effectivelyMultiValuedInContext(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
 			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
 			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,
@@ -857,7 +857,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void missingFields(SimpleMappedIndex<IndexBinding> mainIndex,
+	void missingFields(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
 			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
 			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,

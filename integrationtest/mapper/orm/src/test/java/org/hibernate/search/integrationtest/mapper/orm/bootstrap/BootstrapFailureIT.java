@@ -25,7 +25,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Check that a failing boot correctly propagates exceptions,
  * despite the complex asynchronous code used during boot.
  */
-public class BootstrapFailureIT {
+class BootstrapFailureIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -36,7 +36,7 @@ public class BootstrapFailureIT {
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
-	public void propagateException() {
+	void propagateException() {
 		assertThatThrownBy( () -> ormSetupHelper.start()
 						.setup( FailingIndexedEntity.class, ContainedEntity.class )
 		)

@@ -43,7 +43,7 @@ public class FieldProjectionAndSortNestedIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		index.index( "1", doc -> {
 			doc.addValue( index.binding().year, 1845 );
 

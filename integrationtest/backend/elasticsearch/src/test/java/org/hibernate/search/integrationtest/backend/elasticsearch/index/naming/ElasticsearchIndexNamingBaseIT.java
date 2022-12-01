@@ -24,7 +24,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Test the base functionality of type name mapping strategies.
  */
 @TestForIssue(jiraKey = "HSEARCH-3791")
-public class ElasticsearchIndexNamingBaseIT {
+class ElasticsearchIndexNamingBaseIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -36,7 +36,7 @@ public class ElasticsearchIndexNamingBaseIT {
 	private final StubMappedIndex index2 = StubMappedIndex.withoutFields().name( "index2" );
 
 	@Test
-	public void nameConflict_aliasesOfSingleIndex() {
+	void nameConflict_aliasesOfSingleIndex() {
 		assertThatThrownBy( () -> setup( hardcodedStrategy(
 				"alias-conflicting", "alias-conflicting",
 				"index2-write", "index2-read"
@@ -52,7 +52,7 @@ public class ElasticsearchIndexNamingBaseIT {
 	}
 
 	@Test
-	public void crossIndexNameConflict_writeAliasAndWriteAlias() {
+	void crossIndexNameConflict_writeAliasAndWriteAlias() {
 		setupExpectingCrossIndexNameConflict(
 				"alias-conflicting", "index1-read", // Index 1 aliases
 				"alias-conflicting", "index2-read", // Index 2 aliases
@@ -61,7 +61,7 @@ public class ElasticsearchIndexNamingBaseIT {
 	}
 
 	@Test
-	public void crossIndexNameConflict_readAliasAndReadAlias() {
+	void crossIndexNameConflict_readAliasAndReadAlias() {
 		setupExpectingCrossIndexNameConflict(
 				"index1-write", "alias-conflicting", // Index 1 aliases
 				"index2-write", "alias-conflicting", // Index 2 aliases
@@ -70,7 +70,7 @@ public class ElasticsearchIndexNamingBaseIT {
 	}
 
 	@Test
-	public void crossIndexNameConflict_writeAliasAndReadAlias() {
+	void crossIndexNameConflict_writeAliasAndReadAlias() {
 		setupExpectingCrossIndexNameConflict(
 				"alias-conflicting", "index1-write", // Index 1 aliases
 				"index2-write", "alias-conflicting", // Index 2 aliases
@@ -79,7 +79,7 @@ public class ElasticsearchIndexNamingBaseIT {
 	}
 
 	@Test
-	public void crossIndexNameConflict_hibernateSearchNameAndWriteAlias() {
+	void crossIndexNameConflict_hibernateSearchNameAndWriteAlias() {
 		setupExpectingCrossIndexNameConflict(
 				index2.name(), "index1-read", // Index 1 aliases
 				"index2-write", "index2-read", // Index 2 aliases
@@ -88,7 +88,7 @@ public class ElasticsearchIndexNamingBaseIT {
 	}
 
 	@Test
-	public void crossIndexNameConflict_hibernateSearchNameAndReadAlias() {
+	void crossIndexNameConflict_hibernateSearchNameAndReadAlias() {
 		setupExpectingCrossIndexNameConflict(
 				"index1-write", index2.name(), // Index 1 aliases
 				"index2-write", "index2-read", // Index 2 aliases

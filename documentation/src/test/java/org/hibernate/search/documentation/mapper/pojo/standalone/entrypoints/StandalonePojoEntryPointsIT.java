@@ -26,7 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class StandalonePojoEntryPointsIT {
+class StandalonePojoEntryPointsIT {
 
 	private CloseableSearchMapping theSearchMapping;
 
@@ -65,7 +65,7 @@ public class StandalonePojoEntryPointsIT {
 	}
 
 	@Test
-	public void searchSession() {
+	void searchSession() {
 		// tag::searchSession-simple[]
 		SearchMapping searchMapping = /* ... */ // <1>
 				// end::searchSession-simple[]
@@ -82,7 +82,7 @@ public class StandalonePojoEntryPointsIT {
 	}
 
 	@Test
-	public void searchSession_withOptions() {
+	void searchSession_withOptions() {
 		// tag::searchSession-withOptions[]
 		SearchMapping searchMapping = /* ... */ // <1>
 				// end::searchSession-withOptions[]
@@ -103,7 +103,7 @@ public class StandalonePojoEntryPointsIT {
 	}
 
 	@Test
-	public void searchScope_fromSearchMapping() {
+	void searchScope_fromSearchMapping() {
 		SearchMapping searchMapping = theSearchMapping;
 		// tag::searchScope-fromSearchMapping[]
 		SearchScope<Book> bookScope = searchMapping.scope( Book.class );
@@ -126,7 +126,7 @@ public class StandalonePojoEntryPointsIT {
 	}
 
 	@Test
-	public void searchScope_fromSearchSession() {
+	void searchScope_fromSearchSession() {
 		SearchMapping searchMapping = theSearchMapping;
 		try ( SearchSession searchSession = searchMapping.createSession() ) {
 			SearchScope<Book> bookScope = searchSession.scope( Book.class );

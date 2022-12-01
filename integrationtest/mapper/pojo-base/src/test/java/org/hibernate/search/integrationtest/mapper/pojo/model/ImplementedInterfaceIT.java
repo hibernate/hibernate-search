@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-1656")
-public class ImplementedInterfaceIT {
+class ImplementedInterfaceIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -43,7 +43,7 @@ public class ImplementedInterfaceIT {
 	}
 
 	@Test
-	public void index() {
+	void index() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedPojo indexedPojo = new IndexedPojo( 1, "Using some other text here" );
 			session.indexingPlan().add( indexedPojo );

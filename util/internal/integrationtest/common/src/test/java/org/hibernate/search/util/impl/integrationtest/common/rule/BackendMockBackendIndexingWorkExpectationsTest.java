@@ -24,7 +24,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.AbstractThrowableAssert;
 
-public class BackendMockBackendIndexingWorkExpectationsTest {
+class BackendMockBackendIndexingWorkExpectationsTest {
 
 	private static final String INDEX_NAME = "indexName";
 
@@ -33,7 +33,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4287")
-	public void syncDefaultAddWorkType() {
+	void syncDefaultAddWorkType() {
 		backendMock.indexingWorkExpectations( BackendIndexingWorkExpectations.sync() );
 		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> { } );
 		assertThatCode( () -> backendMock.backendBehavior().executeDocumentWork(
@@ -59,7 +59,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4287")
-	public void asyncDefaultAddWorkType() {
+	void asyncDefaultAddWorkType() {
 		backendMock.indexingWorkExpectations( BackendIndexingWorkExpectations.async( ".*" ) );
 		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> { } );
 		assertThatCode( () -> backendMock.backendBehavior().executeDocumentWork(
@@ -85,7 +85,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4287")
-	public void asyncCustomAddWorkType() {
+	void asyncCustomAddWorkType() {
 		// We tell the backend that all "add" expectations should instead be interpreted as "addOrUpdate",
 		// because the mapper is configured to always issue ADD_OR_UPDATE operations.
 		backendMock.indexingWorkExpectations( BackendIndexingWorkExpectations.async( ".*", StubDocumentWork.Type.ADD_OR_UPDATE ) );
@@ -119,7 +119,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4133")
-	public void workSubmittedFromExpectedThread() {
+	void workSubmittedFromExpectedThread() {
 		backendMock.indexingWorkExpectations( BackendIndexingWorkExpectations.async( "matching.*" ) );
 		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> { } );
 		assertThatThrownByCodeRunningInThreadWithName( "matchingFoo",
@@ -135,7 +135,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4133")
-	public void workSubmittedFromUnexpectedThread() {
+	void workSubmittedFromUnexpectedThread() {
 		backendMock.indexingWorkExpectations( BackendIndexingWorkExpectations.async( "matching.*" ) );
 		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> { } );
 		assertThatThrownByCodeRunningInThreadWithName( "wrongName",
@@ -158,7 +158,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4308")
-	public void syncDuplicateIndexingWork() {
+	void syncDuplicateIndexingWork() {
 		backendMock.indexingWorkExpectations( BackendIndexingWorkExpectations.sync() );
 		backendMock.expectWorks( INDEX_NAME ).add( b -> { } );
 
@@ -183,7 +183,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4308")
-	public void asyncDuplicateIndexingWork() {
+	void asyncDuplicateIndexingWork() {
 		backendMock.indexingWorkExpectations( BackendIndexingWorkExpectations.async( ".*" ) );
 		backendMock.expectWorks( INDEX_NAME ).add( b -> { } );
 
@@ -232,7 +232,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4308")
-	public void syncDuplicateNonIndexingWork() {
+	void syncDuplicateNonIndexingWork() {
 		backendMock.indexingWorkExpectations( BackendIndexingWorkExpectations.sync() );
 		backendMock.expectIndexScaleWorks( INDEX_NAME ).flush();
 
@@ -250,7 +250,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4308")
-	public void asyncDuplicateNonIndexingWork() {
+	void asyncDuplicateNonIndexingWork() {
 		backendMock.indexingWorkExpectations( BackendIndexingWorkExpectations.async( ".*" ) );
 		backendMock.expectIndexScaleWorks( INDEX_NAME ).flush();
 

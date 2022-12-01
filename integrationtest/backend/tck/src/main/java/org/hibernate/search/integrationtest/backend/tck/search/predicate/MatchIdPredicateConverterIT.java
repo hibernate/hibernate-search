@@ -44,14 +44,14 @@ public class MatchIdPredicateConverterIT {
 	}
 
 	@Test
-	public void match_id() {
+	void match_id() {
 		assertThatQuery( index.query()
 				.where( f -> f.id().matching( 1 ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
-	public void match_multiple_ids() {
+	void match_multiple_ids() {
 		assertThatQuery( index.query()
 				.where( f -> f.id()
 						.matching( 1 )
@@ -60,7 +60,7 @@ public class MatchIdPredicateConverterIT {
 	}
 
 	@Test
-	public void match_any_and_match_single_id() {
+	void match_any_and_match_single_id() {
 		assertThatQuery( index.query()
 				.where( f -> f.id()
 						.matching( 2 )
@@ -69,7 +69,7 @@ public class MatchIdPredicateConverterIT {
 	}
 
 	@Test
-	public void match_any_single_id() {
+	void match_any_single_id() {
 		assertThatQuery( index.query()
 				.where( f -> f.id()
 						.matchingAny( Arrays.asList( 1 ) ) ) )
@@ -77,7 +77,7 @@ public class MatchIdPredicateConverterIT {
 	}
 
 	@Test
-	public void match_any_ids() {
+	void match_any_ids() {
 		assertThatQuery( index.query()
 				.where( f -> f.id()
 						.matchingAny( Arrays.asList( 1, 3 ) ) ) )

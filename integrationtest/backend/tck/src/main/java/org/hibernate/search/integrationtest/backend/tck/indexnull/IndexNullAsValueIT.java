@@ -45,7 +45,7 @@ public class IndexNullAsValueIT {
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Test
-	public void indexNullAsValue_match() {
+	void indexNullAsValue_match() {
 		setUp();
 		StubMappingScope scope = index.createScope();
 
@@ -63,7 +63,7 @@ public class IndexNullAsValueIT {
 	}
 
 	@Test
-	public void indexNullAsValue_spatial() {
+	void indexNullAsValue_spatial() {
 		assumeTrue(
 				TckConfiguration.get().getBackendFeatures().geoPointIndexNullAs(),
 				"indexNullAs on a GeoPoint field must be supported"
@@ -79,7 +79,7 @@ public class IndexNullAsValueIT {
 	}
 
 	@Test
-	public void indexNullAsValue_fullText() {
+	void indexNullAsValue_fullText() {
 		assertThatThrownBy( () -> setupHelper.start()
 				.withIndex( StubMappedIndex.ofNonRetrievable(
 						root -> root.field(

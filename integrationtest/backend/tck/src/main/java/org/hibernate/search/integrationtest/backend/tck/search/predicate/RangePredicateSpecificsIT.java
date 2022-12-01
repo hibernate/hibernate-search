@@ -74,7 +74,7 @@ public class RangePredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void atLeast(DataSet<F> dataSet) {
+	void atLeast(DataSet<F> dataSet) {
 		int docOrdinal = 1;
 		assertThatQuery( index.query()
 				.where( f -> f.range().field( defaultDslConverterFieldPath( dataSet ) )
@@ -84,7 +84,7 @@ public class RangePredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void atLeast_withDslConverter_valueConvertDefault(DataSet<F> dataSet) {
+	void atLeast_withDslConverter_valueConvertDefault(DataSet<F> dataSet) {
 		int docOrdinal = 1;
 		assertThatQuery( index.query()
 				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
@@ -94,7 +94,7 @@ public class RangePredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void atLeast_withDslConverter_valueConvertNo(DataSet<F> dataSet) {
+	void atLeast_withDslConverter_valueConvertNo(DataSet<F> dataSet) {
 		int docOrdinal = 1;
 		assertThatQuery( index.query()
 				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
@@ -104,7 +104,7 @@ public class RangePredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void greaterThan(DataSet<F> dataSet) {
+	void greaterThan(DataSet<F> dataSet) {
 		assumeStrictGreaterThanSupported( dataSet );
 		int docOrdinal = 1;
 		assertThatQuery( index.query()
@@ -115,7 +115,7 @@ public class RangePredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void greaterThan_withDslConverter_valueConvertDefault(DataSet<F> dataSet) {
+	void greaterThan_withDslConverter_valueConvertDefault(DataSet<F> dataSet) {
 		assumeStrictGreaterThanSupported( dataSet );
 		int docOrdinal = 1;
 		assertThatQuery( index.query()
@@ -126,7 +126,7 @@ public class RangePredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void greaterThan_withDslConverter_valueConvertNo(DataSet<F> dataSet) {
+	void greaterThan_withDslConverter_valueConvertNo(DataSet<F> dataSet) {
 		assumeStrictGreaterThanSupported( dataSet );
 		int docOrdinal = 1;
 		assertThatQuery( index.query()
@@ -137,7 +137,7 @@ public class RangePredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void atMost(DataSet<F> dataSet) {
+	void atMost(DataSet<F> dataSet) {
 		int docOrdinal = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
 				.where( f -> f.range().field( defaultDslConverterFieldPath( dataSet ) )
@@ -147,7 +147,7 @@ public class RangePredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void atMost_withDslConverter_valueConvertDefault(DataSet<F> dataSet) {
+	void atMost_withDslConverter_valueConvertDefault(DataSet<F> dataSet) {
 		int docOrdinal = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
 				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
@@ -157,7 +157,7 @@ public class RangePredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void atMost_withDslConverter_valueConvertNo(DataSet<F> dataSet) {
+	void atMost_withDslConverter_valueConvertNo(DataSet<F> dataSet) {
 		int docOrdinal = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
 				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
@@ -167,7 +167,7 @@ public class RangePredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void lessThan(DataSet<F> dataSet) {
+	void lessThan(DataSet<F> dataSet) {
 		int docOrdinal = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
 				.where( f -> f.range().field( defaultDslConverterFieldPath( dataSet ) )
@@ -177,7 +177,7 @@ public class RangePredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void lessThan_withDslConverter_valueConvertDefault(DataSet<F> dataSet) {
+	void lessThan_withDslConverter_valueConvertDefault(DataSet<F> dataSet) {
 		int docOrdinal = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
 				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
@@ -187,7 +187,7 @@ public class RangePredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void lessThan_withDslConverter_valueConvertNo(DataSet<F> dataSet) {
+	void lessThan_withDslConverter_valueConvertNo(DataSet<F> dataSet) {
 		int docOrdinal = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
 				.where( f -> f.range().field( customDslConverterFieldPath( dataSet ) )
@@ -197,7 +197,7 @@ public class RangePredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void between(DataSet<F> dataSet) {
+	void between(DataSet<F> dataSet) {
 		int lowerValueNumber = 1;
 		int upperValueNumber = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
@@ -208,7 +208,7 @@ public class RangePredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void between_withDslConverter_valueConvertDefault(DataSet<F> dataSet) {
+	void between_withDslConverter_valueConvertDefault(DataSet<F> dataSet) {
 		int lowerValueNumber = 1;
 		int upperValueNumber = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
@@ -219,7 +219,7 @@ public class RangePredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void between_withDslConverter_valueConvertNo(DataSet<F> dataSet) {
+	void between_withDslConverter_valueConvertNo(DataSet<F> dataSet) {
 		int lowerValueNumber = 1;
 		int upperValueNumber = docCount( dataSet ) - 2;
 		assertThatQuery( index.query()
@@ -231,7 +231,7 @@ public class RangePredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void between_boundInclusion(DataSet<F> dataSet) {
+	void between_boundInclusion(DataSet<F> dataSet) {
 		int lowerValueNumber = 1;
 		int upperValueNumber = docCount( dataSet ) - 2;
 
@@ -272,7 +272,7 @@ public class RangePredicateSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void between_nullBounds(DataSet<F> dataSet) {
+	void between_nullBounds(DataSet<F> dataSet) {
 		int lowerDocOrdinal = 1;
 		int upperDocOrdinal = docCount( dataSet ) - 2;
 

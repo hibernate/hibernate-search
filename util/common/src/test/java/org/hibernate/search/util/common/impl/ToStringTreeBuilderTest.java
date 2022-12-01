@@ -12,10 +12,10 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-public class ToStringTreeBuilderTest {
+class ToStringTreeBuilderTest {
 
 	@Test
-	public void inlineStyle() {
+	void inlineStyle() {
 		assertThat( toString( ToStringStyle.inlineDelimiterStructure() ) )
 				.isEqualTo(
 						"foo=value, children={"
@@ -32,7 +32,7 @@ public class ToStringTreeBuilderTest {
 	}
 
 	@Test
-	public void multiLineStyle() {
+	void multiLineStyle() {
 		assertThat( toString( ToStringStyle.multilineDelimiterStructure() ) )
 				.isEqualTo(
 						"foo=value\n"
@@ -93,7 +93,7 @@ public class ToStringTreeBuilderTest {
 	}
 
 	@Test
-	public void multiLineLightStyle() {
+	void multiLineLightStyle() {
 		ToStringStyle style = ToStringStyle.multilineIndentStructure();
 		assertThat( toString( style ) )
 				.isEqualTo(

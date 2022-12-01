@@ -49,7 +49,7 @@ public class PredicateDefinitionContextIT {
 	}
 
 	@Test
-	public void param() {
+	void param() {
 		Object[] givenParams = new Object[] { "string", new Object(), 5L, Optional.empty() };
 		Object[] receivedParams = new Object[givenParams.length];
 
@@ -72,7 +72,7 @@ public class PredicateDefinitionContextIT {
 	}
 
 	@Test
-	public void param_absent() {
+	void param_absent() {
 		Object[] expectedParams = new Object[] { Optional.empty() };
 		Object[] actualsParams = new Object[1];
 
@@ -88,7 +88,7 @@ public class PredicateDefinitionContextIT {
 	}
 
 	@Test
-	public void param_nullName() {
+	void param_nullName() {
 		assertThatThrownBy( () -> index.createScope().predicate().named( "stub-predicate" )
 				.param( "impl", (PredicateDefinition) context -> {
 					context.param( null );
@@ -100,7 +100,7 @@ public class PredicateDefinitionContextIT {
 	}
 
 	@Test
-	public void missingParam() {
+	void missingParam() {
 		assertThatThrownBy( () -> index.createScope().predicate().named( "stub-predicate" )
 				.param( "impl", (PredicateDefinition) context -> {
 					context.param( "missing" );

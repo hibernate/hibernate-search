@@ -67,7 +67,7 @@ public class DocumentElementDynamicFieldNameIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addValue_nonNull(FieldTypeDescriptor<F> fieldType) {
+	void addValue_nonNull(FieldTypeDescriptor<F> fieldType) {
 		executeAdd( "1", document -> {
 			setNonNullValue( document, fieldType );
 		} );
@@ -78,7 +78,7 @@ public class DocumentElementDynamicFieldNameIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addValue_null(FieldTypeDescriptor<F> fieldType) {
+	void addValue_null(FieldTypeDescriptor<F> fieldType) {
 		executeAdd( "1", document -> {
 			setNullValue( document, fieldType );
 		} );
@@ -90,7 +90,7 @@ public class DocumentElementDynamicFieldNameIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addObject(FieldTypeDescriptor<F> fieldType) {
+	void addObject(FieldTypeDescriptor<F> fieldType) {
 		executeAdd( "1", document -> {
 			setNullValue( document, fieldType );
 
@@ -121,7 +121,7 @@ public class DocumentElementDynamicFieldNameIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addNullObject(FieldTypeDescriptor<F> fieldType) {
+	void addNullObject(FieldTypeDescriptor<F> fieldType) {
 		executeAdd( "1", document -> {
 			setNullValue( document, fieldType );
 
@@ -148,7 +148,7 @@ public class DocumentElementDynamicFieldNameIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void add_excludedFields(FieldTypeDescriptor<F> fieldType) {
+	void add_excludedFields(FieldTypeDescriptor<F> fieldType) {
 		executeAdd( "1", document -> {
 			DocumentElement excludingObject = document.addObject( "excludingObject" );
 			setNonNullValue( excludingObject, fieldType );
@@ -170,7 +170,7 @@ public class DocumentElementDynamicFieldNameIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addValue_unknownField(FieldTypeDescriptor<F> fieldType) {
+	void addValue_unknownField(FieldTypeDescriptor<F> fieldType) {
 		assertThatThrownBy( () -> executeAdd( "1", document -> {
 			document.addValue( "unknownField", null );
 		} ) )
@@ -183,7 +183,7 @@ public class DocumentElementDynamicFieldNameIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addObject_unknownField(FieldTypeDescriptor<F> fieldType) {
+	void addObject_unknownField(FieldTypeDescriptor<F> fieldType) {
 		assertThatThrownBy( () -> executeAdd( "1", document -> {
 			document.addObject( "unknownField" );
 		} ) )
@@ -196,7 +196,7 @@ public class DocumentElementDynamicFieldNameIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addNullObject_unknownField(FieldTypeDescriptor<F> fieldType) {
+	void addNullObject_unknownField(FieldTypeDescriptor<F> fieldType) {
 		assertThatThrownBy( () -> executeAdd( "1", document -> {
 			document.addNullObject( "unknownField" );
 		} ) )
@@ -209,7 +209,7 @@ public class DocumentElementDynamicFieldNameIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addValue_invalidType(FieldTypeDescriptor<F> fieldType) {
+	void addValue_invalidType(FieldTypeDescriptor<F> fieldType) {
 		FieldTypeDescriptor<?> invalidType = FieldTypeDescriptor.getIncompatible( fieldType );
 		Object valueWithInvalidType = invalidType.getIndexableValues().getSingle().get( 0 );
 

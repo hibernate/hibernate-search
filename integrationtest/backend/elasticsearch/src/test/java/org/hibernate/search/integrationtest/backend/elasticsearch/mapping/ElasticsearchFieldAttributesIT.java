@@ -28,7 +28,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchFieldAttributesIT {
+class ElasticsearchFieldAttributesIT {
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
@@ -39,7 +39,7 @@ public class ElasticsearchFieldAttributesIT {
 	public ElasticsearchClientSpy clientSpy = ElasticsearchClientSpy.create();
 
 	@Test
-	public void verifyNorms() {
+	void verifyNorms() {
 		JsonObject properties = new JsonObject();
 		properties.add( "keyword", fieldWithNorms( "keyword", false ) );
 		properties.add( "text", fieldWithNorms( "text", true ) );
@@ -55,7 +55,7 @@ public class ElasticsearchFieldAttributesIT {
 	}
 
 	@Test
-	public void verifyTermVector() {
+	void verifyTermVector() {
 		JsonObject properties = new JsonObject();
 		properties.add( "no", fieldWithTermVector( "no" ) );
 		properties.add( "yes", fieldWithTermVector( "yes" ) );
@@ -71,7 +71,7 @@ public class ElasticsearchFieldAttributesIT {
 	}
 
 	@Test
-	public void verifyNative() {
+	void verifyNative() {
 		JsonObject nativeField = new JsonObject();
 		nativeField.addProperty( "type", "half_float" );
 		nativeField.addProperty( "ignore_malformed", true );

@@ -86,42 +86,42 @@ public class RestartChunkIT {
 	}
 
 	@Test
-	public void failureBeforeFirstRead_fullScope() throws InterruptedException, IOException {
+	void failureBeforeFirstRead_fullScope() throws InterruptedException, IOException {
 		SimulatedFailure.raiseExceptionOnNextRead();
 		doTest( null, DB_COMP_ROWS, DB_COMP_ROWS / 5 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
-	public void failureDuringFirstCheckpointBetweenTwoWrites_fullScope() throws InterruptedException, IOException {
+	void failureDuringFirstCheckpointBetweenTwoWrites_fullScope() throws InterruptedException, IOException {
 		SimulatedFailure.raiseExceptionAfterXWrites( (int) ( CHECKPOINT_INTERVAL * 0.5 ) );
 		doTest( null, DB_COMP_ROWS, DB_COMP_ROWS / 5 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
-	public void failureDuringNonFirstCheckpointBetweenTwoWrites_fullScope() throws InterruptedException, IOException {
+	void failureDuringNonFirstCheckpointBetweenTwoWrites_fullScope() throws InterruptedException, IOException {
 		SimulatedFailure.raiseExceptionAfterXWrites( (int) ( CHECKPOINT_INTERVAL * 2.5 ) );
 		doTest( null, DB_COMP_ROWS, DB_COMP_ROWS / 5 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
-	public void failureBeforeFirstRead_hql() throws InterruptedException, IOException {
+	void failureBeforeFirstRead_hql() throws InterruptedException, IOException {
 		SimulatedFailure.raiseExceptionOnNextRead();
 		doTest( "select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
-	public void failureDuringFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException, IOException {
+	void failureDuringFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException, IOException {
 		SimulatedFailure.raiseExceptionAfterXWrites( (int) ( CHECKPOINT_INTERVAL * 0.5 ) );
 		doTest( "select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
-	public void failureDuringNonFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException, IOException {
+	void failureDuringNonFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException, IOException {
 		SimulatedFailure.raiseExceptionAfterXWrites( (int) ( CHECKPOINT_INTERVAL * 2.5 ) );
 		doTest( "select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
 	}

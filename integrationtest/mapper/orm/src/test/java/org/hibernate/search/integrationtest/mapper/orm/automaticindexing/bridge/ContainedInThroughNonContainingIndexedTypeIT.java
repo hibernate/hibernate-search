@@ -38,7 +38,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * This should not matter given the current implementation, but better safe than sorry.
  */
 @TestForIssue(jiraKey = "HSEARCH-2496")
-public class ContainedInThroughNonContainingIndexedTypeIT {
+class ContainedInThroughNonContainingIndexedTypeIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -62,7 +62,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		with( sessionFactory ).runInTransaction( session -> {
 			Containing containing = new Containing();
 			containing.setId( 1 );

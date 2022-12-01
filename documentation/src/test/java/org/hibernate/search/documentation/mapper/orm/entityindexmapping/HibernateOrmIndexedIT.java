@@ -74,7 +74,7 @@ public class HibernateOrmIndexedIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void search_separateQueries(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+	void search_separateQueries(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
 		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
@@ -93,7 +93,7 @@ public class HibernateOrmIndexedIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void search_singleQuery(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+	void search_singleQuery(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
 		init( annotationProcessingEnabled, mappingContributor );
 		assertThatThrownBy(
 				() -> with( entityManagerFactory ).runInTransaction( entityManager -> {

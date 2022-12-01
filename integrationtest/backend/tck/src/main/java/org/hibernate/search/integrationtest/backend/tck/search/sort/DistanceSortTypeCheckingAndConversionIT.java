@@ -96,7 +96,7 @@ public class DistanceSortTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void unsortable() {
+	void unsortable() {
 		assumeFalse(
 				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault(),
 				"Skipping test for ES GeoPoint as those would become sortable by default in this case."
@@ -115,7 +115,7 @@ public class DistanceSortTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIndex() {
+	void multiIndex_withCompatibleIndex() {
 		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
 		SearchQuery<DocumentReference> query;
@@ -133,7 +133,7 @@ public class DistanceSortTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void multiIndex_withRawFieldCompatibleIndex() {
+	void multiIndex_withRawFieldCompatibleIndex() {
 		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
 		SearchQuery<DocumentReference> query;
@@ -213,7 +213,7 @@ public class DistanceSortTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIndex() {
+	void multiIndex_withIncompatibleIndex() {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
 		String fieldPath = getFieldPath();

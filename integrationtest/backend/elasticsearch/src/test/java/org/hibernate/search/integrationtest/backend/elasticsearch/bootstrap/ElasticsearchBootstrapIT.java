@@ -38,7 +38,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchBootstrapIT {
+class ElasticsearchBootstrapIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -57,7 +57,7 @@ public class ElasticsearchBootstrapIT {
 	 * and that the Elasticsearch client starts in the second phase of bootstrap in that case.
 	 */
 	@Test
-	public void explicitModelDialect() {
+	void explicitModelDialect() {
 		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
 				.withBackendProperty(
 						ElasticsearchBackendSettings.VERSION, ElasticsearchTestDialect.getActualVersion().toString()
@@ -89,7 +89,7 @@ public class ElasticsearchBootstrapIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3841")
-	public void noVersionCheck_missingVersion() {
+	void noVersionCheck_missingVersion() {
 		assertThatThrownBy(
 				() -> setupHelper.start()
 						.withBackendProperty(
@@ -120,7 +120,7 @@ public class ElasticsearchBootstrapIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3841")
-	public void noVersionCheck_incompleteVersion() {
+	void noVersionCheck_incompleteVersion() {
 		assumeFalse(
 				isAtMost( ElasticsearchTestDialect.getActualVersion(), "elastic:5.6" ),
 				"This test only is only relevant" +
@@ -165,7 +165,7 @@ public class ElasticsearchBootstrapIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = {"HSEARCH-3841", "HSEARCH-4214"})
-	public void noVersionCheck_completeVersion() {
+	void noVersionCheck_completeVersion() {
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
 		String versionWithMajorAndMinorOnly = actualVersion.distribution() + ":"
 				+ actualVersion.major() + "." + actualVersion.minor().getAsInt();
@@ -201,7 +201,7 @@ public class ElasticsearchBootstrapIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4214")
-	public void noVersionCheck_versionOverrideOnStart_incompatibleVersion() {
+	void noVersionCheck_versionOverrideOnStart_incompatibleVersion() {
 		assumeFalse(
 				isAtMost( ElasticsearchTestDialect.getActualVersion(), "elastic:5.6" ),
 				"This test only is only relevant" +
@@ -255,7 +255,7 @@ public class ElasticsearchBootstrapIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4214")
-	public void noVersionCheck_versionOverrideOnStart_compatibleVersion() {
+	void noVersionCheck_versionOverrideOnStart_compatibleVersion() {
 		assumeFalse(
 				isAtMost( ElasticsearchTestDialect.getActualVersion(), "elastic:5.6" ),
 				"This test only is only relevant" +
@@ -302,7 +302,7 @@ public class ElasticsearchBootstrapIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = {"HSEARCH-4435"})
-	public void noVersionCheck_customSettingsAndMapping() {
+	void noVersionCheck_customSettingsAndMapping() {
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
 		String versionWithMajorAndMinorOnly = actualVersion.distribution() + ":"
 				+ actualVersion.major() + "." + actualVersion.minor().getAsInt();

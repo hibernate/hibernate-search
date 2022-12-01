@@ -83,7 +83,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void nonProjectable() {
+	void nonProjectable() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		String fieldPath = getNonProjectableFieldPath();
@@ -98,7 +98,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void projectableDefault() {
+	void projectableDefault() {
 		assumeFalse(
 				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault(),
 				"Skipping this test as the backend makes fields projectable by default."
@@ -170,7 +170,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void withProjectionConverters() {
+	void withProjectionConverters() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		String fieldPath = getFieldWithConverterPath();
@@ -190,7 +190,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIndex() {
+	void multiIndex_withCompatibleIndex() {
 		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
 		assertThatQuery( scope.query()
@@ -209,7 +209,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void multiIndex_withRawFieldCompatibleIndex() {
+	void multiIndex_withRawFieldCompatibleIndex() {
 		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
 		assertThatQuery( scope.query()
@@ -248,7 +248,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIndex() {
+	void multiIndex_withIncompatibleIndex() {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
 		String fieldPath = getFieldPath();
@@ -262,7 +262,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIndex_inNestedObject() {
+	void multiIndex_withIncompatibleIndex_inNestedObject() {
 		StubMappingScope scope = incompatibleIndex.createScope( mainIndex );
 
 		String fieldPath = mainIndex.binding().nestedObject.relativeFieldName + "."

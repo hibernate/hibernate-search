@@ -59,7 +59,7 @@ import org.springframework.stereotype.Component;
  * exactly as many times as expected.
  */
 @TestForIssue(jiraKey = { "HSEARCH-1316", "HSEARCH-3171" })
-public class SpringBeanResolutionIT {
+class SpringBeanResolutionIT {
 
 	@Configuration
 	@EnableAutoConfiguration
@@ -92,7 +92,7 @@ public class SpringBeanResolutionIT {
 	public StaticCounters counters = StaticCounters.create();
 
 	@Test
-	public void singleton_byType() {
+	void singleton_byType() {
 		doTest(
 				ExpectedScope.SINGLETON, UnnamedSingletonBean.KEYS,
 				BeanReference.of( UnnamedSingletonBean.class )
@@ -100,7 +100,7 @@ public class SpringBeanResolutionIT {
 	}
 
 	@Test
-	public void singleton_byName() {
+	void singleton_byName() {
 		doTest(
 				ExpectedScope.SINGLETON, NamedSingletonBean.KEYS,
 				BeanReference.of( InterfaceDefinedByMapper.class, NamedSingletonBean.NAME )
@@ -108,7 +108,7 @@ public class SpringBeanResolutionIT {
 	}
 
 	@Test
-	public void prototype_byType() {
+	void prototype_byType() {
 		doTest(
 				ExpectedScope.PROTOTYPE, UnnamedPrototypeBean.KEYS,
 				BeanReference.of( UnnamedPrototypeBean.class )
@@ -116,7 +116,7 @@ public class SpringBeanResolutionIT {
 	}
 
 	@Test
-	public void prototype_byName() {
+	void prototype_byName() {
 		doTest(
 				ExpectedScope.PROTOTYPE, NamedPrototypeBean.KEYS,
 				BeanReference.of( InterfaceDefinedByMapper.class, NamedPrototypeBean.NAME )

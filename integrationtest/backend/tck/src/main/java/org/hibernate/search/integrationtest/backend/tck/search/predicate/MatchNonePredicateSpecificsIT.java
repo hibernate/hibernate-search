@@ -43,14 +43,14 @@ public class MatchNonePredicateSpecificsIT {
 	}
 
 	@Test
-	public void matchNone() {
+	void matchNone() {
 		assertThatQuery( index.query()
 				.where( SearchPredicateFactory::matchNone ) )
 				.hasNoHits();
 	}
 
 	@Test
-	public void matchNoneWithinBoolPredicate() {
+	void matchNoneWithinBoolPredicate() {
 		//check that we will find something with a single match predicate
 		assertThatQuery( index.query()
 				.where(

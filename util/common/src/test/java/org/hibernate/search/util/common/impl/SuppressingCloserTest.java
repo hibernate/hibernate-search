@@ -18,10 +18,10 @@ import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 
 
-public class SuppressingCloserTest {
+class SuppressingCloserTest {
 
 	@Test
-	public void nullCloseable() {
+	void nullCloseable() {
 		Throwable mainException = new Exception();
 
 		// Should not do anything, in particular should not throw any NPE
@@ -34,7 +34,7 @@ public class SuppressingCloserTest {
 	}
 
 	@Test
-	public void extract_nullSupplier() {
+	void extract_nullSupplier() {
 		Throwable mainException = new Exception();
 
 		// Should not do anything, in particular should not throw any NPE
@@ -47,7 +47,7 @@ public class SuppressingCloserTest {
 	}
 
 	@Test
-	public void extract_nullCloseable() {
+	void extract_nullCloseable() {
 		Throwable mainException = new Exception();
 
 		// Should not do anything, in particular should not throw any NPE
@@ -60,7 +60,7 @@ public class SuppressingCloserTest {
 	}
 
 	@Test
-	public void javaIOCloseable() {
+	void javaIOCloseable() {
 		Throwable mainException = new Exception();
 		IOException exception1 = new IOException();
 		RuntimeException exception2 = new IllegalStateException();
@@ -79,7 +79,7 @@ public class SuppressingCloserTest {
 	}
 
 	@Test
-	public void extract_javaIOCloseable() {
+	void extract_javaIOCloseable() {
 		Throwable mainException = new Exception();
 		IOException exception1 = new IOException();
 		RuntimeException exception2 = new IllegalStateException();
@@ -100,7 +100,7 @@ public class SuppressingCloserTest {
 	}
 
 	@Test
-	public void autoCloseable() {
+	void autoCloseable() {
 		Throwable mainException = new Exception();
 		Exception exception1 = new Exception();
 		RuntimeException exception2 = new IllegalStateException();
@@ -119,7 +119,7 @@ public class SuppressingCloserTest {
 	}
 
 	@Test
-	public void extract_autoCloseable() {
+	void extract_autoCloseable() {
 		Throwable mainException = new Exception();
 		Exception exception1 = new Exception();
 		RuntimeException exception2 = new IllegalStateException();
@@ -139,7 +139,7 @@ public class SuppressingCloserTest {
 	}
 
 	@Test
-	public void runtimeException() {
+	void runtimeException() {
 		Throwable mainException = new Exception();
 		RuntimeException exception1 = new RuntimeException();
 		RuntimeException exception2 = new IllegalStateException();
@@ -157,7 +157,7 @@ public class SuppressingCloserTest {
 	}
 
 	@Test
-	public void extract_runtimeException() {
+	void extract_runtimeException() {
 		Throwable mainException = new Exception();
 		RuntimeException exception1 = new RuntimeException();
 		RuntimeException exception2 = new IllegalStateException();
@@ -179,7 +179,7 @@ public class SuppressingCloserTest {
 	}
 
 	@Test
-	public void someNonFailingCloseables() {
+	void someNonFailingCloseables() {
 		Throwable mainException = new Exception();
 		RuntimeException exception1 = new RuntimeException();
 		RuntimeException exception2 = new RuntimeException();
@@ -201,7 +201,7 @@ public class SuppressingCloserTest {
 	}
 
 	@Test
-	public void onlyNonFailingCloseables() {
+	void onlyNonFailingCloseables() {
 		Throwable mainException = new Exception();
 
 		new SuppressingCloser( mainException )
@@ -213,7 +213,7 @@ public class SuppressingCloserTest {
 	}
 
 	@Test
-	public void customCloseable() {
+	void customCloseable() {
 		Throwable mainException = new Exception();
 		MyException1 exception1 = new MyException1();
 		RuntimeException exception2 = new IllegalStateException();
@@ -231,7 +231,7 @@ public class SuppressingCloserTest {
 	}
 
 	@Test
-	public void iterable() {
+	void iterable() {
 		Throwable mainException = new Exception();
 		IOException exception1 = new IOException();
 		RuntimeException exception2 = new IllegalStateException();
@@ -255,7 +255,7 @@ public class SuppressingCloserTest {
 	}
 
 	@Test
-	public void extract_iterable() {
+	void extract_iterable() {
 		Throwable mainException = new Exception();
 		IOException exception1 = new IOException();
 		RuntimeException exception2 = new IllegalStateException();

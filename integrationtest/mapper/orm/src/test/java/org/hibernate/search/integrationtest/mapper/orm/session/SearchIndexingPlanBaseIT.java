@@ -75,7 +75,7 @@ public class SearchIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void simple() {
+	void simple() {
 		listenerEnabled( false );
 
 		setupHolder.runInTransaction( session -> {
@@ -103,7 +103,7 @@ public class SearchIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void mergedEvents() {
+	void mergedEvents() {
 		listenerEnabled( false );
 
 		setupHolder.runInTransaction( session -> {
@@ -178,7 +178,7 @@ public class SearchIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void purgeByEntityClass_invalidClass() {
+	void purgeByEntityClass_invalidClass() {
 		listenerEnabled( false );
 
 		Class<?> invalidClass = String.class;
@@ -200,7 +200,7 @@ public class SearchIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void purgeByEntityName() {
+	void purgeByEntityName() {
 		listenerEnabled( false );
 
 		setupHolder.runInTransaction( session -> {
@@ -214,7 +214,7 @@ public class SearchIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void purgeByEntityName_invalidName() {
+	void purgeByEntityName_invalidName() {
 		listenerEnabled( false );
 
 		String invalidName = "foo";
@@ -241,7 +241,7 @@ public class SearchIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void earlyProcess() {
+	void earlyProcess() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
 			IndexedEntity1 entity2 = new IndexedEntity1( 2, "number2" );
@@ -281,7 +281,7 @@ public class SearchIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void earlyExecute() {
+	void earlyExecute() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
 			IndexedEntity1 entity2 = new IndexedEntity1( 2, "number2" );
@@ -314,7 +314,7 @@ public class SearchIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void mixedExplicitAndAutomaticIndexing() {
+	void mixedExplicitAndAutomaticIndexing() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
 			IndexedEntity1 entity2 = new IndexedEntity1( 2, "number2" );
@@ -350,7 +350,7 @@ public class SearchIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void multiIndexMultiBackend() {
+	void multiIndexMultiBackend() {
 		listenerEnabled( false );
 
 		setupHolder.runInTransaction( session -> {
@@ -378,7 +378,7 @@ public class SearchIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void outOfSession() {
+	void outOfSession() {
 		listenerEnabled( false );
 
 		SearchIndexingPlan indexingPlan;

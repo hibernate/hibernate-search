@@ -60,7 +60,7 @@ public class Java17IT {
 
 	// This checks that top-level records get automatically indexed by Hibernate Search with Jandex, in particular.
 	@Test
-	public void searchAndProject() {
+	void searchAndProject() {
 		List<LibrarySimpleProjectionRecord> libraries = java17Service.searchAndProjectToRecord( "library", 0, 10 );
 		assertThat( libraries ).extracting( LibrarySimpleProjectionRecord::name ).containsExactly(
 				libraryService.getById( CITY_CENTER_ID, Library::getName ),
@@ -92,7 +92,7 @@ public class Java17IT {
 
 	// This checks that method-local records get automatically indexed by Hibernate Search with Jandex, in particular.
 	@Test
-	public void searchAndProjectToMethodLocalClass() {
+	void searchAndProjectToMethodLocalClass() {
 		List<LibrarySimpleProjectionRecord> libraries = java17Service.searchAndProjectToMethodLocalRecord( "library", 0, 10 );
 		assertThat( libraries ).extracting( LibrarySimpleProjectionRecord::name ).containsExactly(
 				libraryService.getById( CITY_CENTER_ID, Library::getName ),

@@ -24,7 +24,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.index.IndexReader;
 
-public class LuceneLowLevelIndexReaderIT {
+class LuceneLowLevelIndexReaderIT {
 
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper =
@@ -38,7 +38,7 @@ public class LuceneLowLevelIndexReaderIT {
 	}
 
 	@Test
-	public void indexReader() throws Exception {
+	void indexReader() throws Exception {
 		int numDocs;
 		//tag::indexReader[]
 		SearchMapping mapping = /* ... */ // <1>

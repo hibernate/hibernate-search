@@ -42,7 +42,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 
-public class ProgrammaticMappingSmokeIT {
+class ProgrammaticMappingSmokeIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -204,7 +204,7 @@ public class ProgrammaticMappingSmokeIT {
 	}
 
 	@Test
-	public void index() {
+	void index() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -395,7 +395,7 @@ public class ProgrammaticMappingSmokeIT {
 	}
 
 	@Test
-	public void search() {
+	void search() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchQuery<EntityReference> query = session.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
@@ -430,7 +430,7 @@ public class ProgrammaticMappingSmokeIT {
 	}
 
 	@Test
-	public void search_singleElementProjection() {
+	void search_singleElementProjection() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchQuery<String> query = session.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
@@ -464,7 +464,7 @@ public class ProgrammaticMappingSmokeIT {
 	}
 
 	@Test
-	public void search_multipleElementsProjection() {
+	void search_multipleElementsProjection() {
 		SearchScope<ParentIndexedEntity> scope = mapping.scope(
 				Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 		);

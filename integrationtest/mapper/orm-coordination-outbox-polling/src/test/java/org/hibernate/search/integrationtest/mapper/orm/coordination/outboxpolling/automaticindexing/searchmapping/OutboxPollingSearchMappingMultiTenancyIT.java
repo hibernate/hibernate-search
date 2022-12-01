@@ -22,7 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class OutboxPollingSearchMappingMultiTenancyIT {
+class OutboxPollingSearchMappingMultiTenancyIT {
 
 	private static final String TENANT_1_ID = "tenant1";
 	private static final String TENANT_2_ID = "tenant2";
@@ -54,7 +54,7 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 	}
 
 	@Test
-	public void countAbortedEvents_noTenantIdSpecified() {
+	void countAbortedEvents_noTenantIdSpecified() {
 		assertThatThrownBy( () -> searchMapping.countAbortedEvents() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -64,7 +64,7 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 	}
 
 	@Test
-	public void countAbortedEvents_wrongTenantId() {
+	void countAbortedEvents_wrongTenantId() {
 		assertThatThrownBy( () -> searchMapping.countAbortedEvents( "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -74,7 +74,7 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 	}
 
 	@Test
-	public void reprocessAbortedEvents_noTenantIdSpecified() {
+	void reprocessAbortedEvents_noTenantIdSpecified() {
 		assertThatThrownBy( () -> searchMapping.reprocessAbortedEvents() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -84,7 +84,7 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 	}
 
 	@Test
-	public void reprocessAbortedEvents_wrongTenantId() {
+	void reprocessAbortedEvents_wrongTenantId() {
 		assertThatThrownBy( () -> searchMapping.reprocessAbortedEvents( "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -94,7 +94,7 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 	}
 
 	@Test
-	public void clearAllAbortedEvents_noTenantIdSpecified() {
+	void clearAllAbortedEvents_noTenantIdSpecified() {
 		assertThatThrownBy( () -> searchMapping.clearAllAbortedEvents() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -104,7 +104,7 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 	}
 
 	@Test
-	public void clearAllAbortedEvents_wrongTenantId() {
+	void clearAllAbortedEvents_wrongTenantId() {
 		assertThatThrownBy( () -> searchMapping.clearAllAbortedEvents( "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -114,7 +114,7 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 	}
 
 	@Test
-	public void clearAllAbortedEvents() {
+	void clearAllAbortedEvents() {
 		assertThat( searchMapping.countAbortedEvents( TENANT_1_ID ) ).isZero();
 		assertThat( searchMapping.countAbortedEvents( TENANT_2_ID ) ).isZero();
 		assertThat( searchMapping.countAbortedEvents( TENANT_3_ID ) ).isZero();
@@ -134,7 +134,7 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 	}
 
 	@Test
-	public void reprocessAbortedEvents() {
+	void reprocessAbortedEvents() {
 		assertThat( searchMapping.countAbortedEvents( TENANT_1_ID ) ).isZero();
 		assertThat( searchMapping.countAbortedEvents( TENANT_2_ID ) ).isZero();
 		assertThat( searchMapping.countAbortedEvents( TENANT_3_ID ) ).isZero();

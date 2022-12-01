@@ -76,7 +76,7 @@ public class TermsPredicateMultivaluedIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void matchingAny_rightTerms(TermsPredicateTestValues<F> values) {
+	void matchingAny_rightTerms(TermsPredicateTestValues<F> values) {
 		String path = index.binding().field.get( values.fieldType() ).relativeFieldName;
 		for ( int i = 0; i < values.size(); i++ ) {
 			F term = values.matchingArg( i );
@@ -87,7 +87,7 @@ public class TermsPredicateMultivaluedIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void matchingAny_wrongTerms(TermsPredicateTestValues<F> values) {
+	void matchingAny_wrongTerms(TermsPredicateTestValues<F> values) {
 		String path = index.binding().field.get( values.fieldType() ).relativeFieldName;
 		for ( int i = 0; i < values.nonMatchingArgsSize(); i++ ) {
 			F term = values.nonMatchingArg( i );
@@ -98,7 +98,7 @@ public class TermsPredicateMultivaluedIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void matchingAll_someTerms(TermsPredicateTestValues<F> values) {
+	void matchingAll_someTerms(TermsPredicateTestValues<F> values) {
 		String path = index.binding().field.get( values.fieldType() ).relativeFieldName;
 
 		F firstTerm = null;
@@ -119,7 +119,7 @@ public class TermsPredicateMultivaluedIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void matchingAll_allTerms(TermsPredicateTestValues<F> values) {
+	void matchingAll_allTerms(TermsPredicateTestValues<F> values) {
 		String path = index.binding().field.get( values.fieldType() ).relativeFieldName;
 
 		F firstTerm = null;
@@ -140,7 +140,7 @@ public class TermsPredicateMultivaluedIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void matchingAll_oneWrongTerm(TermsPredicateTestValues<F> values) {
+	void matchingAll_oneWrongTerm(TermsPredicateTestValues<F> values) {
 		String path = index.binding().field.get( values.fieldType() ).relativeFieldName;
 
 		F firstTerm = null;

@@ -53,7 +53,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void success_simple(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
+	void success_simple(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -111,7 +111,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void analyzer_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
+	void analyzer_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -155,7 +155,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void analyzer_charFilters_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
+	void analyzer_charFilters_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -209,7 +209,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void analyzer_tokenizer_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
+	void analyzer_tokenizer_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -263,7 +263,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void analyzer_tokenFilters_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
+	void analyzer_tokenFilters_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -317,7 +317,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void charFilter_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
+	void charFilter_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -355,7 +355,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void tokenizer_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
+	void tokenizer_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -394,7 +394,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void tokenFilter_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
+	void tokenFilter_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -430,7 +430,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void charFilter_type_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
+	void charFilter_type_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -483,7 +483,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void charFilter_parameter_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
+	void charFilter_parameter_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -537,7 +537,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void charFilter_parameter_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
+	void charFilter_parameter_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -591,7 +591,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void tokenFilter_parameter_unexpected(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
+	void tokenFilter_parameter_unexpected(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"

@@ -38,7 +38,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Test that defining a routing bridge that generates (mutable) routing keys works as expected
  * with a full setup (real mapper + real backend).
  */
-public class RoutingBridgeConditionalIndexingIT {
+class RoutingBridgeConditionalIndexingIT {
 
 	@RegisterExtension
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
@@ -54,7 +54,7 @@ public class RoutingBridgeConditionalIndexingIT {
 	}
 
 	@Test
-	public void testLifecycle() {
+	void testLifecycle() {
 		assertThat( searchAllIds() ).isEmpty();
 
 		with( entityManagerFactory ).runInTransaction( entityManager -> {

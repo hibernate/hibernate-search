@@ -60,7 +60,7 @@ public class FilteredAssociationIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void reindexing(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+	void reindexing(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
 		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book = new Book();

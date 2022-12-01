@@ -47,7 +47,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 	}
 
 	@Test
-	public void serializedArray_replaceArray() {
+	void serializedArray_replaceArray() {
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -85,7 +85,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 	}
 
 	@Test
-	public void serializedArray_replaceElement() {
+	void serializedArray_replaceElement() {
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -119,7 +119,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 	}
 
 	@Test
-	public void elementCollectionArray_replaceArray() {
+	void elementCollectionArray_replaceArray() {
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -157,7 +157,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 	}
 
 	@Test
-	public void elementCollectionArray_replaceElement() {
+	void elementCollectionArray_replaceElement() {
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 

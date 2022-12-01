@@ -47,7 +47,7 @@ import org.awaitility.core.ThrowingRunnable;
 /**
  * See "limitations-parallel-embedded-update" in the documentation.
  */
-public class ConcurrentEmbeddedUpdateLimitationIT {
+class ConcurrentEmbeddedUpdateLimitationIT {
 
 	@RegisterExtension
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
@@ -56,7 +56,7 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 	private boolean synchronizationAsync;
 
 	@Test
-	public void indexingStrategySession() throws Throwable {
+	void indexingStrategySession() throws Throwable {
 		synchronizationAsync = false;
 		sessionFactory = setupHelper.start()
 				// This is absolutely necessary to avoid false positives in this test
@@ -82,7 +82,7 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 	}
 
 	@Test
-	public void indexingStrategyOutbox() throws Throwable {
+	void indexingStrategyOutbox() throws Throwable {
 		synchronizationAsync = true;
 		sessionFactory = setupHelper.start()
 				.withProperty( "hibernate.search.coordination.strategy", "outbox-polling" )

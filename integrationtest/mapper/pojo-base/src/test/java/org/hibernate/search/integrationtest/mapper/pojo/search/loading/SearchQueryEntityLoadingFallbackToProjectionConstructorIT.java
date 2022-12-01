@@ -37,7 +37,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * when no loader is registered for the loaded type.
  */
 @TestForIssue(jiraKey = "HSEARCH-4579")
-public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
+class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 
 	private static final String ENTITY_NAME = "entity_name";
 
@@ -51,7 +51,7 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 	protected final StubLoadingContext loadingContext = new StubLoadingContext();
 
 	@Test
-	public void withoutLoadingStrategy_withoutProjectionConstructor() {
+	void withoutLoadingStrategy_withoutProjectionConstructor() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -93,7 +93,7 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 	}
 
 	@Test
-	public void withoutLoadingStrategy_withProjectionConstructor() {
+	void withoutLoadingStrategy_withProjectionConstructor() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -144,7 +144,7 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 
 
 	@Test
-	public void withLoadingStrategy_withProjectionConstructor() {
+	void withLoadingStrategy_withProjectionConstructor() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -217,7 +217,7 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 	}
 
 	@Test
-	public void multiType() {
+	void multiType() {
 		class Model {
 			@Indexed
 			class IndexedEntityWithLoadingStrategy {

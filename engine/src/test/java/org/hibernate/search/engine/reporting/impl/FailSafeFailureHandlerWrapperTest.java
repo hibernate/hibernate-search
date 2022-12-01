@@ -29,7 +29,7 @@ import org.mockito.quality.Strictness;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
-public class FailSafeFailureHandlerWrapperTest {
+class FailSafeFailureHandlerWrapperTest {
 
 	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
@@ -45,7 +45,7 @@ public class FailSafeFailureHandlerWrapperTest {
 	}
 
 	@Test
-	public void genericContext_runtimeException() {
+	void genericContext_runtimeException() {
 		RuntimeException runtimeException = new SimulatedRuntimeException();
 
 		logged.expectEvent(
@@ -58,7 +58,7 @@ public class FailSafeFailureHandlerWrapperTest {
 	}
 
 	@Test
-	public void genericContext_error() {
+	void genericContext_error() {
 		Error error = new SimulatedError();
 
 		logged.expectEvent(
@@ -71,7 +71,7 @@ public class FailSafeFailureHandlerWrapperTest {
 	}
 
 	@Test
-	public void entityIndexingContext_runtimeException() {
+	void entityIndexingContext_runtimeException() {
 		RuntimeException runtimeException = new SimulatedRuntimeException();
 
 		logged.expectEvent(
@@ -84,7 +84,7 @@ public class FailSafeFailureHandlerWrapperTest {
 	}
 
 	@Test
-	public void entityIndexingContext_error() {
+	void entityIndexingContext_error() {
 		Error error = new SimulatedError();
 
 		logged.expectEvent(

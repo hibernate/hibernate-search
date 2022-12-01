@@ -33,7 +33,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest(classes = JtaAndSpringOutboxApplicationConfiguration.class)
 @ActiveProfiles({ "jta", "outbox" })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class JtaAndSpringOutboxIT {
+class JtaAndSpringOutboxIT {
 
 	@Autowired
 	@RegisterExtension
@@ -58,7 +58,7 @@ public class JtaAndSpringOutboxIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		Snert snert = new Snert();
 		snert.setId( 1L );
 		snert.setName( "dave" );

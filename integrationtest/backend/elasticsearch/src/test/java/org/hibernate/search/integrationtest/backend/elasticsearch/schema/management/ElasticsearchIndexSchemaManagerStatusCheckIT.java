@@ -54,7 +54,7 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void indexMissing(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
+	void indexMissing(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
 		assumeFalse(
 				ElasticsearchIndexSchemaManagerOperation.creating().contains( operation ),
 				"The operation " + operation + " creates an index automatically."
@@ -70,7 +70,7 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void invalidIndexStatus_creatingIndex(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
+	void invalidIndexStatus_creatingIndex(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
 		assumeTrue(
 				ElasticsearchIndexSchemaManagerOperation.creating().contains( operation ),
 				"The operation " + operation + " doesn't create an index automatically."
@@ -88,7 +88,7 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void invalidIndexStatus_usingPreexistingIndex(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
+	void invalidIndexStatus_usingPreexistingIndex(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
 		assumeFalse(
 				ElasticsearchIndexSchemaManagerOperation.dropping().contains( operation ),
 				"The operation " + operation + " drops the existing index automatically."

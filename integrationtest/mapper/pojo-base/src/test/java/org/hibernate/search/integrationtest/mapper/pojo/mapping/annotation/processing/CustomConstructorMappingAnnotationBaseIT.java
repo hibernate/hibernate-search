@@ -45,7 +45,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  */
 @SuppressWarnings("unused")
 @TestForIssue(jiraKey = "HSEARCH-3927")
-public class CustomConstructorMappingAnnotationBaseIT {
+class CustomConstructorMappingAnnotationBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -62,7 +62,7 @@ public class CustomConstructorMappingAnnotationBaseIT {
 	 * Basic test checking that a simple constructor mapping will be applied as expected.
 	 */
 	@Test
-	public void simple() {
+	void simple() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -123,7 +123,7 @@ public class CustomConstructorMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void missingProcessorReference() {
+	void missingProcessorReference() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -149,7 +149,7 @@ public class CustomConstructorMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void invalidAnnotationType() {
+	void invalidAnnotationType() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -193,7 +193,7 @@ public class CustomConstructorMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void annotatedElement() {
+	void annotatedElement() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -304,7 +304,7 @@ public class CustomConstructorMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void eventContext() {
+	void eventContext() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntityType {
 			@DocumentId

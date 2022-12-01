@@ -25,7 +25,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.document.FeatureField;
 
-public class LuceneNativeTypeIT {
+class LuceneNativeTypeIT {
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
@@ -37,7 +37,7 @@ public class LuceneNativeTypeIT {
 	}
 
 	@Test
-	public void smoke() {
+	void smoke() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			WebPage webPage1 = new WebPage();
 			webPage1.setId( 1 );

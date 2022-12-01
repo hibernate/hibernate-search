@@ -31,7 +31,7 @@ import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class HibernateOrmBootstrapIntrospectorAccessTypeTest
+class HibernateOrmBootstrapIntrospectorAccessTypeTest
 		extends AbstractHibernateOrmBootstrapIntrospectorPerReflectionStrategyTest {
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")

@@ -52,7 +52,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void success(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void success(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate1", f -> f.asInteger() )
 					.matchingPathGlob( "*_t1" );
@@ -96,7 +96,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void missing(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void missing(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
 			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
@@ -131,7 +131,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void extra(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void extra(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
 			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
@@ -174,7 +174,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void wrongOrder(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void wrongOrder(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
 			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
@@ -216,7 +216,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void duplicate(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void duplicate(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
 		} );
@@ -252,7 +252,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void attribute_pathMatch_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void attribute_pathMatch_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.objectFieldTemplate( "myTemplate", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_suffix" );
@@ -283,7 +283,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void attribute_pathMatch_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void attribute_pathMatch_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.objectFieldTemplate( "myTemplate", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_suffix" );
@@ -315,7 +315,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void attribute_pathMatch_extra(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void attribute_pathMatch_extra(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate", f -> f.asString() );
 		} );
@@ -345,7 +345,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void attribute_matchMappingType_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void attribute_matchMappingType_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.objectFieldTemplate( "myTemplate", ObjectStructure.NESTED );
 		} );
@@ -375,7 +375,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void attribute_matchMappingType_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void attribute_matchMappingType_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.objectFieldTemplate( "myTemplate", ObjectStructure.NESTED );
 		} );
@@ -406,7 +406,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void attribute_matchMappingType_extra(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void attribute_matchMappingType_extra(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate", f -> f.asString() );
 		} );
@@ -437,7 +437,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void attribute_extra(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void attribute_extra(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate", f -> f.asString() );
 		} );
@@ -468,7 +468,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void mapping_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void mapping_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate", f -> f.asString() );
 		} );

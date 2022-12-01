@@ -20,7 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ReindexOnUpdateNoIncorrectIT {
+class ReindexOnUpdateNoIncorrectIT {
 
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper =
@@ -34,7 +34,7 @@ public class ReindexOnUpdateNoIncorrectIT {
 	}
 
 	@Test
-	public void missingReindexOnUpdateNo() {
+	void missingReindexOnUpdateNo() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			for ( int i = 0 ; i < 2000 ; ++i ) {
 				Sensor sensor = new Sensor();

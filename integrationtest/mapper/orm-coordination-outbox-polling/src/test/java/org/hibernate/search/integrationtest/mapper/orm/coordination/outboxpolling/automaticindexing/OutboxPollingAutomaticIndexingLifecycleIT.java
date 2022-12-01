@@ -28,7 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class OutboxPollingAutomaticIndexingLifecycleIT {
+class OutboxPollingAutomaticIndexingLifecycleIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -46,7 +46,7 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 	}
 
 	@Test
-	public void stopWhileOutboxEventsIsBeingProcessed() {
+	void stopWhileOutboxEventsIsBeingProcessed() {
 		SessionFactory sessionFactory = setup();
 		backendMock.verifyExpectationsMet();
 		int size = 1000;
@@ -96,7 +96,7 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 	}
 
 	@Test
-	public void processCreateUpdateDelete() {
+	void processCreateUpdateDelete() {
 		SessionFactory sessionFactory = setup();
 		backendMock.verifyExpectationsMet();
 

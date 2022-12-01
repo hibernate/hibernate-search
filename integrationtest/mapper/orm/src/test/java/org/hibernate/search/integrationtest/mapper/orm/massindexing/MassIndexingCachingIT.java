@@ -81,7 +81,7 @@ public class MassIndexingCachingIT {
 	@Test
 	// Note this test used to pass even before fixed HSEARCH-4272, but only because of another bug: HSEARCH-4273
 	@TestForIssue(jiraKey = "HSEARCH-4272")
-	public void default_ignore() {
+	void default_ignore() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();
@@ -119,7 +119,7 @@ public class MassIndexingCachingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4273")
-	public void explicit_get() {
+	void explicit_get() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer()
@@ -157,7 +157,7 @@ public class MassIndexingCachingIT {
 	}
 
 	@Test
-	public void explicit_normal() {
+	void explicit_normal() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer()

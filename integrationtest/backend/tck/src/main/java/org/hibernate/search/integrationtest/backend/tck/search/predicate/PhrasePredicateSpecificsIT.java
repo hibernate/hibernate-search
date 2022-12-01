@@ -70,7 +70,7 @@ public class PhrasePredicateSpecificsIT {
 	}
 
 	@Test
-	public void nonAnalyzedField() {
+	void nonAnalyzedField() {
 		String absoluteFieldPath = index.binding().nonAnalyzedField.relativeFieldName;
 
 		assertThatQuery( index.query()

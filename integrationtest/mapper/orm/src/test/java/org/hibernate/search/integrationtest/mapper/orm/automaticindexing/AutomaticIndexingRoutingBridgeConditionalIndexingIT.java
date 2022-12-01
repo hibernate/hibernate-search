@@ -50,7 +50,7 @@ public class AutomaticIndexingRoutingBridgeConditionalIndexingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4537")
-	public void testLifecycle() {
+	void testLifecycle() {
 		setupHolder.runInTransaction( entityManager -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );

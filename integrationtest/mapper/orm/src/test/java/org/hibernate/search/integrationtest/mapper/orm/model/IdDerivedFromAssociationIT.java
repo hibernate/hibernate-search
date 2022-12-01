@@ -31,7 +31,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 /**
  * Tests behavior when an entity binds a {@code @OneToOne} association as its {@code @Id}.
  */
-public class IdDerivedFromAssociationIT {
+class IdDerivedFromAssociationIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -43,7 +43,7 @@ public class IdDerivedFromAssociationIT {
 	// with an appropriate error message giving at least a hint of how to solve the problem.
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4352")
-	public void indexed_withoutDocumentId() {
+	void indexed_withoutDocumentId() {
 		assertThatThrownBy( () -> ormSetupHelper.start().setup( NonIndexedBaseForIndexedDerived.class, IndexedDerived.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -59,7 +59,7 @@ public class IdDerivedFromAssociationIT {
 	// even though the class with a derived ID was not indexed.
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4352")
-	public void nonIndexed() {
+	void nonIndexed() {
 		backendMock.expectAnySchema( IndexedBaseForNonIndexedDerived.NAME );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
@@ -81,7 +81,7 @@ public class IdDerivedFromAssociationIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4352")
-	public void indexed_withDocumentId() {
+	void indexed_withDocumentId() {
 		backendMock.expectAnySchema( IndexedDerivedWithDocumentId.NAME );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()

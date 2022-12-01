@@ -59,7 +59,7 @@ public class AggregationBaseIT {
 	}
 
 	@Test
-	public void extension() {
+	void extension() {
 		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query;
 		AggregationKey<Map<String, Long>> aggregationKey = AggregationKey.of( "someAggregation" );

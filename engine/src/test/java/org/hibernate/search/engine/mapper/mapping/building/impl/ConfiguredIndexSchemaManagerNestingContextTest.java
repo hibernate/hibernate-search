@@ -42,7 +42,7 @@ import org.mockito.quality.Strictness;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
-public class ConfiguredIndexSchemaManagerNestingContextTest {
+class ConfiguredIndexSchemaManagerNestingContextTest {
 
 	@Mock(strictness = Mock.Strictness.LENIENT)
 	private MappableTypeModel typeModel1Mock;
@@ -77,7 +77,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	}
 
 	@Test
-	public void noFilter() {
+	void noFilter() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		checkFooBarIncluded( "", rootContext );
@@ -89,7 +89,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	}
 
 	@Test
-	public void indexedEmbedded_noFilter() {
+	void indexedEmbedded_noFilter() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
@@ -114,7 +114,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	}
 
 	@Test
-	public void indexedEmbedded_noFilter_detectCycle_direct() {
+	void indexedEmbedded_noFilter_detectCycle_direct() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
@@ -141,7 +141,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	}
 
 	@Test
-	public void indexedEmbedded_noFilter_detectCycle_indirect() {
+	void indexedEmbedded_noFilter_detectCycle_indirect() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
@@ -172,7 +172,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	}
 
 	@Test
-	public void indexedEmbedded_noFilter_multiLevelInOneIndexedEmbedded() {
+	void indexedEmbedded_noFilter_multiLevelInOneIndexedEmbedded() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		ArgumentCaptor<ConfiguredIndexSchemaNestingContext> nestedContextCapture =
@@ -209,7 +209,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2552")
-	public void indexedEmbedded_includePaths() {
+	void indexedEmbedded_includePaths() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
@@ -294,7 +294,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3136")
-	public void indexedEmbedded_includePaths_tracking() {
+	void indexedEmbedded_includePaths_tracking() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
@@ -502,7 +502,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2194")
-	public void indexedEmbedded_noFilterThenIncludePaths() {
+	void indexedEmbedded_noFilterThenIncludePaths() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		// First level of @IndexedEmbedded: no filter
@@ -522,7 +522,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	}
 
 	@Test
-	public void indexedEmbedded_depth0() {
+	void indexedEmbedded_depth0() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		// Depth == 0 => only include fields and nested indexed-embeddeds if they are explicitly included.
@@ -535,7 +535,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	}
 
 	@Test
-	public void indexedEmbedded_depth1() {
+	void indexedEmbedded_depth1() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		// Depth == 1 => implicitly include all fields at the first level,
@@ -561,7 +561,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	}
 
 	@Test
-	public void indexedEmbedded_depth3_overridden() {
+	void indexedEmbedded_depth3_overridden() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		// Depth == 3 => allow three levels of IndexedEmbedded composition, including level1,
@@ -630,7 +630,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	}
 
 	@Test
-	public void indexedEmbedded_includePaths_depth1() {
+	void indexedEmbedded_includePaths_depth1() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
@@ -704,7 +704,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3136")
-	public void indexedEmbedded_includePaths_depth1_tracking() {
+	void indexedEmbedded_includePaths_depth1_tracking() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
@@ -804,7 +804,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	}
 
 	@Test
-	public void indexedEmbedded_includePaths_embedding_includePaths() {
+	void indexedEmbedded_includePaths_embedding_includePaths() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
@@ -845,7 +845,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	}
 
 	@Test
-	public void indexedEmbedded_includePaths_embedding_depth1AndIncludePaths() {
+	void indexedEmbedded_includePaths_embedding_depth1AndIncludePaths() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
@@ -879,7 +879,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3684")
-	public void indexedEmbedded_includePaths_embedding_depth2AndIncludePaths() {
+	void indexedEmbedded_includePaths_embedding_depth2AndIncludePaths() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();

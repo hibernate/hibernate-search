@@ -57,7 +57,7 @@ public abstract class AbstractEntityReferenceProjectionIT {
 			SearchQuerySelectStep<?, R, E, LOS, ?, ?> step);
 
 	@Test
-	public void noReferenceTransformer() {
+	void noReferenceTransformer() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = select( scope.query() )
@@ -72,7 +72,7 @@ public abstract class AbstractEntityReferenceProjectionIT {
 	}
 
 	@Test
-	public void referenceTransformer() {
+	void referenceTransformer() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 		StubTransformedReference doc1TransformedReference = new StubTransformedReference( doc1Reference );

@@ -127,7 +127,7 @@ public class AnnotationMappingSmokeIT {
 	}
 
 	@Test
-	public void index() {
+	void index() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -284,7 +284,7 @@ public class AnnotationMappingSmokeIT {
 	}
 
 	@Test
-	public void search() {
+	void search() {
 		backendMock.inLenientMode( () -> setupHolder.runInTransaction( session -> {
 			IndexedEntity entity0 = new IndexedEntity();
 			entity0.setId( 0 );

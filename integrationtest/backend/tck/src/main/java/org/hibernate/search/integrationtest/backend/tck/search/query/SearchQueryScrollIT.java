@@ -51,7 +51,7 @@ public class SearchQueryScrollIT {
 	}
 
 	@Test
-	public void none() {
+	void none() {
 		try ( SearchScroll<DocumentReference> scroll = matchNoneQuery().scroll( CHUNK_SIZE ) ) {
 			SearchScrollResult<DocumentReference> scrollResult = scroll.next();
 			assertThat( scrollResult.hasHits() ).isFalse();
@@ -61,7 +61,7 @@ public class SearchQueryScrollIT {
 	}
 
 	@Test
-	public void one() {
+	void one() {
 		try ( SearchScroll<DocumentReference> scroll = matchOneQuery( 4 ).scroll( CHUNK_SIZE ) ) {
 			SearchScrollResult<DocumentReference> scrollResult = scroll.next();
 			assertThat( scrollResult.hasHits() ).isTrue();
@@ -75,42 +75,42 @@ public class SearchQueryScrollIT {
 	}
 
 	@Test
-	public void all() {
+	void all() {
 		try ( SearchScroll<DocumentReference> scroll = matchAllQuery().scroll( CHUNK_SIZE ) ) {
 			checkScrolling( scroll, DOCUMENT_COUNT, CHUNK_SIZE );
 		}
 	}
 
 	@Test
-	public void all_exactDivisorPageSize() {
+	void all_exactDivisorPageSize() {
 		try ( SearchScroll<DocumentReference> scroll = matchAllQuery().scroll( EXACT_DIVISOR_CHUNK_SIZE ) ) {
 			checkScrolling( scroll, DOCUMENT_COUNT, EXACT_DIVISOR_CHUNK_SIZE );
 		}
 	}
 
 	@Test
-	public void firstHalf() {
+	void firstHalf() {
 		try ( SearchScroll<DocumentReference> scroll = matchFirstHalfQuery().scroll( CHUNK_SIZE ) ) {
 			checkScrolling( scroll, DOCUMENT_COUNT / 2, CHUNK_SIZE );
 		}
 	}
 
 	@Test
-	public void firstHalf_onePage() {
+	void firstHalf_onePage() {
 		try ( SearchScroll<DocumentReference> scroll = matchFirstHalfQuery().scroll( DOCUMENT_COUNT / 2 ) ) {
 			checkScrolling( scroll, DOCUMENT_COUNT / 2, DOCUMENT_COUNT / 2 );
 		}
 	}
 
 	@Test
-	public void firstHalf_largerPage() {
+	void firstHalf_largerPage() {
 		try ( SearchScroll<DocumentReference> scroll = matchFirstHalfQuery().scroll( DOCUMENT_COUNT / 2 + 10 ) ) {
 			checkScrolling( scroll, DOCUMENT_COUNT / 2, DOCUMENT_COUNT / 2 );
 		}
 	}
 
 	@Test
-	public void tookAndTimedOut() {
+	void tookAndTimedOut() {
 		try ( SearchScroll<DocumentReference> scroll = matchAllQuery().scroll( CHUNK_SIZE ) ) {
 			SearchScrollResult<DocumentReference> result = scroll.next();
 
@@ -120,7 +120,7 @@ public class SearchQueryScrollIT {
 	}
 
 	@Test
-	public void resultTotal() {
+	void resultTotal() {
 		try ( SearchScroll<DocumentReference> scroll = matchAllWithConditionSortedByScoreQuery()
 				.scroll( CHUNK_SIZE ) ) {
 			for ( SearchScrollResult<DocumentReference> chunk = scroll.next(); chunk.hasHits();
@@ -136,7 +136,7 @@ public class SearchQueryScrollIT {
 	}
 
 	@Test
-	public void resultTotal_totalHitCountThreshold() {
+	void resultTotal_totalHitCountThreshold() {
 		assumeTrue(
 				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForScroll(),
 				"This backend doesn't take totalHitsThreshold() into account for scrolls."
@@ -198,7 +198,7 @@ public class SearchQueryScrollIT {
 	}
 
 	@Test
-	public void resultTotal_totalHitCountThreshold_veryHigh() {
+	void resultTotal_totalHitCountThreshold_veryHigh() {
 		assumeTrue(
 				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForScroll(),
 				"This backend doesn't take totalHitsThreshold() into account for scrolls."

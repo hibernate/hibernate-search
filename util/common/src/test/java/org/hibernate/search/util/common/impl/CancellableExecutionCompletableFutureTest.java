@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
 
-public class CancellableExecutionCompletableFutureTest {
+class CancellableExecutionCompletableFutureTest {
 
 	private ExecutorService executorService;
 
@@ -46,7 +46,7 @@ public class CancellableExecutionCompletableFutureTest {
 	}
 
 	@Test
-	public void runnable_success() {
+	void runnable_success() {
 		AtomicBoolean finished = new AtomicBoolean( false );
 		CompletableFuture<Void> future = new CancellableExecutionCompletableFuture<>(
 				() -> finished.set( true ),
@@ -59,7 +59,7 @@ public class CancellableExecutionCompletableFutureTest {
 	}
 
 	@Test
-	public void runnable_runtimeException() {
+	void runnable_runtimeException() {
 		AtomicBoolean finished = new AtomicBoolean( false );
 		RuntimeException exception = new RuntimeException( "Some message" );
 		CompletableFuture<Void> future = new CancellableExecutionCompletableFuture<>(
@@ -80,7 +80,7 @@ public class CancellableExecutionCompletableFutureTest {
 	}
 
 	@Test
-	public void runnable_error() {
+	void runnable_error() {
 		AtomicBoolean finished = new AtomicBoolean( false );
 		Error error = new Error( "Some message" );
 		CompletableFuture<Void> future = new CancellableExecutionCompletableFuture<>(
@@ -101,7 +101,7 @@ public class CancellableExecutionCompletableFutureTest {
 	}
 
 	@Test
-	public void runnable_cancel() throws InterruptedException {
+	void runnable_cancel() throws InterruptedException {
 		AtomicBoolean started = new AtomicBoolean( false );
 		AtomicBoolean finished = new AtomicBoolean( false );
 		CompletableFuture<Void> future = new CancellableExecutionCompletableFuture<>(

@@ -26,7 +26,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.Sta
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ProjectionConstructorRecordIT {
+class ProjectionConstructorRecordIT {
 
 	private static final String INDEX_NAME = "index_name";
 
@@ -37,7 +37,7 @@ public class ProjectionConstructorRecordIT {
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void typeLevelAnnotation() {
+	void typeLevelAnnotation() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -70,7 +70,7 @@ public class ProjectionConstructorRecordIT {
 	}
 
 	@Test
-	public void constructorLevelAnnotation_canonical() {
+	void constructorLevelAnnotation_canonical() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -110,7 +110,7 @@ public class ProjectionConstructorRecordIT {
 	}
 
 	@Test
-	public void constructorLevelAnnotation_nonCanonical() {
+	void constructorLevelAnnotation_nonCanonical() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId

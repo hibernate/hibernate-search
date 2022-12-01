@@ -48,7 +48,7 @@ public class DistanceSortFilteringSpecificsIT {
 	}
 
 	@Test
-	public void nonNested() {
+	void nonNested() {
 		String fieldPath = index.binding().flattenedObject.relativeFieldName + ".geoPoint";
 
 		assertThatThrownBy(
@@ -63,7 +63,7 @@ public class DistanceSortFilteringSpecificsIT {
 	}
 
 	@Test
-	public void invalidNestedPath_parent() {
+	void invalidNestedPath_parent() {
 		String fieldPath = index.binding().nestedObject1.relativeFieldName + ".geoPoint";
 		String fieldInParentPath = "geoPoint";
 
@@ -80,7 +80,7 @@ public class DistanceSortFilteringSpecificsIT {
 	}
 
 	@Test
-	public void invalidNestedPath_sibling() {
+	void invalidNestedPath_sibling() {
 		String fieldPath = index.binding().nestedObject1.relativeFieldName + ".geoPoint";
 		String fieldInSiblingPath = index.binding().nestedObject2.relativeFieldName + ".geoPoint";
 

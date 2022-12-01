@@ -42,7 +42,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Does not test sorts and predicates, or other features that only involve the backend.
  * Those should be tested in the backend integration tests.
  */
-public class SearchQueryBaseIT {
+class SearchQueryBaseIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -66,7 +66,7 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void target_byClass_singleType() {
+	void target_byClass_singleType() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchQuery<EntityReference> query = searchSession.search( Book.class )
 					.selectEntityReference()
@@ -93,7 +93,7 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void target_byClass_multipleTypes() {
+	void target_byClass_multipleTypes() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchQuery<EntityReference> query = searchSession.search( Arrays.asList( Book.class, Author.class ) )
 					.selectEntityReference()
@@ -118,7 +118,7 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void target_byClass_invalidClass() {
+	void target_byClass_invalidClass() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			Class<?> invalidClass = String.class;
 

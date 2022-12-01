@@ -40,7 +40,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
+class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
 	private static final String OUTBOX_EVENT_UPDATE_ID_AND_TIME = "UPDATE HSEARCH_OUTBOX_EVENT SET ID = ?, CREATED = ? WHERE ID = ?";
 
@@ -73,7 +73,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 	}
 
 	@Test
-	public void processCreateUpdateDelete() {
+	void processCreateUpdateDelete() {
 		// An entity is created, updated, then deleted in separate transactions,
 		// but the delete event has ID 1, the update event has ID 2, and the add event has ID 3.
 
@@ -142,7 +142,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 	}
 
 	@Test
-	public void processDeleteRecreate_rightOrder() {
+	void processDeleteRecreate_rightOrder() {
 		// An entity is deleted, then re-created in separate transactions.
 
 		int id = 1;
@@ -176,7 +176,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 	}
 
 	@Test
-	public void processDeleteRecreate_outOfOrder() {
+	void processDeleteRecreate_outOfOrder() {
 		// An entity is deleted, then re-created in separate transactions,
 		// but the add event has ID 1, the and the delete event has ID 2.
 
@@ -237,7 +237,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 	}
 
 	@Test
-	public void processDifferentRoutesUpdates() {
+	void processDifferentRoutesUpdates() {
 		// An entity is updated twice in two separate transactions,
 		// resulting in two events with different routing keys
 
@@ -284,7 +284,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 	}
 
 	@Test
-	public void processDifferentRoutesUpdates_outOfOrder() {
+	void processDifferentRoutesUpdates_outOfOrder() {
 		// An entity is updated twice in two separate transactions,
 		// resulting in two events with different routing keys,
 		// but the second update event has ID 1, and the first update has ID 2.

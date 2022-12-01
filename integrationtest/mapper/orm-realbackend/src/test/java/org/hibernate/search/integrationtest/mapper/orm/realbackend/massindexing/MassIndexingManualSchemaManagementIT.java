@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class MassIndexingManualSchemaManagementIT {
+class MassIndexingManualSchemaManagementIT {
 
 	private static final int NUMBER_OF_BOOKS = 200;
 	private static final int MASS_INDEXING_MONITOR_LOG_PERIOD = 50; // This is the default in the implementation, do not change this value
@@ -70,7 +70,7 @@ public class MassIndexingManualSchemaManagementIT {
 	}
 
 	@Test
-	public void testMassIndexingWithAutomaticDropAndCreate() {
+	void testMassIndexingWithAutomaticDropAndCreate() {
 		// The index doesn't exist initially, since we delete it in "cleanup()" the schema management strategy is "none"
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 					MassIndexer indexer = Search.session( entityManager ).massIndexer()
@@ -87,7 +87,7 @@ public class MassIndexingManualSchemaManagementIT {
 	}
 
 	@Test
-	public void testMassIndexingWithManualDropAndCreate() {
+	void testMassIndexingWithManualDropAndCreate() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 					// The index doesn't exist initially, since the schema management strategy is "none"
 					Search.session( entityManager ).schemaManager().dropAndCreate();

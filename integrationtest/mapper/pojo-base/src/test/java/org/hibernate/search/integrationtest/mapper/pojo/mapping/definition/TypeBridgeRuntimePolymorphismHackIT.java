@@ -39,7 +39,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * See https://discourse.hibernate.org/t/runtime-polymophism-with-typebinder-bridge/6057/2
  */
 @TestForIssue(jiraKey = "HSEARCH-4491")
-public class TypeBridgeRuntimePolymorphismHackIT {
+class TypeBridgeRuntimePolymorphismHackIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -51,7 +51,7 @@ public class TypeBridgeRuntimePolymorphismHackIT {
 			MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void explicitReindexing_hack_runtimePolymorphism() {
+	void explicitReindexing_hack_runtimePolymorphism() {
 		backendMock.expectSchema( INDEX_NAME, b ->
 				b.objectField( "contained", b2 -> b2
 						.field( "someField", String.class ) ) );

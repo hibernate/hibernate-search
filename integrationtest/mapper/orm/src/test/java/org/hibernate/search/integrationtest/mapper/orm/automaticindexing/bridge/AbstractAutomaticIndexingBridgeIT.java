@@ -49,7 +49,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
-	public void directPersistUpdateDelete() {
+	void directPersistUpdateDelete() {
 		SessionFactory sessionFactory = setupWithTypeBridge();
 
 		with( sessionFactory ).runInTransaction( session -> {
@@ -99,7 +99,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_typeBridge() {
+	void indirectAssociationUpdate_typeBridge() {
 		SessionFactory sessionFactory = setupWithTypeBridge();
 
 		with( sessionFactory ).runInTransaction( session -> {
@@ -217,7 +217,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 	}
 
 	@Test
-	public void indirectValueUpdate_typeBridge() {
+	void indirectValueUpdate_typeBridge() {
 		SessionFactory sessionFactory = setupWithTypeBridge();
 
 		with( sessionFactory ).runInTransaction( session -> {
@@ -301,7 +301,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_singleValuedPropertyBridge() {
+	void indirectAssociationUpdate_singleValuedPropertyBridge() {
 		SessionFactory sessionFactory = setupWithSingleValuedPropertyBridge();
 
 		with( sessionFactory ).runInTransaction( session -> {

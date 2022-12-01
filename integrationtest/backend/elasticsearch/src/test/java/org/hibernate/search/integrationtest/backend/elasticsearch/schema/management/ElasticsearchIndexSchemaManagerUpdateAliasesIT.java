@@ -32,7 +32,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Tests related to aliases when updating indexes.
  */
 @TestForIssue(jiraKey = "HSEARCH-3791")
-public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
+class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -43,7 +43,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
 	@Test
-	public void nothingToDo_defaultLayoutStrategy() {
+	void nothingToDo_defaultLayoutStrategy() {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
@@ -66,7 +66,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 	}
 
 	@Test
-	public void nothingToDo_noAliasLayoutStrategy() {
+	void nothingToDo_noAliasLayoutStrategy() {
 		elasticsearchClient.indexNoAlias( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
@@ -85,7 +85,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 	}
 
 	@Test
-	public void writeAlias_missing() {
+	void writeAlias_missing() {
 		elasticsearchClient.index( defaultPrimaryName( index.name() ), null, defaultReadAlias( index.name() ) )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
@@ -108,7 +108,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 	}
 
 	@Test
-	public void writeAlias_invalid_filter() {
+	void writeAlias_invalid_filter() {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
@@ -132,7 +132,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 	}
 
 	@Test
-	public void writeAlias_invalid_isWriteIndex() {
+	void writeAlias_invalid_isWriteIndex() {
 		assumeFalse(
 				isAtMost( ElasticsearchTestDialect.getActualVersion(), "elastic:6.3" ),
 				"This test only is only relevant for Elasticsearch versions supporting the is_write_index" +
@@ -163,7 +163,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 	}
 
 	@Test
-	public void readAlias_missing() {
+	void readAlias_missing() {
 		elasticsearchClient.index( defaultPrimaryName( index.name() ), defaultWriteAlias( index.name() ), null )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
@@ -185,7 +185,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 	}
 
 	@Test
-	public void readAlias_invalid_filter() {
+	void readAlias_invalid_filter() {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );

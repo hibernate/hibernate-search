@@ -27,7 +27,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class LuceneIndexSchemaManagerCreationOrPreservationIT {
+class LuceneIndexSchemaManagerCreationOrPreservationIT {
 
 	public static List<? extends Arguments> params() {
 		return LuceneIndexSchemaManagerOperation.creatingOrPreserving().stream()
@@ -43,7 +43,7 @@ public class LuceneIndexSchemaManagerCreationOrPreservationIT {
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3759")
-	public void doesNotExist(LuceneIndexSchemaManagerOperation operation) throws IOException {
+	void doesNotExist(LuceneIndexSchemaManagerOperation operation) throws IOException {
 		assertThat( indexExists() ).isFalse();
 
 		setup();
@@ -55,7 +55,7 @@ public class LuceneIndexSchemaManagerCreationOrPreservationIT {
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3759")
-	public void alreadyExists(LuceneIndexSchemaManagerOperation operation) throws IOException {
+	void alreadyExists(LuceneIndexSchemaManagerOperation operation) throws IOException {
 		assertThat( indexExists() ).isFalse();
 
 		setup();

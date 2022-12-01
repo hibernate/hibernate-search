@@ -17,7 +17,7 @@ import org.hibernate.search.util.common.SearchException;
 
 import org.junit.jupiter.api.Test;
 
-public class JavaModulePathIT {
+class JavaModulePathIT {
 
 	/*
 	 * Test that the service successfully uses Hibernate Search in the module path.
@@ -25,7 +25,7 @@ public class JavaModulePathIT {
 	 * but the easiest way to check this is to just use Hibernate Search features and see if it works.
 	 */
 	@Test
-	public void test() {
+	void test() {
 		checkIsInModulePath( Object.class );
 		checkIsInModulePath( AuthorService.class );
 		checkIsInModulePath( Search.class );

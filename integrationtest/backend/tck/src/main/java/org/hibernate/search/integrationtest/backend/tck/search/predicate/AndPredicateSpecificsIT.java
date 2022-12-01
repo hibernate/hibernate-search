@@ -64,14 +64,14 @@ public class AndPredicateSpecificsIT {
 	}
 
 	@Test
-	public void empty() {
+	void empty() {
 		assertThatQuery( index.query()
 				.where( f -> f.and() ) )
 				.hasNoHits();
 	}
 
 	@Test
-	public void and() {
+	void and() {
 		assertThatQuery( index.query()
 				.where( f -> f.and( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
@@ -92,7 +92,7 @@ public class AndPredicateSpecificsIT {
 	}
 
 	@Test
-	public void and_separatePredicateObject() {
+	void and_separatePredicateObject() {
 		StubMappingScope scope = index.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
@@ -119,7 +119,7 @@ public class AndPredicateSpecificsIT {
 	}
 
 	@Test
-	public void nested() {
+	void nested() {
 		assertThatQuery( index.query()
 				.where( f -> f.and( f.or(
 						f.match().field( "field1" ).matching( FIELD1_VALUE1 ),
@@ -129,7 +129,7 @@ public class AndPredicateSpecificsIT {
 	}
 
 	@Test
-	public void add() {
+	void add() {
 		assertThatQuery( index.query()
 				.where( f -> f.and()
 						.add( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) ) )
@@ -149,7 +149,7 @@ public class AndPredicateSpecificsIT {
 	}
 
 	@Test
-	public void add_separatePredicateObject() {
+	void add_separatePredicateObject() {
 		StubMappingScope scope = index.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
@@ -175,7 +175,7 @@ public class AndPredicateSpecificsIT {
 	}
 
 	@Test
-	public void add_function() {
+	void add_function() {
 		assertThatQuery( index.query()
 				.where( f -> f.and()
 						.add( f2 -> f2.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) ) )
@@ -195,7 +195,7 @@ public class AndPredicateSpecificsIT {
 	}
 
 	@Test
-	public void where() {
+	void where() {
 		assertThatQuery( index.query()
 				.where( (f, root) -> {
 					root.add( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
@@ -218,7 +218,7 @@ public class AndPredicateSpecificsIT {
 	}
 
 	@Test
-	public void with() {
+	void with() {
 		assertThatQuery( index.query()
 				.where( f -> f.and().with( and -> and.add( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );

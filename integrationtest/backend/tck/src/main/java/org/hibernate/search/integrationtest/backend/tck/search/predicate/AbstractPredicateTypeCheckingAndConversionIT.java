@@ -40,7 +40,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void defaultDslConverter_valueConvertDefault_validType(SimpleMappedIndex<IndexBinding> index,
+	void defaultDslConverter_valueConvertDefault_validType(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -55,7 +55,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void defaultDslConverter_valueConvertDefault_invalidType(SimpleMappedIndex<IndexBinding> index,
+	void defaultDslConverter_valueConvertDefault_invalidType(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -74,7 +74,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void customDslConverter_valueConvertDefault_validType(SimpleMappedIndex<IndexBinding> index,
+	void customDslConverter_valueConvertDefault_validType(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -90,7 +90,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void customDslConverter_valueConvertDefault_invalidType(SimpleMappedIndex<IndexBinding> index,
+	void customDslConverter_valueConvertDefault_invalidType(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -109,7 +109,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void defaultDslConverter_valueConvertYes_validType(SimpleMappedIndex<IndexBinding> index,
+	void defaultDslConverter_valueConvertYes_validType(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -124,7 +124,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void defaultDslConverter_valueConvertYes_invalidType(SimpleMappedIndex<IndexBinding> index,
+	void defaultDslConverter_valueConvertYes_invalidType(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -144,7 +144,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void customDslConverter_valueConvertYes_validType(SimpleMappedIndex<IndexBinding> index,
+	void customDslConverter_valueConvertYes_validType(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -159,7 +159,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void customDslConverter_valueConvertYes_invalidType(SimpleMappedIndex<IndexBinding> index,
+	void customDslConverter_valueConvertYes_invalidType(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -179,7 +179,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void defaultDslConverter_valueConvertNo_validType(SimpleMappedIndex<IndexBinding> index,
+	void defaultDslConverter_valueConvertNo_validType(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -194,7 +194,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void defaultDslConverter_valueConvertNo_invalidType(SimpleMappedIndex<IndexBinding> index,
+	void defaultDslConverter_valueConvertNo_invalidType(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -214,7 +214,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void customDslConverter_valueConvertNo_validType(SimpleMappedIndex<IndexBinding> index,
+	void customDslConverter_valueConvertNo_validType(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -229,7 +229,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void customDslConverter_valueConvertNo_invalidType(SimpleMappedIndex<IndexBinding> index,
+	void customDslConverter_valueConvertNo_invalidType(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -249,7 +249,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void multiFields_customDslConverter_valueConvertYes(SimpleMappedIndex<IndexBinding> index,
+	void multiFields_customDslConverter_valueConvertYes(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -271,7 +271,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void multiFields_customDslConverter_valueConvertNo(SimpleMappedIndex<IndexBinding> index,
+	void multiFields_customDslConverter_valueConvertNo(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -293,7 +293,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void multiIndex_withCompatibleIndex_valueConvertYes(SimpleMappedIndex<IndexBinding> index,
+	void multiIndex_withCompatibleIndex_valueConvertYes(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -315,7 +315,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void multiIndex_withRawFieldCompatibleIndex_valueConvertYes(SimpleMappedIndex<IndexBinding> index,
+	void multiIndex_withRawFieldCompatibleIndex_valueConvertYes(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -339,7 +339,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void multiIndex_withRawFieldCompatibleIndex_valueConvertNo(SimpleMappedIndex<IndexBinding> index,
+	void multiIndex_withRawFieldCompatibleIndex_valueConvertNo(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -441,7 +441,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void multiIndex_withIncompatibleIndex_valueConvertYes(SimpleMappedIndex<IndexBinding> index,
+	void multiIndex_withIncompatibleIndex_valueConvertYes(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -465,7 +465,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("params")
-	public void multiIndex_withIncompatibleIndex_valueConvertNo(SimpleMappedIndex<IndexBinding> index,
+	void multiIndex_withIncompatibleIndex_valueConvertNo(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,

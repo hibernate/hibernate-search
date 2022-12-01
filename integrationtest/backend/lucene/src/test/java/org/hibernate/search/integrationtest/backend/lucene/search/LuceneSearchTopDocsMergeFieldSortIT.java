@@ -120,7 +120,7 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 
 	@ParameterizedTest(name = "{0} - {2} - {1}")
 	@MethodSource("params")
-	public void asc(TestedFieldStructure fieldStructure,
+	void asc(TestedFieldStructure fieldStructure,
 			FieldTypeDescriptor<F> fieldType, SortMode sortMode,
 			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
 		assumeTestParametersWork( sortMode, fieldStructure, fieldType );
@@ -155,7 +155,7 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 	// Also check descending order, to be sure the above didn't just pass by chance
 	@ParameterizedTest(name = "{0} - {2} - {1}")
 	@MethodSource("params")
-	public void desc(TestedFieldStructure fieldStructure,
+	void desc(TestedFieldStructure fieldStructure,
 			FieldTypeDescriptor<F> fieldType, SortMode sortMode,
 			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
 		assumeTestParametersWork( sortMode, fieldStructure, fieldType );

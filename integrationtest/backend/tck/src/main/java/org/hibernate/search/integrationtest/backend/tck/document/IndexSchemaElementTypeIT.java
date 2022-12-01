@@ -38,7 +38,7 @@ public class IndexSchemaElementTypeIT {
 	private StubMappedIndex index;
 
 	@Test
-	public void analyzerOnSortableField() {
+	void analyzerOnSortableField() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -70,7 +70,7 @@ public class IndexSchemaElementTypeIT {
 	}
 
 	@Test
-	public void analyzerOnAggregableField() {
+	void analyzerOnAggregableField() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -103,7 +103,7 @@ public class IndexSchemaElementTypeIT {
 	}
 
 	@Test
-	public void analyzerAndNormalizer() {
+	void analyzerAndNormalizer() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -130,7 +130,7 @@ public class IndexSchemaElementTypeIT {
 	}
 
 	@Test
-	public void searchAnalyzerWithoutAnalyzer() {
+	void searchAnalyzerWithoutAnalyzer() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();

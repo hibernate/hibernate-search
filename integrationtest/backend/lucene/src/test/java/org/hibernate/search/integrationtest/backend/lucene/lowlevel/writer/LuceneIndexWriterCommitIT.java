@@ -62,7 +62,7 @@ public class LuceneIndexWriterCommitIT {
 
 	@ParameterizedTest(name = "I/O strategy {0}, commit_interval {1}")
 	@MethodSource("params")
-	public void commitStrategyNone(String ioStrategyName, Integer commitInterval) throws IOException {
+	void commitStrategyNone(String ioStrategyName, Integer commitInterval) throws IOException {
 		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP, ioStrategyName, commitInterval );
 
 		// Initially our document is not in the index
@@ -90,7 +90,7 @@ public class LuceneIndexWriterCommitIT {
 
 	@ParameterizedTest(name = "I/O strategy {0}, commit_interval {1}")
 	@MethodSource("params")
-	public void commitStrategyForce(String ioStrategyName, Integer commitInterval) throws IOException {
+	void commitStrategyForce(String ioStrategyName, Integer commitInterval) throws IOException {
 		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP, ioStrategyName, commitInterval );
 
 		// Initially our document is not in the index
@@ -113,7 +113,7 @@ public class LuceneIndexWriterCommitIT {
 	 */
 	@ParameterizedTest(name = "I/O strategy {0}, commit_interval {1}")
 	@MethodSource("params")
-	public void integrationClose(String ioStrategyName, Integer commitInterval) throws IOException {
+	void integrationClose(String ioStrategyName, Integer commitInterval) throws IOException {
 		StubMapping mapping = setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY,
 				ioStrategyName,
 				commitInterval

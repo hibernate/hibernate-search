@@ -27,7 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class HibernateOrmEntryPointsIT {
+class HibernateOrmEntryPointsIT {
 
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
@@ -41,7 +41,7 @@ public class HibernateOrmEntryPointsIT {
 	}
 
 	@Test
-	public void searchMapping_fromSessionFactory() {
+	void searchMapping_fromSessionFactory() {
 		// tag::searchMapping-fromSessionFactory[]
 		SessionFactory sessionFactory = /* ... */ // <1>
 				// end::searchMapping-fromSessionFactory[]
@@ -54,7 +54,7 @@ public class HibernateOrmEntryPointsIT {
 	}
 
 	@Test
-	public void searchMapping_fromEntityManagerFactory() {
+	void searchMapping_fromEntityManagerFactory() {
 		// tag::searchMapping-fromEntityManagerFactory[]
 		EntityManagerFactory entityManagerFactory = /* ... */ // <1>
 				// end::searchMapping-fromEntityManagerFactory[]
@@ -67,7 +67,7 @@ public class HibernateOrmEntryPointsIT {
 	}
 
 	@Test
-	public void searchSession_fromSession() {
+	void searchSession_fromSession() {
 		with( theSessionFactory ).runNoTransaction( theSession -> {
 			// tag::searchSession-fromSession[]
 			Session session = /* ... */ // <1>
@@ -82,7 +82,7 @@ public class HibernateOrmEntryPointsIT {
 	}
 
 	@Test
-	public void searchSession_fromEntityManager() {
+	void searchSession_fromEntityManager() {
 		with( theSessionFactory ).runNoTransaction( theSession -> {
 			// tag::searchSession-fromEntityManager[]
 			EntityManager entityManager = /* ... */ // <1>
@@ -97,7 +97,7 @@ public class HibernateOrmEntryPointsIT {
 	}
 
 	@Test
-	public void searchScope_fromSearchMapping() {
+	void searchScope_fromSearchMapping() {
 		// tag::searchScope-fromSearchMapping[]
 		SearchMapping searchMapping = /* ... */ // <1>
 				// end::searchScope-fromSearchMapping[]
@@ -128,7 +128,7 @@ public class HibernateOrmEntryPointsIT {
 	}
 
 	@Test
-	public void searchScope_fromSearchSession() {
+	void searchScope_fromSearchSession() {
 		with( theSessionFactory ).runNoTransaction( theSession -> {
 			// tag::searchScope-fromSearchSession[]
 			SearchSession searchSession = /* ... */ // <1>

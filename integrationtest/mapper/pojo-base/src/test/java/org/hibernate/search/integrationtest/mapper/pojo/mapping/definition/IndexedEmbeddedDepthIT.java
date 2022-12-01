@@ -19,7 +19,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class IndexedEmbeddedDepthIT {
+class IndexedEmbeddedDepthIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -31,7 +31,7 @@ public class IndexedEmbeddedDepthIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1467")
-	public void includeDepth_differentDepths() {
+	void includeDepth_differentDepths() {
 		class IndexedEmbeddedLevel2 {
 			@GenericField
 			String level2Property;

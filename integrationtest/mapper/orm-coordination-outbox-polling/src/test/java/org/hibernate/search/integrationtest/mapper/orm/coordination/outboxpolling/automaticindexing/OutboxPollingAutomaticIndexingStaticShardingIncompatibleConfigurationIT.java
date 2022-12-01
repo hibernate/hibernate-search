@@ -31,7 +31,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Test for static sharding where some nodes are configured in an incompatible way.
  */
 @TestForIssue(jiraKey = "HSEARCH-4140")
-public class OutboxPollingAutomaticIndexingStaticShardingIncompatibleConfigurationIT {
+class OutboxPollingAutomaticIndexingStaticShardingIncompatibleConfigurationIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -58,7 +58,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingIncompatibleConfigurati
 	}
 
 	@Test
-	public void conflictingTotalShardCount() throws InterruptedException {
+	void conflictingTotalShardCount() throws InterruptedException {
 		TestFailureHandler sessionFactory1FailureHandler = new TestFailureHandler();
 		TestFailureHandler sessionFactory2FailureHandler = new TestFailureHandler();
 
@@ -97,7 +97,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingIncompatibleConfigurati
 	}
 
 	@Test
-	public void conflictingAssignedShardIndex() throws InterruptedException {
+	void conflictingAssignedShardIndex() throws InterruptedException {
 		TestFailureHandler sessionFactory1FailureHandler = new TestFailureHandler();
 		TestFailureHandler sessionFactory2FailureHandler = new TestFailureHandler();
 

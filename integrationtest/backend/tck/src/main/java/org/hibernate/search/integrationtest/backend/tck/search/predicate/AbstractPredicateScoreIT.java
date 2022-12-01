@@ -19,7 +19,7 @@ public abstract class AbstractPredicateScoreIT {
 
 	@ParameterizedTest(name = "{1}")
 	@MethodSource("params")
-	public void predicateLevelBoost(StubMappedIndex index, AbstractPredicateDataSet dataSet) {
+	void predicateLevelBoost(StubMappedIndex index, AbstractPredicateDataSet dataSet) {
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
 						.should( predicate( f, 0, dataSet, index ) )
@@ -37,7 +37,7 @@ public abstract class AbstractPredicateScoreIT {
 
 	@ParameterizedTest(name = "{1}")
 	@MethodSource("params")
-	public void constantScore(StubMappedIndex index, AbstractPredicateDataSet dataSet) {
+	void constantScore(StubMappedIndex index, AbstractPredicateDataSet dataSet) {
 		assumeConstantScoreSupported();
 
 		assertThatQuery( index.query()
@@ -61,7 +61,7 @@ public abstract class AbstractPredicateScoreIT {
 
 	@ParameterizedTest(name = "{1}")
 	@MethodSource("params")
-	public void constantScore_predicateLevelBoost(StubMappedIndex index, AbstractPredicateDataSet dataSet) {
+	void constantScore_predicateLevelBoost(StubMappedIndex index, AbstractPredicateDataSet dataSet) {
 		assumeConstantScoreSupported();
 
 		assertThatQuery( index.query()

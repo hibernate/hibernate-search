@@ -58,7 +58,7 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void getQueryString() {
+	void getQueryString() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -81,7 +81,7 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void resultTotal() {
+	void resultTotal() {
 		initData( 5000 );
 
 		SearchResult<DocumentReference> fetch = matchAllSortedByScoreQuery()
@@ -95,7 +95,7 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void resultTotal_totalHitCountThreshold() {
+	void resultTotal_totalHitCountThreshold() {
 		assumeTrue(
 				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForSearch(),
 				"This backend doesn't take totalHitsThreshold() into account."
@@ -123,7 +123,7 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void resultTotal_totalHitCountThreshold_veryHigh() {
+	void resultTotal_totalHitCountThreshold_veryHigh() {
 		initData( 5000 );
 
 		SearchResult<DocumentReference> fetch = matchAllWithConditionSortedByScoreQuery()
@@ -139,7 +139,7 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void extension() {
+	void extension() {
 		initData( 2 );
 
 		SearchQuery<DocumentReference> query = matchAllSortedByScoreQuery().toQuery();
@@ -157,7 +157,7 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void context_extension() {
+	void context_extension() {
 		initData( 5 );
 
 		StubMappingScope scope = index.createScope();

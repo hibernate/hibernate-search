@@ -36,7 +36,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * This used to fail on MS SQL Server, in particular, because of its lock escalation mechanism.
  */
 @TestForIssue(jiraKey = "HSEARCH-4141")
-public class OutboxPollingAutomaticIndexingConcurrencyIT {
+class OutboxPollingAutomaticIndexingConcurrencyIT {
 
 	public static final int TOTAL_SHARD_COUNT = 23;
 	public static final int ENTITY_COUNT = 2000;
@@ -84,7 +84,7 @@ public class OutboxPollingAutomaticIndexingConcurrencyIT {
 	// which would abort the transaction,
 	// which would cause a failure in the background thread and eventually would fail the test.
 	@Test
-	public void noDeadlock() {
+	void noDeadlock() {
 		SessionFactory sessionFactory = sessionFactories.get( 0 );
 
 		for ( int i = 0; i < ENTITY_COUNT; i += ENTITY_UPDATE_BATCH_SIZE ) {

@@ -43,14 +43,14 @@ public class IndexDescriptorIT {
 	}
 
 	@Test
-	public void name() {
+	void name() {
 		IndexDescriptor indexDescriptor = index.toApi().descriptor();
 
 		assertThat( indexDescriptor.hibernateSearchName() ).isEqualTo( index.name() );
 	}
 
 	@Test
-	public void root() {
+	void root() {
 		IndexDescriptor indexDescriptor = index.toApi().descriptor();
 
 		assertThat( indexDescriptor.root() ).isNotNull()
@@ -59,7 +59,7 @@ public class IndexDescriptorIT {
 	}
 
 	@Test
-	public void staticFields() {
+	void staticFields() {
 		IndexDescriptor indexDescriptor = index.toApi().descriptor();
 
 		Optional<IndexFieldDescriptor> valueFieldDescriptorOptional = indexDescriptor.field( "myValueField" );
@@ -76,7 +76,7 @@ public class IndexDescriptorIT {
 	}
 
 	@Test
-	public void dynamicFields() {
+	void dynamicFields() {
 		IndexDescriptor indexDescriptor = index.toApi().descriptor();
 
 		Optional<IndexFieldDescriptor> valueFieldDescriptorOptional = indexDescriptor.field( "myDynamicField_txt" );
@@ -92,7 +92,7 @@ public class IndexDescriptorIT {
 	}
 
 	@Test
-	public void missingField() {
+	void missingField() {
 		IndexDescriptor indexDescriptor = index.toApi().descriptor();
 		Optional<IndexFieldDescriptor> fieldDescriptorOptional = indexDescriptor.field( "unknownField" );
 		assertThat( fieldDescriptorOptional ).isEmpty();

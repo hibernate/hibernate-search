@@ -71,7 +71,7 @@ public class LuceneSearchMultiIndexIT {
 
 	@ParameterizedTest(name = "Lucene directory type {0}")
 	@MethodSource("params")
-	public void field_in_one_index_only_is_supported_for_sorting(String directoryType) {
+	void field_in_one_index_only_is_supported_for_sorting(String directoryType) {
 		init( directoryType );
 		StubMappingScope scope = index1.createScope( index2 );
 

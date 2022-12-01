@@ -51,7 +51,7 @@ public class HibernateOrmMapperOutboxPollingClassesTest {
 	}
 
 	@Test
-	public void testNoMissingAvroGeneratedClass() {
+	void testNoMissingAvroGeneratedClass() {
 		Set<String> annotatedClasses = new HashSet<>();
 		for ( AnnotationInstance annotationInstance : outboxPollingIndex
 				.getAnnotations( DotName.createSimple( AvroGenerated.class.getName() ) ) ) {
@@ -65,7 +65,7 @@ public class HibernateOrmMapperOutboxPollingClassesTest {
 	}
 
 	@Test
-	public void testNoMissingJpaModelClass() {
+	void testNoMissingJpaModelClass() {
 		Set<DotName> modelClasses = collectModelClassesRecursively( outboxPollingIndex, new HashSet<>( Arrays.asList(
 				DotName.createSimple( OutboxEvent.class.getName() ),
 				DotName.createSimple( Agent.class.getName() )

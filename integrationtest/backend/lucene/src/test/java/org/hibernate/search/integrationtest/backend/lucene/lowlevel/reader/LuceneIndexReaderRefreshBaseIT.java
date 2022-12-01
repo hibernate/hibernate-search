@@ -63,7 +63,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 
 	@ParameterizedTest(name = "Commit strategy {0}, commit_interval {1}")
 	@MethodSource("params")
-	public void ioStrategyDefault_refreshIntervalDefault(DocumentCommitStrategy commitStrategy, Integer commitInterval) {
+	void ioStrategyDefault_refreshIntervalDefault(DocumentCommitStrategy commitStrategy, Integer commitInterval) {
 		setup( null, null, commitInterval );
 
 		SearchQuery<DocumentReference> query = index.createScope().query()
@@ -85,7 +85,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 
 	@ParameterizedTest(name = "Commit strategy {0}, commit_interval {1}")
 	@MethodSource("params")
-	public void ioStrategyDefault_refreshIntervalZero(DocumentCommitStrategy commitStrategy, Integer commitInterval) {
+	void ioStrategyDefault_refreshIntervalZero(DocumentCommitStrategy commitStrategy, Integer commitInterval) {
 		setup( null, 0, commitInterval );
 
 		SearchQuery<DocumentReference> query = index.createScope().query()
@@ -107,7 +107,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 
 	@ParameterizedTest(name = "Commit strategy {0}, commit_interval {1}")
 	@MethodSource("params")
-	public void ioStrategyDefault_refreshIntervalPositive_refreshStrategyNone(DocumentCommitStrategy commitStrategy, Integer commitInterval) {
+	void ioStrategyDefault_refreshIntervalPositive_refreshStrategyNone(DocumentCommitStrategy commitStrategy, Integer commitInterval) {
 		setup( null, NON_ZERO_DELAY, commitInterval );
 
 		SearchQuery<DocumentReference> query = index.createScope().query()
@@ -132,7 +132,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 
 	@ParameterizedTest(name = "Commit strategy {0}, commit_interval {1}")
 	@MethodSource("params")
-	public void ioStrategyDefault_refreshIntervalPositive_refreshStrategyForce(DocumentCommitStrategy commitStrategy, Integer commitInterval) {
+	void ioStrategyDefault_refreshIntervalPositive_refreshStrategyForce(DocumentCommitStrategy commitStrategy, Integer commitInterval) {
 		setup( null, NON_ZERO_DELAY, commitInterval );
 
 		SearchQuery<DocumentReference> query = index.createScope().query()
@@ -154,7 +154,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 
 	@ParameterizedTest(name = "Commit strategy {0}, commit_interval {1}")
 	@MethodSource("params")
-	public void ioStrategyDebug(DocumentCommitStrategy commitStrategy, Integer commitInterval) {
+	void ioStrategyDebug(DocumentCommitStrategy commitStrategy, Integer commitInterval) {
 		setup( "debug", null, commitInterval );
 
 		SearchQuery<DocumentReference> query = index.createScope().query()

@@ -28,7 +28,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * i.e. when no implementation is known by HSearch.
  */
 @TestForIssue(jiraKey = "HSEARCH-4385")
-public class AbstractInterfaceIT {
+class AbstractInterfaceIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -50,7 +50,7 @@ public class AbstractInterfaceIT {
 	}
 
 	@Test
-	public void index() {
+	void index() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity = new IndexedEntity( 1, new AbstractInterface() {
 				@Override

@@ -33,7 +33,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * This case seems to be not already supported for the current version of Elasticsearch server.
  */
 @TestForIssue(jiraKey = "HSEARCH-3612")
-public class LuceneNormalizeWildcardExpressionsIT {
+class LuceneNormalizeWildcardExpressionsIT {
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
@@ -63,7 +63,7 @@ public class LuceneNormalizeWildcardExpressionsIT {
 	}
 
 	@Test
-	public void wildcard_normalizeMatchingExpression() {
+	void wildcard_normalizeMatchingExpression() {
 		StubMappingScope scope = index.createScope();
 		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
 				.where( f -> f.wildcard().field( "analyzed" ).matching( queryString ) )
@@ -80,7 +80,7 @@ public class LuceneNormalizeWildcardExpressionsIT {
 	}
 
 	@Test
-	public void wildcard_tokenizeMatchingExpression() {
+	void wildcard_tokenizeMatchingExpression() {
 		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.wildcard().field( "analyzed" ).matching( PATTERN_1_AND_2 ) )

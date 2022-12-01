@@ -45,7 +45,7 @@ import org.mockito.quality.Strictness;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
-public class BeanResolutionIT {
+class BeanResolutionIT {
 
 	@RegisterExtension
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
@@ -61,7 +61,7 @@ public class BeanResolutionIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4096")
-	public void noExplicitBean_noCallToBeanContainer() {
+	void noExplicitBean_noCallToBeanContainer() {
 		setupHelper.start()
 				.withProperty( AvailableSettings.BEAN_CONTAINER, beanContainerMock )
 				.setup( IndexedEntity.class );
@@ -72,7 +72,7 @@ public class BeanResolutionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4096")
-	public void explicitBean_callToBeanContainer() {
+	void explicitBean_callToBeanContainer() {
 		when( beanContainerMock
 				.getBean( eq( "myConfigurer" ), eq( HibernateOrmSearchMappingConfigurer.class ), any(), any() ) )
 				.thenReturn( new StubContainedBean<>( new HibernateOrmSearchMappingConfigurer() {

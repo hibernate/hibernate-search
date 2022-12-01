@@ -46,7 +46,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  */
 @SuppressWarnings("unused")
 @TestForIssue(jiraKey = "HSEARCH-3135")
-public class CustomPropertyMappingAnnotationBaseIT {
+class CustomPropertyMappingAnnotationBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -60,7 +60,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	 * Basic test checking that a simple property mapping will be applied as expected.
 	 */
 	@Test
-	public void simple() {
+	void simple() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -93,7 +93,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void missingProcessorReference() {
+	void missingProcessorReference() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -117,7 +117,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void invalidAnnotationType() {
+	void invalidAnnotationType() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -159,7 +159,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void annotatedElement() {
+	void annotatedElement() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -296,7 +296,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void eventContext() {
+	void eventContext() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntityType {
 			Integer id;

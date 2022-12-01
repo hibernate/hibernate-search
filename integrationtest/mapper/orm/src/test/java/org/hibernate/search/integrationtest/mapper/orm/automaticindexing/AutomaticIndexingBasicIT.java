@@ -59,7 +59,7 @@ public class AutomaticIndexingBasicIT {
 	}
 
 	@Test
-	public void directPersistUpdateDelete() {
+	void directPersistUpdateDelete() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -101,7 +101,7 @@ public class AutomaticIndexingBasicIT {
 	}
 
 	@Test
-	public void rollback_discardPreparedWorks() {
+	void rollback_discardPreparedWorks() {
 		assumeTrue(
 				setupHolder.areEntitiesProcessedInSession(),
 				"This test only makes sense if entities are processed in-session"
@@ -146,7 +146,7 @@ public class AutomaticIndexingBasicIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
-	public void directValueUpdate_nonIndexedField() {
+	void directValueUpdate_nonIndexedField() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -189,7 +189,7 @@ public class AutomaticIndexingBasicIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
-	public void directValueUpdate_shallowReindexOnUpdateField() {
+	void directValueUpdate_shallowReindexOnUpdateField() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -239,7 +239,7 @@ public class AutomaticIndexingBasicIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3206")
-	public void directValueUpdate_noReindexOnUpdateField() {
+	void directValueUpdate_noReindexOnUpdateField() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -274,7 +274,7 @@ public class AutomaticIndexingBasicIT {
 	}
 
 	@Test
-	public void sessionClear() {
+	void sessionClear() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "number1" );
 			IndexedEntity entity2 = new IndexedEntity( 2, "number2" );
@@ -365,7 +365,7 @@ public class AutomaticIndexingBasicIT {
 	 */
 	@Test
 	@SuppressWarnings("deprecation") // This is specifically about "update", which is NOT strictly equivalent to "merge"
-	public void sessionUpdate_directValueUpdate_indexedField() {
+	void sessionUpdate_directValueUpdate_indexedField() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -407,7 +407,7 @@ public class AutomaticIndexingBasicIT {
 	@SuppressWarnings("deprecation") // This is specifically about "update", which is NOT strictly equivalent to "merge"
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
-	public void sessionUpdate_directValueUpdate_nonIndexedField() {
+	void sessionUpdate_directValueUpdate_nonIndexedField() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -447,7 +447,7 @@ public class AutomaticIndexingBasicIT {
 	 * triggers reindexing of the indexed entity owning the property.
 	 */
 	@Test
-	public void sessionMerge_directValueUpdate_indexedField() {
+	void sessionMerge_directValueUpdate_indexedField() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -487,7 +487,7 @@ public class AutomaticIndexingBasicIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
-	public void sessionMerge_directValueUpdate_nonIndexedField() {
+	void sessionMerge_directValueUpdate_nonIndexedField() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );

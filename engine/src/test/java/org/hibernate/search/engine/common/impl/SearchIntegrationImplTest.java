@@ -41,7 +41,7 @@ import org.mockito.quality.Strictness;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
-public class SearchIntegrationImplTest {
+class SearchIntegrationImplTest {
 
 	@Mock
 	private BeanProvider beanProviderMock;
@@ -97,7 +97,7 @@ public class SearchIntegrationImplTest {
 	}
 
 	@Test
-	public void close_success() {
+	void close_success() {
 		when( mapping1Mock.preStop( any() ) ).thenReturn( CompletableFuture.completedFuture( null ) );
 		when( mapping2Mock.preStop( any() ) ).thenReturn( CompletableFuture.completedFuture( null ) );
 		when( indexManager1Mock.preStop() ).thenReturn( CompletableFuture.completedFuture( null ) );
@@ -144,7 +144,7 @@ public class SearchIntegrationImplTest {
 	}
 
 	@Test
-	public void close_failure() {
+	void close_failure() {
 		when( mapping1Mock.preStop( any() ) ).thenReturn( failedFuture( "mapping1 preStop failure" ) );
 		when( mapping2Mock.preStop( any() ) ).thenThrow( exception( "mapping2 preStop failure" ) );
 		doThrow( exception( "mapping1 stop failure" ) ).when( mapping1Mock ).stop();

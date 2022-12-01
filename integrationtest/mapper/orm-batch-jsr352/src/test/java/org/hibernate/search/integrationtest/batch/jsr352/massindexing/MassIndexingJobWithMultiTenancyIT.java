@@ -74,7 +74,7 @@ public class MassIndexingJobWithMultiTenancyIT {
 	}
 
 	@Test
-	public void shouldHandleTenantIds() throws Exception {
+	void shouldHandleTenantIds() throws Exception {
 		SessionFactory sessionFactory = setupHolder.sessionFactory();
 
 		long executionId = jobOperator.start(

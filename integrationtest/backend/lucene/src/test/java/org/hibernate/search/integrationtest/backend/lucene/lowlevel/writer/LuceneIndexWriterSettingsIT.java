@@ -36,7 +36,7 @@ import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.apache.lucene.index.MergePolicy;
 import org.apache.lucene.util.InfoStream;
 
-public class LuceneIndexWriterSettingsIT {
+class LuceneIndexWriterSettingsIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -45,7 +45,7 @@ public class LuceneIndexWriterSettingsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3776")
-	public void defaults() {
+	void defaults() {
 		setup( properties -> { } );
 
 		LuceneIndexManagerImpl luceneIndexManager = index.unwrapForTests( LuceneIndexManagerImpl.class );
@@ -98,7 +98,7 @@ public class LuceneIndexWriterSettingsIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3776")
 	@PortedFromSearch5(original = "org.hibernate.search.test.configuration.LuceneIndexingParametersTest.testSpecificTypeParametersOverride")
-	public void custom() {
+	void custom() {
 		setup( properties -> {
 			properties.accept( LuceneIndexSettings.IO_WRITER_MAX_BUFFERED_DOCS, "420" );
 			properties.accept( LuceneIndexSettings.IO_WRITER_RAM_BUFFER_SIZE, "420" );

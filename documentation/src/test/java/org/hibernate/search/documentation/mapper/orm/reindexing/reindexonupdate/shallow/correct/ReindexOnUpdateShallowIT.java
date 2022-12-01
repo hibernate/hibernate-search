@@ -56,7 +56,7 @@ public class ReindexOnUpdateShallowIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void reindexOnUpdateShallow(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+	void reindexOnUpdateShallow(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
 		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			BookCategory category = new BookCategory();

@@ -16,14 +16,14 @@ import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureRe
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ReindexOnUpdateShallowIncorrectIT {
+class ReindexOnUpdateShallowIncorrectIT {
 
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper =
 			DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	@Test
-	public void missingReindexOnUpdateShallow() {
+	void missingReindexOnUpdateShallow() {
 		assertThatThrownBy( () -> setupHelper.start().setup( Book.class, BookCategory.class ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()

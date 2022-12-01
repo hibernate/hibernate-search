@@ -91,7 +91,7 @@ public class FieldProjectionMultiValuedBaseIT<F> {
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	public void simple(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void simple(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		StubMappingScope scope = index.createScope();
 
 		String fieldPath = getFieldPath( fieldStructure, fieldType );
@@ -111,7 +111,7 @@ public class FieldProjectionMultiValuedBaseIT<F> {
 
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	public void noClass(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void noClass(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		StubMappingScope scope = index.createScope();
 
 		String fieldPath = getFieldPath( fieldStructure, fieldType );
@@ -134,7 +134,7 @@ public class FieldProjectionMultiValuedBaseIT<F> {
 	 */
 	@ParameterizedTest(name = "{0} - {1}")
 	@MethodSource("params")
-	public void duplicated(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void duplicated(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		StubMappingScope scope = index.createScope();
 
 		String fieldPath = getFieldPath( fieldStructure, fieldType );

@@ -35,7 +35,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class AggregationDslIT {
+class AggregationDslIT {
 
 	private static final int BOOK1_ID = 1;
 	private static final int BOOK2_ID = 2;
@@ -54,7 +54,7 @@ public class AggregationDslIT {
 	}
 
 	@Test
-	public void entryPoint() {
+	void entryPoint() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint-lambdas[]
 			SearchSession searchSession = /* ... */ // <1>
@@ -109,7 +109,7 @@ public class AggregationDslIT {
 	}
 
 	@Test
-	public void terms() {
+	void terms() {
 		withinSearchSession( searchSession -> {
 			// tag::terms[]
 			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" );
@@ -252,7 +252,7 @@ public class AggregationDslIT {
 	}
 
 	@Test
-	public void range() {
+	void range() {
 		withinSearchSession( searchSession -> {
 			// tag::range[]
 			AggregationKey<Map<Range<Double>, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
@@ -382,7 +382,7 @@ public class AggregationDslIT {
 	}
 
 	@Test
-	public void filter() {
+	void filter() {
 		withinSearchSession( searchSession -> {
 			// tag::filter[]
 			AggregationKey<Map<Range<Double>, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );

@@ -26,7 +26,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * <p>
  * Similar to {@link ProgrammaticMappingAccessTypeIT}, which tests programmatic mapping.
  */
-public class AnnotationMappingAccessTypeIT {
+class AnnotationMappingAccessTypeIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -58,7 +58,7 @@ public class AnnotationMappingAccessTypeIT {
 	}
 
 	@Test
-	public void index() {
+	void index() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.id = 1;

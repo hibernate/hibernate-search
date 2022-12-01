@@ -26,13 +26,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class AnalysisIT {
+class AnalysisIT {
 
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	@Test
-	public void simple() {
+	void simple() {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withProperties(
 						isLucene()
@@ -93,7 +93,7 @@ public class AnalysisIT {
 	}
 
 	@Test
-	public void default_override() {
+	void default_override() {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withProperties(
 						isLucene()

@@ -57,7 +57,7 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void schema(String strategyName, JsonObject expectedMappingContent) {
+	void schema(String strategyName, JsonObject expectedMappingContent) {
 		clientSpy.expectNext(
 				ElasticsearchRequest.get().build(),
 				ElasticsearchRequestAssertionMode.STRICT

@@ -30,7 +30,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * from a background thread, since they will have to remember the tenant ID somehow.
  */
 @TestForIssue(jiraKey = "HSEARCH-4316")
-public class AutomaticIndexingMultiTenancyIT {
+class AutomaticIndexingMultiTenancyIT {
 
 	private static final String TENANT_1_ID = "tenant1";
 	private static final String TENANT_2_ID = "tenant2";
@@ -42,7 +42,7 @@ public class AutomaticIndexingMultiTenancyIT {
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
-	public void test() throws InterruptedException {
+	void test() throws InterruptedException {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) ) );
 

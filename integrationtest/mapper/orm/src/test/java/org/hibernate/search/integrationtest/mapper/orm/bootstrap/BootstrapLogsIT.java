@@ -39,7 +39,7 @@ import org.hamcrest.TypeSafeMatcher;
  * but at least we will be aware if a warning or error is logged on every boot.
  */
 @TestForIssue(jiraKey = "HSEARCH-3644")
-public class BootstrapLogsIT {
+class BootstrapLogsIT {
 
 	private static final Pattern CONNECTION_POOL_WARNING_PATTERN = Pattern.compile(
 			"CachingRegionFactory should be only used for testing"
@@ -62,7 +62,7 @@ public class BootstrapLogsIT {
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
-	public void noSuspiciousLogEvents() {
+	void noSuspiciousLogEvents() {
 		logged.expectEvent( suspiciousLogEventMatcher() )
 				.never(); // Also fails if a higher severity event (e.g. error) is logged
 
@@ -74,7 +74,7 @@ public class BootstrapLogsIT {
 
 	@Test
 	@SuppressWarnings("deprecation")
-	public void version() {
+	void version() {
 		if ( Version.versionString().equals( "UNKNOWN" ) ) {
 			throw new IllegalStateException( "Tests seem to be running from an IDE,"
 					+ " or the code was compiled by an IDE."
@@ -105,7 +105,7 @@ public class BootstrapLogsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4503")
-	public void versionLoggingDisabled() {
+	void versionLoggingDisabled() {
 		String propertyKey = "org.hibernate.search.version";
 		String expectedHibernateSearchVersion = System.getProperty( propertyKey );
 		if ( expectedHibernateSearchVersion == null ) {

@@ -60,7 +60,7 @@ public class DistanceSortUnsupportedTypesIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void error_notSupported(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void error_notSupported(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = getFieldPath( fieldTypeDescriptor );
 

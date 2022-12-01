@@ -72,7 +72,7 @@ public class AutomaticIndexingPolymorphicOriginalSideAssociationIT {
 	 * paths for a single getter.
 	 */
 	@Test
-	public void inversePathDependsOnConcreteType() {
+	void inversePathDependsOnConcreteType() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity indexedEntity1 = new IndexedEntity();
 			indexedEntity1.setId( 1 );

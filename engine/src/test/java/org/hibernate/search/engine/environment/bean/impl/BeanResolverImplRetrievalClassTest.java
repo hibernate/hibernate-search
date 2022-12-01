@@ -43,7 +43,7 @@ import org.mockito.quality.Strictness;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
-public class BeanResolverImplRetrievalClassTest {
+class BeanResolverImplRetrievalClassTest {
 
 	@Mock
 	private ClassResolver classResolverMock;
@@ -92,7 +92,7 @@ public class BeanResolverImplRetrievalClassTest {
 	}
 
 	@Test
-	public void resolve_matchingBeanManager() {
+	void resolve_matchingBeanManager() {
 		BeanHolder<BeanManagerType1> type1BeanHolder = BeanHolder.of( new BeanManagerType1() );
 		BeanHolder<BeanManagerType2> type2BeanHolder = BeanHolder.of( new BeanManagerType2() );
 		BeanHolder<BeanManagerType3> type3BeanHolder1 = BeanHolder.of( new BeanManagerType3() );
@@ -140,7 +140,7 @@ public class BeanResolverImplRetrievalClassTest {
 	}
 
 	@Test
-	public void resolve_matchingReflection() {
+	void resolve_matchingReflection() {
 		BeanNotFoundException beanManagerNotFoundException = new BeanNotFoundException( "cannot find from beanManager" );
 
 		// resolve(Class)
@@ -188,7 +188,7 @@ public class BeanResolverImplRetrievalClassTest {
 	}
 
 	@Test
-	public void resolve_noMatch() {
+	void resolve_noMatch() {
 		BeanNotFoundException beanManagerNotFoundException = new BeanNotFoundException( "cannot find from beanManager" );
 		RuntimeException classNotFoundException = new RuntimeException( "cannot find class" );
 
@@ -258,7 +258,7 @@ public class BeanResolverImplRetrievalClassTest {
 	}
 
 	@Test
-	public void resolve_beanManagerFailure() {
+	void resolve_beanManagerFailure() {
 		RuntimeException beanManagerFailure = new RuntimeException( "internal failure in provider" );
 
 		// resolve(Class)

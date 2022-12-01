@@ -26,13 +26,13 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Checks that Hibernate Search will auto-detect the backend type when the property "hibernate.search.backend.type" is not set
  * and there is only one backend in the classpath.
  */
-public class BackendTypeAutoDetectSingleBackendTypeInClasspathIT {
+class BackendTypeAutoDetectSingleBackendTypeInClasspathIT {
 
 	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	@Test
-	public void backendType_autoDetect() {
+	void backendType_autoDetect() {
 		if ( IS_IDE ) {
 			throw new IllegalStateException( "Tests seem to be running from an IDE."
 					+ " This test cannot run from the IDE"

@@ -32,7 +32,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Tests related to index custom settings when updating indexes.
  */
 @TestForIssue(jiraKey = "HSEARCH-3934")
-public class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
+class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -52,7 +52,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 	}
 
 	@Test
-	public void nothingToDo() {
+	void nothingToDo() {
 		elasticsearchClient.index( index.name() ).deleteAndCreate( "index",
 				" { " +
 				"   'number_of_shards': '3', " +
@@ -111,7 +111,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 	}
 
 	@Test
-	public void change_analysis() {
+	void change_analysis() {
 		elasticsearchClient.index( index.name() ).deleteAndCreate( "index",
 				" { " +
 				"   'number_of_shards': '3', " +
@@ -170,7 +170,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 	}
 
 	@Test
-	public void change_numberOfShards() {
+	void change_numberOfShards() {
 		elasticsearchClient.index( index.name() ).deleteAndCreate( "index",
 				" { " +
 				"   'number_of_shards': '7', " +
@@ -204,7 +204,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 	}
 
 	@Test
-	public void change_maxResultWindow() {
+	void change_maxResultWindow() {
 		elasticsearchClient.index( index.name() ).deleteAndCreate( "index", "{ 'max_result_window': '20000' }" );
 
 		setupAndUpdateIndex( "max-result-window.json" );
@@ -216,7 +216,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 	}
 
 	@Test
-	public void set_maxResultWindow() {
+	void set_maxResultWindow() {
 		elasticsearchClient.index( index.name() ).deleteAndCreate( "index", "{ }" );
 
 		setupAndUpdateIndex( "max-result-window.json" );

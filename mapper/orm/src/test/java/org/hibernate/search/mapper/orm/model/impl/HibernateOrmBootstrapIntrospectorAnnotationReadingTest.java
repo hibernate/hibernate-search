@@ -22,7 +22,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class HibernateOrmBootstrapIntrospectorAnnotationReadingTest
+class HibernateOrmBootstrapIntrospectorAnnotationReadingTest
 		extends AbstractHibernateOrmBootstrapIntrospectorPerReflectionStrategyTest {
 
 	@ParameterizedTest(name = "Reflection strategy = {0}")

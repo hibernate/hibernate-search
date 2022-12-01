@@ -26,7 +26,7 @@ public abstract class AbstractPredicateMultiFieldIT<V extends AbstractPredicateT
 
 	@ParameterizedTest(name = "{1}")
 	@MethodSource("params")
-	public void fieldAndField(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
+	void fieldAndField(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
 				.where( f -> predicateOnFieldAndField( f, field0Path( index, dataSet ), field1Path( index, dataSet ),
 						0, dataSet
@@ -43,7 +43,7 @@ public abstract class AbstractPredicateMultiFieldIT<V extends AbstractPredicateT
 
 	@ParameterizedTest(name = "{1}")
 	@MethodSource("params")
-	public void fields(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
+	void fields(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
 				.where( f -> predicateOnFields( f,
 						new String[] { field0Path( index, dataSet ), field1Path( index, dataSet ) }, 0, dataSet
@@ -60,7 +60,7 @@ public abstract class AbstractPredicateMultiFieldIT<V extends AbstractPredicateT
 
 	@ParameterizedTest(name = "{1}")
 	@MethodSource("params")
-	public void fieldAndFields(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
+	void fieldAndFields(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
 				.where( f -> predicateOnFieldAndFields( f, field0Path( index, dataSet ),
 						new String[] { field1Path( index, dataSet ), field2Path( index, dataSet ) },

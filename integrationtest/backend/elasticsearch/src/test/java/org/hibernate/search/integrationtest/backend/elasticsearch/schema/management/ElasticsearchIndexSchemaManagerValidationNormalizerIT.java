@@ -52,7 +52,7 @@ public class ElasticsearchIndexSchemaManagerValidationNormalizerIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void success_simple(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
+	void success_simple(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -86,7 +86,7 @@ public class ElasticsearchIndexSchemaManagerValidationNormalizerIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void normalizer_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
+	void normalizer_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"

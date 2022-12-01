@@ -48,7 +48,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Does not test uses of container value extractors, which are tested in {@link FieldContainerExtractorBaseIT}
  * (and others, see javadoc on that class).
  */
-public class KeywordFieldIT {
+class KeywordFieldIT {
 
 	private static final String INDEX_NAME = "IndexName";
 	private static final String NORMALIZER_NAME = "myNormalizer";
@@ -60,7 +60,7 @@ public class KeywordFieldIT {
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void defaultAttributes() {
+	void defaultAttributes() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -78,7 +78,7 @@ public class KeywordFieldIT {
 	}
 
 	@Test
-	public void name() {
+	void name() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
 			@DocumentId
@@ -95,7 +95,7 @@ public class KeywordFieldIT {
 	}
 
 	@Test
-	public void name_invalid_dot() {
+	void name_invalid_dot() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
 			@DocumentId
@@ -116,7 +116,7 @@ public class KeywordFieldIT {
 	}
 
 	@Test
-	public void defaultBridge() {
+	void defaultBridge() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -138,7 +138,7 @@ public class KeywordFieldIT {
 	}
 
 	@Test
-	public void norms() {
+	void norms() {
 
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
@@ -165,7 +165,7 @@ public class KeywordFieldIT {
 	}
 
 	@Test
-	public void searchable() {
+	void searchable() {
 
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
@@ -192,7 +192,7 @@ public class KeywordFieldIT {
 	}
 
 	@Test
-	public void aggregable() {
+	void aggregable() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
 			@DocumentId
@@ -218,7 +218,7 @@ public class KeywordFieldIT {
 	}
 
 	@Test
-	public void customBridge_implicitFieldType() {
+	void customBridge_implicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -236,7 +236,7 @@ public class KeywordFieldIT {
 	}
 
 	@Test
-	public void customBridge_explicitFieldType() {
+	void customBridge_explicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -254,7 +254,7 @@ public class KeywordFieldIT {
 	}
 
 	@Test
-	public void customBridge_withParams_annotationMapping() {
+	void customBridge_withParams_annotationMapping() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -287,7 +287,7 @@ public class KeywordFieldIT {
 	}
 
 	@Test
-	public void customBridge_withParams_programmaticMapping() {
+	void customBridge_withParams_programmaticMapping() {
 		class IndexedEntity {
 			Integer id;
 			WrappedValue wrap;
@@ -327,7 +327,7 @@ public class KeywordFieldIT {
 	}
 
 	@Test
-	public void defaultBridge_invalidFieldType() {
+	void defaultBridge_invalidFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -355,7 +355,7 @@ public class KeywordFieldIT {
 	}
 
 	@Test
-	public void customBridge_implicitFieldType_invalid() {
+	void customBridge_implicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -382,7 +382,7 @@ public class KeywordFieldIT {
 	}
 
 	@Test
-	public void customBridge_explicitFieldType_invalid() {
+	void customBridge_explicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -410,7 +410,7 @@ public class KeywordFieldIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3243")
-	public void customBridge_implicitFieldType_generic() {
+	void customBridge_implicitFieldType_generic() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId

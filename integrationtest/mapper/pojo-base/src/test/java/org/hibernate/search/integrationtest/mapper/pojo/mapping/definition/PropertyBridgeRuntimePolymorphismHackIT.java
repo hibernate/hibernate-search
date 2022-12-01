@@ -38,7 +38,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * See https://discourse.hibernate.org/t/propertybinder-for-base-type-reports-no-children-property-found-in-parent-class/5493/2
  */
 @TestForIssue(jiraKey = "HSEARCH-4491")
-public class PropertyBridgeRuntimePolymorphismHackIT {
+class PropertyBridgeRuntimePolymorphismHackIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -50,7 +50,7 @@ public class PropertyBridgeRuntimePolymorphismHackIT {
 			MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void explicitReindexing_hack_runtimePolymorphism() {
+	void explicitReindexing_hack_runtimePolymorphism() {
 		backendMock.expectSchema( INDEX_NAME, b ->
 				b.field( "someField", String.class ) );
 

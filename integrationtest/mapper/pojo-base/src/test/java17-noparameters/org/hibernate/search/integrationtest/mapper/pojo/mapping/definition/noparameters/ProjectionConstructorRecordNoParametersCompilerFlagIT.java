@@ -27,7 +27,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.Sta
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ProjectionConstructorRecordNoParametersCompilerFlagIT {
+class ProjectionConstructorRecordNoParametersCompilerFlagIT {
 
 	private static final String INDEX_NAME = "index_name";
 
@@ -38,14 +38,14 @@ public class ProjectionConstructorRecordNoParametersCompilerFlagIT {
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void sourcesCompiledWithoutParametersFlag() {
+	void sourcesCompiledWithoutParametersFlag() {
 		assertThat( ConstructorWithParameters.class.getDeclaredConstructors()[0].getParameters() )
 				.extracting( Parameter::isNamePresent )
 				.containsOnly( Boolean.FALSE, Boolean.FALSE );
 	}
 
 	@Test
-	public void typeLevelAnnotation() {
+	void typeLevelAnnotation() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -78,7 +78,7 @@ public class ProjectionConstructorRecordNoParametersCompilerFlagIT {
 	}
 
 	@Test
-	public void constructorLevelAnnotation_canonical() {
+	void constructorLevelAnnotation_canonical() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId

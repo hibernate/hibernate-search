@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.store.ByteBuffersDirectory;
 
-public class LuceneLocalHeapDirectoryIT extends AbstractBuiltInDirectoryIT {
+class LuceneLocalHeapDirectoryIT extends AbstractBuiltInDirectoryIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")

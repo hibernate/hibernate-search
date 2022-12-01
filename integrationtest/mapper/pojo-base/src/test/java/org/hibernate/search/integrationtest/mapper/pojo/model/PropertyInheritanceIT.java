@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 
-public class PropertyInheritanceIT {
+class PropertyInheritanceIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -54,7 +54,7 @@ public class PropertyInheritanceIT {
 	}
 
 	@Test
-	public void index() {
+	void index() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );

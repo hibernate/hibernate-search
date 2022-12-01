@@ -62,7 +62,7 @@ public class IndexingFieldTypesIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void withReference(FieldTypeDescriptor<F> typeDescriptor) {
+	void withReference(FieldTypeDescriptor<F> typeDescriptor) {
 		init( typeDescriptor );
 		List<F> values = new ArrayList<>( typeDescriptor.getIndexableValues().getSingle() );
 		values.add( null ); // Also test null
@@ -103,7 +103,7 @@ public class IndexingFieldTypesIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void withPath(FieldTypeDescriptor<F> typeDescriptor) {
+	void withPath(FieldTypeDescriptor<F> typeDescriptor) {
 		init( typeDescriptor );
 		List<F> values = new ArrayList<>( typeDescriptor.getIndexableValues().getSingle() );
 		values.add( null ); // Also test null
@@ -144,7 +144,7 @@ public class IndexingFieldTypesIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void dynamic_withPath(FieldTypeDescriptor<F> typeDescriptor) {
+	void dynamic_withPath(FieldTypeDescriptor<F> typeDescriptor) {
 		init( typeDescriptor );
 		assumeTrue(
 				TckConfiguration.get().getBackendFeatures()

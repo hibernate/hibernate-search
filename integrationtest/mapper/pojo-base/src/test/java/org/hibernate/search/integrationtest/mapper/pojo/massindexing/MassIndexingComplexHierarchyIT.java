@@ -33,7 +33,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Test that the {@link MassIndexer} correctly indexes even complex entity hierarchies
  * where superclasses are indexed but not all of their subclasses, and vice-versa.
  */
-public class MassIndexingComplexHierarchyIT {
+class MassIndexingComplexHierarchyIT {
 
 	@RegisterExtension
 	public final BackendMock backendMock = BackendMock.create();
@@ -82,7 +82,7 @@ public class MassIndexingComplexHierarchyIT {
 	}
 
 	@Test
-	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
+	void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class )
 					// Simulate passing information to connect to a DB, ...
@@ -110,7 +110,7 @@ public class MassIndexingComplexHierarchyIT {
 	}
 
 	@Test
-	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
+	void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H1_B_Indexed.class )
 					// Simulate passing information to connect to a DB, ...
@@ -138,7 +138,7 @@ public class MassIndexingComplexHierarchyIT {
 	}
 
 	@Test
-	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
+	void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class )
 					// Simulate passing information to connect to a DB, ...
@@ -182,7 +182,7 @@ public class MassIndexingComplexHierarchyIT {
 	}
 
 	@Test
-	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
+	void rootIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H2_B_Indexed.class )
 					// Simulate passing information to connect to a DB, ...

@@ -35,7 +35,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 // This does not work because Hibernate ORM doesn't support instantiating records
 // for entities/embeddables at the moment.
 @Disabled
-public class IndexedEmbeddedRecordIT {
+class IndexedEmbeddedRecordIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -62,7 +62,7 @@ public class IndexedEmbeddedRecordIT {
 	}
 
 	@Test
-	public void index() {
+	void index() {
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.id = 1;

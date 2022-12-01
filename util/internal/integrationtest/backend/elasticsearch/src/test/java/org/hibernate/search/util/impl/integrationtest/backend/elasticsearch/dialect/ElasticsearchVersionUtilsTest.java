@@ -12,10 +12,10 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 
 import org.junit.jupiter.api.Test;
 
-public class ElasticsearchVersionUtilsTest {
+class ElasticsearchVersionUtilsTest {
 
 	@Test
-	public void isBetween() {
+	void isBetween() {
 		assertThat(
 				ElasticsearchVersionUtils.isBetween(
 						ElasticsearchVersion.of( "elastic:6.7.0" ),
@@ -66,7 +66,7 @@ public class ElasticsearchVersionUtilsTest {
 	}
 
 	@Test
-	public void isOpenSearch() {
+	void isOpenSearch() {
 		assertThat(
 				ElasticsearchVersionUtils.isOpenSearch(
 						ElasticsearchVersion.of( "elastic:1.1.1" )
@@ -81,7 +81,7 @@ public class ElasticsearchVersionUtilsTest {
 	}
 
 	@Test
-	public void isMatching() {
+	void isMatching() {
 		assertThat(
 				ElasticsearchVersionUtils.isMatching(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),
@@ -105,7 +105,7 @@ public class ElasticsearchVersionUtilsTest {
 	}
 
 	@Test
-	public void isAtMost() {
+	void isAtMost() {
 		assertThat(
 				ElasticsearchVersionUtils.isAtMost(
 						ElasticsearchVersion.of( "elastic:1.1.2" ),
@@ -136,7 +136,7 @@ public class ElasticsearchVersionUtilsTest {
 	}
 
 	@Test
-	public void isLessThan() {
+	void isLessThan() {
 		assertThat(
 				ElasticsearchVersionUtils.isLessThan(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),

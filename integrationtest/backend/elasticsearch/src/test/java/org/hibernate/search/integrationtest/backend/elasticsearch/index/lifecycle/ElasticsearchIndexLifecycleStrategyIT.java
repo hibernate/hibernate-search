@@ -19,14 +19,14 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 /**
  * Tests that setting the obsolete index lifecycle strategy property fails.
  */
-public class ElasticsearchIndexLifecycleStrategyIT {
+class ElasticsearchIndexLifecycleStrategyIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3540")
-	public void noCall() {
+	void noCall() {
 		StubMappedIndex index = StubMappedIndex.withoutFields();
 		assertThatThrownBy(
 				() -> setupHelper.start()

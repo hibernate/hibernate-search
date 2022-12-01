@@ -93,7 +93,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void superClassFieldType(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void superClassFieldType(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		Class<? super F> superClass = fieldType.getJavaType().getSuperclass();
 
 		doTestSuperClassFieldType( superClass, fieldType, dataSet );
@@ -124,7 +124,7 @@ public class TermsAggregationSpecificsIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void predicate(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void predicate(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -155,7 +155,7 @@ public class TermsAggregationSpecificsIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void limitAndOffset(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void limitAndOffset(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -257,7 +257,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void orderByTermDescending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void orderByTermDescending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		assumeNonDefaultOrdersSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -381,7 +381,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void minDocumentCount_zero_noMatch(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void minDocumentCount_zero_noMatch(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -411,7 +411,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void minDocumentCount_zero_noMatch_orderByTermDescending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void minDocumentCount_zero_noMatch_orderByTermDescending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		assumeNonDefaultOrdersSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -444,7 +444,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void minDocumentCount_negative(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void minDocumentCount_negative(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		assertThatThrownBy( () ->
@@ -490,7 +490,7 @@ public class TermsAggregationSpecificsIT<F> {
 	 */
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void maxTermCount_positive_orderByTermAscending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void maxTermCount_positive_orderByTermAscending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		assumeNonDefaultOrdersSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -520,7 +520,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void maxTermCount_positive_orderByCountAscending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void maxTermCount_positive_orderByCountAscending(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		assumeNonDefaultOrdersSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -550,7 +550,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void maxTermCount_zero(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void maxTermCount_zero(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		assertThatThrownBy( () ->
@@ -563,7 +563,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void maxTermCount_negative(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+	void maxTermCount_negative(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		assertThatThrownBy( () ->

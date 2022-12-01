@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class OperationSubmitterTest {
+class OperationSubmitterTest {
 
 	private BlockingQueue<Integer> queue;
 
@@ -33,7 +33,7 @@ public class OperationSubmitterTest {
 	}
 
 	@Test
-	public void blockingOperationSubmitterBlocksTheOperation() throws InterruptedException {
+	void blockingOperationSubmitterBlocksTheOperation() throws InterruptedException {
 		CompletableFuture<Boolean> future = CompletableFuture.supplyAsync( () -> {
 			try {
 				OperationSubmitter.BLOCKING.submitToQueue( queue, 3 );
@@ -57,7 +57,7 @@ public class OperationSubmitterTest {
 
 
 	@Test
-	public void nonBlockingOperationSubmitterThrowsException() {
+	void nonBlockingOperationSubmitterThrowsException() {
 		Integer element = 3;
 		assertThatThrownBy( () -> OperationSubmitter.REJECTED_EXECUTION_EXCEPTION.submitToQueue( queue, element ) )
 				.isInstanceOf( RejectedExecutionException.class );

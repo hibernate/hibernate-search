@@ -41,7 +41,7 @@ public class FieldSortTypeIndependentIT {
 	}
 
 	@Test
-	public void unknownField() {
+	void unknownField() {
 		StubMappingScope scope = index.createScope();
 
 		String absoluteFieldPath = "unknownField";
@@ -60,7 +60,7 @@ public class FieldSortTypeIndependentIT {
 	}
 
 	@Test
-	public void objectField_nested() {
+	void objectField_nested() {
 		StubMappingScope scope = index.createScope();
 
 		String absoluteFieldPath = index.binding().nestedObject.relativeFieldName;
@@ -75,7 +75,7 @@ public class FieldSortTypeIndependentIT {
 	}
 
 	@Test
-	public void objectField_flattened() {
+	void objectField_flattened() {
 		StubMappingScope scope = index.createScope();
 
 		String absoluteFieldPath = index.binding().flattenedObject.relativeFieldName;

@@ -24,7 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class OutboxPollingAutomaticIndexingRoutingIT {
+class OutboxPollingAutomaticIndexingRoutingIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -48,7 +48,7 @@ public class OutboxPollingAutomaticIndexingRoutingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4186")
-	public void processingEventsWithOutdatedRoutingKey() {
+	void processingEventsWithOutdatedRoutingKey() {
 		with( sessionFactory ).runInTransaction( session -> {
 			RoutedIndexedEntity entity = new RoutedIndexedEntity( 1, "first", RoutedIndexedEntity.Status.FIRST );
 			session.persist( entity );

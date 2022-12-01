@@ -32,7 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class DslConverterIT {
+class DslConverterIT {
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
@@ -45,7 +45,7 @@ public class DslConverterIT {
 	}
 
 	@Test
-	public void dslConverterEnabled() {
+	void dslConverterEnabled() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -63,7 +63,7 @@ public class DslConverterIT {
 	}
 
 	@Test
-	public void dslConverterDisabled() {
+	void dslConverterDisabled() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 

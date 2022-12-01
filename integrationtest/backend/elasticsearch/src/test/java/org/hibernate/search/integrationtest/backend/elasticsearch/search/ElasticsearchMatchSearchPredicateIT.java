@@ -19,7 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchMatchSearchPredicateIT {
+class ElasticsearchMatchSearchPredicateIT {
 
 	private static final String TEST_TERM = "ThisWillBeLowercasedByTheNormalizer";
 
@@ -36,7 +36,7 @@ public class ElasticsearchMatchSearchPredicateIT {
 	}
 
 	@Test
-	public void match_skipAnalysis_normalizedStringField() {
+	void match_skipAnalysis_normalizedStringField() {
 		assertThatThrownBy( () -> index.createScope().query()
 				.where( f -> f.match().field( "normalizedStringField" ).matching( TEST_TERM ).skipAnalysis() )
 				.toQuery()

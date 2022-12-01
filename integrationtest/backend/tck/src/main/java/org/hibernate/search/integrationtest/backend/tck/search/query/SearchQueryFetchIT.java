@@ -52,7 +52,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetchAll() {
+	void fetchAll() {
 		assertThatResult( matchAllQuerySortByField().fetchAll() )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
@@ -71,7 +71,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetch_limit() {
+	void fetch_limit() {
 		assertThatResult( matchAllQuerySortByField().fetch( null ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
@@ -90,7 +90,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetch_offset_limit() {
+	void fetch_offset_limit() {
 		assertThatResult( matchAllQuerySortByField().fetch( 1, null ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
@@ -122,7 +122,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetch_offset_limit_exceedsMaxValue() {
+	void fetch_offset_limit_exceedsMaxValue() {
 		assertThatThrownBy( () -> matchAllQuerySortByField().fetch( 1, Integer.MAX_VALUE ) )
 				// error message will depend on the specific backend
 				.isInstanceOf( SearchException.class );
@@ -167,7 +167,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetchAllHits() {
+	void fetchAllHits() {
 		assertThatHits( matchAllQuerySortByField().fetchAllHits() )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
@@ -184,7 +184,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetchHits_limit() {
+	void fetchHits_limit() {
 		assertThatHits( matchAllQuerySortByField().fetchHits( null ) )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
@@ -200,7 +200,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetchHits_offset_limit_fieldSort() {
+	void fetchHits_offset_limit_fieldSort() {
 		assertThatHits( matchAllQuerySortByField().fetchHits( 1, null ) )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 1; i < DOCUMENT_COUNT; i++ ) {
@@ -260,7 +260,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetchTotalHitCount() {
+	void fetchTotalHitCount() {
 		assertThat( matchAllQuerySortByField().fetchTotalHitCount() ).isEqualTo( DOCUMENT_COUNT );
 		assertThat( matchAllQuerySortByField().toQuery().fetchTotalHitCount() ).isEqualTo( DOCUMENT_COUNT );
 
@@ -282,7 +282,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetchTotalHitCount_withProjection() {
+	void fetchTotalHitCount_withProjection() {
 		assertThat( index.query()
 				.select( f -> f.field( "integer", Integer.class ) )
 				.where( f -> f.matchAll() )
@@ -309,7 +309,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetchSingleHit() {
+	void fetchSingleHit() {
 		Optional<DocumentReference> result = matchOneQuery( 4 ).fetchSingleHit();
 		assertThat( result ).isNotEmpty();
 		assertThat( normalize( result.get() ) )
@@ -325,7 +325,7 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetch_limitAndOffset_reuseQuery() {
+	void fetch_limitAndOffset_reuseQuery() {
 		SearchQuery<DocumentReference> query = matchAllQuerySortByField().toQuery();
 		assertThatResult( query.fetch( 1, null ) ).fromQuery( query )
 				.hasTotalHitCount( DOCUMENT_COUNT )

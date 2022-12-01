@@ -49,7 +49,7 @@ public class GsonClassesTest {
 	}
 
 	@Test
-	public void testNoMissingGsonAnnotatedClass() {
+	void testNoMissingGsonAnnotatedClass() {
 		Set<DotName> gsonAnnotations = findRuntimeAnnotations( gsonIndex );
 
 		Set<DotName> annotatedClasses = new HashSet<>();
@@ -69,7 +69,7 @@ public class GsonClassesTest {
 	}
 
 	@Test
-	public void testNoMissingGsonContractImplementations() {
+	void testNoMissingGsonContractImplementations() {
 		List<DotName> gsonContracts = Arrays.asList(
 				DotName.createSimple( TypeAdapterFactory.class.getName() ),
 				DotName.createSimple( TypeAdapter.class.getName() )

@@ -43,7 +43,7 @@ import org.mockito.quality.Strictness;
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types
-public class BulkWorkTest {
+class BulkWorkTest {
 
 	@Mock
 	private ElasticsearchClient clientMock;
@@ -56,7 +56,7 @@ public class BulkWorkTest {
 	}
 
 	@Test
-	public void execute_success() {
+	void execute_success() {
 		BulkableWork<Object> bulkableWork0 = bulkableWork( 0 );
 		BulkableWork<Object> bulkableWork1 = bulkableWork( 1 );
 
@@ -102,7 +102,7 @@ public class BulkWorkTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3869")
-	public void execute_http500() {
+	void execute_http500() {
 		BulkableWork<Object> bulkableWork0 = bulkableWork( 0 );
 		BulkableWork<Object> bulkableWork1 = bulkableWork( 1 );
 

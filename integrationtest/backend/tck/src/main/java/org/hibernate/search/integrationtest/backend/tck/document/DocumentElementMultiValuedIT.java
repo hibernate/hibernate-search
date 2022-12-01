@@ -58,7 +58,7 @@ public class DocumentElementMultiValuedIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addValue_root(FieldTypeDescriptor<F> fieldType) {
+	void addValue_root(FieldTypeDescriptor<F> fieldType) {
 		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding(), fieldType );
 		SimpleFieldModel<F> multiValuedFieldModel = getMultiValuedField( index.binding(), fieldType );
 		expectSuccess( "1", document -> {
@@ -80,7 +80,7 @@ public class DocumentElementMultiValuedIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addObject_flattened(FieldTypeDescriptor<F> fieldType) {
+	void addObject_flattened(FieldTypeDescriptor<F> fieldType) {
 		expectSuccess( "1", document -> {
 			document.addObject( index.binding().singleValuedFlattenedObject.self );
 		} );
@@ -100,7 +100,7 @@ public class DocumentElementMultiValuedIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addObject_nested(FieldTypeDescriptor<F> fieldType) {
+	void addObject_nested(FieldTypeDescriptor<F> fieldType) {
 		expectSuccess( "1", document -> {
 			document.addObject( index.binding().singleValuedNestedObject.self );
 		} );
@@ -120,7 +120,7 @@ public class DocumentElementMultiValuedIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addNullObject_flattened(FieldTypeDescriptor<F> fieldType) {
+	void addNullObject_flattened(FieldTypeDescriptor<F> fieldType) {
 		expectSuccess( "1", document -> {
 			document.addObject( index.binding().singleValuedFlattenedObject.self );
 		} );
@@ -158,7 +158,7 @@ public class DocumentElementMultiValuedIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addNullObject_nested(FieldTypeDescriptor<F> fieldType) {
+	void addNullObject_nested(FieldTypeDescriptor<F> fieldType) {
 		expectSuccess( "1", document -> {
 			document.addObject( index.binding().singleValuedNestedObject.self );
 		} );
@@ -196,7 +196,7 @@ public class DocumentElementMultiValuedIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addValue_inSingleValuedFlattenedObject(FieldTypeDescriptor<F> fieldType) {
+	void addValue_inSingleValuedFlattenedObject(FieldTypeDescriptor<F> fieldType) {
 		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding().singleValuedFlattenedObject,
 				fieldType
 		);
@@ -226,7 +226,7 @@ public class DocumentElementMultiValuedIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addValue_inMultiValuedFlattenedObject(FieldTypeDescriptor<F> fieldType) {
+	void addValue_inMultiValuedFlattenedObject(FieldTypeDescriptor<F> fieldType) {
 		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding().multiValuedFlattenedObject,
 				fieldType
 		);
@@ -256,7 +256,7 @@ public class DocumentElementMultiValuedIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addValue_inSingleValuedNestedObject(FieldTypeDescriptor<F> fieldType) {
+	void addValue_inSingleValuedNestedObject(FieldTypeDescriptor<F> fieldType) {
 		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding().singleValuedNestedObject,
 				fieldType
 		);
@@ -286,7 +286,7 @@ public class DocumentElementMultiValuedIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void addValue_inMultiValuedNestedObject(FieldTypeDescriptor<F> fieldType) {
+	void addValue_inMultiValuedNestedObject(FieldTypeDescriptor<F> fieldType) {
 		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding().multiValuedNestedObject,
 				fieldType
 		);

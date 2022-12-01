@@ -47,7 +47,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 /**
  * Test that all resources are closed as expected upon shutdown, or when startup fails.
  */
-public class CleanupIT {
+class CleanupIT {
 	private static final StartupStubBridge.CounterKeys IDENTIFIER_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
 	private static final StartupStubBridge.CounterKeys ROUTING_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
 	private static final StartupStubBridge.CounterKeys TYPE_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
@@ -68,7 +68,7 @@ public class CleanupIT {
 	private CloseableSearchMapping mapping;
 
 	@Test
-	public void successfulBuilding() {
+	void successfulBuilding() {
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
 		backendMock.expectAnySchema( OtherIndexedEntity.INDEX );
 
@@ -120,7 +120,7 @@ public class CleanupIT {
 	}
 
 	@Test
-	public void failingRoutingBinding() {
+	void failingRoutingBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
 			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX );
@@ -155,7 +155,7 @@ public class CleanupIT {
 	}
 
 	@Test
-	public void failingTypeBinding() {
+	void failingTypeBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
 			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX )
@@ -190,7 +190,7 @@ public class CleanupIT {
 	}
 
 	@Test
-	public void failingIdentifierBinding() {
+	void failingIdentifierBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
 			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX )
@@ -225,7 +225,7 @@ public class CleanupIT {
 	}
 
 	@Test
-	public void failingPropertyBinding() {
+	void failingPropertyBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
 			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX )
@@ -260,7 +260,7 @@ public class CleanupIT {
 	}
 
 	@Test
-	public void failingValueBinding() {
+	void failingValueBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
 			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX )
@@ -298,7 +298,7 @@ public class CleanupIT {
 	}
 
 	@Test
-	public void failingContainerExtractorBuilding() {
+	void failingContainerExtractorBuilding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
 			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX )

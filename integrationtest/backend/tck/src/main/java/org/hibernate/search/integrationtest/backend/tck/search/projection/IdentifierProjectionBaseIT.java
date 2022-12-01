@@ -63,7 +63,7 @@ public class IdentifierProjectionBaseIT {
 	}
 
 	@Test
-	public void simple() {
+	void simple() {
 		StubMappingScope scope = index.createScope();
 		SearchQuery<String> query = scope.query()
 				.select( f -> f.id( String.class ) )
@@ -75,7 +75,7 @@ public class IdentifierProjectionBaseIT {
 	}
 
 	@Test
-	public void noClass() {
+	void noClass() {
 		StubMappingScope scope = index.createScope();
 		SearchQuery<Object> query = scope.query()
 				.select( f -> f.id() )
@@ -87,7 +87,7 @@ public class IdentifierProjectionBaseIT {
 	}
 
 	@Test
-	public void duplicated() {
+	void duplicated() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
@@ -100,7 +100,7 @@ public class IdentifierProjectionBaseIT {
 	}
 
 	@Test
-	public void validSuperClass() {
+	void validSuperClass() {
 		StubMappingScope scope = index.createScope();
 		SearchQuery<CharSequence> query = scope.query()
 				.select( f -> f.id( CharSequence.class ) )
@@ -112,7 +112,7 @@ public class IdentifierProjectionBaseIT {
 	}
 
 	@Test
-	public void invalidProjectionType() {
+	void invalidProjectionType() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.projection().id( Integer.class ) )
@@ -123,7 +123,7 @@ public class IdentifierProjectionBaseIT {
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIndex() {
+	void multiIndex_withCompatibleIndex() {
 		StubMappingScope scope = index.createScope( compatibleIndex );
 		SearchQuery<String> query = scope.query()
 				.select( f -> f.id( String.class ) )
@@ -139,7 +139,7 @@ public class IdentifierProjectionBaseIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIndex() {
+	void multiIndex_withIncompatibleIndex() {
 		StubMappingScope scope = index.createScope( incompatibleIndex );
 
 		assertThatThrownBy( () -> scope.projection().id() )
@@ -151,7 +151,7 @@ public class IdentifierProjectionBaseIT {
 	}
 
 	@Test
-	public void nullClass() {
+	void nullClass() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.projection().id( (Class<?>) null ) )

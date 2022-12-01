@@ -19,7 +19,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchCustomIndexMappingIT {
+class ElasticsearchCustomIndexMappingIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -29,7 +29,7 @@ public class ElasticsearchCustomIndexMappingIT {
 	// Valid cases are tested elsewhere, e.g. ElasticsearchIndexSchemaManagerCreationCustomMappingIT
 
 	@Test
-	public void notExisting() {
+	void notExisting() {
 		assertThatThrownBy( () -> setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MAPPING_FILE,
 						"custom-index-mapping/not-existing.json"
@@ -43,7 +43,7 @@ public class ElasticsearchCustomIndexMappingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4438")
-	public void notParsable() {
+	void notParsable() {
 		assertThatThrownBy( () -> setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MAPPING_FILE,
 						"custom-index-mapping/not-parsable.json"
@@ -57,7 +57,7 @@ public class ElasticsearchCustomIndexMappingIT {
 	}
 
 	@Test
-	public void unknownParameter() {
+	void unknownParameter() {
 		assertThatThrownBy( () -> setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MAPPING_FILE,
 						"custom-index-mapping/unknown-parameter.json"

@@ -50,7 +50,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Does not test uses of container value extractors, which are tested in {@link FieldContainerExtractorBaseIT}
  * (and others, see javadoc on that class).
  */
-public class FullTextFieldIT {
+class FullTextFieldIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -61,7 +61,7 @@ public class FullTextFieldIT {
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void defaultAttributes() {
+	void defaultAttributes() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
 			@DocumentId
@@ -79,7 +79,7 @@ public class FullTextFieldIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4123")
-	public void defaultAttributes_programmaticAPI() {
+	void defaultAttributes_programmaticAPI() {
 		class IndexedEntity {
 			Integer id;
 			String value;
@@ -100,7 +100,7 @@ public class FullTextFieldIT {
 	}
 
 	@Test
-	public void name() {
+	void name() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
 			@DocumentId
@@ -117,7 +117,7 @@ public class FullTextFieldIT {
 	}
 
 	@Test
-	public void name_invalid_dot() {
+	void name_invalid_dot() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
 			@DocumentId
@@ -138,7 +138,7 @@ public class FullTextFieldIT {
 	}
 
 	@Test
-	public void defaultBridge() {
+	void defaultBridge() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -160,7 +160,7 @@ public class FullTextFieldIT {
 	}
 
 	@Test
-	public void norms() {
+	void norms() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
 			@DocumentId
@@ -186,7 +186,7 @@ public class FullTextFieldIT {
 	}
 
 	@Test
-	public void searchable() {
+	void searchable() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
 			@DocumentId
@@ -212,7 +212,7 @@ public class FullTextFieldIT {
 	}
 
 	@Test
-	public void termVector() {
+	void termVector() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
 			@DocumentId
@@ -241,7 +241,7 @@ public class FullTextFieldIT {
 	}
 
 	@Test
-	public void analyzer() {
+	void analyzer() {
 		final String analyzerName = "analyzerName";
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
@@ -259,7 +259,7 @@ public class FullTextFieldIT {
 	}
 
 	@Test
-	public void searchAnalyzer() {
+	void searchAnalyzer() {
 		final String searchAnalyzerName = "searchAnalyzerName";
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
@@ -278,7 +278,7 @@ public class FullTextFieldIT {
 	}
 
 	@Test
-	public void analyzer_searchAnalyzer() {
+	void analyzer_searchAnalyzer() {
 		final String analyzerName = "analyzerName";
 		final String searchAnalyzerName = "searchAnalyzerName";
 		@Indexed(index = INDEX_NAME)
@@ -298,7 +298,7 @@ public class FullTextFieldIT {
 	}
 
 	@Test
-	public void customBridge_implicitFieldType() {
+	void customBridge_implicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -315,7 +315,7 @@ public class FullTextFieldIT {
 	}
 
 	@Test
-	public void customBridge_explicitFieldType() {
+	void customBridge_explicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -332,7 +332,7 @@ public class FullTextFieldIT {
 	}
 
 	@Test
-	public void customBridge_withParams_annotationMapping() {
+	void customBridge_withParams_annotationMapping() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -365,7 +365,7 @@ public class FullTextFieldIT {
 	}
 
 	@Test
-	public void customBridge_withParams_programmaticMapping() {
+	void customBridge_withParams_programmaticMapping() {
 		class IndexedEntity {
 			Integer id;
 			WrappedValue wrap;
@@ -405,7 +405,7 @@ public class FullTextFieldIT {
 	}
 
 	@Test
-	public void defaultBridge_invalidFieldType() {
+	void defaultBridge_invalidFieldType() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -432,7 +432,7 @@ public class FullTextFieldIT {
 	}
 
 	@Test
-	public void customBridge_implicitFieldType_invalid() {
+	void customBridge_implicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -458,7 +458,7 @@ public class FullTextFieldIT {
 	}
 
 	@Test
-	public void customBridge_explicitFieldType_invalid() {
+	void customBridge_explicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -485,7 +485,7 @@ public class FullTextFieldIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3243")
-	public void customBridge_implicitFieldType_generic() {
+	void customBridge_implicitFieldType_generic() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId

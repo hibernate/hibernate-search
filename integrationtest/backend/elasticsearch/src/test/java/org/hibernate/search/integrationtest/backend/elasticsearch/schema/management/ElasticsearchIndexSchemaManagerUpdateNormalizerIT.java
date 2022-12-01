@@ -27,7 +27,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Tests related to normalizers when updating indexes.
  */
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchNormalizerDefinitionMigrationIT")
-public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
+class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -47,7 +47,7 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 	}
 
 	@Test
-	public void nothingToDo() throws Exception {
+	void nothingToDo() throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -100,7 +100,7 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 	}
 
 	@Test
-	public void normalizer_missing() throws Exception {
+	void normalizer_missing() throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -148,7 +148,7 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 	}
 
 	@Test
-	public void normalizer_componentDefinition_missing() throws Exception {
+	void normalizer_componentDefinition_missing() throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -195,7 +195,7 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 	}
 
 	@Test
-	public void normalizer_componentReference_invalid() throws Exception {
+	void normalizer_componentReference_invalid() throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -257,7 +257,7 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 	}
 
 	@Test
-	public void normalizer_componentDefinition_invalid() throws Exception {
+	void normalizer_componentDefinition_invalid() throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"

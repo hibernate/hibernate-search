@@ -60,7 +60,7 @@ public class RoutingBridgeRoutingKeyIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void routing_single(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+	void routing_single(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
 		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );

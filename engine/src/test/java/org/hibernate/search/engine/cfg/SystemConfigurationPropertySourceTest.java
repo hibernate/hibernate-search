@@ -20,11 +20,11 @@ import org.hibernate.search.util.impl.test.SystemHelper.SystemPropertyRestorer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-public class SystemConfigurationPropertySourceTest extends AbstractAllAwareConfigurationPropertySourceTest {
+class SystemConfigurationPropertySourceTest extends AbstractAllAwareConfigurationPropertySourceTest {
 	private final List<SystemPropertyRestorer> toClose = new ArrayList<>();
 
 	@Test
-	public void to_string() {
+	void to_string() {
 		ConfigurationPropertySource propertySource = createPropertySource( "someKey", "foo" );
 		assertThat( propertySource ).asString().contains( "System" );
 	}

@@ -29,7 +29,7 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 	}
 
 	@Test
-	public void analyzerOverride() {
+	void analyzerOverride() {
 		String whitespaceAnalyzedField = index.binding().whitespaceAnalyzedField.relativeFieldName;
 		String whitespaceLowercaseAnalyzedField = index.binding().whitespaceLowercaseAnalyzedField.relativeFieldName;
 		String whitespaceLowercaseSearchAnalyzedField = index.binding().whitespaceLowercaseSearchAnalyzedField.relativeFieldName;
@@ -66,7 +66,7 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 	}
 
 	@Test
-	public void analyzerOverride_withNormalizer() {
+	void analyzerOverride_withNormalizer() {
 		String whitespaceAnalyzedField = index.binding().whitespaceAnalyzedField.relativeFieldName;
 
 		assertThatThrownBy( () -> index.query()
@@ -79,7 +79,7 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 	}
 
 	@Test
-	public void analyzerOverride_notExistingName() {
+	void analyzerOverride_notExistingName() {
 		String whitespaceAnalyzedField = index.binding().whitespaceAnalyzedField.relativeFieldName;
 
 		assertThatThrownBy( () -> index.query()
@@ -92,7 +92,7 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 	}
 
 	@Test
-	public void skipAnalysis() {
+	void skipAnalysis() {
 		String absoluteFieldPath = index.binding().whitespaceLowercaseAnalyzedField.relativeFieldName;
 
 		assertThatQuery( index.query()
@@ -114,7 +114,7 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 	}
 
 	@Test
-	public void analyzerOverride_normalizedStringField() {
+	void analyzerOverride_normalizedStringField() {
 		String absoluteFieldPath = index.binding().normalizedStringField.relativeFieldName;
 
 		assertThatQuery( index.query()
@@ -153,7 +153,7 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 	}
 
 	@Test
-	public void multiIndex_incompatibleAnalyzer_overrideAnalyzer() {
+	void multiIndex_incompatibleAnalyzer_overrideAnalyzer() {
 		StubMappingScope scope = index.createScope( incompatibleSearchAnalyzerIndex );
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 
@@ -167,7 +167,7 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 	}
 
 	@Test
-	public void multiIndex_incompatibleAnalyzer_skipAnalysis() {
+	void multiIndex_incompatibleAnalyzer_skipAnalysis() {
 		StubMappingScope scope = index.createScope( incompatibleSearchAnalyzerIndex );
 		String absoluteFieldPath = index.binding().analyzedStringField.relativeFieldName;
 

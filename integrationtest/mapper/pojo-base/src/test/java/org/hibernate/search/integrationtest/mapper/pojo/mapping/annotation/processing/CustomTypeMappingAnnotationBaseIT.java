@@ -41,7 +41,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  */
 @SuppressWarnings("unused")
 @TestForIssue(jiraKey = "HSEARCH-3135")
-public class CustomTypeMappingAnnotationBaseIT {
+class CustomTypeMappingAnnotationBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -55,7 +55,7 @@ public class CustomTypeMappingAnnotationBaseIT {
 	 * Basic test checking that a simple type mapping will be applied as expected.
 	 */
 	@Test
-	public void simple() {
+	void simple() {
 		@Indexed(index = INDEX_NAME)
 		@WorkingAnnotation
 		class IndexedEntity {
@@ -88,7 +88,7 @@ public class CustomTypeMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void missingBinderReference() {
+	void missingBinderReference() {
 		@Indexed
 		@AnnotationWithEmptyProcessorRef
 		class IndexedEntity {
@@ -112,7 +112,7 @@ public class CustomTypeMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void invalidAnnotationType() {
+	void invalidAnnotationType() {
 		@Indexed
 		@AnnotationWithProcessorWithDifferentAnnotationType
 		class IndexedEntity {
@@ -154,7 +154,7 @@ public class CustomTypeMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void annotatedElement() {
+	void annotatedElement() {
 		final String index1Name = "index1";
 		final String index2Name = "index2";
 		final String index3Name = "index3";
@@ -292,7 +292,7 @@ public class CustomTypeMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void eventContext() {
+	void eventContext() {
 		@Indexed(index = INDEX_NAME)
 		@EventContextAwareAnnotation
 		class IndexedEntityType {

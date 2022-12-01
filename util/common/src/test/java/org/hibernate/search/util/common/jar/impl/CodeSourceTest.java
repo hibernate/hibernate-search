@@ -31,7 +31,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import org.springframework.boot.loader.jar.JarFile;
 
-public class CodeSourceTest {
+class CodeSourceTest {
 
 	private static final String META_INF_FILE_RELATIVE_PATH = "META-INF/someFile.txt";
 	private static final byte[] META_INF_FILE_CONTENT = "This is some content".getBytes( StandardCharsets.UTF_8 );

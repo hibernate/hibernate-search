@@ -22,7 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchIndexManagerIT {
+class ElasticsearchIndexManagerIT {
 
 	@RegisterExtension
 	public DocumentationSetupHelper setupHelper =
@@ -36,7 +36,7 @@ public class ElasticsearchIndexManagerIT {
 	}
 
 	@Test
-	public void readWriteName() {
+	void readWriteName() {
 		//tag::readWriteName[]
 		SearchMapping mapping = /* ... */ // <1>
 				//end::readWriteName[]

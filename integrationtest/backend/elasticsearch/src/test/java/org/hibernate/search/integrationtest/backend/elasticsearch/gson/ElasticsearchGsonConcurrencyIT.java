@@ -39,7 +39,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * will see a null adapter and throw an exception.
  */
 @TestForIssue(jiraKey = "HSEARCH-3725")
-public class ElasticsearchGsonConcurrencyIT {
+class ElasticsearchGsonConcurrencyIT {
 
 	/*
 	 * Please keep these constants reasonably low so that routine builds don't take forever:
@@ -55,7 +55,7 @@ public class ElasticsearchGsonConcurrencyIT {
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@Test
-	public void repeatedlyStartMultipleIndexesSerializingWithGsonInParallel() throws IOException {
+	void repeatedlyStartMultipleIndexesSerializingWithGsonInParallel() throws IOException {
 		for ( int i = 0; i < REPRODUCER_ATTEMPTS; i++ ) {
 			startMultipleIndexesSerializingWithGsonInParallel();
 			setupHelper.cleanUp();

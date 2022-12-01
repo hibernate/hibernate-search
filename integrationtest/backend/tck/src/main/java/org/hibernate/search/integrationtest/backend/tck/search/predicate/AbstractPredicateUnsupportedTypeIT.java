@@ -26,7 +26,7 @@ public abstract class AbstractPredicateUnsupportedTypeIT {
 
 	@ParameterizedTest(name = "{1}")
 	@MethodSource("params")
-	public void unsupported(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?> fieldType) {
+	void unsupported(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?> fieldType) {
 		SearchPredicateFactory f = index.createScope().predicate();
 
 		String fieldPath = index.binding().field.get( fieldType ).relativeFieldName;

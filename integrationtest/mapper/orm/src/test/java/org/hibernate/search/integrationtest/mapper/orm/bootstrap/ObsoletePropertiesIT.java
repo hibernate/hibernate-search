@@ -29,7 +29,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFa
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ObsoletePropertiesIT {
+class ObsoletePropertiesIT {
 
 	private static final List<String> OBSOLETE_ROOT_LEVEL_PROPERTY_KEYS = CollectionHelper.asImmutableList(
 			"hibernate.search.query.object_lookup_method",
@@ -109,7 +109,7 @@ public class ObsoletePropertiesIT {
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
-	public void obsoleteProperty() {
+	void obsoleteProperty() {
 		// Generate a list of all invalid property keys we can think of
 		List<String> obsoletePropertyKeys = new ArrayList<>();
 		obsoletePropertyKeys.addAll( OBSOLETE_ROOT_LEVEL_PROPERTY_KEYS );

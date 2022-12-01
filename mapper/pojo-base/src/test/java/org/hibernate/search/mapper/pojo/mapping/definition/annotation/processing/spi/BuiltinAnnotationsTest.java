@@ -36,12 +36,12 @@ public class BuiltinAnnotationsTest {
 	}
 
 	@Test
-	public void testRootMapping() {
+	void testRootMapping() {
 		assertThat( pojoMapperBaseIndex.getClassByName( BuiltinAnnotations.ROOT_MAPPING ) ).isNotNull();
 	}
 
 	@Test
-	public void testNoMissingRootMappingAnnotation() {
+	void testNoMissingRootMappingAnnotation() {
 		Set<DotName> rootMappingAnnotatedAnnotations = JandexUtils.findAnnotatedAnnotationsAndContaining(
 				pojoMapperBaseIndex, BuiltinAnnotations.ROOT_MAPPING );
 

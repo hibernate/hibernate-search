@@ -44,7 +44,7 @@ import org.mockito.quality.Strictness;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
-public class BeanResolverImplBaseTest {
+class BeanResolverImplBaseTest {
 
 	@Mock
 	private ClassResolver classResolverMock;
@@ -106,7 +106,7 @@ public class BeanResolverImplBaseTest {
 	}
 
 	@Test
-	public void resolve_matchingConfiguredBeans() {
+	void resolve_matchingConfiguredBeans() {
 		BeanHolder<InternalType1> type1BeanHolder = BeanHolder.of( new InternalType1() );
 		BeanHolder<InternalType2> type2BeanHolder = BeanHolder.of( new InternalType2() );
 		BeanHolder<InternalType3> type3BeanHolder1 = BeanHolder.of( new InternalType3() );
@@ -147,7 +147,7 @@ public class BeanResolverImplBaseTest {
 	}
 
 	@Test
-	public void resolve_matchingBeanManager_beanName() {
+	void resolve_matchingBeanManager_beanName() {
 		BeanHolder<BeanManagerType1> type1BeanHolder = BeanHolder.of( new BeanManagerType1() );
 		BeanHolder<BeanManagerType2> type2BeanHolder = BeanHolder.of( new BeanManagerType2() );
 		BeanHolder<BeanManagerType3> type3BeanHolder1 = BeanHolder.of( new BeanManagerType3() );
@@ -192,7 +192,7 @@ public class BeanResolverImplBaseTest {
 	}
 
 	@Test
-	public void resolve_matchingBeanManager_className() {
+	void resolve_matchingBeanManager_className() {
 		BeanHolder<BeanManagerType1> type1BeanHolder = BeanHolder.of( new BeanManagerType1() );
 		BeanHolder<BeanManagerType2> type2BeanHolder = BeanHolder.of( new BeanManagerType2() );
 		BeanHolder<BeanManagerType3> type3BeanHolder1 = BeanHolder.of( new BeanManagerType3() );
@@ -246,7 +246,7 @@ public class BeanResolverImplBaseTest {
 	}
 
 	@Test
-	public void resolve_matchingReflection() {
+	void resolve_matchingReflection() {
 		BeanNotFoundException beanManagerNotFoundException = new BeanNotFoundException( "cannot find from beanManager" );
 
 		// resolve(Class)
@@ -300,7 +300,7 @@ public class BeanResolverImplBaseTest {
 	}
 
 	@Test
-	public void resolve_noMatch() {
+	void resolve_noMatch() {
 		BeanNotFoundException beanManagerNotFoundException = new BeanNotFoundException( "cannot find from beanManager" );
 		RuntimeException classNotFoundException = new RuntimeException( "cannot find class" );
 
@@ -379,7 +379,7 @@ public class BeanResolverImplBaseTest {
 	}
 
 	@Test
-	public void resolve_configuredBeanFactoryFailure() {
+	void resolve_configuredBeanFactoryFailure() {
 		RuntimeException beanFactoryFailure = new RuntimeException( "internal failure in factory" );
 
 		// resolve(Class)
@@ -398,7 +398,7 @@ public class BeanResolverImplBaseTest {
 	}
 
 	@Test
-	public void resolve_beanManagerFailure() {
+	void resolve_beanManagerFailure() {
 		RuntimeException beanManagerFailure = new RuntimeException( "internal failure in provider" );
 
 		// resolve(Class)
@@ -416,7 +416,7 @@ public class BeanResolverImplBaseTest {
 	}
 
 	@Test
-	public void resolve_ambiguousInternalBean() {
+	void resolve_ambiguousInternalBean() {
 		BeanNotFoundException beanManagerNotFoundException = new BeanNotFoundException( "cannot find from beanManager" );
 
 		// resolve(Class)
@@ -434,7 +434,7 @@ public class BeanResolverImplBaseTest {
 	}
 
 	@Test
-	public void resolveRole() {
+	void resolveRole() {
 		BeanHolder<RoleType> beanHolder1 = BeanHolder.of( new InternalType3() );
 		BeanHolder<RoleType> beanHolder2 = BeanHolder.of( new InternalType3() );
 		BeanHolder<RoleType> beanHolder3 = BeanHolder.of( new InternalType3() );

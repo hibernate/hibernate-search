@@ -62,7 +62,7 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 	}
 
 	@Test
-	public void toOne() {
+	void toOne() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity indexed1 = new IndexedEntity( 1, "initialValue" );
 
@@ -103,7 +103,7 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 	}
 
 	@Test
-	public void toMany() {
+	void toMany() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity indexed1 = new IndexedEntity( 1, "initialValue" );
 

@@ -100,7 +100,7 @@ public class HibernateSearchPartitionMapperComponentIT {
 	 * between the rows to index and the max rows per partition.
 	 */
 	@Test
-	public void testMapPartitions() throws Exception {
+	void testMapPartitions() throws Exception {
 		JobContextData jobData = new JobContextData();
 		jobData.setEntityManagerFactory( emf );
 		jobData.setEntityTypeDescriptors( Arrays.asList(

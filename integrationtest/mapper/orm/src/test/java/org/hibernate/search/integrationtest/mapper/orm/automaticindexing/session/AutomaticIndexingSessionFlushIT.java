@@ -49,7 +49,7 @@ public class AutomaticIndexingSessionFlushIT {
 	}
 
 	@Test
-	public void onExplicitFlush() {
+	void onExplicitFlush() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "number1" );
 			session.setHibernateFlushMode( FlushMode.AUTO );
@@ -73,7 +73,7 @@ public class AutomaticIndexingSessionFlushIT {
 	}
 
 	@Test
-	public void onAutoFlush() {
+	void onAutoFlush() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "number1" );
 			session.setHibernateFlushMode( FlushMode.AUTO );

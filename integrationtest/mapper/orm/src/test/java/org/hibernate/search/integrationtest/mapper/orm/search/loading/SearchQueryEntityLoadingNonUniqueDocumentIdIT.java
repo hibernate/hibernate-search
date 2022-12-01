@@ -26,7 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SearchQueryEntityLoadingNonUniqueDocumentIdIT {
+class SearchQueryEntityLoadingNonUniqueDocumentIdIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -44,7 +44,7 @@ public class SearchQueryEntityLoadingNonUniqueDocumentIdIT {
 	}
 
 	@Test
-	public void nonUniqueDocumentId() {
+	void nonUniqueDocumentId() {
 		backendMock.inLenientMode( () -> with( sessionFactory ).runInTransaction( session -> {
 			for ( long i = 0; i < 2; i++ ) {
 				IndexedEntity entity = new IndexedEntity();

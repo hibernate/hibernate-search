@@ -34,7 +34,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 /**
  * Test mass indexing of an entity type whose document ID is not the entity ID.
  */
-public class MassIndexingNonEntityIdDocumentIdIT {
+class MassIndexingNonEntityIdDocumentIdIT {
 
 	private static final String TITLE_1 = "Oliver Twist";
 	private static final String AUTHOR_1 = "Charles Dickens";
@@ -66,7 +66,7 @@ public class MassIndexingNonEntityIdDocumentIdIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3203")
-	public void defaultMassIndexerStartAndWait() {
+	void defaultMassIndexerStartAndWait() {
 		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();

@@ -26,7 +26,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.RegexpQuery;
 
-public class LucenePredicateDslIT {
+class LucenePredicateDslIT {
 
 	private static final int ASIMOV_ID = 1;
 	private static final int MARTINEZ_ID = 2;
@@ -48,7 +48,7 @@ public class LucenePredicateDslIT {
 	}
 
 	@Test
-	public void fromLucene() {
+	void fromLucene() {
 		withinSearchSession( searchSession -> {
 			// tag::lucene-fromLuceneQuery[]
 			List<Book> hits = searchSession.search( Book.class )

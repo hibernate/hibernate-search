@@ -38,7 +38,7 @@ public class IndexSchemaElementFieldTemplateIT {
 	private StubMappedIndex index;
 
 	@Test
-	public void nullName() {
+	void nullName() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -94,7 +94,7 @@ public class IndexSchemaElementFieldTemplateIT {
 	}
 
 	@Test
-	public void emptyName() {
+	void emptyName() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -149,7 +149,7 @@ public class IndexSchemaElementFieldTemplateIT {
 	}
 
 	@Test
-	public void dotInName() {
+	void dotInName() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -212,7 +212,7 @@ public class IndexSchemaElementFieldTemplateIT {
 	}
 
 	@Test
-	public void nameCollision_fieldTemplates() {
+	void nameCollision_fieldTemplates() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -245,7 +245,7 @@ public class IndexSchemaElementFieldTemplateIT {
 	}
 
 	@Test
-	public void nameCollision_objectFieldTemplates() {
+	void nameCollision_objectFieldTemplates() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -278,7 +278,7 @@ public class IndexSchemaElementFieldTemplateIT {
 	}
 
 	@Test
-	public void nameCollision_fieldTemplateAndObjectFieldTemplate() {
+	void nameCollision_fieldTemplateAndObjectFieldTemplate() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();

@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 
-public class IndexedEmbeddedRecordIT {
+class IndexedEmbeddedRecordIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -54,7 +54,7 @@ public class IndexedEmbeddedRecordIT {
 	}
 
 	@Test
-	public void index() {
+	void index() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.id = 1;

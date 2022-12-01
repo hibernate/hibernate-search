@@ -24,7 +24,7 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class HibernateOrmAutomaticIndexingIT {
+class HibernateOrmAutomaticIndexingIT {
 	private static final String BOOK1_TITLE = "I, Robot";
 
 	private static final String BOOK2_TITLE = "The Caves of Steel";
@@ -35,7 +35,7 @@ public class HibernateOrmAutomaticIndexingIT {
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	@Test
-	public void synchronizationStrategyOverride() {
+	void synchronizationStrategyOverride() {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,

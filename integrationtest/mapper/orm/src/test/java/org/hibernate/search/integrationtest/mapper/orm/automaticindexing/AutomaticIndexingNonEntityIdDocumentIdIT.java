@@ -55,7 +55,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3203")
-	public void directPersistUpdateDelete() {
+	void directPersistUpdateDelete() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -104,7 +104,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3203")
-	public void directValueUpdate_indexedElementCollectionField() {
+	void directValueUpdate_indexedElementCollectionField() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -167,7 +167,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3199", "HSEARCH-3203" })
-	public void directValueReplace_indexedElementCollectionField() {
+	void directValueReplace_indexedElementCollectionField() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );

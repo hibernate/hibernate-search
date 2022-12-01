@@ -118,7 +118,7 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void withDslConverters_dslConverterEnabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void withDslConverters_dslConverterEnabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		SearchQuery<DocumentReference> query;
 		String fieldPath = getFieldWithDslConverterPath( fieldTypeDescriptor );
 
@@ -146,7 +146,7 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void withDslConverters_dslConverterDisabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void withDslConverters_dslConverterDisabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		SearchQuery<DocumentReference> query;
 		String fieldPath = getFieldWithDslConverterPath( fieldTypeDescriptor );
 
@@ -170,7 +170,7 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void unsortable(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void unsortable(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = mainIndex.createScope();
 		String fieldPath = getNonSortableFieldPath( fieldTypeDescriptor );
 
@@ -186,7 +186,7 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void invalidType_noDslConverter(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void invalidType_noDslConverter(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = mainIndex.createScope();
 
 		String absoluteFieldPath = getFieldPath( fieldTypeDescriptor );
@@ -208,7 +208,7 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void invalidType_withDslConverter(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void invalidType_withDslConverter(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = mainIndex.createScope();
 
 		String absoluteFieldPath = getFieldWithDslConverterPath( fieldTypeDescriptor );
@@ -230,7 +230,7 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void multiIndex_withCompatibleIndex_usingField(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void multiIndex_withCompatibleIndex_usingField(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
 		SearchQuery<DocumentReference> query;
@@ -255,7 +255,7 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void multiIndex_withRawFieldCompatibleIndex_dslConverterEnabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void multiIndex_withRawFieldCompatibleIndex_dslConverterEnabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
 		String fieldPath = getFieldPath( fieldTypeDescriptor );
@@ -280,7 +280,7 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void multiIndex_withRawFieldCompatibleIndex_dslConverterDisabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void multiIndex_withRawFieldCompatibleIndex_dslConverterDisabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
 		SearchQuery<DocumentReference> query;
@@ -412,7 +412,7 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void multiIndex_withIncompatibleIndex_dslConverterEnabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void multiIndex_withIncompatibleIndex_dslConverterEnabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
 		String fieldPath = getFieldPath( fieldTypeDescriptor );
@@ -434,7 +434,7 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	public void multiIndex_withIncompatibleIndex_dslConverterDisabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	void multiIndex_withIncompatibleIndex_dslConverterDisabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
 		String fieldPath = getFieldPath( fieldTypeDescriptor );

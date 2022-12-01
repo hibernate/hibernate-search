@@ -27,7 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ProxyIT {
+class ProxyIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -59,7 +59,7 @@ public class ProxyIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-383")
-	public void proxyAccess() {
+	void proxyAccess() {
 		with( sessionFactory ).runInTransaction( session -> {
 			EntityWithPropertyAccessTypeForId entity1 = new EntityWithPropertyAccessTypeForId();
 			entity1.id = 1;

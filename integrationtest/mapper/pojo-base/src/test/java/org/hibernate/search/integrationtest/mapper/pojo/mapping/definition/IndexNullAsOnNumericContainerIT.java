@@ -29,7 +29,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * would result in indexNullAs being interpreted as a string rather than the numeric type.
  */
 @TestForIssue(jiraKey = "HSEARCH-2663")
-public class IndexNullAsOnNumericContainerIT {
+class IndexNullAsOnNumericContainerIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -38,7 +38,7 @@ public class IndexNullAsOnNumericContainerIT {
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void test() {
+	void test() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				// Check that the field has type Integer and has an Integer indexNullAs value
 				.field( "integerList", Integer.class, b2 -> b2.indexNullAs( 42 ).multiValued( true ) )

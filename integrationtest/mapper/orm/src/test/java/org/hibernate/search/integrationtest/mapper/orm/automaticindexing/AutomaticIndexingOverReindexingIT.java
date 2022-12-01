@@ -104,7 +104,7 @@ public class AutomaticIndexingOverReindexingIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		setupHolder.runInTransaction( session -> {
 			Level1Entity level1 = new Level1Entity();
 			level1.setId( 1 );

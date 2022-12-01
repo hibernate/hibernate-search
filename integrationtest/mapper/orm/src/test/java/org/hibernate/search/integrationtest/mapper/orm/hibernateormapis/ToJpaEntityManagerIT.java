@@ -51,13 +51,13 @@ public class ToJpaEntityManagerIT {
 	}
 
 	@Test
-	public void toJpaEntityManagerFactory() {
+	void toJpaEntityManagerFactory() {
 		SearchMapping searchMapping = Search.mapping( setupHolder.entityManagerFactory() );
 		assertThat( searchMapping.toEntityManagerFactory() ).isSameAs( setupHolder.entityManagerFactory() );
 	}
 
 	@Test
-	public void toJpaEntityManager() {
+	void toJpaEntityManager() {
 		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			assertThat( searchSession.toEntityManager() ).isSameAs( entityManager );
@@ -65,7 +65,7 @@ public class ToJpaEntityManagerIT {
 	}
 
 	@Test
-	public void toJpaEntityManager_withClosedEntityManager() {
+	void toJpaEntityManager_withClosedEntityManager() {
 		EntityManager entityManager = setupHolder.entityManagerFactory().createEntityManager();
 		try {
 			entityManager = setupHolder.entityManagerFactory().createEntityManager();
@@ -84,7 +84,7 @@ public class ToJpaEntityManagerIT {
 
 	@Test
 	@TestForIssue( jiraKey = "HSEARCH-1857" )
-	public void reuseSearchSessionAfterEntityManagerIsClosed_noMatching() {
+	void reuseSearchSessionAfterEntityManagerIsClosed_noMatching() {
 		EntityManager entityManager = setupHolder.entityManagerFactory().createEntityManager();
 		SearchSession searchSession = Search.session( entityManager );
 		// a SearchSession instance is created lazily,
@@ -98,7 +98,7 @@ public class ToJpaEntityManagerIT {
 	}
 
 	@Test
-	public void lazyCreateSearchSessionAfterEntityManagerIsClosed() {
+	void lazyCreateSearchSessionAfterEntityManagerIsClosed() {
 		EntityManager entityManager = setupHolder.entityManagerFactory().createEntityManager();
 		// Search session is not created, since we don't use it
 		SearchSession searchSession = Search.session( entityManager );

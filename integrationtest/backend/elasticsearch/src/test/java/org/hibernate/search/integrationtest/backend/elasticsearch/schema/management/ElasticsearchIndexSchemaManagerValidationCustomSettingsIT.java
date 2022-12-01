@@ -51,7 +51,7 @@ public class ElasticsearchIndexSchemaManagerValidationCustomSettingsIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void success_simple(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void success_simple(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( index.name() ).deleteAndCreate( "index",
 				" { " +
 				"   'number_of_shards': '3', " +
@@ -89,7 +89,7 @@ public class ElasticsearchIndexSchemaManagerValidationCustomSettingsIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void invalid_analysis(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void invalid_analysis(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( index.name() ).deleteAndCreate( "index",
 				" { " +
 				"   'number_of_shards': '3', " +
@@ -137,7 +137,7 @@ public class ElasticsearchIndexSchemaManagerValidationCustomSettingsIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void invalid_numberOfShards(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void invalid_numberOfShards(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( index.name() ).deleteAndCreate( "index",
 				" { " +
 				"   'number_of_shards': '7', " +
@@ -180,7 +180,7 @@ public class ElasticsearchIndexSchemaManagerValidationCustomSettingsIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void invalid_maxResultWindow(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void invalid_maxResultWindow(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( index.name() ).deleteAndCreate( "index", "{ 'max_result_window': '20000' }" );
 
 		elasticsearchClient.index( index.name() ).type().putMapping(
@@ -198,7 +198,7 @@ public class ElasticsearchIndexSchemaManagerValidationCustomSettingsIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void default_maxResultWindow(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void default_maxResultWindow(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( index.name() ).deleteAndCreate( "index", "{ 'max_result_window': '10000' }" );
 
 		elasticsearchClient.index( index.name() ).type().putMapping(
@@ -211,7 +211,7 @@ public class ElasticsearchIndexSchemaManagerValidationCustomSettingsIT {
 
 	@ParameterizedTest(name = "With operation {0}")
 	@MethodSource("params")
-	public void empty(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+	void empty(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( index.name() ).deleteAndCreate( "index", "{ }" );
 
 		elasticsearchClient.index( index.name() ).type().putMapping(

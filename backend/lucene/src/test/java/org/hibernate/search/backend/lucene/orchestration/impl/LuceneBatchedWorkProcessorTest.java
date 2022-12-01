@@ -40,7 +40,7 @@ import org.mockito.quality.Strictness;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
-public class LuceneBatchedWorkProcessorTest {
+class LuceneBatchedWorkProcessorTest {
 
 	private static final String INDEX_NAME = "SomeIndexName";
 
@@ -61,7 +61,7 @@ public class LuceneBatchedWorkProcessorTest {
 	}
 
 	@Test
-	public void batch() throws IOException {
+	void batch() throws IOException {
 		processor.beginBatch();
 		verifyNoOtherIndexInteractionsAndClear();
 
@@ -90,7 +90,7 @@ public class LuceneBatchedWorkProcessorTest {
 	}
 
 	@Test
-	public void error_workExecute() throws IOException {
+	void error_workExecute() throws IOException {
 		processor.beginBatch();
 		verifyNoOtherIndexInteractionsAndClear();
 
@@ -119,7 +119,7 @@ public class LuceneBatchedWorkProcessorTest {
 	}
 
 	@Test
-	public void forceCommit() {
+	void forceCommit() {
 		processor.forceCommit();
 
 		verify( indexAccessorMock ).commit();
@@ -127,7 +127,7 @@ public class LuceneBatchedWorkProcessorTest {
 	}
 
 	@Test
-	public void error_forceCommit() {
+	void error_forceCommit() {
 		RuntimeException commitException = new RuntimeException( "Some message" );
 		doThrow( commitException ).when( indexAccessorMock ).commit();
 		assertThatThrownBy( () -> processor.forceCommit() )
@@ -143,14 +143,14 @@ public class LuceneBatchedWorkProcessorTest {
 	}
 
 	@Test
-	public void forceRefresh() {
+	void forceRefresh() {
 		processor.forceRefresh();
 		verify( indexAccessorMock ).refresh();
 		verifyNoOtherIndexInteractionsAndClear();
 	}
 
 	@Test
-	public void error_forceRefresh() {
+	void error_forceRefresh() {
 		RuntimeException refreshException = new RuntimeException( "Some message" );
 		doThrow( refreshException ).when( indexAccessorMock ).refresh();
 		assertThatThrownBy( () -> processor.forceRefresh() )
@@ -159,7 +159,7 @@ public class LuceneBatchedWorkProcessorTest {
 	}
 
 	@Test
-	public void error_batchCommit() throws IOException {
+	void error_batchCommit() throws IOException {
 		RuntimeException commitException = new RuntimeException( "Some message" );
 
 		processor.beginBatch();

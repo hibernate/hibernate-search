@@ -27,7 +27,7 @@ public abstract class AbstractPredicateSingleFieldIT<V extends AbstractPredicate
 
 	@ParameterizedTest(name = "{1}")
 	@MethodSource("params")
-	public void match(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
+	void match(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
 		int valueCount = dataSet.values.size();
 		for ( int i = 0; i < valueCount; i++ ) {
 			int matchingDocOrdinal = i;

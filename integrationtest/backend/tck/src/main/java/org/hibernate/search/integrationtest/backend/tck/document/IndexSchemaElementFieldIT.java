@@ -39,7 +39,7 @@ public class IndexSchemaElementFieldIT {
 	private StubMappedIndex index;
 
 	@Test
-	public void nullFieldName() {
+	void nullFieldName() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -100,7 +100,7 @@ public class IndexSchemaElementFieldIT {
 	}
 
 	@Test
-	public void emptyFieldName() {
+	void emptyFieldName() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -159,7 +159,7 @@ public class IndexSchemaElementFieldIT {
 	}
 
 	@Test
-	public void dotInFieldName() {
+	void dotInFieldName() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -238,7 +238,7 @@ public class IndexSchemaElementFieldIT {
 	}
 
 	@Test
-	public void nameCollision_fields() {
+	void nameCollision_fields() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -273,7 +273,7 @@ public class IndexSchemaElementFieldIT {
 	}
 
 	@Test
-	public void nameCollision_objectFields() {
+	void nameCollision_objectFields() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -308,7 +308,7 @@ public class IndexSchemaElementFieldIT {
 	}
 
 	@Test
-	public void nameCollision_fieldAndObjectField() {
+	void nameCollision_fieldAndObjectField() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -343,7 +343,7 @@ public class IndexSchemaElementFieldIT {
 	}
 
 	@Test
-	public void missingToReferenceCall() {
+	void missingToReferenceCall() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -373,7 +373,7 @@ public class IndexSchemaElementFieldIT {
 	}
 
 	@Test
-	public void multipleToReferenceCall() {
+	void multipleToReferenceCall() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();

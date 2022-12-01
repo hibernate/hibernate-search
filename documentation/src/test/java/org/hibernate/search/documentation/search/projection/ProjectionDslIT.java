@@ -42,7 +42,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 
-public class ProjectionDslIT {
+class ProjectionDslIT {
 
 	private static final int ASIMOV_ID = 1;
 	private static final int MARTINEZ_ID = 2;
@@ -65,7 +65,7 @@ public class ProjectionDslIT {
 	}
 
 	@Test
-	public void entryPoint() {
+	void entryPoint() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint-lambdas[]
 			SearchSession searchSession = /* ... */ // <1>
@@ -111,7 +111,7 @@ public class ProjectionDslIT {
 	}
 
 	@Test
-	public void documentReference() {
+	void documentReference() {
 		withinSearchSession( searchSession -> {
 			// tag::documentReference[]
 			List<DocumentReference> hits = searchSession.search( Book.class )
@@ -130,7 +130,7 @@ public class ProjectionDslIT {
 	}
 
 	@Test
-	public void reference() {
+	void reference() {
 		withinSearchSession( searchSession -> {
 			// tag::reference[]
 			List<EntityReference> hits = searchSession.search( Book.class )
@@ -148,7 +148,7 @@ public class ProjectionDslIT {
 	}
 
 	@Test
-	public void id_object() {
+	void id_object() {
 		withinSearchSession( searchSession -> {
 			// tag::id-object[]
 			List<Object> hits = searchSession.search( Book.class )
@@ -163,7 +163,7 @@ public class ProjectionDslIT {
 	}
 
 	@Test
-	public void id_int() {
+	void id_int() {
 		withinSearchSession( searchSession -> {
 			// tag::id-int[]
 			List<Integer> hits = searchSession.search( Book.class )
@@ -178,7 +178,7 @@ public class ProjectionDslIT {
 	}
 
 	@Test
-	public void entity() {
+	void entity() {
 		withinSearchSession( searchSession -> {
 			// tag::entity[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -197,7 +197,7 @@ public class ProjectionDslIT {
 	}
 
 	@Test
-	public void field() {
+	void field() {
 		withinSearchSession( searchSession -> {
 			// tag::field[]
 			List<Genre> hits = searchSession.search( Book.class )
@@ -272,7 +272,7 @@ public class ProjectionDslIT {
 	}
 
 	@Test
-	public void score() {
+	void score() {
 		withinSearchSession( searchSession -> {
 			// tag::score[]
 			List<Float> hits = searchSession.search( Book.class )
@@ -290,7 +290,7 @@ public class ProjectionDslIT {
 	}
 
 	@Test
-	public void distance() {
+	void distance() {
 		withinSearchSession( searchSession -> {
 			// tag::distance[]
 			GeoPoint center = GeoPoint.of( 47.506060, 2.473916 );
@@ -341,7 +341,7 @@ public class ProjectionDslIT {
 	}
 
 	@Test
-	public void composite() {
+	void composite() {
 		withinSearchSession( searchSession -> {
 			// tag::composite-customObject[]
 			List<MyPair<String, Genre>> hits = searchSession.search( Book.class )
@@ -481,7 +481,7 @@ public class ProjectionDslIT {
 
 	@Test
 	@SuppressWarnings("deprecation")
-	public void composite_singleStep() {
+	void composite_singleStep() {
 		withinSearchSession( searchSession -> {
 			// tag::composite-customObject-singlestep[]
 			List<MyPair<String, Genre>> hits = searchSession.search( Book.class )
@@ -547,7 +547,7 @@ public class ProjectionDslIT {
 	}
 
 	@Test
-	public void object() {
+	void object() {
 		withinSearchSession( searchSession -> {
 			// tag::object-customObject[]
 			List<List<MyAuthorName>> hits = searchSession.search( Book.class )
@@ -801,7 +801,7 @@ public class ProjectionDslIT {
 	}
 
 	@Test
-	public void constant() {
+	void constant() {
 		withinSearchSession( searchSession -> {
 			// tag::constant-incomposite[]
 			Instant searchRequestTimestamp = Instant.now();

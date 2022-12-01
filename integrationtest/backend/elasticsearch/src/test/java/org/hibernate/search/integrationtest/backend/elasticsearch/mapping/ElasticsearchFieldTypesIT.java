@@ -27,7 +27,7 @@ import com.google.gson.JsonObject;
 /**
  * Test the property types defined on Elasticsearch server
  */
-public class ElasticsearchFieldTypesIT {
+class ElasticsearchFieldTypesIT {
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
@@ -40,7 +40,7 @@ public class ElasticsearchFieldTypesIT {
 	private final StubMappedIndex index = StubMappedIndex.ofNonRetrievable( IndexBinding::new );
 
 	@Test
-	public void test() {
+	void test() {
 		clientSpy.expectNext(
 				ElasticsearchRequest.get().build(),
 				ElasticsearchRequestAssertionMode.STRICT

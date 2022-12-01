@@ -34,7 +34,7 @@ public class ElasticsearchIndexDescriptorIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		ElasticsearchIndexDescriptor indexDescriptor = index.toApi()
 				.unwrap( ElasticsearchIndexManager.class ).descriptor();
 

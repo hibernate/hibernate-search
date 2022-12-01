@@ -24,7 +24,7 @@ import org.mockito.ArgumentCaptor;
 /**
  * Tests edge cases of static sharding.
  */
-public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
+class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 		extends AbstractEventProcessorClusterLinkTest {
 	private static final long OTHER_0_ID = SELF_ID - 1;
 	private static final long OTHER_1_ID = SELF_ID + 1;
@@ -47,7 +47,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 	}
 
 	@Test
-	public void selfExpires_rejoin() {
+	void selfExpires_rejoin() {
 		OutboxPollingEventProcessorClusterLink link = setupLink( null );
 		defineSelfNotCreatedYet( link );
 
@@ -83,7 +83,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 	}
 
 	@Test
-	public void staticSharding_conflictingAssignedShardIds() {
+	void staticSharding_conflictingAssignedShardIds() {
 		int totalShardCount = 3;
 		ShardAssignmentDescriptor selfStaticShardAssignment =
 				new ShardAssignmentDescriptor( totalShardCount, 1 );
@@ -124,7 +124,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 	}
 
 	@Test
-	public void staticSharding_conflictingTotalShardCount() {
+	void staticSharding_conflictingTotalShardCount() {
 		ShardAssignmentDescriptor selfStaticShardAssignment =
 				new ShardAssignmentDescriptor( 3, 1 );
 
@@ -164,7 +164,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 	}
 
 	@Test
-	public void mixedSharding_otherDynamicSuperfluous_selfWaiting_includedAgentsReady_extraAgentsSuspended() {
+	void mixedSharding_otherDynamicSuperfluous_selfWaiting_includedAgentsReady_extraAgentsSuspended() {
 		int totalShardCount = 4;
 		ShardAssignmentDescriptor selfStaticShardAssignment =
 				new ShardAssignmentDescriptor( totalShardCount, 1 );
@@ -190,7 +190,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 	}
 
 	@Test
-	public void mixedSharding_otherDynamicSuperfluous_selfSuspended_includedAgentsReady_extraAgentsSuspended() {
+	void mixedSharding_otherDynamicSuperfluous_selfSuspended_includedAgentsReady_extraAgentsSuspended() {
 		int totalShardCount = 4;
 		ShardAssignmentDescriptor selfStaticShardAssignment =
 				new ShardAssignmentDescriptor( totalShardCount, 1 );
@@ -216,7 +216,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 	}
 
 	@Test
-	public void mixedSharding_otherDynamicSuperfluous_selfWaiting_includedAgentSuspended_extraAgentsSuspended() {
+	void mixedSharding_otherDynamicSuperfluous_selfWaiting_includedAgentSuspended_extraAgentsSuspended() {
 		int totalShardCount = 4;
 		ShardAssignmentDescriptor selfStaticShardAssignment =
 				new ShardAssignmentDescriptor( totalShardCount, 1 );
@@ -242,7 +242,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 	}
 
 	@Test
-	public void mixedSharding_otherDynamicSuperfluous_selfWaiting_includedAgentInWrongCluster_extraAgentsSuspended() {
+	void mixedSharding_otherDynamicSuperfluous_selfWaiting_includedAgentInWrongCluster_extraAgentsSuspended() {
 		int totalShardCount = 4;
 		ShardAssignmentDescriptor selfStaticShardAssignment =
 				new ShardAssignmentDescriptor( totalShardCount, 1 );
@@ -268,7 +268,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 	}
 
 	@Test
-	public void mixedSharding_otherDynamicSuperfluous_selfWaiting_includedAgentsReady_extraAgentsRunning() {
+	void mixedSharding_otherDynamicSuperfluous_selfWaiting_includedAgentsReady_extraAgentsRunning() {
 		int totalShardCount = 4;
 		ShardAssignmentDescriptor selfStaticShardAssignment =
 				new ShardAssignmentDescriptor( totalShardCount, 1 );
@@ -295,7 +295,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 	}
 
 	@Test
-	public void mixedSharding_otherDynamicSuperfluous_selfWaiting_includedAgentsReady_extraAgentsWaiting() {
+	void mixedSharding_otherDynamicSuperfluous_selfWaiting_includedAgentsReady_extraAgentsWaiting() {
 		int totalShardCount = 4;
 		ShardAssignmentDescriptor selfStaticShardAssignment =
 				new ShardAssignmentDescriptor( totalShardCount, 1 );
@@ -322,7 +322,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 	}
 
 	@Test
-	public void mixedSharding_selfDynamicSuperfluous_selfWaiting_includedAgentsReady_extraAgentsSuspended() {
+	void mixedSharding_selfDynamicSuperfluous_selfWaiting_includedAgentsReady_extraAgentsSuspended() {
 		int totalShardCount = 4;
 
 		OutboxPollingEventProcessorClusterLink link = setupLink( null );

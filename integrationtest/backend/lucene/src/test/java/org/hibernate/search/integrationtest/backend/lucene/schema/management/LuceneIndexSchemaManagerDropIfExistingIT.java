@@ -23,7 +23,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class LuceneIndexSchemaManagerDropIfExistingIT {
+class LuceneIndexSchemaManagerDropIfExistingIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -35,7 +35,7 @@ public class LuceneIndexSchemaManagerDropIfExistingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3759")
-	public void doesNotExist() throws IOException {
+	void doesNotExist() throws IOException {
 		assertThat( indexExists() ).isFalse();
 
 		setup();
@@ -61,7 +61,7 @@ public class LuceneIndexSchemaManagerDropIfExistingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3759")
-	public void alreadyExists() throws IOException {
+	void alreadyExists() throws IOException {
 		assertThat( indexExists() ).isFalse();
 
 		setup();

@@ -25,7 +25,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.ByteBuffersDirectory;
 
-public class LoggerInfoStreamTest {
+class LoggerInfoStreamTest {
 
 	private static final String LOGGER_NAME = LuceneLogCategories.INFOSTREAM_LOGGER_CATEGORY.getName();
 
@@ -48,7 +48,7 @@ public class LoggerInfoStreamTest {
 	}
 
 	@Test
-	public void testEnableInfoStream() throws Exception {
+	void testEnableInfoStream() throws Exception {
 		LoggerInfoStream infoStream = new LoggerInfoStream();
 
 		ByteBuffersDirectory directory = new ByteBuffersDirectory();

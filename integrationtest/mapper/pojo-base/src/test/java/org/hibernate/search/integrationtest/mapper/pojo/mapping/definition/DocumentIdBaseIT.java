@@ -46,7 +46,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Does not test default bridges, which are tested in {@link DocumentIdDefaultBridgeBaseIT}.
  */
 @SuppressWarnings("unused")
-public class DocumentIdBaseIT {
+class DocumentIdBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -57,7 +57,7 @@ public class DocumentIdBaseIT {
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void identifierBridge_default_noMatch() {
+	void identifierBridge_default_noMatch() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -76,7 +76,7 @@ public class DocumentIdBaseIT {
 
 	@Test
 	@SuppressWarnings("rawtypes")
-	public void identifierBridge_default_noMatch_enumSuperClassRaw() {
+	void identifierBridge_default_noMatch_enumSuperClassRaw() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -94,7 +94,7 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
-	public void identifierBridge_default_noMatch_enumSuperClassWithWildcard() {
+	void identifierBridge_default_noMatch_enumSuperClassWithWildcard() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -113,7 +113,7 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
-	public void identifierBridge_default_noMatch_enumSuperClassWithParameters() {
+	void identifierBridge_default_noMatch_enumSuperClassWithParameters() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -137,7 +137,7 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
-	public void identifierBridge_invalidInputType() {
+	void identifierBridge_invalidInputType() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId(identifierBridge = @IdentifierBridgeRef(type = MyStringBridge.class))
@@ -174,7 +174,7 @@ public class DocumentIdBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3243")
-	public void identifierBridge_invalidInputType_superType() {
+	void identifierBridge_invalidInputType_superType() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId(identifierBridge = @IdentifierBridgeRef(type = MyNumberBridge.class))
@@ -192,7 +192,7 @@ public class DocumentIdBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3243")
-	public void identifierBridge_invalidInputType_subType() {
+	void identifierBridge_invalidInputType_subType() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId(identifierBridge = @IdentifierBridgeRef(type = MyNumberBridge.class))
@@ -226,7 +226,7 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
-	public void identifierBridge_identifierBinder() {
+	void identifierBridge_identifierBinder() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId(
@@ -252,7 +252,7 @@ public class DocumentIdBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3243")
-	public void identifierBridge_implicitInputType_generic() {
+	void identifierBridge_implicitInputType_generic() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId(identifierBridge = @IdentifierBridgeRef(type = GenericTypeBridge.class))
@@ -295,7 +295,7 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
-	public void missing() {
+	void missing() {
 		@Indexed
 		class IndexedEntity {
 			Object id;
@@ -316,7 +316,7 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
-	public void customBridge_withParams_annotationMapping() {
+	void customBridge_withParams_annotationMapping() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId(identifierBinder = @IdentifierBinderRef(type = ParametricBridge.ParametricBinder.class,
@@ -361,7 +361,7 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
-	public void customBridge_withParams_paramNotDefined() {
+	void customBridge_withParams_paramNotDefined() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId(identifierBinder = @IdentifierBinderRef(type = ParametricBridge.ParametricBinder.class))
@@ -387,7 +387,7 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
-	public void customBridge_withParams_paramDefinedTwice() {
+	void customBridge_withParams_paramDefinedTwice() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId(identifierBinder = @IdentifierBinderRef(type = ParametricBridge.ParametricBinder.class,
@@ -419,7 +419,7 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
-	public void customBridge_withParams_programmaticMapping() {
+	void customBridge_withParams_programmaticMapping() {
 		class IndexedEntity {
 			Integer id;
 			String value;

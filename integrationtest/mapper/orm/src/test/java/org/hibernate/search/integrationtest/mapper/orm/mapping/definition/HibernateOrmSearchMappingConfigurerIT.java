@@ -21,7 +21,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class HibernateOrmSearchMappingConfigurerIT {
+class HibernateOrmSearchMappingConfigurerIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
@@ -30,7 +30,7 @@ public class HibernateOrmSearchMappingConfigurerIT {
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
-	public void none() {
+	void none() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "annotationMapped", String.class )
 		);
@@ -41,7 +41,7 @@ public class HibernateOrmSearchMappingConfigurerIT {
 	}
 
 	@Test
-	public void single() {
+	void single() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "annotationMapped", String.class )
 				.field( "nonAnnotationMapped1", String.class )
@@ -65,7 +65,7 @@ public class HibernateOrmSearchMappingConfigurerIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4594")
-	public void multiple() {
+	void multiple() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "annotationMapped", String.class )
 				.field( "nonAnnotationMapped1", String.class )
