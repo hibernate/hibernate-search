@@ -22,7 +22,7 @@ import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.test.rule.StaticIndexingSwitch;
+import org.hibernate.search.test.extension.StaticIndexingSwitch;
 import org.hibernate.stat.Statistics;
 
 import org.hibernate.testing.cache.CachingRegionFactory;

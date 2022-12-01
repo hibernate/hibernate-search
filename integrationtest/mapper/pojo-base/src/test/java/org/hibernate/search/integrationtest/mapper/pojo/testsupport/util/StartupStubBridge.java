@@ -31,7 +31,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
 /**
  * A stub bridge for use in tests where the bridge is only used on startup.

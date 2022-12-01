@@ -7,7 +7,7 @@
 package org.hibernate.search.documentation.analysis;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.isLucene;
+import static org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration.isLucene;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import javax.persistence.Entity;

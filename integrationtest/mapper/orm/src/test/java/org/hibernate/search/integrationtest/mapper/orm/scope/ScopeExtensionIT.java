@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 

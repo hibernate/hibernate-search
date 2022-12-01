@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendIndexingWorkExpectations;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendIndexingWorkExpectations;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 
 public final class CoordinationStrategyExpectations {

@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
 import java.io.IOException;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.store.Directory;

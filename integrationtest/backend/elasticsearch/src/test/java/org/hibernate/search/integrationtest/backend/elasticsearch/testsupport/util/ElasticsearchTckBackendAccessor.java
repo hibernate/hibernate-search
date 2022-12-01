@@ -10,7 +10,7 @@ import java.io.IOException;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexSettingsTestUtils;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 
 public class ElasticsearchTckBackendAccessor implements TckBackendAccessor {
 	private final TestElasticsearchClient client;

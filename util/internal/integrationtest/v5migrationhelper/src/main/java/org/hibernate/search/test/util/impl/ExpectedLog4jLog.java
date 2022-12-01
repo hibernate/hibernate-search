@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.util.impl.test.rule.log4j.Log4j2ConfigurationAccessor;
+import org.hibernate.search.util.impl.test.extension.log4j.Log4j2ConfigurationAccessor;
 
 import org.junit.rules.TestRule;
 import org.junit.runners.model.Statement;

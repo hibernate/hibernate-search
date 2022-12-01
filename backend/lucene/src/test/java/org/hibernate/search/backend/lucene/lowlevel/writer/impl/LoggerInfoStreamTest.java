@@ -11,7 +11,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.LuceneLogCategories;
-import org.hibernate.search.util.impl.test.rule.log4j.Log4j2ConfigurationAccessor;
+import org.hibernate.search.util.impl.test.extension.log4j.Log4j2ConfigurationAccessor;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

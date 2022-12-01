@@ -49,7 +49,7 @@ import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.mult
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Interface2;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.util.common.SearchTimeoutException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSoftAssertions;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;

@@ -11,7 +11,7 @@ import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.co
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchBackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
 class ElasticsearchTckBackendSetupStrategy extends TckBackendSetupStrategy<ElasticsearchBackendConfiguration> {

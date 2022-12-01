@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.backend.elasticsearch.client;
 
 import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;

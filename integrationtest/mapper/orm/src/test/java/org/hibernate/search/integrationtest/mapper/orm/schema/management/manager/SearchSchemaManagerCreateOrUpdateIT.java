@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.schema.management.manager;
 
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
-import org.hibernate.search.util.impl.integrationtest.common.rule.SchemaManagementWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.SchemaManagementWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 
 public class SearchSchemaManagerCreateOrUpdateIT extends AbstractSearchSchemaManagerSimpleOperationIT {

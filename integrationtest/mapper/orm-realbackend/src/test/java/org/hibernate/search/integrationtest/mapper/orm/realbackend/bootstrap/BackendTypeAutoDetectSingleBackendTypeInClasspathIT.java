@@ -7,8 +7,8 @@
 package org.hibernate.search.integrationtest.mapper.orm.realbackend.bootstrap;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.BACKEND_TYPE;
-import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.IS_IDE;
+import static org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration.BACKEND_TYPE;
+import static org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration.IS_IDE;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

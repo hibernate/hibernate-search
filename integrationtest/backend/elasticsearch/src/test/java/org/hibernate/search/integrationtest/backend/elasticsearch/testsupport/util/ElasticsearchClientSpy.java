@@ -21,7 +21,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
-import org.hibernate.search.util.impl.integrationtest.common.rule.CallQueue;
+import org.hibernate.search.util.impl.integrationtest.common.extension.CallQueue;
 
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;

@@ -9,7 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.backend.lucene;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
 
 public class LuceneBackendConfiguration extends BackendConfiguration {
 	@Override

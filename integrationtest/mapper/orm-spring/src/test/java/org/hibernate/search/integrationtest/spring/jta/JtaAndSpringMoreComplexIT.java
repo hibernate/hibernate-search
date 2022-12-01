@@ -17,7 +17,7 @@ import org.hibernate.search.integrationtest.spring.jta.entity.Box;
 import org.hibernate.search.integrationtest.spring.jta.entity.Doughnut;
 import org.hibernate.search.integrationtest.spring.jta.entity.Muffin;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionHolder;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 import org.junit.jupiter.api.AfterEach;

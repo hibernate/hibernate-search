@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.index.lifecyc
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;

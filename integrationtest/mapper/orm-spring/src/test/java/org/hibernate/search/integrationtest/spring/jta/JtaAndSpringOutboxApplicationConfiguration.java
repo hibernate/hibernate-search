@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.spring.jta;
 
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 
 public class JtaAndSpringOutboxApplicationConfiguration extends JtaAndSpringApplicationConfiguration {

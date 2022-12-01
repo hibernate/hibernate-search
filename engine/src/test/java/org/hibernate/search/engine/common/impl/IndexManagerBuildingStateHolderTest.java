@@ -34,7 +34,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

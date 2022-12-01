@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubNextScrollWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubNextScrollWorkBehavior;
 
 public class SearchQueryEntityLoadingScrollingIT<T> extends SearchQueryEntityLoadingBaseIT<T> {
 

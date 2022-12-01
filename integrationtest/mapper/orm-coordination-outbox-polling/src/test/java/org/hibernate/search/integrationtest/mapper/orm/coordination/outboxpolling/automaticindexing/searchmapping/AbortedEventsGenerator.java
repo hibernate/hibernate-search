@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 
 public class AbortedEventsGenerator {
 

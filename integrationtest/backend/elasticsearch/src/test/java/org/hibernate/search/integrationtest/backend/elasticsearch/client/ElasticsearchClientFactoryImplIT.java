@@ -61,8 +61,8 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dial
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
-import org.hibernate.search.util.impl.test.rule.RetryExtension;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.RetryExtension;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
