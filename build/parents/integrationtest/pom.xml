@@ -81,97 +81,6 @@
                         <startParallel>true</startParallel>
                         <images>
                             <image>
-                                <name>${test.elasticsearch.run.elastic.image.name}:${test.elasticsearch.run.elastic.image.tag}</name>
-                                <alias>elasticsearch</alias>
-                                <run>
-                                    <skip>${test.elasticsearch.run.elastic.skip}</skip>
-                                    <env>
-                                        <logger.level>WARN</logger.level>
-                                        <discovery.type>single-node</discovery.type>
-                                        <!-- fix Docker images for older versions -->
-                                        <!-- Older images require HTTP authentication for all requests;
-                                             it's not practical for testing, so we disable that.
-                                         -->
-                                        <xpack.security.enabled>false</xpack.security.enabled>
-                                        <!-- Limit the RAM usage.
-                                             Recent versions of ES limit themselves to 50% of the total available RAM,
-                                             but on CI this is sometimes too much, as we also have the Maven JVM
-                                             and the JVM that runs tests taking up a significant amount of RAM,
-                                             leaving too little for filesystem caches and resulting in freezes.
-                                         -->
-                                        <ES_JAVA_OPTS>-Xms1g -Xmx1g</ES_JAVA_OPTS>
-                                        <!-- Disable disk-based shard allocation thresholds: on large, relatively full disks (>90% used),
-                                             it will lead to index creation to get stuck waiting for other nodes to join the cluster,
-                                             which will never happen since we only have one node.
-                                             See https://www.elastic.co/guide/en/elasticsearch/reference/7.17/modules-cluster.html#disk-based-shard-allocation
-                                         -->
-                                        <cluster.routing.allocation.disk.threshold_enabled>false</cluster.routing.allocation.disk.threshold_enabled>
-                                    </env>
-                                    <envPropertyFile>${rootProject.directory}/build/container/elasticsearch/env-${parsed-version.test.elasticsearch.version.majorVersion}.${parsed-version.test.elasticsearch.version.minorVersion}.properties</envPropertyFile>
-                                    <tmpfs>/var/lib/elasticsearch</tmpfs>
-                                    <ports>
-                                        <port>9200:9200</port>
-                                    </ports>
-                                    <log>
-                                        <prefix>Elasticsearch: </prefix>
-                                        <date>default</date>
-                                        <color>cyan</color>
-                                    </log>
-                                    <wait>
-                                        <http>
-                                            <url>http://localhost:9200</url>
-                                            <method>GET</method>
-                                            <status>200</status>
-                                        </http>
-                                        <time>30000</time>
-                                    </wait>
-                                </run>
-                            </image>
-                            <image>
-                                <name>${test.elasticsearch.run.opensearch.image.name}:${test.elasticsearch.run.opensearch.image.tag}</name>
-                                <alias>opensearch</alias>
-                                <run>
-                                    <skip>${test.elasticsearch.run.opensearch.skip}</skip>
-                                    <env>
-                                        <logger.level>WARN</logger.level>
-                                        <discovery.type>single-node</discovery.type>
-                                        <!-- Prevent swapping, same as the Elasticsearch image above. -->
-                                        <bootstrap.memory_lock>true</bootstrap.memory_lock>
-                                        <!-- OpenSearch expects SSL and uses a self-signed certificate by default;
-                                             it's not practical for testing, so we disable that.
-                                         -->
-                                        <plugins.security.disabled>true</plugins.security.disabled>
-                                        <!-- ISM floods the logs with errors, and we don't need it.
-                                             See https://docs-beta.opensearch.org/im-plugin/ism/settings/
-                                         -->
-                                        <plugins.index_state_management.enabled>false</plugins.index_state_management.enabled>
-                                        <!-- Disable disk-based shard allocation thresholds: on large, relatively full disks (>90% used),
-                                             it will lead to index creation to get stuck waiting for other nodes to join the cluster,
-                                             which will never happen since we only have one node.
-                                             See https://www.elastic.co/guide/en/elasticsearch/reference/7.17/modules-cluster.html#disk-based-shard-allocation
-                                             See https://opensearch.org/docs/latest/opensearch/popular-api/#change-disk-watermarks-or-other-cluster-settings
-                                         -->
-                                        <cluster.routing.allocation.disk.threshold_enabled>false</cluster.routing.allocation.disk.threshold_enabled>
-                                    </env>
-                                    <ports>
-                                        <port>9200:9200</port>
-                                    </ports>
-                                    <log>
-                                        <prefix>OpenSearch: </prefix>
-                                        <date>default</date>
-                                        <color>cyan</color>
-                                    </log>
-                                    <wait>
-                                        <http>
-                                            <url>http://localhost:9200</url>
-                                            <method>GET</method>
-                                            <status>200</status>
-                                        </http>
-                                        <time>20000</time>
-                                    </wait>
-                                </run>
-                            </image>
-                            <image>
                                 <name>${test.database.run.postgres.image.name}:${test.database.run.postgres.image.tag}</name>
                                 <alias>postgres</alias>
                                 <run>
@@ -450,53 +359,8 @@
         <!-- Elasticsearch IT profiles       -->
         <!-- =============================== -->
         <!--
-             Different profiles are needed to handle the environment setup (which is handled in Maven,
-             on contrary to the various database profiles).
-
              To run tests against a different version of Elasticsearch, see CONTRIBUTING.md.
           -->
-
-        <!-- Profile enabled when an Elasticsearch instance must be run by Maven -->
-        <profile>
-            <id>elasticsearch-run</id>
-            <activation>
-                <!-- Activate by default, i.e. if test.elasticsearch.connection.uris has not been defined explicitly -->
-                <property>
-                    <name>!test.elasticsearch.connection.uris</name>
-                </property>
-            </activation>
-            <properties>
-                <test.elasticsearch.connection.uris>http://localhost:9200</test.elasticsearch.connection.uris>
-            </properties>
-        </profile>
-        <!-- Profile enabled when an Elasticsearch instance must NOT be run by Maven -->
-        <profile>
-            <id>elasticsearch-do-not-run</id>
-            <activation>
-                <!-- Activate if test.elasticsearch.connection.uris has been defined explicitly -->
-                <property>
-                    <name>test.elasticsearch.connection.uris</name>
-                </property>
-            </activation>
-            <properties>
-                <test.elasticsearch.run.skip.forRelevantModules>true</test.elasticsearch.run.skip.forRelevantModules>
-            </properties>
-        </profile>
-        <!-- Profile enabled when Elasticsearch tests are skipped -->
-        <profile>
-            <id>elasticsearch-test-skip</id>
-            <activation>
-                <!-- Activate if test.elasticsearch.connection.uris has been defined explicitly -->
-                <property>
-                    <name>test.elasticsearch.skip</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <properties>
-                <test.elasticsearch.run.skip.forRelevantModules>true</test.elasticsearch.run.skip.forRelevantModules>
-            </properties>
-        </profile>
-
         <profile>
             <id>aws</id>
             <activation>
@@ -513,47 +377,6 @@
                      so we also have retry steps in the Jenkinsfile.
                  -->
                 <failsafe.rerunFailingTestsCount>4</failsafe.rerunFailingTestsCount>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>opensearch</id>
-            <activation>
-                <property>
-                    <name>test.elasticsearch.distribution</name>
-                    <value>opensearch</value>
-                </property>
-            </activation>
-            <properties>
-                <test.elasticsearch.run.opensearch.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.opensearch.skip>
-                <test.elasticsearch.run.elastic.skip>true</test.elasticsearch.run.elastic.skip>
-                <test.elasticsearch.version>${version.org.opensearch.latest}</test.elasticsearch.version>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>amazon-opensearch-serverless</id>
-            <activation>
-                <property>
-                    <name>test.elasticsearch.distribution</name>
-                    <value>amazon-opensearch-serverless</value>
-                </property>
-            </activation>
-            <properties>
-                <!-- We'll simulate testing against Amazon OpenSearch Serverless by:
-                     1. Using the Amazon OpenSearch Serverless in Hibernate Search
-                     2. Connecting to a (local) OpenSearch container running the latest version
-                 -->
-                <!-- Amazon OpenSearch Serverless doesn't use versions -->
-                <test.elasticsearch.version/>
-                <!-- We'll simulate Amazon OpenSearch Serverless with a (local)
-                     OpenSearch container running the latest version -->
-                <test.elasticsearch.run.opensearch.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.opensearch.skip>
-                <test.elasticsearch.run.elastic.skip>true</test.elasticsearch.run.elastic.skip>
-                <test.elasticsearch.run.opensearch.image.tag>${version.org.opensearch.latest}</test.elasticsearch.run.opensearch.image.tag>
-                <!-- This is just to fix docker-maven-plugin, which complains about
-                     invalid image names (missing version) even for disabled images -->
-                <test.elasticsearch.run.elastic.image.tag>${version.org.elasticsearch.latest}</test.elasticsearch.run.elastic.image.tag>
             </properties>
         </profile>
 
