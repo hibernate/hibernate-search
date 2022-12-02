@@ -20,10 +20,10 @@ public final class SearchContainer {
 	private static final GenericContainer<?> SEARCH_CONTAINER;
 
 	static {
-		String distribution = System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.distribution" );
+		String name = System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.name", "" );
 		String tag = System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.tag" );
 
-		SEARCH_CONTAINER = "elastic".equalsIgnoreCase( distribution ) ? elasticsearch( tag ) : opensearch( tag );
+		SEARCH_CONTAINER = name.contains( "elastic" ) ? elasticsearch( name, tag ) : opensearch( name, tag );
 	}
 
 	public static int mappedPort(int port) {
@@ -42,8 +42,8 @@ public final class SearchContainer {
 		}
 	}
 
-	private static GenericContainer<?> elasticsearch(String imageTag) {
-		return common( "elastic/elasticsearch", imageTag )
+	private static GenericContainer<?> elasticsearch(String name, String tag) {
+		return common( name, tag )
 				.withEnv( "logger.level", "WARN" )
 				.withEnv( "discovery.type", "single-node" )
 				// Older images require HTTP authentication for all requests;
@@ -63,8 +63,8 @@ public final class SearchContainer {
 				;
 	}
 
-	private static GenericContainer<?> opensearch(String imageTag) {
-		return common( "opensearchproject/opensearch", imageTag )
+	private static GenericContainer<?> opensearch(String name, String tag) {
+		return common( name, tag )
 				.withEnv( "logger.level", "WARN" )
 				.withEnv( "discovery.type", "single-node" )
 				// Prevent swapping

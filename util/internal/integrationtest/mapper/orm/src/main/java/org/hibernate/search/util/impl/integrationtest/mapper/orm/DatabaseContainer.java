@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.Locale;
 
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.utility.DockerImageName;
@@ -27,10 +28,11 @@ public final class DatabaseContainer {
 
 
 	static {
-		String database = System.getProperty( "org.hibernate.search.integrationtest.orm.database" );
-		DATABASE = SupportedDatabase.from( database );
+		String name = System.getProperty( "org.hibernate.search.integrationtest.orm.database.image.name", "" );
+		String tag = System.getProperty( "org.hibernate.search.integrationtest.orm.database.image.tag" );
+		DATABASE = SupportedDatabase.from( name );
 
-		DATABASE_CONTAINER = DATABASE.container();
+		DATABASE_CONTAINER = DATABASE.container( name, tag );
 	}
 
 
@@ -63,19 +65,19 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			<SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container() {
+			<SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container(String name, String tag) {
 				return null;
 			}
 		},
-		POSTGRESQL {
+		POSTGRES {
 			@Override
 			String dialect() {
 				return org.hibernate.dialect.PostgreSQL10Dialect.class.getName();
 			}
 
 			@Override
-			<SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container() {
-				return new JdbcDatabaseContainer<SELF>( DockerImageName.parse( "postgres" ).withTag( "13.1" ) ) {
+			<SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container(String name, String tag) {
+				return new JdbcDatabaseContainer<SELF>( DockerImageName.parse( name ).withTag( tag ) ) {
 					@Override
 					public String getDriverClassName() {
 						return "org.postgresql.Driver";
@@ -115,8 +117,8 @@ public final class DatabaseContainer {
 				return org.hibernate.dialect.MariaDB103Dialect.class.getName();
 			}
 			@Override
-			<SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container() {
-				return new JdbcDatabaseContainer<SELF>( DockerImageName.parse( "mariadb" ).withTag( "10.5.8" ) ) {
+			<SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container(String name, String tag) {
+				return new JdbcDatabaseContainer<SELF>( DockerImageName.parse( name ).withTag( tag ) ) {
 					@Override
 					public String getDriverClassName() {
 						return "org.mariadb.jdbc.Driver";
@@ -160,8 +162,8 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			<SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container() {
-				return new JdbcDatabaseContainer<SELF>( DockerImageName.parse( "mysql" ).withTag( "8.0.22" ) ) {
+			<SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container(String name, String tag) {
+				return new JdbcDatabaseContainer<SELF>( DockerImageName.parse( name ).withTag( tag ) ) {
 					@Override
 					public String getDriverClassName() {
 						return "com.mysql.jdbc.Driver";
@@ -205,8 +207,8 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			<SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container() {
-				return new JdbcDatabaseContainer<SELF>( DockerImageName.parse( "ibmcom/db2" ).withTag( "11.5.8.0" ) ) {
+			<SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container(String name, String tag) {
+				return new JdbcDatabaseContainer<SELF>( DockerImageName.parse( name ).withTag( tag ) ) {
 					@Override
 					public String getDriverClassName() {
 						return "com.ibm.db2.jcc.DB2Driver";
@@ -256,8 +258,8 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			<SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container() {
-				return new JdbcDatabaseContainer<SELF>( DockerImageName.parse( "gvenzl/oracle-xe" ).withTag( "21-slim-faststart" ) ) {
+			<SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container(String name, String tag) {
+				return new JdbcDatabaseContainer<SELF>( DockerImageName.parse( name ).withTag( tag ) ) {
 					@Override
 					public String getDriverClassName() {
 						return "oracle.jdbc.OracleDriver";
@@ -296,8 +298,8 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			<SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container() {
-				return new JdbcDatabaseContainer<SELF>( DockerImageName.parse( "mcr.microsoft.com/mssql/server" ).withTag( "2019-CU8-ubuntu-16.04" ) ) {
+			<SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container(String name, String tag) {
+				return new JdbcDatabaseContainer<SELF>( DockerImageName.parse( name ).withTag( tag ) ) {
 					@Override
 					public String getDriverClassName() {
 						return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
@@ -337,8 +339,8 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			<SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container() {
-				return new JdbcDatabaseContainer<SELF>( DockerImageName.parse( "cockroachdb/cockroach" ).withTag( "v22.1.4" ) ) {
+			<SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container(String name, String tag) {
+				return new JdbcDatabaseContainer<SELF>( DockerImageName.parse( name ).withTag( tag ) ) {
 					@Override
 					public String getDriverClassName() {
 						return "org.postgresql.Driver";
@@ -384,11 +386,11 @@ public final class DatabaseContainer {
 
 		abstract String dialect();
 
-		abstract <SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container();
+		abstract <SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container(String name, String tag);
 
 		static SupportedDatabase from(String name) {
 			for ( SupportedDatabase database : values() ) {
-				if ( database.name().equalsIgnoreCase( name ) ) {
+				if ( name.toLowerCase( Locale.ROOT ).contains( database.name().toLowerCase( Locale.ROOT ) ) ) {
 					return database;
 				}
 			}

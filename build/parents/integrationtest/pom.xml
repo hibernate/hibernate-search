@@ -183,9 +183,6 @@
             <properties>
                 <jdbc.driver.groupId>com.h2database</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>h2</jdbc.driver.artifactId>
-                <failsafe.jvm.args.hibernate-orm>
-                    -Dorg.hibernate.search.integrationtest.orm.database=h2
-                </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
 
@@ -199,10 +196,6 @@
                 <test.database.run.image.pull>true</test.database.run.image.pull>
                 <test.database.run.image.name>${test.database.run.postgres.image.name}</test.database.run.image.name>
                 <test.database.run.image.tag>${test.database.run.postgres.image.tag}</test.database.run.image.tag>
-                <failsafe.jvm.args.hibernate-orm>
-                    -Dorg.hibernate.search.integrationtest.orm.database=postgresql
-                    -Dorg.hibernate.search.integrationtest.orm.database.image.name=${test.database.run.image.tag}
-                </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
 
@@ -216,9 +209,6 @@
                 <test.database.run.image.pull>true</test.database.run.image.pull>
                 <test.database.run.image.name>${test.database.run.mariadb.image.name}</test.database.run.image.name>
                 <test.database.run.image.tag>${test.database.run.mariadb.image.tag}</test.database.run.image.tag>
-                <failsafe.jvm.args.hibernate-orm>
-                    -Dorg.hibernate.search.integrationtest.orm.database=mariadb
-                </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
 
@@ -232,9 +222,6 @@
                 <test.database.run.image.pull>true</test.database.run.image.pull>
                 <test.database.run.image.name>${test.database.run.mysql.image.name}</test.database.run.image.name>
                 <test.database.run.image.tag>${test.database.run.mysql.image.tag}</test.database.run.image.tag>
-                <failsafe.jvm.args.hibernate-orm>
-                    -Dorg.hibernate.search.integrationtest.orm.database=mysql
-                </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
 
@@ -248,9 +235,6 @@
                 <test.database.run.image.pull>true</test.database.run.image.pull>
                 <test.database.run.image.name>${test.database.run.db2.image.name}</test.database.run.image.name>
                 <test.database.run.image.tag>${test.database.run.db2.image.tag}</test.database.run.image.tag>
-                <failsafe.jvm.args.hibernate-orm>
-                    -Dorg.hibernate.search.integrationtest.orm.database=db2
-                </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
 
@@ -264,9 +248,6 @@
                 <test.database.run.image.pull>true</test.database.run.image.pull>
                 <test.database.run.image.name>${test.database.run.oracle.image.name}</test.database.run.image.name>
                 <test.database.run.image.tag>${test.database.run.oracle.image.tag}</test.database.run.image.tag>
-                <failsafe.jvm.args.hibernate-orm>
-                    -Dorg.hibernate.search.integrationtest.orm.database=oracle
-                </failsafe.jvm.args.hibernate-orm>
                 <!-- avoid `ORA-01882: timezone region not found` exception on CI -->
                 <failsafe.jvm.args.jdbc>-Doracle.jdbc.timezoneAsRegion=false</failsafe.jvm.args.jdbc>
             </properties>
@@ -282,9 +263,6 @@
                 <test.database.run.image.pull>true</test.database.run.image.pull>
                 <test.database.run.image.name>${test.database.run.mssql.image.name}</test.database.run.image.name>
                 <test.database.run.image.tag>${test.database.run.mssql.image.tag}</test.database.run.image.tag>
-                <failsafe.jvm.args.hibernate-orm>
-                    -Dorg.hibernate.search.integrationtest.orm.database=mssql
-                </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
 
@@ -299,9 +277,6 @@
                 <test.database.run.image.pull>true</test.database.run.image.pull>
                 <test.database.run.image.name>${test.database.run.cockroachdb.image.name}</test.database.run.image.name>
                 <test.database.run.image.tag>${test.database.run.cockroachdb.image.tag}</test.database.run.image.tag>
-                <failsafe.jvm.args.hibernate-orm>
-                    -Dorg.hibernate.search.integrationtest.orm.database=cockroachdb
-                </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
     </profiles>
