@@ -65,6 +65,34 @@
         <!--
              To run tests against a different version of Elasticsearch, see CONTRIBUTING.md.
           -->
+        <!-- Profile enabled when an Elasticsearch instance must be pulled -->
+        <profile>
+            <id>elasticsearch-run</id>
+            <activation>
+                <!-- Activate by default, i.e. if test.elasticsearch.connection.uris has not been defined explicitly -->
+                <property>
+                    <name>!test.elasticsearch.connection.uris</name>
+                </property>
+            </activation>
+            <properties>
+                <test.elasticsearch.run.image.name>${test.elasticsearch.run.elastic.image.name}</test.elasticsearch.run.image.name>
+                <test.elasticsearch.run.image.tag>${test.elasticsearch.run.elastic.image.tag}</test.elasticsearch.run.image.tag>
+            </properties>
+        </profile>
+        <!-- Profile enabled when an Elasticsearch instance must NOT be run by Maven -->
+        <profile>
+            <id>elasticsearch-do-not-run</id>
+            <activation>
+                <!-- Activate if test.elasticsearch.connection.uris has been defined explicitly -->
+                <property>
+                    <name>test.elasticsearch.connection.uris</name>
+                </property>
+            </activation>
+            <properties>
+                <test.elasticsearch.run.image.pull>false</test.elasticsearch.run.image.pull>
+            </properties>
+        </profile>
+
         <profile>
             <id>aws</id>
             <activation>
@@ -84,6 +112,20 @@
             </properties>
         </profile>
 
+        <profile>
+            <id>opensearch</id>
+            <activation>
+                <property>
+                    <name>test.elasticsearch.distribution</name>
+                    <value>opensearch</value>
+                </property>
+            </activation>
+            <properties>
+                <test.elasticsearch.run.image.name>${test.elasticsearch.run.opensearch.image.name}</test.elasticsearch.run.image.name>
+                <test.elasticsearch.run.image.tag>${test.elasticsearch.run.opensearch.image.tag}</test.elasticsearch.run.image.tag>
+            </properties>
+        </profile>
+
         <!-- =============================== -->
         <!-- Database profiles               -->
         <!-- =============================== -->
@@ -100,7 +142,7 @@
                 <jdbc.driver.groupId>com.h2database</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>h2</jdbc.driver.artifactId>
                 <failsafe.jvm.args.hibernate-orm>
-                    -Dorg.hibernate.search.integrationtest.orn.database=h2
+                    -Dorg.hibernate.search.integrationtest.orm.database=h2
                 </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
@@ -112,8 +154,12 @@
             <properties>
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
+                <test.database.run.image.pull>true</test.database.run.image.pull>
+                <test.database.run.image.name>${test.database.run.postgres.image.name}</test.database.run.image.name>
+                <test.database.run.image.tag>${test.database.run.postgres.image.tag}</test.database.run.image.tag>
                 <failsafe.jvm.args.hibernate-orm>
-                    -Dorg.hibernate.search.integrationtest.orn.database=postgresql
+                    -Dorg.hibernate.search.integrationtest.orm.database=postgresql
+                    -Dorg.hibernate.search.integrationtest.orm.database.image.name=${test.database.run.image.tag}
                 </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
@@ -125,8 +171,11 @@
             <properties>
                 <jdbc.driver.groupId>org.mariadb.jdbc</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mariadb-java-client</jdbc.driver.artifactId>
+                <test.database.run.image.pull>true</test.database.run.image.pull>
+                <test.database.run.image.name>${test.database.run.mariadb.image.name}</test.database.run.image.name>
+                <test.database.run.image.tag>${test.database.run.mariadb.image.tag}</test.database.run.image.tag>
                 <failsafe.jvm.args.hibernate-orm>
-                    -Dorg.hibernate.search.integrationtest.orn.database=mariadb
+                    -Dorg.hibernate.search.integrationtest.orm.database=mariadb
                 </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
@@ -138,8 +187,11 @@
             <properties>
                 <jdbc.driver.groupId>com.mysql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mysql-connector-j</jdbc.driver.artifactId>
+                <test.database.run.image.pull>true</test.database.run.image.pull>
+                <test.database.run.image.name>${test.database.run.mysql.image.name}</test.database.run.image.name>
+                <test.database.run.image.tag>${test.database.run.mysql.image.tag}</test.database.run.image.tag>
                 <failsafe.jvm.args.hibernate-orm>
-                    -Dorg.hibernate.search.integrationtest.orn.database=mysql
+                    -Dorg.hibernate.search.integrationtest.orm.database=mysql
                 </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
@@ -151,8 +203,11 @@
             <properties>
                 <jdbc.driver.groupId>com.ibm.db2</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>jcc</jdbc.driver.artifactId>
+                <test.database.run.image.pull>true</test.database.run.image.pull>
+                <test.database.run.image.name>${test.database.run.db2.image.name}</test.database.run.image.name>
+                <test.database.run.image.tag>${test.database.run.db2.image.tag}</test.database.run.image.tag>
                 <failsafe.jvm.args.hibernate-orm>
-                    -Dorg.hibernate.search.integrationtest.orn.database=db2
+                    -Dorg.hibernate.search.integrationtest.orm.database=db2
                 </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
@@ -164,8 +219,11 @@
             <properties>
                 <jdbc.driver.groupId>com.oracle.database.jdbc</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>ojdbc11</jdbc.driver.artifactId>
+                <test.database.run.image.pull>true</test.database.run.image.pull>
+                <test.database.run.image.name>${test.database.run.oracle.image.name}</test.database.run.image.name>
+                <test.database.run.image.tag>${test.database.run.oracle.image.tag}</test.database.run.image.tag>
                 <failsafe.jvm.args.hibernate-orm>
-                    -Dorg.hibernate.search.integrationtest.orn.database=oracle
+                    -Dorg.hibernate.search.integrationtest.orm.database=oracle
                 </failsafe.jvm.args.hibernate-orm>
                 <!-- avoid `ORA-01882: timezone region not found` exception on CI -->
                 <failsafe.jvm.args.jdbc>-Doracle.jdbc.timezoneAsRegion=false</failsafe.jvm.args.jdbc>
@@ -179,8 +237,11 @@
             <properties>
                 <jdbc.driver.groupId>com.microsoft.sqlserver</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mssql-jdbc</jdbc.driver.artifactId>
+                <test.database.run.image.pull>true</test.database.run.image.pull>
+                <test.database.run.image.name>${test.database.run.mssql.image.name}</test.database.run.image.name>
+                <test.database.run.image.tag>${test.database.run.mssql.image.tag}</test.database.run.image.tag>
                 <failsafe.jvm.args.hibernate-orm>
-                    -Dorg.hibernate.search.integrationtest.orn.database=mssql
+                    -Dorg.hibernate.search.integrationtest.orm.database=mssql
                 </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>
@@ -193,8 +254,11 @@
                 <!-- CockroachDB uses the same client protocol as PostgreSQL (pgwire), so the driver is the same. -->
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
+                <test.database.run.image.pull>true</test.database.run.image.pull>
+                <test.database.run.image.name>${test.database.run.cockroachdb.image.name}</test.database.run.image.name>
+                <test.database.run.image.tag>${test.database.run.cockroachdb.image.tag}</test.database.run.image.tag>
                 <failsafe.jvm.args.hibernate-orm>
-                    -Dorg.hibernate.search.integrationtest.orn.database=cockroachdb
+                    -Dorg.hibernate.search.integrationtest.orm.database=cockroachdb
                 </failsafe.jvm.args.hibernate-orm>
             </properties>
         </profile>

@@ -36,7 +36,7 @@ public final class DatabaseContainer {
 
 
 	static {
-		String database = System.getProperty( "org.hibernate.search.integrationtest.orn.database" );
+		String database = System.getProperty( "org.hibernate.search.integrationtest.orm.database" );
 		DATABASE = SupportedDatabase.from( database );
 
 		DATABASE_CONTAINER = DATABASE.container();
