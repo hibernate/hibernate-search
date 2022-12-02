@@ -21,8 +21,6 @@
     <properties>
         <!-- We don't want to use a Jacoco agent here, and we don't want to rely on these tests for coverage either -->
         <jacoco.skip>true</jacoco.skip>
-
-        <test.elasticsearch.run.skip>${test.elasticsearch.run.skip.forRelevantModules}</test.elasticsearch.run.skip>
     </properties>
 
     <dependencies>
