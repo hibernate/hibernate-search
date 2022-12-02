@@ -12,10 +12,6 @@
     <name>Hibernate Search ITs - ORM</name>
     <description>Hibernate Search integration tests for the Hibernate ORM integration</description>
 
-    <properties>
-        <test.database.run.skip>false</test.database.run.skip>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>

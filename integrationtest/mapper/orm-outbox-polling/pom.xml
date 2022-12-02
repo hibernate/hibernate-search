@@ -14,8 +14,6 @@
 
     <properties>
         <surefire.module>coord-outbox</surefire.module>
-
-        <test.database.run.skip>false</test.database.run.skip>
     </properties>
 
     <dependencies>

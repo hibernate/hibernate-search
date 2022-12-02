@@ -14,8 +14,6 @@
 
     <properties>
         <surefire.module>elasticsearch</surefire.module>
-
-        <test.elasticsearch.run.skip>${test.elasticsearch.run.skip.forRelevantModules}</test.elasticsearch.run.skip>
     </properties>
 
     <dependencies>

@@ -391,8 +391,6 @@
         <test.testcontainers.run.image.name>testcontainers/ryuk</test.testcontainers.run.image.name>
         <test.testcontainers.run.image.tag>0.5.1</test.testcontainers.run.image.tag>
 
-        <!-- Run containers for additional ORM databases -->
-        <test.database.run.skip>true</test.database.run.skip>
         <!-- PostgreSQL -->
         <!-- See https://hub.docker.com/_/postgres -->
         <test.database.run.postgres.skip>true</test.database.run.postgres.skip>
