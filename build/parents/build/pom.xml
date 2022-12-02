@@ -1192,8 +1192,10 @@
                             <org.hibernate.search.version>${project.version}</org.hibernate.search.version>
                             <org.hibernate.search.enable_performance_tests>${test.performance.enable}</org.hibernate.search.enable_performance_tests>
                             <org.hibernate.search.integrationtest.backend.elasticsearch.distribution>${test.elasticsearch.distribution}</org.hibernate.search.integrationtest.backend.elasticsearch.distribution>
-                            <org.hibernate.search.integrationtest.backend.elasticsearch.version>${test.elasticsearch.distribution}:${test.elasticsearch.version}</org.hibernate.search.integrationtest.backend.elasticsearch.version>
-                            <org.hibernate.search.integrationtest.backend.elasticsearch.tag>${test.elasticsearch.version}</org.hibernate.search.integrationtest.backend.elasticsearch.tag>
+                            <org.hibernate.search.integrationtest.backend.elasticsearch.name>${test.searchengine.run.image.name}</org.hibernate.search.integrationtest.backend.elasticsearch.name>
+                            <org.hibernate.search.integrationtest.backend.elasticsearch.tag>${test.searchengine.run.image.tag}</org.hibernate.search.integrationtest.backend.elasticsearch.tag>
+                            <org.hibernate.search.integrationtest.orm.database.image.name>${test.database.run.image.name}</org.hibernate.search.integrationtest.orm.database.image.name>
+                            <org.hibernate.search.integrationtest.orm.database.image.tag>${test.database.run.image.tag}</org.hibernate.search.integrationtest.orm.database.image.tag>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>

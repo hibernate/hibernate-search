@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Future;
+import java.util.Locale;
 
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Ulimit;
@@ -36,10 +37,11 @@ public final class DatabaseContainer {
 
 
 	static {
-		String database = System.getProperty( "org.hibernate.search.integrationtest.orm.database" );
-		DATABASE = SupportedDatabase.from( database );
+		String name = System.getProperty( "org.hibernate.search.integrationtest.orm.database.image.name", "" );
+		String tag = System.getProperty( "org.hibernate.search.integrationtest.orm.database.image.tag" );
+		DATABASE = SupportedDatabase.from( name );
 
-		DATABASE_CONTAINER = DATABASE.container();
+		DATABASE_CONTAINER = DATABASE.container( name, tag );
 	}
 
 
@@ -72,20 +74,20 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container() {
+			HibernateSearchJdbcDatabaseContainer container(String name, String tag) {
 				return null;
 			}
 		},
-		POSTGRESQL {
+		POSTGRES {
 			@Override
 			String dialect() {
 				return org.hibernate.dialect.PostgreSQLDialect.class.getName();
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container() {
+			HibernateSearchJdbcDatabaseContainer container(String name, String tag) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						DockerImageName.parse( "postgres" ).withTag( "13.1" ),
+						DockerImageName.parse( name ).withTag( tag ),
 						"org.postgresql.Driver",
 						"jdbc:postgresql://%s:%d/hibernate_orm_test",
 						5432,
@@ -104,9 +106,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container() {
+			HibernateSearchJdbcDatabaseContainer container(String name, String tag) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						DockerImageName.parse( "mariadb" ).withTag( "10.5.8" ),
+						DockerImageName.parse( name ).withTag( tag ),
 						"org.mariadb.jdbc.Driver",
 						"jdbc:mariadb://%s:%d/hibernate_orm_test",
 						3306,
@@ -128,9 +130,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container() {
+			HibernateSearchJdbcDatabaseContainer container(String name, String tag) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						DockerImageName.parse( "mysql" ).withTag( "8.0.22" ),
+						DockerImageName.parse( name ).withTag( tag ),
 						"com.mysql.jdbc.Driver",
 						"jdbc:mysql://%s:%d/hibernate_orm_test",
 						3306,
@@ -152,9 +154,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container() {
+			HibernateSearchJdbcDatabaseContainer container(String name, String tag) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						DockerImageName.parse( "ibmcom/db2" ).withTag( "11.5.8.0" ),
+						DockerImageName.parse( name ).withTag( tag ),
 						"com.ibm.db2.jcc.DB2Driver",
 						"jdbc:db2://%s:%d/hreact",
 						50000,
@@ -184,9 +186,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container() {
+			HibernateSearchJdbcDatabaseContainer container(String name, String tag) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						DockerImageName.parse( "gvenzl/oracle-xe" ).withTag( "21-slim-faststart" ),
+						DockerImageName.parse( name ).withTag( tag ),
 						"oracle.jdbc.OracleDriver",
 						"jdbc:oracle:thin:@%s:%d/XE",
 						1521,
@@ -204,9 +206,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container() {
+			HibernateSearchJdbcDatabaseContainer container(String name, String tag) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						DockerImageName.parse( "mcr.microsoft.com/mssql/server" ).withTag( "2019-CU8-ubuntu-16.04" ),
+						DockerImageName.parse( name ).withTag( tag ),
 						"com.microsoft.sqlserver.jdbc.SQLServerDriver",
 						"jdbc:sqlserver://%s:%d;databaseName=tempdb",
 						1433,
@@ -225,9 +227,9 @@ public final class DatabaseContainer {
 			}
 
 			@Override
-			HibernateSearchJdbcDatabaseContainer container() {
+			HibernateSearchJdbcDatabaseContainer container(String name, String tag) {
 				return new HibernateSearchJdbcDatabaseContainer(
-						DockerImageName.parse( "cockroachdb/cockroach" ).withTag( "v22.1.4" ),
+						DockerImageName.parse( name ).withTag( tag ),
 						"org.postgresql.Driver",
 						"jdbc:postgresql://%s:%d/defaultdb?sslmode=disable",
 						26257,
@@ -259,11 +261,11 @@ public final class DatabaseContainer {
 
 		abstract String dialect();
 
-		abstract HibernateSearchJdbcDatabaseContainer container();
+		abstract HibernateSearchJdbcDatabaseContainer container(String name, String tag);
 
 		static SupportedDatabase from(String name) {
 			for ( SupportedDatabase database : values() ) {
-				if ( database.name().equalsIgnoreCase( name ) ) {
+				if ( name.toLowerCase( Locale.ROOT ).contains( database.name().toLowerCase( Locale.ROOT ) ) ) {
 					return database;
 				}
 			}

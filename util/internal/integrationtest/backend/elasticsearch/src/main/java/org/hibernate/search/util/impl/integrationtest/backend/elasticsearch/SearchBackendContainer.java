@@ -23,12 +23,12 @@ public final class SearchBackendContainer {
 	private static final GenericContainer<?> SEARCH_CONTAINER;
 
 	static {
-		String distribution = System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.distribution" );
+		String name = System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.name", "" );
 		String tag = System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.tag" );
 
-		ElasticsearchVersion version = ElasticsearchVersion.of( ElasticsearchDistributionName.of( distribution ), tag );
-
-		SEARCH_CONTAINER = "elastic".equalsIgnoreCase( distribution ) ? elasticsearch( tag, version ) : opensearch( tag );
+		SEARCH_CONTAINER = name.contains( "elastic" )
+				? elasticsearch( name, tag, ElasticsearchVersion.of( ElasticsearchDistributionName.ELASTIC, tag ) )
+				: opensearch( name, tag );
 	}
 
 	public static int mappedPort(int port) {
@@ -47,8 +47,8 @@ public final class SearchBackendContainer {
 		}
 	}
 
-	private static GenericContainer<?> elasticsearch(String imageTag, ElasticsearchVersion version) {
-		GenericContainer<?> container = common( "elastic/elasticsearch", imageTag )
+	private static GenericContainer<?> elasticsearch(String name, String tag, ElasticsearchVersion version) {
+		GenericContainer<?> container = common( name, tag )
 				.withEnv( "logger.level", "WARN" )
 				.withEnv( "discovery.type", "single-node" )
 				// Older images require HTTP authentication for all requests;
@@ -96,8 +96,8 @@ public final class SearchBackendContainer {
 		return container;
 	}
 
-	private static GenericContainer<?> opensearch(String imageTag) {
-		return common( "opensearchproject/opensearch", imageTag )
+	private static GenericContainer<?> opensearch(String name, String tag) {
+		return common( name, tag )
 				.withEnv( "logger.level", "WARN" )
 				.withEnv( "discovery.type", "single-node" )
 				// Prevent swapping
