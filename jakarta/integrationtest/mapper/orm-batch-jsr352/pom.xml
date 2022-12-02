@@ -15,8 +15,6 @@
     <properties>
         <transform.original.pathFromRoot>integrationtest/mapper/orm-batch-jsr352</transform.original.pathFromRoot>
 
-        <test.elasticsearch.run.skip>${test.elasticsearch.connection.uris.defined}</test.elasticsearch.run.skip>
-
         <surefire.jvm.args.module>
             ${test.elasticsearch.connection.jvm.args}
             ${test.weld.jvm.args}

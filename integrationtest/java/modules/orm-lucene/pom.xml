@@ -17,8 +17,6 @@
     <description>Hibernate Search integration tests for Java 11+ modules</description>
 
     <properties>
-        <test.database.run.skip>false</test.database.run.skip>
-
         <maven.compiler.release>11</maven.compiler.release>
         <!-- Override the default from the parent POM: here we really do want to use the modulepath -->
         <failsafe.useModulePath>true</failsafe.useModulePath>

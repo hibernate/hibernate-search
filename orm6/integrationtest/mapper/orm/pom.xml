@@ -14,8 +14,6 @@
 
     <properties>
         <transform.original.pathFromRoot>integrationtest/mapper/orm</transform.original.pathFromRoot>
-
-        <test.database.run.skip>false</test.database.run.skip>
     </properties>
 
     <dependencies>

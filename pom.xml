@@ -608,8 +608,6 @@
 
         <!-- Mapper ORM tests properties -->
 
-        <!-- Run containers for additional ORM databases -->
-        <test.database.run.skip>true</test.database.run.skip>
         <!-- PostgreSQL -->
         <test.database.run.postgres.skip>true</test.database.run.postgres.skip>
         <test.database.run.postgres.image.name>postgres</test.database.run.postgres.image.name>

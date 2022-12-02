@@ -19,8 +19,6 @@
     <properties>
         <transform.original.pathFromRoot>integrationtest/java/modules/orm-lucene</transform.original.pathFromRoot>
 
-        <test.database.run.skip>false</test.database.run.skip>
-
         <maven.compiler.release>11</maven.compiler.release>
         <!-- Override the default from the parent POM: here we really do want to use the modulepath -->
         <failsafe.useModulePath>true</failsafe.useModulePath>
