@@ -93,7 +93,6 @@ public final class SearchContainer {
 		return new GenericContainer<>( DockerImageName.parse( image ).withTag( tag ) )
 				.withExposedPorts( 9200, 9300 )
 				.waitingFor( new HttpWaitStrategy().forPort( 9200 ).forStatusCode( 200 ) )
-				.withStartupTimeout( Duration.ofMinutes( 2 ) )
-				.withReuse( true );
+				.withStartupTimeout( Duration.ofMinutes( 5 ) );
 	}
 }
