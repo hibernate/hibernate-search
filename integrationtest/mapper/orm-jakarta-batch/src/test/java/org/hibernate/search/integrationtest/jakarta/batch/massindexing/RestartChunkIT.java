@@ -126,8 +126,8 @@ class RestartChunkIT {
 
 	private void doTest(String reindexOnly, long expectedTotal, long expectedGoogle) throws InterruptedException {
 		assertThat( JobTestUtil.nbDocumentsInIndex( emf, SimulatedFailureCompany.class ) ).isZero();
-		List<SimulatedFailureCompany> google =
-				JobTestUtil.findIndexedResults( emf, SimulatedFailureCompany.class, "name", "Google" );
+		List<SimulatedFailureCompany> google = JobTestUtil.findIndexedResults(
+				emf, SimulatedFailureCompany.class, "name", "Google" );
 		assertThat( google ).isEmpty();
 
 		// start the job
