@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Future;
-import java.util.Locale;
+import java.util.function.Consumer;
 
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Ulimit;
@@ -32,8 +32,10 @@ public final class DatabaseContainer {
 	private DatabaseContainer() {
 	}
 
+	private static final Object LOCK = new Object();
 	private static final SupportedDatabase DATABASE;
 	private static final HibernateSearchJdbcDatabaseContainer DATABASE_CONTAINER;
+	private static Boolean H2_INITIALIZED = Boolean.FALSE;
 
 
 	static {
@@ -46,11 +48,36 @@ public final class DatabaseContainer {
 
 
 	public static Configuration configuration() {
+		return configure( Configuration::addAsSystemProperties );
+	}
+
+	public static Configuration springConfiguration() {
+		return configure( Configuration::addAsSpringSystemProperties );
+	}
+
+	private static Configuration configure(Consumer<Configuration> propertySetter) {
 		if ( !SupportedDatabase.H2.equals( DATABASE ) ) {
 			DATABASE_CONTAINER.start();
 		}
 		Configuration configuration = DATABASE.configuration( DATABASE_CONTAINER );
-		configuration.addAsSystemProperties();
+
+		if ( DATABASE_CONTAINER != null && !DATABASE_CONTAINER.isRunning() ) {
+			synchronized (DATABASE_CONTAINER) {
+				if ( !DATABASE_CONTAINER.isRunning() ) {
+					DATABASE_CONTAINER.start();
+					propertySetter.accept( configuration );
+				}
+			}
+		}
+		else if ( !H2_INITIALIZED ) {
+			synchronized (LOCK) {
+				if ( !H2_INITIALIZED ) {
+					propertySetter.accept( configuration );
+					H2_INITIALIZED = Boolean.TRUE;
+				}
+			}
+		}
+
 		return configuration;
 	}
 
@@ -364,6 +391,15 @@ public final class DatabaseContainer {
 			System.setProperty( "hibernate.connection.username", this.user );
 			System.setProperty( "hibernate.connection.password", this.pass );
 			System.setProperty( "hibernate.connection.isolation", this.isolation );
+		}
+
+		private void addAsSpringSystemProperties() {
+			System.setProperty( "HIBERNATE_DIALECT", this.dialect );
+			System.setProperty( "JDBC_DRIVER", this.driver );
+			System.setProperty( "JDBC_URL", this.url );
+			System.setProperty( "JDBC_USERNAME", this.user );
+			System.setProperty( "JDBC_PASSWORD", this.pass );
+			System.setProperty( "JDBC_ISOLATION", this.isolation );
 		}
 	}
 

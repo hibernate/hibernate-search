@@ -23,6 +23,7 @@ import jakarta.persistence.Id;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.integrationtest.spring.extension.HibernateSpringPropertiesSetterExtension;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
@@ -31,6 +32,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -58,6 +60,7 @@ import org.springframework.stereotype.Component;
  * then checking the Spring-defined hooks (@PostConstruct and @PreDestroy) have been called
  * exactly as many times as expected.
  */
+@ExtendWith(HibernateSpringPropertiesSetterExtension.class)
 @TestForIssue(jiraKey = { "HSEARCH-1316", "HSEARCH-3171" })
 class SpringBeanResolutionIT {
 

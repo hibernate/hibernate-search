@@ -12,6 +12,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
+import org.hibernate.search.integrationtest.spring.extension.HibernateSpringPropertiesSetterExtension;
 import org.hibernate.search.integrationtest.spring.jta.dao.SnertDAO;
 import org.hibernate.search.integrationtest.spring.jta.entity.Snert;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionHolder;
@@ -29,6 +30,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@ExtendWith(HibernateSpringPropertiesSetterExtension.class)
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = JtaAndSpringOutboxApplicationConfiguration.class)
 @ActiveProfiles({ "jta", "outbox" })
