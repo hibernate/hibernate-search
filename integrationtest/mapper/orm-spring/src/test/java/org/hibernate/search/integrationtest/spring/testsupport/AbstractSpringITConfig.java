@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.DatabaseContainer;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,11 @@ import org.springframework.context.event.EventListener;
 @Configuration
 @EnableAutoConfiguration(exclude = JtaAutoConfiguration.class)
 public abstract class AbstractSpringITConfig {
+
+	static {
+		DatabaseContainer.springConfiguration();
+	}
+
 	private final CompletableFuture<BackendMappingHandle> mappingHandlePromise = new CompletableFuture<>();
 
 	@Bean
