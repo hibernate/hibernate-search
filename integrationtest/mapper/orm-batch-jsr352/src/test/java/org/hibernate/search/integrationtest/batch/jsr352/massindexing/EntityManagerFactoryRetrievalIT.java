@@ -18,19 +18,22 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
+import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Person;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.WhoAmI;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
-import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
+import org.hibernate.search.integrationtest.batch.jsr352.util.extension.HibernatePropertiesSetterExtension;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Mincong Huang
  */
+@ExtendWith(HibernatePropertiesSetterExtension.class)
 class EntityManagerFactoryRetrievalIT {
 
 	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
@@ -53,6 +56,8 @@ class EntityManagerFactoryRetrievalIT {
 
 	@BeforeEach
 	public void setup() {
+
+
 		jobOperator = JobTestUtil.getAndCheckRuntime();
 		List<Company> companies = new ArrayList<>();
 		List<Person> people = new ArrayList<>();

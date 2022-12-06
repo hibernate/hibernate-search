@@ -24,12 +24,14 @@ import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Per
 import org.hibernate.search.integrationtest.batch.jsr352.util.BackendConfigurations;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
+import org.hibernate.search.integrationtest.batch.jsr352.util.extension.HibernatePropertiesSetterExtension;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -38,6 +40,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  *
  * @author Mincong Huang
  */
+@ExtendWith(HibernatePropertiesSetterExtension.class)
 public class HibernateSearchPartitionMapperComponentIT {
 
 	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();

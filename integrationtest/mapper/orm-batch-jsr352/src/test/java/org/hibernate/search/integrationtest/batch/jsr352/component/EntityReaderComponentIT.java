@@ -24,6 +24,7 @@ import org.hibernate.search.batch.jsr352.core.massindexing.step.spi.EntityReader
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.util.BackendConfigurations;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
+import org.hibernate.search.integrationtest.batch.jsr352.util.extension.HibernatePropertiesSetterExtension;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
@@ -43,6 +44,7 @@ import org.mockito.quality.Strictness;
  *
  * @author Mincong Huang
  */
+@ExtendWith(HibernatePropertiesSetterExtension.class)
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
 public class EntityReaderComponentIT {

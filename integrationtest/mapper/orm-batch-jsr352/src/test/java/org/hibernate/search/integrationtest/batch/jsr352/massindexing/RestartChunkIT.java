@@ -27,6 +27,7 @@ import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
 import org.hibernate.search.integrationtest.batch.jsr352.util.BackendConfigurations;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.util.SimulatedFailure;
+import org.hibernate.search.integrationtest.batch.jsr352.util.extension.HibernatePropertiesSetterExtension;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -36,12 +37,14 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * @author Mincong Huang
  */
+@ExtendWith(HibernatePropertiesSetterExtension.class)
 public class RestartChunkIT {
 
 	private static final int CHECKPOINT_INTERVAL = 10;
@@ -109,26 +112,36 @@ public class RestartChunkIT {
 	@TestForIssue(jiraKey = "HSEARCH-2616")
 	void failureBeforeFirstRead_hql() throws InterruptedException, IOException {
 		SimulatedFailure.raiseExceptionOnNextRead();
-		doTest( "select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
+		doTest(
+				"select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5,
+				DB_COMP_ROWS / 5
+		);
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
 	void failureDuringFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException, IOException {
 		SimulatedFailure.raiseExceptionAfterXWrites( (int) ( CHECKPOINT_INTERVAL * 0.5 ) );
-		doTest( "select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
+		doTest(
+				"select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5,
+				DB_COMP_ROWS / 5
+		);
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
 	void failureDuringNonFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException, IOException {
 		SimulatedFailure.raiseExceptionAfterXWrites( (int) ( CHECKPOINT_INTERVAL * 2.5 ) );
-		doTest( "select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
+		doTest(
+				"select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5,
+				DB_COMP_ROWS / 5
+		);
 	}
 
 	private void doTest(String hql, long expectedTotal, long expectedGoogle) throws InterruptedException, IOException {
 		assertThat( JobTestUtil.nbDocumentsInIndex( emf, SimulatedFailureCompany.class ) ).isZero();
-		List<SimulatedFailureCompany> google = JobTestUtil.findIndexedResults( emf, SimulatedFailureCompany.class, "name", "Google" );
+		List<SimulatedFailureCompany> google = JobTestUtil.findIndexedResults(
+				emf, SimulatedFailureCompany.class, "name", "Google" );
 		assertThat( google ).isEmpty();
 
 		// start the job

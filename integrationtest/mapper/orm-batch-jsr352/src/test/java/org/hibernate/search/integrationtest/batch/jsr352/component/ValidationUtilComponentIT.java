@@ -15,18 +15,21 @@ import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.ValidationU
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Person;
 import org.hibernate.search.integrationtest.batch.jsr352.util.BackendConfigurations;
+import org.hibernate.search.integrationtest.batch.jsr352.util.extension.HibernatePropertiesSetterExtension;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * @author Mincong Huang
  */
+@ExtendWith(HibernatePropertiesSetterExtension.class)
 public class ValidationUtilComponentIT {
 
 	@RegisterExtension
