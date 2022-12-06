@@ -43,7 +43,11 @@ public final class SearchBackendContainer {
 
 	private static void startIfNeeded() {
 		if ( !SEARCH_CONTAINER.isRunning() ) {
-			SEARCH_CONTAINER.start();
+			synchronized (SEARCH_CONTAINER) {
+				if ( !SEARCH_CONTAINER.isRunning() ) {
+					SEARCH_CONTAINER.start();
+				}
+			}
 		}
 	}
 

@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.jakarta.batch.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.integrationtest.jakarta.batch.util.HibernateSearchBatchTestConnectionProperties.connectionProperties;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ class EntityManagerFactoryRetrievalIT {
 			whos.add( new WhoAmI( "cid03 " + index3, "id03 " + index3, "uid03 " + index3 ) );
 		}
 
-		emf = Persistence.createEntityManagerFactory( getPersistenceUnitName() );
+		emf = Persistence.createEntityManagerFactory( getPersistenceUnitName(), connectionProperties() );
 		with( emf ).runInTransaction( em -> {
 			companies.forEach( em::persist );
 			people.forEach( em::persist );
