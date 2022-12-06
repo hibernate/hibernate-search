@@ -18,7 +18,7 @@
             Remove Hibernate system properties from parent settings:
             They are supposed to be handled by the spring.datasource subsystem
             and not by the Hibernate internal pool!
-            See also the failsafe configuration.
+            See also the DatabaseContainer#springConfiguration().
          -->
         <failsafe.jvm.args.hibernate-orm></failsafe.jvm.args.hibernate-orm>
     </properties>
@@ -89,20 +89,6 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <skip>${failsafe.spring.skip}</skip>
-                    <!--
-                        Since we do not pass the Hibernate ORM settings through system properties directly
-                        (see the override of the failsafe.jvm.args.hibernate-orm near the top of this file),
-                        we need to pass the settings some other way.
-                        Here we chose to use environment variables.
-                     -->
-                    <environmentVariables>
-                        <HIBERNATE_DIALECT>${db.dialect}</HIBERNATE_DIALECT>
-                        <JDBC_DRIVER>${jdbc.driver}</JDBC_DRIVER>
-                        <JDBC_URL>${jdbc.url}</JDBC_URL>
-                        <JDBC_USERNAME>${jdbc.user}</JDBC_USERNAME>
-                        <JDBC_PASSWORD>${jdbc.pass}</JDBC_PASSWORD>
-                        <JDBC_ISOLATION>${jdbc.isolation}</JDBC_ISOLATION>
-                    </environmentVariables>
                 </configuration>
                 <executions>
                     <execution>

@@ -12,6 +12,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
+import org.hibernate.search.integrationtest.spring.extension.HibernateSpringPropertiesSetterExtension;
 import org.hibernate.search.integrationtest.spring.jta.dao.BoxDAO;
 import org.hibernate.search.integrationtest.spring.jta.entity.Box;
 import org.hibernate.search.integrationtest.spring.jta.entity.Doughnut;
@@ -32,6 +33,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@ExtendWith(HibernateSpringPropertiesSetterExtension.class)
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = JtaAndSpringApplicationConfiguration.class)
 @ActiveProfiles("jta")
