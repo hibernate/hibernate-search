@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.integrationtest.java.modules.orm.elasticsearch.outboxpolling.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -21,6 +23,8 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.SearchBackendContainer;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.DatabaseContainer;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 public class AuthorService implements AutoCloseable {
@@ -32,7 +36,7 @@ public class AuthorService implements AutoCloseable {
 	}
 
 	private SessionFactory createSessionFactory() {
-		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
+		StandardServiceRegistryBuilder registryBuilder = applyConnectionProperties( new StandardServiceRegistryBuilder() );
 		ServiceRegistryImplementor serviceRegistry = (ServiceRegistryImplementor) registryBuilder.build();
 		Metadata metadata = new MetadataSources( serviceRegistry ).addAnnotatedClass( Author.class ).buildMetadata();
 		SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
@@ -40,7 +44,7 @@ public class AuthorService implements AutoCloseable {
 	}
 
 	public void triggerValidationFailure() {
-		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
+		StandardServiceRegistryBuilder registryBuilder = applyConnectionProperties( new StandardServiceRegistryBuilder() );
 		registryBuilder.applySetting( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY, "none" );
 		ServiceRegistryImplementor serviceRegistry = (ServiceRegistryImplementor) registryBuilder.build();
 		Metadata metadata = new MetadataSources( serviceRegistry )
@@ -51,6 +55,33 @@ public class AuthorService implements AutoCloseable {
 			Search.mapping( sessionFactory ).scope( Object.class ).schemaManager().validate();
 			throw new AssertionFailure( "Validation failure was not triggered?" );
 		}
+	}
+
+	private StandardServiceRegistryBuilder applyConnectionProperties(StandardServiceRegistryBuilder registryBuilder) {
+		// DB properties:
+		Map<String, Object> db = new HashMap<>();
+		DatabaseContainer.configuration().add( db );
+		registryBuilder.applySettings( db );
+		// ES connection:
+		registryBuilder.applySetting( "hibernate.search.backend.uris", SearchBackendContainer.connectionUrl() );
+		// # Hibernate ORM properties:
+		// ## Connection info: see above
+		registryBuilder.applySetting( "hibernate.hbm2ddl.auto", "create-drop" );
+		registryBuilder.applySetting( "hibernate.show_sql", true );
+		registryBuilder.applySetting( "hibernate.format_sql", true );
+		registryBuilder.applySetting( "hibernate.max_fetch_depth", 5 );
+		//  We can't use classes from the hibernate-testing module unless we add an explicit dependency to that module.
+		// registryBuilder.applySetting( "hibernate.cache.region_prefix","hibernate.test");
+		// registryBuilder.applySetting( "hibernate.cache.region.factory_class", "org.hibernate.testing.cache.CachingRegionFactory");
+
+		// # Hibernate Search properties:
+		// ## Connection info: see above
+		registryBuilder.applySetting( "hibernate.search.backend.log.json_pretty_printing", true );
+		registryBuilder.applySetting( "hibernate.search.coordination.strategy", "outbox-polling" );
+		registryBuilder.applySetting( "hibernate.search.backend.analysis.configurer",
+				org.hibernate.search.integrationtest.java.modules.orm.elasticsearch.outboxpolling.config.MyElasticsearchAnalysisConfigurer.class );
+
+		return registryBuilder;
 	}
 
 	public void add(String name) {

@@ -16,6 +16,9 @@ module org.hibernate.search.integrationtest.java.module.orm.elasticsearch.outbox
 	requires org.hibernate.search.mapper.orm;
 	requires org.hibernate.search.backend.elasticsearch;
 	requires org.hibernate.search.mapper.orm.outboxpolling;
+	// Access to testcontainers:
+	requires hibernate.search.util.internal.integrationtest.mapper.orm;
+	requires hibernate.search.util.internal.integrationtest.backend.elasticsearch;
 
 	/*
 	 * This is necessary in order to use SessionFactory,

@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.SearchBackendContainer;
 
 public class AuthorService implements AutoCloseable {
 
@@ -32,6 +33,7 @@ public class AuthorService implements AutoCloseable {
 
 	private CloseableSearchMapping createSearchMapping() {
 		return SearchMapping.builder()
+				.property( "hibernate.search.backend.uris", SearchBackendContainer.connectionUrl() )
 				.property( "hibernate.search.backend.log.json_pretty_printing", true )
 				.property(
 						"hibernate.search.backend.analysis.configurer",

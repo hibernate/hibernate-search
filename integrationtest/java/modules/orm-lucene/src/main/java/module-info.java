@@ -23,4 +23,7 @@ module org.hibernate.search.integrationtest.java.module.orm.lucene {
 	 */
 	requires java.naming;
 
+	// Access to testcontainers:
+	requires hibernate.search.util.internal.integrationtest.mapper.orm;
+
 }

@@ -36,15 +36,15 @@
             <artifactId>hibernate-search-backend-elasticsearch</artifactId>
         </dependency>
 
+        <!-- Access to testcontainers -->
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-util-internal-integrationtest-mapper-pojo-standalone</artifactId>
-            <scope>test</scope>
+            <artifactId>hibernate-search-util-internal-integrationtest-backend-elasticsearch</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-util-internal-integrationtest-backend-elasticsearch</artifactId>
+            <artifactId>hibernate-search-util-internal-integrationtest-mapper-pojo-standalone</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
