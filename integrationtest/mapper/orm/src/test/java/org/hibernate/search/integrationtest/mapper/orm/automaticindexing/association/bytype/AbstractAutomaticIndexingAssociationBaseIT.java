@@ -207,6 +207,10 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 	protected abstract boolean isAssociationLazyOnContainingSide();
 
+	protected boolean isEmbeddedAssociationChangeCausingWork() {
+		return !isAssociationOwnedByContainedSide() && !isAssociationMultiValuedOnContainingSide();
+	}
+
 	private boolean isElementCollectionAssociationsOnContainingSide() {
 		return !isAssociationOwnedByContainedSide() && !isAssociationMultiValuedOnContainingSide();
 	}
@@ -450,6 +454,18 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			TContained oldContained = containingAssociation.get( entity1 );
 			containedAssociation.clear( oldContained );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			if ( !isAssociationMultiValuedOnContainingSide() ) {
+				containingAssociation.clear( entity1 );
+
+				if ( setupHolder.areEntitiesProcessedInSession() ) {
+					backendMock.expectWorks( _indexed().indexName() )
+							.addOrUpdate( "1", b -> {
+							} );
+				}
+				session.flush();
+			}
+
 			containingAssociation.set( entity1, containedEntity );
 			containedAssociation.set( containedEntity, entity1 );
 
@@ -525,6 +541,12 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			TContained oldContained = containingAssociation.get( entity1 );
 			containedAssociation.clear( oldContained );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			if ( !isAssociationMultiValuedOnContainingSide() ) {
+				containingAssociation.clear( entity1 );
+				session.flush();
+			}
+
 			containingAssociation.set( entity1, containedEntity );
 			containedAssociation.set( containedEntity, entity1 );
 
@@ -599,6 +621,18 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			TContained oldContained = containingAssociation.get( entity1 );
 			containedAssociation.clear( oldContained );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			if ( !isAssociationMultiValuedOnContainingSide() ) {
+				containingAssociation.clear( entity1 );
+
+				if ( setupHolder.areEntitiesProcessedInSession() ) {
+					backendMock.expectWorks( _indexed().indexName() )
+							.addOrUpdate( "1", b -> {
+							} );
+				}
+				session.flush();
+			}
+
 			containingAssociation.set( entity1, containedEntity );
 			containedAssociation.set( containedEntity, entity1 );
 
@@ -674,6 +708,12 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			TContained oldContained = containingAssociation.get( entity1 );
 			containedAssociation.clear( oldContained );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			if ( !isAssociationMultiValuedOnContainingSide() ) {
+				containingAssociation.clear( entity1 );
+				session.flush();
+			}
+
 			containingAssociation.set( entity1, containedEntity );
 			containedAssociation.set( containedEntity, entity1 );
 
@@ -747,6 +787,18 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			TContained oldContained = containingAssociation.get( entity1 );
 			containedAssociation.clear( oldContained );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			if ( !isAssociationMultiValuedOnContainingSide() ) {
+				containingAssociation.clear( entity1 );
+
+				if ( setupHolder.areEntitiesProcessedInSession() ) {
+					backendMock.expectWorks( _indexed().indexName() )
+							.addOrUpdate( "1", b -> {
+							} );
+				}
+				session.flush();
+			}
+
 			containingAssociation.set( entity1, containedEntity );
 			containedAssociation.set( containedEntity, entity1 );
 
@@ -829,6 +881,17 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			TContained oldContained = containingAssociation.get( entity1 );
 			containedAssociation.clear( oldContained );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			if ( !isAssociationMultiValuedOnContainingSide() ) {
+				containingAssociation.clear( entity1 );
+				if ( isEmbeddedAssociationChangeCausingWork() && setupHolder.areEntitiesProcessedInSession() ) {
+					backendMock.expectWorks( _indexed().indexName() )
+							.addOrUpdate( "1", b ->
+									b.objectField( "embeddedAssociations", b2 -> { } ) );
+				}
+				session.flush();
+			}
+
 			containingAssociation.set( entity1, containedEntity );
 			containedAssociation.set( containedEntity, entity1 );
 
@@ -1087,6 +1150,17 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			TContained oldContained = containingAssociation.get( entity1 );
 			containedAssociation.clear( oldContained );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			if ( !isAssociationMultiValuedOnContainingSide() ) {
+				containingAssociation.clear( entity1 );
+
+				if ( setupHolder.areEntitiesProcessedInSession() ) {
+					backendMock.expectWorks( _indexed().indexName() )
+							.addOrUpdate( "1", b -> { } );
+				}
+				session.flush();
+			}
+
 			_containing().embeddedAssociations().set( entity1, _containingEmbeddable().newInstance() );
 			containingAssociation.set( entity1, contained );
 			containedAssociation.set( contained, entity1 );
@@ -1139,6 +1213,17 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			TContained oldContained = containingAssociation.get( entity1 );
 			containedAssociation.clear( oldContained );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			if ( !isAssociationMultiValuedOnContainingSide() ) {
+				containingAssociation.clear( entity1 );
+				if ( isEmbeddedAssociationChangeCausingWork() && setupHolder.areEntitiesProcessedInSession() ) {
+					backendMock.expectWorks( _indexed().indexName() )
+							.addOrUpdate( "1", b ->
+									b.objectField( "embeddedAssociations", b2 -> { } ) );
+				}
+				session.flush();
+			}
+
 			_containing().embeddedAssociations().set( entity1, _containingEmbeddable().newInstance() );
 			containingAssociation.set( entity1, contained );
 			containedAssociation.set( contained, entity1 );
@@ -1844,6 +1929,20 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			TContained oldContained = containingAssociation.get( containingEntity1 );
 			containedAssociation.clear( oldContained );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			if ( !isAssociationMultiValuedOnContainingSide() ) {
+				containingAssociation.clear( containingEntity1 );
+
+				if ( setupHolder.areEntitiesProcessedInSession() ) {
+					backendMock.expectWorks( _indexed().indexName() )
+							.addOrUpdate( "1", b -> b
+									.objectField( "child", b2 -> {
+									} )
+							);
+				}
+				session.flush();
+			}
+
 			containingAssociation.set( containingEntity1, containedEntity );
 			containedAssociation.set( containedEntity, containingEntity1 );
 
@@ -1946,6 +2045,12 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			TContained oldContained = containingAssociation.get( containingEntity1 );
 			containedAssociation.clear( oldContained );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			if ( !isAssociationMultiValuedOnContainingSide() ) {
+				containingAssociation.clear( containingEntity1 );
+				session.flush();
+			}
+
 			containingAssociation.set( containingEntity1, containedEntity );
 			containedAssociation.set( containedEntity, containingEntity1 );
 
@@ -2030,6 +2135,19 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			TContained oldContained = containingAssociation.get( containingEntity1 );
 			containedAssociation.clear( oldContained );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			if ( !isAssociationMultiValuedOnContainingSide() ) {
+				containingAssociation.clear( containingEntity1 );
+
+				if ( setupHolder.areEntitiesProcessedInSession() ) {
+					backendMock.expectWorks( _indexed().indexName() )
+							.addOrUpdate( "1", b -> b
+									.objectField( "child", b2 -> { } )
+							);
+				}
+				session.flush();
+			}
+
 			containingAssociation.set( containingEntity1, containedEntity );
 			containedAssociation.set( containedEntity, containingEntity1 );
 
@@ -2117,6 +2235,12 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			TContained oldContained = containingAssociation.get( containingEntity1 );
 			containedAssociation.clear( oldContained );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			if ( !isAssociationMultiValuedOnContainingSide() ) {
+				containingAssociation.clear( containingEntity1 );
+				session.flush();
+			}
+
 			containingAssociation.set( containingEntity1, containedEntity );
 			containedAssociation.set( containedEntity, containingEntity1 );
 
@@ -2209,6 +2333,19 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			TContained oldContained = containingAssociation.get( containingEntity1 );
 			containedAssociation.clear( oldContained );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			if ( !isAssociationMultiValuedOnContainingSide() ) {
+				containingAssociation.clear( containingEntity1 );
+
+				if ( setupHolder.areEntitiesProcessedInSession() ) {
+					backendMock.expectWorks( _indexed().indexName() )
+							.addOrUpdate( "1", b -> b
+									.objectField( "child", b2 -> { } )
+							);
+				}
+				session.flush();
+			}
+
 			containingAssociation.set( containingEntity1, containedEntity );
 			containedAssociation.set( containedEntity, containingEntity1 );
 
@@ -2324,6 +2461,19 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			TContained oldContained = containingAssociation.get( containingEntity1 );
 			containedAssociation.clear( oldContained );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			if ( !isAssociationMultiValuedOnContainingSide() ) {
+				containingAssociation.clear( containingEntity1 );
+
+				if ( setupHolder.areEntitiesProcessedInSession() ) {
+					backendMock.expectWorks( _indexed().indexName() )
+							.addOrUpdate( "1", b -> b
+									.objectField( "child", b2 -> { } )
+							);
+				}
+				session.flush();
+			}
+
 			containingAssociation.set( containingEntity1, containedEntity );
 			containedAssociation.set( containedEntity, containingEntity1 );
 
@@ -2435,6 +2585,17 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			TContained oldContained = containingAssociation.get( containingEntity1 );
 			containedAssociation.clear( oldContained );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			if ( !isAssociationMultiValuedOnContainingSide() ) {
+				containingAssociation.clear( containingEntity1 );
+				if ( isEmbeddedAssociationChangeCausingWork() && setupHolder.areEntitiesProcessedInSession() ) {
+					backendMock.expectWorks( _indexed().indexName() )
+							.addOrUpdate( "1", b ->
+									b.objectField( "child", b2 -> { } ) );
+				}
+				session.flush();
+			}
+
 			containingAssociation.set( containingEntity1, containedEntity );
 			containedAssociation.set( containedEntity, containingEntity1 );
 
@@ -2523,6 +2684,19 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			TContained oldContained = containingAssociation.get( containing );
 			containedAssociation.clear( oldContained );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			if ( !isAssociationMultiValuedOnContainingSide() ) {
+				containingAssociation.clear( containing );
+
+				if ( setupHolder.areEntitiesProcessedInSession() ) {
+					backendMock.expectWorks( _indexed().indexName() )
+							.addOrUpdate( "1", b -> b
+									.objectField( "child", b2 -> { } )
+							);
+				}
+				session.flush();
+			}
+
 			_containing().embeddedAssociations().set( containing, _containingEmbeddable().newInstance() );
 			containingAssociation.set( containing, contained );
 			containedAssociation.set( contained, containing );
@@ -2605,6 +2779,19 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 			TContained oldContained = containingAssociation.get( containing );
 			containedAssociation.clear( oldContained );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			if ( !isAssociationMultiValuedOnContainingSide() ) {
+				containingAssociation.clear( containing );
+				if ( isEmbeddedAssociationChangeCausingWork() && setupHolder.areEntitiesProcessedInSession() ) {
+					backendMock.expectWorks( _indexed().indexName() )
+							.addOrUpdate( "1", b -> b
+									.objectField( "child", b2 ->
+											b2.objectField( "embeddedAssociations", b3 -> { } ) )
+							);
+				}
+				session.flush();
+			}
+
 			_containing().embeddedAssociations().set( containing, _containingEmbeddable().newInstance() );
 			containingAssociation.set( containing, contained );
 			containedAssociation.set( contained, containing );
