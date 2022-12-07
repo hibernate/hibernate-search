@@ -14,7 +14,7 @@ import org.springframework.test.context.ActiveProfilesResolver;
 public class TestActiveProfilesResolver implements ActiveProfilesResolver {
 
 	static {
-		System.setProperty( "ES_HOSTS", SearchContainer.host() + ":" + SearchContainer.mappedPort( 9200 ) );
+		System.setProperty( "ES_HOSTS", SearchContainer.connectionUrl() );
 		DatabaseContainer.springConfiguration();
 	}
 	@Override

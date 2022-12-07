@@ -16,6 +16,9 @@ module org.hibernate.search.integrationtest.java.module.orm.elasticsearch.coordi
 	requires org.hibernate.search.mapper.orm;
 	requires org.hibernate.search.backend.elasticsearch;
 	requires org.hibernate.search.mapper.orm.coordination.outboxpolling;
+	// Access to testcontainers:
+	requires hibernate.search.util.internal.integrationtest.mapper.orm;
+	requires hibernate.search.util.internal.integrationtest.backend.elasticsearch;
 
 	// This should be re-exported transitively by org.hibernate.search.mapper.orm
 	// but currently isn't, because org.hibernate.search.mapper.orm

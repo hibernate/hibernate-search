@@ -36,6 +36,15 @@ public final class SearchContainer {
 		return SEARCH_CONTAINER.getHost();
 	}
 
+	public static String connectionUrl() {
+		String uris = System.getProperty( "test.elasticsearch.connection.uris" );
+		if ( uris == null || uris.trim().isEmpty() ) {
+			// need to start a container:
+			uris = host() + ":" + mappedPort( 9200 );
+		}
+		return uris;
+	}
+
 	private static void startIfNeeded() {
 		if ( !SEARCH_CONTAINER.isRunning() ) {
 			synchronized (SEARCH_CONTAINER) {

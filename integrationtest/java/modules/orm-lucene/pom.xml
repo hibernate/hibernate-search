@@ -32,6 +32,12 @@
             <artifactId>hibernate-search-backend-lucene</artifactId>
         </dependency>
 
+        <!-- Access to testcontainers -->
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-test-orm</artifactId>

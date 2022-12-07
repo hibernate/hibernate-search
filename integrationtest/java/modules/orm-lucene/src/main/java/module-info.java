@@ -16,6 +16,9 @@ module org.hibernate.search.integrationtest.java.module.orm.lucene {
 	requires org.hibernate.search.mapper.orm;
 	requires org.hibernate.search.backend.lucene;
 
+	// Access to testcontainers:
+	requires hibernate.search.util.internal.integrationtest.mapper.orm;
+
 	// This should be re-exported transitively by org.hibernate.search.mapper.orm
 	// but currently isn't, because org.hibernate.search.mapper.orm
 	// is still an automatic module

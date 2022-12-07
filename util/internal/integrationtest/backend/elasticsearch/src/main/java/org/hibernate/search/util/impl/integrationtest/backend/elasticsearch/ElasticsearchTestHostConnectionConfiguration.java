@@ -35,14 +35,7 @@ public class ElasticsearchTestHostConnectionConfiguration {
 	private final String awsCredentialsSecretAccessKey;
 
 	private ElasticsearchTestHostConnectionConfiguration() {
-		String uris = System.getProperty( "test.elasticsearch.connection.uris" );
-		if ( uris == null || uris.trim().isEmpty() ) {
-			// need to start a container:
-			String host = SearchContainer.host();
-			int port = SearchContainer.mappedPort( 9200 );
-			uris = host + ":" + port;
-		}
-		this.uris = uris;
+		this.uris = SearchContainer.connectionUrl();
 		this.username = System.getProperty( "test.elasticsearch.connection.username" );
 		this.password = System.getProperty( "test.elasticsearch.connection.password" );
 		String enabledAsString = System.getProperty( "test.elasticsearch.connection.aws.signing.enabled" );

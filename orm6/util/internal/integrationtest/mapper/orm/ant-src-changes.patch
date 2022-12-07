@@ -1,8 +1,75 @@
+diff --git a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/DatabaseContainer.java b/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/DatabaseContainer.java
+index 9737b422b4..bca0911ac2 100644
+--- a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/DatabaseContainer.java
++++ b/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/DatabaseContainer.java
+@@ -96,7 +96,7 @@ <SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container
+ 		POSTGRES {
+ 			@Override
+ 			String dialect() {
+-				return org.hibernate.dialect.PostgreSQL10Dialect.class.getName();
++				return org.hibernate.dialect.PostgreSQLDialect.class.getName();
+ 			}
+ 
+ 			@Override
+@@ -137,7 +137,7 @@ protected String getTestQueryString() {
+ 		MARIADB {
+ 			@Override
+ 			String dialect() {
+-				return org.hibernate.dialect.MariaDB103Dialect.class.getName();
++				return org.hibernate.dialect.MariaDBDialect.class.getName();
+ 			}
+ 			@Override
+ 			<SELF extends JdbcDatabaseContainer<SELF>> JdbcDatabaseContainer<SELF> container(String name, String tag) {
+@@ -180,7 +180,7 @@ protected String getTestQueryString() {
+ 		MYSQL {
+ 			@Override
+ 			String dialect() {
+-				return org.hibernate.dialect.MySQL8Dialect.class.getName();
++				return org.hibernate.dialect.MySQLDialect.class.getName();
+ 			}
+ 
+ 			@Override
+@@ -224,7 +224,7 @@ protected String getTestQueryString() {
+ 		DB2 {
+ 			@Override
+ 			String dialect() {
+-				return org.hibernate.dialect.DB297Dialect.class.getName();
++				return org.hibernate.dialect.DB2Dialect.class.getName();
+ 			}
+ 
+ 			@Override
+@@ -271,7 +271,7 @@ protected String getTestQueryString() {
+ 		ORACLE {
+ 			@Override
+ 			String dialect() {
+-				return org.hibernate.dialect.Oracle12cDialect.class.getName();
++				return org.hibernate.dialect.OracleDialect.class.getName();
+ 			}
+ 
+ 			@Override
+@@ -310,7 +310,7 @@ protected String getTestQueryString() {
+ 		MSSQL {
+ 			@Override
+ 			String dialect() {
+-				return org.hibernate.dialect.SQLServer2016Dialect.class.getName();
++				return org.hibernate.dialect.SQLServerDialect.class.getName();
+ 			}
+ 
+ 			@Override
+@@ -350,7 +350,7 @@ protected String getTestQueryString() {
+ 		COCKROACHDB {
+ 			@Override
+ 			String dialect() {
+-				return org.hibernate.dialect.CockroachDB201Dialect.class.getName();
++				return org.hibernate.dialect.CockroachDialect.class.getName();
+ 			}
+ 
+ 			@Override
 diff --git a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/ReusableOrmSetupHolder.java b/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/ReusableOrmSetupHolder.java
-index 0d3ea20d95..d9db099561 100644
+index e3e3d030d5..8f232864ba 100644
 --- a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/ReusableOrmSetupHolder.java
 +++ b/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/ReusableOrmSetupHolder.java
-@@ -450,7 +450,7 @@ private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOr
+@@ -463,7 +463,7 @@ private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOr
  		for ( Class<?> entityClass : config.entityClearOrder ) {
  			EntityType<?> entityType;
  			try {
@@ -11,7 +78,7 @@ index 0d3ea20d95..d9db099561 100644
  			}
  			catch (IllegalArgumentException e) {
  				// When using annotatedTypes to infer the clear order,
-@@ -467,7 +467,7 @@ private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOr
+@@ -480,7 +480,7 @@ private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOr
  		// we try to delete all remaining entity types.
  		// Note we're stabilizing the order, because ORM uses a HashSet internally
  		// and the order may change from one execution to the next.
@@ -20,7 +87,7 @@ index 0d3ea20d95..d9db099561 100644
  				.sorted( Comparator.comparing( EntityType::getName ) )
  				.collect( Collectors.toList() );
  		for ( EntityType<?> entityType : sortedEntityTypes ) {
-@@ -556,6 +556,7 @@ private static Query<?> createSelectOrDeleteAllOfSpecificTypeQuery(EntityType<?>
+@@ -569,6 +569,7 @@ private static Query<?> createSelectOrDeleteAllOfSpecificTypeQuery(EntityType<?>
  			builder.append( " where type( e ) in (:type)" );
  			typeArg = entityType.getJavaType();
  		}
@@ -28,7 +95,7 @@ index 0d3ea20d95..d9db099561 100644
  		Query<?> query = QueryType.SELECT.equals( queryType )
  				? session.createQuery( builder.toString(), entityType.getJavaType() )
  				: session.createQuery( builder.toString() );
-@@ -566,7 +567,7 @@ private static Query<?> createSelectOrDeleteAllOfSpecificTypeQuery(EntityType<?>
+@@ -579,7 +580,7 @@ private static Query<?> createSelectOrDeleteAllOfSpecificTypeQuery(EntityType<?>
  	}
  
  	private static boolean hasEntitySubclass(SessionFactory sessionFactory, EntityType<?> parentEntity) {
@@ -37,7 +104,7 @@ index 0d3ea20d95..d9db099561 100644
  		for ( EntityType<?> entity : metamodel.getEntities() ) {
  			if ( parentEntity.equals( entity.getSupertype() ) ) {
  				return true;
-@@ -588,7 +589,7 @@ private static boolean hasPotentiallyJoinTable(SessionFactoryImplementor session
+@@ -601,7 +602,7 @@ private static boolean hasPotentiallyJoinTable(SessionFactoryImplementor session
  				case ELEMENT_COLLECTION:
  					return true;
  				case EMBEDDED:
@@ -47,7 +114,7 @@ index 0d3ea20d95..d9db099561 100644
  						return true;
  					}
 diff --git a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelper.java b/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelper.java
-index cc6c240317..a536100782 100644
+index 1f5ebb40bf..fdad375f91 100644
 --- a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelper.java
 +++ b/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelper.java
 @@ -8,7 +8,6 @@

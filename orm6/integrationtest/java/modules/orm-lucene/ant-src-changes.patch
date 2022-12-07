@@ -1,0 +1,12 @@
+diff --git a/main/java/module-info.java b/main/java/module-info.java
+--- a/main/java/module-info.java	(revision a1e09e275e3a667f707ff9f505da0de1821ecd69)
++++ b/main/java/module-info.java	(date 1670497891899)
+@@ -17,7 +17,7 @@
+ 	requires org.hibernate.search.backend.elasticsearch;
+ 	requires org.hibernate.search.mapper.orm.coordination.outboxpolling;
+ 	// Access to testcontainers:
+-	requires hibernate.search.util.internal.integrationtest.mapper.orm;
++	requires hibernate.search.util.internal.integrationtest.mapper.orm.orm6;
+
+ 	// This should be re-exported transitively by org.hibernate.search.mapper.orm
+ 	// but currently isn't, because org.hibernate.search.mapper.orm

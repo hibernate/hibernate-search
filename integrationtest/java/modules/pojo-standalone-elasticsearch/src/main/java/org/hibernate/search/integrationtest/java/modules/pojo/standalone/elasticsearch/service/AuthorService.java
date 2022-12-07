@@ -18,6 +18,7 @@ import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrat
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.SearchContainer;
 
 public class AuthorService implements AutoCloseable {
 
@@ -31,6 +32,7 @@ public class AuthorService implements AutoCloseable {
 
 	private CloseableSearchMapping createSearchMapping() {
 		return SearchMapping.builder()
+				.property( "hibernate.search.backend.uris", SearchContainer.connectionUrl() )
 				.property( "hibernate.search.backend.log.json_pretty_printing", true )
 				.property( "hibernate.search.backend.analysis.configurer",
 						"org.hibernate.search.integrationtest.java.modules.pojo.standalone.elasticsearch.config.MyElasticsearchAnalysisConfigurer" )

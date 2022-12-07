@@ -28,7 +28,7 @@ public class HibernatePropertiesSetterExtension implements BeforeAllCallback {
 		if ( "elasticsearch_pu".equals( PersistenceUnitTestUtil.getPersistenceUnitName() ) ) {
 			System.setProperty(
 					BackendSettings.backendKey( ElasticsearchBackendSettings.URIS ),
-					SearchContainer.host() + ":" + SearchContainer.mappedPort( 9200 )
+					SearchContainer.connectionUrl()
 			);
 		}
 		// make sure that DB is available and correctly configured:

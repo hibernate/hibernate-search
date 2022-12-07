@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.integrationtest.java.modules.orm.elasticsearch.coordination.outboxpolling.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -21,6 +23,8 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.SearchContainer;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.DatabaseContainer;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 public class AuthorService implements AutoCloseable {
@@ -32,7 +36,7 @@ public class AuthorService implements AutoCloseable {
 	}
 
 	private SessionFactory createSessionFactory() {
-		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
+		StandardServiceRegistryBuilder registryBuilder = applyConnectionProperties( new StandardServiceRegistryBuilder() );
 		ServiceRegistryImplementor serviceRegistry = (ServiceRegistryImplementor) registryBuilder.build();
 		Metadata metadata = new MetadataSources( serviceRegistry ).addAnnotatedClass( Author.class ).buildMetadata();
 		SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
@@ -40,7 +44,7 @@ public class AuthorService implements AutoCloseable {
 	}
 
 	public void triggerValidationFailure() {
-		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
+		StandardServiceRegistryBuilder registryBuilder = applyConnectionProperties( new StandardServiceRegistryBuilder() );
 		registryBuilder.applySetting( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY, "none" );
 		ServiceRegistryImplementor serviceRegistry = (ServiceRegistryImplementor) registryBuilder.build();
 		Metadata metadata = new MetadataSources( serviceRegistry )
@@ -51,6 +55,17 @@ public class AuthorService implements AutoCloseable {
 			Search.mapping( sessionFactory ).scope( Object.class ).schemaManager().validate();
 			throw new AssertionFailure( "Validation failure was not triggered?" );
 		}
+	}
+
+	private StandardServiceRegistryBuilder applyConnectionProperties(StandardServiceRegistryBuilder registryBuilder) {
+		// DB properties:
+		Map<String, Object> db = new HashMap<>();
+		DatabaseContainer.configuration().add( db );
+		registryBuilder.applySettings( db );
+		// ES connection:
+		registryBuilder.applySetting( "hibernate.search.backend.uris", SearchContainer.connectionUrl() );
+
+		return registryBuilder;
 	}
 
 	public void add(String name) {

@@ -9,4 +9,7 @@ module org.hibernate.search.integrationtest.java.modules.pojo.standalone.elastic
 	requires org.hibernate.search.backend.elasticsearch;
 	requires org.hibernate.search.mapper.pojo.standalone;
 
+	// Access to testcontainers:
+	requires hibernate.search.util.internal.integrationtest.backend.elasticsearch;
+
 }

@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.integrationtest.java.modules.orm.lucene.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -18,6 +20,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.java.modules.orm.lucene.entity.Author;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.DatabaseContainer;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 public class AuthorService implements AutoCloseable {
@@ -29,11 +32,20 @@ public class AuthorService implements AutoCloseable {
 	}
 
 	private SessionFactory createSessionFactory() {
-		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
+		StandardServiceRegistryBuilder registryBuilder = applyConnectionProperties( new StandardServiceRegistryBuilder() );
 		ServiceRegistryImplementor serviceRegistry = (ServiceRegistryImplementor) registryBuilder.build();
 		Metadata metadata = new MetadataSources( serviceRegistry ).addAnnotatedClass( Author.class ).buildMetadata();
 		SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
 		return sfb.build();
+	}
+
+	private StandardServiceRegistryBuilder applyConnectionProperties(StandardServiceRegistryBuilder registryBuilder) {
+		// DB properties:
+		Map<String, Object> db = new HashMap<>();
+		DatabaseContainer.configuration().add( db );
+		registryBuilder.applySettings( db );
+
+		return registryBuilder;
 	}
 
 	public void add(String name) {
