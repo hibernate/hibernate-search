@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
@@ -382,6 +383,15 @@ public final class DatabaseContainer {
 			this.user = user;
 			this.pass = pass;
 			this.isolation = isolation;
+		}
+
+		public void add(Map<String, Object> map) {
+			map.put( "hibernate.dialect", this.dialect );
+			map.put( "hibernate.connection.driver_class", this.driver );
+			map.put( "hibernate.connection.url", this.url );
+			map.put( "hibernate.connection.username", this.user );
+			map.put( "hibernate.connection.password", this.pass );
+			map.put( "hibernate.connection.isolation", this.isolation );
 		}
 
 		private void addAsSystemProperties() {

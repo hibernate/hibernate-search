@@ -46,6 +46,12 @@
             <artifactId>hibernate-search-backend-elasticsearch-aws</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Only needed to start ES container in tests -->
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-backend-elasticsearch</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -114,12 +120,6 @@
                         Here we chose to use environment variables.
                      -->
                     <environmentVariables>
-                        <HIBERNATE_DIALECT>${db.dialect}</HIBERNATE_DIALECT>
-                        <JDBC_DRIVER>${jdbc.driver}</JDBC_DRIVER>
-                        <JDBC_URL>${jdbc.url}</JDBC_URL>
-                        <JDBC_USERNAME>${jdbc.user}</JDBC_USERNAME>
-                        <JDBC_PASSWORD>${jdbc.pass}</JDBC_PASSWORD>
-                        <JDBC_ISOLATION>${jdbc.isolation}</JDBC_ISOLATION>
                         <ELASTICSEARCH_URIS>${test.elasticsearch.connection.uris}</ELASTICSEARCH_URIS>
                         <ELASTICSEARCH_USERNAME>${test.elasticsearch.connection.username}</ELASTICSEARCH_USERNAME>
                         <ELASTICSEARCH_PASSWORD>${test.elasticsearch.connection.password}</ELASTICSEARCH_PASSWORD>
