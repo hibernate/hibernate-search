@@ -15,6 +15,11 @@ module org.hibernate.search.integrationtest.java.module.orm.elasticsearch {
 	requires org.hibernate.orm.core;
 	requires org.hibernate.search.mapper.orm;
 	requires org.hibernate.search.backend.elasticsearch;
+	// Access to testcontainers:
+	requires hibernate.search.util.internal.integrationtest.mapper.orm;
+	requires hibernate.search.util.internal.integrationtest.backend.elasticsearch;
+	// Since testcontainers is using log4j we need to explicitly require it to make things work:
+	requires org.apache.logging.log4j;
 
 	/*
 	 * This is necessary in order to use SessionFactory,

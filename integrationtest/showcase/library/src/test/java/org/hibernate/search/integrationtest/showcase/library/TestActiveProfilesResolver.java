@@ -27,7 +27,7 @@ public class TestActiveProfilesResolver implements ActiveProfilesResolver {
 			testBackend = "lucene";
 		}
 		if ( "elasticsearch".equals( testBackend ) ) {
-			System.setProperty( "ES_HOSTS", SearchContainer.host() + ":" + SearchContainer.mappedPort( 9200 ) );
+			System.setProperty( "ES_HOSTS", SearchContainer.connectionUrl() );
 		}
 		DatabaseContainer.springConfiguration();
 		// The test profiles must be mentioned last, to allow them to override properties

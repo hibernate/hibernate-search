@@ -24,7 +24,7 @@ public final class HibernateSearchBatchTestConnectionProperties {
 		if ( "elasticsearch_pu".equals( PersistenceUnitTestUtil.getPersistenceUnitName() ) ) {
 			properties.put(
 					BackendSettings.backendKey( ElasticsearchBackendSettings.URIS ),
-					SearchBackendContainer.host() + ":" + SearchBackendContainer.mappedPort( 9200 )
+					SearchBackendContainer.connectionUrl()
 			);
 		}
 		DatabaseContainer.configuration();
