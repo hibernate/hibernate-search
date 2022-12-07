@@ -18,6 +18,7 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Transient;
@@ -466,7 +467,7 @@ public class AutomaticIndexingOneToOneOwnedByContainingEagerOnBothSidesIT
 		 * and in this case it is a List.
 		 * TODO use mappedBy when the above gets fixed in Hibernate ORM
 		 */
-		@OneToOne
+		@ManyToOne
 		@JoinColumn(name = "CECAssocIdxEmb")
 		@AssociationInverseSide(inversePath = @ObjectPath({
 				@PropertyValue(propertyName = "elementCollectionAssociations"),
@@ -478,7 +479,7 @@ public class AutomaticIndexingOneToOneOwnedByContainingEagerOnBothSidesIT
 		 * No mappedBy here. Same reason as just above.
 		 * TODO use mappedBy when the above gets fixed in Hibernate ORM
 		 */
-		@OneToOne
+		@ManyToOne
 		@JoinColumn(name = "CECAssocNonIdxEmb")
 		@AssociationInverseSide(inversePath = @ObjectPath({
 				@PropertyValue(propertyName = "elementCollectionAssociations"),
