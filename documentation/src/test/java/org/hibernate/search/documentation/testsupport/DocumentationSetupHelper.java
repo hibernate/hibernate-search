@@ -16,15 +16,19 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.SearchContainer;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendSetupStrategy;
 import org.hibernate.search.util.impl.integrationtest.common.extension.MappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.DatabaseContainer;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 
@@ -144,6 +148,11 @@ public final class DocumentationSetupHelper
 			// Ensure we don't build Jandex indexes needlessly:
 			// discovery based on Jandex ought to be tested in real projects that don't use this setup helper.
 			withProperty( HibernateOrmMapperSettings.MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES, false );
+
+			// DB properties:
+			DatabaseContainer.configuration().add( overriddenProperties );
+			overriddenProperties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.URIS ), SearchContainer.connectionUrl() );
+
 			// Ensure overridden properties will be applied
 			withConfiguration( builder -> overriddenProperties.forEach( builder::setProperty ) );
 		}
