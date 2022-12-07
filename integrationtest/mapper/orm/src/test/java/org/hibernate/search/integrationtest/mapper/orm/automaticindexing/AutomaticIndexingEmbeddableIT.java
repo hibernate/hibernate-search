@@ -960,6 +960,24 @@ public class AutomaticIndexingEmbeddableIT {
 			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
 			containingEntity1.getContainedSingleWithInverseSideEmbedded()
 					.getContainingAsSingleWithInverseSideEmbedded().setContainingAsSingle( null );
+			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
+			containingEntity1.setContainedSingleWithInverseSideEmbedded( null );
+
+			if ( setupHolder.areEntitiesProcessedInSession() ) {
+				backendMock.expectWorks( IndexedEntity.INDEX )
+						.addOrUpdate( "1", b -> b
+								.objectField( "child", b2 -> b2
+										.objectField( "containedEmbeddedSingle", b3 -> {
+										} )
+										.objectField( "containedEmbeddedList", b3 -> {
+										} )
+										.objectField( "containedBidirectionalEmbedded", b3 -> {
+										} )
+								)
+						);
+			}
+			session.flush();
+
 			containingEntity1.setContainedSingleWithInverseSideEmbedded( containedEntity );
 			containedEntity.setContainingAsSingleWithInverseSideEmbedded( new InverseSideEmbeddable( containingEntity1 ) );
 
