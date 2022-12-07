@@ -6,9 +6,17 @@
  */
 package org.hibernate.search.integrationtest.showcase.library;
 
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.SearchContainer;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.DatabaseContainer;
+
 import org.springframework.test.context.ActiveProfilesResolver;
 
 public class TestActiveProfilesResolver implements ActiveProfilesResolver {
+
+	static {
+		System.setProperty( "ES_HOSTS", SearchContainer.host() + ":" + SearchContainer.mappedPort( 9200 ) );
+		DatabaseContainer.springConfiguration();
+	}
 	@Override
 	public String[] resolve(Class<?> testClass) {
 		String testBackend = System.getProperty( "test.backend" );
