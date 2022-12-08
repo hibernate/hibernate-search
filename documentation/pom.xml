@@ -328,6 +328,8 @@
                         <elasticsearchDocUrl>${documentation.org.elasticsearch.url}</elasticsearchDocUrl>
                         <elasticsearchClientVersions>${version.org.elasticsearch.client}</elasticsearchClientVersions>
                         <elasticsearchCompatibleVersions>${version.org.elasticsearch.compatible.regularly-tested.text}</elasticsearchCompatibleVersions>
+                        <elasticsearchExpectedRunningVersions>${version.org.elasticsearch.compatible.expected.text}</elasticsearchExpectedRunningVersions>
+                        <opensearchExpectedRunningVersions>${version.org.opensearch.compatible.expected.text}</opensearchExpectedRunningVersions>
                         <elasticsearchOtherPotentiallyCompatibleVersions>${version.org.elasticsearch.compatible.not-regularly-tested.text}</elasticsearchOtherPotentiallyCompatibleVersions>
                         <openSearchUrl>https://www.opensearch.org</openSearchUrl>
                         <openSearchCompatibleVersions>${version.org.opensearch.compatible.regularly-tested.text}</openSearchCompatibleVersions>
