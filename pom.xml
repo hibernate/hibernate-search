@@ -2221,6 +2221,9 @@
                              See https://issues.apache.org/jira/browse/SUREFIRE-1226?focusedCommentId=16187391&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-16187391
                          -->
                         <trimStackTrace>false</trimStackTrace>
+                        <environmentVariables>
+                            <TESTCONTAINERS_RYUK_DISABLED>true</TESTCONTAINERS_RYUK_DISABLED>
+                        </environmentVariables>
                         <systemPropertyVariables>
                             <org.hibernate.search.test.property-set-in-maven-config>someValue</org.hibernate.search.test.property-set-in-maven-config>
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
