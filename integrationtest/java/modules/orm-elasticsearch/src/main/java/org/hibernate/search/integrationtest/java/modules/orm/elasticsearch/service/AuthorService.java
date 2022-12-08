@@ -58,6 +58,7 @@ public class AuthorService implements AutoCloseable {
 	}
 
 	private StandardServiceRegistryBuilder applyConnectionProperties(StandardServiceRegistryBuilder registryBuilder) {
+		registryBuilder.loadProperties( "actual-hibernate.properties" );
 		// DB properties:
 		Map<String, Object> db = new HashMap<>();
 		DatabaseContainer.configuration().add( db );
