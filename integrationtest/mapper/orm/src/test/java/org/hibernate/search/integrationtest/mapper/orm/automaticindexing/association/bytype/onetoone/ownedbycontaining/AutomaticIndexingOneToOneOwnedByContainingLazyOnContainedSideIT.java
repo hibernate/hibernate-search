@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.onetoone.ownedbycontaining;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +43,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetu
 
 import org.hibernate.testing.bytecode.enhancement.BytecodeEnhancerRunner;
 import org.hibernate.testing.bytecode.enhancement.EnhancementOptions;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
@@ -93,6 +97,13 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT
 			contained.setContainingAsElementCollectionAssociationsIndexedEmbedded( null );
 			contained.setContainingAsElementCollectionAssociationsNonIndexedEmbedded( null );
 		} );
+	}
+
+	@Test
+	public void testBytecodeEnhancementWorked() {
+		assertThat( ContainingEntity.class.getDeclaredMethods() )
+				.extracting( Method::getName )
+				.anyMatch( name -> name.startsWith( "$$_hibernate_" ) );
 	}
 
 	@Entity(name = "containing")
