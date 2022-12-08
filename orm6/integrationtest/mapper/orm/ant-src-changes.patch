@@ -66,19 +66,18 @@ index cbd1ace7ae..193d70675f 100644
  								.objectField( "elementCollectionAssociations", b2 -> b2
  										.multiValued( true )
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontained/AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontained/AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT.java
-index 0a9b28691d..a8dd3aec0f 100644
+index 2a43f25e1c..f8b1e3eb8f 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontained/AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontained/AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT.java
-@@ -6,6 +6,8 @@
+@@ -6,6 +6,7 @@
   */
  package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.onetoone.ownedbycontained;
  
 +import static org.junit.Assume.assumeTrue;
-+
- import java.util.ArrayList;
- import java.util.List;
- import java.util.Optional;
-@@ -81,6 +83,57 @@ protected boolean isAssociationLazyOnContainingSide() {
+ import static org.assertj.core.api.Assertions.assertThat;
+ 
+ import java.lang.reflect.Method;
+@@ -85,6 +86,57 @@ protected boolean isAssociationLazyOnContainingSide() {
  		return true;
  	}
  
@@ -136,7 +135,7 @@ index 0a9b28691d..a8dd3aec0f 100644
  	@Override
  	public void setup(OrmSetupHelper.SetupContext setupContext,
  			ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
-@@ -119,9 +172,6 @@ public static class ContainingEntity {
+@@ -130,9 +182,6 @@ public static class ContainingEntity {
  				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
  				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
  				"containedIndexedEmbeddedWithCast.indexedField",
@@ -146,7 +145,7 @@ index 0a9b28691d..a8dd3aec0f 100644
  				"containedElementCollectionAssociationsIndexedEmbedded.indexedField",
  				"containedElementCollectionAssociationsIndexedEmbedded.indexedElementCollectionField",
  				"containedElementCollectionAssociationsIndexedEmbedded.containedDerivedField",
-@@ -153,10 +203,6 @@ public static class ContainingEntity {
+@@ -164,10 +213,6 @@ public static class ContainingEntity {
  		@IndexedEmbedded(includePaths = { "indexedField" }, targetType = ContainedEntity.class)
  		private Object containedIndexedEmbeddedWithCast;
  
@@ -157,7 +156,7 @@ index 0a9b28691d..a8dd3aec0f 100644
  		/*
  		 * No mappedBy here. The inverse side of associations within an element collection cannot use mappedBy.
  		 * If they do, Hibernate ORM will fail (throw an exception) while attempting to walk down the mappedBy path,
-@@ -266,14 +312,6 @@ public void setContainedIndexedEmbeddedWithCast(Object containedIndexedEmbeddedW
+@@ -279,14 +324,6 @@ public void setContainedIndexedEmbeddedWithCast(Object containedIndexedEmbeddedW
  			this.containedIndexedEmbeddedWithCast = containedIndexedEmbeddedWithCast;
  		}
  
@@ -172,7 +171,7 @@ index 0a9b28691d..a8dd3aec0f 100644
  		public ContainedEntity getContainedElementCollectionAssociationsIndexedEmbedded() {
  			return containedElementCollectionAssociationsIndexedEmbedded;
  		}
-@@ -374,7 +412,8 @@ public PropertyAccessor<ContainingEntity, ContainedEntity> containedIndexedEmbed
+@@ -387,7 +424,8 @@ public PropertyAccessor<ContainingEntity, ContainedEntity> containedIndexedEmbed
  
  			@Override
  			public PropertyAccessor<ContainingEntity, ContainingEmbeddable> embeddedAssociations() {
@@ -182,7 +181,7 @@ index 0a9b28691d..a8dd3aec0f 100644
  			}
  
  			@Override
-@@ -501,9 +540,6 @@ public static class ContainedEntity {
+@@ -514,9 +552,6 @@ public static class ContainedEntity {
  		@JoinColumn(name = "CIndexedEmbeddedCast")
  		private Object containingAsIndexedEmbeddedWithCast;
  
@@ -192,7 +191,7 @@ index 0a9b28691d..a8dd3aec0f 100644
  		@ElementCollection
  		@Embedded
  		@OrderColumn(name = "idx")
-@@ -608,14 +644,6 @@ public void setContainingAsIndexedEmbeddedWithCast(Object containingAsIndexedEmb
+@@ -621,14 +656,6 @@ public void setContainingAsIndexedEmbeddedWithCast(Object containingAsIndexedEmb
  			this.containingAsIndexedEmbeddedWithCast = containingAsIndexedEmbeddedWithCast;
  		}
  
@@ -207,7 +206,7 @@ index 0a9b28691d..a8dd3aec0f 100644
  		public List<ContainedEmbeddable> getElementCollectionAssociations() {
  			return elementCollectionAssociations;
  		}
-@@ -744,7 +772,8 @@ public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEm
+@@ -757,7 +784,8 @@ public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEm
  
  			@Override
  			public PropertyAccessor<ContainedEntity, ContainedEmbeddable> embeddedAssociations() {
@@ -218,19 +217,18 @@ index 0a9b28691d..a8dd3aec0f 100644
  
  			@Override
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontaining/AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontaining/AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT.java
-index df817fa9b3..4599ad3369 100644
+index 0fbdf16231..edf4fb86af 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontaining/AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontaining/AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT.java
-@@ -6,6 +6,8 @@
+@@ -6,6 +6,7 @@
   */
  package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.onetoone.ownedbycontaining;
  
 +import static org.junit.Assume.assumeTrue;
-+
- import java.util.ArrayList;
- import java.util.List;
- import java.util.Optional;
-@@ -79,6 +81,57 @@ protected boolean isAssociationLazyOnContainingSide() {
+ import static org.assertj.core.api.Assertions.assertThat;
+ 
+ import java.lang.reflect.Method;
+@@ -83,6 +84,57 @@ protected boolean isAssociationLazyOnContainingSide() {
  		return false;
  	}
  
@@ -288,7 +286,7 @@ index df817fa9b3..4599ad3369 100644
  	@Override
  	public void setup(OrmSetupHelper.SetupContext setupContext,
  			ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
-@@ -118,9 +171,6 @@ public static class ContainingEntity {
+@@ -129,9 +181,6 @@ public static class ContainingEntity {
  				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
  				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
  				"containedIndexedEmbeddedWithCast.indexedField",
@@ -298,7 +296,7 @@ index df817fa9b3..4599ad3369 100644
  				"elementCollectionAssociations.containedIndexedEmbedded.indexedField",
  				"elementCollectionAssociations.containedIndexedEmbedded.indexedElementCollectionField",
  				"elementCollectionAssociations.containedIndexedEmbedded.containedDerivedField",
-@@ -156,10 +206,6 @@ public static class ContainingEntity {
+@@ -167,10 +216,6 @@ public static class ContainingEntity {
  		@IndexedEmbedded(includePaths = { "indexedField" }, targetType = ContainedEntity.class)
  		private Object containedIndexedEmbeddedWithCast;
  
@@ -309,7 +307,7 @@ index df817fa9b3..4599ad3369 100644
  		@IndexedEmbedded
  		@ElementCollection
  		@Embedded
-@@ -250,14 +296,6 @@ public void setContainedIndexedEmbeddedWithCast(Object containedIndexedEmbeddedW
+@@ -261,14 +306,6 @@ public void setContainedIndexedEmbeddedWithCast(Object containedIndexedEmbeddedW
  			this.containedIndexedEmbeddedWithCast = containedIndexedEmbeddedWithCast;
  		}
  
@@ -324,7 +322,7 @@ index df817fa9b3..4599ad3369 100644
  		public List<ContainingEmbeddable> getElementCollectionAssociations() {
  			return elementCollectionAssociations;
  		}
-@@ -344,7 +382,7 @@ public PropertyAccessor<ContainingEntity, ContainedEntity> containedIndexedEmbed
+@@ -355,7 +392,7 @@ public PropertyAccessor<ContainingEntity, ContainedEntity> containedIndexedEmbed
  
  			@Override
  			public PropertyAccessor<ContainingEntity, ContainingEmbeddable> embeddedAssociations() {
@@ -333,7 +331,7 @@ index df817fa9b3..4599ad3369 100644
  			}
  
  			@Override
-@@ -461,9 +499,6 @@ public static class ContainedEntity {
+@@ -472,9 +509,6 @@ public static class ContainedEntity {
  		@OneToOne(mappedBy = "containedIndexedEmbeddedWithCast", targetEntity = ContainingEntity.class, fetch = FetchType.LAZY)
  		private Object containingAsIndexedEmbeddedWithCast;
  
@@ -343,7 +341,7 @@ index df817fa9b3..4599ad3369 100644
  		/*
  		 * No mappedBy here. The inverse side of associations within an element collection cannot use mappedBy.
  		 * If they do, Hibernate ORM will fail (throw an exception) while attempting to walk down the mappedBy path,
-@@ -587,14 +622,6 @@ public void setContainingAsIndexedEmbeddedWithCast(Object containingAsIndexedEmb
+@@ -600,14 +634,6 @@ public void setContainingAsIndexedEmbeddedWithCast(Object containingAsIndexedEmb
  			this.containingAsIndexedEmbeddedWithCast = containingAsIndexedEmbeddedWithCast;
  		}
  
@@ -358,7 +356,7 @@ index df817fa9b3..4599ad3369 100644
  		public ContainingEntity getContainingAsElementCollectionAssociationsIndexedEmbedded() {
  			return containingAsElementCollectionAssociationsIndexedEmbedded;
  		}
-@@ -737,7 +764,7 @@ public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEm
+@@ -750,7 +776,7 @@ public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEm
  
  			@Override
  			public PropertyAccessor<ContainedEntity, ContainedEmbeddable> embeddedAssociations() {
@@ -1271,26 +1269,6 @@ index 6af91cdb9f..34c4c1b092 100644
  				.contains( "_containing_fk_containingidBackref" )
  				.contains( "_containingIndexBackref" );
  
-diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BytecodeEnhancementIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BytecodeEnhancementIT.java
-index 0d83f15961..7a71fb282b 100644
---- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BytecodeEnhancementIT.java
-+++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BytecodeEnhancementIT.java
-@@ -275,11 +275,14 @@ public static class IndexedEntitySuperClass extends IndexedMappedSuperClass {
- 			extends IndexedEntitySuperClass {
- 		public static final String INDEX = "IndexedEntity";
- 
-+		// "containedEntityList" is not listed here,
-+		// because collection properties are initialized eagerly
-+		// (even if the collection themselves are initialized lazily).
-+		// See HHH-15473 / https://github.com/hibernate/hibernate-orm/pull/5252
- 		private static final String[] LAZY_PROPERTY_NAMES = new String[] {
- 				"mappedSuperClassText",
- 				"entitySuperClassText",
- 				"notIndexedText",
--				"containedEntityList",
- 				"text1",
- 				"text2",
- 				"primitiveInteger",
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java
 index f3c50122f5..74e1a3d37c 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java
@@ -1331,7 +1309,7 @@ index f3c50122f5..74e1a3d37c 100644
  
  		@OneToMany(mappedBy = "genericProperty")
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java
-index e4943eba1f..79d8d96c29 100644
+index 3669e15c62..132ed8aed1 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java
 @@ -20,7 +20,7 @@
@@ -1343,7 +1321,7 @@ index e4943eba1f..79d8d96c29 100644
  import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
  import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
  import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-@@ -56,8 +56,8 @@ public void test() {
+@@ -58,8 +58,8 @@ public void test() {
  
  		// Hibernate Search started successfully.
  		// Check that there actually is a synthetic property:

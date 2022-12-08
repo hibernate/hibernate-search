@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedAssert.assertThatManaged;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -95,6 +97,13 @@ public class BytecodeEnhancementIT {
 						ContainedEmbeddable.class
 				);
 		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void testBytecodeEnhancementWorked() {
+		assertThat( IndexedEntity.class.getDeclaredMethods() )
+				.extracting( Method::getName )
+				.anyMatch( name -> name.startsWith( "$$_hibernate_" ) );
 	}
 
 	@Test

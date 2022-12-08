@@ -6,12 +6,17 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.lang.reflect.Method;
+
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.hibernate.testing.bytecode.enhancement.BytecodeEnhancerRunner;
 import org.hibernate.testing.bytecode.enhancement.EnhancementOptions;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
@@ -28,5 +33,12 @@ public class AutomaticIndexingAssociationDeletionBytecodeEnhancementIT
 	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		// Necessary for BytecodeEnhancerRunner, see BytecodeEnhancementIT.setup
 		setupContext.withTcclLookupPrecedenceBefore();
+	}
+
+	@Test
+	public void testBytecodeEnhancementWorked() {
+		assertThat( AssociationNonOwner.class.getDeclaredMethods() )
+				.extracting( Method::getName )
+				.anyMatch( name -> name.startsWith( "$$_hibernate_" ) );
 	}
 }
