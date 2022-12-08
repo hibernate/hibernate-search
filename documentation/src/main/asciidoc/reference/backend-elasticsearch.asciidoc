@@ -4,8 +4,8 @@
 [[backend-elasticsearch-compatibility]]
 == Compatibility
 
-Hibernate Search expects an link:{elasticsearchUrl}[Elasticsearch] cluster running version 5.6, 6.x or 7.x,
-or an link:{openSearchUrl}[OpenSearch] cluster running version 1.x.
+Hibernate Search expects an link:{elasticsearchUrl}[Elasticsearch] cluster running version {elasticsearchExpectedRunningVersions},
+or an link:{openSearchUrl}[OpenSearch] cluster running version {opensearchExpectedRunningVersions}.
 
 The version running on your cluster will be automatically detected on startup,
 and Hibernate Search will adapt based on the detected version;
@@ -23,12 +23,12 @@ but there are a few differences in how Hibernate Search behaves depending
 on the Elasticsearch version that may affect you.
 The following table details those differences.
 
-[cols="h,4*",options="header"]
+[cols="h,6*",options="header"]
 |===============
-| 3+|Elasticsearch|OpenSearch
-||5.6|6.x|7.x|1.x
-|Formats for date fields in the Elasticsearch schema 4+|Formats changed in ES 7, see <<backend-elasticsearch-field-types>>
-|`indexNullAs` on `geo_point` fields |Not available 3+|Available
+| 4+|Elasticsearch 2+|OpenSearch
+||5.6|6.x|7.x|8.x|1.x|2.x
+|Formats for date fields in the Elasticsearch schema 6+|Formats changed in ES 7, see <<backend-elasticsearch-field-types>>
+|`indexNullAs` on `geo_point` fields |Not available 5+|Available
 |===============
 
 [[backend-elasticsearch-upgrading]]
