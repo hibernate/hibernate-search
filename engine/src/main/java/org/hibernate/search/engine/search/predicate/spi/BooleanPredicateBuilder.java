@@ -37,4 +37,6 @@ public interface BooleanPredicateBuilder extends SearchPredicateBuilder {
 	 */
 	void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent);
 
+	boolean hasClause();
+
 }

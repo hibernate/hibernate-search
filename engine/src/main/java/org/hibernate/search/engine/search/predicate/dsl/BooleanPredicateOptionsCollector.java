@@ -258,4 +258,11 @@ public interface BooleanPredicateOptionsCollector<S extends BooleanPredicateOpti
 	 */
 	S minimumShouldMatch(Consumer<? super MinimumShouldMatchConditionStep<?>> constraintContributor);
 
+	/**
+	 * Checks if this predicate contains at least one clause.
+	 *
+	 * @return {@code true} if any clauses were added, i.e. any of the {@code must(..)}/{@code should(..)}/{@code mustNot(..)}/{@code filter(..)}
+	 * were called at least once, {@code false} otherwise.
+	 */
+	boolean hasClause();
 }

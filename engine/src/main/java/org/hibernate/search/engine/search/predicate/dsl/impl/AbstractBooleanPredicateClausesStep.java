@@ -127,4 +127,9 @@ abstract class AbstractBooleanPredicateClausesStep<S extends C, C extends Boolea
 		return builder.build();
 	}
 
+	@Override
+	public boolean hasClause() {
+		return builder.hasClause();
+	}
+
 }

@@ -86,6 +86,11 @@ public abstract class AbstractSimpleBooleanPredicateClausesStep<S extends C, C e
 	}
 
 	@Override
+	public boolean hasClause() {
+		return builder.hasClause();
+	}
+
+	@Override
 	protected SearchPredicate build() {
 		return builder.build();
 	}
