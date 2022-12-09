@@ -196,6 +196,11 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			);
 		}
 
+		@Override
+		public boolean hasClause() {
+			return mustClauses != null || shouldClauses != null || mustNotClauses != null || filterClauses != null;
+		}
+
 		private void addMinimumShouldMatchConstraint(int ignoreConstraintCeiling,
 				MinimumShouldMatchConstraint constraint) {
 			if ( minimumShouldMatchConstraints == null ) {

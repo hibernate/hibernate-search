@@ -116,6 +116,7 @@ public class StubSearchPredicate implements SearchPredicate {
 			SpatialWithinPolygonPredicateBuilder,
 			SpatialWithinBoundingBoxPredicateBuilder,
 			NamedPredicateBuilder {
+		private boolean hasClause = false;
 
 		@Override
 		public SearchPredicate build() {
@@ -126,18 +127,21 @@ public class StubSearchPredicate implements SearchPredicate {
 		public void must(SearchPredicate clause) {
 			// No-op, just check the type
 			from( clause );
+			hasClause = true;
 		}
 
 		@Override
 		public void mustNot(SearchPredicate clause) {
 			// No-op, just check the type
 			from( clause );
+			hasClause = true;
 		}
 
 		@Override
 		public void should(SearchPredicate clause) {
 			// No-op, just check the type
 			from( clause );
+			hasClause = true;
 
 		}
 
@@ -145,6 +149,7 @@ public class StubSearchPredicate implements SearchPredicate {
 		public void filter(SearchPredicate clause) {
 			// No-op, just check the type
 			from( clause );
+			hasClause = true;
 		}
 
 		@Override
@@ -155,6 +160,11 @@ public class StubSearchPredicate implements SearchPredicate {
 		@Override
 		public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
 			// No-op
+		}
+
+		@Override
+		public boolean hasClause() {
+			return hasClause;
 		}
 
 		@Override

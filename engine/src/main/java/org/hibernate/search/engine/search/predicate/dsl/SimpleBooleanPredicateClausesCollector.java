@@ -83,4 +83,12 @@ public interface SimpleBooleanPredicateClausesCollector<S extends SimpleBooleanP
 	 * @return {@code this}, for method chaining.
 	 */
 	S with(Consumer<? super S> contributor);
+
+	/**
+	 * Checks if this predicate contains at least one clause.
+	 *
+	 * @return {@code true} if any clauses were added, i.e. any of the {@code add(..)} methods
+	 * were called at least once, {@code false} otherwise.
+	 */
+	boolean hasClause();
 }

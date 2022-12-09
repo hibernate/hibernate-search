@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
@@ -762,6 +763,44 @@ public class BoolPredicateSpecificsIT {
 						)
 				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+	}
+
+	@Test
+	public void hasClause() {
+		StubMappingScope scope = index.createScope();
+
+		assertThat(
+				scope.predicate().bool().hasClause()
+		).isFalse();
+
+		assertThat(
+				scope.predicate().bool().must( f -> f.match().field( "field1" ).matching( "no-match" ) )
+						.hasClause()
+		).isTrue();
+
+		assertThat(
+				scope.predicate().bool().mustNot( f -> f.match().field( "field1" ).matching( "no-match" ) )
+						.hasClause()
+		).isTrue();
+
+		assertThat(
+				scope.predicate().bool().should( f -> f.match().field( "field1" ).matching( "no-match" ) )
+						.hasClause()
+		).isTrue();
+
+		assertThat(
+				scope.predicate().bool().filter( f -> f.match().field( "field1" ).matching( "no-match" ) )
+						.hasClause()
+		).isTrue();
+
+		assertThat(
+				scope.predicate().bool().must( f -> f.match().field( "field1" ).matching( "no-match" ) )
+						.mustNot( f -> f.match().field( "field1" ).matching( "no-match" ) )
+						.should( f -> f.match().field( "field1" ).matching( "no-match" ) )
+						.filter( f -> f.match().field( "field1" ).matching( "no-match" ) )
+						.hasClause()
+		).isTrue();
+
 	}
 
 	private static void initData() {

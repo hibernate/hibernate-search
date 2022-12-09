@@ -176,6 +176,11 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 		}
 
 		@Override
+		public boolean hasClause() {
+			return mustClauses != null || shouldClauses != null || mustNotClauses != null || filterClauses != null;
+		}
+
+		@Override
 		public SearchPredicate build() {
 			return new LuceneBooleanPredicate( this );
 		}

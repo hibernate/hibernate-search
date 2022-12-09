@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -235,6 +236,22 @@ public class AndPredicateSpecificsIT {
 						.with( and -> and.add( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) )
 						.with( and -> and.add( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+	}
+
+	@Test
+	public void hasClause() {
+		StubMappingScope scope = index.createScope();
+
+		assertThat(
+				scope.predicate().and().hasClause()
+		).isFalse();
+
+		assertThat(
+				scope.predicate().and()
+						.with( and -> and.add( f -> f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) )
+						.with( and -> and.add( f -> f.match().field( "field2" ).matching( FIELD2_VALUE1 ) ) )
+						.hasClause()
+		).isTrue();
 	}
 
 	private static void initData() {
