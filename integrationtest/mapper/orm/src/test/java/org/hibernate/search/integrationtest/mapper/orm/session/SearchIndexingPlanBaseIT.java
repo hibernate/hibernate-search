@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.session;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +100,62 @@ public class SearchIndexingPlanBaseIT {
 					.addOrUpdate( "2", b -> b.field( "text", "number2" ) )
 					.delete( "3" )
 					.delete( "42" );
+		} );
+		defaultBackendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void updateOnContainedEntityTriggersUpdateOfContaining() {
+		listenerEnabled( false );
+
+		setupHolder.runInTransaction( session -> {
+			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
+			ContainedEntity contained1 = new ContainedEntity( 11, "text 1" );
+			contained1.containing = entity1;
+			entity1.contained = Arrays.asList( contained1 );
+
+			IndexedEntity1 entity2 = new IndexedEntity1( 2, "number2" );
+			ContainedEntity contained2 = new ContainedEntity( 12, "text 2" );
+			contained2.containing = entity2;
+			ContainedEntity contained3 = new ContainedEntity( 13, "text 3" );
+			contained3.containing = entity2;
+			entity2.contained = Arrays.asList( contained2, contained3 );
+
+			IndexedEntity1 entity3 = new IndexedEntity1( 3, "number3" );
+
+			session.persist( entity1 );
+			session.persist( entity2 );
+			session.persist( entity3 );
+			session.persist( contained1 );
+			session.persist( contained2 );
+			session.persist( contained3 );
+
+			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
+			indexingPlan.addOrUpdate( contained1 );
+			indexingPlan.addOrUpdate( contained2 );
+
+			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
+					.addOrUpdate( "1", b -> b.field( "text", "number1" )
+							.objectField( "contained", b2 -> b2.field( "text", "text 1" ) ) )
+					.addOrUpdate( "2", b -> b.field( "text", "number2" )
+							.objectField( "contained", b2 -> b2.field( "text", "text 2" ) )
+							.objectField( "contained", b2 -> b2.field( "text", "text 3" ) )
+					);
+		} );
+
+		setupHolder.runInTransaction( session -> {
+			IndexedEntity1 entity1 = session.get( IndexedEntity1.class, 1 );
+			ContainedEntity contained1 = entity1.contained.get( 0 );
+			contained1.text = "new text 1";
+
+			session.persist( contained1 );
+
+			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
+			indexingPlan.addOrUpdate( contained1 );
+
+			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
+					.addOrUpdate( "1", b -> b.field( "text", "number1" )
+							.objectField( "contained", b2 -> b2.field( "text", "new text 1" ) ) );
 		} );
 		defaultBackendMock.verifyExpectationsMet();
 	}
