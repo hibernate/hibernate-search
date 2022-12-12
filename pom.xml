@@ -153,6 +153,7 @@
     <modules>
         <module>build/config</module>
         <module>build/parents/internal</module>
+        <module>build/configuration-properties-collector</module>
         <module>util/internal/test/common</module>
         <module>util/internal/test/orm</module>
         <module>build/parents/public</module>
@@ -397,6 +398,8 @@
         <version.org.jruby>9.3.2.0</version.org.jruby>
         <version.org.asciidoctor.asciidoctorj>2.5.6</version.org.asciidoctor.asciidoctorj>
         <version.org.asciidoctor.asciidoctorj-pdf>1.5.0-alpha.18</version.org.asciidoctor.asciidoctorj-pdf>
+
+        <version.jsoup>1.15.3</version.jsoup>
 
         <!-- Maven Central repository -->
 
@@ -1324,6 +1327,14 @@
                 <artifactId>jberet-se</artifactId>
                 <version>${version.org.jberet}</version>
             </dependency>
+
+            <!-- For javadocs parsing -->
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${version.jsoup}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
