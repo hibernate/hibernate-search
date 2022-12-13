@@ -6,12 +6,16 @@
  */
 package org.hibernate.search.backend.elasticsearch.aws.cfg;
 
+
+import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
+
 /**
  * AWS-specific configuration properties for Elasticsearch backends.
  * <p>
  * Constants in this class are to be appended to a prefix to form a property key;
  * see {@link org.hibernate.search.engine.cfg.BackendSettings} for details.
  */
+@HibernateSearchConfiguration(prefix = "hibernate.search.backends.")
 public final class ElasticsearchAwsBackendSettings {
 
 	private ElasticsearchAwsBackendSettings() {
