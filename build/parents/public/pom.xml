@@ -206,6 +206,41 @@
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>${version.compiler.plugin}</version>
+                        <executions>
+                            <execution>
+                                <id>properties-collector-compile</id>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- Only run annotation processor and do not recompile the classes: -->
+                                    <proc>only</proc>
+                                    <fork>true</fork>
+                                    <executable>${java-version.test.compiler}</executable>
+                                    <annotationProcessorPaths>
+                                        <path>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>hibernate-search-configuration-properties-collector</artifactId>
+                                            <version>${project.version}</version>
+                                        </path>
+                                    </annotationProcessorPaths>
+                                    <annotationProcessors>
+                                        <processor>org.hibernate.search.configuration.properties.collector.ConfigurationPropertyProcessor</processor>
+                                    </annotationProcessors>
+                                    <compilerArgs>
+                                        <arg>-Aorg.hibernate.search.cpcap.javadoc.link=${javadoc.org.hibernate.search.url}</arg>
+                                        <arg>-Aorg.hibernate.search.cpcap.module.name=${project.name}</arg>
+                                        <arg>-Aorg.hibernate.search.cpcap.ignore.pattern=.*\.impl\..*</arg>
+                                        <arg>-Aorg.hibernate.search.cpcap.generated.filename=${project.artifactId}</arg>
+                                    </compilerArgs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
                         <executions>
                             <execution>
@@ -252,7 +287,7 @@
                                 <goals>
                                     <goal>javadoc-no-fork</goal>
                                 </goals>
-                                <phase>prepare-package</phase>
+                                <phase>process-resources</phase>
                             </execution>
                         </executions>
                     </plugin>

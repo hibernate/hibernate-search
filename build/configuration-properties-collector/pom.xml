@@ -59,6 +59,13 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration combine.self="append">
+                    <proc>none</proc>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
