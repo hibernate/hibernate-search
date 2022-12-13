@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.configuration.properties.collector;
 
-import static org.hibernate.search.configuration.properties.collector.utils.AnnotationUtils.isIgnored;
+import static org.hibernate.search.configuration.properties.collector.utils.AnnotationUtils.findAnnotation;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
@@ -29,6 +30,8 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
+
+import org.hibernate.search.configuration.properties.collector.utils.AnnotationUtils;
 
 import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
@@ -66,9 +69,15 @@ public class ConfigurationPropertyCollector {
 		if ( !processedTypes.contains( qualifiedName ) ) {
 			processedTypes.add( qualifiedName );
 
+			Optional<String> classPrefix = findAnnotation( element, HibernateSearchConfiguration.class )
+					.flatMap(
+							a -> a.attribute( "prefix", String.class )
+									.map( ConfigurationPropertyCollector::nullIfBlank )
+					);
+
 			for ( Element inner : elementUtils.getAllMembers( element ) ) {
 				if ( inner.getKind().equals( ElementKind.FIELD ) && inner instanceof VariableElement ) {
-					processConstant( ( (VariableElement) inner ) );
+					processConstant( ( (VariableElement) inner ), classPrefix );
 				}
 			}
 		}
@@ -82,13 +91,18 @@ public class ConfigurationPropertyCollector {
 		return Collections.unmodifiableMap( properties );
 	}
 
-	private void processConstant(VariableElement constant) {
-		if ( isIgnored( constant ) ) {
+	private void processConstant(VariableElement constant, Optional<String> classPrefix) {
+		Optional<AnnotationUtils.AnnotationAttributeHolder> annotation = findAnnotation( constant, HibernateSearchConfiguration.class );
+		if ( annotation.flatMap( a -> a.attribute( "ignore", Boolean.class ) ).orElse( false ) ) {
 			return;
 		}
 
-		String key = configPrefix + Objects.toString(
-				constant.getConstantValue(), "NOT_FOUND#" + constant.getSimpleName() );
+		String key = extractKey(
+				constant,
+				classPrefix,
+				annotation.flatMap( a -> a.attribute( "prefix", String.class ) )
+						.map( ConfigurationPropertyCollector::nullIfBlank )
+		);
 		if ( !ignoreKeys.matcher( key ).matches() ) {
 			// Try to find a default value. Assumption is that the settings class has an inner class called "Defaults" and
 			// the key for the default value is exactly the same as the config constant name:
@@ -104,6 +118,22 @@ public class ConfigurationPropertyCollector {
 							.defaultValue( value )
 			);
 		}
+	}
+
+
+	private String extractKey(VariableElement constant, Optional<String> classPrefix, Optional<String> constantPrefix) {
+		String prefix;
+		if ( constantPrefix.isPresent() ) {
+			prefix = constantPrefix.get();
+		}
+		else if ( classPrefix.isPresent() ) {
+			prefix = classPrefix.get();
+		}
+		else {
+			prefix = configPrefix;
+		}
+
+		return prefix + Objects.toString( constant.getConstantValue(), "NOT_FOUND#" + constant.getSimpleName() );
 	}
 
 	private HibernateSearchConfiguration.Type extractType(VariableElement constant) {
@@ -147,7 +177,7 @@ public class ConfigurationPropertyCollector {
 	}
 
 	/**
-	 * This really works only for string constants ... other types would just get null returned.
+	 * This really works only for string/primitive constants ... other types would just get null returned.
 	 */
 	private Object findDefault(VariableElement constant) {
 		if ( constant.getEnclosingElement() instanceof TypeElement ) {
@@ -163,6 +193,10 @@ public class ConfigurationPropertyCollector {
 			}
 		}
 		return null;
+	}
+
+	private static String nullIfBlank(String str) {
+		return str != null && str.isBlank() ? null : str;
 	}
 
 }

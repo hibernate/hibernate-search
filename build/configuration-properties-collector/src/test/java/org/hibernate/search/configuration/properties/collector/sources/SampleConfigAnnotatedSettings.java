@@ -8,7 +8,7 @@ package org.hibernate.search.configuration.properties.collector.sources;
 
 import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
-@HibernateSearchConfiguration
+@HibernateSearchConfiguration(prefix = "replacement.prefix.")
 public final class SampleConfigAnnotatedSettings {
 
 	private SampleConfigAnnotatedSettings() {

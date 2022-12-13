@@ -73,7 +73,7 @@ public class ConfigurationPropertiesProcessorTest {
 		assertThat( configurationPropertyProcessor.collectedProperties().values() )
 				.extracting( ConfigurationProperty::key )
 				.containsOnly(
-						"hibernate.search." + SampleConfigAnnotatedSettings.SOME_PROPERTY_KEY,
+						"replacement.prefix." + SampleConfigAnnotatedSettings.SOME_PROPERTY_KEY,
 						"hibernate.search." + SampleConfigNotAnnotatedSettings.SOME_OTHER_PROPERTY_KEY,
 						"hibernate.search." + SampleConfigNotAnnotatedSettings.SOME_YET_ANOTHER_PROPERTY_KEY,
 						"hibernate.search." + JustSomeClass.InnerConfigurationSettings.SOME_INNER_SETTING
@@ -84,7 +84,7 @@ public class ConfigurationPropertiesProcessorTest {
 						"default",
 						"",
 						"",
-						""
+						false
 				);
 	}
 

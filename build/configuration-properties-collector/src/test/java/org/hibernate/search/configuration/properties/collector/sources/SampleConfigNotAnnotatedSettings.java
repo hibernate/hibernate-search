@@ -41,6 +41,6 @@ public final class SampleConfigNotAnnotatedSettings {
 
 	public static class Defaults {
 		public static final String SOME_OTHER_PROPERTY_KEY = "default";
-		public static final Boolean SOME_YET_ANOTHER_PROPERTY_KEY = Boolean.FALSE;
+		public static final boolean SOME_YET_ANOTHER_PROPERTY_KEY = false;
 	}
 }

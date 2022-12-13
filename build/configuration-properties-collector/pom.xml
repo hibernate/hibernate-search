@@ -62,6 +62,8 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <!-- This is to make IDE happy and not fail to compile the module.
+                     Otherwise, it tries to apply the annotation processor to itself. -->
                 <configuration combine.self="append">
                     <proc>none</proc>
                 </configuration>
