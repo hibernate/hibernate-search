@@ -63,4 +63,6 @@ include::further-reading.asciidoc[]
 
 include::credits.asciidoc[]
 
+include::configuration-properties-aggregated.asciidoc[]
+
 :leveloffset: -1
