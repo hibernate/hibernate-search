@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.configuration.properties.collector.utils;
 
-import java.util.Objects;
 import java.util.Optional;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -19,31 +18,34 @@ public final class AnnotationUtils {
 	private AnnotationUtils() {
 	}
 
-	public static Optional<HibernateSearchConfiguration.Type> findType(Element element) {
-		return element.getAnnotationMirrors().stream()
-				.filter( mirror -> mirror.getAnnotationType().toString()
-						.equals( HibernateSearchConfiguration.class.getName() ) )
-				.map( mirror -> getAnnotationValue( mirror, "type" ) )
-				.filter( Objects::nonNull )
-				.filter( Optional::isPresent )
-				.map( opt -> ( (HibernateSearchConfiguration.Type) opt.get() ) )
-				.findAny();
-	}
-
 	public static boolean isIgnored(Element element) {
-		return element.getAnnotationMirrors().stream()
-				.filter( mirror -> mirror.getAnnotationType().toString()
-						.equals( HibernateSearchConfiguration.class.getName() ) )
-				.map( mirror -> getAnnotationValue( mirror, "ignore" ).orElse( null ) )
-				.filter( Objects::nonNull )
-				.anyMatch( Boolean.TRUE::equals );
+		return findAnnotation( element, HibernateSearchConfiguration.class )
+				.flatMap( a -> a.attribute( "ignore", Boolean.class ) )
+				.orElse( false );
 	}
 
-	private static Optional<Object> getAnnotationValue(AnnotationMirror annotationMirror, String name) {
-		return annotationMirror.getElementValues().entrySet().stream()
-				.filter( entry -> entry.getKey().getSimpleName().contentEquals( name ) )
-				.map( entry -> entry.getValue().getValue() )
-				.findAny();
+	public static Optional<AnnotationAttributeHolder> findAnnotation(Element element, Class<?> annotation) {
+		for ( AnnotationMirror mirror : element.getAnnotationMirrors() ) {
+			if ( mirror.getAnnotationType().toString().equals( annotation.getName() ) ) {
+				return Optional.of( new AnnotationAttributeHolder( mirror ) );
+			}
+		}
+		return Optional.empty();
+	}
+
+	public static class AnnotationAttributeHolder {
+		private final AnnotationMirror annotationMirror;
+
+		private AnnotationAttributeHolder(AnnotationMirror annotationMirror) {
+			this.annotationMirror = annotationMirror;
+		}
+
+		public <T> Optional<T> attribute(String name, Class<T> klass) {
+			return annotationMirror.getElementValues().entrySet().stream()
+					.filter( entry -> entry.getKey().getSimpleName().contentEquals( name ) )
+					.map( entry -> klass.cast( entry.getValue().getValue() ) )
+					.findAny();
+		}
 	}
 
 }
