@@ -926,6 +926,11 @@
                 <artifactId>hibernate-search-documentation</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-configuration-properties-collector</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.hibernate</groupId>
