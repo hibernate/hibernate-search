@@ -92,10 +92,6 @@ public abstract class AbstractMultiIndexSearchIndexCompositeNodeContext<
 			return staticChildrenByName;
 		}
 
-		// TODO HSEARCH-4050 remove this unnecessary restriction?
-		fromNodeIfCompatible( field -> field.staticChildrenByName().keySet(),
-				Object::equals, "staticChildren" );
-
 		Map<String, F> result = new TreeMap<>();
 		Function<String, F> createChildFieldContext = this::childInScope;
 		for ( S nodeForIndex : nodeForEachIndex ) {
