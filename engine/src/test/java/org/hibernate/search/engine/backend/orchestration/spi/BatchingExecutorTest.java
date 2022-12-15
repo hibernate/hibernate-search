@@ -11,6 +11,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -387,6 +389,7 @@ public class BatchingExecutorTest {
 		StubWork work1Mock = workMock( 1 );
 		StubWork work2Mock = workMock( 2 );
 		StubWork work3Mock = workMock( 3 );
+		StubWork work4Mock = workMock( 4 );
 
 		executor.submit( work1Mock, operationSubmitter );
 		executor.submit( work2Mock, operationSubmitter );
@@ -409,6 +412,14 @@ public class BatchingExecutorTest {
 
 		when( processorMock.endBatch() ).thenReturn( CompletableFuture.completedFuture( null ) );
 
+		doAnswer(
+				invocation -> {
+					// this would call ensureScheduled() which will reset the needsRun = true;
+					// doing so should ensure that needsRun remains true when `afterRun()` is called.
+					executor.submit( work4Mock, operationSubmitter );
+					return null;
+				} ).when( work2Mock ).submitTo( any( StubWorkProcessor.class ) );
+
 		unblockExecutorSwitch.run();
 
 		verifyAsynchronouslyAndReset( inOrder -> {
@@ -418,6 +429,7 @@ public class BatchingExecutorTest {
 			inOrder.verify( processorMock ).endBatch();
 			inOrder.verify( processorMock ).beginBatch();
 			inOrder.verify( work3Mock ).submitTo( processorMock );
+			inOrder.verify( work4Mock ).submitTo( processorMock );
 			inOrder.verify( processorMock ).endBatch();
 			inOrder.verify( processorMock ).complete();
 		} );
