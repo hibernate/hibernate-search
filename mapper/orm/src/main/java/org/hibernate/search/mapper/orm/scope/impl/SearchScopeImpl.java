@@ -29,6 +29,7 @@ import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.schema.management.impl.SearchSchemaManagerImpl;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
+import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.work.impl.SearchWorkspaceImpl;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
@@ -38,11 +39,13 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	private final HibernateOrmScopeMappingContext mappingContext;
+	private final TenancyConfiguration tenancyConfiguration;
 	private final PojoScopeDelegate<EntityReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate;
 
 	public SearchScopeImpl(HibernateOrmScopeMappingContext mappingContext,
-			PojoScopeDelegate<EntityReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate) {
+			TenancyConfiguration tenancyConfiguration, PojoScopeDelegate<EntityReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate) {
 		this.mappingContext = mappingContext;
+		this.tenancyConfiguration = tenancyConfiguration;
 		this.delegate = delegate;
 	}
 
@@ -103,12 +106,27 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	@Override
 	public MassIndexer massIndexer(Collection<String> tenantIds) {
-		return massIndexer( tenantIds.isEmpty() ?
-				Collections.singletonList( DetachedBackendSessionContext.of( mappingContext, null ) ) :
-				tenantIds.stream()
+		List<DetachedBackendSessionContext> contexts;
+		if ( tenantIds.isEmpty() ) {
+			// Let's see if we are in multi-tenant environment and try to get the tenant ids
+			Set<String> configuredTenants = tenancyConfiguration.tenantIdsOrFail();
+			if ( configuredTenants.isEmpty() ) {
+				// if we didn't fail with exception - single tenant is used so just create an empty session:
+				contexts = Collections.singletonList( DetachedBackendSessionContext.of( mappingContext, null ) );
+			}
+			else {
+				contexts = configuredTenants.stream()
 						.map( id -> DetachedBackendSessionContext.of( mappingContext, id ) )
-						.collect( Collectors.toList() )
-		);
+						.collect( Collectors.toList() );
+			}
+		}
+		else {
+			contexts = tenantIds.stream()
+					.map( id -> DetachedBackendSessionContext.of( mappingContext, id ) )
+					.collect( Collectors.toList() );
+		}
+
+		return massIndexer( contexts );
 	}
 
 	public MassIndexer massIndexer(List<DetachedBackendSessionContext> detachedSessionContexts) {
