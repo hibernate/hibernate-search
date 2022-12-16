@@ -9,6 +9,8 @@ package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import javax.persistence.Entity;
@@ -116,6 +118,12 @@ public class MassIndexingBaseIT {
 
 	private String targetTenantId() {
 		return TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ? TENANT_1_ID : null;
+	}
+
+	private Collection<String> allTenantIds() {
+		return TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ?
+				Arrays.asList( TENANT_1_ID, TENANT_2_ID ) :
+				Collections.emptyList();
 	}
 
 	@Test
@@ -254,15 +262,15 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void fromMappingWithoutSession() throws Exception {
+	public void fromMappingWithoutSessionWithSpecificTenant() throws Exception {
 		SearchMapping searchMapping = Search.mapping( setupHolder.sessionFactory() );
 		MassIndexer indexer = searchMapping.scope( Object.class ).massIndexer( targetTenantId() );
 
 		// add operations on indexes can follow any random order,
 		// since they are executed by different threads
 		backendMock.expectWorks(
-				Book.INDEX, targetTenantId(), DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
-		)
+						Book.INDEX, targetTenantId(), DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+				)
 				.add( "1", b -> b
 						.field( "title", TITLE_1 )
 						.field( "author", AUTHOR_1 )
@@ -280,6 +288,75 @@ public class MassIndexingBaseIT {
 		// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
 		backendMock.expectIndexScaleWorks( Book.INDEX, targetTenantId() )
 				.purge()
+				.mergeSegments()
+				.flush()
+				.refresh();
+
+		try {
+			indexer.startAndWait();
+		}
+		catch (InterruptedException e) {
+			fail( "Unexpected InterruptedException: " + e.getMessage() );
+		}
+
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void fromMappingWithoutSessionWithAllTenants() throws Exception {
+		SearchMapping searchMapping = Search.mapping( setupHolder.sessionFactory() );
+		MassIndexer indexer = searchMapping.scope( Object.class ).massIndexer( allTenantIds() );
+
+		// add operations on indexes can follow any random order,
+		// since they are executed by different threads
+		backendMock.expectWorks(
+						Book.INDEX, targetTenantId(), DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+				)
+				.add( "1", b -> b
+						.field( "title", TITLE_1 )
+						.field( "author", AUTHOR_1 )
+				)
+				.add( "2", b -> b
+						.field( "title", TITLE_2 )
+						.field( "author", AUTHOR_2 )
+				)
+				.add( "3", b -> b
+						.field( "title", TITLE_3 )
+						.field( "author", AUTHOR_3 )
+				);
+		if ( TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ) {
+			backendMock.expectWorks(
+							Book.INDEX, TENANT_2_ID, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+					)
+					.add( "1", b -> b
+							.field( "title", TITLE_1 )
+							.field( "author", AUTHOR_1 )
+					)
+					.add( "2", b -> b
+							.field( "title", TITLE_2 )
+							.field( "author", AUTHOR_2 )
+					)
+					.add( "3", b -> b
+							.field( "title", TITLE_3 )
+							.field( "author", AUTHOR_3 )
+					)
+					.add( "4", b -> b
+							.field( "title", TITLE_4 )
+							.field( "author", AUTHOR_4 )
+					);
+		}
+
+		// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
+		// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
+		// But if we are in multi-tenant case then we expect that purge will be called for all tenants first,
+		// while other work like merge or flush/refresh will be called just once for the first tenant in the list:
+		backendMock.expectIndexScaleWorks( Book.INDEX, targetTenantId() )
+				.purge();
+		if ( TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ) {
+			backendMock.expectIndexScaleWorks( Book.INDEX, TENANT_2_ID )
+					.purge();
+		}
+		backendMock.expectIndexScaleWorks( Book.INDEX, targetTenantId() )
 				.mergeSegments()
 				.flush()
 				.refresh();
