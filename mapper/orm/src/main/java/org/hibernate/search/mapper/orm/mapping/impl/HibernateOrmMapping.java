@@ -131,6 +131,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	private final SchemaManagementListener schemaManagementListener;
 
+	private TenancyConfiguration tenancyConfiguration;
+
 	private SearchIntegration.Handle integrationHandle;
 
 	private volatile boolean listenerEnabled = true;
@@ -175,10 +177,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		}
 		SearchScopeImpl<Object> scope = scopeOptional.get();
 
-		TenancyConfiguration tenancyConfiguration =
+		this.tenancyConfiguration =
 				TenancyConfiguration.create( delegate().tenancyMode(), context.configurationPropertySource() );
-		// TODO HSEARCH-4321 use the tenancy configuration to have a default list of tenant IDs
-		//  to target when creating the mass indexer from the mapping (not from a session)
 
 		// Schema management
 		PojoScopeSchemaManager schemaManager = scope.schemaManagerDelegate();
@@ -419,7 +419,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 						this,
 						typeContextContainer::indexedForExactType
 				)
-				.map( scopeDelegate -> new SearchScopeImpl<>( this, scopeDelegate ) );
+				.map( scopeDelegate -> new SearchScopeImpl<>( this, tenancyConfiguration, scopeDelegate ) );
 	}
 
 	private <T> SearchScopeImpl<T> doCreateScope(Collection<PojoRawTypeIdentifier<? extends T>> typeIdentifiers) {
@@ -431,6 +431,6 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 				);
 
 		// Explicit type parameter is necessary here for ECJ (Eclipse compiler)
-		return new SearchScopeImpl<T>( this, scopeDelegate );
+		return new SearchScopeImpl<T>( this, tenancyConfiguration, scopeDelegate );
 	}
 }

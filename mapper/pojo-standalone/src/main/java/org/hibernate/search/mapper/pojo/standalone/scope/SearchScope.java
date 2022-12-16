@@ -165,7 +165,7 @@ public interface SearchScope<E> {
 	 * Create a {@link MassIndexer} for the indexes mapped to types in this scope, or to any of their sub-types.
 	 * <p>
 	 * This method works for both single- and multi-tenant applications.
-	 * If multi-tenancy is disabled, simply keep the list of tenants empty.
+	 * If multi-tenancy is disabled, simply keep the collection of tenants empty.
 	 * <p>
 	 * {@link MassIndexer} instances cannot be reused.
 	 *
