@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.session.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
 import java.util.Collection;
 import javax.persistence.EntityManager;
 import javax.transaction.Synchronization;
@@ -154,7 +155,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
-		return scope( types ).massIndexer( DetachedBackendSessionContext.of( this ) );
+		return scope( types ).massIndexer( Arrays.asList( DetachedBackendSessionContext.of( this ) ) );
 	}
 
 	@Override

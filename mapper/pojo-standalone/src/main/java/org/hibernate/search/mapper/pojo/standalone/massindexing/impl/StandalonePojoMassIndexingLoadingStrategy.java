@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.massindexing.impl;
 
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassIdentifierSink;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingOptions;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassEntitySink;
@@ -30,17 +29,15 @@ public class StandalonePojoMassIndexingLoadingStrategy<E, I>
 	private final StandalonePojoMassIndexingMappingContext mappingContext;
 	private final LoadingTypeContextProvider typeContextProvider;
 	private final MassLoadingStrategy<E, I> delegate;
-	private final DetachedBackendSessionContext sessionContext;
 	private final MassLoadingOptions options;
 
 	public StandalonePojoMassIndexingLoadingStrategy(StandalonePojoMassIndexingMappingContext mappingContext,
 			LoadingTypeContextProvider typeContextProvider,
-			MassLoadingStrategy<E, I> delegate, DetachedBackendSessionContext sessionContext,
+			MassLoadingStrategy<E, I> delegate,
 			MassLoadingOptions options) {
 		this.mappingContext = mappingContext;
 		this.typeContextProvider = typeContextProvider;
 		this.delegate = delegate;
-		this.sessionContext = sessionContext;
 		this.options = options;
 	}
 
@@ -71,7 +68,7 @@ public class StandalonePojoMassIndexingLoadingStrategy<E, I>
 
 	@Override
 	public PojoMassEntityLoader<I> createEntityLoader(PojoMassIndexingEntityLoadingContext<E> context) {
-		StandalonePojoMassIndexingSessionContext session = mappingContext.createSession( sessionContext );
+		StandalonePojoMassIndexingSessionContext session = mappingContext.createSession( context.tenantIdentifier() );
 		try {
 			StandalonePojoLoadingTypeGroup<E> includedTypes = new StandalonePojoLoadingTypeGroup<>(
 					typeContextProvider, context.includedTypes(), mappingContext.runtimeIntrospector() );

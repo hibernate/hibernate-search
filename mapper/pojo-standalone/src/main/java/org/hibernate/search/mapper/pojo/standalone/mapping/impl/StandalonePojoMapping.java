@@ -18,7 +18,6 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
@@ -201,8 +200,8 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 	}
 
 	@Override
-	public StandalonePojoLoadingContext.Builder loadingContextBuilder(DetachedBackendSessionContext sessionContext) {
-		return new StandalonePojoLoadingContext.Builder( this, typeContextContainer, sessionContext );
+	public StandalonePojoLoadingContext.Builder loadingContextBuilder() {
+		return new StandalonePojoLoadingContext.Builder( this, typeContextContainer );
 	}
 
 	@Override
@@ -212,8 +211,8 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 	}
 
 	@Override
-	public StandalonePojoMassIndexingSessionContext createSession(DetachedBackendSessionContext sessionContext) {
-		return createSessionBuilder().tenantId( sessionContext.tenantIdentifier() ).build();
+	public StandalonePojoMassIndexingSessionContext createSession(String tenantIdentifier) {
+		return createSessionBuilder().tenantId( tenantIdentifier ).build();
 	}
 
 	private SearchIntegration searchIntegration() {

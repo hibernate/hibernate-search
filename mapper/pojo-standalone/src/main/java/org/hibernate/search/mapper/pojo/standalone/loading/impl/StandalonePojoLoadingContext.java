@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingOptions;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingOptions;
@@ -39,7 +38,6 @@ public final class StandalonePojoLoadingContext
 
 	private final StandalonePojoMassIndexingMappingContext mappingContext;
 	private final LoadingTypeContextProvider typeContextProvider;
-	private final DetachedBackendSessionContext sessionContext;
 
 	private int batchSize = 10;
 	private final Map<Class<?>, Object> contextData;
@@ -47,13 +45,7 @@ public final class StandalonePojoLoadingContext
 	private StandalonePojoLoadingContext(Builder builder) {
 		this.mappingContext = builder.mappingContext;
 		this.typeContextProvider = builder.typeContextProvider;
-		this.sessionContext = builder.sessionContext;
 		this.contextData = builder.contextData;
-	}
-
-	@Override
-	public String tenantIdentifier() {
-		return sessionContext.tenantIdentifier();
 	}
 
 	public void batchSize(int batchSize) {
@@ -113,20 +105,18 @@ public final class StandalonePojoLoadingContext
 			throw log.entityLoadingStrategyNotRegistered( typeContext.typeIdentifier() );
 		}
 		return new StandalonePojoMassIndexingLoadingStrategy<>( mappingContext, typeContextProvider,
-				strategyOptional.get(), sessionContext, this );
+				strategyOptional.get(), this );
 	}
 
 	public static final class Builder implements StandalonePojoSelectionLoadingContextBuilder, SelectionLoadingOptionsStep {
 		private final StandalonePojoMassIndexingMappingContext mappingContext;
 		private final LoadingTypeContextProvider typeContextProvider;
-		private final DetachedBackendSessionContext sessionContext;
 		private final Map<Class<?>, Object> contextData = new HashMap<>();
 
 		public Builder(StandalonePojoMassIndexingMappingContext mappingContext,
-				LoadingTypeContextProvider typeContextProvider, DetachedBackendSessionContext sessionContext) {
+				LoadingTypeContextProvider typeContextProvider) {
 			this.mappingContext = mappingContext;
 			this.typeContextProvider = typeContextProvider;
-			this.sessionContext = sessionContext;
 		}
 
 		@Override

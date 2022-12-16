@@ -6,7 +6,11 @@
  */
 package org.hibernate.search.mapper.orm.scope.impl;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
@@ -18,9 +22,9 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmSelectionLoadingContext;
-import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingContext;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexer;
+import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingContext;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.schema.management.impl.SearchSchemaManagerImpl;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
@@ -89,20 +93,30 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	@Override
 	public MassIndexer massIndexer() {
-		return massIndexer( (String) null );
+		return massIndexer( Collections.<String>emptyList() );
 	}
 
 	@Override
 	public MassIndexer massIndexer(String tenantId) {
-		return massIndexer( DetachedBackendSessionContext.of( mappingContext, tenantId ) );
+		return massIndexer( Collections.singletonList( tenantId ) );
 	}
 
-	public MassIndexer massIndexer(DetachedBackendSessionContext detachedSessionContext) {
+	@Override
+	public MassIndexer massIndexer(Collection<String> tenantIds) {
+		return massIndexer( tenantIds.isEmpty() ?
+				Collections.singletonList( DetachedBackendSessionContext.of( mappingContext, null ) ) :
+				tenantIds.stream()
+						.map( id -> DetachedBackendSessionContext.of( mappingContext, id ) )
+						.collect( Collectors.toList() )
+		);
+	}
+
+	public MassIndexer massIndexer(List<DetachedBackendSessionContext> detachedSessionContexts) {
 		HibernateOrmMassIndexingContext massIndexingContext = new HibernateOrmMassIndexingContext( mappingContext,
-						mappingContext.typeContextProvider(), detachedSessionContext );
+						mappingContext.typeContextProvider() );
 
 		PojoMassIndexer massIndexerDelegate = delegate
-				.massIndexer( massIndexingContext, detachedSessionContext );
+				.massIndexer( massIndexingContext, detachedSessionContexts );
 
 		return new HibernateOrmMassIndexer( massIndexerDelegate, massIndexingContext );
 	}

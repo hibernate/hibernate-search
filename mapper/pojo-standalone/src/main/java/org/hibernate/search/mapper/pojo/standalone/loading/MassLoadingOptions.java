@@ -15,11 +15,6 @@ import org.hibernate.search.util.common.annotation.Incubating;
 public interface MassLoadingOptions {
 
 	/**
-	 * @return The tenant identifier, or {@code null} for single-tenancy.
-	 */
-	String tenantIdentifier();
-
-	/**
 	 * @return How many entities to load and index in each batch.
 	 * Defines the maximum expected size of each list of IDs
 	 * loaded by {@link MassIdentifierLoader#loadNext()}

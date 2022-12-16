@@ -29,4 +29,9 @@ public interface PojoMassIndexingEntityLoadingContext<E> {
 	 */
 	PojoMassEntitySink<E> createSink(PojoMassIndexingSessionContext sessionContext);
 
+	/**
+	 * @return The tenant identifier to use ({@code null} if none).
+	 */
+	String tenantIdentifier();
+
 }

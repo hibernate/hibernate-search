@@ -13,11 +13,6 @@ import org.hibernate.search.util.common.annotation.Incubating;
 public interface SelectionLoadingOptions {
 
 	/**
-	 * @return The tenant identifier, or {@code null} for single-tenancy.
-	 */
-	String tenantIdentifier();
-
-	/**
 	 * Gets context previously passed to
 	 * {@link SelectionLoadingOptionsStep#context(Class, Object)}.
 	 *

@@ -41,17 +41,19 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 	private final PojoMassIndexingLoadingStrategy<E, I> loadingStrategy;
 
 	private final int entityExtractingThreads;
+	private final String tenantId;
 
 	PojoMassIndexingBatchIndexingWorkspace(PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
 			PojoMassIndexingIndexedTypeGroup<E> typeGroup,
 			PojoMassIndexingLoadingStrategy<E, I> loadingStrategy,
-			int entityExtractingThreads) {
+			int entityExtractingThreads, String tenantId) {
 		super( notifier );
 		this.mappingContext = mappingContext;
 		this.typeGroup = typeGroup;
 		this.loadingStrategy = loadingStrategy;
 		this.entityExtractingThreads = entityExtractingThreads;
+		this.tenantId = tenantId;
 	}
 
 	@Override
@@ -95,7 +97,8 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 
 	private void startProducingPrimaryKeys(PojoProducerConsumerQueue<List<I>> identifierQueue) {
 		final Runnable runnable = new PojoMassIndexingEntityIdentifierLoadingRunnable<>( getNotifier(), typeGroup,
-				loadingStrategy, identifierQueue );
+				loadingStrategy, identifierQueue, tenantId
+		);
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor identifierProducingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
 				1,
@@ -111,7 +114,8 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 
 	private void startIndexing(PojoProducerConsumerQueue<List<I>> identifierQueue) {
 		final Runnable runnable = new PojoMassIndexingEntityLoadingRunnable<>( getNotifier(), typeGroup,
-				loadingStrategy, identifierQueue );
+				loadingStrategy, identifierQueue, tenantId
+		);
 		final ThreadPoolExecutor indexingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
 				entityExtractingThreads,
 				THREAD_NAME_PREFIX + typeGroup.notifiedGroupName() + " - Entity loading"
