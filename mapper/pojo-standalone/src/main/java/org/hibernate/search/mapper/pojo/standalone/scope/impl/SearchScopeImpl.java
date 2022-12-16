@@ -6,7 +6,11 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.scope.impl;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
@@ -100,17 +104,27 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	@Override
 	public MassIndexer massIndexer() {
-		return massIndexer( (String) null );
+		return massIndexer( Collections.<String>emptyList() );
 	}
 
 	@Override
 	public MassIndexer massIndexer(String tenantId) {
-		return massIndexer( DetachedBackendSessionContext.of( mappingContext, tenantId ) );
+		return massIndexer( Collections.singletonList( tenantId ) );
 	}
 
-	public MassIndexer massIndexer(DetachedBackendSessionContext sessionContext) {
-		StandalonePojoLoadingContext context = mappingContext.loadingContextBuilder( sessionContext ).build();
-		PojoMassIndexer massIndexerDelegate = delegate.massIndexer( context, sessionContext );
+	@Override
+	public MassIndexer massIndexer(Collection<String> tenantIds) {
+		return massIndexer( tenantIds.isEmpty() ?
+				Collections.singletonList( DetachedBackendSessionContext.of( mappingContext, null ) ) :
+				tenantIds.stream()
+						.map( id -> DetachedBackendSessionContext.of( mappingContext, id ) )
+						.collect( Collectors.toList() )
+		);
+	}
+
+	public MassIndexer massIndexer(List<DetachedBackendSessionContext> detachedSessionContexts) {
+		StandalonePojoLoadingContext context = mappingContext.loadingContextBuilder().build();
+		PojoMassIndexer massIndexerDelegate = delegate.massIndexer( context, detachedSessionContexts );
 		return new StandalonePojoMassIndexer( massIndexerDelegate, context );
 	}
 

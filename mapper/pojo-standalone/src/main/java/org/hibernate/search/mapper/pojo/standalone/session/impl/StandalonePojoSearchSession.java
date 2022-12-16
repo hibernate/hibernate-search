@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.standalone.session.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -98,7 +99,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	@Override
 	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
 		checkOpenAndThrow();
-		return scope( types ).massIndexer( DetachedBackendSessionContext.of( this ) );
+		return scope( types ).massIndexer( Arrays.asList( DetachedBackendSessionContext.of( this ) ) );
 	}
 
 	@Override
@@ -189,7 +190,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	}
 
 	private StandalonePojoSelectionLoadingContextBuilder loadingContextBuilder() {
-		StandalonePojoLoadingContext.Builder builder = mappingContext.loadingContextBuilder( DetachedBackendSessionContext.of( this ) );
+		StandalonePojoLoadingContext.Builder builder = mappingContext.loadingContextBuilder();
 		if ( loadingOptionsContributor != null ) {
 			loadingOptionsContributor.accept( builder );
 		}

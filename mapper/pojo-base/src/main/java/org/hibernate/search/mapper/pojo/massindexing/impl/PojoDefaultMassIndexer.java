@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -16,12 +17,11 @@ import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionCon
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
-
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
-import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -41,8 +41,8 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 	private final PojoMassIndexingTypeContextProvider typeContextProvider;
 	private final Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes;
 	private final PojoScopeSchemaManager scopeSchemaManager;
-	private final DetachedBackendSessionContext detachedSession;
-	private final PojoScopeWorkspace scopeWorkspace;
+	private final Collection<DetachedBackendSessionContext> detachedSessions;
+	private final PojoScopeDelegate<?, ?, ?> pojoScopeDelegate;
 
 	// default settings defined here:
 	private int typesToIndexInParallel = 1;
@@ -60,15 +60,15 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 			PojoMassIndexingTypeContextProvider typeContextProvider,
 			Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
 			PojoScopeSchemaManager scopeSchemaManager,
-			DetachedBackendSessionContext detachedSession,
-			PojoScopeWorkspace scopeWorkspace) {
+			Collection<DetachedBackendSessionContext> detachedSessions,
+			PojoScopeDelegate<?, ?, ?> pojoScopeDelegate) {
 		this.indexingContext = indexingContext;
 		this.mappingContext = mappingContext;
 		this.typeContextProvider = typeContextProvider;
 		this.targetedIndexedTypes = targetedIndexedTypes;
 		this.scopeSchemaManager = scopeSchemaManager;
-		this.detachedSession = detachedSession;
-		this.scopeWorkspace = scopeWorkspace;
+		this.detachedSessions = detachedSessions;
+		this.pojoScopeDelegate = pojoScopeDelegate;
 	}
 
 	@Override
@@ -169,7 +169,8 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 		return new PojoMassIndexingBatchCoordinator(
 				mappingContext,
 				notifier,
-				typeGroupsToIndex, scopeSchemaManager, detachedSession, scopeWorkspace,
+				typeGroupsToIndex, scopeSchemaManager,
+				detachedSessions, pojoScopeDelegate,
 				typesToIndexInParallel, documentBuilderThreads,
 				mergeSegmentsOnFinish,
 				// false by default:

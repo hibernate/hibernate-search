@@ -27,15 +27,17 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 	private final PojoMassIndexingIndexedTypeGroup<E> typeGroup;
 	private final PojoMassIndexingLoadingStrategy<E, I> loadingStrategy;
 	private final PojoProducerConsumerQueue<List<I>> identifierQueue;
+	private final String tenantId;
 
 	public PojoMassIndexingEntityIdentifierLoadingRunnable(PojoMassIndexingNotifier notifier,
 			PojoMassIndexingIndexedTypeGroup<E> typeGroup,
 			PojoMassIndexingLoadingStrategy<E, I> loadingStrategy,
-			PojoProducerConsumerQueue<List<I>> identifierQueue) {
+			PojoProducerConsumerQueue<List<I>> identifierQueue, String tenantId) {
 		super( notifier );
 		this.loadingStrategy = loadingStrategy;
 		this.typeGroup = typeGroup;
 		this.identifierQueue = identifierQueue;
+		this.tenantId = tenantId;
 	}
 
 	@Override
@@ -96,6 +98,11 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 					done = true;
 				}
 			};
+		}
+
+		@Override
+		public String tenantIdentifier() {
+			return tenantId;
 		}
 	}
 }

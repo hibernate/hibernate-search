@@ -18,7 +18,6 @@ import org.hibernate.FlushMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityLoadingStrategy;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassEntityLoader;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassIdentifierLoader;
@@ -41,8 +40,6 @@ public final class HibernateOrmMassIndexingContext
 		implements PojoMassIndexingContext, HibernateOrmMassLoadingOptions {
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
-	private final DetachedBackendSessionContext sessionContext;
-
 	private final Map<Class<?>, ConditionalExpression> conditionalExpressions = new HashMap<>();
 	private CacheMode cacheMode = CacheMode.IGNORE;
 	private Integer idLoadingTransactionTimeout;
@@ -51,11 +48,9 @@ public final class HibernateOrmMassIndexingContext
 	private long objectsLimit = 0; //means no limit at all
 
 	public HibernateOrmMassIndexingContext(HibernateOrmMassIndexingMappingContext mappingContext,
-			HibernateOrmSessionTypeContextProvider typeContextContainer,
-			DetachedBackendSessionContext sessionContext) {
+			HibernateOrmSessionTypeContextProvider typeContextContainer) {
 		this.mappingContext = mappingContext;
 		this.typeContextProvider = typeContextContainer;
-		this.sessionContext = sessionContext;
 	}
 
 	@Override
@@ -179,7 +174,7 @@ public final class HibernateOrmMassIndexingContext
 					typeContexts, conditionalExpression );
 			SharedSessionContractImplementor session = (SharedSessionContractImplementor) sessionFactory
 					.withStatelessOptions()
-					.tenantIdentifier( sessionContext.tenantIdentifier() )
+					.tenantIdentifier( context.tenantIdentifier() )
 					.openStatelessSession();
 			try {
 				PojoMassIdentifierSink<I> sink = context.createSink();
@@ -203,7 +198,7 @@ public final class HibernateOrmMassIndexingContext
 					typeContexts, conditionalExpression );
 			SessionImplementor session = (SessionImplementor) sessionFactory
 					.withOptions()
-					.tenantIdentifier( sessionContext.tenantIdentifier() )
+					.tenantIdentifier( context.tenantIdentifier() )
 					.openSession();
 			try {
 				session.setHibernateFlushMode( FlushMode.MANUAL );
