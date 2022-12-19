@@ -10,7 +10,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
@@ -361,7 +360,7 @@ public interface Log extends BasicLogger {
 	SearchException cannotUseDefaultExtractorsInMultiExtractorChain();
 
 	@Message(id = ID_OFFSET + 43, value = "Exception creating URL from String '%1$s'.")
-	SearchException malformedURL(String value, @Cause MalformedURLException e);
+	SearchException malformedURL(String value, @Cause Exception e);
 
 	@Message(id = ID_OFFSET + 44, value = "Exception creating URI from String '%1$s'.")
 	SearchException badURISyntax(String value, @Cause URISyntaxException e);

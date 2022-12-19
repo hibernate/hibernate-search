@@ -9,6 +9,8 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 import static org.junit.Assert.fail;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
@@ -38,10 +40,16 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 				"https://access.redhat.com/products/red-hat-fuse/",
 				"https://access.redhat.com/products/red-hat-openshift-container-platform/",
 				// No normalization is expected
-				"https://www.google.com/./foo/bar/../bar"
+				"https://www.google.com/./foo/bar/../bar",
+				// url with escaped characters:
+				"https://www.google.com/search?q=text+with+some+escapes+in+it+%2B+%21+%23+%D1%84%D0%BE%D1%82%D0%B0%D0%BF%D1%88%D1%89%D0%B3%D0%B9%D0%BA%D0%B0"
 		} ) {
 			builder.add( url( string ), string );
 		}
+
+		String url = "https://github.com/hibernate/hibernate-search/search?q=hibernate+%2B*%2F%21";
+		builder.add( urlAsNewUrl( url ), url );
+
 		return builder.build();
 	}
 
@@ -140,7 +148,21 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 
 	private static URL url(String spec) {
 		try {
-			return new URL( spec );
+			return new URI( spec ).toURL();
+		}
+		catch (URISyntaxException | MalformedURLException e) {
+			fail( "Wrong test URL: " + e.getMessage() );
+			return null;
+		}
+	}
+
+	// TODO: HSEARCH-4765 To be removed when URL constructor is removed (JDK 20+). We keep it for now as users might still be using
+	// this constructor and we want to test such scenario
+	private static URL urlAsNewUrl(String spec) {
+		try {
+			@SuppressWarnings( "deprecation" )
+			URL url = new URL( spec );
+			return url;
 		}
 		catch (MalformedURLException e) {
 			fail( "Wrong test URL: " + e.getMessage() );

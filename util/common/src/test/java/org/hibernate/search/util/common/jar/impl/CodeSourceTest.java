@@ -13,6 +13,7 @@ import static org.hibernate.search.util.impl.test.jar.JarTestUtils.toJar;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
@@ -120,8 +121,8 @@ public class CodeSourceTest {
 			addSimpleClass( root );
 		} );
 
-		URL fileURL = jarPath.toUri().toURL();
-		URL jarURL = new URL( "jar:" + fileURL.toExternalForm() + "!/" );
+		URI fileURL = jarPath.toUri();
+		URL jarURL = new URI( "jar:" + fileURL + "!/" ).toURL();
 		try ( URLClassLoader isolatedClassLoader = createIsolatedClassLoader( jarURL ) ) {
 			Class<?> classInIsolatedClassLoader = isolatedClassLoader.loadClass( SimpleClass.class.getName() );
 
@@ -164,6 +165,10 @@ public class CodeSourceTest {
 		} );
 
 		try ( JarFile outerJar = new JarFile( jarPath.toFile() ) ) {
+			@SuppressWarnings( "deprecation" ) // For JDK 20+
+			// TODO: HSEARCH-4765 To be replaced with URL#of(URI, URLStreamHandler) when switching to JDK 20+
+			// see https://download.java.net/java/early_access/jdk20/docs/api/java.base/java/net/URL.html#of(java.net.URI,java.net.URLStreamHandler) for deprecation info
+			// cannot simply change to URI as boot specific Handler is required to make things work.
 			URL innerJarURL = new URL( outerJar.getUrl(), classesDirRelativeString + "!/" );
 			try ( URLClassLoader isolatedClassLoader = createIsolatedClassLoader( innerJarURL ) ) {
 				Class<?> classInIsolatedClassLoader = isolatedClassLoader.loadClass( SimpleClass.class.getName() );
@@ -262,8 +267,8 @@ public class CodeSourceTest {
 				parentDirWithSpecialChar.resolve( "namewith%40special@char.jar" )
 		);
 
-		URL fileURL = jarPath.toUri().toURL();
-		URL jarURL = new URL( "jar:" + fileURL.toExternalForm() + "!/" );
+		URI fileURL = jarPath.toUri();
+		URL jarURL = new URI( "jar:" + fileURL + "!/" ).toURL();
 		try ( URLClassLoader isolatedClassLoader = createIsolatedClassLoader( jarURL ) ) {
 			Class<?> classInIsolatedClassLoader = isolatedClassLoader.loadClass( SimpleClass.class.getName() );
 
