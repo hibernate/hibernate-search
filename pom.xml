@@ -303,7 +303,7 @@
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
 
         <version.org.hamcrest>2.2</version.org.hamcrest>
-        <version.org.mockito>4.9.0</version.org.mockito>
+        <version.org.mockito>4.10.0</version.org.mockito>
         <version.org.assertj.assertj-core>3.23.1</version.org.assertj.assertj-core>
         <version.org.awaitily>4.2.0</version.org.awaitily>
         <version.org.skyscreamer.jsonassert>1.5.1</version.org.skyscreamer.jsonassert>
