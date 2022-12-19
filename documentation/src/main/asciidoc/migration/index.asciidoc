@@ -392,3 +392,7 @@ used to match no documents with the Lucene backend, but all documents with the E
 A boolean predicate with no clause will now consistently match no documents regardless of the backend.
 * API methods matching `*Async(..)` pattern (e.g. `SearchWorkspace#purgeAsync()`) will no longer block
 if internal queues of operations are full, but will throw `RejectedOperationException` instead.
+
+Due to switching from `new URL(..)` to `new URI(..)` in the Hibernate Search internals indexing
+behaviour of `URL` properties might change. In particular malformed URLs won't be accepted anymore and would result in
+a runtime exception.

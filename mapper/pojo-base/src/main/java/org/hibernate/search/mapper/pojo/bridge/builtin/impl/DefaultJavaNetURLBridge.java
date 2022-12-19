@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -24,15 +26,20 @@ public final class DefaultJavaNetURLBridge extends AbstractStringBasedDefaultBri
 
 	@Override
 	protected String toString(URL value) {
-		return value.toExternalForm();
+		try {
+			return value.toURI().toString();
+		}
+		catch (URISyntaxException e) {
+			throw log.badURISyntax( value.toString(), e );
+		}
 	}
 
 	@Override
 	protected URL fromString(String value) {
 		try {
-			return new URL( value );
+			return new URI( value ).toURL();
 		}
-		catch (MalformedURLException e) {
+		catch (MalformedURLException | URISyntaxException e) {
 			throw log.malformedURL( value, e );
 		}
 	}

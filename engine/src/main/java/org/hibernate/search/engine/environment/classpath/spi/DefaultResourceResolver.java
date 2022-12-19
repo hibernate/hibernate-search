@@ -42,7 +42,10 @@ public final class DefaultResourceResolver implements ResourceResolver {
 
 		if ( stripped != null ) {
 			try {
-				return new URL( stripped ).openStream();
+				@SuppressWarnings("deprecation")
+				// TODO: HSEARCH-4765 address the URL -> URI constructor change once the URLClassLoader stops using the URL constructor
+				InputStream resourceStream = new URL( stripped ).openStream();
+				return resourceStream;
 			}
 			catch (Exception ignore) {
 				// Ignore
