@@ -69,7 +69,7 @@ public class IndexDescriptorIT {
 		assertThat( objectFieldDescriptorOptional ).isPresent();
 
 		Collection<IndexFieldDescriptor> staticFields = indexDescriptor.staticFields();
-		assertThat( staticFields ).containsExactlyInAnyOrder(
+		assertThat( staticFields ).contains(
 				valueFieldDescriptorOptional.get(),
 				objectFieldDescriptorOptional.get()
 		);

@@ -31,13 +31,19 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.I
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexCompositeNodeType;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.ImplicitFieldCollector;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.ImplicitFieldContributor;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.document.model.spi.IndexIdentifier;
+import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -48,7 +54,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 	private final ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider;
 	private final EventContext indexEventContext;
 	private final List<IndexSchemaRootContributor> schemaRootContributors = new ArrayList<>();
-
+	private final List<ImplicitFieldContributor> implicitFieldContributors = new ArrayList<>();
 	private final IndexNames indexNames;
 	private final String mappedTypeName;
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
@@ -75,6 +81,8 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 		this.customIndexSettings = customIndexSettings;
 		this.customIndexMapping = customIndexMapping;
 		this.defaultDynamicType = DynamicType.create( dynamicMapping );
+
+		this.addDefaultImplicitFields();
 	}
 
 	@Override
@@ -105,6 +113,10 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 
 	public void addSchemaRootContributor(IndexSchemaRootContributor schemaRootContributor) {
 		schemaRootContributors.add( schemaRootContributor );
+	}
+
+	public void addImplicitFieldContributor(ImplicitFieldContributor implicitFieldContributor) {
+		implicitFieldContributors.add( implicitFieldContributor );
 	}
 
 	public ElasticsearchIndexModel build() {
@@ -155,6 +167,33 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 		ElasticsearchIndexRoot rootNode = new ElasticsearchIndexRoot( typeBuilder.build(), staticChildrenByName );
 		contributeChildren( mapping, rootNode, collector, staticChildrenByName );
 
+		ImplicitFieldCollector implicitFieldCollector = new ImplicitFieldCollector() {
+
+			private ElasticsearchIndexFieldTypeFactory typeFactory = typeFactoryProvider.create(
+					indexEventContext,
+					new IndexFieldTypeDefaultsProvider()
+			);
+
+			@Override
+			public IndexFieldTypeFactory indexFieldTypeFactory() {
+				return typeFactory;
+			}
+
+			@Override
+			public <F> void addImplicitField(String fieldName, IndexFieldType<F> indexFieldType) {
+				ElasticsearchIndexValueFieldType<F> fieldType = (ElasticsearchIndexValueFieldType<F>) indexFieldType;
+
+				staticFields.put(
+						fieldName,
+						new ElasticsearchIndexValueField<>(
+								rootNode, fieldName, fieldType, IndexFieldInclusion.INCLUDED, false )
+				);
+			}
+		};
+		for ( ImplicitFieldContributor contributor : implicitFieldContributors ) {
+			contributor.contribute( implicitFieldCollector );
+		}
+
 		return new ElasticsearchIndexModel( indexNames, mappedTypeName, identifier,
 				rootNode, staticFields, fieldTemplates,
 				analysisDefinitionRegistry, customIndexSettings, mapping, customIndexMapping );
@@ -172,5 +211,10 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 
 	EventContext getIndexEventContext() {
 		return indexEventContext;
+	}
+
+	private void addDefaultImplicitFields() {
+		implicitFieldContributors.add( new ElasticsearchStringImplicitFieldContributor( "_id" ) );
+		implicitFieldContributors.add( new ElasticsearchStringImplicitFieldContributor( "_index" ) );
 	}
 }
