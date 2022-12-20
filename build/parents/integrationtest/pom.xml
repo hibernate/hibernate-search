@@ -639,7 +639,7 @@
                 <jdbc.driver.groupId>com.microsoft.sqlserver</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mssql-jdbc</jdbc.driver.artifactId>
                 <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
-                <jdbc.url>jdbc:sqlserver://localhost:1433;databaseName=tempdb</jdbc.url>
+                <jdbc.url>jdbc:sqlserver://localhost:1433;databaseName=tempdb;encrypt=false</jdbc.url>
                 <jdbc.user>sa</jdbc.user>
                 <jdbc.pass>ActuallyRequired11Complexity</jdbc.pass>
             </properties>
