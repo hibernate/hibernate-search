@@ -523,7 +523,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String ENTITY_MAPPING_OUTBOXEVENT_SCHEMA = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "schema";
 		public static final String ENTITY_MAPPING_OUTBOXEVENT_CATALOG = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "catalog";
 		public static final String ENTITY_MAPPING_OUTBOXEVENT_UUID_GEN_STRATEGY = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "uuid_gen_strategy";
-		public static final String ENTITY_MAPPING_OUTBOXEVENT_UUID_DATA_TYPE = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "preferred_uuid_jdbc_type";
+		public static final String ENTITY_MAPPING_OUTBOXEVENT_UUID_DATA_TYPE = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "uuid_jdbc_type";
 	}
 
 	/**
@@ -555,7 +555,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
 		public static final String COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE = HSEARCH_PREFIX + "OUTBOX_EVENT";
 		public static final UuidGenerationStrategy COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_GEN_STRATEGY = UuidGenerationStrategy.AUTO;
-		public static final UuidDataType COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_DATA_TYPE = UuidDataType.DEFAULT;
+		public static final String COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_DATA_TYPE = "default";
 	}
 
 	/**
