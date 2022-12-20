@@ -255,6 +255,8 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 		typeNameMapping.getIndexSchemaRootContributor()
 				.ifPresent( builder::addSchemaRootContributor );
+		typeNameMapping.getImplicitFieldContributor()
+				.ifPresent( builder::addImplicitFieldContributor );
 
 		multiTenancyStrategy.indexSchemaRootContributor()
 				.ifPresent( builder::addSchemaRootContributor );

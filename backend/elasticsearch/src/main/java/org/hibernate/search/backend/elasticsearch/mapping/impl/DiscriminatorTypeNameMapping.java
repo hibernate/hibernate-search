@@ -10,7 +10,9 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.ImplicitFieldContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
+import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchStringImplicitFieldContributor;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
@@ -49,6 +51,11 @@ public class DiscriminatorTypeNameMapping implements TypeNameMapping {
 	@Override
 	public Optional<DocumentMetadataContributor> getDocumentMetadataContributor(String mappedTypeName) {
 		return Optional.of( new TypeNameDiscriminatorContributor( mappedTypeName ) );
+	}
+
+	@Override
+	public Optional<ImplicitFieldContributor> getImplicitFieldContributor() {
+		return Optional.of( new ElasticsearchStringImplicitFieldContributor( MAPPED_TYPE_FIELD_NAME ) );
 	}
 
 	@Override
