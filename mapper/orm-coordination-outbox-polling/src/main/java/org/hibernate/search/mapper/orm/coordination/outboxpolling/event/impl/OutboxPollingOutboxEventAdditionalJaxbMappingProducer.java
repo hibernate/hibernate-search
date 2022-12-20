@@ -27,7 +27,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateSearchOrmMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.UuidDataType;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.UuidDataTypeUtils;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.UuidGenerationStrategy;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.spi.HibernateOrmMapperOutboxPollingSpiSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
@@ -82,7 +82,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			Locale.ROOT, ENTITY_DEFINITION_TEMPLATE, "", "",
 			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE,
 			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_GEN_STRATEGY,
-			UuidDataType.CHAR.externalRepresentation()
+			UuidDataTypeUtils.UUID_CHAR
 	);
 
 	private static final OptionalConfigurationProperty<String> OUTBOXEVENT_ENTITY_MAPPING =
@@ -119,7 +119,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			ConfigurationProperty.forKey(
 							HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_UUID_DATA_TYPE )
 					.asString()
-					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_DATA_TYPE.externalRepresentation() )
+					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_DATA_TYPE )
 					.build();
 
 	@Override
@@ -147,7 +147,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			);
 		}
 
-		String uuidDataType = UuidDataType.uuidType( ENTITY_MAPPING_OUTBOXEVENT_UUID_DATA_TYPE.get( propertySource ), dialect );
+		String uuidDataType = UuidDataTypeUtils.uuidType( ENTITY_MAPPING_OUTBOXEVENT_UUID_DATA_TYPE.get( propertySource ), dialect );
 
 		String entityDefinition = mapping.orElseGet( () ->
 				String.format(
