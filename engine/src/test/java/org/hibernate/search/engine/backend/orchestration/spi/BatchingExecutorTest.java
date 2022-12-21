@@ -11,6 +11,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -44,6 +46,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import org.awaitility.Awaitility;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
@@ -408,6 +411,15 @@ public class BatchingExecutorTest {
 		assertThat( future.isDone() ).isFalse();
 
 		when( processorMock.endBatch() ).thenReturn( CompletableFuture.completedFuture( null ) );
+		doAnswer( invocation -> {
+			// See https://hibernate.atlassian.net/browse/HSEARCH-4750
+			// Just make sure that we don't finish the batch until work3 has actually been submitted.
+			// If we don't do this, and the batch finishes before work3 has been submitted,
+			// then processorMock.complete() gets called and the call to verifyAsynchronouslyAndReset
+			// below fails. Since that can happen randomly, it's very inconvenient and leads to flaky tests.
+			Awaitility.await().until( future::isDone );
+			return null;
+		} ).when( work2Mock ).submitTo( any( StubWorkProcessor.class ) );
 
 		unblockExecutorSwitch.run();
 
