@@ -23,6 +23,7 @@ import org.hibernate.search.engine.search.predicate.dsl.MatchNonePredicateFinalS
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.NamedPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.NotPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldStep;
@@ -43,6 +44,7 @@ import org.hibernate.search.engine.search.predicate.dsl.impl.MatchNonePredicateF
 import org.hibernate.search.engine.search.predicate.dsl.impl.MatchPredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.NamedPredicateOptionsStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.NestedPredicateClausesStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.NotPredicateFinalStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.PhrasePredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.RangePredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.RegexpPredicateFieldStepImpl;
@@ -121,6 +123,16 @@ public abstract class AbstractSearchPredicateFactory<
 	public SimpleBooleanPredicateOptionsStep<?> or(PredicateFinalStep firstSearchPredicate,
 			PredicateFinalStep... otherSearchPredicate) {
 		return new SimpleBooleanPredicateClausesStepImpl( OR, dslContext, this, firstSearchPredicate, otherSearchPredicate );
+	}
+
+	@Override
+	public NotPredicateFinalStep not(SearchPredicate searchPredicate) {
+		return new NotPredicateFinalStepImpl( dslContext, searchPredicate );
+	}
+
+	@Override
+	public NotPredicateFinalStep not(PredicateFinalStep searchPredicate) {
+		return new NotPredicateFinalStepImpl( dslContext, searchPredicate );
 	}
 
 	@Override

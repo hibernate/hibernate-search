@@ -133,6 +133,26 @@ public interface SearchPredicateFactory {
 			PredicateFinalStep... otherSearchPredicates);
 
 	/**
+	 * Match documents that do not satisfy the passed in previously-built {@link SearchPredicate}.
+	 * <p>
+	 * Can be used to negate a predicate.
+	 *
+	 * @return The initial and final step of a DSL where the "not" predicate can be defined.
+	 * @see NotPredicateFinalStep
+	 */
+	NotPredicateFinalStep not(SearchPredicate searchPredicate);
+
+	/**
+	 * Match documents that do not satisfy the passed in predicate.
+	 * <p>
+	 * Can be used to negate a predicate.
+	 *
+	 * @return The initial and final step of a DSL where the "not" predicate can be defined.
+	 * @see NotPredicateFinalStep
+	 */
+	NotPredicateFinalStep not(PredicateFinalStep searchPredicate);
+
+	/**
 	 * Match documents where targeted fields have a value that "matches" a given single value.
 	 * <p>
 	 * Note that "value matching" may be exact or approximate depending on the type of the targeted fields:
