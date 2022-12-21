@@ -29,7 +29,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
@@ -394,8 +394,10 @@ public class BatchingExecutorTest {
 		executor.submit( work1Mock, operationSubmitter );
 		executor.submit( work2Mock, operationSubmitter );
 
+		AtomicReference<Thread> work3SubmitThread = new AtomicReference<>();
 		CompletableFuture<Boolean> future = CompletableFuture.supplyAsync( () -> {
 			try {
+				work3SubmitThread.set( Thread.currentThread() );
 				executor.submit( work3Mock, operationSubmitter );
 			}
 			catch (InterruptedException e) {
@@ -404,10 +406,12 @@ public class BatchingExecutorTest {
 			return true;
 		} );
 
-		// wait to give some time for the above future to actually block
-		TimeUnit.SECONDS.sleep( 2 );
+		// wait until the thread submitting work3 is submitting and blocked
+		Awaitility.await().untilAsserted( () -> assertThat( work3SubmitThread )
+				.hasValueSatisfying( thread -> assertThat( thread.getState() )
+						.isIn( Thread.State.BLOCKED, Thread.State.WAITING, Thread.State.TIMED_WAITING ) ) );
 
-		//queue is full so future won't complete.
+		// queue is full so submitting work3 will block indefinitely
 		assertThat( future.isDone() ).isFalse();
 
 		when( processorMock.endBatch() ).thenReturn( CompletableFuture.completedFuture( null ) );
