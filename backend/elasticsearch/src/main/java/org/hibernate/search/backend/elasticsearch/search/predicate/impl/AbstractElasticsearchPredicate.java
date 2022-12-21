@@ -50,6 +50,10 @@ public abstract class AbstractElasticsearchPredicate implements ElasticsearchSea
 	protected abstract JsonObject doToJsonQuery(PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject);
 
+	protected boolean hasNoModifiers() {
+		return !withConstantScore && boost == null;
+	}
+
 	private JsonObject applyConstantScore(JsonObject filter) {
 		JsonObject constantScore = new JsonObject();
 		constantScore.add( "filter", filter );
@@ -83,5 +87,8 @@ public abstract class AbstractElasticsearchPredicate implements ElasticsearchSea
 			this.withConstantScore = true;
 		}
 
+		protected boolean hasNoModifiers() {
+			return !withConstantScore && boost == null;
+		}
 	}
 }

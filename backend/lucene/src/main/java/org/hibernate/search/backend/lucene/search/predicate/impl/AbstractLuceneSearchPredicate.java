@@ -51,6 +51,10 @@ public abstract class AbstractLuceneSearchPredicate implements LuceneSearchPredi
 
 	protected abstract Query doToQuery(PredicateRequestContext context);
 
+	protected boolean hasNoModifiers() {
+		return !constantScore && boost == null;
+	}
+
 	public abstract static class AbstractBuilder implements SearchPredicateBuilder {
 		protected final LuceneSearchIndexScope<?> scope;
 
@@ -69,6 +73,10 @@ public abstract class AbstractLuceneSearchPredicate implements LuceneSearchPredi
 		@Override
 		public void constantScore() {
 			this.constantScore = true;
+		}
+
+		protected boolean hasNoModifiers() {
+			return !constantScore && boost == null;
 		}
 	}
 }
