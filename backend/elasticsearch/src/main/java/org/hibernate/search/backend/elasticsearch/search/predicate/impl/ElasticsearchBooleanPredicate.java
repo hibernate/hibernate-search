@@ -136,6 +136,23 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		return builder.toString();
 	}
 
+	private boolean isOnlyMustNot() {
+		return mustNotClauses != null && !mustNotClauses.isEmpty()
+				&& ( mustClauses == null || mustClauses.isEmpty() )
+				&& ( shouldClauses == null || shouldClauses.isEmpty() )
+				&& ( filterClauses == null || filterClauses.isEmpty() );
+	}
+
+	private boolean hasOnlyOneMustNotClause() {
+		return isOnlyMustNot() && mustNotClauses.size() == 1;
+	}
+
+	@Override
+	protected boolean hasNoModifiers() {
+		return minimumShouldMatchConstraints == null
+				&& super.hasNoModifiers();
+	}
+
 	static class Builder extends AbstractElasticsearchPredicate.AbstractBuilder implements BooleanPredicateBuilder {
 		private List<ElasticsearchSearchPredicate> mustClauses;
 		private List<ElasticsearchSearchPredicate> mustNotClauses;
@@ -215,9 +232,43 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 
 		@Override
 		public SearchPredicate build() {
-			if ( mustClauses == null && shouldClauses == null && mustNotClauses == null && filterClauses == null ) {
+			if ( !hasClause() ) {
 				// HSEARCH-4619: a boolean predicate without any clause must not match anything.
 				return new ElasticsearchMatchNonePredicate( this );
+			}
+
+			if ( mustClauses != null ) {
+				Iterator<ElasticsearchSearchPredicate> mustIterator = mustClauses.iterator();
+				while ( mustIterator.hasNext() ) {
+					ElasticsearchSearchPredicate must = mustIterator.next();
+					if ( must instanceof ElasticsearchBooleanPredicate
+							&& ( (ElasticsearchBooleanPredicate) must ).hasOnlyOneMustNotClause()
+							&& ( (ElasticsearchBooleanPredicate) must ).hasNoModifiers()
+					) {
+						mustIterator.remove();
+						mustNot( ( (ElasticsearchBooleanPredicate) must ).mustNotClauses.get( 0 ) );
+					}
+				}
+				if ( mustClauses.isEmpty() ) {
+					mustClauses = null;
+				}
+			}
+
+			if ( hasNoModifiers() ) {
+				if ( hasOnlyOneMustNotClause() ) {
+					ElasticsearchSearchPredicate mustNot = mustNotClauses.get( 0 );
+					if ( mustNot instanceof ElasticsearchBooleanPredicate
+							&& ( (ElasticsearchBooleanPredicate) mustNot ).hasOnlyOneMustNotClause()
+							&& ( (ElasticsearchBooleanPredicate) mustNot ).hasNoModifiers() ) {
+						return ( (ElasticsearchBooleanPredicate) mustNot ).mustNotClauses.get( 0 );
+					}
+				}
+				else if ( hasOnlyOneMustClause() ) {
+					return mustClauses.get( 0 );
+				}
+				else if ( hasOnlyOneShouldClause() ) {
+					return shouldClauses.get( 0 );
+				}
 			}
 
 			// Forcing to Lucene's defaults. See HSEARCH-3534
@@ -230,6 +281,32 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 
 		private boolean hasAtLeastOneMustOrFilterPredicate() {
 			return mustClauses != null || filterClauses != null;
+		}
+
+		private boolean hasOnlyOneMustNotClause() {
+			return mustNotClauses != null && mustNotClauses.size() == 1
+					&& ( mustClauses == null || mustClauses.isEmpty() )
+					&& ( shouldClauses == null || shouldClauses.isEmpty() )
+					&& ( filterClauses == null || filterClauses.isEmpty() );
+		}
+
+		private boolean hasOnlyOneMustClause() {
+			return mustClauses != null && mustClauses.size() == 1
+					&& ( mustNotClauses == null || mustNotClauses.isEmpty() )
+					&& ( shouldClauses == null || shouldClauses.isEmpty() )
+					&& ( filterClauses == null || filterClauses.isEmpty() );
+		}
+
+		private boolean hasOnlyOneShouldClause() {
+			return shouldClauses != null && shouldClauses.size() == 1
+					&& ( mustNotClauses == null || mustNotClauses.isEmpty() )
+					&& ( mustClauses == null || mustClauses.isEmpty() )
+					&& ( filterClauses == null || filterClauses.isEmpty() );
+		}
+
+		@Override
+		protected boolean hasNoModifiers() {
+			return minimumShouldMatchConstraints == null && super.hasNoModifiers();
 		}
 	}
 

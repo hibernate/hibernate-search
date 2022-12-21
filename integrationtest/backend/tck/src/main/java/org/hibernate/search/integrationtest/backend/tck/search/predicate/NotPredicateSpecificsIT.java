@@ -6,13 +6,21 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
+import java.util.Arrays;
+
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubLoadingOptionsStep;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -89,6 +97,42 @@ public class NotPredicateSpecificsIT {
 				.where( f -> f.bool().must( f.not( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) ) ) ) )
 				.hasTotalHitCount( 2 )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2, DOCUMENT_3 );
+	}
+
+	@Test
+	public void manyNestedNot() {
+		SearchPredicateFactory f = index.createScope().predicate();
+		BooleanPredicateClausesStep<?> step = f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) ) ) ) ) ) ) ) );
+
+		// as query strings are backend specific let's check that generated string is among expected.
+		// in this case there's an odd number of nested `not` hence we should end up having mustNot/- query
+		SearchQueryOptionsStep<?, DocumentReference, StubLoadingOptionsStep, ?, ?> query = index.query()
+				.where( ( step ).toPredicate() );
+		assertThat(
+				Arrays.asList(
+						"+(-field2:[3 TO 3] #*:*)", // Lucene query
+						"{\"query\":{\"bool\":{\"must_not\":{\"match\":{\"field2\":{\"query\":3}}}}},\"_source\":false}" // Elasticsearch query
+				)
+		).contains( query.toQuery().queryString() );
+
+		assertThatQuery( query )
+				.hasTotalHitCount( 2 )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2, DOCUMENT_3 );
+
+		// as query strings are backend specific let's check that generated string is among expected.
+		// in this case there's an even number of nested `not` hence we should end up having simple match/+ query
+		query = index.query()
+				.where( f.not( ( step ) ).toPredicate() );
+		assertThat(
+				Arrays.asList(
+						"+field2:[3 TO 3]", // Lucene query
+						"{\"query\":{\"match\":{\"field2\":{\"query\":3}}},\"_source\":false}" // Elasticsearch query
+				)
+		).contains( query.toQuery().queryString() );
+
+		assertThatQuery( query )
+				.hasTotalHitCount( 1 )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
 	private static void initData() {
