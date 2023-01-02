@@ -401,15 +401,15 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_UUID_GEN_STRATEGY;
 
 	/**
-	 * The database type used for representing an UUID in the outbox event table.
+	 * The name of the {@link org.hibernate.type.BasicType Hibernate ORM registered basic type} used for representing an UUID in the outbox event table.
 	 * <p>
 	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
 	 * <p>
-	 * The default for this value is {@link  Defaults#COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_DATA_TYPE}.
+	 * The default for this value is {@link  Defaults#COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_TYPE}.
 	 */
-	public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_UUID_DATA_TYPE =
-			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_UUID_DATA_TYPE;
+	public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_UUID_TYPE =
+			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_UUID_TYPE;
 
 	/**
 	 * The database catalog to use for the agent table.
@@ -460,15 +460,15 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY;
 
 	/**
-	 * The JDBC type used for representing an UUID in the agent table.
+	 * The name of the {@link org.hibernate.type.BasicType Hibernate ORM registered basic type} used for representing an UUID in the agent table.
 	 * <p>
 	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
 	 * <p>
-	 * The default for this value is {@link  Defaults#COORDINATION_ENTITY_MAPPING_AGENT_UUID_DATA_TYPE}.
+	 * The default for this value is {@link  Defaults#COORDINATION_ENTITY_MAPPING_AGENT_UUID_TYPE}.
 	 */
-	public static final String COORDINATION_ENTITY_MAPPING_AGENT_UUID_DATA_TYPE =
-			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_AGENT_UUID_DATA_TYPE;
+	public static final String COORDINATION_ENTITY_MAPPING_AGENT_UUID_TYPE =
+			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_AGENT_UUID_TYPE;
 
 	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
@@ -496,12 +496,12 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_SCHEMA = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_SCHEMA;
 		public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_TABLE = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_TABLE;
 		public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_UUID_GEN_STRATEGY = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_UUID_GEN_STRATEGY;
-		public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_UUID_DATA_TYPE = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_UUID_DATA_TYPE;
+		public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_UUID_TYPE = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_UUID_TYPE;
 		public static final String COORDINATION_ENTITY_MAPPING_AGENT_CATALOG = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_AGENT_CATALOG;
 		public static final String COORDINATION_ENTITY_MAPPING_AGENT_SCHEMA = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_AGENT_SCHEMA;
 		public static final String COORDINATION_ENTITY_MAPPING_AGENT_TABLE = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_AGENT_TABLE;
 		public static final String COORDINATION_ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY;
-		public static final String COORDINATION_ENTITY_MAPPING_AGENT_UUID_DATA_TYPE = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_AGENT_UUID_DATA_TYPE;
+		public static final String COORDINATION_ENTITY_MAPPING_AGENT_UUID_TYPE = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_AGENT_UUID_TYPE;
 	}
 
 	/**
@@ -534,13 +534,13 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String ENTITY_MAPPING_AGENT_SCHEMA = ENTITY_MAPPING_AGENT_PREFIX + "schema";
 		public static final String ENTITY_MAPPING_AGENT_CATALOG = ENTITY_MAPPING_AGENT_PREFIX + "catalog";
 		public static final String ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY = ENTITY_MAPPING_AGENT_PREFIX + "uuid_gen_strategy";
-		public static final String ENTITY_MAPPING_AGENT_UUID_DATA_TYPE = ENTITY_MAPPING_AGENT_PREFIX + "uuid_jdbc_type";
+		public static final String ENTITY_MAPPING_AGENT_UUID_TYPE = ENTITY_MAPPING_AGENT_PREFIX + "uuid_type";
 		public static final String ENTITY_MAPPING_OUTBOXEVENT_PREFIX = ENTITY_MAPPING_PREFIX + "outboxevent.";
 		public static final String ENTITY_MAPPING_OUTBOXEVENT_TABLE = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "table";
 		public static final String ENTITY_MAPPING_OUTBOXEVENT_SCHEMA = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "schema";
 		public static final String ENTITY_MAPPING_OUTBOXEVENT_CATALOG = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "catalog";
 		public static final String ENTITY_MAPPING_OUTBOXEVENT_UUID_GEN_STRATEGY = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "uuid_gen_strategy";
-		public static final String ENTITY_MAPPING_OUTBOXEVENT_UUID_DATA_TYPE = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "uuid_jdbc_type";
+		public static final String ENTITY_MAPPING_OUTBOXEVENT_UUID_TYPE = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "uuid_type";
 	}
 
 	/**
@@ -568,12 +568,12 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
 		public static final String COORDINATION_ENTITY_MAPPING_AGENT_TABLE = HSEARCH_PREFIX + "AGENT";
 		public static final UuidGenerationStrategy COORDINATION_ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY = UuidGenerationStrategy.AUTO;
-		public static final String COORDINATION_ENTITY_MAPPING_AGENT_UUID_DATA_TYPE = "default";
+		public static final String COORDINATION_ENTITY_MAPPING_AGENT_UUID_TYPE = "default";
 
 		// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
 		public static final String COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE = HSEARCH_PREFIX + "OUTBOX_EVENT";
 		public static final UuidGenerationStrategy COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_GEN_STRATEGY = UuidGenerationStrategy.AUTO;
-		public static final String COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_DATA_TYPE = "default";
+		public static final String COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_TYPE = "default";
 	}
 
 	/**
