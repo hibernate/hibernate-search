@@ -65,10 +65,29 @@ this job may automatically merge a branch before running the build.
 By convention, such a branch will be named `wip/<base-branch>-dependency-update-<update-name>`,
 e.g. `wip/main-dependency-update-orm6.1`.
 
-Note you can test dependency updates locally by calling the script `ci/dependency-update/perform-update.sh`, e.g.:
+Note you can test dependency updates locally by calling the script `ci/dependency-update/perform-update.sh`.
+First, make sure to have all the necessary artifacts in your local Maven repository:
+
+```shell
+./mvnw clean install -Pdist -DskipTests
+```
+
+Then update the dependencies and apply necessary patches to tests with this command:
 
 ```shell
 ci/dependency-update/perform-update.sh orm6.2 version.org.hibernate.orm
+```
+
+Or if you're on a feature branch and want to apply patches of another, primary branch (here the main branch):
+
+```shell
+BRANCH_NAME=main ci/dependency-update/perform-update.sh orm6.2 version.org.hibernate.orm
+```
+
+After applying the update, you can easily run all tests that rely on a particular module with this command:
+
+```shell
+./mvnw clean verify -Pdist -pl $(./ci/list-dependent-integration-tests.sh hibernate-search-mapper-orm)
 ```
 
 ### Performance pipeline
