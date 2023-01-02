@@ -318,8 +318,8 @@ public class OutboxPollingCustomEntityMappingIT {
 				.withProperty( "hibernate.search.coordination.outbox_event_finder.provider", outboxEventFinder.provider() )
 				// Allow ORM to create schema as we want to use non-default for this testcase:
 				.withProperty( "javax.persistence.create-database-schemas", true )
-				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.uuid_jdbc_type", "uuid-char" )
-				.withProperty( "hibernate.search.coordination.entity.mapping.agent.uuid_jdbc_type", "uuid-char" )
+				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.uuid_type", "uuid-char" )
+				.withProperty( "hibernate.search.coordination.entity.mapping.agent.uuid_type", "uuid-char" )
 				.withProperty( "hibernate.session_factory.statement_inspector", statementInspector )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();

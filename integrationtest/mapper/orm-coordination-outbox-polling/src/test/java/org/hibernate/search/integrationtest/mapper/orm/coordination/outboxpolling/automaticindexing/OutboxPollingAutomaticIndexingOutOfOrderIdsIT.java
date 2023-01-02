@@ -67,7 +67,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.uuid_gen_strategy", "time" )
 				// see HSEARCH-4749, as some DBs (MSSQL) might use a nonstring representation of UUID we want to force it
 				// in this case to make row manipulation easier:
-				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.uuid_jdbc_type", "uuid-char" )
+				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.uuid_type", "uuid-char" )
 				.setup( IndexedEntity.class, RoutedIndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}

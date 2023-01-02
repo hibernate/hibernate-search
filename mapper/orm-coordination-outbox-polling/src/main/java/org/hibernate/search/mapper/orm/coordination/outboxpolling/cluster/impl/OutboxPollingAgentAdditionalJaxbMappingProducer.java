@@ -119,9 +119,9 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 					.as( UuidGenerationStrategy.class, UuidGenerationStrategy::of )
 					.build();
 
-	private static final OptionalConfigurationProperty<String> ENTITY_MAPPING_AGENT_UUID_DATA_TYPE =
+	private static final OptionalConfigurationProperty<String> ENTITY_MAPPING_AGENT_UUID_TYPE =
 			ConfigurationProperty.forKey(
-							HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_UUID_DATA_TYPE )
+							HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_UUID_TYPE )
 					.asString()
 					.build();
 
@@ -136,10 +136,10 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 		Optional<String> catalog = ENTITY_MAPPING_AGENT_CATALOG.get( propertySource );
 		Optional<String> table = ENTITY_MAPPING_AGENT_TABLE.get( propertySource );
 		Optional<UuidGenerationStrategy> uuidStrategy = ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY.get( propertySource );
-		Optional<String> uuidDataType = ENTITY_MAPPING_AGENT_UUID_DATA_TYPE.get( propertySource );
+		Optional<String> uuidType = ENTITY_MAPPING_AGENT_UUID_TYPE.get( propertySource );
 
 		// only allow configuring the entire mapping or table/catalog/schema/generator/datatype names
-		if ( mapping.isPresent() && ( schema.isPresent() || catalog.isPresent() || table.isPresent() || uuidStrategy.isPresent() || uuidDataType.isPresent() ) ) {
+		if ( mapping.isPresent() && ( schema.isPresent() || catalog.isPresent() || table.isPresent() || uuidStrategy.isPresent() || uuidType.isPresent() ) ) {
 			throw log.agentConfigurationPropertyConflict(
 					AGENT_ENTITY_MAPPING.resolveOrRaw( propertySource ),
 					new String[] {
@@ -147,12 +147,12 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 							ENTITY_MAPPING_AGENT_CATALOG.resolveOrRaw( propertySource ),
 							ENTITY_MAPPING_AGENT_TABLE.resolveOrRaw( propertySource ),
 							ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY.resolveOrRaw( propertySource ),
-							ENTITY_MAPPING_AGENT_UUID_DATA_TYPE.resolveOrRaw( propertySource )
+							ENTITY_MAPPING_AGENT_UUID_TYPE.resolveOrRaw( propertySource )
 					}
 			);
 		}
 
-		String resolvedUuidDataType = UuidDataTypeUtils.uuidType( uuidDataType.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_UUID_DATA_TYPE ), dialect );
+		String resolvedUuidType = UuidDataTypeUtils.uuidType( uuidType.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_UUID_TYPE ), dialect );
 
 		String entityDefinition = mapping.orElseGet( () ->
 				String.format(
@@ -162,7 +162,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 						catalog.orElse( "" ),
 						table.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_TABLE ),
 						uuidStrategy.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY ).strategy(),
-						resolvedUuidDataType
+						resolvedUuidType
 				)
 		);
 
