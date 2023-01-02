@@ -12,35 +12,31 @@ Map settings() {
 	switch (env.DEPENDENCY_UPDATE_NAME) {
 		case 'jandex3':
 			return [
-					mavenArgs: """ \
-							-pl mapper/pojo-base,mapper/orm,jakarta/mapper/orm,orm6/mapper/orm -amd \
-					"""
+					onlyRunTestDependingOn: ['hibernate-search-mapper-pojo-base'],
+					// Need to rebuild this module in order to insert the Jandex 3 dependency in tests
+					additionalMavenArgs: '-pl :hibernate-search-util-internal-test-common'
 			]
 		case 'orm5.6':
 			return [
-					mavenArgs: """ \
-							-pl mapper/orm,jakarta/mapper/orm -amd \
-					""",
-					updateProperties: ['version.org.hibernate']
+					updateProperties: ['version.org.hibernate'],
+					onlyRunTestDependingOn: ['hibernate-search-mapper-orm', 'hibernate-search-mapper-orm-jakarta']
 			]
 		case 'orm6.1':
 			return [
-					mavenArgs: """ \
-							-pl orm6/mapper/orm -amd \
-					""",
-					updateProperties: ['version.org.hibernate.orm']
+					updateProperties: ['version.org.hibernate.orm'],
+					onlyRunTestDependingOn: ['hibernate-search-mapper-orm-orm6']
 			]
 		case 'orm6.2':
 			return [
-					mavenArgs: """ \
-							-pl orm6/mapper/orm -amd \
-					""",
-					updateProperties: ['version.org.hibernate.orm']
+					updateProperties: ['version.org.hibernate.orm'],
+					onlyRunTestDependingOn: ['hibernate-search-mapper-orm-orm6'],
+					// Need to rebuild non-test modules to apply some patches
+					additionalMavenArgs: '-am'
 			]
 		case 'orm6-in-main-code':
 			return [
-					mavenArgs: "", // In this case we'll test everything.
 					updateProperties: ['version.org.hibernate.orm']
+					// In this case we'll rebuild and test everything.
 			]
 		default:
 			return [:]
@@ -49,7 +45,7 @@ Map settings() {
 
 // Perform authenticated pulls of container images, to avoid failure due to download throttling on dockerhub.
 def pullContainerImages() {
-	String containerImageRefsString = ((String) sh(script: "./ci/list-container-images.sh -U -Pdist -Pdependency-update ${settings().mavenArgs}", returnStdout: true))
+	String containerImageRefsString = ((String) sh(script: "./ci/list-container-images.sh -U -Pdist -Pdependency-update ${env.ADDITIONAL_MAVEN_ARGS}", returnStdout: true))
 	String[] containerImageRefs = containerImageRefsString ? containerImageRefsString.split('\\s+') : new String[0]
 	echo 'Container images to be used in tests: ' + Arrays.toString(containerImageRefs)
 	if (containerImageRefs.length == 0) {
@@ -86,6 +82,33 @@ pipeline {
 		rateLimitBuilds(throttle: [count: 2, durationName: 'week', userBoost: true])
 	}
 	stages {
+		// This allows testing the original (unpatched) artifacts,
+		// while patching tests where necessary.
+		// Especially important when testing the compatibility
+		// of published artifacts with different versions of dependencies.
+		stage('Pre-build original code') {
+			agent {
+				label 'Worker&&Containers'
+			}
+			post {
+				cleanup {
+					sh 'ci/docker-cleanup.sh'
+				}
+			}
+			options {
+				timeout(time: 30, unit: 'MINUTES')
+			}
+			steps {
+				withMavenWorkspace {
+					sh """ \
+						mvn clean install -U -Pdist -DskipTests \
+					"""
+					dir(env.WORKSPACE_TMP + '/.m2repository') {
+						stash name: 'original-build-result', includes:"org/hibernate/search/**"
+					}
+				}
+			}
+		}
 		stage('Update dependency and test') {
 			matrix {
 				agent {
@@ -107,6 +130,9 @@ pipeline {
 					stage('Init') {
 						steps {
 							sh 'ci/docker-cleanup.sh'
+							dir(env.WORKSPACE_TMP + '/.m2repository') {
+								unstash name: 'original-build-result'
+							}
 						}
 					}
 					stage('Update dependency') {
@@ -119,24 +145,13 @@ pipeline {
 									error "This job does not seem to update any dependency; perhaps it is misconfigured? The source code has not been updated, neither by merging a WIP branch nor by updating version properties."
 								}
 							}
-						}
-					}
-					// If we're going to execute only a few tests,
-					// make sure all artifacts are built and can be used as dependency in those tests.
-					stage('Pre-build') {
-						when {
-							expression {
-								return !settings().mavenArgs.isBlank()
-							}
-						}
-						options {
-							timeout(time: 30, unit: 'MINUTES')
-						}
-						steps {
 							withMavenWorkspace {
-								sh """ \
-									mvn clean install -U -Pdependency-update -Pdist -DskipTests \
-								"""
+								script {
+									env.ADDITIONAL_MAVEN_ARGS = settings().additionalMavenArgs ?: ''
+									if (settings().onlyRunTestDependingOn) {
+										env.ADDITIONAL_MAVEN_ARGS += ' -pl ' + sh(script: "bash -x ./ci/list-dependent-integration-tests.sh ${settings().onlyRunTestDependingOn.join(' ')}", returnStdout: true).trim()
+									}
+								}
 							}
 						}
 					}
@@ -150,7 +165,7 @@ pipeline {
 								sh """ \
 									mvn clean install -U -Pdependency-update -Pdist -Dsurefire.environment=${env.DEPENDENCY_UPDATE_NAME} \
 									--fail-at-end \
-									${settings().mavenArgs} \
+									${env.ADDITIONAL_MAVEN_ARGS} \
 								"""
 							}
 						}
