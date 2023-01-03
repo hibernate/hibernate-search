@@ -91,6 +91,8 @@ public class MassIndexingBaseIT {
 
 		if ( TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ) {
 			setupContext.tenants( TENANT_1_ID, TENANT_2_ID );
+			setupContext.withProperty( HibernateOrmMapperSettings.MULTI_TENANCY_TENANT_IDS,
+					String.join( ",", TENANT_1_ID, TENANT_2_ID ) );
 			dataClearConfig.tenants( TENANT_1_ID, TENANT_2_ID );
 		}
 	}
@@ -262,7 +264,7 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void fromMappingWithoutSessionWithSpecificTenant() throws Exception {
+	public void fromMappingWithoutSession_explicitSingleTenant() {
 		SearchMapping searchMapping = Search.mapping( setupHolder.sessionFactory() );
 		MassIndexer indexer = searchMapping.scope( Object.class ).massIndexer( targetTenantId() );
 
@@ -303,9 +305,81 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void fromMappingWithoutSessionWithAllTenants() throws Exception {
+	public void fromMappingWithoutSession_explicitAllTenants() {
 		SearchMapping searchMapping = Search.mapping( setupHolder.sessionFactory() );
 		MassIndexer indexer = searchMapping.scope( Object.class ).massIndexer( allTenantIds() );
+
+		// add operations on indexes can follow any random order,
+		// since they are executed by different threads
+		backendMock.expectWorks(
+						Book.INDEX, targetTenantId(), DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+				)
+				.add( "1", b -> b
+						.field( "title", TITLE_1 )
+						.field( "author", AUTHOR_1 )
+				)
+				.add( "2", b -> b
+						.field( "title", TITLE_2 )
+						.field( "author", AUTHOR_2 )
+				)
+				.add( "3", b -> b
+						.field( "title", TITLE_3 )
+						.field( "author", AUTHOR_3 )
+				);
+		if ( TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ) {
+			backendMock.expectWorks(
+							Book.INDEX, TENANT_2_ID, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+					)
+					.add( "1", b -> b
+							.field( "title", TITLE_1 )
+							.field( "author", AUTHOR_1 )
+					)
+					.add( "2", b -> b
+							.field( "title", TITLE_2 )
+							.field( "author", AUTHOR_2 )
+					)
+					.add( "3", b -> b
+							.field( "title", TITLE_3 )
+							.field( "author", AUTHOR_3 )
+					)
+					.add( "4", b -> b
+							.field( "title", TITLE_4 )
+							.field( "author", AUTHOR_4 )
+					);
+		}
+
+		// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
+		// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
+		// But if we are in multi-tenant case then we expect that purge will be called for all tenants first,
+		// while other work like merge or flush/refresh will be called just once for the first tenant in the list:
+		backendMock.expectIndexScaleWorks( Book.INDEX, targetTenantId() )
+				.purge();
+		if ( TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ) {
+			backendMock.expectIndexScaleWorks( Book.INDEX, TENANT_2_ID )
+					.purge();
+		}
+		backendMock.expectIndexScaleWorks( Book.INDEX, targetTenantId() )
+				.mergeSegments()
+				.flush()
+				.refresh();
+
+		try {
+			indexer.startAndWait();
+		}
+		catch (InterruptedException e) {
+			fail( "Unexpected InterruptedException: " + e.getMessage() );
+		}
+
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void fromMappingWithoutSession_implicitTenant() {
+		SearchMapping searchMapping = Search.mapping( setupHolder.sessionFactory() );
+		// We don't pass a tenant ID, it's implicit:
+		// in single-tenancy mode the tenant ID is set to `null`,
+		// and in multi-tenancy mode the tenant IDs are extracted from the configuration properties.
+		MassIndexer indexer = searchMapping.scope( Object.class ).massIndexer();
 
 		// add operations on indexes can follow any random order,
 		// since they are executed by different threads
