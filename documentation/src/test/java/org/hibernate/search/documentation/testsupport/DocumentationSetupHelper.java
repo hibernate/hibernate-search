@@ -27,6 +27,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHe
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl.MultitenancyTestHelper;
 
 public final class DocumentationSetupHelper
 		extends MappingSetupHelper<DocumentationSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SimpleSessionFactoryBuilder, SessionFactory> {
@@ -159,6 +160,11 @@ public final class DocumentationSetupHelper
 		@Override
 		public SetupContext withProperty(String key, Object value) {
 			overriddenProperties.put( key, value );
+			return thisAsC();
+		}
+
+		public SetupContext tenants(String... tenants) {
+			withConfiguration( b -> MultitenancyTestHelper.enable( b, tenants ) );
 			return thisAsC();
 		}
 

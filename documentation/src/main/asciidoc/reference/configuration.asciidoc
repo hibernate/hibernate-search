@@ -452,7 +452,8 @@ For details, see:
 * <<backend-lucene-multi-tenancy,here for Lucene>>
 * <<backend-elasticsearch-multi-tenancy,here for Elasticsearch>>
 
-In some cases, in particular when <<coordination-outbox-polling-multi-tenancy,using the `outbox-polling` coordination strategy>>,
+In some cases, in particular when <<coordination-outbox-polling-multi-tenancy,using the `outbox-polling` coordination strategy>>
+or when expecting the <<indexing-massindexer-multitenancy,mass indexer to implicitly target all tenants>>,
 you will need to list explicitly all tenant identifiers that your application might use.
 This information is used by Hibernate Search when spawning background processes
 that should apply an operation to every tenant.
