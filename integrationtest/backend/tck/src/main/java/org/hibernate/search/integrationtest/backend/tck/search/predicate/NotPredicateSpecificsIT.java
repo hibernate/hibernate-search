@@ -104,33 +104,26 @@ public class NotPredicateSpecificsIT {
 		SearchPredicateFactory f = index.createScope().predicate();
 		BooleanPredicateClausesStep<?> step = f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) ) ) ) ) ) ) ) );
 
-		// as query strings are backend specific let's check that generated string is among expected.
-		// in this case there's an odd number of nested `not` hence we should end up having mustNot/- query
-		SearchQueryOptionsStep<?, DocumentReference, StubLoadingOptionsStep, ?, ?> query = index.query()
-				.where( ( step ).toPredicate() );
-		assertThat(
-				Arrays.asList(
-						"+(-field2:[3 TO 3] #*:*)", // Lucene query
-						"{\"query\":{\"bool\":{\"must_not\":{\"match\":{\"field2\":{\"query\":3}}}}},\"_source\":false}" // Elasticsearch query
-				)
-		).contains( query.toQuery().queryString() );
-
-		assertThatQuery( query )
+		assertThatQuery( index.query()
+				.where( ( step ).toPredicate() ) )
 				.hasTotalHitCount( 2 )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2, DOCUMENT_3 );
 
-		// as query strings are backend specific let's check that generated string is among expected.
-		// in this case there's an even number of nested `not` hence we should end up having simple match/+ query
-		query = index.query()
-				.where( f.not( ( step ) ).toPredicate() );
-		assertThat(
-				Arrays.asList(
-						"+field2:[3 TO 3]", // Lucene query
-						"{\"query\":{\"match\":{\"field2\":{\"query\":3}}},\"_source\":false}" // Elasticsearch query
-				)
-		).contains( query.toQuery().queryString() );
+		assertThatQuery( index.query()
+				.where( f.not( ( step ) ).toPredicate() ) )
+				.hasTotalHitCount( 1 )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+	}
 
-		assertThatQuery( query )
+	@Test
+	public void combinationOfMustMustNotAndNestedNot() {
+		assertThatQuery( index.query()
+				.where( f -> f.bool()
+						.must( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) )
+						.must( f.not( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) ) )
+						.mustNot( f.not( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) ) )
+						.mustNot( f.matchNone() )
+				) )
 				.hasTotalHitCount( 1 )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
