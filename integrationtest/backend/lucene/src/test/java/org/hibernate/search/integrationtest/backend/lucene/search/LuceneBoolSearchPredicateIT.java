@@ -6,10 +6,15 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -49,6 +54,39 @@ public class LuceneBoolSearchPredicateIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Computed minimum for minimumShouldMatch constraint is out of bounds" )
 				.hasMessageContaining( "expected a number between '1' and '1', got '3'" );
+	}
+
+	@Test
+	public void resultingQueryOptimization() {
+		SearchPredicateFactory f = index.createScope().predicate();
+		BooleanPredicateClausesStep<?> step = f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "fieldName" ).matching( "test" ) ) ) ) ) ) ) ) );
+
+		assertThat(
+				index.query()
+						.where( ( step ).toPredicate() )
+						.toQuery()
+						.queryString()
+		).isEqualTo( "+(-fieldName:test #*:*)" );
+
+		assertThat(
+				index.query()
+						.where( f.not( ( step ) ).toPredicate() )
+						.toQuery()
+						.queryString()
+		).isEqualTo( "+fieldName:test" );
+
+		assertThat(
+				index.query()
+						.where( f.bool()
+								.must( f.match().field( "fieldName" ).matching( "test1" ) )
+								.must( f.not( f.match().field( "fieldName" ).matching( "test2" ) ) )
+								.mustNot( f.not( f.match().field( "fieldName" ).matching( "test3" ) ) )
+								.mustNot( f.matchNone() )
+								.toPredicate()
+						)
+						.toQuery()
+						.queryString()
+		).isEqualTo( "+(+fieldName:test1 +fieldName:test3 -MatchNoDocsQuery(\"\") -fieldName:test2)" );
 	}
 
 	private static class IndexBinding {
