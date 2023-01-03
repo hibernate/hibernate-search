@@ -73,7 +73,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingIncompatibleConfigurati
 
 		String[] expectedContent = new String[] {
 				"is statically assigned to shard ",
-				"this conflicts with agent '#",
+				"this conflicts with agent '",
 				"' which expects ", " shards.",
 				"This can be a temporary situation caused by some application instances being forcibly stopped and replacements being spun up",
 				"consider adjusting the configuration or switching to dynamic sharding.",
@@ -112,7 +112,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingIncompatibleConfigurati
 
 		String[] expectedContent = new String[] {
 				"is statically assigned to shard ",
-				"this conflicts with agent '#",
+				"this conflicts with agent '",
 				"' which is also assigned to that shard.",
 				"This can be a temporary situation caused by some application instances being forcibly stopped and replacements being spun up",
 				"consider adjusting the configuration or switching to dynamic sharding.",

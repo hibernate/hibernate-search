@@ -116,9 +116,9 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 				.hasMessageContainingAll(
 						"Agent '" + SELF_REF + "': failed to infer a target cluster from the list of registered agents.",
 						"The agent will try again in the next pulse.",
-						"Agent '#" + OTHER_2_ID + " - ",
+						"Agent '" + OTHER_2_ID + " - ",
 						"is statically assigned to shard 0 (total " + totalShardCount + ")",
-						"this conflicts with agent '#" + OTHER_1_ID + " - ",
+						"this conflicts with agent '" + OTHER_1_ID + " - ",
 						"' which is also assigned to that shard.",
 						"This can be a temporary situation caused by some application instances being forcibly stopped and replacements being spun up",
 						"consider adjusting the configuration or switching to dynamic sharding.",
@@ -156,7 +156,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 				.hasMessageContainingAll(
 						"Agent '" + SELF_REF + "': failed to infer a target cluster from the list of registered agents.",
 						"The agent will try again in the next pulse.",
-						"Agent '#" + OTHER_2_ID + " - ",
+						"Agent '" + OTHER_2_ID + " - ",
 						"is statically assigned to shard 2 (total 4)",
 						"this conflicts with agent '" + SELF_REF + "'",
 						"which expects 3 shards.",
