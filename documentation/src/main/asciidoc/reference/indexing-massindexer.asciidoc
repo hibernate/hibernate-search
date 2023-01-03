@@ -108,6 +108,49 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 <2> Start the mass indexing process for the selected types and return when it is over.
 ====
 
+[[indexing-massindexer-multitenancy]]
+== Mass indexing multiple tenants
+
+Examples in sections above create a mass indexer from a given session,
+which will always limit mass indexing to the tenant targeted by that session.
+
+When using <<configuration-multi-tenancy,multi-tenancy>>
+you can reindex multiple tenants at once by retrieving the mass indexer from a <<entrypoints-search-scope,`SearchScope`>>
+and passing a collection of tenant identifiers:
+
+.Reindexing multiple tenants listed explicitly using a `MassIndexer`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmMassIndexerMultiTenancyIT.java[tags=explicitTenants]
+----
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> <<entrypoints-search-mapping,Retrieve a `SearchScope`>> targeting all types that we want reindexed;
+here we use `Object.class`, meaning "all indexed types that extent `Object`",
+i.e. simply all indexed types.
+<3> Pass the identifiers of tenants we want to mass index and create the mass indexer.
+<4> Start the mass indexing process and return when it is over.
+====
+
+With the <<mapper-orm,Hibernate ORM mapper>>,
+if you <<configuration-multi-tenancy,included the comprehensive list of tenants in Hibernate Search's configuration>>,
+you can simply call `scope.massIndexer()` without any argument,
+and the resulting mass indexer will target all configured tenants:
+
+.Reindexing multiple tenants configured implicitly using a `MassIndexer`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmMassIndexerMultiTenancyIT.java[tags=implicitTenants]
+----
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> <<entrypoints-search-mapping,Retrieve a `SearchScope`>> targeting all types that we want reindexed;
+here we use `Object.class`, meaning "all indexed types that extent `Object`",
+i.e. simply all indexed types.
+<3> Create a mass indexer targeting all tenants <<configuration-multi-tenancy,included in the configuration>>.
+<4> Start the mass indexing process and return when it is over.
+====
+
 [[indexing-massindexer-asynchronous]]
 == Running the mass indexer asynchronously
 
