@@ -13,7 +13,6 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
@@ -166,15 +165,11 @@ public abstract class StubMappedIndex {
 	}
 
 	public IndexWorkspace createWorkspace(StubSession sessionContext) {
-		return createWorkspace( DetachedBackendSessionContext.of( sessionContext ) );
+		return createWorkspace( sessionContext.tenantIdentifier() );
 	}
 
 	public IndexWorkspace createWorkspace(String tenantId) {
-		return createWorkspace( DetachedBackendSessionContext.of( mapping.session( tenantId ) ) );
-	}
-
-	public IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext) {
-		return delegate().createWorkspace( sessionContext );
+		return delegate().createWorkspace( mapping, tenantId );
 	}
 
 	/**

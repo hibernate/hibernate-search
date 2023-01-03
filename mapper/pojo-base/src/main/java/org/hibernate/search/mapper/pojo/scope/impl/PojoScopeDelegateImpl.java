@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
@@ -142,10 +141,14 @@ public final class PojoScopeDelegateImpl<R, E, C> implements PojoScopeDelegate<R
 	}
 
 	@Override
-	public PojoScopeWorkspace workspace(DetachedBackendSessionContext sessionContext) {
-		return new PojoScopeWorkspaceImpl(
-				targetedTypeContexts, sessionContext
-		);
+	@Deprecated
+	public PojoScopeWorkspace workspace(org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext sessionContext) {
+		return workspace( sessionContext.tenantIdentifier() );
+	}
+
+	@Override
+	public PojoScopeWorkspace workspace(String tenantId) {
+		return new PojoScopeWorkspaceImpl( mappingContext, targetedTypeContexts, tenantId );
 	}
 
 	@Override
@@ -155,14 +158,14 @@ public final class PojoScopeDelegateImpl<R, E, C> implements PojoScopeDelegate<R
 
 	@Override
 	@Deprecated
-	public PojoMassIndexer massIndexer(PojoMassIndexingContext context, DetachedBackendSessionContext detachedSession) {
+	public PojoMassIndexer massIndexer(PojoMassIndexingContext context, org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext detachedSession) {
 		return massIndexer( context, Collections.singleton( detachedSession.tenantIdentifier() ) );
 	}
 
 	@Override
-	public PojoMassIndexer massIndexer(PojoMassIndexingContext context, Collection<DetachedBackendSessionContext> detachedSessions) {
+	public PojoMassIndexer massIndexer(PojoMassIndexingContext context, Collection<String> tenantIds) {
 		return new PojoDefaultMassIndexer( context, mappingContext, indexedTypeContextProvider, targetedTypeContexts,
-				schemaManager(), detachedSessions, this );
+				schemaManager(), tenantIds, this );
 	}
 
 	@Override

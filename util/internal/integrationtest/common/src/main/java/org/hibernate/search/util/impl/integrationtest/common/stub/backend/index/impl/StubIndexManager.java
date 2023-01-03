@@ -19,7 +19,6 @@ import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
@@ -106,9 +105,9 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	}
 
 	@Override
-	public IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext) {
+	public IndexWorkspace createWorkspace(BackendMappingContext mappingContext, String tenantId) {
 		checkStarted();
-		return new StubIndexWorkspace( name, backend.getBehavior(), sessionContext );
+		return new StubIndexWorkspace( name, backend.getBehavior(), tenantId );
 	}
 
 	@Override

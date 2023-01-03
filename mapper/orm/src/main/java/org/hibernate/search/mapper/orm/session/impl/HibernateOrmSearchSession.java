@@ -7,8 +7,8 @@
 package org.hibernate.search.mapper.orm.session.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import javax.persistence.EntityManager;
 import javax.transaction.Synchronization;
 
@@ -20,7 +20,6 @@ import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
@@ -150,12 +149,12 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public SearchWorkspace workspace(Collection<? extends Class<?>> types) {
-		return scope( types ).workspace( DetachedBackendSessionContext.of( this ) );
+		return scope( types ).workspace( tenantIdentifier() );
 	}
 
 	@Override
 	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
-		return scope( types ).massIndexer( Arrays.asList( DetachedBackendSessionContext.of( this ) ) );
+		return scope( types ).massIndexer( Collections.singleton( tenantIdentifier() ) );
 	}
 
 	@Override

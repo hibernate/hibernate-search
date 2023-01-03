@@ -7,13 +7,14 @@
 package org.hibernate.search.mapper.pojo.massindexing.spi;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 
 /**
  * Contextual information about a search mapping.
  */
-public interface PojoMassIndexingMappingContext {
+public interface PojoMassIndexingMappingContext extends BackendMappingContext {
 
 	/**
 	 * @return A {@link EntityReferenceFactory} that relies on the object's class to return entity types.

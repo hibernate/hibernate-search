@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
@@ -19,13 +18,12 @@ class StubIndexWorkspace implements IndexWorkspace {
 
 	private final String indexName;
 	private final StubBackendBehavior behavior;
-	private final DetachedBackendSessionContext sessionContext;
+	private final String tenantId;
 
-	StubIndexWorkspace(String indexName, StubBackendBehavior behavior,
-			DetachedBackendSessionContext sessionContext) {
+	StubIndexWorkspace(String indexName, StubBackendBehavior behavior, String tenantId) {
 		this.indexName = indexName;
 		this.behavior = behavior;
-		this.sessionContext = sessionContext;
+		this.tenantId = tenantId;
 	}
 
 	@Override
@@ -35,7 +33,7 @@ class StubIndexWorkspace implements IndexWorkspace {
 				// because that doesn't matter,
 				// but here passing along the tenant identifier
 				// makes testing easier.
-				.tenantIdentifier( sessionContext.tenantIdentifier() )
+				.tenantIdentifier( tenantId )
 				.build();
 		return behavior.executeIndexScaleWork( indexName, work );
 	}
@@ -43,7 +41,7 @@ class StubIndexWorkspace implements IndexWorkspace {
 	@Override
 	public CompletableFuture<?> purge(Set<String> routingKeys, OperationSubmitter operationSubmitter) {
 		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.PURGE )
-				.tenantIdentifier( sessionContext.tenantIdentifier() )
+				.tenantIdentifier( tenantId )
 				.routingKeys( routingKeys )
 				.build();
 		return behavior.executeIndexScaleWork( indexName, work );
@@ -56,7 +54,7 @@ class StubIndexWorkspace implements IndexWorkspace {
 				// because that doesn't matter,
 				// but here passing along the tenant identifier
 				// makes testing easier.
-				.tenantIdentifier( sessionContext.tenantIdentifier() )
+				.tenantIdentifier( tenantId )
 				.build();
 		return behavior.executeIndexScaleWork( indexName, work );
 	}
@@ -68,7 +66,7 @@ class StubIndexWorkspace implements IndexWorkspace {
 				// because that doesn't matter,
 				// but here passing along the tenant identifier
 				// makes testing easier.
-				.tenantIdentifier( sessionContext.tenantIdentifier() )
+				.tenantIdentifier( tenantId )
 				.build();
 		return behavior.executeIndexScaleWork( indexName, work );
 	}

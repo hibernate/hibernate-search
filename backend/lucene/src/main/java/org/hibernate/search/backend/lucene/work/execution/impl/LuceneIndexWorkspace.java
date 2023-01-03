@@ -14,21 +14,20 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWork
 import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 
 public class LuceneIndexWorkspace implements IndexWorkspace {
 
 	private final LuceneWorkFactory factory;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
-	private final DetachedBackendSessionContext sessionContext;
+	private final String tenantId;
 
 	public LuceneIndexWorkspace(LuceneWorkFactory factory,
 			WorkExecutionIndexManagerContext indexManagerContext,
-			DetachedBackendSessionContext sessionContext) {
+			String tenantId) {
 		this.factory = factory;
 		this.indexManagerContext = indexManagerContext;
-		this.sessionContext = sessionContext;
+		this.tenantId = tenantId;
 	}
 
 	@Override
@@ -40,7 +39,7 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 	public CompletableFuture<?> purge(Set<String> routingKeys, OperationSubmitter operationSubmitter) {
 		return doSubmit(
 				indexManagerContext.managementOrchestrators( routingKeys ),
-				factory.deleteAll( sessionContext.tenantIdentifier(), routingKeys ),
+				factory.deleteAll( tenantId, routingKeys ),
 				true, operationSubmitter
 		);
 	}

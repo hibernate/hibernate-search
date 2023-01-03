@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.work.execution.impl;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
@@ -39,5 +38,5 @@ public interface WorkExecutionBackendContext {
 			BackendSessionContext sessionContext);
 
 	IndexWorkspace createWorkspace(WorkExecutionIndexManagerContext indexManagerContext,
-			DetachedBackendSessionContext sessionContext);
+			String tenantId);
 }
