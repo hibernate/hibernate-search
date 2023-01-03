@@ -15,7 +15,6 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
 /**
@@ -34,7 +33,15 @@ public interface MappedIndexManager {
 
 	IndexIndexer createIndexer(BackendSessionContext sessionContext);
 
-	IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext);
+	/**
+	 * @param sessionContext The detached session context.
+	 * @return An {@link IndexWorkspace}.
+	 * @deprecated Use {@link #createWorkspace(BackendMappingContext, String)} instead.
+	 */
+	@Deprecated
+	IndexWorkspace createWorkspace(org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext sessionContext);
+
+	IndexWorkspace createWorkspace(BackendMappingContext mappingContext, String tenantId);
 
 	<R, E> MappedIndexScopeBuilder<R, E> createScopeBuilder(BackendMappingContext mappingContext);
 

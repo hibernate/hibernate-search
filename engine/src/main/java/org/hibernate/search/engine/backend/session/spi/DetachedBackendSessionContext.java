@@ -24,7 +24,11 @@ import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
  * {@link org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor#createIndexingPlan(BackendSessionContext, DocumentCommitStrategy, DocumentRefreshStrategy) indexing plans}
  * or {@link org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor#createIndexer(BackendSessionContext) indexers}
  * because these may need access to the session.
+ *
+ * @deprecated SPIs should simply pass around a string representing the tenant ID instead of using this class.
+ * In cases where the mapping context is also necessary, it should be passed around as a separate parameter.
  */
+@Deprecated
 public final class DetachedBackendSessionContext {
 
 	public static DetachedBackendSessionContext of(BackendSessionContext sessionContext) {

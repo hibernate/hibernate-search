@@ -8,12 +8,9 @@ package org.hibernate.search.mapper.orm.scope.impl;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -87,11 +84,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	@Override
 	public SearchWorkspace workspace(String tenantId) {
-		return workspace( DetachedBackendSessionContext.of( mappingContext, tenantId ) );
-	}
-
-	public SearchWorkspace workspace(DetachedBackendSessionContext detachedSessionContext) {
-		return new SearchWorkspaceImpl( delegate.workspace( detachedSessionContext ) );
+		return new SearchWorkspaceImpl( delegate.workspace( tenantId ) );
 	}
 
 	@Override
@@ -106,35 +99,23 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	@Override
 	public MassIndexer massIndexer(Collection<String> tenantIds) {
-		List<DetachedBackendSessionContext> contexts;
 		if ( tenantIds.isEmpty() ) {
 			// Let's see if we are in multi-tenant environment and try to get the tenant ids
 			Set<String> configuredTenants = tenancyConfiguration.tenantIdsOrFail();
 			if ( configuredTenants.isEmpty() ) {
 				// if we didn't fail with exception - single tenant is used so just create an empty session:
-				contexts = Collections.singletonList( DetachedBackendSessionContext.of( mappingContext, null ) );
+				tenantIds = Collections.singletonList( null );
 			}
 			else {
-				contexts = configuredTenants.stream()
-						.map( id -> DetachedBackendSessionContext.of( mappingContext, id ) )
-						.collect( Collectors.toList() );
+				tenantIds = configuredTenants;
 			}
 		}
-		else {
-			contexts = tenantIds.stream()
-					.map( id -> DetachedBackendSessionContext.of( mappingContext, id ) )
-					.collect( Collectors.toList() );
-		}
 
-		return massIndexer( contexts );
-	}
-
-	public MassIndexer massIndexer(List<DetachedBackendSessionContext> detachedSessionContexts) {
 		HibernateOrmMassIndexingContext massIndexingContext = new HibernateOrmMassIndexingContext( mappingContext,
-						mappingContext.typeContextProvider() );
+				mappingContext.typeContextProvider() );
 
 		PojoMassIndexer massIndexerDelegate = delegate
-				.massIndexer( massIndexingContext, detachedSessionContexts );
+				.massIndexer( massIndexingContext, tenantIds );
 
 		return new HibernateOrmMassIndexer( massIndexerDelegate, massIndexingContext );
 	}

@@ -7,14 +7,13 @@
 package org.hibernate.search.mapper.pojo.standalone.session.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
@@ -99,7 +98,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	@Override
 	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
 		checkOpenAndThrow();
-		return scope( types ).massIndexer( Arrays.asList( DetachedBackendSessionContext.of( this ) ) );
+		return scope( types ).massIndexer( Collections.singletonList( this.tenantIdentifier() ) );
 	}
 
 	@Override
@@ -134,7 +133,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public SearchWorkspace workspace(Collection<? extends Class<?>> types) {
-		return scope( types ).workspace( DetachedBackendSessionContext.of( this ) );
+		return scope( types ).workspace( tenantIdentifier() );
 	}
 
 	@Override

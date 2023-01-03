@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
@@ -41,7 +40,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 	private final PojoMassIndexingTypeContextProvider typeContextProvider;
 	private final Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes;
 	private final PojoScopeSchemaManager scopeSchemaManager;
-	private final Collection<DetachedBackendSessionContext> detachedSessions;
+	private final Collection<String> tenantIds;
 	private final PojoScopeDelegate<?, ?, ?> pojoScopeDelegate;
 
 	// default settings defined here:
@@ -60,14 +59,14 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 			PojoMassIndexingTypeContextProvider typeContextProvider,
 			Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
 			PojoScopeSchemaManager scopeSchemaManager,
-			Collection<DetachedBackendSessionContext> detachedSessions,
+			Collection<String> tenantIds,
 			PojoScopeDelegate<?, ?, ?> pojoScopeDelegate) {
 		this.indexingContext = indexingContext;
 		this.mappingContext = mappingContext;
 		this.typeContextProvider = typeContextProvider;
 		this.targetedIndexedTypes = targetedIndexedTypes;
 		this.scopeSchemaManager = scopeSchemaManager;
-		this.detachedSessions = detachedSessions;
+		this.tenantIds = tenantIds;
 		this.pojoScopeDelegate = pojoScopeDelegate;
 	}
 
@@ -170,7 +169,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 				mappingContext,
 				notifier,
 				typeGroupsToIndex, scopeSchemaManager,
-				detachedSessions, pojoScopeDelegate,
+				tenantIds, pojoScopeDelegate,
 				typesToIndexInParallel, documentBuilderThreads,
 				mergeSegmentsOnFinish,
 				// false by default:

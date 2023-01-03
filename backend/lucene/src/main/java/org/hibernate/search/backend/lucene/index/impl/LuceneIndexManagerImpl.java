@@ -28,7 +28,6 @@ import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.common.resources.spi.SavedState;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -138,8 +137,8 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext) {
-		return backendContext.createWorkspace( shardHolder, sessionContext );
+	public IndexWorkspace createWorkspace(BackendMappingContext mappingContext, String tenantId) {
+		return backendContext.createWorkspace( shardHolder, tenantId );
 	}
 
 	@Override

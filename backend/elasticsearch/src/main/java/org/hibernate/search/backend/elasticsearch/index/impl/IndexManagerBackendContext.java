@@ -36,7 +36,6 @@ import org.hibernate.search.backend.elasticsearch.work.execution.impl.WorkExecut
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.WorkExecutionIndexManagerContext;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -123,13 +122,12 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	}
 
 	@Override
-	public IndexWorkspace createWorkspace(WorkExecutionIndexManagerContext indexManagerContext,
-			DetachedBackendSessionContext sessionContext) {
-		multiTenancyStrategy.documentIdHelper().checkTenantId( sessionContext.tenantIdentifier(), eventContext );
+	public IndexWorkspace createWorkspace(WorkExecutionIndexManagerContext indexManagerContext, String tenantId) {
+		multiTenancyStrategy.documentIdHelper().checkTenantId( tenantId, eventContext );
 
 		return new ElasticsearchIndexWorkspace(
 				link.getWorkFactory(), multiTenancyStrategy, generalPurposeOrchestrator,
-				indexManagerContext, sessionContext
+				indexManagerContext, tenantId
 		);
 	}
 

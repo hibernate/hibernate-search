@@ -17,7 +17,6 @@ import org.hibernate.search.engine.mapper.scope.impl.MappedIndexScopeBuilderImpl
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 
@@ -58,8 +57,14 @@ public class MappedIndexManagerImpl implements MappedIndexManager {
 	}
 
 	@Override
-	public IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext) {
-		return implementor.createWorkspace( sessionContext );
+	@Deprecated
+	public IndexWorkspace createWorkspace(org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext sessionContext) {
+		return createWorkspace( sessionContext.mappingContext(), sessionContext.tenantIdentifier() );
+	}
+
+	@Override
+	public IndexWorkspace createWorkspace(BackendMappingContext mappingContext, String tenantId) {
+		return implementor.createWorkspace( mappingContext, tenantId );
 	}
 
 	@Override

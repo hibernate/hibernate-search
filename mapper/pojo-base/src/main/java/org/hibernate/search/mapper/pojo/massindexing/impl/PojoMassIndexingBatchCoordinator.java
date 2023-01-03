@@ -15,7 +15,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
@@ -41,7 +40,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	private final List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex;
 
 	private final PojoScopeSchemaManager scopeSchemaManager;
-	private final Collection<DetachedBackendSessionContext> detachedSessions;
+	private final Collection<String> tenantIds;
 	private final PojoScopeDelegate<?, ?, ?> pojoScopeDelegate;
 	private final int typesToIndexInParallel;
 	private final int documentBuilderThreads;
@@ -58,7 +57,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 			PojoMassIndexingNotifier notifier,
 			List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex,
 			PojoScopeSchemaManager scopeSchemaManager,
-			Collection<DetachedBackendSessionContext> detachedSessions,
+			Collection<String> tenantIds,
 			PojoScopeDelegate<?, ?, ?> pojoScopeDelegate,
 			int typesToIndexInParallel, int documentBuilderThreads, boolean mergeSegmentsOnFinish,
 			boolean dropAndCreateSchemaOnStart, boolean purgeAtStart, boolean mergeSegmentsAfterPurge) {
@@ -67,7 +66,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 		this.typeGroupsToIndex = typeGroupsToIndex;
 
 		this.scopeSchemaManager = scopeSchemaManager;
-		this.detachedSessions = detachedSessions;
+		this.tenantIds = tenantIds;
 		this.pojoScopeDelegate = pojoScopeDelegate;
 		this.typesToIndexInParallel = typesToIndexInParallel;
 		this.documentBuilderThreads = documentBuilderThreads;
@@ -100,15 +99,15 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	 */
 	private void beforeBatch() throws InterruptedException {
 		// Prepare the contexts first. These will be used for all batch related work:
-		for ( DetachedBackendSessionContext detachedSession : detachedSessions ) {
+		for ( String tenantId : tenantIds ) {
 			sessionContexts.add(
 					new SessionContext(
 							// Create an agent to suspend concurrent indexing
 							mappingContext.createMassIndexerAgent(
-									new PojoMassIndexerAgentCreateContextImpl( mappingContext, detachedSession.tenantIdentifier() )
+									new PojoMassIndexerAgentCreateContextImpl( mappingContext, tenantId )
 							),
-							pojoScopeDelegate.workspace( detachedSession ),
-							detachedSession
+							pojoScopeDelegate.workspace( tenantId ),
+							tenantId
 					)
 			);
 		}
@@ -171,7 +170,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 				mappingContext, getNotifier(), typeGroup,
 				typeGroup.loadingStrategy(),
 				documentBuilderThreads,
-				context.sessionContext().tenantIdentifier()
+				context.tenantIdentifier()
 		);
 	}
 
@@ -252,12 +251,12 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	public static class SessionContext {
 		private final PojoMassIndexerAgent agent;
 		private final PojoScopeWorkspace scopeWorkspace;
-		private final DetachedBackendSessionContext sessionContext;
+		private final String tenantIdentifier;
 
-		public SessionContext(PojoMassIndexerAgent agent, PojoScopeWorkspace scopeWorkspace, DetachedBackendSessionContext sessionContext) {
+		public SessionContext(PojoMassIndexerAgent agent, PojoScopeWorkspace scopeWorkspace, String tenantIdentifier) {
 			this.agent = agent;
 			this.scopeWorkspace = scopeWorkspace;
-			this.sessionContext = sessionContext;
+			this.tenantIdentifier = tenantIdentifier;
 		}
 
 		public PojoMassIndexerAgent agent() {
@@ -268,8 +267,8 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 			return scopeWorkspace;
 		}
 
-		public DetachedBackendSessionContext sessionContext() {
-			return sessionContext;
+		public String tenantIdentifier() {
+			return tenantIdentifier;
 		}
 	}
 

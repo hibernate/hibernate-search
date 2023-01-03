@@ -11,7 +11,6 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
 /**
@@ -38,7 +37,6 @@ public interface WorkExecutionBackendContext {
 			WorkExecutionIndexManagerContext indexManagerContext,
 			BackendSessionContext sessionContext);
 
-	IndexWorkspace createWorkspace(WorkExecutionIndexManagerContext indexManagerContext,
-			DetachedBackendSessionContext sessionContext);
+	IndexWorkspace createWorkspace(WorkExecutionIndexManagerContext indexManagerContext, String tenantId);
 
 }

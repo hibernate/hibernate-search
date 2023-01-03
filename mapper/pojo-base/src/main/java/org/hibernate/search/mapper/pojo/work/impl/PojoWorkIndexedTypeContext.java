@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
@@ -38,6 +38,6 @@ public interface PojoWorkIndexedTypeContext<I, E> extends PojoWorkTypeContext<I,
 
 	IndexIndexer createIndexer(PojoWorkSessionContext sessionContext);
 
-	IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext);
+	IndexWorkspace createWorkspace(BackendMappingContext mappingContext, String tenantId);
 
 }

@@ -16,7 +16,7 @@ import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
@@ -35,7 +35,8 @@ public class BulkIndexer {
 	private static final int PARALLELISM = 2;
 
 	private final MappedIndexManager indexManager;
-	private final DetachedBackendSessionContext sessionContext;
+	private final BackendMappingContext mappingContext;
+	private final String tenantId;
 	private final IndexIndexer indexer;
 	private final boolean refresh;
 
@@ -46,7 +47,8 @@ public class BulkIndexer {
 
 	BulkIndexer(MappedIndexManager indexManager, StubSession sessionContext, boolean refresh) {
 		this.indexManager = indexManager;
-		this.sessionContext = DetachedBackendSessionContext.of( sessionContext );
+		this.mappingContext = sessionContext.mappingContext();
+		this.tenantId = sessionContext.tenantIdentifier();
 		this.indexer = indexManager.createIndexer( sessionContext );
 		this.refresh = refresh;
 		this.indexingQueues = new ArrayList<>( PARALLELISM );
@@ -117,7 +119,7 @@ public class BulkIndexer {
 		}
 		CompletableFuture<?> future = CompletableFuture.allOf( indexingFutures );
 		if ( refresh ) {
-			IndexWorkspace workspace = indexManager.createWorkspace( sessionContext );
+			IndexWorkspace workspace = indexManager.createWorkspace( mappingContext, tenantId );
 			future = future.thenCompose( ignored -> workspace.refresh( OperationSubmitter.BLOCKING ) );
 		}
 		return future;

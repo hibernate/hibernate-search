@@ -42,7 +42,6 @@ import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionInde
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
@@ -138,10 +137,10 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 
 	@Override
 	public IndexWorkspace createWorkspace(WorkExecutionIndexManagerContext indexManagerContext,
-			DetachedBackendSessionContext sessionContext) {
-		multiTenancyStrategy.checkTenantId( sessionContext.tenantIdentifier(), eventContext );
+			String tenantId) {
+		multiTenancyStrategy.checkTenantId( tenantId, eventContext );
 
-		return new LuceneIndexWorkspace( workFactory, indexManagerContext, sessionContext );
+		return new LuceneIndexWorkspace( workFactory, indexManagerContext, tenantId );
 	}
 
 	@Override

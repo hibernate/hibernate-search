@@ -11,7 +11,6 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
@@ -115,8 +114,8 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 	}
 
 	@Override
-	public IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext) {
-		return indexManager.createWorkspace( sessionContext );
+	public IndexWorkspace createWorkspace(BackendMappingContext mappingContext, String tenantId) {
+		return indexManager.createWorkspace( mappingContext, tenantId );
 	}
 
 	@Override
