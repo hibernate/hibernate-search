@@ -53,6 +53,15 @@ public interface PojoScopeDelegate<R, E, C> {
 
 	PojoScopeSchemaManager schemaManager();
 
+	/**
+	 * @param context The mass indexing context.
+	 * @param detachedSession The detached session, for the tenant ID.
+	 * @return A {@link PojoMassIndexer}.
+	 * @deprecated Use {@link #massIndexer(PojoMassIndexingContext, Collection)} instead.
+	 */
+	@Deprecated
+	PojoMassIndexer massIndexer(PojoMassIndexingContext context, DetachedBackendSessionContext detachedSession);
+
 	PojoMassIndexer massIndexer(PojoMassIndexingContext context, Collection<DetachedBackendSessionContext> detachedSessions);
 
 	<T> T extension(IndexScopeExtension<T> extension);
