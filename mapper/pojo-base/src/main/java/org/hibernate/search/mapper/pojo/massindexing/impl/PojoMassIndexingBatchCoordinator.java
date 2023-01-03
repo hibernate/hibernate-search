@@ -114,9 +114,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 		}
 
 		// Start the agent and wait until concurrent indexing actually gets suspended
-		applyToAllContexts(
-				c -> CompletableFuture.supplyAsync( () -> c.agent().start() )
-		);
+		applyToAllContexts( c -> c.agent().start() );
 
 
 		if ( dropAndCreateSchemaOnStart ) {
