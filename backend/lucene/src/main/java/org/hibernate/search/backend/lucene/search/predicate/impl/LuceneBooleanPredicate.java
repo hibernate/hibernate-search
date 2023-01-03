@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -193,33 +194,20 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 
 		@Override
 		public SearchPredicate build() {
-			if ( mustClauses != null ) {
-				Iterator<LuceneSearchPredicate> mustIterator = mustClauses.iterator();
-				while ( mustIterator.hasNext() ) {
-					LuceneSearchPredicate must = mustIterator.next();
-					if ( must instanceof LuceneBooleanPredicate
-							&& ( (LuceneBooleanPredicate) must ).hasOnlyOneMustNotClause()
-							&& ( (LuceneBooleanPredicate) must ).hasNoModifiers()
-					) {
-						mustIterator.remove();
-						mustNot( ( (LuceneBooleanPredicate) must ).mustNotClauses.get( 0 ) );
-					}
-				}
-				if ( mustClauses.isEmpty() ) {
-					mustClauses = null;
-				}
-			}
+			optimizeClauseCollection(
+					mustClauses,
+					this::mustNot
+			);
+
+			optimizeClauseCollection(
+					mustNotClauses,
+					this::must
+			);
+
+			checkAndClearClauseCollections();
 
 			if ( hasNoModifiers() ) {
-				if ( hasOnlyOneMustNotClause() ) {
-					LuceneSearchPredicate mustNot = mustNotClauses.get( 0 );
-					if ( mustNot instanceof LuceneBooleanPredicate
-							&& ( (LuceneBooleanPredicate) mustNot ).hasOnlyOneMustNotClause()
-							&& ( (LuceneBooleanPredicate) mustNot ).hasNoModifiers() ) {
-						return ( (LuceneBooleanPredicate) mustNot ).mustNotClauses.get( 0 );
-					}
-				}
-				else if ( hasOnlyOneMustClause() ) {
+				if ( hasOnlyOneMustClause() ) {
 					return mustClauses.get( 0 );
 				}
 				else if ( hasOnlyOneShouldClause() ) {
@@ -230,11 +218,30 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 			return new LuceneBooleanPredicate( this );
 		}
 
-		private boolean hasOnlyOneMustNotClause() {
-			return mustNotClauses != null && mustNotClauses.size() == 1
-					&& ( mustClauses == null || mustClauses.isEmpty() )
-					&& ( shouldClauses == null || shouldClauses.isEmpty() )
-					&& ( filterClauses == null || filterClauses.isEmpty() );
+		private void optimizeClauseCollection(List<LuceneSearchPredicate> collection,
+				Consumer<LuceneSearchPredicate> newCollection) {
+			if ( collection != null ) {
+				Iterator<LuceneSearchPredicate> iterator = collection.iterator();
+				while ( iterator.hasNext() ) {
+					LuceneSearchPredicate clause = iterator.next();
+					if ( clause instanceof LuceneBooleanPredicate
+							&& ( (LuceneBooleanPredicate) clause ).hasOnlyOneMustNotClause()
+							&& ( (LuceneBooleanPredicate) clause ).hasNoModifiers()
+					) {
+						iterator.remove();
+						newCollection.accept( ( (LuceneBooleanPredicate) clause ).mustNotClauses.get( 0 ) );
+					}
+				}
+			}
+		}
+
+		private void checkAndClearClauseCollections() {
+			if ( mustClauses != null && mustClauses.isEmpty() ) {
+				mustClauses = null;
+			}
+			if ( mustNotClauses != null && mustNotClauses.isEmpty() ) {
+				mustNotClauses = null;
+			}
 		}
 
 		private boolean hasOnlyOneMustClause() {

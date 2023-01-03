@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.GsonUtils;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
@@ -237,33 +238,20 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 				return new ElasticsearchMatchNonePredicate( this );
 			}
 
-			if ( mustClauses != null ) {
-				Iterator<ElasticsearchSearchPredicate> mustIterator = mustClauses.iterator();
-				while ( mustIterator.hasNext() ) {
-					ElasticsearchSearchPredicate must = mustIterator.next();
-					if ( must instanceof ElasticsearchBooleanPredicate
-							&& ( (ElasticsearchBooleanPredicate) must ).hasOnlyOneMustNotClause()
-							&& ( (ElasticsearchBooleanPredicate) must ).hasNoModifiers()
-					) {
-						mustIterator.remove();
-						mustNot( ( (ElasticsearchBooleanPredicate) must ).mustNotClauses.get( 0 ) );
-					}
-				}
-				if ( mustClauses.isEmpty() ) {
-					mustClauses = null;
-				}
-			}
+			optimizeClauseCollection(
+					mustClauses,
+					this::mustNot
+			);
+
+			optimizeClauseCollection(
+					mustNotClauses,
+					this::must
+			);
+
+			checkAndClearClauseCollections();
 
 			if ( hasNoModifiers() ) {
-				if ( hasOnlyOneMustNotClause() ) {
-					ElasticsearchSearchPredicate mustNot = mustNotClauses.get( 0 );
-					if ( mustNot instanceof ElasticsearchBooleanPredicate
-							&& ( (ElasticsearchBooleanPredicate) mustNot ).hasOnlyOneMustNotClause()
-							&& ( (ElasticsearchBooleanPredicate) mustNot ).hasNoModifiers() ) {
-						return ( (ElasticsearchBooleanPredicate) mustNot ).mustNotClauses.get( 0 );
-					}
-				}
-				else if ( hasOnlyOneMustClause() ) {
+				if ( hasOnlyOneMustClause() ) {
 					return mustClauses.get( 0 );
 				}
 				else if ( hasOnlyOneShouldClause() ) {
@@ -279,15 +267,34 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			return new ElasticsearchBooleanPredicate( this );
 		}
 
-		private boolean hasAtLeastOneMustOrFilterPredicate() {
-			return mustClauses != null || filterClauses != null;
+		private void optimizeClauseCollection(List<ElasticsearchSearchPredicate> collection,
+				Consumer<ElasticsearchSearchPredicate> newCollection) {
+			if ( collection != null ) {
+				Iterator<ElasticsearchSearchPredicate> iterator = collection.iterator();
+				while ( iterator.hasNext() ) {
+					ElasticsearchSearchPredicate clause = iterator.next();
+					if ( clause instanceof ElasticsearchBooleanPredicate
+							&& ( (ElasticsearchBooleanPredicate) clause ).hasOnlyOneMustNotClause()
+							&& ( (ElasticsearchBooleanPredicate) clause ).hasNoModifiers()
+					) {
+						iterator.remove();
+						newCollection.accept( ( (ElasticsearchBooleanPredicate) clause ).mustNotClauses.get( 0 ) );
+					}
+				}
+			}
 		}
 
-		private boolean hasOnlyOneMustNotClause() {
-			return mustNotClauses != null && mustNotClauses.size() == 1
-					&& ( mustClauses == null || mustClauses.isEmpty() )
-					&& ( shouldClauses == null || shouldClauses.isEmpty() )
-					&& ( filterClauses == null || filterClauses.isEmpty() );
+		private void checkAndClearClauseCollections() {
+			if ( mustClauses != null && mustClauses.isEmpty() ) {
+				mustClauses = null;
+			}
+			if ( mustNotClauses != null && mustNotClauses.isEmpty() ) {
+				mustNotClauses = null;
+			}
+		}
+
+		private boolean hasAtLeastOneMustOrFilterPredicate() {
+			return mustClauses != null || filterClauses != null;
 		}
 
 		private boolean hasOnlyOneMustClause() {
