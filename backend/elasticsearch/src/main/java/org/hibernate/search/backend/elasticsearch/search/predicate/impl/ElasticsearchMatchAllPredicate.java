@@ -17,7 +17,7 @@ import com.google.gson.JsonObject;
 
 class ElasticsearchMatchAllPredicate extends AbstractElasticsearchPredicate {
 
-	private static final JsonObjectAccessor MATCH_ALL_ACCESSOR = JsonAccessor.root().property( "match_all" ).asObject();
+	static final JsonObjectAccessor MATCH_ALL_ACCESSOR = JsonAccessor.root().property( "match_all" ).asObject();
 
 	private ElasticsearchMatchAllPredicate(Builder builder) {
 		super( builder );

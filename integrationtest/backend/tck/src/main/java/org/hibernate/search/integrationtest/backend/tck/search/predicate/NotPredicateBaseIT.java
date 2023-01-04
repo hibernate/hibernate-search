@@ -59,12 +59,6 @@ public class NotPredicateBaseIT {
 			super( index, dataSet );
 		}
 
-
-		@Override
-		public void predicateLevelBoost() {
-			// ignore
-		}
-
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal) {
 			return f.not( f.id().matchingAny( dataSet.docsExcept( matchingDocOrdinal ) ) );

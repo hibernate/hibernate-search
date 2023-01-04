@@ -71,7 +71,7 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 		contributeQueries( context, booleanQueryBuilder, filterClauses, Occur.FILTER );
 
 		if ( isOnlyMustNot() ) {
-			booleanQueryBuilder.add( new MatchAllDocsQuery(), Occur.FILTER );
+			booleanQueryBuilder.add( new MatchAllDocsQuery(), super.hasNoModifiers() ? Occur.FILTER : Occur.MUST );
 		}
 
 		if ( minimumShouldMatchConstraints != null && shouldClauses != null ) {

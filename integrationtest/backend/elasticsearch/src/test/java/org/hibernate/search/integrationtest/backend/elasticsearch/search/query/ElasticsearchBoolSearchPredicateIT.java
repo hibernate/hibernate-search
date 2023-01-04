@@ -6,11 +6,10 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.search.query;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEqualsIgnoringUnknownFields;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -18,9 +17,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 public class ElasticsearchBoolSearchPredicateIT {
 
@@ -37,18 +33,8 @@ public class ElasticsearchBoolSearchPredicateIT {
 	@Test
 	public void resultingQueryOptimization() {
 		SearchPredicateFactory f = index.createScope().predicate();
-		BooleanPredicateClausesStep<?> step = f.bool().must( f.not( f.not(
-				f.not( f.not( f.not( f.not( f.not( f.match().field( "fieldName" ).matching( "test" ) ) ) ) ) ) ) ) );
 
-		assertThat(
-				new Gson().fromJson(
-						index.query()
-								.where( ( step ).toPredicate() )
-								.toQuery()
-								.queryString(),
-						JsonObject.class
-				)
-		).isEqualTo( new Gson().fromJson(
+		assertJsonEqualsIgnoringUnknownFields(
 				"{" +
 						"  \"query\": {" +
 						"    \"bool\": {" +
@@ -60,21 +46,15 @@ public class ElasticsearchBoolSearchPredicateIT {
 						"        }" +
 						"      }" +
 						"    }" +
-						"  }," +
-						"  \"_source\": false" +
+						"  }" +
 						"}",
-				JsonObject.class
-		) );
+				index.query()
+						.where( f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "fieldName" ).matching( "test" ) ) ) ) ) ) ) ) ).toPredicate() )
+						.toQuery()
+						.queryString()
+		);
 
-		assertThat(
-				new Gson().fromJson(
-						index.query()
-								.where( f.not( ( step ) ).toPredicate() )
-								.toQuery()
-								.queryString(),
-						JsonObject.class
-				)
-		).isEqualTo( new Gson().fromJson(
+		assertJsonEqualsIgnoringUnknownFields(
 				"{" +
 						"  \"query\": {" +
 						"    \"match\": {" +
@@ -82,27 +62,15 @@ public class ElasticsearchBoolSearchPredicateIT {
 						"        \"query\": \"test\"" +
 						"      }" +
 						"    }" +
-						"  }," +
-						"  \"_source\": false" +
+						"  }" +
 						"}",
-				JsonObject.class
-		) );
+				index.query()
+						.where( f.not( f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "fieldName" ).matching( "test" ) ) ) ) ) ) ) ) ) ).toPredicate() )
+						.toQuery()
+						.queryString()
+		);
 
-		assertThat(
-				new Gson().fromJson(
-						index.query()
-								.where( f.bool()
-										.must( f.match().field( "fieldName" ).matching( "test1" ) )
-										.must( f.not( f.match().field( "fieldName" ).matching( "test2" ) ) )
-										.mustNot( f.not( f.match().field( "fieldName" ).matching( "test3" ) ) )
-										.mustNot( f.matchNone() )
-										.toPredicate()
-								)
-								.toQuery()
-								.queryString(),
-						JsonObject.class
-				)
-		).isEqualTo( new Gson().fromJson(
+		assertJsonEqualsIgnoringUnknownFields(
 				"{" +
 						"  \"query\": {" +
 						"    \"bool\": {" +
@@ -136,11 +104,68 @@ public class ElasticsearchBoolSearchPredicateIT {
 						"      ]," +
 						"      \"minimum_should_match\": \"0\"" +
 						"    }" +
-						"  }," +
-						"  \"_source\": false" +
+						"  }" +
 						"}",
-				JsonObject.class
-		) );
+				index.query()
+						.where( f.bool()
+								.must( f.match().field( "fieldName" ).matching( "test1" ) )
+								.must( f.not( f.match().field( "fieldName" ).matching( "test2" ) ) )
+								.mustNot( f.not( f.match().field( "fieldName" ).matching( "test3" ) ) )
+								.mustNot( f.matchNone() )
+								.toPredicate()
+						)
+						.toQuery()
+						.queryString()
+		);
+	}
+	@Test
+	public void resultingQueryOptimizationWithBoost() {
+		SearchPredicateFactory f = index.createScope().predicate();
+
+		assertJsonEqualsIgnoringUnknownFields(
+				"{" +
+						"  \"query\": {" +
+						"    \"bool\": {" +
+						"      \"must_not\": {" +
+						"        \"match\": {" +
+						"          \"fieldName\": {" +
+						"            \"query\": \"test\"" +
+						"          }" +
+						"        }" +
+						"      }" +
+						"    }" +
+						"  }" +
+						"}",
+				index.query()
+						.where( f.not( f.match().field( "fieldName" ).matching( "test" ) ).toPredicate() )
+						.toQuery()
+						.queryString()
+		);
+
+		// having boost in the not predicate should result in having additional must{match_all{}}
+		assertJsonEqualsIgnoringUnknownFields(
+				"{" +
+						"  \"query\": {" +
+						"    \"bool\": {" +
+						"      \"boost\": 5.0," +
+						"      \"must_not\": {" +
+						"        \"match\": {" +
+						"          \"fieldName\": {" +
+						"            \"query\": \"test\"" +
+						"          }" +
+						"        }" +
+						"      }," +
+						"      \"must\": {" +
+						"        \"match_all\": {}" +
+						"      }" +
+						"    }" +
+						"  }" +
+						"}",
+				index.query()
+						.where( f.not( f.match().field( "fieldName" ).matching( "test" ) ).boost( 5.0F ).toPredicate() )
+						.toQuery()
+						.queryString()
+		);
 	}
 
 	private static class IndexBinding {
