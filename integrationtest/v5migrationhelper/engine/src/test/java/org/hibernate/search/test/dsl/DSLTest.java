@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.test.dsl;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -36,6 +35,7 @@ import org.junit.rules.ExpectedException;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.Query;
 import org.hamcrest.CoreMatchers;
 
@@ -355,8 +355,7 @@ public class DSLTest {
 				.should( null )
 				.createQuery();
 
-		assertThat( query, CoreMatchers.instanceOf( BooleanQuery.class ) );
-		assertEquals( 1, ( (BooleanQuery) query ).clauses().size() );
+		assertThat( query, CoreMatchers.instanceOf( BoostQuery.class ) );
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 1 );
 
@@ -368,8 +367,7 @@ public class DSLTest {
 					.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
 					.createQuery();
 
-		assertThat( query, CoreMatchers.instanceOf( BooleanQuery.class ) );
-		assertEquals( 1, ( (BooleanQuery) query ).clauses().size() );
+		assertThat( query, CoreMatchers.instanceOf( BoostQuery.class ) );
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 1 );
 	}
