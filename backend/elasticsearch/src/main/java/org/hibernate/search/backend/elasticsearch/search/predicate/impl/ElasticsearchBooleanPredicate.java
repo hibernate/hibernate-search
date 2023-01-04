@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import static org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchMatchAllPredicate.MATCH_ALL_ACCESSOR;
+
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -74,6 +76,12 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		contributeClauses( context, innerObject, MUST_NOT_PROPERTY_NAME, mustNotClauses );
 		contributeClauses( context, innerObject, SHOULD_PROPERTY_NAME, shouldClauses );
 		contributeClauses( context, innerObject, FILTER_PROPERTY_NAME, filterClauses );
+
+		if ( isOnlyMustNot() && !super.hasNoModifiers() ) {
+			JsonObject matchAllClause = new JsonObject();
+			MATCH_ALL_ACCESSOR.set( matchAllClause, new JsonObject() );
+			GsonUtils.setOrAppendToArray( innerObject, MUST_PROPERTY_NAME, matchAllClause );
+		}
 
 		if ( minimumShouldMatchConstraints != null ) {
 			MINIMUM_SHOULD_MATCH_ACCESSOR.set(

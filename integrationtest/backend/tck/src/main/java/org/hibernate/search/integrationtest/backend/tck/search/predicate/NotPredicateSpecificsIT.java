@@ -6,21 +6,14 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
-import java.util.Arrays;
-
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubLoadingOptionsStep;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -102,15 +95,14 @@ public class NotPredicateSpecificsIT {
 	@Test
 	public void manyNestedNot() {
 		SearchPredicateFactory f = index.createScope().predicate();
-		BooleanPredicateClausesStep<?> step = f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) ) ) ) ) ) ) ) );
 
 		assertThatQuery( index.query()
-				.where( ( step ).toPredicate() ) )
+				.where( f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) ) ) ) ) ) ) ) ).toPredicate() ) )
 				.hasTotalHitCount( 2 )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2, DOCUMENT_3 );
 
 		assertThatQuery( index.query()
-				.where( f.not( ( step ) ).toPredicate() ) )
+				.where( f.not( f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) ) ) ) ) ) ) ) ) ).toPredicate() ) )
 				.hasTotalHitCount( 1 )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}

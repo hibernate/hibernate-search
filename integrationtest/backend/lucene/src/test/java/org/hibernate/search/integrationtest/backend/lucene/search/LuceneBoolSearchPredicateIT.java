@@ -9,12 +9,9 @@ package org.hibernate.search.integrationtest.backend.lucene.search;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -59,18 +56,16 @@ public class LuceneBoolSearchPredicateIT {
 	@Test
 	public void resultingQueryOptimization() {
 		SearchPredicateFactory f = index.createScope().predicate();
-		BooleanPredicateClausesStep<?> step = f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "fieldName" ).matching( "test" ) ) ) ) ) ) ) ) );
-
 		assertThat(
 				index.query()
-						.where( ( step ).toPredicate() )
+						.where( f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "fieldName" ).matching( "test" ) ) ) ) ) ) ) ) ).toPredicate() )
 						.toQuery()
 						.queryString()
 		).isEqualTo( "+(-fieldName:test #*:*)" );
 
 		assertThat(
 				index.query()
-						.where( f.not( ( step ) ).toPredicate() )
+						.where( f.not( f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "fieldName" ).matching( "test" ) ) ) ) ) ) ) ) ) ).toPredicate() )
 						.toQuery()
 						.queryString()
 		).isEqualTo( "+fieldName:test" );
@@ -87,6 +82,28 @@ public class LuceneBoolSearchPredicateIT {
 						.toQuery()
 						.queryString()
 		).isEqualTo( "+(+fieldName:test1 +fieldName:test3 -MatchNoDocsQuery(\"\") -fieldName:test2)" );
+	}
+
+	@Test
+	public void resultingQueryOptimizationWithBoost() {
+		SearchPredicateFactory f = index.createScope().predicate();
+		// by default Lucene bool query would have a filter on match all
+		assertThat(
+				index.query()
+						.where( f.not( f.match().field( "fieldName" ).matching( "test" ) ).toPredicate() )
+						.toQuery()
+						.queryString()
+		).isEqualTo( "+(-fieldName:test #*:*)" );
+
+		// but having boost in the not predicate should result in having a *:* as "must"
+		assertThat(
+				index.query()
+						.where(
+								f.not( f.match().field( "fieldName" ).matching( "test" ) ).boost( 5.0F ).toPredicate()
+						)
+						.toQuery()
+						.queryString()
+		).isEqualTo( "+(-fieldName:test +*:*)^5.0" );
 	}
 
 	private static class IndexBinding {
