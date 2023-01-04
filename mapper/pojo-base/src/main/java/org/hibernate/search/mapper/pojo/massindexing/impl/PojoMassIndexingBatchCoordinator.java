@@ -190,8 +190,12 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 		flushAndRefresh();
 		applyToAllContexts(
 				context -> context.agent().preStop()
-						.thenRun( () -> context.agent().stop() )
 		);
+		// NOTE: HSEARCH-4773 this loop was added here on purpose, as composing this stop() operation to the above future
+		// was causing an issue when running against Oracle DB. Doing it like this seems to allow a graceful stopping of the agents.
+		for ( SessionContext context : sessionContexts ) {
+			context.agent().stop();
+		}
 		sessionContexts.clear();
 	}
 
