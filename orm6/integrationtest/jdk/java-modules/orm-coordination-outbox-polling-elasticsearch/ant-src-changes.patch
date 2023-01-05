@@ -1,0 +1,27 @@
+diff --git a/main/java/module-info.java b/main/java/module-info.java
+index de9b64d55f..56efa76484 100644
+--- a/main/java/module-info.java
++++ b/main/java/module-info.java
+@@ -17,16 +17,16 @@
+ 	requires org.hibernate.search.backend.elasticsearch;
+ 	requires org.hibernate.search.mapper.orm.coordination.outboxpolling;
+ 
+-	// This should be re-exported transitively by org.hibernate.search.mapper.orm
+-	// but currently isn't, because org.hibernate.search.mapper.orm
+-	// is still an automatic module
+-	requires org.hibernate.search.engine;
+-	requires org.hibernate.search.mapper.pojo;
+-
+ 	/*
+ 	 * This is necessary in order to use SessionFactory,
+ 	 * which extends "javax.naming.Referenceable".
+ 	 * Without this, compilation as a Java module fails.
+ 	 */
+ 	requires java.naming;
++
++	/*
++	 * This is necessary in order to put ByteBuddy in the modulepath and make module exports effective.
++	 * I do not know why ByteBuddy doesn't end up in the modulepath without this.
++	 */
++	requires net.bytebuddy;
+ }
