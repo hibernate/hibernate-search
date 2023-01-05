@@ -124,4 +124,8 @@ public abstract class TckBackendFeatures {
 		return true;
 	}
 
+	public boolean supportsExtremeLongValuesInAggregations() {
+		return true;
+	}
+
 }
