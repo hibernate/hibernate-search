@@ -32,4 +32,10 @@ module org.hibernate.search.integrationtest.java.module.orm.elasticsearch.coordi
 
 	// Since Avro is using log4j we need to explicitly require it to make things work:
 	requires org.apache.logging.log4j;
+
+	/*
+	 * This is necessary in order to put ByteBuddy in the modulepath and make module exports effective.
+	 * I do not know why ByteBuddy doesn't end up in the modulepath without this.
+	 */
+	requires net.bytebuddy;
 }
