@@ -5,7 +5,6 @@ module org.hibernate.search.integrationtest.java.modules.pojo.standalone.elastic
 	opens org.hibernate.search.integrationtest.java.modules.pojo.standalone.elasticsearch.config to
 			org.hibernate.search.engine; // For reflective instantiation of the analysis configurer
 
-	requires org.hibernate.search.engine;
 	requires org.hibernate.search.backend.elasticsearch;
 	requires org.hibernate.search.mapper.pojo.standalone;
 

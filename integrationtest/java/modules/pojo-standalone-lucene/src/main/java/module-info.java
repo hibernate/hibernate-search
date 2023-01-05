@@ -5,7 +5,6 @@ module org.hibernate.search.integrationtest.java.modules.pojo.standalone.lucene 
 	opens org.hibernate.search.integrationtest.java.modules.pojo.standalone.lucene.config to
 			org.hibernate.search.engine; // For reflective instantiation of the analysis configurer
 
-	requires org.hibernate.search.engine;
 	requires org.hibernate.search.backend.lucene;
 	requires org.hibernate.search.mapper.pojo.standalone;
 
