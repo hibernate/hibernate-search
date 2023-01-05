@@ -17,12 +17,6 @@ module org.hibernate.search.integrationtest.java.module.orm.elasticsearch.coordi
 	requires org.hibernate.search.backend.elasticsearch;
 	requires org.hibernate.search.mapper.orm.coordination.outboxpolling;
 
-	// This should be re-exported transitively by org.hibernate.search.mapper.orm
-	// but currently isn't, because org.hibernate.search.mapper.orm
-	// is still an automatic module
-	requires org.hibernate.search.engine;
-	requires org.hibernate.search.mapper.pojo;
-
 	/*
 	 * This is necessary in order to use SessionFactory,
 	 * which extends "javax.naming.Referenceable".
