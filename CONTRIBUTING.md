@@ -159,7 +159,7 @@ Before submitting a pull requests, check your contribution:
   No need to run the whole test suite, the Continuous Integration will take care of that.
 
 **Note**: If you want to run specific tests of the `integrationtests/backend/tck` module from the IDE,
-you will need to rely on runner classes to to run them in the appropriate context:
+you will need to rely on runner classes to run them in the appropriate context:
 see `org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckTestRunner` for Elasticsearch,
 or `org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneTckTestRunner` for Lucene.
 
