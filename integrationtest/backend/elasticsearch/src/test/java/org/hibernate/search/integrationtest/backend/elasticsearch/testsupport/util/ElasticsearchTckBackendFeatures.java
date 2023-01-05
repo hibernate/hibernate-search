@@ -249,6 +249,15 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean supportsMatchOnScaledNumericLossOfPrecision() {
 		// https://github.com/elastic/elasticsearch/issues/91246
 		// Hopefully this will get fixed in 8.5.4.
-		return !isBetween( actualVersion, "elastic:8.5.0", "elastic:8.5.3" );
+		return !isBetween( actualVersion, "elastic:7.17.7", "elastic:7.17" )
+				&& !isBetween( actualVersion, "elastic:8.5.0", "elastic:8.5.3" );
+	}
+
+	@Override
+	public boolean supportsExtremeLongValuesInAggregations() {
+		// https://github.com/elastic/elasticsearch/issues/84601
+		// There doesn't seem to be any hope for this to get fixed in older versions.
+		return !isBetween( actualVersion, "elastic:7.17.7", "elastic:7.17" )
+				&& !isBetween( actualVersion, "elastic:8.0.0", "elastic:8.0" );
 	}
 }

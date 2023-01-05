@@ -6,13 +6,16 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 
 public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 
@@ -27,16 +30,25 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 		return new AscendingUniqueTermValues<Long>() {
 			@Override
 			protected List<Long> createSingle() {
-				return Arrays.asList(
-						Long.MIN_VALUE,
+				List<Long> list = new ArrayList<>();
+				if ( TckConfiguration.get().getBackendFeatures().supportsMatchOnScaledNumericLossOfPrecision() ) {
+					list.add( Long.MIN_VALUE );
+				}
+				Collections.addAll(
+						list,
 						-251_484_254L,
+						-988L,
+						-45L,
 						0L,
 						42L,
 						55L,
 						2500L,
-						151_484_254L,
-						Long.MAX_VALUE
+						151_484_254L
 				);
+				if ( TckConfiguration.get().getBackendFeatures().supportsMatchOnScaledNumericLossOfPrecision() ) {
+					list.add( Long.MAX_VALUE );
+				}
+				return list;
 			}
 
 			@Override
@@ -63,11 +75,16 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 
 	@Override
 	protected List<Long> createUniquelyMatchableValues() {
-		return Arrays.asList(
-				Long.MIN_VALUE, Long.MAX_VALUE,
-				(long) Integer.MIN_VALUE, (long) Integer.MAX_VALUE,
+		List<Long> list = new ArrayList<>( Arrays.asList(
 				-251_484_254L, -42L, -1L, 0L, 1L, 3L, 42L, 151_484_254L
-		);
+		) );
+		if ( TckConfiguration.get().getBackendFeatures().supportsMatchOnScaledNumericLossOfPrecision() ) {
+			Collections.addAll(
+					list,
+					Long.MIN_VALUE, Long.MAX_VALUE
+			);
+		}
+		return list;
 	}
 
 	@Override
