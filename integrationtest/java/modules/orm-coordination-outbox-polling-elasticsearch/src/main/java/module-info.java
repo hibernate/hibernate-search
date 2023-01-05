@@ -29,4 +29,10 @@ module org.hibernate.search.integrationtest.java.module.orm.elasticsearch.coordi
 	 * Without this, compilation as a Java module fails.
 	 */
 	requires java.naming;
+
+	/*
+	 * This is necessary in order to put ByteBuddy in the modulepath and make module exports effective.
+	 * I do not know why ByteBuddy doesn't end up in the modulepath without this.
+	 */
+	requires net.bytebuddy;
 }

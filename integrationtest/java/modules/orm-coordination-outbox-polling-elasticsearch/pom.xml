@@ -44,6 +44,14 @@
             <artifactId>hibernate-search-mapper-orm-coordination-outbox-polling</artifactId>
         </dependency>
 
+        <!-- Adding this dependency to be able to refer to ByteBuddy in module-info.java -->
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
+            <version>${version.net.bytebuddy}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-test-orm</artifactId>
