@@ -10,6 +10,8 @@ import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEqualsIgn
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -118,6 +120,7 @@ public class ElasticsearchBoolSearchPredicateIT {
 						.queryString()
 		);
 	}
+
 	@Test
 	public void resultingQueryOptimizationWithBoost() {
 		SearchPredicateFactory f = index.createScope().predicate();
@@ -168,11 +171,167 @@ public class ElasticsearchBoolSearchPredicateIT {
 		);
 	}
 
+	@Test
+	public void nested() {
+		String expectedQueryJson = "{" +
+				"  \"query\": {" +
+				"    \"bool\": {" +
+				"      \"must\": [" +
+				"        {" +
+				"          \"match\": {" +
+				"            \"fieldName\": {" +
+				"              \"query\": \"test\"" +
+				"            }" +
+				"          }" +
+				"        }," +
+				"        {" +
+				"          \"nested\": {" +
+				"            \"path\": \"nested\"," +
+				"            \"query\": {" +
+				"              \"bool\": {" +
+				"                \"must\": [" +
+				"                  {" +
+				"                    \"range\": {" +
+				"                      \"nested.integer\": {" +
+				"                        \"gte\": 5," +
+				"                        \"lte\": 10" +
+				"                      }" +
+				"                    }" +
+				"                  }," +
+				"                  {" +
+				"                    \"match\": {" +
+				"                      \"nested.text\": {" +
+				"                        \"query\": \"value\"" +
+				"                      }" +
+				"                    }" +
+				"                  }" +
+				"                ]" +
+				"              }" +
+				"            }" +
+				"          }" +
+				"        }" +
+				"      ]" +
+				"    }" +
+				"  }" +
+				"}";
+
+		assertJsonEqualsIgnoringUnknownFields(
+				expectedQueryJson,
+				index.query().where( f -> f.bool()
+								.must( f.match().field( "fieldName" ).matching( "test" ) )
+								.must( f.nested( "nested" )
+										.add( f.range().field( "nested.integer" )
+												.between( 5, 10 ) )
+										.add( f.match().field( "nested.text" )
+												.matching( "value" )
+										) )
+						).toQuery()
+						.queryString()
+		);
+
+		// now the same query but using the bool predicate instead:
+		assertJsonEqualsIgnoringUnknownFields(
+				expectedQueryJson,
+				index.query().where( f -> f.bool()
+								.must( f.match().field( "fieldName" ).matching( "test" ) )
+								.must( f.nested( "nested" )
+										.add(
+												f.bool()
+														.must( f.range().field( "nested.integer" )
+																.between( 5, 10 ) )
+														.must( f.match().field( "nested.text" )
+																.matching( "value" )
+														)
+										) )
+						).toQuery()
+						.queryString()
+		);
+	}
+
+	@Test
+	public void onlyNested() {
+		//bool query remains as there are > 1 clause
+		assertJsonEqualsIgnoringUnknownFields(
+				"{" +
+						"  \"query\": {" +
+						"    \"nested\": {" +
+						"      \"path\": \"nested\"," +
+						"      \"query\": {" +
+						"        \"bool\": {" +
+						"          \"must\": [" +
+						"            {" +
+						"              \"range\": {" +
+						"                \"nested.integer\": {" +
+						"                  \"gte\": 5," +
+						"                  \"lte\": 10" +
+						"                }" +
+						"              }" +
+						"            }," +
+						"            {" +
+						"              \"match\": {" +
+						"                \"nested.text\": {" +
+						"                  \"query\": \"value\"" +
+						"                }" +
+						"              }" +
+						"            }" +
+						"          ]" +
+						"        }" +
+						"      }" +
+						"    }" +
+						"  }" +
+						"}",
+				index.query().where( f -> f.nested( "nested" )
+								.add(
+										f.bool()
+												.must( f.range().field( "nested.integer" )
+														.between( 5, 10 )
+												)
+												.must( f.match().field( "nested.text" )
+														.matching( "value" )
+												)
+								)
+						).toQuery()
+						.queryString()
+		);
+
+		// bool query is removed as there's only 1 clause
+		assertJsonEqualsIgnoringUnknownFields(
+				"{" +
+						"  \"query\": {" +
+						"    \"nested\": {" +
+						"      \"path\": \"nested\"," +
+						"      \"query\": {" +
+						"        \"range\": {" +
+						"          \"nested.integer\": {" +
+						"            \"gte\": 5," +
+						"            \"lte\": 10" +
+						"          }" +
+						"        }" +
+						"      }" +
+						"    }" +
+						"  }" +
+						"}",
+				index.query().where( f -> f.nested( "nested" )
+								.add(
+										f.bool()
+												.must( f.range().field( "nested.integer" )
+														.between( 5, 10 ) )
+								)
+						).toQuery()
+						.queryString()
+		);
+	}
+
 	private static class IndexBinding {
 		final IndexFieldReference<String> field;
 
 		IndexBinding(IndexSchemaElement root) {
 			field = root.field( "fieldName", c -> c.asString() ).toReference();
+			IndexSchemaObjectField nested = root.objectField( "nested", ObjectStructure.NESTED );
+			nested.toReference();
+
+			nested.field( "text", c -> c.asString() ).toReference();
+			nested.field( "integer", c -> c.asInteger() ).toReference();
 		}
 	}
 }
