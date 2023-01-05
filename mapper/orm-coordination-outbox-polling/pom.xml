@@ -97,11 +97,11 @@
                         <configuration>
                             <module>
                                 <moduleInfo>
-                                    <!-- cluster and event packages to expose Agent and OutboxEvent entities to ORM -->
+                                    <!-- cluster and event packages to expose Agent and OutboxEvent entities to ORM and ByteBuddy -->
                                     <opens>
                                         org.hibernate.search.mapper.orm.coordination.outboxpolling.avro.generated.impl to org.apache.avro;
-                                        org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl to org.hibernate.orm.core;
-                                        org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl to org.hibernate.orm.core;
+                                        org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl to org.hibernate.orm.core, net.bytebuddy;
+                                        org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl to org.hibernate.orm.core, net.bytebuddy;
                                     </opens>
                                 </moduleInfo>
                             </module>
