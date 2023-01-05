@@ -1068,6 +1068,25 @@ public class PredicateDslIT {
 		} );
 	}
 
+	@Test
+	public void not() {
+		withinSearchSession( searchSession -> {
+			// tag::not[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.not(
+							f.match()
+									.field( "genre" )
+									.matching( Genre.SCIENCE_FICTION )
+					) )
+					.fetchHits( 20 );
+			// end::not[]
+			assertThat( hits )
+					.extracting( Book::getGenre )
+					.isNotEmpty()
+					.doesNotContain( Genre.SCIENCE_FICTION );
+		} );
+	}
+
 	private MySearchParameters getSearchParameters() {
 		return new MySearchParameters() {
 			@Override

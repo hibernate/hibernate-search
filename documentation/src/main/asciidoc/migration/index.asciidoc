@@ -396,3 +396,10 @@ if internal queues of operations are full, but will throw `RejectedOperationExce
 Due to switching from `new URL(..)` to `new URI(..)` in the Hibernate Search internals indexing
 behaviour of `URL` properties might change. In particular malformed URLs won't be accepted anymore and would result in
 a runtime exception.
+
+Due to some optimizations applied to bool queries, the resulting query might get replaced with a more straightforward
+query that returns the same results.
+Possible changes can include: some clauses can be rearranged, nested bool queries might be flattened, a bool query might be
+replaced with its clause.
+
+A bool query with a single `mustNot` clause and applied boost would implicitly add a `must` with `match_all` clause.
