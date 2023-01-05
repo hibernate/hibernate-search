@@ -11,6 +11,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -61,14 +63,14 @@ public class LuceneBoolSearchPredicateIT {
 						.where( f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "fieldName" ).matching( "test" ) ) ) ) ) ) ) ) ).toPredicate() )
 						.toQuery()
 						.queryString()
-		).isEqualTo( "+(-fieldName:test #*:*)" );
+		).isEqualTo( "+(-fieldName:test #*:*) #__HSEARCH_type:main" );
 
 		assertThat(
 				index.query()
 						.where( f.not( f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "fieldName" ).matching( "test" ) ) ) ) ) ) ) ) ) ).toPredicate() )
 						.toQuery()
 						.queryString()
-		).isEqualTo( "+fieldName:test" );
+		).isEqualTo( "+fieldName:test #__HSEARCH_type:main" );
 
 		assertThat(
 				index.query()
@@ -81,7 +83,7 @@ public class LuceneBoolSearchPredicateIT {
 						)
 						.toQuery()
 						.queryString()
-		).isEqualTo( "+(+fieldName:test1 +fieldName:test3 -MatchNoDocsQuery(\"\") -fieldName:test2)" );
+		).isEqualTo( "+(+fieldName:test1 +fieldName:test3 -MatchNoDocsQuery(\"\") -fieldName:test2) #__HSEARCH_type:main" );
 	}
 
 	@Test
@@ -93,7 +95,7 @@ public class LuceneBoolSearchPredicateIT {
 						.where( f.not( f.match().field( "fieldName" ).matching( "test" ) ).toPredicate() )
 						.toQuery()
 						.queryString()
-		).isEqualTo( "+(-fieldName:test #*:*)" );
+		).isEqualTo( "+(-fieldName:test #*:*) #__HSEARCH_type:main" );
 
 		// but having boost in the not predicate should result in having a *:* as "must"
 		assertThat(
@@ -103,7 +105,73 @@ public class LuceneBoolSearchPredicateIT {
 						)
 						.toQuery()
 						.queryString()
-		).isEqualTo( "+(-fieldName:test +*:*)^5.0" );
+		).isEqualTo( "+(-fieldName:test +*:*)^5.0 #__HSEARCH_type:main" );
+	}
+
+	@Test
+	public void nested() {
+		String expectedQueryString = "+(+fieldName:test +ToParentBlockJoinQuery (#__HSEARCH_type:child #__HSEARCH_nested_document_path:nested +(+nested.integer:[5 TO 10] +nested.text:value))) #__HSEARCH_type:main";
+
+		assertThat(
+				index.query().where( f -> f.bool()
+								.must( f.match().field( "fieldName" ).matching( "test" ) )
+								.must( f.nested( "nested" )
+										.add( f.range().field( "nested.integer" )
+												.between( 5, 10 ) )
+										.add( f.match().field( "nested.text" )
+												.matching( "value" )
+										) )
+						).toQuery()
+						.queryString()
+		).isEqualTo( expectedQueryString );
+
+		// now the same query but using the bool predicate instead:
+		assertThat(
+				index.query().where( f -> f.bool()
+								.must( f.match().field( "fieldName" ).matching( "test" ) )
+								.must( f.nested( "nested" )
+										.add(
+												f.bool()
+														.must( f.range().field( "nested.integer" )
+																.between( 5, 10 ) )
+														.must( f.match().field( "nested.text" )
+																.matching( "value" )
+														)
+										) )
+						).toQuery()
+						.queryString()
+		).isEqualTo( expectedQueryString );
+	}
+
+	@Test
+	public void onlyNested() {
+		//bool query remains as there are > 1 clause
+		assertThat(
+				index.query().where( f -> f.nested( "nested" )
+								.add(
+										f.bool()
+												.must( f.range().field( "nested.integer" )
+														.between( 5, 10 )
+												)
+												.must( f.match().field( "nested.text" )
+														.matching( "value" )
+												)
+								)
+						).toQuery()
+						.queryString()
+		).isEqualTo( "+ToParentBlockJoinQuery (#__HSEARCH_type:child #__HSEARCH_nested_document_path:nested +(+nested.integer:[5 TO 10] +nested.text:value)) #__HSEARCH_type:main" );
+
+		// bool query is removed as there's only 1 clause
+		assertThat(
+				index.query().where( f -> f.nested( "nested" )
+								.add(
+										f.bool()
+												.must( f.range().field( "nested.integer" )
+														.between( 5, 10 ) )
+								)
+						).toQuery()
+						.queryString()
+		).isEqualTo( "+ToParentBlockJoinQuery (#__HSEARCH_type:child #__HSEARCH_nested_document_path:nested +nested.integer:[5 TO 10]) #__HSEARCH_type:main" );
 	}
 
 	private static class IndexBinding {
@@ -111,6 +179,11 @@ public class LuceneBoolSearchPredicateIT {
 
 		IndexBinding(IndexSchemaElement root) {
 			field = root.field( "fieldName", c -> c.asString() ).toReference();
+			IndexSchemaObjectField nested = root.objectField( "nested", ObjectStructure.NESTED );
+			nested.toReference();
+
+			nested.field( "text", c -> c.asString() ).toReference();
+			nested.field( "integer", c -> c.asInteger() ).toReference();
 		}
 	}
 }
