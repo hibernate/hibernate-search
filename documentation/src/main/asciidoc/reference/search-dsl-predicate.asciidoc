@@ -912,6 +912,28 @@ but can be <<search-dsl-predicate-common-constantScore,made constant with `.cons
 * The score of an `or` predicate can be <<search-dsl-predicate-common-boost,boosted>>
 with a call to `.boost(...)`.
 
+
+[[search-dsl-predicate-not]]
+== `not`: negating another predicate
+
+The `not` predicate matches documents that are not matched by a given predicate.
+
+.Negating a `match` predicate
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=not]
+----
+====
+
+[[search-dsl-predicate-not-other]]
+=== Other options
+
+* The score of a `not` predicate is constant and equal to 0 by default,
+but if <<search-dsl-predicate-common-boost,boosted with `.boost(...)`>> the default would be changed to 1
+and corresponding boost will be applied.
+
+
 [[search-dsl-predicate-boolean]]
 == [[_combining_queries]] `bool`: advanced combinations of predicates (or/and/...)
 
