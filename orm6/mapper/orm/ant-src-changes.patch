@@ -591,10 +591,10 @@ index 1e581dd9de..189f713827 100644
  					|| isWholePath && isAssociation( containedValueClass ) ) {
  				String stringRepresentationAsProperty = propertyNode.toPropertyString();
 diff --git a/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java b/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
-index c8ca89a1e0..f7140b4d52 100644
+index c8ca89a1e0..995f314a33 100644
 --- a/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
 +++ b/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
-@@ -7,52 +7,48 @@
+@@ -7,52 +7,50 @@
  package org.hibernate.search.mapper.orm.search.query.impl;
  
  import java.lang.invoke.MethodHandles;
@@ -602,7 +602,6 @@ index c8ca89a1e0..f7140b4d52 100644
 -import java.util.Collections;
 -import java.util.Date;
 -import java.util.Iterator;
-+import java.util.Collection;
  import java.util.List;
  import java.util.Map;
 -import java.util.Set;
@@ -634,7 +633,9 @@ index c8ca89a1e0..f7140b4d52 100644
 +import org.hibernate.query.spi.AbstractQuery;
 +import org.hibernate.query.spi.ParameterMetadataImplementor;
 +import org.hibernate.query.spi.QueryImplementor;
++import org.hibernate.query.spi.QueryParameterBinding;
  import org.hibernate.query.spi.QueryParameterBindings;
++import org.hibernate.query.spi.QueryParameterImplementor;
  import org.hibernate.query.spi.ScrollableResultsImplementor;
  import org.hibernate.search.engine.search.query.SearchQuery;
  import org.hibernate.search.engine.search.query.spi.SearchQueryImplementor;
@@ -653,6 +654,7 @@ index c8ca89a1e0..f7140b4d52 100644
  
 -@SuppressForbiddenApis(reason = "We need to extend the internal AbstractProducedQuery"
 +import jakarta.persistence.LockModeType;
++import jakarta.persistence.Parameter;
 +import jakarta.persistence.PersistenceException;
 +import jakarta.persistence.QueryTimeoutException;
 +
@@ -664,7 +666,7 @@ index c8ca89a1e0..f7140b4d52 100644
  
  	public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query) {
  		return query.extension( HibernateOrmSearchQueryAdapterExtension.get() );
-@@ -61,15 +57,16 @@ public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query)
+@@ -61,15 +59,16 @@ public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query)
  	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
  
  	private final SearchQueryImplementor<R> delegate;
@@ -685,7 +687,7 @@ index c8ca89a1e0..f7140b4d52 100644
  		this.loadingOptions = loadingOptions;
  	}
  
-@@ -84,83 +81,26 @@ public String toString() {
+@@ -84,83 +83,26 @@ public String toString() {
  
  	@Override
  	@SuppressWarnings("unchecked")
@@ -776,7 +778,7 @@ index c8ca89a1e0..f7140b4d52 100644
  	}
  
  	@Override
-@@ -168,6 +108,11 @@ public String getQueryString() {
+@@ -168,6 +110,11 @@ public String getQueryString() {
  		return delegate.queryString();
  	}
  
@@ -788,7 +790,7 @@ index c8ca89a1e0..f7140b4d52 100644
  	@Override
  	public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value) {
  		switch ( hintName ) {
-@@ -180,14 +125,12 @@ public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value)
+@@ -180,14 +127,12 @@ public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value)
  				break;
  			case HibernateOrmSearchQueryHints.JAVAX_FETCHGRAPH:
  			case HibernateOrmSearchQueryHints.JAKARTA_FETCHGRAPH:
@@ -805,7 +807,7 @@ index c8ca89a1e0..f7140b4d52 100644
  				break;
  		}
  		return this;
-@@ -200,148 +143,104 @@ public HibernateOrmSearchQueryAdapter<R> setTimeout(int timeout) {
+@@ -200,148 +145,109 @@ public HibernateOrmSearchQueryAdapter<R> setTimeout(int timeout) {
  	}
  
  	@Override
@@ -915,22 +917,23 @@ index c8ca89a1e0..f7140b4d52 100644
 +	}
 +
 +	@Override
-+	public HibernateOrmSearchQueryAdapter<R> setParameterList(String name, Object[] values) {
++	protected <P> QueryParameterBinding<P> locateBinding(String name) {
  		throw parametersNoSupported();
  	}
  
  	@Override
 -	public HibernateOrmSearchQueryAdapter<R> setParameter(Parameter<Date> dateParameter, Date date, TemporalType temporalType) {
-+	public QueryImplementor<R> setParameterList(String s, Collection collection, Class aClass) {
++	protected <P> QueryParameterBinding<P> locateBinding(int position) {
  		throw parametersNoSupported();
  	}
  
  	@Override
 -	public HibernateOrmSearchQueryAdapter<R> setParameter(String name, Object value) {
--		throw parametersNoSupported();
--	}
--
--	@Override
++	protected <P> QueryParameterBinding<P> locateBinding(Parameter<P> parameter) {
+ 		throw parametersNoSupported();
+ 	}
+ 
+ 	@Override
 -	public HibernateOrmSearchQueryAdapter<R> setParameter(String name, Date value, TemporalType temporalType) {
 -		throw parametersNoSupported();
 -	}
@@ -1002,11 +1005,11 @@ index c8ca89a1e0..f7140b4d52 100644
 -
 -	@Override
 -	public Object getParameterValue(int position) {
-+	public QueryImplementor<R> setParameterList(int i, Collection collection, Class aClass) {
++	protected <P> QueryParameterBinding<P> locateBinding(QueryParameterImplementor<P> parameter) {
  		throw parametersNoSupported();
  	}
  
-@@ -350,18 +249,16 @@ private UnsupportedOperationException parametersNoSupported() {
+@@ -350,18 +256,16 @@ private UnsupportedOperationException parametersNoSupported() {
  	}
  
  	@Override
@@ -1030,7 +1033,7 @@ index c8ca89a1e0..f7140b4d52 100644
  		return new UnsupportedOperationException( "Result transformers are not supported in Hibernate Search queries" );
  	}
  
-@@ -391,7 +288,12 @@ private UnsupportedOperationException lockOptionsNotSupported() {
+@@ -391,7 +295,12 @@ private UnsupportedOperationException lockOptionsNotSupported() {
  	}
  
  	@Override
@@ -1044,7 +1047,7 @@ index c8ca89a1e0..f7140b4d52 100644
  		throw new UnsupportedOperationException( "executeUpdate is not supported in Hibernate Search queries" );
  	}
  
-@@ -400,30 +302,6 @@ public HibernateOrmSearchQueryAdapter<R> setLockMode(String alias, LockMode lock
+@@ -400,30 +309,6 @@ public HibernateOrmSearchQueryAdapter<R> setLockMode(String alias, LockMode lock
  		throw lockOptionsNotSupported();
  	}
  
@@ -1075,7 +1078,7 @@ index c8ca89a1e0..f7140b4d52 100644
  	private static long hintValueToLong(Object value) {
  		if ( value instanceof Number ) {
  			return ( (Number) value ).longValue();
-@@ -442,8 +320,4 @@ private static int hintValueToInteger(Object value) {
+@@ -442,8 +327,4 @@ private static int hintValueToInteger(Object value) {
  		}
  	}
  
