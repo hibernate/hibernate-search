@@ -87,7 +87,7 @@ BRANCH_NAME=main ci/dependency-update/perform-update.sh orm6.2 version.org.hiber
 After applying the update, you can easily run all tests that rely on a particular module with this command:
 
 ```shell
-./mvnw clean verify -Pdist -pl $(./ci/list-dependent-integration-tests.sh hibernate-search-mapper-orm)
+./mvnw clean verify -Pdependency-update -Pdist -pl $(./ci/list-dependent-integration-tests.sh hibernate-search-mapper-orm)
 ```
 
 ### Performance pipeline
