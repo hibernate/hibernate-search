@@ -90,7 +90,7 @@ index d6ed099098..e3fee26f2c 100644
  			}
  		}
 diff --git a/main/java/org/hibernate/search/mapper/orm/event/impl/HibernateSearchEventListener.java b/main/java/org/hibernate/search/mapper/orm/event/impl/HibernateSearchEventListener.java
-index 128fc8cf1a..ed6a3ca1d1 100644
+index 87538e160e..2b0f3c7ee5 100644
 --- a/main/java/org/hibernate/search/mapper/orm/event/impl/HibernateSearchEventListener.java
 +++ b/main/java/org/hibernate/search/mapper/orm/event/impl/HibernateSearchEventListener.java
 @@ -344,7 +344,7 @@ private void processCollectionEvent(AbstractCollectionEvent event) {
@@ -223,10 +223,10 @@ index 82c86985ab..3abdf72591 100644
  		}
  		else {
 diff --git a/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java b/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
-index 00903ee7b9..50009c9e37 100644
+index d1dfbe37aa..870bd2ee6f 100644
 --- a/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
 +++ b/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
-@@ -254,14 +254,10 @@ SearchException foundMultipleEntitiesForDocumentId(String entityName, String doc
+@@ -255,14 +255,10 @@ SearchException foundMultipleEntitiesForDocumentId(String entityName, String doc
  			+ " Currently configured tenant identifiers: %2$s." )
  	SearchException invalidTenantId(String tenantId, Set<String> allTenantIds, String tenantIdsConfigurationPropertyKey);
  
@@ -561,7 +561,7 @@ index 1e978c8d18..e99b682d70 100644
  		}
  	}
 diff --git a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathInterpreter.java b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathInterpreter.java
-index 434c1e7bc3..099cee2604 100644
+index 1e581dd9de..189f713827 100644
 --- a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathInterpreter.java
 +++ b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathInterpreter.java
 @@ -17,6 +17,7 @@
@@ -572,7 +572,7 @@ index 434c1e7bc3..099cee2604 100644
  import org.hibernate.mapping.Component;
  import org.hibernate.mapping.ManyToOne;
  import org.hibernate.mapping.OneToMany;
-@@ -351,7 +352,7 @@ public Value value(Context context, Property property, PojoModelPathValueNode pa
+@@ -352,7 +353,7 @@ public Value value(Context context, Property property, PojoModelPathValueNode pa
  				return baseValue;
  			}
  		}
@@ -581,7 +581,7 @@ index 434c1e7bc3..099cee2604 100644
  			// The path as a whole (and not just a prefix) was resolved to a non-component, non-association value
  			context.resolvedStringRepresentation( propertyNode.toPropertyString() );
  			// We don't need state extraction in this case
-@@ -413,7 +414,7 @@ private Value resolveExtractorPath(Context context, PojoModelPathValueNode path,
+@@ -414,7 +415,7 @@ private Value resolveExtractorPath(Context context, PojoModelPathValueNode path,
  		if ( !extractorNameIterator.hasNext() ) {
  			// We managed to resolve the whole container value extractor list
  			Class<? extends Value> containedValueClass = containedValue.getClass();

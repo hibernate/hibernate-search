@@ -33,7 +33,7 @@ index eec9fc845c..da14602448 100644
  	 */
 @@ -445,14 +446,14 @@ private HibernateOrmMapperOutboxPollingSettings() {
  			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_AGENT_TABLE;
-
+ 
  	/**
 -	 * The name of UUID generator strategy to be used by {@link UUIDGenerator} for the agent table.
 +	 * The name of UUID generator strategy to be used by {@link UuidGenerator} for the agent table.
@@ -45,29 +45,11 @@ index eec9fc845c..da14602448 100644
  	 *
 -	 * @see UUIDGenerator
 +	 * @see UuidGenerator
- 	 * @see CustomVersionOneStrategy
- 	 * @see StandardRandomStrategy
- 	 */
-@@ -445,14 +446,15 @@ private HibernateOrmMapperOutboxPollingSettings() {
- 			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_AGENT_TABLE;
-
- 	/**
--	 * The name of UUID generator strategy to be used by {@link UUIDGenerator} for the agent table.
-+	 * The name of UUID generator strategy to be used by {@link UuidGenerator} for the agent table.
- 	 * <p>
- 	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
- 	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
- 	 * <p>
- 	 * The default for this value is {@link  Defaults#COORDINATION_ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY}.
- 	 *
--	 * @see UUIDGenerator
-+	 * @see UuidGenerator
-+	 * @see org.hibernate.annotations.UuidGenerator
  	 * @see CustomVersionOneStrategy
  	 * @see StandardRandomStrategy
  	 */
 diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java
-index 2f5402d464..36c120231e 100644
+index f42125b5a8..ded12df777 100644
 --- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java
 +++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java
 @@ -39,6 +39,8 @@
@@ -89,7 +71,7 @@ index 2f5402d464..36c120231e 100644
  	}
  }
 diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java
-index eef4e98f1b..f5394cd491 100644
+index 87bb27fb18..b06a01b337 100644
 --- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java
 +++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java
 @@ -30,6 +30,7 @@
