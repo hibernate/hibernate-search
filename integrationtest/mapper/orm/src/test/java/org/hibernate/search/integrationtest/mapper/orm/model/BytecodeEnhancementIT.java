@@ -284,11 +284,14 @@ public class BytecodeEnhancementIT {
 			extends IndexedEntitySuperClass {
 		public static final String INDEX = "IndexedEntity";
 
+		// "containedEntityList" is not listed here,
+		// because collection properties are initialized eagerly on ORM 6.2+
+		// (even if the collection themselves are initialized lazily).
+		// See HHH-15473 / https://github.com/hibernate/hibernate-orm/pull/5252
 		private static final String[] LAZY_PROPERTY_NAMES = new String[] {
 				"mappedSuperClassText",
 				"entitySuperClassText",
 				"notIndexedText",
-				"containedEntityList",
 				"text1",
 				"text2",
 				"primitiveInteger",
