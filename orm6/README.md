@@ -28,6 +28,8 @@ Then:
 * Rebase on `main` and fix conflicts as necessary.
 * If the last few commits are there to upgrade to the latest snapshot of ORM 6, revert them.
 * Try to build that branch as you would usually build Hibernate Search.
+  WARNING: Do not forget to also enable the dependency-update profile (`-Pdependency-update`)
+  to disable unwanted checks (deprecations, ...).
 * Fix compilation/test errors by updating the code as necessary.
 * Commit your changes, rebase and squash them with the relevant commit
   (probably the one that upgrades to ORM 6.0.0.Beta3 or something similar).
