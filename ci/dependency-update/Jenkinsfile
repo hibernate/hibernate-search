@@ -129,6 +129,14 @@ pipeline {
 							dir(env.WORKSPACE_TMP + '/.m2repository') {
 								unstash name: 'original-build-result'
 							}
+							withMavenWorkspace {
+								script {
+									env.ADDITIONAL_MAVEN_ARGS = settings().additionalMavenArgs ?: ''
+									if (settings().onlyRunTestDependingOn) {
+										env.ADDITIONAL_MAVEN_ARGS += ' -pl ' + sh(script: "bash -x ./ci/list-dependent-integration-tests.sh ${settings().onlyRunTestDependingOn.join(' ')}", returnStdout: true).trim()
+									}
+								}
+							}
 						}
 					}
 					stage('Update dependency') {
@@ -139,14 +147,6 @@ pipeline {
 							script {
 								if (0 != sh(script: "git diff origin/${BRANCH_NAME} | grep -q '.'", returnStatus: true)) {
 									error "This job does not seem to update any dependency; perhaps it is misconfigured? The source code has not been updated, neither by merging a WIP branch nor by updating version properties."
-								}
-							}
-							withMavenWorkspace {
-								script {
-									env.ADDITIONAL_MAVEN_ARGS = settings().additionalMavenArgs ?: ''
-									if (settings().onlyRunTestDependingOn) {
-										env.ADDITIONAL_MAVEN_ARGS += ' -pl ' + sh(script: "bash -x ./ci/list-dependent-integration-tests.sh ${settings().onlyRunTestDependingOn.join(' ')}", returnStdout: true).trim()
-									}
 								}
 							}
 						}
