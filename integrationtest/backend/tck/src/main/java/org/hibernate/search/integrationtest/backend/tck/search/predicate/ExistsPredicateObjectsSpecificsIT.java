@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeFalse;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -18,7 +17,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
@@ -119,7 +117,6 @@ public class ExistsPredicateObjectsSpecificsIT {
 
 	@Test
 	public void nested_multiIndexes_incompatibleIndexBinding() {
-		assumeFullMultiIndexCompatibilityCheck();
 		SearchPredicateFactory f = mainIndex.createScope( incompatibleIndex ).predicate();
 		String fieldPath = "nested";
 
@@ -146,7 +143,6 @@ public class ExistsPredicateObjectsSpecificsIT {
 
 	@Test
 	public void nested_multiIndexes_wrongStructure() {
-		assumeFullMultiIndexCompatibilityCheck();
 		SearchPredicateFactory f = mainIndex.createScope( invertedIndex ).predicate();
 
 		String fieldPath = "nested";
@@ -207,7 +203,6 @@ public class ExistsPredicateObjectsSpecificsIT {
 
 	@Test
 	public void flattened_multiIndexes_incompatibleIndexBinding() {
-		assumeFullMultiIndexCompatibilityCheck();
 		SearchPredicateFactory f = incompatibleIndex.createScope( mainIndex ).predicate();
 		String fieldPath = "flattened";
 
@@ -234,7 +229,6 @@ public class ExistsPredicateObjectsSpecificsIT {
 
 	@Test
 	public void flattened_multiIndexes_wrongStructure() {
-		assumeFullMultiIndexCompatibilityCheck();
 		SearchPredicateFactory f = invertedIndex.createScope( mainIndex ).predicate();
 
 		String fieldPath = "flattened";
@@ -301,13 +295,6 @@ public class ExistsPredicateObjectsSpecificsIT {
 					document.addObject( mainIndex.binding().flattenedNoChild );
 				} )
 				.join();
-	}
-
-	private void assumeFullMultiIndexCompatibilityCheck() {
-		assumeFalse(
-				"We do not test some Multi-indexing compatibility checks if the backend allows these",
-				TckConfiguration.get().getBackendFeatures().lenientOnMultiIndexesCompatibilityChecks()
-		);
 	}
 
 	private static class IndexBinding {
