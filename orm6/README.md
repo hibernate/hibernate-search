@@ -33,10 +33,20 @@ Then:
 * Fix compilation/test errors by updating the code as necessary.
 * Commit your changes, rebase and squash them with the relevant commit
   (probably the one that upgrades to ORM 6.0.0.Beta3 or something similar).
-* Rebase again to remove the "revert" commits that you added earlier.
+* Rebase again to remove the "revert" commits that you added earlier (if any).
 * Identify the first and last commit that are necessary to upgrade from ORM 5
   to the version of ORM 6 that you want to target.
   Copy their SHA somewhere.
 * Checkout the branch where you originally witnessed the compilation failures.
 * Execute `./orm6/extract-patches <first commit SHA>~1..<last commit SHA>` from the root of your local git repository.
 * Commit the resulting changes.
+
+Alternatively, if you know of some words that can uniquely identify
+the first commit to include and first commit to exclude,
+you can try something like this:
+
+```shell
+COMMIT_RANGE="wip/main/dependency-update/orm6-in-main-code^{/6.0.0.Beta3}^1..wip/main/dependency-update/orm6-in-main-code^{/6.2.0-SNAPSHOT}^1"
+tig $COMMIT_RANGE # To check the range
+./orm6/extract-patches.sh $COMMIT_RANGE
+```
