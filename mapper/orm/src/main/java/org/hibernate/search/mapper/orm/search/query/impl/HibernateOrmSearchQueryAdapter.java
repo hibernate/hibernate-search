@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.search.query.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +28,9 @@ import org.hibernate.query.internal.QueryOptionsImpl;
 import org.hibernate.query.spi.AbstractQuery;
 import org.hibernate.query.spi.ParameterMetadataImplementor;
 import org.hibernate.query.spi.QueryImplementor;
+import org.hibernate.query.spi.QueryParameterBinding;
 import org.hibernate.query.spi.QueryParameterBindings;
+import org.hibernate.query.spi.QueryParameterImplementor;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.SearchQueryImplementor;
@@ -43,6 +44,7 @@ import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import jakarta.persistence.LockModeType;
+import jakarta.persistence.Parameter;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.QueryTimeoutException;
 
@@ -232,17 +234,22 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 	}
 
 	@Override
-	public HibernateOrmSearchQueryAdapter<R> setParameterList(String name, Object[] values) {
+	protected <P> QueryParameterBinding<P> locateBinding(String name) {
 		throw parametersNoSupported();
 	}
 
 	@Override
-	public QueryImplementor<R> setParameterList(String s, Collection collection, Class aClass) {
+	protected <P> QueryParameterBinding<P> locateBinding(int position) {
 		throw parametersNoSupported();
 	}
 
 	@Override
-	public QueryImplementor<R> setParameterList(int i, Collection collection, Class aClass) {
+	protected <P> QueryParameterBinding<P> locateBinding(Parameter<P> parameter) {
+		throw parametersNoSupported();
+	}
+
+	@Override
+	protected <P> QueryParameterBinding<P> locateBinding(QueryParameterImplementor<P> parameter) {
 		throw parametersNoSupported();
 	}
 
