@@ -7,7 +7,6 @@
 package org.hibernate.search.query.hibernate.impl;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +15,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import jakarta.persistence.FlushModeType;
 import jakarta.persistence.LockModeType;
+import jakarta.persistence.Parameter;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.QueryTimeoutException;
 
@@ -34,7 +34,9 @@ import org.hibernate.query.internal.QueryOptionsImpl;
 import org.hibernate.query.spi.AbstractQuery;
 import org.hibernate.query.spi.ParameterMetadataImplementor;
 import org.hibernate.query.spi.QueryImplementor;
+import org.hibernate.query.spi.QueryParameterBinding;
 import org.hibernate.query.spi.QueryParameterBindings;
+import org.hibernate.query.spi.QueryParameterImplementor;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
@@ -287,17 +289,22 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 	}
 
 	@Override
-	public QueryImplementor<?> setParameterList(String name, Object[] values) {
+	protected QueryParameterBinding locateBinding(String name) {
 		throw parametersNoSupported();
 	}
 
 	@Override
-	public QueryImplementor<?> setParameterList(String s, Collection collection, Class aClass) {
+	protected QueryParameterBinding locateBinding(int position) {
 		throw parametersNoSupported();
 	}
 
 	@Override
-	public QueryImplementor<?> setParameterList(int i, Collection collection, Class aClass) {
+	protected QueryParameterBinding locateBinding(Parameter parameter) {
+		throw parametersNoSupported();
+	}
+
+	@Override
+	protected QueryParameterBinding locateBinding(QueryParameterImplementor parameter) {
 		throw parametersNoSupported();
 	}
 
