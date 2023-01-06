@@ -46,7 +46,8 @@ public final class PersistenceUtil {
 	 */
 	public static Session openSession(EntityManagerFactory entityManagerFactory, String tenantId) {
 		SessionFactory sessionFactory = entityManagerFactory.unwrap( SessionFactory.class );
-		SessionBuilder<?> builder = sessionFactory.withOptions();
+		@SuppressWarnings("rawtypes")
+		SessionBuilder builder = sessionFactory.withOptions();
 		if ( StringHelper.isNotEmpty( tenantId ) ) {
 			builder.tenantIdentifier( tenantId );
 		}
@@ -69,7 +70,8 @@ public final class PersistenceUtil {
 	 */
 	public static StatelessSession openStatelessSession(EntityManagerFactory entityManagerFactory, String tenantId) {
 		SessionFactory sessionFactory = entityManagerFactory.unwrap( SessionFactory.class );
-		StatelessSessionBuilder<?> builder = sessionFactory.withStatelessOptions();
+		@SuppressWarnings("rawtypes")
+		StatelessSessionBuilder builder = sessionFactory.withStatelessOptions();
 		if ( StringHelper.isNotEmpty( tenantId ) ) {
 			builder.tenantIdentifier( tenantId );
 		}
