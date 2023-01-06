@@ -75,11 +75,6 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
-	public boolean lenientOnMultiIndexesCompatibilityChecks() {
-		return true;
-	}
-
-	@Override
 	public boolean sortByFieldValue(TestedFieldStructure fieldStructure, Class<?> fieldType, SortMode sortMode) {
 		if (
 				fieldStructure.isInNested()

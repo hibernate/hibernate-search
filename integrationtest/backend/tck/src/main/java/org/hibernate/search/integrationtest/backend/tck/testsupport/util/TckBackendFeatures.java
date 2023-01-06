@@ -43,11 +43,6 @@ public abstract class TckBackendFeatures {
 		return true;
 	}
 
-	public boolean lenientOnMultiIndexesCompatibilityChecks() {
-		// we decide to allow ALL the model incompatibilities Elasticsearch allows.
-		return false;
-	}
-
 	public boolean sortByFieldValue(TestedFieldStructure fieldStructure, Class<?> fieldType, SortMode sortMode) {
 		return true;
 	}
