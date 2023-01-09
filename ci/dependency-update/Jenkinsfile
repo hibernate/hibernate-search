@@ -82,16 +82,17 @@ pipeline {
 					sh 'ci/docker-cleanup.sh'
 				}
 			}
-			options {
-				timeout(time: 30, unit: 'MINUTES')
-			}
 			steps {
-				withMavenWorkspace {
-					sh """ \
-						mvn clean install -U -Pdist -DskipTests \
-					"""
-					dir(env.WORKSPACE_TMP + '/.m2repository') {
-						stash name: 'original-build-result', includes:"org/hibernate/search/**"
+				// The timeout cannot be in stage options, because that would
+				// include the time needed to provision a node.
+				timeout(time: 30, unit: 'MINUTES') {
+					withMavenWorkspace {
+						sh """ \
+							mvn clean install -U -Pdist -DskipTests \
+						"""
+						dir(env.WORKSPACE_TMP + '/.m2repository') {
+							stash name: 'original-build-result', includes:"org/hibernate/search/**"
+						}
 					}
 				}
 			}
