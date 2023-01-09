@@ -56,6 +56,17 @@ def withMavenWorkspace(Closure body) {
 	}
 }
 
+String normalize(String string) {
+	return string.replaceAll('[^\\w]', '_')
+}
+
+// env is shared between parallel executions,
+// so if we want a variable that is local to a given execution branch,
+// we have to qualify its name to avoid conflicts...
+String qualify(String radical) {
+	return '_' + normalize(env.DEPENDENCY_UPDATE_NAME) + '_' + radical
+}
+
 pipeline {
 	agent none
 	triggers {
@@ -123,9 +134,9 @@ pipeline {
 							}
 							withMavenWorkspace {
 								script {
-									env.ADDITIONAL_MAVEN_ARGS = settings().additionalMavenArgs ?: ''
+									env[qualify('ADDITIONAL_MAVEN_ARGS')] = settings().additionalMavenArgs ?: ''
 									if (settings().onlyRunTestDependingOn) {
-										env.ADDITIONAL_MAVEN_ARGS += ' -pl ' + sh(script: "./ci/list-dependent-integration-tests.sh ${settings().onlyRunTestDependingOn.join(' ')}", returnStdout: true).trim()
+										env[qualify('ADDITIONAL_MAVEN_ARGS')] += ' -pl ' + sh(script: "./ci/list-dependent-integration-tests.sh ${settings().onlyRunTestDependingOn.join(' ')}", returnStdout: true).trim()
 									}
 								}
 							}
@@ -153,7 +164,7 @@ pipeline {
 								sh """ \
 									mvn clean install -U -Pdependency-update -Pdist -Dsurefire.environment=${env.DEPENDENCY_UPDATE_NAME} \
 									--fail-at-end \
-									${env.ADDITIONAL_MAVEN_ARGS} \
+									${env[qualify('ADDITIONAL_MAVEN_ARGS')]} \
 								"""
 							}
 						}
