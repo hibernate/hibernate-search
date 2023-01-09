@@ -19,6 +19,9 @@ public abstract class AbstractElasticsearchPredicate implements ElasticsearchSea
 	private static final JsonAccessor<Float> BOOST_ACCESSOR = JsonAccessor.root().property( "boost" ).asFloat();
 
 	private final Set<String> indexNames;
+	// NOTE: below modifiers (boost, constant score) are used to implement hasNoModifiers() that other predicates
+	// rely on and might build on to include additional predicate-specific modifiers ElasticsearchBooleanPredicate in particular.
+	// IMPORTANT: Review where current modifiers are used and how the new modifier affects that logic, when adding a new modifier.
 	private final Float boost;
 	private final boolean withConstantScore;
 
@@ -70,6 +73,9 @@ public abstract class AbstractElasticsearchPredicate implements ElasticsearchSea
 	protected abstract static class AbstractBuilder implements SearchPredicateBuilder {
 		protected final ElasticsearchSearchIndexScope<?> scope;
 
+		// NOTE: below modifiers (boost, constant score) are used to implement hasNoModifiers() that other predicates
+		// rely on and might build on to include additional predicate-specific modifiers ElasticsearchBooleanPredicate in particular.
+		// IMPORTANT: Review where current modifiers are used and how the new modifier affects that logic, when adding a new modifier.
 		private Float boost;
 		private boolean withConstantScore = false;
 

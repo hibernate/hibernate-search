@@ -19,6 +19,9 @@ import org.apache.lucene.search.Query;
 public abstract class AbstractLuceneSearchPredicate implements LuceneSearchPredicate {
 
 	protected final Set<String> indexNames;
+	// NOTE: below modifiers (boost, constant score) are used to implement hasNoModifiers() that other predicates
+	// rely on and might build on to include additional predicate-specific modifiers ElasticsearchBooleanPredicate in particular.
+	// IMPORTANT: Review where current modifiers are used and how the new modifier affects that logic, when adding a new modifier.
 	private final Float boost;
 	private final boolean constantScore;
 
@@ -58,6 +61,9 @@ public abstract class AbstractLuceneSearchPredicate implements LuceneSearchPredi
 	public abstract static class AbstractBuilder implements SearchPredicateBuilder {
 		protected final LuceneSearchIndexScope<?> scope;
 
+		// NOTE: below modifiers (boost, constant score) are used to implement hasNoModifiers() that other predicates
+		// rely on and might build on to include additional predicate-specific modifiers ElasticsearchBooleanPredicate in particular.
+		// IMPORTANT: Review where current modifiers are used and how the new modifier affects that logic, when adding a new modifier.
 		private Float boost;
 		private boolean constantScore;
 

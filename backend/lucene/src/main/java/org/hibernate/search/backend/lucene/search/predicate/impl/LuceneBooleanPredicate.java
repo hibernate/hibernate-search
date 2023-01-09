@@ -36,6 +36,9 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 	private final List<LuceneSearchPredicate> shouldClauses;
 	private final List<LuceneSearchPredicate> filterClauses;
 
+	// NOTE: below modifiers (minimumShouldMatchConstraints) are used to implement hasNoModifiers() which is based on a
+	// parent implementation.
+	// IMPORTANT: Review where current modifiers are used and how the new modifier affects that logic, when adding a new modifier.
 	private final NavigableMap<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
 	private LuceneBooleanPredicate(Builder builder) {
@@ -133,6 +136,9 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 		private List<LuceneSearchPredicate> shouldClauses;
 		private List<LuceneSearchPredicate> filterClauses;
 
+		// NOTE: below modifiers (minimumShouldMatchConstraints) are used to implement hasNoModifiers() which is based on a
+		// parent implementation.
+		// IMPORTANT: Review where current modifiers are used and how the new modifier affects that logic, when adding a new modifier.
 		private NavigableMap<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
 		Builder(LuceneSearchIndexScope<?> scope) {

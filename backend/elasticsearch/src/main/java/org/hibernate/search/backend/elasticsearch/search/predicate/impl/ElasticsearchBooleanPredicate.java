@@ -44,6 +44,9 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 	private final List<ElasticsearchSearchPredicate> shouldClauses;
 	private final List<ElasticsearchSearchPredicate> filterClauses;
 
+	// NOTE: below modifiers (minimumShouldMatchConstraints) are used to implement hasNoModifiers() which is based on a
+	// parent implementation.
+	// IMPORTANT: Review where current modifiers are used and how the new modifier affects that logic, when adding a new modifier.
 	private final Map<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
 	private ElasticsearchBooleanPredicate(Builder builder) {
@@ -168,6 +171,9 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		private List<ElasticsearchSearchPredicate> shouldClauses;
 		private List<ElasticsearchSearchPredicate> filterClauses;
 
+		// NOTE: below modifiers (minimumShouldMatchConstraints) are used to implement hasNoModifiers() which is based on a
+		// parent implementation.
+		// IMPORTANT: Review where current modifiers are used and how the new modifier affects that logic, when adding a new modifier.
 		private Map<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
 		Builder(ElasticsearchSearchIndexScope<?> scope) {
