@@ -125,7 +125,7 @@ pipeline {
 								script {
 									env.ADDITIONAL_MAVEN_ARGS = settings().additionalMavenArgs ?: ''
 									if (settings().onlyRunTestDependingOn) {
-										env.ADDITIONAL_MAVEN_ARGS += ' -pl ' + sh(script: "bash -x ./ci/list-dependent-integration-tests.sh ${settings().onlyRunTestDependingOn.join(' ')}", returnStdout: true).trim()
+										env.ADDITIONAL_MAVEN_ARGS += ' -pl ' + sh(script: "./ci/list-dependent-integration-tests.sh ${settings().onlyRunTestDependingOn.join(' ')}", returnStdout: true).trim()
 									}
 								}
 							}
