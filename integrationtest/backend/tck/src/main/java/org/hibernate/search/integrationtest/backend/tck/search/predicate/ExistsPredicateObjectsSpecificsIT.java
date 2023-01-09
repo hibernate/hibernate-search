@@ -51,6 +51,12 @@ public class ExistsPredicateObjectsSpecificsIT {
 	// it will never be matched by an exists predicate
 	private static final String DOCUMENT_5 = "5";
 
+	// Document not from the main index. All fields are filled out
+	private static final String DOCUMENT_6 = "6";
+
+	// Document not from the main index. Only object fields are populated
+	private static final String DOCUMENT_7 = "7";
+
 	public static final String ANY_STRING = "Any String";
 	public static final int ANY_INTEGER = 173173;
 
@@ -169,11 +175,21 @@ public class ExistsPredicateObjectsSpecificsIT {
 
 		assertThatQuery( mainIndex.createScope( noInnerNestedField ).query()
 				.where( f -> f.exists().field( fieldPath ) ) )
-				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( c -> {
+					c.doc( mainIndex.typeName(), DOCUMENT_3 );
+					c.doc( noInnerNestedField.typeName(), DOCUMENT_6 );
+				} );
 
 		assertThatQuery( mainIndex.createScope( differentInnerNestedField ).query()
 				.where( f -> f.exists().field( fieldPath ) ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
+
+		assertThatQuery( mainIndex.createScope( differentInnerNestedField ).query()
+				.where( f -> f.exists().field( "nested.nestedX2" ) ) )
+				.hasDocRefHitsAnyOrder( c -> {
+					c.doc( mainIndex.typeName(), DOCUMENT_4 );
+					c.doc( differentInnerNestedField.typeName(), DOCUMENT_6 );
+				} );
 	}
 
 	@Test
@@ -295,6 +311,30 @@ public class ExistsPredicateObjectsSpecificsIT {
 					document.addObject( mainIndex.binding().flattenedNoChild );
 				} )
 				.join();
+
+		noInnerNestedField.bulkIndexer()
+				.add( DOCUMENT_6, document -> {
+					DocumentElement nestedDocument = document.addObject( noInnerNestedField.binding().nested );
+					nestedDocument.addValue( noInnerNestedField.binding().nestedString, ANY_STRING );
+					nestedDocument.addValue( noInnerNestedField.binding().nestedNumeric, ANY_INTEGER );
+
+				} )
+				.add( DOCUMENT_7, document -> {
+					document.addObject( noInnerNestedField.binding().nested );
+				} )
+				.join();
+
+		differentInnerNestedField.bulkIndexer()
+				.add( DOCUMENT_6, document -> {
+					DocumentElement nestedDocument = document.addObject( differentInnerNestedField.binding().nested );
+					DocumentElement nestedX2Document = nestedDocument.addObject( differentInnerNestedField.binding().nestedX2 );
+					nestedX2Document.addValue( differentInnerNestedField.binding().nestedX2String, ANY_STRING );
+				} )
+				.add( DOCUMENT_7, document -> {
+					DocumentElement nestedDocument = document.addObject( differentInnerNestedField.binding().nested );
+					nestedDocument.addObject( differentInnerNestedField.binding().nestedX2 );
+				} )
+				.join();
 	}
 
 	private static class IndexBinding {
@@ -392,23 +432,30 @@ public class ExistsPredicateObjectsSpecificsIT {
 	}
 
 	private static class DifferentFieldsNoInnerNestedIndexBinding {
+		final IndexObjectFieldReference nested;
+		final IndexFieldReference<String> nestedString;
+		final IndexFieldReference<Integer> nestedNumeric;
+
 		DifferentFieldsNoInnerNestedIndexBinding(IndexSchemaElement root) {
 			IndexSchemaObjectField nestedObject = root.objectField( "nested", ObjectStructure.NESTED );
-			nestedObject.toReference();
+			nested = nestedObject.toReference();
 
-			nestedObject.field( "string", f -> f.asString() ).toReference();
-			nestedObject.field( "numeric", f -> f.asInteger() ).toReference();
+			nestedString = nestedObject.field( "string", f -> f.asString() ).toReference();
+			nestedNumeric = nestedObject.field( "numeric", f -> f.asInteger() ).toReference();
 		}
 	}
 
 	private static class DifferentFieldsDifferentInnerNestedFieldsIndexBinding {
+		final IndexObjectFieldReference nested;
+		final IndexObjectFieldReference nestedX2;
+		final IndexFieldReference<String> nestedX2String;
 		DifferentFieldsDifferentInnerNestedFieldsIndexBinding(IndexSchemaElement root) {
 			IndexSchemaObjectField nestedObject = root.objectField( "nested", ObjectStructure.NESTED );
-			nestedObject.toReference();
+			nested = nestedObject.toReference();
 
 			IndexSchemaObjectField nestedX2Object = nestedObject.objectField( "nestedX2", ObjectStructure.NESTED );
-			nestedX2Object.toReference();
-			nestedX2Object.field( "stringDifferentName", f -> f.asString() ).toReference();
+			nestedX2 = nestedX2Object.toReference();
+			nestedX2String = nestedX2Object.field( "stringDifferentName", f -> f.asString() ).toReference();
 		}
 	}
 }
