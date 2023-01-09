@@ -91,17 +91,15 @@ public class IndexingFieldTypesIT<F> {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = fieldModel.relativeFieldName;
 
-		for ( int i = 0; i < values.size(); i++ ) {
-			SearchQuery<IdAndValue<F>> query = scope.query()
-					.select( f -> f.composite()
-							.from( f.id( String.class ),
-									f.field( absoluteFieldPath, typeDescriptor.getJavaType() ) )
-							.as( (id, val) -> new IdAndValue<>( id, val ) ) )
-					.where( f -> f.matchAll() )
-					.toQuery();
+		SearchQuery<IdAndValue<F>> query = scope.query()
+				.select( f -> f.composite()
+						.from( f.id( String.class ),
+								f.field( absoluteFieldPath, typeDescriptor.getJavaType() ) )
+						.as( (id, val) -> new IdAndValue<>( id, val ) ) )
+				.where( f -> f.matchAll() )
+				.toQuery();
 
-			assertThatQuery( query ).hasHitsAnyOrder( expectedDocuments );
-		}
+		assertThatQuery( query ).hasHitsAnyOrder( expectedDocuments );
 	}
 
 	@Test
@@ -130,17 +128,15 @@ public class IndexingFieldTypesIT<F> {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = fieldModel.relativeFieldName;
 
-		for ( int i = 0; i < values.size(); i++ ) {
-			SearchQuery<IdAndValue<F>> query = scope.query()
-					.select( f -> f.composite()
-							.from( f.entityReference(),
-									f.field( absoluteFieldPath, typeDescriptor.getJavaType() ) )
-							.as( (ref, val) -> new IdAndValue<>( ref.id(), val ) ) )
-					.where( f -> f.matchAll() )
-					.toQuery();
+		SearchQuery<IdAndValue<F>> query = scope.query()
+				.select( f -> f.composite()
+						.from( f.entityReference(),
+								f.field( absoluteFieldPath, typeDescriptor.getJavaType() ) )
+						.as( (ref, val) -> new IdAndValue<>( ref.id(), val ) ) )
+				.where( f -> f.matchAll() )
+				.toQuery();
 
-			assertThatQuery( query ).hasHitsAnyOrder( expectedDocuments );
-		}
+		assertThatQuery( query ).hasHitsAnyOrder( expectedDocuments );
 	}
 
 	@Test
@@ -176,17 +172,15 @@ public class IndexingFieldTypesIT<F> {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = relativeFieldName;
 
-		for ( int i = 0; i < values.size(); i++ ) {
-			SearchQuery<IdAndValue<F>> query = scope.query()
-					.select( f -> f.composite()
-							.from( f.entityReference(),
-									f.field( absoluteFieldPath, typeDescriptor.getJavaType() ) )
-							.as( (ref, val) -> new IdAndValue<>( ref.id(), val ) ) )
-					.where( f -> f.matchAll() )
-					.toQuery();
+		SearchQuery<IdAndValue<F>> query = scope.query()
+				.select( f -> f.composite()
+						.from( f.entityReference(),
+								f.field( absoluteFieldPath, typeDescriptor.getJavaType() ) )
+						.as( (ref, val) -> new IdAndValue<>( ref.id(), val ) ) )
+				.where( f -> f.matchAll() )
+				.toQuery();
 
-			assertThatQuery( query ).hasHitsAnyOrder( expectedDocuments );
-		}
+		assertThatQuery( query ).hasHitsAnyOrder( expectedDocuments );
 	}
 
 	private class IndexBinding {
