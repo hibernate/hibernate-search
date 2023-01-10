@@ -41,7 +41,7 @@ Map settings() {
 
 // Perform authenticated pulls of container images, to avoid failure due to download throttling on dockerhub.
 def pullContainerImages() {
-	String containerImageRefsString = ((String) sh(script: "./ci/list-container-images.sh -U -Pdist -Pdependency-update ${env.ADDITIONAL_MAVEN_ARGS}", returnStdout: true))
+	String containerImageRefsString = ((String) sh(script: "./ci/list-container-images.sh -U -Pdist -Pdependency-update ${env[qualify('ADDITIONAL_MAVEN_ARGS')]}", returnStdout: true))
 	String[] containerImageRefs = containerImageRefsString ? containerImageRefsString.split('\\s+') : new String[0]
 	echo 'Container images to be used in tests: ' + Arrays.toString(containerImageRefs)
 	if (containerImageRefs.length == 0) {
