@@ -117,7 +117,20 @@ public class ConfigurationPropertyProcessor extends AbstractProcessor {
 
 	private void beforeExit() {
 		writeProperties( fileName + ".json", (map, w) -> new Gson().toJson( map, w ) );
-		writeProperties( fileName + ".asciidoc", new AsciiDocWriter( moduleName ) );
+		writeProperties(
+				fileName + ".asciidoc",
+				new AsciiDocWriter(
+						moduleName,
+						entry -> HibernateSearchConfiguration.Type.API.equals( entry.getValue().type() )
+				)
+		);
+		writeProperties(
+				fileName + "-spi.asciidoc",
+				new AsciiDocWriter(
+						moduleName,
+						entry -> HibernateSearchConfiguration.Type.SPI.equals( entry.getValue().type() )
+				)
+		);
 	}
 
 	private void writeProperties(String fileName, BiConsumer<Map<String, ConfigurationProperty>, Writer> transformer) {
