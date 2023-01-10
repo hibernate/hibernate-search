@@ -548,3 +548,5 @@ and in the `resolveEntitiesToReindex` method of `PojoImplicitReindexingResolverD
 == [[_json_mapper]] JSON mapper
 
 The JSON mapper does not currently exist, but there are plans to work on it.
+
+include::configuration-properties-aggregated.asciidoc[]
