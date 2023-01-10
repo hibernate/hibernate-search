@@ -40,24 +40,26 @@ public class AsciiDocWriter implements BiConsumer<Map<String, ConfigurationPrope
 		}
 		try {
 			moduleName.ifPresent( name -> tryToWriteLine( "== ", name, writer ) );
-			moduleName.ifPresent( name -> tryToWriteLine( "\n.", name, writer ) );
-			writer.write( "|===\n" );
-			writer.write( "|Configuration key |Description |Default value" );
-			moduleName.ifPresent( ignore -> tryToWriteLine( " |", "Module", writer ) );
-			writer.write( "\n" );
-			writer.write( "\n" );
+			writer.write( '\n' );
 			for ( Map.Entry<String, ConfigurationProperty> entry : entries ) {
-				writer.write( "|" );
+				writer.write( '`' );
 				writer.write( entry.getValue().key() );
+				writer.write( '`' );
+
+				String defaultValue = Objects.toString( entry.getValue().defaultValue(), "" );
+				if ( !defaultValue.isBlank() ) {
+					writer.write( " (default value: `" );
+					writer.write( defaultValue );
+					writer.write( "`)" );
+				}
+				writer.write( "::\n" );
 				// using inline passthrough for javadocs to not render HTML.
-				writer.write( " | +++ " );
+				writer.write( "+++ " );
 				writer.write( entry.getValue().javadoc() );
-				writer.write( " +++ |" );
-				writer.write( Objects.toString( entry.getValue().defaultValue(), "See description." ) );
-				moduleName.ifPresent( name -> tryToWriteLine( " |", name, writer ) );
-				writer.write( "\n" );
+				writer.write( " +++ " );
+				writer.write( '\n' );
 			}
-			writer.write( "|===\n" );
+			writer.write( '\n' );
 		}
 		catch (IOException e) {
 			throw new RuntimeException( e );
