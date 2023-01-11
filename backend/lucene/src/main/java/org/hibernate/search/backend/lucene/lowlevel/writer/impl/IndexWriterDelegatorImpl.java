@@ -10,15 +10,15 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.engine.backend.orchestration.spi.SingletonTask;
+import org.hibernate.search.engine.common.execution.SimpleScheduledExecutor;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.engine.backend.orchestration.spi.SingletonTask;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -48,7 +48,7 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 	private long commitExpiration;
 
 	public IndexWriterDelegatorImpl(IndexWriter delegate, EventContext eventContext,
-			ScheduledExecutorService delayedCommitExecutor,
+			SimpleScheduledExecutor delayedCommitExecutor,
 			TimingSource timingSource, int commitInterval,
 			FailureHandler failureHandler,
 			DelayedCommitFailureHandler delayedCommitFailureHandler) {
@@ -255,9 +255,9 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 	}
 
 	private class LuceneDelayedCommitScheduler implements SingletonTask.Scheduler {
-		private final ScheduledExecutorService delegate;
+		private final SimpleScheduledExecutor delegate;
 
-		private LuceneDelayedCommitScheduler(ScheduledExecutorService delegate) {
+		private LuceneDelayedCommitScheduler(SimpleScheduledExecutor delegate) {
 			this.delegate = delegate;
 		}
 

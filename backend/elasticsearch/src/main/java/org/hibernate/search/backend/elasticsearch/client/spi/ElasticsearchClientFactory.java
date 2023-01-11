@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.client.spi;
 
-import java.util.concurrent.ScheduledExecutorService;
-
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.engine.common.execution.SimpleScheduledExecutor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
@@ -21,7 +20,7 @@ public interface ElasticsearchClientFactory {
 
 	ElasticsearchClientImplementor create(BeanResolver beanResolver, ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix,
-			ScheduledExecutorService timeoutExecutorService,
+			SimpleScheduledExecutor timeoutExecutorService,
 			GsonProvider gsonProvider);
 
 }

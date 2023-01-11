@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
@@ -17,6 +16,7 @@ import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.IndexManagementWorkExecutionContext;
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.common.execution.SimpleScheduledExecutor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -31,7 +31,7 @@ public class LuceneParallelWorkOrchestratorImpl
 	private final IndexAccessorWorkExecutionContext context;
 	private final BackendThreads threads;
 
-	private ExecutorService executor;
+	private SimpleScheduledExecutor executor;
 
 	public LuceneParallelWorkOrchestratorImpl(String name,
 			EventContext eventContext, IndexAccessor indexAccessor,

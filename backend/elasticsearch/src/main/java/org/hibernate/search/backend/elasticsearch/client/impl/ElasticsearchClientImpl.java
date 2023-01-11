@@ -17,7 +17,6 @@ import java.time.Duration;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -27,6 +26,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRespon
 import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLogCategories;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.engine.common.execution.SimpleScheduledExecutor;
 import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.util.common.impl.Closer;
@@ -57,7 +57,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 
 	private final Sniffer sniffer;
 
-	private final ScheduledExecutorService timeoutExecutorService;
+	private final SimpleScheduledExecutor timeoutExecutorService;
 
 	private final Optional<Integer> requestTimeoutMs;
 	private final int connectionTimeoutMs;
@@ -66,7 +66,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	private final JsonLogHelper jsonLogHelper;
 
 	ElasticsearchClientImpl(BeanHolder<? extends RestClient> restClientHolder, Sniffer sniffer,
-			ScheduledExecutorService timeoutExecutorService,
+			SimpleScheduledExecutor timeoutExecutorService,
 			Optional<Integer> requestTimeoutMs, int connectionTimeoutMs,
 			Gson gson, JsonLogHelper jsonLogHelper) {
 		this.restClientHolder = restClientHolder;

@@ -44,6 +44,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.engine.common.execution.impl.DelegatingSimpleScheduledExecutor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
@@ -1047,8 +1048,9 @@ public class ElasticsearchClientFactoryImplIT {
 		);
 		return new ElasticsearchClientFactoryImpl().create( beanResolver, clientPropertySource,
 				threadPoolProvider.threadProvider(), "Client",
-				timeoutExecutorService,
-				GsonProvider.create( GsonBuilder::new, true ) );
+				new DelegatingSimpleScheduledExecutor( timeoutExecutorService ),
+				GsonProvider.create( GsonBuilder::new, true )
+		);
 	}
 
 	private ElasticsearchResponse doPost(ElasticsearchClient client, String path, String payload) {

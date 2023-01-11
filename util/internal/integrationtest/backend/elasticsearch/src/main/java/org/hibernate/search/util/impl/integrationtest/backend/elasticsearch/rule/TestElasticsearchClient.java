@@ -38,6 +38,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchResp
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
+import org.hibernate.search.engine.common.execution.impl.DelegatingSimpleScheduledExecutor;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.impl.EmbeddedThreadProvider;
@@ -519,7 +520,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		 */
 		client = new ElasticsearchClientFactoryImpl().create( beanResolver, backendProperties,
 				threadPoolProvider.threadProvider(), "Client",
-				timeoutExecutorService,
+				new DelegatingSimpleScheduledExecutor( timeoutExecutorService ),
 				GsonProvider.create( GsonBuilder::new, true ) );
 	}
 
