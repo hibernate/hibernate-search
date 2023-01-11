@@ -9,6 +9,7 @@ package org.hibernate.search.engine.cfg.spi;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.engine.backend.work.execution.spi.BackendWorkExecutorProvider;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
@@ -55,6 +56,15 @@ public class EngineSpiSettings {
 	public static final String THREAD_PROVIDER = PREFIX + Radicals.THREAD_PROVIDER;
 
 	/**
+	 * The {@link BackendWorkExecutorProvider} used to create work executors.
+	 * <p>
+	 * Expects a reference to a bean of type {@link BackendWorkExecutorProvider}.
+	 * <p>
+	 * Defaults to {@link Defaults#BACKEND_WORK_EXECUTOR_PROVIDER}, a built-in work executor provider.
+	 */
+	public static final String BACKEND_WORK_EXECUTOR_PROVIDER = PREFIX + Radicals.BACKEND_WORK_EXECUTOR_PROVIDER;
+
+	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
 	 */
 	public static class Radicals {
@@ -64,6 +74,7 @@ public class EngineSpiSettings {
 
 		public static final String BEAN_CONFIGURERS = "bean_configurers";
 		public static final String THREAD_PROVIDER = "thread_provider";
+		public static final String BACKEND_WORK_EXECUTOR_PROVIDER = "backend_work_executor_provider";
 	}
 
 	/**
@@ -77,5 +88,7 @@ public class EngineSpiSettings {
 		public static final List<BeanReference<? extends BeanConfigurer>> BEAN_CONFIGURERS = Collections.emptyList();
 		public static final BeanReference<? extends ThreadProvider> THREAD_PROVIDER =
 				BeanReference.of( ThreadProvider.class, EmbeddedThreadProvider.NAME );
+		public static final BeanReference<? extends BackendWorkExecutorProvider> BACKEND_WORK_EXECUTOR_PROVIDER =
+				BeanReference.of( BackendWorkExecutorProvider.class, BackendWorkExecutorProvider.DEFAULT_BEAN_NAME );
 	}
 }
