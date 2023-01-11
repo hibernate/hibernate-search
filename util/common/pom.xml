@@ -14,6 +14,7 @@
 
     <properties>
         <java.module.name>org.hibernate.search.util.common</java.module.name>
+        <properties.collector.processing.phase>none</properties.collector.processing.phase>
     </properties>
 
     <dependencies>

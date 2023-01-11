@@ -22,6 +22,8 @@
 
     <properties>
         <javadoc.packagelists.directory>${project.build.directory}/dependencies-javadoc-packagelists</javadoc.packagelists.directory>
+        <!-- override the value if no property collection should happen (set to `none`)-->
+        <properties.collector.processing.phase>compile</properties.collector.processing.phase>
     </properties>
 
     <build>
@@ -214,11 +216,12 @@
                                 <goals>
                                     <goal>compile</goal>
                                 </goals>
+                                <phase>${properties.collector.processing.phase}</phase>
                                 <configuration>
                                     <!-- Only run annotation processor and do not recompile the classes: -->
                                     <proc>only</proc>
                                     <fork>true</fork>
-                                    <executable>${java-version.test.compiler}</executable>
+                                    <executable>${java-version.main.compiler}</executable>
                                     <annotationProcessorPaths>
                                         <path>
                                             <groupId>${project.groupId}</groupId>
