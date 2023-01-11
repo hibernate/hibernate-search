@@ -115,11 +115,11 @@ public abstract class TckBackendFeatures {
 		return true;
 	}
 
-	public boolean supportsMatchOnScaledNumericLossOfPrecision() {
+	public boolean supportsExtremeLongValues() {
 		return true;
 	}
 
-	public boolean supportsExtremeLongValuesInAggregations() {
+	public boolean supportsExtremeScaledNumericValues() {
 		return true;
 	}
 
