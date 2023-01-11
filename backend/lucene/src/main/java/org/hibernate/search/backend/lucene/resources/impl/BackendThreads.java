@@ -6,12 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.resources.impl;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.common.execution.SimpleScheduledExecutor;
+import org.hibernate.search.engine.common.execution.impl.DelegatingSimpleScheduledExecutor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
@@ -28,7 +27,7 @@ public class BackendThreads {
 	private final String prefix;
 
 	private ThreadPoolProvider threadPoolProvider;
-	private ScheduledExecutorService writeExecutor;
+	private SimpleScheduledExecutor writeExecutor;
 
 	public BackendThreads(String prefix) {
 		this.prefix = prefix;
@@ -45,14 +44,16 @@ public class BackendThreads {
 				.orElse( Runtime.getRuntime().availableProcessors() );
 		// We use a scheduled executor for write so that we perform all commits,
 		// scheduled or not, in the *same* thread pool.
-		this.writeExecutor = threadPoolProvider.newScheduledExecutor(
-				threadPoolSize, prefix + " - Worker thread"
+		this.writeExecutor = new DelegatingSimpleScheduledExecutor(
+				threadPoolProvider.newScheduledExecutor(
+						threadPoolSize, prefix + " - Worker thread"
+				)
 		);
 	}
 
 	public void onStop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( ExecutorService::shutdownNow, writeExecutor );
+			closer.push( SimpleScheduledExecutor::shutdownNow, writeExecutor );
 		}
 	}
 
@@ -61,7 +62,7 @@ public class BackendThreads {
 		return threadPoolProvider.threadProvider();
 	}
 
-	public ScheduledExecutorService getWriteExecutor() {
+	public SimpleScheduledExecutor getWriteExecutor() {
 		checkStarted();
 		return writeExecutor;
 	}

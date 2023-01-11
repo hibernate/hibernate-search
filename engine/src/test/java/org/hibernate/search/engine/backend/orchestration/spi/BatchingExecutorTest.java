@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.common.execution.impl.DelegatingSimpleScheduledExecutor;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.thread.impl.EmbeddedThreadProvider;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
@@ -480,7 +481,7 @@ public class BatchingExecutorTest {
 		// the batching executor takes care of executing in only one thread at a time.
 		this.executorService = threadPoolProvider.newScheduledExecutor( 4, "BatchingExecutorTest" );
 
-		executor.start( executorService );
+		executor.start( new DelegatingSimpleScheduledExecutor( executorService ) );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			// No calls expected yet
 		} );

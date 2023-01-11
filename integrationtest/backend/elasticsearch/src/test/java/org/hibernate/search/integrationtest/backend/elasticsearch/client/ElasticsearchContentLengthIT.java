@@ -33,6 +33,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.engine.common.execution.impl.DelegatingSimpleScheduledExecutor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -217,7 +218,7 @@ public class ElasticsearchContentLengthIT {
 		BeanResolver beanResolver = testConfigurationProvider.createBeanResolverForTest();
 		return new ElasticsearchClientFactoryImpl().create( beanResolver, clientPropertySource,
 				threadPoolProvider.threadProvider(), "Client",
-				timeoutExecutorService,
+				new DelegatingSimpleScheduledExecutor( timeoutExecutorService ),
 				GsonProvider.create( GsonBuilder::new, true ) );
 	}
 

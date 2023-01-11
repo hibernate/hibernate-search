@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.resources.impl;
 
-import java.util.concurrent.ScheduledExecutorService;
-
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.common.execution.SimpleScheduledExecutor;
+import org.hibernate.search.engine.common.execution.impl.DelegatingSimpleScheduledExecutor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
@@ -26,7 +26,7 @@ public class BackendThreads {
 	private final String prefix;
 
 	private ThreadPoolProvider threadPoolProvider;
-	private ScheduledExecutorService workExecutor;
+	private SimpleScheduledExecutor workExecutor;
 
 	public BackendThreads(String prefix) {
 		this.prefix = prefix;
@@ -42,8 +42,10 @@ public class BackendThreads {
 		int threadPoolSize = THREAD_POOL_SIZE.get( propertySource )
 				.orElse( Runtime.getRuntime().availableProcessors() );
 		// We use a scheduled executor so that we can also schedule client timeouts in the same thread pool.
-		this.workExecutor = threadPoolProvider.newScheduledExecutor(
-				threadPoolSize, prefix + " - Worker thread"
+		this.workExecutor = new DelegatingSimpleScheduledExecutor(
+				threadPoolProvider.newScheduledExecutor(
+						threadPoolSize, prefix + " - Worker thread"
+				)
 		);
 	}
 
@@ -62,7 +64,7 @@ public class BackendThreads {
 		return threadPoolProvider.threadProvider();
 	}
 
-	public ScheduledExecutorService getWorkExecutor() {
+	public SimpleScheduledExecutor getWorkExecutor() {
 		checkStarted();
 		return workExecutor;
 	}

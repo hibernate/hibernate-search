@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.common.execution.SimpleScheduledExecutor;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -75,7 +75,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	 *
 	 * @param executorService An executor service with at least one thread.
 	 */
-	public synchronized void start(ExecutorService executorService) {
+	public synchronized void start(SimpleScheduledExecutor executorService) {
 		log.startingExecutor( name );
 		processingTask = new SingletonTask(
 				name, worker,
@@ -204,9 +204,9 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	}
 
 	private static final class BatchScheduler implements SingletonTask.Scheduler {
-		private final ExecutorService delegate;
+		private final SimpleScheduledExecutor delegate;
 
-		public BatchScheduler(ExecutorService delegate) {
+		public BatchScheduler(SimpleScheduledExecutor delegate) {
 			this.delegate = delegate;
 		}
 

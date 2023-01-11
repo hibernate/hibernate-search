@@ -9,16 +9,16 @@ package org.hibernate.search.backend.elasticsearch.client.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ScheduledExecutorService;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
-import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.common.execution.SimpleScheduledExecutor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -132,7 +132,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 	@Override
 	public ElasticsearchClientImplementor create(BeanResolver beanResolver, ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix,
-			ScheduledExecutorService timeoutExecutorService,
+			SimpleScheduledExecutor timeoutExecutorService,
 			GsonProvider gsonProvider) {
 		Optional<Integer> requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
 		int connectionTimeoutMs = CONNECTION_TIMEOUT.get( propertySource );
