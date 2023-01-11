@@ -6,23 +6,24 @@
  */
 package org.hibernate.search.backend.elasticsearch.resources.impl;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.engine.common.execution.SimpleScheduledExecutor;
-import org.hibernate.search.engine.common.execution.impl.DelegatingSimpleScheduledExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.BackendWorkExecutorProvider;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
+import org.hibernate.search.engine.common.execution.SimpleScheduledExecutor;
+import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.util.common.AssertionFailure;
 
 public class BackendThreads {
 
-	private static final OptionalConfigurationProperty<Integer> THREAD_POOL_SIZE =
-			ConfigurationProperty.forKey( ElasticsearchBackendSettings.THREAD_POOL_SIZE )
-					.asIntegerStrictlyPositive()
+	private static final ConfigurationProperty<BeanReference<? extends BackendWorkExecutorProvider>> BACKEND_WORK_EXECUTOR_PROVIDER =
+			ConfigurationProperty.forKey( EngineSpiSettings.Radicals.BACKEND_WORK_EXECUTOR_PROVIDER )
+					.asBeanReference( BackendWorkExecutorProvider.class )
+					.withDefault( EngineSpiSettings.Defaults.BACKEND_WORK_EXECUTOR_PROVIDER )
 					.build();
-
 	private final String prefix;
 
 	private ThreadPoolProvider threadPoolProvider;
@@ -32,21 +33,32 @@ public class BackendThreads {
 		this.prefix = prefix;
 	}
 
-	public void onStart(ConfigurationPropertySource propertySource, ThreadPoolProvider threadPoolProvider) {
+	public void onStart(ConfigurationPropertySource propertySource, BeanResolver beanResolver,
+			ThreadPoolProvider threadPoolProvider) {
 		if ( this.workExecutor != null ) {
 			// Already started
 			return;
 		}
 		this.threadPoolProvider = threadPoolProvider;
 
-		int threadPoolSize = THREAD_POOL_SIZE.get( propertySource )
-				.orElse( Runtime.getRuntime().availableProcessors() );
-		// We use a scheduled executor so that we can also schedule client timeouts in the same thread pool.
-		this.workExecutor = new DelegatingSimpleScheduledExecutor(
-				threadPoolProvider.newScheduledExecutor(
-						threadPoolSize, prefix + " - Worker thread"
-				)
-		);
+		BackendWorkExecutorProvider provider = BACKEND_WORK_EXECUTOR_PROVIDER.getAndTransform(
+				propertySource, beanResolver::resolve ).get();
+		this.workExecutor = provider.writeExecutor( new BackendWorkExecutorProvider.Context() {
+			@Override
+			public ThreadPoolProvider threadPoolProvider() {
+				return threadPoolProvider;
+			}
+
+			@Override
+			public ConfigurationPropertySource propertySource() {
+				return propertySource;
+			}
+
+			@Override
+			public String recommendedThreadNamePrefix() {
+				return prefix + " - Worker thread";
+			}
+		} );
 	}
 
 	public void onStop() {
@@ -76,4 +88,5 @@ public class BackendThreads {
 			);
 		}
 	}
+
 }
