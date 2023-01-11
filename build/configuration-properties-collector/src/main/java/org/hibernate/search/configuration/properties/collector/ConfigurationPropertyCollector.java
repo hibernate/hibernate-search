@@ -28,6 +28,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Name;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
@@ -140,7 +141,7 @@ public class ConfigurationPropertyCollector {
 	}
 
 	private HibernateSearchConfiguration.Type extractType(VariableElement constant) {
-		String packageName = constant.getEnclosingElement().getEnclosingElement().toString();
+		String packageName = packageElement( constant ).getQualifiedName().toString();
 		return SPI_PATTERN.matcher( packageName ).matches() ?
 				HibernateSearchConfiguration.Type.SPI :
 				HibernateSearchConfiguration.Type.API;
@@ -154,7 +155,7 @@ public class ConfigurationPropertyCollector {
 			);
 
 			// calling getEnclosingElement() on class should return a package:
-			String packagePath = enclosingClass.getEnclosingElement().toString().replace( ".", File.separator );
+			String packagePath = packageElement( enclosingClass ).getQualifiedName().toString().replace( ".", File.separator );
 
 			Document javadoc = Jsoup.parse( docs.toFile() );
 
@@ -206,6 +207,15 @@ public class ConfigurationPropertyCollector {
 			}
 		}
 		return null;
+	}
+
+	private PackageElement packageElement(Element element) {
+		Element packageElement = element;
+		while ( !( packageElement instanceof PackageElement ) && packageElement.getEnclosingElement() != null ) {
+			packageElement = packageElement.getEnclosingElement();
+		}
+
+		return packageElement instanceof PackageElement ? (PackageElement) packageElement : null;
 	}
 
 }
