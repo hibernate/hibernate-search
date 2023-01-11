@@ -189,21 +189,24 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 						);
 					}
 				}
-				DocumentElement nestedObject2 = document.addObject( nestedObject.self );
-				nestedObject2.addValue( nestedObject.discriminator, DISCRIMINATOR_VALUE_EXCLUDED );
-				for ( F value : garbageValues ) {
-					nestedObject2.addValue(
-							nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
-							value
-					);
-				}
-				DocumentElement nestedObject3 = document.addObject( nestedObject.self );
-				nestedObject3.addValue( nestedObject.discriminator, DISCRIMINATOR_VALUE_EXCLUDED );
-				for ( F value : garbageValues ) {
-					nestedObject3.addValue(
-							nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
-							value
-					);
+				// This condition is necessary to avoid triggering https://github.com/elastic/elasticsearch/issues/92814
+				if ( !garbageValues.isEmpty() ) {
+					DocumentElement nestedObject2 = document.addObject( nestedObject.self );
+					nestedObject2.addValue( nestedObject.discriminator, DISCRIMINATOR_VALUE_EXCLUDED );
+					for ( F value : garbageValues ) {
+						nestedObject2.addValue(
+								nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
+								value
+						);
+					}
+					DocumentElement nestedObject3 = document.addObject( nestedObject.self );
+					nestedObject3.addValue( nestedObject.discriminator, DISCRIMINATOR_VALUE_EXCLUDED );
+					for ( F value : garbageValues ) {
+						nestedObject3.addValue(
+								nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
+								value
+						);
+					}
 				}
 				break;
 			case IN_NESTED_TWICE:
@@ -228,21 +231,24 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 						);
 					}
 				}
-				DocumentElement nestedNestedObject2 = nestedObjectFirstLevel0.addObject( nestedObject.nestedObject.self );
-				nestedNestedObject2.addValue( nestedObject.nestedObject.discriminator, DISCRIMINATOR_VALUE_EXCLUDED );
-				for ( F value : garbageValues ) {
-					nestedNestedObject2.addValue(
-							nestedObject.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
-							value
-					);
-				}
-				DocumentElement nestedNestedObject3 = nestedObjectFirstLevel1.addObject( nestedObject.nestedObject.self );
-				nestedNestedObject3.addValue( nestedObject.nestedObject.discriminator, DISCRIMINATOR_VALUE_EXCLUDED );
-				for ( F value : garbageValues ) {
-					nestedNestedObject3.addValue(
-							nestedObject.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
-							value
-					);
+				// This condition is necessary to avoid triggering https://github.com/elastic/elasticsearch/issues/92814
+				if ( !garbageValues.isEmpty() ) {
+					DocumentElement nestedNestedObject2 = nestedObjectFirstLevel0.addObject( nestedObject.nestedObject.self );
+					nestedNestedObject2.addValue( nestedObject.nestedObject.discriminator, DISCRIMINATOR_VALUE_EXCLUDED );
+					for ( F value : garbageValues ) {
+						nestedNestedObject2.addValue(
+								nestedObject.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
+								value
+						);
+					}
+					DocumentElement nestedNestedObject3 = nestedObjectFirstLevel1.addObject( nestedObject.nestedObject.self );
+					nestedNestedObject3.addValue( nestedObject.nestedObject.discriminator, DISCRIMINATOR_VALUE_EXCLUDED );
+					for ( F value : garbageValues ) {
+						nestedNestedObject3.addValue(
+								nestedObject.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
+								value
+						);
+					}
 				}
 				break;
 		}
