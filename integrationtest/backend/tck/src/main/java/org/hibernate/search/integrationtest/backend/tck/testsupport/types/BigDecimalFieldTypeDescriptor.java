@@ -99,7 +99,7 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 				BigDecimal.valueOf( 42.42 ),
 				BigDecimal.valueOf( 1584514514.000000184 )
 		) );
-		if ( TckConfiguration.get().getBackendFeatures().supportsMatchOnScaledNumericLossOfPrecision() ) {
+		if ( TckConfiguration.get().getBackendFeatures().supportsExtremeScaledNumericValues() ) {
 			Collections.addAll(
 					list,
 					scaled( Long.MAX_VALUE ),

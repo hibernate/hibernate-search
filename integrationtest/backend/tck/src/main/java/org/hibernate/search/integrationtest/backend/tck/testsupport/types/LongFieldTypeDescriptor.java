@@ -31,7 +31,7 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 			@Override
 			protected List<Long> createSingle() {
 				List<Long> list = new ArrayList<>();
-				if ( TckConfiguration.get().getBackendFeatures().supportsMatchOnScaledNumericLossOfPrecision() ) {
+				if ( TckConfiguration.get().getBackendFeatures().supportsExtremeLongValues() ) {
 					list.add( Long.MIN_VALUE );
 				}
 				Collections.addAll(
@@ -45,7 +45,7 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 						2500L,
 						151_484_254L
 				);
-				if ( TckConfiguration.get().getBackendFeatures().supportsMatchOnScaledNumericLossOfPrecision() ) {
+				if ( TckConfiguration.get().getBackendFeatures().supportsExtremeLongValues() ) {
 					list.add( Long.MAX_VALUE );
 				}
 				return list;
@@ -78,7 +78,7 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 		List<Long> list = new ArrayList<>( Arrays.asList(
 				-251_484_254L, -42L, -1L, 0L, 1L, 3L, 42L, 151_484_254L
 		) );
-		if ( TckConfiguration.get().getBackendFeatures().supportsMatchOnScaledNumericLossOfPrecision() ) {
+		if ( TckConfiguration.get().getBackendFeatures().supportsExtremeLongValues() ) {
 			Collections.addAll(
 					list,
 					Long.MIN_VALUE, Long.MAX_VALUE
