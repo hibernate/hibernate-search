@@ -72,8 +72,9 @@ public class ConfigurationPropertiesProcessorTest {
 
 		assertThat( configurationPropertyProcessor.collectedProperties().values() )
 				.extracting( ConfigurationProperty::key )
+				.map( ConfigurationProperty.Key::toString )
 				.containsOnly(
-						"replacement.prefix." + SampleConfigAnnotatedSettings.SOME_PROPERTY_KEY,
+						"replacement.prefix." + SampleConfigAnnotatedSettings.SOME_PROPERTY_KEY + "/" + "replacement.another.prefix." + SampleConfigAnnotatedSettings.SOME_PROPERTY_KEY,
 						"hibernate.search." + SampleConfigNotAnnotatedSettings.SOME_OTHER_PROPERTY_KEY,
 						"hibernate.search." + SampleConfigNotAnnotatedSettings.SOME_YET_ANOTHER_PROPERTY_KEY,
 						"hibernate.search." + JustSomeClass.InnerConfigurationSettings.SOME_INNER_SETTING

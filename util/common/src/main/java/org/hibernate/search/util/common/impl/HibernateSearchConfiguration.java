@@ -38,10 +38,10 @@ public @interface HibernateSearchConfiguration {
 	boolean ignore() default false;
 
 	/**
-	 * Overrides a prefix provided by {@link Configuration}. If set on class level - all constants from that class will
+	 * Overrides a prefix provided by annotation processor configuration. If set on class level - all constants from that class will
 	 * use this prefix. If set on field level - that particular constant will use the configured prefix and will ignore the
-	 * one set by {@link Configuration} or at class level.
+	 * one set by annotation processor configuration or at class level.
 	 */
-	String prefix() default "";
+	String[] prefix() default "";
 
 }

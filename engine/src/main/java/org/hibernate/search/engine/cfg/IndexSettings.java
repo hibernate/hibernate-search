@@ -8,6 +8,8 @@ package org.hibernate.search.engine.cfg;
 
 import static java.lang.String.join;
 
+import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
+
 /**
  * Configuration properties common to all Hibernate Search indexes regardless of the underlying technology.
  * <p>
@@ -16,6 +18,12 @@ import static java.lang.String.join;
  * "{@code hibernate.search.backend.indexes.<index name>.}" (for per-index settings)
  * or "{@code hibernate.search.backend.}" (for default index settings).
  */
+@HibernateSearchConfiguration(prefix = {
+		"hibernate.search.backend.",
+		"hibernate.search.backend.index.<index name>.",
+		"hibernate.search.backends.<backend name>.",
+		"hibernate.search.backends.<backend name>.index.<index name>."
+})
 public final class IndexSettings {
 
 	private IndexSettings() {

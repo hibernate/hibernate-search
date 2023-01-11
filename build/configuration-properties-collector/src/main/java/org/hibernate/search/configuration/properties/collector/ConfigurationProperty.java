@@ -6,11 +6,17 @@
  */
 package org.hibernate.search.configuration.properties.collector;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
 public class ConfigurationProperty {
 
-	private String key;
+	private Key key;
 	private String javadoc;
 	private String sourceClass;
 
@@ -18,11 +24,11 @@ public class ConfigurationProperty {
 
 	private Object defaultValue;
 
-	public String key() {
+	public Key key() {
 		return key;
 	}
 
-	public ConfigurationProperty key(String key) {
+	public ConfigurationProperty key(Key key) {
 		this.key = key;
 		return this;
 	}
@@ -72,5 +78,59 @@ public class ConfigurationProperty {
 				", type='" + type + '\'' +
 				", default='" + defaultValue + '\'' +
 				'}';
+	}
+
+	public static class Key {
+		private final List<String> prefixes;
+		private final String key;
+
+		public Key(List<String> prefixes, String key) {
+			this.key = key;
+			this.prefixes = prefixes;
+		}
+
+		public void overridePrefixes(String... prefixes) {
+			overridePrefixes( Arrays.asList( prefixes ) );
+		}
+
+		public void overridePrefixes(List<String> prefixes) {
+			this.prefixes.clear();
+			this.prefixes.addAll( prefixes );
+		}
+
+		public boolean matches(Pattern pattern) {
+			return pattern.matcher( key ).matches();
+		}
+
+		public List<String> resolvedKeys() {
+			if ( prefixes.isEmpty() ) {
+				return Collections.singletonList( key );
+			}
+			else {
+				return prefixes.stream()
+						.map( p -> p + key )
+						.collect( Collectors.toList() );
+			}
+		}
+
+		@Override
+		public String toString() {
+			return toString( "/" );
+		}
+
+		public String toHtmlString() {
+			return toString( "</br>" );
+		}
+
+		private String toString(String delimiter) {
+			if ( prefixes.isEmpty() ) {
+				return key;
+			}
+			else {
+				return prefixes.stream()
+						.map( p -> p + key )
+						.collect( Collectors.joining( delimiter ) );
+			}
+		}
 	}
 }

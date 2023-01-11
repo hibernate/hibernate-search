@@ -75,7 +75,7 @@ public class ConfigurationPropertyProcessor extends AbstractProcessor {
 		Pattern ignoreKeys = Pattern.compile( keyPattern );
 		Path javadocs = locateJavaDocFolder();
 
-		this.propertyCollector = new ConfigurationPropertyCollector( processingEnv, configPrefix, javadocs, ignoreKeys,
+		this.propertyCollector = new ConfigurationPropertyCollector( processingEnv, configPrefix.split( "," ), javadocs, ignoreKeys,
 				javadocsBaseLink
 		);
 	}

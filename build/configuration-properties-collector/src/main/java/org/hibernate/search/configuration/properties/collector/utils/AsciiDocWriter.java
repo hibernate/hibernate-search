@@ -10,6 +10,7 @@ package org.hibernate.search.configuration.properties.collector.utils;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -42,9 +43,9 @@ public class AsciiDocWriter implements BiConsumer<Map<String, ConfigurationPrope
 			moduleName.ifPresent( name -> tryToWriteLine( "== ", name, writer ) );
 			writer.write( '\n' );
 			for ( Map.Entry<String, ConfigurationProperty> entry : entries ) {
-				writer.write( '`' );
-				writer.write( entry.getValue().key() );
-				writer.write( '`' );
+				writer.write( entry.getValue().key().resolvedKeys().stream()
+						.map( key -> String.format( Locale.ROOT, "`%s`", key ) )
+						.collect( Collectors.joining( "/" ) ) );
 
 				String defaultValue = Objects.toString( entry.getValue().defaultValue(), "" );
 				if ( !defaultValue.isBlank() ) {

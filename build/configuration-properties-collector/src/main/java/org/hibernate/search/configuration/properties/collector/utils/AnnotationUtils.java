@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.configuration.properties.collector.utils;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 
 import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
@@ -44,6 +47,16 @@ public final class AnnotationUtils {
 			return annotationMirror.getElementValues().entrySet().stream()
 					.filter( entry -> entry.getKey().getSimpleName().contentEquals( name ) )
 					.map( entry -> klass.cast( entry.getValue().getValue() ) )
+					.findAny();
+		}
+
+		public <T> Optional<List<T>> multiAttribute(String name, Class<T> klass) {
+			return annotationMirror.getElementValues().entrySet().stream()
+					.filter( entry -> entry.getKey().getSimpleName().contentEquals( name ) )
+					.map( entry -> entry.getValue().getValue() )
+					.map( obj -> ( (List<?>) List.class.cast( obj ) ) )
+					.map( list -> list.stream().map( AnnotationValue.class::cast ).map( AnnotationValue::getValue )
+							.map( klass::cast ).collect( Collectors.toList() ) )
 					.findAny();
 		}
 	}

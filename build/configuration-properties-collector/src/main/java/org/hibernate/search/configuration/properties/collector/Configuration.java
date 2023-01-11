@@ -16,8 +16,8 @@ public final class Configuration {
 	}
 
 	/**
-	 * Use to define a property prefix for entire module. Can be overriden with {@link HibernateSearchConfiguration}
-	 * on class and property levels if needed.
+	 * Use to define a property prefix for entire module. Accepts a list of comma seperated prefixes.
+	 * Can be overriden with {@link HibernateSearchConfiguration} on class and property levels if needed.
 	 */
 	public static final String PROPERTY_PREFIX = "org.hibernate.search.cpcap.property.prefix";
 	/**
