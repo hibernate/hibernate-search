@@ -12,9 +12,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -47,17 +49,17 @@ public class ConfigurationPropertyCollector {
 	private final Set<Name> processedTypes = new HashSet<>();
 	private final Map<String, ConfigurationProperty> properties = new LinkedHashMap<>();
 	private final Elements elementUtils;
-	private final String configPrefix;
+	private final List<String> configPrefix;
 	private final Path javadocsLocation;
 	private final String javadocsBaseLink;
 	private final Pattern ignoreKeys;
 	private final Messager messager;
 
-	public ConfigurationPropertyCollector(ProcessingEnvironment processingEnvironment, String configPrefix,
+	public ConfigurationPropertyCollector(ProcessingEnvironment processingEnvironment, String configPrefix[],
 			Path javadocsLocation, Pattern ignoreKeys,
 			String javadocsBaseLink) {
 		this.elementUtils = processingEnvironment.getElementUtils();
-		this.configPrefix = configPrefix;
+		this.configPrefix = Arrays.asList( configPrefix );
 		this.javadocsLocation = javadocsLocation;
 		this.javadocsBaseLink = javadocsBaseLink;
 		this.ignoreKeys = ignoreKeys;
@@ -69,10 +71,9 @@ public class ConfigurationPropertyCollector {
 		if ( !processedTypes.contains( qualifiedName ) ) {
 			processedTypes.add( qualifiedName );
 
-			Optional<String> classPrefix = findAnnotation( element, HibernateSearchConfiguration.class )
+			Optional<List<String>> classPrefix = findAnnotation( element, HibernateSearchConfiguration.class )
 					.flatMap(
-							a -> a.attribute( "prefix", String.class )
-									.map( ConfigurationPropertyCollector::nullIfBlank )
+							a -> a.multiAttribute( "prefix", String.class )
 					);
 
 			for ( Element inner : elementUtils.getAllMembers( element ) ) {
@@ -91,19 +92,18 @@ public class ConfigurationPropertyCollector {
 		return Collections.unmodifiableMap( properties );
 	}
 
-	private void processConstant(VariableElement constant, Optional<String> classPrefix) {
+	private void processConstant(VariableElement constant, Optional<List<String>> classPrefix) {
 		Optional<AnnotationUtils.AnnotationAttributeHolder> annotation = findAnnotation( constant, HibernateSearchConfiguration.class );
 		if ( annotation.flatMap( a -> a.attribute( "ignore", Boolean.class ) ).orElse( false ) ) {
 			return;
 		}
 
-		String key = extractKey(
+		ConfigurationProperty.Key key = extractKey(
 				constant,
 				classPrefix,
-				annotation.flatMap( a -> a.attribute( "prefix", String.class ) )
-						.map( ConfigurationPropertyCollector::nullIfBlank )
+				annotation.flatMap( a -> a.multiAttribute( "prefix", String.class ) )
 		);
-		if ( !ignoreKeys.matcher( key ).matches() ) {
+		if ( !key.matches( ignoreKeys ) ) {
 			// Try to find a default value. Assumption is that the settings class has an inner class called "Defaults" and
 			// the key for the default value is exactly the same as the config constant name:
 			Object value = findDefault( constant );
@@ -121,8 +121,8 @@ public class ConfigurationPropertyCollector {
 	}
 
 
-	private String extractKey(VariableElement constant, Optional<String> classPrefix, Optional<String> constantPrefix) {
-		String prefix;
+	private ConfigurationProperty.Key extractKey(VariableElement constant, Optional<List<String>> classPrefix, Optional<List<String>> constantPrefix) {
+		List<String> prefix;
 		if ( constantPrefix.isPresent() ) {
 			prefix = constantPrefix.get();
 		}
@@ -133,7 +133,10 @@ public class ConfigurationPropertyCollector {
 			prefix = configPrefix;
 		}
 
-		return prefix + Objects.toString( constant.getConstantValue(), "NOT_FOUND#" + constant.getSimpleName() );
+		return new ConfigurationProperty.Key(
+				prefix,
+				Objects.toString( constant.getConstantValue(), "NOT_FOUND#" + constant.getSimpleName() )
+		);
 	}
 
 	private HibernateSearchConfiguration.Type extractType(VariableElement constant) {
@@ -203,10 +206,6 @@ public class ConfigurationPropertyCollector {
 			}
 		}
 		return null;
-	}
-
-	private static String nullIfBlank(String str) {
-		return str != null && str.isBlank() ? null : str;
 	}
 
 }

@@ -26,7 +26,12 @@ import org.apache.lucene.util.InfoStream;
  * Constants in this class are to be appended to a prefix to form a property key;
  * see {@link org.hibernate.search.engine.cfg.IndexSettings} for details.
  */
-@HibernateSearchConfiguration(prefix = "hibernate.search.backends.")
+@HibernateSearchConfiguration(prefix = {
+		"hibernate.search.backend.",
+		"hibernate.search.backend.index.<index name>.",
+		"hibernate.search.backends.<backend name>.",
+		"hibernate.search.backends.<backend name>.index.<index name>."
+})
 public final class LuceneIndexSettings {
 
 	private LuceneIndexSettings() {
