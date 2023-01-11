@@ -14,7 +14,9 @@ import org.hibernate.search.backend.lucene.index.spi.ShardingStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.directory.impl.LocalFileSystemDirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.directory.impl.LocalHeapDirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
+import org.hibernate.search.backend.lucene.resources.impl.LuceneBackendWorkExecutorProvider;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
+import org.hibernate.search.engine.backend.work.execution.spi.BackendWorkExecutorProvider;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
@@ -45,6 +47,10 @@ public class LuceneBeanConfigurer implements BeanConfigurer {
 		context.define(
 				ShardingStrategy.class, ExplicitShardingStrategy.NAME,
 				beanResolver -> BeanHolder.of( new ExplicitShardingStrategy() )
+		);
+		context.define(
+				BackendWorkExecutorProvider.class, BackendWorkExecutorProvider.DEFAULT_BEAN_NAME,
+				beanResolver -> BeanHolder.of( new LuceneBackendWorkExecutorProvider() )
 		);
 	}
 }
