@@ -159,10 +159,20 @@ public class ConfigurationPropertyCollector {
 			if ( !blocks.isEmpty() ) {
 				org.jsoup.nodes.Element block = blocks.get( 0 );
 				for ( org.jsoup.nodes.Element link : block.getElementsByTag( "a" ) ) {
+					String href = link.attr( "href" );
 					// only update links if they are not external:
 					if ( !link.hasClass( "external-link" ) ) {
-						link.attr( "href", javadocsBaseLink + packagePath + "/" + link.attr( "href" ) );
+						if ( href.startsWith( "#" ) ) {
+							href = enclosingClass.getSimpleName().toString() + ".html" + href;
+						}
+						href = javadocsBaseLink + packagePath + "/" + href;
 					}
+					else if ( href.contains( "/build/parents/" ) && href.contains( "/apidocs" ) ) {
+						// means a link was to a class from other module and javadoc plugin generated some external link
+						// that won't work. So we replace it:
+						href = javadocsBaseLink + href.substring( href.indexOf( "/apidocs" ) + "/apidocs".length() );
+					}
+					link.attr( "href", href );
 				}
 				return block.toString();
 			}
