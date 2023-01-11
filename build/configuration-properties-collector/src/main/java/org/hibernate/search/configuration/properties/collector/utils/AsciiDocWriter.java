@@ -9,8 +9,8 @@ package org.hibernate.search.configuration.properties.collector.utils;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -43,21 +43,43 @@ public class AsciiDocWriter implements BiConsumer<Map<String, ConfigurationPrope
 			moduleName.ifPresent( name -> tryToWriteLine( "== ", name, writer ) );
 			writer.write( '\n' );
 			for ( Map.Entry<String, ConfigurationProperty> entry : entries ) {
-				writer.write( entry.getValue().key().resolvedKeys().stream()
-						.map( key -> String.format( Locale.ROOT, "`%s`", key ) )
-						.collect( Collectors.joining( "/" ) ) );
-
-				String defaultValue = Objects.toString( entry.getValue().defaultValue(), "" );
-				if ( !defaultValue.isBlank() ) {
-					writer.write( " (default value: `" );
-					writer.write( defaultValue );
-					writer.write( "`)" );
-				}
+				Iterator<String> keys = entry.getValue().key().resolvedKeys().iterator();
+				writer.write( '`' );
+				writer.write( keys.next() );
+				writer.write( '`' );
 				writer.write( "::\n" );
+
+				boolean hasMultipleKeys = false;
+				if ( keys.hasNext() ) {
+					hasMultipleKeys = true;
+					writer.write( "Other variants: " );
+				}
+				while ( keys.hasNext() ) {
+					writer.write( '`' );
+					writer.write( keys.next() );
+					writer.write( '`' );
+					if ( keys.hasNext() ) {
+						writer.write( ", " );
+					}
+				}
+
+				if ( hasMultipleKeys ) {
+					writer.write( "\n+\n" );
+				}
+
 				// using inline passthrough for javadocs to not render HTML.
 				writer.write( "+++ " );
 				writer.write( entry.getValue().javadoc() );
 				writer.write( " +++ " );
+
+				String defaultValue = Objects.toString( entry.getValue().defaultValue(), "" );
+				if ( !defaultValue.isBlank() ) {
+					writer.write( "\n+\n" );
+					writer.write( "Default value: `" );
+					writer.write( defaultValue );
+					writer.write( '`' );
+				}
+
 				writer.write( '\n' );
 			}
 			writer.write( '\n' );
