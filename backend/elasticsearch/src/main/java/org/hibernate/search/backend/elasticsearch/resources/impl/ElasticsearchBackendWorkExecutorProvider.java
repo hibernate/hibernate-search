@@ -11,7 +11,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.BackendWorkExecuto
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.common.execution.SimpleScheduledExecutor;
-import org.hibernate.search.engine.common.execution.impl.DelegatingSimpleScheduledExecutor;
+import org.hibernate.search.engine.common.execution.DelegatingSimpleScheduledExecutor;
 
 public class ElasticsearchBackendWorkExecutorProvider implements BackendWorkExecutorProvider {
 
