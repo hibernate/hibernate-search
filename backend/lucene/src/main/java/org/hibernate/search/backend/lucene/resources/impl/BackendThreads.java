@@ -8,8 +8,8 @@ package org.hibernate.search.backend.lucene.resources.impl;
 
 import org.hibernate.search.engine.backend.work.execution.spi.BackendWorkExecutorProvider;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.BackendSpiSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.common.execution.SimpleScheduledExecutor;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -21,9 +21,9 @@ import org.hibernate.search.util.common.impl.Closer;
 public class BackendThreads {
 
 	private static final ConfigurationProperty<BeanReference<? extends BackendWorkExecutorProvider>> BACKEND_WORK_EXECUTOR_PROVIDER =
-			ConfigurationProperty.forKey( EngineSpiSettings.Radicals.BACKEND_WORK_EXECUTOR_PROVIDER )
+			ConfigurationProperty.forKey( BackendSpiSettings.Radicals.BACKEND_WORK_EXECUTOR_PROVIDER )
 					.asBeanReference( BackendWorkExecutorProvider.class )
-					.withDefault( EngineSpiSettings.Defaults.BACKEND_WORK_EXECUTOR_PROVIDER )
+					.withDefault( LuceneBackendWorkExecutorProvider.BACKEND_WORK_EXECUTOR_PROVIDER )
 					.build();
 	private final String prefix;
 

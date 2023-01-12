@@ -12,8 +12,14 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.common.execution.SimpleScheduledExecutor;
 import org.hibernate.search.engine.common.execution.DelegatingSimpleScheduledExecutor;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 
 public class LuceneBackendWorkExecutorProvider implements BackendWorkExecutorProvider {
+
+	public static final String DEFAULT_BEAN_NAME = "lucene-built-in";
+	public static final BeanReference<? extends BackendWorkExecutorProvider> BACKEND_WORK_EXECUTOR_PROVIDER =
+			BeanReference.of( BackendWorkExecutorProvider.class, DEFAULT_BEAN_NAME );
+
 
 	private static final OptionalConfigurationProperty<Integer> THREAD_POOL_SIZE =
 			ConfigurationProperty.forKey( LuceneBackendSettings.THREAD_POOL_SIZE )

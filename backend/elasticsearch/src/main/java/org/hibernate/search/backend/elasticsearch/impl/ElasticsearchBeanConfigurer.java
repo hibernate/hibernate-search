@@ -33,7 +33,7 @@ public class ElasticsearchBeanConfigurer implements BeanConfigurer {
 				beanResolver -> BeanHolder.of( new NoAliasIndexLayoutStrategy() )
 		);
 		context.define(
-				BackendWorkExecutorProvider.class, BackendWorkExecutorProvider.DEFAULT_BEAN_NAME,
+				BackendWorkExecutorProvider.class, ElasticsearchBackendWorkExecutorProvider.DEFAULT_BEAN_NAME,
 				beanResolver -> BeanHolder.of( new ElasticsearchBackendWorkExecutorProvider() )
 		);
 	}
