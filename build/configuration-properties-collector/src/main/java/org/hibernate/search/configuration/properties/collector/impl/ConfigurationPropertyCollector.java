@@ -4,9 +4,9 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.configuration.properties.collector;
+package org.hibernate.search.configuration.properties.collector.impl;
 
-import static org.hibernate.search.configuration.properties.collector.utils.AnnotationUtils.findAnnotation;
+import static org.hibernate.search.configuration.properties.collector.impl.AnnotationUtils.findAnnotation;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,8 +33,6 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
-
-import org.hibernate.search.configuration.properties.collector.utils.AnnotationUtils;
 
 import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 

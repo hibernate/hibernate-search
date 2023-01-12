@@ -23,6 +23,9 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
+import org.hibernate.search.configuration.properties.collector.impl.Configuration;
+import org.hibernate.search.configuration.properties.collector.impl.ConfigurationProperty;
+import org.hibernate.search.configuration.properties.collector.impl.ConfigurationPropertyProcessor;
 import org.hibernate.search.configuration.properties.collector.sources.IgnoredSampleConfigAnnotatedSettings;
 import org.hibernate.search.configuration.properties.collector.sources.JustSomeClass;
 import org.hibernate.search.configuration.properties.collector.sources.SampleConfigAnnotatedSettings;
