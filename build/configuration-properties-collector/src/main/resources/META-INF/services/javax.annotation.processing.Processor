@@ -1,1 +1,1 @@
-org.hibernate.search.configuration.properties.collector.ConfigurationPropertyProcessor
+org.hibernate.search.configuration.properties.collector.impl.ConfigurationPropertyProcessor

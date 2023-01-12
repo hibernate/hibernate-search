@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.configuration.properties.collector.utils;
+package org.hibernate.search.configuration.properties.collector.impl;
 
 
 import java.io.IOException;
@@ -17,8 +17,6 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import org.hibernate.search.configuration.properties.collector.ConfigurationProperty;
 
 public class AsciiDocWriter implements BiConsumer<Map<String, ConfigurationProperty>, Writer> {
 

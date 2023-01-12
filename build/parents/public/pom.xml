@@ -230,7 +230,7 @@
                                         </path>
                                     </annotationProcessorPaths>
                                     <annotationProcessors>
-                                        <processor>org.hibernate.search.configuration.properties.collector.ConfigurationPropertyProcessor</processor>
+                                        <processor>org.hibernate.search.configuration.properties.collector.impl.ConfigurationPropertyProcessor</processor>
                                     </annotationProcessors>
                                     <compilerArgs>
                                         <arg>-Aorg.hibernate.search.cpcap.javadoc.link=${javadoc.org.hibernate.search.url}</arg>
