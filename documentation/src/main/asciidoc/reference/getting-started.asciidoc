@@ -83,9 +83,12 @@ most of the artifact IDs changed to reflect the new mapper/backend design,
 and the Lucene integration now requires an explicit dependency instead of being available by default.
 Read <<gettingstarted-dependencies>> for more information.
 
-Additionally, be aware that a lot of APIs changed, some only because of a package change,
+Additionally, be aware that a lot of APIs have changed, some only because of a package change,
 others because of more fundamental changes
 (like moving away from using Lucene types in Hibernate Search APIs).
+For that reason, you are encouraged to migrate first to Hibernate Search 6.0
+using the https://docs.jboss.org/hibernate/search/6.0/migration/html_single/[6.0 migration guide],
+and only then to later versions (which will be significantly easier).
 ====
 
 [[gettingstarted-framework]]
