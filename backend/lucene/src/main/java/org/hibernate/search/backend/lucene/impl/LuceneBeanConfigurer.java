@@ -49,7 +49,7 @@ public class LuceneBeanConfigurer implements BeanConfigurer {
 				beanResolver -> BeanHolder.of( new ExplicitShardingStrategy() )
 		);
 		context.define(
-				BackendWorkExecutorProvider.class, BackendWorkExecutorProvider.DEFAULT_BEAN_NAME,
+				BackendWorkExecutorProvider.class, LuceneBackendWorkExecutorProvider.DEFAULT_BEAN_NAME,
 				beanResolver -> BeanHolder.of( new LuceneBackendWorkExecutorProvider() )
 		);
 	}

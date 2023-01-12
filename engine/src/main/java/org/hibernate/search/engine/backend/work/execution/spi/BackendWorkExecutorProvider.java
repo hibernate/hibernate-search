@@ -13,7 +13,6 @@ import org.hibernate.search.util.common.annotation.Incubating;
 
 @Incubating
 public interface BackendWorkExecutorProvider {
-	String DEFAULT_BEAN_NAME = "built-in";
 
 	SimpleScheduledExecutor writeExecutor(Context context);
 
