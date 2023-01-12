@@ -22,6 +22,19 @@ If you're looking to migrate from an earlier version,
 you should migrate step-by-step, from one minor version to the next,
 following the migration guide of link:https://hibernate.org/search/documentation/[each version].
 
+[WARNING]
+====
+**To Hibernate Search 5 users**
+
+Be aware that a lot of APIs have changed since Hibernate Search 5, some only because of a package change,
+others because of more fundamental changes
+(like moving away from using Lucene types in Hibernate Search APIs).
+
+When migrating from Hibernate Search 5, you are encouraged to migrate first to Hibernate Search 6.0
+using the https://docs.jboss.org/hibernate/search/6.0/migration/html_single/[6.0 migration guide],
+and only then to later versions (which will be significantly easier).
+====
+
 [[requirements]]
 == Requirements
 
