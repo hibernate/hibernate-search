@@ -80,7 +80,7 @@
                         <configuration>
                             <!-- WARNING: When using <dependenciesToScan>, be sure to set the Maven property surefire.module -->
                             <dependenciesToScan>
-                                <dependency>${project.groupId}:hibernate-search-integrationtest-mapper-orm</dependency>
+                                <dependency>${project.groupId}:hibernate-search-integrationtest-mapper-orm-orm6</dependency>
                             </dependenciesToScan>
                             <includes>
                                 <!-- Include all tests from this module -->
