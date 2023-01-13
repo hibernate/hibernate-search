@@ -463,7 +463,7 @@ stage('Non-default environments') {
 				withMavenWorkspace {
 					// Re-run integration tests against the JARs produced by the default build,
 					// but using a different JDK to build and run the tests.
-					mavenNonDefaultBuild buildEnv, "", 'integrationtest'
+					mavenNonDefaultBuild buildEnv, "-f integrationtest"
 				}
 			}
 		})
@@ -489,7 +489,18 @@ stage('Non-default environments') {
 			// Some databases, e.g. DB2 or CockroachDB, can be really slow, so we need to raise the timeout.
 			runBuildOnNode(NODE_PATTERN_BASE, [time: 2, unit: 'HOURS']) {
 				withMavenWorkspace {
-					String mavenBuildAdditionalArgs = ""
+					// Some modules are likely to fail for reasons unrelated to Hibernate Search anyway
+					// (for example because we didn't configure the tests to handle other DBs),
+					// so we skip them.
+					String mavenBuildAdditionalArgs = ''' \
+							-pl !documentation \
+							-pl !integrationtest/mapper/orm-spring \
+							-pl !integrationtest/mapper/orm-batch-jsr352 \
+							-pl !integrationtest/v5migrationhelper/orm \
+							-pl !integrationtest/java/modules/orm-lucene \
+							-pl !integrationtest/java/modules/orm-elasticsearch \
+							-pl !integrationtest/java/modules/orm-coordination-outbox-polling-elasticsearch \
+					'''
 					String mavenDockerArgs = ""
 					def startedContainers = false
 					// DB2 setup is super slow (~5 to 15 minutes).
@@ -518,16 +529,13 @@ stage('Non-default environments') {
 					}
 					try {
 						mavenNonDefaultBuild buildEnv, """ \
-								-pl ${[
-									'org.hibernate.search:hibernate-search-integrationtest-mapper-orm',
-									'org.hibernate.search:hibernate-search-integrationtest-mapper-orm-coordination-outbox-polling',
-									'org.hibernate.search:hibernate-search-integrationtest-mapper-orm-envers',
-									'org.hibernate.search:hibernate-search-integrationtest-showcase-library',
-									'org.hibernate.search:hibernate-search-integrationtest-mapper-orm-realbackend'
-									 ].join(',')} \
+								-Pdist \
 								-P$buildEnv.mavenProfile \
 								$mavenBuildAdditionalArgs \
-						"""
+								""",
+								[
+										'hibernate-search-mapper-orm'
+								]
 					}
 					finally {
 						if ( startedContainers ) {
@@ -545,14 +553,11 @@ stage('Non-default environments') {
 			runBuildOnNode {
 				withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
+							-pl ${sh(script: "./ci/list-dependent-integration-tests.sh ${artifactsToTest.join(',')}", returnStdout: true).trim()} \
 							-Dtest.elasticsearch.distribution=$buildEnv.distribution \
 							-Dtest.elasticsearch.version=$buildEnv.version \
-							-pl ${[
-								'org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch',
-								'org.hibernate.search:hibernate-search-integrationtest-showcase-library',
-								'org.hibernate.search:hibernate-search-integrationtest-mapper-orm-realbackend'
-								 ].join(',')} \
-					"""
+							""",
+							['hibernate-search-backend-elasticsearch']
 				}
 			}
 		})
@@ -599,6 +604,9 @@ stage('Non-default environments') {
 										-Dtest.elasticsearch.connection.aws.signing.enabled=true \
 										-Dtest.elasticsearch.connection.aws.region=$env.ES_AWS_REGION \
 									"""
+									// We're not using ./ci/list-dependent-integration-tests.sh here on purpose:
+									// testing using AWS services is slow, and requires tweaks in test modules,
+									// so we're running only a few specific test modules.
 							}
 						}
 					}
@@ -637,7 +645,10 @@ stage('Non-default environments') {
 										-Dtest.elasticsearch.connection.aws.credentials.type=static \
 										-Dtest.elasticsearch.connection.aws.credentials.access_key_id=\${AWS_ACCESS_KEY_ID} \
 										-Dtest.elasticsearch.connection.aws.credentials.secret_access_key=\${AWS_SECRET_ACCESS_KEY} \
-									"""
+										"""
+										// We're not using ./ci/list-dependent-integration-tests.sh here on purpose:
+										// testing using AWS services is slow, and requires tweaks in test modules,
+										// so we're running only a few specific test modules.
 								}
 							}
 						}
@@ -864,27 +875,32 @@ def pullContainerImages(String mavenArgs) {
 	}
 }
 
-void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, String projectPath = '.') {
+void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> artifactsToTest = []) {
 	if ( buildEnv.requiresDefaultBuildArtifacts() ) {
 		dir(helper.configuration.maven.localRepositoryPath) {
 			unstash name:'default-build-result'
 		}
 	}
 
-	pullContainerImages( args )
+	String argsWithProjectSelection = args
+	if ( artifactsToTest ) {
+		argsWithProjectSelection = '-pl ' +
+				sh(script: "./ci/list-dependent-integration-tests.sh ${artifactsToTest.join(',')}", returnStdout: true).trim() +
+				' ' + args
+	}
+
+	pullContainerImages( argsWithProjectSelection )
 
 	// Add a suffix to tests to distinguish between different executions
 	// of the same test in different environments in reports
 	def testSuffix = buildEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
 
-	dir(projectPath) {
-		sh """ \
-				mvn clean install -Dsurefire.environment=$testSuffix \
-						${toTestJdkArg(buildEnv)} \
-						--fail-at-end \
-						$args \
-		"""
-	}
+	sh """ \
+			mvn clean install -Dsurefire.environment=$testSuffix \
+					${toTestJdkArg(buildEnv)} \
+					--fail-at-end \
+					$argsWithProjectSelection \
+	"""
 }
 
 String toTestJdkArg(BuildEnvironment buildEnv) {
