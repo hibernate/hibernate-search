@@ -23,9 +23,9 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaNestingContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
@@ -973,7 +973,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	private void checkCompositeExcluded(String expectedPrefixedName, IndexSchemaNestingContext context,
 			String relativeFieldName, boolean recurse) {
 		ArgumentCaptor<IndexSchemaNestingContext> nestedContextCapture =
-				ArgumentCaptor.forClass( ConfiguredIndexSchemaNestingContext.class );
+				ArgumentCaptor.forClass( IndexSchemaNestingContext.class );
 		Object expectedReturn = new Object();
 		when( compositeFactoryMock.create(
 				eq( expectedPrefixedName ), eq( IndexFieldInclusion.EXCLUDED ),
