@@ -87,6 +87,12 @@
             <!-- DO NOT MANAGE this dependency. See the version property declaration. -->
             <version>${version.net.bytebuddy}</version>
         </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy-agent</artifactId>
+            <!-- DO NOT MANAGE this dependency. See the version property declaration. -->
+            <version>${version.net.bytebuddy}</version>
+        </dependency>
     </dependencies>
 
     <build>
