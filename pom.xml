@@ -370,7 +370,7 @@
         <version.jdeps.plugin>0.5.1</version.jdeps.plugin>
         <version.nexus-staging.plugin>1.6.13</version.nexus-staging.plugin>
         <version.processor.plugin>4.5-jdk8</version.processor.plugin>
-        <version.project-info.plugin>3.4.1</version.project-info.plugin>
+        <version.project-info.plugin>3.4.2</version.project-info.plugin>
         <version.release.plugin>2.5.3</version.release.plugin>
         <version.resources.plugin>3.3.0</version.resources.plugin>
         <version.shade.plugin>3.4.1</version.shade.plugin>
