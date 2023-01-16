@@ -379,7 +379,6 @@
         <!-- Surefire versions are a minefield of bugs: be careful with upgrades -->
         <version.surefire.plugin>3.0.0-M8</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.4</version.surefire.plugin.java-version.asm>
-        <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.jacoco.plugin>0.8.8</version.jacoco.plugin>
         <version.com.buschmais.jqassistant.plugin>1.12.0</version.com.buschmais.jqassistant.plugin>
         <version.docker.maven.plugin>0.40.2</version.docker.maven.plugin>
@@ -2174,7 +2173,7 @@
                         <dependency>
                             <groupId>org.apache.maven.surefire</groupId>
                             <artifactId>surefire-junit47</artifactId>
-                            <version>${version.failsafe.plugin}</version>
+                            <version>${version.surefire.plugin}</version>
                         </dependency>
                         <!--
                              maven-surefire-plugin and maven-failsafe-plugin use an older version of ASM
@@ -2192,7 +2191,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>${version.failsafe.plugin}</version>
+                    <version>${version.surefire.plugin}</version>
                     <configuration>
                         <forkCount>1</forkCount>
                         <reuseForks>true</reuseForks>
@@ -2233,7 +2232,7 @@
                         <dependency>
                             <groupId>org.apache.maven.surefire</groupId>
                             <artifactId>surefire-junit47</artifactId>
-                            <version>${version.failsafe.plugin}</version>
+                            <version>${version.surefire.plugin}</version>
                         </dependency>
                         <!--
                              maven-surefire-plugin and maven-failsafe-plugin use an older version of ASM
