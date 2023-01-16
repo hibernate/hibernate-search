@@ -352,7 +352,7 @@
         <version.clean.plugin>3.2.0</version.clean.plugin>
         <!-- Needing 3.6.2 at least because of MCOMPILER-294 -->
         <version.compiler.plugin>3.10.1</version.compiler.plugin>
-        <version.dependency.plugin>3.4.0</version.dependency.plugin>
+        <version.dependency.plugin>3.5.0</version.dependency.plugin>
         <!-- Check dependencies for security vulnerabilities -->
         <version.dependency-check.plugin>7.2.1</version.dependency-check.plugin>
         <version.deploy.plugin>3.0.0</version.deploy.plugin>
