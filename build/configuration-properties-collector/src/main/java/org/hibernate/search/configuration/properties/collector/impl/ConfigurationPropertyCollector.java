@@ -15,12 +15,12 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 import javax.annotation.processing.Messager;
@@ -46,7 +46,7 @@ public class ConfigurationPropertyCollector {
 			"(.*\\.spi$)|(.*\\.spi\\..*)|(.*\\.impl$)|(.*\\.impl\\..*)|(.*\\.internal$)|(.*\\.internal\\..*)" );
 
 	private final Set<Name> processedTypes = new HashSet<>();
-	private final Map<String, ConfigurationProperty> properties = new LinkedHashMap<>();
+	private final Map<String, ConfigurationProperty> properties = new TreeMap<>();
 	private final Elements elementUtils;
 	private final List<String> configPrefix;
 	private final Path javadocsLocation;

@@ -20,10 +20,12 @@ import java.util.stream.Collectors;
 
 public class AsciiDocWriter implements BiConsumer<Map<String, ConfigurationProperty>, Writer> {
 
+	private final Optional<String> moduleArtifactId;
 	private final Optional<String> moduleName;
 	private final Predicate<Map.Entry<String, ConfigurationProperty>> filter;
 
-	public AsciiDocWriter(String moduleName, Predicate<Map.Entry<String, ConfigurationProperty>> filter) {
+	public AsciiDocWriter(String moduleArtifactId, String moduleName, Predicate<Map.Entry<String, ConfigurationProperty>> filter) {
+		this.moduleArtifactId = Optional.ofNullable( moduleArtifactId );
 		this.moduleName = Optional.ofNullable( moduleName );
 		this.filter = filter;
 	}
@@ -38,32 +40,21 @@ public class AsciiDocWriter implements BiConsumer<Map<String, ConfigurationPrope
 			return;
 		}
 		try {
-			moduleName.ifPresent( name -> tryToWriteLine( "== ", name, writer ) );
+			moduleArtifactId.ifPresent( id -> tryToWriteLine( writer, "[[configuration-properties-aggregated-", id, "]]" ) );
+			moduleName.ifPresent( name -> tryToWriteLine( writer, "== ", name ) );
 			writer.write( '\n' );
 			for ( Map.Entry<String, ConfigurationProperty> entry : entries ) {
 				Iterator<String> keys = entry.getValue().key().resolvedKeys().iterator();
+				String firstKey = keys.next();
+				writer.write( "[[" );
+				writer.write( "configuration-properties-aggregated-" );
+				writer.write( firstKey.replaceAll( "[^\\w-.]", "_" ) );
+				writer.write( "]] " );
+
 				writer.write( '`' );
-				writer.write( keys.next() );
+				writer.write( firstKey );
 				writer.write( '`' );
 				writer.write( "::\n" );
-
-				boolean hasMultipleKeys = false;
-				if ( keys.hasNext() ) {
-					hasMultipleKeys = true;
-					writer.write( "Other variants: " );
-				}
-				while ( keys.hasNext() ) {
-					writer.write( '`' );
-					writer.write( keys.next() );
-					writer.write( '`' );
-					if ( keys.hasNext() ) {
-						writer.write( ", " );
-					}
-				}
-
-				if ( hasMultipleKeys ) {
-					writer.write( "\n+\n" );
-				}
 
 				// using inline passthrough for javadocs to not render HTML.
 				writer.write( "+++ " );
@@ -79,6 +70,8 @@ public class AsciiDocWriter implements BiConsumer<Map<String, ConfigurationPrope
 				}
 
 				writer.write( '\n' );
+
+				printOtherKeyVariants( writer, keys );
 			}
 			writer.write( '\n' );
 		}
@@ -87,10 +80,36 @@ public class AsciiDocWriter implements BiConsumer<Map<String, ConfigurationPrope
 		}
 	}
 
-	private void tryToWriteLine(String prefix, String value, Writer writer) {
+	private void printOtherKeyVariants(Writer writer, Iterator<String> keys) throws IOException {
+		boolean hasMultipleKeys = false;
+		if ( keys.hasNext() ) {
+			hasMultipleKeys = true;
+			writer.write( "+\n" );
+			writer.write( ".Variants of this configuration property (Click here):\n" );
+			writer.write( "[%collapsible]\n" );
+			writer.write( "====\n" );
+		}
+		while ( keys.hasNext() ) {
+			writer.write( '`' );
+			writer.write( keys.next() );
+			writer.write( '`' );
+			if ( keys.hasNext() ) {
+				writer.write( ", " );
+			}
+		}
+
+		if ( hasMultipleKeys ) {
+			writer.write( "\n====\n" );
+		}
+	}
+
+	private void tryToWriteLine(Writer writer, String prefix, String value, String... other) {
 		try {
 			writer.write( prefix );
 			writer.write( value );
+			for ( String s : other ) {
+				writer.write( s );
+			}
 			writer.write( "\n" );
 		}
 		catch (IOException e) {
