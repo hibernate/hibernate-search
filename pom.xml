@@ -153,7 +153,7 @@
     <modules>
         <module>build/config</module>
         <module>build/parents/internal</module>
-        <module>build/configuration-properties-collector</module>
+        <module>build/configuration-properties-collector-processor</module>
         <module>util/internal/test/common</module>
         <module>util/internal/test/orm</module>
         <module>build/parents/public</module>
@@ -2469,6 +2469,7 @@
                 <module>jakarta</module>
                 <module>orm6</module>
                 <module>distribution</module>
+                <module>build/configuration-properties-collector</module>
             </modules>
         </profile>
 
