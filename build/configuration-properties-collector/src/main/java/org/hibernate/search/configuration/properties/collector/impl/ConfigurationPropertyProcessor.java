@@ -35,6 +35,7 @@ import com.google.gson.Gson;
 @SupportedAnnotationTypes("*")
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
 @SupportedOptions({
+		Configuration.MODULE_ARTIFACT_ID,
 		Configuration.MODULE_NAME,
 		Configuration.PROPERTY_PREFIX,
 		Configuration.JAVADOC_LINK,
@@ -45,6 +46,7 @@ import com.google.gson.Gson;
 public class ConfigurationPropertyProcessor extends AbstractProcessor {
 
 	private ConfigurationPropertyCollector propertyCollector;
+	private String moduleArtifactId;
 	private String moduleName;
 	private String fileName;
 	private Optional<Pattern> ignore;
@@ -63,6 +65,7 @@ public class ConfigurationPropertyProcessor extends AbstractProcessor {
 	public synchronized void init(ProcessingEnvironment processingEnv) {
 		super.init( processingEnv );
 
+		this.moduleArtifactId = processingEnv.getOptions().get( Configuration.MODULE_ARTIFACT_ID );
 		this.moduleName = processingEnv.getOptions().get( Configuration.MODULE_NAME );
 		String pattern = processingEnv.getOptions().get( Configuration.IGNORE_PATTERN );
 		this.ignore = Optional.ofNullable( pattern ).map( Pattern::compile );
@@ -119,6 +122,7 @@ public class ConfigurationPropertyProcessor extends AbstractProcessor {
 		writeProperties(
 				fileName + ".asciidoc",
 				new AsciiDocWriter(
+						moduleArtifactId,
 						moduleName,
 						entry -> HibernateSearchConfiguration.Type.API.equals( entry.getValue().type() )
 				)
@@ -126,6 +130,7 @@ public class ConfigurationPropertyProcessor extends AbstractProcessor {
 		writeProperties(
 				fileName + "-spi.asciidoc",
 				new AsciiDocWriter(
+						moduleArtifactId,
 						moduleName,
 						entry -> HibernateSearchConfiguration.Type.SPI.equals( entry.getValue().type() )
 				)
