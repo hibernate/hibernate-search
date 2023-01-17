@@ -8,6 +8,8 @@ package org.hibernate.search.engine.cfg;
 
 import static java.lang.String.join;
 
+import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
+
 /**
  * Configuration properties common to all Hibernate Search backends regardless of the underlying technology.
  * <p>
@@ -31,11 +33,13 @@ public final class BackendSettings {
 	 * <p>
 	 * No default: this property must be set.
 	 */
+	@HibernateSearchConfiguration(prefix = EngineSettings.BACKEND + ".")
 	public static final String TYPE = "type";
 
 	/**
 	 * The root property whose children are index names, e.g. {@code indexes.myIndex.<some index-scoped property> = bar}.
 	 */
+	@HibernateSearchConfiguration(ignore = true)
 	public static final String INDEXES = "indexes";
 
 	/**
