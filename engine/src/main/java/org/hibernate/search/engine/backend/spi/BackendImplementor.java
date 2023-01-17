@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.IndexSettings;
 
@@ -56,6 +57,7 @@ public interface BackendImplementor {
 	 * allowing the mapper to resolve the type of each hit in multi-index searches.
 	 * Each index is mapped to one and only one type.
 	 * @param context The build context
+	 * @param backendMapperContext
 	 * @param propertySource A configuration property source, appropriately masked so that the backend
 	 * doesn't need to care about Hibernate Search prefixes (hibernate.search.*, etc.). All the properties
 	 * can be accessed at the root.
@@ -63,8 +65,8 @@ public interface BackendImplementor {
 	 * are reserved for use by the engine.
 	 * @return A builder for index managers targeting this backend.
 	 */
-	IndexManagerBuilder createIndexManagerBuilder(String indexName,
-			String mappedTypeName, BackendBuildContext context,
+	IndexManagerBuilder createIndexManagerBuilder(String indexName, String mappedTypeName, BackendBuildContext context,
+			BackendMapperContext backendMapperContext,
 			ConfigurationPropertySource propertySource);
 
 }

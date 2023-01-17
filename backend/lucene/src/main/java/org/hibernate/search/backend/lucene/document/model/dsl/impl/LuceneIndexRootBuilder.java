@@ -27,6 +27,7 @@ import org.hibernate.search.backend.lucene.types.impl.LuceneIndexCompositeNodeTy
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexIdentifier;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
@@ -40,6 +41,7 @@ public class LuceneIndexRootBuilder extends AbstractLuceneIndexCompositeNodeBuil
 		implements IndexRootBuilder, IndexSchemaBuildContext {
 
 	private final EventContext indexEventContext;
+	private final BackendMapperContext backendMapperContext;
 	private final String mappedTypeName;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
@@ -47,9 +49,10 @@ public class LuceneIndexRootBuilder extends AbstractLuceneIndexCompositeNodeBuil
 	private ProjectionConverter<String, ?> idProjectionConverter;
 
 	public LuceneIndexRootBuilder(EventContext indexEventContext,
-			String mappedTypeName, LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry) {
+			BackendMapperContext backendMapperContext, String mappedTypeName, LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry) {
 		super( new LuceneIndexCompositeNodeType.Builder( ObjectStructure.FLATTENED ) );
 		this.indexEventContext = indexEventContext;
+		this.backendMapperContext = backendMapperContext;
 		this.mappedTypeName = mappedTypeName;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 	}
@@ -61,7 +64,7 @@ public class LuceneIndexRootBuilder extends AbstractLuceneIndexCompositeNodeBuil
 
 	@Override
 	public LuceneIndexFieldTypeFactory createTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
-		return new LuceneIndexFieldTypeFactoryImpl( indexEventContext, analysisDefinitionRegistry, defaultsProvider );
+		return new LuceneIndexFieldTypeFactoryImpl( indexEventContext, backendMapperContext, analysisDefinitionRegistry, defaultsProvider );
 	}
 
 	@Override

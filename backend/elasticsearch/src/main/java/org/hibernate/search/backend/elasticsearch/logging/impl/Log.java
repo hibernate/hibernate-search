@@ -419,8 +419,8 @@ public interface Log extends BasicLogger {
 	SearchException explainUnknownDocument(URLEncodedString indexName, URLEncodedString id);
 
 	@Message(id = ID_OFFSET + 67, value = "Invalid index field type: missing decimal scale."
-			+ " Define the decimal scale explicitly.")
-	SearchException nullDecimalScale(@Param EventContext eventContext);
+			+ " Define the decimal scale explicitly.  %1$s")
+	SearchException nullDecimalScale(String hint, @Param EventContext eventContext);
 
 	@Message(id = ID_OFFSET + 69,
 			value = "Unable to encode value '%1$s': this field type only supports values ranging from '%2$s' to '%3$s'."

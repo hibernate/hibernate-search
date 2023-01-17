@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
+import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
+import org.hibernate.search.mapper.orm.reporting.impl.HibernateOrmMappingHints;
 import org.hibernate.search.mapper.orm.session.impl.ConfiguredAutomaticIndexingStrategy;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
@@ -57,5 +59,10 @@ public final class HibernateOrmMapperDelegate
 	public HibernateOrmMappingPartialBuildState prepareBuild(PojoMappingDelegate mappingDelegate) {
 		return new HibernateOrmMappingPartialBuildState( mappingDelegate, typeContextContainerBuilder,
 				coordinationStrategyHolder, configuredAutomaticIndexingStrategy );
+	}
+
+	@Override
+	public BackendMappingHints hints() {
+		return HibernateOrmMappingHints.INSTANCE;
 	}
 }

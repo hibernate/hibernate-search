@@ -358,8 +358,8 @@ public interface Log extends BasicLogger {
 			@Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 80, value = "Invalid index field type: missing decimal scale."
-			+ " Define the decimal scale explicitly.")
-	SearchException nullDecimalScale(@Param EventContext eventContext);
+			+ " Define the decimal scale explicitly. %1$s")
+	SearchException nullDecimalScale(String hint, @Param EventContext eventContext);
 
 	@Message(id = ID_OFFSET + 81,
 			value = "Unable to encode value '%1$s': this field type only supports values ranging from '%2$s' to '%3$s'."

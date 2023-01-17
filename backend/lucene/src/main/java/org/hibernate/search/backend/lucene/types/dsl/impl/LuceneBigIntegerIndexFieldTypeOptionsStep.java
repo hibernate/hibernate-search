@@ -66,6 +66,6 @@ class LuceneBigIntegerIndexFieldTypeOptionsStep
 			return defaultsProvider.decimalScale();
 		}
 
-		throw log.nullDecimalScale( buildContext.getEventContext() );
+		throw log.nullDecimalScale( buildContext.hints().missingDecimalScale(), buildContext.getEventContext() );
 	}
 }

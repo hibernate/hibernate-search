@@ -14,6 +14,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
@@ -78,10 +79,10 @@ class IndexManagerBuildingStateHolder {
 		}
 	}
 
-	IndexManagerBuildingState getIndexManagerBuildingState(Optional<String> backendName, String indexName,
+	IndexManagerBuildingState getIndexManagerBuildingState(BackendMapperContext backendMapperContext, Optional<String> backendName, String indexName,
 			String mappedTypeName) {
 		return getBackend( backendName.orElse( null ) )
-				.createIndexManagerBuildingState( indexName, mappedTypeName );
+				.createIndexManagerBuildingState( backendMapperContext, indexName, mappedTypeName );
 	}
 
 	private BackendInitialBuildState getBackend(String backendName) {
@@ -164,7 +165,7 @@ class IndexManagerBuildingStateHolder {
 		}
 
 		IndexManagerInitialBuildState createIndexManagerBuildingState(
-				String indexName, String mappedTypeName) {
+				BackendMapperContext backendMapperContext, String indexName, String mappedTypeName) {
 			IndexManagerInitialBuildState state = indexManagerBuildStateByName.get( indexName );
 			if ( state != null ) {
 				throw log.twoTypesTargetSameIndex( indexName, state.mappedTypeName, mappedTypeName );
@@ -175,7 +176,7 @@ class IndexManagerBuildingStateHolder {
 			ConfigurationPropertySource indexPropertySource = indexPropertySourceExtractor.extract( propertySource );
 
 			IndexManagerBuilder builder = backend.createIndexManagerBuilder(
-					indexName, mappedTypeName, backendBuildContext, indexPropertySource
+					indexName, mappedTypeName, backendBuildContext, backendMapperContext, indexPropertySource
 			);
 			IndexRootBuilder schemaRootNodeBuilder = builder.schemaRootNodeBuilder();
 

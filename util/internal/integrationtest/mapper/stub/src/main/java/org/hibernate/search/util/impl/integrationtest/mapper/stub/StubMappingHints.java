@@ -18,4 +18,9 @@ public final class StubMappingHints implements BackendMappingHints {
 	public String noEntityProjectionAvailable() {
 		return getClass().getName() + "#noEntityProjectionAvailable";
 	}
+
+	@Override
+	public String missingDecimalScale() {
+		return getClass().getName() + "#missingDecimalScale";
+	}
 }

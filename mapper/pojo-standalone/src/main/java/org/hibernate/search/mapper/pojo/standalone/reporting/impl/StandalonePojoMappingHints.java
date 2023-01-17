@@ -26,4 +26,7 @@ public interface StandalonePojoMappingHints extends BackendMappingHints {
 	@Override
 	String noEntityProjectionAvailable();
 
+	@Override
+	@Message( "If you used a @*Field annotation here, make sure to use @ScaledNumberField and configure the `decimalScale` attribute as necessary." )
+	String missingDecimalScale();
 }

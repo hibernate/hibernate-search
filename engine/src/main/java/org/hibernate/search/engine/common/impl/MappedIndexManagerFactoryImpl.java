@@ -8,6 +8,7 @@ package org.hibernate.search.engine.common.impl;
 
 import java.util.Optional;
 
+import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
 import org.hibernate.search.engine.mapper.mapping.building.impl.MappedIndexManagerBuilderImpl;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
@@ -22,12 +23,13 @@ class MappedIndexManagerFactoryImpl implements MappedIndexManagerFactory {
 
 	@Override
 	public MappedIndexManagerBuilder createMappedIndexManager(IndexedEntityBindingMapperContext mapperContext,
+			BackendMapperContext backendMapperContext,
 			Optional<String> backendName, String indexName,
 			String mappedTypeName) {
 		return new MappedIndexManagerBuilderImpl(
 				mapperContext,
 				indexManagerBuildingStateHolder.getIndexManagerBuildingState(
-						backendName, indexName, mappedTypeName
+						backendMapperContext, backendName, indexName, mappedTypeName
 				)
 		);
 	}
