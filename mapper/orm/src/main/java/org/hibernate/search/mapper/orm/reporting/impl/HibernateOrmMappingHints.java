@@ -22,4 +22,7 @@ public interface HibernateOrmMappingHints extends BackendMappingHints {
 	@Message(value = "This is likely a bug, as Hibernate ORM entities should always be loadable from the database.")
 	String noEntityProjectionAvailable();
 
+	@Override
+	@Message( "If you used a @*Field annotation here, make sure to use @ScaledNumberField and configure the `decimalScale` attribute as necessary." )
+	String missingDecimalScale();
 }

@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
+import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.impl.StandalonePojoEntityTypeMetadataProvider;
+import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojoMappingHints;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.SchemaManagementListener;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
@@ -50,4 +52,8 @@ public final class StandalonePojoMapperDelegate
 		return new StandalonePojoMappingPartialBuildState( mappingDelegate, typeContextContainerBuilder.build(), schemaManagementListener );
 	}
 
+	@Override
+	public BackendMappingHints hints() {
+		return StandalonePojoMappingHints.INSTANCE;
+	}
 }

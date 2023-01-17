@@ -25,6 +25,8 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
+import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
@@ -42,12 +44,14 @@ public class LuceneIndexFieldTypeFactoryImpl
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final EventContext eventContext;
+	private final BackendMapperContext backendMapperContext;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private final IndexFieldTypeDefaultsProvider typeDefaultsProvider;
 
 	public LuceneIndexFieldTypeFactoryImpl(EventContext eventContext,
-			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexFieldTypeDefaultsProvider typeDefaultsProvider) {
+			BackendMapperContext backendMapperContext, LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexFieldTypeDefaultsProvider typeDefaultsProvider) {
 		this.eventContext = eventContext;
+		this.backendMapperContext = backendMapperContext;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.typeDefaultsProvider = typeDefaultsProvider;
 	}
@@ -245,5 +249,10 @@ public class LuceneIndexFieldTypeFactoryImpl
 	@Override
 	public LuceneAnalysisDefinitionRegistry getAnalysisDefinitionRegistry() {
 		return analysisDefinitionRegistry;
+	}
+
+	@Override
+	public BackendMappingHints hints() {
+		return backendMapperContext.hints();
 	}
 }

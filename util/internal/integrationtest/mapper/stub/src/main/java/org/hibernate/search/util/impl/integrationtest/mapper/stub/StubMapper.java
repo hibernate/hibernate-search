@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
+import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.mapper.mapping.building.spi.BackendsInfo;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
@@ -27,7 +29,7 @@ import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 
-class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityBindingMapperContext {
+class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityBindingMapperContext, BackendMapperContext {
 
 	private final ContextualFailureCollector failureCollector;
 	private final TypeMetadataContributorProvider<StubMappedIndex> contributorProvider;
@@ -88,6 +90,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 		mappedIndexOptional.ifPresent( mappedIndex -> {
 			MappedIndexManagerBuilder indexManagerBuilder = indexManagerFactory.createMappedIndexManager(
 					this,
+					this,
 					mappedIndex.backendName(),
 					mappedIndex.name(),
 					type.name()
@@ -136,5 +139,10 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 	@Override
 	public IndexedEmbeddedPathTracker getOrCreatePathTracker(IndexedEmbeddedDefinition definition) {
 		return pathTrackers.computeIfAbsent( definition, IndexedEmbeddedPathTracker::new );
+	}
+
+	@Override
+	public BackendMappingHints hints() {
+		return StubMappingHints.INSTANCE;
 	}
 }

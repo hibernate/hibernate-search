@@ -40,6 +40,7 @@ import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.Elasti
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
@@ -186,8 +187,8 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 	@Override
 	public IndexManagerBuilder createIndexManagerBuilder(
-			String hibernateSearchIndexName,
-			String mappedTypeName, BackendBuildContext buildContext,
+			String hibernateSearchIndexName, String mappedTypeName, BackendBuildContext buildContext,
+			BackendMapperContext backendMapperContext,
 			ConfigurationPropertySource propertySource) {
 
 		EventContext indexEventContext = EventContexts.fromIndexName( hibernateSearchIndexName );
@@ -199,11 +200,12 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 		return new ElasticsearchIndexManagerBuilder(
 				indexManagerBackendContext,
-				createIndexSchemaRootNodeBuilder( indexEventContext, indexNames, mappedTypeName,
+				createIndexSchemaRootNodeBuilder( indexEventContext, backendMapperContext, indexNames, mappedTypeName,
 						analysisDefinitionRegistry,
 						customIndexSettings( buildContext, propertySource, indexEventContext ),
 						customIndexMappings( buildContext, propertySource, indexEventContext ),
-						DYNAMIC_MAPPING.get( propertySource ) ),
+						DYNAMIC_MAPPING.get( propertySource )
+				),
 				createDocumentMetadataContributors( mappedTypeName )
 		);
 	}
@@ -238,7 +240,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 	}
 
 	private ElasticsearchIndexRootBuilder createIndexSchemaRootNodeBuilder(EventContext indexEventContext,
-			IndexNames indexNames, String mappedTypeName,
+			BackendMapperContext backendMapperContext, IndexNames indexNames, String mappedTypeName,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			IndexSettings customIndexSettings, RootTypeMapping customIndexMapping,
 			DynamicMapping dynamicMapping) {
@@ -246,6 +248,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 		ElasticsearchIndexRootBuilder builder = new ElasticsearchIndexRootBuilder(
 				typeFactoryProvider,
 				indexEventContext,
+				backendMapperContext,
 				indexNames,
 				mappedTypeName,
 				analysisDefinitionRegistry,

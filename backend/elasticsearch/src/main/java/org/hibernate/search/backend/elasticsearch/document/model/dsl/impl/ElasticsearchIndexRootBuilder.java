@@ -37,6 +37,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.ImplicitFieldC
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.document.model.spi.IndexIdentifier;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
@@ -53,6 +54,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 
 	private final ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider;
 	private final EventContext indexEventContext;
+	private final BackendMapperContext backendMapperContext;
 	private final List<IndexSchemaRootContributor> schemaRootContributors = new ArrayList<>();
 	private final List<ImplicitFieldContributor> implicitFieldContributors = new ArrayList<>();
 	private final IndexNames indexNames;
@@ -68,13 +70,14 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 
 	public ElasticsearchIndexRootBuilder(ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
 			EventContext indexEventContext,
-			IndexNames indexNames, String mappedTypeName,
+			BackendMapperContext backendMapperContext, IndexNames indexNames, String mappedTypeName,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			IndexSettings customIndexSettings, RootTypeMapping customIndexMapping,
 			DynamicMapping dynamicMapping) {
 		super( new ElasticsearchIndexCompositeNodeType.Builder( ObjectStructure.FLATTENED ) );
 		this.typeFactoryProvider = typeFactoryProvider;
 		this.indexEventContext = indexEventContext;
+		this.backendMapperContext = backendMapperContext;
 		this.indexNames = indexNames;
 		this.mappedTypeName = mappedTypeName;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
@@ -93,7 +96,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 
 	@Override
 	public ElasticsearchIndexFieldTypeFactory createTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
-		return typeFactoryProvider.create( indexEventContext, defaultsProvider );
+		return typeFactoryProvider.create( indexEventContext, backendMapperContext, defaultsProvider );
 	}
 
 	@Override
@@ -171,7 +174,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 
 			private ElasticsearchIndexFieldTypeFactory typeFactory = typeFactoryProvider.create(
 					indexEventContext,
-					new IndexFieldTypeDefaultsProvider()
+					backendMapperContext, new IndexFieldTypeDefaultsProvider()
 			);
 
 			@Override

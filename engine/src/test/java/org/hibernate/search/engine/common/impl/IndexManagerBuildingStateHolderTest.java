@@ -22,6 +22,8 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
+import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -118,16 +120,14 @@ public class IndexManagerBuildingStateHolderTest {
 		verifyNoOtherBackendInteractionsAndReset();
 
 		when( backendMock.createIndexManagerBuilder(
-				eq( "myIndex" ),
-				eq( "myType" ),
-				any(),
+				eq( "myIndex" ), eq( "myType" ), any(), any(),
 				indexPropertySourceCapture.capture()
 		) )
 				.thenReturn( indexManagerBuilderMock );
 		when( indexManagerBuilderMock.schemaRootNodeBuilder() )
 				.thenReturn( indexRootBuilderMock );
 		holder.getIndexManagerBuildingState(
-				Optional.empty(), "myIndex", "myType"
+				backendMapperContext(), Optional.empty(), "myIndex", "myType"
 		);
 		verifyNoOtherBackendInteractionsAndReset();
 
@@ -183,16 +183,14 @@ public class IndexManagerBuildingStateHolderTest {
 		verifyNoOtherBackendInteractionsAndReset();
 
 		when( backendMock.createIndexManagerBuilder(
-				eq( "myIndex" ),
-				eq( "myType" ),
-				any(),
+				eq( "myIndex" ), eq( "myType" ), any(), any(),
 				indexPropertySourceCapture.capture()
 		) )
 				.thenReturn( indexManagerBuilderMock );
 		when( indexManagerBuilderMock.schemaRootNodeBuilder() )
 				.thenReturn( indexRootBuilderMock );
 		holder.getIndexManagerBuildingState(
-				Optional.of( "myBackend" ), "myIndex", "myType"
+				backendMapperContext(), Optional.of( "myBackend" ), "myIndex", "myType"
 		);
 		verifyNoOtherBackendInteractionsAndReset();
 
@@ -333,5 +331,14 @@ public class IndexManagerBuildingStateHolderTest {
 		BackendsInfo result = new BackendsInfo();
 		result.collect( Optional.of( name ), TenancyMode.SINGLE_TENANCY );
 		return result;
+	}
+
+	static BackendMapperContext backendMapperContext() {
+		return new BackendMapperContext() {
+			@Override
+			public BackendMappingHints hints() {
+				return BackendMappingHints.NONE;
+			}
+		};
 	}
 }

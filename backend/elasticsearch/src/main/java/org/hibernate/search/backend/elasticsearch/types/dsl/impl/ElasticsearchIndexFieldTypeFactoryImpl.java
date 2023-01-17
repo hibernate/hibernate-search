@@ -24,6 +24,8 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchNativeIndexFieldTypeMappingStep;
 import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
+import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
@@ -42,14 +44,17 @@ public class ElasticsearchIndexFieldTypeFactoryImpl
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final EventContext eventContext;
+	private final BackendMapperContext backendMapperContext;
 	private final Gson userFacingGson;
 	private final ElasticsearchDefaultFieldFormatProvider defaultFieldFormatProvider;
 	private final IndexFieldTypeDefaultsProvider typeDefaultsProvider;
 
-	public ElasticsearchIndexFieldTypeFactoryImpl(EventContext eventContext, Gson userFacingGson,
+	public ElasticsearchIndexFieldTypeFactoryImpl(EventContext eventContext, BackendMapperContext backendMapperContext,
+			Gson userFacingGson,
 			ElasticsearchDefaultFieldFormatProvider defaultFieldFormatProvider,
 			IndexFieldTypeDefaultsProvider typeDefaultsProvider) {
 		this.eventContext = eventContext;
+		this.backendMapperContext = backendMapperContext;
 		this.userFacingGson = userFacingGson;
 		this.defaultFieldFormatProvider = defaultFieldFormatProvider;
 		this.typeDefaultsProvider = typeDefaultsProvider;
@@ -249,5 +254,10 @@ public class ElasticsearchIndexFieldTypeFactoryImpl
 	@Override
 	public ElasticsearchDefaultFieldFormatProvider getDefaultFieldFormatProvider() {
 		return defaultFieldFormatProvider;
+	}
+
+	@Override
+	public BackendMappingHints hints() {
+		return backendMapperContext.hints();
 	}
 }

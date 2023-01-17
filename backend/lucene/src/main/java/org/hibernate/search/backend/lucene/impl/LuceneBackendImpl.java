@@ -22,6 +22,7 @@ import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
@@ -131,11 +132,11 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
 	@Override
 	public IndexManagerBuilder createIndexManagerBuilder(
-			String indexName, String mappedTypeName,
-			BackendBuildContext context, ConfigurationPropertySource propertySource) {
+			String indexName, String mappedTypeName, BackendBuildContext context, BackendMapperContext backendMapperContext,
+			ConfigurationPropertySource propertySource) {
 
 		LuceneIndexRootBuilder indexRootBuilder = new LuceneIndexRootBuilder(
-				EventContexts.fromIndexName( indexName ), mappedTypeName, analysisDefinitionRegistry
+				EventContexts.fromIndexName( indexName ), backendMapperContext, mappedTypeName, analysisDefinitionRegistry
 		);
 
 		/*

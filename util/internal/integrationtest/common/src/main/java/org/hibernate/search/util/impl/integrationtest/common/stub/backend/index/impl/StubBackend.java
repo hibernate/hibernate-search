@@ -11,6 +11,7 @@ import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
@@ -80,8 +81,8 @@ public class StubBackend implements BackendImplementor, Backend {
 	}
 
 	@Override
-	public IndexManagerBuilder createIndexManagerBuilder(String indexName,
-			String mappedTypeName, BackendBuildContext context,
+	public IndexManagerBuilder createIndexManagerBuilder(String indexName, String mappedTypeName,
+			BackendBuildContext context, BackendMapperContext backendMapperContext,
 			ConfigurationPropertySource propertySource) {
 		return new StubIndexManagerBuilder( this, indexName, mappedTypeName );
 	}

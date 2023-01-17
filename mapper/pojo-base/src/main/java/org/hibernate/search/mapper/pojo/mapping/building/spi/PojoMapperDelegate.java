@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
+import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
@@ -15,7 +16,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
  *
  * @param <MPBS> The Java type of the partial build state of the produced mapping.
  */
-public interface PojoMapperDelegate<MPBS> {
+public interface PojoMapperDelegate<MPBS> extends BackendMapperContext {
 
 	/**
 	 * Close any allocated resource.
