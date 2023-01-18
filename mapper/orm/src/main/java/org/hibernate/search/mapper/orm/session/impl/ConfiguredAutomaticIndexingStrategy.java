@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.session.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 import java.util.function.Function;
 import javax.transaction.Synchronization;
 
@@ -16,16 +17,18 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.mapper.orm.automaticindexing.impl.HibernateOrmIndexingQueueEventSendingPlan;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
-import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategyStartContext;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextProvider;
 import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.plan.synchronization.impl.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
 import org.hibernate.search.util.common.impl.Closer;
@@ -48,9 +51,15 @@ public final class ConfiguredAutomaticIndexingStrategy {
 							.equals( org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.of( v ) ) )
 					.build();
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends AutomaticIndexingSynchronizationStrategy>> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
+	@SuppressWarnings("deprecation")
+	private static final OptionalConfigurationProperty<BeanReference<? extends org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy>> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.SYNCHRONIZATION_STRATEGY )
-					.asBeanReference( AutomaticIndexingSynchronizationStrategy.class )
+					.asBeanReference( org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy.class )
+					.build();
+
+	private static final OptionalConfigurationProperty<BeanReference<? extends HibernateOrmIndexingPlanSynchronizationStrategy>> INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY )
+					.asBeanReference( HibernateOrmIndexingPlanSynchronizationStrategy.class )
 					.build();
 
 	private static final ConfigurationProperty<Boolean> DIRTY_CHECK_ENABLED =
@@ -63,8 +72,8 @@ public final class ConfiguredAutomaticIndexingStrategy {
 	private final boolean enlistsInTransaction;
 
 	private HibernateOrmSearchSessionMappingContext mappingContext;
-	private BeanHolder<? extends AutomaticIndexingSynchronizationStrategy> defaultSynchronizationStrategyHolder;
-	private ConfiguredAutomaticIndexingSynchronizationStrategy defaultSynchronizationStrategy;
+	private BeanHolder<? extends HibernateOrmIndexingPlanSynchronizationStrategy> defaultSynchronizationStrategyHolder;
+	private ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> defaultSynchronizationStrategy;
 
 	public ConfiguredAutomaticIndexingStrategy(
 			Function<AutomaticIndexingEventSendingSessionContext, AutomaticIndexingQueueEventSendingPlan> senderFactory,
@@ -79,29 +88,14 @@ public final class ConfiguredAutomaticIndexingStrategy {
 
 	// Do everything related to runtime configuration or that doesn't involve I/O
 	public void start(HibernateOrmSearchSessionMappingContext mappingContext,
+			MappingStartContext mappingStartContext,
 			AutomaticIndexingStrategyStartContext startContext,
 			HibernateOrmListenerContextProvider contextProvider) {
 		this.mappingContext = mappingContext;
 		ConfigurationPropertySource configurationSource = startContext.configurationPropertySource();
-		defaultSynchronizationStrategyHolder =
-				AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.getAndTransform( configurationSource, referenceOptional -> {
-					if ( usesEventQueue() ) {
-						// If we send events to a queue, we're mostly asynchronous
-						// and thus configuring the synchronization strategy does not make sense.
-						if ( referenceOptional.isPresent() ) {
-							throw log.cannotConfigureSynchronizationStrategyWithIndexingEventQueue();
-						}
-						// We force the synchronization strategy to sync.
-						// The commit/refresh strategies will be ignored,
-						// but we're only interested in the future handler:
-						// we need it to block until the sender is done pushing events to the queue.
-						return BeanHolder.of( AutomaticIndexingSynchronizationStrategy.writeSync() );
-					}
-					else {
-						return startContext.beanResolver().resolve( referenceOptional
-								.orElse( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY ) );
-					}
-				} );
+
+		resolveDefaultSyncStrategyHolder( mappingStartContext, startContext, configurationSource );
+
 		defaultSynchronizationStrategy = configure( defaultSynchronizationStrategyHolder.get() );
 		if ( AUTOMATIC_INDEXING_ENABLED.get( configurationSource )
 				&& AUTOMATIC_INDEXING_ENABLED_LEGACY_STRATEGY.getAndMap( configurationSource, enabled -> {
@@ -120,6 +114,73 @@ public final class ConfiguredAutomaticIndexingStrategy {
 		}
 	}
 
+	private void resolveDefaultSyncStrategyHolder(MappingStartContext mappingStartContext, AutomaticIndexingStrategyStartContext startContext,
+			ConfigurationPropertySource configurationSource) {
+		@SuppressWarnings("deprecation")
+		Optional<BeanReference<? extends org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy>> automaticBeanReference = AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.get(
+				configurationSource );
+		Optional<BeanReference<? extends HibernateOrmIndexingPlanSynchronizationStrategy>> planBeanReference = INDEXING_PLAN_SYNCHRONIZATION_STRATEGY.get(
+				mappingStartContext.configurationPropertySource() );
+
+		if ( automaticBeanReference.isPresent() && planBeanReference.isPresent() ) {
+			@SuppressWarnings("deprecation")
+			String deprecatedProperty = HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY;
+			throw log.bothNewAndOldConfigurationPropertiesForIndexingPlanSyncAreUsed(
+					HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY, deprecatedProperty
+			);
+		}
+
+		if ( usesEventQueue() ) {
+			if ( ( automaticBeanReference.isPresent() || planBeanReference.isPresent() ) ) {
+				// If we send events to a queue, we're mostly asynchronous
+				// and thus configuring the synchronization strategy does not make sense.
+				throw log.cannotConfigureSynchronizationStrategyWithIndexingEventQueue();
+			}
+
+			// We force the synchronization strategy to sync.
+			// The commit/refresh strategies will be ignored,
+			// but we're only interested in the future handler:
+			// we need it to block until the sender is done pushing events to the queue.
+			defaultSynchronizationStrategyHolder = BeanHolder.of(
+					HibernateOrmIndexingPlanSynchronizationStrategy.writeSync() );
+		}
+		else if ( automaticBeanReference.isPresent() ) {
+			try {
+				@SuppressWarnings("deprecation")
+				BeanHolder<? extends org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy> holder = startContext.beanResolver()
+						.resolve( automaticBeanReference.get() );
+
+				defaultSynchronizationStrategyHolder = BeanHolder.of(
+						new HibernateOrmIndexingPlanSynchronizationStrategyAdapter( holder.get() )
+				).withDependencyAutoClosing( holder );
+			}
+			catch (Exception e) {
+				@SuppressWarnings("deprecation")
+				String deprecatedProperty = HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY;
+				throw log.unableToConvertConfigurationProperty(
+						deprecatedProperty,
+						e.getMessage(),
+						e
+				);
+			}
+		}
+		else {
+			try {
+				defaultSynchronizationStrategyHolder = startContext.beanResolver().resolve(
+						planBeanReference
+								.orElse( HibernateOrmMapperSettings.Defaults.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY )
+				);
+			}
+			catch (Exception e) {
+				throw log.unableToConvertConfigurationProperty(
+						HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,
+						e.getMessage(),
+						e
+				);
+			}
+		}
+	}
+
 	public void stop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( BeanHolder::close, defaultSynchronizationStrategyHolder );
@@ -129,24 +190,24 @@ public final class ConfiguredAutomaticIndexingStrategy {
 		}
 	}
 
-	public ConfiguredAutomaticIndexingSynchronizationStrategy defaultIndexingPlanSynchronizationStrategy() {
+	public ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> defaultIndexingPlanSynchronizationStrategy() {
 		return defaultSynchronizationStrategy;
 	}
 
-	public ConfiguredAutomaticIndexingSynchronizationStrategy configureOverriddenSynchronizationStrategy(
-			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
+	public ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> configureOverriddenSynchronizationStrategy(
+			HibernateOrmIndexingPlanSynchronizationStrategy synchronizationStrategy) {
 		if ( usesEventQueue() ) {
 			throw log.cannotConfigureSynchronizationStrategyWithIndexingEventQueue();
 		}
-		ConfiguredAutomaticIndexingSynchronizationStrategy.Builder builder =
-				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder( mappingContext.failureHandler(),
+		ConfiguredIndexingPlanSynchronizationStrategy.Builder<EntityReference> builder =
+				new ConfiguredIndexingPlanSynchronizationStrategy.Builder<>( mappingContext.failureHandler(),
 						mappingContext.entityReferenceFactory() );
 		synchronizationStrategy.apply( builder );
 		return builder.build();
 	}
 
 	public PojoIndexingPlan createIndexingPlan(HibernateOrmSearchSession context,
-			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
+			ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> synchronizationStrategy) {
 		if ( usesEventQueue() ) {
 			AutomaticIndexingQueueEventSendingPlan delegate = senderFactory.apply( context );
 			return mappingContext.createIndexingPlan( context, new HibernateOrmIndexingQueueEventSendingPlan( delegate ) );
@@ -161,7 +222,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 	public Synchronization createTransactionWorkQueueSynchronization(PojoIndexingPlan indexingPlan,
 			HibernateOrmSearchSessionHolder sessionProperties,
 			Transaction transactionIdentifier,
-			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
+			ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> synchronizationStrategy) {
 		if ( enlistsInTransaction ) {
 			return new BeforeCommitIndexingPlanSynchronization( indexingPlan, sessionProperties, transactionIdentifier,
 					synchronizationStrategy );
@@ -173,7 +234,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 	}
 
 	public PojoIndexingQueueEventProcessingPlan createIndexingQueueEventProcessingPlan(HibernateOrmSearchSession context,
-			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
+			ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> synchronizationStrategy) {
 		AutomaticIndexingQueueEventSendingPlan delegate = senderFactory.apply( context );
 		return mappingContext.createIndexingQueueEventProcessingPlan( context,
 				synchronizationStrategy.getDocumentCommitStrategy(),
@@ -181,11 +242,13 @@ public final class ConfiguredAutomaticIndexingStrategy {
 				new HibernateOrmIndexingQueueEventSendingPlan( delegate ) );
 	}
 
-	private ConfiguredAutomaticIndexingSynchronizationStrategy configure(
-			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
-		ConfiguredAutomaticIndexingSynchronizationStrategy.Builder builder =
-				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder( mappingContext.failureHandler(),
-						mappingContext.entityReferenceFactory() );
+	private ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> configure(
+			HibernateOrmIndexingPlanSynchronizationStrategy synchronizationStrategy) {
+		ConfiguredIndexingPlanSynchronizationStrategy.Builder<EntityReference> builder =
+				new ConfiguredIndexingPlanSynchronizationStrategy.Builder<>(
+						mappingContext.failureHandler(),
+						mappingContext.entityReferenceFactory()
+				);
 		synchronizationStrategy.apply( builder );
 		return builder.build();
 	}

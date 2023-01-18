@@ -11,12 +11,14 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
+import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
+import org.hibernate.search.mapper.pojo.standalone.plan.synchronization.PojoStandaloneIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
-import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
-import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -201,5 +203,16 @@ public interface SearchSession extends AutoCloseable {
 	 * @return The tenant identifier for this session.
 	 */
 	String tenantIdentifier();
+
+	/**
+	 * Set the {@link IndexingPlanSynchronizationStrategy} to use for this session.
+	 * <p>
+	 * Behavior is undefined if called while entity changes are pending:
+	 * be sure to call this only just after creating a session.
+	 *
+	 * @param synchronizationStrategy The synchronization strategy to use
+	 * @see IndexingPlanSynchronizationStrategy
+	 */
+	void indexingPlanSynchronizationStrategy(PojoStandaloneIndexingPlanSynchronizationStrategy synchronizationStrategy);
 
 }

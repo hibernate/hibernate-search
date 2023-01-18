@@ -11,8 +11,9 @@ import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
 import org.hibernate.Transaction;
-import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.plan.synchronization.impl.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -26,11 +27,11 @@ class AfterCommitIndexingPlanSynchronization implements Synchronization {
 	private final PojoIndexingPlan indexingPlan;
 	private final HibernateOrmSearchSessionHolder sessionHolder;
 	private final Transaction transactionIdentifier;
-	private final ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy;
+	private final ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> synchronizationStrategy;
 
 	AfterCommitIndexingPlanSynchronization(PojoIndexingPlan indexingPlan,
 			HibernateOrmSearchSessionHolder sessionHolder, Transaction transactionIdentifier,
-			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
+			ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> synchronizationStrategy) {
 		this.indexingPlan = indexingPlan;
 		this.sessionHolder = sessionHolder;
 		this.transactionIdentifier = transactionIdentifier;

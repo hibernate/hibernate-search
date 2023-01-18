@@ -23,10 +23,10 @@ public class DocumentRouteDescriptorDto extends org.apache.avro.specific.Specifi
   private static final SpecificData MODEL$ = new SpecificData();
 
   private static final BinaryMessageEncoder<DocumentRouteDescriptorDto> ENCODER =
-      new BinaryMessageEncoder<DocumentRouteDescriptorDto>(MODEL$, SCHEMA$);
+      new BinaryMessageEncoder<>(MODEL$, SCHEMA$);
 
   private static final BinaryMessageDecoder<DocumentRouteDescriptorDto> DECODER =
-      new BinaryMessageDecoder<DocumentRouteDescriptorDto>(MODEL$, SCHEMA$);
+      new BinaryMessageDecoder<>(MODEL$, SCHEMA$);
 
   /**
    * Return the BinaryMessageEncoder instance used by this class.
@@ -50,7 +50,7 @@ public class DocumentRouteDescriptorDto extends org.apache.avro.specific.Specifi
    * @return a BinaryMessageDecoder instance for this class backed by the given SchemaStore
    */
   public static BinaryMessageDecoder<DocumentRouteDescriptorDto> createDecoder(SchemaStore resolver) {
-    return new BinaryMessageDecoder<DocumentRouteDescriptorDto>(MODEL$, SCHEMA$, resolver);
+    return new BinaryMessageDecoder<>(MODEL$, SCHEMA$, resolver);
   }
 
   /**
@@ -90,9 +90,14 @@ public class DocumentRouteDescriptorDto extends org.apache.avro.specific.Specifi
     this.routingKey = routingKey;
   }
 
+  @Override
   public org.apache.avro.specific.SpecificData getSpecificData() { return MODEL$; }
+
+  @Override
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
+
   // Used by DatumWriter.  Applications should not call.
+  @Override
   public java.lang.Object get(int field$) {
     switch (field$) {
     case 0: return routingKey;
@@ -101,6 +106,7 @@ public class DocumentRouteDescriptorDto extends org.apache.avro.specific.Specifi
   }
 
   // Used by DatumReader.  Applications should not call.
+  @Override
   @SuppressWarnings(value="unchecked")
   public void put(int field$, java.lang.Object value$) {
     switch (field$) {

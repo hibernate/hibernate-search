@@ -106,8 +106,6 @@ See <<mapper-orm-indexing-manual-indexingplan-process-execute>> for more informa
 [[indexing-plan-synchronization]]
 == [[mapper-orm-indexing-automatic-synchronization]] Synchronization with the indexes
 
-include::components/mapper-orm-only-note.asciidoc[]
-
 [[indexing-plan-synchronization-basics]]
 === [[mapper-orm-indexing-automatic-synchronization-basics]] Basics
 
@@ -137,7 +135,8 @@ an <<concepts-commit-refresh,index commit>> is necessary.
 Without it, index changes may only be safe after a few seconds,
 when a periodic index commit happens in the background.
 2. *Real-time search queries*:
-if, once the database transaction completes,
+if, once the database transaction completes (for the <<mapper-orm,Hibernate ORM integration>>)
+or the ``SearchSession``'s `close()` method returns (for the <<mapper-pojo-standalone,Standalone POJO Mapper>>),
 any search query must immediately take the index changes into account,
 an <<concepts-commit-refresh,index refresh>> is necessary.
 Without it, index changes may only be visible after a few seconds,
@@ -145,7 +144,7 @@ when a periodic index refresh happens in the background.
 
 These two requirements are controlled by the _synchronization strategy_.
 The default strategy is defined by the configuration property
-`hibernate.search.automatic_indexing.synchronization.strategy`.
+`hibernate.search.indexing.plan.synchronization.strategy`.
 Below is a reference of all available strategies and their guarantees.
 
 |====
@@ -196,20 +195,20 @@ which by default will simply log the failure.
 
 While the configuration property mentioned above defines a default,
 it is possible to override this default on a particular session
-by calling `SearchSession#automaticIndexingSynchronizationStrategy(...)` and passing a different strategy.
+by calling `SearchSession#indexingPlanSynchronizationStrategy(...)` and passing a different strategy.
 
 The built-in strategies can be retrieved by calling:
 
-* `AutomaticIndexingSynchronizationStrategy.async()`
-* `AutomaticIndexingSynchronizationStrategy.writeSync()`
-* `AutomaticIndexingSynchronizationStrategy.readSync()`
-* or `AutomaticIndexingSynchronizationStrategy.sync()`
+* `HibernateOrmIndexingPlanSynchronizationStrategy.async()` for the Hibernate ORM mapper, or `PojoStandaloneIndexingPlanSynchronizationStrategy.async()` for the Pojo Standalone mapper
+* `HibernateOrmIndexingPlanSynchronizationStrategy.writeSync()` for the Hibernate ORM mapper, or `PojoStandaloneIndexingPlanSynchronizationStrategy.writeSync()` for the Pojo Standalone mapper
+* `HibernateOrmIndexingPlanSynchronizationStrategy.readSync()` for the Hibernate ORM mapper, or `PojoStandaloneIndexingPlanSynchronizationStrategy.readSync()` for the Pojo Standalone mapper
+* or `HibernateOrmIndexingPlanSynchronizationStrategy.sync()` for the Hibernate ORM mapper, or `PojoStandaloneIndexingPlanSynchronizationStrategy.sync()` for the Pojo Standalone mapper
 
 .Overriding the automatic indexing synchronization strategy
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmAutomaticIndexingIT.java[tags=automatic-indexing-synchronization-strategy-override]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmIndexingPlanSynchronizationStrategyIT.java[tags=indexing-plan-synchronization-strategy-override]
 ----
 <1> <<entrypoints-search-session,Retrieve the `SearchSession`>>, which by default uses the synchronization strategy configured in properties.
 <2> Override the synchronization strategy.
@@ -227,8 +226,8 @@ You can also implement custom strategy.
 The custom strategy can then be set just like the built-in strategies:
 
 * as the default by setting
-the configuration property `hibernate.search.automatic_indexing.synchronization.strategy`
+the configuration property `hibernate.search.indexing.plan.synchronization.strategy`
 to a <<configuration-bean-reference-parsing,bean reference>> pointing to the custom implementation,
 for example `class:com.mycompany.MySynchronizationStrategy`.
 * at the session level by passing an instance of the custom implementation
-to `SearchSession#automaticIndexingSynchronizationStrategy(...)`.
+to `SearchSession#indexingPlanSynchronizationStrategy(...)`.

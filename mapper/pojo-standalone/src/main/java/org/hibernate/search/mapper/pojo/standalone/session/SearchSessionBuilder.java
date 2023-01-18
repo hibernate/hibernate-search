@@ -10,7 +10,9 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.standalone.loading.dsl.SelectionLoadingOptionsStep;
+import org.hibernate.search.mapper.pojo.standalone.plan.synchronization.PojoStandaloneIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 @Incubating
@@ -26,14 +28,29 @@ public interface SearchSessionBuilder {
 	/**
 	 * @param commitStrategy The commit strategy for indexing works added to the {@link SearchSession#indexingPlan() indexing plan}.
 	 * @return {@code this} for method chaining.
+	 *
+	 * @deprecated Use {@link #indexingPlanSynchronizationStrategy(PojoStandaloneIndexingPlanSynchronizationStrategy)} instead.
 	 */
+	@Deprecated
 	SearchSessionBuilder commitStrategy(DocumentCommitStrategy commitStrategy);
 
 	/**
 	 * @param refreshStrategy The refresh strategy for indexing works added to the {@link SearchSession#indexingPlan() indexing plan}.
 	 * @return {@code this} for method chaining.
+	 *
+	 * @deprecated Use {@link #indexingPlanSynchronizationStrategy(PojoStandaloneIndexingPlanSynchronizationStrategy)} instead.
 	 */
+	@Deprecated
 	SearchSessionBuilder refreshStrategy(DocumentRefreshStrategy refreshStrategy);
+
+	/**
+	 * @param synchronizationStrategy The synchronization strategy for indexing works added to the {@link SearchSession#indexingPlan() indexing plan}.
+	 * @return {@code this} for method chaining.
+	 *
+	 * @see IndexingPlanSynchronizationStrategy
+	 * @see PojoStandaloneIndexingPlanSynchronizationStrategy
+	 */
+	SearchSessionBuilder indexingPlanSynchronizationStrategy(PojoStandaloneIndexingPlanSynchronizationStrategy synchronizationStrategy);
 
 	/**
 	 * @param loadingOptionsContributor The default loading options.

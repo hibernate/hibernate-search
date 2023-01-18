@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.cfg;
 
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
+import org.hibernate.search.mapper.pojo.standalone.plan.synchronization.PojoStandaloneIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.standalone.plan.synchronization.PojoStandaloneIndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
@@ -60,6 +63,20 @@ public final class StandalonePojoMapperSettings {
 	public static final String MULTI_TENANCY_ENABLED = PREFIX + Radicals.MULTI_TENANCY_ENABLED;
 
 
+	/**
+	 * The synchronization strategy to use when indexing automatically.
+	 * <p>
+	 * Expects one of the strings defined in {@link PojoStandaloneIndexingPlanSynchronizationStrategy},
+	 * or a reference to a bean of type {@link PojoStandaloneIndexingPlanSynchronizationStrategy}.
+	 * <p>
+	 * Defaults to {@link Defaults#INDEXING_PLAN_SYNCHRONIZATION_STRATEGY}.
+	 *
+	 * @see PojoStandaloneIndexingPlanSynchronizationStrategyNames
+	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
+	 * which includes a description of the "bean reference" properties and accepted values.
+	 */
+	public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY = PREFIX + Radicals.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY;
+
 	public static class Radicals {
 
 		private Radicals() {
@@ -68,6 +85,9 @@ public final class StandalonePojoMapperSettings {
 		public static final String SCHEMA_MANAGEMENT_STRATEGY = "schema_management.strategy";
 		public static final String MAPPING_CONFIGURER = "mapping.configurer";
 		public static final String MULTI_TENANCY_ENABLED = "mapping.multi_tenancy.enabled";
+		public static final String INDEXING_PLAN_SYNCHRONIZATION_PREFIX = "indexing.plan.synchronization.";
+		public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY = INDEXING_PLAN_SYNCHRONIZATION_PREFIX + "strategy";
+
 	}
 
 	/**
@@ -80,6 +100,9 @@ public final class StandalonePojoMapperSettings {
 
 		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY = SchemaManagementStrategyName.CREATE_OR_VALIDATE;
 		public static final Boolean MULTI_TENANCY_ENABLED = Boolean.FALSE;
+
+		public static final BeanReference<PojoStandaloneIndexingPlanSynchronizationStrategy> INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
+				BeanReference.of( PojoStandaloneIndexingPlanSynchronizationStrategy.class, "write-sync" );
 	}
 
 }

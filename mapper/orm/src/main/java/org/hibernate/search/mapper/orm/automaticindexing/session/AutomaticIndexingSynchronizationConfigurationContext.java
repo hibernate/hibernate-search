@@ -14,8 +14,13 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategyConfigurationContext;
 import org.hibernate.search.util.common.annotation.Incubating;
 
+/**
+ * @deprecated Use {@link IndexingPlanSynchronizationStrategyConfigurationContext}
+ */
+@Deprecated
 public interface AutomaticIndexingSynchronizationConfigurationContext {
 
 	/**

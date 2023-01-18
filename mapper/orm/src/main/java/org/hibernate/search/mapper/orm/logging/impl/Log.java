@@ -317,4 +317,13 @@ public interface Log extends BasicLogger {
 					+ " %2$s") // Context
 	void failedToResolveStateRepresentation(String path, @FormatWith(EventContextFormatter.class) EventContext context, String causeMessage,
 			@Cause Exception cause);
+
+	@Message(id = ID_OFFSET + 122,
+			value = "Invalid value for configuration property '%1$s'. %2$s")
+	SearchException unableToConvertConfigurationProperty(String key, String errorMessage,
+			@Cause Exception cause);
+
+	@Message(id = ID_OFFSET + 123,
+			value = "Both '%1$s' and '%2$s' are configured. Use only '%1$s' to set the indexing plan synchronization strategy. ")
+	SearchException bothNewAndOldConfigurationPropertiesForIndexingPlanSyncAreUsed(String key1, String key2);
 }

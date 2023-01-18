@@ -8,13 +8,13 @@ package org.hibernate.search.mapper.orm.cfg;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
+import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.coordination.impl.NoCoordinationStrategy;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
 /**
@@ -72,15 +72,18 @@ public final class HibernateOrmMapperSettings {
 	/**
 	 * The synchronization strategy to use when indexing automatically.
 	 * <p>
-	 * Expects one of the strings defined in {@link AutomaticIndexingSynchronizationStrategyNames},
-	 * or a reference to a bean of type {@link AutomaticIndexingSynchronizationStrategy}.
+	 * Expects one of the strings defined in {@link org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames},
+	 * or a reference to a bean of type {@link org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy}.
 	 * <p>
 	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY}.
 	 *
-	 * @see AutomaticIndexingSynchronizationStrategyNames
+	 * @see org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames
 	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
 	 * which includes a description of the "bean reference" properties and accepted values.
+	 *
+	 * @deprecated Use {@link #INDEXING_PLAN_SYNCHRONIZATION_STRATEGY} instead.
 	 */
+	@Deprecated
 	public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = PREFIX + Radicals.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY;
 
 	/**
@@ -194,6 +197,20 @@ public final class HibernateOrmMapperSettings {
 	public static final String MULTI_TENANCY_TENANT_IDS = PREFIX + Radicals.MULTI_TENANCY_TENANT_IDS;
 
 	/**
+	 * The synchronization strategy to use when indexing automatically.
+	 * <p>
+	 * Expects one of the strings defined in {@link HibernateOrmIndexingPlanSynchronizationStrategyNames},
+	 * or a reference to a bean of type {@link HibernateOrmIndexingPlanSynchronizationStrategy}.
+	 * <p>
+	 * Defaults to {@link Defaults#INDEXING_PLAN_SYNCHRONIZATION_STRATEGY}.
+	 *
+	 * @see HibernateOrmIndexingPlanSynchronizationStrategyNames
+	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
+	 * which includes a description of the "bean reference" properties and accepted values.
+	 */
+	public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY = PREFIX + Radicals.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY;
+
+	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
 	 */
 	public static final class Radicals {
@@ -210,6 +227,10 @@ public final class HibernateOrmMapperSettings {
 		 */
 		@Deprecated
 		public static final String AUTOMATIC_INDEXING_STRATEGY = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.STRATEGY;
+		/**
+		 * @deprecated Use {@link  #INDEXING_PLAN_SYNCHRONIZATION_STRATEGY} instead.
+		 */
+		@Deprecated
 		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.SYNCHRONIZATION_STRATEGY;
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.ENABLE_DIRTY_CHECK;
 		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup.strategy";
@@ -224,6 +245,9 @@ public final class HibernateOrmMapperSettings {
 		public static final String MULTI_TENANCY = "multi_tenancy";
 		public static final String MULTI_TENANCY_PREFIX = MULTI_TENANCY + ".";
 		public static final String MULTI_TENANCY_TENANT_IDS = MULTI_TENANCY_PREFIX + MultiTenancyRadicals.TENANT_IDS;
+		public static final String INDEXING_PLAN_PREFIX = "indexing.plan.";
+		public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY = INDEXING_PLAN_PREFIX + IndexingPlanRadicals.SYNCHRONIZATION_STRATEGY;
+
 	}
 
 	/**
@@ -240,8 +264,23 @@ public final class HibernateOrmMapperSettings {
 		 */
 		@Deprecated
 		public static final String STRATEGY = "strategy";
+		/**
+		 * @deprecated Use {@link IndexingPlanRadicals#SYNCHRONIZATION_STRATEGY} instead.
+		 */
+		@Deprecated
 		public static final String SYNCHRONIZATION_STRATEGY = "synchronization.strategy";
 		public static final String ENABLE_DIRTY_CHECK = "enable_dirty_check";
+	}
+
+	/**
+	 * Configuration property keys without the {@link #PREFIX prefix} + {@link Radicals#INDEXING_PLAN_PREFIX}.
+	 */
+	public static final class IndexingPlanRadicals {
+
+		private IndexingPlanRadicals() {
+		}
+
+		public static final String SYNCHRONIZATION_STRATEGY = "synchronization.strategy";
 	}
 
 	/**
@@ -284,8 +323,12 @@ public final class HibernateOrmMapperSettings {
 		@Deprecated
 		public static final org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName AUTOMATIC_INDEXING_STRATEGY =
 				org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.SESSION;
-		public static final BeanReference<AutomaticIndexingSynchronizationStrategy> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
-				BeanReference.of( AutomaticIndexingSynchronizationStrategy.class, "write-sync" );
+		/**
+		 * @deprecated Use {@link #INDEXING_PLAN_SYNCHRONIZATION_STRATEGY} instead.
+		 */
+		@Deprecated
+		public static final BeanReference<org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
+				BeanReference.of( org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy.class, "write-sync" );
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
 		public static final EntityLoadingCacheLookupStrategy QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
 				EntityLoadingCacheLookupStrategy.SKIP;
@@ -295,6 +338,9 @@ public final class HibernateOrmMapperSettings {
 		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY = SchemaManagementStrategyName.CREATE_OR_VALIDATE;
 		public static final BeanReference<CoordinationStrategy> COORDINATION_STRATEGY =
 				BeanReference.of( CoordinationStrategy.class, NoCoordinationStrategy.NAME );
+		public static final BeanReference<HibernateOrmIndexingPlanSynchronizationStrategy> INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
+				BeanReference.of( HibernateOrmIndexingPlanSynchronizationStrategy.class, "write-sync" );
+
 	}
 
 }

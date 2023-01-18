@@ -7,33 +7,30 @@
 package org.hibernate.search.mapper.pojo.standalone.work.impl;
 
 import java.util.BitSet;
-import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
-import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
-import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
-import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.plan.synchronization.impl.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
+import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
-import org.hibernate.search.util.common.impl.Throwables;
 
 public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	private final SearchIndexingPlanTypeContextProvider typeContextProvider;
 	private final PojoRuntimeIntrospector introspector;
 	private final PojoIndexingPlan delegate;
-	private final EntityReferenceFactory<EntityReference> entityReferenceFactory;
+	private final ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> indexingPlanSynchronizationStrategy;
 
-	public SearchIndexingPlanImpl(SearchIndexingPlanTypeContextProvider typeContextProvider,
-			PojoRuntimeIntrospector introspector,
+	public SearchIndexingPlanImpl(
+			SearchIndexingPlanTypeContextProvider typeContextProvider, PojoRuntimeIntrospector introspector,
 			PojoIndexingPlan delegate,
-			EntityReferenceFactory<EntityReference> entityReferenceFactory) {
+			ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> indexingPlanSynchronizationStrategy) {
 		this.typeContextProvider = typeContextProvider;
 		this.introspector = introspector;
 		this.delegate = delegate;
-		this.entityReferenceFactory = entityReferenceFactory;
+		this.indexingPlanSynchronizationStrategy = indexingPlanSynchronizationStrategy;
 	}
 
 	@Override
@@ -114,13 +111,8 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 				forceSelfDirty, forceContainingDirty, dirtyPaths );
 	}
 
-	public CompletableFuture<?> execute() {
-		return delegate.executeAndReport( entityReferenceFactory, OperationSubmitter.blocking() ).thenApply( report -> {
-			report.throwable().ifPresent( t -> {
-				throw Throwables.toRuntimeException( t );
-			} );
-			return null;
-		} );
+	public void execute() {
+		this.indexingPlanSynchronizationStrategy.executeAndSynchronize( delegate );
 	}
 
 	private <T> PojoRawTypeIdentifier<? extends T> getTypeIdentifier(T entity) {

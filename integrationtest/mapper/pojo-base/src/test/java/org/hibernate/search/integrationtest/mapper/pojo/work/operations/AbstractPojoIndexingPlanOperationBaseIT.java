@@ -13,19 +13,29 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
+import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
+import org.junit.Rule;
 import org.junit.Test;
+
+import org.apache.logging.log4j.Level;
 
 /**
  * Tests of individual operations in {@link org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan}.
  */
 public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPojoIndexingOperationIT {
+
+	@Rule
+	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
 	public void simple() {
@@ -334,7 +344,8 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 	public void runtimeException() {
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		RuntimeException exception = new RuntimeException();
-		assertThatThrownBy( () -> {
+
+		Runnable work = () -> {
 			try ( SearchSession session = createSession() ) {
 				SearchIndexingPlan indexingPlan = session.indexingPlan();
 				expectOperation( futureFromBackend, 1, null, "1" );
@@ -343,15 +354,17 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 				// so we need to complete it now.
 				futureFromBackend.completeExceptionally( exception );
 			}
-		} )
-				.isSameAs( exception );
+		};
+
+		assertExceptionalSituation( work, exception );
 	}
 
 	@Test
 	public void error() {
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		Error error = new Error();
-		assertThatThrownBy( () -> {
+
+		Runnable work = () -> {
 			try ( SearchSession session = createSession() ) {
 				SearchIndexingPlan indexingPlan = session.indexingPlan();
 				expectOperation( futureFromBackend, 1, null, "1" );
@@ -360,13 +373,40 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 				// so we need to complete it now.
 				futureFromBackend.completeExceptionally( error );
 			}
-		} )
-				.isSameAs( error );
+		};
+
+		assertExceptionalSituation( work, error );
+	}
+
+	private void assertExceptionalSituation(Runnable work, Throwable exception ) {
+		if ( isErrorLoggedOnly() ) {
+			// we are in async case and error will not be thrown, but rather logged so let's check for that:
+			logged.expectEvent(
+							Level.ERROR,
+							ExceptionMatcherBuilder.isException( exception )
+									.build(),
+							"Automatic indexing of entities",
+							"Entities that could not be indexed correctly:"
+					)
+					.once();
+			work.run();
+		}
+		else {
+			assertThatThrownBy( () -> work.run() )
+					// the exception is going to be wrapped in the SearchException
+					.rootCause()
+					.isSameAs( exception );
+		}
 	}
 
 	@Override
 	protected boolean isImplicitRoutingEnabled() {
 		return routingBinder != null;
+	}
+
+	private boolean isErrorLoggedOnly() {
+		return DocumentCommitStrategy.NONE.equals( commitStrategy ) &&
+				DocumentRefreshStrategy.NONE.equals( refreshStrategy );
 	}
 
 }

@@ -436,6 +436,7 @@ public class PojoIndexingPlanBaseIT {
 						);
 			}
 		} )
+				.rootCause()
 				.isSameAs( simulatedFailure );
 	}
 

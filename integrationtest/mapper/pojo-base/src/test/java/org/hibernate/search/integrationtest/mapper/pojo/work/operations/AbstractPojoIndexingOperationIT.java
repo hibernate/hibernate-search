@@ -19,12 +19,13 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionEntityLoader;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.plan.synchronization.PojoStandaloneIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,15 +46,20 @@ public abstract class AbstractPojoIndexingOperationIT {
 
 	@Parameterized.Parameters(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
 	public static List<Object[]> parameters() {
+		Object[][] strategies = new Object[][] {
+				new Object[] { DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, PojoStandaloneIndexingPlanSynchronizationStrategy.async() },
+				new Object[] { DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE, PojoStandaloneIndexingPlanSynchronizationStrategy.writeSync() },
+				new Object[] { DocumentCommitStrategy.NONE, DocumentRefreshStrategy.FORCE, PojoStandaloneIndexingPlanSynchronizationStrategy.readSync() },
+				new Object[] { DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, PojoStandaloneIndexingPlanSynchronizationStrategy.sync() }
+		};
+
 		List<Object[]> params = new ArrayList<>();
 		MyRoutingBinder routingBinder = new MyRoutingBinder();
-		for ( DocumentCommitStrategy commitStrategy : DocumentCommitStrategy.values() ) {
-			for ( DocumentRefreshStrategy refreshStrategy : DocumentRefreshStrategy.values() ) {
-				params.add( new Object[] { commitStrategy, refreshStrategy, null, null } );
-				params.add( new Object[] { commitStrategy, refreshStrategy, null, routingBinder } );
-				params.add( new Object[] { commitStrategy, refreshStrategy, "tenant1", null } );
-				params.add( new Object[] { commitStrategy, refreshStrategy, "tenant1", routingBinder } );
-			}
+		for ( Object[] strategy : strategies ) {
+			params.add( new Object[] { strategy[0], strategy[1], null, null, strategy[2] } );
+			params.add( new Object[] { strategy[0], strategy[1], null, routingBinder, strategy[2] } );
+			params.add( new Object[] { strategy[0], strategy[1], "tenant1", null, strategy[2] } );
+			params.add( new Object[] { strategy[0], strategy[1], "tenant1", routingBinder, strategy[2] } );
 		}
 		return params;
 	}
@@ -76,6 +82,8 @@ public abstract class AbstractPojoIndexingOperationIT {
 	public String tenantId;
 	@Parameterized.Parameter(3)
 	public MyRoutingBinder routingBinder;
+	@Parameterized.Parameter(4)
+	public PojoStandaloneIndexingPlanSynchronizationStrategy strategy;
 
 	protected SearchMapping mapping;
 
@@ -134,8 +142,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 
 	protected final SearchSession createSession() {
 		return mapping.createSessionWithOptions()
-				.commitStrategy( commitStrategy )
-				.refreshStrategy( refreshStrategy )
+				.indexingPlanSynchronizationStrategy( strategy )
 				.tenantId( tenantId )
 				.build();
 	}
