@@ -8,22 +8,21 @@ package org.hibernate.search.mapper.orm.session.impl;
 
 import java.util.Collection;
 import java.util.function.Supplier;
-
 import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
+import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
-import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 
 /**
  * A lazily initializing {@link SearchSession}.
@@ -95,9 +94,14 @@ public class DelegatingSearchSession implements SearchSession {
 	}
 
 	@Override
-	public void automaticIndexingSynchronizationStrategy(
-			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
+	@SuppressWarnings("deprecation")
+	public void automaticIndexingSynchronizationStrategy(org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		getDelegate().automaticIndexingSynchronizationStrategy( synchronizationStrategy );
+	}
+
+	@Override
+	public void indexingPlanSynchronizationStrategy(HibernateOrmIndexingPlanSynchronizationStrategy synchronizationStrategy) {
+		getDelegate().indexingPlanSynchronizationStrategy( synchronizationStrategy );
 	}
 
 	private HibernateOrmSearchSession getDelegate() {

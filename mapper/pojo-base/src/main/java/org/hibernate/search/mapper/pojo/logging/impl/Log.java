@@ -768,4 +768,10 @@ public interface Log extends BasicLogger {
 			String causeMessage,
 			@Cause Exception cause,
 			@Param ProjectionConstructorPath path);
+
+	@Message(value = "Automatic indexing of entities")
+	String automaticIndexing();
+
+	@Message(id = ID_OFFSET + 124, value = "Indexing failure: %1$s.\nThe following entities may not have been updated correctly in the index: %2$s.")
+	SearchException indexingFailure(String causeMessage, List<?> failingEntities, @Cause Throwable cause);
 }

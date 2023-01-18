@@ -35,7 +35,7 @@ public final class TestConfiguration {
 			properties.put( "hibernate.search.backend." + entry.getKey(), entry.getValue() );
 		}
 		properties.put( "hibernate.search.schema_management.strategy", "drop-and-create-and-drop" );
-		properties.put( "hibernate.search.automatic_indexing.synchronization.strategy", "sync" );
+		properties.put( "hibernate.search.indexing.plan.synchronization.strategy", "sync" );
 
 		return properties;
 	}

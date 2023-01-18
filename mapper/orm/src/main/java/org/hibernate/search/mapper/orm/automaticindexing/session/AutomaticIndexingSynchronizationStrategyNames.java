@@ -11,7 +11,10 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 /**
  * The names of built-in automatic indexing synchronization strategies,
  * accepted by {@link HibernateOrmMapperSettings#AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY}.
+ *
+ * @deprecated See {@link HibernateOrmIndexingPlanSynchronizationStrategyNames}
  */
+@Deprecated
 public final class AutomaticIndexingSynchronizationStrategyNames {
 
 	private AutomaticIndexingSynchronizationStrategyNames() {

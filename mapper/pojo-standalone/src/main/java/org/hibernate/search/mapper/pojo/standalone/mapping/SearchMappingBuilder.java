@@ -116,9 +116,14 @@ public final class SearchMappingBuilder {
 
 			SearchIntegrationFinalizer finalizer =
 					integrationPartialBuildState.finalizer( propertySource, propertyChecker );
+
+			SearchIntegrationEnvironment finalEnvironment = environment;
 			mapping = finalizer.finalizeMapping(
 					mappingKey,
-					(context, partialMapping) -> partialMapping.finalizeMapping()
+					(context, partialMapping) -> partialMapping.finalizeMapping(
+							finalEnvironment.propertySource(),
+							finalEnvironment.beanResolver()
+					)
 			);
 			finalizer.finalizeIntegration();
 			return mapping;

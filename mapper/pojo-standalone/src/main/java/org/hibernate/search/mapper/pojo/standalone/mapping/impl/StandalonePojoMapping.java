@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,7 +17,9 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
@@ -33,10 +34,9 @@ import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLoadingContext;
-import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojoMappingHints;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.impl.StandalonePojoMassIndexingSessionContext;
+import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojoMappingHints;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.SchemaManagementListener;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.scope.impl.SearchScopeImpl;
@@ -47,13 +47,12 @@ import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSe
 import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSearchSessionMappingContext;
 import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSessionIndexedTypeContext;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class StandalonePojoMapping extends AbstractPojoMappingImplementor<StandalonePojoMapping>
 		implements CloseableSearchMapping, StandalonePojoSearchSessionMappingContext, EntityReferenceFactory<EntityReference> {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
+	private final ConfigurationPropertySource configurationPropertySource;
+	private final BeanResolver beanResolver;
 	private final StandalonePojoTypeContextContainer typeContextContainer;
 
 	private SearchIntegration.Handle integrationHandle;
@@ -62,9 +61,12 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 
 	private final SchemaManagementListener schemaManagementListener;
 
-	StandalonePojoMapping(PojoMappingDelegate mappingDelegate, StandalonePojoTypeContextContainer typeContextContainer,
+	StandalonePojoMapping(ConfigurationPropertySource configurationPropertySource, BeanResolver beanResolver,
+			PojoMappingDelegate mappingDelegate, StandalonePojoTypeContextContainer typeContextContainer,
 			SchemaManagementListener schemaManagementListener) {
 		super( mappingDelegate );
+		this.configurationPropertySource = configurationPropertySource;
+		this.beanResolver = beanResolver;
 		this.typeContextContainer = typeContextContainer;
 		this.schemaManagementListener = schemaManagementListener;
 		this.active = true;
@@ -230,7 +232,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 
 	private StandalonePojoSearchSession.Builder createSessionBuilder() {
 		return new StandalonePojoSearchSession.Builder(
-				this, typeContextContainer
+				this, configurationPropertySource, beanResolver, typeContextContainer
 		);
 	}
 }

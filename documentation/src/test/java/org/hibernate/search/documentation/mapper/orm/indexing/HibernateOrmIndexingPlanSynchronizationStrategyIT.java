@@ -16,15 +16,15 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
+import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HibernateOrmAutomaticIndexingIT {
+public class HibernateOrmIndexingPlanSynchronizationStrategyIT {
 	private static final String BOOK1_TITLE = "I, Robot";
 
 	private static final String BOOK2_TITLE = "The Caves of Steel";
@@ -38,21 +38,21 @@ public class HibernateOrmAutomaticIndexingIT {
 	public void synchronizationStrategyOverride() {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withProperty(
-						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
+						HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,
 						// To be overridden below
-						AutomaticIndexingSynchronizationStrategyNames.ASYNC
+						HibernateOrmIndexingPlanSynchronizationStrategyNames.ASYNC
 				)
 				.setup( Book.class, Author.class );
 		initData( entityManagerFactory );
 
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
-			// tag::automatic-indexing-synchronization-strategy-override[]
+			// tag::indexing-plan-synchronization-strategy-override[]
 			SearchSession searchSession = /* ... */ // <1>
-					// end::automatic-indexing-synchronization-strategy-override[]
+					// end::indexing-plan-synchronization-strategy-override[]
 					Search.session( entityManager );
-			// tag::automatic-indexing-synchronization-strategy-override[]
-			searchSession.automaticIndexingSynchronizationStrategy(
-					AutomaticIndexingSynchronizationStrategy.sync()
+			// tag::indexing-plan-synchronization-strategy-override[]
+			searchSession.indexingPlanSynchronizationStrategy(
+					HibernateOrmIndexingPlanSynchronizationStrategy.sync()
 			); // <2>
 
 			entityManager.getTransaction().begin();
@@ -68,7 +68,7 @@ public class HibernateOrmAutomaticIndexingIT {
 			List<Book> result = searchSession.search( Book.class )
 					.where( f -> f.match().field( "title" ).matching( "2nd edition" ) )
 					.fetchHits( 20 ); // <5>
-			// end::automatic-indexing-synchronization-strategy-override[]
+			// end::indexing-plan-synchronization-strategy-override[]
 
 			assertThat( result ).extracting( Book::getId )
 					.containsExactly( 1 );

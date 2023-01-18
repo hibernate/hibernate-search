@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.IndexSettings;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
+import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 
 import org.junit.Test;
@@ -35,8 +35,8 @@ public class ElasticsearchConfigurationIT {
 		);
 		// orm configuration
 		config.put(
-				HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-				AutomaticIndexingSynchronizationStrategyNames.ASYNC
+				HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,
+				HibernateOrmIndexingPlanSynchronizationStrategyNames.ASYNC
 		);
 		// engine configuration
 		config.put( EngineSettings.BACKGROUND_FAILURE_HANDLER, "myFailureHandler" );
@@ -51,7 +51,7 @@ public class ElasticsearchConfigurationIT {
 						entry( "hibernate.search.backend.hosts", "127.0.0.1:9200" ),
 						entry( "hibernate.search.backend.protocol", "http" ),
 						entry( "hibernate.search.backend.indexes.myIndex.indexing.max_bulk_size", 20 ),
-						entry( "hibernate.search.automatic_indexing.synchronization.strategy", "async" ),
+						entry( "hibernate.search.indexing.plan.synchronization.strategy", "async" ),
 						entry( "hibernate.search.background_failure_handler", "myFailureHandler" )
 				);
 	}

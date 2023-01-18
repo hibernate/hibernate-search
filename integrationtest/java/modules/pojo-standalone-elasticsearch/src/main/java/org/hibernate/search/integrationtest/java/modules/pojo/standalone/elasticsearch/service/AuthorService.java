@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.java.modules.pojo.standalone.elasticsearch.entity.Author;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
+import org.hibernate.search.mapper.pojo.standalone.plan.synchronization.PojoStandaloneIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 
 public class AuthorService implements AutoCloseable {
@@ -53,7 +53,7 @@ public class AuthorService implements AutoCloseable {
 
 	public void add(String name) {
 		try ( SearchSession session = mapping.createSessionWithOptions()
-				.refreshStrategy( DocumentRefreshStrategy.FORCE )
+				.indexingPlanSynchronizationStrategy( PojoStandaloneIndexingPlanSynchronizationStrategy.sync() )
 				.build() ) {
 
 			Author author = new Author( ID_PROVIDER.getAndIncrement(), name );

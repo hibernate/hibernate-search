@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.automaticindexing.session.impl;
+package org.hibernate.search.mapper.pojo.plan.synchronization.impl;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -14,28 +14,26 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationConfigurationContext;
-import org.hibernate.search.mapper.orm.common.EntityReference;
-import org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport;
-import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanExecutionReportImpl;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategyConfigurationContext;
+import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport;
+import org.hibernate.search.mapper.pojo.work.impl.SearchIndexingPlanExecutionReportImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.impl.Contracts;
 
-public final class ConfiguredAutomaticIndexingSynchronizationStrategy {
+public class ConfiguredIndexingPlanSynchronizationStrategy<E> {
 
 	private final DocumentCommitStrategy documentCommitStrategy;
 	private final DocumentRefreshStrategy documentRefreshStrategy;
-	private final Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> indexingFutureHandler;
+	private final Consumer<CompletableFuture<SearchIndexingPlanExecutionReport<E>>> indexingFutureHandler;
 	private final OperationSubmitter operationSubmitter;
-	private final EntityReferenceFactory<EntityReference> entityReferenceFactory;
+	private final EntityReferenceFactory<E> entityReferenceFactory;
 
-	private ConfiguredAutomaticIndexingSynchronizationStrategy(Builder configurationContext,
-			EntityReferenceFactory<EntityReference> entityReferenceFactory) {
+	protected ConfiguredIndexingPlanSynchronizationStrategy(Builder<E> configurationContext) {
 		this.documentCommitStrategy = configurationContext.documentCommitStrategy;
 		this.documentRefreshStrategy = configurationContext.documentRefreshStrategy;
 		this.indexingFutureHandler = configurationContext.indexingFutureHandler;
 		this.operationSubmitter = configurationContext.operationSubmitter;
-		this.entityReferenceFactory = entityReferenceFactory;
+		this.entityReferenceFactory = configurationContext.entityReferenceFactory;
 	}
 
 	public DocumentCommitStrategy getDocumentCommitStrategy() {
@@ -47,26 +45,26 @@ public final class ConfiguredAutomaticIndexingSynchronizationStrategy {
 	}
 
 	public void executeAndSynchronize(PojoIndexingPlan indexingPlan) {
-		CompletableFuture<SearchIndexingPlanExecutionReport> reportFuture =
+		CompletableFuture<SearchIndexingPlanExecutionReport<E>> reportFuture =
 				indexingPlan.executeAndReport( entityReferenceFactory, operationSubmitter )
 						.thenApply( SearchIndexingPlanExecutionReportImpl::new );
 		indexingFutureHandler.accept( reportFuture );
 	}
 
-	public static final class Builder
-			implements AutomaticIndexingSynchronizationConfigurationContext {
+	public static final class Builder<E>
+			implements IndexingPlanSynchronizationStrategyConfigurationContext<E> {
 
 		private final FailureHandler failureHandler;
 
 		private DocumentCommitStrategy documentCommitStrategy = DocumentCommitStrategy.NONE;
 		private DocumentRefreshStrategy documentRefreshStrategy = DocumentRefreshStrategy.NONE;
-		private Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> indexingFutureHandler = future -> {
+		private Consumer<CompletableFuture<SearchIndexingPlanExecutionReport<E>>> indexingFutureHandler = future -> {
 		};
 		private OperationSubmitter operationSubmitter = OperationSubmitter.blocking();
 
-		private final EntityReferenceFactory<EntityReference> entityReferenceFactory;
+		private final EntityReferenceFactory<E> entityReferenceFactory;
 
-		public Builder(FailureHandler failureHandler, EntityReferenceFactory<EntityReference> entityReferenceFactory) {
+		public Builder(FailureHandler failureHandler, EntityReferenceFactory<E> entityReferenceFactory) {
 			this.failureHandler = failureHandler;
 			this.entityReferenceFactory = entityReferenceFactory;
 		}
@@ -84,7 +82,7 @@ public final class ConfiguredAutomaticIndexingSynchronizationStrategy {
 		}
 
 		@Override
-		public void indexingFutureHandler(Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> handler) {
+		public void indexingFutureHandler(Consumer<CompletableFuture<SearchIndexingPlanExecutionReport<E>>> handler) {
 			Contracts.assertNotNull( handler, "handler" );
 			this.indexingFutureHandler = handler;
 		}
@@ -99,8 +97,8 @@ public final class ConfiguredAutomaticIndexingSynchronizationStrategy {
 			this.operationSubmitter = operationSubmitter;
 		}
 
-		public ConfiguredAutomaticIndexingSynchronizationStrategy build() {
-			return new ConfiguredAutomaticIndexingSynchronizationStrategy( this, entityReferenceFactory );
+		public ConfiguredIndexingPlanSynchronizationStrategy<E> build() {
+			return new ConfiguredIndexingPlanSynchronizationStrategy<>( this );
 		}
 	}
 

@@ -4,20 +4,19 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.work.impl;
+package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
-import org.hibernate.search.mapper.orm.common.EntityReference;
-import org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport;
+import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport;
 
-public class SearchIndexingPlanExecutionReportImpl implements SearchIndexingPlanExecutionReport {
+public class SearchIndexingPlanExecutionReportImpl<E> implements SearchIndexingPlanExecutionReport<E> {
 
-	private final MultiEntityOperationExecutionReport<EntityReference> delegate;
+	private final MultiEntityOperationExecutionReport<E> delegate;
 
-	public SearchIndexingPlanExecutionReportImpl(MultiEntityOperationExecutionReport<EntityReference> delegate) {
+	public SearchIndexingPlanExecutionReportImpl(MultiEntityOperationExecutionReport<E> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -27,7 +26,7 @@ public class SearchIndexingPlanExecutionReportImpl implements SearchIndexingPlan
 	}
 
 	@Override
-	public List<EntityReference> failingEntities() {
+	public List<E> failingEntities() {
 		return delegate.failingEntityReferences();
 	}
 

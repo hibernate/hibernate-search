@@ -15,7 +15,7 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
@@ -219,15 +219,30 @@ public interface SearchSession {
 	Session toOrmSession();
 
 	/**
-	 * Set the {@link AutomaticIndexingSynchronizationStrategy} to use for this session.
+	 * Set the {@link org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy} to use for this session.
 	 * <p>
 	 * Behavior is undefined if called while entity changes are pending:
 	 * be sure to call this only just after creating a session,
 	 * or just after committing a transaction.
 	 *
 	 * @param synchronizationStrategy The synchronization strategy to use
-	 * @see AutomaticIndexingSynchronizationStrategy
+	 * @see org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy
+	 *
+	 * @deprecated Use {@link #indexingPlanSynchronizationStrategy(HibernateOrmIndexingPlanSynchronizationStrategy)} instead.
 	 */
-	void automaticIndexingSynchronizationStrategy(AutomaticIndexingSynchronizationStrategy synchronizationStrategy);
+	@Deprecated
+	void automaticIndexingSynchronizationStrategy(org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy synchronizationStrategy);
+
+	/**
+	 * Set the {@link HibernateOrmIndexingPlanSynchronizationStrategy} to use for this session.
+	 * <p>
+	 * Behavior is undefined if called while entity changes are pending:
+	 * be sure to call this only just after creating a session,
+	 * or just after committing a transaction.
+	 *
+	 * @param synchronizationStrategy The synchronization strategy to use
+	 * @see HibernateOrmIndexingPlanSynchronizationStrategy
+	 */
+	void indexingPlanSynchronizationStrategy(HibernateOrmIndexingPlanSynchronizationStrategy synchronizationStrategy);
 
 }

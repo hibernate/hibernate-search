@@ -21,13 +21,14 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
-import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.automaticindexing.session.impl.DelegatingAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmSelectionLoadingContext;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospector;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
@@ -42,24 +43,23 @@ import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanSessionContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.plan.synchronization.impl.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 
 /**
  * The actual implementation of {@link SearchSession}.
  */
 public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		implements SearchSession, HibernateOrmSessionContext, HibernateOrmScopeSessionContext,
-				SearchIndexingPlanSessionContext, DocumentReferenceConverter<EntityReference>,
-				AutomaticIndexingEventSendingSessionContext {
+		SearchIndexingPlanSessionContext, DocumentReferenceConverter<EntityReference>,
+		AutomaticIndexingEventSendingSessionContext {
 
 	/**
 	 * @param sessionImplementor A Hibernate session
-	 *
 	 * @return The {@link HibernateOrmSearchSession} to use within the context of the given session.
 	 */
 	public static HibernateOrmSearchSession get(HibernateOrmSearchSessionMappingContext context,
@@ -69,7 +69,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	/**
 	 * @param sessionImplementor A Hibernate session
-	 *
 	 * @return The {@link HibernateOrmSearchSession} to use within the context of the given session.
 	 */
 	public static HibernateOrmSearchSession get(HibernateOrmSearchSessionMappingContext context,
@@ -101,7 +100,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	private final SessionImplementor sessionImplementor;
 	private final HibernateOrmRuntimeIntrospector runtimeIntrospector;
 	private final ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy;
-	private ConfiguredAutomaticIndexingSynchronizationStrategy indexingPlanSynchronizationStrategy;
+	private ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> indexingPlanSynchronizationStrategy;
 
 	private SearchIndexingPlanImpl indexingPlan;
 
@@ -188,8 +187,19 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
+	@SuppressWarnings("deprecation") // need to keep OLD API still implemented
 	public void automaticIndexingSynchronizationStrategy(
-			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
+			org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
+		indexingPlanSynchronizationStrategy(
+				synchronizationStrategy instanceof DelegatingAutomaticIndexingSynchronizationStrategy ?
+						( (DelegatingAutomaticIndexingSynchronizationStrategy) synchronizationStrategy ).delegate() :
+						new HibernateOrmIndexingPlanSynchronizationStrategyAdapter( synchronizationStrategy )
+		);
+	}
+
+	@Override
+	public void indexingPlanSynchronizationStrategy(
+			HibernateOrmIndexingPlanSynchronizationStrategy synchronizationStrategy) {
 		this.indexingPlanSynchronizationStrategy =
 				automaticIndexingStrategy.configureOverriddenSynchronizationStrategy( synchronizationStrategy );
 	}
@@ -249,7 +259,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			return null;
 		}
 
-		ConfiguredAutomaticIndexingSynchronizationStrategy currentSynchronizationStrategy =
+		ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> currentSynchronizationStrategy =
 				indexingPlanSynchronizationStrategy;
 		plan = automaticIndexingStrategy.createIndexingPlan( this, currentSynchronizationStrategy );
 		holder.pojoIndexingPlan( transactionIdentifier, plan );
@@ -275,7 +285,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public ConfiguredAutomaticIndexingSynchronizationStrategy configuredAutomaticIndexingSynchronizationStrategy() {
+	public ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> configuredAutomaticIndexingSynchronizationStrategy() {
 		return indexingPlanSynchronizationStrategy;
 	}
 
