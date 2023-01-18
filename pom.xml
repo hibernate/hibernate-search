@@ -2626,6 +2626,25 @@
         </profile>
 
         <profile>
+            <id>testWithJdk21</id>
+            <activation>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>21</value>
+                </property>
+            </activation>
+            <properties>
+                <!-- We need net.bytebuddy.experimental=true to make BytecodeEnhancementIT and mockito-based tests pass -->
+                <surefire.jvm.args.java-version>
+                    -Djdk.attach.allowAttachSelf=true
+                    -Dnet.bytebuddy.experimental=true
+                </surefire.jvm.args.java-version>
+                <!-- Spring isn't ready for JDK21 yet -->
+                <failsafe.spring.skip>true</failsafe.spring.skip>
+            </properties>
+        </profile>
+
+        <profile>
             <id>compiler-eclipse</id>
             <build>
                 <pluginManagement>
