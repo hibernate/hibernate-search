@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -44,6 +45,11 @@ import com.google.gson.Gson;
 		Configuration.GENERATED_FILE_NAME
 })
 public class ConfigurationPropertyProcessor extends AbstractProcessor {
+
+	private static final Predicate<Map.Entry<String, ConfigurationProperty>> API_FILTER = entry -> HibernateSearchConfiguration.Type.API.equals(
+			entry.getValue().type() );
+	private static final Predicate<Map.Entry<String, ConfigurationProperty>> SPI_FILTER = entry -> HibernateSearchConfiguration.Type.SPI.equals(
+			entry.getValue().type() );
 
 	private ConfigurationPropertyCollector propertyCollector;
 	private String moduleArtifactId;
@@ -118,23 +124,30 @@ public class ConfigurationPropertyProcessor extends AbstractProcessor {
 	}
 
 	private void beforeExit() {
-		writeProperties( fileName + ".json", (map, w) -> new Gson().toJson( map, w ) );
-		writeProperties(
-				fileName + ".asciidoc",
-				new AsciiDocWriter(
-						moduleArtifactId,
-						moduleName,
-						entry -> HibernateSearchConfiguration.Type.API.equals( entry.getValue().type() )
-				)
-		);
-		writeProperties(
-				fileName + "-spi.asciidoc",
-				new AsciiDocWriter(
-						moduleArtifactId,
-						moduleName,
-						entry -> HibernateSearchConfiguration.Type.SPI.equals( entry.getValue().type() )
-				)
-		);
+		if ( propertyCollector.hasProperties() ) {
+			writeProperties( fileName + ".json", (map, w) -> new Gson().toJson( map, w ) );
+
+			if ( propertyCollector.hasProperties( API_FILTER ) ) {
+				writeProperties(
+						fileName + ".asciidoc",
+						new AsciiDocWriter(
+								moduleArtifactId,
+								moduleName,
+								API_FILTER
+						)
+				);
+			}
+			if ( propertyCollector.hasProperties( SPI_FILTER ) ) {
+				writeProperties(
+						fileName + "-spi.asciidoc",
+						new AsciiDocWriter(
+								moduleArtifactId,
+								moduleName,
+								SPI_FILTER
+						)
+				);
+			}
+		}
 	}
 
 	private void writeProperties(String fileName, BiConsumer<Map<String, ConfigurationProperty>, Writer> transformer) {

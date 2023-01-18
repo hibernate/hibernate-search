@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -89,6 +90,14 @@ public class ConfigurationPropertyCollector {
 
 	public Map<String, ConfigurationProperty> properties() {
 		return Collections.unmodifiableMap( properties );
+	}
+
+	public boolean hasProperties() {
+		return !properties.isEmpty();
+	}
+
+	public boolean hasProperties(Predicate<Map.Entry<String, ConfigurationProperty>> filter) {
+		return properties.entrySet().stream().anyMatch( filter );
 	}
 
 	private void processConstant(VariableElement constant, Optional<List<String>> classPrefix) {
