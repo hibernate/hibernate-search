@@ -1,10 +1,4 @@
 [[configuration-properties-aggregated]]
 = List of all available configuration properties
 
-include::../../../../target/hibernate-search-engine.asciidoc[opts=optional]
-include::../../../../target/hibernate-search-backend-lucene.asciidoc[opts=optional]
-include::../../../../target/hibernate-search-backend-elasticsearch.asciidoc[opts=optional]
-include::../../../../target/hibernate-search-backend-elasticsearch-aws.asciidoc[opts=optional]
-include::../../../../target/hibernate-search-mapper-orm.asciidoc[opts=optional]
-include::../../../../target/hibernate-search-mapper-orm-coordination-outbox-polling.asciidoc[opts=optional]
-include::../../../../target/hibernate-search-mapper-pojo-standalone.asciidoc[opts=optional]
+include::../../../../target/hibernate-search-configuration-properties-collector.asciidoc[opts=optional]
