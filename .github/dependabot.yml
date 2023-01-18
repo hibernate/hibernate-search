@@ -65,3 +65,7 @@ updates:
       # (see https://search.maven.org/artifact/software.amazon.awssdk/aws-sdk-java-pom/2.17.257/pom)
       - dependency-name: "org.slf4j:*"
         update-types: ["version-update:semver-major"]
+      # Mockito 5 requires Java 11 which is not possible with Hibernate Search 6 series.
+      # https://github.com/mockito/mockito/releases/tag/v5.0.0
+      - dependency-name: "org.mockito:*"
+        versions: ["[5.0.0,)"]
