@@ -4,15 +4,15 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.backend.work.execution.spi;
+package org.hibernate.search.backend.lucene.work.spi;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.execution.SimpleScheduledExecutor;
+import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 @Incubating
-public interface BackendWorkExecutorProvider {
+public interface LuceneWorkExecutorProvider {
 
 	SimpleScheduledExecutor writeExecutor(Context context);
 

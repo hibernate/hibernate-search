@@ -7,18 +7,15 @@
 package org.hibernate.search.backend.elasticsearch.resources.impl;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.engine.backend.work.execution.spi.BackendWorkExecutorProvider;
+import org.hibernate.search.backend.elasticsearch.work.spi.ElasticsearchWorkExecutorProvider;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
-import org.hibernate.search.engine.common.execution.SimpleScheduledExecutor;
-import org.hibernate.search.engine.common.execution.DelegatingSimpleScheduledExecutor;
-import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.common.execution.spi.DelegatingSimpleScheduledExecutor;
+import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
 
-public class ElasticsearchBackendWorkExecutorProvider implements BackendWorkExecutorProvider {
+public class DefaultElasticsearchWorkExecutorProvider implements ElasticsearchWorkExecutorProvider {
 
 	public static final String DEFAULT_BEAN_NAME = "es-built-in";
-	public static final BeanReference<? extends BackendWorkExecutorProvider> BACKEND_WORK_EXECUTOR_PROVIDER =
-			BeanReference.of( BackendWorkExecutorProvider.class, DEFAULT_BEAN_NAME );
 
 	private static final OptionalConfigurationProperty<Integer> THREAD_POOL_SIZE =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.THREAD_POOL_SIZE )
@@ -26,7 +23,7 @@ public class ElasticsearchBackendWorkExecutorProvider implements BackendWorkExec
 					.build();
 
 	@Override
-	public SimpleScheduledExecutor writeExecutor(Context context) {
+	public SimpleScheduledExecutor workExecutor(ElasticsearchWorkExecutorProvider.Context context) {
 		int threadPoolSize = THREAD_POOL_SIZE.get( context.propertySource() )
 				.orElse( Runtime.getRuntime().availableProcessors() );
 		// We use a scheduled executor so that we can also schedule client timeouts in the same thread pool.
