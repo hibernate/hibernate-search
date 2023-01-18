@@ -36,8 +36,6 @@ import com.google.gson.Gson;
 @SupportedAnnotationTypes("*")
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
 @SupportedOptions({
-		Configuration.MODULE_ARTIFACT_ID,
-		Configuration.MODULE_NAME,
 		Configuration.PROPERTY_PREFIX,
 		Configuration.JAVADOC_LINK,
 		Configuration.IGNORE_PATTERN,
@@ -52,8 +50,6 @@ public class ConfigurationPropertyProcessor extends AbstractProcessor {
 			entry.getValue().type() );
 
 	private ConfigurationPropertyCollector propertyCollector;
-	private String moduleArtifactId;
-	private String moduleName;
 	private String fileName;
 	private Optional<Pattern> ignore;
 	private final String javadocFolderName;
@@ -71,8 +67,6 @@ public class ConfigurationPropertyProcessor extends AbstractProcessor {
 	public synchronized void init(ProcessingEnvironment processingEnv) {
 		super.init( processingEnv );
 
-		this.moduleArtifactId = processingEnv.getOptions().get( Configuration.MODULE_ARTIFACT_ID );
-		this.moduleName = processingEnv.getOptions().get( Configuration.MODULE_NAME );
 		String pattern = processingEnv.getOptions().get( Configuration.IGNORE_PATTERN );
 		this.ignore = Optional.ofNullable( pattern ).map( Pattern::compile );
 		this.fileName = processingEnv.getOptions().getOrDefault( Configuration.GENERATED_FILE_NAME, "properties" );
@@ -131,8 +125,6 @@ public class ConfigurationPropertyProcessor extends AbstractProcessor {
 				writeProperties(
 						fileName + ".asciidoc",
 						new AsciiDocWriter(
-								moduleArtifactId,
-								moduleName,
 								API_FILTER
 						)
 				);
@@ -141,8 +133,6 @@ public class ConfigurationPropertyProcessor extends AbstractProcessor {
 				writeProperties(
 						fileName + "-spi.asciidoc",
 						new AsciiDocWriter(
-								moduleArtifactId,
-								moduleName,
 								SPI_FILTER
 						)
 				);

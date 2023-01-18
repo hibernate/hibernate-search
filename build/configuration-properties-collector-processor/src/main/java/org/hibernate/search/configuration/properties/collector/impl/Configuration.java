@@ -23,14 +23,6 @@ public final class Configuration {
 	 */
 	public static final String PROPERTY_PREFIX = HIBERNATE_SEARCH_CPCAP_PREFIX + "property.prefix";
 	/**
-	 * Use to define an anchor for generated asciidoc properties list.
-	 */
-	public static final String MODULE_ARTIFACT_ID = HIBERNATE_SEARCH_CPCAP_PREFIX + "module.artifact.id";
-	/**
-	 * Use to define a list title for generated asciidoc properties list.
-	 */
-	public static final String MODULE_NAME = HIBERNATE_SEARCH_CPCAP_PREFIX + "module.name";
-	/**
 	 * Use to define a base URL for Hibernate Search Javadoc. As we are getting parts of Javadoc links in it should
 	 * be adjusted to point to somewhere where the docs actually live.
 	 */

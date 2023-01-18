@@ -71,14 +71,16 @@ public class ConfigurationPropertyCollector {
 		if ( !processedTypes.contains( qualifiedName ) ) {
 			processedTypes.add( qualifiedName );
 
-			Optional<List<String>> classPrefix = findAnnotation( element, HibernateSearchConfiguration.class )
-					.flatMap(
-							a -> a.multiAttribute( "prefix", String.class )
-					);
+			Optional<AnnotationUtils.AnnotationAttributeHolder> annotation = findAnnotation(
+					element, HibernateSearchConfiguration.class );
+			Optional<List<String>> classPrefix = annotation
+					.flatMap( a -> a.multiAttribute( "prefix", String.class ) );
+			Optional<String> title = annotation.flatMap( a -> a.attribute( "title", String.class ) );
+			Optional<String> anchorPrefix = annotation.flatMap( a -> a.attribute( "anchorPrefix", String.class ) );
 
 			for ( Element inner : elementUtils.getAllMembers( element ) ) {
 				if ( inner.getKind().equals( ElementKind.FIELD ) && inner instanceof VariableElement ) {
-					processConstant( ( (VariableElement) inner ), classPrefix );
+					processConstant( ( (VariableElement) inner ), classPrefix, title, anchorPrefix );
 				}
 			}
 		}
@@ -100,11 +102,15 @@ public class ConfigurationPropertyCollector {
 		return properties.entrySet().stream().anyMatch( filter );
 	}
 
-	private void processConstant(VariableElement constant, Optional<List<String>> classPrefix) {
+	private void processConstant(VariableElement constant, Optional<List<String>> classPrefix, Optional<String> classTitle,
+			Optional<String> classAnchorPrefix) {
 		Optional<AnnotationUtils.AnnotationAttributeHolder> annotation = findAnnotation( constant, HibernateSearchConfiguration.class );
 		if ( annotation.flatMap( a -> a.attribute( "ignore", Boolean.class ) ).orElse( false ) ) {
 			return;
 		}
+
+		Optional<String> title = annotation.flatMap( a -> a.attribute( "title", String.class ) );
+		Optional<String> anchorPrefix = annotation.flatMap( a -> a.attribute( "anchorPrefix", String.class ) );
 
 		ConfigurationProperty.Key key = extractKey(
 				constant,
@@ -124,6 +130,8 @@ public class ConfigurationPropertyCollector {
 							.sourceClass( constant.getEnclosingElement().toString() )
 							.type( extractType( constant ) )
 							.defaultValue( value )
+							.withModuleName( title.orElse( classTitle.orElse( "Unknown" ) ) )
+							.withAnchorPrefix( anchorPrefix.orElse( classAnchorPrefix.orElse( "" ) ) )
 			);
 		}
 	}

@@ -15,11 +15,16 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigur
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
+@HibernateSearchConfiguration(
+		title = "Hibernate Search ORM Integration",
+		anchorPrefix = "hibernate-search-mapper-orm-"
+)
 public final class HibernateOrmMapperSettings {
 
 	private HibernateOrmMapperSettings() {

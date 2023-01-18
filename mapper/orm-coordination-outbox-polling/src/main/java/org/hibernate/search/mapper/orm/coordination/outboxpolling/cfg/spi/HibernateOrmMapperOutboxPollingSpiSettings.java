@@ -11,11 +11,16 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateO
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalJaxbMappingProducer;
 import org.hibernate.search.util.common.annotation.Incubating;
+import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
 /**
  * SPI-related settings.
  */
 @Incubating
+@HibernateSearchConfiguration(
+		title = "Hibernate Search ORM Integration - Coordination - Outbox Polling",
+		anchorPrefix = "hibernate-search-mapper-orm-coordination-outbox-polling-"
+)
 public final class HibernateOrmMapperOutboxPollingSpiSettings {
 
 	private HibernateOrmMapperOutboxPollingSpiSettings() {

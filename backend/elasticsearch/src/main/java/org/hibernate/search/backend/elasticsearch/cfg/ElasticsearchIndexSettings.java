@@ -17,12 +17,16 @@ import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
  * Constants in this class are to be appended to a prefix to form a property key;
  * see {@link org.hibernate.search.engine.cfg.IndexSettings} for details.
  */
-@HibernateSearchConfiguration(prefix = {
-		"hibernate.search.backend.",
-		"hibernate.search.backend.index.<index name>.",
-		"hibernate.search.backends.<backend name>.",
-		"hibernate.search.backends.<backend name>.index.<index name>."
-})
+@HibernateSearchConfiguration(
+		prefix = {
+				"hibernate.search.backend.",
+				"hibernate.search.backend.index.<index name>.",
+				"hibernate.search.backends.<backend name>.",
+				"hibernate.search.backends.<backend name>.index.<index name>."
+		},
+		title = "Hibernate Search Backend - Elasticsearch",
+		anchorPrefix = "hibernate-search-backend-elasticsearch-"
+)
 public final class ElasticsearchIndexSettings {
 
 	private ElasticsearchIndexSettings() {

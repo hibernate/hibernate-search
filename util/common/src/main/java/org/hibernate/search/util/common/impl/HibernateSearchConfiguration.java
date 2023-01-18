@@ -44,4 +44,13 @@ public @interface HibernateSearchConfiguration {
 	 */
 	String[] prefix() default "";
 
+	/**
+	 * Used to group properties in sections and as a title of that grouped section.
+	 */
+	String title() default "";
+
+	/**
+	 * Used as part of generated anchor links to provide uniqueness.
+	 */
+	String anchorPrefix() default "";
 }
