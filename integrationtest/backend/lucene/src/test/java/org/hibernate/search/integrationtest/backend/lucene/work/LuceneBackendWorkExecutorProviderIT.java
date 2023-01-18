@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.tck.work;
+package org.hibernate.search.integrationtest.backend.lucene.work;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -12,11 +12,11 @@ import static org.mockito.Mockito.when;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import org.hibernate.search.backend.lucene.cfg.spi.LuceneBackendSpiSettings;
+import org.hibernate.search.backend.lucene.work.spi.LuceneWorkExecutorProvider;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.BackendWorkExecutorProvider;
-import org.hibernate.search.engine.cfg.spi.BackendSpiSettings;
-import org.hibernate.search.engine.common.execution.DelegatingSimpleScheduledExecutor;
+import org.hibernate.search.engine.common.execution.spi.DelegatingSimpleScheduledExecutor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
@@ -28,13 +28,13 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
-public class BackendWorkExecutorProviderIT {
+public class LuceneBackendWorkExecutorProviderIT {
 
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	@Mock
-	private BackendWorkExecutorProvider backendWorkExecutorProvider;
+	private LuceneWorkExecutorProvider backendWorkExecutorProvider;
 
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -48,7 +48,7 @@ public class BackendWorkExecutorProviderIT {
 		);
 		setupHelper.start()
 				.withIndex( index )
-				.withBackendProperty( BackendSpiSettings.Radicals.BACKEND_WORK_EXECUTOR_PROVIDER, backendWorkExecutorProvider )
+				.withBackendProperty( LuceneBackendSpiSettings.Radicals.BACKEND_WORK_EXECUTOR_PROVIDER, backendWorkExecutorProvider )
 				.setup();
 
 		verify( backendWorkExecutorProvider ).writeExecutor( any() );

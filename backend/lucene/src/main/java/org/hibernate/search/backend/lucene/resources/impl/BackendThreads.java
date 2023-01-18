@@ -6,11 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.resources.impl;
 
-import org.hibernate.search.engine.backend.work.execution.spi.BackendWorkExecutorProvider;
+import org.hibernate.search.backend.lucene.cfg.spi.LuceneBackendSpiSettings;
+import org.hibernate.search.backend.lucene.work.spi.LuceneWorkExecutorProvider;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.BackendSpiSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.common.execution.SimpleScheduledExecutor;
+import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
@@ -20,10 +21,10 @@ import org.hibernate.search.util.common.impl.Closer;
 
 public class BackendThreads {
 
-	private static final ConfigurationProperty<BeanReference<? extends BackendWorkExecutorProvider>> BACKEND_WORK_EXECUTOR_PROVIDER =
-			ConfigurationProperty.forKey( BackendSpiSettings.Radicals.BACKEND_WORK_EXECUTOR_PROVIDER )
-					.asBeanReference( BackendWorkExecutorProvider.class )
-					.withDefault( LuceneBackendWorkExecutorProvider.BACKEND_WORK_EXECUTOR_PROVIDER )
+	private static final ConfigurationProperty<BeanReference<? extends LuceneWorkExecutorProvider>> BACKEND_WORK_EXECUTOR_PROVIDER =
+			ConfigurationProperty.forKey( LuceneBackendSpiSettings.Radicals.BACKEND_WORK_EXECUTOR_PROVIDER )
+					.asBeanReference( LuceneWorkExecutorProvider.class )
+					.withDefault( LuceneBackendSpiSettings.Defaults.BACKEND_WORK_EXECUTOR_PROVIDER )
 					.build();
 	private final String prefix;
 
@@ -42,24 +43,25 @@ public class BackendThreads {
 		this.threadPoolProvider = threadPoolProvider;
 
 
-		BackendWorkExecutorProvider provider = BACKEND_WORK_EXECUTOR_PROVIDER.getAndTransform(
-				propertySource, beanResolver::resolve ).get();
-		this.writeExecutor = provider.writeExecutor( new BackendWorkExecutorProvider.Context() {
-			@Override
-			public ThreadPoolProvider threadPoolProvider() {
-				return threadPoolProvider;
-			}
+		try ( BeanHolder<? extends LuceneWorkExecutorProvider> provider = BACKEND_WORK_EXECUTOR_PROVIDER.getAndTransform(
+				propertySource, beanResolver::resolve ) ) {
+			this.writeExecutor = provider.get().writeExecutor( new LuceneWorkExecutorProvider.Context() {
+				@Override
+				public ThreadPoolProvider threadPoolProvider() {
+					return threadPoolProvider;
+				}
 
-			@Override
-			public ConfigurationPropertySource propertySource() {
-				return propertySource;
-			}
+				@Override
+				public ConfigurationPropertySource propertySource() {
+					return propertySource;
+				}
 
-			@Override
-			public String recommendedThreadNamePrefix() {
-				return prefix + " - Worker thread";
-			}
-		} );
+				@Override
+				public String recommendedThreadNamePrefix() {
+					return prefix + " - Worker thread";
+				}
+			} );
+		}
 	}
 
 	public void onStop() {

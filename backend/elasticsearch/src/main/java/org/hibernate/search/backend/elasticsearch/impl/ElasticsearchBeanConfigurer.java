@@ -10,9 +10,9 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.NoAliasIndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.SimpleIndexLayoutStrategy;
-import org.hibernate.search.backend.elasticsearch.resources.impl.ElasticsearchBackendWorkExecutorProvider;
+import org.hibernate.search.backend.elasticsearch.resources.impl.DefaultElasticsearchWorkExecutorProvider;
+import org.hibernate.search.backend.elasticsearch.work.spi.ElasticsearchWorkExecutorProvider;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
-import org.hibernate.search.engine.backend.work.execution.spi.BackendWorkExecutorProvider;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
@@ -33,8 +33,8 @@ public class ElasticsearchBeanConfigurer implements BeanConfigurer {
 				beanResolver -> BeanHolder.of( new NoAliasIndexLayoutStrategy() )
 		);
 		context.define(
-				BackendWorkExecutorProvider.class, ElasticsearchBackendWorkExecutorProvider.DEFAULT_BEAN_NAME,
-				beanResolver -> BeanHolder.of( new ElasticsearchBackendWorkExecutorProvider() )
+				ElasticsearchWorkExecutorProvider.class, DefaultElasticsearchWorkExecutorProvider.DEFAULT_BEAN_NAME,
+				beanResolver -> BeanHolder.of( new DefaultElasticsearchWorkExecutorProvider() )
 		);
 	}
 }
