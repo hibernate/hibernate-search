@@ -246,7 +246,6 @@
                             </annotationProcessors>
                             <compilerArgs>
                                 <arg>-Aorg.hibernate.search.cpcap.javadoc.link=${javadoc.org.hibernate.search.url}</arg>
-                                <arg>-Aorg.hibernate.search.cpcap.module.name=${project.name}</arg>
                                 <arg>-Aorg.hibernate.search.cpcap.ignore.pattern=.*\.impl\..*</arg>
                                 <arg>-Aorg.hibernate.search.cpcap.generated.filename=${project.artifactId}</arg>
                             </compilerArgs>

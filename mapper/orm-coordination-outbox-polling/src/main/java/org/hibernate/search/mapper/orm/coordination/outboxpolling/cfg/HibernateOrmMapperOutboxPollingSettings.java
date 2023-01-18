@@ -16,6 +16,10 @@ import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
 @Incubating
+@HibernateSearchConfiguration(
+		title = "Hibernate Search ORM Integration - Coordination - Outbox Polling",
+		anchorPrefix = "hibernate-search-mapper-orm-coordination-outbox-polling-"
+)
 public final class HibernateOrmMapperOutboxPollingSettings {
 
 	private HibernateOrmMapperOutboxPollingSettings() {

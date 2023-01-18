@@ -7,7 +7,12 @@
 package org.hibernate.search.mapper.orm.cfg.spi;
 
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
+@HibernateSearchConfiguration(
+		title = "Hibernate Search ORM Integration",
+		anchorPrefix = "hibernate-search-mapper-orm-"
+)
 public final class HibernateOrmMapperSpiSettings {
 
 	private HibernateOrmMapperSpiSettings() {

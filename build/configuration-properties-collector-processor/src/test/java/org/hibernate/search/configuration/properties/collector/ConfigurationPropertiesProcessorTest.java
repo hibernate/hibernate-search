@@ -55,7 +55,6 @@ public class ConfigurationPropertiesProcessorTest {
 	@Test
 	public void process() {
 		compile(
-				Optional.of( "Test module name" ),
 				Optional.of( "hibernate.search." ),
 				source( SampleConfigAnnotatedSettings.class ),
 				source( SampleConfigNotAnnotatedSettings.class ),
@@ -97,7 +96,7 @@ public class ConfigurationPropertiesProcessorTest {
 				.resolve( klass.getName().replace( ".", File.separator ) + ".java" );
 	}
 
-	public boolean compile(Optional<String> moduleName, Optional<String> prefix, Path... sourceFiles) {
+	public boolean compile(Optional<String> prefix, Path... sourceFiles) {
 		StandardJavaFileManager fileManager = compiler.getStandardFileManager( null, null, null );
 		Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjects( sourceFiles );
 
@@ -113,14 +112,6 @@ public class ConfigurationPropertiesProcessorTest {
 		}
 
 		List<String> options = new ArrayList<>();
-		moduleName.ifPresent( name -> options.add(
-				String.format(
-						Locale.ROOT,
-						"-A%s=%s",
-						Configuration.MODULE_NAME,
-						name
-				)
-		) );
 		prefix.ifPresent( p -> options.add(
 				String.format(
 						Locale.ROOT,

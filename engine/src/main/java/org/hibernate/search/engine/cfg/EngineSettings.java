@@ -14,6 +14,10 @@ import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 /**
  * Configuration properties for the Hibernate Search engine.
  */
+@HibernateSearchConfiguration(
+		title = "Hibernate Search Engine",
+		anchorPrefix = "hibernate-search-engine-"
+)
 public final class EngineSettings {
 
 	private EngineSettings() {

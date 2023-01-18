@@ -19,9 +19,11 @@ import org.apache.lucene.util.Version;
  * Constants in this class are to be appended to a prefix to form a property key;
  * see {@link org.hibernate.search.engine.cfg.BackendSettings} for details.
  */
-@HibernateSearchConfiguration(prefix = {
-		"hibernate.search.backend.", "hibernate.search.backends.<backend name>."
-})
+@HibernateSearchConfiguration(
+		prefix = { "hibernate.search.backend.", "hibernate.search.backends.<backend name>." },
+		title = "Hibernate Search Backend - Lucene",
+		anchorPrefix = "hibernate-search-backend-lucene-"
+)
 public final class LuceneBackendSettings {
 
 	private LuceneBackendSettings() {

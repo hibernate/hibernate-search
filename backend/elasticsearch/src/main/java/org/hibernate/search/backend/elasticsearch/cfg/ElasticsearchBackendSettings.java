@@ -28,9 +28,11 @@ import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
  *
  * @author Gunnar Morling
  */
-@HibernateSearchConfiguration(prefix = {
-		"hibernate.search.backend.", "hibernate.search.backends.<backend name>."
-})
+@HibernateSearchConfiguration(
+		prefix = { "hibernate.search.backend.", "hibernate.search.backends.<backend name>." },
+		title = "Hibernate Search Backend - Elasticsearch",
+		anchorPrefix = "hibernate-search-backend-elasticsearch-"
+)
 public final class ElasticsearchBackendSettings {
 
 	private ElasticsearchBackendSettings() {

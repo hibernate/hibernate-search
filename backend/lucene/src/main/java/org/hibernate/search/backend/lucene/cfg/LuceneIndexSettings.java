@@ -26,12 +26,16 @@ import org.apache.lucene.util.InfoStream;
  * Constants in this class are to be appended to a prefix to form a property key;
  * see {@link org.hibernate.search.engine.cfg.IndexSettings} for details.
  */
-@HibernateSearchConfiguration(prefix = {
-		"hibernate.search.backend.",
-		"hibernate.search.backend.index.<index name>.",
-		"hibernate.search.backends.<backend name>.",
-		"hibernate.search.backends.<backend name>.index.<index name>."
-})
+@HibernateSearchConfiguration(
+		prefix = {
+				"hibernate.search.backend.",
+				"hibernate.search.backend.index.<index name>.",
+				"hibernate.search.backends.<backend name>.",
+				"hibernate.search.backends.<backend name>.index.<index name>."
+		},
+		title = "Hibernate Search Backend - Lucene",
+		anchorPrefix = "hibernate-search-backend-lucene-"
+)
 public final class LuceneIndexSettings {
 
 	private LuceneIndexSettings() {
@@ -361,7 +365,6 @@ public final class LuceneIndexSettings {
 	 *
 	 * @param shardId The identifier of the shard to configure.
 	 * @param radical The radical of the configuration property (see constants in this class).
-	 *
 	 * @return the concatenated shard settings key
 	 */
 	public static String shardKey(String shardId, String radical) {
@@ -379,7 +382,6 @@ public final class LuceneIndexSettings {
 	 * @param indexName The name of the index in which the shard to configure is located.
 	 * @param shardId The identifier of the shard to configure.
 	 * @param radical The radical of the configuration property (see constants in this class).
-	 *
 	 * @return the concatenated shard settings key
 	 */
 	public static String shardKey(String indexName, String shardId, String radical) {
@@ -387,7 +389,8 @@ public final class LuceneIndexSettings {
 			return shardKey( shardId, radical );
 		}
 		return join( ".", EngineSettings.BACKEND, BackendSettings.INDEXES, indexName,
-				SHARDS, shardId, radical );
+				SHARDS, shardId, radical
+		);
 	}
 
 	/**
@@ -402,7 +405,6 @@ public final class LuceneIndexSettings {
 	 * @param indexName The name of the index in which the shard to configure is located.
 	 * @param shardId The identifier of the shard to configure.
 	 * @param radical The radical of the configuration property (see constants in this class).
-	 *
 	 * @return the concatenated shard settings key
 	 */
 	public static String shardKey(String backendName, String indexName, String shardId, String radical) {
@@ -413,7 +415,8 @@ public final class LuceneIndexSettings {
 			return join( ".", EngineSettings.BACKENDS, backendName, SHARDS, shardId, radical );
 		}
 		return join( ".", EngineSettings.BACKENDS, backendName, BackendSettings.INDEXES, indexName,
-				SHARDS, shardId, radical );
+				SHARDS, shardId, radical
+		);
 	}
 
 	/**

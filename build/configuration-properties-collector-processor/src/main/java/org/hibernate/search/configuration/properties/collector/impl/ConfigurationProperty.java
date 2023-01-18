@@ -8,14 +8,18 @@ package org.hibernate.search.configuration.properties.collector.impl;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
-public class ConfigurationProperty {
+public class ConfigurationProperty implements Comparable<ConfigurationProperty> {
 
+	private static final Comparator<ConfigurationProperty> CONFIGURATION_PROPERTY_COMPARATOR = Comparator.comparing(
+			c -> c.key().key );
 	private Key key;
 	private String javadoc;
 	private String sourceClass;
@@ -23,6 +27,9 @@ public class ConfigurationProperty {
 	private HibernateSearchConfiguration.Type type;
 
 	private Object defaultValue;
+
+	private String anchorPrefix;
+	private String moduleName;
 
 	public Key key() {
 		return key;
@@ -69,6 +76,24 @@ public class ConfigurationProperty {
 		return this;
 	}
 
+	public String anchorPrefix() {
+		return anchorPrefix;
+	}
+
+	public ConfigurationProperty withAnchorPrefix(String anchorPrefix) {
+		this.anchorPrefix = anchorPrefix.replaceAll( "[^\\w-.]", "_" );
+		return this;
+	}
+
+	public String moduleName() {
+		return moduleName;
+	}
+
+	public ConfigurationProperty withModuleName(String moduleName) {
+		this.moduleName = moduleName;
+		return this;
+	}
+
 	@Override
 	public String toString() {
 		return "ConfigurationProperty{" +
@@ -77,7 +102,37 @@ public class ConfigurationProperty {
 				", sourceClass='" + sourceClass + '\'' +
 				", type='" + type + '\'' +
 				", default='" + defaultValue + '\'' +
+				", anchorPrefix='" + anchorPrefix + '\'' +
+				", moduleName='" + moduleName + '\'' +
 				'}';
+	}
+
+	@Override
+	public int compareTo(ConfigurationProperty o) {
+		return CONFIGURATION_PROPERTY_COMPARATOR.compare( this, o );
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+		ConfigurationProperty that = (ConfigurationProperty) o;
+		return Objects.equals( key, that.key ) &&
+				Objects.equals( javadoc, that.javadoc ) &&
+				Objects.equals( sourceClass, that.sourceClass ) &&
+				type == that.type &&
+				Objects.equals( defaultValue, that.defaultValue ) &&
+				Objects.equals( anchorPrefix, that.anchorPrefix ) &&
+				Objects.equals( moduleName, that.moduleName );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( key, javadoc, sourceClass, type, defaultValue, anchorPrefix, moduleName );
 	}
 
 	public static class Key {

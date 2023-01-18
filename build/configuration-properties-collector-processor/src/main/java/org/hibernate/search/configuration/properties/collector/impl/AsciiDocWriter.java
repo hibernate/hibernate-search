@@ -9,69 +9,78 @@ package org.hibernate.search.configuration.properties.collector.impl;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class AsciiDocWriter implements BiConsumer<Map<String, ConfigurationProperty>, Writer> {
 
-	private final Optional<String> moduleArtifactId;
-	private final Optional<String> moduleName;
 	private final Predicate<Map.Entry<String, ConfigurationProperty>> filter;
 
-	public AsciiDocWriter(String moduleArtifactId, String moduleName, Predicate<Map.Entry<String, ConfigurationProperty>> filter) {
-		this.moduleArtifactId = Optional.ofNullable( moduleArtifactId );
-		this.moduleName = Optional.ofNullable( moduleName );
+	public AsciiDocWriter(Predicate<Map.Entry<String, ConfigurationProperty>> filter) {
 		this.filter = filter;
 	}
 
 	@Override
 	public void accept(Map<String, ConfigurationProperty> propertyMap, Writer writer) {
-		List<Map.Entry<String, ConfigurationProperty>> entries = propertyMap.entrySet().stream()
+		Map<String, Collection<ConfigurationProperty>> groups = propertyMap.entrySet().stream()
 				.filter( filter )
-				.collect( Collectors.toList() );
-		if ( entries.isEmpty() ) {
+				.map( Map.Entry::getValue )
+				.collect(
+						Collectors.groupingBy(
+								ConfigurationProperty::moduleName,
+								TreeMap::new,
+								Collectors.toCollection( TreeSet::new )
+						)
+				);
+
+		if ( groups.isEmpty() ) {
 			// nothing to write - return fast.
 			return;
 		}
+
 		try {
-			moduleArtifactId.ifPresent( id -> tryToWriteLine( writer, "[[configuration-properties-aggregated-", id, "]]" ) );
-			moduleName.ifPresent( name -> tryToWriteLine( writer, "== ", name ) );
-			writer.write( '\n' );
-			for ( Map.Entry<String, ConfigurationProperty> entry : entries ) {
-				Iterator<String> keys = entry.getValue().key().resolvedKeys().iterator();
-				String firstKey = keys.next();
-				writer.write( "[[" );
-				writer.write( "configuration-properties-aggregated-" );
-				writer.write( firstKey.replaceAll( "[^\\w-.]", "_" ) );
-				writer.write( "]] " );
-
-				writer.write( '`' );
-				writer.write( firstKey );
-				writer.write( '`' );
-				writer.write( "::\n" );
-
-				// using inline passthrough for javadocs to not render HTML.
-				writer.write( "+++ " );
-				writer.write( entry.getValue().javadoc() );
-				writer.write( " +++ " );
-
-				String defaultValue = Objects.toString( entry.getValue().defaultValue(), "" );
-				if ( !defaultValue.isBlank() ) {
-					writer.write( "\n+\n" );
-					writer.write( "Default value: `" );
-					writer.write( defaultValue );
-					writer.write( '`' );
-				}
-
+			for ( Map.Entry<String, Collection<ConfigurationProperty>> entry : groups.entrySet() ) {
+				tryToWriteLine( writer, "[[configuration-properties-aggregated-", entry.getValue().iterator().next().anchorPrefix(), "]]" );
+				tryToWriteLine( writer, "== ", entry.getKey() );
 				writer.write( '\n' );
+				for ( ConfigurationProperty el : entry.getValue() ) {
+					Iterator<String> keys = el.key().resolvedKeys().iterator();
+					String firstKey = keys.next();
+					writer.write( "[[" );
+					writer.write( "configuration-properties-aggregated-" );
+					writer.write( el.anchorPrefix() );
+					writer.write( firstKey.replaceAll( "[^\\w-.]", "_" ) );
+					writer.write( "]] " );
 
-				printOtherKeyVariants( writer, keys );
+					writer.write( '`' );
+					writer.write( firstKey );
+					writer.write( '`' );
+					writer.write( "::\n" );
+
+					// using inline passthrough for javadocs to not render HTML.
+					writer.write( "+++ " );
+					writer.write( el.javadoc() );
+					writer.write( " +++ " );
+
+					String defaultValue = Objects.toString( el.defaultValue(), "" );
+					if ( !defaultValue.isBlank() ) {
+						writer.write( "\n+\n" );
+						writer.write( "Default value: `" );
+						writer.write( defaultValue );
+						writer.write( '`' );
+					}
+
+					writer.write( '\n' );
+
+					printOtherKeyVariants( writer, keys );
+				}
 			}
 			writer.write( '\n' );
 		}

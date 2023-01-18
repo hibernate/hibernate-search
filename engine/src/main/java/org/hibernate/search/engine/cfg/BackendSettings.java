@@ -33,7 +33,11 @@ public final class BackendSettings {
 	 * <p>
 	 * No default: this property must be set.
 	 */
-	@HibernateSearchConfiguration(prefix = EngineSettings.BACKEND + ".")
+	@HibernateSearchConfiguration(
+			prefix = EngineSettings.BACKEND + ".",
+			title = "Hibernate Search Engine",
+			anchorPrefix = "hibernate-search-engine-"
+	)
 	public static final String TYPE = "type";
 
 	/**
