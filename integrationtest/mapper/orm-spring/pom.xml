@@ -13,6 +13,7 @@
     <description>Hibernate Search integration tests for the Hibernate ORM integration with Spring</description>
 
     <properties>
+        <test.database.run.skip>false</test.database.run.skip>
         <!--
             Remove Hibernate system properties from parent settings:
             They are supposed to be handled by the spring.datasource subsystem
