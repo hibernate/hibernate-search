@@ -64,14 +64,18 @@ public final class HibernateOrmMappingConfigurationContributor implements PojoMa
 					HibernateOrmUtils.sortedNonSyntheticProperties( persistentClass.getPropertyIterator() );
 
 			Property identifierProperty = persistentClass.getIdentifierProperty();
-			Optional<String> identifierPropertyNameOptional =
-					Optional.ofNullable( identifierProperty ).map( Property::getName );
+			Optional<Property> identifierPropertyOptional = Optional.ofNullable( identifierProperty );
+
+			// include ID in the properties list for additional metadata contribution.
+			// as the list of properties is supposed to be sorted, we put id as the first element.
+			identifierPropertyOptional.ifPresent( identifier -> properties.add( 0, identifier ) );
+
 			configurationCollector.collectContributor(
 					typeModel,
 					new ErrorCollectingPojoTypeMetadataContributor()
 							// Ensure entities are declared as such
 							.add( new HibernateOrmEntityTypeMetadataContributor(
-									typeModel, persistentClass, identifierPropertyNameOptional
+									typeModel, persistentClass, identifierPropertyOptional.map( Property::getName )
 							) )
 							// Ensure Hibernate ORM metadata about properties is translated into Hibernate Search metadata
 							.add( new HibernateOrmMappingPropertiesMetadataContributor(
