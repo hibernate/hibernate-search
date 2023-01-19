@@ -222,5 +222,76 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- =============================== -->
+        <!-- Database profiles               -->
+        <!-- =============================== -->
+        <profile>
+            <id>h2</id>
+            <activation>
+                <property>
+                    <name>inMemoryTests</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <properties>
+                <db.dialect>org.hibernate.dialect.H2Dialect</db.dialect>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>ci-postgresql</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.PostgreSQLDialect</db.dialect>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>ci-mariadb</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.MariaDBDialect</db.dialect>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>ci-mysql</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.MySQLDialect</db.dialect>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>ci-db2</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.DBDialect</db.dialect>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>ci-oracle</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.OracleDialect</db.dialect>
+            </properties>
+        </profile>
+
+        <!-- SQL Server Docker container for tests -->
+        <!-- See test.database.run.mssql.image.tag for the server version in use -->
+        <profile>
+            <id>ci-mssql</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.SQLServerDialect</db.dialect>
+            </properties>
+        </profile>
+
+        <!-- CockroachDB Docker container for tests -->
+        <!-- See test.database.run.cockroachdb.image.tag for the server version in use -->
+        <profile>
+            <id>ci-cockroachdb</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.CockroachDBDialect</db.dialect>
+            </properties>
+        </profile>
+    </profiles>
 </project>
 
