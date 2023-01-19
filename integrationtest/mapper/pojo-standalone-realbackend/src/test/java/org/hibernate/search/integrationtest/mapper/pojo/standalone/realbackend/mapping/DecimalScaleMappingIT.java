@@ -4,20 +4,18 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.realbackend.mapping;
+package org.hibernate.search.integrationtest.mapper.pojo.standalone.realbackend.mapping;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
+import java.lang.invoke.MethodHandles;
 import java.math.BigInteger;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 
-import org.hibernate.search.integrationtest.mapper.orm.realbackend.testsupport.BackendConfigurations;
+import org.hibernate.search.integrationtest.mapper.pojo.standalone.realbackend.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,7 +23,8 @@ import org.junit.Test;
 public class DecimalScaleMappingIT {
 
 	@Rule
-	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
+	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withSingleBackend(
+			MethodHandles.lookup(), BackendConfigurations.simple() );
 
 	@Test
 	public void testFailingWithHint() {
@@ -39,11 +38,8 @@ public class DecimalScaleMappingIT {
 				);
 	}
 
-	@Entity(name = "failing")
 	@Indexed
 	public static class FailingEntity {
-		@Id
-		@Column(name = "id", nullable = false, precision = 18)
 		@GenericField
 		private BigInteger id;
 
