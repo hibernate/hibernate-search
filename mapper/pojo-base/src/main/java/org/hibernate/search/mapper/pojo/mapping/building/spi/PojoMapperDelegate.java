@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
 import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
+import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
@@ -25,6 +26,11 @@ public interface PojoMapperDelegate<MPBS> extends BackendMapperContext {
 	 * When this method is called, it is guaranteed to be the last call on this object.
 	 */
 	void closeOnFailure();
+
+	@Override
+	default BackendMappingHints hints() {
+		return BackendMappingHints.NONE;
+	}
 
 	/**
 	 * @param <E> The indexed entity type.
