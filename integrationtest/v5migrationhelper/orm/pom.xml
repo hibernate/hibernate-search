@@ -24,6 +24,8 @@
         <jqassistant.skip>true</jqassistant.skip>
         <forbiddenapis.skip>true</forbiddenapis.skip>
         <sonar.skip>true</sonar.skip>
+
+        <test.database.run.skip>false</test.database.run.skip>
     </properties>
 
     <dependencies>
@@ -104,6 +106,11 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

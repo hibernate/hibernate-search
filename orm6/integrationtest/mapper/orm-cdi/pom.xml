@@ -15,6 +15,7 @@
     <properties>
         <transform.original.pathFromRoot>integrationtest/mapper/orm-cdi</transform.original.pathFromRoot>
 
+        <test.database.run.skip>false</test.database.run.skip>
         <surefire.jvm.args.module>
             ${test.weld.jvm.args}
         </surefire.jvm.args.module>
@@ -71,6 +72,11 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
