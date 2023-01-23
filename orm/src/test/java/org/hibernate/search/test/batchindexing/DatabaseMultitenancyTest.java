@@ -170,7 +170,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 				.containsExactlyInAnyOrder( GEOCHRON_MODELS );
 
 		Clock newMetamec;
-		try (Session session = openSessionWithTenantId( METAMEC_TID )) {
+		try ( Session session = openSessionWithTenantId( METAMEC_TID ) ) {
 			session.beginTransaction();
 			newMetamec = session.get( Clock.class, METAMEC_MODELS[0].getId() );
 			newMetamec.setBrand( newMetamec.getBrand() + " foo" );
@@ -190,7 +190,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		assertThat( searchAll( GEOCHRON_TID ) )
 				.containsExactlyInAnyOrder( GEOCHRON_MODELS );
 
-		try (Session session = openSessionWithTenantId( METAMEC_TID )) {
+		try ( Session session = openSessionWithTenantId( METAMEC_TID ) ) {
 			session.beginTransaction();
 			Clock metamec = session.get( Clock.class, METAMEC_MODELS[0].getId() );
 			session.delete( metamec );
