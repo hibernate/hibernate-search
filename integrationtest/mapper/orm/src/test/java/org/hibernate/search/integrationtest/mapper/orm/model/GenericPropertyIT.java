@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.model;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.io.Serializable;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import jakarta.persistence.Basic;
@@ -18,6 +19,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -130,6 +132,7 @@ public class GenericPropertyIT {
 
 		@Basic
 		@GenericField
+		@JdbcTypeCode(Types.VARBINARY)
 		private T[] arrayContent;
 
 		@OneToMany(mappedBy = "genericProperty")
