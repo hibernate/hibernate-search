@@ -27,14 +27,17 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.util.logging.impl.Log;
 
 /**
- * Extension of <code>DeleteLuceneWork</code> that will always perform the
- * delete LuceneWork in an optimal way, since the underlying data store guarantee
- * uniqueness of terms across different entity types.
+ * Extension of {@link DeleteWorkExecutor}
+ * that applies the index delete operation using the Lucene operation
+ * {@link org.apache.lucene.index.IndexWriter#deleteDocuments(Term...)} when possible.
+ * <p>
+ * This is the most efficient way to delete from the index, but the underlying store
+ * must guarantee that the term is unique across documents and entity types.
  *
  * @author gustavonalle
  * @see DeleteWorkExecutor
  */
-public final class ByTermDeleteWorkExecutor extends DeleteWorkExecutor {
+public class ByTermDeleteWorkExecutor extends DeleteWorkExecutor {
 
 	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
@@ -45,16 +48,20 @@ public final class ByTermDeleteWorkExecutor extends DeleteWorkExecutor {
 	@Override
 	public void performWork(LuceneWork work, IndexWriterDelegate delegate, IndexingMonitor monitor) {
 		final IndexedTypeIdentifier managedType = work.getEntityType();
-		final String tenantId = work.getTenantId();
 		DocumentBuilderIndexedEntity builder = workspace.getDocumentBuilder( managedType );
+		doPerformWork( work, delegate, managedType, builder, isIdNumeric( builder ) );
+	}
+	protected void doPerformWork(LuceneWork work, IndexWriterDelegate delegate,
+			IndexedTypeIdentifier managedType, DocumentBuilderIndexedEntity builder, boolean isIdNumeric) {
+		final String tenantId = work.getTenantId();
 		Serializable id = work.getId();
 		log.tracef( "Removing %s#%s by id using an IndexWriter.", managedType, id );
 		try {
 			if ( tenantId == null ) {
-				deleteWithoutTenant( work, delegate, builder, id );
+				deleteWithoutTenant( work, delegate, builder, isIdNumeric, id );
 			}
 			else {
-				deleteWithTenant( work, delegate, tenantId, builder, id );
+				deleteWithTenant( work, delegate, builder, isIdNumeric, tenantId, id );
 			}
 			workspace.notifyWorkApplied( work );
 		}
@@ -64,11 +71,13 @@ public final class ByTermDeleteWorkExecutor extends DeleteWorkExecutor {
 		}
 	}
 
-	private void deleteWithTenant(LuceneWork work, IndexWriterDelegate delegate, final String tenantId, DocumentBuilderIndexedEntity builder, Serializable id) throws IOException {
+	private void deleteWithTenant(LuceneWork work, IndexWriterDelegate delegate,
+			DocumentBuilderIndexedEntity builder, boolean isIdNumeric,
+			final String tenantId, Serializable id) throws IOException {
 		BooleanQuery.Builder termDeleteQueryBuilder = new BooleanQuery.Builder();
 		TermQuery tenantTermQuery = new TermQuery( new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) );
 		termDeleteQueryBuilder.add( tenantTermQuery, Occur.FILTER );
-		if ( isIdNumeric( builder ) ) {
+		if ( isIdNumeric ) {
 			Query exactMatchQuery = NumericFieldUtils.createExactMatchQuery( builder.getIdFieldName(), id );
 			termDeleteQueryBuilder.add( exactMatchQuery, Occur.FILTER );
 		}
@@ -80,8 +89,10 @@ public final class ByTermDeleteWorkExecutor extends DeleteWorkExecutor {
 		delegate.deleteDocuments( termDeleteQuery );
 	}
 
-	private void deleteWithoutTenant(LuceneWork work, IndexWriterDelegate delegate, DocumentBuilderIndexedEntity builder, Serializable id) throws IOException {
-		if ( isIdNumeric( builder ) ) {
+	private void deleteWithoutTenant(LuceneWork work, IndexWriterDelegate delegate,
+			DocumentBuilderIndexedEntity builder, boolean isIdNumeric,
+			Serializable id) throws IOException {
+		if ( isIdNumeric ) {
 			delegate.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdFieldName(), id ) );
 		}
 		else {

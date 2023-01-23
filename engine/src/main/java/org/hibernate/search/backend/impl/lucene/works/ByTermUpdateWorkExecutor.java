@@ -7,6 +7,9 @@
 
 package org.hibernate.search.backend.impl.lucene.works;
 
+import static org.hibernate.search.backend.impl.lucene.works.DeleteWorkExecutor.isIdNumeric;
+
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -29,14 +32,16 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**
- * This applies the index update operation using the Lucene operation
- * {@link org.apache.lucene.index.IndexWriter#updateDocument}.
- * This is the most efficient way to update the index, but underlying store
+ * Extension of {@link UpdateWorkExecutor}
+ * that applies the index update operation using the Lucene operation
+ * {@link org.apache.lucene.index.IndexWriter#updateDocument} when possible.
+ * <p>
+ * This is the most efficient way to update the index, but the underlying store
  * must guarantee that the term is unique across documents and entity types.
  *
  * @author gustavonalle
  */
-public final class ByTermUpdateWorkExecutor extends UpdateWorkExecutor {
+public class ByTermUpdateWorkExecutor extends UpdateWorkExecutor {
 
 	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
@@ -51,35 +56,22 @@ public final class ByTermUpdateWorkExecutor extends UpdateWorkExecutor {
 
 	@Override
 	public void performWork(LuceneWork work, IndexWriterDelegate delegate, IndexingMonitor monitor) {
-		final Serializable id = work.getId();
-		final String tenantId = work.getTenantId();
 		final IndexedTypeIdentifier managedType = work.getEntityType();
 		DocumentBuilderIndexedEntity builder = workspace.getDocumentBuilder( managedType );
+		doPerformWork( work, delegate, monitor, managedType, builder, isIdNumeric( builder ) );
+	}
+
+	protected void doPerformWork(LuceneWork work, IndexWriterDelegate delegate, IndexingMonitor monitor,
+			IndexedTypeIdentifier managedType, DocumentBuilderIndexedEntity builder, boolean isIdNumeric) {
+		final Serializable id = work.getId();
+		final String tenantId = work.getTenantId();
+		log.tracef( "Updating %s#%s by id using an IndexWriter.", managedType, id );
 		try {
-			if ( DeleteWorkExecutor.isIdNumeric( builder ) ) {
-				log.tracef(
-						"Deleting %s#%s by query using an IndexWriter#updateDocument as id is Numeric",
-						managedType,
-						id
-				);
-				Query exactMatchQuery = NumericFieldUtils.createExactMatchQuery( builder.getIdFieldName(), id );
-				BooleanQuery.Builder deleteDocumentsQueryBuilder = new BooleanQuery.Builder();
-				deleteDocumentsQueryBuilder.add( exactMatchQuery, Occur.FILTER );
-				if ( tenantId != null ) {
-					TermQuery tenantTermQuery = new TermQuery( new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) );
-					deleteDocumentsQueryBuilder.add( tenantTermQuery, Occur.FILTER );
-				}
-				delegate.deleteDocuments( deleteDocumentsQueryBuilder.build() );
-				// no need to log the Add operation as we'll log in the delegate
-				this.addDelegate.performWork( work, delegate, monitor );
+			if ( tenantId == null ) {
+				updateWithoutTenant( work, delegate, monitor, builder, isIdNumeric, id );
 			}
 			else {
-				log.tracef( "Updating %s#%s by id using an IndexWriter#updateDocument.", managedType, id );
-				Term idTerm = new Term( builder.getIdFieldName(), work.getIdInString() );
-				Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
-				ScopedAnalyzerReference analyzerReference = builder.getAnalyzerReference();
-				analyzerReference = AddWorkExecutor.updateAnalyzerMappings( workspace, analyzerReference, fieldToAnalyzerMap );
-				delegate.updateDocument( idTerm, work.getDocument(), analyzerReference );
+				updateWithTenant( work, delegate, monitor, builder, isIdNumeric, tenantId, id );
 			}
 			workspace.notifyWorkApplied( work );
 		}
@@ -92,4 +84,38 @@ public final class ByTermUpdateWorkExecutor extends UpdateWorkExecutor {
 		}
 	}
 
+	private void updateWithTenant(LuceneWork work, IndexWriterDelegate delegate, IndexingMonitor monitor,
+			DocumentBuilderIndexedEntity builder, boolean isIdNumeric,
+			final String tenantId, Serializable id) throws IOException {
+		BooleanQuery.Builder termDeleteQueryBuilder = new BooleanQuery.Builder();
+		TermQuery tenantTermQuery = new TermQuery( new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) );
+		termDeleteQueryBuilder.add( tenantTermQuery, Occur.FILTER );
+		if ( isIdNumeric ) {
+			Query exactMatchQuery = NumericFieldUtils.createExactMatchQuery( builder.getIdFieldName(), id );
+			termDeleteQueryBuilder.add( exactMatchQuery, Occur.FILTER );
+		}
+		else {
+			Term idTerm = new Term( builder.getIdFieldName(), work.getIdInString() );
+			termDeleteQueryBuilder.add( new TermQuery( idTerm ), Occur.FILTER );
+		}
+		BooleanQuery termDeleteQuery = termDeleteQueryBuilder.build();
+		delegate.deleteDocuments( termDeleteQuery );
+		this.addDelegate.performWork( work, delegate, monitor );
+	}
+
+	private void updateWithoutTenant(LuceneWork work, IndexWriterDelegate delegate, IndexingMonitor monitor,
+			DocumentBuilderIndexedEntity builder, boolean isIdNumeric,
+			Serializable id) throws IOException {
+		if ( isIdNumeric ) {
+			delegate.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdFieldName(), id ) );
+			this.addDelegate.performWork( work, delegate, monitor );
+		}
+		else {
+			Term idTerm = new Term( builder.getIdFieldName(), work.getIdInString() );
+			Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
+			ScopedAnalyzerReference analyzerReference = builder.getAnalyzerReference();
+			analyzerReference = AddWorkExecutor.updateAnalyzerMappings( workspace, analyzerReference, fieldToAnalyzerMap );
+			delegate.updateDocument( idTerm, work.getDocument(), analyzerReference );
+		}
+	}
 }
