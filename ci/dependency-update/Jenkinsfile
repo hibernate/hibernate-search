@@ -29,9 +29,7 @@ Map settings() {
 		case 'orm6.2':
 			return [
 					updateProperties: ['version.org.hibernate.orm'],
-					onlyRunTestDependingOn: ['hibernate-search-mapper-orm-orm6'],
-					// Need to rebuild non-test modules to apply some patches
-					additionalMavenArgs: '-am'
+					onlyRunTestDependingOn: ['hibernate-search-mapper-orm-orm6']
 			]
 		case 'orm6-in-main-code':
 			return [
