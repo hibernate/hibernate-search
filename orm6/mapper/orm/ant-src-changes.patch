@@ -266,7 +266,7 @@ index c09968682b..057510b863 100644
  		this.ascendingSuperTypes = builder.ascendingSuperTypes;
  		if ( builder.documentIdSourcePropertyName != null ) {
 diff --git a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingConfigurationContributor.java b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingConfigurationContributor.java
-index b24077bcaf..1bee40f7fd 100644
+index 661f94b149..bdd369055b 100644
 --- a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingConfigurationContributor.java
 +++ b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingConfigurationContributor.java
 @@ -59,9 +59,8 @@ public void configure(MappingBuildContext buildContext, PojoMappingConfiguration
@@ -279,8 +279,8 @@ index b24077bcaf..1bee40f7fd 100644
 +					HibernateOrmUtils.sortedNonSyntheticProperties( persistentClass.getProperties().iterator() );
  
  			Property identifierProperty = persistentClass.getIdentifierProperty();
- 			Optional<String> identifierPropertyNameOptional =
-@@ -121,9 +120,8 @@ private void contributeEmbeddableTypeMetadata(
+ 			Optional<Property> identifierPropertyOptional = Optional.ofNullable( identifierProperty );
+@@ -125,9 +124,8 @@ private void contributeEmbeddableTypeMetadata(
  			 */
  			if ( processedEmbeddableTypes.add( componentTypeModel ) ) {
  				// Sort the properties before processing for deterministic iteration

@@ -1,5 +1,5 @@
 diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cfg/HibernateOrmMapperOutboxPollingSettings.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cfg/HibernateOrmMapperOutboxPollingSettings.java
-index eec9fc845c..da14602448 100644
+index 67a2ed156d..771f3cc9cd 100644
 --- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cfg/HibernateOrmMapperOutboxPollingSettings.java
 +++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cfg/HibernateOrmMapperOutboxPollingSettings.java
 @@ -8,9 +8,9 @@
@@ -12,8 +12,8 @@ index eec9fc845c..da14602448 100644
 +import org.hibernate.id.uuid.UuidGenerator;
  import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
  import org.hibernate.search.util.common.annotation.Incubating;
- 
-@@ -386,14 +386,15 @@ private HibernateOrmMapperOutboxPollingSettings() {
+ import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
+@@ -392,14 +392,15 @@ private HibernateOrmMapperOutboxPollingSettings() {
  			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_TABLE;
  
  	/**
@@ -31,7 +31,7 @@ index eec9fc845c..da14602448 100644
  	 * @see CustomVersionOneStrategy
  	 * @see StandardRandomStrategy
  	 */
-@@ -445,14 +446,14 @@ private HibernateOrmMapperOutboxPollingSettings() {
+@@ -451,14 +452,14 @@ private HibernateOrmMapperOutboxPollingSettings() {
  			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_AGENT_TABLE;
  
  	/**

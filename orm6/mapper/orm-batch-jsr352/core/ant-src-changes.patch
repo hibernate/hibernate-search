@@ -95,7 +95,7 @@ index 6daddd7182..47a1fe9fcd 100644
  		}
  
 diff --git a/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/PersistenceUtil.java b/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/PersistenceUtil.java
-index e7132835a4..e5cdce650e 100644
+index d20b3cc57f..009aae20f9 100644
 --- a/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/PersistenceUtil.java
 +++ b/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/PersistenceUtil.java
 @@ -18,7 +18,7 @@
@@ -107,7 +107,7 @@ index e7132835a4..e5cdce650e 100644
  import org.hibernate.persister.entity.EntityPersister;
  import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.IndexScope;
  import org.hibernate.search.util.common.impl.StringHelper;
-@@ -93,15 +93,15 @@ public static IndexScope getIndexScope(String hql) {
+@@ -95,15 +95,15 @@ public static IndexScope getIndexScope(String hql) {
  	public static List<EntityTypeDescriptor> createDescriptors(EntityManagerFactory entityManagerFactory, Set<Class<?>> types) {
  		SessionFactoryImplementor sessionFactory = entityManagerFactory.unwrap( SessionFactoryImplementor.class );
  		List<EntityTypeDescriptor> result = new ArrayList<>( types.size() );

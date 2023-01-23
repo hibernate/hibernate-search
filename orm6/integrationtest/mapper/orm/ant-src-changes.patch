@@ -1,3 +1,199 @@
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingBooleanArrayIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingBooleanArrayIT.java
+index b0a91acdfd..245f25164b 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingBooleanArrayIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingBooleanArrayIT.java
+@@ -6,6 +6,7 @@
+  */
+ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.array;
+ 
++import java.sql.Types;
+ import java.util.Arrays;
+ import java.util.List;
+ import jakarta.persistence.ElementCollection;
+@@ -13,6 +14,7 @@
+ import jakarta.persistence.Id;
+ import jakarta.persistence.OrderColumn;
+ 
++import org.hibernate.annotations.JdbcTypeCode;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+@@ -96,6 +98,7 @@ public static class IndexedEntity {
+ 		private Integer id;
+ 
+ 		@GenericField
++		@JdbcTypeCode(Types.VARBINARY)
+ 		private boolean[] serializedArray;
+ 
+ 		@GenericField
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingDoubleArrayIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingDoubleArrayIT.java
+index 68872d144a..5a2e4b75fc 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingDoubleArrayIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingDoubleArrayIT.java
+@@ -6,6 +6,7 @@
+  */
+ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.array;
+ 
++import java.sql.Types;
+ import java.util.Arrays;
+ import java.util.List;
+ import jakarta.persistence.ElementCollection;
+@@ -13,6 +14,7 @@
+ import jakarta.persistence.Id;
+ import jakarta.persistence.OrderColumn;
+ 
++import org.hibernate.annotations.JdbcTypeCode;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+@@ -96,6 +98,7 @@ public static class IndexedEntity {
+ 		private Integer id;
+ 
+ 		@GenericField
++		@JdbcTypeCode(Types.VARBINARY)
+ 		private double[] serializedArray;
+ 
+ 		@GenericField
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingFloatArrayIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingFloatArrayIT.java
+index 1166f292ff..0b154beb72 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingFloatArrayIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingFloatArrayIT.java
+@@ -6,6 +6,7 @@
+  */
+ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.array;
+ 
++import java.sql.Types;
+ import java.util.Arrays;
+ import java.util.List;
+ import jakarta.persistence.ElementCollection;
+@@ -13,6 +14,7 @@
+ import jakarta.persistence.Id;
+ import jakarta.persistence.OrderColumn;
+ 
++import org.hibernate.annotations.JdbcTypeCode;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+@@ -96,6 +98,7 @@ public static class IndexedEntity {
+ 		private Integer id;
+ 
+ 		@GenericField
++		@JdbcTypeCode(Types.VARBINARY)
+ 		private float[] serializedArray;
+ 
+ 		@GenericField
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingIntArrayIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingIntArrayIT.java
+index b7b8c6567c..752d88e268 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingIntArrayIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingIntArrayIT.java
+@@ -6,6 +6,7 @@
+  */
+ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.array;
+ 
++import java.sql.Types;
+ import java.util.Arrays;
+ import java.util.List;
+ import jakarta.persistence.ElementCollection;
+@@ -13,6 +14,7 @@
+ import jakarta.persistence.Id;
+ import jakarta.persistence.OrderColumn;
+ 
++import org.hibernate.annotations.JdbcTypeCode;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+@@ -96,6 +98,7 @@ public static class IndexedEntity {
+ 		private Integer id;
+ 
+ 		@GenericField
++		@JdbcTypeCode(Types.VARBINARY)
+ 		private int[] serializedArray;
+ 
+ 		@GenericField
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingLongArrayIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingLongArrayIT.java
+index b4ef90515e..45340e2163 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingLongArrayIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingLongArrayIT.java
+@@ -6,6 +6,7 @@
+  */
+ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.array;
+ 
++import java.sql.Types;
+ import java.util.Arrays;
+ import java.util.List;
+ import jakarta.persistence.ElementCollection;
+@@ -13,6 +14,7 @@
+ import jakarta.persistence.Id;
+ import jakarta.persistence.OrderColumn;
+ 
++import org.hibernate.annotations.JdbcTypeCode;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+@@ -96,6 +98,7 @@ public static class IndexedEntity {
+ 		private Integer id;
+ 
+ 		@GenericField
++		@JdbcTypeCode(Types.VARBINARY)
+ 		private long[] serializedArray;
+ 
+ 		@GenericField
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingShortArrayIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingShortArrayIT.java
+index 6a5b0666f7..9ad69dca1b 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingShortArrayIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingShortArrayIT.java
+@@ -6,6 +6,7 @@
+  */
+ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.array;
+ 
++import java.sql.Types;
+ import java.util.Arrays;
+ import java.util.List;
+ import jakarta.persistence.ElementCollection;
+@@ -13,6 +14,7 @@
+ import jakarta.persistence.Id;
+ import jakarta.persistence.OrderColumn;
+ 
++import org.hibernate.annotations.JdbcTypeCode;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+@@ -96,6 +98,7 @@ public static class IndexedEntity {
+ 		private Integer id;
+ 
+ 		@GenericField
++		@JdbcTypeCode(Types.VARBINARY)
+ 		private short[] serializedArray;
+ 
+ 		@GenericField
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingStringArrayIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingStringArrayIT.java
+index 7898311502..a08c5e44f9 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingStringArrayIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/array/AutomaticIndexingStringArrayIT.java
+@@ -6,6 +6,7 @@
+  */
+ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.array;
+ 
++import java.sql.Types;
+ import java.util.Arrays;
+ import java.util.List;
+ import jakarta.persistence.ElementCollection;
+@@ -13,6 +14,7 @@
+ import jakarta.persistence.Id;
+ import jakarta.persistence.OrderColumn;
+ 
++import org.hibernate.annotations.JdbcTypeCode;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+ 
+@@ -95,6 +97,7 @@ public static class IndexedEntity {
+ 		private Integer id;
+ 
+ 		@GenericField
++		@JdbcTypeCode(Types.VARBINARY)
+ 		private String[] serializedArray;
+ 
+ 		@GenericField
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/AbstractAutomaticIndexingAssociationBaseIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/AbstractAutomaticIndexingAssociationBaseIT.java
 index f48b9b1291..d45e2e7e86 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/AbstractAutomaticIndexingAssociationBaseIT.java
@@ -1270,18 +1466,27 @@ index 6af91cdb9f..34c4c1b092 100644
  				.contains( "_containingIndexBackref" );
  
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java
-index f3c50122f5..74e1a3d37c 100644
+index f3c50122f5..a31ff7cbb5 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java
-@@ -8,6 +8,7 @@
+@@ -8,6 +8,8 @@
  
  import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
  
 +import java.io.Serializable;
++import java.sql.Types;
  import java.util.ArrayList;
  import java.util.List;
  import jakarta.persistence.Basic;
-@@ -118,25 +119,17 @@ public void setGenericProperty(GenericEntity<String> genericProperty) {
+@@ -17,6 +19,7 @@
+ import jakarta.persistence.OneToMany;
+ 
+ import org.hibernate.SessionFactory;
++import org.hibernate.annotations.JdbcTypeCode;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+@@ -118,25 +121,18 @@ public void setGenericProperty(GenericEntity<String> genericProperty) {
  	}
  
  	@Entity(name = "generic")
@@ -1305,6 +1510,7 @@ index f3c50122f5..74e1a3d37c 100644
 -		// ORM doesn't take it into account for some reason.
 -		@SuppressWarnings("deprecation")
 -		@org.hibernate.annotations.Type(type = "serializable")
++		@JdbcTypeCode(Types.VARBINARY)
  		private T[] arrayContent;
  
  		@OneToMany(mappedBy = "genericProperty")
