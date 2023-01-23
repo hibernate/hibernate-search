@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.array;
 
+import java.sql.Types;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OrderColumn;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
@@ -98,6 +100,7 @@ public class AutomaticIndexingStringArrayIT
 		private Integer id;
 
 		@GenericField
+		@JdbcTypeCode(Types.VARBINARY)
 		private String[] serializedArray;
 
 		@GenericField
