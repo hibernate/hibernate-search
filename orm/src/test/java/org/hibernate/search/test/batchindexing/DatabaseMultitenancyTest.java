@@ -163,6 +163,47 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	}
 
 	@Test
+	public void shouldOnlyUpdateTheSpecificTenant() {
+		assertThat( searchAll( METAMEC_TID ) )
+				.containsExactlyInAnyOrder( METAMEC_MODELS );
+		assertThat( searchAll( GEOCHRON_TID ) )
+				.containsExactlyInAnyOrder( GEOCHRON_MODELS );
+
+		Clock newMetamec;
+		try (Session session = openSessionWithTenantId( METAMEC_TID )) {
+			session.beginTransaction();
+			newMetamec = session.get( Clock.class, METAMEC_MODELS[0].getId() );
+			newMetamec.setBrand( newMetamec.getBrand() + " foo" );
+			session.getTransaction().commit();
+		}
+
+		assertThat( searchAll( METAMEC_TID ) )
+				.containsExactlyInAnyOrder( newMetamec, METAMEC_MODELS[1], METAMEC_MODELS[2] );
+		assertThat( searchAll( GEOCHRON_TID ) )
+				.containsExactlyInAnyOrder( GEOCHRON_MODELS );
+	}
+
+	@Test
+	public void shouldOnlyDeleteTheSpecificTenant() {
+		assertThat( searchAll( METAMEC_TID ) )
+				.containsExactlyInAnyOrder( METAMEC_MODELS );
+		assertThat( searchAll( GEOCHRON_TID ) )
+				.containsExactlyInAnyOrder( GEOCHRON_MODELS );
+
+		try (Session session = openSessionWithTenantId( METAMEC_TID )) {
+			session.beginTransaction();
+			Clock metamec = session.get( Clock.class, METAMEC_MODELS[0].getId() );
+			session.delete( metamec );
+			session.getTransaction().commit();
+		}
+
+		assertThat( searchAll( METAMEC_TID ) )
+				.containsExactlyInAnyOrder( METAMEC_MODELS[1], METAMEC_MODELS[2] );
+		assertThat( searchAll( GEOCHRON_TID ) )
+				.containsExactlyInAnyOrder( GEOCHRON_MODELS );
+	}
+
+	@Test
 	public void shouldSearchOtherTenantsDocuments() throws Exception {
 		purgeAll( Clock.class, GEOCHRON_TID );
 		purgeAll( Clock.class, METAMEC_TID );
