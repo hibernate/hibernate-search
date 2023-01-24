@@ -2093,7 +2093,8 @@ SearchPredicate topLevelPredicate = pf.bool( b -> {
     for ( SearchPredicate predicate : predicates ) {
         b.must( predicate );
     }
-} );
+} )
+        .toPredicate();
 
 List<Book> hits = searchSession.search( Book.class )
         .where( topLevelPredicate )
@@ -3048,7 +3049,7 @@ Analyzer searchAnalyzer = mapping.indexedEntity( Book.class ).indexManager()
         .unwrap( LuceneIndexManager.class ).searchAnalyzer();
 
 // Get the search analyzer for a given index
-Analyzer searchAnalyzer = mapping.indexexManager( "Book" ).indexManager()
+Analyzer searchAnalyzer = mapping.indexManager( "Book" ).indexManager()
         .unwrap( LuceneIndexManager.class ).searchAnalyzer();
 ----
 
