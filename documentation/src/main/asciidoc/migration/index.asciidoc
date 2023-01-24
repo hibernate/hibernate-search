@@ -1740,6 +1740,7 @@ Here is how to retrieve the `SearchSession` in Hibernate Search 6:
 [source, JAVA]
 ----
 SearchSession searchSession = Search.session( entityManager );
+// OR
 SearchSession searchSession = Search.session( session );
 ----
 
@@ -2969,8 +2970,8 @@ Here is how to retrieve the `SessionFactory` in Hibernate Search 5:
 [source, JAVA]
 ----
 SearchFactory searchFactory = Search.getFullTextEntityManager( entityManager ).getSearchFactory();
-// Alternatively
-searchFactory = Search.getFullTextSession( session ).getSearchFactory();
+// OR
+SearchFactory searchFactory = Search.getFullTextSession( session ).getSearchFactory();
 ----
 
 The main entry point to Hibernate Search APIs is still named `Search`, but it moved to another package:
@@ -2980,10 +2981,12 @@ Here is how to retrieve the `SearchMapping` in Hibernate Search 6:
 [source, JAVA]
 ----
 SearchMapping mapping = Search.mapping( entityManagerFactory );
-// Alternatively
-mapping = Search.mapping( sessionFactory );
-mapping = Search.mapping( entityManager.getEntityManagerFactory() );
-mapping = Search.mapping( session.getSessionFactory() );
+// OR
+SearchMapping mapping = Search.mapping( sessionFactory );
+// OR
+SearchMapping mapping = Search.mapping( entityManager.getEntityManagerFactory() );
+// OR
+SearchMapping mapping = Search.mapping( session.getSessionFactory() );
 ----
 
 See the following sections for the exact equivalent of each operation of `SearchFactory`.
@@ -2998,7 +3001,7 @@ In Hibernate Search 5:
 SearchFactory searchFactory = Search.getFullTextSession( session ).getSearchFactory();
 
 searchFactory.optimize( Book.class );
-// or
+// OR
 searchFactory.optimize();
 ----
 
@@ -3009,7 +3012,7 @@ Equivalent in Hibernate Search 6:
 SearchSession searchSession = Search.session( session );
 
 searchSession.workspace( Book.class ).mergeSegments();
-// or
+// OR
 searchSession.workspace().mergeSegments();
 ----
 
@@ -3037,8 +3040,8 @@ Equivalent in Hibernate Search 6:
 [source, JAVA]
 ----
 SearchMapping mapping = Search.mapping( entityManagerFactory );
-// Alternatively
-mapping = Search.mapping( entityManager.getEntityManagerFactory() );
+// OR
+SearchMapping mapping = Search.mapping( entityManager.getEntityManagerFactory() );
 
 // Get a named analyzer
 Optional<? extends Analyzer> analyzer = mapping.backend().unwrap( LuceneBackend.class )
@@ -3121,7 +3124,7 @@ Here is how to retrieve and use a `MassIndexer` in Hibernate Search 5:
 ----
 FullTextSession fullTextSession = Search.getFullTextSession( session );
 fullTextSession.createIndexer().startAndWait();
-// or
+// OR
 fullTextSession.createIndexer( Book.class, Author.class ).startAndWait();
 ----
 
@@ -3131,7 +3134,7 @@ Here is how to retrieve and use a `MassIndexer` in Hibernate Search 6:
 ----
 SearchSession searchSession = Search.session( entityManager );
 searchSession.massIndexer().startAndWait();
-// or
+// OR
 searchSession.massIndexer( Book.class, Author.class ).startAndWait();
 ----
 
