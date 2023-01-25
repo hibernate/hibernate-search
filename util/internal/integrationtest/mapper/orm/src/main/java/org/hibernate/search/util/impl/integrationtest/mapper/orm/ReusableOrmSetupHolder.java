@@ -42,6 +42,7 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.function.ThrowingBiFunction;
@@ -328,6 +329,10 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 					clearAllData( sessionFactory );
 				}
 				catch (RuntimeException e) {
+					// Close the session factory (and consequently drop the schema) so that later tests
+					// are not affected by the failure.
+					new SuppressingCloser( e )
+							.push( this::tearDownSessionFactory );
 					throw new Error( "Failed to clear data before test execution: " + e.getMessage(), e );
 				}
 				return;
@@ -675,4 +680,5 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 		NONE,
 		DROP_AND_CREATE_SCHEMA
 	}
+
 }
