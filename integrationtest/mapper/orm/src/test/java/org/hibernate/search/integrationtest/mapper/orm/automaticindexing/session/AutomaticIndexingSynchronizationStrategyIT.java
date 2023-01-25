@@ -29,14 +29,13 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategyConfigurationContext;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Throwables;
@@ -78,7 +77,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void success_async() throws InterruptedException, ExecutionException, TimeoutException {
-		SessionFactory sessionFactory = setup( HibernateOrmIndexingPlanSynchronizationStrategyNames.ASYNC );
+		SessionFactory sessionFactory = setup( IndexingPlanSynchronizationStrategyNames.ASYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingNoBlock(
@@ -115,7 +114,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void success_writeSync_explicit() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( HibernateOrmIndexingPlanSynchronizationStrategyNames.WRITE_SYNC );
+		SessionFactory sessionFactory = setup( IndexingPlanSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
@@ -137,7 +136,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void success_readSync() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( HibernateOrmIndexingPlanSynchronizationStrategyNames.READ_SYNC );
+		SessionFactory sessionFactory = setup( IndexingPlanSynchronizationStrategyNames.READ_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
@@ -159,7 +158,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void success_sync() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( HibernateOrmIndexingPlanSynchronizationStrategyNames.SYNC );
+		SessionFactory sessionFactory = setup( IndexingPlanSynchronizationStrategyNames.SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
@@ -181,11 +180,11 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void success_override_writeSyncToSync() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( HibernateOrmIndexingPlanSynchronizationStrategyNames.WRITE_SYNC );
+		SessionFactory sessionFactory = setup( IndexingPlanSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
-				sessionFactory, HibernateOrmIndexingPlanSynchronizationStrategy.sync(),
+				sessionFactory, IndexingPlanSynchronizationStrategy.sync(),
 				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, indexingWorkFuture
 		);
 
@@ -203,7 +202,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void success_override_writeSyncToCustom() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( HibernateOrmIndexingPlanSynchronizationStrategyNames.WRITE_SYNC );
+		SessionFactory sessionFactory = setup( IndexingPlanSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		AtomicReference<CompletableFuture<?>> futureThatTookTooLong = new AtomicReference<>( null );
@@ -267,7 +266,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void failure_async() throws InterruptedException, ExecutionException, TimeoutException {
-		SessionFactory sessionFactory = setup( HibernateOrmIndexingPlanSynchronizationStrategyNames.ASYNC );
+		SessionFactory sessionFactory = setup( IndexingPlanSynchronizationStrategyNames.ASYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 
@@ -320,7 +319,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void failure_writeSync_explicit() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( HibernateOrmIndexingPlanSynchronizationStrategyNames.WRITE_SYNC );
+		SessionFactory sessionFactory = setup( IndexingPlanSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 
@@ -345,7 +344,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void failure_readSync() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( HibernateOrmIndexingPlanSynchronizationStrategyNames.READ_SYNC );
+		SessionFactory sessionFactory = setup( IndexingPlanSynchronizationStrategyNames.READ_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 
@@ -370,7 +369,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void failure_sync() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( HibernateOrmIndexingPlanSynchronizationStrategyNames.SYNC );
+		SessionFactory sessionFactory = setup( IndexingPlanSynchronizationStrategyNames.SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 
@@ -395,12 +394,12 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void failure_override_writeSyncToSync() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( HibernateOrmIndexingPlanSynchronizationStrategyNames.WRITE_SYNC );
+		SessionFactory sessionFactory = setup( IndexingPlanSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
-				sessionFactory, HibernateOrmIndexingPlanSynchronizationStrategy.sync(),
+				sessionFactory, IndexingPlanSynchronizationStrategy.sync(),
 				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, indexingWorkFuture
 		);
 
@@ -420,7 +419,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void failure_override_writeSyncToCustom() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( HibernateOrmIndexingPlanSynchronizationStrategyNames.WRITE_SYNC );
+		SessionFactory sessionFactory = setup( IndexingPlanSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 
@@ -481,13 +480,13 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 								+ HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY
 								+ "'",
 						"Unable to load class 'invalidName'",
-						"No beans defined for type '" + HibernateOrmIndexingPlanSynchronizationStrategy.class.getName()
+						"No beans defined for type '" + IndexingPlanSynchronizationStrategy.class.getName()
 								+ "' and name 'invalidName' in Hibernate Search's internal registry"
 				);
 	}
 
 	private CompletableFuture<?> runTransactionInDifferentThreadExpectingBlock(SessionFactory sessionFactory,
-			HibernateOrmIndexingPlanSynchronizationStrategy customStrategy,
+			IndexingPlanSynchronizationStrategy customStrategy,
 			DocumentCommitStrategy expectedCommitStrategy,
 			DocumentRefreshStrategy expectedRefreshStrategy,
 			CompletableFuture<?> indexingWorkFuture)
@@ -509,7 +508,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	private CompletableFuture<?> runTransactionInDifferentThreadExpectingNoBlock(SessionFactory sessionFactory,
-			HibernateOrmIndexingPlanSynchronizationStrategy overriddenStrategy,
+			IndexingPlanSynchronizationStrategy overriddenStrategy,
 			DocumentCommitStrategy expectedCommitStrategy,
 			DocumentRefreshStrategy expectedRefreshStrategy,
 			CompletableFuture<?> indexingWorkFuture)
@@ -532,7 +531,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	 * Run a transaction in a different thread so that its progress can be inspected from the current thread.
 	 */
 	private CompletableFuture<?> runTransactionInDifferentThread(SessionFactory sessionFactory,
-			HibernateOrmIndexingPlanSynchronizationStrategy overriddenStrategy,
+			IndexingPlanSynchronizationStrategy overriddenStrategy,
 			DocumentCommitStrategy expectedCommitStrategy,
 			DocumentRefreshStrategy expectedRefreshStrategy,
 			CompletableFuture<?> indexingWorkFuture)
@@ -650,7 +649,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	}
 
-	private class CustomAutomaticIndexingSynchronizationStrategy implements HibernateOrmIndexingPlanSynchronizationStrategy {
+	private class CustomAutomaticIndexingSynchronizationStrategy implements IndexingPlanSynchronizationStrategy {
 
 		private final AtomicReference<CompletableFuture<?>> futureThatTookTooLong;
 
@@ -668,7 +667,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		}
 
 		@Override
-		public void apply(IndexingPlanSynchronizationStrategyConfigurationContext<EntityReference> context) {
+		public void apply(IndexingPlanSynchronizationStrategyConfigurationContext context) {
 			context.documentCommitStrategy( DocumentCommitStrategy.FORCE );
 			context.documentRefreshStrategy( DocumentRefreshStrategy.FORCE );
 			context.operationSubmitter( operationSubmitter );
@@ -676,7 +675,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				// try to wait for the future to complete for a small duration...
 				try {
 					future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
-					SearchIndexingPlanExecutionReport<EntityReference> report = future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
+					SearchIndexingPlanExecutionReport report = future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
 					report.throwable().ifPresent( t -> {
 						throw log.indexingFailure( t.getMessage(), report.failingEntities(), t );
 					} );

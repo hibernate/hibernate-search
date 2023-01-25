@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 @Incubating
-public interface IndexingPlanSynchronizationStrategyConfigurationContext<E> {
+public interface IndexingPlanSynchronizationStrategyConfigurationContext {
 
 	/**
 	 * @param strategy A strategy describing how commits should be handled after document changes are applied.
@@ -45,7 +45,7 @@ public interface IndexingPlanSynchronizationStrategyConfigurationContext<E> {
 	 * the report will {@link SearchIndexingPlanExecutionReport#throwable() contain a throwable}
 	 * and (if applicable) {@link SearchIndexingPlanExecutionReport#failingEntities() a list of failing entities}.
 	 */
-	void indexingFutureHandler(Consumer<CompletableFuture<SearchIndexingPlanExecutionReport<E>>> handler);
+	void indexingFutureHandler(Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> handler);
 
 	/**
 	 * @return The failure handler.

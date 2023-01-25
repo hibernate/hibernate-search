@@ -13,7 +13,6 @@ import javax.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -23,6 +22,7 @@ import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsSt
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
 
 /**
  * A lazily initializing {@link SearchSession}.
@@ -100,7 +100,7 @@ public class DelegatingSearchSession implements SearchSession {
 	}
 
 	@Override
-	public void indexingPlanSynchronizationStrategy(HibernateOrmIndexingPlanSynchronizationStrategy synchronizationStrategy) {
+	public void indexingPlanSynchronizationStrategy(IndexingPlanSynchronizationStrategy synchronizationStrategy) {
 		getDelegate().indexingPlanSynchronizationStrategy( synchronizationStrategy );
 	}
 

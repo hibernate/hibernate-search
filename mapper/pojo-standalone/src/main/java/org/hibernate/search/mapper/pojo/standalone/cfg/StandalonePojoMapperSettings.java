@@ -7,10 +7,10 @@
 package org.hibernate.search.mapper.pojo.standalone.cfg;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
-import org.hibernate.search.mapper.pojo.standalone.plan.synchronization.PojoStandaloneIndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.pojo.standalone.plan.synchronization.PojoStandaloneIndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
@@ -66,12 +66,12 @@ public final class StandalonePojoMapperSettings {
 	/**
 	 * The synchronization strategy to use when indexing automatically.
 	 * <p>
-	 * Expects one of the strings defined in {@link PojoStandaloneIndexingPlanSynchronizationStrategy},
-	 * or a reference to a bean of type {@link PojoStandaloneIndexingPlanSynchronizationStrategy}.
+	 * Expects one of the strings defined in {@link IndexingPlanSynchronizationStrategy},
+	 * or a reference to a bean of type {@link IndexingPlanSynchronizationStrategy}.
 	 * <p>
 	 * Defaults to {@link Defaults#INDEXING_PLAN_SYNCHRONIZATION_STRATEGY}.
 	 *
-	 * @see PojoStandaloneIndexingPlanSynchronizationStrategyNames
+	 * @see IndexingPlanSynchronizationStrategyNames
 	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
 	 * which includes a description of the "bean reference" properties and accepted values.
 	 */
@@ -101,8 +101,8 @@ public final class StandalonePojoMapperSettings {
 		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY = SchemaManagementStrategyName.CREATE_OR_VALIDATE;
 		public static final Boolean MULTI_TENANCY_ENABLED = Boolean.FALSE;
 
-		public static final BeanReference<PojoStandaloneIndexingPlanSynchronizationStrategy> INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
-				BeanReference.of( PojoStandaloneIndexingPlanSynchronizationStrategy.class, "write-sync" );
+		public static final BeanReference<IndexingPlanSynchronizationStrategy> INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
+				BeanReference.of( IndexingPlanSynchronizationStrategy.class, "write-sync" );
 	}
 
 }

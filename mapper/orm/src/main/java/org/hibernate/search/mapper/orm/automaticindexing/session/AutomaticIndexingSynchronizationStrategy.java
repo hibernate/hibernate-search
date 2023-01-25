@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.automaticindexing.session;
 
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.AutomaticIndexingSynchronizationStrategyImpl;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
 
 /**
  * Determines how the thread will block upon committing a transaction
@@ -15,7 +16,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.session.impl.AutomaticI
  *
  * @see SearchSession#automaticIndexingSynchronizationStrategy(AutomaticIndexingSynchronizationStrategy)
  *
- * @deprecated See {@link HibernateOrmIndexingPlanSynchronizationStrategy}
+ * @deprecated See {@link IndexingPlanSynchronizationStrategy}
  */
 @Deprecated
 public interface AutomaticIndexingSynchronizationStrategy {

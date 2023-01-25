@@ -20,7 +20,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.mapping.Value;
 import org.hibernate.resource.beans.container.spi.BeanContainer;
 import org.hibernate.search.engine.environment.bean.spi.BeanNotFoundException;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
@@ -155,7 +154,7 @@ public interface Log extends BasicLogger {
 	SearchException hibernateSessionFactoryAccessError(String causeMessage, @Cause IllegalStateException cause);
 
 	@Message(id = ID_OFFSET + 22, value = "Indexing failure: %1$s.\nThe following entities may not have been updated correctly in the index: %2$s.")
-	SearchException indexingFailure(String causeMessage, List<EntityReference> failingEntities, @Cause Throwable cause);
+	SearchException indexingFailure(String causeMessage, List<?> failingEntities, @Cause Throwable cause);
 
 	@Message(value = "Automatic indexing of Hibernate ORM entities")
 	String automaticIndexing();

@@ -17,12 +17,13 @@ import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class SyncIndexingPlanSynchronizationStrategy<E>
-		implements IndexingPlanSynchronizationStrategy<E> {
+public final class SyncIndexingPlanSynchronizationStrategy
+		implements IndexingPlanSynchronizationStrategy {
 
+	public static final IndexingPlanSynchronizationStrategy INSTANCE = new SyncIndexingPlanSynchronizationStrategy();
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public SyncIndexingPlanSynchronizationStrategy() {
+	private SyncIndexingPlanSynchronizationStrategy() {
 	}
 
 	@Override
@@ -31,13 +32,13 @@ public class SyncIndexingPlanSynchronizationStrategy<E>
 	}
 
 	@Override
-	public void apply(IndexingPlanSynchronizationStrategyConfigurationContext<E> context) {
+	public void apply(IndexingPlanSynchronizationStrategyConfigurationContext context) {
 		// Request indexing to force a commit and a refresh.
 		context.documentCommitStrategy( DocumentCommitStrategy.FORCE );
 		context.documentRefreshStrategy( DocumentRefreshStrategy.FORCE );
 		context.indexingFutureHandler( future -> {
 			// Wait for the result of indexing, so that we're sure changes were committed and refreshed.
-			SearchIndexingPlanExecutionReport<E> report = Futures.unwrappedExceptionJoin( future );
+			SearchIndexingPlanExecutionReport report = Futures.unwrappedExceptionJoin( future );
 			report.throwable().ifPresent( t -> {
 				throw log.indexingFailure( t.getMessage(), report.failingEntities(), t );
 			} );

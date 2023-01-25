@@ -24,7 +24,7 @@ public class ConfiguredIndexingPlanSynchronizationStrategy<E> {
 
 	private final DocumentCommitStrategy documentCommitStrategy;
 	private final DocumentRefreshStrategy documentRefreshStrategy;
-	private final Consumer<CompletableFuture<SearchIndexingPlanExecutionReport<E>>> indexingFutureHandler;
+	private final Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> indexingFutureHandler;
 	private final OperationSubmitter operationSubmitter;
 	private final EntityReferenceFactory<E> entityReferenceFactory;
 
@@ -45,20 +45,20 @@ public class ConfiguredIndexingPlanSynchronizationStrategy<E> {
 	}
 
 	public void executeAndSynchronize(PojoIndexingPlan indexingPlan) {
-		CompletableFuture<SearchIndexingPlanExecutionReport<E>> reportFuture =
+		CompletableFuture<SearchIndexingPlanExecutionReport> reportFuture =
 				indexingPlan.executeAndReport( entityReferenceFactory, operationSubmitter )
 						.thenApply( SearchIndexingPlanExecutionReportImpl::new );
 		indexingFutureHandler.accept( reportFuture );
 	}
 
 	public static final class Builder<E>
-			implements IndexingPlanSynchronizationStrategyConfigurationContext<E> {
+			implements IndexingPlanSynchronizationStrategyConfigurationContext {
 
 		private final FailureHandler failureHandler;
 
 		private DocumentCommitStrategy documentCommitStrategy = DocumentCommitStrategy.NONE;
 		private DocumentRefreshStrategy documentRefreshStrategy = DocumentRefreshStrategy.NONE;
-		private Consumer<CompletableFuture<SearchIndexingPlanExecutionReport<E>>> indexingFutureHandler = future -> {
+		private Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> indexingFutureHandler = future -> {
 		};
 		private OperationSubmitter operationSubmitter = OperationSubmitter.blocking();
 
@@ -82,7 +82,7 @@ public class ConfiguredIndexingPlanSynchronizationStrategy<E> {
 		}
 
 		@Override
-		public void indexingFutureHandler(Consumer<CompletableFuture<SearchIndexingPlanExecutionReport<E>>> handler) {
+		public void indexingFutureHandler(Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> handler) {
 			Contracts.assertNotNull( handler, "handler" );
 			this.indexingFutureHandler = handler;
 		}

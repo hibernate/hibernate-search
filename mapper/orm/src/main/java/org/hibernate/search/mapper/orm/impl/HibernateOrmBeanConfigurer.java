@@ -9,8 +9,6 @@ package org.hibernate.search.mapper.orm.impl;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
-import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.coordination.impl.NoCoordinationStrategy;
 
@@ -43,27 +41,6 @@ public class HibernateOrmBeanConfigurer implements BeanConfigurer {
 				org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy.class,
 				org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames.SYNC,
 				BeanReference.ofInstance( org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy.sync() )
-		);
-
-		context.define(
-				HibernateOrmIndexingPlanSynchronizationStrategy.class,
-				HibernateOrmIndexingPlanSynchronizationStrategyNames.ASYNC,
-				BeanReference.ofInstance( HibernateOrmIndexingPlanSynchronizationStrategy.async() )
-		);
-		context.define(
-				HibernateOrmIndexingPlanSynchronizationStrategy.class,
-				HibernateOrmIndexingPlanSynchronizationStrategyNames.WRITE_SYNC,
-				BeanReference.ofInstance( HibernateOrmIndexingPlanSynchronizationStrategy.writeSync() )
-		);
-		context.define(
-				HibernateOrmIndexingPlanSynchronizationStrategy.class,
-				HibernateOrmIndexingPlanSynchronizationStrategyNames.READ_SYNC,
-				BeanReference.ofInstance( HibernateOrmIndexingPlanSynchronizationStrategy.readSync() )
-		);
-		context.define(
-				HibernateOrmIndexingPlanSynchronizationStrategy.class,
-				HibernateOrmIndexingPlanSynchronizationStrategyNames.SYNC,
-				BeanReference.ofInstance( HibernateOrmIndexingPlanSynchronizationStrategy.sync() )
 		);
 	}
 }

@@ -21,9 +21,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
-import org.hibernate.search.mapper.pojo.standalone.plan.synchronization.PojoStandaloneIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
@@ -85,7 +85,7 @@ public class EntityAsTreeSmokeIT {
 					.isEmpty();
 		}
 		try ( SearchSession session = mapping.createSessionWithOptions()
-				.indexingPlanSynchronizationStrategy( PojoStandaloneIndexingPlanSynchronizationStrategy.sync() )
+				.indexingPlanSynchronizationStrategy( IndexingPlanSynchronizationStrategy.sync() )
 				.build() ) {
 			session.indexingPlan().add( indexed1 );
 			session.indexingPlan().add( indexed2 );
@@ -99,7 +99,7 @@ public class EntityAsTreeSmokeIT {
 					.containsExactlyInAnyOrder( indexed1 );
 		}
 		try ( SearchSession session = mapping.createSessionWithOptions()
-				.indexingPlanSynchronizationStrategy( PojoStandaloneIndexingPlanSynchronizationStrategy.sync() )
+				.indexingPlanSynchronizationStrategy( IndexingPlanSynchronizationStrategy.sync() )
 				.build() ) {
 			session.indexingPlan().delete( indexed1 );
 		}

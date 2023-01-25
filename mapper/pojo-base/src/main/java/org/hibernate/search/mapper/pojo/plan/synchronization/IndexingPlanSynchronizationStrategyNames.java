@@ -4,17 +4,17 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.automaticindexing.session;
+package org.hibernate.search.mapper.pojo.plan.synchronization;
 
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * The names of built-in automatic indexing synchronization strategies,
- * accepted by {@link HibernateOrmMapperSettings#INDEXING_PLAN_SYNCHRONIZATION_STRATEGY}.
+ * The names of built-in automatic indexing synchronization strategies.
  */
-public final class HibernateOrmIndexingPlanSynchronizationStrategyNames {
+@Incubating
+public final class IndexingPlanSynchronizationStrategyNames {
 
-	private HibernateOrmIndexingPlanSynchronizationStrategyNames() {
+	private IndexingPlanSynchronizationStrategyNames() {
 	}
 
 	/**

@@ -29,13 +29,13 @@ import org.hibernate.dialect.CockroachDB192Dialect;
 import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEvent;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
@@ -62,7 +62,7 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 		sessionFactory = setupHelper.start()
 				// This is absolutely necessary to avoid false positives in this test
 				.withProperty( HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,
-						HibernateOrmIndexingPlanSynchronizationStrategyNames.SYNC )
+						IndexingPlanSynchronizationStrategyNames.SYNC )
 				.skipTestForDialect( SQLServerDialect.class,
 						"The execution could provoke a failure caused by a deadlock on SQLServer, "
 						+ "which will abort our requests and will make the tests fail." )

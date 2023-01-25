@@ -10,28 +10,28 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategyConfigurationContext;
 import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport;
 
 @SuppressWarnings( "deprecation" )
 public class DelegatingAutomaticIndexingSynchronizationStrategy implements org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy {
 
-	private final HibernateOrmIndexingPlanSynchronizationStrategy delegate;
+	private final IndexingPlanSynchronizationStrategy delegate;
 
-	public DelegatingAutomaticIndexingSynchronizationStrategy(HibernateOrmIndexingPlanSynchronizationStrategy delegate) {
+	public DelegatingAutomaticIndexingSynchronizationStrategy(IndexingPlanSynchronizationStrategy delegate) {
 		this.delegate = delegate;
 	}
 
 	@Override
 	public void apply(org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationConfigurationContext context) {
-		delegate.apply( new IndexingPlanSynchronizationStrategyConfigurationContext<EntityReference>() {
+		delegate.apply( new IndexingPlanSynchronizationStrategyConfigurationContext() {
 			@Override
 			public void documentCommitStrategy(DocumentCommitStrategy strategy) {
 				context.documentCommitStrategy( strategy );
@@ -43,7 +43,7 @@ public class DelegatingAutomaticIndexingSynchronizationStrategy implements org.h
 			}
 
 			@Override
-			public void indexingFutureHandler(Consumer<CompletableFuture<SearchIndexingPlanExecutionReport<EntityReference>>> handler) {
+			public void indexingFutureHandler(Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> handler) {
 				context.indexingFutureHandler( report ->
 						handler.accept( report.thenApply( DelegatingSearchIndexingPlanExecutionReport::new ) )
 				);
@@ -61,11 +61,11 @@ public class DelegatingAutomaticIndexingSynchronizationStrategy implements org.h
 		} );
 	}
 
-	public HibernateOrmIndexingPlanSynchronizationStrategy delegate() {
+	public IndexingPlanSynchronizationStrategy delegate() {
 		return delegate;
 	}
 
-	private static class DelegatingSearchIndexingPlanExecutionReport implements SearchIndexingPlanExecutionReport<EntityReference> {
+	private static class DelegatingSearchIndexingPlanExecutionReport implements SearchIndexingPlanExecutionReport {
 
 		private final org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport report;
 
@@ -79,8 +79,8 @@ public class DelegatingAutomaticIndexingSynchronizationStrategy implements org.h
 		}
 
 		@Override
-		public List<EntityReference> failingEntities() {
-			return report.failingEntities();
+		public List<Object> failingEntities() {
+			return report.failingEntities().stream().map( Object.class::cast ).collect( Collectors.toList() );
 		}
 	}
 }

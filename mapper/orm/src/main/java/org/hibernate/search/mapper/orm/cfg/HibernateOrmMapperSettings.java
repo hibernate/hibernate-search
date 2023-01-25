@@ -8,13 +8,13 @@ package org.hibernate.search.mapper.orm.cfg;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.coordination.impl.NoCoordinationStrategy;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
 /**
@@ -199,12 +199,12 @@ public final class HibernateOrmMapperSettings {
 	/**
 	 * The synchronization strategy to use when indexing automatically.
 	 * <p>
-	 * Expects one of the strings defined in {@link HibernateOrmIndexingPlanSynchronizationStrategyNames},
-	 * or a reference to a bean of type {@link HibernateOrmIndexingPlanSynchronizationStrategy}.
+	 * Expects one of the strings defined in {@link IndexingPlanSynchronizationStrategyNames},
+	 * or a reference to a bean of type {@link IndexingPlanSynchronizationStrategy}.
 	 * <p>
 	 * Defaults to {@link Defaults#INDEXING_PLAN_SYNCHRONIZATION_STRATEGY}.
 	 *
-	 * @see HibernateOrmIndexingPlanSynchronizationStrategyNames
+	 * @see IndexingPlanSynchronizationStrategyNames
 	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
 	 * which includes a description of the "bean reference" properties and accepted values.
 	 */
@@ -338,8 +338,8 @@ public final class HibernateOrmMapperSettings {
 		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY = SchemaManagementStrategyName.CREATE_OR_VALIDATE;
 		public static final BeanReference<CoordinationStrategy> COORDINATION_STRATEGY =
 				BeanReference.of( CoordinationStrategy.class, NoCoordinationStrategy.NAME );
-		public static final BeanReference<HibernateOrmIndexingPlanSynchronizationStrategy> INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
-				BeanReference.of( HibernateOrmIndexingPlanSynchronizationStrategy.class, "write-sync" );
+		public static final BeanReference<IndexingPlanSynchronizationStrategy> INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
+				BeanReference.of( IndexingPlanSynchronizationStrategy.class, "write-sync" );
 
 	}
 

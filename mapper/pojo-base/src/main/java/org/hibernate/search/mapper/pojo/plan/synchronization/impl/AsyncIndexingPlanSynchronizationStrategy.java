@@ -18,11 +18,12 @@ import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchro
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class AsyncIndexingPlanSynchronizationStrategy<E> implements IndexingPlanSynchronizationStrategy<E> {
+public final class AsyncIndexingPlanSynchronizationStrategy implements IndexingPlanSynchronizationStrategy {
 
+	public static final IndexingPlanSynchronizationStrategy INSTANCE = new AsyncIndexingPlanSynchronizationStrategy();
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public AsyncIndexingPlanSynchronizationStrategy() {
+	private AsyncIndexingPlanSynchronizationStrategy() {
 	}
 
 	@Override
@@ -31,7 +32,7 @@ public class AsyncIndexingPlanSynchronizationStrategy<E> implements IndexingPlan
 	}
 
 	@Override
-	public void apply(IndexingPlanSynchronizationStrategyConfigurationContext<E> context) {
+	public void apply(IndexingPlanSynchronizationStrategyConfigurationContext context) {
 		context.documentCommitStrategy( DocumentCommitStrategy.NONE );
 		context.documentRefreshStrategy( DocumentRefreshStrategy.NONE );
 		FailureHandler failureHandler = context.failureHandler();
@@ -47,7 +48,7 @@ public class AsyncIndexingPlanSynchronizationStrategy<E> implements IndexingPlan
 								EntityIndexingFailureContext.Builder contextBuilder = EntityIndexingFailureContext.builder();
 								contextBuilder.throwable( result.throwable().get() );
 								contextBuilder.failingOperation( log.automaticIndexing() );
-								for ( E entityReference : result.failingEntities() ) {
+								for ( Object entityReference : result.failingEntities() ) {
 									contextBuilder.entityReference( entityReference );
 								}
 								failureHandler.handle( contextBuilder.build() );

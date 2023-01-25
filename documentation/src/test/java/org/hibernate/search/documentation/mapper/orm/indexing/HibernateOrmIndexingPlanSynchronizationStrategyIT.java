@@ -16,10 +16,10 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategyNames;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,7 +40,7 @@ public class HibernateOrmIndexingPlanSynchronizationStrategyIT {
 				.withProperty(
 						HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,
 						// To be overridden below
-						HibernateOrmIndexingPlanSynchronizationStrategyNames.ASYNC
+						IndexingPlanSynchronizationStrategyNames.ASYNC
 				)
 				.setup( Book.class, Author.class );
 		initData( entityManagerFactory );
@@ -52,7 +52,7 @@ public class HibernateOrmIndexingPlanSynchronizationStrategyIT {
 					Search.session( entityManager );
 			// tag::indexing-plan-synchronization-strategy-override[]
 			searchSession.indexingPlanSynchronizationStrategy(
-					HibernateOrmIndexingPlanSynchronizationStrategy.sync()
+					IndexingPlanSynchronizationStrategy.sync()
 			); // <2>
 
 			entityManager.getTransaction().begin();
