@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendImplSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.impl.ElasticsearchBackendImplSettings;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
