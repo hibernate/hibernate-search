@@ -26,6 +26,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Transient;
 
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.AbstractAutomaticIndexingSingleValuedAssociationBaseIT;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.ContainerPrimitives;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.accessor.MultiValuedPropertyAccessor;
@@ -89,6 +90,11 @@ public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT
 	public void setup(OrmSetupHelper.SetupContext setupContext,
 			ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
 		super.setup( setupContext, dataClearConfig );
+		// Avoid problems with deep chains of eager associations in ORM 6
+		// See https://github.com/hibernate/hibernate-orm/blob/6.0/migration-guide.adoc#fetch-circularity-determination
+		// See https://hibernate.zulipchat.com/#narrow/stream/132094-hibernate-orm-dev/topic/lazy.20associations.20with.20ORM.206
+		setupContext.withProperty( AvailableSettings.MAX_FETCH_DEPTH, 1 );
+
 		// Necessary for BytecodeEnhancerRunner, see BytecodeEnhancementIT.setup
 		setupContext.withTcclLookupPrecedenceBefore();
 

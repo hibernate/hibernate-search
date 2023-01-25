@@ -80,9 +80,9 @@ public class AutomaticIndexingOneToOneOwnedByContainedEagerOnBothSidesIT
 			ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
 		super.setup( setupContext, dataClearConfig );
 		// Avoid problems with deep chains of eager associations in ORM 6
-		// See https://github.com/hibernate/hibernate-orm/blob/main/migration-guide.adoc#fetch-behaviour-change
+		// See https://github.com/hibernate/hibernate-orm/blob/6.0/migration-guide.adoc#fetch-circularity-determination
 		// See https://hibernate.zulipchat.com/#narrow/stream/132094-hibernate-orm-dev/topic/lazy.20associations.20with.20ORM.206
-		setupContext.withProperty( AvailableSettings.MAX_FETCH_DEPTH, 2 );
+		setupContext.withProperty( AvailableSettings.MAX_FETCH_DEPTH, 1 );
 
 		// We're simulating a mappedBy with two associations (see comments in annotation mapping),
 		// so we need to clear one side before we can delete entities.
