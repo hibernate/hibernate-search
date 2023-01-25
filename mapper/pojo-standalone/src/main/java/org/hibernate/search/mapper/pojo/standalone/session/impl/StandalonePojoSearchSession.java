@@ -25,6 +25,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.plan.synchronization.impl.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
@@ -37,8 +38,6 @@ import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoSe
 import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.impl.StandalonePojoMassIndexingSessionContext;
-import org.hibernate.search.mapper.pojo.standalone.plan.synchronization.PojoStandaloneIndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.pojo.standalone.plan.synchronization.impl.PojoStandaloneIndexingPlanSynchronizationStrategyImpl;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.scope.impl.SearchScopeImpl;
@@ -116,7 +115,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public void indexingPlanSynchronizationStrategy( PojoStandaloneIndexingPlanSynchronizationStrategy synchronizationStrategy) {
+	public void indexingPlanSynchronizationStrategy( IndexingPlanSynchronizationStrategy synchronizationStrategy) {
 		this.indexingPlanSynchronizationStrategy = configureSynchronizationStrategy( synchronizationStrategy );
 	}
 
@@ -216,7 +215,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	}
 
 	private ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> configureSynchronizationStrategy(
-			PojoStandaloneIndexingPlanSynchronizationStrategy synchronizationStrategy) {
+			IndexingPlanSynchronizationStrategy synchronizationStrategy) {
 		ConfiguredIndexingPlanSynchronizationStrategy.Builder<EntityReference> builder =
 				new ConfiguredIndexingPlanSynchronizationStrategy.Builder<>(
 						mappingContext.failureHandler(),
@@ -228,9 +227,9 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 
 	public static class Builder implements SearchSessionBuilder {
 
-		private static final OptionalConfigurationProperty<BeanReference<? extends PojoStandaloneIndexingPlanSynchronizationStrategy>> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
+		private static final OptionalConfigurationProperty<BeanReference<? extends IndexingPlanSynchronizationStrategy>> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 				ConfigurationProperty.forKey( StandalonePojoMapperSettings.Radicals.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY )
-						.asBeanReference( PojoStandaloneIndexingPlanSynchronizationStrategy.class )
+						.asBeanReference( IndexingPlanSynchronizationStrategy.class )
 						.build();
 
 		private final ConfigurationPropertySource configurationPropertySource;
@@ -238,7 +237,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 		private final StandalonePojoSearchSessionMappingContext mappingContext;
 		private final StandalonePojoSearchSessionTypeContextProvider typeContextProvider;
 
-		private PojoStandaloneIndexingPlanSynchronizationStrategy synchronizationStrategy;
+		private IndexingPlanSynchronizationStrategy synchronizationStrategy;
 
 		private String tenantId;
 		private DocumentCommitStrategy commitStrategy;
@@ -268,14 +267,14 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 		}
 
 		@SuppressWarnings( "deprecation" ) // need to keep OLD API still implemented
-		// @Override
+		@Override
 		public SearchSessionBuilder refreshStrategy(DocumentRefreshStrategy refreshStrategy) {
 			this.refreshStrategy = refreshStrategy;
 			return this;
 		}
 
 		@Override
-		public SearchSessionBuilder indexingPlanSynchronizationStrategy(PojoStandaloneIndexingPlanSynchronizationStrategy synchronizationStrategy) {
+		public SearchSessionBuilder indexingPlanSynchronizationStrategy(IndexingPlanSynchronizationStrategy synchronizationStrategy) {
 			this.synchronizationStrategy = synchronizationStrategy;
 			return this;
 		}
@@ -293,20 +292,20 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 				throw log.conflictingIndexPlanSynchronizationConfiguration();
 			}
 			else if ( synchronizationStrategy == null && lowLevelConfig ) {
-				synchronizationStrategy = PojoStandaloneIndexingPlanSynchronizationStrategyImpl.from(
+				synchronizationStrategy = strategy(
 						Optional.ofNullable( commitStrategy ).orElse( DocumentCommitStrategy.FORCE ),
 						Optional.ofNullable( refreshStrategy ).orElse( DocumentRefreshStrategy.NONE )
 				);
 			}
 			else if ( synchronizationStrategy == null ) {
-				synchronizationStrategy = PojoStandaloneIndexingPlanSynchronizationStrategy.writeSync();
+				synchronizationStrategy = IndexingPlanSynchronizationStrategy.writeSync();
 			}
 
 			return new StandalonePojoSearchSession( this );
 		}
 
-		private PojoStandaloneIndexingPlanSynchronizationStrategy resolveAutomaticIndexingSynchronizationStrategy() {
-			try ( BeanHolder<? extends PojoStandaloneIndexingPlanSynchronizationStrategy> beanHolder = AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.getAndTransform(
+		private IndexingPlanSynchronizationStrategy resolveAutomaticIndexingSynchronizationStrategy() {
+			try ( BeanHolder<? extends IndexingPlanSynchronizationStrategy> beanHolder = AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.getAndTransform(
 					configurationPropertySource,
 					referenceOptional -> beanResolver.resolve( referenceOptional.orElse(
 							StandalonePojoMapperSettings.Defaults.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY ) )
@@ -314,6 +313,29 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 				return synchronizationStrategy != null ? synchronizationStrategy :
 						beanHolder.get();
 			}
+		}
+
+		private static IndexingPlanSynchronizationStrategy strategy(
+				DocumentCommitStrategy commitStrategy,
+				DocumentRefreshStrategy refreshStrategy
+		) {
+			if ( DocumentCommitStrategy.NONE.equals( commitStrategy ) && DocumentRefreshStrategy.NONE.equals(
+					refreshStrategy ) ) {
+				return IndexingPlanSynchronizationStrategy.async();
+			}
+			if ( DocumentCommitStrategy.FORCE.equals( commitStrategy ) && DocumentRefreshStrategy.FORCE.equals(
+					refreshStrategy ) ) {
+				return IndexingPlanSynchronizationStrategy.sync();
+			}
+			if ( DocumentCommitStrategy.FORCE.equals( commitStrategy ) && DocumentRefreshStrategy.NONE.equals(
+					refreshStrategy ) ) {
+				return IndexingPlanSynchronizationStrategy.writeSync();
+			}
+			if ( DocumentCommitStrategy.NONE.equals( commitStrategy ) && DocumentRefreshStrategy.FORCE.equals(
+					refreshStrategy ) ) {
+				return IndexingPlanSynchronizationStrategy.readSync();
+			}
+			throw new IllegalStateException( "This shouldn't happen." );
 		}
 	}
 }

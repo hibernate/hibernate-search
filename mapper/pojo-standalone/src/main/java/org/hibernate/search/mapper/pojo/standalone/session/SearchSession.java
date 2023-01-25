@@ -14,7 +14,6 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
-import org.hibernate.search.mapper.pojo.standalone.plan.synchronization.PojoStandaloneIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
@@ -213,6 +212,6 @@ public interface SearchSession extends AutoCloseable {
 	 * @param synchronizationStrategy The synchronization strategy to use
 	 * @see IndexingPlanSynchronizationStrategy
 	 */
-	void indexingPlanSynchronizationStrategy(PojoStandaloneIndexingPlanSynchronizationStrategy synchronizationStrategy);
+	void indexingPlanSynchronizationStrategy(IndexingPlanSynchronizationStrategy synchronizationStrategy);
 
 }

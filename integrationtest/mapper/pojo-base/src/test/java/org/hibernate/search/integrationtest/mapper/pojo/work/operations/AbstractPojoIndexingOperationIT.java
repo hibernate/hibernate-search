@@ -19,10 +19,10 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionEntityLoader;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
-import org.hibernate.search.mapper.pojo.standalone.plan.synchronization.PojoStandaloneIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
@@ -47,10 +47,10 @@ public abstract class AbstractPojoIndexingOperationIT {
 	@Parameterized.Parameters(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
 	public static List<Object[]> parameters() {
 		Object[][] strategies = new Object[][] {
-				new Object[] { DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, PojoStandaloneIndexingPlanSynchronizationStrategy.async() },
-				new Object[] { DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE, PojoStandaloneIndexingPlanSynchronizationStrategy.writeSync() },
-				new Object[] { DocumentCommitStrategy.NONE, DocumentRefreshStrategy.FORCE, PojoStandaloneIndexingPlanSynchronizationStrategy.readSync() },
-				new Object[] { DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, PojoStandaloneIndexingPlanSynchronizationStrategy.sync() }
+				new Object[] { DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, IndexingPlanSynchronizationStrategy.async() },
+				new Object[] { DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE, IndexingPlanSynchronizationStrategy.writeSync() },
+				new Object[] { DocumentCommitStrategy.NONE, DocumentRefreshStrategy.FORCE, IndexingPlanSynchronizationStrategy.readSync() },
+				new Object[] { DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, IndexingPlanSynchronizationStrategy.sync() }
 		};
 
 		List<Object[]> params = new ArrayList<>();
@@ -83,7 +83,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 	@Parameterized.Parameter(3)
 	public MyRoutingBinder routingBinder;
 	@Parameterized.Parameter(4)
-	public PojoStandaloneIndexingPlanSynchronizationStrategy strategy;
+	public IndexingPlanSynchronizationStrategy strategy;
 
 	protected SearchMapping mapping;
 

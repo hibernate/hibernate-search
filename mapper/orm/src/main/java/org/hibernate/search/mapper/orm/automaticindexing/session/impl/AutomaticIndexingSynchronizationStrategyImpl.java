@@ -7,17 +7,19 @@
 package org.hibernate.search.mapper.orm.automaticindexing.session.impl;
 
 
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
+
 @SuppressWarnings( "deprecation" )
 public final class AutomaticIndexingSynchronizationStrategyImpl {
 	private AutomaticIndexingSynchronizationStrategyImpl() {
 	}
 
 	public static final org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy ASYNC = new DelegatingAutomaticIndexingSynchronizationStrategy(
-			HibernateOrmIndexingPlanSynchronizationStrategyImpl.ASYNC );
+			IndexingPlanSynchronizationStrategy.async() );
 	public static final org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy WRITE_SYNC = new DelegatingAutomaticIndexingSynchronizationStrategy(
-			HibernateOrmIndexingPlanSynchronizationStrategyImpl.WRITE_SYNC );
+			IndexingPlanSynchronizationStrategy.writeSync() );
 	public static final org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy READ_SYNC = new DelegatingAutomaticIndexingSynchronizationStrategy(
-			HibernateOrmIndexingPlanSynchronizationStrategyImpl.READ_SYNC );
+			IndexingPlanSynchronizationStrategy.readSync() );
 	public static final org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy SYNC = new DelegatingAutomaticIndexingSynchronizationStrategy(
-			HibernateOrmIndexingPlanSynchronizationStrategyImpl.SYNC );
+			IndexingPlanSynchronizationStrategy.sync() );
 }

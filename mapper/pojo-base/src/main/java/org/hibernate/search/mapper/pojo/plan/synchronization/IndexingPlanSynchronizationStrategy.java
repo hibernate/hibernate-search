@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.plan.synchronization;
 
+import org.hibernate.search.mapper.pojo.plan.synchronization.impl.AsyncIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.plan.synchronization.impl.ReadSyncIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.plan.synchronization.impl.SyncIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.plan.synchronization.impl.WriteSyncIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -15,8 +19,40 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * {@code SearchSession#indexingPlanSynchronizationStrategy(IndexingPlanSynchronizationStrategy)}
  */
 @Incubating
-public interface IndexingPlanSynchronizationStrategy<E> {
+public interface IndexingPlanSynchronizationStrategy {
 
-	void apply(IndexingPlanSynchronizationStrategyConfigurationContext<E> context);
+	void apply(IndexingPlanSynchronizationStrategyConfigurationContext context);
 
+	/**
+	 * @return A strategy that only waits for index changes to be queued in the backend.
+	 * See the reference documentation for details.
+	 */
+	static IndexingPlanSynchronizationStrategy async() {
+		return AsyncIndexingPlanSynchronizationStrategy.INSTANCE;
+	}
+
+	/**
+	 * @return A strategy that waits for index changes to be queued and applied, forces a commit, and waits for the commit to complete.
+	 * See the reference documentation for details.
+	 */
+	static IndexingPlanSynchronizationStrategy writeSync() {
+		return WriteSyncIndexingPlanSynchronizationStrategy.INSTANCE;
+	}
+
+	/**
+	 * @return A strategy that waits for index changes to be queued and applied, forces a refresh, and waits for the refresh to complete.
+	 * See the reference documentation for details.
+	 */
+	static IndexingPlanSynchronizationStrategy readSync() {
+		return ReadSyncIndexingPlanSynchronizationStrategy.INSTANCE;
+	}
+
+	/**
+	 * @return A strategy that waits for index changes to be queued and applied, forces a commit and a refresh,
+	 * and waits for the commit and refresh to complete.
+	 * See the reference documentation for details.
+	 */
+	static IndexingPlanSynchronizationStrategy sync() {
+		return SyncIndexingPlanSynchronizationStrategy.INSTANCE;
+	}
 }

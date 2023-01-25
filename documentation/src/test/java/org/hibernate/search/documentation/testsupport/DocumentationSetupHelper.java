@@ -16,11 +16,11 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
@@ -142,7 +142,7 @@ public final class DocumentationSetupHelper
 					SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP );
 			// Override the automatic indexing synchronization strategy according to our needs for testing
 			withProperty( HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,
-					HibernateOrmIndexingPlanSynchronizationStrategyNames.SYNC );
+					IndexingPlanSynchronizationStrategyNames.SYNC );
 			// Set up default mapping if necessary
 			if ( annotationProcessingEnabled != null ) {
 				withProperty( HibernateOrmMapperSettings.MAPPING_PROCESS_ANNOTATIONS, annotationProcessingEnabled );

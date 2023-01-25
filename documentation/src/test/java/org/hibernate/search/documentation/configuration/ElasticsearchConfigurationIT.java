@@ -16,8 +16,8 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.IndexSettings;
-import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategyNames;
 
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ public class ElasticsearchConfigurationIT {
 		// orm configuration
 		config.put(
 				HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,
-				HibernateOrmIndexingPlanSynchronizationStrategyNames.ASYNC
+				IndexingPlanSynchronizationStrategyNames.ASYNC
 		);
 		// engine configuration
 		config.put( EngineSettings.BACKGROUND_FAILURE_HANDLER, "myFailureHandler" );

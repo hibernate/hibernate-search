@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.work;
 import java.util.List;
 import java.util.Optional;
 
-public interface SearchIndexingPlanExecutionReport<E> {
+public interface SearchIndexingPlanExecutionReport {
 
 	/**
 	 * @return The {@link Exception} or {@link Error} thrown when indexing failed,
@@ -21,6 +21,6 @@ public interface SearchIndexingPlanExecutionReport<E> {
 	 * @return A list of references to entities that may not be indexed correctly as a result of the failure.
 	 * Never {@code null}, but may be empty.
 	 */
-	List<E> failingEntities();
+	List<Object> failingEntities();
 
 }

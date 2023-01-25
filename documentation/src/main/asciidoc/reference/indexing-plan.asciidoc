@@ -199,10 +199,10 @@ by calling `SearchSession#indexingPlanSynchronizationStrategy(...)` and passing 
 
 The built-in strategies can be retrieved by calling:
 
-* `HibernateOrmIndexingPlanSynchronizationStrategy.async()` for the Hibernate ORM mapper, or `PojoStandaloneIndexingPlanSynchronizationStrategy.async()` for the Pojo Standalone mapper
-* `HibernateOrmIndexingPlanSynchronizationStrategy.writeSync()` for the Hibernate ORM mapper, or `PojoStandaloneIndexingPlanSynchronizationStrategy.writeSync()` for the Pojo Standalone mapper
-* `HibernateOrmIndexingPlanSynchronizationStrategy.readSync()` for the Hibernate ORM mapper, or `PojoStandaloneIndexingPlanSynchronizationStrategy.readSync()` for the Pojo Standalone mapper
-* or `HibernateOrmIndexingPlanSynchronizationStrategy.sync()` for the Hibernate ORM mapper, or `PojoStandaloneIndexingPlanSynchronizationStrategy.sync()` for the Pojo Standalone mapper
+* `IndexingPlanSynchronizationStrategy.async()`
+* `IndexingPlanSynchronizationStrategy.writeSync()`
+* `IndexingPlanSynchronizationStrategy.readSync()`
+* or `IndexingPlanSynchronizationStrategy.sync()`
 
 .Overriding the automatic indexing synchronization strategy
 ====

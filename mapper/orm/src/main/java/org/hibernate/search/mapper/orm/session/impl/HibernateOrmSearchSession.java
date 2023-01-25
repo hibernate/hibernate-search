@@ -21,7 +21,6 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.mapper.orm.automaticindexing.session.HibernateOrmIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.DelegatingAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
 import org.hibernate.search.mapper.orm.common.EntityReference;
@@ -43,6 +42,7 @@ import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanSessionContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.plan.synchronization.impl.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
@@ -193,13 +193,12 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		indexingPlanSynchronizationStrategy(
 				synchronizationStrategy instanceof DelegatingAutomaticIndexingSynchronizationStrategy ?
 						( (DelegatingAutomaticIndexingSynchronizationStrategy) synchronizationStrategy ).delegate() :
-						new HibernateOrmIndexingPlanSynchronizationStrategyAdapter( synchronizationStrategy )
+						new IndexingPlanSynchronizationStrategyAdapter( synchronizationStrategy )
 		);
 	}
 
 	@Override
-	public void indexingPlanSynchronizationStrategy(
-			HibernateOrmIndexingPlanSynchronizationStrategy synchronizationStrategy) {
+	public void indexingPlanSynchronizationStrategy(IndexingPlanSynchronizationStrategy synchronizationStrategy) {
 		this.indexingPlanSynchronizationStrategy =
 				automaticIndexingStrategy.configureOverriddenSynchronizationStrategy( synchronizationStrategy );
 	}
