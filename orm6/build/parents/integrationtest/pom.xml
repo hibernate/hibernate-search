@@ -264,7 +264,7 @@
         <profile>
             <id>ci-db2</id>
             <properties>
-                <db.dialect>org.hibernate.dialect.DBDialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.DB2Dialect</db.dialect>
             </properties>
         </profile>
 
