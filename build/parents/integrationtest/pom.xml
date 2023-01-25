@@ -548,7 +548,7 @@
             <id>ci-postgresql</id>
             <properties>
                 <test.database.run.postgres.skip>${test.database.run.skip}</test.database.run.postgres.skip>
-                <db.dialect>org.hibernate.dialect.PostgreSQL10Dialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.PostgreSQLDialect</db.dialect>
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
                 <jdbc.driver>org.postgresql.Driver</jdbc.driver>
@@ -565,7 +565,7 @@
             <id>ci-mariadb</id>
             <properties>
                 <test.database.run.mariadb.skip>${test.database.run.skip}</test.database.run.mariadb.skip>
-                <db.dialect>org.hibernate.dialect.MariaDB103Dialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.MariaDBDialect</db.dialect>
                 <jdbc.driver.groupId>org.mariadb.jdbc</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mariadb-java-client</jdbc.driver.artifactId>
                 <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
@@ -582,7 +582,7 @@
             <id>ci-mysql</id>
             <properties>
                 <test.database.run.mysql.skip>${test.database.run.skip}</test.database.run.mysql.skip>
-                <db.dialect>org.hibernate.dialect.MySQL8Dialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.MySQLDialect</db.dialect>
                 <jdbc.driver.groupId>mysql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mysql-connector-java</jdbc.driver.artifactId>
                 <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
@@ -599,7 +599,7 @@
             <id>ci-db2</id>
             <properties>
                 <test.database.run.db2.skip>${test.database.run.skip}</test.database.run.db2.skip>
-                <db.dialect>org.hibernate.dialect.DB297Dialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.DB2Dialect</db.dialect>
                 <jdbc.driver.groupId>com.ibm.db2</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>jcc</jdbc.driver.artifactId>
                 <jdbc.driver>com.ibm.db2.jcc.DB2Driver</jdbc.driver>
@@ -616,7 +616,7 @@
             <id>ci-oracle</id>
             <properties>
                 <test.database.run.oracle.skip>${test.database.run.skip}</test.database.run.oracle.skip>
-                <db.dialect>org.hibernate.dialect.Oracle12cDialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.OracleDialect</db.dialect>
                 <jdbc.driver.groupId>com.oracle.database.jdbc</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>ojdbc8</jdbc.driver.artifactId>
                 <jdbc.driver>oracle.jdbc.OracleDriver</jdbc.driver>
@@ -635,7 +635,7 @@
             <id>ci-mssql</id>
             <properties>
                 <test.database.run.mssql.skip>${test.database.run.skip}</test.database.run.mssql.skip>
-                <db.dialect>org.hibernate.dialect.SQLServer2016Dialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.SQLServerDialect</db.dialect>
                 <jdbc.driver.groupId>com.microsoft.sqlserver</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mssql-jdbc</jdbc.driver.artifactId>
                 <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
@@ -651,7 +651,7 @@
             <id>ci-cockroachdb</id>
             <properties>
                 <test.database.run.cockroachdb.skip>${test.database.run.skip}</test.database.run.cockroachdb.skip>
-                <db.dialect>org.hibernate.dialect.CockroachDB201Dialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.CockroachDBDialect</db.dialect>
                 <!-- CockroachDB uses the same client protocol as PostgreSQL (pgwire), so the driver is the same. -->
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
