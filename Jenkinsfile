@@ -568,7 +568,6 @@ stage('Non-default environments') {
 				withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							-Pdist \
-							-pl ${sh(script: "./ci/list-dependent-integration-tests.sh ${artifactsToTest.join(',')}", returnStdout: true).trim()} \
 							-Dtest.elasticsearch.distribution=$buildEnv.distribution \
 							-Dtest.elasticsearch.version=$buildEnv.version \
 							""",
