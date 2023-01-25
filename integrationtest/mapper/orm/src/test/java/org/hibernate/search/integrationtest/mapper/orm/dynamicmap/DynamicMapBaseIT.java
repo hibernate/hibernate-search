@@ -43,6 +43,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWork
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -649,6 +650,7 @@ public class DynamicMapBaseIT {
 	}
 
 	@Test
+	@Ignore("toone associations are buggy in dynamic-map mode -- see https://hibernate.atlassian.net/browse/HHH-16100")
 	public void toOne() {
 		String hbmPath = "/DynamicMapBaseIT/toone.hbm.xml";
 		String bookTypeName = "Book";
