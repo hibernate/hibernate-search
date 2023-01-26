@@ -28,7 +28,7 @@ import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextPro
 import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.pojo.plan.synchronization.impl.ConfiguredIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.plan.synchronization.spi.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
 import org.hibernate.search.util.common.impl.Closer;
@@ -150,7 +150,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 						.resolve( automaticBeanReference.get() );
 
 				defaultSynchronizationStrategyHolder = BeanHolder.of(
-						new IndexingPlanSynchronizationStrategyAdapter( holder.get() )
+						new HibernateOrmIndexingPlanSynchronizationStrategyAdapter( holder.get() )
 				).withDependencyAutoClosing( holder );
 			}
 			catch (Exception e) {
@@ -213,8 +213,8 @@ public final class ConfiguredAutomaticIndexingStrategy {
 		}
 		else {
 			return mappingContext.createIndexingPlan( context,
-					synchronizationStrategy.getDocumentCommitStrategy(),
-					synchronizationStrategy.getDocumentRefreshStrategy() );
+					synchronizationStrategy.documentCommitStrategy(),
+					synchronizationStrategy.documentRefreshStrategy() );
 		}
 	}
 
@@ -236,8 +236,8 @@ public final class ConfiguredAutomaticIndexingStrategy {
 			ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> synchronizationStrategy) {
 		AutomaticIndexingQueueEventSendingPlan delegate = senderFactory.apply( context );
 		return mappingContext.createIndexingQueueEventProcessingPlan( context,
-				synchronizationStrategy.getDocumentCommitStrategy(),
-				synchronizationStrategy.getDocumentRefreshStrategy(),
+				synchronizationStrategy.documentCommitStrategy(),
+				synchronizationStrategy.documentRefreshStrategy(),
 				new HibernateOrmIndexingQueueEventSendingPlan( delegate ) );
 	}
 

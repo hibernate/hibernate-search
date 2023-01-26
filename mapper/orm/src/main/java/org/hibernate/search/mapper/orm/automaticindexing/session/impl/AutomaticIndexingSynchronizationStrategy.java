@@ -10,8 +10,8 @@ package org.hibernate.search.mapper.orm.automaticindexing.session.impl;
 import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
 
 @SuppressWarnings( "deprecation" )
-public final class AutomaticIndexingSynchronizationStrategyImpl {
-	private AutomaticIndexingSynchronizationStrategyImpl() {
+public final class AutomaticIndexingSynchronizationStrategy {
+	private AutomaticIndexingSynchronizationStrategy() {
 	}
 
 	public static final org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy ASYNC = new DelegatingAutomaticIndexingSynchronizationStrategy(

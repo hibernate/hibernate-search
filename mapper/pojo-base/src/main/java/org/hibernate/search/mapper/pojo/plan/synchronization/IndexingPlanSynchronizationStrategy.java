@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.plan.synchronization;
 
-import org.hibernate.search.mapper.pojo.plan.synchronization.impl.AsyncIndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.pojo.plan.synchronization.impl.ReadSyncIndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.pojo.plan.synchronization.impl.SyncIndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.pojo.plan.synchronization.impl.WriteSyncIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.plan.synchronization.spi.AsyncIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.plan.synchronization.spi.ReadSyncIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.plan.synchronization.spi.SyncIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.plan.synchronization.spi.WriteSyncIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**

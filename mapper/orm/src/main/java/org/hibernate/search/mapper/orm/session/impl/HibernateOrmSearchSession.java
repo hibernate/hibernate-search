@@ -43,7 +43,7 @@ import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanSessionContex
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.pojo.plan.synchronization.impl.ConfiguredIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.plan.synchronization.spi.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
@@ -193,7 +193,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		indexingPlanSynchronizationStrategy(
 				synchronizationStrategy instanceof DelegatingAutomaticIndexingSynchronizationStrategy ?
 						( (DelegatingAutomaticIndexingSynchronizationStrategy) synchronizationStrategy ).delegate() :
-						new IndexingPlanSynchronizationStrategyAdapter( synchronizationStrategy )
+						new HibernateOrmIndexingPlanSynchronizationStrategyAdapter( synchronizationStrategy )
 		);
 	}
 

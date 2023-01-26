@@ -45,7 +45,7 @@ public class DelegatingAutomaticIndexingSynchronizationStrategy implements org.h
 			@Override
 			public void indexingFutureHandler(Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> handler) {
 				context.indexingFutureHandler( report ->
-						handler.accept( report.thenApply( DelegatingSearchIndexingPlanExecutionReport::new ) )
+						handler.accept( report.thenApply( HibernateOrmDelegatingSearchIndexingPlanExecutionReport::new ) )
 				);
 			}
 
@@ -65,11 +65,11 @@ public class DelegatingAutomaticIndexingSynchronizationStrategy implements org.h
 		return delegate;
 	}
 
-	private static class DelegatingSearchIndexingPlanExecutionReport implements SearchIndexingPlanExecutionReport {
+	private static class HibernateOrmDelegatingSearchIndexingPlanExecutionReport implements SearchIndexingPlanExecutionReport {
 
 		private final org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport report;
 
-		private DelegatingSearchIndexingPlanExecutionReport(org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport report) {
+		private HibernateOrmDelegatingSearchIndexingPlanExecutionReport(org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport report) {
 			this.report = report;
 		}
 
