@@ -10,7 +10,6 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isMatching;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isLessThan;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isAtMost;
-import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isOpenSearch;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -52,8 +51,9 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean normalizesStringArgumentToWildcardPredicateForAnalyzedStringField() {
 		// In ES 7.7 through 7.11, wildcard predicates on analyzed fields get their pattern normalized,
 		// but that was deemed a bug and fixed in 7.12.2+: https://github.com/elastic/elasticsearch/pull/53127
+		// Apparently the "fix" was also introduced in OpenSearch 2.5.0
 		return isBetween( actualVersion, "elastic:7.7", "elastic:7.12.1" ) ||
-				isOpenSearch( actualVersion );
+				!isLessThan( actualVersion, "opensearch:2.5.0" );
 	}
 
 	@Override
