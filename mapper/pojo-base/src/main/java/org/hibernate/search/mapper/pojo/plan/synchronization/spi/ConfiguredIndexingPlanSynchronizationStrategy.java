@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.plan.synchronization.impl;
+package org.hibernate.search.mapper.pojo.plan.synchronization.spi;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -16,10 +16,12 @@ import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategyConfigurationContext;
 import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport;
-import org.hibernate.search.mapper.pojo.work.impl.SearchIndexingPlanExecutionReportImpl;
+import org.hibernate.search.mapper.pojo.work.impl.DelegatingSearchIndexingPlanExecutionReport;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
+import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.impl.Contracts;
 
+@Incubating
 public class ConfiguredIndexingPlanSynchronizationStrategy<E> {
 
 	private final DocumentCommitStrategy documentCommitStrategy;
@@ -36,18 +38,18 @@ public class ConfiguredIndexingPlanSynchronizationStrategy<E> {
 		this.entityReferenceFactory = configurationContext.entityReferenceFactory;
 	}
 
-	public DocumentCommitStrategy getDocumentCommitStrategy() {
+	public DocumentCommitStrategy documentCommitStrategy() {
 		return documentCommitStrategy;
 	}
 
-	public DocumentRefreshStrategy getDocumentRefreshStrategy() {
+	public DocumentRefreshStrategy documentRefreshStrategy() {
 		return documentRefreshStrategy;
 	}
 
 	public void executeAndSynchronize(PojoIndexingPlan indexingPlan) {
 		CompletableFuture<SearchIndexingPlanExecutionReport> reportFuture =
 				indexingPlan.executeAndReport( entityReferenceFactory, operationSubmitter )
-						.thenApply( SearchIndexingPlanExecutionReportImpl::new );
+						.thenApply( DelegatingSearchIndexingPlanExecutionReport::new );
 		indexingFutureHandler.accept( reportFuture );
 	}
 

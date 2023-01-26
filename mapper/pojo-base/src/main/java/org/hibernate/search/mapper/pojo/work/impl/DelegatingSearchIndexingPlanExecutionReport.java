@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport;
 
-public class SearchIndexingPlanExecutionReportImpl implements SearchIndexingPlanExecutionReport {
+public class DelegatingSearchIndexingPlanExecutionReport implements SearchIndexingPlanExecutionReport {
 
 	private final MultiEntityOperationExecutionReport<?> delegate;
 
-	public SearchIndexingPlanExecutionReportImpl(MultiEntityOperationExecutionReport<?> delegate) {
+	public DelegatingSearchIndexingPlanExecutionReport(MultiEntityOperationExecutionReport<?> delegate) {
 		this.delegate = delegate;
 	}
 

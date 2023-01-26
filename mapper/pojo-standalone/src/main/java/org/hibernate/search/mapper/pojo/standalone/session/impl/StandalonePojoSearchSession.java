@@ -26,7 +26,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.pojo.plan.synchronization.impl.ConfiguredIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.plan.synchronization.spi.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
 import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
@@ -161,8 +161,8 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 					typeContextProvider, runtimeIntrospector(),
 					mappingContext().createIndexingPlan(
 							this,
-							indexingPlanSynchronizationStrategy.getDocumentCommitStrategy(),
-							indexingPlanSynchronizationStrategy.getDocumentRefreshStrategy()
+							indexingPlanSynchronizationStrategy.documentCommitStrategy(),
+							indexingPlanSynchronizationStrategy.documentRefreshStrategy()
 					),
 					indexingPlanSynchronizationStrategy
 			);
@@ -176,8 +176,8 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 			indexer = new SearchIndexerImpl(
 					runtimeIntrospector(),
 					mappingContext().createIndexer( this ),
-					indexingPlanSynchronizationStrategy.getDocumentCommitStrategy(),
-					indexingPlanSynchronizationStrategy.getDocumentRefreshStrategy()
+					indexingPlanSynchronizationStrategy.documentCommitStrategy(),
+					indexingPlanSynchronizationStrategy.documentRefreshStrategy()
 			);
 		}
 		return indexer;

@@ -21,11 +21,11 @@ import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchro
 import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategyConfigurationContext;
 
 @SuppressWarnings("deprecation")
-public class IndexingPlanSynchronizationStrategyAdapter implements IndexingPlanSynchronizationStrategy {
+public class HibernateOrmIndexingPlanSynchronizationStrategyAdapter implements IndexingPlanSynchronizationStrategy {
 
 	private final org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy delegate;
 
-	public IndexingPlanSynchronizationStrategyAdapter(
+	public HibernateOrmIndexingPlanSynchronizationStrategyAdapter(
 			org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy delegate) {
 		this.delegate = delegate;
 	}
