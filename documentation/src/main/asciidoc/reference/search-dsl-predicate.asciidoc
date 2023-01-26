@@ -526,6 +526,9 @@ If an analyzer has been defined on the field:
 
 * when using the Elasticsearch backend, the patterns won't be analyzed nor normalized,
 and will be expected to match a *single* indexed token, not a sequence of tokens.
+This may behave differently on an older versions of the underlying search engine
+(for example with Elasticsearch 7.7-7.11 or OpenSearch prior to 2.5 the wildcard pattern will get normalized).
+Hence, please refer to the documentation of your particular version for the exact behaviour.
 * when using the Lucene backend the patterns will be normalized, but not tokenized:
 the pattern will still be expected to match a *single* indexed token, not a sequence of tokens.
 
