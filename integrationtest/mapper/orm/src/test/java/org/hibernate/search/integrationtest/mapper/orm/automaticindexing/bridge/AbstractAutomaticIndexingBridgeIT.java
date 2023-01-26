@@ -723,6 +723,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 		private ContainingEntity association2InverseSide;
 
 		@OneToMany(mappedBy = "association2InverseSide")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> association2;
 
 		@ManyToOne
