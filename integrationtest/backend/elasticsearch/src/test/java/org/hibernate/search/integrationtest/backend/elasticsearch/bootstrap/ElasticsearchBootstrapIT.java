@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.bootstrap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isAtMost;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect.isActualVersion;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEqualsIgnoringUnknownFields;
 import static org.junit.Assume.assumeFalse;
@@ -127,7 +127,10 @@ public class ElasticsearchBootstrapIT {
 						" use the same model dialect." +
 						" It is not the case on ES 5 in particular, since 5.6 has a dialect" +
 						" but 5.0, 5.1, etc. don't have one.",
-				isAtMost( ElasticsearchTestDialect.getActualVersion(), "elastic:5.6" )
+				isActualVersion(
+						esVersion -> esVersion.isAtMost( "5.6" ),
+						osVersion -> false
+				)
 		);
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
 		String versionWithMajorOnly = actualVersion.distribution() + ":" + actualVersion.major();
@@ -208,7 +211,10 @@ public class ElasticsearchBootstrapIT {
 						" use the same model dialect." +
 						" It is not the case on ES 5 in particular, since 5.6 has a dialect" +
 						" but 5.0, 5.1, etc. don't have one.",
-				isAtMost( ElasticsearchTestDialect.getActualVersion(), "elastic:5.6" )
+				isActualVersion(
+						esVersion -> esVersion.isAtMost( "5.6" ),
+						osVersion -> false
+				)
 		);
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
 		String versionWithMajorOnly = actualVersion.distribution() + ":" + actualVersion.major();
@@ -262,7 +268,10 @@ public class ElasticsearchBootstrapIT {
 						" use the same model dialect." +
 						" It is not the case on ES 5 in particular, since 5.6 has a dialect" +
 						" but 5.0, 5.1, etc. don't have one.",
-				isAtMost( ElasticsearchTestDialect.getActualVersion(), "elastic:5.6" )
+				isActualVersion(
+						esVersion -> esVersion.isAtMost( "5.6" ),
+						osVersion -> false
+				)
 		);
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
 		String versionWithMajorOnly = actualVersion.distribution() + ":" + actualVersion.major();
