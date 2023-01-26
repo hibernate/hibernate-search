@@ -6,38 +6,35 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
 
-import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isBetween;
-import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isMatching;
-import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isLessThan;
-import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isAtMost;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect.isActualVersion;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 
 class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
-	private final ElasticsearchVersion actualVersion;
-
 	ElasticsearchTckBackendFeatures() {
-		this.actualVersion = ElasticsearchTestDialect.getActualVersion();
 	}
 
 	@Override
 	public boolean geoPointIndexNullAs() {
-		return !isLessThan( actualVersion, "elastic:6.3.0" );
+		return isActualVersion(
+				esVersion -> !esVersion.isLessThan( "6.3.0" ),
+				osVersion -> true
+		);
 	}
 
 	@Override
 	public boolean worksFineWithStrictAboveRangedQueriesOnDecimalScaledField() {
-		return !isLessThan( actualVersion, "elastic:6.0.0" );
+		return isActualVersion(
+				esVersion -> !esVersion.isLessThan( "6.0.0" ),
+				osVersion -> true
+		);
 	}
 
 	@Override
@@ -52,8 +49,10 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// In ES 7.7 through 7.11, wildcard predicates on analyzed fields get their pattern normalized,
 		// but that was deemed a bug and fixed in 7.12.2+: https://github.com/elastic/elasticsearch/pull/53127
 		// Apparently the "fix" was also introduced in OpenSearch 2.5.0
-		return isBetween( actualVersion, "elastic:7.7", "elastic:7.12.1" ) ||
-				!isLessThan( actualVersion, "opensearch:2.5.0" );
+		return isActualVersion(
+				esVersion -> esVersion.isBetween( "7.7", "7.12.1" ),
+				osVersion -> osVersion.isLessThan( "2.5.0" )
+		);
 	}
 
 	@Override
@@ -65,7 +64,10 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
 	public boolean zonedDateTimeDocValueHasUTCZoneId() {
-		return isAtMost( actualVersion, "elastic:6.8" );
+		return isActualVersion(
+				esVersion -> esVersion.isAtMost( "6.8" ),
+				osVersion -> false
+		);
 	}
 
 	@Override
@@ -92,7 +94,10 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 			// and it is fixed in ES 6.x.
 			// Since 5.6 is really old and EOL'd anyway, it's unlikely to ever get a fix.
 			// We'll just ignore tests that fail because of this.
-			return !isLessThan( actualVersion, "elastic:6.0.0" );
+			return isActualVersion(
+					esVersion -> !esVersion.isLessThan( "6.0.0" ),
+					osVersion -> true
+			);
 		}
 		else {
 			return true;
@@ -105,13 +110,19 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 			// For some reason, ES 5.6 to 7.2 fail to index BigInteger values
 			// with "No matching token for number_type [BIG_INTEGER]".
 			// It's fixed in Elasticsearch 7.3, though.
-			return !isLessThan( actualVersion, "elastic:7.3.0" );
+			return isActualVersion(
+					esVersion -> !esVersion.isLessThan( "7.3.0" ),
+					osVersion -> true
+			);
 		}
 		else if ( BigDecimal.class.equals( javaType ) ) {
 			// For some reason, ES 5.6 and 6.x sometimes fails to index BigDecimal values
 			// in dynamic fields.
 			// See https://hibernate.atlassian.net/browse/HSEARCH-4310
-			return !isAtMost( actualVersion, "elastic:6.8" );
+			return isActualVersion(
+					esVersion -> !esVersion.isAtMost( "6.8" ),
+					osVersion -> true
+			);
 		}
 		else {
 			return true;
@@ -125,7 +136,10 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
 	public boolean supportsTotalHitsThresholdForSearch() {
-		return !isAtMost( actualVersion, "elastic:6.8" );
+		return isActualVersion(
+				esVersion -> !esVersion.isAtMost( "6.8" ),
+				osVersion -> true
+		);
 	}
 
 	@Override
@@ -145,7 +159,10 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean supportsExistsForFieldWithoutDocValues(Class<?> fieldType) {
 		if ( GeoPoint.class.equals( fieldType ) ) {
 			// See https://github.com/elastic/elasticsearch/issues/65306
-			return isAtMost( actualVersion, "elastic:7.9" );
+			return isActualVersion(
+					esVersion -> esVersion.isAtMost( "7.9" ),
+					osVersion -> false
+			);
 		}
 		return true;
 	}
@@ -176,7 +193,10 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
 	public boolean supportMoreThan1024TermsOnMatchingAny() {
-		return !isLessThan( actualVersion, "elastic:6.0.0" );
+		return isActualVersion(
+				esVersion -> !esVersion.isLessThan( "6.0.0" ),
+				osVersion -> true
+		);
 	}
 
 	@Override
@@ -187,7 +207,10 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// https://github.com/elastic/elasticsearch/pull/31153
 		// In 6.3 and below, we just can't ignore unmapped fields,
 		// which means sorts will fail when the geo_point field is not present in all indexes.
-		return !isLessThan( actualVersion, "elastic:6.4.0" );
+		return isActualVersion(
+				esVersion -> !esVersion.isLessThan( "6.4.0" ),
+				osVersion -> true
+		);
 	}
 
 	@Override
@@ -222,9 +245,10 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// to their 6.8 branch:
 		// https://github.com/elastic/elasticsearch/pull/42451
 
-		return !isAtMost( actualVersion, "elastic:6.7" ) &&
-				( !ElasticsearchTestHostConnectionConfiguration.get().isAws() ||
-						!isMatching( actualVersion, "elastic:6.8" ) );
+		return isActualVersion(
+				esVersion -> !esVersion.isAtMost( "6.7" ) && ( !esVersion.isMatching( "6.8" ) || !esVersion.isAws() ),
+				osVersion -> true
+		);
 	}
 
 	@Override
@@ -237,15 +261,20 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// https://github.com/elastic/elasticsearch/issues/90187
 		// Seems like this was fixed in 8.5.1 and they won't backport to 8.4:
 		// https://github.com/elastic/elasticsearch/pull/90458
-		return !isBetween( actualVersion, "elastic:8.4.2", "elastic:8.5.0" );
+		return isActualVersion(
+				esVersion -> !esVersion.isBetween( "8.4.2", "8.5.0" ),
+				osVersion -> true
+		);
 	}
 
 	@Override
 	public boolean supportsExtremeScaledNumericValues() {
 		// https://github.com/elastic/elasticsearch/issues/91246
 		// Hopefully this will get fixed in a future version.
-		return !isBetween( actualVersion, "elastic:7.17.7", "elastic:7.17" )
-				&& !isBetween( actualVersion, "elastic:8.5.0", "elastic:8.6.0" );
+		return isActualVersion(
+				esVersion -> !esVersion.isBetween( "7.17.7", "7.17" ) && !esVersion.isBetween( "8.5.0", "8.6.0" ),
+				osVersion -> true
+		);
 	}
 
 	@Override
@@ -253,7 +282,9 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// https://github.com/elastic/elasticsearch/issues/84601
 		// There doesn't seem to be any hope for this to get fixed in older versions (7.17/8.0),
 		// but it's been fixed in 8.1.
-		return !isBetween( actualVersion, "elastic:7.17.7", "elastic:7.17" )
-				&& !isBetween( actualVersion, "elastic:8.0.0", "elastic:8.0" );
+		return isActualVersion(
+				esVersion -> !esVersion.isBetween( "7.17.7", "7.17" ) && !esVersion.isBetween( "8.0.0", "8.0" ),
+				osVersion -> true
+		);
 	}
 }
