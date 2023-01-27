@@ -262,7 +262,7 @@ index f48b9b1291..d45e2e7e86 100644
  								.objectField( "elementCollectionAssociations", b2 -> b2
  										.multiValued( true )
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontained/AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontained/AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT.java
-index 2a43f25e1c..ea90597d52 100644
+index fd12c875c9..11ec226614 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontained/AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontained/AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT.java
 @@ -7,6 +7,7 @@
@@ -273,7 +273,7 @@ index 2a43f25e1c..ea90597d52 100644
  
  import java.lang.reflect.Method;
  import java.util.ArrayList;
-@@ -85,6 +86,57 @@ protected boolean isAssociationLazyOnContainingSide() {
+@@ -86,6 +87,57 @@ protected boolean isAssociationLazyOnContainingSide() {
  		return true;
  	}
  
@@ -331,7 +331,7 @@ index 2a43f25e1c..ea90597d52 100644
  	@Override
  	public void setup(OrmSetupHelper.SetupContext setupContext,
  			ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
-@@ -130,9 +182,6 @@ public static class ContainingEntity {
+@@ -136,9 +188,6 @@ public static class ContainingEntity {
  				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
  				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
  				"containedIndexedEmbeddedWithCast.indexedField",
@@ -341,7 +341,7 @@ index 2a43f25e1c..ea90597d52 100644
  				"containedElementCollectionAssociationsIndexedEmbedded.indexedField",
  				"containedElementCollectionAssociationsIndexedEmbedded.indexedElementCollectionField",
  				"containedElementCollectionAssociationsIndexedEmbedded.containedDerivedField",
-@@ -164,10 +213,6 @@ public static class ContainingEntity {
+@@ -170,10 +219,6 @@ public static class ContainingEntity {
  		@IndexedEmbedded(includePaths = { "indexedField" }, targetType = ContainedEntity.class)
  		private Object containedIndexedEmbeddedWithCast;
  
@@ -352,7 +352,7 @@ index 2a43f25e1c..ea90597d52 100644
  		/*
  		 * No mappedBy here. The inverse side of associations within an element collection cannot use mappedBy.
  		 * If they do, Hibernate ORM will fail (throw an exception) while attempting to walk down the mappedBy path,
-@@ -279,14 +324,6 @@ public void setContainedIndexedEmbeddedWithCast(Object containedIndexedEmbeddedW
+@@ -285,14 +330,6 @@ public void setContainedIndexedEmbeddedWithCast(Object containedIndexedEmbeddedW
  			this.containedIndexedEmbeddedWithCast = containedIndexedEmbeddedWithCast;
  		}
  
@@ -367,7 +367,7 @@ index 2a43f25e1c..ea90597d52 100644
  		public ContainedEntity getContainedElementCollectionAssociationsIndexedEmbedded() {
  			return containedElementCollectionAssociationsIndexedEmbedded;
  		}
-@@ -387,7 +424,8 @@ public PropertyAccessor<ContainingEntity, ContainedEntity> containedIndexedEmbed
+@@ -393,7 +430,8 @@ public PropertyAccessor<ContainingEntity, ContainedEntity> containedIndexedEmbed
  
  			@Override
  			public PropertyAccessor<ContainingEntity, ContainingEmbeddable> embeddedAssociations() {
@@ -377,7 +377,7 @@ index 2a43f25e1c..ea90597d52 100644
  			}
  
  			@Override
-@@ -514,9 +552,6 @@ public static class ContainedEntity {
+@@ -520,9 +558,6 @@ public static class ContainedEntity {
  		@JoinColumn(name = "CIndexedEmbeddedCast")
  		private Object containingAsIndexedEmbeddedWithCast;
  
@@ -387,7 +387,7 @@ index 2a43f25e1c..ea90597d52 100644
  		@ElementCollection
  		@Embedded
  		@OrderColumn(name = "idx")
-@@ -621,14 +656,6 @@ public void setContainingAsIndexedEmbeddedWithCast(Object containingAsIndexedEmb
+@@ -627,14 +662,6 @@ public void setContainingAsIndexedEmbeddedWithCast(Object containingAsIndexedEmb
  			this.containingAsIndexedEmbeddedWithCast = containingAsIndexedEmbeddedWithCast;
  		}
  
@@ -402,7 +402,7 @@ index 2a43f25e1c..ea90597d52 100644
  		public List<ContainedEmbeddable> getElementCollectionAssociations() {
  			return elementCollectionAssociations;
  		}
-@@ -757,7 +784,8 @@ public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEm
+@@ -763,7 +790,8 @@ public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEm
  
  			@Override
  			public PropertyAccessor<ContainedEntity, ContainedEmbeddable> embeddedAssociations() {
@@ -413,7 +413,7 @@ index 2a43f25e1c..ea90597d52 100644
  
  			@Override
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontaining/AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontaining/AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT.java
-index 4109ed9ed8..3d427bc578 100644
+index 0fa4791f36..e65f9988c5 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontaining/AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontaining/AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT.java
 @@ -7,6 +7,7 @@
@@ -424,7 +424,7 @@ index 4109ed9ed8..3d427bc578 100644
  
  import java.lang.reflect.Method;
  import java.util.ArrayList;
-@@ -84,6 +85,57 @@ protected boolean isAssociationLazyOnContainingSide() {
+@@ -85,6 +86,57 @@ protected boolean isAssociationLazyOnContainingSide() {
  		return false;
  	}
  
@@ -482,7 +482,7 @@ index 4109ed9ed8..3d427bc578 100644
  	@Override
  	public void setup(OrmSetupHelper.SetupContext setupContext,
  			ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
-@@ -130,9 +182,6 @@ public static class ContainingEntity {
+@@ -135,9 +187,6 @@ public static class ContainingEntity {
  				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
  				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
  				"containedIndexedEmbeddedWithCast.indexedField",
@@ -492,7 +492,7 @@ index 4109ed9ed8..3d427bc578 100644
  				"elementCollectionAssociations.containedIndexedEmbedded.indexedField",
  				"elementCollectionAssociations.containedIndexedEmbedded.indexedElementCollectionField",
  				"elementCollectionAssociations.containedIndexedEmbedded.containedDerivedField",
-@@ -168,10 +217,6 @@ public static class ContainingEntity {
+@@ -173,10 +222,6 @@ public static class ContainingEntity {
  		@IndexedEmbedded(includePaths = { "indexedField" }, targetType = ContainedEntity.class)
  		private Object containedIndexedEmbeddedWithCast;
  
@@ -503,7 +503,7 @@ index 4109ed9ed8..3d427bc578 100644
  		@IndexedEmbedded
  		@ElementCollection
  		@Embedded
-@@ -262,14 +307,6 @@ public void setContainedIndexedEmbeddedWithCast(Object containedIndexedEmbeddedW
+@@ -267,14 +312,6 @@ public void setContainedIndexedEmbeddedWithCast(Object containedIndexedEmbeddedW
  			this.containedIndexedEmbeddedWithCast = containedIndexedEmbeddedWithCast;
  		}
  
@@ -518,7 +518,7 @@ index 4109ed9ed8..3d427bc578 100644
  		public List<ContainingEmbeddable> getElementCollectionAssociations() {
  			return elementCollectionAssociations;
  		}
-@@ -356,7 +393,7 @@ public PropertyAccessor<ContainingEntity, ContainedEntity> containedIndexedEmbed
+@@ -361,7 +398,7 @@ public PropertyAccessor<ContainingEntity, ContainedEntity> containedIndexedEmbed
  
  			@Override
  			public PropertyAccessor<ContainingEntity, ContainingEmbeddable> embeddedAssociations() {
@@ -527,7 +527,7 @@ index 4109ed9ed8..3d427bc578 100644
  			}
  
  			@Override
-@@ -473,9 +510,6 @@ public static class ContainedEntity {
+@@ -478,9 +515,6 @@ public static class ContainedEntity {
  		@OneToOne(mappedBy = "containedIndexedEmbeddedWithCast", targetEntity = ContainingEntity.class, fetch = FetchType.LAZY)
  		private Object containingAsIndexedEmbeddedWithCast;
  
@@ -537,7 +537,7 @@ index 4109ed9ed8..3d427bc578 100644
  		/*
  		 * No mappedBy here. The inverse side of associations within an element collection cannot use mappedBy.
  		 * If they do, Hibernate ORM will fail (throw an exception) while attempting to walk down the mappedBy path,
-@@ -601,14 +635,6 @@ public void setContainingAsIndexedEmbeddedWithCast(Object containingAsIndexedEmb
+@@ -606,14 +640,6 @@ public void setContainingAsIndexedEmbeddedWithCast(Object containingAsIndexedEmb
  			this.containingAsIndexedEmbeddedWithCast = containingAsIndexedEmbeddedWithCast;
  		}
  
@@ -552,7 +552,7 @@ index 4109ed9ed8..3d427bc578 100644
  		public ContainingEntity getContainingAsElementCollectionAssociationsIndexedEmbedded() {
  			return containingAsElementCollectionAssociationsIndexedEmbedded;
  		}
-@@ -751,7 +777,7 @@ public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEm
+@@ -756,7 +782,7 @@ public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEm
  
  			@Override
  			public PropertyAccessor<ContainedEntity, ContainedEmbeddable> embeddedAssociations() {
@@ -561,11 +561,57 @@ index 4109ed9ed8..3d427bc578 100644
  			}
  
  			@Override
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/proxy/ContainedInTriggerUnnecessaryCollectionInitializationIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/proxy/ContainedInTriggerUnnecessaryCollectionInitializationIT.java
+index 902615812e..9723769194 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/proxy/ContainedInTriggerUnnecessaryCollectionInitializationIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/proxy/ContainedInTriggerUnnecessaryCollectionInitializationIT.java
+@@ -20,8 +20,6 @@
+ 
+ import org.hibernate.Hibernate;
+ import org.hibernate.SessionFactory;
+-import org.hibernate.annotations.LazyCollection;
+-import org.hibernate.annotations.LazyCollectionOption;
+ import org.hibernate.collection.spi.PersistentCollection;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+@@ -138,7 +136,8 @@ public static class Group {
+ 		private int someInteger;
+ 
+ 		@OneToMany(mappedBy = "group")
+-		@LazyCollection(LazyCollectionOption.EXTRA)
++		@SuppressWarnings("deprecation")
++		@org.hibernate.annotations.LazyCollection(org.hibernate.annotations.LazyCollectionOption.EXTRA)
+ 		private Set<Post> posts = new HashSet<>();
+ 
+ 		public Integer getId() {
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/session/FlushClearEvictAllIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/session/FlushClearEvictAllIT.java
+index 767464177c..6f480f1d5e 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/session/FlushClearEvictAllIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/session/FlushClearEvictAllIT.java
+@@ -25,8 +25,6 @@
+ import jakarta.persistence.OrderColumn;
+ import jakarta.persistence.Table;
+ 
+-import org.hibernate.annotations.LazyCollection;
+-import org.hibernate.annotations.LazyCollectionOption;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+@@ -130,7 +128,8 @@ public static class Post {
+ 		private String name;
+ 
+ 		@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+-		@LazyCollection(LazyCollectionOption.EXTRA)
++		@SuppressWarnings("deprecation")
++		@org.hibernate.annotations.LazyCollection(org.hibernate.annotations.LazyCollectionOption.EXTRA)
+ 		@OrderColumn(name = "idx")
+ 		private List<Comment> comments = new ArrayList<>();
+ 
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/dynamicmap/DynamicMapBaseIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/dynamicmap/DynamicMapBaseIT.java
-index 33961f27f1..9b54d34961 100644
+index 7d1a6e73fb..6df49ccec6 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/dynamicmap/DynamicMapBaseIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/dynamicmap/DynamicMapBaseIT.java
-@@ -126,7 +126,7 @@ public void simple() {
+@@ -127,7 +127,7 @@ public void simple() {
  			);
  
  			assertThat( query.fetchAllHits() ).containsExactly(
@@ -574,7 +620,7 @@ index 33961f27f1..9b54d34961 100644
  			);
  		} );
  	}
-@@ -211,7 +211,7 @@ public void searchObject() {
+@@ -212,7 +212,7 @@ public void searchObject() {
  			);
  
  			assertThat( query.fetchAllHits() ).containsExactly(
@@ -583,7 +629,7 @@ index 33961f27f1..9b54d34961 100644
  			);
  		} );
  	}
-@@ -330,7 +330,7 @@ public void nonEntityIdDocumentId() {
+@@ -331,7 +331,7 @@ public void nonEntityIdDocumentId() {
  			);
  
  			assertThat( query.fetchAllHits() ).containsExactly(
@@ -592,7 +638,7 @@ index 33961f27f1..9b54d34961 100644
  			);
  		} );
  	}
-@@ -417,8 +417,8 @@ public void inheritance() {
+@@ -418,8 +418,8 @@ public void inheritance() {
  			);
  
  			assertThat( query.fetchAllHits() ).containsExactly(

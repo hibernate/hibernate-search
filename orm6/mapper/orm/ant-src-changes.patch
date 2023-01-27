@@ -591,7 +591,7 @@ index 1e581dd9de..189f713827 100644
  					|| isWholePath && isAssociation( containedValueClass ) ) {
  				String stringRepresentationAsProperty = propertyNode.toPropertyString();
 diff --git a/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java b/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
-index c8ca89a1e0..995f314a33 100644
+index c8ca89a1e0..c83cd836d2 100644
 --- a/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
 +++ b/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
 @@ -7,52 +7,50 @@
@@ -1015,7 +1015,7 @@ index c8ca89a1e0..995f314a33 100644
  	@Override
 -	public HibernateOrmSearchQueryAdapter<R> setLockOptions(LockOptions lockOptions) {
 -		throw lockOptionsNotSupported();
-+	public QueryImplementor<R> setTupleTransformer(TupleTransformer transformer) {
++	public <T> QueryImplementor<T> setTupleTransformer(TupleTransformer<T> transformer) {
 +		throw resultOrTupleTransformerNotImplemented();
  	}
  
@@ -1024,7 +1024,7 @@ index c8ca89a1e0..995f314a33 100644
 -	public HibernateOrmSearchQueryAdapter<R> setResultTransformer(ResultTransformer transformer) {
 -		super.setResultTransformer( transformer );
 -		throw resultTransformerNotImplemented();
-+	public QueryImplementor<R> setResultListTransformer(ResultListTransformer resultListTransformer) {
++	public QueryImplementor<R> setResultListTransformer(ResultListTransformer<R> resultListTransformer) {
 +		throw resultOrTupleTransformerNotImplemented();
  	}
  

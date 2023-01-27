@@ -70,6 +70,19 @@ index f42125b5a8..ded12df777 100644
  		return Collections.singletonList( mappingDocument );
  	}
  }
+diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxEventLoader.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxEventLoader.java
+index 21d3f29254..d45dec439c 100644
+--- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxEventLoader.java
++++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxEventLoader.java
+@@ -78,7 +78,7 @@ protected List<OutboxEvent> tryLoadLocking(Session session, Set<UUID> ids) {
+ 			Query<OutboxEvent> query = session.createQuery( LOAD_QUERY, OutboxEvent.class );
+ 			query.setParameter( "ids", ids );
+ 
+-			query.setLockOptions( new LockOptions( LockMode.PESSIMISTIC_WRITE ).setTimeOut( LockOptions.SKIP_LOCKED ) );
++			query.setLockOptions( new LockOptions( LockMode.UPGRADE_SKIPLOCKED ) );
+ 
+ 			return query.getResultList();
+ 		}
 diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java
 index 87bb27fb18..b06a01b337 100644
 --- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java

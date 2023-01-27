@@ -261,11 +261,24 @@
         <version.org.jboss.jandex>2.4.2.Final</version.org.jboss.jandex>
         <version.org.hibernate.commons.annotations>5.1.2.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
+        <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>1.1.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>
         <version.javax.enterprise>2.0</version.javax.enterprise>
         <version.net.bytebuddy>1.12.9</version.net.bytebuddy>
 
-        <!-- >>> ORM 6 / Jakarta Persistence -->
-        <version.org.hibernate.orm>6.1.6.Final</version.org.hibernate.orm>
+        <!-- >>> ORM 5 with Jakarta Persistence -->
+        <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM 5 -jakarta artifacts.
+             DO NOT USE DEPENDENCY MANAGEMENT FOR THESE DEPENDENCIES!
+             Thanks to not using dependency management for these dependencies, we get a build failure
+             when the versions start diverging, thanks to the maven-enforcer-plugin
+             and to our own explicit dependencies in the relevant artifacts.
+          -->
+        <version.jakarta.persistence.orm5>3.0.0</version.jakarta.persistence.orm5>
+        <version.jakarta.transaction-api.orm5>2.0.0</version.jakarta.transaction-api.orm5>
+        <version.jakarta.enterprise.orm5>3.0.1</version.jakarta.enterprise.orm5>
+        <version.jakarta.xml.bind.orm5>3.0.1</version.jakarta.xml.bind.orm5>
+
+        <!-- >>> ORM 6 with Jakarta Persistence -->
+        <version.org.hibernate.orm>6.2.0.CR2</version.org.hibernate.orm>
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
         <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM 6.
@@ -274,10 +287,13 @@
              when the versions start diverging, thanks to the maven-enforcer-plugin
              and to our own explicit dependencies in the relevant artifacts.
           -->
-        <version.org.hibernate.commons.annotations.orm6>6.0.2.Final</version.org.hibernate.commons.annotations.orm6>
-        <version.jakarta.persistence>3.0.0</version.jakarta.persistence>
+        <version.io.smallrye.jandex>3.0.5</version.io.smallrye.jandex>
+        <version.org.hibernate.commons.annotations.orm6>6.0.6.Final</version.org.hibernate.commons.annotations.orm6>
+        <version.jakarta.persistence>3.1.0</version.jakarta.persistence>
+        <version.jakarta.transaction-api>2.0.1</version.jakarta.transaction-api>
+        <version.jakarta.interceptor-api>2.0.1</version.jakarta.interceptor-api>
         <version.jakarta.enterprise>3.0.1</version.jakarta.enterprise>
-        <version.jakarta.xml.bind>3.0.1</version.jakarta.xml.bind>
+        <version.jakarta.xml.bind>4.0.0</version.jakarta.xml.bind>
         <version.net.bytebuddy.orm6>1.12.18</version.net.bytebuddy.orm6>
 
         <!-- >>> JSR 352 -->
@@ -290,8 +306,6 @@
         <!-- Used in the JSR352 integration in particular, but also in the ORM integration (?) and various tests -->
         <version.javax.inject>1</version.javax.inject>
         <version.jakarta.inject-api>2.0.1</version.jakarta.inject-api>
-        <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>1.1.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>
-        <version.jakarta.transaction-api>2.0.0</version.jakarta.transaction-api>
         <!-- This is used to generate a link to the Java EE javadoc -->
         <javadoc.javaee.url>https://javaee.github.io/javaee-spec/javadocs/</javadoc.javaee.url>
         <javadoc.jakarta.batch.url>https://jakarta.ee/specifications/batch/2.0/apidocs/</javadoc.jakarta.batch.url>
