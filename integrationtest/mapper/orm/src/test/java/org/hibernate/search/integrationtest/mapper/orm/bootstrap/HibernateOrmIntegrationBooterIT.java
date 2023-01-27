@@ -22,11 +22,12 @@ import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataBuilder;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.spi.BootstrapContext;
-import org.hibernate.boot.spi.MetadataImplementor;
+import org.hibernate.boot.spi.MetadataBuilderImplementor;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
@@ -169,11 +170,12 @@ public class HibernateOrmIntegrationBooterIT {
 		for ( Class<?> entityClass : entityClasses ) {
 			metadataSources.addAnnotatedClass( entityClass );
 		}
-		Metadata metadata = metadataSources.buildMetadata();
 
-		MetadataImplementor metadataImplementor = (MetadataImplementor) metadata;
-		BootstrapContext bootstrapContext =
-				metadataImplementor.getTypeConfiguration().getMetadataBuildingContext().getBootstrapContext();
+		MetadataBuilder metadataBuilderImplementor = metadataSources.getMetadataBuilder();
+		// This seems to be the right way to access BootstrapContext
+		// https://hibernate.zulipchat.com/#narrow/stream/132094-hibernate-orm-dev/topic/BootstrapContext
+		BootstrapContext bootstrapContext = ((MetadataBuilderImplementor) metadataBuilderImplementor).getBootstrapContext();
+		Metadata metadata = metadataBuilderImplementor.build();
 
 		return HibernateOrmIntegrationBooter.builder( metadata, bootstrapContext )
 				.valueReadHandleFactory( valueHandleFactoryMock )

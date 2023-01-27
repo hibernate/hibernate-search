@@ -28,6 +28,11 @@
         <!-- Prevent these modules from artificially affecting Sonar metrics -->
         <sonar.skip>true</sonar.skip>
 
+        <version.jakarta.persistence>${version.jakarta.persistence.orm5}</version.jakarta.persistence>
+        <version.jakarta.transaction-api>${version.jakarta.transaction-api.orm5}</version.jakarta.transaction-api>
+        <version.jakarta.enterprise>${version.jakarta.enterprise.orm5}</version.jakarta.enterprise>
+        <version.jakarta.xml.bind>${version.jakarta.xml.bind.orm5}</version.jakarta.xml.bind>
+
         <!-- To be set by child modules -->
         <transform.original.pathFromRoot></transform.original.pathFromRoot>
         <transform.original.path>${rootProject.directory}/${transform.original.pathFromRoot}</transform.original.path>
