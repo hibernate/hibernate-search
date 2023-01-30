@@ -21,8 +21,6 @@ import jakarta.persistence.OneToMany;
 
 import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -139,7 +137,8 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 		private int someInteger;
 
 		@OneToMany(mappedBy = "group")
-		@LazyCollection(LazyCollectionOption.EXTRA)
+		@SuppressWarnings("deprecation")
+		@org.hibernate.annotations.LazyCollection(org.hibernate.annotations.LazyCollectionOption.EXTRA)
 		private Set<Post> posts = new HashSet<>();
 
 		public Integer getId() {
