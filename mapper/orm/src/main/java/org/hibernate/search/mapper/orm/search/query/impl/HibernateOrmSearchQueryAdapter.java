@@ -256,12 +256,12 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 	}
 
 	@Override
-	public QueryImplementor<R> setTupleTransformer(TupleTransformer transformer) {
+	public <T> QueryImplementor<T> setTupleTransformer(TupleTransformer<T> transformer) {
 		throw resultOrTupleTransformerNotImplemented();
 	}
 
 	@Override
-	public QueryImplementor<R> setResultListTransformer(ResultListTransformer resultListTransformer) {
+	public QueryImplementor<R> setResultListTransformer(ResultListTransformer<R> resultListTransformer) {
 		throw resultOrTupleTransformerNotImplemented();
 	}
 

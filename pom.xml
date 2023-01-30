@@ -267,9 +267,10 @@
         <version.org.jboss.jandex>2.4.2.Final</version.org.jboss.jandex>
         <version.org.hibernate.commons.annotations>${version.org.hibernate.commons.annotations.orm6}</version.org.hibernate.commons.annotations>
         <version.net.bytebuddy>${version.net.bytebuddy.orm6}</version.net.bytebuddy>
+        <version.io.smallrye.jandex>3.0.0</version.io.smallrye.jandex>
 
         <!-- >>> ORM 6 with Jakarta Persistence -->
-        <version.org.hibernate.orm>6.1.6.Final</version.org.hibernate.orm>
+        <version.org.hibernate.orm>6.2.0.CR2</version.org.hibernate.orm>
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
         <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM 6.
@@ -280,12 +281,12 @@
           -->
         <version.io.smallrye.jandex>3.0.5</version.io.smallrye.jandex>
         <version.org.hibernate.commons.annotations.orm6>6.0.5.Final</version.org.hibernate.commons.annotations.orm6>
-        <version.jakarta.persistence>3.0.0</version.jakarta.persistence>
-        <version.jakarta.transaction-api>2.0.0</version.jakarta.transaction-api>
+        <version.jakarta.persistence>3.1.0</version.jakarta.persistence>
+        <version.jakarta.transaction-api>2.0.1</version.jakarta.transaction-api>
         <version.jakarta.interceptor-api>2.0.1</version.jakarta.interceptor-api>
         <version.jakarta.enterprise>3.0.1</version.jakarta.enterprise>
-        <version.jakarta.xml.bind>3.0.1</version.jakarta.xml.bind>
-        <version.net.bytebuddy.orm6>1.12.9</version.net.bytebuddy.orm6>
+        <version.jakarta.xml.bind>4.0.0</version.jakarta.xml.bind>
+        <version.net.bytebuddy.orm6>1.12.18</version.net.bytebuddy.orm6>
 
         <!-- >>> JSR 352 -->
         <version.jakarta.batch>2.1.1</version.jakarta.batch>
@@ -887,14 +888,6 @@
                 <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-core</artifactId>
                 <version>${version.org.hibernate.orm}</version>
-                <exclusions>
-                    <!-- hibernate-core already depends on jakarta.xml.bind-api,
-                         which depends on com.sun.activation, which bundles the activation API already -->
-                    <exclusion>
-                        <groupId>jakarta.activation</groupId>
-                        <artifactId>jakarta.activation-api</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.orm</groupId>

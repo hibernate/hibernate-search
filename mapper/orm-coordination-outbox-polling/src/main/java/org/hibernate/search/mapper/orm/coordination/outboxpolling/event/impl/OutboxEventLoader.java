@@ -49,7 +49,7 @@ final class OutboxEventLoader implements ToStringTreeAppendable {
 		// so we can afford to just skip events that are already locked,
 		// and process them later when they are no longer locked.
 		if ( dialect.supportsSkipLocked() ) {
-			lockOptions = new LockOptions( LockMode.PESSIMISTIC_WRITE ).setTimeOut( LockOptions.SKIP_LOCKED );
+			lockOptions = new LockOptions( LockMode.UPGRADE_SKIPLOCKED );
 		}
 		// If SKIP_LOCKED is not supported, we just do basic locking and hope for the best
 		// (in particular we hope for transaction deadlocks to be detected by the database and result in a failure,
