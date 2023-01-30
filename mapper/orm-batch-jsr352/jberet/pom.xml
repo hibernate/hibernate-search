@@ -54,21 +54,6 @@
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-annotations</artifactId>
         </dependency>
-
-        <!-- This dependency is only here to solve javadoc warnings.
-             For some reason, if we rely on the transitive dependency from mapper-orm,
-             we end up with javadoc warnings like this:
-                unknown enum constant XmlAccessType.FIELD
-             This seems related to the annotation processor,
-             but who knows what the exact reason is.
-         -->
-        <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
-            <version>${version.jakarta.xml.bind}</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
     <build>
