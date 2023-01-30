@@ -26,8 +26,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -131,7 +129,8 @@ public class FlushClearEvictAllIT {
 		private String name;
 
 		@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-		@LazyCollection(LazyCollectionOption.EXTRA)
+		@SuppressWarnings("deprecation")
+		@org.hibernate.annotations.LazyCollection(org.hibernate.annotations.LazyCollectionOption.EXTRA)
 		@OrderColumn(name = "idx")
 		private List<Comment> comments = new ArrayList<>();
 
