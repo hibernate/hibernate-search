@@ -12,6 +12,7 @@ import java.util.concurrent.CompletionStage;
 import org.hibernate.CacheMode;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -194,4 +195,17 @@ public interface MassIndexer {
 	 * @return {@code this} for method chaining
 	 */
 	MassIndexer failureHandler(MassIndexingFailureHandler failureHandler);
+
+	/**
+	 * Sets the {@link MassIndexingEnvironment}, which can set up an environment (thread locals, ...) in mass indexing threads.
+	 *
+	 * @param environment a component that gets a chance to
+	 * set up e.g. {@link ThreadLocal ThreadLocals} in mass indexing threads before
+	 * mass indexing starts, and to remove them after mass indexing stops.
+	 * @return {@code this} for method chaining
+	 *
+	 * @see MassIndexingEnvironment
+	 */
+	@Incubating
+	MassIndexer environment(MassIndexingEnvironment environment);
 }

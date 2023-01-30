@@ -333,6 +333,15 @@ or for more advanced use cases, such as cancelling mass indexing on the first fa
 
 Implementations of `MassIndexingFailureHandler` must be thread-safe.
 
+|`environment(MassIndexingEnvironment)`
+|An empty environment (no threadlocals, ...).
+|
+The component responsible for setting up an environment (threadlocals, ...) on mass indexing threads before mass indexing
+starts, and tearing down that environment after mass indexing.
+
+Implementations should handle their exceptions unless it is an unrecoverable situation in which further mass indexing
+does not make sense: any exception thrown by the `MassIndexingEnvironment` will abort mass indexing.
+
 |===
 
 [[indexing-massindexer-tuning]]

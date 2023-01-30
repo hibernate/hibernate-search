@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutorService;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
@@ -34,6 +35,17 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public class PojoDefaultMassIndexer implements PojoMassIndexer {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final MassIndexingEnvironment DO_NOTHING_ENVIRONMENT = new MassIndexingEnvironment() {
+		@Override
+		public void beforeExecution(Context context) {
+			// Do nothing.
+		}
+
+		@Override
+		public void afterExecution(Context context) {
+			// Do nothing.
+		}
+	};
 
 	private final PojoMassIndexingContext indexingContext;
 	private final PojoMassIndexingMappingContext mappingContext;
@@ -53,6 +65,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 
 	private MassIndexingFailureHandler failureHandler;
 	private MassIndexingMonitor monitor;
+	private MassIndexingEnvironment environment;
 
 	public PojoDefaultMassIndexer(PojoMassIndexingContext indexingContext,
 			PojoMassIndexingMappingContext mappingContext,
@@ -170,6 +183,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 				notifier,
 				typeGroupsToIndex, scopeSchemaManager,
 				tenantIds, pojoScopeDelegate,
+				resolvedMassIndexingEnvironment(),
 				typesToIndexInParallel, documentBuilderThreads,
 				mergeSegmentsOnFinish,
 				// false by default:
@@ -183,6 +197,12 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 	@Override
 	public PojoDefaultMassIndexer failureHandler(MassIndexingFailureHandler failureHandler) {
 		this.failureHandler = failureHandler;
+		return this;
+	}
+
+	@Override
+	public PojoMassIndexer environment(MassIndexingEnvironment environment) {
+		this.environment = environment;
 		return this;
 	}
 
@@ -200,5 +220,9 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 			return monitor;
 		}
 		return new PojoMassIndexingLoggingMonitor();
+	}
+
+	private MassIndexingEnvironment resolvedMassIndexingEnvironment() {
+		return environment != null ? environment : DO_NOTHING_ENVIRONMENT;
 	}
 }

@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierSink;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingIdentifierLoadingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoadingStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -28,16 +29,19 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 	private final PojoMassIndexingLoadingStrategy<E, I> loadingStrategy;
 	private final PojoProducerConsumerQueue<List<I>> identifierQueue;
 	private final String tenantId;
+	private final MassIndexingEnvironment.EntityIdentifierLoadingContext identifierLoadingContext;
 
 	public PojoMassIndexingEntityIdentifierLoadingRunnable(PojoMassIndexingNotifier notifier,
-			PojoMassIndexingIndexedTypeGroup<E> typeGroup,
+			MassIndexingEnvironment environment, PojoMassIndexingIndexedTypeGroup<E> typeGroup,
 			PojoMassIndexingLoadingStrategy<E, I> loadingStrategy,
 			PojoProducerConsumerQueue<List<I>> identifierQueue, String tenantId) {
-		super( notifier );
+		super( notifier, environment );
 		this.loadingStrategy = loadingStrategy;
 		this.typeGroup = typeGroup;
 		this.identifierQueue = identifierQueue;
 		this.tenantId = tenantId;
+
+		this.identifierLoadingContext = new EntityIdentifierLoadingContextImpl();
 	}
 
 	@Override
@@ -68,6 +72,16 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 	@Override
 	protected void cleanUpOnInterruption() {
 		// Nothing to do
+	}
+
+	@Override
+	protected MassIndexingEnvironment.Context createMassIndexingEnvironmentContext() {
+		return identifierLoadingContext;
+	}
+
+	@Override
+	protected boolean supportsThreadLifecycleHooks() {
+		return true;
 	}
 
 	@Override
@@ -104,5 +118,8 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 		public String tenantIdentifier() {
 			return tenantId;
 		}
+	}
+
+	private static final class EntityIdentifierLoadingContextImpl implements MassIndexingEnvironment.EntityIdentifierLoadingContext {
 	}
 }

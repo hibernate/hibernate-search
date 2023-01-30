@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 import java.util.concurrent.CompletionStage;
 
 import org.hibernate.CacheMode;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexerFilteringTypeStep;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
@@ -121,5 +122,11 @@ public class HibernateOrmMassIndexer implements MassIndexer {
 
 	ConditionalExpression reindexOnly(Class<?> type, String conditionalExpression) {
 		return context.reindexOnly( type, conditionalExpression );
+	}
+
+	@Override
+	public MassIndexer environment(MassIndexingEnvironment environment) {
+		delegate.environment( environment );
+		return this;
 	}
 }

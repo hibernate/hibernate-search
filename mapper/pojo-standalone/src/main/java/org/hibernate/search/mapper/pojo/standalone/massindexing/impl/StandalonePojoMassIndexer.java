@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.standalone.massindexing.impl;
 
 import java.util.concurrent.CompletionStage;
 
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLoadingContext;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
@@ -94,4 +95,9 @@ public class StandalonePojoMassIndexer implements MassIndexer {
 		return this;
 	}
 
+	@Override
+	public MassIndexer environment(MassIndexingEnvironment environment) {
+		delegate.environment( environment );
+		return this;
+	}
 }
