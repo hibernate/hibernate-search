@@ -23,20 +23,6 @@
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-mapper-orm</artifactId>
         </dependency>
-        <!-- This dependency is only here to solve compilation warnings.
-             For some reason, if we rely on the transitive dependency from mapper-orm,
-             we end up with compilation warnings like this:
-                unknown enum constant XmlAccessType.FIELD
-             This seems related to the annotation processor,
-             but who knows what the exact reason is.
-         -->
-        <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
-            <version>${version.jakarta.xml.bind}</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
@@ -49,6 +35,34 @@
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
         </dependency>
+
+        <!-- This dependency is only here to solve Moditect errors.
+             For some reason, the jakarta.transaction module requires jakarta.interceptor,
+             but the jakarta.transaction-api Maven module doesn't depend on jakarta.interceptor-api,
+             and that doesn't play well with Moditect, which ends up throwing an exception:
+               Execution add-module-infos of goal org.moditect:moditect-maven-plugin:1.0.0.RC2:add-module-info failed: Module jakarta.interceptor not found, required by jakarta.transaction
+         -->
+        <dependency>
+            <groupId>jakarta.interceptor</groupId>
+            <artifactId>jakarta.interceptor-api</artifactId>
+            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
+            <version>${version.jakarta.interceptor-api}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- This dependency is only here to solve Moditect errors.
+             For some reason, the jakarta.transaction module requires jakarta.cdi,
+             but the jakarta.transaction-api Maven module doesn't depend on jakarta.enterprise.cdi-api,
+             and that doesn't play well with Moditect, which ends up throwing an exception:
+               Execution add-module-infos of goal org.moditect:moditect-maven-plugin:1.0.0.RC2:add-module-info failed: Module jakarta.interceptor not found, required by jakarta.transaction
+         -->
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
+            <version>${version.jakarta.enterprise}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-test-orm</artifactId>
