@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoadingStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
@@ -45,10 +46,11 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 
 	PojoMassIndexingBatchIndexingWorkspace(PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
+			MassIndexingEnvironment environment,
 			PojoMassIndexingIndexedTypeGroup<E> typeGroup,
 			PojoMassIndexingLoadingStrategy<E, I> loadingStrategy,
 			int entityExtractingThreads, String tenantId) {
-		super( notifier );
+		super( notifier, environment );
 		this.mappingContext = mappingContext;
 		this.typeGroup = typeGroup;
 		this.loadingStrategy = loadingStrategy;
@@ -96,8 +98,10 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 	}
 
 	private void startProducingPrimaryKeys(PojoProducerConsumerQueue<List<I>> identifierQueue) {
-		final Runnable runnable = new PojoMassIndexingEntityIdentifierLoadingRunnable<>( getNotifier(), typeGroup,
-				loadingStrategy, identifierQueue, tenantId
+		final Runnable runnable = new PojoMassIndexingEntityIdentifierLoadingRunnable<>(
+				getNotifier(),
+				getMassIndexingEnvironment(),
+				typeGroup, loadingStrategy, identifierQueue, tenantId
 		);
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor identifierProducingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
@@ -113,8 +117,10 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 	}
 
 	private void startIndexing(PojoProducerConsumerQueue<List<I>> identifierQueue) {
-		final Runnable runnable = new PojoMassIndexingEntityLoadingRunnable<>( getNotifier(), typeGroup,
-				loadingStrategy, identifierQueue, tenantId
+		final Runnable runnable = new PojoMassIndexingEntityLoadingRunnable<>(
+				getNotifier(),
+				getMassIndexingEnvironment(),
+				typeGroup, loadingStrategy, identifierQueue, tenantId
 		);
 		final ThreadPoolExecutor indexingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
 				entityExtractingThreads,

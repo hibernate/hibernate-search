@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.standalone.massindexing;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingOptions;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
@@ -157,4 +158,15 @@ public interface MassIndexer {
 	 */
 	<T> MassIndexer context(Class<T> contextType, T context);
 
+	/**
+	 * Sets the {@link MassIndexingEnvironment}, which can set up an environment (thread locals, ...) in mass indexing threads.
+	 *
+	 * @param environment a component that gets a chance to
+	 * set up e.g. {@link ThreadLocal ThreadLocals} in mass indexing threads before
+	 * mass indexing starts, and to remove them after mass indexing stops.
+	 *
+	 * @see MassIndexingEnvironment
+	 */
+	@Incubating
+	MassIndexer environment(MassIndexingEnvironment environment);
 }

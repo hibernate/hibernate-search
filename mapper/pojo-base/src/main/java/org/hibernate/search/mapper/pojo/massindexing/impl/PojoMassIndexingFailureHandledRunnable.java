@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.massindexing.impl;
 import java.lang.invoke.MethodHandles;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -20,16 +21,26 @@ public abstract class PojoMassIndexingFailureHandledRunnable implements Runnable
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoMassIndexingNotifier notifier;
+	private final MassIndexingEnvironment environment;
 
-	protected PojoMassIndexingFailureHandledRunnable(PojoMassIndexingNotifier notifier) {
+	protected PojoMassIndexingFailureHandledRunnable(PojoMassIndexingNotifier notifier, MassIndexingEnvironment environment) {
 		this.notifier = notifier;
+		this.environment = environment;
 	}
 
 	@Override
 	public final void run() {
 		boolean interrupted = false;
+
 		try {
-			runWithFailureHandler();
+			beforeExecution();
+			try {
+				runWithFailureHandler();
+			}
+			finally {
+				// will only make an attempt to call `afterExecution()` if `beforeExecution()` call was successful.
+				afterExecution();
+			}
 		}
 		catch (MassIndexingOperationHandledFailureException e) {
 			// This exception has already been reported; just clean up then propagate it.
@@ -118,8 +129,36 @@ public abstract class PojoMassIndexingFailureHandledRunnable implements Runnable
 
 	protected abstract void cleanUpOnFailure() throws InterruptedException;
 
+	protected MassIndexingEnvironment.Context createMassIndexingEnvironmentContext() {
+		throw new UnsupportedOperationException( "There's no context supported for " + this.getClass().getSimpleName() );
+	}
+
+	protected boolean supportsThreadLifecycleHooks() {
+		return false;
+	}
+
+	protected void beforeExecution() {
+		if ( supportsThreadLifecycleHooks() ) {
+			getMassIndexingEnvironment().beforeExecution(
+					createMassIndexingEnvironmentContext()
+			);
+		}
+	}
+
+	protected void afterExecution() {
+		if ( supportsThreadLifecycleHooks() ) {
+			getMassIndexingEnvironment().afterExecution(
+					createMassIndexingEnvironmentContext()
+			);
+		}
+	}
+
 	protected final PojoMassIndexingNotifier getNotifier() {
 		return notifier;
+	}
+
+	protected final MassIndexingEnvironment getMassIndexingEnvironment() {
+		return environment;
 	}
 
 	protected void notifySuccess() {

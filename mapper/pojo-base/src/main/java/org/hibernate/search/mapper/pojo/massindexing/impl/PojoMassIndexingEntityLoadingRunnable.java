@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntitySink;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingEntityLoadingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoadingStrategy;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
@@ -37,17 +38,20 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 	private final PojoMassIndexingLoadingStrategy<E, I> loadingStrategy;
 	private final PojoProducerConsumerQueue<List<I>> identifierQueue;
 	private final String tenantId;
+	private final MassIndexingEnvironment.EntityLoadingContext entityLoadingContext;
 
 	protected PojoMassIndexingEntityLoadingRunnable(PojoMassIndexingNotifier notifier,
-			PojoMassIndexingIndexedTypeGroup<E> typeGroup,
+			MassIndexingEnvironment environment, PojoMassIndexingIndexedTypeGroup<E> typeGroup,
 			PojoMassIndexingLoadingStrategy<E, I> loadingStrategy,
 			PojoProducerConsumerQueue<List<I>> identifierQueue,
 			String tenantId) {
-		super( notifier );
+		super( notifier, environment );
 		this.typeGroup = typeGroup;
 		this.loadingStrategy = loadingStrategy;
 		this.identifierQueue = identifierQueue;
 		this.tenantId = tenantId;
+
+		this.entityLoadingContext = new EntityLoadingContextImpl();
 	}
 
 	@Override
@@ -83,6 +87,16 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 	@Override
 	protected void cleanUpOnInterruption() {
 		// Nothing to do
+	}
+
+	@Override
+	protected MassIndexingEnvironment.Context createMassIndexingEnvironmentContext() {
+		return entityLoadingContext;
+	}
+
+	@Override
+	protected boolean supportsThreadLifecycleHooks() {
+		return true;
 	}
 
 	@Override
@@ -242,4 +256,6 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 		}
 	}
 
+	private static final class EntityLoadingContextImpl implements MassIndexingEnvironment.EntityLoadingContext {
+	}
 }

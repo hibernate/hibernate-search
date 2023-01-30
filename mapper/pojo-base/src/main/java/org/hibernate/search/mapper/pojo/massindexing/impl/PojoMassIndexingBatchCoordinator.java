@@ -17,6 +17,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContextMessages;
@@ -59,9 +60,10 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 			PojoScopeSchemaManager scopeSchemaManager,
 			Collection<String> tenantIds,
 			PojoScopeDelegate<?, ?, ?> pojoScopeDelegate,
+			MassIndexingEnvironment environment,
 			int typesToIndexInParallel, int documentBuilderThreads, boolean mergeSegmentsOnFinish,
 			boolean dropAndCreateSchemaOnStart, boolean purgeAtStart, boolean mergeSegmentsAfterPurge) {
-		super( notifier );
+		super( notifier, environment );
 		this.mappingContext = mappingContext;
 		this.typeGroupsToIndex = typeGroupsToIndex;
 
@@ -167,7 +169,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	private <E> PojoMassIndexingBatchIndexingWorkspace<E, ?> createBatchIndexingWorkspace(
 			PojoMassIndexingIndexedTypeGroup<E> typeGroup, SessionContext context) {
 		return new PojoMassIndexingBatchIndexingWorkspace<>(
-				mappingContext, getNotifier(), typeGroup,
+				mappingContext, getNotifier(), getMassIndexingEnvironment(), typeGroup,
 				typeGroup.loadingStrategy(),
 				documentBuilderThreads,
 				context.tenantIdentifier()
