@@ -8,6 +8,9 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.AssociationOverride;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -24,7 +27,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 
-import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -32,6 +34,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeDiffer;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
@@ -56,6 +60,26 @@ public class AutomaticIndexingEmbeddableIT {
 
 	@ReusableOrmSetupHolder.Setup
 	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+		// Embedded deserialization rules in ORM are just weird:
+		// when all columns are empty, an embedded is sometimes deserialized as `null`
+		// (though that can be prevented with hibernate.create_empty_composites.enabled = true),
+		// and this applies to embeddeds in @ElementCollections as well.
+		// That's just too much noise when writing indexing assertions,
+		// so we'll consider null equivalent to an empty instance for embeddeds.
+		backendMock.documentDiffer( IndexedEntity.INDEX, StubTreeNodeDiffer.<StubDocumentNode>builder()
+				.missingEquivalentToEmptyForPath( "containedEmbeddedSingle" )
+				.missingEquivalentToEmptyForPath( "containedEmbeddedList" )
+				.missingEquivalentToEmptyForPath( "containedElementCollection" )
+				.missingEquivalentToEmptyForPath( "containedBidirectionalEmbedded" )
+				.missingEquivalentToEmptyForPath( "containedSingleWithInverseSideEmbedded" )
+				.missingEquivalentToEmptyForPath( "child.containedEmbeddedSingle" )
+				.missingEquivalentToEmptyForPath( "child.containedEmbeddedList" )
+				.missingEquivalentToEmptyForPath( "child.containedElementCollection" )
+				.missingEquivalentToEmptyForPath( "child.containedBidirectionalEmbedded" )
+				.missingEquivalentToEmptyForPath( "child.containedSingleWithInverseSideEmbedded" )
+				.build() );
+
+
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "child", b4 -> b4
 						.objectField( "containedEmbeddedSingle", b2 -> b2
@@ -86,7 +110,7 @@ public class AutomaticIndexingEmbeddableIT {
 				)
 		);
 
-		setupContext.withProperty( AvailableSettings.CREATE_EMPTY_COMPOSITES_ENABLED, true )
+		setupContext
 				.withAnnotatedTypes(
 						IndexedEntity.class,
 						ContainingEntity.class,
@@ -191,13 +215,7 @@ public class AutomaticIndexingEmbeddableIT {
 							.objectField( "child", b2 -> {
 								b2.objectField( "containedEmbeddedList", b3 -> { } );
 								b2.objectField( "containedBidirectionalEmbedded", b3 -> { } );
-								if ( !setupHolder.areEntitiesProcessedInSession() ) {
-									// When running indexing from a different session,
-									// the embeddable will no longer be null but will be an empty embeddable.
-									// Ideally we should use hibernate.create_empty_composites.enabled to avoid that,
-									// but this feature is still experimental: https://hibernate.atlassian.net/browse/HHH-11936
-									b2.objectField( "containedEmbeddedSingle", b3 -> { } );
-								}
+								b2.objectField( "containedEmbeddedSingle", b3 -> { } );
 							} )
 					);
 		} );
@@ -443,13 +461,7 @@ public class AutomaticIndexingEmbeddableIT {
 							.objectField( "child", b2 -> {
 								b2.objectField( "containedEmbeddedSingle", b3 -> { } );
 								b2.objectField( "containedBidirectionalEmbedded", b3 -> { } );
-								if ( !setupHolder.areEntitiesProcessedInSession() ) {
-									// When running indexing from a different session,
-									// the embeddable will no longer be null but will be an empty embeddable.
-									// Ideally we should use hibernate.create_empty_composites.enabled to avoid that,
-									// but this feature is still experimental: https://hibernate.atlassian.net/browse/HHH-11936
-									b2.objectField( "containedEmbeddedList", b3 -> { } );
-								}
+								b2.objectField( "containedEmbeddedList", b3 -> { } );
 							} )
 					);
 		} );
@@ -777,7 +789,19 @@ public class AutomaticIndexingEmbeddableIT {
 			containedEntity.setIncludedInElementCollection( "initialValue" );
 
 			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
-			containingEntity1.getContainedElementCollection().get( 0 ).setContainedSingle( containedEntity );
+			SingleContainingEmbeddable embedded;
+			if ( containingEntity1.getContainedElementCollection().isEmpty() ) { // Hibernate ORM 5
+				embedded = new SingleContainingEmbeddable();
+				containingEntity1.getContainedElementCollection().add( embedded );
+			}
+			else { // Hibernate ORM 6
+				embedded = containingEntity1.getContainedElementCollection().get( 0 );
+				if ( embedded == null ) {
+					embedded = new SingleContainingEmbeddable();
+					containingEntity1.getContainedElementCollection().set( 0, embedded );
+				}
+			}
+			embedded.setContainedSingle( containedEntity );
 			containedEntity.getContainingAsElementCollection().add( containingEntity1 );
 
 			session.persist( containedEntity );
@@ -1173,13 +1197,7 @@ public class AutomaticIndexingEmbeddableIT {
 							.objectField( "child", b2 -> {
 								b2.objectField( "containedEmbeddedSingle", b3 -> { } );
 								b2.objectField( "containedEmbeddedList", b3 -> { } );
-								if ( !setupHolder.areEntitiesProcessedInSession() ) {
-									// When running indexing from a different session,
-									// the embeddable will no longer be null but will be an empty embeddable.
-									// Ideally we should use hibernate.create_empty_composites.enabled to avoid that,
-									// but this feature is still experimental: https://hibernate.atlassian.net/browse/HHH-11936
-									b2.objectField( "containedBidirectionalEmbedded", b3 -> { } );
-								}
+								b2.objectField( "containedBidirectionalEmbedded", b3 -> { } );
 							} )
 					);
 		} );
@@ -1347,6 +1365,7 @@ public class AutomaticIndexingEmbeddableIT {
 
 		@Embedded
 		@IndexedEmbedded(includePaths = "containedSingle.includedInEmbeddedSingle")
+		@Access(AccessType.PROPERTY)
 		private SingleContainingEmbeddable containedEmbeddedSingle = new SingleContainingEmbeddable();
 
 		@Embedded
@@ -1355,6 +1374,7 @@ public class AutomaticIndexingEmbeddableIT {
 				name = "containedList",
 				joinTable = @JoinTable(name = "containing_embeddedList", inverseJoinColumns = @JoinColumn(name = "CEList_containedList"))
 		)
+		@Access(AccessType.PROPERTY)
 		private ListContainingEmbeddable containedEmbeddedList = new ListContainingEmbeddable();
 
 		@ElementCollection
@@ -1379,6 +1399,7 @@ public class AutomaticIndexingEmbeddableIT {
 
 		@Embedded
 		@IndexedEmbedded(includePaths = "containedSingle.includedInBidirectionalEmbedded")
+		@Access(AccessType.PROPERTY)
 		private BidirectionalEmbeddable containedBidirectionalEmbedded = new BidirectionalEmbeddable();
 
 		public Integer getId() {
@@ -1398,6 +1419,9 @@ public class AutomaticIndexingEmbeddableIT {
 		}
 
 		public SingleContainingEmbeddable getContainedEmbeddedSingle() {
+			if ( containedEmbeddedSingle == null ) {
+				containedEmbeddedSingle = new SingleContainingEmbeddable();
+			}
 			return containedEmbeddedSingle;
 		}
 
@@ -1406,6 +1430,9 @@ public class AutomaticIndexingEmbeddableIT {
 		}
 
 		public ListContainingEmbeddable getContainedEmbeddedList() {
+			if ( containedEmbeddedList == null ) {
+				containedEmbeddedList = new ListContainingEmbeddable();
+			}
 			return containedEmbeddedList;
 		}
 
@@ -1426,6 +1453,9 @@ public class AutomaticIndexingEmbeddableIT {
 		}
 
 		public BidirectionalEmbeddable getContainedBidirectionalEmbedded() {
+			if ( containedBidirectionalEmbedded == null ) {
+				containedBidirectionalEmbedded = new BidirectionalEmbeddable();
+			}
 			return containedBidirectionalEmbedded;
 		}
 
@@ -1502,9 +1532,11 @@ public class AutomaticIndexingEmbeddableIT {
 		private List<ContainingEntity> containingAsElementCollection = new ArrayList<>();
 
 		@Embedded
+		@Access(AccessType.PROPERTY)
 		private InverseSideEmbeddable containingAsSingleWithInverseSideEmbedded = new InverseSideEmbeddable();
 
 		@Embedded
+		@Access(AccessType.PROPERTY)
 		private InverseSideBidirectionalEmbeddable containingAsBidirectionalEmbedded = new InverseSideBidirectionalEmbeddable();
 
 		@Basic
@@ -1554,6 +1586,9 @@ public class AutomaticIndexingEmbeddableIT {
 		}
 
 		public InverseSideEmbeddable getContainingAsSingleWithInverseSideEmbedded() {
+			if ( containingAsSingleWithInverseSideEmbedded == null ) {
+				containingAsSingleWithInverseSideEmbedded = new InverseSideEmbeddable();
+			}
 			return containingAsSingleWithInverseSideEmbedded;
 		}
 
@@ -1563,6 +1598,9 @@ public class AutomaticIndexingEmbeddableIT {
 		}
 
 		public InverseSideBidirectionalEmbeddable getContainingAsBidirectionalEmbedded() {
+			if ( containingAsBidirectionalEmbedded == null ) {
+				containingAsBidirectionalEmbedded = new InverseSideBidirectionalEmbeddable();
+			}
 			return containingAsBidirectionalEmbedded;
 		}
 
@@ -1621,6 +1659,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Embeddable
+	@Access(AccessType.FIELD)
 	public static class SingleContainingEmbeddable {
 
 		@ManyToOne
@@ -1645,6 +1684,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Embeddable
+	@Access(AccessType.FIELD)
 	public static class ListContainingEmbeddable {
 
 		@ManyToMany
@@ -1666,6 +1706,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Embeddable
+	@Access(AccessType.FIELD)
 	public static class InverseSideEmbeddable {
 		/*
 		 * This association must not use "mappedBy".
@@ -1705,6 +1746,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Embeddable
+	@Access(AccessType.FIELD)
 	public static class BidirectionalEmbeddable {
 
 		@OneToOne
@@ -1729,6 +1771,7 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Embeddable
+	@Access(AccessType.FIELD)
 	public static class InverseSideBidirectionalEmbeddable {
 
 		@OneToOne(mappedBy = "containedBidirectionalEmbedded.containedSingle")
