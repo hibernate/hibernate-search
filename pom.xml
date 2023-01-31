@@ -10,7 +10,7 @@
 
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-search-parent</artifactId>
-    <version>5.11.12-SNAPSHOT</version>
+    <version>5.11.12.Final</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Search Aggregator</name>

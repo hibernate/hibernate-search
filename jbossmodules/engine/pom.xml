@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-search-jbossmodules-parent</artifactId>
-        <version>5.11.12-SNAPSHOT</version>
+        <version>5.11.12.Final</version>
     </parent>
 
     <artifactId>hibernate-search-jbossmodules-engine</artifactId>
