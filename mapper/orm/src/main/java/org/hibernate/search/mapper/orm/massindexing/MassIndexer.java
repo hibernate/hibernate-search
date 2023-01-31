@@ -208,4 +208,21 @@ public interface MassIndexer {
 	 */
 	@Incubating
 	MassIndexer environment(MassIndexingEnvironment environment);
+
+	/**
+	 * Sets the threshold for failures that will be reported and sent to {@link MassIndexingFailureHandler} per indexed type.
+	 * Any failures exceeding this number will be ignored. A count of such ignored failures together with the operation
+	 * they belong to will be reported to the failure handler upon the completion of indexing process.
+	 *
+	 * @param threshold The number of failures during one mass indexing beyond which the
+	 * failure handler will no longer be notified. This threshold is reached separately for each indexed type.
+	 * Overrides the {@link MassIndexingFailureHandler#failureFloodingThreshold() threshold defined by the failure handler itself}.
+	 * <p>
+	 * Defaults to {@code 100} with the default failure handler.
+	 *
+	 * @return {@code this} for method chaining
+	 */
+	@Incubating
+	MassIndexer failureFloodingThreshold(long threshold);
+
 }

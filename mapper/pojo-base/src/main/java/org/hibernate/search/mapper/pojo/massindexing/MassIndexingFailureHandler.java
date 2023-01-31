@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * A handler for failures occurring during mass indexing.
  * <p>
@@ -47,4 +49,16 @@ public interface MassIndexingFailureHandler {
 		handle( (MassIndexingFailureContext) context );
 	}
 
+	/**
+	 * Returns the number of failures during one mass indexing beyond which
+	 * the failure handler will no longer be notified.
+	 * This threshold is reached separately for each indexed type.
+	 * <p>
+	 * May be overridden by mass indexer parameters
+	 * (see {@code failureFloodingThreshold(long)} in the {@code MassIndexer} interface).
+	 */
+	@Incubating
+	default long failureFloodingThreshold() {
+		return Long.MAX_VALUE;
+	}
 }

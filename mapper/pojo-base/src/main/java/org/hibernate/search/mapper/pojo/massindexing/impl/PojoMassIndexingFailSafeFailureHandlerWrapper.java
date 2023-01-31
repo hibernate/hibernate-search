@@ -44,4 +44,14 @@ public class PojoMassIndexingFailSafeFailureHandlerWrapper implements MassIndexi
 		}
 	}
 
+	@Override
+	public long failureFloodingThreshold() {
+		try {
+			return delegate.failureFloodingThreshold();
+		}
+		catch (Throwable t) {
+			log.failureInMassIndexingFailureHandler( t );
+			return MassIndexingFailureHandler.super.failureFloodingThreshold();
+		}
+	}
 }

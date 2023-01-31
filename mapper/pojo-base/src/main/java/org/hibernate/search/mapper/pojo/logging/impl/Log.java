@@ -774,4 +774,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 124, value = "Indexing failure: %1$s.\nThe following entities may not have been updated correctly in the index: %2$s.")
 	SearchException indexingFailure(String causeMessage, List<?> failingEntities, @Cause Throwable cause);
+
+	@Message(id = ID_OFFSET + 125,
+			value = "%1$s failures went unreported for this operation to avoid flooding."
+					+ " To disable flooding protection, use 'massIndexer.failureFloodingThreshold(Long.MAX_VALUE)'.")
+	SearchException notReportedFailures(long count);
 }

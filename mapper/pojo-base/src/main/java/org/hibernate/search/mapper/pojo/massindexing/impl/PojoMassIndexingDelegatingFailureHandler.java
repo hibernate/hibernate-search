@@ -39,4 +39,9 @@ public class PojoMassIndexingDelegatingFailureHandler implements MassIndexingFai
 		}
 		delegate.handle( builder.build() );
 	}
+
+	@Override
+	public long failureFloodingThreshold() {
+		return delegate.failureFloodingThreshold();
+	}
 }

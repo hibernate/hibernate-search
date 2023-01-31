@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
@@ -43,7 +44,8 @@ public class MassIndexingErrorCustomMassIndexingFailureHandlerIT extends Abstrac
 
 	@Override
 	protected void assertNoFailureHandling() {
-		verifyNoInteractions( failureHandler );
+		verify( failureHandler ).failureFloodingThreshold();
+		verifyNoMoreInteractions( failureHandler );
 	}
 
 }

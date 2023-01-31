@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -48,6 +49,9 @@ import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
 
 public abstract class AbstractMassIndexingFailureIT {
+	private static final int COUNT = 1500;
+	private static final int FAILURE_FLOODING_THRESHOLD = 45;
+	private static final int DEFAULT_FAILURE_FLOODING_THRESHOLD = 100;
 
 	public static final String TITLE_1 = "Oliver Twist";
 	public static final String AUTHOR_1 = "Charles Dickens";
@@ -64,6 +68,10 @@ public abstract class AbstractMassIndexingFailureIT {
 
 	@Rule
 	public ThreadSpy threadSpy = new ThreadSpy();
+
+	public int getDefaultFailureFloodingThreshold() {
+		return DEFAULT_FAILURE_FLOODING_THRESHOLD;
+	}
 
 	@Test
 	@TestForIssue(jiraKey = {"HSEARCH-4218", "HSEARCH-4236"})
@@ -103,6 +111,16 @@ public abstract class AbstractMassIndexingFailureIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4236")
 	public void entityLoading() {
+		entityLoading( Optional.empty() );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4236")
+	public void entityLoadingWithFailureFloodingThreshold() {
+		entityLoading( Optional.of( FAILURE_FLOODING_THRESHOLD ) );
+	}
+
+	public void entityLoading(Optional<Integer> failureFloodingThreshold) {
 		SessionFactory sessionFactory = setup( builder ->
 				builder.setProperty(
 						AvailableSettings.AUTO_SESSION_EVENTS_LISTENER,
@@ -113,9 +131,8 @@ public abstract class AbstractMassIndexingFailureIT {
 		// We need more than 1000 batches in order to reproduce HSEARCH-4236.
 		// That's because of the size of the queue:
 		// see org.hibernate.search.mapper.orm.massindexing.impl.PojoProducerConsumerQueue.DEFAULT_BUFF_LENGTH
-		int count = 1500;
 		with( sessionFactory ).runInTransaction( session -> {
-			for ( int i = 4; i <= count; i++ ) {
+			for ( int i = 4; i <= COUNT; i++ ) {
 				session.persist( new Book( i, "title " + i, "author " + i ) );
 			}
 		} );
@@ -124,12 +141,29 @@ public abstract class AbstractMassIndexingFailureIT {
 		String failingOperationAsString = "Loading and extracting entity data for entity '"
 				+ Book.NAME + "' during mass indexing";
 
-		expectMassIndexerLoadingOperationFailureHandling( SimulatedFailure.class, exceptionMessage, failingOperationAsString, count );
+		// in case of using default handlers we will get a failure flooding threshold of 100 coming from PojoMassIndexingDelegatingFailureHandler
+		Integer actualThreshold = failureFloodingThreshold.orElseGet( this::getDefaultFailureFloodingThreshold );
+		expectMassIndexerLoadingOperationFailureHandling(
+				SimulatedFailure.class, exceptionMessage,
+				actualThreshold,
+				failingOperationAsString,
+				"Entities that could not be indexed correctly"
+		);
+		expectMassIndexerLoadingOperationFailureHandling(
+				SearchException.class,
+				"",
+				1,
+				( COUNT - actualThreshold ) + " failures went unreported for this operation to avoid flooding."
+		);
 
+		MassIndexer massIndexer = Search.mapping( sessionFactory ).scope( Object.class ).massIndexer()
+				.threadsToLoadObjects( 1 ) // Just to simplify the assertions
+				.batchSizeToLoadObjects( 1 ); // We need more than 1000 batches in order to reproduce HSEARCH-4236
+		failureFloodingThreshold.ifPresent( threshold -> {
+			massIndexer.failureFloodingThreshold( threshold );
+		} );
 		doMassIndexingWithFailure(
-				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer()
-						.threadsToLoadObjects( 1 ) // Just to simplify the assertions
-						.batchSizeToLoadObjects( 1 ), // We need more than 1000 batches in order to reproduce HSEARCH-4236
+				massIndexer,
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
@@ -147,7 +181,12 @@ public abstract class AbstractMassIndexingFailureIT {
 		);
 
 		assertMassIndexerLoadingOperationFailureHandling(
-				SimulatedFailure.class, exceptionMessage, failingOperationAsString, count );
+				SimulatedFailure.class, exceptionMessage, failingOperationAsString,
+				actualThreshold,
+				SearchException.class,
+				( COUNT - actualThreshold ) + " failures went unreported for this operation to avoid flooding.",
+				failingOperationAsString
+		);
 	}
 
 	@Test
@@ -568,11 +607,13 @@ public abstract class AbstractMassIndexingFailureIT {
 			String failingOperationAsString);
 
 	protected abstract void expectMassIndexerLoadingOperationFailureHandling(Class<? extends Throwable> exceptionType,
-			String exceptionMessage, String failingOperationAsString, int count);
+			String exceptionMessage, int count, String failingOperationAsString, String... extraMessages);
 
 	protected abstract void assertMassIndexerLoadingOperationFailureHandling(
 			Class<? extends Throwable> exceptionType, String exceptionMessage,
-			String failingOperationAsString, int count);
+			String failingOperationAsString,
+			int failureFloodingThreshold, Class<? extends Throwable> closingExceptionType,
+			String closingExceptionMessage, String closingFailingOperationAsString);
 
 	protected abstract void expectEntityIndexingAndMassIndexerOperationFailureHandling(
 			String entityName, String entityReferenceAsString,

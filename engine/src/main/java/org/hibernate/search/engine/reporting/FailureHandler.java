@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.reporting;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * A handler for failures occurring during background operations,
  * which may not have been reported to the caller due to being executed asynchronously.
@@ -47,4 +49,16 @@ public interface FailureHandler {
 	 */
 	void handle(EntityIndexingFailureContext context);
 
+	/**
+	 * When this handler is used for handling mass indexing failures - returns the number of failures during
+	 * one mass indexing beyond which the failure handler will no longer be notified. This threshold is reached
+	 * separately for each indexed type. Otherwise, i.e. not in the context of mass indexing, this value is ignored.
+	 * <p>
+	 * May be overridden by mass indexer parameters
+	 * (see {@code failureFloodingThreshold(long)} in the {@code MassIndexer} interface).
+	 */
+	@Incubating
+	default long failureFloodingThreshold() {
+		return Long.MAX_VALUE;
+	}
 }

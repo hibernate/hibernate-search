@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -17,6 +18,7 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.util.common.SearchException;
 
+import org.junit.Before;
 import org.junit.Rule;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -28,6 +30,8 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
 public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends AbstractMassIndexingFailureIT {
+
+	private static final int DEFAULT_FAILURE_FLOODING_THRESHOLD = 100;
 
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
@@ -59,6 +63,7 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	@Override
 	protected void assertEntityIndexingFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
+		verify( failureHandler ).failureFloodingThreshold();
 		verify( failureHandler ).handle( entityFailureContextCapture.capture() );
 		verifyNoMoreInteractions( failureHandler );
 
@@ -84,6 +89,7 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	@Override
 	protected void assertEntityIdGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
+		verify( failureHandler ).failureFloodingThreshold();
 		verify( failureHandler ).handle( entityFailureContextCapture.capture() );
 		verifyNoMoreInteractions( failureHandler );
 
@@ -112,6 +118,7 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	@Override
 	protected void assertEntityNonIdGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
+		verify( failureHandler ).failureFloodingThreshold();
 		verify( failureHandler ).handle( entityFailureContextCapture.capture() );
 		verifyNoMoreInteractions( failureHandler );
 
@@ -143,6 +150,7 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	protected void assertMassIndexerOperationFailureHandling(
 			Class<? extends Throwable> exceptionType, String exceptionMessage,
 			String failingOperationAsString) {
+		verify( failureHandler ).failureFloodingThreshold();
 		verify( failureHandler ).handle( genericFailureContextCapture.capture() );
 		verifyNoMoreInteractions( failureHandler );
 
@@ -156,23 +164,38 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 
 	@Override
 	protected void expectMassIndexerLoadingOperationFailureHandling(Class<? extends Throwable> exceptionType,
-			String exceptionMessage, String failingOperationAsString, int count) {
+			String exceptionMessage, int count, String failingOperationAsString, String... extraMessages) {
 		// We'll check in the assert*() method, see below.
 	}
 
 	@Override
 	protected void assertMassIndexerLoadingOperationFailureHandling(Class<? extends Throwable> exceptionType,
-			String exceptionMessage, String failingOperationAsString, int count) {
-		verify( failureHandler, times( count ) ).handle( entityFailureContextCapture.capture() );
+			String exceptionMessage, String failingOperationAsString,
+			int failureFloodingThreshold, Class<? extends Throwable> closingExceptionType,
+			String closingExceptionMessage, String closingFailingOperationAsString) {
+		if ( failureFloodingThreshold == getDefaultFailureFloodingThreshold() ) {
+			verify( failureHandler ).failureFloodingThreshold();
+		}
+		verify( failureHandler, times( failureFloodingThreshold ) ).handle(
+				entityFailureContextCapture.capture() );
 
 		EntityIndexingFailureContext context = entityFailureContextCapture.getValue();
 		assertThat( context.throwable() )
-				.isInstanceOf( SimulatedFailure.class )
+				.isInstanceOf( exceptionType )
 				.hasMessageContainingAll( exceptionMessage );
 		assertThat( context.failingOperation() ).asString()
 				.isEqualTo( failingOperationAsString );
 		assertThat( context.entityReferences() )
 				.hasSize( 1 );
+
+		verify( failureHandler, times( 1 ) ).handle( genericFailureContextCapture.capture() );
+
+		FailureContext genericContext = genericFailureContextCapture.getValue();
+		assertThat( genericContext.throwable() )
+				.isInstanceOf( closingExceptionType )
+				.hasMessageContainingAll( closingExceptionMessage );
+		assertThat( genericContext.failingOperation() ).asString()
+				.isEqualTo( closingFailingOperationAsString );
 
 		verifyNoMoreInteractions( failureHandler );
 	}
@@ -190,6 +213,7 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 			String entityReferenceAsString,
 			String failingEntityIndexingExceptionMessage, String failingEntityIndexingOperationAsString,
 			String failingMassIndexerOperationExceptionMessage, String failingMassIndexerOperationAsString) {
+		verify( failureHandler ).failureFloodingThreshold();
 		verify( failureHandler ).handle( entityFailureContextCapture.capture() );
 		verify( failureHandler ).handle( genericFailureContextCapture.capture() );
 		verifyNoMoreInteractions( failureHandler );
@@ -213,4 +237,16 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 		assertThat( massIndexerOperationFailureContext.failingOperation() ).asString()
 				.isEqualTo( failingMassIndexerOperationAsString );
 	}
+
+	@Before
+	public void setUp() {
+		lenient().when( failureHandler.failureFloodingThreshold() ).thenReturn(
+				(long) getDefaultFailureFloodingThreshold() );
+	}
+
+	@Override
+	public int getDefaultFailureFloodingThreshold() {
+		return DEFAULT_FAILURE_FLOODING_THRESHOLD;
+	}
+
 }

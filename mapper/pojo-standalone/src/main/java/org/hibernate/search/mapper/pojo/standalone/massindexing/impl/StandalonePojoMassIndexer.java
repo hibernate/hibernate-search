@@ -90,6 +90,12 @@ public class StandalonePojoMassIndexer implements MassIndexer {
 	}
 
 	@Override
+	public MassIndexer failureFloodingThreshold(long threshold) {
+		delegate.failureFloodingThreshold( threshold );
+		return this;
+	}
+
+	@Override
 	public <T> MassIndexer context(Class<T> contextType, T context) {
 		this.context.context( contextType, context );
 		return this;
