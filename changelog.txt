@@ -1,6 +1,33 @@
 Hibernate Search Changelog
 ==========================
 
+6.1.8.Final (2023-01-31)
+-------------------------
+
+** Bug
+    * HSEARCH-4727 OutboxEvent "payload" column created as blob(255) with DB2
+    * HSEARCH-4708 No automatic reindexing when changing a property annotated with @OneToOne(mappedBy = ...) @IndexedEmbedded
+    * HSEARCH-4703 HSearch Outbox table module -> inaccesible private field error using Java 9 modules
+    * HSEARCH-4305 No automatic reindexing when setting a property annotated with @OneToOne(mappedBy = ...) @IndexedEmbedded to null
+
+** Improvement
+    * HSEARCH-4739 Upgrade to jackson-databind 2.13.4.2
+    * HSEARCH-4707 Upgrade to Hibernate ORM 5.6.12.Final
+    * HSEARCH-4697 Upgrade to Jackson 2.13.4
+
+** Task
+    * HSEARCH-4779 Reference the Hibernate Search 6.0 migration guide from the reference documentation
+    * HSEARCH-4775 Improve source code compatibility of Hibernate Search with Hibernate ORM 6.2
+    * HSEARCH-4770 Only update dependencies for test modules in dependency-update builds
+    * HSEARCH-4768 Fix JavaModulePathTest with ORM 6.2
+    * HSEARCH-4757 Adjust tests to address ORM changes introduced in HHH-15767
+    * HSEARCH-4735 Test Hibernate Search 6.1 with Hibernate ORM 6.2
+    * HSEARCH-4733 Adapt SyntheticPropertyIT to Hibernate ORM 6.2
+    * HSEARCH-4732 Run tests against DB2 and DB2 JDBC driver version 11.5.8.0
+    * HSEARCH-4728 Stop testing against OpenSearch 1.0
+    * HSEARCH-4723 Fix flakiness in AutomaticIndexingOneToManyListBaseIT caused by unpredictable collection order
+    * HSEARCH-4722 Fix postgresql container start timing out on CI
+
 6.1.7.Final (2022-09-16)
 -------------------------
 
