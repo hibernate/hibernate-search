@@ -1,6 +1,17 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.11.Final (2023-01-31)
+-------------------------
+
+** Task
+    * HSEARCH-4786 Fix non-compiling code in migration guide
+    * HSEARCH-4770 Only update dependencies for test modules in dependency-update builds
+    * HSEARCH-4722 Fix postgresql container start timing out on CI
+    * HSEARCH-4696 Move all Jenkins-related config to ci/
+    * HSEARCH-4695 Add Jenkins jobs to test component upgrades
+    * HSEARCH-4684 Fix tests starting before postgresql containers are ready on CI
+
 6.0.10.Final (2022-08-23)
 -------------------------
 
