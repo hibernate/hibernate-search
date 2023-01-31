@@ -1,6 +1,12 @@
 Hibernate Search Changelog
 ==========================
 
+5.11.12.Final (2023-01-31)
+-------------------------
+
+** Bug
+    * HSEARCH-4789 [HSearch 5] Indexing entities with a shared id across tenants results in removal from those tenants
+
 5.11.11.Final (2022-10-27)
 -------------------------
 
