@@ -345,6 +345,17 @@ starts, and tearing down that environment after mass indexing.
 Implementations should handle their exceptions unless it is an unrecoverable situation in which further mass indexing
 does not make sense: any exception thrown by the `MassIndexingEnvironment` will abort mass indexing.
 
+|`failureFloodingThreshold(long)`
+| `100` with the default failure handler (see description)
+|*This feature is _incubating_: it is still under active development.*
+The maximum number of failures to be handled per indexed type.
+Any failures exceeding this number will be ignored and not sent for processing by `MassIndexingFailureHandler`.
+Can be set to `Long.MAX_VALUE` if none of the failures should be ignored.
+
+Defaults to a threshold defined by the failure handler in use; see `MassIndexingFailureHandler#failureFloodingThreshold`,
+`FailureHandler#failureFloodingThreshold`.
+For the default log-based failure handler, the default threshold is 100.
+
 |===
 
 [[indexing-massindexer-tuning]]

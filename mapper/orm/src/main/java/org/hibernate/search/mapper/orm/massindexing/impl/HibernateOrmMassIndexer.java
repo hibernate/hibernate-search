@@ -120,6 +120,12 @@ public class HibernateOrmMassIndexer implements MassIndexer {
 		return this;
 	}
 
+	@Override
+	public MassIndexer failureFloodingThreshold(long threshold) {
+		delegate.failureFloodingThreshold( threshold );
+		return this;
+	}
+
 	ConditionalExpression reindexOnly(Class<?> type, String conditionalExpression) {
 		return context.reindexOnly( type, conditionalExpression );
 	}

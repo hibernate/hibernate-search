@@ -62,6 +62,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 	private Boolean dropAndCreateSchemaOnStart;
 	private Boolean purgeAtStart;
 	private boolean mergeSegmentsAfterPurge = true;
+	private Long failureFloodingThreshold = null;
 
 	private MassIndexingFailureHandler failureHandler;
 	private MassIndexingMonitor monitor;
@@ -171,7 +172,8 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 		typesToIndexInParallel = Math.min( typesToIndexInParallel, typeGroupsToIndex.size() );
 		PojoMassIndexingNotifier notifier = new PojoMassIndexingNotifier(
 				getOrCreateFailureHandler(),
-				getOrCreateMonitor()
+				getOrCreateMonitor(),
+				failureFloodingThreshold
 		);
 
 		if ( Boolean.TRUE.equals( dropAndCreateSchemaOnStart ) && Boolean.TRUE.equals( purgeAtStart ) ) {
@@ -203,6 +205,12 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 	@Override
 	public PojoMassIndexer environment(MassIndexingEnvironment environment) {
 		this.environment = environment;
+		return this;
+	}
+
+	@Override
+	public PojoMassIndexer failureFloodingThreshold(long threshold) {
+		this.failureFloodingThreshold = threshold;
 		return this;
 	}
 

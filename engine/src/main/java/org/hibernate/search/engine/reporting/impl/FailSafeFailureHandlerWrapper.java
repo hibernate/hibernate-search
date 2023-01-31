@@ -44,4 +44,14 @@ public class FailSafeFailureHandlerWrapper implements FailureHandler {
 		}
 	}
 
+	@Override
+	public long failureFloodingThreshold() {
+		try {
+			return delegate.failureFloodingThreshold();
+		}
+		catch (Throwable t) {
+			log.failureInFailureHandler( t );
+			return FailureHandler.super.failureFloodingThreshold();
+		}
+	}
 }

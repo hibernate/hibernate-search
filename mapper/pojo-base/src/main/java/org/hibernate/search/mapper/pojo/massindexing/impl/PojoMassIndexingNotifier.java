@@ -7,7 +7,12 @@
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 
@@ -16,8 +21,8 @@ import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEntityFailureCo
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureContext;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A central object to which various are reported,
@@ -33,11 +38,15 @@ public class PojoMassIndexingNotifier {
 	private final AtomicReference<RecordedFailure> firstFailure =
 			new AtomicReference<>( null );
 	private final LongAdder failureCount = new LongAdder();
+	private final Map<String, AtomicLong> failureCounts = Collections.synchronizedMap( new HashMap<>() );
+	private final long failureFloodingThreshold;
 
 	public PojoMassIndexingNotifier(
-			MassIndexingFailureHandler failureHandler, MassIndexingMonitor monitor) {
+			MassIndexingFailureHandler failureHandler, MassIndexingMonitor monitor, Long failureFloodingThreshold) {
 		this.failureHandler = failureHandler;
 		this.monitor = monitor;
+		this.failureFloodingThreshold = Optional.ofNullable( failureFloodingThreshold )
+				.orElseGet( failureHandler::failureFloodingThreshold );
 	}
 
 	void reportAddedTotalCount(long totalCount) {
@@ -85,13 +94,19 @@ public class PojoMassIndexingNotifier {
 
 	void reportEntityIndexingFailure(PojoMassIndexingIndexedTypeGroup<?> typeGroup,
 			PojoMassIndexingSessionContext sessionContext, Object entity, Exception exception) {
+		String failingOperation = log.massIndexerIndexingInstance( typeGroup.notifiedGroupName() );
+
 		// Don't record these failures as suppressed beyond the first one, because there may be hundreds of them.
 		RecordedFailure recordedFailure = recordFailure( exception, false );
+		// We want to check this after recording failure above to make sure that total failure count is increased.
+		if ( shouldNotBeReported( failingOperation ) ) {
+			return;
+		}
 
 		MassIndexingEntityFailureContext.Builder contextBuilder = MassIndexingEntityFailureContext.builder();
 		contextBuilder.throwable( exception );
 		// Add minimal information here, but information we're sure we can get
-		contextBuilder.failingOperation( log.massIndexerIndexingInstance( typeGroup.notifiedGroupName() ) );
+		contextBuilder.failingOperation( failingOperation );
 		// Add more information here, but information that may not be available if the session completely broke down
 		// (we're being extra careful here because we don't want to throw an exception while handling and exception)
 		Object entityReference = extractReferenceOrSuppress( typeGroup, sessionContext, entity, exception );
@@ -103,13 +118,20 @@ public class PojoMassIndexingNotifier {
 	}
 
 	void reportEntitiesLoadingFailure(PojoMassIndexingIndexedTypeGroup<?> typeGroup, List<?> idList, Exception exception) {
+		String failingOperation = log.massIndexingLoadingAndExtractingEntityData( typeGroup.notifiedGroupName() );
+
 		// Don't record these failures as suppressed beyond the first one, because there may be hundreds of them.
 		recordFailure( exception, false );
+
+		// We want to check this after recording failure above to make sure that total failure count is increased.
+		if ( shouldNotBeReported( failingOperation ) ) {
+			return;
+		}
 
 		MassIndexingEntityFailureContext.Builder contextBuilder = MassIndexingEntityFailureContext.builder();
 		contextBuilder.throwable( exception );
 		// Add minimal information here, but information we're sure we can get
-		contextBuilder.failingOperation( log.massIndexingLoadingAndExtractingEntityData( typeGroup.notifiedGroupName() ) );
+		contextBuilder.failingOperation( failingOperation );
 		// Add more information here:
 		for ( Object id : idList ) {
 			try {
@@ -122,12 +144,33 @@ public class PojoMassIndexingNotifier {
 		failureHandler.handle( contextBuilder.build() );
 	}
 
+	private boolean shouldNotBeReported(String operation) {
+		long failuresSoFar = failureCounts.computeIfAbsent(
+						operation,
+						s -> new AtomicLong( 0 )
+				)
+				.incrementAndGet();
+
+		return failureFloodingThreshold < failuresSoFar;
+	}
+
 	void reportIndexingCompleted() {
 		monitor.indexingCompleted();
 
 		RecordedFailure firstFailure = this.firstFailure.get();
 		if ( firstFailure == null ) {
 			return;
+		}
+
+		// report that some failures went unreported:
+		for ( Map.Entry<String, AtomicLong> entry : failureCounts.entrySet() ) {
+			long unreported = entry.getValue().get() - failureFloodingThreshold;
+			if ( unreported > 0 ) {
+				MassIndexingFailureContext.Builder builder = MassIndexingFailureContext.builder();
+				builder.throwable( log.notReportedFailures( unreported ) );
+				builder.failingOperation( entry.getKey() );
+				failureHandler.handle( builder.build() );
+			}
 		}
 
 		if ( firstFailure.throwable instanceof InterruptedException ) {
@@ -181,4 +224,5 @@ public class PojoMassIndexingNotifier {
 			this.throwable = throwable;
 		}
 	}
+
 }

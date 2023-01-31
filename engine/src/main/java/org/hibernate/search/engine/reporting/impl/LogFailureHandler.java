@@ -23,6 +23,7 @@ import org.hibernate.search.util.common.logging.impl.Log;
 public class LogFailureHandler implements FailureHandler {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final int FAILURE_FLOODING_THRESHOLD = 100;
 
 	public static final String NAME = "log";
 
@@ -34,6 +35,11 @@ public class LogFailureHandler implements FailureHandler {
 	@Override
 	public void handle(EntityIndexingFailureContext context) {
 		log.exceptionOccurred( formatMessage( context ).toString(), context.throwable() );
+	}
+
+	@Override
+	public long failureFloodingThreshold() {
+		return FAILURE_FLOODING_THRESHOLD;
 	}
 
 	private StringBuilder formatMessage(FailureContext context) {
