@@ -12,7 +12,7 @@
     <parent>
         <artifactId>hibernate-search-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>5.11.12.Final</version>
+        <version>5.11.13-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
