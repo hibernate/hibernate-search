@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Queue;
@@ -15,12 +16,12 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubMassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
@@ -117,9 +118,24 @@ public class MassIndexingEnvironmentIT {
 	}
 
 	@Test
-	public void failingBeforeHook() throws InterruptedException {
+	public void testFailingEntityLoading() {
+		testFailingBeforeHook(
+				MassIndexingEnvironment.EntityLoadingContext.class,
+				"don't call me in entity loading."
+		);
+	}
+
+	@Test
+	public void testFailingEntityIdentifierLoading() {
+		testFailingBeforeHook(
+				MassIndexingEnvironment.EntityIdentifierLoadingContext.class,
+				"don't call me in identifier loading."
+		);
+	}
+
+	public void testFailingBeforeHook(Class<? extends MassIndexingEnvironment.Context> contextClass, String message) {
 		try ( SearchSession searchSession = mapping.createSession() ) {
-			Queue<String> after = new ArrayBlockingQueue<>( 10 );
+			Queue<String> threadNames = new ArrayBlockingQueue<>( 10 );
 
 			MassIndexer indexer = searchSession.massIndexer()
 					// Simulate passing information to connect to a DB, ...
@@ -130,12 +146,25 @@ public class MassIndexingEnvironmentIT {
 					.environment( new MassIndexingEnvironment() {
 						@Override
 						public void beforeExecution(Context context) {
-							throw new UnsupportedOperationException( "don't call me." );
+							if ( contextClass.isAssignableFrom( EntityIdentifierLoadingContext.class ) &&
+									context instanceof EntityIdentifierLoadingContext ) {
+								throw new UnsupportedOperationException( "don't call me in identifier loading." );
+							}
+							if ( contextClass.isAssignableFrom( EntityLoadingContext.class ) &&
+									context instanceof EntityIdentifierLoadingContext ) {
+								throw new UnsupportedOperationException( "don't call me in entity loading." );
+							}
+
+							// if we've successfully executed before - let's save the name so we can remove it in after
+							threadNames.add( Thread.currentThread().getName() );
 						}
 
 						@Override
 						public void afterExecution(Context context) {
-							after.add( Thread.currentThread().getName() );
+							if ( !threadNames.remove( Thread.currentThread().getName() ) ) {
+								fail( "We should not have reached this state as after call is only possible " +
+										"with successful before call which would've added the thread name." );
+							}
 						}
 					} );
 
@@ -148,11 +177,12 @@ public class MassIndexingEnvironmentIT {
 			assertThatThrownBy( () -> Futures.unwrappedExceptionGet( indexer.start().toCompletableFuture() ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
-							"2 failure(s) occurred during mass indexing",
-							"First failure: don't call me."
+							"1 failure(s) occurred during mass indexing",
+							"First failure: ",
+							message
 					);
 
-			assertThat( after ).isEmpty();
+			assertThat( threadNames ).isEmpty();
 		}
 	}
 
