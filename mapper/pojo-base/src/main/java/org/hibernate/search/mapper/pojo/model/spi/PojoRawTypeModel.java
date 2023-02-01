@@ -52,6 +52,9 @@ public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel
 	@Override
 	Stream<? extends PojoRawTypeModel<? super T>> descendingSuperTypes();
 
+	/**
+	 * @return All annotations on this specific type (non-inherited annotations from supertype are excluded).
+	 */
 	Stream<Annotation> annotations();
 
 	/**
@@ -73,6 +76,9 @@ public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel
 	 */
 	Collection<PojoConstructorModel<T>> declaredConstructors();
 
+	/**
+	 * @return All declared properties of this type.
+	 */
 	Collection<PojoPropertyModel<?>> declaredProperties();
 
 	/**
@@ -85,6 +91,9 @@ public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel
 	 */
 	PojoTypeModel<? extends T> cast(PojoTypeModel<?> other);
 
+	/**
+	 * @return A {@link PojoCaster} targeting this type.
+	 */
 	PojoCaster<T> caster();
 
 }

@@ -17,6 +17,11 @@ public interface ConstructorMappingStep {
 	 */
 	TypeMappingStep hostingType();
 
+	/**
+	 * Marks the constructor to use for projections from an index object (root or object field) to a Java object.
+	 * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor
+	 * @return {@code this}, for method chaining.
+	 */
 	ConstructorMappingStep projectionConstructor();
 
 }

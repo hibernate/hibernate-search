@@ -14,6 +14,9 @@ import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 
 public interface PojoConstructorModel<T> {
 
+	/**
+	 * @return All annotations on this constructor.
+	 */
 	Stream<Annotation> annotations();
 
 	/**
@@ -21,10 +24,19 @@ public interface PojoConstructorModel<T> {
 	 */
 	PojoRawTypeModel<T> typeModel();
 
+	/**
+	 * @return A handle to call this constructor.
+	 */
 	ValueCreateHandle<T> handle();
 
+	/**
+	 * @return All declared parameters of this constructor.
+	 */
 	List<PojoMethodParameterModel<?>> declaredParameters();
 
+	/**
+	 * @return An array containing the Java types of all {@link #declaredParameters() declared parameters} of this constructor.
+	 */
 	Class<?>[] parametersJavaTypes();
 
 }

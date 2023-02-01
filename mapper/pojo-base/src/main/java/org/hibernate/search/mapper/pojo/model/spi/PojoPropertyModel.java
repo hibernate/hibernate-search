@@ -13,8 +13,14 @@ import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 public interface PojoPropertyModel<T> {
 
+	/**
+	 * @return The name of this property, without the {@code get}/{@code set} prefixes of getters/setters.
+	 */
 	String name();
 
+	/**
+	 * @return All annotations on this property.
+	 */
 	Stream<Annotation> annotations();
 
 	/**
@@ -23,6 +29,9 @@ public interface PojoPropertyModel<T> {
 	 */
 	PojoTypeModel<T> typeModel();
 
+	/**
+	 * @return A handle to read the value of this property on a instance of its hosting type.
+	 */
 	ValueReadHandle<T> handle();
 
 }

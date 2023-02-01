@@ -12,8 +12,8 @@ public interface IndexedEntityBindingMapperContext {
 	 * Get the shared path-tracker for a given indexed-embedded definition.
 	 * <p>
 	 * A single definition may lead to multiple indexed-embedded "instances":
-	 * in sub-types of the type defining the indexed-embedded (the "holding type"),
-	 * or simply at a deeper level when the indexed-embedded points to the same type as the holding type
+	 * in sub-types of the type defining the indexed-embedded (the "hosting type"),
+	 * or simply at a deeper level when the indexed-embedded points to the same type as the hosting type
 	 * (recursive indexed-embedded).
 	 * In such case, each "instance" of the indexed-embedded may use different parts of the definition,
 	 * so using a single path tracker gives it a complete views
