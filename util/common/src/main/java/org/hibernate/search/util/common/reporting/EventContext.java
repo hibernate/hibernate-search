@@ -31,7 +31,7 @@ public final class EventContext {
 	public static EventContext concat(EventContext first, EventContext... others) {
 		EventContext result = first;
 		for ( EventContext other : others ) {
-			result = first.append( other );
+			result = result.append( other );
 		}
 		return result;
 	}
