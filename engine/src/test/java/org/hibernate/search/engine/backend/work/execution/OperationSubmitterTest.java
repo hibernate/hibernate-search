@@ -16,6 +16,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,15 +29,15 @@ public class OperationSubmitterTest {
 	public void setUp() throws Exception {
 		this.queue = new ArrayBlockingQueue<>( 2 );
 
-		OperationSubmitter.BLOCKING.submitToQueue( queue, 1 );
-		OperationSubmitter.BLOCKING.submitToQueue( queue, 2 );
+		OperationSubmitter.BLOCKING.submitToQueue( queue, 1, i -> () -> { } );
+		OperationSubmitter.BLOCKING.submitToQueue( queue, 2, i -> () -> { } );
 	}
 
 	@Test
 	public void blockingOperationSubmitterBlocksTheOperation() throws InterruptedException {
 		CompletableFuture<Boolean> future = CompletableFuture.supplyAsync( () -> {
 			try {
-				OperationSubmitter.BLOCKING.submitToQueue( queue, 3 );
+				OperationSubmitter.BLOCKING.submitToQueue( queue, 3, i -> () -> { } );
 			}
 			catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
@@ -59,7 +60,16 @@ public class OperationSubmitterTest {
 	@Test
 	public void nonBlockingOperationSubmitterThrowsException() {
 		Integer element = 3;
-		assertThatThrownBy( () -> OperationSubmitter.REJECTED_EXECUTION_EXCEPTION.submitToQueue( queue, element ) )
+		assertThatThrownBy( () -> OperationSubmitter.REJECTED_EXECUTION_EXCEPTION.submitToQueue( queue, element, i -> () -> { } ) )
 				.isInstanceOf( RejectedExecutionException.class );
+	}
+
+	@Test
+	public void offloadingSubmitterOffloads() throws Exception {
+		// we won't submit to the queue but just make sure that work got offloaded
+		AtomicBoolean worked = new AtomicBoolean( false );
+		OperationSubmitter.offloading( Runnable::run ).submitToQueue( queue, 1, i -> () -> { worked.set( true ); } );
+
+		await().untilAsserted( () -> assertThat( worked ).isTrue() );
 	}
 }

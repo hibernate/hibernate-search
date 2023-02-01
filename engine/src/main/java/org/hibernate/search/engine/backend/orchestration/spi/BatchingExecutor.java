@@ -13,6 +13,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
@@ -71,7 +72,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 
 	/**
 	 * Start the executor, allowing works to be submitted
-	 * through {@link #submit(BatchedWork)}.
+	 * through {@link #submit(BatchedWork, OperationSubmitter, Function)}.
 	 *
 	 * @param executorService An executor service with at least one thread.
 	 */
@@ -86,7 +87,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 
 	/**
 	 * Stop the executor, no longer allowing works to be submitted
-	 * through {@link #submit(BatchedWork)}.
+	 * through {@link #submit(BatchedWork, OperationSubmitter, Function)}.
 	 * <p>
 	 * This will remove pending works from the queue.
 	 */
@@ -102,11 +103,13 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	}
 
 	/**
-	 * @deprecated Use {@link #submit(BatchedWork, OperationSubmitter)} instead.
+	 * @deprecated Use {@link #submit(BatchedWork, OperationSubmitter, Function)} instead.
 	 */
 	@Deprecated
 	public void submit(BatchedWork<? super P> work) throws InterruptedException {
-		submit( work, OperationSubmitter.BLOCKING );
+		submit( work, OperationSubmitter.BLOCKING, w -> () -> {
+			throw new IllegalStateException( "Blocking executor does not offload work." );
+		} );
 	}
 
 	/**
@@ -114,15 +117,18 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	 * <p>
 	 * Must not be called when the executor is stopped.
 	 * @param work A work to execute.
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full.
+	 * @param blockingRetryProducer
 	 * @throws InterruptedException If the current thread is interrupted while enqueuing the work.
 	 */
-	public void submit(BatchedWork<? super P> work, OperationSubmitter operationSubmitter) throws InterruptedException {
+	public void submit(BatchedWork<? super P> work, OperationSubmitter operationSubmitter,
+			Function<BatchedWork<? super P>, Runnable> blockingRetryProducer) throws InterruptedException {
 		if ( processingTask == null ) {
 			throw new AssertionFailure(
 					"Attempt to submit a work to executor '" + name + "', which is stopped."
 			);
 		}
-		operationSubmitter.submitToQueue( workQueue, work );
+		operationSubmitter.submitToQueue( workQueue, work, blockingRetryProducer );
 		processingTask.ensureScheduled();
 	}
 

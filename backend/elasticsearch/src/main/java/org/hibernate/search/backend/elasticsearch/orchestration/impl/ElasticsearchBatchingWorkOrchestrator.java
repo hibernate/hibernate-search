@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
@@ -107,8 +108,13 @@ public class ElasticsearchBatchingWorkOrchestrator
 	}
 
 	@Override
-	protected void doSubmit(ElasticsearchBatchedWork<?> work, OperationSubmitter operationSubmitter) throws InterruptedException {
-		executors.get( work.getQueuingKey() ).submit( work, operationSubmitter );
+	protected void doSubmit(ElasticsearchBatchedWork<?> work, OperationSubmitter operationSubmitter,
+			Function<ElasticsearchBatchedWork<?>, Runnable> blockingRetryProducer) throws InterruptedException {
+		executors.get( work.getQueuingKey() ).submit(
+				work,
+				operationSubmitter,
+				w -> blockingRetryProducer.apply( (ElasticsearchBatchedWork<?>) w )
+		);
 	}
 
 	@Override

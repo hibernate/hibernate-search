@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
@@ -37,7 +38,8 @@ public class ElasticsearchSimpleWorkOrchestrator
 	}
 
 	@Override
-	protected void doSubmit(WorkExecution<?> work, OperationSubmitter ignore) {
+	protected void doSubmit(WorkExecution<?> work, OperationSubmitter ignore,
+			Function<WorkExecution<?>, Runnable> blockingRetryProducer) {
 		// ignoring the submitter as WorkExecution#execute will eventually call nonblocking REST client.
 		work.execute( executionContext );
 	}
