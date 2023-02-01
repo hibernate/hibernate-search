@@ -2841,6 +2841,23 @@
                     <scope>provided</scope>
                 </dependency>
             </dependencies>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration>
+                                <!-- Intellij IDEA only understands the main configuration,
+                                     so we need to do this in order for (most) @ProjectionConstructor tests to work fine. -->
+                                <compilerArgs combine.self="append">
+                                    <compilerArg>-parameters</compilerArg>
+                                </compilerArgs>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
         </profile>
 
         <profile>
