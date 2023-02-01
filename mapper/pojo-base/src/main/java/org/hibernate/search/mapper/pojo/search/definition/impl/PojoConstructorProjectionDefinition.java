@@ -10,10 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
-import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.spi.CompositeProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
@@ -24,13 +22,10 @@ import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPa
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoSearchMappingCollectorConstructorNode;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoSearchMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoSearchMappingConstructorNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoMethodParameterModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoConstructorProjectionDefinitionMessages;
@@ -41,9 +36,17 @@ import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormat
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
+import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
 public final class PojoConstructorProjectionDefinition<T>
 		implements CompositeProjectionDefinition<T>, ToStringTreeAppendable {
+
+	public static <T> PojoConstructorProjectionDefinition<T> create(PojoMappingHelper mappingHelper,
+			PojoConstructorModel<T> constructor) {
+		return new ConstructorNode<>( mappingHelper, constructor ).createConstructorProjectionDefinition();
+	}
+
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final PojoConstructorProjectionDefinitionMessages MESSAGES = PojoConstructorProjectionDefinitionMessages.INSTANCE;
 
@@ -96,63 +99,66 @@ public final class PojoConstructorProjectionDefinition<T>
 		}
 	}
 
-	static class ConstructorNode<T> implements PojoSearchMappingCollectorConstructorNode {
+	private static class ConstructorNode<T> implements EventContextProvider {
 		private final PojoMappingHelper mappingHelper;
-		private final ConstructorParameterTypeNode<?> parent;
+		private final ConstructorParameterNode<?> parent;
 		private final String relativeFieldPath;
 		private final String absoluteFieldPath;
 		private final PojoConstructorModel<T> constructor;
-		private final Consumer<PojoConstructorProjectionDefinition<T>> collector;
 
-		ConstructorNode(PojoMappingHelper mappingHelper,
-				PojoConstructorModel<T> constructor, Consumer<PojoConstructorProjectionDefinition<T>> collector) {
-			this( mappingHelper, null, constructor, collector );
+		ConstructorNode(PojoMappingHelper mappingHelper, PojoConstructorModel<T> constructor) {
+			this( mappingHelper, constructor, null, null );
 		}
 
-		ConstructorNode(PojoMappingHelper mappingHelper, ConstructorParameterTypeNode<?> parent,
-				PojoConstructorModel<T> constructor, Consumer<PojoConstructorProjectionDefinition<T>> collector) {
+		ConstructorNode(PojoMappingHelper mappingHelper, PojoConstructorModel<T> constructor,
+				ConstructorParameterNode<?> parent, String relativeFieldPath) {
 			this.mappingHelper = mappingHelper;
 			this.parent = parent;
-			this.relativeFieldPath = parent == null ? null : parent.relativeFieldPath;
-			this.absoluteFieldPath = FieldPaths.compose( parent == null ? null : parent.parent.parent.absoluteFieldPath,
+			this.relativeFieldPath = relativeFieldPath;
+			this.absoluteFieldPath = FieldPaths.compose( parent == null ? null : parent.parent.absoluteFieldPath,
 					relativeFieldPath );
 			this.constructor = constructor;
-			this.collector = collector;
 		}
 
 		@Override
-		public ContextualFailureCollector failureCollector() {
-			if ( parent == null ) {
-				return mappingHelper.failureCollector()
-						.withContext( PojoEventContexts.fromType( constructor.typeModel() ) )
-						.withContext( PojoEventContexts.fromConstructor( constructor ) );
-			}
-			else {
-				return parent.failureCollector()
-						.withContext( PojoEventContexts.fromConstructor( constructor ) );
-			}
+		public EventContext eventContext() {
+			return EventContext.concat(
+					parent == null ? null : parent.eventContext(),
+					PojoEventContexts.fromType( constructor.typeModel() ),
+					PojoEventContexts.fromConstructor( constructor )
+			);
 		}
 
-		@Override
-		public void projectionConstructor() {
+		PojoConstructorProjectionDefinition<T> createConstructorProjectionDefinition() {
 			if ( constructor.typeModel().isAbstract() ) {
 				throw log.invalidAbstractTypeForProjectionConstructor( constructor.typeModel() );
 			}
 			if ( parent != null ) {
-				String path = parent.parent.parent.getPathFromSameProjectionConstructor( constructor );
+				String path = parent.parent.getPathFromSameProjectionConstructor( constructor );
 				if ( path != null ) {
-					throw log.infiniteRecursionForProjectionConstructor( constructor, FieldPaths.compose( path,
-							relativeFieldPath
-					) );
+					throw log.infiniteRecursionForProjectionConstructor( constructor,
+							FieldPaths.compose( path, relativeFieldPath ) );
 				}
 			}
 			List<InnerProjectionDefinition> innerDefinitions = new ArrayList<>();
 			for ( PojoMethodParameterModel<?> parameter : constructor.declaredParameters() ) {
 				ConstructorParameterNode<?> parameterNode =
 						new ConstructorParameterNode<>( mappingHelper, this, parameter );
-				innerDefinitions.add( parameterNode.inferInnerProjection() );
+				InnerProjectionDefinition innerProjection;
+				try {
+					innerProjection = parameterNode.inferInnerProjection();
+				}
+				catch (RuntimeException e) {
+					mappingHelper.failureCollector()
+							.withContext( parameterNode.eventContext() )
+							.add( e );
+					// Here the result no longer matters, bootstrap will fail anyway.
+					// We just pick a neutral value that won't trigger cascading failures.
+					innerProjection = NullInnerProjectionDefinition.INSTANCE;
+				}
+				innerDefinitions.add( innerProjection );
 			}
-			collector.accept( new PojoConstructorProjectionDefinition<>( constructor, innerDefinitions ) );
+			return new PojoConstructorProjectionDefinition<>( constructor, innerDefinitions );
 		}
 
 		private String getPathFromSameProjectionConstructor(PojoConstructorModel<?> constructorToMatch) {
@@ -160,7 +166,7 @@ public final class PojoConstructorProjectionDefinition<T>
 				return "";
 			}
 			else if ( parent != null ) {
-				String path = parent.parent.parent.getPathFromSameProjectionConstructor( constructorToMatch );
+				String path = parent.parent.getPathFromSameProjectionConstructor( constructorToMatch );
 				return path == null ? null : FieldPaths.compose( path, relativeFieldPath );
 			}
 			else {
@@ -171,12 +177,12 @@ public final class PojoConstructorProjectionDefinition<T>
 		}
 	}
 
-	private static class ConstructorParameterNode<P> implements PojoMappingCollector {
+	private static class ConstructorParameterNode<P> implements EventContextProvider {
 		private final PojoMappingHelper mappingHelper;
 		private final ConstructorNode<?> parent;
 		private final PojoMethodParameterModel<P> parameter;
 
-		public ConstructorParameterNode(PojoMappingHelper mappingHelper, ConstructorNode<?> parent,
+		ConstructorParameterNode(PojoMappingHelper mappingHelper, ConstructorNode<?> parent,
 				PojoMethodParameterModel<P> parameter) {
 			this.mappingHelper = mappingHelper;
 			this.parent = parent;
@@ -184,9 +190,8 @@ public final class PojoConstructorProjectionDefinition<T>
 		}
 
 		@Override
-		public ContextualFailureCollector failureCollector() {
-			return parent.failureCollector()
-					.withContext( PojoEventContexts.fromMethodParameter( parameter ) );
+		public EventContext eventContext() {
+			return parent.eventContext().append( PojoEventContexts.fromMethodParameter( parameter ) );
 		}
 
 		InnerProjectionDefinition inferInnerProjection() {
@@ -212,8 +217,7 @@ public final class PojoConstructorProjectionDefinition<T>
 						|| ! ( BuiltinContainerExtractors.COLLECTION.equals( boundParameterElementExtractorNames.get( 0 ) )
 										|| BuiltinContainerExtractors.ITERABLE.equals( boundParameterElementExtractorNames.get( 0 ) ) )
 						|| !mappingHelper.introspector().typeModel( List.class ).isSubTypeOf( parameterType.rawType().rawType() ) ) {
-					throw log.invalidMultiValuedParameterTypeForProjectionConstructor( parameterType,
-							PojoEventContexts.fromMethodParameter( parameter ) );
+					throw log.invalidMultiValuedParameterTypeForProjectionConstructor( parameterType );
 				}
 				multi = true;
 			}
@@ -221,67 +225,40 @@ public final class PojoConstructorProjectionDefinition<T>
 			PojoRawTypeModel<?> boundParameterElementRawType = boundParameterElementPath.getExtractedType().rawType();
 			Optional<String> paramName = parameter.name();
 			if ( !paramName.isPresent() ) {
-				throw log.missingParameterNameForProjectionConstructor( parent.constructor.typeModel(),
-						PojoEventContexts.fromMethodParameter( parameter ) );
+				throw log.missingParameterNameForProjectionConstructor( parent.constructor.typeModel() );
 			}
 			String innerRelativeFieldPath = paramName.get();
 			String innerAbsoluteFieldPath = FieldPaths.compose( parent.absoluteFieldPath, innerRelativeFieldPath );
-			ConstructorParameterTypeNode<?> parameterTypeNode = new ConstructorParameterTypeNode<>( mappingHelper,
-					this, innerRelativeFieldPath, boundParameterElementRawType );
-			for ( PojoTypeMetadataContributor contributor : mappingHelper.contributorProvider().get( boundParameterElementRawType ) ) {
-				contributor.contributeSearchMapping( parameterTypeNode );
-			}
-
-			if ( parameterTypeNode.constructorProjectionDefinition != null ) {
-				return new ObjectInnerProjectionDefinition( innerAbsoluteFieldPath, multi, parameterTypeNode.constructorProjectionDefinition );
+			PojoConstructorProjectionDefinition<?> definition = createConstructorProjectionDefinitionOrNull(
+					boundParameterElementRawType, innerRelativeFieldPath );
+			if ( definition != null ) {
+				return new ObjectInnerProjectionDefinition( innerAbsoluteFieldPath, multi, definition );
 			}
 			else {
-				// No projection constructor mapping for this type; assume it's a projection on value field
+				// No projection constructor for this type; assume it's a projection on value field
 				return new ValueInnerProjectionDefinition( innerAbsoluteFieldPath, multi,
 						boundParameterElementRawType.typeIdentifier().javaClass() );
 			}
 		}
-	}
 
-	private static class ConstructorParameterTypeNode<T>
-			implements PojoSearchMappingCollectorTypeNode, Consumer<PojoConstructorProjectionDefinition<T>> {
-		private final PojoMappingHelper mappingHelper;
-		private final ConstructorParameterNode<?> parent;
-		private final String relativeFieldPath;
-		private final PojoRawTypeModel<T> type;
-
-		private PojoConstructorProjectionDefinition<T> constructorProjectionDefinition;
-
-		public ConstructorParameterTypeNode(PojoMappingHelper mappingHelper, ConstructorParameterNode<?> parent,
-				String relativeFieldPath, PojoRawTypeModel<T> type) {
-			this.mappingHelper = mappingHelper;
-			this.parent = parent;
-			this.relativeFieldPath = relativeFieldPath;
-			this.type = type;
-		}
-
-		@Override
-		public ContextualFailureCollector failureCollector() {
-			return parent.failureCollector()
-					.withContext( PojoEventContexts.fromType( type ) );
-		}
-
-		@Override
-		public PojoRawTypeIdentifier<?> typeIdentifier() {
-			return type.typeIdentifier();
-		}
-
-		@Override
-		public PojoSearchMappingCollectorConstructorNode constructor(Class<?>[] parameterTypes) {
-			return new ConstructorNode<>( mappingHelper, this, type.constructor( parameterTypes ), this );
-		}
-
-		@Override
-		public void accept(PojoConstructorProjectionDefinition<T> constructorProjectionDefinition) {
-			if ( this.constructorProjectionDefinition != null ) {
-				throw log.multipleProjectionConstructorsForType( type.typeIdentifier().javaClass() );
+		<T> PojoConstructorProjectionDefinition<T> createConstructorProjectionDefinitionOrNull(PojoRawTypeModel<T> parameterType,
+				String relativeFieldPath) {
+			PojoConstructorProjectionDefinition<T> result = null;
+			for ( PojoTypeMetadataContributor contributor : mappingHelper.contributorProvider()
+					// Constructor mapping is not inherited
+					.getIgnoringInheritance( parameterType ) ) {
+				for ( PojoSearchMappingConstructorNode constructorMapping : contributor.constructors().values() ) {
+					if ( constructorMapping.isProjectionConstructor() ) {
+						if ( result != null ) {
+							throw log.multipleProjectionConstructorsForType( parameterType.typeIdentifier().javaClass() );
+						}
+						PojoConstructorModel<T> constructor = parameterType.constructor( constructorMapping.parametersJavaTypes() );
+						result = new ConstructorNode<>( mappingHelper, constructor, this, relativeFieldPath )
+								.createConstructorProjectionDefinition();
+					}
+				}
 			}
-			this.constructorProjectionDefinition = constructorProjectionDefinition;
+			return result;
 		}
 	}
 

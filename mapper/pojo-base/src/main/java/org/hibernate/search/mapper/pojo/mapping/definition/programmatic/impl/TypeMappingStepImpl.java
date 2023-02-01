@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
@@ -13,7 +17,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurat
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoSearchMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoSearchMappingConstructorNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ConstructorMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
@@ -31,6 +35,8 @@ public class TypeMappingStepImpl
 	private final PojoRawTypeModel<?> typeModel;
 
 	private final ErrorCollectingPojoTypeMetadataContributor children = new ErrorCollectingPojoTypeMetadataContributor();
+
+	private Map<List<Class<?>>, InitialConstructorMappingStep> constructors;
 
 	public TypeMappingStepImpl(PojoRawTypeModel<?> typeModel) {
 		this.typeModel = typeModel;
@@ -53,11 +59,6 @@ public class TypeMappingStepImpl
 	}
 
 	@Override
-	public void contributeSearchMapping(PojoSearchMappingCollectorTypeNode collector) {
-		children.contributeSearchMapping( collector );
-	}
-
-	@Override
 	public TypeMappingIndexedStep indexed() {
 		TypeMappingIndexedStepImpl child = new TypeMappingIndexedStepImpl( typeModel.typeIdentifier() );
 		children.add( child );
@@ -72,17 +73,26 @@ public class TypeMappingStepImpl
 
 	@Override
 	public ConstructorMappingStep mainConstructor() {
-		InitialConstructorMappingStep child = new InitialConstructorMappingStep( this, typeModel.mainConstructor() );
-		children.add( child );
-		return child;
+		return constructor( typeModel.mainConstructor().parametersJavaTypes() );
 	}
 
 	@Override
 	public ConstructorMappingStep constructor(Class<?>... parameterTypes) {
-		InitialConstructorMappingStep child = new InitialConstructorMappingStep(
-				this, typeModel.constructor( parameterTypes ) );
-		children.add( child );
-		return child;
+		if ( constructors == null ) {
+			constructors = new LinkedHashMap<>();
+		}
+		List<Class<?>> key = Arrays.asList( parameterTypes );
+		InitialConstructorMappingStep result = constructors.get( key );
+		if ( result == null ) {
+			result = new InitialConstructorMappingStep( this, typeModel.constructor( parameterTypes ) );
+			constructors.put( key, result );
+		}
+		return result;
+	}
+
+	@Override
+	public Map<List<Class<?>>, ? extends PojoSearchMappingConstructorNode> constructors() {
+		return constructors == null ? Collections.emptyMap() : constructors;
 	}
 
 	@Override

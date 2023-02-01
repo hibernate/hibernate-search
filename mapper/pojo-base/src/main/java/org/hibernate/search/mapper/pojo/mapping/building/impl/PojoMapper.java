@@ -48,7 +48,6 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoSearchMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
@@ -214,13 +213,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		PojoSearchQueryElementRegistryBuilder searchQueryElementRegistryBuilder =
 				new PojoSearchQueryElementRegistryBuilder( mappingHelper );
 		for ( PojoRawTypeModel<?> type : initialMappedTypes ) {
-			try {
-				collectSearchMapping( type, searchQueryElementRegistryBuilder.type( type ) );
-			}
-			catch (RuntimeException e) {
-				failureCollector.withContext( EventContexts.fromType( type ) )
-						.add( e );
-			}
+			searchQueryElementRegistryBuilder.process( type );
 		}
 		searchQueryElementRegistry = searchQueryElementRegistryBuilder.build();
 	}
@@ -426,12 +419,6 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	private <T> void collectIndexMapping(PojoRawTypeModel<T> type, PojoIndexMappingCollectorTypeNode collector) {
 		for ( PojoTypeMetadataContributor contributor : contributorProvider.get( type ) ) {
 			contributor.contributeIndexMapping( collector );
-		}
-	}
-
-	private <T> void collectSearchMapping(PojoRawTypeModel<T> type, PojoSearchMappingCollectorTypeNode collector) {
-		for ( PojoTypeMetadataContributor contributor : contributorProvider.get( type ) ) {
-			contributor.contributeSearchMapping( collector );
 		}
 	}
 

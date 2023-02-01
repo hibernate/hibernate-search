@@ -6,20 +6,20 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoConstructorMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoSearchMappingCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import java.util.Optional;
+
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoSearchMappingConstructorNode;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ConstructorMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 
-public class InitialConstructorMappingStep implements ConstructorMappingStep, PojoTypeMetadataContributor {
+public class InitialConstructorMappingStep
+		implements ConstructorMappingStep, PojoSearchMappingConstructorNode {
 
 	private final TypeMappingStepImpl parent;
 	private final PojoConstructorModel<?> constructorModel;
 
-	private final ErrorCollectingPojoConstructorMetadataContributor children =
-			new ErrorCollectingPojoConstructorMetadataContributor();
+	private boolean projectionConstructor = false;
 
 	InitialConstructorMappingStep(TypeMappingStepImpl parent, PojoConstructorModel<?> constructorModel) {
 		this.parent = parent;
@@ -32,19 +32,18 @@ public class InitialConstructorMappingStep implements ConstructorMappingStep, Po
 	}
 
 	@Override
-	public void contributeSearchMapping(PojoSearchMappingCollectorTypeNode collector) {
-		// Constructor mapping is not inherited
-		if ( !constructorModel.typeModel().typeIdentifier().equals( collector.typeIdentifier() ) ) {
-			return;
-		}
-		if ( children.hasContent() ) {
-			children.contributeSearchMapping( collector.constructor( constructorModel.parametersJavaTypes() ) );
-		}
+	public Class<?>[] parametersJavaTypes() {
+		return constructorModel.parametersJavaTypes();
 	}
 
 	@Override
 	public ConstructorMappingStep projectionConstructor() {
-		children.add( new ProjectionConstructorMappingContributor() );
+		this.projectionConstructor = true;
 		return this;
+	}
+
+	@Override
+	public boolean isProjectionConstructor() {
+		return projectionConstructor;
 	}
 }

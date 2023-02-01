@@ -6,8 +6,15 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
-public interface PojoSearchMappingCollectorConstructorNode extends PojoMappingCollector {
+public interface PojoSearchMappingConstructorNode {
 
-	void projectionConstructor();
+	Class<?>[] parametersJavaTypes();
+
+	/**
+	 * @return Whether this constructor is a projection constructor ({@code true}) or not ({@code false}).
+	 */
+	default boolean isProjectionConstructor() {
+		return false;
+	}
 
 }

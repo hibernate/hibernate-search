@@ -709,8 +709,7 @@ public interface Log extends BasicLogger {
 					+ " When inferring inner projections from constructor parameters, constructor parameter names must be known."
 					+ " Make sure that '%1$s' was compiled with the '-parameters' compiler flag.")
 	SearchException missingParameterNameForProjectionConstructor(
-			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> parentTypeModel,
-			@Param EventContext eventContext);
+			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> parentTypeModel);
 
 	@Message(id = ID_OFFSET + 115,
 			value = "Invalid parameter type for projection constructor: %1$s."
@@ -718,8 +717,7 @@ public interface Log extends BasicLogger {
 					+ " multi-valued constructor parameters must be lists (java.util.List<...>)"
 					+ " or list supertypes (java.lang.Iterable<...>, java.util.Collection<...>)")
 	SearchException invalidMultiValuedParameterTypeForProjectionConstructor(
-			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> parentTypeModel,
-			@Param EventContext eventContext);
+			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> parentTypeModel);
 
 	@Message(id = ID_OFFSET + 116,
 			value = "Multiple projection constructor are mapped for type '%1$s'."

@@ -39,20 +39,6 @@ public final class ErrorCollectingPojoTypeMetadataContributor implements PojoTyp
 		}
 	}
 
-	@Override
-	public void contributeSearchMapping(PojoSearchMappingCollectorTypeNode collector) {
-		if ( children != null ) {
-			for ( PojoTypeMetadataContributor child : children ) {
-				try {
-					child.contributeSearchMapping( collector );
-				}
-				catch (RuntimeException e) {
-					collector.failureCollector().add( e );
-				}
-			}
-		}
-	}
-
 	public ErrorCollectingPojoTypeMetadataContributor addAll(Collection<? extends PojoTypeMetadataContributor> children) {
 		initChildren();
 		this.children.addAll( children );
