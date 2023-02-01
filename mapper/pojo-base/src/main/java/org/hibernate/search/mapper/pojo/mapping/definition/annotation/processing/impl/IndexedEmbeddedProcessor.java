@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProcessor<IndexedEmbedded> {
 
 	@Override
-	@SuppressWarnings("deprecation") // For IndexedEmbedded.maxDepth, IndexedEmbedded.storage, ObjectFieldStorage
+	@SuppressWarnings("deprecation") // For IndexedEmbedded.prefix
 	public void process(PropertyMappingStep mappingContext, IndexedEmbedded annotation,
 			PropertyMappingAnnotationProcessorContext context) {
 		String cleanedUpPrefix = annotation.prefix();

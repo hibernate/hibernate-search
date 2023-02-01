@@ -36,6 +36,11 @@ public interface PojoTypeModel<T> {
 	 */
 	PojoRawTypeModel<? super T> rawType();
 
+	/**
+	 * @param propertyName The name of a {@link PojoPropertyModel property} in this type.
+	 * @return A representation of the property with the given name.
+	 * @throws org.hibernate.search.util.common.SearchException If there is no property with the given name in this type.
+	 */
 	PojoPropertyModel<?> property(String propertyName);
 
 	/**
