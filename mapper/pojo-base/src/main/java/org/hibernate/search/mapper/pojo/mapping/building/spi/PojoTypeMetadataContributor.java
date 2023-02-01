@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 
-public interface PojoTypeMetadataContributor {
+public interface PojoTypeMetadataContributor extends PojoSearchMappingTypeNode {
 
 	default void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
 		// No-op by default
@@ -16,10 +16,6 @@ public interface PojoTypeMetadataContributor {
 
 	default void contributeIndexMapping(PojoIndexMappingCollectorTypeNode collector) {
 		// No-op by default
-	}
-
-	default void contributeSearchMapping(PojoSearchMappingCollectorTypeNode collector) {
-		// Defaults to no-op
 	}
 
 }

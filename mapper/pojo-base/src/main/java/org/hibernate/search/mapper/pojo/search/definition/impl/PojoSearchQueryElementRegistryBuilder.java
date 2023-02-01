@@ -10,14 +10,13 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.projection.definition.spi.CompositeProjectionDefinition;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoSearchMappingCollectorConstructorNode;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoSearchMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoSearchMappingConstructorNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -33,65 +32,52 @@ public final class PojoSearchQueryElementRegistryBuilder {
 		this.mappingHelper = mappingHelper;
 	}
 
-	public <T> PojoSearchMappingCollectorTypeNode type(PojoRawTypeModel<T> type) {
-		return new TypeNode<>( type );
+	public void process(PojoRawTypeModel<?> type) {
+		try {
+			for ( PojoTypeMetadataContributor contributor : mappingHelper.contributorProvider()
+					// Constructor mapping is not inherited
+					.getIgnoringInheritance( type ) ) {
+				for ( PojoSearchMappingConstructorNode constructorMapping : contributor.constructors().values() ) {
+					processProjectionConstructors( type, constructorMapping );
+				}
+			}
+		}
+		catch (RuntimeException e) {
+			mappingHelper.failureCollector()
+					.withContext( EventContexts.fromType( type ) )
+					.add( e );
+		}
+	}
+
+	private <T> void processProjectionConstructors(PojoRawTypeModel<T> type, PojoSearchMappingConstructorNode constructorMapping) {
+		PojoConstructorModel<T> constructor = type.constructor( constructorMapping.parametersJavaTypes() );
+		try {
+			processProjectionConstructors( type, constructor, constructorMapping );
+		}
+		catch (RuntimeException e) {
+			mappingHelper.failureCollector()
+					.withContext( PojoEventContexts.fromType( type ) )
+					.withContext( PojoEventContexts.fromConstructor( constructor ) )
+					.add( e );
+		}
+	}
+
+	private <T> void processProjectionConstructors(PojoRawTypeModel<T> type, PojoConstructorModel<T> constructor,
+			PojoSearchMappingConstructorNode constructorMapping) {
+		if ( constructorMapping.isProjectionConstructor() ) {
+			Class<T> instantiatedJavaClass = type.typeIdentifier().javaClass();
+			PojoConstructorProjectionDefinition<T> definition =
+					PojoConstructorProjectionDefinition.create( mappingHelper, constructor );
+			CompositeProjectionDefinition<?> existing =
+					projectionDefinitions.putIfAbsent( instantiatedJavaClass, definition );
+			log.constructorProjection( type, definition );
+			if ( existing != null ) {
+				throw log.multipleProjectionConstructorsForType( instantiatedJavaClass );
+			}
+		}
 	}
 
 	public PojoSearchQueryElementRegistry build() {
 		return new PojoSearchQueryElementRegistry( projectionDefinitions );
-	}
-
-	private class TypeNode<T> implements PojoSearchMappingCollectorTypeNode {
-		private final PojoRawTypeModel<T> type;
-
-		public TypeNode(PojoRawTypeModel<T> type) {
-			this.type = type;
-		}
-
-		@Override
-		public ContextualFailureCollector failureCollector() {
-			return mappingHelper.failureCollector()
-					.withContext( PojoEventContexts.fromType( type ) );
-		}
-
-		@Override
-		public PojoRawTypeIdentifier<?> typeIdentifier() {
-			return type.typeIdentifier();
-		}
-
-		@Override
-		public PojoSearchMappingCollectorConstructorNode constructor(Class<?>[] parameterTypes) {
-			return new ConstructorNode<>( type.constructor( parameterTypes ) );
-		}
-	}
-
-	private class ConstructorNode<T> implements PojoSearchMappingCollectorConstructorNode {
-		private final PojoConstructorModel<T> constructor;
-
-		public ConstructorNode(PojoConstructorModel<T> constructor) {
-			this.constructor = constructor;
-		}
-
-		@Override
-		public ContextualFailureCollector failureCollector() {
-			return mappingHelper.failureCollector()
-					.withContext( PojoEventContexts.fromType( constructor.typeModel().rawType() ) )
-					.withContext( PojoEventContexts.fromConstructor( constructor ) );
-		}
-
-		@Override
-		public void projectionConstructor() {
-			new PojoConstructorProjectionDefinition.ConstructorNode<>( mappingHelper, constructor, definition -> {
-				PojoRawTypeModel<T> typeModel = constructor.typeModel();
-				Class<T> instantiatedJavaClass = typeModel.typeIdentifier().javaClass();
-				CompositeProjectionDefinition<?> existing =
-						projectionDefinitions.putIfAbsent( instantiatedJavaClass, definition );
-				log.constructorProjection( typeModel, definition );
-				if ( existing != null ) {
-					throw log.multipleProjectionConstructorsForType( instantiatedJavaClass );
-				}
-			} )
-					.projectionConstructor();
-		}
 	}
 }

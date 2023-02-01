@@ -1202,8 +1202,6 @@ public class ProjectionConstructorBaseIT {
 						.typeContext( Model.ProjectionLevel2.class.getName() )
 						.constructorContext( Model.class, String.class, Model.ProjectionLevel1.class )
 						.methodParameterContext( 2, "level1" )
-						.typeContext( Model.ProjectionLevel1.class.getName() )
-						.constructorContext( Model.class, String.class, Model.ProjectionLevel2.class )
 						.failure( "Infinite object projection recursion starting from projection constructor "
 								+ Model.ProjectionLevel1.class.getName() + "(" + Model.class.getName() + ", "
 								+ String.class.getName() + ", " + Model.ProjectionLevel2.class.getName() + ")"
@@ -1281,8 +1279,6 @@ public class ProjectionConstructorBaseIT {
 						.typeContext( Model.ProjectionLevel3.class.getName() )
 						.constructorContext( Model.class, String.class, Model.ProjectionLevel1.class )
 						.methodParameterContext( 2, "level1" )
-						.typeContext( Model.ProjectionLevel1.class.getName() )
-						.constructorContext( Model.class, String.class, Model.ProjectionLevel2.class )
 						.failure( "Infinite object projection recursion starting from projection constructor "
 								+ Model.ProjectionLevel1.class.getName() + "(" + Model.class.getName() + ", "
 								+ String.class.getName() + ", " + Model.ProjectionLevel2.class.getName() + ")"
@@ -1360,8 +1356,6 @@ public class ProjectionConstructorBaseIT {
 						.typeContext( Model.ProjectionLevel3.class.getName() )
 						.constructorContext( Model.class, String.class, Model.ProjectionLevel2.class )
 						.methodParameterContext( 2, "level2" )
-						.typeContext( Model.ProjectionLevel2.class.getName() )
-						.constructorContext( Model.class, String.class, Model.ProjectionLevel3.class )
 						.failure( "Infinite object projection recursion starting from projection constructor "
 								+ Model.ProjectionLevel2.class.getName() + "(" + Model.class.getName() + ", "
 								+ String.class.getName() + ", " + Model.ProjectionLevel3.class.getName() + ")"

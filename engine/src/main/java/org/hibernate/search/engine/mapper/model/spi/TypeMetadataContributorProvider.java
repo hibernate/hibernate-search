@@ -42,7 +42,7 @@ public final class TypeMetadataContributorProvider<C> {
 	/**
 	 * @param typeModel The model of a type to retrieve contributors for, including supertype contributors.
 	 *
-	 * @return A set of the Java types of the metadata contributors
+	 * @return A set of metadata contributors
 	 */
 	public Set<C> get(MappableTypeModel typeModel) {
 		return typeModel.descendingSuperTypes()
@@ -51,6 +51,22 @@ public final class TypeMetadataContributorProvider<C> {
 				.flatMap( List::stream )
 				// Using a LinkedHashSet because the order matters.
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
+	}
+
+	/**
+	 * @param typeModel The model of a type to retrieve contributors for, excluding supertype contributors.
+	 *
+	 * @return A set of metadata contributors
+	 */
+	public Set<C> getIgnoringInheritance(MappableTypeModel typeModel) {
+		List<C> result = getContributionIncludingAutomaticallyDiscovered( typeModel );
+		if ( result == null || result.isEmpty() ) {
+			return Collections.emptySet();
+		}
+		else {
+			// Using a LinkedHashSet because the order matters.
+			return new LinkedHashSet<>( result );
+		}
 	}
 
 	/**
