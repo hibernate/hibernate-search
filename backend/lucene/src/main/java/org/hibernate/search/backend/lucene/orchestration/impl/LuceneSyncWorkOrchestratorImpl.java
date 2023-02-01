@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
@@ -83,11 +85,22 @@ public class LuceneSyncWorkOrchestratorImpl
 	}
 
 	@Override
-	protected void doSubmit(WorkExecution<?> work, OperationSubmitter operationSubmitter) {
-		if ( !OperationSubmitter.BLOCKING.equals( operationSubmitter ) ) {
+	protected void doSubmit(WorkExecution<?> work, OperationSubmitter operationSubmitter,
+			Function<WorkExecution<?>, Runnable> blockingRetryProducer) throws InterruptedException {
+		if ( OperationSubmitter.REJECTED_EXECUTION_EXCEPTION.equals( operationSubmitter ) ) {
 			throw log.nonblockingOperationSubmitterNotSupported();
 		}
-		work.execute();
+		else if ( OperationSubmitter.BLOCKING.equals( operationSubmitter ) ) {
+			work.execute();
+		}
+		else {
+			// otherwise assume that it's offloading submitter, and we want to offload right away:
+			operationSubmitter.submitToQueue(
+					new ArrayBlockingQueue<>( 0 ),
+					work,
+					blockingRetryProducer
+			);
+		}
 	}
 
 	@Override

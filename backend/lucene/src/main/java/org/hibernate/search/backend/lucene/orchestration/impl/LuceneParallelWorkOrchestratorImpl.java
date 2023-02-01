@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
@@ -64,7 +65,8 @@ public class LuceneParallelWorkOrchestratorImpl
 	}
 
 	@Override
-	protected void doSubmit(WorkExecution<?> workExecution, OperationSubmitter operationSubmitter) {
+	protected void doSubmit(WorkExecution<?> workExecution, OperationSubmitter operationSubmitter,
+			Function<WorkExecution<?>, Runnable> blockingRetryProducer) {
 		if ( !OperationSubmitter.BLOCKING.equals( operationSubmitter ) && threads.isWriteExecutorBlocking() ) {
 			throw log.nonblockingOperationSubmitterNotSupported();
 		}

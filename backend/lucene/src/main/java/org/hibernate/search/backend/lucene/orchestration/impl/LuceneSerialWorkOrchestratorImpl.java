@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
@@ -91,8 +92,13 @@ public class LuceneSerialWorkOrchestratorImpl
 	}
 
 	@Override
-	protected void doSubmit(LuceneBatchedWork<?> work, OperationSubmitter operationSubmitter) throws InterruptedException {
-		executors.get( work.getQueuingKey() ).submit( work, operationSubmitter );
+	protected void doSubmit(LuceneBatchedWork<?> work, OperationSubmitter operationSubmitter,
+			Function<LuceneBatchedWork<?>, Runnable> blockingRetryProducer) throws InterruptedException {
+		executors.get( work.getQueuingKey() ).submit(
+				work,
+				operationSubmitter,
+				w -> blockingRetryProducer.apply( (LuceneBatchedWork<?>) w )
+		);
 	}
 
 	@Override
