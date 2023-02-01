@@ -335,7 +335,10 @@ Implementations of `MassIndexingFailureHandler` must be thread-safe.
 
 |`environment(MassIndexingEnvironment)`
 |An empty environment (no threadlocals, ...).
-|
+|*This feature is _incubating_: it is still under active development.*
+The contract of incubating elements (e.g. types, methods, configuration properties, etc.)
+may be altered in a backward-incompatible way -- or even removed -- in subsequent releases.
+
 The component responsible for setting up an environment (threadlocals, ...) on mass indexing threads before mass indexing
 starts, and tearing down that environment after mass indexing.
 
