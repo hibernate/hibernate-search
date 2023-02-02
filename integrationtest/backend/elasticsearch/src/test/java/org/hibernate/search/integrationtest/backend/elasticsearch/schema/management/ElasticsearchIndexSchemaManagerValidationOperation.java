@@ -28,13 +28,13 @@ enum ElasticsearchIndexSchemaManagerValidationOperation {
 	CREATE_OR_VALIDATE {
 		@Override
 		protected CompletableFuture<?> apply(IndexSchemaManager schemaManager, ContextualFailureCollector failureCollector) {
-			return schemaManager.createOrValidate( failureCollector, OperationSubmitter.BLOCKING );
+			return schemaManager.createOrValidate( failureCollector, OperationSubmitter.blocking() );
 		}
 	},
 	VALIDATE {
 		@Override
 		protected CompletableFuture<?> apply(IndexSchemaManager schemaManager, ContextualFailureCollector failureCollector) {
-			return schemaManager.validate( failureCollector, OperationSubmitter.BLOCKING );
+			return schemaManager.validate( failureCollector, OperationSubmitter.blocking() );
 		}
 	};
 

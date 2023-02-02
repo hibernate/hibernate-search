@@ -235,7 +235,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 				PojoRawTypeIdentifier<?> typeIdentifier = detectTypeIdentifier( sessionContext, entity );
 				future = indexer.add( typeIdentifier, null, null, entity,
 						// Commit and refresh are handled globally after all documents are indexed.
-						DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, OperationSubmitter.BLOCKING
+						DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, OperationSubmitter.blocking()
 				);
 			}
 			catch (RuntimeException e) {

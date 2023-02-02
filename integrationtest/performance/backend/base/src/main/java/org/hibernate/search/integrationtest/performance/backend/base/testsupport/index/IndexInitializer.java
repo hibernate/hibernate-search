@@ -75,12 +75,12 @@ public class IndexInitializer {
 					StubMapperUtils.referenceProvider( String.valueOf( id ) ),
 					document -> dataset.populate( index, document, id, 0L ),
 					DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
-					OperationSubmitter.BLOCKING
+					OperationSubmitter.blocking()
 			);
 			futures.add( future );
 		} );
 		CompletableFuture.allOf( futures.toArray( new CompletableFuture[0] ) ).join();
-		workspace.flush( OperationSubmitter.BLOCKING ).join();
+		workspace.flush( OperationSubmitter.blocking() ).join();
 
 		log( index, " ... added " + futures.size() + " documents to the index." );
 	}
@@ -89,7 +89,7 @@ public class IndexInitializer {
 		log( index, "Starting index initialization..." );
 		log( index, "Purging..." );
 		IndexWorkspace workspace = index.createWorkspace();
-		workspace.purge( Collections.emptySet(), OperationSubmitter.BLOCKING ).join();
+		workspace.purge( Collections.emptySet(), OperationSubmitter.blocking() ).join();
 		log( index, "Finished purge." );
 
 		addToIndex( index, idStream );

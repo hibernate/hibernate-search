@@ -121,7 +121,7 @@ public class LuceneCleanupIT {
 				document.addValue( binding.integer.reference, id );
 			} );
 		}
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 	}
 
 	private StubMapping setup(OpenResourceTracker tracker) {

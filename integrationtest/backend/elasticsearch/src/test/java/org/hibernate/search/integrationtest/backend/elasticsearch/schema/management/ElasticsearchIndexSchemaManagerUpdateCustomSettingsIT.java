@@ -248,7 +248,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 				.withIndex( index )
 				.setup();
 
-		Futures.unwrappedExceptionJoin( index.schemaManager().createOrUpdate( OperationSubmitter.BLOCKING ) );
+		Futures.unwrappedExceptionJoin( index.schemaManager().createOrUpdate( OperationSubmitter.blocking() ) );
 	}
 
 }

@@ -117,7 +117,7 @@ public class MultiDirectoryIT {
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			document.addValue( index.binding().string, "text 3" );
 		} );
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// Check that all documents are searchable
 		assertThatQuery( index.query().where( f -> f.matchAll() ) )

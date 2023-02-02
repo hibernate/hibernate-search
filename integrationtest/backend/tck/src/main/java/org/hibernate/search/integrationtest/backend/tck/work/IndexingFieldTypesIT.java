@@ -83,7 +83,7 @@ public class IndexingFieldTypesIT<F> {
 			} );
 			expectedDocuments.add( new IdAndValue<>( documentId, value ) );
 		}
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// If we get here, indexing went well.
 		// However, it may have failed silently... Let's check the documents are there, with the right value.
@@ -120,7 +120,7 @@ public class IndexingFieldTypesIT<F> {
 			} );
 			expectedDocuments.add( new IdAndValue<>( documentId, value ) );
 		}
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// If we get here, indexing went well.
 		// However, it may have failed silently... Let's check the documents are there, with the right value.
@@ -164,7 +164,7 @@ public class IndexingFieldTypesIT<F> {
 			} );
 			expectedDocuments.add( new IdAndValue<>( documentId, value ) );
 		}
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// If we get here, indexing went well.
 		// However, it may have failed silently... Let's check the documents are there, with the right value.

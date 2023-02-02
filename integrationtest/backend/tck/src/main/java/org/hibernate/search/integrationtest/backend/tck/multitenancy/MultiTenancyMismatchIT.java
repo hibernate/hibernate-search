@@ -98,7 +98,7 @@ public class MultiTenancyMismatchIT {
 		assertThatThrownBy( () -> {
 			IndexIndexingPlan plan = index.createIndexingPlan( tenant1Session );
 			plan.addOrUpdate( referenceProvider( "1" ), document -> { } );
-			plan.execute( OperationSubmitter.BLOCKING ).join();
+			plan.execute( OperationSubmitter.blocking() ).join();
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -116,7 +116,7 @@ public class MultiTenancyMismatchIT {
 		assertThatThrownBy( () -> {
 			IndexIndexingPlan plan = index.createIndexingPlan( tenant1Session );
 			plan.addOrUpdate( referenceProvider( "1" ), document -> { } );
-			plan.execute( OperationSubmitter.BLOCKING ).join();
+			plan.execute( OperationSubmitter.blocking() ).join();
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -134,7 +134,7 @@ public class MultiTenancyMismatchIT {
 		assertThatThrownBy( () -> {
 			IndexIndexingPlan plan = index.createIndexingPlan( tenant1Session );
 			plan.delete( referenceProvider( "1" ) );
-			plan.execute( OperationSubmitter.BLOCKING ).join();
+			plan.execute( OperationSubmitter.blocking() ).join();
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(

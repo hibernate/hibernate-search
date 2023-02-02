@@ -134,10 +134,10 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3824")
 	public void purge_noRoutingKey() {
-		index.createWorkspace().purge( Collections.emptySet(), OperationSubmitter.BLOCKING ).join();
+		index.createWorkspace().purge( Collections.emptySet(), OperationSubmitter.blocking() ).join();
 
 		// No routing key => all documents should be purged
-		index.createWorkspace().refresh( OperationSubmitter.BLOCKING ).join();
+		index.createWorkspace().refresh( OperationSubmitter.blocking() ).join();
 		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hasNoHits();
 	}
@@ -151,13 +151,13 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 		Set<String> otherRoutingKeys = new LinkedHashSet<>( routingKeys );
 		otherRoutingKeys.remove( someRoutingKey );
 
-		index.createWorkspace().purge( Collections.singleton( someRoutingKey ), OperationSubmitter.BLOCKING ).join();
+		index.createWorkspace().purge( Collections.singleton( someRoutingKey ), OperationSubmitter.blocking() ).join();
 
 		/*
 		 * One routing key => all documents indexed with that routing key should be purged,
 		 * and only those documents.
 		 */
-		index.createWorkspace().refresh( OperationSubmitter.BLOCKING ).join();
+		index.createWorkspace().refresh( OperationSubmitter.blocking() ).join();
 		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hits().asNormalizedDocRefs()
 				.containsExactlyInAnyOrder( docRefsForRoutingKeys( otherRoutingKeys, docIdByRoutingKey ) );
@@ -172,13 +172,13 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 		Set<String> otherRoutingKeys = new LinkedHashSet<>( routingKeys );
 		otherRoutingKeys.removeAll( twoRoutingKeys );
 
-		index.createWorkspace().purge( twoRoutingKeys, OperationSubmitter.BLOCKING ).join();
+		index.createWorkspace().purge( twoRoutingKeys, OperationSubmitter.blocking() ).join();
 
 		/*
 		 * Two routing keys => all documents indexed with these routing keys should be returned,
 		 * and only those documents.
 		 */
-		index.createWorkspace().refresh( OperationSubmitter.BLOCKING ).join();
+		index.createWorkspace().refresh( OperationSubmitter.blocking() ).join();
 		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hits().asNormalizedDocRefs()
 				.containsExactlyInAnyOrder( docRefsForRoutingKeys( otherRoutingKeys, docIdByRoutingKey ) );
@@ -187,10 +187,10 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3824")
 	public void purge_allRoutingKeys() {
-		index.createWorkspace().purge( routingKeys, OperationSubmitter.BLOCKING ).join();
+		index.createWorkspace().purge( routingKeys, OperationSubmitter.blocking() ).join();
 
 		// All routing keys => all documents should be purged
-		index.createWorkspace().refresh( OperationSubmitter.BLOCKING ).join();
+		index.createWorkspace().refresh( OperationSubmitter.blocking() ).join();
 		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hasNoHits();
 	}

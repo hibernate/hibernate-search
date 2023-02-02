@@ -69,7 +69,7 @@ public class LuceneIndexSchemaManagerCreationOrPreservationIT {
 		IndexIndexingPlan plan = index.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), document -> {
 		} );
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 
 		assertThat( countDocsOnDisk() ).isEqualTo( 1 );
 
@@ -91,7 +91,7 @@ public class LuceneIndexSchemaManagerCreationOrPreservationIT {
 	}
 
 	private void createOrPreserve() {
-		Futures.unwrappedExceptionJoin( operation.apply( index.schemaManager(), OperationSubmitter.BLOCKING ) );
+		Futures.unwrappedExceptionJoin( operation.apply( index.schemaManager(), OperationSubmitter.blocking() ) );
 	}
 
 	private void setup() {

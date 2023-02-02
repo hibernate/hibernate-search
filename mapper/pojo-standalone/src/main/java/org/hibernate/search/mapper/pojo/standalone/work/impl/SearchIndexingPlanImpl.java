@@ -115,7 +115,7 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	public CompletableFuture<?> execute() {
-		return delegate.executeAndReport( entityReferenceFactory, OperationSubmitter.BLOCKING ).thenApply( report -> {
+		return delegate.executeAndReport( entityReferenceFactory, OperationSubmitter.blocking() ).thenApply( report -> {
 			report.throwable().ifPresent( t -> {
 				throw Throwables.toRuntimeException( t );
 			} );

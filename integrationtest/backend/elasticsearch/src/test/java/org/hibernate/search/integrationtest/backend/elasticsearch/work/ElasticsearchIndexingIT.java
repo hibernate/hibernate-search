@@ -100,7 +100,7 @@ public class ElasticsearchIndexingIT {
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 		clientSpy.verifyExpectationsMet();
 
 		plan.addOrUpdate( referenceProvider( "1" ), document -> {
@@ -116,7 +116,7 @@ public class ElasticsearchIndexingIT {
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 		clientSpy.verifyExpectationsMet();
 
 		plan.delete( referenceProvider( "1" ) );
@@ -129,7 +129,7 @@ public class ElasticsearchIndexingIT {
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 		clientSpy.verifyExpectationsMet();
 	}
 
@@ -154,7 +154,7 @@ public class ElasticsearchIndexingIT {
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 		clientSpy.verifyExpectationsMet();
 
 		plan.addOrUpdate( referenceProvider( "1", routingKey ), document -> {
@@ -171,7 +171,7 @@ public class ElasticsearchIndexingIT {
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 		clientSpy.verifyExpectationsMet();
 
 		plan.delete( referenceProvider( "1", routingKey ) );
@@ -185,7 +185,7 @@ public class ElasticsearchIndexingIT {
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 		clientSpy.verifyExpectationsMet();
 	}
 

@@ -259,7 +259,7 @@ public class FieldTemplateIT {
 				document -> initDocument( document, "parent.foo",
 						"matchedValue", "notMatchedValue1", "notMatchedValue2"
 				),
-				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE, OperationSubmitter.BLOCKING
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE, OperationSubmitter.blocking()
 		) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(

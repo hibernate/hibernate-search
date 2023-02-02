@@ -24,37 +24,37 @@ enum ElasticsearchIndexSchemaManagerOperation {
 	CREATE_IF_MISSING {
 		@Override
 		public CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
-			return schemaManager.createIfMissing( OperationSubmitter.BLOCKING );
+			return schemaManager.createIfMissing( OperationSubmitter.blocking() );
 		}
 	},
 	DROP_AND_CREATE {
 		@Override
 		public CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
-			return schemaManager.dropAndCreate( OperationSubmitter.BLOCKING );
+			return schemaManager.dropAndCreate( OperationSubmitter.blocking() );
 		}
 	},
 	CREATE_OR_VALIDATE {
 		@Override
 		public CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
-			return schemaManager.createOrValidate( new StubUnusedContextualFailureCollector(), OperationSubmitter.BLOCKING );
+			return schemaManager.createOrValidate( new StubUnusedContextualFailureCollector(), OperationSubmitter.blocking() );
 		}
 	},
 	CREATE_OR_UPDATE {
 		@Override
 		public CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
-			return schemaManager.createOrUpdate( OperationSubmitter.BLOCKING );
+			return schemaManager.createOrUpdate( OperationSubmitter.blocking() );
 		}
 	},
 	DROP_IF_EXISTING {
 		@Override
 		public CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
-			return schemaManager.dropIfExisting( OperationSubmitter.BLOCKING );
+			return schemaManager.dropIfExisting( OperationSubmitter.blocking() );
 		}
 	},
 	VALIDATE {
 		@Override
 		public CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
-			return schemaManager.validate( new StubUnusedContextualFailureCollector(), OperationSubmitter.BLOCKING );
+			return schemaManager.validate( new StubUnusedContextualFailureCollector(), OperationSubmitter.blocking() );
 		}
 	};
 

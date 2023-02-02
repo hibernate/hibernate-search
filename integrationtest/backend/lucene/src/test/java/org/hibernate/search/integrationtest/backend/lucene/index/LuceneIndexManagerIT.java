@@ -95,7 +95,7 @@ public class LuceneIndexManagerIT {
 				) )
 				.join();
 
-		index.createWorkspace().flush( OperationSubmitter.BLOCKING ).join();
+		index.createWorkspace().flush( OperationSubmitter.blocking() ).join();
 
 		long finalSize = indexApi.computeSizeInBytes();
 		assertThat( finalSize ).isGreaterThan( 0L );
@@ -118,7 +118,7 @@ public class LuceneIndexManagerIT {
 				) )
 				.join();
 
-		index.createWorkspace().flush( OperationSubmitter.BLOCKING ).join();
+		index.createWorkspace().flush( OperationSubmitter.blocking() ).join();
 
 		CompletableFuture<Long> finalSizeFuture = indexApi.computeSizeInBytesAsync().toCompletableFuture();
 		await().untilAsserted( () -> assertThat( finalSizeFuture ).isCompleted() );

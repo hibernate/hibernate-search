@@ -348,7 +348,7 @@ public class ElasticsearchBootstrapIT {
 	}
 
 	private void checkBackendWorks() {
-		index.schemaManager().createIfMissing( OperationSubmitter.BLOCKING ).join();
+		index.schemaManager().createIfMissing( OperationSubmitter.blocking() ).join();
 		assertThatQuery( index.query().where( f -> f.matchAll() ) ).hasNoHits();
 		index.index( "1", document -> { } );
 		assertThatQuery( index.query().where( f -> f.matchAll() ) ).hasDocRefHitsAnyOrder( index.typeName(), "1" );

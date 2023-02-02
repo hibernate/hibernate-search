@@ -67,7 +67,7 @@ public class BatchingExecutorTest {
 	public static Object[][] params() {
 		return new Object[][] {
 				{ "BLOCKING", OperationSubmitter.blocking() },
-				{ "REJECTED_EXECUTION_EXCEPTION", OperationSubmitter.rejectedExecutionException() },
+				{ "REJECTING", OperationSubmitter.rejecting() },
 				{ "OFFLOADING", OperationSubmitter.offloading( CompletableFuture::runAsync ) }
 		};
 	}
@@ -351,7 +351,7 @@ public class BatchingExecutorTest {
 
 		assumeTrue(
 				"This test only makes sense for nonblocking submitter",
-				OperationSubmitter.REJECTED_EXECUTION_EXCEPTION.equals( operationSubmitter )
+				OperationSubmitter.rejecting().equals( operationSubmitter )
 		);
 
 		Runnable unblockExecutorSwitch = blockExecutor();
@@ -387,7 +387,7 @@ public class BatchingExecutorTest {
 
 		assumeTrue(
 				"This test only makes sense for blocking submitter",
-				OperationSubmitter.BLOCKING.equals( operationSubmitter )
+				OperationSubmitter.blocking().equals( operationSubmitter )
 		);
 
 		Runnable unblockExecutorSwitch = blockExecutor();
@@ -453,8 +453,8 @@ public class BatchingExecutorTest {
 
 		assumeFalse(
 				"This test only makes sense for offloading submitter",
-				OperationSubmitter.BLOCKING.equals( operationSubmitter ) ||
-						OperationSubmitter.REJECTED_EXECUTION_EXCEPTION.equals( operationSubmitter )
+				OperationSubmitter.blocking().equals( operationSubmitter ) ||
+						OperationSubmitter.rejecting().equals( operationSubmitter )
 		);
 
 		Runnable unblockExecutorSwitch = blockExecutor();

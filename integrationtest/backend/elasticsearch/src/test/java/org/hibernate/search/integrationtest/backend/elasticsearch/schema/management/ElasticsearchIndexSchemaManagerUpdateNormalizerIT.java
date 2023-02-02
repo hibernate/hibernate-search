@@ -320,7 +320,7 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 				.withIndex( index )
 				.setup();
 
-		index.schemaManager().createOrUpdate( OperationSubmitter.BLOCKING ).join();
+		index.schemaManager().createOrUpdate( OperationSubmitter.blocking() ).join();
 	}
 
 }

@@ -59,16 +59,16 @@ public class IndexWorkspaceIT {
 		IndexWorkspace workspace = index.createWorkspace();
 		createBookIndexes( noTenantSessionContext );
 
-		workspace.refresh( OperationSubmitter.BLOCKING ).join();
+		workspace.refresh( OperationSubmitter.blocking() ).join();
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, noTenantSessionContext );
 
-		workspace.mergeSegments( OperationSubmitter.BLOCKING ).join();
+		workspace.mergeSegments( OperationSubmitter.blocking() ).join();
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, noTenantSessionContext );
 
 		// purge without providing a tenant
-		workspace.purge( Collections.emptySet(), OperationSubmitter.BLOCKING ).join();
-		workspace.flush( OperationSubmitter.BLOCKING ).join();
-		workspace.refresh( OperationSubmitter.BLOCKING ).join();
+		workspace.purge( Collections.emptySet(), OperationSubmitter.blocking() ).join();
+		workspace.flush( OperationSubmitter.blocking() ).join();
+		workspace.refresh( OperationSubmitter.blocking() ).join();
 
 		assertBookNumberIsEqualsTo( 0, noTenantSessionContext );
 	}
@@ -84,18 +84,18 @@ public class IndexWorkspaceIT {
 
 		createBookIndexes( tenant1SessionContext );
 		createBookIndexes( tenant2SessionContext );
-		workspace.refresh( OperationSubmitter.BLOCKING ).join();
+		workspace.refresh( OperationSubmitter.blocking() ).join();
 
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant1SessionContext );
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant2SessionContext );
 
-		workspace.mergeSegments( OperationSubmitter.BLOCKING ).join();
+		workspace.mergeSegments( OperationSubmitter.blocking() ).join();
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant1SessionContext );
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant2SessionContext );
 
-		workspace.purge( Collections.emptySet(), OperationSubmitter.BLOCKING ).join();
-		workspace.flush( OperationSubmitter.BLOCKING ).join();
-		workspace.refresh( OperationSubmitter.BLOCKING ).join();
+		workspace.purge( Collections.emptySet(), OperationSubmitter.blocking() ).join();
+		workspace.flush( OperationSubmitter.blocking() ).join();
+		workspace.refresh( OperationSubmitter.blocking() ).join();
 
 		// check that only TENANT_1 is affected by the purge
 		assertBookNumberIsEqualsTo( 0, tenant1SessionContext );

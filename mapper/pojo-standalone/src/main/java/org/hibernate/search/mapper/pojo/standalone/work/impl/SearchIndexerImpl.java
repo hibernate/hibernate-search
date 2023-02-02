@@ -36,37 +36,37 @@ public class SearchIndexerImpl implements SearchIndexer {
 	@Override
 	public CompletionStage<?> add(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
 		return delegate.add( getTypeIdentifier( entity ), providedId, providedRoutes, entity,
-				commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING );
+				commitStrategy, refreshStrategy, OperationSubmitter.blocking() );
 	}
 
 	@Override
 	public CompletionStage<?> add(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes) {
 		return delegate.add( getTypeIdentifier( entityClass ), providedId, providedRoutes, null,
-				commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING );
+				commitStrategy, refreshStrategy, OperationSubmitter.blocking() );
 	}
 
 	@Override
 	public CompletionStage<?> addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
 		return delegate.addOrUpdate( getTypeIdentifier( entity ), providedId, providedRoutes, entity,
-				commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING );
+				commitStrategy, refreshStrategy, OperationSubmitter.blocking() );
 	}
 
 	@Override
 	public CompletionStage<?> addOrUpdate(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes) {
 		return delegate.addOrUpdate( getTypeIdentifier( entityClass ), providedId, providedRoutes, null,
-				commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING );
+				commitStrategy, refreshStrategy, OperationSubmitter.blocking() );
 	}
 
 	@Override
 	public CompletionStage<?> delete(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
 		return delegate.delete( getTypeIdentifier( entity ), providedId, providedRoutes, entity,
-				commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING );
+				commitStrategy, refreshStrategy, OperationSubmitter.blocking() );
 	}
 
 	@Override
 	public CompletionStage<?> delete(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes) {
 		return delegate.delete( getTypeIdentifier( entityClass ), providedId, providedRoutes,
-				commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING );
+				commitStrategy, refreshStrategy, OperationSubmitter.blocking() );
 	}
 
 	private <T> PojoRawTypeIdentifier<? extends T> getTypeIdentifier(T entity) {

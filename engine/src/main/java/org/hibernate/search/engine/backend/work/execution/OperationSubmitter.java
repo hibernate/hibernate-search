@@ -20,17 +20,8 @@ import org.hibernate.search.util.common.annotation.Incubating;
 @Incubating
 public abstract class OperationSubmitter {
 
-	/**
-	 * When using this submitter, dding a new element will block the thread when the underlying
-	 * queue is a {@link java.util.concurrent.BlockingQueue} and it is at its maximum capacity, until some elements
-	 * are removed from the queue
-	 */
-	public static final OperationSubmitter BLOCKING = new BlockingOperationSubmitter();
-	/**
-	 * When using this submitter adding a new element will cause a {@link RejectedExecutionException} when the underlying
-	 * queue is a {@link java.util.concurrent.BlockingQueue} and it is at its maximum capacity.
-	 */
-	public static final OperationSubmitter REJECTED_EXECUTION_EXCEPTION = new RejectedExecutionExceptionOperationSubmitter();
+	private static final OperationSubmitter BLOCKING = new BlockingOperationSubmitter();
+	private static final OperationSubmitter REJECTED_EXECUTION_EXCEPTION = new RejectedExecutionExceptionOperationSubmitter();
 
 	private OperationSubmitter() {
 	}
@@ -39,7 +30,7 @@ public abstract class OperationSubmitter {
 	 * Defines how an element will be submitted to the queue. Currently supported implementations:
 	 * <ul>
 	 *     <li>{@link #blocking()}</li>
-	 *     <li>{@link #rejectedExecutionException()}</li>
+	 *     <li>{@link #rejecting()}</li>
 	 *     <li>{@link #offloading(Consumer)}</li>
 	 * </ul>
 	 * <p>
@@ -50,16 +41,19 @@ public abstract class OperationSubmitter {
 			Function<? super T, Runnable> blockingRetryProducer) throws InterruptedException;
 
 	/**
-	 * @see #BLOCKING
+	 * When using this submitter, dding a new element will block the thread when the underlying
+	 * queue is a {@link java.util.concurrent.BlockingQueue} and it is at its maximum capacity, until some elements
+	 * are removed from the queue
 	 */
 	public static OperationSubmitter blocking() {
 		return BLOCKING;
 	}
 
 	/**
-	 * @see #REJECTED_EXECUTION_EXCEPTION
+	 * When using this submitter adding a new element will cause a {@link RejectedExecutionException} when the underlying
+	 * queue is a {@link java.util.concurrent.BlockingQueue} and it is at its maximum capacity.
 	 */
-	public static OperationSubmitter rejectedExecutionException() {
+	public static OperationSubmitter rejecting() {
 		return REJECTED_EXECUTION_EXCEPTION;
 	}
 

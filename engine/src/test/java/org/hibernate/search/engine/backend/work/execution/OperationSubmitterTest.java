@@ -29,15 +29,15 @@ public class OperationSubmitterTest {
 	public void setUp() throws Exception {
 		this.queue = new ArrayBlockingQueue<>( 2 );
 
-		OperationSubmitter.BLOCKING.submitToQueue( queue, 1, i -> () -> { } );
-		OperationSubmitter.BLOCKING.submitToQueue( queue, 2, i -> () -> { } );
+		OperationSubmitter.blocking().submitToQueue( queue, 1, i -> () -> { } );
+		OperationSubmitter.blocking().submitToQueue( queue, 2, i -> () -> { } );
 	}
 
 	@Test
 	public void blockingOperationSubmitterBlocksTheOperation() throws InterruptedException {
 		CompletableFuture<Boolean> future = CompletableFuture.supplyAsync( () -> {
 			try {
-				OperationSubmitter.BLOCKING.submitToQueue( queue, 3, i -> () -> { } );
+				OperationSubmitter.blocking().submitToQueue( queue, 3, i -> () -> { } );
 			}
 			catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
@@ -60,7 +60,7 @@ public class OperationSubmitterTest {
 	@Test
 	public void nonBlockingOperationSubmitterThrowsException() {
 		Integer element = 3;
-		assertThatThrownBy( () -> OperationSubmitter.REJECTED_EXECUTION_EXCEPTION.submitToQueue( queue, element, i -> () -> { } ) )
+		assertThatThrownBy( () -> OperationSubmitter.rejecting().submitToQueue( queue, element, i -> () -> { } ) )
 				.isInstanceOf( RejectedExecutionException.class );
 	}
 

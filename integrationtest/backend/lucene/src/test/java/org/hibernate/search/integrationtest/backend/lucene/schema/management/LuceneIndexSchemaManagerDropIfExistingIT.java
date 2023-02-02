@@ -43,7 +43,7 @@ public class LuceneIndexSchemaManagerDropIfExistingIT {
 		// The setup currently creates the index: work around that.
 		Futures.unwrappedExceptionJoin(
 				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( index.schemaManager(),
-						OperationSubmitter.BLOCKING
+						OperationSubmitter.blocking()
 				)
 		);
 
@@ -51,7 +51,7 @@ public class LuceneIndexSchemaManagerDropIfExistingIT {
 
 		Futures.unwrappedExceptionJoin(
 				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( index.schemaManager(),
-						OperationSubmitter.BLOCKING
+						OperationSubmitter.blocking()
 				)
 		);
 
@@ -67,7 +67,7 @@ public class LuceneIndexSchemaManagerDropIfExistingIT {
 		setup();
 		Futures.unwrappedExceptionJoin(
 				LuceneIndexSchemaManagerOperation.CREATE_IF_MISSING.apply( index.schemaManager(),
-						OperationSubmitter.BLOCKING
+						OperationSubmitter.blocking()
 				)
 		);
 
@@ -76,13 +76,13 @@ public class LuceneIndexSchemaManagerDropIfExistingIT {
 		IndexIndexingPlan plan = index.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), document -> {
 		} );
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 
 		assertThat( countDocsOnDisk() ).isEqualTo( 1 );
 
 		Futures.unwrappedExceptionJoin(
 				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( index.schemaManager(),
-						OperationSubmitter.BLOCKING
+						OperationSubmitter.blocking()
 				)
 		);
 

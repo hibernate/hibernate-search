@@ -15,28 +15,28 @@ public interface PojoScopeWorkspace {
 
 	@Deprecated
 	default CompletableFuture<?> mergeSegments() {
-		return mergeSegments( OperationSubmitter.BLOCKING );
+		return mergeSegments( OperationSubmitter.blocking() );
 	}
 
 	CompletableFuture<?> mergeSegments(OperationSubmitter operationSubmitter);
 
 	@Deprecated
 	default CompletableFuture<?> purge(Set<String> routingKeys) {
-		return purge( routingKeys, OperationSubmitter.BLOCKING );
+		return purge( routingKeys, OperationSubmitter.blocking() );
 	}
 
 	CompletableFuture<?> purge(Set<String> routingKeys, OperationSubmitter operationSubmitter);
 
 	@Deprecated
 	default CompletableFuture<?> flush() {
-		return flush( OperationSubmitter.BLOCKING );
+		return flush( OperationSubmitter.blocking() );
 	}
 
 	CompletableFuture<?> flush(OperationSubmitter operationSubmitter);
 
 	@Deprecated
 	default CompletableFuture<?> refresh() {
-		return refresh( OperationSubmitter.BLOCKING );
+		return refresh( OperationSubmitter.blocking() );
 	}
 
 	CompletableFuture<?> refresh(OperationSubmitter operationSubmitter);

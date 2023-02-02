@@ -55,7 +55,7 @@ public interface AutomaticIndexingSynchronizationConfigurationContext {
 	/**
 	 * Set operation submitter to be applied while executing underlying plans.
 	 *
-	 * Using {@link OperationSubmitter#BLOCKING} by default.
+	 * Using {@link OperationSubmitter#blocking()} by default.
 	 *
 	 * @param operationSubmitter How to handle request to submit operation when the queue is full
 	 * @see OperationSubmitter

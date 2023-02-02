@@ -105,10 +105,10 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 		Iterator<String> iterator = docIds.iterator();
 		String someDocumentId = iterator.next();
 
-		index.createWorkspace().purge( Collections.singleton( someDocumentId ), OperationSubmitter.BLOCKING ).join();
+		index.createWorkspace().purge( Collections.singleton( someDocumentId ), OperationSubmitter.blocking() ).join();
 
 		// One or more explicit routing key => no document should be purged, since no documents was indexed with that routing key.
-		index.createWorkspace().refresh( OperationSubmitter.BLOCKING ).join();
+		index.createWorkspace().refresh( OperationSubmitter.blocking() ).join();
 		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hits().asNormalizedDocRefs()
 				.hasSize( TOTAL_DOCUMENT_COUNT )

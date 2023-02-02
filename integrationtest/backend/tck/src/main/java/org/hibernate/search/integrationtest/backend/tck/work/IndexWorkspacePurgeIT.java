@@ -25,19 +25,19 @@ public class IndexWorkspacePurgeIT extends AbstractIndexWorkspaceSimpleOperation
 
 	@Override
 	protected CompletableFuture<?> executeAsync(IndexWorkspace workspace) {
-		return workspace.purge( Collections.emptySet(), OperationSubmitter.REJECTED_EXECUTION_EXCEPTION );
+		return workspace.purge( Collections.emptySet(), OperationSubmitter.rejecting() );
 	}
 
 	@Override
 	protected void afterInitData(StubMappedIndex index) {
 		// Make sure to flush the index, otherwise the test won't fail as expected with Lucene,
 		// probably because the index writer optimizes purges when changes are not committed yet.
-		index.createWorkspace().flush( OperationSubmitter.BLOCKING ).join();
+		index.createWorkspace().flush( OperationSubmitter.blocking() ).join();
 	}
 
 	@Override
 	protected void assertPreconditions(StubMappedIndex index) {
-		index.createWorkspace().refresh( OperationSubmitter.BLOCKING ).join();
+		index.createWorkspace().refresh( OperationSubmitter.blocking() ).join();
 		long count = index.createScope().query().where( f -> f.matchAll() )
 				.fetchTotalHitCount();
 		assertThat( count ).isGreaterThan( 0 );
@@ -45,7 +45,7 @@ public class IndexWorkspacePurgeIT extends AbstractIndexWorkspaceSimpleOperation
 
 	@Override
 	protected void assertSuccess(StubMappedIndex index) {
-		index.createWorkspace().refresh( OperationSubmitter.BLOCKING ).join();
+		index.createWorkspace().refresh( OperationSubmitter.blocking() ).join();
 		long count = index.createScope().query().where( f -> f.matchAll() )
 				.fetchTotalHitCount();
 		assertThat( count ).isEqualTo( 0 );

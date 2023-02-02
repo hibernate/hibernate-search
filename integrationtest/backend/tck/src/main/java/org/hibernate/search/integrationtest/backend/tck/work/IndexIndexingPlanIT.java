@@ -105,7 +105,7 @@ public class IndexIndexingPlanIT {
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "The Lord of the Rings chap. 1" ) );
 		plan.add( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "The Lord of the Rings chap. 2" ) );
 		plan.add( referenceProvider( "3" ), document -> document.addValue( index.binding().title, "The Lord of the Rings chap. 3" ) );
-		CompletableFuture<?> future = plan.execute( OperationSubmitter.BLOCKING );
+		CompletableFuture<?> future = plan.execute( OperationSubmitter.blocking() );
 		Awaitility.await().until( future::isDone );
 		// The operations should succeed.
 		assertThatFuture( future ).isSuccessful();
@@ -117,7 +117,7 @@ public class IndexIndexingPlanIT {
 
 		// Update
 		plan.addOrUpdate( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "The Boss of the Rings chap. 2" ) );
-		future = plan.execute( OperationSubmitter.BLOCKING );
+		future = plan.execute( OperationSubmitter.blocking() );
 		Awaitility.await().until( future::isDone );
 		// The operations should succeed.
 		assertThatFuture( future ).isSuccessful();
@@ -129,7 +129,7 @@ public class IndexIndexingPlanIT {
 
 		// Delete
 		plan.delete( referenceProvider( "1" ) );
-		future = plan.execute( OperationSubmitter.BLOCKING );
+		future = plan.execute( OperationSubmitter.blocking() );
 		Awaitility.await().until( future::isDone );
 		// The operations should succeed.
 		assertThatFuture( future ).isSuccessful();
@@ -148,7 +148,7 @@ public class IndexIndexingPlanIT {
 		plan.discard();
 		plan.add( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
 
-		CompletableFuture<?> future = plan.execute( OperationSubmitter.BLOCKING );
+		CompletableFuture<?> future = plan.execute( OperationSubmitter.blocking() );
 		Awaitility.await().until( future::isDone );
 		// The operations should succeed.
 		assertThatFuture( future ).isSuccessful();
@@ -168,7 +168,7 @@ public class IndexIndexingPlanIT {
 		// Trigger failures in the next operations
 		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );
 
-		CompletableFuture<?> future = plan.execute( OperationSubmitter.BLOCKING );
+		CompletableFuture<?> future = plan.execute( OperationSubmitter.blocking() );
 		Awaitility.await().until( future::isDone );
 
 		// The operation should fail.
@@ -194,7 +194,7 @@ public class IndexIndexingPlanIT {
 		// Trigger failures in the next operations
 		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );
 
-		CompletableFuture<?> future = plan.execute( OperationSubmitter.BLOCKING );
+		CompletableFuture<?> future = plan.execute( OperationSubmitter.blocking() );
 		Awaitility.await().until( future::isDone );
 
 		// The operation should fail.
@@ -220,7 +220,7 @@ public class IndexIndexingPlanIT {
 		// Trigger failures in the next operations
 		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );
 
-		CompletableFuture<?> future = plan.execute( OperationSubmitter.BLOCKING );
+		CompletableFuture<?> future = plan.execute( OperationSubmitter.blocking() );
 		Awaitility.await().until( future::isDone );
 
 		// The operation should fail.
@@ -248,7 +248,7 @@ public class IndexIndexingPlanIT {
 		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );
 
 		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> future =
-				plan.executeAndReport( StubEntityReference.FACTORY, OperationSubmitter.BLOCKING );
+				plan.executeAndReport( StubEntityReference.FACTORY, OperationSubmitter.blocking() );
 		Awaitility.await().until( future::isDone );
 
 		// The operation should succeed, but the report should indicate a failure.

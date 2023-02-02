@@ -29,7 +29,7 @@ public class IndexWorkspaceRefreshIT extends AbstractIndexWorkspaceSimpleOperati
 
 	@Override
 	protected CompletableFuture<?> executeAsync(IndexWorkspace workspace) {
-		return workspace.refresh( OperationSubmitter.REJECTED_EXECUTION_EXCEPTION );
+		return workspace.refresh( OperationSubmitter.rejecting() );
 	}
 
 	@Override

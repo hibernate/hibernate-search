@@ -83,7 +83,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter
 		);
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().textField, "text1" ) );
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// Readers should be up-to-date immediately after indexing finishes
 		assertThatQuery( query ).hasTotalHitCount( 1 );
@@ -104,7 +104,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter
 		);
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().textField, "text1" ) );
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// Readers should be up-to-date immediately after indexing finishes
 		assertThatQuery( query ).hasTotalHitCount( 1 );
@@ -125,7 +125,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 				DocumentRefreshStrategy.NONE // This means no refresh will take place until after the refresh interval
 		);
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().textField, "text1" ) );
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// Readers should *not* be up-to-date immediately after indexing finishes
 		assertThatQuery( query ).hasNoHits();
@@ -149,7 +149,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 				DocumentRefreshStrategy.FORCE // This will force a refresh before the end of the refresh interval
 		);
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().textField, "text1" ) );
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// Readers should be up-to-date immediately after indexing finishes
 		assertThatQuery( query ).hasTotalHitCount( 1 );
@@ -170,7 +170,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter
 		);
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().textField, "text1" ) );
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// Readers should be up-to-date immediately after indexing finishes
 		assertThatQuery( query ).hasTotalHitCount( 1 );

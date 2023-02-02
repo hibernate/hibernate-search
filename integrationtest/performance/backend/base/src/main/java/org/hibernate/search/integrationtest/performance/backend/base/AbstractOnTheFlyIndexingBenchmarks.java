@@ -143,7 +143,7 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 		}
 
 		// Do not return until works are *actually* executed
-		Futures.unwrappedExceptionJoin( indexingPlan.execute( OperationSubmitter.BLOCKING ) );
+		Futures.unwrappedExceptionJoin( indexingPlan.execute( OperationSubmitter.blocking() ) );
 
 		counters.write += 3 * worksPerTypePerWritePlan;
 

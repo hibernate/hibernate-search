@@ -81,7 +81,7 @@ public class LuceneIndexWriterCommitIT {
 				DocumentRefreshStrategy.NONE // This is irrelevant
 		);
 		plan.add( referenceProvider( "1" ), document -> { } );
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// Commit will happen some time after indexing finished
 		Awaitility.await().untilAsserted( () -> {
@@ -108,7 +108,7 @@ public class LuceneIndexWriterCommitIT {
 				DocumentRefreshStrategy.NONE // This is irrelevant
 		);
 		plan.add( referenceProvider( "1" ), document -> { } );
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// Commit should have happened before indexing finished
 		assertThat( countDocsOnDisk() ).isEqualTo( 1 );
@@ -130,7 +130,7 @@ public class LuceneIndexWriterCommitIT {
 				DocumentRefreshStrategy.NONE // The refresh should be done regardless of this parameter
 		);
 		plan.add( referenceProvider( "1" ), document -> { } );
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// Stop Hibernate Search
 		mapping.close();

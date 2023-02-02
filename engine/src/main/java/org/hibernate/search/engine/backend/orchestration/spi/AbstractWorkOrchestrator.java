@@ -162,7 +162,7 @@ public abstract class AbstractWorkOrchestrator<W> {
 		@Override
 		public void run() {
 			// at this point we've offloaded submit call to some other executor so we just want to block the operation:
-			AbstractWorkOrchestrator.this.submit( work, OperationSubmitter.BLOCKING );
+			AbstractWorkOrchestrator.this.submit( work, OperationSubmitter.blocking() );
 		}
 	}
 
