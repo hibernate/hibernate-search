@@ -70,9 +70,10 @@ if [ -n "$PROPERTIES" ]
 then
 	echo "Updating properties '$PROPERTIES'."
 	# We allow any update, but constrain using a rules file (more flexible)
+	# We allow downgrades because the versions plugin considers e.g. 6.2.0-SNAPSHOT to be lower than 6.2.0.CR2
 	./mvnw --quiet -U -Pdependency-update -Pdist org.codehaus.mojo:versions-maven-plugin:update-properties \
 		-DgenerateBackupPoms=false \
-		-DallowMajorUpdates=true -DallowMinorUpdates=true -DallowSnapshots=true \
+		-DallowMajorUpdates=true -DallowMinorUpdates=true -DallowSnapshots=true -DallowDowngrade=true \
 		-DincludeProperties="$PROPERTIES" \
 		-Dmaven.version.rules="file://$(pwd)/ci/dependency-update/rules-$DEPENDENCY_UPDATE_NAME.xml" \
 		"${@}"
