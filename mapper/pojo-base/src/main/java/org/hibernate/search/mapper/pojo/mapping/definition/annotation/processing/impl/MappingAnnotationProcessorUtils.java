@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processin
 
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -83,6 +84,10 @@ public final class MappingAnnotationProcessorUtils {
 
 	public static Map<String, Object> toMap(Param[] params) {
 		Contracts.assertNotNull( params, "params" );
+
+		if ( params.length == 0 ) {
+			return Collections.emptyMap();
+		}
 
 		Map<String, Object> map = new LinkedHashMap<>();
 		for ( Param param : params ) {

@@ -35,13 +35,8 @@ public class DocumentIdProcessor implements PropertyMappingAnnotationProcessor<D
 		IdentifierBinder binder = createIdentifierBinder( annotation, context );
 
 		IdentifierBinderRef identifierBinderRef = annotation.identifierBinder();
-		if ( identifierBinderRef.params() != null ) {
-			Map<String, Object> params = context.toMap( identifierBinderRef.params() );
-			mappingContext.documentId().identifierBinder( binder, params );
-		}
-		else {
-			mappingContext.documentId().identifierBinder( binder );
-		}
+		Map<String, Object> params = context.toMap( identifierBinderRef.params() );
+		mappingContext.documentId().identifierBinder( binder, params );
 	}
 
 	@SuppressWarnings("rawtypes") // Raw types are the best we can do here

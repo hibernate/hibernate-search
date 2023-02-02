@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -52,4 +53,8 @@ public abstract class AbstractMappingAnnotationProcessorContext
 		return MappingAnnotationProcessorUtils.toBeanReference( expectedType, undefinedTypeMarker, type, name, retrieval );
 	}
 
+	@Override
+	public <T> T toNullIfDefault(T value, T defaultValue) {
+		return Objects.equals( value, defaultValue ) ? null : value;
+	}
 }

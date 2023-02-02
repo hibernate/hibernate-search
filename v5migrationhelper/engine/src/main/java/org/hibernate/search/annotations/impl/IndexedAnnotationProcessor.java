@@ -14,10 +14,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
 public class IndexedAnnotationProcessor implements TypeMappingAnnotationProcessor<Indexed> {
 	@Override
 	public void process(TypeMappingStep mapping, Indexed annotation, TypeMappingAnnotationProcessorContext context) {
-		String indexName = annotation.index();
-		if ( indexName.isEmpty() ) {
-			indexName = null;
-		}
+		String indexName = context.toNullIfDefault( annotation.index(), "" );
 		mapping.indexed().index( indexName );
 	}
 }

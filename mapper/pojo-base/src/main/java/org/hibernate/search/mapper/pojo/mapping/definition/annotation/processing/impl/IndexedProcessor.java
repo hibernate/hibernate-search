@@ -24,14 +24,8 @@ public class IndexedProcessor implements TypeMappingAnnotationProcessor<Indexed>
 	@Override
 	public void process(TypeMappingStep mappingContext, Indexed annotation,
 			TypeMappingAnnotationProcessorContext context) {
-		String indexName = annotation.index();
-		if ( indexName.isEmpty() ) {
-			indexName = null;
-		}
-		String backendName = annotation.backend();
-		if ( backendName.isEmpty() ) {
-			backendName = null;
-		}
+		String indexName = context.toNullIfDefault( annotation.index(), "" );
+		String backendName = context.toNullIfDefault( annotation.backend(), "" );
 		TypeMappingIndexedStep indexedStep = mappingContext.indexed().backend( backendName ).index( indexName )
 				.enabled( annotation.enabled() );
 
@@ -47,12 +41,7 @@ public class IndexedProcessor implements TypeMappingAnnotationProcessor<Indexed>
 			return;
 		}
 
-		if ( routingBinderReferenceAnnotation.params() != null ) {
-			Map<String, Object> params = context.toMap( routingBinderReferenceAnnotation.params() );
-			indexedStep.routingBinder( new BeanDelegatingBinder( routingBinderReference.get() ), params );
-		}
-		else {
-			indexedStep.routingBinder( new BeanDelegatingBinder( routingBinderReference.get() ) );
-		}
+		Map<String, Object> params = context.toMap( routingBinderReferenceAnnotation.params() );
+		indexedStep.routingBinder( new BeanDelegatingBinder( routingBinderReference.get() ), params );
 	}
 }

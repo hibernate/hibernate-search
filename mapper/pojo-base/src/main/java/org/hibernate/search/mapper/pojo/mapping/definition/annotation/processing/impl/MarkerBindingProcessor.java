@@ -32,13 +32,8 @@ public final class MarkerBindingProcessor implements PropertyMappingAnnotationPr
 		MarkerBinderRef markerBinderRef = annotation.binder();
 		MarkerBinder binder = createBinder( markerBinderRef, context );
 
-		if ( markerBinderRef.params() != null ) {
-			Map<String, Object> params = context.toMap( markerBinderRef.params() );
-			mapping.marker( binder, params );
-		}
-		else {
-			mapping.marker( binder );
-		}
+		Map<String, Object> params = context.toMap( markerBinderRef.params() );
+		mapping.marker( binder, params );
 	}
 
 	private MarkerBinder createBinder(MarkerBinderRef binderReferenceAnnotation, MappingAnnotationProcessorContext context) {

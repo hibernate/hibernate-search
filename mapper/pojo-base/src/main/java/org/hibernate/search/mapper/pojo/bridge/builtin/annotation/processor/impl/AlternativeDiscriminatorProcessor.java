@@ -18,6 +18,6 @@ public class AlternativeDiscriminatorProcessor implements PropertyMappingAnnotat
 	public void process(PropertyMappingStep mapping, AlternativeDiscriminator annotation,
 			PropertyMappingAnnotationProcessorContext context) {
 		mapping.marker( AlternativeBinder.alternativeDiscriminator()
-				.id( annotation.id().isEmpty() ? null : annotation.id() ) );
+				.id( context.toNullIfDefault( annotation.id(), "" ) ) );
 	}
 }

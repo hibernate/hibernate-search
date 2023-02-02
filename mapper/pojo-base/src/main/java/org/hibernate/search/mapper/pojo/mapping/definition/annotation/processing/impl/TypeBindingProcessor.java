@@ -32,13 +32,8 @@ public final class TypeBindingProcessor implements TypeMappingAnnotationProcesso
 		TypeBinderRef typeBinder = annotation.binder();
 		TypeBinder binder = createBinder( typeBinder, context );
 
-		if ( typeBinder.params() != null ) {
-			Map<String, Object> params = context.toMap( typeBinder.params() );
-			mapping.binder( binder, params );
-		}
-		else {
-			mapping.binder( binder );
-		}
+		Map<String, Object> params = context.toMap( typeBinder.params() );
+		mapping.binder( binder, params );
 	}
 
 	private TypeBinder createBinder(TypeBinderRef binderReferenceAnnotation, MappingAnnotationProcessorContext context) {

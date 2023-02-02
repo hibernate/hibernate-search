@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -97,10 +98,18 @@ public interface MappingAnnotationProcessorContext {
 	 * @param params The original params
 	 * @return A {@link Map} created from {@link Param}
 	 * using {@link Param#name()} as key and {@link Param#value()} as value
-	 * @throws SearchException if {@code params} contain multiple param with the same {@link Param#name()}
+	 * @throws SearchException if {@code params} contain multiple parameters with the same {@link Param#name()}
 	 */
 	default Map<String, Object> toMap(Param[] params) {
 		return MappingAnnotationProcessorUtils.toMap( params );
 	}
+
+	/**
+	 * @param value A value extracted from an annotation attribute.
+	 * @param defaultValue A default value for that annotation attribute.
+	 * @return {@code null} if {@code value} is {@link Objects#equals(Object, Object) equal}
+	 * to {@code defaultValue}, {@code value} otherwise.
+	 */
+	<T> T toNullIfDefault(T value, T defaultValue);
 
 }
