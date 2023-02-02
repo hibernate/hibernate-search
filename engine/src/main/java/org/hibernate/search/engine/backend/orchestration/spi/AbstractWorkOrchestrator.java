@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -31,6 +31,8 @@ public abstract class AbstractWorkOrchestrator<W> {
 
 	private State state = State.STOPPED; // Guarded by lifecycleLock
 	private final ReadWriteLock lifecycleLock = new ReentrantReadWriteLock();
+
+	protected final Consumer<? extends W> blockingRetryProducer = w -> submit( w, OperationSubmitter.blocking() );
 
 	protected AbstractWorkOrchestrator(String name) {
 		this.name = name;
@@ -118,8 +120,7 @@ public abstract class AbstractWorkOrchestrator<W> {
 
 	protected abstract void doStart(ConfigurationPropertySource propertySource);
 
-	protected abstract void doSubmit(W work, OperationSubmitter operationSubmitter,
-			Function<W, Runnable> blockingRetryProducer) throws InterruptedException;
+	protected abstract void doSubmit(W work, OperationSubmitter operationSubmitter) throws InterruptedException;
 
 	protected abstract CompletableFuture<?> completion();
 
@@ -135,7 +136,7 @@ public abstract class AbstractWorkOrchestrator<W> {
 				// The orchestrator is stopping or stopped: abort.
 				throw log.submittedWorkToStoppedOrchestrator( name );
 			}
-			doSubmit( work, operationSubmitter, BlockingRetry::new );
+			doSubmit( work, operationSubmitter );
 		}
 		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
@@ -150,20 +151,6 @@ public abstract class AbstractWorkOrchestrator<W> {
 		RUNNING,
 		PRE_STOPPING,
 		STOPPED;
-	}
-
-	private class BlockingRetry implements Runnable {
-		private final W work;
-
-		private BlockingRetry(W work) {
-			this.work = work;
-		}
-
-		@Override
-		public void run() {
-			// at this point we've offloaded submit call to some other executor so we just want to block the operation:
-			AbstractWorkOrchestrator.this.submit( work, OperationSubmitter.blocking() );
-		}
 	}
 
 }

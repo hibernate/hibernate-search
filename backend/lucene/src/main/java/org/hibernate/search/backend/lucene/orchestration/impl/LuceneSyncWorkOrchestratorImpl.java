@@ -10,10 +10,9 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
+import org.hibernate.search.backend.lucene.cache.impl.LuceneQueryCachingContext;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
@@ -30,7 +29,6 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.similarities.Similarity;
-import org.hibernate.search.backend.lucene.cache.impl.LuceneQueryCachingContext;
 
 public class LuceneSyncWorkOrchestratorImpl
 		extends AbstractWorkOrchestrator<LuceneSyncWorkOrchestratorImpl.WorkExecution<?>>
@@ -85,22 +83,11 @@ public class LuceneSyncWorkOrchestratorImpl
 	}
 
 	@Override
-	protected void doSubmit(WorkExecution<?> work, OperationSubmitter operationSubmitter,
-			Function<WorkExecution<?>, Runnable> blockingRetryProducer) throws InterruptedException {
-		if ( OperationSubmitter.rejecting().equals( operationSubmitter ) ) {
+	protected void doSubmit(WorkExecution<?> work, OperationSubmitter operationSubmitter) {
+		if ( !OperationSubmitter.blocking().equals( operationSubmitter ) ) {
 			throw log.nonblockingOperationSubmitterNotSupported();
 		}
-		else if ( OperationSubmitter.blocking().equals( operationSubmitter ) ) {
-			work.execute();
-		}
-		else {
-			// otherwise assume that it's offloading submitter, and we want to offload right away:
-			operationSubmitter.submitToQueue(
-					new ArrayBlockingQueue<>( 0 ),
-					work,
-					blockingRetryProducer
-			);
-		}
+		work.execute();
 	}
 
 	@Override

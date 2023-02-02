@@ -9,7 +9,6 @@ package org.hibernate.search.engine.backend.work.execution;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -38,7 +37,7 @@ public abstract class OperationSubmitter {
 	 *
 	 */
 	public abstract <T> void submitToQueue(BlockingQueue<? super T> queue, T element,
-			Function<? super T, Runnable> blockingRetryProducer) throws InterruptedException;
+			Consumer<? super T> blockingRetryProducer) throws InterruptedException;
 
 	/**
 	 * When using this submitter, dding a new element will block the thread when the underlying
@@ -71,7 +70,7 @@ public abstract class OperationSubmitter {
 	private static final class BlockingOperationSubmitter extends OperationSubmitter {
 		@Override
 		public <T> void submitToQueue(BlockingQueue<? super T> queue, T element,
-				Function<? super T, Runnable> blockingRetryProducer)
+				Consumer<? super T> blockingRetryProducer)
 				throws InterruptedException {
 			queue.put( element );
 		}
@@ -80,7 +79,7 @@ public abstract class OperationSubmitter {
 	private static final class RejectedExecutionExceptionOperationSubmitter extends OperationSubmitter {
 		@Override
 		public <T> void submitToQueue(BlockingQueue<? super T> queue, T element,
-				Function<? super T, Runnable> blockingRetryProducer) {
+				Consumer<? super T> blockingRetryProducer) {
 			if ( !queue.offer( element ) ) {
 				throw new RejectedExecutionException();
 			}
@@ -95,10 +94,9 @@ public abstract class OperationSubmitter {
 		}
 
 		@Override
-		public <T> void submitToQueue(BlockingQueue<? super T> queue, T element,
-				Function<? super T, Runnable> blockingRetryProducer) {
+		public <T> void submitToQueue(BlockingQueue<? super T> queue, T element, Consumer<? super T> blockingRetryProducer) {
 			if ( !queue.offer( element ) ) {
-				executor.accept( blockingRetryProducer.apply( element ) );
+				executor.accept( () -> blockingRetryProducer.accept( element ) );
 			}
 		}
 	}

@@ -13,7 +13,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
@@ -39,6 +39,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 
 	private final BlockingQueue<BatchedWork<? super P>> workQueue;
 	private final BatchWorker<P> worker;
+	private final Consumer<? super BatchedWork<? super P>> blockingRetryProducer;
 
 	private SingletonTask processingTask;
 
@@ -51,12 +52,14 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	 * processor in FIFO order, if {@code false} tasks submitted
 	 * when the internal queue is full may be submitted out of order.
 	 * @param failureHandler A failure handler to report failures of the background thread.
+	 * @param blockingRetryProducer
 	 */
 	public BatchingExecutor(String name,
 			P processor, int maxTasksPerBatch, boolean fair,
-			FailureHandler failureHandler) {
+			FailureHandler failureHandler, Consumer<? super BatchedWork<? super P>> blockingRetryProducer) {
 		this.name = name;
 		this.failureHandler = failureHandler;
+		this.blockingRetryProducer = blockingRetryProducer;
 		this.workQueue = new ArrayBlockingQueue<>( maxTasksPerBatch, fair );
 		this.worker = new BatchWorker<>( name, processor, workQueue, maxTasksPerBatch );
 	}
@@ -72,7 +75,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 
 	/**
 	 * Start the executor, allowing works to be submitted
-	 * through {@link #submit(BatchedWork, OperationSubmitter, Function)}.
+	 * through {@link #submit(BatchedWork, OperationSubmitter)}.
 	 *
 	 * @param executorService An executor service with at least one thread.
 	 */
@@ -87,7 +90,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 
 	/**
 	 * Stop the executor, no longer allowing works to be submitted
-	 * through {@link #submit(BatchedWork, OperationSubmitter, Function)}.
+	 * through {@link #submit(BatchedWork, OperationSubmitter)}.
 	 * <p>
 	 * This will remove pending works from the queue.
 	 */
@@ -103,13 +106,11 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	}
 
 	/**
-	 * @deprecated Use {@link #submit(BatchedWork, OperationSubmitter, Function)} instead.
+	 * @deprecated Use {@link #submit(BatchedWork, OperationSubmitter)} instead.
 	 */
 	@Deprecated
 	public void submit(BatchedWork<? super P> work) throws InterruptedException {
-		submit( work, OperationSubmitter.blocking(), w -> () -> {
-			throw new IllegalStateException( "Blocking executor does not offload work." );
-		} );
+		submit( work, OperationSubmitter.blocking() );
 	}
 
 	/**
@@ -118,11 +119,9 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	 * Must not be called when the executor is stopped.
 	 * @param work A work to execute.
 	 * @param operationSubmitter How to handle request to submit operation when the queue is full.
-	 * @param blockingRetryProducer
 	 * @throws InterruptedException If the current thread is interrupted while enqueuing the work.
 	 */
-	public <W extends BatchedWork<? super P>> void submit(W work, OperationSubmitter operationSubmitter,
-			Function<? super W, Runnable> blockingRetryProducer) throws InterruptedException {
+	public <W extends BatchedWork<? super P>> void submit(W work, OperationSubmitter operationSubmitter) throws InterruptedException {
 		if ( processingTask == null ) {
 			throw new AssertionFailure(
 					"Attempt to submit a work to executor '" + name + "', which is stopped."
