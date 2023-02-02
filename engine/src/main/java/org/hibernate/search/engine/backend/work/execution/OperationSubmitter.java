@@ -46,8 +46,8 @@ public abstract class OperationSubmitter {
 	 * Depending on the implementation might throw {@link RejectedExecutionException} or offload the submit operation to a provided executor.
 	 *
 	 */
-	public abstract <T> void submitToQueue(BlockingQueue<T> queue, T element,
-			Function<T, Runnable> blockingRetryProducer) throws InterruptedException;
+	public abstract <T> void submitToQueue(BlockingQueue<? super T> queue, T element,
+			Function<? super T, Runnable> blockingRetryProducer) throws InterruptedException;
 
 	/**
 	 * @see #BLOCKING
@@ -76,7 +76,8 @@ public abstract class OperationSubmitter {
 
 	private static final class BlockingOperationSubmitter extends OperationSubmitter {
 		@Override
-		public <T> void submitToQueue(BlockingQueue<T> queue, T element, Function<T, Runnable> blockingRetryProducer)
+		public <T> void submitToQueue(BlockingQueue<? super T> queue, T element,
+				Function<? super T, Runnable> blockingRetryProducer)
 				throws InterruptedException {
 			queue.put( element );
 		}
@@ -84,7 +85,8 @@ public abstract class OperationSubmitter {
 
 	private static final class RejectedExecutionExceptionOperationSubmitter extends OperationSubmitter {
 		@Override
-		public <T> void submitToQueue(BlockingQueue<T> queue, T element, Function<T, Runnable> blockingRetryProducer) {
+		public <T> void submitToQueue(BlockingQueue<? super T> queue, T element,
+				Function<? super T, Runnable> blockingRetryProducer) {
 			if ( !queue.offer( element ) ) {
 				throw new RejectedExecutionException();
 			}
@@ -99,7 +101,8 @@ public abstract class OperationSubmitter {
 		}
 
 		@Override
-		public <T> void submitToQueue(BlockingQueue<T> queue, T element, Function<T, Runnable> blockingRetryProducer) {
+		public <T> void submitToQueue(BlockingQueue<? super T> queue, T element,
+				Function<? super T, Runnable> blockingRetryProducer) {
 			if ( !queue.offer( element ) ) {
 				executor.accept( blockingRetryProducer.apply( element ) );
 			}
