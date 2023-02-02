@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
+import static org.awaitility.Awaitility.await;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Queue;
@@ -182,7 +183,7 @@ public class MassIndexingEnvironmentIT {
 							message
 					);
 
-			assertThat( threadNames ).isEmpty();
+			await().untilAsserted( () -> assertThat( threadNames ).isEmpty() );
 		}
 	}
 
