@@ -88,7 +88,7 @@ public class LuceneIndexWriterSettingsIT {
 		// Add a document to the index
 		IndexIndexingPlan plan = index.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), document -> { } );
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// Check that writing succeeded
 		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
@@ -151,7 +151,7 @@ public class LuceneIndexWriterSettingsIT {
 		// Add a document to the index
 		IndexIndexingPlan plan = index.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), document -> { } );
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// Check that writing succeeded
 		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )

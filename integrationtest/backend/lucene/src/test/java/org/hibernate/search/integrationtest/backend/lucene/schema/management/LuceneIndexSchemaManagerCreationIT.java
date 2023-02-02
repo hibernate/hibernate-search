@@ -61,7 +61,7 @@ public class LuceneIndexSchemaManagerCreationIT {
 	}
 
 	private void create() {
-		Futures.unwrappedExceptionJoin( operation.apply( index.schemaManager(), OperationSubmitter.BLOCKING ) );
+		Futures.unwrappedExceptionJoin( operation.apply( index.schemaManager(), OperationSubmitter.blocking() ) );
 	}
 
 	private void setup() {

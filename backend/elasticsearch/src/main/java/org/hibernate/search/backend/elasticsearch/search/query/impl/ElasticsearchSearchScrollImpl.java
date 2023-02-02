@@ -49,7 +49,7 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 			Futures.unwrappedExceptionJoin(
 					queryOrchestrator.submit(
 							workFactory.clearScroll( scrollId ).build(),
-							OperationSubmitter.BLOCKING
+							OperationSubmitter.blocking()
 					)
 			);
 		}
@@ -67,7 +67,7 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 		ElasticsearchLoadableSearchResult<H> loadableSearchResult = Futures.unwrappedExceptionJoin(
 				queryOrchestrator.submit(
 						scroll,
-						OperationSubmitter.BLOCKING
+						OperationSubmitter.blocking()
 				)
 		);
 		ElasticsearchSearchResultImpl<H> searchResult = loadableSearchResult.loadBlocking();

@@ -60,7 +60,7 @@ public interface PojoIndexer {
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return add(
 				typeIdentifier, providedId, providedRoutes, entity, commitStrategy, refreshStrategy,
-				OperationSubmitter.BLOCKING
+				OperationSubmitter.blocking()
 		);
 	}
 
@@ -98,7 +98,7 @@ public interface PojoIndexer {
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return addOrUpdate(
 				typeIdentifier, providedId, providedRoutes, entity, commitStrategy, refreshStrategy,
-				OperationSubmitter.BLOCKING
+				OperationSubmitter.blocking()
 		);
 	}
 
@@ -138,7 +138,7 @@ public interface PojoIndexer {
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return delete(
 				typeIdentifier, providedId, providedRoutes, entity, commitStrategy, refreshStrategy,
-				OperationSubmitter.BLOCKING
+				OperationSubmitter.blocking()
 		);
 	}
 
@@ -176,7 +176,7 @@ public interface PojoIndexer {
 	) {
 		return delete(
 				typeIdentifier, providedId, providedRoutes, commitStrategy, refreshStrategy,
-				OperationSubmitter.BLOCKING
+				OperationSubmitter.blocking()
 		);
 	}
 

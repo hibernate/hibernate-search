@@ -45,7 +45,7 @@ final class OutboxEventProcessingPlan {
 		try {
 			addEventsToThePlan();
 			reportBackendResult(
-					Futures.unwrappedExceptionGet( processingPlan.executeAndReport( OperationSubmitter.BLOCKING ) ) );
+					Futures.unwrappedExceptionGet( processingPlan.executeAndReport( OperationSubmitter.blocking() ) ) );
 		}
 		catch (Throwable throwable) {
 			if ( throwable instanceof InterruptedException ) {

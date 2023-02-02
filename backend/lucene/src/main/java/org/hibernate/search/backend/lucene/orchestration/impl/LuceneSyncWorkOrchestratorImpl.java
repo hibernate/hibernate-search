@@ -58,7 +58,7 @@ public class LuceneSyncWorkOrchestratorImpl
 		);
 		Throwable throwable = null;
 		try {
-			submit( workExecution, OperationSubmitter.BLOCKING );
+			submit( workExecution, OperationSubmitter.blocking() );
 			// If we get there, the task succeeded and we are sure there is a result.
 			return workExecution.getResult();
 		}
@@ -87,10 +87,10 @@ public class LuceneSyncWorkOrchestratorImpl
 	@Override
 	protected void doSubmit(WorkExecution<?> work, OperationSubmitter operationSubmitter,
 			Function<WorkExecution<?>, Runnable> blockingRetryProducer) throws InterruptedException {
-		if ( OperationSubmitter.REJECTED_EXECUTION_EXCEPTION.equals( operationSubmitter ) ) {
+		if ( OperationSubmitter.rejecting().equals( operationSubmitter ) ) {
 			throw log.nonblockingOperationSubmitterNotSupported();
 		}
-		else if ( OperationSubmitter.BLOCKING.equals( operationSubmitter ) ) {
+		else if ( OperationSubmitter.blocking().equals( operationSubmitter ) ) {
 			work.execute();
 		}
 		else {

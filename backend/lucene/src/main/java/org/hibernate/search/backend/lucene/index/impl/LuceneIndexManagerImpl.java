@@ -207,7 +207,7 @@ public class LuceneIndexManagerImpl
 
 	@Override
 	public CompletableFuture<Long> computeSizeInBytesAsync() {
-		return computeSizeInBytesAsync( OperationSubmitter.REJECTED_EXECUTION_EXCEPTION );
+		return computeSizeInBytesAsync( OperationSubmitter.rejecting() );
 	}
 
 	@Override

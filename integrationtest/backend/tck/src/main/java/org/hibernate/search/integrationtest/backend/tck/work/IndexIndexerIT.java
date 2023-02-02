@@ -89,7 +89,7 @@ public class IndexIndexerIT {
 			tasks[i] = indexer.add(
 					referenceProvider( id ),
 					document -> document.addValue( index.binding().title, "The Lord of the Rings chap. " + id ),
-					commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING
+					commitStrategy, refreshStrategy, OperationSubmitter.blocking()
 			);
 		}
 		CompletableFuture<?> future = CompletableFuture.allOf( tasks );
@@ -114,7 +114,7 @@ public class IndexIndexerIT {
 			tasks[i] = indexer.addOrUpdate(
 					referenceProvider( id ),
 					document -> document.addValue( index.binding().title, "The Boss of the Rings chap. " + id ),
-					commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING
+					commitStrategy, refreshStrategy, OperationSubmitter.blocking()
 			);
 		}
 		future = CompletableFuture.allOf( tasks );
@@ -138,7 +138,7 @@ public class IndexIndexerIT {
 			final String id = String.valueOf( i + booksToUpdate );
 			tasks[i] = indexer.delete(
 					referenceProvider( id ),
-					commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING
+					commitStrategy, refreshStrategy, OperationSubmitter.blocking()
 			);
 		}
 		future = CompletableFuture.allOf( tasks );
@@ -166,7 +166,7 @@ public class IndexIndexerIT {
 		CompletableFuture<?> future = indexer.add(
 				referenceProvider( "1" ),
 				document -> document.addValue( index.binding().title, "Document #1" ),
-				commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING
+				commitStrategy, refreshStrategy, OperationSubmitter.blocking()
 		);
 		Awaitility.await().until( future::isDone );
 
@@ -192,7 +192,7 @@ public class IndexIndexerIT {
 		CompletableFuture<?> future = indexer.addOrUpdate(
 				referenceProvider( "1" ),
 				document -> document.addValue( index.binding().title, "Document #1" ),
-				commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING
+				commitStrategy, refreshStrategy, OperationSubmitter.blocking()
 		);
 		Awaitility.await().until( future::isDone );
 
@@ -216,7 +216,7 @@ public class IndexIndexerIT {
 		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );
 
 		CompletableFuture<?> future = indexer.delete(
-				referenceProvider( "1" ), commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING
+				referenceProvider( "1" ), commitStrategy, refreshStrategy, OperationSubmitter.blocking()
 		);
 		Awaitility.await().until( future::isDone );
 
@@ -235,7 +235,7 @@ public class IndexIndexerIT {
 	private void refreshIfNecessary() {
 		if ( DocumentRefreshStrategy.NONE.equals( refreshStrategy ) ) {
 			IndexWorkspace workspace = index.createWorkspace();
-			workspace.refresh( OperationSubmitter.BLOCKING ).join();
+			workspace.refresh( OperationSubmitter.blocking() ).join();
 		}
 	}
 

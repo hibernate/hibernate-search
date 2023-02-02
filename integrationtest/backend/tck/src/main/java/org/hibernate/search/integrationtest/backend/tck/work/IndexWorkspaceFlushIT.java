@@ -22,7 +22,7 @@ public class IndexWorkspaceFlushIT extends AbstractIndexWorkspaceSimpleOperation
 
 	@Override
 	protected CompletableFuture<?> executeAsync(IndexWorkspace workspace) {
-		return workspace.flush( OperationSubmitter.REJECTED_EXECUTION_EXCEPTION );
+		return workspace.flush( OperationSubmitter.rejecting() );
 	}
 
 	@Override

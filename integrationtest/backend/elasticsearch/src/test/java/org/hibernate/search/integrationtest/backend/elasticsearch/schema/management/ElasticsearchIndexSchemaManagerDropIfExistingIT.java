@@ -87,7 +87,7 @@ public class ElasticsearchIndexSchemaManagerDropIfExistingIT {
 				)
 				.setup();
 
-		Futures.unwrappedExceptionJoin( index.schemaManager().dropIfExisting( OperationSubmitter.BLOCKING ) );
+		Futures.unwrappedExceptionJoin( index.schemaManager().dropIfExisting( OperationSubmitter.blocking() ) );
 	}
 
 }

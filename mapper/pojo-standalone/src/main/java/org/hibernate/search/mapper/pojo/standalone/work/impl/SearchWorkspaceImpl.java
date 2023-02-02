@@ -24,12 +24,12 @@ public class SearchWorkspaceImpl implements SearchWorkspace {
 
 	@Override
 	public void mergeSegments() {
-		Futures.unwrappedExceptionJoin( delegate.mergeSegments( OperationSubmitter.BLOCKING ) );
+		Futures.unwrappedExceptionJoin( delegate.mergeSegments( OperationSubmitter.blocking() ) );
 	}
 
 	@Override
 	public CompletableFuture<?> mergeSegmentsAsync() {
-		return delegate.mergeSegments( OperationSubmitter.REJECTED_EXECUTION_EXCEPTION );
+		return delegate.mergeSegments( OperationSubmitter.rejecting() );
 	}
 
 	@Override
@@ -44,31 +44,31 @@ public class SearchWorkspaceImpl implements SearchWorkspace {
 
 	@Override
 	public void purge(Set<String> routingKeys) {
-		Futures.unwrappedExceptionJoin( delegate.purge( routingKeys, OperationSubmitter.BLOCKING ) );
+		Futures.unwrappedExceptionJoin( delegate.purge( routingKeys, OperationSubmitter.blocking() ) );
 	}
 
 	@Override
 	public CompletableFuture<?> purgeAsync(Set<String> routingKeys) {
-		return delegate.purge( routingKeys, OperationSubmitter.REJECTED_EXECUTION_EXCEPTION );
+		return delegate.purge( routingKeys, OperationSubmitter.rejecting() );
 	}
 
 	@Override
 	public void flush() {
-		Futures.unwrappedExceptionJoin( delegate.flush( OperationSubmitter.BLOCKING ) );
+		Futures.unwrappedExceptionJoin( delegate.flush( OperationSubmitter.blocking() ) );
 	}
 
 	@Override
 	public CompletableFuture<?> flushAsync() {
-		return delegate.flush( OperationSubmitter.REJECTED_EXECUTION_EXCEPTION );
+		return delegate.flush( OperationSubmitter.rejecting() );
 	}
 
 	@Override
 	public void refresh() {
-		Futures.unwrappedExceptionJoin( delegate.refresh( OperationSubmitter.BLOCKING ) );
+		Futures.unwrappedExceptionJoin( delegate.refresh( OperationSubmitter.blocking() ) );
 	}
 
 	@Override
 	public CompletableFuture<?> refreshAsync() {
-		return delegate.refresh( OperationSubmitter.REJECTED_EXECUTION_EXCEPTION );
+		return delegate.refresh( OperationSubmitter.rejecting() );
 	}
 }

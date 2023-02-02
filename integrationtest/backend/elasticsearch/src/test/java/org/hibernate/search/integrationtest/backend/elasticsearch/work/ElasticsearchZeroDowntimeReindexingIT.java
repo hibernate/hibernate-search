@@ -63,9 +63,9 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 				document -> document.addValue( index.binding().text, "text1" ),
 				DocumentCommitStrategy.NONE,
 				DocumentRefreshStrategy.NONE,
-				OperationSubmitter.BLOCKING
+				OperationSubmitter.blocking()
 		).join();
-		workspace.refresh( OperationSubmitter.BLOCKING ).join();
+		workspace.refresh( OperationSubmitter.blocking() ).join();
 
 		SearchQuery<DocumentReference> text1Query = index
 				.createScope().query()
@@ -100,9 +100,9 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 				document -> document.addValue( index.binding().text, "text2" ),
 				DocumentCommitStrategy.NONE,
 				DocumentRefreshStrategy.NONE,
-				OperationSubmitter.BLOCKING
+				OperationSubmitter.blocking()
 		).join();
-		workspace.refresh( OperationSubmitter.BLOCKING ).join();
+		workspace.refresh( OperationSubmitter.blocking() ).join();
 
 		// Search queries are unaffected: text == "text1"
 		assertThatQuery( text1Query ).hasTotalHitCount( 1 );

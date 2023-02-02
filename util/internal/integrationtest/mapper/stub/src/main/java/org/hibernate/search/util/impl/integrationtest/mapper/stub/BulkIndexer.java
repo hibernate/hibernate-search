@@ -120,7 +120,7 @@ public class BulkIndexer {
 		CompletableFuture<?> future = CompletableFuture.allOf( indexingFutures );
 		if ( refresh ) {
 			IndexWorkspace workspace = indexManager.createWorkspace( mappingContext, tenantId );
-			future = future.thenCompose( ignored -> workspace.refresh( OperationSubmitter.BLOCKING ) );
+			future = future.thenCompose( ignored -> workspace.refresh( OperationSubmitter.blocking() ) );
 		}
 		return future;
 	}
@@ -148,7 +148,7 @@ public class BulkIndexer {
 					batchFutures[i] = indexer.add(
 							documentProvider.getReferenceProvider(), documentProvider.getContributor(),
 							DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
-							OperationSubmitter.BLOCKING
+							OperationSubmitter.blocking()
 					);
 				}
 				return CompletableFuture.allOf( batchFutures );

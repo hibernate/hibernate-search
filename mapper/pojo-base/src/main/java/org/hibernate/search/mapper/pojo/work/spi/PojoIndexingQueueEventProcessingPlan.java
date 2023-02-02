@@ -44,7 +44,7 @@ public interface PojoIndexingQueueEventProcessingPlan {
 	@Deprecated
 	default <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
 			EntityReferenceFactory<R> entityReferenceFactory) {
-		return executeAndReport( entityReferenceFactory, OperationSubmitter.BLOCKING );
+		return executeAndReport( entityReferenceFactory, OperationSubmitter.blocking() );
 	}
 
 	/**

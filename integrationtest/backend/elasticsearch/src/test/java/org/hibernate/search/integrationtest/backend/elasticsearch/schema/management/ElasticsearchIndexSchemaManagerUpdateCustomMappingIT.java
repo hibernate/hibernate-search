@@ -189,6 +189,6 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomMappingIT {
 				.withIndex( index )
 				.setup();
 
-		Futures.unwrappedExceptionJoin( index.schemaManager().createOrUpdate( OperationSubmitter.BLOCKING ) );
+		Futures.unwrappedExceptionJoin( index.schemaManager().createOrUpdate( OperationSubmitter.blocking() ) );
 	}
 }

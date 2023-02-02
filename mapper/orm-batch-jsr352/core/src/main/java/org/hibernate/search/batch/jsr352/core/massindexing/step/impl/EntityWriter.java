@@ -154,13 +154,13 @@ public class EntityWriter extends AbstractItemWriter {
 		if ( WriteMode.ADD.equals( writeMode ) ) {
 			return indexer.add( typeIdentifier, null, null, entity,
 					// Commit and refresh are handled globally after all documents are indexed.
-					DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, OperationSubmitter.BLOCKING
+					DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, OperationSubmitter.blocking()
 			);
 		}
 
 		return indexer.addOrUpdate( typeIdentifier, null, null, entity,
 				// Commit and refresh are handled globally after all documents are indexed.
-				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, OperationSubmitter.BLOCKING
+				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, OperationSubmitter.blocking()
 		);
 	}
 

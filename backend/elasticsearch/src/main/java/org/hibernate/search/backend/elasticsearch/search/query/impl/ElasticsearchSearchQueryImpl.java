@@ -122,7 +122,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				.build();
 
 		ElasticsearchSearchResultImpl<H> result = Futures.unwrappedExceptionJoin(
-				queryOrchestrator.submit( work, OperationSubmitter.BLOCKING ) )
+				queryOrchestrator.submit( work, OperationSubmitter.blocking() ) )
 				/*
 				 * WARNING: the following call must run in the user thread.
 				 * If we introduce async query execution, we will have to add a loadAsync method here,
@@ -150,7 +150,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				.build();
 
 		ElasticsearchSearchResultImpl<H> result = Futures.unwrappedExceptionJoin(
-				queryOrchestrator.submit( work, OperationSubmitter.BLOCKING ) )
+				queryOrchestrator.submit( work, OperationSubmitter.blocking() ) )
 				/*
 				 * WARNING: the following call must run in the user thread.
 				 * If we introduce async query execution, we will have to add a loadAsync method here,
@@ -190,7 +190,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
 				);
 		NonBulkableWork<Long> work = builder.build();
-		Long result = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work, OperationSubmitter.BLOCKING ) );
+		Long result = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work, OperationSubmitter.blocking() ) );
 		timeoutManager.stop();
 		return result;
 	}
@@ -284,7 +284,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				)
 				.build();
 
-		ExplainResult explainResult = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work, OperationSubmitter.BLOCKING ) );
+		ExplainResult explainResult = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work, OperationSubmitter.blocking() ) );
 		return explainResult.getJsonObject();
 	}
 

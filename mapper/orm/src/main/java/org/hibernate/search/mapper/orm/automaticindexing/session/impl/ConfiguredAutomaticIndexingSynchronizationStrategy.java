@@ -62,7 +62,7 @@ public final class ConfiguredAutomaticIndexingSynchronizationStrategy {
 		private DocumentRefreshStrategy documentRefreshStrategy = DocumentRefreshStrategy.NONE;
 		private Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> indexingFutureHandler = future -> {
 		};
-		private OperationSubmitter operationSubmitter = OperationSubmitter.BLOCKING;
+		private OperationSubmitter operationSubmitter = OperationSubmitter.blocking();
 
 		private final EntityReferenceFactory<EntityReference> entityReferenceFactory;
 

@@ -61,7 +61,7 @@ public class SearchSchemaManagerImpl implements SearchSchemaManager {
 				StandalonePojoEventContextMessages.INSTANCE.schemaManagement()
 		);
 		try {
-			Futures.unwrappedExceptionJoin( operation.apply( delegate, failureCollector, OperationSubmitter.BLOCKING ) );
+			Futures.unwrappedExceptionJoin( operation.apply( delegate, failureCollector, OperationSubmitter.blocking() ) );
 		}
 		catch (RuntimeException e) {
 			failureCollector.withContext( EventContexts.defaultContext() )

@@ -122,13 +122,13 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 			RootFailureCollector failureCollector = new RootFailureCollector(
 					PojoEventContextMessages.INSTANCE.schemaManagement()
 			);
-			Futures.unwrappedExceptionGet( scopeSchemaManager.dropAndCreate( failureCollector, OperationSubmitter.BLOCKING ) );
+			Futures.unwrappedExceptionGet( scopeSchemaManager.dropAndCreate( failureCollector, OperationSubmitter.blocking() ) );
 			failureCollector.checkNoFailure();
 		}
 
 		if ( purgeAtStart ) {
 			applyToAllContexts(
-					context -> context.scopeWorkspace().purge( Collections.emptySet(), OperationSubmitter.BLOCKING )
+					context -> context.scopeWorkspace().purge( Collections.emptySet(), OperationSubmitter.blocking() )
 			);
 			if ( mergeSegmentsAfterPurge ) {
 				// TODO: HSEARCH-4767 Note this only works fine as long as we have only a discriminator-based multitenancy.
@@ -136,7 +136,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 				// and calling it for multiple tenants would just request doing the same work.
 				Futures.unwrappedExceptionGet(
 						sessionContexts.iterator().next()
-								.scopeWorkspace().mergeSegments( OperationSubmitter.BLOCKING )
+								.scopeWorkspace().mergeSegments( OperationSubmitter.blocking() )
 				);
 			}
 		}
@@ -185,7 +185,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 			// We deliberately are targeting a single context as the underlying operation at this point is not tenant dependent
 			// and calling it for multiple tenants would just request doing the same work.
 			Futures.unwrappedExceptionGet( sessionContexts.iterator().next()
-					.scopeWorkspace().mergeSegments( OperationSubmitter.BLOCKING )
+					.scopeWorkspace().mergeSegments( OperationSubmitter.blocking() )
 			);
 		}
 		flushAndRefresh();
@@ -205,8 +205,8 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 		// We deliberately are targeting a single context as the underlying operation at this point is not tenant dependent
 		// and calling it for multiple tenants would just request doing the same work.
 		SessionContext context = sessionContexts.iterator().next();
-		Futures.unwrappedExceptionGet( context.scopeWorkspace().flush( OperationSubmitter.BLOCKING ) );
-		Futures.unwrappedExceptionGet( context.scopeWorkspace().refresh( OperationSubmitter.BLOCKING ) );
+		Futures.unwrappedExceptionGet( context.scopeWorkspace().flush( OperationSubmitter.blocking() ) );
+		Futures.unwrappedExceptionGet( context.scopeWorkspace().refresh( OperationSubmitter.blocking() ) );
 	}
 
 	@Override

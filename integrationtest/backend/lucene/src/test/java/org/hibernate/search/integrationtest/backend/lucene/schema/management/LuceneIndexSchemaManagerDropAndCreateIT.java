@@ -46,7 +46,7 @@ public class LuceneIndexSchemaManagerDropAndCreateIT {
 		IndexIndexingPlan plan = index.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), document -> {
 		} );
-		plan.execute( OperationSubmitter.BLOCKING ).join();
+		plan.execute( OperationSubmitter.blocking() ).join();
 
 		assertThat( countDocsOnDisk() ).isEqualTo( 1 );
 
@@ -70,7 +70,7 @@ public class LuceneIndexSchemaManagerDropAndCreateIT {
 	private void dropAndCreate() {
 		Futures.unwrappedExceptionJoin(
 				LuceneIndexSchemaManagerOperation.DROP_AND_CREATE.apply( index.schemaManager(),
-						OperationSubmitter.BLOCKING
+						OperationSubmitter.blocking()
 				)
 		);
 	}

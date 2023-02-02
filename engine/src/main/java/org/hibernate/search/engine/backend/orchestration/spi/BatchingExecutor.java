@@ -107,7 +107,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	 */
 	@Deprecated
 	public void submit(BatchedWork<? super P> work) throws InterruptedException {
-		submit( work, OperationSubmitter.BLOCKING, w -> () -> {
+		submit( work, OperationSubmitter.blocking(), w -> () -> {
 			throw new IllegalStateException( "Blocking executor does not offload work." );
 		} );
 	}

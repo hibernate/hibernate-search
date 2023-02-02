@@ -28,16 +28,16 @@ public class SchemaManagementListener {
 		ContextualFailureCollector failureCollector = context.failureCollector();
 		switch ( strategyName ) {
 			case CREATE:
-				return manager.createIfMissing( failureCollector, OperationSubmitter.BLOCKING );
+				return manager.createIfMissing( failureCollector, OperationSubmitter.blocking() );
 			case DROP_AND_CREATE:
 			case DROP_AND_CREATE_AND_DROP:
-				return manager.dropAndCreate( failureCollector, OperationSubmitter.BLOCKING );
+				return manager.dropAndCreate( failureCollector, OperationSubmitter.blocking() );
 			case CREATE_OR_UPDATE:
-				return manager.createOrUpdate( failureCollector, OperationSubmitter.BLOCKING );
+				return manager.createOrUpdate( failureCollector, OperationSubmitter.blocking() );
 			case CREATE_OR_VALIDATE:
-				return manager.createOrValidate( failureCollector, OperationSubmitter.BLOCKING );
+				return manager.createOrValidate( failureCollector, OperationSubmitter.blocking() );
 			case VALIDATE:
-				return manager.validate( failureCollector, OperationSubmitter.BLOCKING );
+				return manager.validate( failureCollector, OperationSubmitter.blocking() );
 			case NONE:
 				// Nothing to do
 				return CompletableFuture.completedFuture( null );
@@ -50,7 +50,7 @@ public class SchemaManagementListener {
 		ContextualFailureCollector failureCollector = context.failureCollector();
 		switch ( strategyName ) {
 			case DROP_AND_CREATE_AND_DROP:
-				return manager.dropIfExisting( failureCollector, OperationSubmitter.BLOCKING );
+				return manager.dropIfExisting( failureCollector, OperationSubmitter.blocking() );
 			case CREATE:
 			case DROP_AND_CREATE:
 			case CREATE_OR_UPDATE:

@@ -71,7 +71,7 @@ public abstract class AbstractMassIndexingBenchmarks extends AbstractBackendBenc
 			futures[i] = indexer.add(
 					StubMapperUtils.referenceProvider( String.valueOf( documentId ) ),
 					document -> dataset.populate( index, document, documentId, 0L ),
-					commitStrategy, DocumentRefreshStrategy.NONE, OperationSubmitter.BLOCKING
+					commitStrategy, DocumentRefreshStrategy.NONE, OperationSubmitter.blocking()
 			);
 		}
 

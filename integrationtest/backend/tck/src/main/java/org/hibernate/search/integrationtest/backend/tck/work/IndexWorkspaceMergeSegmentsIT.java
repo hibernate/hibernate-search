@@ -22,7 +22,7 @@ public class IndexWorkspaceMergeSegmentsIT extends AbstractIndexWorkspaceSimpleO
 
 	@Override
 	protected CompletableFuture<?> executeAsync(IndexWorkspace workspace) {
-		return workspace.mergeSegments( OperationSubmitter.REJECTED_EXECUTION_EXCEPTION );
+		return workspace.mergeSegments( OperationSubmitter.rejecting() );
 	}
 
 	@Override
