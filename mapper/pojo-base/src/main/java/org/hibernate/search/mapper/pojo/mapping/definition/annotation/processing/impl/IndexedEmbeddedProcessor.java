@@ -23,20 +23,11 @@ public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProces
 	@SuppressWarnings("deprecation") // For IndexedEmbedded.prefix
 	public void process(PropertyMappingStep mappingContext, IndexedEmbedded annotation,
 			PropertyMappingAnnotationProcessorContext context) {
-		String cleanedUpPrefix = annotation.prefix();
-		if ( cleanedUpPrefix.isEmpty() ) {
-			cleanedUpPrefix = null;
-		}
+		String cleanedUpPrefix = context.toNullIfDefault( annotation.prefix(), "" );
 
-		String cleanedUpName = annotation.name();
-		if ( cleanedUpName.isEmpty() ) {
-			cleanedUpName = null;
-		}
+		String cleanedUpName = context.toNullIfDefault( annotation.name(), "" );
 
-		Integer cleanedUpIncludeDepth = annotation.includeDepth();
-		if ( cleanedUpIncludeDepth.equals( -1 ) ) {
-			cleanedUpIncludeDepth = null;
-		}
+		Integer cleanedUpIncludeDepth = context.toNullIfDefault( annotation.includeDepth(), -1 );
 
 		String[] includePathsArray = annotation.includePaths();
 		Set<String> cleanedUpIncludePaths;
@@ -50,10 +41,7 @@ public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProces
 
 		ContainerExtractorPath extractorPath = context.toContainerExtractorPath( annotation.extraction() );
 
-		Class<?> cleanedUpTargetType = annotation.targetType();
-		if ( cleanedUpTargetType.equals( void.class ) ) {
-			cleanedUpTargetType = null;
-		}
+		Class<?> cleanedUpTargetType = context.toNullIfDefault( annotation.targetType(), void.class );
 
 		ObjectStructure structure = annotation.structure();
 

@@ -35,10 +35,7 @@ abstract class AbstractFieldAnnotationProcessor<A extends Annotation> implements
 	@Override
 	public final void process(PropertyMappingStep mappingContext, A annotation,
 			PropertyMappingAnnotationProcessorContext context) {
-		String cleanedUpRelativeFieldName = getName( annotation );
-		if ( cleanedUpRelativeFieldName.isEmpty() ) {
-			cleanedUpRelativeFieldName = null;
-		}
+		String cleanedUpRelativeFieldName = context.toNullIfDefault( getName( annotation ), "" );
 
 		PropertyMappingFieldOptionsStep<?> fieldContext =
 				initFieldMappingContext( mappingContext, annotation, cleanedUpRelativeFieldName );
@@ -50,13 +47,8 @@ abstract class AbstractFieldAnnotationProcessor<A extends Annotation> implements
 				context
 		);
 
-		if ( valueBinder.params() != null ) {
-			Map<String, Object> params = context.toMap( valueBinder.params() );
-			fieldContext.valueBinder( binder, params );
-		}
-		else {
-			fieldContext.valueBinder( binder );
-		}
+		Map<String, Object> params = context.toMap( valueBinder.params() );
+		fieldContext.valueBinder( binder, params );
 
 		ContainerExtractorPath extractorPath =
 				context.toContainerExtractorPath( getExtraction( annotation ) );
