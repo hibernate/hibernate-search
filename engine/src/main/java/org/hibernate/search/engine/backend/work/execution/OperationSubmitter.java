@@ -18,25 +18,21 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * Interface defining how operation should be submitted to the queue.
  */
 @Incubating
-public final class OperationSubmitter {
+public abstract class OperationSubmitter {
 
 	/**
 	 * When using this submitter, dding a new element will block the thread when the underlying
 	 * queue is a {@link java.util.concurrent.BlockingQueue} and it is at its maximum capacity, until some elements
 	 * are removed from the queue
 	 */
-	public static final OperationSubmitter BLOCKING = new OperationSubmitter( new BlockingOperation() );
+	public static final OperationSubmitter BLOCKING = new BlockingOperationSubmitter();
 	/**
 	 * When using this submitter adding a new element will cause a {@link RejectedExecutionException} when the underlying
 	 * queue is a {@link java.util.concurrent.BlockingQueue} and it is at its maximum capacity.
 	 */
-	public static final OperationSubmitter REJECTED_EXECUTION_EXCEPTION = new OperationSubmitter(
-			new RejectedExecutionExceptionOperation() );
+	public static final OperationSubmitter REJECTED_EXECUTION_EXCEPTION = new RejectedExecutionExceptionOperationSubmitter();
 
-	private final Operation operation;
-
-	private OperationSubmitter(Operation operation) {
-		this.operation = operation;
+	private OperationSubmitter() {
 	}
 
 	/**
@@ -50,10 +46,8 @@ public final class OperationSubmitter {
 	 * Depending on the implementation might throw {@link RejectedExecutionException} or offload the submit operation to a provided executor.
 	 *
 	 */
-	public <T> void submitToQueue(BlockingQueue<T> queue, T element, Function<T, Runnable> blockingRetryProducer)
-			throws InterruptedException {
-		operation.accept( queue, element, blockingRetryProducer );
-	}
+	public abstract <T> void submitToQueue(BlockingQueue<T> queue, T element,
+			Function<T, Runnable> blockingRetryProducer) throws InterruptedException;
 
 	/**
 	 * @see #BLOCKING
@@ -77,42 +71,35 @@ public final class OperationSubmitter {
 	 * @param executor executor to offload submit operation to if the queue is full
 	 */
 	public static OperationSubmitter offloading(Consumer<Runnable> executor) {
-		return new OperationSubmitter( new OffloadingExecutorOperation( executor ) );
+		return new OffloadingExecutorOperationSubmitter( executor );
 	}
 
-	@FunctionalInterface
-	private interface Operation {
-		<T> void accept(BlockingQueue<T> queue, T element, Function<T, Runnable> blockingRetryProducer)
-				throws InterruptedException;
-	}
-
-	private static final class BlockingOperation implements Operation {
+	private static final class BlockingOperationSubmitter extends OperationSubmitter {
 		@Override
-		public <T> void accept(BlockingQueue<T> queue, T element, Function<T, Runnable> blockingRetryProducer)
+		public <T> void submitToQueue(BlockingQueue<T> queue, T element, Function<T, Runnable> blockingRetryProducer)
 				throws InterruptedException {
 			queue.put( element );
 		}
 	}
 
-	private static final class RejectedExecutionExceptionOperation implements Operation {
+	private static final class RejectedExecutionExceptionOperationSubmitter extends OperationSubmitter {
 		@Override
-		public <T> void accept(BlockingQueue<T> queue, T element, Function<T, Runnable> blockingRetryProducer) {
+		public <T> void submitToQueue(BlockingQueue<T> queue, T element, Function<T, Runnable> blockingRetryProducer) {
 			if ( !queue.offer( element ) ) {
 				throw new RejectedExecutionException();
 			}
 		}
 	}
 
-	private static final class OffloadingExecutorOperation implements Operation {
+	private static final class OffloadingExecutorOperationSubmitter extends OperationSubmitter {
 		private final Consumer<Runnable> executor;
 
-		private OffloadingExecutorOperation(Consumer<Runnable> executor) {
+		private OffloadingExecutorOperationSubmitter(Consumer<Runnable> executor) {
 			this.executor = executor;
 		}
 
 		@Override
-		public <T> void accept(BlockingQueue<T> queue, T element, Function<T, Runnable> blockingRetryProducer)
-				throws InterruptedException {
+		public <T> void submitToQueue(BlockingQueue<T> queue, T element, Function<T, Runnable> blockingRetryProducer) {
 			if ( !queue.offer( element ) ) {
 				executor.accept( blockingRetryProducer.apply( element ) );
 			}
