@@ -121,8 +121,8 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	 * @param blockingRetryProducer
 	 * @throws InterruptedException If the current thread is interrupted while enqueuing the work.
 	 */
-	public void submit(BatchedWork<? super P> work, OperationSubmitter operationSubmitter,
-			Function<BatchedWork<? super P>, Runnable> blockingRetryProducer) throws InterruptedException {
+	public <W extends BatchedWork<? super P>> void submit(W work, OperationSubmitter operationSubmitter,
+			Function<? super W, Runnable> blockingRetryProducer) throws InterruptedException {
 		if ( processingTask == null ) {
 			throw new AssertionFailure(
 					"Attempt to submit a work to executor '" + name + "', which is stopped."

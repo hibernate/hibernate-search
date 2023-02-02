@@ -110,11 +110,7 @@ public class ElasticsearchBatchingWorkOrchestrator
 	@Override
 	protected void doSubmit(ElasticsearchBatchedWork<?> work, OperationSubmitter operationSubmitter,
 			Function<ElasticsearchBatchedWork<?>, Runnable> blockingRetryProducer) throws InterruptedException {
-		executors.get( work.getQueuingKey() ).submit(
-				work,
-				operationSubmitter,
-				w -> blockingRetryProducer.apply( (ElasticsearchBatchedWork<?>) w )
-		);
+		executors.get( work.getQueuingKey() ).submit( work, operationSubmitter, blockingRetryProducer );
 	}
 
 	@Override

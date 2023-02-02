@@ -94,11 +94,7 @@ public class LuceneSerialWorkOrchestratorImpl
 	@Override
 	protected void doSubmit(LuceneBatchedWork<?> work, OperationSubmitter operationSubmitter,
 			Function<LuceneBatchedWork<?>, Runnable> blockingRetryProducer) throws InterruptedException {
-		executors.get( work.getQueuingKey() ).submit(
-				work,
-				operationSubmitter,
-				w -> blockingRetryProducer.apply( (LuceneBatchedWork<?>) w )
-		);
+		executors.get( work.getQueuingKey() ).submit( work, operationSubmitter, blockingRetryProducer );
 	}
 
 	@Override
