@@ -122,7 +122,7 @@ public class BatchingExecutorTest {
 		// allowing the executor to handle the next batch immediately.
 		CompletableFuture<Object> batch1Future = CompletableFuture.completedFuture( null );
 		when( processorMock.endBatch() ).thenReturn( (CompletableFuture) batch1Future );
-		executor.submit( work1Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } );
+		executor.submit( work1Mock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			inOrder.verify( processorMock ).beginBatch();
 			inOrder.verify( work1Mock ).submitTo( processorMock );
@@ -144,7 +144,7 @@ public class BatchingExecutorTest {
 		// forcing the executor to wait before it handles the next batch.
 		CompletableFuture<Object> batch1Future = new CompletableFuture<>();
 		when( processorMock.endBatch() ).thenReturn( (CompletableFuture) batch1Future );
-		executor.submit( work1Mock, operationSubmitter, w -> () -> { } );
+		executor.submit( work1Mock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			inOrder.verify( processorMock ).beginBatch();
 			inOrder.verify( work1Mock ).submitTo( processorMock );
@@ -157,8 +157,8 @@ public class BatchingExecutorTest {
 		// Submit other works before the first batch ends
 		StubWork work2Mock = workMock( 2 );
 		StubWork work3Mock = workMock( 3 );
-		executor.submit( work2Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } );
-		executor.submit( work3Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } );
+		executor.submit( work2Mock, operationSubmitter );
+		executor.submit( work3Mock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			// No calls expected yet
 		} );
@@ -202,7 +202,7 @@ public class BatchingExecutorTest {
 		// forcing the executor to wait before it handles the next batch.
 		CompletableFuture<Object> batch1Future = new CompletableFuture<>();
 		when( processorMock.endBatch() ).thenReturn( (CompletableFuture) batch1Future );
-		executor.submit( work1Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } );
+		executor.submit( work1Mock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			inOrder.verify( processorMock ).beginBatch();
 			inOrder.verify( work1Mock ).submitTo( processorMock );
@@ -233,7 +233,7 @@ public class BatchingExecutorTest {
 		Runnable unblockExecutorSwitch = blockExecutor();
 
 		StubWork work1Mock = workMock( 1 );
-		executor.submit( work1Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } );
+		executor.submit( work1Mock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			// No calls expected yet
 		} );
@@ -273,9 +273,9 @@ public class BatchingExecutorTest {
 		StubWork work1Mock = workMock( 1 );
 		StubWork work2Mock = workMock( 2 );
 		StubWork work3Mock = workMock( 3 );
-		executor.submit( work1Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } );
-		executor.submit( work2Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } );
-		executor.submit( work3Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } );
+		executor.submit( work1Mock, operationSubmitter );
+		executor.submit( work2Mock, operationSubmitter );
+		executor.submit( work3Mock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			// No calls expected yet
 		} );
@@ -313,8 +313,8 @@ public class BatchingExecutorTest {
 
 		StubWork work1Mock = workMock( 1 );
 		StubWork work2Mock = workMock( 2 );
-		executor.submit( work1Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } );
-		executor.submit( work2Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } );
+		executor.submit( work1Mock, operationSubmitter );
+		executor.submit( work2Mock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			// No calls expected yet
 		} );
@@ -359,10 +359,10 @@ public class BatchingExecutorTest {
 		StubWork work1Mock = workMock( 1 );
 		StubWork work2Mock = workMock( 2 );
 		StubWork work3Mock = workMock( 3 );
-		executor.submit( work1Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } );
-		executor.submit( work2Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } );
+		executor.submit( work1Mock, operationSubmitter );
+		executor.submit( work2Mock, operationSubmitter );
 
-		assertThatThrownBy( () -> executor.submit( work3Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } ) )
+		assertThatThrownBy( () -> executor.submit( work3Mock, operationSubmitter ) )
 				.isInstanceOf( RejectedExecutionException.class );
 
 		when( processorMock.endBatch() ).thenReturn( CompletableFuture.completedFuture( null ) );
@@ -396,14 +396,14 @@ public class BatchingExecutorTest {
 		StubWork work2Mock = workMock( 2 );
 		StubWork work3Mock = workMock( 3 );
 
-		executor.submit( work1Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } );
-		executor.submit( work2Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } );
+		executor.submit( work1Mock, operationSubmitter );
+		executor.submit( work2Mock, operationSubmitter );
 
 		AtomicReference<Thread> work3SubmitThread = new AtomicReference<>();
 		CompletableFuture<Boolean> future = CompletableFuture.supplyAsync( () -> {
 			try {
 				work3SubmitThread.set( Thread.currentThread() );
-				executor.submit( work3Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } );
+				executor.submit( work3Mock, operationSubmitter );
 			}
 			catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
@@ -449,7 +449,8 @@ public class BatchingExecutorTest {
 
 	@Test
 	public void simple_newTasksBlockedAndOffloadedCompletes() throws InterruptedException {
-		createAndStartExecutor( 2, true );
+		AtomicReference<Runnable> offloadAction = new AtomicReference<>( () -> { } );
+		createAndStartExecutor( 2, true, w -> offloadAction.get().run() );
 
 		assumeFalse(
 				"This test only makes sense for offloading submitter",
@@ -463,21 +464,22 @@ public class BatchingExecutorTest {
 		StubWork work2Mock = workMock( 2 );
 		StubWork work3Mock = workMock( 3 );
 
-		executor.submit( work1Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } );
-		executor.submit( work2Mock, operationSubmitter, w -> () -> { fail( "shouldn't be offloaded!" ); } );
+		executor.submit( work1Mock, operationSubmitter );
+		executor.submit( work2Mock, operationSubmitter );
 
 		AtomicReference<Thread> work3SubmitThread = new AtomicReference<>();
 		AtomicBoolean work3Submitted = new AtomicBoolean( false );
-		executor.submit( work3Mock, operationSubmitter, w -> () -> {
+		offloadAction.set( () -> {
 			work3SubmitThread.set( Thread.currentThread() );
 			try {
-				executor.submit( work3Mock, OperationSubmitter.blocking(), w2 -> () -> { } );
+				executor.submit( work3Mock, OperationSubmitter.blocking() );
 				work3Submitted.set( true );
 			}
 			catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
 		} );
+		executor.submit( work3Mock, operationSubmitter );
 
 		// wait until the thread submitting work3 is submitting and blocked
 		Awaitility.await().untilAsserted( () -> assertThat( work3SubmitThread )
@@ -531,7 +533,7 @@ public class BatchingExecutorTest {
 		StubWork blockingWorkMock = workMock( 0 );
 		CompletableFuture<Object> blockingBatchFuture = new CompletableFuture<>();
 		when( processorMock.endBatch() ).thenReturn( (CompletableFuture) blockingBatchFuture );
-		executor.submit( blockingWorkMock, operationSubmitter, w -> () -> { } );
+		executor.submit( blockingWorkMock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			inOrder.verify( processorMock ).beginBatch();
 			inOrder.verify( blockingWorkMock ).submitTo( processorMock );
@@ -543,8 +545,11 @@ public class BatchingExecutorTest {
 	}
 
 	private void createAndStartExecutor(int maxTasksPerBatch, boolean fair) {
+		createAndStartExecutor( maxTasksPerBatch, fair, w -> fail( "Work shouldn't be offloaded." ) );
+	}
+	private void createAndStartExecutor(int maxTasksPerBatch, boolean fair, Consumer<? super BatchedWork<? super StubWorkProcessor>> blockingRetryProducer) {
 		this.executor = new BatchingExecutor<>(
-				NAME, processorMock, maxTasksPerBatch, fair, failureHandlerMock
+				NAME, processorMock, maxTasksPerBatch, fair, failureHandlerMock, blockingRetryProducer
 		);
 
 		// Having multiple threads should not matter:
@@ -591,7 +596,7 @@ public class BatchingExecutorTest {
 		StubWork workMock = workMock( 42 );
 		CompletableFuture<Object> batchFuture = CompletableFuture.completedFuture( null );
 		when( processorMock.endBatch() ).thenReturn( (CompletableFuture) batchFuture );
-		executor.submit( workMock, operationSubmitter, w -> () -> { } );
+		executor.submit( workMock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			inOrder.verify( processorMock ).beginBatch();
 			inOrder.verify( workMock ).submitTo( processorMock );
