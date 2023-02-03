@@ -64,7 +64,9 @@ public final class StandalonePojoMapperSettings {
 
 
 	/**
-	 * The synchronization strategy to use when indexing automatically.
+	 * The synchronization strategy to use when indexing through the
+	 * {@link org.hibernate.search.mapper.pojo.standalone.session.SearchSession SearchSession}'s
+	 * {@link org.hibernate.search.mapper.pojo.standalone.session.SearchSession#indexingPlan indexing plan}.
 	 * <p>
 	 * Expects one of the strings defined in {@link IndexingPlanSynchronizationStrategy},
 	 * or a reference to a bean of type {@link IndexingPlanSynchronizationStrategy}.

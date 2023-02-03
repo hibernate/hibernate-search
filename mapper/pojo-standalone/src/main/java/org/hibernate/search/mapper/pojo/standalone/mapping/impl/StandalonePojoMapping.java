@@ -17,9 +17,11 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
@@ -29,7 +31,9 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentCreateContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
+import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
 import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
@@ -51,22 +55,23 @@ import org.hibernate.search.util.common.impl.Closer;
 public class StandalonePojoMapping extends AbstractPojoMappingImplementor<StandalonePojoMapping>
 		implements CloseableSearchMapping, StandalonePojoSearchSessionMappingContext, EntityReferenceFactory<EntityReference> {
 
-	private final ConfigurationPropertySource configurationPropertySource;
-	private final BeanResolver beanResolver;
+	private static final OptionalConfigurationProperty<BeanReference<? extends IndexingPlanSynchronizationStrategy>> INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
+			ConfigurationProperty.forKey( StandalonePojoMapperSettings.Radicals.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY )
+					.asBeanReference( IndexingPlanSynchronizationStrategy.class )
+					.build();
+
 	private final StandalonePojoTypeContextContainer typeContextContainer;
 
 	private SearchIntegration.Handle integrationHandle;
 
 	private boolean active;
+	private IndexingPlanSynchronizationStrategy configuredIndexingPlanSynchronizationStrategy;
 
 	private final SchemaManagementListener schemaManagementListener;
 
-	StandalonePojoMapping(ConfigurationPropertySource configurationPropertySource, BeanResolver beanResolver,
-			PojoMappingDelegate mappingDelegate, StandalonePojoTypeContextContainer typeContextContainer,
+	StandalonePojoMapping(PojoMappingDelegate mappingDelegate, StandalonePojoTypeContextContainer typeContextContainer,
 			SchemaManagementListener schemaManagementListener) {
 		super( mappingDelegate );
-		this.configurationPropertySource = configurationPropertySource;
-		this.beanResolver = beanResolver;
 		this.typeContextContainer = typeContextContainer;
 		this.schemaManagementListener = schemaManagementListener;
 		this.active = true;
@@ -75,6 +80,15 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 	@Override
 	public CompletableFuture<?> start(MappingStartContext context) {
 		integrationHandle = context.integrationHandle();
+		// check if indexing plan sync strategy was configured and cache it for further usage when creating sessions:
+		try ( BeanHolder<? extends IndexingPlanSynchronizationStrategy> beanHolder = INDEXING_PLAN_SYNCHRONIZATION_STRATEGY.getAndTransform(
+				context.configurationPropertySource(),
+				referenceOptional -> context.beanResolver().resolve( referenceOptional.orElse(
+						StandalonePojoMapperSettings.Defaults.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY ) )
+		) ) {
+			this.configuredIndexingPlanSynchronizationStrategy = beanHolder.get();
+		}
+
 		Optional<SearchScopeImpl<Object>> scopeOptional = createAllScope();
 		if ( !scopeOptional.isPresent() ) {
 			// No indexed type
@@ -232,7 +246,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 
 	private StandalonePojoSearchSession.Builder createSessionBuilder() {
 		return new StandalonePojoSearchSession.Builder(
-				this, configurationPropertySource, beanResolver, typeContextContainer
+				this, configuredIndexingPlanSynchronizationStrategy, typeContextContainer
 		);
 	}
 }

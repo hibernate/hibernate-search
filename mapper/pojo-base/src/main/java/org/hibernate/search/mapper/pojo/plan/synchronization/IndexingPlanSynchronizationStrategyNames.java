@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.plan.synchronization;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * The names of built-in automatic indexing synchronization strategies.
+ * The names of built-in indexing plan synchronization strategies.
  */
 @Incubating
 public final class IndexingPlanSynchronizationStrategyNames {

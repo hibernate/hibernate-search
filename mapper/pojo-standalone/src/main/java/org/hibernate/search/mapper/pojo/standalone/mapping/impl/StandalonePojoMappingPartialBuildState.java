@@ -6,11 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
-import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.SchemaManagementListener;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
+import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.SchemaManagementListener;
 
 public class StandalonePojoMappingPartialBuildState implements MappingPartialBuildState {
 
@@ -31,9 +29,8 @@ public class StandalonePojoMappingPartialBuildState implements MappingPartialBui
 		mappingDelegate.close();
 	}
 
-	public StandalonePojoMapping finalizeMapping(ConfigurationPropertySource configurationPropertySource,
-			BeanResolver beanResolver) {
-		return new StandalonePojoMapping( configurationPropertySource, beanResolver, mappingDelegate, typeContextContainer, schemaManagementListener );
+	public StandalonePojoMapping finalizeMapping() {
+		return new StandalonePojoMapping( mappingDelegate, typeContextContainer, schemaManagementListener );
 	}
 
 }

@@ -90,8 +90,4 @@ public interface Log extends BasicLogger {
 			+ " Valid classes for mapped entity types are: %2$s")
 	SearchException unknownClassForMappedEntityType(@FormatWith(ClassFormatter.class) Class<?> invalidClass,
 			@FormatWith(CommaSeparatedClassesFormatter.class) Collection<Class<?>> validClasses);
-
-	@Message(id = ID_OFFSET + 19, value = "Index plan synchronization strategy and at least one of commit/refresh strategies are set at the same time."
-			+ " Use either the index plan synchronization strategy or a combination of commit/refresh strategies.")
-	SearchException conflictingIndexPlanSynchronizationConfiguration();
 }
