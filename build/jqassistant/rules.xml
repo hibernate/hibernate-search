@@ -394,6 +394,8 @@
                 (method.visibility="public" OR method.visibility="protected")
                 // Exclude extensions from SPI leak rules: they are *meant* to allow SPI leaks
                 AND NOT type.name =~ ".*Extension"
+                // Exclude OperationSubmitter from SPI leak rules: it is *expected* for submitter to access SPI executor leading to SPI leaks
+                AND NOT type.name =~ "OperationSubmitter"
             RETURN
                 method AS ExposingSite, parameterType AS ExposedType
 

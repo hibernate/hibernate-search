@@ -18,6 +18,10 @@ import org.hibernate.search.util.common.annotation.Incubating;
 /**
  * Interface defining how operation should be submitted to the queue or executor.
  * <p>
+ * <strong>WARNING:</strong> while this type is API, because instances should be manipulated by users,
+ * all of its methods are considered SPIs and therefore should never be called directly by users.
+ * In short, users are only expected to get instances of this type from an API and pass it to another API.
+ * <p>
  * Currently supported implementations:
  * <ul>
  *     <li>{@link #blocking()}</li>
