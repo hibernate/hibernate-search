@@ -80,10 +80,6 @@ public class BackendThreads {
 		return writeExecutor;
 	}
 
-	public boolean isWriteExecutorBlocking() {
-		return threadPoolProvider.isScheduledExecutorBlocking();
-	}
-
 	private void checkStarted() {
 		if ( writeExecutor == null ) {
 			throw new AssertionFailure(

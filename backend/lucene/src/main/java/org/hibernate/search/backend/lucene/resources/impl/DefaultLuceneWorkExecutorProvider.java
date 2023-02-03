@@ -33,7 +33,8 @@ public class DefaultLuceneWorkExecutorProvider implements LuceneWorkExecutorProv
 				context.threadPoolProvider().newScheduledExecutor(
 						threadPoolSize,
 						context.recommendedThreadNamePrefix()
-				)
+				),
+				context.threadPoolProvider().isScheduledExecutorBlocking()
 		);
 	}
 }

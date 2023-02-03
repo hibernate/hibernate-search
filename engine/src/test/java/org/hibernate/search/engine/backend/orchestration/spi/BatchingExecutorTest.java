@@ -556,7 +556,7 @@ public class BatchingExecutorTest {
 		// the batching executor takes care of executing in only one thread at a time.
 		this.executorService = threadPoolProvider.newScheduledExecutor( 4, "BatchingExecutorTest" );
 
-		executor.start( new DelegatingSimpleScheduledExecutor( executorService ) );
+		executor.start( new DelegatingSimpleScheduledExecutor( executorService, true ) );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			// No calls expected yet
 		} );

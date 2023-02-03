@@ -44,7 +44,7 @@ public class LuceneBackendWorkExecutorProviderIT {
 	@Test
 	public void test() {
 		when( backendWorkExecutorProvider.writeExecutor( any() ) ).thenReturn(
-				new DelegatingSimpleScheduledExecutor( new ScheduledThreadPoolExecutor( 1 ) )
+				new DelegatingSimpleScheduledExecutor( new ScheduledThreadPoolExecutor( 1 ), true )
 		);
 		setupHelper.start()
 				.withIndex( index )

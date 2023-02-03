@@ -65,7 +65,7 @@ public class LuceneParallelWorkOrchestratorImpl
 
 	@Override
 	protected void doSubmit(WorkExecution<?> workExecution, OperationSubmitter operationSubmitter) {
-		if ( !OperationSubmitter.blocking().equals( operationSubmitter ) && threads.isWriteExecutorBlocking() ) {
+		if ( !OperationSubmitter.blocking().equals( operationSubmitter ) && executor.isBlocking() ) {
 			throw log.nonblockingOperationSubmitterNotSupported();
 		}
 		executor.submit( workExecution );
