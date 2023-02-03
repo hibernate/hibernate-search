@@ -9,12 +9,21 @@ package org.hibernate.search.engine.backend.work.execution;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
+import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 
 /**
- * Interface defining how operation should be submitted to the queue.
+ * Interface defining how operation should be submitted to the queue or executor.
+ * <p>
+ * Currently supported implementations:
+ * <ul>
+ *     <li>{@link #blocking()}</li>
+ *     <li>{@link #rejecting()}</li>
+ *     <li>{@link #offloading(Consumer)}</li>
+ * </ul>
  */
 @Incubating
 public abstract class OperationSubmitter {
@@ -26,18 +35,18 @@ public abstract class OperationSubmitter {
 	}
 
 	/**
-	 * Defines how an element will be submitted to the queue. Currently supported implementations:
-	 * <ul>
-	 *     <li>{@link #blocking()}</li>
-	 *     <li>{@link #rejecting()}</li>
-	 *     <li>{@link #offloading(Consumer)}</li>
-	 * </ul>
-	 * <p>
+	 * Defines how an element will be submitted to the queue.
 	 * Depending on the implementation might throw {@link RejectedExecutionException} or offload the submit operation to a provided executor.
-	 *
 	 */
 	public abstract <T> void submitToQueue(BlockingQueue<? super T> queue, T element,
 			Consumer<? super T> blockingRetryProducer) throws InterruptedException;
+
+	/**
+	 * Defines how an element will be submitted to the executor.
+	 * Depending on the implementation might throw {@link RejectedExecutionException} or offload the submit operation to an offload executor.
+	 */
+	public abstract <T extends Runnable> void submitToExecutor(SimpleScheduledExecutor executor, T element,
+			Function<? super T, Runnable> blockingRetryProducer) throws InterruptedException;
 
 	/**
 	 * When using this submitter, dding a new element will block the thread when the underlying
@@ -74,6 +83,12 @@ public abstract class OperationSubmitter {
 				throws InterruptedException {
 			queue.put( element );
 		}
+
+		@Override
+		public <T extends Runnable> void submitToExecutor(SimpleScheduledExecutor executor, T element,
+				Function<? super T, Runnable> blockingRetryProducer) {
+			executor.submit( element );
+		}
 	}
 
 	private static final class RejectedExecutionExceptionOperationSubmitter extends OperationSubmitter {
@@ -83,6 +98,12 @@ public abstract class OperationSubmitter {
 			if ( !queue.offer( element ) ) {
 				throw new RejectedExecutionException();
 			}
+		}
+
+		@Override
+		public <T extends Runnable> void submitToExecutor(SimpleScheduledExecutor executor, T element,
+				Function<? super T, Runnable> blockingRetryProducer) {
+			executor.offer( element );
 		}
 	}
 
@@ -98,6 +119,12 @@ public abstract class OperationSubmitter {
 			if ( !queue.offer( element ) ) {
 				executor.accept( () -> blockingRetryProducer.accept( element ) );
 			}
+		}
+
+		@Override
+		public <T extends Runnable> void submitToExecutor(SimpleScheduledExecutor executor, T element,
+				Function<? super T, Runnable> blockingRetryProducer) {
+			this.executor.accept( blockingRetryProducer.apply( element ) );
 		}
 	}
 
