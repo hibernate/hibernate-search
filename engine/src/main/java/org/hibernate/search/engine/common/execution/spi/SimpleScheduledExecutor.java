@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.common.execution.spi;
 
+import java.util.Locale;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledFuture;
@@ -37,6 +38,29 @@ public interface SimpleScheduledExecutor {
 	 * @throws RejectedExecutionException if the task cannot be  scheduled for execution
 	 */
 	ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit);
+
+	/**
+	 * Makes an attempt to submit a {@link Runnable task} for execution. If the attempt is successful - returns
+	 * a {@link Future} representing that task. Otherwise, in case submitting a task would result in blocking -
+	 * task is not submitted and an {@link RejectedExecutionException exception} is thrown.
+	 *
+	 * @param task the task to submit
+	 * @return a {@link Future} representing pending completion of the task
+	 *
+	 * @throws RejectedExecutionException if the task cannot be scheduled for execution, or doing so would result in blocking the tread.
+	 */
+	default Future<?> offer(Runnable task) {
+		if ( isBlocking() ) {
+			throw new RejectedExecutionException(
+					String.format( Locale.ROOT,
+							"Unable to accept '%1$s' task for execution. '%2$s' is a blocking executor and it does not implement `SimpleScheduledExecutor#offer(Runnable)`.",
+							task, this
+					) );
+		}
+		else {
+			return submit( task );
+		}
+	}
 
 	/**
 	 * Attempts to stop all actively executing tasks, halts the processing of waiting tasks.
