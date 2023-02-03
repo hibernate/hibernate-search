@@ -378,6 +378,10 @@ use the (more flexible) syntax `f.composite().from(<some projection>, <some proj
 * `SearchProjectionFactory#composite((TriFunction, SearchProjection, SearchProjection, SearchProjection)`/`SearchProjectionFactory#composite((TriFunction, ProjectionFinalStep, ProjectionFinalStep, ProjectionFinalStep)`
 which enable the syntax `f.composite((p1, p2, p3) -> ..., <some projection>, <some projection>, <some projection>)`:
 use the (more flexible) syntax `f.composite().from(<some projection>, <some projection>, <some projection>).as((p1, p2, p3) -> ...)` instead.
+* `SearchSession#automaticIndexingSynchronizationStrategy(..)` and related `AutomaticIndexingSynchronizationStrategy`/`AutomaticIndexingSynchronizationConfigurationContext`/`AutomaticIndexingSynchronizationStrategyNames`:
+use `SearchSession#indexingPlanSynchronizationStrategy(..)` and `IndexingPlanSynchronizationStrategy`/`IndexingPlanSynchronizationStrategyConfigurationContext`/`IndexingPlanSynchronizationStrategyNames` instead.
+Note new API is still incubating and might change.
+Also, configuration property `hibernate.search.automatic_indexing.synchronization.strategy` is now deprecated in favor of `hibernate.search.indexing.plan.synchronization.strategy`
 
 [[spi]]
 == SPI changes
