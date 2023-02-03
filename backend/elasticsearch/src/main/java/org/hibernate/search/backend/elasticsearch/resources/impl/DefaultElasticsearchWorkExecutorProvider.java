@@ -31,7 +31,8 @@ public class DefaultElasticsearchWorkExecutorProvider implements ElasticsearchWo
 				context.threadPoolProvider().newScheduledExecutor(
 						threadPoolSize,
 						context.recommendedThreadNamePrefix()
-				)
+				),
+				context.threadPoolProvider().isScheduledExecutorBlocking()
 		);
 	}
 }

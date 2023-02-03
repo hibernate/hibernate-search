@@ -520,8 +520,12 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		 */
 		client = new ElasticsearchClientFactoryImpl().create( beanResolver, backendProperties,
 				threadPoolProvider.threadProvider(), "Client",
-				new DelegatingSimpleScheduledExecutor( timeoutExecutorService ),
-				GsonProvider.create( GsonBuilder::new, true ) );
+				new DelegatingSimpleScheduledExecutor(
+						timeoutExecutorService,
+						threadPoolProvider.isScheduledExecutorBlocking()
+				),
+				GsonProvider.create( GsonBuilder::new, true )
+		);
 	}
 
 	@Override

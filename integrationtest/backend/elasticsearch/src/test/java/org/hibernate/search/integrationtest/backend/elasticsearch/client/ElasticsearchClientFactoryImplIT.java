@@ -1048,7 +1048,7 @@ public class ElasticsearchClientFactoryImplIT {
 		);
 		return new ElasticsearchClientFactoryImpl().create( beanResolver, clientPropertySource,
 				threadPoolProvider.threadProvider(), "Client",
-				new DelegatingSimpleScheduledExecutor( timeoutExecutorService ),
+				new DelegatingSimpleScheduledExecutor( timeoutExecutorService, true ),
 				GsonProvider.create( GsonBuilder::new, true )
 		);
 	}

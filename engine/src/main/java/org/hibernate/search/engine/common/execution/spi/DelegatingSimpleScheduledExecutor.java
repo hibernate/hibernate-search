@@ -17,9 +17,11 @@ import org.hibernate.search.util.common.annotation.Incubating;
 public class DelegatingSimpleScheduledExecutor implements SimpleScheduledExecutor {
 
 	private final ScheduledExecutorService delegate;
+	private final boolean blocking;
 
-	public DelegatingSimpleScheduledExecutor(ScheduledExecutorService executorService) {
-		this.delegate = executorService;
+	public DelegatingSimpleScheduledExecutor(ScheduledExecutorService delegate, boolean blocking) {
+		this.delegate = delegate;
+		this.blocking = blocking;
 	}
 
 	@Override
@@ -35,5 +37,10 @@ public class DelegatingSimpleScheduledExecutor implements SimpleScheduledExecuto
 	@Override
 	public void shutdownNow() {
 		delegate.shutdownNow();
+	}
+
+	@Override
+	public boolean isBlocking() {
+		return blocking;
 	}
 }

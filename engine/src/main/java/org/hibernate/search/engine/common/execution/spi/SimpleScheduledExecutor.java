@@ -43,4 +43,9 @@ public interface SimpleScheduledExecutor {
 	 */
 	void shutdownNow();
 
+	/**
+	 * @return {@code true} if this executor may block when a task is submitted to it;
+	 * {@code false} if it never block (e.g. throws an {@link RejectedExecutionException}).
+	 */
+	boolean isBlocking();
 }
