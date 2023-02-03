@@ -29,7 +29,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * Useful when works can be merged together for optimization purposes (bulking in Elasticsearch),
  * or when they should never be executed in parallel (writes to a Lucene index).
  */
-public final class BatchingExecutor<P extends BatchedWorkProcessor> {
+public final class BatchingExecutor<P extends BatchedWorkProcessor, W extends BatchedWork<? super P>> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -37,9 +37,9 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 
 	private final FailureHandler failureHandler;
 
-	private final BlockingQueue<BatchedWork<? super P>> workQueue;
-	private final BatchWorker<P> worker;
-	private final Consumer<? super BatchedWork<? super P>> blockingRetryProducer;
+	private final BlockingQueue<W> workQueue;
+	private final BatchWorker<P, ? super W> worker;
+	private final Consumer<? super W> blockingRetryProducer;
 
 	private SingletonTask processingTask;
 
@@ -52,11 +52,11 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	 * processor in FIFO order, if {@code false} tasks submitted
 	 * when the internal queue is full may be submitted out of order.
 	 * @param failureHandler A failure handler to report failures of the background thread.
-	 * @param blockingRetryProducer
+	 * @param blockingRetryProducer A retry work producer that would be called in case of offloading operation submitter and full queue.
 	 */
 	public BatchingExecutor(String name,
 			P processor, int maxTasksPerBatch, boolean fair,
-			FailureHandler failureHandler, Consumer<? super BatchedWork<? super P>> blockingRetryProducer) {
+			FailureHandler failureHandler, Consumer<? super W> blockingRetryProducer) {
 		this.name = name;
 		this.failureHandler = failureHandler;
 		this.blockingRetryProducer = blockingRetryProducer;
@@ -109,7 +109,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	 * @deprecated Use {@link #submit(BatchedWork, OperationSubmitter)} instead.
 	 */
 	@Deprecated
-	public void submit(BatchedWork<? super P> work) throws InterruptedException {
+	public void submit(W work) throws InterruptedException {
 		submit( work, OperationSubmitter.blocking() );
 	}
 
@@ -121,7 +121,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	 * @param operationSubmitter How to handle request to submit operation when the queue is full.
 	 * @throws InterruptedException If the current thread is interrupted while enqueuing the work.
 	 */
-	public <W extends BatchedWork<? super P>> void submit(W work, OperationSubmitter operationSubmitter) throws InterruptedException {
+	public void submit(W work, OperationSubmitter operationSubmitter) throws InterruptedException {
 		if ( processingTask == null ) {
 			throw new AssertionFailure(
 					"Attempt to submit a work to executor '" + name + "', which is stopped."
@@ -146,16 +146,16 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	/**
 	 * Takes a batch of works from the queue and submits them to the processor.
 	 */
-	private static final class BatchWorker<P extends BatchedWorkProcessor> implements SingletonTask.Worker {
+	private static final class BatchWorker<P extends BatchedWorkProcessor, W extends BatchedWork<? super P>> implements SingletonTask.Worker {
 		private final CompletableFuture<?> completedFuture = CompletableFuture.completedFuture( null );
 
 		private final String name;
 		private final P processor;
-		private final BlockingQueue<BatchedWork<? super P>> workQueue;
+		private final BlockingQueue<W> workQueue;
 		private final int maxTasksPerBatch;
-		private final List<BatchedWork<? super P>> workBuffer;
+		private final List<W> workBuffer;
 
-		private BatchWorker(String name, P processor, BlockingQueue<BatchedWork<? super P>> workQueue,
+		private BatchWorker(String name, P processor, BlockingQueue<W> workQueue,
 				int maxTasksPerBatch) {
 			this.name = name;
 			this.processor = processor;
@@ -181,8 +181,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 			}
 
 			processor.beginBatch();
-
-			for ( BatchedWork<? super P> work : workBuffer ) {
+			for ( W work : workBuffer ) {
 				try {
 					work.submitTo( processor );
 				}

@@ -32,7 +32,7 @@ public abstract class AbstractWorkOrchestrator<W> {
 	private State state = State.STOPPED; // Guarded by lifecycleLock
 	private final ReadWriteLock lifecycleLock = new ReentrantReadWriteLock();
 
-	protected final Consumer<? extends W> blockingRetryProducer = w -> submit( w, OperationSubmitter.blocking() );
+	protected final Consumer<? super W> blockingRetryProducer = w -> submit( w, OperationSubmitter.blocking() );
 
 	protected AbstractWorkOrchestrator(String name) {
 		this.name = name;
