@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport;
@@ -27,10 +26,8 @@ public class DelegatingSearchIndexingPlanExecutionReport implements SearchIndexi
 	}
 
 	@Override
-	public List<Object> failingEntities() {
-		return delegate.failingEntityReferences().stream()
-				.map( Object.class::cast )
-				.collect( Collectors.toList() );
+	public List<?> failingEntities() {
+		return delegate.failingEntityReferences();
 	}
 
 }

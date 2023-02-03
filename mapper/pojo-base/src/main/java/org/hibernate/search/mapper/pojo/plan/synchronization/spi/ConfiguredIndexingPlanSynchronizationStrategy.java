@@ -26,7 +26,7 @@ public class ConfiguredIndexingPlanSynchronizationStrategy<E> {
 
 	private final DocumentCommitStrategy documentCommitStrategy;
 	private final DocumentRefreshStrategy documentRefreshStrategy;
-	private final Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> indexingFutureHandler;
+	private final Consumer<? super CompletableFuture<? extends SearchIndexingPlanExecutionReport>> indexingFutureHandler;
 	private final OperationSubmitter operationSubmitter;
 	private final EntityReferenceFactory<E> entityReferenceFactory;
 
@@ -60,8 +60,7 @@ public class ConfiguredIndexingPlanSynchronizationStrategy<E> {
 
 		private DocumentCommitStrategy documentCommitStrategy = DocumentCommitStrategy.NONE;
 		private DocumentRefreshStrategy documentRefreshStrategy = DocumentRefreshStrategy.NONE;
-		private Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> indexingFutureHandler = future -> {
-		};
+		private Consumer<? super CompletableFuture<? extends SearchIndexingPlanExecutionReport>> indexingFutureHandler = future -> { };
 		private OperationSubmitter operationSubmitter = OperationSubmitter.blocking();
 
 		private final EntityReferenceFactory<E> entityReferenceFactory;
@@ -84,7 +83,7 @@ public class ConfiguredIndexingPlanSynchronizationStrategy<E> {
 		}
 
 		@Override
-		public void indexingFutureHandler(Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> handler) {
+		public void indexingFutureHandler(Consumer<? super CompletableFuture<? extends SearchIndexingPlanExecutionReport>> handler) {
 			Contracts.assertNotNull( handler, "handler" );
 			this.indexingFutureHandler = handler;
 		}

@@ -9,26 +9,16 @@ package org.hibernate.search.mapper.pojo.standalone.session.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
-import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.plan.synchronization.spi.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
-import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
 import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.pojo.standalone.loading.dsl.SelectionLoadingOptionsStep;
@@ -76,9 +66,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 		this.tenantId = builder.tenantId;
 		this.loadingOptionsContributor = builder.loadingOptionsContributor;
 
-		this.indexingPlanSynchronizationStrategy = configureSynchronizationStrategy(
-				builder.resolveAutomaticIndexingSynchronizationStrategy()
-		);
+		this.indexingPlanSynchronizationStrategy = configureSynchronizationStrategy( builder.synchronizationStrategy );
 	}
 
 	private void checkOpenAndThrow() {
@@ -226,29 +214,18 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	}
 
 	public static class Builder implements SearchSessionBuilder {
-
-		private static final OptionalConfigurationProperty<BeanReference<? extends IndexingPlanSynchronizationStrategy>> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
-				ConfigurationProperty.forKey( StandalonePojoMapperSettings.Radicals.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY )
-						.asBeanReference( IndexingPlanSynchronizationStrategy.class )
-						.build();
-
-		private final ConfigurationPropertySource configurationPropertySource;
-		private final BeanResolver beanResolver;
 		private final StandalonePojoSearchSessionMappingContext mappingContext;
 		private final StandalonePojoSearchSessionTypeContextProvider typeContextProvider;
 
 		private IndexingPlanSynchronizationStrategy synchronizationStrategy;
 
 		private String tenantId;
-		private DocumentCommitStrategy commitStrategy;
-		private DocumentRefreshStrategy refreshStrategy;
 		private Consumer<SelectionLoadingOptionsStep> loadingOptionsContributor;
 
 		public Builder(StandalonePojoSearchSessionMappingContext mappingContext,
-				ConfigurationPropertySource configurationPropertySource, BeanResolver beanResolver,
+				IndexingPlanSynchronizationStrategy synchronizationStrategy,
 				StandalonePojoSearchSessionTypeContextProvider typeContextProvider) {
-			this.configurationPropertySource = configurationPropertySource;
-			this.beanResolver = beanResolver;
+			this.synchronizationStrategy = synchronizationStrategy;
 			this.mappingContext = mappingContext;
 			this.typeContextProvider = typeContextProvider;
 		}
@@ -256,20 +233,6 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 		@Override
 		public Builder tenantId(String tenantId) {
 			this.tenantId = tenantId;
-			return this;
-		}
-
-		@SuppressWarnings( "deprecation" ) // need to keep OLD API still implemented
-		@Override
-		public SearchSessionBuilder commitStrategy(DocumentCommitStrategy commitStrategy) {
-			this.commitStrategy = commitStrategy;
-			return this;
-		}
-
-		@SuppressWarnings( "deprecation" ) // need to keep OLD API still implemented
-		@Override
-		public SearchSessionBuilder refreshStrategy(DocumentRefreshStrategy refreshStrategy) {
-			this.refreshStrategy = refreshStrategy;
 			return this;
 		}
 
@@ -287,55 +250,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 
 		@Override
 		public StandalonePojoSearchSession build() {
-			boolean lowLevelConfig = ( refreshStrategy != null || commitStrategy != null );
-			if ( synchronizationStrategy != null && lowLevelConfig ) {
-				throw log.conflictingIndexPlanSynchronizationConfiguration();
-			}
-			else if ( synchronizationStrategy == null && lowLevelConfig ) {
-				synchronizationStrategy = strategy(
-						Optional.ofNullable( commitStrategy ).orElse( DocumentCommitStrategy.FORCE ),
-						Optional.ofNullable( refreshStrategy ).orElse( DocumentRefreshStrategy.NONE )
-				);
-			}
-			else if ( synchronizationStrategy == null ) {
-				synchronizationStrategy = IndexingPlanSynchronizationStrategy.writeSync();
-			}
-
 			return new StandalonePojoSearchSession( this );
-		}
-
-		private IndexingPlanSynchronizationStrategy resolveAutomaticIndexingSynchronizationStrategy() {
-			try ( BeanHolder<? extends IndexingPlanSynchronizationStrategy> beanHolder = AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.getAndTransform(
-					configurationPropertySource,
-					referenceOptional -> beanResolver.resolve( referenceOptional.orElse(
-							StandalonePojoMapperSettings.Defaults.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY ) )
-			) ) {
-				return synchronizationStrategy != null ? synchronizationStrategy :
-						beanHolder.get();
-			}
-		}
-
-		private static IndexingPlanSynchronizationStrategy strategy(
-				DocumentCommitStrategy commitStrategy,
-				DocumentRefreshStrategy refreshStrategy
-		) {
-			if ( DocumentCommitStrategy.NONE.equals( commitStrategy ) && DocumentRefreshStrategy.NONE.equals(
-					refreshStrategy ) ) {
-				return IndexingPlanSynchronizationStrategy.async();
-			}
-			if ( DocumentCommitStrategy.FORCE.equals( commitStrategy ) && DocumentRefreshStrategy.FORCE.equals(
-					refreshStrategy ) ) {
-				return IndexingPlanSynchronizationStrategy.sync();
-			}
-			if ( DocumentCommitStrategy.FORCE.equals( commitStrategy ) && DocumentRefreshStrategy.NONE.equals(
-					refreshStrategy ) ) {
-				return IndexingPlanSynchronizationStrategy.writeSync();
-			}
-			if ( DocumentCommitStrategy.NONE.equals( commitStrategy ) && DocumentRefreshStrategy.FORCE.equals(
-					refreshStrategy ) ) {
-				return IndexingPlanSynchronizationStrategy.readSync();
-			}
-			throw new IllegalStateException( "This shouldn't happen." );
 		}
 	}
 }

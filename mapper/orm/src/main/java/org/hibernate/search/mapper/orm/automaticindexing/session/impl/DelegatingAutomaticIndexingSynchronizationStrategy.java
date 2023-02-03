@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -43,7 +42,7 @@ public class DelegatingAutomaticIndexingSynchronizationStrategy implements org.h
 			}
 
 			@Override
-			public void indexingFutureHandler(Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> handler) {
+			public void indexingFutureHandler(Consumer<? super CompletableFuture<? extends SearchIndexingPlanExecutionReport>> handler) {
 				context.indexingFutureHandler( report ->
 						handler.accept( report.thenApply( HibernateOrmDelegatingSearchIndexingPlanExecutionReport::new ) )
 				);
@@ -79,8 +78,8 @@ public class DelegatingAutomaticIndexingSynchronizationStrategy implements org.h
 		}
 
 		@Override
-		public List<Object> failingEntities() {
-			return report.failingEntities().stream().map( Object.class::cast ).collect( Collectors.toList() );
+		public List<?> failingEntities() {
+			return report.failingEntities();
 		}
 	}
 }

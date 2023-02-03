@@ -70,7 +70,8 @@ public final class HibernateOrmMapperSettings {
 	public static final String AUTOMATIC_INDEXING_STRATEGY = PREFIX + Radicals.AUTOMATIC_INDEXING_STRATEGY;
 
 	/**
-	 * The synchronization strategy to use when indexing automatically.
+	 * The synchronization strategy to use when indexing automatically or explicitly
+	 * through a {@link org.hibernate.search.mapper.orm.work.SearchIndexingPlan SearchIndexingPlan}.
 	 * <p>
 	 * Expects one of the strings defined in {@link org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames},
 	 * or a reference to a bean of type {@link org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy}.
@@ -197,7 +198,8 @@ public final class HibernateOrmMapperSettings {
 	public static final String MULTI_TENANCY_TENANT_IDS = PREFIX + Radicals.MULTI_TENANCY_TENANT_IDS;
 
 	/**
-	 * The synchronization strategy to use when indexing automatically.
+	 * The synchronization strategy to use when indexing automatically or explicitly
+	 * through a {@link org.hibernate.search.mapper.orm.work.SearchIndexingPlan SearchIndexingPlan}.
 	 * <p>
 	 * Expects one of the strings defined in {@link IndexingPlanSynchronizationStrategyNames},
 	 * or a reference to a bean of type {@link IndexingPlanSynchronizationStrategy}.

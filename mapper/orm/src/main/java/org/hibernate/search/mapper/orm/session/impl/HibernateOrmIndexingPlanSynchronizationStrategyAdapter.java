@@ -79,4 +79,9 @@ public class HibernateOrmIndexingPlanSynchronizationStrategyAdapter implements I
 				}
 		);
 	}
+
+	@Override
+	public String toString() {
+		return HibernateOrmIndexingPlanSynchronizationStrategyAdapter.class.getSimpleName() + "(" + delegate.toString() + ")";
+	}
 }

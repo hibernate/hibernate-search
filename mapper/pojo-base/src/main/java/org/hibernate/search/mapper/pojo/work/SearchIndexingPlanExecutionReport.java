@@ -21,6 +21,6 @@ public interface SearchIndexingPlanExecutionReport {
 	 * @return A list of references to entities that may not be indexed correctly as a result of the failure.
 	 * Never {@code null}, but may be empty.
 	 */
-	List<Object> failingEntities();
+	List<?> failingEntities();
 
 }

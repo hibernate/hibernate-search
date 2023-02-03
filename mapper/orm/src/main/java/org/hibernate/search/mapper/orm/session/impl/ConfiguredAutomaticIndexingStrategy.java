@@ -145,6 +145,8 @@ public final class ConfiguredAutomaticIndexingStrategy {
 		}
 		else if ( automaticBeanReference.isPresent() ) {
 			try {
+				log.automaticIndexingSynchronizationStrategyIsDeprecated( AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.resolveOrRaw( configurationSource ),
+						INDEXING_PLAN_SYNCHRONIZATION_STRATEGY.resolveOrRaw( configurationSource ) );
 				@SuppressWarnings("deprecation")
 				BeanHolder<? extends org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy> holder = startContext.beanResolver()
 						.resolve( automaticBeanReference.get() );
