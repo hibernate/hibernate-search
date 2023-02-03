@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.plan.synchronization.spi;
+package org.hibernate.search.mapper.pojo.plan.synchronization.impl;
 
 import java.lang.invoke.MethodHandles;
 
@@ -19,26 +19,27 @@ import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 @Incubating
-public final class WriteSyncIndexingPlanSynchronizationStrategy implements IndexingPlanSynchronizationStrategy {
+public final class SyncIndexingPlanSynchronizationStrategy
+		implements IndexingPlanSynchronizationStrategy {
 
-	public static final IndexingPlanSynchronizationStrategy INSTANCE = new WriteSyncIndexingPlanSynchronizationStrategy();
+	public static final IndexingPlanSynchronizationStrategy INSTANCE = new SyncIndexingPlanSynchronizationStrategy();
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private WriteSyncIndexingPlanSynchronizationStrategy() {
+	private SyncIndexingPlanSynchronizationStrategy() {
 	}
 
 	@Override
 	public String toString() {
-		return IndexingPlanSynchronizationStrategy.class.getSimpleName() + ".writeSync()";
+		return IndexingPlanSynchronizationStrategy.class.getSimpleName() + ".sync()";
 	}
 
 	@Override
 	public void apply(IndexingPlanSynchronizationStrategyConfigurationContext context) {
-		// Request indexing to force a commit, but not necessarily a refresh.
+		// Request indexing to force a commit and a refresh.
 		context.documentCommitStrategy( DocumentCommitStrategy.FORCE );
-		context.documentRefreshStrategy( DocumentRefreshStrategy.NONE );
+		context.documentRefreshStrategy( DocumentRefreshStrategy.FORCE );
 		context.indexingFutureHandler( future -> {
-			// Wait for the result of indexing, so that we're sure changes were committed.
+			// Wait for the result of indexing, so that we're sure changes were committed and refreshed.
 			SearchIndexingPlanExecutionReport report = Futures.unwrappedExceptionJoin( future );
 			report.throwable().ifPresent( t -> {
 				throw log.indexingFailure( t.getMessage(), report.failingEntities(), t );
