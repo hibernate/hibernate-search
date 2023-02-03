@@ -89,7 +89,7 @@ public class BatchingExecutorTest {
 	private final ForkJoinPool asyncExecutor = new ForkJoinPool( 12 );
 
 	private ScheduledExecutorService executorService;
-	private BatchingExecutor<StubWorkProcessor> executor;
+	private BatchingExecutor<StubWorkProcessor, StubWork> executor;
 
 	private final OperationSubmitter operationSubmitter;
 

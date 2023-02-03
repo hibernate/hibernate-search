@@ -41,7 +41,7 @@ public class LuceneSerialWorkOrchestratorImpl
 	private final BackendThreads threads;
 	private final FailureHandler failureHandler;
 
-	private HashTable<BatchingExecutor<LuceneBatchedWorkProcessor>> executors;
+	private HashTable<BatchingExecutor<LuceneBatchedWorkProcessor, LuceneBatchedWork<?>>> executors;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
@@ -86,7 +86,7 @@ public class LuceneSerialWorkOrchestratorImpl
 			) );
 		}
 
-		for ( BatchingExecutor<?> executor : executors ) {
+		for ( BatchingExecutor<?, ?> executor : executors ) {
 			executor.start( threads.getWriteExecutor() );
 		}
 	}
