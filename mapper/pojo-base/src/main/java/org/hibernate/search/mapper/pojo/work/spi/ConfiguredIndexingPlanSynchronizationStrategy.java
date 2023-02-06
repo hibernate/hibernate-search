@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.plan.synchronization.spi;
+package org.hibernate.search.mapper.pojo.work.spi;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -14,10 +14,9 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategyConfigurationContext;
+import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyConfigurationContext;
 import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport;
 import org.hibernate.search.mapper.pojo.work.impl.DelegatingSearchIndexingPlanExecutionReport;
-import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.impl.Contracts;
 

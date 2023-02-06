@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsSt
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
-import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 
 /**
  * A Hibernate Search session, bound to a Hibernate ORM {@link Session}/{@link EntityManager}.

@@ -25,7 +25,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingBinderR
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategyNames;
+import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyNames;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 

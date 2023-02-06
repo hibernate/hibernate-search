@@ -17,7 +17,7 @@ import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.IndexSettings;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategyNames;
+import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyNames;
 
 import org.junit.Test;
 

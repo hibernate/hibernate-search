@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.java.modules.pojo.standalone.lucene.entity.Author;
-import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
