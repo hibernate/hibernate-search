@@ -9,7 +9,6 @@ package org.hibernate.search.engine.backend.work.execution;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -50,7 +49,7 @@ public abstract class OperationSubmitter {
 	 * Depending on the implementation might throw {@link RejectedExecutionException} or offload the submit operation to an offload executor.
 	 */
 	public abstract <T extends Runnable> void submitToExecutor(SimpleScheduledExecutor executor, T element,
-			Function<? super T, Runnable> blockingRetryProducer) throws InterruptedException;
+			Consumer<? super T> blockingRetryProducer) throws InterruptedException;
 
 	/**
 	 * When using this submitter, dding a new element will block the thread when the underlying
@@ -90,7 +89,7 @@ public abstract class OperationSubmitter {
 
 		@Override
 		public <T extends Runnable> void submitToExecutor(SimpleScheduledExecutor executor, T element,
-				Function<? super T, Runnable> blockingRetryProducer) {
+				Consumer<? super T> blockingRetryProducer) {
 			executor.submit( element );
 		}
 	}
@@ -106,7 +105,7 @@ public abstract class OperationSubmitter {
 
 		@Override
 		public <T extends Runnable> void submitToExecutor(SimpleScheduledExecutor executor, T element,
-				Function<? super T, Runnable> blockingRetryProducer) {
+				Consumer<? super T> blockingRetryProducer) {
 			executor.offer( element );
 		}
 	}
@@ -127,8 +126,8 @@ public abstract class OperationSubmitter {
 
 		@Override
 		public <T extends Runnable> void submitToExecutor(SimpleScheduledExecutor executor, T element,
-				Function<? super T, Runnable> blockingRetryProducer) {
-			this.executor.accept( blockingRetryProducer.apply( element ) );
+				Consumer<? super T> blockingRetryProducer) {
+			this.executor.accept( () -> blockingRetryProducer.accept( element ) );
 		}
 	}
 
