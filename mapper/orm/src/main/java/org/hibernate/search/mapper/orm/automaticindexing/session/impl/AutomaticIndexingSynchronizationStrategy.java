@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.orm.automaticindexing.session.impl;
 
 
-import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 
 @SuppressWarnings( "deprecation" )
 public final class AutomaticIndexingSynchronizationStrategy {

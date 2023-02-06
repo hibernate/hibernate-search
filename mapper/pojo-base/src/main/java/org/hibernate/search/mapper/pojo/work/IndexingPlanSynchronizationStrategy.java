@@ -4,12 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.plan.synchronization;
+package org.hibernate.search.mapper.pojo.work;
 
-import org.hibernate.search.mapper.pojo.plan.synchronization.impl.AsyncIndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.pojo.plan.synchronization.impl.ReadSyncIndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.pojo.plan.synchronization.impl.SyncIndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.pojo.plan.synchronization.impl.WriteSyncIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.work.impl.AsyncIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.work.impl.ReadSyncIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.work.impl.SyncIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.work.impl.WriteSyncIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**

@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.standalone.session;
 
 import java.util.function.Consumer;
 
-import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.standalone.loading.dsl.SelectionLoadingOptionsStep;
 import org.hibernate.search.util.common.annotation.Incubating;
 

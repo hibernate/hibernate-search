@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.orm.automaticindexing.session;
 
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.mapper.pojo.plan.synchronization.IndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 
 /**
  * Determines how the thread will block upon committing a transaction
