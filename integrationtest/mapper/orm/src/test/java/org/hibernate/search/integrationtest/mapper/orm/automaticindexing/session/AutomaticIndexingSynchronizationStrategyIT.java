@@ -479,7 +479,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				.hasMessageContainingAll(
 						"Invalid value for configuration property '"
 								+ HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY
-								+ "'",
+								+ "': 'invalidName'",
 						"Unable to load class 'invalidName'",
 						"No beans defined for type '" + AutomaticIndexingSynchronizationStrategy.class.getName()
 								+ "' and name 'invalidName' in Hibernate Search's internal registry"
