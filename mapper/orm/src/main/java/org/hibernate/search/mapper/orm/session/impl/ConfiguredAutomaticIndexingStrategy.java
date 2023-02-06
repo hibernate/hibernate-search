@@ -179,11 +179,8 @@ public final class ConfiguredAutomaticIndexingStrategy {
 		if ( usesEventQueue() ) {
 			throw log.cannotConfigureSynchronizationStrategyWithIndexingEventQueue();
 		}
-		ConfiguredIndexingPlanSynchronizationStrategy.Builder<EntityReference> builder =
-				new ConfiguredIndexingPlanSynchronizationStrategy.Builder<>( mappingContext.failureHandler(),
-						mappingContext.entityReferenceFactory() );
-		synchronizationStrategy.apply( builder );
-		return builder.build();
+
+		return configure( synchronizationStrategy );
 	}
 
 	public PojoIndexingPlan createIndexingPlan(HibernateOrmSearchSession context,
