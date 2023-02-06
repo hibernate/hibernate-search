@@ -60,7 +60,7 @@ public class LuceneParallelWorkOrchestratorImpl
 
 	@Override
 	protected void doSubmit(WorkExecution<?> workExecution, OperationSubmitter operationSubmitter) throws InterruptedException {
-		operationSubmitter.submitToExecutor( executor, workExecution, blockingRetryExecutorProducer );
+		operationSubmitter.submitToExecutor( executor, workExecution, blockingRetryProducer );
 	}
 
 	@Override

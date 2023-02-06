@@ -11,7 +11,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -34,7 +33,6 @@ public abstract class AbstractWorkOrchestrator<W> {
 	private final ReadWriteLock lifecycleLock = new ReentrantReadWriteLock();
 
 	protected final Consumer<? super W> blockingRetryProducer = w -> submit( w, OperationSubmitter.blocking() );
-	protected final Function<? super W, Runnable> blockingRetryExecutorProducer = BlockingRetry::new;
 
 	protected AbstractWorkOrchestrator(String name) {
 		this.name = name;
@@ -153,19 +151,5 @@ public abstract class AbstractWorkOrchestrator<W> {
 		RUNNING,
 		PRE_STOPPING,
 		STOPPED;
-	}
-
-	private class BlockingRetry implements Runnable {
-		private final W work;
-
-		private BlockingRetry(W work) {
-			this.work = work;
-		}
-
-		@Override
-		public void run() {
-			// at this point we've offloaded submit call to some other executor so we just want to block the operation:
-			AbstractWorkOrchestrator.this.submit( work, OperationSubmitter.blocking() );
-		}
 	}
 }

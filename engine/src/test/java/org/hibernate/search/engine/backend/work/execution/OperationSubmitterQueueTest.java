@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Before;
 import org.junit.Test;
 
-public class OperationSubmitterTest {
+public class OperationSubmitterQueueTest {
 
 	private BlockingQueue<Integer> queue;
 
