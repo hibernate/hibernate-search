@@ -9,6 +9,10 @@ package org.hibernate.search.mapper.orm.automaticindexing.spi;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 
+/**
+ * @deprecated This SPI was introduced by mistake and was never used.
+ */
+@Deprecated
 public interface AutomaticIndexingStrategyStartContext {
 
 	/**
