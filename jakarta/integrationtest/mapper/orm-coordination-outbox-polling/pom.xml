@@ -92,6 +92,7 @@
                                 <!-- Exclude tests from integrationtest-mapper-orm that just cannot work with the outbox polling strategy: -->
                                 <!-- * Synchronization strategies can only be used with the "session" automatic indexing strategy -->
                                 <exclude>AutomaticIndexingSynchronizationStrategyIT</exclude>
+                                <exclude>IndexingPlanSynchronizationStrategyIT</exclude>
                                 <!-- * Sending events outside of transactions, during a flush, doesn't work for some reason;
                                        entities are only visible from other sessions after the original session is closed. -->
                                 <exclude>AutomaticIndexingOutOfTransactionIT</exclude>
