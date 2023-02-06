@@ -398,6 +398,8 @@ Use `.annotationMapping().discoverAnnotationsFromReferencedTypes(...)` instead.
 Use/implement `org.hibernate.search.util.common.reflect.spi.ValueHandleFactory` instead.
 * `PojoAdditionalMetadataCollectorTypeNode#markAsEntity(String, org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition)` is deprecated.
 Use `PojoAdditionalMetadataCollectorTypeNode#markAsEntity(String, org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvider)` instead.
+* `AutomaticIndexingStrategyStartContext` is deprecated.
+It was introduced by mistake and does not have any use.
 
 [[behavior]]
 == Behavior changes

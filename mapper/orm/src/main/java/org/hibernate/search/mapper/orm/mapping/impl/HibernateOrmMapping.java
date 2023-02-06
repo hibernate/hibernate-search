@@ -169,7 +169,6 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		// This may fail and normally doesn't involve I/O, so do it first
 		configuredAutomaticIndexingStrategy.start(
 				this,
-				context,
 				new AutomaticIndexingStrategyStartContextImpl( context ),
 				this
 		);

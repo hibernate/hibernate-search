@@ -9,8 +9,7 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
-import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategyStartContext;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.automaticindexing.impl.AutomaticIndexingStrategyStartContext;
 
 public class AutomaticIndexingStrategyStartContextImpl implements AutomaticIndexingStrategyStartContext {
 	private final MappingStartContext delegate;
@@ -18,8 +17,7 @@ public class AutomaticIndexingStrategyStartContextImpl implements AutomaticIndex
 
 	public AutomaticIndexingStrategyStartContextImpl(MappingStartContext delegate) {
 		this.delegate = delegate;
-		this.configurationPropertySource = delegate.configurationPropertySource()
-				.withMask( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING );
+		this.configurationPropertySource = delegate.configurationPropertySource();
 	}
 
 	@Override
