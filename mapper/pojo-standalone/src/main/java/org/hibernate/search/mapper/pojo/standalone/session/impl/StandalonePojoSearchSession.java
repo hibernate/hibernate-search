@@ -26,6 +26,7 @@ import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLo
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLoadingSessionContext;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoSelectionLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.standalone.mapping.impl.ConfiguredIndexingPlanSynchronizationStrategyHolder;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.impl.StandalonePojoMassIndexingSessionContext;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
@@ -53,6 +54,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	private final String tenantId;
 
 	private final Consumer<SelectionLoadingOptionsStep> loadingOptionsContributor;
+	private final ConfiguredIndexingPlanSynchronizationStrategyHolder synchronizationStrategyHolder;
 
 	private SearchIndexingPlanImpl indexingPlan;
 	private SearchIndexer indexer;
@@ -65,8 +67,10 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 		this.typeContextProvider = builder.typeContextProvider;
 		this.tenantId = builder.tenantId;
 		this.loadingOptionsContributor = builder.loadingOptionsContributor;
+		this.synchronizationStrategyHolder = builder.synchronizationStrategyHolder;
 
-		this.indexingPlanSynchronizationStrategy = configureSynchronizationStrategy( builder.synchronizationStrategy );
+		this.indexingPlanSynchronizationStrategy = this.synchronizationStrategyHolder.configureOverriddenSynchronizationStrategy(
+				builder.synchronizationStrategy );
 	}
 
 	private void checkOpenAndThrow() {
@@ -104,7 +108,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public void indexingPlanSynchronizationStrategy( IndexingPlanSynchronizationStrategy synchronizationStrategy) {
-		this.indexingPlanSynchronizationStrategy = configureSynchronizationStrategy( synchronizationStrategy );
+		this.indexingPlanSynchronizationStrategy = synchronizationStrategyHolder.configureOverriddenSynchronizationStrategy( synchronizationStrategy );
 	}
 
 	@Override
@@ -202,30 +206,19 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 		return builder;
 	}
 
-	private ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> configureSynchronizationStrategy(
-			IndexingPlanSynchronizationStrategy synchronizationStrategy) {
-		ConfiguredIndexingPlanSynchronizationStrategy.Builder<EntityReference> builder =
-				new ConfiguredIndexingPlanSynchronizationStrategy.Builder<>(
-						mappingContext.failureHandler(),
-						mappingContext.entityReferenceFactory()
-				);
-		synchronizationStrategy.apply( builder );
-		return builder.build();
-	}
-
 	public static class Builder implements SearchSessionBuilder {
 		private final StandalonePojoSearchSessionMappingContext mappingContext;
 		private final StandalonePojoSearchSessionTypeContextProvider typeContextProvider;
-
+		private final ConfiguredIndexingPlanSynchronizationStrategyHolder synchronizationStrategyHolder;
 		private IndexingPlanSynchronizationStrategy synchronizationStrategy;
 
 		private String tenantId;
 		private Consumer<SelectionLoadingOptionsStep> loadingOptionsContributor;
 
 		public Builder(StandalonePojoSearchSessionMappingContext mappingContext,
-				IndexingPlanSynchronizationStrategy synchronizationStrategy,
+				ConfiguredIndexingPlanSynchronizationStrategyHolder synchronizationStrategyHolder,
 				StandalonePojoSearchSessionTypeContextProvider typeContextProvider) {
-			this.synchronizationStrategy = synchronizationStrategy;
+			this.synchronizationStrategyHolder = synchronizationStrategyHolder;
 			this.mappingContext = mappingContext;
 			this.typeContextProvider = typeContextProvider;
 		}
