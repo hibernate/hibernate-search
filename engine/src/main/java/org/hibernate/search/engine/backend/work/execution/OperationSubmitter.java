@@ -127,7 +127,12 @@ public abstract class OperationSubmitter {
 		@Override
 		public <T extends Runnable> void submitToExecutor(SimpleScheduledExecutor executor, T element,
 				Consumer<? super T> blockingRetryProducer) {
-			this.executor.accept( () -> blockingRetryProducer.accept( element ) );
+			try {
+				executor.offer( element );
+			}
+			catch (RejectedExecutionException e) {
+				this.executor.accept( () -> blockingRetryProducer.accept( element ) );
+			}
 		}
 	}
 
