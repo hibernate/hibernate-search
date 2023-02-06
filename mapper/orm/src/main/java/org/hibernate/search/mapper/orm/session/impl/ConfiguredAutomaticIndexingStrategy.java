@@ -115,23 +115,21 @@ public final class ConfiguredAutomaticIndexingStrategy {
 	}
 
 	private void resolveDefaultSyncStrategyHolder(MappingStartContext mappingStartContext, AutomaticIndexingStrategyStartContext startContext,
-			ConfigurationPropertySource configurationSource) {
-		@SuppressWarnings("deprecation")
-		Optional<BeanReference<? extends org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy>> automaticBeanReference = AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.get(
-				configurationSource );
-		Optional<BeanReference<? extends IndexingPlanSynchronizationStrategy>> planBeanReference = INDEXING_PLAN_SYNCHRONIZATION_STRATEGY.get(
-				mappingStartContext.configurationPropertySource() );
+			ConfigurationPropertySource automaticIndexingConfigurationSource) {
+		ConfigurationPropertySource configurationSource = mappingStartContext.configurationPropertySource();
+		boolean legacyStrategySet = AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.get( automaticIndexingConfigurationSource ).isPresent();
+		boolean newStrategySet = INDEXING_PLAN_SYNCHRONIZATION_STRATEGY
+				.get( configurationSource ).isPresent();
 
-		if ( automaticBeanReference.isPresent() && planBeanReference.isPresent() ) {
-			@SuppressWarnings("deprecation")
-			String deprecatedProperty = HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY;
+		if ( legacyStrategySet && newStrategySet ) {
 			throw log.bothNewAndOldConfigurationPropertiesForIndexingPlanSyncAreUsed(
-					HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY, deprecatedProperty
+					INDEXING_PLAN_SYNCHRONIZATION_STRATEGY.resolveOrRaw( configurationSource ),
+					AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.resolveOrRaw( automaticIndexingConfigurationSource )
 			);
 		}
 
 		if ( usesEventQueue() ) {
-			if ( ( automaticBeanReference.isPresent() || planBeanReference.isPresent() ) ) {
+			if ( legacyStrategySet || newStrategySet ) {
 				// If we send events to a queue, we're mostly asynchronous
 				// and thus configuring the synchronization strategy does not make sense.
 				throw log.cannotConfigureSynchronizationStrategyWithIndexingEventQueue();
@@ -143,42 +141,27 @@ public final class ConfiguredAutomaticIndexingStrategy {
 			// we need it to block until the sender is done pushing events to the queue.
 			defaultSynchronizationStrategyHolder = BeanHolder.of( IndexingPlanSynchronizationStrategy.writeSync() );
 		}
-		else if ( automaticBeanReference.isPresent() ) {
-			try {
-				log.automaticIndexingSynchronizationStrategyIsDeprecated( AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.resolveOrRaw( configurationSource ),
-						INDEXING_PLAN_SYNCHRONIZATION_STRATEGY.resolveOrRaw( configurationSource ) );
-				@SuppressWarnings("deprecation")
-				BeanHolder<? extends org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy> holder = startContext.beanResolver()
-						.resolve( automaticBeanReference.get() );
-
-				defaultSynchronizationStrategyHolder = BeanHolder.of(
-						new HibernateOrmIndexingPlanSynchronizationStrategyAdapter( holder.get() )
-				).withDependencyAutoClosing( holder );
-			}
-			catch (Exception e) {
-				@SuppressWarnings("deprecation")
-				String deprecatedProperty = HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY;
-				throw log.unableToConvertConfigurationProperty(
-						deprecatedProperty,
-						e.getMessage(),
-						e
-				);
-			}
+		else if ( legacyStrategySet ) {
+			@SuppressWarnings("deprecation")
+			BeanHolder<? extends org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy> holder =
+					// Going through the config property source again in order to get context if an error occurs.
+					AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.getAndMap( automaticIndexingConfigurationSource, reference -> {
+						log.automaticIndexingSynchronizationStrategyIsDeprecated( AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.resolveOrRaw( automaticIndexingConfigurationSource ),
+								INDEXING_PLAN_SYNCHRONIZATION_STRATEGY.resolveOrRaw( configurationSource ) );
+						return startContext.beanResolver().resolve( reference );
+					} )
+					.get(); // We know this optional is not empty
+			defaultSynchronizationStrategyHolder = BeanHolder.of(
+					new HibernateOrmIndexingPlanSynchronizationStrategyAdapter( holder.get() )
+			).withDependencyAutoClosing( holder );
 		}
 		else {
-			try {
-				defaultSynchronizationStrategyHolder = startContext.beanResolver().resolve(
-						planBeanReference
-								.orElse( HibernateOrmMapperSettings.Defaults.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY )
-				);
-			}
-			catch (Exception e) {
-				throw log.unableToConvertConfigurationProperty(
-						HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,
-						e.getMessage(),
-						e
-				);
-			}
+			// Going through the config property source again in order to get context if an error occurs.
+			defaultSynchronizationStrategyHolder = INDEXING_PLAN_SYNCHRONIZATION_STRATEGY.getAndTransform(
+					configurationSource,
+					referenceOptional -> startContext.beanResolver().resolve( referenceOptional
+							.orElse( HibernateOrmMapperSettings.Defaults.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY ) )
+			);
 		}
 	}
 

@@ -315,15 +315,10 @@ public interface Log extends BasicLogger {
 			@Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 122,
-			value = "Invalid value for configuration property '%1$s'. %2$s")
-	SearchException unableToConvertConfigurationProperty(String key, String errorMessage,
-			@Cause Exception cause);
-
-	@Message(id = ID_OFFSET + 123,
 			value = "Both '%1$s' and '%2$s' are configured. Use only '%1$s' to set the indexing plan synchronization strategy. ")
 	SearchException bothNewAndOldConfigurationPropertiesForIndexingPlanSyncAreUsed(String key1, String key2);
 
 	@LogMessage(level = WARN)
-	@Message(id = ID_OFFSET + 124, value = "Configuration property '%1$s' is deprecated; use '%2$s' instead.")
+	@Message(id = ID_OFFSET + 123, value = "Configuration property '%1$s' is deprecated; use '%2$s' instead.")
 	void automaticIndexingSynchronizationStrategyIsDeprecated(String deprecatedProperty, String newProperty);
 }
