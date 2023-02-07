@@ -14,9 +14,16 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
-
 public class ConfigurationProperty implements Comparable<ConfigurationProperty> {
+
+	public enum Type {
+		/**
+		 * Configuration property type API/SPI will be determined by inspecting the package in which a class is located.
+		 * In case package contains {@code spi} package at any upper levels the type will be {@code SPI}, otherwise - {@code API}
+		 */
+		API,
+		SPI
+	}
 
 	private static final Comparator<ConfigurationProperty> CONFIGURATION_PROPERTY_COMPARATOR = Comparator.comparing(
 			c -> c.key().key );
@@ -24,7 +31,7 @@ public class ConfigurationProperty implements Comparable<ConfigurationProperty> 
 	private String javadoc;
 	private String sourceClass;
 
-	private HibernateSearchConfiguration.Type type;
+	private Type type;
 
 	private Object defaultValue;
 
@@ -58,11 +65,11 @@ public class ConfigurationProperty implements Comparable<ConfigurationProperty> 
 		return this;
 	}
 
-	public HibernateSearchConfiguration.Type type() {
+	public Type type() {
 		return type;
 	}
 
-	public ConfigurationProperty type(HibernateSearchConfiguration.Type type) {
+	public ConfigurationProperty type(Type type) {
 		this.type = type;
 		return this;
 	}
@@ -80,7 +87,7 @@ public class ConfigurationProperty implements Comparable<ConfigurationProperty> 
 		return anchorPrefix;
 	}
 
-	public ConfigurationProperty withAnchorPrefix(String anchorPrefix) {
+	public ConfigurationProperty anchorPrefix(String anchorPrefix) {
 		this.anchorPrefix = anchorPrefix.replaceAll( "[^\\w-.]", "_" );
 		return this;
 	}
@@ -89,7 +96,7 @@ public class ConfigurationProperty implements Comparable<ConfigurationProperty> 
 		return moduleName;
 	}
 
-	public ConfigurationProperty withModuleName(String moduleName) {
+	public ConfigurationProperty moduleName(String moduleName) {
 		this.moduleName = moduleName;
 		return this;
 	}

@@ -1,4 +1,10 @@
 [[configuration-properties-aggregated]]
 == List of all available configuration properties
 
-include::../../../../target/hibernate-search-configuration-properties-collector-spi.asciidoc[opts=optional]
+include::../generated-docs/hibernate-search-engine-spi.asciidoc[opts=optional]
+include::../generated-docs/hibernate-search-backend-lucene-spi.asciidoc[opts=optional]
+include::../generated-docs/hibernate-search-backend-elasticsearch-spi.asciidoc[opts=optional]
+include::../generated-docs/hibernate-search-backend-elasticsearch-aws-spi.asciidoc[opts=optional]
+include::../generated-docs/hibernate-search-mapper-orm-spi.asciidoc[opts=optional]
+include::../generated-docs/hibernate-search-mapper-orm-coordination-outbox-polling-spi.asciidoc[opts=optional]
+include::../generated-docs/hibernate-search-mapper-pojo-standalone-spi.asciidoc[opts=optional]
