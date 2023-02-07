@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 public class ConfigurationPropertyCollector {
 
@@ -51,7 +52,7 @@ public class ConfigurationPropertyCollector {
 	}
 
 	private void processClasses(Document constants) {
-		for ( org.jsoup.nodes.Element table : constants.select( ".block-list li" ) ) {
+		for ( Element table : constants.select( ".block-list li" ) ) {
 			String className = table.selectFirst( ".caption" ).text();
 			if ( !isClassIgnored( className ) ) {
 				// assume that such class is a config class and we want to collect properties from it.
@@ -166,29 +167,45 @@ public class ConfigurationPropertyCollector {
 	}
 
 	private String extractJavadoc(Document javadoc, String className, String constant) {
-		org.jsoup.select.Elements blocks = javadoc.select( "#" + constant + " .block" );
+		Elements blocks = javadoc.selectFirst( "#" + constant + " .member-signature" ).nextElementSiblings();
 		if ( !blocks.isEmpty() ) {
-			org.jsoup.nodes.Element block = blocks.get( 0 );
-			for ( org.jsoup.nodes.Element link : block.getElementsByTag( "a" ) ) {
-				String href = link.attr( "href" );
-				// only update links if they are not external:
-				if ( !link.hasClass( "external-link" ) ) {
-					if ( href.startsWith( "#" ) ) {
-						href = withoutPackagePrefix( className ) + ".html" + href;
-					}
-					String packagePath = packagePrefix( className ).replace( ".", File.separator );
-					href = javadocsBaseLink + packagePath + "/" + href;
+			Elements result = new Elements();
+			for ( Element block : blocks ) {
+				if ( block.hasClass( "notes" ) ) {
+					continue;
 				}
-				else if ( href.contains( "/build/parents/" ) && href.contains( "/apidocs" ) ) {
-					// means a link was to a class from other module and javadoc plugin generated some external link
-					// that won't work. So we replace it:
-					href = javadocsBaseLink + href.substring( href.indexOf( "/apidocs" ) + "/apidocs".length() );
+				if ( block.hasClass( "deprecation-block" ) ) {
+					block.attr(
+							"style",
+							"border-style:solid; border-width:thin;  border-radius:10px; padding:10px; margin-bottom:10px; margin-right:10px; display:inline-block;"
+					);
 				}
-				link.attr( "href", href );
+				for ( Element link : block.getElementsByTag( "a" ) ) {
+					updateLink( className, link );
+				}
+				result.add( block );
 			}
-			return block.toString();
+			return result.toString();
 		}
 		return "";
+	}
+
+	private void updateLink(String className, Element link) {
+		String href = link.attr( "href" );
+		// only update links if they are not external:
+		if ( !link.hasClass( "external-link" ) ) {
+			if ( href.startsWith( "#" ) ) {
+				href = withoutPackagePrefix( className ) + ".html" + href;
+			}
+			String packagePath = packagePrefix( className ).replace( ".", File.separator );
+			href = javadocsBaseLink + packagePath + "/" + href;
+		}
+		else if ( href.contains( "/build/parents/" ) && href.contains( "/apidocs" ) ) {
+			// means a link was to a class from other module and javadoc plugin generated some external link
+			// that won't work. So we replace it:
+			href = javadocsBaseLink + href.substring( href.indexOf( "/apidocs" ) + "/apidocs".length() );
+		}
+		link.attr( "href", href );
 	}
 
 	/**
