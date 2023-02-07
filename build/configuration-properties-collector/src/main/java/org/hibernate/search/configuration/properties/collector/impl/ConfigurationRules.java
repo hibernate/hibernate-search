@@ -20,6 +20,12 @@ public final class ConfigurationRules {
 	private static final Set<String> IGNORED_CLASSES = Collections.emptySet();
 
 	private static final Set<String> IGNORED_CONSTANTS = new HashSet<>( Arrays.asList(
+			"org.hibernate.search.engine.cfg.BackendSettings#INDEXES",
+			"org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings#TYPE_NAME",
+			"org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings#TYPE_NAME",
+			"org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME",
+			"org.hibernate.search.engine.cfg.EngineSettings#BACKEND",
+			"org.hibernate.search.engine.cfg.EngineSettings#BACKENDS",
 			"org.hibernate.search.engine.cfg.BackendSettings#INDEXES"
 	) );
 
