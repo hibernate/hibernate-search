@@ -6,9 +6,9 @@
     <parent>
         <groupId>org.hibernate.search</groupId>
         <!-- Using public parent to reuse the javadoc generation config -->
-        <artifactId>hibernate-search-parent-public</artifactId>
+        <artifactId>hibernate-search-parent-internal</artifactId>
         <version>6.2.0-SNAPSHOT</version>
-        <relativePath>../parents/public</relativePath>
+        <relativePath>../parents/internal</relativePath>
     </parent>
 
     <name>Hibernate Search Configuration Property Collector</name>
@@ -23,93 +23,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-util-common</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-engine</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-mapper-pojo-base</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-mapper-orm</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-mapper-pojo-standalone</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-backend-lucene</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-backend-elasticsearch</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-backend-elasticsearch-aws</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-v5migrationhelper-engine</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-v5migrationhelper-orm</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-mapper-orm-coordination-outbox-polling</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-mapper-orm-batch-jsr352-jberet</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging-processor</artifactId>
-            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
-            <version>${version.org.jboss.logging.jboss-logging-tools}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
-            <version>${version.javax.enterprise}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-configuration-properties-collector-processor</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
         </dependency>
     </dependencies>
 
@@ -117,155 +32,25 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <configuration>
+                    <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <manifestEntries>
+                                <Main-Class>org.hibernate.search.configuration.properties.collector.impl.ConfigurationPropertyProcessor</Main-Class>
+                            </manifestEntries>
+                        </transformer>
+                    </transformers>
+                </configuration>
                 <executions>
-                    <!-- unpack sources to get *.asciidoc files with config properties -->
                     <execution>
-                        <id>unpack-sources-for-config-properties</id>
-                        <phase>generate-resources</phase>
+                        <phase>package</phase>
                         <goals>
-                            <goal>unpack</goal>
+                            <goal>shade</goal>
                         </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.hibernate.search</groupId>
-                                    <artifactId>hibernate-search-engine</artifactId>
-                                    <version>${project.version}</version>
-                                    <classifier>sources</classifier>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/unpacked-sources</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate.search</groupId>
-                                    <artifactId>hibernate-search-backend-lucene</artifactId>
-                                    <version>${project.version}</version>
-                                    <classifier>sources</classifier>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/unpacked-sources</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate.search</groupId>
-                                    <artifactId>hibernate-search-backend-elasticsearch</artifactId>
-                                    <version>${project.version}</version>
-                                    <classifier>sources</classifier>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/unpacked-sources</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate.search</groupId>
-                                    <artifactId>hibernate-search-backend-elasticsearch-aws</artifactId>
-                                    <version>${project.version}</version>
-                                    <classifier>sources</classifier>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/unpacked-sources</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate.search</groupId>
-                                    <artifactId>hibernate-search-mapper-orm</artifactId>
-                                    <version>${project.version}</version>
-                                    <classifier>sources</classifier>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/unpacked-sources</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate.search</groupId>
-                                    <artifactId>hibernate-search-mapper-orm-coordination-outbox-polling</artifactId>
-                                    <version>${project.version}</version>
-                                    <classifier>sources</classifier>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/unpacked-sources</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate.search</groupId>
-                                    <artifactId>hibernate-search-mapper-pojo-standalone</artifactId>
-                                    <version>${project.version}</version>
-                                    <classifier>sources</classifier>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/unpacked-sources</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-unpacked-sources</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${project.build.directory}/unpacked-sources</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-compile</id>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <!-- Only run annotation processor and do not recompile the classes: -->
-                            <proc>only</proc>
-                            <fork>true</fork>
-                            <executable>${java-version.main.compiler}</executable>
-                            <annotationProcessorPaths>
-                                <path>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>hibernate-search-configuration-properties-collector-processor</artifactId>
-                                    <version>${project.version}</version>
-                                </path>
-                            </annotationProcessorPaths>
-                            <annotationProcessors>
-                                <processor>org.hibernate.search.configuration.properties.collector.impl.ConfigurationPropertyProcessor</processor>
-                            </annotationProcessors>
-                            <compilerArgs>
-                                <arg>-Aorg.hibernate.search.cpcap.javadoc.link=${javadoc.org.hibernate.search.url}</arg>
-                                <arg>-Aorg.hibernate.search.cpcap.ignore.pattern=.*\.impl\..*</arg>
-                                <arg>-Aorg.hibernate.search.cpcap.generated.filename=${project.artifactId}</arg>
-                            </compilerArgs>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.moditect</groupId>
-                <artifactId>moditect-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-module-infos</id>
-                        <!-- Do not generate module-info with moditect-maven-plugin -->
-                        <phase>none</phase>
-                    </execution>
-                </executions>
-            </plugin>
-
         </plugins>
     </build>
 

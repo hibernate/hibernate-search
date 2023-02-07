@@ -70,7 +70,7 @@ public class AsciiDocWriter implements BiConsumer<Map<String, ConfigurationPrope
 					writer.write( " +++ " );
 
 					String defaultValue = Objects.toString( el.defaultValue(), "" );
-					if ( !defaultValue.isBlank() ) {
+					if ( !defaultValue.trim().isEmpty() ) {
 						writer.write( "\n+\n" );
 						writer.write( "Default value: `" );
 						writer.write( defaultValue );

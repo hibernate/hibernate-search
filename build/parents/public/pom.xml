@@ -24,6 +24,9 @@
         <javadoc.packagelists.directory>${project.build.directory}/dependencies-javadoc-packagelists</javadoc.packagelists.directory>
         <!-- override the value if no property collection should happen (set to `none`)-->
         <properties.collector.processing.phase>compile</properties.collector.processing.phase>
+        <!-- Output for property collection -->
+        <documentation.config.properties.output.directory>${rootProject.directory}/documentation/src/main/asciidoc/generated-docs</documentation.config.properties.output.directory>
+        <documentation.config.properties.skip>true</documentation.config.properties.skip>
     </properties>
 
     <build>
@@ -257,6 +260,42 @@
                                 <phase>process-resources</phase>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>collect-configuration-properties</id>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <phase>process-resources</phase>
+                                <configuration>
+                                    <skip>${documentation.config.properties.skip}</skip>
+                                    <mainClass>org.hibernate.search.configuration.properties.collector.impl.ConfigurationPropertyProcessor</mainClass>
+                                    <executableDependency>
+                                        <groupId>org.hibernate.search</groupId>
+                                        <artifactId>hibernate-search-configuration-properties-collector</artifactId>
+                                    </executableDependency>
+                                    <arguments>
+                                        <argument>${javadoc.org.hibernate.search.url}</argument>
+                                        <argument>${project.build.directory}</argument>
+                                        <argument>${documentation.config.properties.output.directory}</argument>
+                                        <argument>${project.artifactId}</argument>
+                                        <argument>${project.name}</argument>
+                                    </arguments>
+                                    <includePluginDependencies>true</includePluginDependencies>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.hibernate.search</groupId>
+                                <artifactId>hibernate-search-configuration-properties-collector</artifactId>
+                                <version>${project.version}</version>
+                            </dependency>
+                        </dependencies>
                     </plugin>
                 </plugins>
             </build>

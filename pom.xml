@@ -153,7 +153,6 @@
     <modules>
         <module>build/config</module>
         <module>build/parents/internal</module>
-        <module>build/configuration-properties-collector-processor</module>
         <module>util/internal/test/common</module>
         <module>util/internal/test/orm</module>
         <module>build/parents/public</module>
@@ -938,11 +937,6 @@
             <dependency>
                 <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-documentation</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-configuration-properties-collector-processor</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
