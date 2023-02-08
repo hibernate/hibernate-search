@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -71,7 +70,6 @@ public class FilteringOutboxEventFinder {
 		String queryString = DefaultOutboxEventFinder.createQueryString( combinedPredicate );
 		Query<OutboxEvent> query = DefaultOutboxEventFinder.createQuery( session, maxResults, queryString,
 				combinedPredicate );
-		avoidLockingConflicts( query );
 		return query;
 	}
 
@@ -101,7 +99,6 @@ public class FilteringOutboxEventFinder {
 		checkFiltering();
 		Query<OutboxEvent> query = session.createQuery(
 				"select e from " + ENTITY_NAME + " e order by e.created, e.id", OutboxEvent.class );
-		avoidLockingConflicts( query );
 		return query.list();
 	}
 
@@ -131,12 +128,6 @@ public class FilteringOutboxEventFinder {
 
 		// Need to combine the predicates...
 		return Optional.of( OutboxEventAndPredicate.of( predicate.get(), filterById ) );
-	}
-
-	// Configures a query to avoid locking on events,
-	// so as not to conflict with background processors.
-	private void avoidLockingConflicts(Query<OutboxEvent> query) {
-		query.setLockOptions( LockOptions.NONE );
 	}
 
 	public void awaitUntilNoMoreVisibleEvents(SessionFactory sessionFactory) {
