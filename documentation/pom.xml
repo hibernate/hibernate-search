@@ -337,6 +337,7 @@
                         <springBootUrl>https://spring.io/projects/spring-boot</springBootUrl>
                         <testSpringBootVersion>${version.org.springframework.boot}</testSpringBootVersion>
                         <gsonUrl>https://github.com/google/gson</gsonUrl>
+                        <documentationConfigPropertiesOutputDirectory>${documentation.config.properties.output.directory}</documentationConfigPropertiesOutputDirectory>
                     </attributes>
                 </configuration>
             </plugin>

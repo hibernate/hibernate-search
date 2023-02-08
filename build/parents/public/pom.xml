@@ -25,7 +25,7 @@
         <!-- override the value if no property collection should happen (set to `none`)-->
         <properties.collector.processing.phase>compile</properties.collector.processing.phase>
         <!-- Output for property collection -->
-        <documentation.config.properties.output.directory>${rootProject.directory}/documentation/src/main/asciidoc/generated-docs</documentation.config.properties.output.directory>
+        <documentation.config.properties.output.directory>${rootProject.directory}/target</documentation.config.properties.output.directory>
         <documentation.config.properties.skip>true</documentation.config.properties.skip>
     </properties>
 
