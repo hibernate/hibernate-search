@@ -366,53 +366,6 @@
     </build>
     <profiles>
         <profile>
-            <id>dist</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <!-- unpack sources to get *.asciidoc files with config properties -->
-                            <execution>
-                                <id>unpack-sources-for-config-properties</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>unpack</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.hibernate.search</groupId>
-                                            <artifactId>hibernate-search-configuration-properties-collector</artifactId>
-                                            <version>${project.version}</version>
-                                            <classifier>sources</classifier>
-                                            <type>jar</type>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${project.build.directory}/</outputDirectory>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                        <dependencies>
-                            <!--
-                                Only to make sure that we generate fresh properties before building docs
-                                when running partial maven build i.e. with -am -pl ...
-                                Having this listed as part of general dependencies would cause build issues as the jar has most
-                                of the search classes.
-                             -->
-                            <dependency>
-                                <groupId>${project.groupId}</groupId>
-                                <artifactId>hibernate-search-configuration-properties-collector</artifactId>
-                                <version>${project.version}</version>
-                                <classifier>sources</classifier>
-                            </dependency>
-                        </dependencies>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
             <id>documentation-pdf</id>
             <build>
                 <plugins>
