@@ -18,9 +18,12 @@ import javax.persistence.metamodel.Type;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
+import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.OutboxEventFilter;
+import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.TestingOutboxPollingInternalConfigurer;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
@@ -60,7 +63,7 @@ public class OutboxPollingStrategyPropertyValueIT {
 		);
 	}
 
-	private static final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
+	private static final OutboxEventFilter eventFilter = new OutboxEventFilter();
 
 	@ClassRule
 	public static BackendMock backendMock = new BackendMock();
@@ -81,10 +84,9 @@ public class OutboxPollingStrategyPropertyValueIT {
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 
-		setupContext.withProperty(
-						"hibernate.search.coordination.outbox_event_finder.provider",
-						outboxEventFinder.provider()
-				)
+		setupContext
+				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
+						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
 				.withProperty( HibernateOrmMapperSettings.COORDINATION_STRATEGY, strategyPropertyValue )
 				.withAnnotatedTypes( IndexedEntity.class );
 	}
@@ -96,7 +98,7 @@ public class OutboxPollingStrategyPropertyValueIT {
 
 	@Before
 	public void resetFilter() {
-		outboxEventFinder.reset();
+		eventFilter.reset();
 	}
 
 	@Test
@@ -114,7 +116,7 @@ public class OutboxPollingStrategyPropertyValueIT {
 		} );
 
 		setupHolder.runInTransaction( session -> {
-			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
+			List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 1 );
 		} );

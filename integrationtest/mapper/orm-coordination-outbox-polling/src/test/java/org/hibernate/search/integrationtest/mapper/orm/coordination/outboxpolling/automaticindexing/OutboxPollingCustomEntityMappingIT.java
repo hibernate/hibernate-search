@@ -29,8 +29,10 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.env.spi.NameQualifierSupport;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.jdbc.spi.StatementInspector;
-import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.FilteringOutboxEventFinder;
+import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.OutboxEventFilter;
+import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.TestingOutboxPollingInternalConfigurer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEvent;
@@ -81,7 +83,7 @@ public class OutboxPollingCustomEntityMappingIT {
 
 	private SessionFactory sessionFactory;
 
-	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
+	private final OutboxEventFilter eventFilter = new OutboxEventFilter();
 
 	@Test
 	public void wrongOutboxEventMapping() {
@@ -217,7 +219,8 @@ public class OutboxPollingCustomEntityMappingIT {
 
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
 		sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.coordination.outbox_event_finder.provider", outboxEventFinder.provider() )
+				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
+						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
 				// Allow ORM to create schema as we want to use non-default for this testcase:
 				.withProperty( "javax.persistence.create-database-schemas", true )
 				.withProperty( "hibernate.search.coordination.entity.mapping.agent.schema", CUSTOM_SCHEMA )
@@ -252,8 +255,8 @@ public class OutboxPollingCustomEntityMappingIT {
 		} );
 		// The events were hidden until now, to ensure they were not processed in separate batches.
 		// Make them visible to Hibernate Search now.
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
-		outboxEventFinder.awaitUntilNoMoreVisibleEvents( sessionFactory );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
+		eventFilter.awaitUntilNoMoreVisibleEvents( sessionFactory );
 
 		backendMock.verifyExpectationsMet();
 
@@ -271,7 +274,8 @@ public class OutboxPollingCustomEntityMappingIT {
 
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
 		sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.coordination.outbox_event_finder.provider", outboxEventFinder.provider() )
+				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
+						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
 				// Allow ORM to create schema as we want to use non-default for this testcase:
 				.withProperty( "javax.persistence.create-database-schemas", true )
 				.withProperty( "hibernate.search.coordination.entity.mapping.agent.uuid_gen_strategy", "time" )
@@ -300,8 +304,8 @@ public class OutboxPollingCustomEntityMappingIT {
 		} );
 		// The events were hidden until now, to ensure they were not processed in separate batches.
 		// Make them visible to Hibernate Search now.
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
-		outboxEventFinder.awaitUntilNoMoreVisibleEvents( sessionFactory );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
+		eventFilter.awaitUntilNoMoreVisibleEvents( sessionFactory );
 
 		backendMock.verifyExpectationsMet();
 
@@ -315,7 +319,8 @@ public class OutboxPollingCustomEntityMappingIT {
 
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
 		sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.coordination.outbox_event_finder.provider", outboxEventFinder.provider() )
+				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
+						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
 				// Allow ORM to create schema as we want to use non-default for this testcase:
 				.withProperty( "javax.persistence.create-database-schemas", true )
 				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.uuid_type", "uuid-char" )
@@ -344,8 +349,8 @@ public class OutboxPollingCustomEntityMappingIT {
 		} );
 		// The events were hidden until now, to ensure they were not processed in separate batches.
 		// Make them visible to Hibernate Search now.
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
-		outboxEventFinder.awaitUntilNoMoreVisibleEvents( sessionFactory );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
+		eventFilter.awaitUntilNoMoreVisibleEvents( sessionFactory );
 
 		backendMock.verifyExpectationsMet();
 
@@ -371,7 +376,7 @@ public class OutboxPollingCustomEntityMappingIT {
 	}
 
 	private void assertEventUUIDVersion(Session session, int expectedVersion) {
-		List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+		List<OutboxEvent> events = eventFilter.findOutboxEventsNoFilter( session );
 		assertThat( events )
 				.hasSize( 1 )
 				.extracting( OutboxEvent::getId )

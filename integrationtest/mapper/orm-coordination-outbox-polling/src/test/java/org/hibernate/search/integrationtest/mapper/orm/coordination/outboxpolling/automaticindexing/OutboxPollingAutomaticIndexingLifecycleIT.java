@@ -16,7 +16,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.FilteringOutboxEventFinder;
+import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.OutboxEventFilter;
+import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.TestingOutboxPollingInternalConfigurer;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -37,7 +39,7 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
-	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
+	private final OutboxEventFilter eventFilter = new OutboxEventFilter();
 
 	@Before
 	public void cleanUp() {
@@ -66,11 +68,11 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 		} );
 
 		// wait for the first call is processed (partial progressing)
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		SessionFactory finalSessionFactory = sessionFactory;
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
 			with( finalSessionFactory ).runInTransaction( session -> {
-				assertThat( outboxEventFinder.findOutboxEventIdsNoFilter( session ) ).hasSizeLessThan( size );
+				assertThat( eventFilter.findOutboxEventIdsNoFilter( session ) ).hasSizeLessThan( size );
 			} );
 		} );
 
@@ -78,10 +80,10 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 		sessionFactory.close();
 
 		// verify some entities have not been processed
-		outboxEventFinder.hideAllEvents();
+		eventFilter.hideAllEvents();
 		sessionFactory = setup();
 		with( sessionFactory ).runInTransaction( session -> {
-			List<OutboxEvent> outboxEventsNoFilter = outboxEventFinder.findOutboxEventsNoFilter( session );
+			List<OutboxEvent> outboxEventsNoFilter = eventFilter.findOutboxEventsNoFilter( session );
 			// partial processing, meaning that the events size is *strictly* between 0 and the full size:
 			assertThat( outboxEventsNoFilter ).isNotEmpty();
 			assertThat( outboxEventsNoFilter ).hasSizeLessThan( size );
@@ -90,7 +92,7 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 
 		// process the entities restarting Search:
 		sessionFactory = setup();
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 
 		backendMock.verifyExpectationsMet();
 	}
@@ -123,7 +125,7 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 		sessionFactory = setup();
 
 		with( sessionFactory ).runInTransaction( session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			List<OutboxEvent> events = eventFilter.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 3 );
 			// add
 			verifyOutboxEntry( events.get( 0 ), OutboxPollingAutomaticIndexingOutOfOrderIdsIT.IndexedEntity.INDEX, "1", null );
@@ -142,9 +144,9 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 
 		// The events were hidden until now, to ensure they were not processed in separate batches.
 		// Make them visible to Hibernate Search now.
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 
-		outboxEventFinder.awaitUntilNoMoreVisibleEvents( sessionFactory );
+		eventFilter.awaitUntilNoMoreVisibleEvents( sessionFactory );
 
 		backendMock.verifyExpectationsMet();
 	}
@@ -153,7 +155,8 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 		SessionFactory sessionFactory;
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b.field( "indexedField", String.class ) );
 		sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.coordination.outbox_event_finder.provider", outboxEventFinder.provider() )
+				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
+						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
 				.withProperty( "hibernate.hbm2ddl.auto", "update" )
 				.setup( IndexedEntity.class );
 		return sessionFactory;
@@ -162,7 +165,8 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 	private SessionFactory setupWithCleanup() {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b.field( "indexedField", String.class ) );
 		SessionFactory sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.coordination.outbox_event_finder.provider", outboxEventFinder.provider() )
+				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
+						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 		return sessionFactory;

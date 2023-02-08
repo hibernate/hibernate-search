@@ -20,8 +20,10 @@ import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
-import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.FilteringOutboxEventFinder;
+import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.OutboxEventFilter;
+import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.TestingOutboxPollingInternalConfigurer;
 import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
@@ -46,7 +48,7 @@ public class OutboxPollingAutomaticIndexingBackendFailureIT {
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
-	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder()
+	private final OutboxEventFilter eventFilter = new OutboxEventFilter()
 			// Disable the filter by default: only some of the tests actually need it.
 			.enableFilter( false );
 
@@ -291,7 +293,8 @@ public class OutboxPollingAutomaticIndexingBackendFailureIT {
 		failureHandler = new TestFailureHandler();
 		sessionFactory = ormSetupHelper.start()
 				.withProperty( "hibernate.search.background_failure_handler", failureHandler )
-				.withProperty( "hibernate.search.coordination.outbox_event_finder.provider", outboxEventFinder.provider() )
+				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
+						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
 				.withProperty( "hibernate.search.coordination.event_processor.retry_delay", retryDelay )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();

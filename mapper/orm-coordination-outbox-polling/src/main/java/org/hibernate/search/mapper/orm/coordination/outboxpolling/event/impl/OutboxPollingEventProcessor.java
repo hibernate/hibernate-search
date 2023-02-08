@@ -133,7 +133,7 @@ public final class OutboxPollingEventProcessor {
 					+ ( shardAssignmentOrNull == null ? "" : " - " + shardAssignmentOrNull.assignedShardIndex );
 			OutboxPollingEventProcessorClusterLink clusterLink = new OutboxPollingEventProcessorClusterLink(
 					agentName, mapping.failureHandler(), clock,
-					finderProvider, pollingInterval, pulseInterval, pulseExpiration, shardAssignmentOrNull );
+					new ShardAssignment.Provider( finderProvider ), pollingInterval, pulseInterval, pulseExpiration, shardAssignmentOrNull );
 
 			return new OutboxPollingEventProcessor( agentName, this, scheduledExecutor,
 					agentRepositoryProvider, clusterLink );

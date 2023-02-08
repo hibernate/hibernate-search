@@ -42,7 +42,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 	@Before
 	public final void initLink() {
 		link = new OutboxPollingEventProcessorClusterLink(
-				SELF_REF.name, failureHandlerMock, clockMock, eventFinderProviderStub,
+				SELF_REF.name, failureHandlerMock, clockMock, shardAssignmentProviderStub,
 				POLLING_INTERVAL, PULSE_INTERVAL, PULSE_EXPIRATION,
 				selfStaticShardAssignment()
 		);

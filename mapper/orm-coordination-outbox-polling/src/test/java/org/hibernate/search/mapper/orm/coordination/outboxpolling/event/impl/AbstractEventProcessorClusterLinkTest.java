@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -75,12 +74,8 @@ abstract class AbstractEventProcessorClusterLinkTest {
 	@Mock(stubOnly = true, strictness = Mock.Strictness.LENIENT)
 	public AgentClusterLinkContext contextMock;
 
-	protected final OutboxEventFinderProvider eventFinderProviderStub = new OutboxEventFinderProvider() {
-		@Override
-		public OutboxEventFinder create(Optional<OutboxEventPredicate> predicate) {
-			return eventFinderMock;
-		}
-	};
+	protected final ShardAssignment.Provider shardAssignmentProviderStub =
+			new ShardAssignment.Provider( (ignored1) -> eventFinderMock );
 
 	private final List<Object> allMocks = new ArrayList<>();
 

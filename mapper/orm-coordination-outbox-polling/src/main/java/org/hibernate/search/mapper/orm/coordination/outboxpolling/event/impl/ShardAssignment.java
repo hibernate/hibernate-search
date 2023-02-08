@@ -19,18 +19,26 @@ final class ShardAssignment {
 	// otherwise existing indexes will no longer work correctly.
 	public static final RangeCompatibleHashFunction HASH_FUNCTION = Murmur3HashFunction.INSTANCE;
 
-	public static ShardAssignment of(ShardAssignmentDescriptor descriptor,
-			OutboxEventFinderProvider finderProvider) {
-		Optional<OutboxEventPredicate> predicate;
-		if ( descriptor.totalShardCount == 1 ) {
-			predicate = Optional.empty();
+	public static class Provider {
+		private final OutboxEventFinderProvider finderProvider;
+
+		public Provider(OutboxEventFinderProvider finderProvider) {
+			this.finderProvider = finderProvider;
 		}
-		else {
-			RangeHashTable<Void> hashTable = new RangeHashTable<>( HASH_FUNCTION, descriptor.totalShardCount );
-			Range<Integer> entityIdHashRange = hashTable.rangeForBucket( descriptor.assignedShardIndex );
-			predicate = Optional.of( new EntityIdHashRangeOutboxEventPredicate( entityIdHashRange ) );
+
+		ShardAssignment create(ShardAssignmentDescriptor descriptor) {
+			Optional<OutboxEventPredicate> predicate;
+			if ( descriptor.totalShardCount == 1 ) {
+				predicate = Optional.empty();
+			}
+			else {
+				RangeHashTable<Void> hashTable = new RangeHashTable<>( HASH_FUNCTION, descriptor.totalShardCount );
+				Range<Integer> entityIdHashRange = hashTable.rangeForBucket( descriptor.assignedShardIndex );
+				predicate = Optional.of( new EntityIdHashRangeOutboxEventPredicate( entityIdHashRange ) );
+			}
+			return new ShardAssignment( descriptor, finderProvider.create( predicate ) );
 		}
-		return new ShardAssignment( descriptor, finderProvider.create( predicate ) );
+
 	}
 
 	final ShardAssignmentDescriptor descriptor;

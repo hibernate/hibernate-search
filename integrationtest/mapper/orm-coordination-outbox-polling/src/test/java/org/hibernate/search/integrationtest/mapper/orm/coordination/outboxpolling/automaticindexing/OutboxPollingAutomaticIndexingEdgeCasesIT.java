@@ -16,7 +16,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.FilteringOutboxEventFinder;
+import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.OutboxEventFilter;
+import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.TestingOutboxPollingInternalConfigurer;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -36,7 +38,7 @@ import org.junit.rules.MethodRule;
  */
 public class OutboxPollingAutomaticIndexingEdgeCasesIT {
 
-	private static final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
+	private static final OutboxEventFilter eventFilter = new OutboxEventFilter();
 
 	@ClassRule
 	public static BackendMock backendMock = new BackendMock();
@@ -58,16 +60,16 @@ public class OutboxPollingAutomaticIndexingEdgeCasesIT {
 		backendMock.expectSchema( IndexedAndContainedEntity.NAME, b -> b
 				.field( "text", String.class ) );
 		setupContext
-				.withProperty( "hibernate.search.coordination.outbox_event_finder.provider",
-						outboxEventFinder.provider() )
+				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
+						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
 				.withAnnotatedTypes( IndexedEntity.class, IndexedAndContainedEntity.class );
 	}
 
 	@Before
 	public void resetFilter() {
-		outboxEventFinder.reset();
+		eventFilter.reset();
 		// Disable the filter by default: only some of the tests actually need it.
-		outboxEventFinder.enableFilter( false );
+		eventFilter.enableFilter( false );
 	}
 
 	@Test
@@ -142,7 +144,7 @@ public class OutboxPollingAutomaticIndexingEdgeCasesIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		outboxEventFinder.enableFilter( true );
+		eventFilter.enableFilter( true );
 
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity containing = session.getReference( IndexedEntity.class, 1 );
@@ -162,11 +164,11 @@ public class OutboxPollingAutomaticIndexingEdgeCasesIT {
 		} );
 
 		// Make events visible one by one, so that they are processed in separate batches.
-		List<UUID> eventIds = setupHolder.applyInTransaction( outboxEventFinder::findOutboxEventIdsNoFilter );
+		List<UUID> eventIds = setupHolder.applyInTransaction( eventFilter::findOutboxEventIdsNoFilter );
 		assertThat( eventIds ).hasSize( 2 );
 		for ( UUID eventId : eventIds ) {
-			outboxEventFinder.showOnlyEvents( Collections.singletonList( eventId ) );
-			outboxEventFinder.awaitUntilNoMoreVisibleEvents( setupHolder.sessionFactory() );
+			eventFilter.showOnlyEvents( Collections.singletonList( eventId ) );
+			eventFilter.awaitUntilNoMoreVisibleEvents( setupHolder.sessionFactory() );
 		}
 
 		// If everything goes well, the above will have executed exactly one add work for "contained"
