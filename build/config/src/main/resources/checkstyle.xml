@@ -97,7 +97,8 @@
         <!-- Do not use sync blocks on objects -->
         <module name="RegexpSinglelineJava">
             <property name="format" value="synchronized\s*\(\s*(?!this\b)\w+" />
-            <property name="message" value="Do not use `synchronized (someObject)` blocks. Instead use the `java.util.concurrent.locks.Lock`s. See HSEARCH-4712." />
+            <!-- The last sentence of the message is a keyword to trigger exclusion: see ExcludeTestPackages -->
+            <property name="message" value="Do not use `synchronized (someObject)` blocks. Instead use the `java.util.concurrent.locks.Lock`s. See HSEARCH-4712. [not required for tests]" />
             <property name="ignoreComments" value="true" />
         </module>
 
