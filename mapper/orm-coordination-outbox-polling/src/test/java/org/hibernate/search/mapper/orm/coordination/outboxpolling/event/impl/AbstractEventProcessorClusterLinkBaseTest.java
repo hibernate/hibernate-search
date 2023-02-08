@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 import java.time.Duration;
 import java.util.UUID;
 
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
@@ -22,17 +21,17 @@ import org.junit.Test;
 
 /**
  * This abstract class implements one test method for each "external" situation that
- * {@link OutboxPollingEventProcessorClusterLink#pulse(AgentRepository)} can encounter,
+ * {@link OutboxPollingEventProcessorClusterLink#pulse(AgentClusterLinkContext)} can encounter,
  * i.e. for each configuration of other agents as registered in the database
  * (number of other agent, state of other agents, ...).
  * <p>
  * We then have one subclass for each "internal" situation that
- * {@link OutboxPollingEventProcessorClusterLink#pulse(AgentRepository)} can encounter,
+ * {@link OutboxPollingEventProcessorClusterLink#pulse(AgentClusterLinkContext)} can encounter,
  * i.e. for each state that the "self" agent can be in.
  * Each subclass defines the expectations for each test method.
  * <p>
  * By testing all these combinations, we manage to test many (all?) possible situations
- * that {@link OutboxPollingEventProcessorClusterLink#pulse(AgentRepository)} can encounter.
+ * that {@link OutboxPollingEventProcessorClusterLink#pulse(AgentClusterLinkContext)} can encounter.
  */
 abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventProcessorClusterLinkTest {
 
