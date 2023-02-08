@@ -21,6 +21,7 @@
 
     <properties>
         <java.module.name>org.hibernate.search.batch.jsr352.jberet</java.module.name>
+        <documentation.config.properties.skip>true</documentation.config.properties.skip>
     </properties>
 
     <dependencies>

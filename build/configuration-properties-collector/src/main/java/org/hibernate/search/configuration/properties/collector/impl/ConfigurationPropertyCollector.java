@@ -48,7 +48,7 @@ public class ConfigurationPropertyCollector {
 	}
 
 	public void process() {
-		processClasses( locateConstants() );
+		locateConstants().ifPresent( this::processClasses );
 	}
 
 	private void processClasses(Document constants) {
@@ -132,14 +132,14 @@ public class ConfigurationPropertyCollector {
 		}
 	}
 
-	private Document locateConstants() {
+	private Optional<Document> locateConstants() {
 		try {
 			Path docs = javadocsLocation.resolve( "constant-values.html" );
 
-			return Jsoup.parse( docs.toFile() );
+			return Optional.of( Jsoup.parse( docs.toFile() ) );
 		}
 		catch (IOException e) {
-			throw new IllegalStateException( "Unable to access javadocs `constant-values.html`", e );
+			return Optional.empty();
 		}
 	}
 
