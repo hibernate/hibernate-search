@@ -183,4 +183,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 30, value = "Invalid name for the UUID generation strategy: '%1$s'."
 			+ " Valid names are: %2$s.")
 	SearchException invalidUuidGenerationStrategyName(String name, List<String> values);
+
+	@Message(id = ID_OFFSET + 31, value = "Invalid name for the outbox event processing order: '%1$s'."
+			+ " Valid names are: %2$s.")
+	SearchException invalidOutboxEventProcessingOrderName(String name, List<String> values);
+
 }

@@ -594,6 +594,59 @@ hibernate.search.coordination.event_processor.enabled = false
 ----
 ====
 
+[[coordination-outbox-polling-event-processor-order]]
+==== Processing order
+
+The order in which outbox events are processed can be tuned with a configuration property:
+
+[source]
+----
+hibernate.search.coordination.event_processor.order = auto
+----
+
+Available options are:
+
+`auto`::
+The default value.
++
+Picks the safest, most appropriate order based on the dialect and other settings:
++
+* When using time-based UUIDs for outbox events (see <<coordination-database-polling-schema>>), picks `id`.
+* Otherwise, if using a Microsoft SQL Server dialect, picks `none`.
+* Otherwise, picks `time`.
+`none`::
+Process outbox events in no particular order.
++
+This essentially means events will be consumed in a database-specific, undetermined order.
++
+In setups with multiple event processors,
+this reduces the rate of background failures caused by transaction deadlocks (in particular with Microsoft SQL Server),
+which does not technically "fix" event processing (those failures are handled automatically by trying again anyway),
+but may improve performance and reduce unnecessary noise in logs.
++
+However, this may lead to situations where the processing of one particular event is continuously postponed
+due to newer events being processed before that particular event,
+which can be a problem in write-intensive scenarios where the event queue is never empty.
+`time`::
+Process outbox events in "time" order, i.e. in the order events are created.
++
+This ensures events are processed more or less in the order they were created
+and avoids situations where the processing of one particular event is continuously postponed
+due to newer events being processed before that particular event.
++
+However, in setups with multiple event processors,
+this may increase the rate of background failures caused by transaction deadlocks (in particular with Microsoft SQL Server),
+which does not technically break event processing (those failures are handled automatically by trying again anyway),
+but may reduce performance and lead to unnecessary noise in logs.
+`id`::
+Process outbox events in identifier order.
++
+If outbox event identifiers are time-based UUIDs (see <<coordination-database-polling-schema>>),
+this behaves similarly to `time`, but without the risk of deadlocks.
++
+If outbox event identifiers are random UUIDs (see <<coordination-database-polling-schema>>),
+this behaves similarly to `none`.
+
 [[coordination-outbox-polling-mass-indexer]]
 === Mass indexer
 

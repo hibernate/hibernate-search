@@ -22,9 +22,15 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 			new ProcessAfterFilter(), new ProcessPendingFilter() );
 
 	public static final class Provider extends OutboxEventFinderProvider {
+		private final OutboxEventOrder order;
+
+		public Provider(OutboxEventOrder order) {
+			this.order = order;
+		}
+
 		@Override
 		public void appendTo(ToStringTreeBuilder builder) {
-			// Nothing to display here
+			builder.attribute( "order", order );
 		}
 
 		@Override
@@ -34,21 +40,21 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 					// and will greatly reduce the number of rows.
 					? OutboxEventAndPredicate.of( predicate.get(), BASE_PREDICATE_FILTER )
 					: BASE_PREDICATE_FILTER;
-			return new DefaultOutboxEventFinder( Optional.of( combined ) );
+			return new DefaultOutboxEventFinder( Optional.of( combined ), order );
 		}
 
 		public DefaultOutboxEventFinder createWithoutStatusOrProcessAfterFilter() {
-			return new DefaultOutboxEventFinder( Optional.empty() );
+			return new DefaultOutboxEventFinder( Optional.empty(), order );
 		}
 	}
 
 	private final String queryString;
 	private final Optional<OutboxEventPredicate> predicate;
 
-	private DefaultOutboxEventFinder(Optional<OutboxEventPredicate> predicate) {
+	private DefaultOutboxEventFinder(Optional<OutboxEventPredicate> predicate, OutboxEventOrder order) {
 		this.queryString = "select e from " + ENTITY_NAME + " e "
 				+ ( predicate.isPresent() ? " where " + predicate.get().queryPart( "e" ) : "" )
-				+ " order by e.processAfter, e.id";
+				+ order.queryPart( "e" );
 		this.predicate = predicate;
 	}
 

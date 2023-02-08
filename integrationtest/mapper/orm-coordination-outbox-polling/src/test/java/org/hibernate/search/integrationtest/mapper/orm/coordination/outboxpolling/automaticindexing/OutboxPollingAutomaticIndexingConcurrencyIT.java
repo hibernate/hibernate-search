@@ -34,7 +34,7 @@ import org.junit.Test;
  * Tests highly concurrent background processing of events,
  * and checks in particular that it does not result in processing errors and/or deadlocks.
  * <p>
- * This used to fail on MS SQL Server, in particular, because of its lock escalation mechanism.
+ * This used to fail on Microsoft SQL Server, in particular, because of its lock escalation mechanism.
  */
 @TestForIssue(jiraKey = "HSEARCH-4141")
 public class OutboxPollingAutomaticIndexingConcurrencyIT {
