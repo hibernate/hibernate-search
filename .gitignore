@@ -47,5 +47,3 @@ nbactions.xml
 # Bitronix transaction logs
 *.btm
 
-# Folder for generated configuration properties collected by running maven build
-generated-docs
