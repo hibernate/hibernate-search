@@ -216,6 +216,19 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 			PREFIX + Radicals.COORDINATION_EVENT_PROCESSOR_PULSE_EXPIRATION;
 
 	/**
+	 * In the event processor, the order in which outbox events are processed.
+	 * <p>
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value #COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * Expects one of the "external representation" strings defined in {@link OutboxEventProcessingOrder}.
+	 * <p>
+	 * Defaults to {@link Defaults#COORDINATION_EVENT_PROCESSOR_ORDER}.
+	 */
+	public static final String COORDINATION_EVENT_PROCESSOR_ORDER =
+			PREFIX + Radicals.COORDINATION_EVENT_PROCESSOR_ORDER;
+
+	/**
 	 * In the event processor, how many outbox events, at most, are processed in a single transaction.
 	 * <p>
 	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
@@ -492,6 +505,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String COORDINATION_EVENT_PROCESSOR_POLLING_INTERVAL = COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_POLLING_INTERVAL;
 		public static final String COORDINATION_EVENT_PROCESSOR_PULSE_INTERVAL = COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_PULSE_INTERVAL;
 		public static final String COORDINATION_EVENT_PROCESSOR_PULSE_EXPIRATION = COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_PULSE_EXPIRATION;
+		public static final String COORDINATION_EVENT_PROCESSOR_ORDER = COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_ORDER;
 		public static final String COORDINATION_EVENT_PROCESSOR_BATCH_SIZE = COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_BATCH_SIZE;
 		public static final String COORDINATION_EVENT_PROCESSOR_TRANSACTION_TIMEOUT = COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_TRANSACTION_TIMEOUT;
 		public static final String COORDINATION_EVENT_PROCESSOR_RETRY_DELAY = COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_RETRY_DELAY;
@@ -526,6 +540,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String EVENT_PROCESSOR_POLLING_INTERVAL = EVENT_PROCESSOR_PREFIX + "polling_interval";
 		public static final String EVENT_PROCESSOR_PULSE_INTERVAL = EVENT_PROCESSOR_PREFIX + "pulse_interval";
 		public static final String EVENT_PROCESSOR_PULSE_EXPIRATION = EVENT_PROCESSOR_PREFIX + "pulse_expiration";
+		public static final String EVENT_PROCESSOR_ORDER = EVENT_PROCESSOR_PREFIX + "order";
 		public static final String EVENT_PROCESSOR_BATCH_SIZE = EVENT_PROCESSOR_PREFIX + "batch_size";
 		public static final String EVENT_PROCESSOR_TRANSACTION_TIMEOUT = EVENT_PROCESSOR_PREFIX + "transaction_timeout";
 		public static final String EVENT_PROCESSOR_RETRY_DELAY = EVENT_PROCESSOR_PREFIX + "retry_delay";
@@ -561,6 +576,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final int COORDINATION_EVENT_PROCESSOR_POLLING_INTERVAL = 100;
 		public static final int COORDINATION_EVENT_PROCESSOR_PULSE_INTERVAL = 2000;
 		public static final int COORDINATION_EVENT_PROCESSOR_PULSE_EXPIRATION = 30000;
+		public static final OutboxEventProcessingOrder COORDINATION_EVENT_PROCESSOR_ORDER = OutboxEventProcessingOrder.AUTO;
 		public static final int COORDINATION_EVENT_PROCESSOR_BATCH_SIZE = 50;
 		public static final int COORDINATION_EVENT_PROCESSOR_RETRY_DELAY = 30;
 		public static final int COORDINATION_MASS_INDEXER_POLLING_INTERVAL = 100;
