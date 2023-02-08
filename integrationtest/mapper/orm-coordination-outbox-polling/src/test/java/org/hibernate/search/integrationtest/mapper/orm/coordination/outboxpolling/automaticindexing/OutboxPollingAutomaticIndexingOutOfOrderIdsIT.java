@@ -27,7 +27,9 @@ import org.hibernate.dialect.H2Dialect;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.jdbc.spi.JdbcCoordinator;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.FilteringOutboxEventFinder;
+import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.OutboxEventFilter;
+import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.TestingOutboxPollingInternalConfigurer;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -46,7 +48,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
 	private static final String OUTBOX_EVENT_SELECT_ORDERED_IDS_AND_CREATED_TIME = "SELECT ID, CREATED FROM HSEARCH_OUTBOX_EVENT ORDER BY CREATED, ID";
 
-	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
+	private final OutboxEventFilter eventFilter = new OutboxEventFilter();
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();
@@ -62,7 +64,8 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		backendMock.expectAnySchema( IndexedEntity.INDEX )
 				.expectAnySchema( RoutedIndexedEntity.NAME );
 		sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.coordination.outbox_event_finder.provider", outboxEventFinder.provider() )
+				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
+						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
 				// use timebase uuids to get predictable sorting order
 				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.uuid_gen_strategy", "time" )
 				// see HSEARCH-4749, as some DBs (MSSQL) might use a nonstring representation of UUID we want to force it
@@ -97,7 +100,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		} );
 
 		with( sessionFactory ).runNoTransaction( session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			List<OutboxEvent> events = eventFilter.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 3 );
 			// Correct order when ordered by id (you'll have to trust me on that)
 			// add
@@ -114,7 +117,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		} );
 
 		with( sessionFactory ).runNoTransaction( session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			List<OutboxEvent> events = eventFilter.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 3 );
 			// Out-of-order when ordered by id (you'll have to trust me on that)
 			// delete
@@ -134,9 +137,9 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
 		// The events were hidden until now, to ensure they were not processed in separate batches.
 		// Make them visible to Hibernate Search now.
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 
-		outboxEventFinder.awaitUntilNoMoreVisibleEvents( sessionFactory );
+		eventFilter.awaitUntilNoMoreVisibleEvents( sessionFactory );
 
 		backendMock.verifyExpectationsMet();
 	}
@@ -155,7 +158,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
 		backendMock.expectWorks( IndexedEntity.INDEX )
 				.add( "1", b -> b.field( "indexedField", "value for the field" ) );
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
@@ -171,7 +174,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
 		backendMock.expectWorks( IndexedEntity.INDEX )
 				.addOrUpdate( "1", b -> b.field( "indexedField", "value for the field" ) );
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -190,7 +193,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
 		backendMock.expectWorks( IndexedEntity.INDEX )
 				.add( "1", b -> b.field( "indexedField", "value for the field" ) );
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 
 		with( sessionFactory ).runInTransaction( session -> {
@@ -206,7 +209,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		} );
 
 		with( sessionFactory ).runNoTransaction( session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			List<OutboxEvent> events = eventFilter.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 2 );
 			// Correct order when ordered by id (you'll have to trust me on that)
 			// delete
@@ -221,7 +224,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		} );
 
 		with( sessionFactory ).runNoTransaction( session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			List<OutboxEvent> events = eventFilter.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 2 );
 			// Out-of-order when ordered by id (you'll have to trust me on that)
 			// add
@@ -232,7 +235,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
 		backendMock.expectWorks( IndexedEntity.INDEX )
 				.addOrUpdate( "1", b -> b.field( "indexedField", "value for the field" ) );
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -251,7 +254,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 						.document( StubDocumentNode.document()
 								.field( "text", "first" )
 								.build() ) );
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 
 		// Update the current routing key (but don't trigger indexing yet: events are being filtered)
@@ -279,7 +282,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 						.document( StubDocumentNode.document()
 								.field( "text", "third" )
 								.build() ) );
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -299,7 +302,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 						.document( StubDocumentNode.document()
 								.field( "text", "first" )
 								.build() ) );
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 
 		// Update the current routing key (but don't trigger indexing yet: events are being filtered)
@@ -317,7 +320,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		} );
 
 		with( sessionFactory ).runNoTransaction( session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			List<OutboxEvent> events = eventFilter.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 2 );
 			// Correct order when ordered by id
 			OutboxPollingAutomaticIndexingEventSendingIT.verifyOutboxEntry( events.get( 0 ), RoutedIndexedEntity.NAME, "1",
@@ -335,7 +338,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		} );
 
 		with( sessionFactory ).runNoTransaction( session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			List<OutboxEvent> events = eventFilter.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 2 );
 			// Out-of-order when ordered by id
 			OutboxPollingAutomaticIndexingEventSendingIT.verifyOutboxEntry( events.get( 0 ), RoutedIndexedEntity.NAME, "1",
@@ -357,7 +360,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 						.document( StubDocumentNode.document()
 								.field( "text", "third" )
 								.build() ) );
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 	}
 

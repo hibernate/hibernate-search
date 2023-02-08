@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.FilteringOutboxEventFinder;
+import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.OutboxEventFilter;
+import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.TestingOutboxPollingInternalConfigurer;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
@@ -33,7 +35,7 @@ public class OutboxPollingAutomaticIndexingRoutingIT {
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
-	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
+	private final OutboxEventFilter eventFilter = new OutboxEventFilter();
 
 	private SessionFactory sessionFactory;
 
@@ -41,7 +43,8 @@ public class OutboxPollingAutomaticIndexingRoutingIT {
 	public void setup() {
 		backendMock.expectAnySchema( RoutedIndexedEntity.NAME );
 		sessionFactory = setupHelper.start()
-				.withProperty( "hibernate.search.coordination.outbox_event_finder.provider", outboxEventFinder.provider() )
+				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
+						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
 				.setup( RoutedIndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
@@ -59,7 +62,7 @@ public class OutboxPollingAutomaticIndexingRoutingIT {
 						.document( StubDocumentNode.document()
 								.field( "text", "first" )
 								.build() ) );
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 
 		// Update the current routing key (but don't trigger indexing yet: events are being filtered)
@@ -72,7 +75,7 @@ public class OutboxPollingAutomaticIndexingRoutingIT {
 		// Remember the events at this point
 		List<UUID> eventIdsAtSecondStatus = new ArrayList<>();
 		with( sessionFactory ).runInTransaction( session -> {
-			eventIdsAtSecondStatus.addAll( outboxEventFinder.findOutboxEventIdsNoFilter( session ) );
+			eventIdsAtSecondStatus.addAll( eventFilter.findOutboxEventIdsNoFilter( session ) );
 		} );
 
 		// Update the current routing key again (but don't trigger indexing yet: events are being filtered)
@@ -98,7 +101,7 @@ public class OutboxPollingAutomaticIndexingRoutingIT {
 						.document( StubDocumentNode.document()
 								.field( "text", "third" )
 								.build() ) );
-		outboxEventFinder.showOnlyEvents( eventIdsAtSecondStatus );
+		eventFilter.showOnlyEvents( eventIdsAtSecondStatus );
 		backendMock.verifyExpectationsMet();
 
 		// Simulate the processing of all remaining events
@@ -108,7 +111,7 @@ public class OutboxPollingAutomaticIndexingRoutingIT {
 						.document( StubDocumentNode.document()
 								.field( "text", "third" )
 								.build() ) );
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		eventFilter.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 	}
 

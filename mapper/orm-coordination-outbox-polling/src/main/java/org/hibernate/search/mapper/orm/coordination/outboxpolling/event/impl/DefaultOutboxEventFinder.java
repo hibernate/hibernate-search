@@ -17,48 +17,43 @@ import org.hibernate.query.Query;
 
 public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 
-	private static OutboxEventAndPredicate basePredicateFilter = OutboxEventAndPredicate.of(
+	private static final OutboxEventAndPredicate BASE_PREDICATE_FILTER = OutboxEventAndPredicate.of(
 			new ProcessAfterFilter(), new ProcessPendingFilter() );
 
 	public static final class Provider implements OutboxEventFinderProvider {
 		@Override
 		public DefaultOutboxEventFinder create(Optional<OutboxEventPredicate> predicate) {
-			return new DefaultOutboxEventFinder( predicate );
+			OutboxEventPredicate combined = ( predicate.isPresent() )
+					? OutboxEventAndPredicate.of( predicate.get(), BASE_PREDICATE_FILTER )
+					: BASE_PREDICATE_FILTER;
+			return new DefaultOutboxEventFinder( Optional.of( combined ) );
 		}
-	}
 
-	public static String createQueryString(Optional<OutboxEventPredicate> predicate) {
-		OutboxEventPredicate combined = ( predicate.isPresent() ) ?
-				OutboxEventAndPredicate.of( predicate.get(), basePredicateFilter ) :
-				basePredicateFilter;
-
-		return "select e from " + ENTITY_NAME + " e where " + combined.queryPart( "e" ) + " order by e.created, e.id";
-	}
-
-	public static Query<OutboxEvent> createQuery(Session session, int maxResults,
-			String queryString, Optional<OutboxEventPredicate> predicate) {
-		Query<OutboxEvent> query = session.createQuery( queryString, OutboxEvent.class );
-		if ( predicate.isPresent() ) {
-			predicate.get().setParams( query );
+		public DefaultOutboxEventFinder createWithoutStatusOrProcessAfterFilter() {
+			return new DefaultOutboxEventFinder( Optional.empty() );
 		}
-		basePredicateFilter.setParams( query );
-
-		query.setMaxResults( maxResults );
-		return query;
 	}
 
 	private final String queryString;
 	private final Optional<OutboxEventPredicate> predicate;
 
-	public DefaultOutboxEventFinder(Optional<OutboxEventPredicate> predicate) {
-		this.queryString = createQueryString( predicate );
+	private DefaultOutboxEventFinder(Optional<OutboxEventPredicate> predicate) {
+		this.queryString = "select e from " + ENTITY_NAME + " e "
+				+ ( predicate.isPresent() ? " where " + predicate.get().queryPart( "e" ) : "" )
+				+ " order by e.created, e.id";
 		this.predicate = predicate;
 	}
 
 	@Override
 	public List<OutboxEvent> findOutboxEvents(Session session, int maxResults) {
-		return DefaultOutboxEventFinder.createQuery( session, maxResults, queryString, predicate )
-				.list();
+		Query<OutboxEvent> query = session.createQuery( queryString, OutboxEvent.class );
+		if ( predicate.isPresent() ) {
+			predicate.get().setParams( query );
+		}
+
+		query.setMaxResults( maxResults );
+
+		return query.list();
 	}
 
 	private static class ProcessAfterFilter implements OutboxEventPredicate {

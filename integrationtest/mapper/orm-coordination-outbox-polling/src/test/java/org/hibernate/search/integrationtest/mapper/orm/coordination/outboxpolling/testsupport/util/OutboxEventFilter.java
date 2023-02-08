@@ -4,11 +4,10 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling;
+package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalJaxbMappingProducer.ENTITY_NAME;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
@@ -16,6 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -27,12 +27,15 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.Out
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEventFinderProvider;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEventPredicate;
 
-public class FilteringOutboxEventFinder {
+public class OutboxEventFilter {
 
 	private volatile boolean filter = true;
 	private final Set<UUID> allowedIds = ConcurrentHashMap.newKeySet();
 
-	public FilteringOutboxEventFinder() {
+	private OutboxEventFinder allEventsAllShardsFinder;
+	private OutboxEventFinder visibleEventsAllShardsFinder;
+
+	public OutboxEventFilter() {
 	}
 
 	public synchronized void reset() {
@@ -40,42 +43,23 @@ public class FilteringOutboxEventFinder {
 		allowedIds.clear();
 	}
 
-	public OutboxEventFinderProvider provider() {
-		return new Provider();
-	}
-
-	public synchronized List<OutboxEvent> findOutboxEvents(Session session, int maxResults,
-			Optional<OutboxEventPredicate> predicate) {
-		Query<OutboxEvent> query = createQuery( session, maxResults, predicate );
-		List<OutboxEvent> returned = query.list();
-		// Only return each event once.
-		// This is important because in the case of a retry, the same event will be reused.
-		for ( OutboxEvent outboxEvent : returned ) {
-			allowedIds.remove( outboxEvent.getId() );
-		}
-		return returned;
-	}
-
-	// Find outbox events as shown by the filter, but not for processing:
-	// don't update the filter as a result of this query.
-	public synchronized List<OutboxEvent> findOutboxEventsNotForProcessing(Session session, int maxResults,
-			Optional<OutboxEventPredicate> predicate) {
-		Query<OutboxEvent> query = createQuery( session, maxResults, predicate );
-		return query.list();
-	}
-
-	private Query<OutboxEvent> createQuery(Session session, int maxResults,
-			Optional<OutboxEventPredicate> predicate) {
-		Optional<OutboxEventPredicate> combinedPredicate = combineFilterWithPredicate( predicate );
-		String queryString = DefaultOutboxEventFinder.createQueryString( combinedPredicate );
-		Query<OutboxEvent> query = DefaultOutboxEventFinder.createQuery( session, maxResults, queryString,
-				combinedPredicate );
-		return query;
-	}
-
-	public synchronized FilteringOutboxEventFinder enableFilter(boolean enable) {
+	public synchronized OutboxEventFilter enableFilter(boolean enable) {
 		filter = enable;
 		return this;
+	}
+
+	public OutboxEventFinderProvider wrap(DefaultOutboxEventFinder.Provider delegate) {
+		allEventsAllShardsFinder = delegate.createWithoutStatusOrProcessAfterFilter();
+		// This finder won't update `allowedIds`; that's on purpose.
+		visibleEventsAllShardsFinder = delegate.create( Optional.of( new FilterById() ) );
+		return (predicate) -> {
+			FilterById filterById = new FilterById();
+			OutboxEventPredicate predicateWithFilter =
+					predicate.<OutboxEventPredicate>map( p -> OutboxEventAndPredicate.of( p, filterById ) )
+							.orElse( filterById );
+			return new FilteringFinder( delegate.create( predicate ),
+					delegate.create( Optional.of( predicateWithFilter ) ) );
+		};
 	}
 
 	public synchronized void showAllEventsUpToNow(SessionFactory sessionFactory) {
@@ -94,19 +78,14 @@ public class FilteringOutboxEventFinder {
 		allowedIds.clear();
 	}
 
-	// Orders events by ID, regardless of what order is used when processing them.
 	public List<OutboxEvent> findOutboxEventsNoFilter(Session session) {
 		checkFiltering();
-		Query<OutboxEvent> query = session.createQuery(
-				"select e from " + ENTITY_NAME + " e order by e.created, e.id", OutboxEvent.class );
-		return query.list();
+		// Assuming we'll never deal with more than one million events in tests when this method is called.
+		return allEventsAllShardsFinder.findOutboxEvents( session, 1_000_000 );
 	}
 
 	public List<UUID> findOutboxEventIdsNoFilter(Session session) {
-		checkFiltering();
-		Query<UUID> query = session.createQuery(
-				"select e.id from " + ENTITY_NAME + " e order by e.created, e.id", UUID.class );
-		return query.list();
+		return findOutboxEventsNoFilter( session ).stream().map( OutboxEvent::getId ).collect( Collectors.toList() );
 	}
 
 	private void checkFiltering() {
@@ -116,23 +95,9 @@ public class FilteringOutboxEventFinder {
 		}
 	}
 
-	private Optional<OutboxEventPredicate> combineFilterWithPredicate(Optional<OutboxEventPredicate> predicate) {
-		if ( !filter ) {
-			return predicate;
-		}
-
-		FilterById filterById = new FilterById();
-		if ( !predicate.isPresent() ) {
-			return Optional.of( filterById );
-		}
-
-		// Need to combine the predicates...
-		return Optional.of( OutboxEventAndPredicate.of( predicate.get(), filterById ) );
-	}
-
 	public void awaitUntilNoMoreVisibleEvents(SessionFactory sessionFactory) {
 		await().untilAsserted( () -> with( sessionFactory ).runInTransaction( session -> {
-			List<OutboxEvent> outboxEntries = findOutboxEventsNotForProcessing( session, 1, Optional.empty() );
+			List<OutboxEvent> outboxEntries = visibleEventsAllShardsFinder.findOutboxEvents( session, 1 );
 			assertThat( outboxEntries ).isEmpty();
 		} ) );
 	}
@@ -153,11 +118,27 @@ public class FilteringOutboxEventFinder {
 	 * A replacement for the default outbox event finder that can prevent existing outbox events from being detected,
 	 * thereby simulating a delay in the processing of outbox events.
 	 */
-	private class Provider implements OutboxEventFinderProvider {
+	private class FilteringFinder implements OutboxEventFinder {
+		private final OutboxEventFinder delegateWithoutFilter;
+		private final OutboxEventFinder delegateWithFilter;
+
+		private FilteringFinder(OutboxEventFinder delegateWithoutFilter, OutboxEventFinder delegateWithFilter) {
+			this.delegateWithoutFilter = delegateWithoutFilter;
+			this.delegateWithFilter = delegateWithFilter;
+		}
+
 		@Override
-		public OutboxEventFinder create(Optional<OutboxEventPredicate> predicate) {
-			return (session, maxResults) -> FilteringOutboxEventFinder.this.findOutboxEvents(
-					session, maxResults, predicate );
+		public List<OutboxEvent> findOutboxEvents(Session session, int maxResults) {
+			synchronized ( OutboxEventFilter.this ) {
+				OutboxEventFinder delegate = filter ? delegateWithFilter : delegateWithoutFilter;
+				List<OutboxEvent> returned = delegate.findOutboxEvents( session, maxResults );
+				// Only return each event once.
+				// This is important because in the case of a retry, the same event will be reused.
+				for ( OutboxEvent outboxEvent : returned ) {
+					allowedIds.remove( outboxEvent.getId() );
+				}
+				return returned;
+			}
 		}
 	}
 }

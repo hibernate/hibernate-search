@@ -36,7 +36,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 
 	final OutboxPollingEventProcessorClusterLink setupLink(ShardAssignmentDescriptor staticShardAssignment) {
 		return new OutboxPollingEventProcessorClusterLink(
-				SELF_REF.name, failureHandlerMock, clockMock, eventFinderProviderStub,
+				SELF_REF.name, failureHandlerMock, clockMock, shardAssignmentProviderStub,
 				POLLING_INTERVAL, PULSE_INTERVAL, PULSE_EXPIRATION,
 				staticShardAssignment
 		);
