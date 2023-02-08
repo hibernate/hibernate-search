@@ -51,6 +51,11 @@ public class ConfigurationPropertyProcessor implements AutoCloseable {
 		String artifact = args[3];
 		String moduleName = args[4];
 
+		// we don't want to run this processor on parent poms so if that's what we got - return fast:
+		if ( artifact.startsWith( "hibernate-search-parent-public" ) ) {
+			return;
+		}
+
 		try ( ConfigurationPropertyProcessor processor = new ConfigurationPropertyProcessor(
 				"apidocs",
 				javadocsBaseLink,
@@ -102,6 +107,12 @@ public class ConfigurationPropertyProcessor implements AutoCloseable {
 	}
 
 	private Path locateJavaDocFolder() {
-		return target.resolve( "site" ).resolve( javadocFolderName );
+		Path site = target.resolve( "site" ).resolve( javadocFolderName );
+		if ( !Files.exists( site ) ) {
+			throw new IllegalStateException(
+					"Was unable to locate javadocs. No processing is possible. Make sure that " +
+							"the Javadocs are generated prior to running this processor." );
+		}
+		return site;
 	}
 }

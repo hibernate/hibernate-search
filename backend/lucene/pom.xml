@@ -16,7 +16,6 @@
 
     <properties>
         <java.module.name>org.hibernate.search.backend.lucene</java.module.name>
-        <documentation.config.properties.skip>false</documentation.config.properties.skip>
     </properties>
 
     <dependencies>
