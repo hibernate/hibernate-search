@@ -71,18 +71,18 @@ index f42125b5a8..ded12df777 100644
  	}
  }
 diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxEventLoader.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxEventLoader.java
-index 21d3f29254..d45dec439c 100644
+index abe8ee8ef4..aa23bdb841 100644
 --- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxEventLoader.java
 +++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxEventLoader.java
-@@ -78,7 +78,7 @@ protected List<OutboxEvent> tryLoadLocking(Session session, Set<UUID> ids) {
- 			Query<OutboxEvent> query = session.createQuery( LOAD_QUERY, OutboxEvent.class );
- 			query.setParameter( "ids", ids );
- 
--			query.setLockOptions( new LockOptions( LockMode.PESSIMISTIC_WRITE ).setTimeOut( LockOptions.SKIP_LOCKED ) );
-+			query.setLockOptions( new LockOptions( LockMode.UPGRADE_SKIPLOCKED ) );
- 
- 			return query.getResultList();
+@@ -49,7 +49,7 @@ final class OutboxEventLoader implements ToStringTreeAppendable {
+ 		// so we can afford to just skip events that are already locked,
+ 		// and process them later when they are no longer locked.
+ 		if ( dialect.supportsSkipLocked() ) {
+-			lockOptions = new LockOptions( LockMode.PESSIMISTIC_WRITE ).setTimeOut( LockOptions.SKIP_LOCKED );
++			lockOptions = new LockOptions( LockMode.UPGRADE_SKIPLOCKED );
  		}
+ 		// If SKIP_LOCKED is not supported, we just do basic locking and hope for the best
+ 		// (in particular we hope for transaction deadlocks to be detected by the database and result in a failure,
 diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java
 index 87bb27fb18..b06a01b337 100644
 --- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java
