@@ -19,9 +19,11 @@ import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
+import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-final class OutboxEventLoader {
+final class OutboxEventLoader implements ToStringTreeAppendable {
 
 	private static final String LOAD_QUERY_STRING = "select e from OutboxEvent e where e.id in (:ids)";
 
@@ -57,6 +59,19 @@ final class OutboxEventLoader {
 		else {
 			lockOptions = new LockOptions( LockMode.PESSIMISTIC_WRITE );
 		}
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringTreeBuilder().value( this ).toString();
+	}
+
+	@Override
+	public void appendTo(ToStringTreeBuilder builder) {
+		builder.startObject( "lockOptions" )
+				.attribute( "lockMode", lockOptions.getLockMode() )
+				.attribute( "timeout", lockOptions.getTimeOut() )
+				.endObject();
 	}
 
 	List<OutboxEvent> loadLocking(Session session, Set<UUID> ids, String processorName) {

@@ -26,6 +26,7 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.Out
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEventFinder;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEventFinderProvider;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEventPredicate;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 public class OutboxEventFilter {
 
@@ -52,13 +53,23 @@ public class OutboxEventFilter {
 		allEventsAllShardsFinder = delegate.createWithoutStatusOrProcessAfterFilter();
 		// This finder won't update `allowedIds`; that's on purpose.
 		visibleEventsAllShardsFinder = delegate.create( Optional.of( new FilterById() ) );
-		return (predicate) -> {
-			FilterById filterById = new FilterById();
-			OutboxEventPredicate predicateWithFilter =
-					predicate.<OutboxEventPredicate>map( p -> OutboxEventAndPredicate.of( p, filterById ) )
-							.orElse( filterById );
-			return new FilteringFinder( delegate.create( predicate ),
-					delegate.create( Optional.of( predicateWithFilter ) ) );
+		return new OutboxEventFinderProvider() {
+			@Override
+			public void appendTo(ToStringTreeBuilder builder) {
+				builder.attribute( "filter", OutboxEventFilter.this );
+				builder.attribute( "delegate", delegate );
+			}
+
+			@Override
+			public OutboxEventFinder create(Optional<OutboxEventPredicate> predicate) {
+				FilterById filterById = new FilterById();
+				OutboxEventPredicate
+						predicateWithFilter =
+						predicate.<OutboxEventPredicate>map( p -> OutboxEventAndPredicate.of( p, filterById ) )
+								.orElse( filterById );
+				return new FilteringFinder( delegate.create( predicate ),
+						delegate.create( Optional.of( predicateWithFilter ) ) );
+			}
 		};
 	}
 

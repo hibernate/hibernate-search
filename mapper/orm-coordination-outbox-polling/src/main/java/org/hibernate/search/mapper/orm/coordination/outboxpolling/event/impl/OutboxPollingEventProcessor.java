@@ -31,9 +31,11 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.A
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public final class OutboxPollingEventProcessor {
+public final class OutboxPollingEventProcessor implements ToStringTreeAppendable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -189,8 +191,23 @@ public final class OutboxPollingEventProcessor {
 		);
 	}
 
+	@Override
+	public String toString() {
+		return new ToStringTreeBuilder().value( this ).toString();
+	}
+
+	@Override
+	public void appendTo(ToStringTreeBuilder builder) {
+		builder.attribute( "name", name )
+				.attribute( "loader", loader )
+				.attribute( "pollingInterval", pollingInterval )
+				.attribute( "batchSize", batchSize )
+				.attribute( "retryDelay", retryDelay )
+				.attribute( "clusterLink", clusterLink );
+	}
+
 	public void start() {
-		log.startingOutboxEventProcessor( name );
+		log.startingOutboxEventProcessor( name, this );
 		status.set( Status.STARTED );
 		processingTask.ensureScheduled();
 	}

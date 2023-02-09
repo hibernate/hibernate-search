@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -28,6 +29,7 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.A
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 import org.junit.After;
 import org.junit.Before;
@@ -75,7 +77,17 @@ abstract class AbstractEventProcessorClusterLinkTest {
 	public AgentClusterLinkContext contextMock;
 
 	protected final ShardAssignment.Provider shardAssignmentProviderStub =
-			new ShardAssignment.Provider( (ignored1) -> eventFinderMock );
+			new ShardAssignment.Provider( new OutboxEventFinderProvider() {
+				@Override
+				public OutboxEventFinder create(Optional<OutboxEventPredicate> predicate) {
+					return eventFinderMock;
+				}
+
+				@Override
+				public void appendTo(ToStringTreeBuilder builder) {
+					builder.attribute( "stub", true );
+				}
+			} );
 
 	private final List<Object> allMocks = new ArrayList<>();
 

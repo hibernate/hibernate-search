@@ -20,10 +20,13 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.A
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentReference;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
+import org.hibernate.search.util.common.logging.impl.ToStringTreeMultilineFormatter;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
@@ -51,8 +54,8 @@ public interface Log extends BasicLogger {
 	void automaticIndexingRetry(UUID eventId, String entityName, String entityId, int attempts, Instant processAfter);
 
 	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 5, value = "Starting outbox event processor '%1$s'")
-	void startingOutboxEventProcessor(String name);
+	@Message(id = ID_OFFSET + 5, value = "Starting outbox event processor '%1$s': %2$s")
+	void startingOutboxEventProcessor(String name, @FormatWith(ToStringTreeMultilineFormatter.class) ToStringTreeAppendable processor);
 
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 6, value = "Stopping outbox event processor '%1$s'")
@@ -141,8 +144,8 @@ public interface Log extends BasicLogger {
 			AgentReference conflictingAgentReference);
 
 	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 21, value = "Starting outbox mass indexer agent '%1$s'")
-	void startingOutboxMassIndexerAgent(String name);
+	@Message(id = ID_OFFSET + 21, value = "Starting outbox mass indexer agent '%1$s': %2$s")
+	void startingOutboxMassIndexerAgent(String name, @FormatWith(ToStringTreeMultilineFormatter.class) ToStringTreeAppendable processor);
 
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 22, value = "Stopping outbox mass indexer agent '%1$s'")
