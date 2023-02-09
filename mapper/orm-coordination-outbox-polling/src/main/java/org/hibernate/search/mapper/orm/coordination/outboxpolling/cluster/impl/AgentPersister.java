@@ -11,9 +11,11 @@ import java.time.Instant;
 import java.util.Collections;
 
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
+import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public final class AgentPersister {
+public final class AgentPersister implements ToStringTreeAppendable {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final AgentType type;
@@ -27,6 +29,18 @@ public final class AgentPersister {
 		this.type = type;
 		this.name = name;
 		this.staticShardAssignment = staticShardAssignment;
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringTreeBuilder().value( this ).toString();
+	}
+
+	@Override
+	public void appendTo(ToStringTreeBuilder builder) {
+		builder.attribute( "type", type )
+				.attribute( "name", name )
+				.attribute( "staticShardAssignment", staticShardAssignment );
 	}
 
 	public AgentReference selfReference() {

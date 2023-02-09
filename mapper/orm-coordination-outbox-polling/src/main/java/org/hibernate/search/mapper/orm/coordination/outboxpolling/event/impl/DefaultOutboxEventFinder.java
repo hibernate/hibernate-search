@@ -14,13 +14,19 @@ import java.util.Optional;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 
 	private static final OutboxEventAndPredicate BASE_PREDICATE_FILTER = OutboxEventAndPredicate.of(
 			new ProcessAfterFilter(), new ProcessPendingFilter() );
 
-	public static final class Provider implements OutboxEventFinderProvider {
+	public static final class Provider extends OutboxEventFinderProvider {
+		@Override
+		public void appendTo(ToStringTreeBuilder builder) {
+			// Nothing to display here
+		}
+
 		@Override
 		public DefaultOutboxEventFinder create(Optional<OutboxEventPredicate> predicate) {
 			OutboxEventPredicate combined = ( predicate.isPresent() )

@@ -27,9 +27,11 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.L
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentCreateContext;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent {
+public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent, ToStringTreeAppendable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -144,8 +146,20 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 	}
 
 	@Override
+	public String toString() {
+		return new ToStringTreeBuilder().value( this ).toString();
+	}
+
+	@Override
+	public void appendTo(ToStringTreeBuilder builder) {
+		builder.attribute( "name", name )
+				.attribute( "pollingInterval", pollingInterval )
+				.attribute( "clusterLink", clusterLink );
+	}
+
+	@Override
 	public CompletableFuture<?> start() {
-		log.startingOutboxMassIndexerAgent( name );
+		log.startingOutboxMassIndexerAgent( name, this );
 		status.set( Status.STARTED );
 		processingTask.ensureScheduled();
 		return worker.agentFullyStartedFuture;

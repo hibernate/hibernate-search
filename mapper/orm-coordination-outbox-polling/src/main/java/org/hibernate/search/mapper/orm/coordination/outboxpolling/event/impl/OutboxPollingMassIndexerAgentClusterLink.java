@@ -38,7 +38,6 @@ public final class OutboxPollingMassIndexerAgentClusterLink
 				failureHandler, clock,
 				pollingInterval, pulseInterval, pulseExpiration
 		);
-		log.tracef( "Agent '%s': created", agentName );
 	}
 
 	@Override

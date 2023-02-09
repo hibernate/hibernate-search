@@ -8,8 +8,16 @@ package org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl;
 
 import java.util.Optional;
 
-public interface OutboxEventFinderProvider {
+import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
-	OutboxEventFinder create(Optional<OutboxEventPredicate> predicate);
+public abstract class OutboxEventFinderProvider implements ToStringTreeAppendable {
+
+	@Override
+	public String toString() {
+		return new ToStringTreeBuilder().value( this ).toString();
+	}
+
+	public abstract OutboxEventFinder create(Optional<OutboxEventPredicate> predicate);
 
 }

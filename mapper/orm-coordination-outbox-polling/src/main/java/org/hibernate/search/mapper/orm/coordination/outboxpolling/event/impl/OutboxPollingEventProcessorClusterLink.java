@@ -25,6 +25,7 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.S
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.jboss.logging.Logger;
@@ -62,8 +63,13 @@ public final class OutboxPollingEventProcessorClusterLink
 			this.shardAssignmentIsStatic = true;
 			this.lastShardAssignment = shardAssignmentProvider.create( staticShardAssignment );
 		}
-		log.tracef( "Agent '%s': created, staticShardAssignment = %s",
-				agentName, staticShardAssignment );
+	}
+
+	@Override
+	public void appendTo(ToStringTreeBuilder builder) {
+		super.appendTo( builder );
+		builder.attribute( "shardAssignmentProvider", shardAssignmentProvider )
+				.attribute( "shardAssignmentIsStatic", shardAssignmentIsStatic );
 	}
 
 	@Override

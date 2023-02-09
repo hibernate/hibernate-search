@@ -19,9 +19,11 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.A
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentPersister;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentReference;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
+import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-abstract class AbstractAgentClusterLink<R> {
+abstract class AbstractAgentClusterLink<R> implements ToStringTreeAppendable {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final FailureHandler failureHandler;
@@ -41,6 +43,19 @@ abstract class AbstractAgentClusterLink<R> {
 		this.pollingInterval = pollingInterval;
 		this.pulseInterval = pulseInterval;
 		this.pulseExpiration = pulseExpiration;
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringTreeBuilder().value( this ).toString();
+	}
+
+	@Override
+	public void appendTo(ToStringTreeBuilder builder) {
+		builder.attribute( "agentPersister", agentPersister )
+				.attribute( "pollingInterval", pollingInterval )
+				.attribute( "pulseInterval", pulseInterval )
+				.attribute( "pulseExpiration", pulseExpiration );
 	}
 
 	public final R pulse(AgentClusterLinkContext context) {
