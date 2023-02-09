@@ -82,7 +82,7 @@ public final class OutboxPollingEventProcessor {
 
 	public static Factory factory(AutomaticIndexingMappingContext mapping, Clock clock, String tenantId,
 			ConfigurationPropertySource configurationSource) {
-		OutboxEventLoader loader = OutboxEventLoader.create( mapping.sessionFactory().getJdbcServices().getDialect() );
+		OutboxEventLoader loader = new OutboxEventLoader( mapping.sessionFactory().getJdbcServices().getDialect() );
 
 		Duration pollingInterval = POLLING_INTERVAL.getAndTransform( configurationSource, Duration::ofMillis );
 		Duration pulseInterval = PULSE_INTERVAL.getAndTransform( configurationSource,
