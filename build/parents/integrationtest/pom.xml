@@ -635,7 +635,7 @@
             <id>ci-mssql</id>
             <properties>
                 <test.database.run.mssql.skip>${test.database.run.skip}</test.database.run.mssql.skip>
-                <db.dialect>org.hibernate.dialect.SQLServer2012Dialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.SQLServer2016Dialect</db.dialect>
                 <jdbc.driver.groupId>com.microsoft.sqlserver</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mssql-jdbc</jdbc.driver.artifactId>
                 <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
