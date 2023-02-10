@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.realbackend.limitations;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalJaxbMappingProducer.ENTITY_NAME;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.ArrayList;
@@ -192,7 +193,8 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 
 	private static boolean noMoreOutboxEvents(SessionFactory sessionFactory) {
 		try ( Session session = sessionFactory.openSession() ) {
-			return session.createQuery( "select e from OutboxEvent e order by id", OutboxEvent.class ).list().isEmpty();
+			return session.createQuery( "select e from " + ENTITY_NAME
+					+ " e order by id", OutboxEvent.class ).list().isEmpty();
 		}
 	}
 

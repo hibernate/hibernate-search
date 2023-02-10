@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl;
 
+import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalJaxbMappingProducer.ENTITY_NAME;
+
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +27,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 final class OutboxEventLoader implements ToStringTreeAppendable {
 
-	private static final String LOAD_QUERY_STRING = "select e from OutboxEvent e where e.id in (:ids)";
+	private static final String LOAD_QUERY_STRING = "select e from " + ENTITY_NAME + " e where e.id in (:ids)";
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
