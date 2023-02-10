@@ -10,9 +10,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
+import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.SearchSort;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A builder for search queries.
@@ -34,6 +36,12 @@ public interface SearchQueryBuilder<H> {
 	void failAfter(long timeout, TimeUnit timeUnit);
 
 	void totalHitCountThreshold(long totalHitCountThreshold);
+
+	@Incubating
+	void highlighter(SearchHighlighter queryHighlighter);
+
+	@Incubating
+	void highlighter(String highlighterName, SearchHighlighter highlighter);
 
 	SearchQuery<H> build();
 

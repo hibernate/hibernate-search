@@ -6,19 +6,25 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.highlighter.impl.ElasticsearchSearchHighlighter;
+import org.hibernate.search.backend.elasticsearch.search.highlighter.impl.ElasticsearchSearchHighlighterImpl;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceSortKey;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.FieldProjectionRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionRequestContext;
-import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionRequestRootContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
@@ -33,25 +39,30 @@ import com.google.gson.JsonObject;
  *     ({@link #createExtractContext(JsonObject)}</li>
  * </ul>
  */
-class ElasticsearchSearchQueryRequestContext implements ProjectionRequestContext, AggregationRequestContext {
+class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootContext, AggregationRequestContext {
+
+	private Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchSearchIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContext<?, ?> loadingContext;
 	private final PredicateRequestContext rootPredicateContext;
 	private final Map<DistanceSortKey, Integer> distanceSorts;
+	private final Map<String, ElasticsearchSearchHighlighter> namedHighlighters;
 
 	ElasticsearchSearchQueryRequestContext(
 			ElasticsearchSearchIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContext<?, ?> loadingContext,
 			PredicateRequestContext rootPredicateContext,
-			Map<DistanceSortKey, Integer> distanceSorts) {
+			Map<DistanceSortKey, Integer> distanceSorts,
+			Map<String, ElasticsearchSearchHighlighter> namedHighlighters) {
 		this.scope = scope;
 		this.sessionContext = sessionContext;
 		this.loadingContext = loadingContext;
 		this.rootPredicateContext = rootPredicateContext;
 		this.distanceSorts = distanceSorts != null ? Collections.unmodifiableMap( distanceSorts ) : null;
+		this.namedHighlighters = namedHighlighters;
 	}
 
 	@Override
@@ -79,7 +90,7 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestContext
 	}
 
 	@Override
-	public ProjectionRequestContext root() {
+	public ProjectionRequestRootContext root() {
 		return this;
 	}
 
@@ -96,6 +107,18 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestContext
 	@Override
 	public String[] relativeCurrentFieldPathComponents() {
 		return null;
+	}
+
+	@Override
+	public ElasticsearchSearchHighlighter highlighter(String highlighterName) {
+		if ( highlighterName == null ) {
+			return ElasticsearchSearchHighlighterImpl.NO_OPTIONS_CONFIGURATION;
+		}
+		ElasticsearchSearchHighlighter highlighter = namedHighlighters.get( highlighterName );
+		if ( highlighter == null ) {
+			throw log.cannotFindHighlighter( highlighterName, namedHighlighters.keySet() );
+		}
+		return highlighter;
 	}
 
 	ElasticsearchSearchQueryExtractContext createExtractContext(JsonObject responseBody) {

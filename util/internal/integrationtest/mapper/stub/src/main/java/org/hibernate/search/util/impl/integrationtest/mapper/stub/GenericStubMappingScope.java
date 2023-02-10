@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
@@ -75,6 +76,10 @@ public class GenericStubMappingScope<R, E> {
 
 	public SearchAggregationFactory aggregation() {
 		return delegate.aggregation();
+	}
+
+	public SearchHighlighterFactory highlighter() {
+		return delegate.highlighter();
 	}
 
 	public <T> T extension(IndexScopeExtension<T> extension) {

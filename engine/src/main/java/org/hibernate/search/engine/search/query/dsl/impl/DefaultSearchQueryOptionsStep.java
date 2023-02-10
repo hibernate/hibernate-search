@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.query.dsl.impl;
 
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
@@ -47,6 +48,11 @@ final class DefaultSearchQueryOptionsStep<H, LOS>
 	@Override
 	protected SearchAggregationFactory aggregationFactory() {
 		return scope.aggregationFactory();
+	}
+
+	@Override
+	protected SearchHighlighterFactory highlighterFactory() {
+		return scope.highlighterFactory();
 	}
 
 	@Override

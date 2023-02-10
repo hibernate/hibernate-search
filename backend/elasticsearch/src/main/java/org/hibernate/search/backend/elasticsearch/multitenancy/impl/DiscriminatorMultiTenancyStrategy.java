@@ -150,7 +150,7 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
 		@Override
 		public void request(JsonObject requestBody, ProjectionRequestContext context) {
-			context.getSearchSyntax().requestDocValues( requestBody, ID_FIELD_NAME_JSON );
+			context.root().getSearchSyntax().requestDocValues( requestBody, ID_FIELD_NAME_JSON );
 		}
 
 		@Override

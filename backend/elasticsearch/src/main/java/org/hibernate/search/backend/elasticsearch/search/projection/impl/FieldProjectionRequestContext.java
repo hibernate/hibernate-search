@@ -10,44 +10,32 @@ import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
-import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class FieldProjectionRequestContext implements ProjectionRequestContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ProjectionRequestContext root;
+	private final ProjectionRequestRootContext root;
 	private final String absoluteCurrentFieldPath;
 	private final String[] absoluteCurrentFieldPathComponents;
 	private final String[] relativeCurrentFieldPathComponents;
 
-	public FieldProjectionRequestContext(ProjectionRequestContext root,
+	public FieldProjectionRequestContext(ProjectionRequestRootContext root,
 			String absoluteCurrentFieldPath, String[] absoluteCurrentFieldPathComponents) {
 		this( root, absoluteCurrentFieldPath, absoluteCurrentFieldPathComponents,
 				absoluteCurrentFieldPathComponents
 		);
 	}
 
-	private FieldProjectionRequestContext(ProjectionRequestContext root,
+	private FieldProjectionRequestContext(ProjectionRequestRootContext root,
 			String absoluteCurrentFieldPath, String[] absoluteCurrentFieldPathComponents,
 			String[] relativeCurrentFieldPathComponents) {
 		this.root = root;
 		this.absoluteCurrentFieldPath = absoluteCurrentFieldPath;
 		this.absoluteCurrentFieldPathComponents = absoluteCurrentFieldPathComponents;
 		this.relativeCurrentFieldPathComponents = relativeCurrentFieldPathComponents;
-	}
-
-	@Override
-	public Integer getDistanceSortIndex(String absoluteFieldPath, GeoPoint location) {
-		return root.getDistanceSortIndex( absoluteFieldPath, location );
-	}
-
-	@Override
-	public ElasticsearchSearchSyntax getSearchSyntax() {
-		return root.getSearchSyntax();
 	}
 
 	@Override
@@ -58,7 +46,7 @@ public class FieldProjectionRequestContext implements ProjectionRequestContext {
 	}
 
 	@Override
-	public ProjectionRequestContext root() {
+	public ProjectionRequestRootContext root() {
 		return root;
 	}
 

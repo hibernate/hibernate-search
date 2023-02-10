@@ -10,9 +10,9 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 public class ProjectionExtractContext {
 
-	private final ProjectionRequestContext requestContext;
+	private final ProjectionRequestRootContext requestContext;
 
-	public ProjectionExtractContext(ProjectionRequestContext requestContext) {
+	public ProjectionExtractContext(ProjectionRequestRootContext requestContext) {
 		this.requestContext = requestContext;
 	}
 

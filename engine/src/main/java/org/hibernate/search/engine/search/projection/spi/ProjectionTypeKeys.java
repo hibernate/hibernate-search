@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.projection.spi;
 
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+import org.hibernate.search.engine.search.projection.dsl.spi.HighlightProjectionBuilder;
 
 public final class ProjectionTypeKeys {
 
@@ -20,5 +21,6 @@ public final class ProjectionTypeKeys {
 	public static final SearchQueryElementTypeKey<FieldProjectionBuilder.TypeSelector> FIELD = key( "field" );
 	public static final SearchQueryElementTypeKey<DistanceToFieldProjectionBuilder> DISTANCE = key( "distance" );
 	public static final SearchQueryElementTypeKey<CompositeProjectionBuilder> OBJECT = key( "object" );
+	public static final SearchQueryElementTypeKey<HighlightProjectionBuilder> HIGHLIGHT = key( "highlight" );
 
 }

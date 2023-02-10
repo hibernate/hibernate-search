@@ -35,6 +35,7 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
+import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -71,6 +72,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	private TimeUnit timeUnit;
 	private boolean exceptionOnTimeout;
 	private Long totalHitCountThreshold;
+	private SearchHighlighter queryHighlighterConfiguration;
 
 	public LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
@@ -148,6 +150,16 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	@Override
 	public void totalHitCountThreshold(long totalHitCountThreshold) {
 		this.totalHitCountThreshold = totalHitCountThreshold;
+	}
+
+	@Override
+	public void highlighter(SearchHighlighter queryHighlighter) {
+		this.queryHighlighterConfiguration = queryHighlighter;
+	}
+
+	@Override
+	public void highlighter(String highlighterName, SearchHighlighter highlighter) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

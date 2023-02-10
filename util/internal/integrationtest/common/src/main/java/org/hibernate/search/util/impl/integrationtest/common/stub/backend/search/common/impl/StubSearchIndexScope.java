@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
+import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
@@ -127,6 +128,11 @@ public class StubSearchIndexScope
 	@Override
 	public SearchAggregationFactory aggregationFactory() {
 		return new StubSearchAggregationFactory( SearchAggregationDslContext.root( this, predicateFactory() ) );
+	}
+
+	@Override
+	public SearchHighlighterFactory highlighterFactory() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

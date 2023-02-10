@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -20,6 +21,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregation;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.highlighter.impl.ElasticsearchSearchHighlighter;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceSortKey;
@@ -33,6 +35,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchR
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
+import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -77,6 +80,8 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private TimeUnit timeoutUnit;
 	private boolean exceptionOnTimeout;
 	private Long totalHitCountThreshold;
+	private ElasticsearchSearchHighlighter queryHighlighter;
+	private final Map<String, ElasticsearchSearchHighlighter> namedHighlighters = new HashMap<>();
 	private ElasticsearchSearchRequestTransformer requestTransformer;
 
 	public ElasticsearchSearchQueryBuilder(
@@ -163,6 +168,21 @@ public class ElasticsearchSearchQueryBuilder<H>
 	}
 
 	@Override
+	public void highlighter(SearchHighlighter queryHighlighter) {
+		this.queryHighlighter = ElasticsearchSearchHighlighter.from( scope,
+				queryHighlighter
+		);
+	}
+
+	@Override
+	public void highlighter(String highlighterName, SearchHighlighter highlighter) {
+		this.namedHighlighters.put(
+				highlighterName,
+				ElasticsearchSearchHighlighter.from( scope, highlighter )
+		);
+	}
+
+	@Override
 	public PredicateRequestContext getRootPredicateContext() {
 		return rootPredicateContext;
 	}
@@ -217,7 +237,8 @@ public class ElasticsearchSearchQueryBuilder<H>
 		SearchLoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
 
 		ElasticsearchSearchQueryRequestContext requestContext = new ElasticsearchSearchQueryRequestContext(
-				scope, sessionContext, loadingContext, rootPredicateContext, distanceSorts
+				scope, sessionContext, loadingContext, rootPredicateContext, distanceSorts,
+				namedHighlighters
 		);
 
 		ElasticsearchSearchProjection.Extractor<?, H> rootExtractor = rootProjection.request( payload, requestContext );
@@ -230,6 +251,10 @@ public class ElasticsearchSearchQueryBuilder<H>
 			}
 
 			payload.add( "aggregations", jsonAggregations );
+		}
+
+		if ( queryHighlighter != null ) {
+			queryHighlighter.request( payload );
 		}
 
 		if ( !REQUEST_SOURCE_ACCESSOR.get( payload ).isPresent() ) {

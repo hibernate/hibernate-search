@@ -24,6 +24,7 @@ import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.common.SortMode;
+import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.sort.SearchSort;
@@ -37,6 +38,7 @@ import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.jboss.logging.BasicLogger;
+import org.jboss.logging.Logger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
@@ -742,4 +744,25 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 159, value = "Invalid use of 'missing().lowest()' for a descending distance sort. " +
 			"Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized. ")
 	SearchException missingLowestOnDescSortNotSupported(@Param EventContext context);
+
+	@Message(id = ID_OFFSET + 160,
+			value = "Invalid highlighter: '%1$s'. You must build the highlighter from an Elasticsearch search scope.")
+	SearchException cannotMixElasticsearchSearchQueryWithOtherQueryHighlighters(SearchHighlighter highlighter);
+
+	@Message(id = ID_OFFSET + 161,
+			value = "Invalid highlighter: '%1$s'. You must build the highlighter from a scope targeting indexes %3$s,"
+					+ " but the given highlighter was built from a scope targeting indexes %2$s.")
+	SearchException queryHighlighterDefinedOnDifferentIndexes(SearchHighlighter highlighter, Set<String> configurationIndexes, Set<String> scopeIndexes);
+
+	@LogMessage(level = Logger.Level.WARN)
+	@Message(id = ID_OFFSET + 162,
+			value = "No fields were added to be highlighted, but some query level highlighters were provided. " +
+					"These highlighters will be ignored.")
+	void noFieldsToHighlight();
+
+	@Message(id = ID_OFFSET + 163,
+			value = "Cannot find a highlighter with name '%1$s'." +
+					" Available highlighters are: %2$s." +
+					" Was it configured with `highlighter(\"%1$s\", highlighterContributor)`?")
+	SearchException cannotFindHighlighter(String highlighterName, Set<String> highlighters);
 }

@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.search.query.dsl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchSearchSortFactory;
+import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractExtendedSearchQueryOptionsStep;
 
@@ -72,5 +73,10 @@ class ElasticsearchSearchQueryOptionsStepImpl<H, LOS>
 	@Override
 	protected ElasticsearchSearchAggregationFactory aggregationFactory() {
 		return scope.aggregationFactory();
+	}
+
+	@Override
+	protected SearchHighlighterFactory highlighterFactory() {
+		return scope.highlighterFactory();
 	}
 }

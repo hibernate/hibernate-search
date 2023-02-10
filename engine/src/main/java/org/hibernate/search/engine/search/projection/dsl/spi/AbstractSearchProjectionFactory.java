@@ -10,6 +10,8 @@ import java.util.List;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.projection.dsl.HighlightProjectionOptionsStep;
+import org.hibernate.search.engine.search.projection.dsl.impl.HighlightProjectionOptionsStepImpl;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
@@ -134,5 +136,10 @@ public abstract class AbstractSearchProjectionFactory<
 	@Override
 	public final String toAbsolutePath(String relativeFieldPath) {
 		return dslContext.scope().toAbsolutePath( relativeFieldPath );
+	}
+
+	@Override
+	public HighlightProjectionOptionsStep highlight(String fieldPath) {
+		return new HighlightProjectionOptionsStepImpl( dslContext, fieldPath );
 	}
 }

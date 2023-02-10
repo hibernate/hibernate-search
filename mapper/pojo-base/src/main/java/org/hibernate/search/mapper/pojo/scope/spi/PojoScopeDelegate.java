@@ -11,13 +11,14 @@ import java.util.Set;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 
@@ -46,6 +47,8 @@ public interface PojoScopeDelegate<R, E, C> {
 	SearchProjectionFactory<R, E> projection();
 
 	SearchAggregationFactory aggregation();
+
+	SearchHighlighterFactory highlighter();
 
 	/**
 	 * @param sessionContext The detached session, for the tenant ID.
