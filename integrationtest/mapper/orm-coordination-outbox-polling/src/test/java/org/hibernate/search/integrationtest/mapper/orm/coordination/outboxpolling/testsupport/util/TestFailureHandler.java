@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.automaticindexing;
+package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +18,7 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.impl.LogFailureHandler;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
-class TestFailureHandler implements FailureHandler {
+public class TestFailureHandler implements FailureHandler {
 	public final List<FailureContext> genericFailures = Collections.synchronizedList( new ArrayList<>() );
 	public final Map<Integer, List<EntityIndexingFailureContext>> entityFailures = new ConcurrentHashMap<>();
 	private final LogFailureHandler delegate = new LogFailureHandler();
