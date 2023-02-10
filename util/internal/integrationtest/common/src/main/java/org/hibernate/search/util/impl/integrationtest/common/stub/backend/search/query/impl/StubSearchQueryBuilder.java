@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
+import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -80,6 +81,16 @@ public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H> {
 	@Override
 	public void totalHitCountThreshold(long totalHitCountThreshold) {
 		// totalHitCountThreshold is not tested from the mapper
+	}
+
+	@Override
+	public void highlighter(SearchHighlighter queryHighlighter) {
+		// highlight is not tested from the mapper
+	}
+
+	@Override
+	public void highlighter(String highlighterName, SearchHighlighter highlighter) {
+		// highlight is not tested from the mapper
 	}
 
 	@Override

@@ -108,7 +108,7 @@ public class DiscriminatorTypeNameMapping implements TypeNameMapping {
 
 		@Override
 		public void request(JsonObject requestBody, ProjectionRequestContext context) {
-			context.getSearchSyntax().requestDocValues( requestBody, MAPPED_TYPE_FIELD_NAME_JSON );
+			context.root().getSearchSyntax().requestDocValues( requestBody, MAPPED_TYPE_FIELD_NAME_JSON );
 		}
 
 		@Override

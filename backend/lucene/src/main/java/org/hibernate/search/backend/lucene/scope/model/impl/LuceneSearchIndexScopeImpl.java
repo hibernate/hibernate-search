@@ -27,6 +27,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexC
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexNodeContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.highlighter.LuceneSearchHighlighterFactory;
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.predicate.dsl.impl.LuceneSearchPredicateFactoryImpl;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactory;
@@ -181,6 +182,11 @@ public final class LuceneSearchIndexScopeImpl
 	@Override
 	public LuceneSearchAggregationFactory aggregationFactory() {
 		return new LuceneSearchAggregationFactoryImpl( SearchAggregationDslContext.root( this, predicateFactory() ) );
+	}
+
+	@Override
+	public LuceneSearchHighlighterFactory highlighterFactory() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

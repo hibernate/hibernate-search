@@ -12,16 +12,21 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
-import org.hibernate.search.engine.search.query.SearchResultTotal;
-import org.hibernate.search.engine.search.sort.SearchSort;
+import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
+import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
+import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
+import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFinalStep;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.SearchFetchable;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.engine.search.query.SearchResultTotal;
+import org.hibernate.search.engine.search.sort.SearchSort;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * The final step in a query definition, where optional parameters such as {@link #sort(Function) sorts} can be set,
@@ -155,4 +160,34 @@ public interface SearchQueryOptionsStep<
 	 */
 	S totalHitCountThreshold(long totalHitCountThreshold);
 
+	/**
+	 * Configure the query level highlighting optional settings.
+	 * <p>
+	 * For specifying the fields to highlight and providing field-specific settings see {@link SearchProjectionFactory#highlight(String)} and {@link #highlighter(String, Function)}
+	 * TODO:
+	 * @return {@code this}, for method chaining.
+	 */
+	@Incubating
+	S highlighter(Function<? super SearchHighlighterFactory, ? extends HighlighterFinalStep> highlighterContributor);
+
+	/**
+	 * TODO
+	 */
+	@Incubating
+	S highlighter(SearchHighlighter highlighter);
+
+	/**
+	 * Configure the named highlighter to be referenced at field level highlights in select section of a query.
+	 * <p>
+	 * TODO:
+	 * @return {@code this}, for method chaining.
+	 */
+	@Incubating
+	S highlighter(String highlighterName, Function<? super SearchHighlighterFactory, ? extends HighlighterFinalStep> highlighterContributor);
+
+	/**
+	 * TODO
+	 */
+	@Incubating
+	S highlighter(String highlighterName, SearchHighlighter highlighter);
 }

@@ -18,6 +18,9 @@ import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
+import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
+import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFinalStep;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
@@ -111,6 +114,42 @@ public abstract class AbstractSearchQueryOptionsStep<
 	}
 
 	@Override
+	public S highlighter(Function<? super SearchHighlighterFactory, ? extends HighlighterFinalStep> highlighterContributor) {
+		searchQueryBuilder.highlighter(
+				highlighterContributor.apply(
+						highlighterFactory()
+				).toHighlighter() );
+
+		return thisAsS();
+	}
+
+	@Override
+	public S highlighter(SearchHighlighter highlighter) {
+		searchQueryBuilder.highlighter( highlighter );
+
+		return thisAsS();
+	}
+
+	@Override
+	public S highlighter(String highlighterName, Function<? super SearchHighlighterFactory, ? extends HighlighterFinalStep> highlighterContributor) {
+		searchQueryBuilder.highlighter(
+				highlighterName,
+				highlighterContributor.apply(
+						highlighterFactory()
+				).toHighlighter()
+		);
+
+		return thisAsS();
+	}
+
+	@Override
+	public S highlighter(String highlighterName, SearchHighlighter highlighter) {
+		searchQueryBuilder.highlighter( highlighterName, highlighter );
+
+		return thisAsS();
+	}
+
+	@Override
 	public S loading(Consumer<? super LOS> loadingOptionsContributor) {
 		loadingOptionsContributor.accept( loadingContextBuilder.toAPI() );
 		return thisAsS();
@@ -200,4 +239,7 @@ public abstract class AbstractSearchQueryOptionsStep<
 	protected abstract SF sortFactory();
 
 	protected abstract AF aggregationFactory();
+
+	protected abstract SearchHighlighterFactory highlighterFactory();
+
 }

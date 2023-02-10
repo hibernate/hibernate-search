@@ -46,7 +46,7 @@ public class ElasticsearchRootContextProjection<P>
 			// Avoid unnecessary overhead and skip the wrapping completely:
 			return inner.request( requestBody, context );
 		}
-		ProjectionRequestContext innerContext = context.root();
+		ProjectionRequestRootContext innerContext = context.root();
 		return new RootContextExtractor<>( inner.request( requestBody, innerContext ) );
 	}
 

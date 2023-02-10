@@ -11,6 +11,7 @@ import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -56,6 +57,11 @@ class MappedIndexScopeImpl<R, E> implements MappedIndexScope<R, E> {
 	@Override
 	public SearchAggregationFactory aggregation() {
 		return delegate.searchScope().aggregationFactory();
+	}
+
+	@Override
+	public SearchHighlighterFactory highlighter() {
+		return delegate.searchScope().highlighterFactory();
 	}
 
 	@Override

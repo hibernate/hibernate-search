@@ -11,8 +11,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -413,4 +413,12 @@ public interface SearchProjectionFactory<R, E> {
 	@Incubating
 	String toAbsolutePath(String relativeFieldPath);
 
+	/**
+	 * Project to highlights, i.e. sequences of text that matched the query, extracted from the given field's value.
+	 *
+	 * @param fieldPath The <a href="#field-paths">path</a> to the index field whose highlights will be extracted.
+	 * @return A DSL step where the "highlight" projection can be defined in more details.
+	 */
+	@Incubating
+	HighlightProjectionOptionsStep highlight(String fieldPath);
 }

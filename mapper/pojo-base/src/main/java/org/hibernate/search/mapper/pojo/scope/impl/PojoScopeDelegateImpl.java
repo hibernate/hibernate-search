@@ -24,6 +24,7 @@ import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
@@ -140,6 +141,11 @@ public final class PojoScopeDelegateImpl<R, E, C> implements PojoScopeDelegate<R
 	@Override
 	public SearchAggregationFactory aggregation() {
 		return getIndexScope().aggregation();
+	}
+
+	@Override
+	public SearchHighlighterFactory highlighter() {
+		return getIndexScope().highlighter();
 	}
 
 	@Override
