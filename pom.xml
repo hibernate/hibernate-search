@@ -528,8 +528,13 @@
         <!-- We control whether we should download javadoc based on this property
              that defines the phase of some Maven plugin executions,
              because just skipping those plugins doesn't skip dependency resolution,
-             which will fail if javadco wasn't downloaded. -->
+             which will fail if javadoc wasn't downloaded. -->
         <javadoc.download.phase>generate-resources</javadoc.download.phase>
+        <!--
+            Some profiles might want to ignore running a property collection processor entirely.
+            In such case set this property to `none`.
+        -->
+        <documentation.config.properties.phase>process-resources</documentation.config.properties.phase>
 
         <!-- Test settings -->
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
@@ -2495,6 +2500,7 @@
                 <maven.javadoc.skip>true</maven.javadoc.skip>
                 <javadoc.download.phase>none</javadoc.download.phase>
                 <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
+                <documentation.config.properties.phase>none</documentation.config.properties.phase>
             </properties>
             <build>
                 <plugins>

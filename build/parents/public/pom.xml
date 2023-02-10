@@ -268,7 +268,7 @@
                                 <goals>
                                     <goal>java</goal>
                                 </goals>
-                                <phase>process-resources</phase>
+                                <phase>${documentation.config.properties.phase}</phase>
                                 <configuration>
                                     <skip>${documentation.config.properties.skip}</skip>
                                     <mainClass>org.hibernate.search.configuration.properties.collector.impl.ConfigurationPropertyProcessor</mainClass>
