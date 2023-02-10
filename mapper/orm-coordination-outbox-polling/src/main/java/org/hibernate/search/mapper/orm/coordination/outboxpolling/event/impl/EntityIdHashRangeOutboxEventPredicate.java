@@ -16,53 +16,64 @@ public final class EntityIdHashRangeOutboxEventPredicate implements OutboxEventP
 	private static final String LOWER_BOUND_PARAM_NAME = "lowerHash";
 	private static final String UPPER_BOUND_PARAM_NAME = "upperHash";
 
-	private final Range<Integer> range;
+	private final Integer lowerBoundIncluded;
+	private final Integer upperBoundIncluded;
 
 	public EntityIdHashRangeOutboxEventPredicate(Range<Integer> range) {
-		this.range = range;
+		Optional<Integer> lowerBound = range.lowerBoundValue();
+		if ( lowerBound.isPresent() ) {
+			Integer lowerBoundValue = lowerBound.get();
+			if ( range.lowerBoundInclusion() == RangeBoundInclusion.EXCLUDED ) {
+				++lowerBoundValue;
+			}
+			lowerBoundIncluded = lowerBoundValue;
+		}
+		else {
+			lowerBoundIncluded = null;
+		}
+		Optional<Integer> upperBound = range.upperBoundValue();
+		if ( upperBound.isPresent() ) {
+			Integer upperBoundValue = upperBound.get();
+			if ( range.upperBoundInclusion() == RangeBoundInclusion.EXCLUDED ) {
+				--upperBoundValue;
+			}
+			upperBoundIncluded = upperBoundValue;
+		}
+		else {
+			upperBoundIncluded = null;
+		}
 	}
 
 	@Override
 	public String queryPart(String eventAlias) {
 		StringBuilder builder = new StringBuilder( eventAlias );
 		builder.append( ".entityIdHash " );
-		RangeBoundInclusion lowerBoundCondition = range.lowerBoundValue().isPresent() ? range.lowerBoundInclusion() : null;
-		RangeBoundInclusion upperBoundCondition = range.upperBoundValue().isPresent() ? range.upperBoundInclusion() : null;
 
-		if ( lowerBoundCondition == RangeBoundInclusion.INCLUDED
-				&& upperBoundCondition == RangeBoundInclusion.INCLUDED ) {
+		// We try to use a single predicate instead of "... <= ... and ... < ...",
+		// because this seems to help SQL Server come up with better query plans.
+		// This forces us to adjust the value of bounds so that they are included
+		// (because the BETWEEN predicate includes both bounds),
+		// but since we're dealing with integers that's easy.
+		if ( lowerBoundIncluded != null && upperBoundIncluded != null ) {
 			builder.append( "between :" ).append( LOWER_BOUND_PARAM_NAME )
 					.append( " and :" ).append( UPPER_BOUND_PARAM_NAME );
 		}
-		else {
-			if ( lowerBoundCondition == RangeBoundInclusion.INCLUDED ) {
-				builder.append( " >= :" ).append( LOWER_BOUND_PARAM_NAME );
-			}
-			else if ( lowerBoundCondition == RangeBoundInclusion.EXCLUDED ) {
-				builder.append( " > :" ).append( LOWER_BOUND_PARAM_NAME );
-			}
-			if ( lowerBoundCondition != null && upperBoundCondition != null ) {
-				builder.append( " and " ).append( eventAlias ).append( ".entityIdHash " );
-			}
-			if ( upperBoundCondition == RangeBoundInclusion.INCLUDED ) {
-				builder.append( " <= :" ).append( UPPER_BOUND_PARAM_NAME );
-			}
-			else if ( upperBoundCondition == RangeBoundInclusion.EXCLUDED ) {
-				builder.append( " < :" ).append( UPPER_BOUND_PARAM_NAME );
-			}
+		else if ( lowerBoundIncluded != null ) {
+			builder.append( " >= :" ).append( LOWER_BOUND_PARAM_NAME );
+		}
+		else if ( upperBoundIncluded != null ) {
+			builder.append( " <= :" ).append( UPPER_BOUND_PARAM_NAME );
 		}
 		return builder.toString();
 	}
 
 	@Override
 	public void setParams(Query<OutboxEvent> query) {
-		Optional<Integer> lowerBound = range.lowerBoundValue();
-		if ( lowerBound.isPresent() ) {
-			query.setParameter( LOWER_BOUND_PARAM_NAME, lowerBound.get() );
+		if ( lowerBoundIncluded != null ) {
+			query.setParameter( LOWER_BOUND_PARAM_NAME, lowerBoundIncluded );
 		}
-		Optional<Integer> upperBound = range.upperBoundValue();
-		if ( upperBound.isPresent() ) {
-			query.setParameter( UPPER_BOUND_PARAM_NAME, upperBound.get() );
+		if ( upperBoundIncluded != null ) {
+			query.setParameter( UPPER_BOUND_PARAM_NAME, upperBoundIncluded );
 		}
 	}
 }
