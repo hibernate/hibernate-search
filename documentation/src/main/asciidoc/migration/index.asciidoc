@@ -60,7 +60,7 @@ To address that, either:
 If you use the incubating link:{hibernateSearchDocUrl}#coordination-outbox-polling[`outbox-polling` coordination strategy],
 you will be impacted by changes to the entities that represents the outbox event and agent,
 requiring database schema changes.
-For the outbox event table a new column `created::timestamp` is introduced, the `id` column changes its type from integer to varchar,
+For the outbox event table the column `processAfter` is now non-nullable, the `id` column changes its type from integer to varchar,
 except MSSQL where the `id` type becomes binary.
 For the agent table `id` column changes its type from integer to varchar,
 except MSSQL where the `id` type becomes binary.
@@ -69,16 +69,12 @@ You can find suggested migration scripts for the tested databases below:
 .Postgresql:
 [,sql]
 ----
--- add `created` column that will be used for sorting of events:
-alter table hsearch_outbox_event
-    add column created timestamp;
-
--- adjust `created` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
+-- adjust `processAfter` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
 update hsearch_outbox_event
-set created = now() - make_interval(secs => (select max(id) from hsearch_outbox_event) - id)
-where 1 = 1;
+set processAfter = now() - make_interval(secs => (select max(id) from hsearch_outbox_event) - id)
+where processAfter is null;
 alter table hsearch_outbox_event
-    alter column created set not null;
+    alter column processAfter set not null;
 
 -- change outbox event `id` column type to varchar and generate uuids to replace previous int values:
 alter table hsearch_outbox_event
@@ -92,16 +88,12 @@ alter table hsearch_agent
 .CockroachDB:
 [,sql]
 ----
--- add `created` column that will be used for sorting of events:
-alter table hsearch_outbox_event
-    add column created timestamp;
-
--- adjust `created` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
+-- adjust `processAfter` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
 update hsearch_outbox_event
-set created = now() - cast(((select max(id) from hsearch_outbox_event) - id) || ' SECOND' as interval)
-where 1 = 1;
+set processAfter = now() - cast(((select max(id) from hsearch_outbox_event) - id) || ' SECOND' as interval)
+where processAfter is null;
 alter table hsearch_outbox_event
-    alter column created set not null;
+    alter column processAfter set not null;
 
 -- change outbox event `id` column type to varchar and generate uuids to replace previous int values:
 -- altering type directly is not supported: https://go.crdb.dev/issue-v/47636/v22.1
@@ -128,19 +120,15 @@ alter table hsearch_agent
 .MySQL:
 [,sql]
 ----
--- add `created` column that will be used for sorting of events:
-alter table hsearch_outbox_event
-    add column created datetime;
-
--- adjust `created` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
+-- adjust `processAfter` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
 with max_id as (
     select max(id) as id from hsearch_outbox_event
 )
 update hsearch_outbox_event
 set created = subtime(now(), sec_to_time((select id from max_id) - id))
-where 1 = 1;
+where processAfter is null;
 alter table hsearch_outbox_event
-    modify column created datetime not null;
+    modify column processAfter datetime not null;
 
 -- change outbox event `id` column type to varchar and generate uuids to replace previous int values:
 alter table hsearch_outbox_event
@@ -160,16 +148,12 @@ where 1 = 1;
 .MariaDB:
 [,sql]
 ----
--- add `created` column that will be used for sorting of events:
-alter table hsearch_outbox_event
-    add column created datetime;
-
--- adjust `created` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
+-- adjust `processAfter` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
 update hsearch_outbox_event
-set created = subtime(now(), sec_to_time((select max(id) as id from hsearch_outbox_event) - id))
-where 1 = 1;
+set processAfter = subtime(now(), sec_to_time((select max(id) as id from hsearch_outbox_event) - id))
+where processAfter is null;
 alter table hsearch_outbox_event
-    modify column created datetime not null;
+    modify column processAfter datetime not null;
 
 -- change outbox event `id` column type to varchar and generate uuids to replace previous int values:
 alter table hsearch_outbox_event
@@ -189,16 +173,12 @@ where 1 = 1;
 .DB2:
 [,sql]
 ----
--- add `created` column that will be used for sorting of events:
-alter table hsearch_outbox_event
-    add created timestamp;
-
--- adjust `created` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
+-- adjust `processAfter` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
 update hsearch_outbox_event
-set created = current_timestamp - ((select max(id) from hsearch_outbox_event) - id) seconds
-where 1 = 1;
+set processAfter = current_timestamp - ((select max(id) from hsearch_outbox_event) - id) seconds
+where processAfter is null;
 alter table hsearch_outbox_event
-    alter column created set not null;
+    alter column processAfter set not null;
 
 -- change outbox event `id` column type to varchar and generate uuids to replace previous int values:
 alter table hsearch_outbox_event
@@ -230,16 +210,12 @@ where 1 = 1;
 .Oracle:
 [,sql]
 ----
--- add `created` column that will be used for sorting of events:
-alter table hsearch_outbox_event
-    add created timestamp;
-
--- adjust `created` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
+-- adjust `processAfter` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
 update hsearch_outbox_event
-set created = current_timestamp - numToDSInterval( (select max(id) from hsearch_outbox_event) - id, 'second' )
-where 1 = 1;
+set processAfter = current_timestamp - numToDSInterval( (select max(id) from hsearch_outbox_event) - id, 'second' )
+where processAfter is null;
 alter table hsearch_outbox_event
-    modify (created not null);
+    modify (processAfter not null);
 
 -- change outbox event `id` column type to varchar and generate uuids to replace previous int values:
 alter table hsearch_outbox_event
@@ -265,16 +241,12 @@ alter table hsearch_agent
 .MSSQL:
 [,sql]
 ----
--- add `created` column that will be used for sorting of events:
-alter table hsearch_outbox_event
-    add created datetime;
-
--- adjust `created` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
+-- adjust `processAfter` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
 update hsearch_outbox_event
-set created = dateadd(ss, -(select max(id) from hsearch_outbox_event) + id, current_timestamp)
-where 1 = 1;
+set processAfter = dateadd(ss, -(select max(id) from hsearch_outbox_event) + id, current_timestamp)
+where processAfter is null;
 alter table hsearch_outbox_event
-    alter column created datetime not null;
+    alter column processAfter datetime not null;
 
 -- change publox event `id` column type to varchar and generate uuids to replace previous int values:
 alter table hsearch_outbox_event
@@ -302,16 +274,12 @@ where 1 = 1;
 .H2:
 [,sql]
 ----
--- add `created` column that will be used for sorting of events:
-alter table hsearch_outbox_event
-    add created datetime;
-
--- adjust `created` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
+-- adjust `processAfter` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
 update hsearch_outbox_event
-set created = dateadd(ss, -(select max(id) from hsearch_outbox_event) + id, current_timestamp)
-where 1 = 1;
+set processAfter = dateadd(ss, -(select max(id) from hsearch_outbox_event) + id, current_timestamp)
+where processAfter is null;
 alter table hsearch_outbox_event
-    alter column created set not null;
+    alter column processAfter set not null;
 
 -- change outbox event `id` column type to varchar and generate uuids to replace previous int values:
 alter table hsearch_outbox_event

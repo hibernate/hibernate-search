@@ -30,6 +30,8 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 		@Override
 		public DefaultOutboxEventFinder create(Optional<OutboxEventPredicate> predicate) {
 			OutboxEventPredicate combined = ( predicate.isPresent() )
+					// Put the predicate first, because it's generally about sharding
+					// and will greatly reduce the number of rows.
 					? OutboxEventAndPredicate.of( predicate.get(), BASE_PREDICATE_FILTER )
 					: BASE_PREDICATE_FILTER;
 			return new DefaultOutboxEventFinder( Optional.of( combined ) );
@@ -46,7 +48,7 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 	private DefaultOutboxEventFinder(Optional<OutboxEventPredicate> predicate) {
 		this.queryString = "select e from " + ENTITY_NAME + " e "
 				+ ( predicate.isPresent() ? " where " + predicate.get().queryPart( "e" ) : "" )
-				+ " order by e.created, e.id";
+				+ " order by e.processAfter, e.id";
 		this.predicate = predicate;
 	}
 
@@ -66,7 +68,7 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 
 		@Override
 		public String queryPart(String eventAlias) {
-			return eventAlias + ".processAfter is null or " + eventAlias + ".processAfter < :now";
+			return eventAlias + ".processAfter < :now";
 		}
 
 		@Override

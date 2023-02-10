@@ -44,9 +44,9 @@ import org.junit.Test;
 
 public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
-	private static final String OUTBOX_EVENT_UPDATE_ID_AND_TIME = "UPDATE HSEARCH_OUTBOX_EVENT SET ID = ?, CREATED = ? WHERE ID = ?";
+	private static final String OUTBOX_EVENT_UPDATE_ID_AND_TIME = "UPDATE HSEARCH_OUTBOX_EVENT SET ID = ?, PROCESSAFTER = ? WHERE ID = ?";
 
-	private static final String OUTBOX_EVENT_SELECT_ORDERED_IDS_AND_CREATED_TIME = "SELECT ID, CREATED FROM HSEARCH_OUTBOX_EVENT ORDER BY CREATED, ID";
+	private static final String OUTBOX_EVENT_SELECT_ORDERED_IDS_AND_PROCESS_AFTER_TIME = "SELECT ID, PROCESSAFTER FROM HSEARCH_OUTBOX_EVENT ORDER BY PROCESSAFTER, ID";
 
 	private final OutboxEventFilter eventFilter = new OutboxEventFilter();
 
@@ -383,7 +383,8 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
 			List<String> uuids = new ArrayList<>();
 			List<java.sql.Timestamp> times = new ArrayList<>();
-			try ( PreparedStatement statement = jdbc.getStatementPreparer().prepareStatement( OUTBOX_EVENT_SELECT_ORDERED_IDS_AND_CREATED_TIME ) ) {
+			try ( PreparedStatement statement = jdbc.getStatementPreparer().prepareStatement(
+					OUTBOX_EVENT_SELECT_ORDERED_IDS_AND_PROCESS_AFTER_TIME ) ) {
 				ResultSet resultSet = statement.executeQuery();
 				while ( resultSet.next() ) {
 					uuids.add( resultSet.getString( 1 ) );
