@@ -216,6 +216,7 @@ public class IndexedEmbeddedBaseIT {
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
+			@SuppressWarnings("deprecation")
 			@IndexedEmbedded(name = "somename", prefix = "someprefix.")
 			IndexedEmbeddedLevel1 level1;
 			public IndexedEntity(int id, String value) {
@@ -393,14 +394,17 @@ public class IndexedEmbeddedBaseIT {
 			public String getLevel1Property() {
 				return level1Property;
 			}
+			@SuppressWarnings("deprecation")
 			@IndexedEmbedded(prefix = "level2NoDotInPrefix_")
 			public IndexedEmbeddedLevel2 getLevel2NoDotInPrefix() {
 				return level2NoDotInPrefix;
 			}
+			@SuppressWarnings("deprecation")
 			@IndexedEmbedded(prefix = "level2OneDotInPrefix.")
 			public IndexedEmbeddedLevel2 getLevel2OneDotInPrefix() {
 				return level2OneDotInPrefix;
 			}
+			@SuppressWarnings("deprecation")
 			@IndexedEmbedded(prefix = "level2TwoDotsInPrefix.level3.")
 			public IndexedEmbeddedLevel2 getLevel2TwoDotsInPrefix() {
 				return level2TwoDotsInPrefix;
@@ -410,6 +414,7 @@ public class IndexedEmbeddedBaseIT {
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
+			@SuppressWarnings("deprecation")
 			@IndexedEmbedded(prefix = "level1_")
 			List<IndexedEmbeddedLevel1> level1 = new ArrayList<>();
 		}
@@ -493,6 +498,7 @@ public class IndexedEmbeddedBaseIT {
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
+			@SuppressWarnings("deprecation")
 			@IndexedEmbedded(prefix = "customPrefix_")
 			IndexedEmbeddedLevel1 level1;
 			public IndexedEntity(int id, String level1Property) {
