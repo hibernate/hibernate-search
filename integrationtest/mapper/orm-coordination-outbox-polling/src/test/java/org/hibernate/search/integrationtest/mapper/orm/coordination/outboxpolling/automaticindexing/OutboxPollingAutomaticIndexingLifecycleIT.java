@@ -18,6 +18,7 @@ import javax.persistence.Id;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.OutboxEventFilter;
 import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.TestingOutboxPollingInternalConfigurer;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -85,8 +86,7 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 		with( sessionFactory ).runInTransaction( session -> {
 			List<OutboxEvent> outboxEventsNoFilter = eventFilter.findOutboxEventsNoFilter( session );
 			// partial processing, meaning that the events size is *strictly* between 0 and the full size:
-			assertThat( outboxEventsNoFilter ).isNotEmpty();
-			assertThat( outboxEventsNoFilter ).hasSizeLessThan( size );
+			assertThat( outboxEventsNoFilter ).hasSizeBetween( 1, size - 1 );
 		} );
 		sessionFactory.close();
 
@@ -157,6 +157,11 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 		sessionFactory = ormSetupHelper.start()
 				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
 						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
+				// Override OutboxPollingOrmSetupHelperConfig.overrideHibernateSearchDefaults
+				// because a short polling interval could in theory make event processing too fast
+				// and make this test flaky.
+				.withProperty( HibernateOrmMapperOutboxPollingSettings.COORDINATION_EVENT_PROCESSOR_POLLING_INTERVAL,
+						100 )
 				.withProperty( "hibernate.hbm2ddl.auto", "update" )
 				.setup( IndexedEntity.class );
 		return sessionFactory;
