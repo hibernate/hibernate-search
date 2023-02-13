@@ -1,6 +1,117 @@
 Hibernate Search Changelog
 ==========================
 
+6.2.0.Alpha2 (2023-02-13)
+-------------------------
+
+** Bug
+    * HSEARCH-4749 MSSQL cannot acquire locks properly on outbox event table
+    * HSEARCH-4727 OutboxEvent "payload" column created as blob(255) with DB2
+    * HSEARCH-4724 Classpath scanning ignores classes within Spring Boot's "repackaged" JARs
+    * HSEARCH-4708 No automatic reindexing when changing a property annotated with @OneToOne(mappedBy = ...) @IndexedEmbedded
+    * HSEARCH-4703 HSearch Outbox table module -> inaccesible private field error using Java 9 modules
+    * HSEARCH-4701 org.jboss.logging module needs to access org.hibernate.search.backend.elasticsearch module
+    * HSEARCH-4654 Deadlock in RootFailureCollector when exceeding the failure limit (100) with concurrent failures from different threads
+    * HSEARCH-4652 Schema validation fails if search analyzer is set explicitly to the same value as the analyzer
+    * HSEARCH-4647 High transaction contention in outbox-polling processes
+    * HSEARCH-4634 Executing task 'Outbox event processor' fail with CockroachDB v22.1.1 SKIP LOCKED lock wait policy is not supported
+    * HSEARCH-4305 No automatic reindexing when setting a property annotated with @OneToOne(mappedBy = ...) @IndexedEmbedded to null
+    * HSEARCH-939 Can not manually update index for IndexedEmbedded changes
+
+** Improvement
+    * HSEARCH-4793 Upgrade to Elasticsearch client 8.6.1
+    * HSEARCH-4791 Upgrade to Hibernate ORM 6.2.0.CR2 for -orm6 artifacts
+    * HSEARCH-4782 Retrieve decimal scale automatically from entity identifiers
+    * HSEARCH-4781 Mention @ScaledNumberField in error messages when the decimal scale cannot be found
+    * HSEARCH-4778 Upgrade to Elasticsearch client 8.6.0
+    * HSEARCH-4777 Add compatibility with Elasticsearch 8.6
+    * HSEARCH-4764 Upgrade to AWS SDK 2.19.8
+    * HSEARCH-4758 Upgrade -orm6 artifacts to Hibernate ORM 6.1.6.Final
+    * HSEARCH-4748 Use UUID for outbox-polling agent IDs 
+    * HSEARCH-4747 Upgrade to Hibernate ORM 5.6.14.Final
+    * HSEARCH-4743 Skip Jandex index building for Hibernate JARs
+    * HSEARCH-4740 Run tests against Elasticsearch 7.17.8
+    * HSEARCH-4739 Upgrade to jackson-databind 2.13.4.2
+    * HSEARCH-4738 Add compatibility with Elasticsearch 8.5
+    * HSEARCH-4737 Upgrade to Elasticsearch client 8.5.0
+    * HSEARCH-4736 OperationSubmitter to "retry from another thread"
+    * HSEARCH-4734 Upgrade -orm6 artifacts to Hibernate ORM 6.1.5.Final
+    * HSEARCH-4731 Run tests against OpenSearch 1.3.6
+    * HSEARCH-4729 Add compatibility with OpenSearch 2.1, 2.2, 2.3
+    * HSEARCH-4726 Upgrade to AWS SDK 2.18
+    * HSEARCH-4714 Early sanity checks for property names
+    * HSEARCH-4713 Upgrade to Elasticsearch client 8.4.3 and test against Elasticsearch 8.4.3
+    * HSEARCH-4712 Convert synchronized blocks to java.util.concurrent.Locks for better Loom compatibility
+    * HSEARCH-4711 Upgrade -orm6 artifacts to Hibernate ORM 6.1.4.Final
+    * HSEARCH-4710 Test and document how to apply @IndexedEmbedded to "filtered" associations
+    * HSEARCH-4707 Upgrade to Hibernate ORM 5.6.12.Final
+    * HSEARCH-4704 Upgrade to Elasticsearch client 8.4.2 and test against Elasticsearch 8.4.2
+    * HSEARCH-4700 Configurable behavior on full queues for indexing operations
+    * HSEARCH-4698 Upgrade to Hibernate ORM 6.1.3.Final for -orm6 artifacts
+    * HSEARCH-4697 Upgrade to Jackson 2.13.4
+    * HSEARCH-4694 Compatibility with Jandex 3.0
+    * HSEARCH-4693 Upgrade to Elasticsearch client 8.4.1 and test against Elasticsearch 8.4.1
+    * HSEARCH-4692 Upgrade to Hibernate ORM 5.6.11.Final
+    * HSEARCH-4689 Upgrade to HCANN 6.0.4.Final for -orm6 artifacts
+    * HSEARCH-4681 Add compatibility with Elasticsearch 8.4
+    * HSEARCH-4680 Upgrade to Elasticsearch client 8.4
+    * HSEARCH-4679 Automatically simplify and/or predicates with a single clause
+    * HSEARCH-4678  select  nextval ('hsearch_outbox_event_generator ') performs very slowly on CockroachDB，why not use UUID
+    * HSEARCH-4676 Use .and() syntax by default with .where(BiFunction) and .nested() predicate
+    * HSEARCH-4673 Remove the need for the `-parameters` compiler flag when using the default constructor of records as projection constructor
+    * HSEARCH-4672 Upgrade -orm6 artifacts to hibernate-commons-annotations 6.0.3.Final
+    * HSEARCH-4669 Provide contextual information about the projection definition when it cannot be applied to an index
+    * HSEARCH-4664 Upgrade to Hibernate ORM 6.1.2.Final for -orm6 artifacts
+    * HSEARCH-4661 Upgrade to JBeret 1.4.8.Final
+    * HSEARCH-4660 Upgrade to GSON 2.9.1
+    * HSEARCH-4659 Upgrade to Avro 1.11.1
+    * HSEARCH-4657 Upgrade to Elasticsearch client 8.3.3 and test against Elasticsearch 8.3.3
+    * HSEARCH-4656 Provide more guidance in error messages when calling "retrieve-by-name" methods
+    * HSEARCH-4620 Simplify the configuration of indexing plan synchronization with the Standalone POJO Mapper
+    * HSEARCH-4618 Add an hasClause() accessor in BooleanPredicateOptionsCollector/SimpleBooleanPredicateClausesCollector
+    * HSEARCH-4617 Mention @DocumentId in the error message when no default bridge can be found
+    * HSEARCH-4615 Move more configuration of the Standalone POJO mapper to configuration properties
+    * HSEARCH-4612 Disable purgeAllOnStart by default in MassIndexer when dropAndCreateSchemaOnStart is enabled
+    * HSEARCH-4591 Allow object projections on single-valued, flattened object fields with the Lucene backend
+    * HSEARCH-4579 Default to constructor projection when possible if .select() is not called during query definition and loading is not configured
+    * HSEARCH-4541 Manage Hibernate ORM exceptions thrown during mass indexing. Treat them in a global Failure Handler.
+    * HSEARCH-4503 Disable version logging through system properties
+    * HSEARCH-4500 Provide more context in error messages about fields with invalid type (value vs. object)
+    * HSEARCH-4050 Allow "exists" predicate on object field that has different children when targeting multiple Lucene indexes
+    * HSEARCH-1809 Extension Point for setting thread locals on mass indexer threads
+
+** New Feature
+    * HSEARCH-4683 Configuration property to provide an external RestClient to Hibernate Search
+    * HSEARCH-4645 Syntactic sugar for negating predicates (NOT)
+    * HSEARCH-4601 Syntactic sugar for OR/AND predicates
+    * HSEARCH-4321 Mass indexing for multiple tenants at once
+    * HSEARCH-4294 Targeting of "implicit" fields in the Search DSL
+    * HSEARCH-3910 SPI for integrators to provide their own thread pools
+
+** Task
+    * HSEARCH-4798 Upgrade to AWS SDK 2.20.2
+    * HSEARCH-4797 Run tests against Elasticsearch 7.17.9
+    * HSEARCH-4795 build/configuration-properties-collector should not use the public parent POM because this will get this module published on release
+    * HSEARCH-4794 Fix ci/dependency-update/perform-update.sh ignoring snapshot versions when currently using an alpha/beta/CR
+    * HSEARCH-4792 Run tests against Elasticsearch 8.6.1
+    * HSEARCH-4790 Add compatibility with OpenSearch 2.5.0
+    * HSEARCH-4783 Run more tests for orm6/jakarta artifacts
+    * HSEARCH-4780 Test Hibernate Search against JDK 21
+    * HSEARCH-4779 Reference the Hibernate Search 6.0 migration guide from the reference documentation
+    * HSEARCH-4775 Improve source code compatibility of Hibernate Search with Hibernate ORM 6.2
+    * HSEARCH-4773 Change how agents are stopped in massindexer
+    * HSEARCH-4771 Deprecate the concept of "DetachedBackendSessionContext"
+    * HSEARCH-4770 Only update dependencies for test modules in dependency-update builds
+    * HSEARCH-4768 Fix JavaModulePathTest with ORM 6.2
+    * HSEARCH-4763 Replace usage of URL constructors with URI where possible
+    * HSEARCH-4762 Test against latest OpenSearch 1.3.7/2.4.1 versions
+    * HSEARCH-4761 Update Elasticsearch client to the latest version 8.5.3
+    * HSEARCH-4760 Update Elasticsearch backend compatibility section (17.1) to reference the versions we test against
+    * HSEARCH-4759 Add test to check that entites are getting enhanced for tests with `BytecodeEnhancerRunner`
+    * HSEARCH-4757 Adjust tests to address ORM changes introduced in HHH-15767
+    * HSEARCH-4756 Add TCK tests against more timezones
+    * HSEARCH-4754 Update Elasticsearch client to the latest version 8.5.2
+
 6.2.0.Alpha1 (2022-07-12)
 -------------------------
 
