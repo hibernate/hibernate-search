@@ -22,8 +22,6 @@
 
     <properties>
         <javadoc.packagelists.directory>${project.build.directory}/dependencies-javadoc-packagelists</javadoc.packagelists.directory>
-        <!-- Output for property collection -->
-        <documentation.config.properties.output.directory>${rootProject.directory}/target</documentation.config.properties.output.directory>
         <documentation.config.properties.skip>false</documentation.config.properties.skip>
     </properties>
 

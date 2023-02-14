@@ -535,6 +535,8 @@
             In such case set this property to `none`.
         -->
         <documentation.config.properties.phase>process-resources</documentation.config.properties.phase>
+        <!-- Output for property collection -->
+        <documentation.config.properties.output.directory>${rootProject.directory}/target</documentation.config.properties.output.directory>
 
         <!-- Test settings -->
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
