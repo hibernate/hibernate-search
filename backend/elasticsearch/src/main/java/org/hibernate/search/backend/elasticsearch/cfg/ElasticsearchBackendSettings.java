@@ -110,7 +110,7 @@ public final class ElasticsearchBackendSettings {
 	 * The version of Elasticsearch running on the Elasticsearch cluster.
 	 * <p>
 	 * Expects either an {@link ElasticsearchVersion} object,
-	 * or a String that can be {{@link ElasticsearchVersion#of(String) parsed} in such an object.
+	 * or a String that can be {@link ElasticsearchVersion#of(String) parsed} in such an object.
 	 * <p>
 	 * No default: if not provided, the version will be resolved automatically
 	 * by sending a request to the Elasticsearch cluster on startup.
