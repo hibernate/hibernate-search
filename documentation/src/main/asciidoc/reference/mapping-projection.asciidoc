@@ -87,16 +87,16 @@ Hibernate Search infers the type of the inner projection from the type of the co
 You should set the type of a constructor parameter according to the following rules:
 
 * For a single-valued projection:
-  * For a <<search-dsl-projection-field,projection on a value field>>
-    (generally mapped using <<mapping-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>/<<mapping-geopoint-genericfield,`@GenericField`>>/etc.),
-    set the parameter type to the <<search-dsl-projected-value-type,type of projected values>>
-    for the target field, which in general is the type of the property annotated with `@FullTextField`/`@GenericField`/etc.
-  * For a <<search-dsl-projection-object,projection on an object field>>
-    (generally mapped using <<mapping-indexedembedded,`@IndexedEmbedded`>>),
-    set the parameter type to another custom type annotated with `@ProjectionConstructor`,
-    whose constructor will define which fields to extract from that object field.
+** For a <<search-dsl-projection-field,projection on a value field>>
+(generally mapped using <<mapping-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>/<<mapping-geopoint-genericfield,`@GenericField`>>/etc.),
+set the parameter type to the <<search-dsl-projected-value-type,type of projected values>>
+for the target field, which in general is the type of the property annotated with `@FullTextField`/`@GenericField`/etc.
+** For a <<search-dsl-projection-object,projection on an object field>>
+(generally mapped using <<mapping-indexedembedded,`@IndexedEmbedded`>>),
+set the parameter type to another custom type annotated with `@ProjectionConstructor`,
+whose constructor will define which fields to extract from that object field.
 * For a multivalued projection, follow the rules above then wrap the type with `Iterable`, `Collection` or `List`,
-  e.g. `Iterable<SometType>`, `Collection<SomeType>` or `List<SomeType>`.
+e.g. `Iterable<SometType>`, `Collection<SomeType>` or `List<SomeType>`.
 
 [IMPORTANT]
 ====
