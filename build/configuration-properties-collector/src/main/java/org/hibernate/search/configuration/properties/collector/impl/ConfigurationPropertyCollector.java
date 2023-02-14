@@ -25,6 +25,8 @@ import java.util.regex.Pattern;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 public class ConfigurationPropertyCollector {
@@ -185,9 +187,88 @@ public class ConfigurationPropertyCollector {
 				}
 				result.add( block );
 			}
-			return result.toString();
+			return convertToAsciidoc( result );
 		}
 		return "";
+	}
+
+	private String convertToAsciidoc(Elements elements) {
+		StringBuilder doc = new StringBuilder( "" );
+		for ( Element element : elements ) {
+			convertToAsciidoc( element, doc, false );
+		}
+
+		return doc.toString();
+	}
+
+	private void convertToAsciidoc(Node node, StringBuilder doc, boolean innerBlock) {
+		if ( node instanceof Element ) {
+			Element element = (Element) node;
+			String tag = element.tagName();
+			if ( "p".equalsIgnoreCase( tag ) || "div".equalsIgnoreCase( tag ) ) {
+				if ( doc.length() != 0 ) {
+					if ( !innerBlock ) {
+						doc.append( "\n+" );
+					}
+					doc.append( "\n\n" );
+				}
+				boolean deprecation = element.hasClass( "deprecation-block" );
+				if ( deprecation ) {
+					doc.append( "+\n[WARNING]\n====\n" );
+				}
+				for ( Node child : element.childNodes() ) {
+					convertToAsciidoc( child, doc, deprecation );
+				}
+				doc.append( '\n' );
+				if ( deprecation ) {
+					doc.append( "====\n" );
+				}
+			}
+			else if ( "a".equalsIgnoreCase( tag ) ) {
+				convertToAsciidoc( element, "link:" + element.attr( "href" ) + "[", "]", doc, innerBlock );
+			}
+			else if ( "code".equalsIgnoreCase( tag ) ) {
+				convertToAsciidoc( element, "`", "`", doc, innerBlock );
+			}
+			else if ( "strong".equalsIgnoreCase( tag ) ) {
+				convertToAsciidoc( element, "**", "**", doc, innerBlock );
+			}
+			else if ( "ul".equalsIgnoreCase( tag ) ) {
+				convertToAsciidoc( element, "+\n", "", doc, innerBlock );
+			}
+			else if ( "li".equalsIgnoreCase( tag ) ) {
+				convertToAsciidoc( element, "\n  * ", "", doc, innerBlock );
+			}
+			else if ( "span".equalsIgnoreCase( tag ) ) {
+				// simply pass to render items:
+				convertToAsciidoc( element, "", "", doc, innerBlock );
+			}
+			else {
+				// if we encounter an element that we are not handling - we want to fail as the result might be missing some details:
+				throw new IllegalStateException( "Unknown element: " + element );
+			}
+		}
+		else if ( node instanceof TextNode ) {
+			if ( doc.lastIndexOf( "+\n\n" ) == doc.length() - "+\n\n".length() ) {
+				// if it's a start of paragraph - remove any leading spaces:
+				doc.append( ( (TextNode) node ).text().replaceAll( "^\\s+", "" ) );
+			}
+			else {
+				doc.append( ( (TextNode) node ).text() );
+			}
+		}
+		else {
+			// if we encounter a node that we are not handling - we want to fail as the result might be missing some details:
+			throw new IllegalStateException( "Unknown node: " + node );
+		}
+	}
+
+	private void convertToAsciidoc(Element element, String pre, String post, StringBuilder doc, boolean innerBlock) {
+		doc.append( pre );
+		for ( Node childNode : element.childNodes() ) {
+			convertToAsciidoc( childNode, doc, innerBlock );
+		}
+		doc.append( post );
 	}
 
 	private void updateLink(String className, Element link) {
@@ -205,6 +286,7 @@ public class ConfigurationPropertyCollector {
 			// that won't work. So we replace it:
 			href = javadocsBaseLink + href.substring( href.indexOf( "/apidocs" ) + "/apidocs".length() );
 		}
+		link.clearAttributes();
 		link.attr( "href", href );
 	}
 
