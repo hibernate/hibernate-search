@@ -77,7 +77,7 @@ public interface AnnotationMappingConfigurationContext {
 
 	/**
 	 * @param jandexIndex A Jandex index to use when
-	 * {{@link #discoverAnnotatedTypesFromRootMappingAnnotations(boolean)} discovering annotated types that are also annotated with root mapping annotations}.
+	 * {@link #discoverAnnotatedTypesFromRootMappingAnnotations(boolean)} discovering annotated types that are also annotated with root mapping annotations}.
 	 * @return {@code this}, for method chaining.
 	 * @see #discoverAnnotatedTypesFromRootMappingAnnotations(boolean)
 	 * @see #discoverJandexIndexesFromAddedTypes(boolean)
