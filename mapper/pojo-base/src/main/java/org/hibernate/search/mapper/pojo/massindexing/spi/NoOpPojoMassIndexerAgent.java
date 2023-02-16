@@ -15,7 +15,7 @@ class NoOpPojoMassIndexerAgent implements PojoMassIndexerAgent {
 	}
 
 	@Override
-	public CompletableFuture<?> start() {
+	public CompletableFuture<?> start(PojoMassIndexerAgentStartContext context) {
 		return CompletableFuture.completedFuture( null );
 	}
 

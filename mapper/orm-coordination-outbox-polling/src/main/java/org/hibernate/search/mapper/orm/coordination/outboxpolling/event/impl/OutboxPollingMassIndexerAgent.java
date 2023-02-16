@@ -25,7 +25,7 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateO
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepositoryProvider;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentCreateContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentStartContext;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
@@ -90,17 +90,13 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 			this.pulseExpiration = pulseExpiration;
 		}
 
-		public OutboxPollingMassIndexerAgent create(PojoMassIndexerAgentCreateContext context,
-				AgentRepositoryProvider agentRepositoryProvider) {
+		public OutboxPollingMassIndexerAgent create(AgentRepositoryProvider agentRepositoryProvider) {
 			String agentName = name( tenantId );
 			OutboxPollingMassIndexerAgentClusterLink clusterLink = new OutboxPollingMassIndexerAgentClusterLink(
 					agentName, mapping.failureHandler(), clock,
 					pollingInterval, pulseInterval, pulseExpiration );
 
-			ScheduledExecutorService executor = context.newScheduledExecutor( 1, agentName );
-
-			return new OutboxPollingMassIndexerAgent( agentName, this, executor,
-					agentRepositoryProvider, clusterLink );
+			return new OutboxPollingMassIndexerAgent( agentName, this, agentRepositoryProvider, clusterLink );
 		}
 	}
 
@@ -111,21 +107,18 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 	}
 
 	private final String name;
-	private final ScheduledExecutorService executor;
 	private final long pollingInterval;
 
 	private final AtomicReference<Status> status = new AtomicReference<>( Status.STOPPED );
 	private final OutboxPollingMassIndexerAgentClusterLink clusterLink;
 	private final AgentClusterLinkContextProvider clusterLinkContextProvider;
 	private final Worker worker;
-	private final SingletonTask processingTask;
+	private SingletonTask processingTask;
 
 	private OutboxPollingMassIndexerAgent(String name, Factory factory,
-			ScheduledExecutorService executor,
 			AgentRepositoryProvider agentRepositoryProvider,
 			OutboxPollingMassIndexerAgentClusterLink clusterLink) {
 		this.name = name;
-		this.executor = executor;
 		AutomaticIndexingMappingContext mapping = factory.mapping;
 		this.pollingInterval = factory.pollingInterval.toMillis();
 		String tenantId = factory.tenantId;
@@ -136,13 +129,7 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 		this.clusterLinkContextProvider = new AgentClusterLinkContextProvider( transactionHelper, sessionHelper,
 				agentRepositoryProvider );
 
-		worker = new Worker();
-		processingTask = new SingletonTask(
-				name,
-				worker,
-				new Scheduler( executor ),
-				mapping.failureHandler()
-		);
+		this.worker = new Worker();
 	}
 
 	@Override
@@ -158,8 +145,16 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 	}
 
 	@Override
-	public CompletableFuture<?> start() {
+	public CompletableFuture<?> start(PojoMassIndexerAgentStartContext context) {
 		log.startingOutboxMassIndexerAgent( name, this );
+
+		processingTask = new SingletonTask(
+				name,
+				worker,
+				new Scheduler( context.scheduledExecutor() ),
+				context.failureHandler()
+		);
+
 		status.set( Status.STARTED );
 		processingTask.ensureScheduled();
 		return worker.agentFullyStartedFuture;
@@ -176,7 +171,6 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 		log.stoppingOutboxMassIndexerAgent( name );
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( SingletonTask::stop, processingTask );
-			closer.push( ScheduledExecutorService::shutdownNow, executor );
 			closer.push( OutboxPollingMassIndexerAgent::leaveCluster, this );
 		}
 	}

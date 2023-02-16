@@ -24,7 +24,7 @@ public interface PojoMassIndexerAgent {
 	 * @return A future that completes successfully when other agents have been successfully suspended.
 	 * If no agents can be suspended (e.g. no coordination), returns a successfully completed future immediately.
 	 */
-	CompletableFuture<?> start();
+	CompletableFuture<?> start(PojoMassIndexerAgentStartContext context);
 
 	/**
 	 * Performs preliminary operations necessary to safely stop this agent.
