@@ -144,7 +144,7 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 	@Override
 	public PojoMassIndexerAgent createMassIndexerAgent(PojoMassIndexerAgentCreateContext context) {
 		return tenantDelegate( context.tenantIdentifier() ).massIndexerAgentFactory
-				.create( context, agentRepositoryProvider );
+				.create( agentRepositoryProvider );
 	}
 
 	private TenantDelegate tenantDelegate(String tenantId) {
