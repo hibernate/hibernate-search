@@ -6,9 +6,10 @@
  */
 package org.hibernate.search.mapper.orm.session.impl;
 
+import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnoreNull;
+
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
-import java.util.Collections;
 import javax.persistence.EntityManager;
 import javax.transaction.Synchronization;
 
@@ -42,9 +43,9 @@ import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanSessionContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.ConfiguredIndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
@@ -153,7 +154,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
-		return scope( types ).massIndexer( Collections.singleton( tenantIdentifier() ) );
+		return scope( types ).massIndexer( asSetIgnoreNull( tenantIdentifier() ) );
 	}
 
 	@Override

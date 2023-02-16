@@ -74,9 +74,9 @@ public final class LuceneWorkFactory {
 		return new DeleteEntryWork( tenantId, entityTypeName, entityIdentifier, documentIdentifier, filter );
 	}
 
-	public IndexManagementWork<?> deleteAll(String tenantId, Set<String> routingKeys) {
+	public IndexManagementWork<?> deleteAll(Set<String> tenantIds, Set<String> routingKeys) {
 		List<Query> filters = new ArrayList<>();
-		Query filter = multiTenancyStrategy.filterOrNull( tenantId );
+		Query filter = multiTenancyStrategy.filterOrNull( tenantIds );
 		if ( filter != null ) {
 			filters.add( filter );
 		}

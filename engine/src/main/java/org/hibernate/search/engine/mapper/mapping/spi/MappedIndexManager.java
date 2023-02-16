@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.mapper.mapping.spi;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
@@ -36,12 +38,12 @@ public interface MappedIndexManager {
 	/**
 	 * @param sessionContext The detached session context.
 	 * @return An {@link IndexWorkspace}.
-	 * @deprecated Use {@link #createWorkspace(BackendMappingContext, String)} instead.
+	 * @deprecated Use {@link #createWorkspace(BackendMappingContext, Set)} instead.
 	 */
 	@Deprecated
 	IndexWorkspace createWorkspace(org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext sessionContext);
 
-	IndexWorkspace createWorkspace(BackendMappingContext mappingContext, String tenantId);
+	IndexWorkspace createWorkspace(BackendMappingContext mappingContext, Set<String> tenantId);
 
 	<R, E> MappedIndexScopeBuilder<R, E> createScopeBuilder(BackendMappingContext mappingContext);
 

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.scope.impl;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
@@ -32,6 +31,7 @@ import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.Search
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
 import org.hibernate.search.mapper.pojo.standalone.work.impl.SearchWorkspaceImpl;
+import org.hibernate.search.util.common.impl.Contracts;
 
 public class SearchScopeImpl<E> implements SearchScope<E> {
 
@@ -97,18 +97,19 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	@Override
 	public MassIndexer massIndexer() {
-		return massIndexer( Collections.<String>emptyList() );
+		return massIndexer( Collections.emptySet() );
 	}
 
 	@Override
 	public MassIndexer massIndexer(String tenantId) {
-		return massIndexer( Collections.singletonList( tenantId ) );
+		Contracts.assertNotNull( tenantId, "tenant identifier" );
+		return massIndexer( Collections.singleton( tenantId ) );
 	}
 
 	@Override
-	public MassIndexer massIndexer(Collection<String> tenantIds) {
+	public MassIndexer massIndexer(Set<String> tenantIds) {
 		StandalonePojoLoadingContext context = mappingContext.loadingContextBuilder().build();
-		PojoMassIndexer massIndexerDelegate = delegate.massIndexer( context, tenantIds.isEmpty() ? Collections.singletonList( null ) : tenantIds );
+		PojoMassIndexer massIndexerDelegate = delegate.massIndexer( context, tenantIds );
 		return new StandalonePojoMassIndexer( massIndexerDelegate, context );
 	}
 

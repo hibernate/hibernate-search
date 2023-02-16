@@ -8,21 +8,22 @@ package org.hibernate.search.backend.elasticsearch.multitenancy.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
-import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractContext;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionRequestContext;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.MetadataFields;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionRequestContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -75,6 +76,11 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
+	public JsonObject filterOrNull(Set<String> tenantIds) {
+		return Queries.anyTerm( TENANT_ID_FIELD_NAME, tenantIds );
+	}
+
+	@Override
 	public DiscriminatorMultiTenancyIdProjectionExtractionHelper idProjectionExtractionHelper() {
 		return idProjectionExtractionHelper;
 	}
@@ -104,6 +110,13 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 		public void checkTenantId(String tenantId, EventContext backendContext) {
 			if ( tenantId == null ) {
 				throw log.multiTenancyEnabledButNoTenantIdProvided( backendContext );
+			}
+		}
+
+		@Override
+		public void checkTenantId(Set<String> tenantIds, EventContext context) {
+			if ( tenantIds == null || tenantIds.isEmpty() ) {
+				throw log.multiTenancyEnabledButNoTenantIdProvided( context );
 			}
 		}
 

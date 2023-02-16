@@ -137,8 +137,8 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexWorkspace createWorkspace(BackendMappingContext mappingContext, String tenantId) {
-		return backendContext.createWorkspace( shardHolder, tenantId );
+	public IndexWorkspace createWorkspace(BackendMappingContext mappingContext, Set<String> tenantIds) {
+		return backendContext.createWorkspace( shardHolder, tenantIds );
 	}
 
 	@Override

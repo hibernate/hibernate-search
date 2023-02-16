@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
+import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnoreNull;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.util.ArrayList;
@@ -19,10 +20,10 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
-import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.util.common.impl.Futures;
 
@@ -119,7 +120,10 @@ public class BulkIndexer {
 		}
 		CompletableFuture<?> future = CompletableFuture.allOf( indexingFutures );
 		if ( refresh ) {
-			IndexWorkspace workspace = indexManager.createWorkspace( mappingContext, tenantId );
+			IndexWorkspace workspace = indexManager.createWorkspace(
+					mappingContext,
+					asSetIgnoreNull( tenantId )
+			);
 			future = future.thenCompose( ignored -> workspace.refresh( OperationSubmitter.blocking() ) );
 		}
 		return future;

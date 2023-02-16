@@ -6,19 +6,23 @@
  */
 package org.hibernate.search.engine.mapper.mapping.impl;
 
-import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnoreNull;
+
+import java.util.Set;
+
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.impl.MappedIndexScopeBuilderImpl;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
-import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 
 public class MappedIndexManagerImpl implements MappedIndexManager {
 
@@ -59,12 +63,12 @@ public class MappedIndexManagerImpl implements MappedIndexManager {
 	@Override
 	@Deprecated
 	public IndexWorkspace createWorkspace(org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext sessionContext) {
-		return createWorkspace( sessionContext.mappingContext(), sessionContext.tenantIdentifier() );
+		return createWorkspace( sessionContext.mappingContext(), asSetIgnoreNull( sessionContext.tenantIdentifier() ) );
 	}
 
 	@Override
-	public IndexWorkspace createWorkspace(BackendMappingContext mappingContext, String tenantId) {
-		return implementor.createWorkspace( mappingContext, tenantId );
+	public IndexWorkspace createWorkspace(BackendMappingContext mappingContext, Set<String> tenantIds) {
+		return implementor.createWorkspace( mappingContext, tenantIds );
 	}
 
 	@Override

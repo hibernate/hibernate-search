@@ -44,7 +44,7 @@ class IndexScaleWorkCall extends Call<IndexScaleWorkCall> {
 	@Override
 	protected boolean isSimilarTo(IndexScaleWorkCall other) {
 		return Objects.equals( indexName, other.indexName )
-				&& Objects.equals( work.getTenantIdentifier(), other.work.getTenantIdentifier() );
+				&& Objects.equals( work.getTenantIdentifiers(), other.work.getTenantIdentifiers() );
 	}
 
 	@Override

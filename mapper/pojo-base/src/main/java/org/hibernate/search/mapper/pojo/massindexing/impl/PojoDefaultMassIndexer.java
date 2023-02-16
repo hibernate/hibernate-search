@@ -7,16 +7,15 @@
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
-import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
@@ -52,7 +51,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 	private final PojoMassIndexingTypeContextProvider typeContextProvider;
 	private final Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes;
 	private final PojoScopeSchemaManager scopeSchemaManager;
-	private final Collection<String> tenantIds;
+	private final Set<String> tenantIds;
 	private final PojoScopeDelegate<?, ?, ?> pojoScopeDelegate;
 
 	// default settings defined here:
@@ -73,7 +72,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 			PojoMassIndexingTypeContextProvider typeContextProvider,
 			Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
 			PojoScopeSchemaManager scopeSchemaManager,
-			Collection<String> tenantIds,
+			Set<String> tenantIds,
 			PojoScopeDelegate<?, ?, ?> pojoScopeDelegate) {
 		this.indexingContext = indexingContext;
 		this.mappingContext = mappingContext;

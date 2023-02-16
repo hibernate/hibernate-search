@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.scope.impl;
 
-import java.util.Collection;
+import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnoreNull;
+
 import java.util.Collections;
 import java.util.Set;
 
@@ -89,26 +90,19 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	@Override
 	public MassIndexer massIndexer() {
-		return massIndexer( Collections.<String>emptyList() );
+		return massIndexer( Collections.<String>emptySet() );
 	}
 
 	@Override
 	public MassIndexer massIndexer(String tenantId) {
-		return massIndexer( Collections.singletonList( tenantId ) );
+		return massIndexer( asSetIgnoreNull( tenantId ) );
 	}
 
 	@Override
-	public MassIndexer massIndexer(Collection<String> tenantIds) {
+	public MassIndexer massIndexer(Set<String> tenantIds) {
 		if ( tenantIds.isEmpty() ) {
 			// Let's see if we are in multi-tenant environment and try to get the tenant ids
-			Set<String> configuredTenants = tenancyConfiguration.tenantIdsOrFail();
-			if ( configuredTenants.isEmpty() ) {
-				// if we didn't fail with exception - single tenant is used so just create an empty session:
-				tenantIds = Collections.singletonList( null );
-			}
-			else {
-				tenantIds = configuredTenants;
-			}
+			tenantIds = tenancyConfiguration.tenantIdsOrFail();
 		}
 
 		HibernateOrmMassIndexingContext massIndexingContext = new HibernateOrmMassIndexingContext( mappingContext,

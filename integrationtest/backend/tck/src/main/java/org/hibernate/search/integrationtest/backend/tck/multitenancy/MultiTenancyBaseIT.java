@@ -326,7 +326,7 @@ public class MultiTenancyBaseIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Missing tenant identifier",
-						"The tenant identifier must be non-null, because multi-tenancy is enabled for this backend" );
+						"A tenant identifier is expected, because multi-tenancy is enabled for this backend" );
 	}
 
 	@Test
@@ -347,7 +347,7 @@ public class MultiTenancyBaseIT {
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Missing tenant identifier",
-						"The tenant identifier must be non-null, because multi-tenancy is enabled for this backend" );
+						"A tenant identifier is expected, because multi-tenancy is enabled for this backend" );
 	}
 
 	@Test
@@ -368,7 +368,7 @@ public class MultiTenancyBaseIT {
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Missing tenant identifier",
-						"The tenant identifier must be non-null, because multi-tenancy is enabled for this backend" );
+						"A tenant identifier is expected, because multi-tenancy is enabled for this backend" );
 	}
 
 	@Test
@@ -380,7 +380,7 @@ public class MultiTenancyBaseIT {
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Missing tenant identifier",
-						"The tenant identifier must be non-null, because multi-tenancy is enabled for this backend" );
+						"A tenant identifier is expected, because multi-tenancy is enabled for this backend" );
 	}
 
 	private void initData() {

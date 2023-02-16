@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.index.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
@@ -199,8 +200,8 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	}
 
 	@Override
-	public IndexWorkspace createWorkspace(BackendMappingContext mappingContext, String tenantId) {
-		return backendContext.createWorkspace( this, tenantId );
+	public IndexWorkspace createWorkspace(BackendMappingContext mappingContext, Set<String> tenantIds) {
+		return backendContext.createWorkspace( this, tenantIds );
 	}
 
 	@Override

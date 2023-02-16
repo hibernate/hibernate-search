@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
+import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnoreNull;
+
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -169,7 +171,10 @@ public abstract class StubMappedIndex {
 	}
 
 	public IndexWorkspace createWorkspace(String tenantId) {
-		return delegate().createWorkspace( mapping, tenantId );
+		return delegate().createWorkspace(
+				mapping,
+				asSetIgnoreNull( tenantId )
+		);
 	}
 
 	/**

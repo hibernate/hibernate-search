@@ -6,9 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.session.impl;
 
+import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnoreNull;
+
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -16,8 +17,6 @@ import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.pojo.work.spi.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.common.impl.EntityReferenceImpl;
@@ -39,6 +38,8 @@ import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
 import org.hibernate.search.mapper.pojo.standalone.work.impl.SearchIndexerImpl;
 import org.hibernate.search.mapper.pojo.standalone.work.impl.SearchIndexingPlanImpl;
+import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.work.spi.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -98,7 +99,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	@Override
 	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
 		checkOpenAndThrow();
-		return scope( types ).massIndexer( Collections.singletonList( this.tenantIdentifier() ) );
+		return scope( types ).massIndexer( asSetIgnoreNull( this.tenantIdentifier() ) );
 	}
 
 	@Override

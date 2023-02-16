@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
@@ -114,8 +115,8 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 	}
 
 	@Override
-	public IndexWorkspace createWorkspace(BackendMappingContext mappingContext, String tenantId) {
-		return indexManager.createWorkspace( mappingContext, tenantId );
+	public IndexWorkspace createWorkspace(BackendMappingContext mappingContext, Set<String> tenantIds) {
+		return indexManager.createWorkspace( mappingContext, tenantIds );
 	}
 
 	@Override
