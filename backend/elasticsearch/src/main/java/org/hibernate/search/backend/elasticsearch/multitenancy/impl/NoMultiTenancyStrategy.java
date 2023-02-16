@@ -7,18 +7,20 @@
 package org.hibernate.search.backend.elasticsearch.multitenancy.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
+import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
+import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionRequestContext;
-import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.JsonObject;
 
@@ -60,6 +62,12 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
+	public JsonObject filterOrNull(Set<String> tenantIds) {
+		// No need for a filter
+		return null;
+	}
+
+	@Override
 	public NoMultiTenancyIdProjectionExtractionHelper idProjectionExtractionHelper() {
 		return idProjectionExtractionHelper;
 	}
@@ -68,7 +76,14 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 		@Override
 		public void checkTenantId(String tenantId, EventContext backendContext) {
 			if ( tenantId != null ) {
-				throw log.tenantIdProvidedButMultiTenancyDisabled( tenantId, backendContext );
+				throw log.tenantIdProvidedButMultiTenancyDisabled( Collections.singleton( tenantId ), backendContext );
+			}
+		}
+
+		@Override
+		public void checkTenantId(Set<String> tenantIds, EventContext context) {
+			if ( tenantIds != null && !tenantIds.isEmpty() ) {
+				throw log.tenantIdProvidedButMultiTenancyDisabled( tenantIds, context );
 			}
 		}
 

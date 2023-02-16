@@ -8,11 +8,11 @@ package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
+import static org.hibernate.search.util.common.impl.CollectionHelper.asSet;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -122,10 +122,10 @@ public class MassIndexingBaseIT {
 		return TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ? TENANT_1_ID : null;
 	}
 
-	private Collection<String> allTenantIds() {
+	private Set<String> allTenantIds() {
 		return TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ?
-				Arrays.asList( TENANT_1_ID, TENANT_2_ID ) :
-				Collections.emptyList();
+				asSet( TENANT_1_ID, TENANT_2_ID ) :
+				Collections.emptySet();
 	}
 
 	@Test
@@ -352,16 +352,21 @@ public class MassIndexingBaseIT {
 		// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
 		// But if we are in multi-tenant case then we expect that purge will be called for all tenants first,
 		// while other work like merge or flush/refresh will be called just once for the first tenant in the list:
-		backendMock.expectIndexScaleWorks( Book.INDEX, targetTenantId() )
-				.purge();
+
 		if ( TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ) {
-			backendMock.expectIndexScaleWorks( Book.INDEX, TENANT_2_ID )
-					.purge();
+			backendMock.expectIndexScaleWorks( Book.INDEX, targetTenantId(), TENANT_2_ID )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
 		}
-		backendMock.expectIndexScaleWorks( Book.INDEX, targetTenantId() )
-				.mergeSegments()
-				.flush()
-				.refresh();
+		else {
+			backendMock.expectIndexScaleWorks( Book.INDEX, targetTenantId() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+		}
 
 		try {
 			indexer.startAndWait();
@@ -424,16 +429,21 @@ public class MassIndexingBaseIT {
 		// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
 		// But if we are in multi-tenant case then we expect that purge will be called for all tenants first,
 		// while other work like merge or flush/refresh will be called just once for the first tenant in the list:
-		backendMock.expectIndexScaleWorks( Book.INDEX, targetTenantId() )
-				.purge();
 		if ( TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ) {
-			backendMock.expectIndexScaleWorks( Book.INDEX, TENANT_2_ID )
-					.purge();
+			backendMock.expectIndexScaleWorks( Book.INDEX, targetTenantId(), TENANT_2_ID )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
 		}
-		backendMock.expectIndexScaleWorks( Book.INDEX, targetTenantId() )
-				.mergeSegments()
-				.flush()
-				.refresh();
+		else {
+			backendMock.expectIndexScaleWorks( Book.INDEX, targetTenantId() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+		}
+
 
 		try {
 			indexer.startAndWait();

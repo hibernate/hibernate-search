@@ -6,20 +6,21 @@
  */
 package org.hibernate.search.engine.backend.index.spi;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
-import org.hibernate.search.engine.common.resources.spi.SavedState;
+import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.index.IndexManager;
-import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
-import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
-import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.common.resources.spi.SavedState;
 
 /**
  * The object responsible for applying works and searches to a full-text index.
@@ -85,7 +86,7 @@ public interface IndexManagerImplementor {
 
 	IndexIndexer createIndexer(BackendSessionContext sessionContext);
 
-	IndexWorkspace createWorkspace(BackendMappingContext mappingContext, String tenantId);
+	IndexWorkspace createWorkspace(BackendMappingContext mappingContext, Set<String> tenantId);
 
 	IndexScopeBuilder createScopeBuilder(BackendMappingContext mappingContext);
 

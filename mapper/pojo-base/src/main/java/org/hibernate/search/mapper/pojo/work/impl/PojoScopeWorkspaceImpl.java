@@ -12,8 +12,8 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 
@@ -23,9 +23,9 @@ public class PojoScopeWorkspaceImpl implements PojoScopeWorkspace {
 
 	public PojoScopeWorkspaceImpl(PojoScopeMappingContext mappingContext,
 			Set<? extends PojoWorkIndexedTypeContext<?, ?>> targetedTypeContexts,
-			String tenantId) {
+			Set<String> tenantIds) {
 		for ( PojoWorkIndexedTypeContext<?, ?> targetedTypeContext : targetedTypeContexts ) {
-			delegates.add( targetedTypeContext.createWorkspace( mappingContext, tenantId ) );
+			delegates.add( targetedTypeContext.createWorkspace( mappingContext, tenantIds ) );
 		}
 	}
 

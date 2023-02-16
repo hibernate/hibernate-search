@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.lucene.multitenancy.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
+import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
@@ -34,9 +36,21 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
+	public Query filterOrNull(Set<String> tenantIds) {
+		return null;
+	}
+
+	@Override
 	public void checkTenantId(String tenantId, EventContext backendContext) {
 		if ( tenantId != null ) {
-			throw log.tenantIdProvidedButMultiTenancyDisabled( tenantId, backendContext );
+			throw log.tenantIdProvidedButMultiTenancyDisabled( Collections.singleton( tenantId ), backendContext );
+		}
+	}
+
+	@Override
+	public void checkTenantId(Set<String> tenantIds, EventContext context) {
+		if ( tenantIds != null && !tenantIds.isEmpty() ) {
+			throw log.tenantIdProvidedButMultiTenancyDisabled( tenantIds, context );
 		}
 	}
 }

@@ -230,13 +230,13 @@ public interface Log extends BasicLogger {
 	SearchException invalidMultiTenancyStrategyName(String invalidRepresentation, List<String> validRepresentations);
 
 	@Message(id = ID_OFFSET + 31,
-			value = "Invalid tenant identifier: '%1$s'."
-					+ " The tenant identifier must be null, because multi-tenancy is disabled for this backend.")
-	SearchException tenantIdProvidedButMultiTenancyDisabled(String tenantId, @Param EventContext context);
+			value = "Invalid tenant identifiers: '%1$s'."
+					+ " No tenant identifier is expected, because multi-tenancy is disabled for this backend.")
+	SearchException tenantIdProvidedButMultiTenancyDisabled(Set<String> tenantId, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 32,
 			value = "Missing tenant identifier."
-					+ " The tenant identifier must be non-null, because multi-tenancy is enabled for this backend.")
+					+ " A tenant identifier is expected, because multi-tenancy is enabled for this backend.")
 	SearchException multiTenancyEnabledButNoTenantIdProvided(@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 33,

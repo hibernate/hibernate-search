@@ -137,10 +137,10 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 
 	@Override
 	public IndexWorkspace createWorkspace(WorkExecutionIndexManagerContext indexManagerContext,
-			String tenantId) {
-		multiTenancyStrategy.checkTenantId( tenantId, eventContext );
+			Set<String> tenantIds) {
+		multiTenancyStrategy.checkTenantId( tenantIds, eventContext );
 
-		return new LuceneIndexWorkspace( workFactory, indexManagerContext, tenantId );
+		return new LuceneIndexWorkspace( workFactory, indexManagerContext, tenantIds );
 	}
 
 	@Override

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.scope.impl;
 
+import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnoreNull;
+
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,8 +31,8 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.impl.PojoDefaultMassIndexer;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.schema.management.impl.PojoScopeSchemaManagerImpl;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
@@ -148,7 +150,12 @@ public final class PojoScopeDelegateImpl<R, E, C> implements PojoScopeDelegate<R
 
 	@Override
 	public PojoScopeWorkspace workspace(String tenantId) {
-		return new PojoScopeWorkspaceImpl( mappingContext, targetedTypeContexts, tenantId );
+		return new PojoScopeWorkspaceImpl( mappingContext, targetedTypeContexts, asSetIgnoreNull( tenantId ) );
+	}
+
+	@Override
+	public PojoScopeWorkspace workspace(Set<String> tenantIds) {
+		return new PojoScopeWorkspaceImpl( mappingContext, targetedTypeContexts, tenantIds );
 	}
 
 	@Override
@@ -159,11 +166,12 @@ public final class PojoScopeDelegateImpl<R, E, C> implements PojoScopeDelegate<R
 	@Override
 	@Deprecated
 	public PojoMassIndexer massIndexer(PojoMassIndexingContext context, org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext detachedSession) {
-		return massIndexer( context, Collections.singleton( detachedSession.tenantIdentifier() ) );
+		String tenantIdentifier = detachedSession.tenantIdentifier();
+		return massIndexer( context, asSetIgnoreNull( tenantIdentifier ) );
 	}
 
 	@Override
-	public PojoMassIndexer massIndexer(PojoMassIndexingContext context, Collection<String> tenantIds) {
+	public PojoMassIndexer massIndexer(PojoMassIndexingContext context, Set<String> tenantIds) {
 		return new PojoDefaultMassIndexer( context, mappingContext, indexedTypeContextProvider, targetedTypeContexts,
 				schemaManager(), tenantIds, this );
 	}

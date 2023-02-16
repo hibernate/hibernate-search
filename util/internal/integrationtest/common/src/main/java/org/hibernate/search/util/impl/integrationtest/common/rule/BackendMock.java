@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
+import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnoreNull;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -189,14 +191,11 @@ public class BackendMock implements TestRule {
 		);
 	}
 
-	public IndexScaleWorkCallListContext expectIndexScaleWorks(String indexName) {
-		return expectIndexScaleWorks( indexName , null );
-	}
-
-	public IndexScaleWorkCallListContext expectIndexScaleWorks(String indexName, String tenantId) {
+	public IndexScaleWorkCallListContext expectIndexScaleWorks(String indexName, String... tenantIds) {
 		CallQueue<IndexScaleWorkCall> callQueue = backendBehavior().getIndexScaleWorkCalls( indexName );
 		return new IndexScaleWorkCallListContext(
-				indexName, tenantId,
+				indexName,
+				asSetIgnoreNull( tenantIds ),
 				callQueue::expectInOrder
 		);
 	}
@@ -494,14 +493,14 @@ public class BackendMock implements TestRule {
 
 	public static class IndexScaleWorkCallListContext {
 		private final String indexName;
-		private final String tenantIdentifier;
+		private final Set<String> tenantIdentifiers;
 		private final Consumer<IndexScaleWorkCall> expectationConsumer;
 
 		private IndexScaleWorkCallListContext(String indexName,
-				String tenantIdentifier,
+				Set<String> tenantIdentifiers,
 				Consumer<IndexScaleWorkCall> expectationConsumer) {
 			this.indexName = indexName;
-			this.tenantIdentifier = tenantIdentifier;
+			this.tenantIdentifiers = tenantIdentifiers;
 			this.expectationConsumer = expectationConsumer;
 		}
 
@@ -560,7 +559,7 @@ public class BackendMock implements TestRule {
 		public IndexScaleWorkCallListContext indexScaleWork(StubIndexScaleWork.Type type, Set<String> routingKeys,
 				CompletableFuture<?> future) {
 			StubIndexScaleWork work = StubIndexScaleWork.builder( type )
-					.tenantIdentifier( tenantIdentifier )
+					.tenantIdentifiers( tenantIdentifiers )
 					.routingKeys( routingKeys )
 					.build();
 			expectationConsumer.accept( new IndexScaleWorkCall( indexName, work, future ) );

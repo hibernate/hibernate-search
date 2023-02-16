@@ -122,12 +122,12 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	}
 
 	@Override
-	public IndexWorkspace createWorkspace(WorkExecutionIndexManagerContext indexManagerContext, String tenantId) {
-		multiTenancyStrategy.documentIdHelper().checkTenantId( tenantId, eventContext );
+	public IndexWorkspace createWorkspace(WorkExecutionIndexManagerContext indexManagerContext, Set<String> tenantIds) {
+		multiTenancyStrategy.documentIdHelper().checkTenantId( tenantIds, eventContext );
 
 		return new ElasticsearchIndexWorkspace(
 				link.getWorkFactory(), multiTenancyStrategy, generalPurposeOrchestrator,
-				indexManagerContext, tenantId
+				indexManagerContext, tenantIds
 		);
 	}
 

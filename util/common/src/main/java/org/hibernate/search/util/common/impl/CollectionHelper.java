@@ -16,7 +16,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Provides some methods for simplified collection instantiation.
@@ -50,6 +52,17 @@ public final class CollectionHelper {
 		Set<T> set = new HashSet<>( getInitialCapacityFromExpectedSize( ts.length ) );
 		Collections.addAll( set, ts );
 		return set;
+	}
+
+	@SafeVarargs
+	public static <T> Set<T> asSetIgnoreNull(T... ts) {
+		if ( ts.length == 0 ) {
+			return Collections.emptySet();
+		}
+		if ( ts.length == 1 ) {
+			return ts[0] == null ? Collections.emptySet() : Collections.singleton( ts[0] );
+		}
+		return Arrays.asList( ts ).stream().filter( Objects::nonNull ).collect( Collectors.toSet() );
 	}
 
 	@SafeVarargs

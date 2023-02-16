@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.scope.spi;
 
-import java.util.Collection;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
@@ -58,18 +57,20 @@ public interface PojoScopeDelegate<R, E, C> {
 
 	PojoScopeWorkspace workspace(String tenantId);
 
+	PojoScopeWorkspace workspace(Set<String> tenantIds);
+
 	PojoScopeSchemaManager schemaManager();
 
 	/**
 	 * @param context The mass indexing context.
 	 * @param detachedSession The detached session, for the tenant ID.
 	 * @return A {@link PojoMassIndexer}.
-	 * @deprecated Use {@link #massIndexer(PojoMassIndexingContext, Collection)} instead.
+	 * @deprecated Use {@link #massIndexer(PojoMassIndexingContext, Set)} instead.
 	 */
 	@Deprecated
 	PojoMassIndexer massIndexer(PojoMassIndexingContext context, org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext detachedSession);
 
-	PojoMassIndexer massIndexer(PojoMassIndexingContext context, Collection<String> tenantIds);
+	PojoMassIndexer massIndexer(PojoMassIndexingContext context, Set<String> tenantIds);
 
 	<T> T extension(IndexScopeExtension<T> extension);
 }

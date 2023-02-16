@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -25,12 +26,12 @@ public final class StubIndexScaleWork implements ToStringTreeAppendable {
 	}
 
 	private final Type type;
-	private final String tenantIdentifier;
+	private final Set<String> tenantIdentifiers;
 	private final List<String> routingKeys;
 
 	private StubIndexScaleWork(Builder builder) {
 		this.type = builder.type;
-		this.tenantIdentifier = builder.tenantIdentifier;
+		this.tenantIdentifiers = Collections.unmodifiableSet( builder.tenantIdentifiers );
 		this.routingKeys = Collections.unmodifiableList( new ArrayList<>( builder.routingKeys ) );
 	}
 
@@ -38,8 +39,8 @@ public final class StubIndexScaleWork implements ToStringTreeAppendable {
 		return type;
 	}
 
-	public String getTenantIdentifier() {
-		return tenantIdentifier;
+	public Set<String> getTenantIdentifiers() {
+		return tenantIdentifiers;
 	}
 
 	public List<String> getRoutingKeys() {
@@ -55,14 +56,14 @@ public final class StubIndexScaleWork implements ToStringTreeAppendable {
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "class", getClass().getSimpleName() );
 		builder.attribute( "type", type );
-		builder.attribute( "tenantIdentifier", tenantIdentifier );
+		builder.attribute( "tenantIdentifiers", tenantIdentifiers );
 		builder.attribute( "routingKeys", routingKeys );
 	}
 
 	public static class Builder {
 
 		private final Type type;
-		private String tenantIdentifier;
+		private final Set<String> tenantIdentifiers = new HashSet<>();
 		private final List<String> routingKeys = new ArrayList<>();
 
 		private Builder(Type type) {
@@ -70,7 +71,12 @@ public final class StubIndexScaleWork implements ToStringTreeAppendable {
 		}
 
 		public Builder tenantIdentifier(String tenantIdentifier) {
-			this.tenantIdentifier = tenantIdentifier;
+			this.tenantIdentifiers.add( tenantIdentifier );
+			return this;
+		}
+
+		public Builder tenantIdentifiers(Set<String> tenantIdentifiers) {
+			this.tenantIdentifiers.addAll( tenantIdentifiers );
 			return this;
 		}
 

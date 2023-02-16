@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.scope;
 
-import java.util.Collection;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -138,7 +137,7 @@ public interface SearchScope<E> {
 	 * Create a {@link MassIndexer} for the indexes mapped to types in this scope, or to any of their sub-types.
 	 * <p>
 	 * This method primarily is intended for single-tenant applications.
-	 * If multi-tenancy is enabled, consider using {@link #massIndexer(String)}/{@link #massIndexer(Collection<String>)} instead.
+	 * If multi-tenancy is enabled, consider using {@link #massIndexer(String)}/{@link #massIndexer(Set)} instead.
 	 * In case this method is used in multi-tenant environment - {@link MassIndexer} for all configured tenants will be created.
 	 * <p>
 	 * {@link MassIndexer} instances cannot be reused.
@@ -164,14 +163,14 @@ public interface SearchScope<E> {
 	 * Create a {@link MassIndexer} for the indexes mapped to types in this scope, or to any of their sub-types.
 	 * <p>
 	 * This method works for both single- and multi-tenant applications.
-	 * If multi-tenancy is disabled, simply keep the collection of tenants empty.
+	 * If multi-tenancy is disabled, simply keep the set of tenants empty.
 	 * <p>
 	 * {@link MassIndexer} instances cannot be reused.
 	 *
 	 * @param tenantIds The tenants identifiers whose index content should be targeted. If empty, all tenants will be targeted.
 	 * @return A {@link MassIndexer}.
 	 */
-	MassIndexer massIndexer(Collection<String> tenantIds);
+	MassIndexer massIndexer(Set<String> tenantIds);
 
 	/**
 	 * @return A set containing one {@link SearchIndexedEntity} for each indexed entity in this scope.

@@ -84,8 +84,8 @@ public class MultiTenancyMismatchIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Invalid tenant identifier: '" + tenant1Session.tenantIdentifier() + "'",
-						"The tenant identifier must be null, because multi-tenancy is disabled for this backend."
+						"Invalid tenant identifiers: '[" + tenant1Session.tenantIdentifier() + "]'",
+						"No tenant identifier is expected, because multi-tenancy is disabled for this backend."
 				);
 	}
 
@@ -102,8 +102,8 @@ public class MultiTenancyMismatchIT {
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Invalid tenant identifier: '" + tenant1Session.tenantIdentifier() + "'",
-						"The tenant identifier must be null, because multi-tenancy is disabled for this backend."
+						"Invalid tenant identifiers: '[" + tenant1Session.tenantIdentifier() + "]'",
+						"No tenant identifier is expected, because multi-tenancy is disabled for this backend."
 				);
 	}
 
@@ -120,8 +120,8 @@ public class MultiTenancyMismatchIT {
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Invalid tenant identifier: '" + tenant1Session.tenantIdentifier() + "'",
-						"The tenant identifier must be null, because multi-tenancy is disabled for this backend."
+						"Invalid tenant identifiers: '[" + tenant1Session.tenantIdentifier() + "]'",
+						"No tenant identifier is expected, because multi-tenancy is disabled for this backend."
 				);
 	}
 
@@ -138,8 +138,8 @@ public class MultiTenancyMismatchIT {
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Invalid tenant identifier: '" + tenant1Session.tenantIdentifier() + "'",
-						"The tenant identifier must be null, because multi-tenancy is disabled for this backend."
+						"Invalid tenant identifiers: '[" + tenant1Session.tenantIdentifier() + "]'",
+						"No tenant identifier is expected, because multi-tenancy is disabled for this backend."
 				);
 	}
 

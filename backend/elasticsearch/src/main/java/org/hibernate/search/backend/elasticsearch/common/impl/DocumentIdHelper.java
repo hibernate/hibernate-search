@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.common.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public interface DocumentIdHelper {
@@ -17,6 +19,14 @@ public interface DocumentIdHelper {
 	 * @param context The context to add to exceptions (if any).
 	 */
 	void checkTenantId(String tenantId, EventContext context);
+
+	/**
+	 * Check that the set of tenant id values is valid.
+	 *
+	 * @param tenantIds The set of tenant ids.
+	 * @param context The context to add to exceptions (if any).
+	 */
+	void checkTenantId(Set<String> tenantIds, EventContext context);
 
 	/**
 	 * Converts the object id to an Elasticsearch id: in the case of discriminator-based multi-tenancy, the id of the

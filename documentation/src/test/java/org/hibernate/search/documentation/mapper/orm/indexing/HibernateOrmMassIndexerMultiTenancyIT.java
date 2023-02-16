@@ -7,10 +7,10 @@
 package org.hibernate.search.documentation.mapper.orm.indexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.common.impl.CollectionHelper.asSet;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.function.Function;
 
 import org.hibernate.Session;
@@ -73,7 +73,7 @@ public class HibernateOrmMassIndexerMultiTenancyIT {
 				Search.mapping( sessionFactory );
 		// tag::explicitTenants[]
 		searchMapping.scope( Object.class ) // <2>
-				.massIndexer( Arrays.asList( "tenant1", "tenant2" ) ) // <3>
+				.massIndexer( asSet( "tenant1", "tenant2" ) ) // <3>
 				.startAndWait(); // <4>
 		// end::explicitTenants[]
 		with( sessionFactory, TENANT_1_ID ).runInTransaction( entityManager -> {

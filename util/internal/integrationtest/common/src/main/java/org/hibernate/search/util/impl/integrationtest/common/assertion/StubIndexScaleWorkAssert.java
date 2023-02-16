@@ -41,8 +41,8 @@ public class StubIndexScaleWorkAssert {
 		boolean hasAnyMismatch;
 		boolean mismatch = checkForMismatch( builder, "type", expected.getType(), actual.getType() );
 		hasAnyMismatch = mismatch;
-		mismatch = checkForMismatch( builder, "tenantIdentifier",
-				expected.getTenantIdentifier(), actual.getTenantIdentifier()
+		mismatch = checkForMismatch( builder, "tenantIdentifiers",
+				expected.getTenantIdentifiers(), actual.getTenantIdentifiers()
 		);
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 		mismatch = checkForMismatch( builder, "routingKeys",

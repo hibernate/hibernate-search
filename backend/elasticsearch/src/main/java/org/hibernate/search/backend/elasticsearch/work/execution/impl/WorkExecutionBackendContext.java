@@ -6,12 +6,14 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSerialWorkOrchestrator;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 
 /**
  * An interface with knowledge of the backend internals,
@@ -37,6 +39,6 @@ public interface WorkExecutionBackendContext {
 			WorkExecutionIndexManagerContext indexManagerContext,
 			BackendSessionContext sessionContext);
 
-	IndexWorkspace createWorkspace(WorkExecutionIndexManagerContext indexManagerContext, String tenantId);
+	IndexWorkspace createWorkspace(WorkExecutionIndexManagerContext indexManagerContext, Set<String> tenantIds);
 
 }

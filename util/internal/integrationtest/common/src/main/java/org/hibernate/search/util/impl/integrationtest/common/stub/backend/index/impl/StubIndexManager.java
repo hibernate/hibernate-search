@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.Backend;
@@ -105,9 +106,9 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	}
 
 	@Override
-	public IndexWorkspace createWorkspace(BackendMappingContext mappingContext, String tenantId) {
+	public IndexWorkspace createWorkspace(BackendMappingContext mappingContext, Set<String> tenantIds) {
 		checkStarted();
-		return new StubIndexWorkspace( name, backend.getBehavior(), tenantId );
+		return new StubIndexWorkspace( name, backend.getBehavior(), tenantIds );
 	}
 
 	@Override

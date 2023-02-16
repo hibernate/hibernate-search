@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
@@ -38,6 +39,6 @@ public interface PojoWorkIndexedTypeContext<I, E> extends PojoWorkTypeContext<I,
 
 	IndexIndexer createIndexer(PojoWorkSessionContext sessionContext);
 
-	IndexWorkspace createWorkspace(BackendMappingContext mappingContext, String tenantId);
+	IndexWorkspace createWorkspace(BackendMappingContext mappingContext, Set<String> tenantIds);
 
 }

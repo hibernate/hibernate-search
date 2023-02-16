@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.multitenancy.impl;
 
+import java.util.Set;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -40,11 +42,27 @@ public interface MultiTenancyStrategy {
 	Query filterOrNull(String tenantId);
 
 	/**
+	 * Generate a filter for the given set of tenant IDs, to be applied to search queries.
+	 *
+	 * @param tenantIds The set of tenant ids.
+	 * @return The filter, or {@code null} if no filter is necessary.
+	 */
+	Query filterOrNull(Set<String> tenantIds);
+
+	/**
 	 * Check that the tenant id value is consistent with the strategy.
 	 *
 	 * @param tenantId The tenant id.
 	 * @param backendContext The backend.
 	 */
 	void checkTenantId(String tenantId, EventContext backendContext);
+
+	/**
+	 * Check that the set of tenant id values is valid.
+	 *
+	 * @param tenantIds The set of tenant ids.
+	 * @param context The context to add to exceptions (if any).
+	 */
+	void checkTenantId(Set<String> tenantIds, EventContext context);
 
 }

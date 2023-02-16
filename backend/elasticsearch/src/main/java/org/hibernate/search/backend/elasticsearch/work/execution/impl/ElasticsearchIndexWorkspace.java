@@ -14,8 +14,8 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancy
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -26,17 +26,17 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final ElasticsearchParallelWorkOrchestrator orchestrator;
 	private final URLEncodedString indexName;
-	private final String tenantId;
+	private final Set<String> tenantIds;
 
 	public ElasticsearchIndexWorkspace(ElasticsearchWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy, ElasticsearchParallelWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
-			String tenantId) {
+			Set<String> tenantIds) {
 		this.workFactory = workFactory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
 		this.indexName = indexManagerContext.getElasticsearchIndexWriteName();
-		this.tenantId = tenantId;
+		this.tenantIds = tenantIds;
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 	@Override
 	public CompletableFuture<?> purge(Set<String> routingKeys, OperationSubmitter operationSubmitter) {
 		JsonArray filters = new JsonArray();
-		JsonObject filter = multiTenancyStrategy.filterOrNull( tenantId );
+		JsonObject filter = multiTenancyStrategy.filterOrNull( tenantIds );
 		if ( filter != null ) {
 			filters.add( filter );
 		}
