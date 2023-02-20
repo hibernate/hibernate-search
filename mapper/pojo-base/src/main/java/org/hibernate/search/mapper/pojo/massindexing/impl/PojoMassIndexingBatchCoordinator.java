@@ -13,14 +13,12 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentStartContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContextMessages;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
@@ -40,7 +38,7 @@ import org.hibernate.search.util.common.impl.Futures;
 public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHandledRunnable {
 
 	private final PojoMassIndexingMappingContext mappingContext;
-	private final PojoMassIndexerAgentStartContext agentStartContext;
+	private final PojoMassIndexerAgentStartContextImpl agentStartContext;
 	private final List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex;
 
 	private final PojoScopeSchemaManager scopeSchemaManager;
@@ -81,11 +79,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 		this.mergeSegmentsAfterPurge = mergeSegmentsAfterPurge;
 
 		this.agentStartContext = new PojoMassIndexerAgentStartContextImpl(
-				mappingContext.threadPoolProvider()
-						.newScheduledExecutor(
-								1,
-								PojoMassIndexingBatchIndexingWorkspace.THREAD_NAME_PREFIX + "Mass indexer agent"
-						),
+				mappingContext.threadPoolProvider(),
 				mappingContext.failureHandler()
 		);
 	}
@@ -210,7 +204,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 			context.agent().stop();
 		}
 		sessionContexts.clear();
-		agentStartContext.scheduledExecutor().shutdownNow();
+		agentStartContext.clear();
 	}
 
 	private void flushAndRefresh() throws InterruptedException {
@@ -230,7 +224,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 			// in order to leave the index in a consistent state
 			closer.push( PojoMassIndexingBatchCoordinator::flushAndRefresh, this );
 			closer.pushAll( PojoMassIndexerAgent::stop, sessionContexts, SessionContext::agent );
-			closer.push( ScheduledExecutorService::shutdownNow, agentStartContext.scheduledExecutor() );
+			closer.push( PojoMassIndexerAgentStartContextImpl::clear, agentStartContext );
 			sessionContexts.clear();
 		}
 	}
@@ -240,7 +234,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( this::cancelPendingTask, indexingFutures );
 			closer.pushAll( PojoMassIndexerAgent::stop, sessionContexts, SessionContext::agent );
-			closer.push( ScheduledExecutorService::shutdownNow, agentStartContext.scheduledExecutor() );
+			closer.push( PojoMassIndexerAgentStartContextImpl::clear, agentStartContext );
 			sessionContexts.clear();
 		}
 	}
