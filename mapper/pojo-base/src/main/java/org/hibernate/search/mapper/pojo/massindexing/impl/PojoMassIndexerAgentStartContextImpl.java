@@ -8,27 +8,42 @@ package org.hibernate.search.mapper.pojo.massindexing.impl;
 
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentStartContext;
 
 class PojoMassIndexerAgentStartContextImpl implements PojoMassIndexerAgentStartContext {
 
-	private final ScheduledExecutorService scheduledExecutorService;
+	private final ThreadPoolProvider threadPoolProvider;
 	private final FailureHandler failureHandler;
 
-	PojoMassIndexerAgentStartContextImpl(ScheduledExecutorService scheduledExecutorService,
+	private ScheduledExecutorService scheduledExecutorService;
+
+	PojoMassIndexerAgentStartContextImpl(ThreadPoolProvider threadPoolProvider,
 			FailureHandler failureHandler) {
-		this.scheduledExecutorService = scheduledExecutorService;
+		this.threadPoolProvider = threadPoolProvider;
 		this.failureHandler = failureHandler;
 	}
 
 	@Override
 	public ScheduledExecutorService scheduledExecutor() {
+		if ( this.scheduledExecutorService == null ) {
+			this.scheduledExecutorService = threadPoolProvider.newScheduledExecutor(
+					1,
+					PojoMassIndexingBatchIndexingWorkspace.THREAD_NAME_PREFIX + "Mass indexer agent"
+			);
+		}
 		return scheduledExecutorService;
 	}
 
 	@Override
 	public FailureHandler failureHandler() {
 		return failureHandler;
+	}
+
+	public void clear() {
+		if ( scheduledExecutorService != null ) {
+			scheduledExecutorService.shutdownNow();
+		}
 	}
 }
