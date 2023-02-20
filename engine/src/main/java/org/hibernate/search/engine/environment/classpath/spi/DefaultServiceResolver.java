@@ -6,24 +6,30 @@
  */
 package org.hibernate.search.engine.environment.classpath.spi;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Default implementation of {@code ClassResolver} relying on an {@link AggregatedClassLoader}.
  */
 public abstract class DefaultServiceResolver implements ServiceResolver {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final Method SERVICE_LOADER_STREAM_METHOD;
 	private static final Method PROVIDER_TYPE_METHOD;
 
@@ -130,60 +136,91 @@ public abstract class DefaultServiceResolver implements ServiceResolver {
 		private ClassPathAndModulePathServiceResolver(AggregatedClassLoader aggregatedClassLoader) {
 			super( aggregatedClassLoader );
 			this.classLoaders = new ArrayList<>();
-			// Always try the aggregated class loader first
-			this.classLoaders.add( aggregatedClassLoader );
-			// Then also try the individual class loaders,
+			// Individual class loaders to try besides an aggregated class loader,
 			// because only them can instantiate services provided by jars in the module path
 			aggregatedClassLoader.addAllTo( this.classLoaders );
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
 		public <S> Collection<S> loadJavaServices(Class<S> serviceContract) {
 			final Set<String> alreadyUsedProviderTypes = new LinkedHashSet<>();
 			final Set<S> services = new LinkedHashSet<>();
-			this.classLoaders.stream()
-					.map( classLoader -> ServiceLoader.load( serviceContract, classLoader ) )
-					// Each loader's stream() method returns a stream of service providers: flatten these into a single stream
-					.flatMap( delegate -> {
-						try {
-							return (Stream<? extends Supplier<S>>) SERVICE_LOADER_STREAM_METHOD.invoke( delegate );
-						}
-						catch (RuntimeException | IllegalAccessException | InvocationTargetException e) {
-							throw new AssertionFailure( "Error calling ServiceLoader.stream()", e );
-						}
-					} )
-					// For each provider, check its type to be sure we don't use a provider twice, then get the service
-					.forEach( provider -> {
-						Class<?> type;
-						try {
-							type = (Class<?>) PROVIDER_TYPE_METHOD.invoke( provider );
-						}
-						catch (RuntimeException | IllegalAccessException | InvocationTargetException e) {
-							throw new AssertionFailure( "Error calling ServiceLoader.Provider.type()", e );
-						}
-						String typeName = type.getName();
-						/*
-						 * We may encounter service provider multiple times,
-						 * because the individual classloaders may give access to the same types.
-						 * However, we only want to get the service from each provider once.
-						 *
-						 * ServiceLoader.stream() is useful in that regard,
-						 * since it allows us to check the type of the service provider
-						 * before the service is even instantiated.
-						 *
-						 * We could just instantiate every service and check their type afterwards,
-						 * but 1. it would lead to unnecessary instantiation which could have side effects,
-						 * in particular regarding class loading,
-						 * and 2. the type of the provider may not always be the type of the service,
-						 * and one provider may return different types of services
-						 * depending on conditions known only to itself.
-						 */
-						if ( alreadyUsedProviderTypes.add( typeName ) ) {
-							services.add( provider.get() );
-						}
-					} );
+
+			// Always try the aggregated class loader first and never ignore any errors it might produce:
+			Iterator<? extends Supplier<S>> iterator = providerIterator( aggregatedClassLoader, serviceContract );
+			while ( iterator.hasNext() ) {
+				collectServiceIfNotDuplicate( services, alreadyUsedProviderTypes, iterator.next() );
+			}
+
+			// Then go through other classloaders, but ignore service configuration errors.
+			// Could happen for example in quarkus with AppClassLoader, but those services were already loaded by either aggregated or other classloaders.
+			for ( ClassLoader loader : classLoaders ) {
+				iterator = providerIterator( loader, serviceContract );
+
+				while ( hasNextIgnoringServiceConfigurationError( iterator, serviceContract ) ) {
+					collectServiceIfNotDuplicate( services, alreadyUsedProviderTypes, iterator.next() );
+				}
+			}
+
 			return services;
+		}
+
+		@SuppressWarnings("unchecked")
+		private <S> Iterator<? extends Supplier<S>> providerIterator(ClassLoader classLoader, Class<S> serviceContract) {
+			try {
+				ServiceLoader<S> delegate = ServiceLoader.load( serviceContract, classLoader );
+				return ((Stream<? extends Supplier<S>>) SERVICE_LOADER_STREAM_METHOD.invoke( delegate )).iterator();
+			}
+			catch (RuntimeException | IllegalAccessException | InvocationTargetException e) {
+				throw new AssertionFailure( "Error calling ServiceLoader.stream()", e );
+			}
+		}
+
+		/**
+		 * Only adds a supplied provider if its type name is not present in `alreadyUsedProviderTypes`. Ignores it otherwise.
+		 */
+		private <S> void collectServiceIfNotDuplicate(Set<S> services, Set<String> alreadyUsedProviderTypes, Supplier<S> provider) {
+			Class<?> type;
+			try {
+				type = (Class<?>) PROVIDER_TYPE_METHOD.invoke( provider );
+			}
+			catch (RuntimeException | IllegalAccessException | InvocationTargetException e) {
+				throw new AssertionFailure( "Error calling ServiceLoader.Provider.type()", e );
+			}
+			String typeName = type.getName();
+			/*
+			 * We may encounter service provider multiple times,
+			 * because the individual classloaders may give access to the same types.
+			 * However, we only want to get the service from each provider once.
+			 *
+			 * ServiceLoader.stream() is useful in that regard,
+			 * since it allows us to check the type of the service provider
+			 * before the service is even instantiated.
+			 *
+			 * We could just instantiate every service and check their type afterwards,
+			 * but 1. it would lead to unnecessary instantiation which could have side effects,
+			 * in particular regarding class loading,
+			 * and 2. the type of the provider may not always be the type of the service,
+			 * and one provider may return different types of services
+			 * depending on conditions known only to itself.
+			 */
+			if ( alreadyUsedProviderTypes.add( typeName ) ) {
+				services.add( provider.get() );
+			}
+		}
+
+		/**
+		 * Skips any service configuration errors when trying to move to the next service supplier.
+		 */
+		private boolean hasNextIgnoringServiceConfigurationError(Iterator<?> iterator, Class<?> serviceContract) {
+			while ( true ) {
+				try {
+					return iterator.hasNext();
+				}
+				catch (ServiceConfigurationError e) {
+					log.ignoringServiceConfigurationError( serviceContract, e );
+				}
+			}
 		}
 	}
 }

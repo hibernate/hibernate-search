@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Collection;
 import java.util.List;
+import java.util.ServiceConfigurationError;
 import java.util.Set;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -498,4 +499,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 112,
 			value = "Unable to close saved value for key %1$s: %2$s")
 	SearchException unableToCloseSavedValue(String keyName, String message, @Cause Exception e);
+
+	@LogMessage(level = Logger.Level.WARN)
+	@Message(id = ID_OFFSET + 116,
+			value = "Ignoring ServiceConfigurationError caught while trying to instantiate service '%s'.")
+	void ignoringServiceConfigurationError(Class<?> serviceContract, @Cause ServiceConfigurationError error);
 }
