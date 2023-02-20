@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Collection;
 import java.util.List;
+import java.util.ServiceConfigurationError;
 import java.util.Set;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -531,4 +532,8 @@ public interface Log extends BasicLogger {
 	SearchException unableToResolveField(String absolutePath, String causeMessage, @Cause SearchException e,
 			@Param EventContext context);
 
+	@LogMessage(level = Logger.Level.WARN)
+	@Message(id = ID_OFFSET + 116,
+			value = "Ignoring ServiceConfigurationError caught while trying to instantiate service '%s'.")
+	void ignoringServiceConfigurationError(Class<?> serviceContract, @Cause ServiceConfigurationError error);
 }
