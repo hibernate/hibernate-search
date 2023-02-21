@@ -164,7 +164,7 @@ public class AutomaticIndexingOneToOneOwnedByContainedEagerOnBothSidesIT
 		@JoinColumn(name = "CECAssocIdxEmb")
 		@AssociationInverseSide(inversePath = @ObjectPath({
 				@PropertyValue(propertyName = "elementCollectionAssociations"),
-				@PropertyValue(propertyName = "embContainingAsIndexedEmbedded")
+				@PropertyValue(propertyName = "containingAsIndexedEmbedded")
 		}))
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		private ContainedEntity containedElementCollectionAssociationsIndexedEmbedded;
@@ -177,7 +177,7 @@ public class AutomaticIndexingOneToOneOwnedByContainedEagerOnBothSidesIT
 		@JoinColumn(name = "CECAssocNonIdxEmb")
 		@AssociationInverseSide(inversePath = @ObjectPath({
 				@PropertyValue(propertyName = "elementCollectionAssociations"),
-				@PropertyValue(propertyName = "embContainingAsNonIndexedEmbedded")
+				@PropertyValue(propertyName = "containingAsNonIndexedEmbedded")
 		}))
 		private ContainedEntity containedElementCollectionAssociationsNonIndexedEmbedded;
 
@@ -404,30 +404,28 @@ public class AutomaticIndexingOneToOneOwnedByContainedEagerOnBothSidesIT
 
 	public static class ContainingEmbeddable {
 
-		@OneToOne(mappedBy = "embeddedAssociations.embContainingAsIndexedEmbedded")
+		@OneToOne(mappedBy = "embeddedAssociations.containingAsIndexedEmbedded")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" },
 				name = "containedIndexedEmbedded")
-		// TODO Remove the "emb" prefix from this field when HHH-15604 gets fixed (it's just a workaround)
-		private ContainedEntity embContainedIndexedEmbedded;
+		private ContainedEntity containedIndexedEmbedded;
 
-		@OneToOne(mappedBy = "embeddedAssociations.embContainingAsNonIndexedEmbedded")
-		// TODO Remove the "emb" prefix from this field when HHH-15604 gets fixed (it's just a workaround)
-		private ContainedEntity embContainedNonIndexedEmbedded;
+		@OneToOne(mappedBy = "embeddedAssociations.containingAsNonIndexedEmbedded")
+		private ContainedEntity containedNonIndexedEmbedded;
 
-		public ContainedEntity getEmbContainedIndexedEmbedded() {
-			return embContainedIndexedEmbedded;
+		public ContainedEntity getContainedIndexedEmbedded() {
+			return containedIndexedEmbedded;
 		}
 
-		public void setEmbContainedIndexedEmbedded(ContainedEntity embContainedIndexedEmbedded) {
-			this.embContainedIndexedEmbedded = embContainedIndexedEmbedded;
+		public void setContainedIndexedEmbedded(ContainedEntity containedIndexedEmbedded) {
+			this.containedIndexedEmbedded = containedIndexedEmbedded;
 		}
 
-		public ContainedEntity getEmbContainedNonIndexedEmbedded() {
-			return embContainedNonIndexedEmbedded;
+		public ContainedEntity getContainedNonIndexedEmbedded() {
+			return containedNonIndexedEmbedded;
 		}
 
-		public void setEmbContainedNonIndexedEmbedded(ContainedEntity embContainedNonIndexedEmbedded) {
-			this.embContainedNonIndexedEmbedded = embContainedNonIndexedEmbedded;
+		public void setContainedNonIndexedEmbedded(ContainedEntity containedNonIndexedEmbedded) {
+			this.containedNonIndexedEmbedded = containedNonIndexedEmbedded;
 		}
 
 		static final ContainingEmbeddablePrimitives<ContainingEmbeddable, ContainedEntity> PRIMITIVES =
@@ -439,15 +437,15 @@ public class AutomaticIndexingOneToOneOwnedByContainedEagerOnBothSidesIT
 
 					@Override
 					public PropertyAccessor<ContainingEmbeddable, ContainedEntity> containedIndexedEmbedded() {
-						return PropertyAccessor.create( ContainingEmbeddable::setEmbContainedIndexedEmbedded,
-								ContainingEmbeddable::getEmbContainedIndexedEmbedded
+						return PropertyAccessor.create( ContainingEmbeddable::setContainedIndexedEmbedded,
+								ContainingEmbeddable::getContainedIndexedEmbedded
 						);
 					}
 
 					@Override
 					public PropertyAccessor<ContainingEmbeddable, ContainedEntity> containedNonIndexedEmbedded() {
-						return PropertyAccessor.create( ContainingEmbeddable::setEmbContainedNonIndexedEmbedded,
-								ContainingEmbeddable::getEmbContainedNonIndexedEmbedded
+						return PropertyAccessor.create( ContainingEmbeddable::setContainedNonIndexedEmbedded,
+								ContainingEmbeddable::getContainedNonIndexedEmbedded
 						);
 					}
 				};
@@ -817,28 +815,26 @@ public class AutomaticIndexingOneToOneOwnedByContainedEagerOnBothSidesIT
 
 		@OneToOne
 		@JoinColumn(name = "CEmbIdxEmbedded")
-		// TODO Remove the "emb" prefix from this field when HHH-15604 gets fixed (it's just a workaround)
-		private ContainingEntity embContainingAsIndexedEmbedded;
+		private ContainingEntity containingAsIndexedEmbedded;
 
 		@OneToOne
 		@JoinColumn(name = "CEmbNonIdxEmbedded")
-		// TODO Remove the "emb" prefix from this field when HHH-15604 gets fixed (it's just a workaround)
-		private ContainingEntity embContainingAsNonIndexedEmbedded;
+		private ContainingEntity containingAsNonIndexedEmbedded;
 
-		public ContainingEntity getEmbContainingAsIndexedEmbedded() {
-			return embContainingAsIndexedEmbedded;
+		public ContainingEntity getContainingAsIndexedEmbedded() {
+			return containingAsIndexedEmbedded;
 		}
 
-		public void setEmbContainingAsIndexedEmbedded(ContainingEntity embContainingAsIndexedEmbedded) {
-			this.embContainingAsIndexedEmbedded = embContainingAsIndexedEmbedded;
+		public void setContainingAsIndexedEmbedded(ContainingEntity containingAsIndexedEmbedded) {
+			this.containingAsIndexedEmbedded = containingAsIndexedEmbedded;
 		}
 
-		public ContainingEntity getEmbContainingAsNonIndexedEmbedded() {
-			return embContainingAsNonIndexedEmbedded;
+		public ContainingEntity getContainingAsNonIndexedEmbedded() {
+			return containingAsNonIndexedEmbedded;
 		}
 
-		public void setEmbContainingAsNonIndexedEmbedded(ContainingEntity embContainingAsNonIndexedEmbedded) {
-			this.embContainingAsNonIndexedEmbedded = embContainingAsNonIndexedEmbedded;
+		public void setContainingAsNonIndexedEmbedded(ContainingEntity containingAsNonIndexedEmbedded) {
+			this.containingAsNonIndexedEmbedded = containingAsNonIndexedEmbedded;
 		}
 
 		static ContainedEmbeddablePrimitives<ContainedEmbeddable, ContainingEntity> PRIMITIVES =
@@ -850,15 +846,15 @@ public class AutomaticIndexingOneToOneOwnedByContainedEagerOnBothSidesIT
 
 					@Override
 					public PropertyAccessor<ContainedEmbeddable, ContainingEntity> containingAsIndexedEmbedded() {
-						return PropertyAccessor.create( ContainedEmbeddable::setEmbContainingAsIndexedEmbedded,
-								ContainedEmbeddable::getEmbContainingAsIndexedEmbedded
+						return PropertyAccessor.create( ContainedEmbeddable::setContainingAsIndexedEmbedded,
+								ContainedEmbeddable::getContainingAsIndexedEmbedded
 						);
 					}
 
 					@Override
 					public PropertyAccessor<ContainedEmbeddable, ContainingEntity> containingAsNonIndexedEmbedded() {
-						return PropertyAccessor.create( ContainedEmbeddable::setEmbContainingAsNonIndexedEmbedded,
-								ContainedEmbeddable::getEmbContainingAsNonIndexedEmbedded
+						return PropertyAccessor.create( ContainedEmbeddable::setContainingAsNonIndexedEmbedded,
+								ContainedEmbeddable::getContainingAsNonIndexedEmbedded
 						);
 					}
 				};

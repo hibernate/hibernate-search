@@ -365,28 +365,26 @@ public class AutomaticIndexingManyToOneBaseIT
 		@JoinColumn(name = "CEmbIdxEmbedded")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" },
 				name = "containedIndexedEmbedded")
-		// TODO Remove the "emb" prefix from this field when HHH-15604 gets fixed (it's just a workaround)
-		private ContainedEntity embContainedIndexedEmbedded;
+		private ContainedEntity containedIndexedEmbedded;
 
 		@ManyToOne
 		@JoinColumn(name = "CEmbNonIdxEmbedded")
-		// TODO Remove the "emb" prefix from this field when HHH-15604 gets fixed (it's just a workaround)
-		private ContainedEntity embContainedNonIndexedEmbedded;
+		private ContainedEntity containedNonIndexedEmbedded;
 
-		public ContainedEntity getEmbContainedIndexedEmbedded() {
-			return embContainedIndexedEmbedded;
+		public ContainedEntity getContainedIndexedEmbedded() {
+			return containedIndexedEmbedded;
 		}
 
-		public void setEmbContainedIndexedEmbedded(ContainedEntity embContainedIndexedEmbedded) {
-			this.embContainedIndexedEmbedded = embContainedIndexedEmbedded;
+		public void setContainedIndexedEmbedded(ContainedEntity containedIndexedEmbedded) {
+			this.containedIndexedEmbedded = containedIndexedEmbedded;
 		}
 
-		public ContainedEntity getEmbContainedNonIndexedEmbedded() {
-			return embContainedNonIndexedEmbedded;
+		public ContainedEntity getContainedNonIndexedEmbedded() {
+			return containedNonIndexedEmbedded;
 		}
 
-		public void setEmbContainedNonIndexedEmbedded(ContainedEntity embContainedNonIndexedEmbedded) {
-			this.embContainedNonIndexedEmbedded = embContainedNonIndexedEmbedded;
+		public void setContainedNonIndexedEmbedded(ContainedEntity containedNonIndexedEmbedded) {
+			this.containedNonIndexedEmbedded = containedNonIndexedEmbedded;
 		}
 
 		static final ContainingEmbeddablePrimitives<ContainingEmbeddable, ContainedEntity> PRIMITIVES =
@@ -398,15 +396,15 @@ public class AutomaticIndexingManyToOneBaseIT
 
 					@Override
 					public PropertyAccessor<ContainingEmbeddable, ContainedEntity> containedIndexedEmbedded() {
-						return PropertyAccessor.create( ContainingEmbeddable::setEmbContainedIndexedEmbedded,
-								ContainingEmbeddable::getEmbContainedIndexedEmbedded
+						return PropertyAccessor.create( ContainingEmbeddable::setContainedIndexedEmbedded,
+								ContainingEmbeddable::getContainedIndexedEmbedded
 						);
 					}
 
 					@Override
 					public PropertyAccessor<ContainingEmbeddable, ContainedEntity> containedNonIndexedEmbedded() {
-						return PropertyAccessor.create( ContainingEmbeddable::setEmbContainedNonIndexedEmbedded,
-								ContainingEmbeddable::getEmbContainedNonIndexedEmbedded
+						return PropertyAccessor.create( ContainingEmbeddable::setContainedNonIndexedEmbedded,
+								ContainingEmbeddable::getContainedNonIndexedEmbedded
 						);
 					}
 				};
@@ -491,7 +489,7 @@ public class AutomaticIndexingManyToOneBaseIT
 				inverseJoinColumns = @JoinColumn(name = "containing"))
 		@AssociationInverseSide(inversePath = @ObjectPath({
 				@PropertyValue(propertyName = "elementCollectionAssociations"),
-				@PropertyValue(propertyName = "embContainedIndexedEmbedded")
+				@PropertyValue(propertyName = "containedIndexedEmbedded")
 		}))
 		private List<ContainingEntity> containingAsElementCollectionAssociationsIndexedEmbedded = new ArrayList<>();
 
@@ -506,7 +504,7 @@ public class AutomaticIndexingManyToOneBaseIT
 				inverseJoinColumns = @JoinColumn(name = "containing"))
 		@AssociationInverseSide(inversePath = @ObjectPath({
 				@PropertyValue(propertyName = "elementCollectionAssociations"),
-				@PropertyValue(propertyName = "embContainedNonIndexedEmbedded")
+				@PropertyValue(propertyName = "containedNonIndexedEmbedded")
 		}))
 		private List<ContainingEntity> containingAsElementCollectionAssociationsNonIndexedEmbedded = new ArrayList<>();
 
@@ -804,11 +802,11 @@ public class AutomaticIndexingManyToOneBaseIT
 
 	public static class ContainedEmbeddable {
 
-		@OneToMany(mappedBy = "embeddedAssociations.embContainedIndexedEmbedded")
+		@OneToMany(mappedBy = "embeddedAssociations.containedIndexedEmbedded")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsIndexedEmbedded = new ArrayList<>();
 
-		@OneToMany(mappedBy = "embeddedAssociations.embContainedNonIndexedEmbedded")
+		@OneToMany(mappedBy = "embeddedAssociations.containedNonIndexedEmbedded")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsNonIndexedEmbedded = new ArrayList<>();
 
