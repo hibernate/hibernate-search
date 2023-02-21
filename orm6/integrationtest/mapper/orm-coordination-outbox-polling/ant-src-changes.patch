@@ -12,10 +12,10 @@ index ef59998f6f..e43f3b38e5 100644
  				.containsOnly( IndexedEntity.NAME );
  	}
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/coordination/outboxpolling/OutboxPollingStrategyPropertyValueIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/coordination/outboxpolling/OutboxPollingStrategyPropertyValueIT.java
-index a3d83491fa..7bb088d657 100644
+index 0dd65e1228..e23cc0cb5a 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/coordination/outboxpolling/OutboxPollingStrategyPropertyValueIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/coordination/outboxpolling/OutboxPollingStrategyPropertyValueIT.java
-@@ -101,7 +101,7 @@ public void resetFilter() {
+@@ -103,7 +103,7 @@ public void resetFilter() {
  
  	@Test
  	public void metamodel_userEntitiesAndOutboxEventAndAgent() {

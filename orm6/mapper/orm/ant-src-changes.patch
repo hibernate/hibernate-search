@@ -223,10 +223,10 @@ index 82c86985ab..3abdf72591 100644
  		}
  		else {
 diff --git a/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java b/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
-index d1dfbe37aa..870bd2ee6f 100644
+index ba51476ada..9341b77f8a 100644
 --- a/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
 +++ b/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
-@@ -255,14 +255,10 @@ SearchException foundMultipleEntitiesForDocumentId(String entityName, String doc
+@@ -251,14 +251,10 @@ SearchException foundMultipleEntitiesForDocumentId(String entityName, String doc
  			+ " Currently configured tenant identifiers: %2$s." )
  	SearchException invalidTenantId(String tenantId, Set<String> allTenantIds, String tenantIdsConfigurationPropertyKey);
  
