@@ -52,7 +52,7 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 	public void stopWhileOutboxEventsIsBeingProcessed() {
 		SessionFactory sessionFactory = setup();
 		backendMock.verifyExpectationsMet();
-		int size = 1000;
+		int size = 10000;
 
 		with( sessionFactory ).runInTransaction( session -> {
 			for ( int i = 1; i <= size; i++ ) {
@@ -60,6 +60,10 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 				entity.setId( i );
 				entity.setIndexedField( "value for the field" );
 				session.persist( entity );
+				if ( i % 1000 == 0 ) {
+					session.flush();
+					session.clear();
+				}
 			}
 
 			BackendMock.DocumentWorkCallListContext context = backendMock.expectWorks( IndexedEntity.NAME );
