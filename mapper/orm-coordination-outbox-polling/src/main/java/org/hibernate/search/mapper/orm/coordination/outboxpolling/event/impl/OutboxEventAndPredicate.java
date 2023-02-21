@@ -28,7 +28,7 @@ public class OutboxEventAndPredicate implements OutboxEventPredicate {
 	}
 
 	@Override
-	public void setParams(Query<OutboxEvent> query) {
+	public void setParams(Query<?> query) {
 		// Assuming no conflicts...
 		left.setParams( query );
 		right.setParams( query );

@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -25,6 +24,7 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.Out
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEventAndPredicate;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEventFinder;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEventFinderProvider;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEventOrder;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEventPredicate;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
@@ -33,7 +33,7 @@ public class OutboxEventFilter {
 	private volatile boolean filter = true;
 	private final Set<UUID> allowedIds = ConcurrentHashMap.newKeySet();
 
-	private OutboxEventFinder allEventsAllShardsFinder;
+	private DefaultOutboxEventFinder allEventsAllShardsFinder;
 	private OutboxEventFinder visibleEventsAllShardsFinder;
 
 	public OutboxEventFilter() {
@@ -44,9 +44,8 @@ public class OutboxEventFilter {
 		allowedIds.clear();
 	}
 
-	public synchronized OutboxEventFilter enableFilter(boolean enable) {
+	private synchronized void enableFilter(boolean enable) {
 		filter = enable;
-		return this;
 	}
 
 	public OutboxEventFinderProvider wrap(DefaultOutboxEventFinder.Provider delegate) {
@@ -73,30 +72,45 @@ public class OutboxEventFilter {
 		};
 	}
 
+	public synchronized OutboxEventFilter showAllEvents() {
+		// This is less costly memory-wise than adding "where e.id in (<here go 10,000 IDs>)" to the event finding query
+		enableFilter( false );
+		allowedIds.clear();
+		return this;
+	}
+
 	public synchronized void showAllEventsUpToNow(SessionFactory sessionFactory) {
-		checkFiltering();
+		enableFilter( true );
 		with( sessionFactory ).runInTransaction( session -> showOnlyEvents( findOutboxEventIdsNoFilter( session ) ) );
 	}
 
 	public synchronized void showOnlyEvents(List<UUID> eventIds) {
-		checkFiltering();
+		enableFilter( true );
 		allowedIds.clear();
 		allowedIds.addAll( eventIds );
 	}
 
-	public synchronized void hideAllEvents() {
-		checkFiltering();
+	public synchronized OutboxEventFilter hideAllEvents() {
+		enableFilter( true );
 		allowedIds.clear();
+		return this;
 	}
 
 	public List<OutboxEvent> findOutboxEventsNoFilter(Session session) {
-		checkFiltering();
-		// Assuming we'll never deal with more than one million events in tests when this method is called.
-		return allEventsAllShardsFinder.findOutboxEvents( session, 1_000_000 );
+		return allEventsAllShardsFinder.createOutboxEventQuery( session )
+				.getResultList();
 	}
 
 	public List<UUID> findOutboxEventIdsNoFilter(Session session) {
-		return findOutboxEventsNoFilter( session ).stream().map( OutboxEvent::getId ).collect( Collectors.toList() );
+		return allEventsAllShardsFinder.createOutboxEventQueryForTests( session, alias -> alias + ".id", UUID.class,
+						/* use the same order as the outbox event finder */ null )
+				.getResultList();
+	}
+
+	public Long countOutboxEventsNoFilter(Session session) {
+		return allEventsAllShardsFinder.createOutboxEventQueryForTests( session, alias -> "count(" + alias + ")", Long.class,
+						/* ordering wouldn't make sense for a count() */ OutboxEventOrder.NONE )
+				.getSingleResult();
 	}
 
 	private void checkFiltering() {
@@ -120,7 +134,7 @@ public class OutboxEventFilter {
 		}
 
 		@Override
-		public void setParams(Query<OutboxEvent> query) {
+		public void setParams(Query<?> query) {
 			query.setParameter( "ids", allowedIds );
 		}
 	}

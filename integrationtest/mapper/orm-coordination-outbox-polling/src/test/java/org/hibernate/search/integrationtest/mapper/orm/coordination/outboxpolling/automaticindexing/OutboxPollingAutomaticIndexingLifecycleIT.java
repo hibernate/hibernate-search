@@ -68,12 +68,12 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 			}
 		} );
 
-		// wait for the first call is processed (partial progressing)
-		eventFilter.showAllEventsUpToNow( sessionFactory );
+		// wait for the first call to be processed (partial progressing)
+		eventFilter.showAllEvents();
 		SessionFactory finalSessionFactory = sessionFactory;
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
 			with( finalSessionFactory ).runInTransaction( session -> {
-				assertThat( eventFilter.findOutboxEventIdsNoFilter( session ) ).hasSizeLessThan( size );
+				assertThat( eventFilter.countOutboxEventsNoFilter( session ) ).isLessThan( size );
 			} );
 		} );
 
@@ -84,15 +84,14 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 		eventFilter.hideAllEvents();
 		sessionFactory = setup();
 		with( sessionFactory ).runInTransaction( session -> {
-			List<OutboxEvent> outboxEventsNoFilter = eventFilter.findOutboxEventsNoFilter( session );
-			// partial processing, meaning that the events size is *strictly* between 0 and the full size:
-			assertThat( outboxEventsNoFilter ).hasSizeBetween( 1, size - 1 );
+			// partial processing, meaning that the event count is *strictly* between 0 and the full size:
+			assertThat( eventFilter.countOutboxEventsNoFilter( session ) ).isBetween( 1L, size - 1L );
 		} );
 		sessionFactory.close();
 
 		// process the entities restarting Search:
+		eventFilter.showAllEvents();
 		sessionFactory = setup();
-		eventFilter.showAllEventsUpToNow( sessionFactory );
 
 		backendMock.verifyExpectationsMet();
 	}
