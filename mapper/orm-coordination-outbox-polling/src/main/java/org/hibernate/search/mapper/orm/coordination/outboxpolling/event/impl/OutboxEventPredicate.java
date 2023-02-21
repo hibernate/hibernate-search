@@ -12,6 +12,6 @@ public interface OutboxEventPredicate {
 
 	String queryPart(String eventAlias);
 
-	void setParams(Query<OutboxEvent> query);
+	void setParams(Query<?> query);
 
 }

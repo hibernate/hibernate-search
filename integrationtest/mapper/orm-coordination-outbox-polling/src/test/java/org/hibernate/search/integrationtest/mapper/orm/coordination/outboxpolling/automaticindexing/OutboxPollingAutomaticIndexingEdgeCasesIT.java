@@ -69,7 +69,7 @@ public class OutboxPollingAutomaticIndexingEdgeCasesIT {
 	public void resetFilter() {
 		eventFilter.reset();
 		// Disable the filter by default: only some of the tests actually need it.
-		eventFilter.enableFilter( false );
+		eventFilter.showAllEvents();
 	}
 
 	@Test
@@ -144,7 +144,7 @@ public class OutboxPollingAutomaticIndexingEdgeCasesIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		eventFilter.enableFilter( true );
+		eventFilter.hideAllEvents();
 
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity containing = session.getReference( IndexedEntity.class, 1 );

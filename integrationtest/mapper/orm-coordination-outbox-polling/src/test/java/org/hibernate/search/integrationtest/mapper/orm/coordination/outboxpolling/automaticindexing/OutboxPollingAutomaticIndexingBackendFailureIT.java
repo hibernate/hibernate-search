@@ -51,7 +51,7 @@ public class OutboxPollingAutomaticIndexingBackendFailureIT {
 
 	private final OutboxEventFilter eventFilter = new OutboxEventFilter()
 			// Disable the filter by default: only some of the tests actually need it.
-			.enableFilter( false );
+			.showAllEvents();
 
 	private SessionFactory sessionFactory;
 	private TestFailureHandler failureHandler;

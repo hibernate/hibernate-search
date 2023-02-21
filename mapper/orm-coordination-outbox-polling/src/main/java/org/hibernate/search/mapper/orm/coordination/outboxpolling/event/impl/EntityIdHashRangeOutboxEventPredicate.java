@@ -68,7 +68,7 @@ public final class EntityIdHashRangeOutboxEventPredicate implements OutboxEventP
 	}
 
 	@Override
-	public void setParams(Query<OutboxEvent> query) {
+	public void setParams(Query<?> query) {
 		if ( lowerBoundIncluded != null ) {
 			query.setParameter( LOWER_BOUND_PARAM_NAME, lowerBoundIncluded );
 		}
