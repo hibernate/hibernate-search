@@ -1,5 +1,5 @@
 diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cfg/HibernateOrmMapperOutboxPollingSettings.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cfg/HibernateOrmMapperOutboxPollingSettings.java
-index 67a2ed156d..771f3cc9cd 100644
+index 7773dc4f96..9fb7b30e9c 100644
 --- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cfg/HibernateOrmMapperOutboxPollingSettings.java
 +++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cfg/HibernateOrmMapperOutboxPollingSettings.java
 @@ -8,9 +8,9 @@
@@ -13,7 +13,7 @@ index 67a2ed156d..771f3cc9cd 100644
  import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
  import org.hibernate.search.util.common.annotation.Incubating;
  import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
-@@ -392,14 +392,15 @@ private HibernateOrmMapperOutboxPollingSettings() {
+@@ -405,14 +405,15 @@ private HibernateOrmMapperOutboxPollingSettings() {
  			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_TABLE;
  
  	/**
@@ -31,7 +31,7 @@ index 67a2ed156d..771f3cc9cd 100644
  	 * @see CustomVersionOneStrategy
  	 * @see StandardRandomStrategy
  	 */
-@@ -451,14 +452,14 @@ private HibernateOrmMapperOutboxPollingSettings() {
+@@ -464,14 +465,14 @@ private HibernateOrmMapperOutboxPollingSettings() {
  			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_AGENT_TABLE;
  
  	/**
@@ -122,7 +122,7 @@ index ea4ccc5e6e..5f7479025e 100644
  
  		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( entityDefinition.getBytes() );
  		BufferedInputStream bufferedInputStream = new BufferedInputStream( byteArrayInputStream );
-@@ -171,7 +174,7 @@ public Collection<MappingDocument> produceMappings(ConfigurationPropertySource p
+@@ -170,7 +173,7 @@ public Collection<MappingDocument> produceMappings(ConfigurationPropertySource p
  
  		JaxbHbmHibernateMapping root = (JaxbHbmHibernateMapping) binding.getRoot();
  
