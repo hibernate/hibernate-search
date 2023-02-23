@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrch
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
+import org.hibernate.search.backend.lucene.search.highlighter.impl.LuceneSearchHighlighter;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
@@ -72,7 +74,8 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	private TimeUnit timeUnit;
 	private boolean exceptionOnTimeout;
 	private Long totalHitCountThreshold;
-	private SearchHighlighter queryHighlighterConfiguration;
+	private LuceneSearchHighlighter globalHighlighter;
+	private final Map<String, LuceneSearchHighlighter> namedHighlighters = new HashMap<>();
 
 	public LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
@@ -154,12 +157,15 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 
 	@Override
 	public void highlighter(SearchHighlighter queryHighlighter) {
-		this.queryHighlighterConfiguration = queryHighlighter;
+		this.globalHighlighter = LuceneSearchHighlighter.from( scope, queryHighlighter );
 	}
 
 	@Override
 	public void highlighter(String highlighterName, SearchHighlighter highlighter) {
-		throw new UnsupportedOperationException();
+		this.namedHighlighters.put(
+				highlighterName,
+				LuceneSearchHighlighter.from( scope, highlighter )
+		);
 	}
 
 	@Override
@@ -218,9 +224,31 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 				sessionContext, loadingContext, definitiveLuceneQuery, luceneSort
 		);
 
+		LuceneSearchHighlighter resolvedGlobalHighlighter = this.globalHighlighter == null ? null : this.globalHighlighter.withFallbackDefaults();
+		Map<String, LuceneSearchHighlighter> resolvedNamedHighlighters = new HashMap<>();
+		if ( resolvedGlobalHighlighter != null ) {
+			for ( Map.Entry<String, LuceneSearchHighlighter> entry : this.namedHighlighters.entrySet() ) {
+				resolvedNamedHighlighters.put(
+						entry.getKey(),
+						entry.getValue().withFallback( resolvedGlobalHighlighter )
+				);
+			}
+		}
+		else {
+			for ( Map.Entry<String, LuceneSearchHighlighter> entry : this.namedHighlighters.entrySet() ) {
+				resolvedNamedHighlighters.put(
+						entry.getKey(),
+						entry.getValue().withFallbackDefaults()
+				);
+			}
+		}
+
 		ExtractionRequirements.Builder extractionRequirementsBuilder = new ExtractionRequirements.Builder();
-		ProjectionRequestContext projectionRequestContext =
-				new ProjectionRequestContext( extractionRequirementsBuilder );
+		ProjectionRequestContext projectionRequestContext = new ProjectionRequestContext(
+				extractionRequirementsBuilder,
+				resolvedGlobalHighlighter,
+				resolvedNamedHighlighters
+		);
 		LuceneSearchProjection.Extractor<?, H> rootExtractor =
 				rootProjection.request( projectionRequestContext );
 		if ( aggregations != null ) {

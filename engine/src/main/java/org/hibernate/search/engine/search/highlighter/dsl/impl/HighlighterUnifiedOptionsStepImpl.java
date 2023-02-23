@@ -59,7 +59,7 @@ public class HighlighterUnifiedOptionsStepImpl
 		@Override
 		public HighlighterUnifiedOptionsStep locale(Locale locale) {
 			Contracts.assertNotNull( locale, "locale" );
-			HighlighterUnifiedOptionsStepImpl.this.highlighterBuilder.boundaryScannerLocale( locale.toString() );
+			HighlighterUnifiedOptionsStepImpl.this.highlighterBuilder.boundaryScannerLocale( locale );
 			return HighlighterUnifiedOptionsStepImpl.this;
 		}
 	}

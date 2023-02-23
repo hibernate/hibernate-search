@@ -7,9 +7,11 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
+import org.hibernate.search.backend.lucene.search.highlighter.impl.LuceneSearchHighlighter;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -19,13 +21,19 @@ public final class ProjectionRequestContext {
 
 	private final ExtractionRequirements.Builder extractionRequirementsBuilder;
 	private final String absoluteCurrentFieldPath;
+	private final LuceneSearchHighlighter globalHighlighter;
+	private final Map<String, LuceneSearchHighlighter> namedHighlighters;
 
-	public ProjectionRequestContext(ExtractionRequirements.Builder extractionRequirementsBuilder) {
-		this( extractionRequirementsBuilder, null );
+	public ProjectionRequestContext(ExtractionRequirements.Builder extractionRequirementsBuilder,
+			LuceneSearchHighlighter globalHighlighter, Map<String, LuceneSearchHighlighter> namedHighlighters) {
+		this( extractionRequirementsBuilder, globalHighlighter, namedHighlighters, null );
 	}
 
 	private ProjectionRequestContext(ExtractionRequirements.Builder extractionRequirementsBuilder,
+			LuceneSearchHighlighter globalHighlighter, Map<String, LuceneSearchHighlighter> namedHighlighters,
 			String absoluteCurrentFieldPath) {
+		this.globalHighlighter = globalHighlighter;
+		this.namedHighlighters = namedHighlighters;
 		this.extractionRequirementsBuilder = extractionRequirementsBuilder;
 		this.absoluteCurrentFieldPath = absoluteCurrentFieldPath;
 	}
@@ -49,16 +57,29 @@ public final class ProjectionRequestContext {
 	}
 
 	public ProjectionRequestContext root() {
-		return new ProjectionRequestContext( extractionRequirementsBuilder, null );
+		return new ProjectionRequestContext( extractionRequirementsBuilder, globalHighlighter, namedHighlighters, null );
 	}
 
 	public ProjectionRequestContext forField(String absoluteFieldPath) {
 		checkValidField( absoluteFieldPath );
-		return new ProjectionRequestContext( extractionRequirementsBuilder, absoluteFieldPath );
+		return new ProjectionRequestContext( extractionRequirementsBuilder, globalHighlighter, namedHighlighters, absoluteFieldPath );
 	}
 
 	public String absoluteCurrentFieldPath() {
 		return absoluteCurrentFieldPath;
+	}
+
+	public LuceneSearchHighlighter highlighter(String name) {
+		if ( name == null ) {
+			return globalHighlighter == null ? LuceneSearchHighlighter.DEFAULTS_UNIFIED : globalHighlighter;
+		}
+		else {
+			LuceneSearchHighlighter highlighter = namedHighlighters.get( name );
+			if ( highlighter == null ) {
+				throw log.cannotFindHighlighterWithName( name, namedHighlighters.keySet() );
+			}
+			return highlighter;
+		}
 	}
 
 }

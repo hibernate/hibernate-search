@@ -11,12 +11,15 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import java.util.Arrays;
 import java.util.List;
 
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.TermVector;
+import org.hibernate.search.engine.search.highlighter.dsl.HighlighterEncoder;
+import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFragmenter;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterTagSchema;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -77,8 +80,8 @@ public class FieldHighlightIT {
 						f -> f.highlight( "string" ).highlighter( "strong-tag-highlighter" )
 				)
 				.where( f -> f.match().field( "string" ).matching( "another" ) )
-				.highlighter( h -> h.defaultType().tagSchema( HighlighterTagSchema.STYLED ) )
-				.highlighter( "strong-tag-highlighter", h2 -> h2.defaultType().tag( "<strong>", "</strong>" ) )
+				.highlighter( h -> h.fastVector().tagSchema( HighlighterTagSchema.STYLED ) )
+				.highlighter( "strong-tag-highlighter", h2 -> h2.fastVector().tag( "<strong>", "</strong>" ) )
 				.toQuery();
 
 		assertThatHits( highlights.fetchAllHits() )
@@ -101,6 +104,34 @@ public class FieldHighlightIT {
 		assertThatHits( highlights.fetchAllHits() )
 				.hasHitsAnyOrder(
 						Arrays.asList( "<em>foo</em> and <em>foo</em> and <em>foo</em> much more times" )
+				);
+	}
+
+	@Test
+	public void plainAllSettingsNonsense() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<List<String>> highlights = scope.query().select(
+						f -> f.highlight( "string" )
+				)
+				.where( f -> f.match().field( "string" ).matching( "foo" ) )
+				.highlighter( h -> h.plain()
+						.tag( "--", "--" )
+						.fragmenter( HighlighterFragmenter.SIMPLE )
+						.fragmentSize( 1 )
+						.numberOfFragments( 1 )
+						.boundaryChars( "" )
+						.boundaryMaxScan( 1 )
+						.encoder( HighlighterEncoder.HTML )
+						.maxAnalyzedOffset( 1 )
+						.noMatchSize( 1 )
+						.orderByScore( true )
+				)
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						Arrays.asList( "--foo-- and foo and foo much more times" ) // in case of Lucene the result is `--foo--` which seems to be more in line with what that plain highlighter does
 				);
 	}
 
@@ -141,6 +172,8 @@ public class FieldHighlightIT {
 						.numberOfFragments( 2 ) )
 				.toQuery();
 
+		// Lucene results won't match as ES is using their own custom formatter that creates multiple strings,
+		// while in case of raw Lucene the formatter is generating single string.
 		assertThatHits( highlights.fetchAllHits() )
 				.hasHitsAnyOrder(
 						Arrays.asList(
@@ -174,16 +207,21 @@ public class FieldHighlightIT {
 	}
 
 	private static class IndexBinding {
-		final SimpleFieldModel<String> stringField;
-		final SimpleFieldModel<String> anotherStringField;
+		final IndexFieldReference<String> stringField;
+		final IndexFieldReference<String> anotherStringField;
 
 		IndexBinding(IndexSchemaElement root) {
-			stringField = SimpleFieldModel.mapper( AnalyzedStringFieldTypeDescriptor.INSTANCE, c -> {
-					} )
-					.map( root, "string", c -> c.projectable( Projectable.YES ) );
-			anotherStringField = SimpleFieldModel.mapper( AnalyzedStringFieldTypeDescriptor.INSTANCE, c -> {
-					} )
-					.map( root, "anotherString", c -> c.projectable( Projectable.YES ) );
+			stringField = root.field( "string", f -> f.asString()
+					.projectable( Projectable.YES )
+					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
+					.termVector( TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS )
+			).toReference();
+
+			anotherStringField = root.field( "anotherString", f -> f.asString()
+					.projectable( Projectable.YES )
+					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
+					.termVector( TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS )
+			).toReference();
 		}
 	}
 }
