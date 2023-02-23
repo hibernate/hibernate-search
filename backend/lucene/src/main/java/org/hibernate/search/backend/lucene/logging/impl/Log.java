@@ -22,6 +22,9 @@ import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.common.SortMode;
+import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
+import org.hibernate.search.engine.search.highlighter.spi.BoundaryScannerType;
+import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.sort.SearchSort;
@@ -625,4 +628,28 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 157, value = "Unable to export the schema for '%1$s' index: %2$s" )
 	SearchException unableToExportSchema(String indexName, String message, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET + 158,
+			value = "Invalid highlighter: '%1$s'. You must build the highlighter from a Lucene search scope.")
+	SearchException cannotMixLuceneSearchQueryWithOtherQueryHighlighters(SearchHighlighter highlighter);
+
+	@Message(id = ID_OFFSET + 159,
+			value = "Invalid highlighter: '%1$s'. You must build the highlighter from a scope targeting indexes %3$s,"
+					+ " but the given highlighter was built from a scope targeting indexes %2$s.")
+	SearchException queryHighlighterDefinedOnDifferentIndexes(SearchHighlighter highlighter, Set<String> indexNames, Set<String> hibernateSearchIndexNames);
+
+	@Message(id = ID_OFFSET + 160,
+			value = "Overriding a '%2$s' highlighter with a '%1$s' is not supported. " +
+					"Overriding highlighters should be of the same type as the global is if the global highlighter was configured.")
+	SearchException cannotMixDifferentHighlighterTypesAtOverrideLevel(SearchHighlighterType override, SearchHighlighterType parent);
+
+	@Message(id = ID_OFFSET + 161,
+			value = "Cannot find a highlighter with name '%1$s'." +
+					" Available highlighters are: %2$s." +
+					" Was it configured with `highlighter(\"%1$s\", highlighterContributor)`?")
+	SearchException cannotFindHighlighterWithName(String name, Collection<String> availableHighlighterNames);
+
+	@Message(id = ID_OFFSET + 162,
+			value = "'%1$s' highlighter does not support '%2$s' boundary scanner type.")
+	SearchException unsupportedBoundaryScannerType(SearchHighlighterType type, BoundaryScannerType boundaryScannerType);
 }

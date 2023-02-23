@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.search.query.dsl.impl;
 
 import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAggregationFactory;
-import org.hibernate.search.backend.lucene.search.highlighter.LuceneSearchHighlighterFactory;
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
@@ -17,6 +16,7 @@ import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryWhe
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryIndexScope;
 import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFactory;
+import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractExtendedSearchQueryOptionsStep;
 
@@ -69,7 +69,7 @@ class LuceneSearchQueryOptionsStepImpl<H, LOS>
 	}
 
 	@Override
-	protected LuceneSearchHighlighterFactory highlighterFactory() {
+	protected SearchHighlighterFactory highlighterFactory() {
 		return scope.highlighterFactory();
 	}
 

@@ -111,7 +111,7 @@ public class HighlighterFastVectorHighlighterOptionsStepImpl
 		@Override
 		public HighlighterFastVectorHighlighterOptionsStep locale(Locale locale) {
 			Contracts.assertNotNull( locale, "locale" );
-			HighlighterFastVectorHighlighterOptionsStepImpl.this.highlighterBuilder.boundaryScannerLocale( locale.toString() );
+			HighlighterFastVectorHighlighterOptionsStepImpl.this.highlighterBuilder.boundaryScannerLocale( locale );
 			return HighlighterFastVectorHighlighterOptionsStepImpl.this;
 		}
 	}

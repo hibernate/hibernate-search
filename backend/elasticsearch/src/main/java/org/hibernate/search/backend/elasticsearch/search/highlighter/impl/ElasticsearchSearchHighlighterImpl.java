@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.highlighter.impl;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -75,11 +76,13 @@ public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHi
 				convertHighlighterType( builder.type() ),
 				builder.boundaryCharsAsString(),
 				builder.boundaryMaxScan(), builder.fragmentSize(), builder.noMatchSize(), builder.numberOfFragments(),
-				builder.orderByScore() ? "score" : null, builder.maxAnalyzedOffset(), builder.preTags(),
+				Boolean.TRUE.equals( builder.orderByScore() ) ? "score" : null, builder.maxAnalyzedOffset(), builder.preTags(),
 				builder.postTags(),
-				convertBoundaryScannerType( builder.boundaryScannerType() ), builder.boundaryScannerLocale(),
+				convertBoundaryScannerType( builder.boundaryScannerType() ),
+				Objects.toString( builder.boundaryScannerLocale(), null ),
 				convertHighlighterFragmenter( builder.fragmenterType() ),
-				builder.phraseLimit(), convertHighlighterEncoder( builder.encoder() ), convertHighlighterTagSchema( builder.tagSchema() )
+				builder.phraseLimit(), convertHighlighterEncoder( builder.encoder() ),
+				convertHighlighterTagSchema( builder.tagSchema() )
 		);
 	}
 

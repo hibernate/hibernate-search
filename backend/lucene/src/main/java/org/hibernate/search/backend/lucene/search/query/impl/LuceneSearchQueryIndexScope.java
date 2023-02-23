@@ -14,7 +14,6 @@ import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAg
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.highlighter.LuceneSearchHighlighterFactory;
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateIndexScope;
 import org.hibernate.search.backend.lucene.search.projection.dsl.LuceneSearchProjectionFactory;
@@ -49,9 +48,6 @@ public interface LuceneSearchQueryIndexScope<S extends LuceneSearchQueryIndexSco
 
 	@Override
 	LuceneSearchAggregationFactory aggregationFactory();
-
-	@Override
-	LuceneSearchHighlighterFactory highlighterFactory();
 
 	Query filterOrNull(String tenantId);
 

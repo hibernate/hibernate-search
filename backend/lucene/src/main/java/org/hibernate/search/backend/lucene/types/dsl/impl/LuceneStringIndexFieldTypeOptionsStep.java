@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldHighlightProjection;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LucenePredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
@@ -130,6 +131,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 			builder.searchAnalyzerName( searchAnalyzerName );
 			builder.indexingAnalyzerOrNormalizer( analyzer );
 			builder.searchAnalyzerOrNormalizer( searchAnalyzer != null ? searchAnalyzer : analyzer );
+			builder.queryElementFactory( ProjectionTypeKeys.HIGHLIGHT, new LuceneFieldHighlightProjection.Factory<>() );
 
 			if ( resolvedSortable ) {
 				throw log.cannotUseAnalyzerOnSortableField( analyzerName, buildContext.getEventContext() );

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterEncoder;
@@ -24,12 +25,12 @@ public abstract class SearchHighlighterBuilder {
 	protected Integer fragmentSize;
 	protected Integer noMatchSize;
 	protected Integer numberOfFragments;
-	protected boolean orderByScore;
+	protected Boolean orderByScore;
 	protected Integer maxAnalyzedOffset;
 	protected List<String> preTags;
 	protected List<String> postTags;
 	protected BoundaryScannerType boundaryScannerType = BoundaryScannerType.DEFAULT;
-	protected String boundaryScannerLocale;
+	protected Locale boundaryScannerLocale;
 	protected HighlighterFragmenter fragmenterType;
 	protected Integer phraseLimit;
 	protected HighlighterEncoder encoder;
@@ -79,7 +80,7 @@ public abstract class SearchHighlighterBuilder {
 		return this;
 	}
 
-	public SearchHighlighterBuilder orderByScore(boolean orderByScore) {
+	public SearchHighlighterBuilder orderByScore(Boolean orderByScore) {
 		this.orderByScore = orderByScore;
 		return this;
 	}
@@ -94,7 +95,7 @@ public abstract class SearchHighlighterBuilder {
 		return this;
 	}
 
-	public SearchHighlighterBuilder boundaryScannerLocale(String boundaryScannerLocale) {
+	public SearchHighlighterBuilder boundaryScannerLocale(Locale boundaryScannerLocale) {
 		this.boundaryScannerLocale = boundaryScannerLocale;
 		return this;
 	}
@@ -196,7 +197,7 @@ public abstract class SearchHighlighterBuilder {
 		return numberOfFragments;
 	}
 
-	public boolean orderByScore() {
+	public Boolean orderByScore() {
 		return orderByScore;
 	}
 
@@ -216,7 +217,7 @@ public abstract class SearchHighlighterBuilder {
 		return boundaryScannerType;
 	}
 
-	public String boundaryScannerLocale() {
+	public Locale boundaryScannerLocale() {
 		return boundaryScannerLocale;
 	}
 
