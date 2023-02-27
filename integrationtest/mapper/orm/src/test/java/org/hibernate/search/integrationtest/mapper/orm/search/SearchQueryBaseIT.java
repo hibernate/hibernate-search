@@ -499,21 +499,21 @@ public class SearchQueryBaseIT {
 							3L,
 							Arrays.asList(
 									TITLE_4_3_2_1,
-									reference( Book.NAME, "1" ),
+									"1",
 									reference( Book.NAME, "1" ),
 									reference( Book.NAME, "1" ),
 									AUTHOR_4_3_2_1
 							),
 							Arrays.asList(
 									TITLE_CIDER_HOUSE,
-									reference( Book.NAME, "2" ),
+									"2",
 									reference( Book.NAME, "2" ),
 									reference( Book.NAME, "2" ),
 									AUTHOR_CIDER_HOUSE
 							),
 							Arrays.asList(
 									TITLE_AVENUE_OF_MYSTERIES,
-									reference( Book.NAME, "3" ),
+									"3",
 									reference( Book.NAME, "3" ),
 									reference( Book.NAME, "3" ),
 									AUTHOR_AVENUE_OF_MYSTERIES

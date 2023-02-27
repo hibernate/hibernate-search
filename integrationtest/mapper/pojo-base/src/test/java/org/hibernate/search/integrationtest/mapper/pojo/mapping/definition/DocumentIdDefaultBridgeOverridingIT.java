@@ -135,10 +135,7 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 					b -> { },
 					StubSearchWorkBehavior.of(
 							1L,
-							StubBackendUtils.reference(
-									DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
-									getDocumentIdentifierValue()
-							)
+							getDocumentIdentifierValue()
 					)
 			);
 

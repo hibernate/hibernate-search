@@ -157,10 +157,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 						},
 						StubSearchWorkBehavior.of(
 								1L,
-								StubBackendUtils.reference(
-										DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
-										documentIdentifierValue
-								)
+								documentIdentifierValue
 						)
 				);
 
