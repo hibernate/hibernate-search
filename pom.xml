@@ -312,7 +312,7 @@
         <!-- Test dependencies -->
 
         <!-- >>> Common -->
-        <version.log4j>2.19.0</version.log4j>
+        <version.log4j>2.20.0</version.log4j>
         <version.junit>4.13.2</version.junit>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
 
