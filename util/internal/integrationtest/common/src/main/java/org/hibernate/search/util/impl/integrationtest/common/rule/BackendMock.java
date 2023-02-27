@@ -217,7 +217,7 @@ public class BackendMock implements TestRule {
 	}
 
 	public BackendMock expectSearchIds(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
-			StubSearchWorkBehavior<DocumentReference> behavior) {
+			StubSearchWorkBehavior<String> behavior) {
 		return expectSearch( indexNames, contributor, behavior );
 	}
 

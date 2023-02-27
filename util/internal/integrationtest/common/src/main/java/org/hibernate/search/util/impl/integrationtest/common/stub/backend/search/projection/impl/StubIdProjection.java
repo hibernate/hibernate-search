@@ -8,7 +8,6 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import java.util.Iterator;
 
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -33,11 +32,10 @@ public class StubIdProjection<I> extends StubSearchProjection<I> {
 	@Override
 	public I transform(LoadingResult<?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
-		DocumentReference documentReference = (DocumentReference) extractedData;
+		String documentId = (String) extractedData;
 
 		context.fromDocumentValueConvertContext();
-		return converter.fromDocumentValue( documentReference.id(),
-				context.fromDocumentValueConvertContext() );
+		return converter.fromDocumentValue( documentId, context.fromDocumentValueConvertContext() );
 	}
 
 	@Override
