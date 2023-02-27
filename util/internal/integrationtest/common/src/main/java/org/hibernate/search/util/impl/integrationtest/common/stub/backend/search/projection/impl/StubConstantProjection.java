@@ -11,7 +11,7 @@ import java.util.Iterator;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-class StubConstantProjection<T> implements StubSearchProjection<T> {
+class StubConstantProjection<T> extends StubSearchProjection<T> {
 
 	private final T value;
 
@@ -30,5 +30,15 @@ class StubConstantProjection<T> implements StubSearchProjection<T> {
 	public T transform(LoadingResult<?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
 		return (T) extractedData;
+	}
+
+	@Override
+	protected String typeName() {
+		return "constant";
+	}
+
+	@Override
+	protected void toNode(StubProjectionNode.Builder self) {
+		self.attribute( "value", value );
 	}
 }

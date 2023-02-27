@@ -17,32 +17,20 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexNodeContext;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
 
-public class StubCompositeProjection<E, V, A, P> implements StubSearchProjection<P> {
+class StubCompositeProjection<E, V, A, P> extends StubSearchProjection<P> {
 
 	private final StubSearchProjection<?>[] inners;
 	private final ProjectionCompositor<E, V> compositor;
 	private final ProjectionAccumulator<E, V, A, P> accumulator;
 	private final boolean singleValued;
 
-	private StubCompositeProjection(StubSearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
+	protected StubCompositeProjection(StubSearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
 			ProjectionAccumulator<E, V, A, P> accumulator, boolean singleValued) {
 		this.inners = inners;
 		this.compositor = compositor;
 		this.accumulator = accumulator;
 		this.singleValued = singleValued;
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "["
-				+ "inners=" + Arrays.toString( inners )
-				+ ", compositor=" + compositor
-				+ ", accumulator=" + accumulator
-				+ "]";
 	}
 
 	@Override
@@ -87,11 +75,19 @@ public class StubCompositeProjection<E, V, A, P> implements StubSearchProjection
 		return accumulator.finish( accumulated );
 	}
 
-	public static class Factory extends AbstractStubSearchQueryElementFactory<CompositeProjectionBuilder> {
-		@Override
-		public CompositeProjectionBuilder create(StubSearchIndexScope scope,
-				StubSearchIndexNodeContext node) {
-			return new Builder();
+	@Override
+	protected String typeName() {
+		return "composite";
+	}
+
+	@Override
+	protected void toNode(StubProjectionNode.Builder self) {
+		// Not including the compositor to facilitate assertions
+		// self.attribute( "compositor", compositor );
+		self.attribute( "accumulator", accumulator );
+		self.attribute( "singleValued", singleValued );
+		for ( StubSearchProjection<?> inner : inners ) {
+			appendInnerNode( self, "inner", inner );
 		}
 	}
 
@@ -100,18 +96,21 @@ public class StubCompositeProjection<E, V, A, P> implements StubSearchProjection
 		Builder() {
 		}
 
-
 		@Override
-		@SuppressWarnings("unchecked")
-		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
+		public final <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
 				ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
 			StubSearchProjection<?>[] typedInners =
 					new StubSearchProjection<?>[ inners.length ];
 			for ( int i = 0; i < inners.length; i++ ) {
 				typedInners[i] = StubSearchProjection.from( inners[i] );
 			}
-			return new StubCompositeProjection<>( typedInners, compositor,
-					accumulatorProvider.get(), accumulatorProvider.isSingleValued() );
+			return doBuild( typedInners, compositor, accumulatorProvider.get(), accumulatorProvider.isSingleValued() );
+		}
+
+		protected <E, V, A, P> SearchProjection<P> doBuild(StubSearchProjection<?>[] typedInners,
+				ProjectionCompositor<E, V> compositor,
+				ProjectionAccumulator<E, V, A, P> accumulator, boolean singleValued) {
+			return new StubCompositeProjection<>( typedInners, compositor, accumulator, singleValued );
 		}
 	}
 }

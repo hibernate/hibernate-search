@@ -23,27 +23,23 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
 
-public class StubFieldProjection<F, V, A, P> implements StubSearchProjection<P> {
+public class StubFieldProjection<F, V, A, P> extends StubSearchProjection<P> {
+	private final String fieldPath;
 	private final Class<F> fieldType;
+	private final Class<V> expectedType;
 	private final ProjectionConverter<F, ? extends V> converter;
 	private final ProjectionAccumulator<F, V, A, P> accumulator;
 	private final boolean singleValued;
 
-	public StubFieldProjection(Class<F> fieldType, ProjectionConverter<F,? extends V> converter,
+	public StubFieldProjection(String fieldPath, Class<F> fieldType, Class<V> expectedType,
+			ProjectionConverter<F,? extends V> converter,
 			ProjectionAccumulator<F, V, A, P> accumulator, boolean singleValued) {
+		this.fieldPath = fieldPath;
 		this.fieldType = fieldType;
+		this.expectedType = expectedType;
 		this.converter = converter;
 		this.accumulator = accumulator;
 		this.singleValued = singleValued;
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "["
-				+ "fieldType=" + fieldType
-				+ ", converter=" + converter
-				+ ", accumulator=" + accumulator
-				+ "]";
 	}
 
 	@Override
@@ -73,6 +69,21 @@ public class StubFieldProjection<F, V, A, P> implements StubSearchProjection<P> 
 		return accumulator.finish( transformedData );
 	}
 
+	@Override
+	protected String typeName() {
+		return "field";
+	}
+
+	@Override
+	protected void toNode(StubProjectionNode.Builder self) {
+		self.attribute( "fieldPath", fieldPath );
+		self.attribute( "fieldType", fieldType );
+		self.attribute( "expectedType", expectedType );
+		self.attribute( "converter", converter );
+		self.attribute( "accumulator", accumulator );
+		self.attribute( "singleValued", singleValued );
+	}
+
 	public static class Factory extends AbstractStubSearchQueryElementFactory<FieldProjectionBuilder.TypeSelector> {
 		@Override
 		public FieldProjectionBuilder.TypeSelector create(StubSearchIndexScope scope,
@@ -92,23 +103,27 @@ public class StubFieldProjection<F, V, A, P> implements StubSearchProjection<P> 
 		public <V> Builder<F, V> type(Class<V> expectedType, ValueConvert convert) {
 			ProjectionConverter<F, ? extends V> converter = field.type().projectionConverter( convert )
 					.withConvertedType( expectedType, field );
-			return new Builder<>( field.type().valueClass(), converter );
+			return new Builder<>( field.absolutePath(), field.type().valueClass(), expectedType, converter );
 		}
 	}
 
 	static class Builder<F, V> implements FieldProjectionBuilder<V> {
+		private final String fieldPath;
 		private final Class<F> valueClass;
+		private final Class<V> expectedType;
 		private final ProjectionConverter<F, ? extends V> converter;
 
-		Builder(Class<F> valueClass, ProjectionConverter<F, ? extends V> converter) {
+		Builder(String fieldPath, Class<F> valueClass, Class<V> expectedType,
+				ProjectionConverter<F, ? extends V> converter) {
+			this.fieldPath = fieldPath;
 			this.valueClass = valueClass;
+			this.expectedType = expectedType;
 			this.converter = converter;
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
 		public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
-			return new StubFieldProjection<>( valueClass, converter,
+			return new StubFieldProjection<>( fieldPath, valueClass, expectedType, converter,
 					accumulatorProvider.get(), accumulatorProvider.isSingleValued() );
 		}
 	}

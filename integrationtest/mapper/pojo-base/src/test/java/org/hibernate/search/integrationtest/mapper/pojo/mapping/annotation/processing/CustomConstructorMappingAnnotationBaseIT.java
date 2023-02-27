@@ -17,6 +17,8 @@ import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 
+import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
@@ -58,6 +60,10 @@ public class CustomConstructorMappingAnnotationBaseIT {
 	@Rule
 	public StaticCounters counters = new StaticCounters();
 
+	protected final ProjectionFinalStep<?> dummyProjectionForEnclosingClassInstance(SearchProjectionFactory<?, ?> f) {
+		return f.constant( null );
+	}
+
 	/**
 	 * Basic test checking that a simple constructor mapping will be applied as expected.
 	 */
@@ -89,6 +95,15 @@ public class CustomConstructorMappingAnnotationBaseIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			backendMock.expectSearchProjection(
 					INDEX_NAME,
+					b -> {
+						SearchProjectionFactory<?, ?> f = mapping.scope( IndexedEntity.class ).projection();
+						b.projection( f.composite()
+								.from(
+										dummyProjectionForEnclosingClassInstance( f ),
+										f.field( "text", String.class )
+								)
+								.asList() );
+					},
 					StubSearchWorkBehavior.of(
 							2,
 							Collections.singletonList( "hit1Text" ),

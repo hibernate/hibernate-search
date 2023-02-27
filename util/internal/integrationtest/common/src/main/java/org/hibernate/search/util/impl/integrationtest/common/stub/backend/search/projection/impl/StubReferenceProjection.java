@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public class StubReferenceProjection<T> implements StubSearchProjection<T> {
+public class StubReferenceProjection<T> extends StubSearchProjection<T> {
 
 	@SuppressWarnings("rawtypes")
 	private static final StubSearchProjection INSTANCE = new StubReferenceProjection();
@@ -37,5 +37,15 @@ public class StubReferenceProjection<T> implements StubSearchProjection<T> {
 			StubSearchProjectionContext context) {
 		DocumentReference data = (DocumentReference) extractedData;
 		return (T) loadingResult.convertReference( data );
+	}
+
+	@Override
+	protected String typeName() {
+		return "reference";
+	}
+
+	@Override
+	protected void toNode(StubProjectionNode.Builder self) {
+		// Nothing to do
 	}
 }

@@ -16,19 +16,12 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.test.data.Pair;
 
-final class StubByMappedTypeProjection<P> implements StubSearchProjection<P> {
+final class StubByMappedTypeProjection<P> extends StubSearchProjection<P> {
 
 	private final Map<String, StubSearchProjection<? extends P>> inners;
 
 	StubByMappedTypeProjection(Map<String, StubSearchProjection<? extends P>> inners) {
 		this.inners = inners;
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "["
-				+ "inners=" + inners
-				+ "]";
 	}
 
 	@Override
@@ -64,6 +57,18 @@ final class StubByMappedTypeProjection<P> implements StubSearchProjection<P> {
 	@SuppressWarnings("unchecked")
 	public P transform(LoadingResult<?> loadingResult, Object extractedData, StubSearchProjectionContext context) {
 		return ((DelegateAndExtractedValue<P>) extractedData).transform( loadingResult, context );
+	}
+
+	@Override
+	protected String typeName() {
+		return "byMappedType";
+	}
+
+	@Override
+	protected void toNode(StubProjectionNode.Builder self) {
+		for ( Map.Entry<String, StubSearchProjection<? extends P>> entry : inners.entrySet() ) {
+			appendInnerNode( self, entry.getKey(), entry.getValue() );
+		}
 	}
 
 	private static final class DelegateAndExtractedValue<P> {
