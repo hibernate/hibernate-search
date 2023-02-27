@@ -65,7 +65,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 				.withAnnotatedTypes( MyProjection.class )
 				.setup( IndexedEntity.class );
 
-		testSuccessfulRootProjection(
+		testSuccessfulRootProjectionExecutionOnly(
 				mapping, IndexedEntity.class, MyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1", 1 ),
@@ -150,7 +150,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 				.withAnnotatedTypes( MyProjection.class )
 				.setup( IndexedEntity.class );
 
-		testSuccessfulRootProjection(
+		testSuccessfulRootProjectionExecutionOnly(
 				mapping, IndexedEntity.class, MyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1", 1 ),
@@ -226,7 +226,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
 
-		testSuccessfulRootProjection(
+		testSuccessfulRootProjectionExecutionOnly(
 				mapping, IndexedEntity.class, IndexedEntity.class,
 				Arrays.asList(
 						Arrays.asList( "result1", 1 ),
@@ -271,7 +271,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 				.withAnnotatedTypes( MyProjection.class )
 				.setup( IndexedEntity.class );
 
-		testSuccessfulRootProjection(
+		testSuccessfulRootProjectionExecutionOnly(
 				mapping, IndexedEntity.class, MyProjection.class,
 				Arrays.asList(
 						Arrays.asList(),
@@ -424,7 +424,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 							MyNonProjection.class.getName() );
 		}
 
-		testSuccessfulRootProjection(
+		testSuccessfulRootProjectionExecutionOnly(
 				mapping, IndexedEntity.class, MyProjectionSubclass.class,
 				Arrays.asList(
 						Arrays.asList( "result1", 1 ),
@@ -484,7 +484,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 				.withAnnotatedTypes( MyProjection.class, MyNonProjectionSubclass.class )
 				.setup( IndexedEntity.class );
 
-		testSuccessfulRootProjection(
+		testSuccessfulRootProjectionExecutionOnly(
 				mapping, IndexedEntity.class, MyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1", 1 ),
@@ -553,7 +553,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 				.withAnnotatedTypes( MyProjection.class, MyProjectionSubclass.class )
 				.setup( IndexedEntity.class );
 
-		testSuccessfulRootProjection(
+		testSuccessfulRootProjectionExecutionOnly(
 				mapping, IndexedEntity.class, MyProjection.class,
 				Arrays.asList(
 						Arrays.asList( "result1", 1 ),
@@ -567,7 +567,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 				)
 		);
 
-		testSuccessfulRootProjection(
+		testSuccessfulRootProjectionExecutionOnly(
 				mapping, IndexedEntity.class, MyProjectionSubclass.class,
 				Arrays.asList(
 						Arrays.asList( "result1", 1 ),

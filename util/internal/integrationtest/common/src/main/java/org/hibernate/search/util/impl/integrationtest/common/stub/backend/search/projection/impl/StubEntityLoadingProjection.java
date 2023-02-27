@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public class StubEntityLoadingProjection<T> implements StubSearchProjection<T> {
+public class StubEntityLoadingProjection<T> extends StubSearchProjection<T> {
 
 	@SuppressWarnings("rawtypes")
 	private static final StubSearchProjection INSTANCE = new StubEntityLoadingProjection();
@@ -40,5 +40,15 @@ public class StubEntityLoadingProjection<T> implements StubSearchProjection<T> {
 			context.reportFailedLoad();
 		}
 		return loaded;
+	}
+
+	@Override
+	protected String typeName() {
+		return "entity";
+	}
+
+	@Override
+	protected void toNode(StubProjectionNode.Builder self) {
+		// Nothing to do
 	}
 }

@@ -11,12 +11,22 @@ import java.util.Iterator;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public class StubEntityCompositeProjection<T> implements StubSearchProjection<T> {
+public class StubEntityCompositeProjection<T> extends StubSearchProjection<T> {
 
 	private final StubSearchProjection<T> delegate;
 
 	public StubEntityCompositeProjection(StubSearchProjection<T> delegate) {
 		this.delegate = delegate;
+	}
+
+	@Override
+	protected String typeName() {
+		return "composite";
+	}
+
+	@Override
+	protected void toNode(StubProjectionNode.Builder self) {
+		self.attribute( "delegate", delegate );
 	}
 
 	@Override

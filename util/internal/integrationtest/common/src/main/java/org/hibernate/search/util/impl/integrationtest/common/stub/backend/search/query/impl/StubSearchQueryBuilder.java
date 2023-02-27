@@ -43,6 +43,7 @@ public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H> {
 		this.projectionContext = new StubSearchProjectionContext( sessionContext );
 		this.loadingContextBuilder = loadingContextBuilder;
 		this.rootProjection = rootProjection;
+		workBuilder.projection( rootProjection );
 	}
 
 	@Override

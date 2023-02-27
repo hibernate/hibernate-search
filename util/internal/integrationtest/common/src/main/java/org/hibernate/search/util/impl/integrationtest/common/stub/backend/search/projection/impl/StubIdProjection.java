@@ -13,11 +13,13 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public class StubIdProjection<I> implements StubSearchProjection<I> {
+public class StubIdProjection<I> extends StubSearchProjection<I> {
 
+	private final Class<I> expectedType;
 	private final ProjectionConverter<String, ? extends I> converter;
 
-	StubIdProjection(ProjectionConverter<String, ? extends I> converter) {
+	StubIdProjection(Class<I> expectedType, ProjectionConverter<String, ? extends I> converter) {
+		this.expectedType = expectedType;
 		this.converter = converter;
 	}
 
@@ -36,5 +38,16 @@ public class StubIdProjection<I> implements StubSearchProjection<I> {
 		context.fromDocumentValueConvertContext();
 		return converter.fromDocumentValue( documentReference.id(),
 				context.fromDocumentValueConvertContext() );
+	}
+
+	@Override
+	protected String typeName() {
+		return "id";
+	}
+
+	@Override
+	protected void toNode(StubProjectionNode.Builder self) {
+		self.attribute( "expectedType", expectedType );
+		self.attribute( "converter", converter );
 	}
 }

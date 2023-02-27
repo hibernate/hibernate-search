@@ -68,6 +68,13 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 						Arrays.asList( "result1", 11 ),
 						Arrays.asList( "result2", 21 )
 				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "text", String.class ),
+								f.field( "integer", Integer.class )
+						)
+						.asList(),
 				Arrays.asList(
 						new MyProjection( "result1", 11 ),
 						new MyProjection( "result2", 21 )
@@ -109,6 +116,13 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 						Arrays.asList( Collections.emptyList(), Collections.emptyList() ),
 						Arrays.asList( Arrays.asList( "result4_1" ), Arrays.asList( 41 ) )
 				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "text", String.class ).multi(),
+								f.field( "integer", Integer.class ).multi()
+						)
+						.asList(),
 				Arrays.asList(
 						new MyProjection( Arrays.asList( "result1_1", "result1_2" ), Arrays.asList( 11, 12 ) ),
 						new MyProjection( Arrays.asList( "result2_1" ), Arrays.asList( 21 ) ),
@@ -152,6 +166,13 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 						Arrays.asList( Collections.emptyList(), Collections.emptyList() ),
 						Arrays.asList( Arrays.asList( "result4_1" ), Arrays.asList( 41 ) )
 				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "text", String.class ).multi(),
+								f.field( "integer", Integer.class ).multi()
+						)
+						.asList(),
 				Arrays.asList(
 						new MyProjection( Arrays.asList( "result1_1", "result1_2" ), Arrays.asList( 11, 12 ) ),
 						new MyProjection( Arrays.asList( "result2_1" ), Arrays.asList( 21 ) ),
@@ -195,6 +216,13 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 						Arrays.asList( Collections.emptyList(), Collections.emptyList() ),
 						Arrays.asList( Arrays.asList( "result4_1" ), Arrays.asList( 41 ) )
 				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "text", String.class ).multi(),
+								f.field( "integer", Integer.class ).multi()
+						)
+						.asList(),
 				Arrays.asList(
 						new MyProjection( Arrays.asList( "result1_1", "result1_2" ), Arrays.asList( 11, 12 ) ),
 						new MyProjection( Arrays.asList( "result2_1" ), Arrays.asList( 21 ) ),
@@ -290,6 +318,19 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 						Arrays.asList( "result2", Arrays.asList( null, null ) ),
 						Arrays.asList( "result3", null )
 				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "text", String.class ),
+								f.object( "contained" )
+										.from(
+												dummyProjectionForEnclosingClassInstance( f ),
+												f.field( "contained.text", String.class ),
+												f.field( "contained.integer", Integer.class )
+										)
+										.asList()
+						)
+						.asList(),
 				Arrays.asList(
 						new MyProjection( "result1", new MyInnerProjection( "result1_1", 11 ) ),
 						new MyProjection( "result2", new MyInnerProjection( null, null ) ),
@@ -352,6 +393,19 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 						Arrays.asList( "result2", Arrays.asList( null, null ) ),
 						Arrays.asList( "result3", null )
 				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "text", String.class ),
+								f.object( "contained" )
+										.from(
+												dummyProjectionForEnclosingClassInstance( f ),
+												f.field( "contained.text", String.class ),
+												f.field( "contained.integer", Integer.class )
+										)
+										.asList()
+						)
+						.asList(),
 				Arrays.asList(
 						new MyProjection( "result1", new MyInnerProjection( "result1_1", 11 ) ),
 						new MyProjection( "result2", new MyInnerProjection( null, null ) ),
@@ -418,6 +472,20 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 								Arrays.asList( "result4_1", 41 )
 						) )
 				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "text", String.class ),
+								f.object( "contained" )
+										.from(
+												dummyProjectionForEnclosingClassInstance( f ),
+												f.field( "contained.text", String.class ),
+												f.field( "contained.integer", Integer.class )
+										)
+										.asList()
+										.multi()
+						)
+						.asList(),
 				Arrays.asList(
 						new MyProjection( "result1", Arrays.asList(
 								new MyInnerProjection( "result1_1", 11 ),
@@ -492,6 +560,20 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 								Arrays.asList( "result4_1", 41 )
 						) )
 				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "text", String.class ),
+								f.object( "contained" )
+										.from(
+												dummyProjectionForEnclosingClassInstance( f ),
+												f.field( "contained.text", String.class ),
+												f.field( "contained.integer", Integer.class )
+										)
+										.asList()
+										.multi()
+						)
+						.asList(),
 				Arrays.asList(
 						new MyProjection( "result1", Arrays.asList(
 								new MyInnerProjection( "result1_1", 11 ),
@@ -566,6 +648,20 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 								Arrays.asList( "result4_1", 41 )
 						) )
 				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "text", String.class ),
+								f.object( "contained" )
+										.from(
+												dummyProjectionForEnclosingClassInstance( f ),
+												f.field( "contained.text", String.class ),
+												f.field( "contained.integer", Integer.class )
+										)
+										.asList()
+										.multi()
+						)
+						.asList(),
 				Arrays.asList(
 						new MyProjection( "result1", Arrays.asList(
 								new MyInnerProjection( "result1_1", 11 ),

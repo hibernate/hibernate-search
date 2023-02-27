@@ -12,12 +12,18 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubProjectionNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
+
 public class StubSearchWork {
 
 	public static Builder builder() {
 		return new Builder();
 	}
 
+	private final StubProjectionNode rootProjection;
 	private final List<String> routingKeys;
 	private final Integer offset;
 	private final Integer limit;
@@ -27,6 +33,7 @@ public class StubSearchWork {
 	private final TimeUnit failAfterTimeUnit;
 
 	private StubSearchWork(Builder builder) {
+		this.rootProjection = builder.rootProjection;
 		this.routingKeys = Collections.unmodifiableList( new ArrayList<>( builder.routingKeys ) );
 		this.offset = builder.offset;
 		this.limit = builder.limit;
@@ -34,6 +41,10 @@ public class StubSearchWork {
 		this.truncateAfterTimeUnit = builder.truncateAfterTimeUnit;
 		this.failAfterTimeout = builder.failAfterTimeout;
 		this.failAfterTimeUnit = builder.failAfterTimeUnit;
+	}
+
+	public StubProjectionNode getRootProjection() {
+		return rootProjection;
 	}
 
 	public List<String> getRoutingKeys() {
@@ -67,6 +78,7 @@ public class StubSearchWork {
 	@Override
 	public String toString() {
 		return new StringJoiner( ", ", StubSearchWork.class.getSimpleName() + "[", "]" )
+				.add( "rootProjection=" + rootProjection )
 				.add( "routingKeys=" + routingKeys )
 				.add( "offset=" + offset )
 				.add( "limit=" + limit )
@@ -78,7 +90,7 @@ public class StubSearchWork {
 	}
 
 	public static class Builder {
-
+		private StubProjectionNode rootProjection;
 		private final List<String> routingKeys = new ArrayList<>();
 		private Long truncateAfterTimeout;
 		private TimeUnit truncateAfterTimeUnit;
@@ -88,6 +100,15 @@ public class StubSearchWork {
 		private Integer limit;
 
 		private Builder() {
+		}
+
+		public Builder projection(ProjectionFinalStep<?> projectionStep) {
+			return projection( projectionStep.toProjection() );
+		}
+
+		public Builder projection(SearchProjection<?> projection) {
+			this.rootProjection = StubSearchProjection.from( projection ).toRootNode();
+			return this;
 		}
 
 		public Builder routingKey(String routingKey) {

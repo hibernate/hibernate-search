@@ -63,6 +63,12 @@ public class ProjectionConstructorRecordNoParametersCompilerFlagIT extends Abstr
 						Arrays.asList( "result2", 2 ),
 						Arrays.asList( "result3", 3 )
 				),
+				f -> f.composite()
+						.from(
+								f.field( "text", String.class ),
+								f.field( "integer", Integer.class )
+						)
+						.asList(),
 				Arrays.asList(
 						new MyProjection( "result1", 1 ),
 						new MyProjection( "result2", 2 ),
@@ -103,6 +109,12 @@ public class ProjectionConstructorRecordNoParametersCompilerFlagIT extends Abstr
 						Arrays.asList( "result2", 2 ),
 						Arrays.asList( "result3", 3 )
 				),
+				f -> f.composite()
+						.from(
+								f.field( "text", String.class ),
+								f.field( "integer", Integer.class )
+						)
+						.asList(),
 				Arrays.asList(
 						new MyProjection( "result1", 1 ),
 						new MyProjection( "result2", 2 ),

@@ -11,29 +11,22 @@ import java.util.Iterator;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-class StubDefaultProjection<T> implements StubSearchProjection<T> {
-
-	@SuppressWarnings("rawtypes")
-	private static final StubSearchProjection INSTANCE = new StubDefaultProjection();
-
-	@SuppressWarnings("unchecked")
-	static <T> StubDefaultProjection<T> get() {
-		return (StubDefaultProjection<T>) INSTANCE;
-	}
-
-	private StubDefaultProjection() {
-	}
-
+abstract class AbstractStubPassThroughProjection<T> extends StubSearchProjection<T> {
 	@Override
-	public Object extract(ProjectionHitMapper<?> projectionHitMapper, Iterator<?> projectionFromIndex,
+	public final Object extract(ProjectionHitMapper<?> projectionHitMapper, Iterator<?> projectionFromIndex,
 			StubSearchProjectionContext context) {
 		return projectionFromIndex.next();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData,
+	public final T transform(LoadingResult<?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
 		return (T) extractedData;
+	}
+
+	@Override
+	protected final void toNode(StubProjectionNode.Builder self) {
+		// Nothing to do
 	}
 }

@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.util.common.SearchException;
 
-class StubThrowingProjection<T> implements StubSearchProjection<T> {
+class StubThrowingProjection<T> extends StubSearchProjection<T> {
 
 	private final Supplier<SearchException> exceptionSupplier;
 
@@ -31,5 +31,15 @@ class StubThrowingProjection<T> implements StubSearchProjection<T> {
 	public T transform(LoadingResult<?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
 		throw exceptionSupplier.get();
+	}
+
+	@Override
+	protected String typeName() {
+		return "throwing";
+	}
+
+	@Override
+	public void toNode(StubProjectionNode.Builder self) {
+		// Nothing to do
 	}
 }
