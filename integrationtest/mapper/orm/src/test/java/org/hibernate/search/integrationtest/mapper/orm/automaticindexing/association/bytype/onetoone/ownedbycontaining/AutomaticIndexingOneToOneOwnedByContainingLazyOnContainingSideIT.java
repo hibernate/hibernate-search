@@ -27,6 +27,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.LazyGroup;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.AbstractAutomaticIndexingSingleValuedAssociationBaseIT;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.ContainerPrimitives;
@@ -146,29 +147,35 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainingSideIT
 		private ContainingEntity child;
 
 		@OneToOne(fetch = FetchType.LAZY)
+		@LazyGroup("containedIndexedEmbedded")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		private ContainedEntity containedIndexedEmbedded;
 
 		@OneToOne(fetch = FetchType.LAZY)
+		@LazyGroup("containedNonIndexedEmbedded")
 		private ContainedEntity containedNonIndexedEmbedded;
 
 		@OneToOne(fetch = FetchType.LAZY)
+		@LazyGroup("containedIndexedEmbeddedShallowReindexOnUpdate")
 		@JoinColumn(name = "CIndexedEmbeddedSROU")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		private ContainedEntity containedIndexedEmbeddedShallowReindexOnUpdate;
 
 		@OneToOne(fetch = FetchType.LAZY)
+		@LazyGroup("containedIndexedEmbeddedNoReindexOnUpdate")
 		@JoinColumn(name = "CIndexedEmbeddedNROU")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private ContainedEntity containedIndexedEmbeddedNoReindexOnUpdate;
 
 		@OneToOne(fetch = FetchType.LAZY)
+		@LazyGroup("containedUsedInCrossEntityDerivedProperty")
 		@JoinColumn(name = "CCrossEntityDerived")
 		private ContainedEntity containedUsedInCrossEntityDerivedProperty;
 
 		@OneToOne(targetEntity = ContainedEntity.class, fetch = FetchType.LAZY)
+		@LazyGroup("containedIndexedEmbeddedWithCast")
 		@JoinColumn(name = "CIndexedEmbeddedCast")
 		@IndexedEmbedded(includePaths = { "indexedField" }, targetType = ContainedEntity.class)
 		private Object containedIndexedEmbeddedWithCast;
@@ -179,6 +186,7 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainingSideIT
 
 		@IndexedEmbedded
 		@ElementCollection
+		@LazyGroup("elementCollectionAssociations")
 		@Embedded
 		@OrderColumn(name = "idx")
 		@CollectionTable(name = "i_ECAssoc")
@@ -380,6 +388,7 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainingSideIT
 	public static class ContainingEmbeddable {
 
 		@OneToOne(fetch = FetchType.LAZY)
+		@LazyGroup("embeddable_containedIndexedEmbedded")
 		@JoinColumn(name = "CEmbIdxEmbedded")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" },
 				name = "containedIndexedEmbedded")
@@ -387,6 +396,7 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainingSideIT
 		private ContainedEntity embContainedIndexedEmbedded;
 
 		@OneToOne(fetch = FetchType.LAZY)
+		@LazyGroup("embeddable_containedNonIndexedEmbedded")
 		@JoinColumn(name = "CEmbNonIdxEmbedded")
 		// TODO Remove the "emb" prefix from this field when HHH-15604 gets fixed (it's just a workaround)
 		private ContainedEntity embContainedNonIndexedEmbedded;

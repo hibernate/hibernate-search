@@ -26,6 +26,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.LazyGroup;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.AbstractAutomaticIndexingSingleValuedAssociationBaseIT;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.ContainerPrimitives;
@@ -147,26 +148,32 @@ public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT
 		private ContainingEntity child;
 
 		@OneToOne(mappedBy = "containingAsIndexedEmbedded", fetch = FetchType.LAZY)
+		@LazyGroup("containedIndexedEmbedded")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		private ContainedEntity containedIndexedEmbedded;
 
 		@OneToOne(mappedBy = "containingAsNonIndexedEmbedded", fetch = FetchType.LAZY)
+		@LazyGroup("containedNonIndexedEmbedded")
 		private ContainedEntity containedNonIndexedEmbedded;
 
 		@OneToOne(mappedBy = "containingAsIndexedEmbeddedShallowReindexOnUpdate", fetch = FetchType.LAZY)
+		@LazyGroup("containedIndexedEmbeddedShallowReindexOnUpdate")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		private ContainedEntity containedIndexedEmbeddedShallowReindexOnUpdate;
 
 		@OneToOne(mappedBy = "containingAsIndexedEmbeddedNoReindexOnUpdate", fetch = FetchType.LAZY)
+		@LazyGroup("containedIndexedEmbeddedNoReindexOnUpdate")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private ContainedEntity containedIndexedEmbeddedNoReindexOnUpdate;
 
 		@OneToOne(mappedBy = "containingAsUsedInCrossEntityDerivedProperty", fetch = FetchType.LAZY)
+		@LazyGroup("containedUsedInCrossEntityDerivedProperty")
 		private ContainedEntity containedUsedInCrossEntityDerivedProperty;
 
 		@OneToOne(mappedBy = "containingAsIndexedEmbeddedWithCast", targetEntity = ContainedEntity.class, fetch = FetchType.LAZY)
+		@LazyGroup("containedIndexedEmbeddedWithCast")
 		@IndexedEmbedded(includePaths = { "indexedField" }, targetType = ContainedEntity.class)
 		private Object containedIndexedEmbeddedWithCast;
 
@@ -182,6 +189,7 @@ public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT
 		 * TODO use mappedBy when the above gets fixed in Hibernate ORM
 		 */
 		@OneToOne(fetch = FetchType.LAZY)
+		@LazyGroup("containedElementCollectionAssociationsIndexedEmbedded")
 		@JoinColumn(name = "CECAssocIdxEmb")
 		@AssociationInverseSide(inversePath = @ObjectPath({
 				@PropertyValue(propertyName = "elementCollectionAssociations"),
@@ -195,6 +203,7 @@ public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT
 		 * TODO use mappedBy when the above gets fixed in Hibernate ORM
 		 */
 		@OneToOne(fetch = FetchType.LAZY)
+		@LazyGroup("containedElementCollectionAssociationsNonIndexedEmbedded")
 		@JoinColumn(name = "CECAssocNonIdxEmb")
 		@AssociationInverseSide(inversePath = @ObjectPath({
 				@PropertyValue(propertyName = "elementCollectionAssociations"),
@@ -418,12 +427,14 @@ public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT
 	public static class ContainingEmbeddable {
 
 		@OneToOne(mappedBy = "embeddedAssociations.embContainingAsIndexedEmbedded", fetch = FetchType.LAZY)
+		@LazyGroup("embeddable_containedIndexedEmbedded")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" },
 				name = "containedIndexedEmbedded")
 		// TODO Remove the "emb" prefix from this field when HHH-15604 gets fixed (it's just a workaround)
 		private ContainedEntity embContainedIndexedEmbedded;
 
 		@OneToOne(mappedBy = "embeddedAssociations.embContainingAsNonIndexedEmbedded", fetch = FetchType.LAZY)
+		@LazyGroup("embeddable_containedNonIndexedEmbedded")
 		// TODO Remove the "emb" prefix from this field when HHH-15604 gets fixed (it's just a workaround)
 		private ContainedEntity embContainedNonIndexedEmbedded;
 
