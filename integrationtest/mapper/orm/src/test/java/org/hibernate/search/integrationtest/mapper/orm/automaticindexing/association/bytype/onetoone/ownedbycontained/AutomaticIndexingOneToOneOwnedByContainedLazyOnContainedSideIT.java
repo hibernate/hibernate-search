@@ -26,6 +26,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.LazyGroup;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.AbstractAutomaticIndexingSingleValuedAssociationBaseIT;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.ContainerPrimitives;
@@ -497,26 +498,32 @@ public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainedSideIT
 		private Integer id;
 
 		@OneToOne(fetch = FetchType.LAZY)
+		@LazyGroup("containingAsIndexedEmbedded")
 		@JoinColumn(name = "CIndexedEmbedded")
 		private ContainingEntity containingAsIndexedEmbedded;
 
 		@OneToOne(fetch = FetchType.LAZY)
+		@LazyGroup("containingAsNonIndexedEmbedded")
 		@JoinColumn(name = "CNonIndexedEmbedded")
 		private ContainingEntity containingAsNonIndexedEmbedded;
 
 		@OneToOne(fetch = FetchType.LAZY)
+		@LazyGroup("containingAsIndexedEmbeddedShallowReindexOnUpdate")
 		@JoinColumn(name = "CIndexedEmbeddedSROU")
 		private ContainingEntity containingAsIndexedEmbeddedShallowReindexOnUpdate;
 
 		@OneToOne(fetch = FetchType.LAZY)
+		@LazyGroup("containingAsIndexedEmbeddedNoReindexOnUpdate")
 		@JoinColumn(name = "CIndexedEmbeddedNROU")
 		private ContainingEntity containingAsIndexedEmbeddedNoReindexOnUpdate;
 
 		@OneToOne(fetch = FetchType.LAZY)
+		@LazyGroup("containingAsUsedInCrossEntityDerivedProperty")
 		@JoinColumn(name = "CCrossEntityDerived")
 		private ContainingEntity containingAsUsedInCrossEntityDerivedProperty;
 
 		@OneToOne(targetEntity = ContainingEntity.class, fetch = FetchType.LAZY)
+		@LazyGroup("containingAsIndexedEmbeddedWithCast")
 		@JoinColumn(name = "CIndexedEmbeddedCast")
 		private Object containingAsIndexedEmbeddedWithCast;
 
@@ -524,6 +531,7 @@ public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainedSideIT
 		private ContainedEmbeddable embeddedAssociations;
 
 		@ElementCollection
+		@LazyGroup("elementCollectionAssociations")
 		@Embedded
 		@OrderColumn(name = "idx")
 		@CollectionTable(name = "c_ECAssoc")
@@ -821,11 +829,13 @@ public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainedSideIT
 	public static class ContainedEmbeddable {
 
 		@OneToOne(fetch = FetchType.LAZY)
+		@LazyGroup("embeddable_containingAsIndexedEmbedded")
 		@JoinColumn(name = "CEmbIdxEmbedded")
 		// TODO Remove the "emb" prefix from this field when HHH-15604 gets fixed (it's just a workaround)
 		private ContainingEntity embContainingAsIndexedEmbedded;
 
 		@OneToOne(fetch = FetchType.LAZY)
+		@LazyGroup("embeddable_containingAsNonIndexedEmbedded")
 		@JoinColumn(name = "CEmbNonIdxEmbedded")
 		// TODO Remove the "emb" prefix from this field when HHH-15604 gets fixed (it's just a workaround)
 		private ContainingEntity embContainingAsNonIndexedEmbedded;
