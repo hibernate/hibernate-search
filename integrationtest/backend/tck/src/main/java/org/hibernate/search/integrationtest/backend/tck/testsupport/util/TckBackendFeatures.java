@@ -123,4 +123,27 @@ public abstract class TckBackendFeatures {
 		return true;
 	}
 
+	public boolean supportsHighlighterEncoderAtFieldLevel() {
+		return true;
+	}
+
+	public boolean supportsHighlighterUnifiedTypeNoMatchSize() {
+		return true;
+	}
+
+	public boolean supportsHighlighterUnifiedTypeMultipleFragmentsAsSeparateItems() {
+		return true;
+	}
+
+	public boolean supportsHighlighterUnifiedTypeFragmentSize() {
+		return true;
+	}
+
+	public boolean supportsHighlighterUnifiedTypeMaxAnalyzedOffsetOnFieldsWithTermVector() {
+		return true;
+	}
+
+	public boolean supportsHighlighterNestedStructureResultsOnNestedObjects() {
+		return true;
+	}
 }

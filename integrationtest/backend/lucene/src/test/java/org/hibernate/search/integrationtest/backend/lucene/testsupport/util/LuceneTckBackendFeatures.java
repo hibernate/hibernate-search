@@ -39,4 +39,34 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 	public boolean reliesOnNestedDocumentsForMultiValuedObjectProjection() {
 		return true;
 	}
+
+	@Override
+	public boolean supportsHighlighterUnifiedTypeNoMatchSize() {
+		// Lucene default unified highlighter does not support no-match-size setting.
+		// While in ES a custom highlighter is used that allows for such option.
+		return false;
+	}
+
+	@Override
+	public boolean supportsHighlighterUnifiedTypeMultipleFragmentsAsSeparateItems() {
+		// Lucene default unified highlighter will combine all fragments into one string separating them with `ellipses` parameter.
+		// While in ES a custom highlighter is used that adds each fragment as a separate item to the result list.
+		// See https://hibernate.atlassian.net/browse/HSEARCH-4828
+		return false;
+	}
+
+	@Override
+	public boolean supportsHighlighterUnifiedTypeFragmentSize() {
+		// Break iterators from `java.text.BreakIterator` do not allow for such config.
+		// While in ES a custom iterator is available that wraps sentence and word break iterators and is using the max size option.
+		return false;
+	}
+
+	@Override
+	public boolean supportsHighlighterUnifiedTypeMaxAnalyzedOffsetOnFieldsWithTermVector() {
+		// In default unified highlighter if term vectors are set the analyzer is not used when highlighting.
+		// This leads to wrapped analyzer with this setting being not used.
+		// While in ES a custom field highlighter is used that supports this setting.
+		return false;
+	}
 }

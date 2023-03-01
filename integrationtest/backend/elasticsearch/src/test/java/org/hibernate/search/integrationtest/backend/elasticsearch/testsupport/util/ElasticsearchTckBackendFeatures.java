@@ -287,4 +287,17 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 				osVersion -> true
 		);
 	}
+
+	@Override
+	public boolean supportsHighlighterEncoderAtFieldLevel() {
+		// https://github.com/elastic/elasticsearch/issues/94028
+		return false;
+	}
+
+	@Override
+	public boolean supportsHighlighterNestedStructureResultsOnNestedObjects() {
+		// since response for highlighted nested fields is "flattened" and all the values are squashed together we
+		// cannot extract the nested like structure as we can for a normal projection from source...
+		return false;
+	}
 }
