@@ -54,18 +54,16 @@ public class MatchNonePredicateSpecificsIT {
 		//check that we will find something with a single match predicate
 		assertThatQuery( index.query()
 				.where(
-						f -> f.bool()
-								.must( f.match().field( "string" ).matching( STRING_1 ).toPredicate() )
+						f -> f.match().field( "string" ).matching( STRING_1 )
 				)
 		).hasTotalHitCount( 1 );
 
 		// make sure that matchNone will "override" the other matching predicate
 		assertThatQuery( index.query()
-				.where(
-						f -> f.bool()
-								.must( f.match().field( "string" ).matching( STRING_1 ).toPredicate() )
-								.must( f.matchNone() )
-				)
+				.where( f -> f.and(
+						f.match().field( "string" ).matching( STRING_1 ),
+						f.matchNone()
+				) )
 		).hasNoHits();
 	}
 

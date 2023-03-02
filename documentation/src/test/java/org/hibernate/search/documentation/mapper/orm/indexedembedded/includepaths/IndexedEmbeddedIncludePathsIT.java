@@ -75,13 +75,13 @@ public class IndexedEmbeddedIncludePathsIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Human> result = searchSession.search( Human.class )
-					.where( f -> f.bool()
-							.must( f.match().field( "name" ).matching( "fourth" ) )
-							.must( f.match().field( "nickname" ).matching( "babe" ) )
-							.must( f.match().field( "parents.name" ).matching( "third" ) )
-							.must( f.match().field( "parents.nickname" ).matching( "young" ) )
-							.must( f.match().field( "parents.parents.name" ).matching( "junior" ) )
-					)
+					.where( f -> f.and(
+							f.match().field( "name" ).matching( "fourth" ),
+							f.match().field( "nickname" ).matching( "babe" ),
+							f.match().field( "parents.name" ).matching( "third" ),
+							f.match().field( "parents.nickname" ).matching( "young" ),
+							f.match().field( "parents.parents.name" ).matching( "junior" )
+					) )
 					.fetchHits( 20 );
 			assertThat( result ).hasSize( 1 );
 		} );

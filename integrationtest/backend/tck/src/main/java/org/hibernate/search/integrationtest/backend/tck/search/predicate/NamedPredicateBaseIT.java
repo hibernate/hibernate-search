@@ -240,10 +240,10 @@ public class NamedPredicateBaseIT {
 			String word1 = (String) context.param( "value1" );
 			String word2 = (String) context.param( "value2" );
 			SearchPredicateFactory f = context.predicate();
-			return f.bool()
-					.must( f.match().field( field1Name ).matching( word1 ) )
-					.must( f.match().field( field2Name ).matching( word2 ) )
-					.toPredicate();
+			return f.and(
+					f.match().field( field1Name ).matching( word1 ),
+					f.match().field( field2Name ).matching( word2 )
+			).toPredicate();
 		}
 	}
 

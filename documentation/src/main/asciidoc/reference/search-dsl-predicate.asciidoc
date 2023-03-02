@@ -456,9 +456,9 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 There isn't any built-in predicate to match documents for which a given field is null,
 but you can easily create one yourself by negating an `exists` predicate.
 
-This can be achieved by using an `exists` predicate
-in a <<search-dsl-predicate-boolean-mustNot,`mustNot` clause in a boolean predicate>>,
-or in an <<search-dsl-predicate-match-all-except,`except` clause in a `matchAll` predicate>>.
+This can be achieved by passing in an `exists` predicate
+to a <<search-dsl-predicate-not, `not` predicate>>,
+or by using it in an <<search-dsl-predicate-match-all-except,`except` clause in a `matchAll` predicate>>.
 ====
 
 [[search-dsl-predicate-exists-object-field]]

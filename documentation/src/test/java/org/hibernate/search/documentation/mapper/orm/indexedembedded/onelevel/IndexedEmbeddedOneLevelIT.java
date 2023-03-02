@@ -78,10 +78,10 @@ public class IndexedEmbeddedOneLevelIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.where( f -> f.bool()
-							.must( f.match().field( "title" ).matching( "robot" ) )
-							.must( f.match().field( "authors.name" ).matching( "isaac" ) )
-					)
+					.where( f -> f.and(
+							f.match().field( "title" ).matching( "robot" ),
+							f.match().field( "authors.name" ).matching( "isaac" )
+					) )
 					.fetchHits( 20 );
 			assertThat( result ).hasSize( 1 );
 		} );

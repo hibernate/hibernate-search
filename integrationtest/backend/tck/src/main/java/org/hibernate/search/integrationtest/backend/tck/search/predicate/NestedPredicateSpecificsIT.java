@@ -306,10 +306,10 @@ public class NestedPredicateSpecificsIT {
 		// ... but it should not prevent the query from executing either:
 		// if the "nested" predicate is optional, it should be ignored for missingFieldIndex.
 		assertThatQuery( mainIndex.createScope( missingFieldIndex ).query()
-				.where( f.bool()
-						.should( nestedPredicate )
-						.should( f.id().matching( MISSING_FIELD_INDEX_DOCUMENT_1 ) )
-						.toPredicate() ) )
+				.where( f.or(
+						nestedPredicate,
+						f.id().matching( MISSING_FIELD_INDEX_DOCUMENT_1 ).toPredicate()
+				).toPredicate() ) )
 				.hasDocRefHitsAnyOrder( c -> c
 						.doc( mainIndex.typeName(), DOCUMENT_1 )
 						.doc( missingFieldIndex.typeName(), MISSING_FIELD_INDEX_DOCUMENT_1 ) )

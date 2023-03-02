@@ -288,10 +288,9 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		// ... but it should not prevent the query from executing either:
 		// if the predicate is optional, it should be ignored for missingFieldIndex.
 		assertThatQuery( scope.query()
-				.where( f -> f.bool()
-						.should( predicate( f, defaultDslConverterField0Path(), unwrappedMatchingParam( 0 ),
-								ValueConvert.YES ) )
-						.should( f.id().matching( dataSet.docId( DataSet.MISSING_FIELD_INDEX_DOC_ORDINAL ) ) ) ) )
+				.where( f -> f.or(
+						predicate( f, defaultDslConverterField0Path(), unwrappedMatchingParam( 0 ), ValueConvert.YES ),
+						f.id().matching( dataSet.docId( DataSet.MISSING_FIELD_INDEX_DOC_ORDINAL ) ) ) ) )
 				.hasDocRefHitsAnyOrder( c -> c
 						.doc( index.typeName(), dataSet.docId( 0 ) )
 						.doc( missingFieldIndex.typeName(), dataSet.docId( DataSet.MISSING_FIELD_INDEX_DOC_ORDINAL ) ) )
@@ -319,10 +318,9 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		// ... but it should not prevent the query from executing either:
 		// if the predicate is optional, it should be ignored for missingFieldIndex.
 		assertThatQuery( scope.query()
-				.where( f -> f.bool()
-						.should( predicate( f, defaultDslConverterField0Path(), unwrappedMatchingParam( 0 ),
-								ValueConvert.NO ) )
-						.should( f.id().matching( dataSet.docId( DataSet.MISSING_FIELD_INDEX_DOC_ORDINAL ) ) ) ) )
+				.where( f -> f.or(
+						predicate( f, defaultDslConverterField0Path(), unwrappedMatchingParam( 0 ), ValueConvert.NO ),
+						f.id().matching( dataSet.docId( DataSet.MISSING_FIELD_INDEX_DOC_ORDINAL ) ) ) ) )
 				.hasDocRefHitsAnyOrder( c -> c
 						.doc( index.typeName(), dataSet.docId( 0 ) )
 						.doc( missingFieldIndex.typeName(), dataSet.docId( DataSet.MISSING_FIELD_INDEX_DOC_ORDINAL ) ) )

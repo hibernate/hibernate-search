@@ -59,10 +59,10 @@ public class DependenciesContainersPropertyIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.where( f -> f.bool()
-							.must( f.match().field( "editionsForSale" ).matching( "paperback" ) )
-							.must( f.match().field( "editionsForSale" ).matching( "kindle" ) )
-					)
+					.where( f -> f.and(
+							f.match().field( "editionsForSale" ).matching( "paperback" ),
+							f.match().field( "editionsForSale" ).matching( "kindle" )
+					) )
 					.fetchHits( 20 );
 			assertThat( result ).hasSize( 1 );
 		} );

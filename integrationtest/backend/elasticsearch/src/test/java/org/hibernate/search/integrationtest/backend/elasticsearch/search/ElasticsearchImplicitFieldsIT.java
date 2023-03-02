@@ -65,7 +65,7 @@ public class ElasticsearchImplicitFieldsIT {
 	public void implicit_fields_id() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.bool().must( ff -> ff.terms().field( "_id" ).matchingAny( "4" ) ) )
+				.where( f -> f.terms().field( "_id" ).matchingAny( "4" ) )
 				.toQuery();
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( "mainType", "4" );
@@ -75,7 +75,7 @@ public class ElasticsearchImplicitFieldsIT {
 	public void implicit_fields_index() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.bool().must( ff -> ff.match().field( "_index" ).matching( "main-000001" ) ) )
+				.where( f -> f.match().field( "_index" ).matching( "main-000001" ) )
 				.toQuery();
 		assertThatQuery( query )
 				.hasTotalHitCount( 6 )

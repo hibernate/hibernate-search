@@ -280,10 +280,10 @@ public class SearchQueryBaseIT {
 		}
 
 		public SearchQuery<T> extendedFeature(String fieldName, String value1, String value2) {
-			return delegate.where( f -> f.bool()
-					.should( f.match().field( fieldName ).matching( value1 ) )
-					.should( f.match().field( fieldName ).matching( value2 ) )
-			)
+			return delegate.where( f -> f.or(
+							f.match().field( fieldName ).matching( value1 ),
+							f.match().field( fieldName ).matching( value2 )
+					) )
 					.sort( f -> f.field( fieldName ) )
 					.toQuery();
 		}

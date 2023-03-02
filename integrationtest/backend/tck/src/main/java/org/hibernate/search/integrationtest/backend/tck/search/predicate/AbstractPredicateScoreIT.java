@@ -26,16 +26,16 @@ public abstract class AbstractPredicateScoreIT {
 	@Test
 	public void predicateLevelBoost() {
 		assertThatQuery( index.query()
-				.where( f -> f.bool()
-						.should( predicate( f, 0 ) )
-						.should( predicateWithBoost( f, 1, 7f ) ) )
+				.where( f -> f.or(
+						predicate( f, 0 ),
+						predicateWithBoost( f, 1, 7f ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 1 ), dataSet.docId( 0 ) );
 
 		assertThatQuery( index.query()
-				.where( f -> f.bool()
-						.should( predicateWithBoost( f, 0, 39f ) )
-						.should( predicate( f, 1 ) ) )
+				.where( f -> f.or(
+						predicateWithBoost( f, 0, 39f ),
+						predicate( f, 1 ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 0 ), dataSet.docId( 1 ) );
 	}
@@ -45,20 +45,20 @@ public abstract class AbstractPredicateScoreIT {
 		assumeConstantScoreSupported();
 
 		assertThatQuery( index.query()
-				.where( f -> f.bool()
+				.where( f -> f.or(
 						// Very low boost, so score << 1
-						.should( predicateWithBoost( f, 0, 0.01f ) )
+						predicateWithBoost( f, 0, 0.01f ),
 						// Constant score, so score = 1
-						.should( predicateWithConstantScore( f, 1 ) ) )
+						predicateWithConstantScore( f, 1 ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 1 ), dataSet.docId( 0 ) );
 
 		assertThatQuery( index.query()
-				.where( f -> f.bool()
+				.where( f -> f.or(
 						// Constant score, so score = 1
-						.should( predicateWithConstantScore( f, 0 ) )
+						predicateWithConstantScore( f, 0 ),
 						// Very low boost, so score << 1
-						.should( predicateWithBoost( f, 1, 0.01f ) ) )
+						predicateWithBoost( f, 1, 0.01f ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 0 ), dataSet.docId( 1 ) );
 	}
@@ -68,16 +68,16 @@ public abstract class AbstractPredicateScoreIT {
 		assumeConstantScoreSupported();
 
 		assertThatQuery( index.query()
-				.where( f -> f.bool()
-						.should( predicateWithConstantScoreAndBoost( f, 0, 7f ) )
-						.should( predicateWithConstantScoreAndBoost( f, 1, 39f ) ) )
+				.where( f -> f.or(
+						predicateWithConstantScoreAndBoost( f, 0, 7f ),
+						predicateWithConstantScoreAndBoost( f, 1, 39f ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 1 ), dataSet.docId( 0 ) );
 
 		assertThatQuery( index.query()
-				.where( f -> f.bool()
-						.should( predicateWithConstantScoreAndBoost( f, 0, 39f ) )
-						.should( predicateWithConstantScoreAndBoost( f, 1, 7f ) ) )
+				.where( f -> f.or(
+						predicateWithConstantScoreAndBoost( f, 0, 39f ),
+						predicateWithConstantScoreAndBoost( f, 1, 7f ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 0 ), dataSet.docId( 1 ) );
 	}

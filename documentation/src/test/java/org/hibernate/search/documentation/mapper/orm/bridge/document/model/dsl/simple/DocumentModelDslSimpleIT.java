@@ -52,18 +52,18 @@ public class DocumentModelDslSimpleIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Object> result = searchSession.search( Arrays.asList( Book.class, Author.class ) )
-					.where( f -> f.bool()
-							.should( f.bool()
-									.must( f.match().field( "fullName" )
-											.matching( "isaac asimov" ) )
-									.must( f.match().field( "names" )
-											.matching( "isaac" ) )
-									.must( f.match().field( "names" )
-											.matching( "asimov" ) )
-							)
-							.should( f.match().field( "isbn" )
-									.matching( "978-0-58-600835-5" ) )
-					)
+					.where( f -> f.or(
+							f.and(
+									f.match().field( "fullName" )
+											.matching( "isaac asimov" ),
+									f.match().field( "names" )
+											.matching( "isaac" ),
+									f.match().field( "names" )
+											.matching( "asimov" )
+							),
+							f.match().field( "isbn" )
+									.matching( "978-0-58-600835-5" )
+					) )
 					.fetchHits( 20 );
 
 			assertThat( result ).hasSize( 2 );

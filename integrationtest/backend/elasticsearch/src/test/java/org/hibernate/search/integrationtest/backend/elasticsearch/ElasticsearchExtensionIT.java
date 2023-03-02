@@ -382,14 +382,12 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.bool()
-						.should( f.extension( ElasticsearchExtension.get() )
-								.fromJson( gson.fromJson( "{'match': {'nativeField_string': 'text 1'}}", JsonObject.class ) )
-						)
-						.should( f.extension( ElasticsearchExtension.get() )
-								.fromJson( gson.fromJson( "{'match': {'nativeField_integer': 2}}", JsonObject.class ) )
-						)
-						.should( f.extension( ElasticsearchExtension.get() )
+				.where( f -> f.or(
+						f.extension( ElasticsearchExtension.get() )
+								.fromJson( gson.fromJson( "{'match': {'nativeField_string': 'text 1'}}", JsonObject.class ) ),
+						f.extension( ElasticsearchExtension.get() )
+								.fromJson( gson.fromJson( "{'match': {'nativeField_integer': 2}}", JsonObject.class ) ),
+						f.extension( ElasticsearchExtension.get() )
 								.fromJson( gson.fromJson(
 										"{"
 											+ "'geo_distance': {"
@@ -433,11 +431,11 @@ public class ElasticsearchExtensionIT {
 						JsonObject.class
 				) )
 				.toPredicate();
-		SearchPredicate booleanPredicate = scope.predicate().bool()
-				.should( predicate1 )
-				.should( predicate2 )
-				.should( predicate3 )
-				.toPredicate();
+		SearchPredicate booleanPredicate = scope.predicate().or(
+						predicate1,
+						predicate2,
+						predicate3
+				).toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( booleanPredicate )
@@ -452,14 +450,12 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.bool()
-						.should( f.extension( ElasticsearchExtension.get() )
-								.fromJson( "{'match': {'nativeField_string': 'text 1'}}" )
-						)
-						.should( f.extension( ElasticsearchExtension.get() )
-								.fromJson( "{'match': {'nativeField_integer': 2}}" )
-						)
-						.should( f.extension( ElasticsearchExtension.get() )
+				.where( f -> f.or(
+						f.extension( ElasticsearchExtension.get() )
+								.fromJson( "{'match': {'nativeField_string': 'text 1'}}" ),
+						f.extension( ElasticsearchExtension.get() )
+								.fromJson( "{'match': {'nativeField_integer': 2}}" ),
+						f.extension( ElasticsearchExtension.get() )
 								.fromJson(
 										"{"
 											+ "'geo_distance': {"
@@ -500,11 +496,11 @@ public class ElasticsearchExtensionIT {
 						+ "}"
 				)
 				.toPredicate();
-		SearchPredicate booleanPredicate = scope.predicate().bool()
-				.should( predicate1 )
-				.should( predicate2 )
-				.should( predicate3 )
-				.toPredicate();
+		SearchPredicate booleanPredicate = scope.predicate().or(
+						predicate1,
+						predicate2,
+						predicate3
+				).toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( booleanPredicate )

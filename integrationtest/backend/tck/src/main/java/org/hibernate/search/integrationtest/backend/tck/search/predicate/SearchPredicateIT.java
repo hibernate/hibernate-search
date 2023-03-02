@@ -194,10 +194,10 @@ public class SearchPredicateIT {
 		assertThatQuery( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		query = otherIndex.createScope( mainIndex ).query()
-				.where( f -> f.bool()
-						.should( multiIndexScopedPredicate )
-						.should( f.match().field( "string" ).matching( STRING_2 ) )
-				)
+				.where( f -> f.or(
+						multiIndexScopedPredicate,
+						f.match().field( "string" ).matching( STRING_2 ).toPredicate()
+				) )
 				.toQuery();
 
 		assertThatQuery( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
