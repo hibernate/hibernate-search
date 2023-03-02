@@ -109,7 +109,17 @@ public interface SearchScope<E> {
 	SearchAggregationFactory aggregation();
 
 	/**
-	 * TODO:
+	 * Initiate the building of a highlighter that will be valid for the indexes in this scope.
+	 * <p>
+	 * The highlighter will only be valid for {@link SearchSession#search(SearchScope) search queries}
+	 * created using this scope or another scope instance targeting the same indexes.
+	 * <p>
+	 * Note this method is only necessary if you do not want to use lambda expressions,
+	 * since you can {@link SearchQueryOptionsStep#highlighter(Function) define highlighters with lambdas}
+	 * within the search query DSL,
+	 * removing the need to create separate objects to represent the projections.
+	 *
+	 * @return A highlighter factory.
 	 */
 	SearchHighlighterFactory highlighter();
 

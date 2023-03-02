@@ -6,11 +6,22 @@
  */
 package org.hibernate.search.engine.search.projection.dsl;
 
+import java.util.function.Function;
+
 /**
  * The initial and final step in a highlight definition, where optional parameters can be set.
  */
 public interface HighlightProjectionOptionsStep extends HighlightProjectionFinalStep {
 
+	/**
+	 * Defines a name of a named highlighter to be used by this field projection.
+	 *
+	 * @param highlighterName a name of a named highlighter.
+	 *
+	 * @return A final step to finish the definition of a highlight projection.
+	 *
+	 * @see org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep#highlighter(String, Function)
+	 */
 	HighlightProjectionFinalStep highlighter(String highlighterName);
 
 }

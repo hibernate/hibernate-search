@@ -17,8 +17,9 @@ import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
-import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFinalStep;
+import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
+import org.hibernate.search.engine.search.projection.dsl.HighlightProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.SearchFetchable;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -161,32 +162,69 @@ public interface SearchQueryOptionsStep<
 	S totalHitCountThreshold(long totalHitCountThreshold);
 
 	/**
-	 * Configure the query level highlighting optional settings.
+	 * Configure the default highlighter.
 	 * <p>
-	 * For specifying the fields to highlight and providing field-specific settings see {@link SearchProjectionFactory#highlight(String)} and {@link #highlighter(String, Function)}
-	 * TODO:
+	 * For specifying the fields to highlight see {@link SearchProjectionFactory#highlight(String)}.
+	 * For providing field-specific settings to override the ones set here see {@link #highlighter(String, Function)}.
+	 * <p>
+	 * Backend specific defaults will be used if no configuration is provided.
+	 *
+	 * @param highlighterContributor a function that will use a highlighter factory to configure the default highlighter for this query.
+	 *
 	 * @return {@code this}, for method chaining.
 	 */
 	@Incubating
 	S highlighter(Function<? super SearchHighlighterFactory, ? extends HighlighterFinalStep> highlighterContributor);
 
 	/**
-	 * TODO
+	 * Configure the default highlighter.
+	 * <p>
+	 * For specifying the fields to highlight see {@link SearchProjectionFactory#highlight(String)}.
+	 * For providing field-specific settings to override the ones set here see {@link #highlighter(String, Function)}.
+	 * <p>
+	 * Backend specific defaults will be used if no configuration is provided.
+	 *
+	 * @param highlighter a highlighter obtained from the search scope to be used as the default highlighter for this query.
+	 *
+	 * @return {@code this}, for method chaining.
 	 */
 	@Incubating
 	S highlighter(SearchHighlighter highlighter);
 
 	/**
-	 * Configure the named highlighter to be referenced at field level highlights in select section of a query.
+	 * Configure a named highlighter.
 	 * <p>
-	 * TODO:
+	 * Named highlighters are to be referenced in {@link HighlightProjectionOptionsStep#highlighter(String) highlight projections}.
+	 * <p>
+	 * Named highlighters override the settings set by a default highlighter if such was configured for this query.
+	 * <p>
+	 * The highlighter type must be the same as the default highlighter's, if a {@link #highlighter(Function) default highlighter settings was configured} for this query.
+	 *
+	 * @param highlighterName name of the highlighter. Can be referenced when defining a {@link HighlightProjectionOptionsStep#highlighter(String) highlight projection}.
+	 * @param highlighterContributor a function that will use a highlighter factory to configure the named highlighter.
 	 * @return {@code this}, for method chaining.
+	 *
+	 * @see SearchProjectionFactory#highlight(String)
+	 * @see HighlightProjectionOptionsStep#highlighter(String)
 	 */
 	@Incubating
 	S highlighter(String highlighterName, Function<? super SearchHighlighterFactory, ? extends HighlighterFinalStep> highlighterContributor);
 
 	/**
-	 * TODO
+	 * Configure a named highlighter.
+	 * <p>
+	 * Named highlighters are to be referenced in {@link HighlightProjectionOptionsStep#highlighter(String) highlight projections}.
+	 * <p>
+	 * Named highlighters override the settings set by a default highlighter if such was configured for this query.
+	 * <p>
+	 * The highlighter type must be the same as the default highlighter's, if a {@link #highlighter(Function) default highlighter settings was configured} for this query.
+	 *
+	 * @param highlighterName name of the highlighter. Can be referenced when defining a {@link HighlightProjectionOptionsStep#highlighter(String) highlight projection}.
+	 * @param highlighter a highlighter obtained from the search scope that will serve as the named highlighter.
+	 * @return {@code this}, for method chaining.
+	 *
+	 * @see SearchProjectionFactory#highlight(String)
+	 * @see HighlightProjectionOptionsStep#highlighter(String)
 	 */
 	@Incubating
 	S highlighter(String highlighterName, SearchHighlighter highlighter);

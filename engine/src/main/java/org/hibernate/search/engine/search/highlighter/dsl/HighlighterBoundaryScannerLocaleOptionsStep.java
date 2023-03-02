@@ -6,17 +6,30 @@
  */
 package org.hibernate.search.engine.search.highlighter.dsl;
 
+import java.text.BreakIterator;
 import java.util.Locale;
 
 /**
- * TODO
+ * The step in a highlighter definition where the boundary scanner options can be set.
+ * Refer to your particular backend documentation for more detailed information on the exposed settings.
  */
 public interface HighlighterBoundaryScannerLocaleOptionsStep<T extends HighlighterOptionsStep<?>> {
 
+	/**
+	 * Specify {@link Locale#ROOT a default locale} to be used when searching for boundaries by a {@link BreakIterator}.
+	 *
+	 * @return The next step in a highlighter definition.
+	 */
 	default T defaultLocale() {
 		return locale( Locale.ROOT );
 	}
 
+	/**
+	 * Specify a locale to be used when searching for boundaries by a {@link BreakIterator}.
+	 *
+	 * @param locale The locale to be applied by the {@link BreakIterator}
+	 * @return The next step in a highlighter definition.
+	 */
 	T locale(Locale locale);
 
 }

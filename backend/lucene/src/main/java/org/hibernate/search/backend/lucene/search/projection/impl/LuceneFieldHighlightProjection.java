@@ -19,20 +19,15 @@ import org.hibernate.search.engine.search.projection.dsl.spi.HighlightProjection
 
 import org.apache.lucene.analysis.Analyzer;
 
-/**
- * TODO
- */
 public class LuceneFieldHighlightProjection implements LuceneSearchProjection<List<String>> {
 
 	private final Set<String> indexNames;
 	private final Analyzer analyzer;
 	private final String absoluteFieldPath;
-	private final String[] absoluteFieldPathComponents;
-
 	private final String highlighterName;
 
 	private LuceneFieldHighlightProjection(Builder builder) {
-		this( builder.scope, builder.field, builder.highlighterConfigurationName() );
+		this( builder.scope, builder.field, builder.highlighterName() );
 	}
 
 	LuceneFieldHighlightProjection(LuceneSearchIndexScope<?> scope,
@@ -41,7 +36,6 @@ public class LuceneFieldHighlightProjection implements LuceneSearchProjection<Li
 		this.indexNames = scope.hibernateSearchIndexNames();
 		this.analyzer = field.type().searchAnalyzerOrNormalizer();
 		this.absoluteFieldPath = field.absolutePath();
-		this.absoluteFieldPathComponents = field.absolutePathComponents();
 		this.highlighterName = highlighterName;
 	}
 
@@ -103,7 +97,7 @@ public class LuceneFieldHighlightProjection implements LuceneSearchProjection<Li
 			this.field = field;
 		}
 
-		protected String highlighterConfigurationName() {
+		protected String highlighterName() {
 			return highlighterName;
 		}
 

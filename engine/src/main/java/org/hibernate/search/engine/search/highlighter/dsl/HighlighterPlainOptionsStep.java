@@ -7,12 +7,27 @@
 package org.hibernate.search.engine.search.highlighter.dsl;
 
 /**
- * TODO
+ * The step in a plain highlighter definition where options can be set. Refer to your particular backend documentation
+ * for more detailed information on the exposed settings.
  */
 public interface HighlighterPlainOptionsStep
 		extends HighlighterOptionsStep<HighlighterPlainOptionsStep> {
 
+	/**
+	 * Specify the maximum number of characters to be analyzed by the highlighter.
+	 *
+	 * @param max The maximum number of characters to consider when highlighting.
+	 * @return The next step in a highlighter definition.
+	 */
 	HighlighterPlainOptionsStep maxAnalyzedOffset(int max);
 
+	/**
+	 * Specify how the text should be broken up into highlighting snippets.
+	 *
+	 * @param type The type of fragmeter to be applied.
+	 * @return The next step in a highlighter definition.
+	 *
+	 * @see HighlighterFragmenter
+	 */
 	HighlighterPlainOptionsStep fragmenter(HighlighterFragmenter type);
 }
