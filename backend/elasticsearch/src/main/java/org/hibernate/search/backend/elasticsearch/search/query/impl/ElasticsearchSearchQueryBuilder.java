@@ -176,10 +176,17 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 	@Override
 	public void highlighter(String highlighterName, SearchHighlighter highlighter) {
-		this.namedHighlighters.put(
-				highlighterName,
-				ElasticsearchSearchHighlighter.from( scope, highlighter )
-		);
+		if ( highlighterName == null || highlighterName.trim().isEmpty() ) {
+			throw log.highlighterNameCannotBeBlank();
+		}
+		if (
+				this.namedHighlighters.put(
+						highlighterName,
+						ElasticsearchSearchHighlighter.from( scope, highlighter )
+				) != null
+		) {
+			throw log.highlighterWithTheSameNameCannotBeAdded( highlighterName );
+		}
 	}
 
 	@Override

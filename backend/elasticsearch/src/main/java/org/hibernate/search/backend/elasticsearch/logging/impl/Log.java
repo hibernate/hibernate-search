@@ -765,4 +765,11 @@ public interface Log extends BasicLogger {
 					" Available highlighters are: %2$s." +
 					" Was it configured with `highlighter(\"%1$s\", highlighterContributor)`?")
 	SearchException cannotFindHighlighter(String highlighterName, Set<String> highlighters);
+
+	@Message(id = ID_OFFSET + 164, value = "Named highlighters cannot use a blank string as name.")
+	SearchException highlighterNameCannotBeBlank();
+
+	@Message(id = ID_OFFSET + 165,
+			value = "Highlighter with name '%1$s' is already defined. Use a different name to add another highlighter.")
+	SearchException highlighterWithTheSameNameCannotBeAdded(String highlighterName);
 }
