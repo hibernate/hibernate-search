@@ -652,4 +652,11 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 162,
 			value = "'%1$s' highlighter does not support '%2$s' boundary scanner type.")
 	SearchException unsupportedBoundaryScannerType(SearchHighlighterType type, BoundaryScannerType boundaryScannerType);
+
+	@Message(id = ID_OFFSET + 163, value = "Named highlighters cannot use a blank string as name.")
+	SearchException highlighterNameCannotBeBlank();
+
+	@Message(id = ID_OFFSET + 164,
+			value = "Highlighter with name '%1$s' is already defined. Use a different name to add another highlighter.")
+	SearchException highlighterWithTheSameNameCannotBeAdded(String highlighterName);
 }

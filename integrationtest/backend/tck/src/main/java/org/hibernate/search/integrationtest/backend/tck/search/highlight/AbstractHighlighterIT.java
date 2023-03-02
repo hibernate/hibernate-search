@@ -646,6 +646,49 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
+	public void highlighterNullName() {
+		assertThatThrownBy(
+				() -> index.createScope().query().select(
+								f -> f.highlight( "string" )
+						).where( f -> f.matchAll() )
+						.highlighter( null, h -> highlighter( h ) )
+						.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Named highlighters cannot use a blank string as name."
+				);
+	}
+
+	@Test
+	public void highlighterEmptyName() {
+		assertThatThrownBy(
+				() -> index.createScope().query().select(
+								f -> f.highlight( "string" )
+						).where( f -> f.matchAll() )
+						.highlighter( "", h -> highlighter( h ) )
+						.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Named highlighters cannot use a blank string as name."
+				);
+	}
+
+	@Test
+	public void highlighterSameName() {
+		assertThatThrownBy(
+				() -> index.createScope().query().select(
+								f -> f.highlight( "string" )
+						).where( f -> f.matchAll() )
+						.highlighter( "same-name", h -> highlighter( h ) )
+						.highlighter( "same-name", h -> highlighter( h ) )
+						.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Highlighter with name 'same-name' is already defined. Use a different name to add another highlighter."
+				);
+	}
+
+	@Test
 	public void prebuiltHighlighter() {
 		SearchHighlighter highlighter = highlighter( index.createScope().highlighter() ).tag( "---", "---" )
 				.toHighlighter();
