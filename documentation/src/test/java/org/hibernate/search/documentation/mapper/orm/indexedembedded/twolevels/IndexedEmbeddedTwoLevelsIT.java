@@ -59,11 +59,11 @@ public class IndexedEmbeddedTwoLevelsIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.where( f -> f.bool()
-							.must( f.match().field( "title" ).matching( "robot" ) )
-							.must( f.match().field( "authors.name" ).matching( "isaac" ) )
-							.must( f.match().field( "authors.placeOfBirth.country" ).matching( "russia" ) )
-					)
+					.where( f -> f.and(
+							f.match().field( "title" ).matching( "robot" ),
+							f.match().field( "authors.name" ).matching( "isaac" ),
+							f.match().field( "authors.placeOfBirth.country" ).matching( "russia" )
+					) )
 					.fetchHits( 20 );
 			assertThat( result ).hasSize( 1 );
 		} );

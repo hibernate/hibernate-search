@@ -99,12 +99,12 @@ public class ObjectStructureIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.bool()
-						.must( f.match().field( "flattenedObject.string" ).matching( MATCHING_STRING ) )
-						.must( f.match().field( "flattenedObject.string_analyzed" ).matching( MATCHING_STRING_ANALYZED ) )
-						.must( f.match().field( "flattenedObject.integer" ).matching( MATCHING_INTEGER ) )
-						.must( f.match().field( "flattenedObject.localDate" ).matching( MATCHING_LOCAL_DATE ) )
-				)
+				.where( f -> f.and(
+						f.match().field( "flattenedObject.string" ).matching( MATCHING_STRING ),
+						f.match().field( "flattenedObject.string_analyzed" ).matching( MATCHING_STRING_ANALYZED ),
+						f.match().field( "flattenedObject.integer" ).matching( MATCHING_INTEGER ),
+						f.match().field( "flattenedObject.localDate" ).matching( MATCHING_LOCAL_DATE )
+				) )
 				.toQuery();
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), EXPECTED_NON_NESTED_MATCH_ID )
@@ -128,17 +128,14 @@ public class ObjectStructureIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.bool()
-						.must( f.range().field( "flattenedObject.string" )
-								.between( MATCHING_STRING, MATCHING_STRING )
-						)
-						.must( f.range().field( "flattenedObject.integer" )
-								.between( MATCHING_INTEGER - 1, MATCHING_INTEGER + 1 )
-						)
-						.must( f.range().field( "flattenedObject.localDate" )
+				.where( f -> f.and(
+						f.range().field( "flattenedObject.string" )
+								.between( MATCHING_STRING, MATCHING_STRING ),
+						f.range().field( "flattenedObject.integer" )
+								.between( MATCHING_INTEGER - 1, MATCHING_INTEGER + 1 ),
+						f.range().field( "flattenedObject.localDate" )
 								.between( MATCHING_LOCAL_DATE.minusDays( 1 ), MATCHING_LOCAL_DATE.plusDays( 1 ) )
-						)
-				)
+				) )
 				.toQuery();
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), EXPECTED_NON_NESTED_MATCH_ID )

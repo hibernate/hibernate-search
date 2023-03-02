@@ -130,9 +130,9 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 		// ... but it should not prevent the query from executing either:
 		// if the predicate is optional, it should be ignored for missingFieldIndex.
 		assertThatQuery( scope.query()
-				.where( f -> f.bool()
-						.should( predicate( f, defaultDslConverterField0Path(), 0 ) )
-						.should( f.id().matching( dataSet.docId( DataSet.MISSING_FIELD_INDEX_DOC_ORDINAL ) ) ) ) )
+				.where( f -> f.or(
+						predicate( f, defaultDslConverterField0Path(), 0 ),
+						f.id().matching( dataSet.docId( DataSet.MISSING_FIELD_INDEX_DOC_ORDINAL ) ) ) ) )
 				.hasDocRefHitsAnyOrder( c -> c
 						.doc( index.typeName(), dataSet.docId( 0 ) )
 						.doc( missingFieldIndex.typeName(), dataSet.docId( DataSet.MISSING_FIELD_INDEX_DOC_ORDINAL ) ) )

@@ -75,15 +75,15 @@ public class IndexedEmbeddedIncludePathsAndDepthIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Human> result = searchSession.search( Human.class )
-					.where( f -> f.bool()
-							.must( f.match().field( "name" ).matching( "fourth" ) )
-							.must( f.match().field( "nickname" ).matching( "babe" ) )
-							.must( f.match().field( "parents.name" ).matching( "third" ) )
-							.must( f.match().field( "parents.nickname" ).matching( "young" ) )
-							.must( f.match().field( "parents.parents.name" ).matching( "junior" ) )
-							.must( f.match().field( "parents.parents.nickname" ).matching( "old" ) )
-							.must( f.match().field( "parents.parents.parents.name" ).matching( "senior" ) )
-					)
+					.where( f -> f.and(
+							f.match().field( "name" ).matching( "fourth" ),
+							f.match().field( "nickname" ).matching( "babe" ),
+							f.match().field( "parents.name" ).matching( "third" ),
+							f.match().field( "parents.nickname" ).matching( "young" ),
+							f.match().field( "parents.parents.name" ).matching( "junior" ),
+							f.match().field( "parents.parents.nickname" ).matching( "old" ),
+							f.match().field( "parents.parents.parents.name" ).matching( "senior" )
+					) )
 					.fetchHits( 20 );
 			assertThat( result ).hasSize( 1 );
 		} );

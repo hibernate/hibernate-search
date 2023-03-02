@@ -184,9 +184,10 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 			SearchSession searchSession = Search.session( session );
 
 			return searchSession.search( Book.class )
-					.where( f -> f.bool()
-							.must( f.match().field( "editions.label" ).matching( editionLabel ) )
-							.must( f.match().field( "authors.name" ).matching( authorName ) ) )
+					.where( f -> f.and(
+							f.match().field( "editions.label" ).matching( editionLabel ),
+							f.match().field( "authors.name" ).matching( authorName )
+					) )
 					.fetchTotalHitCount();
 		} );
 	}

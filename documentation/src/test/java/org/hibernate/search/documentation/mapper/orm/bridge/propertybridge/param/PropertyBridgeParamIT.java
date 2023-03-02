@@ -72,12 +72,12 @@ public class PropertyBridgeParamIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Invoice> result = searchSession.search( Invoice.class )
-					.where( f -> f.bool()
-							.must( f.range().field( "itemSummary.total" )
-									.atLeast( new BigDecimal( "20.0" ) ) )
-							.must( f.range().field( "itemSummary.shipping" )
-									.atMost( new BigDecimal( "10.0" ) ) )
-					)
+					.where( f -> f.and(
+							f.range().field( "itemSummary.total" )
+									.atLeast( new BigDecimal( "20.0" ) ),
+							f.range().field( "itemSummary.shipping" )
+									.atMost( new BigDecimal( "10.0" ) )
+					) )
 					.fetchHits( 20 );
 
 			assertThat( result ).hasSize( 1 );

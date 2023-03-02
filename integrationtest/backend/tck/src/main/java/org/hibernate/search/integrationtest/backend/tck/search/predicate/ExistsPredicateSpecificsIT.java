@@ -92,7 +92,7 @@ public class ExistsPredicateSpecificsIT<F> {
 		String fieldPath = mainIndex.binding().fieldWithDefaults.get( dataSet.fieldType ).relativeFieldName;
 
 		assertThatQuery( mainIndex.query()
-				.where( f -> f.bool().mustNot( f.exists().field( fieldPath ) ) )
+				.where( f -> f.not( f.exists().field( fieldPath ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 2 ), dataSet.docId( 3 ) );
 	}
@@ -134,7 +134,7 @@ public class ExistsPredicateSpecificsIT<F> {
 				+ mainIndex.binding().nestedObject.fieldWithDocValues.get( dataSet.fieldType ).relativeFieldName;
 
 		assertThatQuery( mainIndex.query()
-				.where( f -> f.bool().mustNot( f.exists().field( fieldPath ) ) )
+				.where( f -> f.not( f.exists().field( fieldPath ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 2 ), dataSet.docId( 3 ) );
 	}

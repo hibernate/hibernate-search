@@ -69,34 +69,28 @@ public class NestedPredicateLegacyIT {
 	public void search_nestedOnTwoLevels() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested().objectField( "nestedObject" )
-						.nest( f.bool()
+						.nest( f.and(
 								// This is referred to as "condition 1" in the data initialization method
-								.must( f.nested().objectField( "nestedObject.nestedObject" )
-										.nest( f.bool()
-												.must( f.match()
+								f.nested().objectField( "nestedObject.nestedObject" )
+										.nest( f.and(
+												f.match()
 														.field( "nestedObject.nestedObject.field1" )
-														.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 )
-												)
-												.must( f.match()
+														.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 ),
+												f.match()
 														.field( "nestedObject.nestedObject.field2" )
 														.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 )
-												)
-										)
-								)
+										) ),
 								// This is referred to as "condition 2" in the data initialization method
-								.must( f.nested().objectField( "nestedObject.nestedObject" )
-										.nest( f.bool()
-												.must( f.match()
+								f.nested().objectField( "nestedObject.nestedObject" )
+										.nest( f.and(
+												f.match()
 														.field( "nestedObject.nestedObject.field1" )
-														.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 )
-												)
-												.must( f.match()
+														.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 ),
+												f.match()
 														.field( "nestedObject.nestedObject.field2" )
 														.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 )
-												)
-										)
-								)
-						)
+										) )
+						) )
 				) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 )
 				.hasTotalHitCount( 1 );
@@ -105,34 +99,28 @@ public class NestedPredicateLegacyIT {
 	@Test
 	public void search_nestedOnTwoLevels_onlySecondLevel() {
 		assertThatQuery( mainIndex.query()
-				.where( f -> f.bool()
+				.where( f -> f.and(
 						// This is referred to as "condition 1" in the data initialization method
-						.must( f.nested().objectField( "nestedObject.nestedObject" )
-								.nest( f.bool()
-										.must( f.match()
+						f.nested().objectField( "nestedObject.nestedObject" )
+								.nest( f.and(
+										f.match()
 												.field( "nestedObject.nestedObject.field1" )
-												.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 )
-										)
-										.must( f.match()
+												.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 ),
+										f.match()
 												.field( "nestedObject.nestedObject.field2" )
 												.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 )
-										)
-								)
-						)
+								) ),
 						// This is referred to as "condition 2" in the data initialization method
-						.must( f.nested().objectField( "nestedObject.nestedObject" )
-								.nest( f.bool()
-										.must( f.match()
+						f.nested().objectField( "nestedObject.nestedObject" )
+								.nest( f.and(
+										f.match()
 												.field( "nestedObject.nestedObject.field1" )
-												.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 )
-										)
-										.must( f.match()
+												.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 ),
+										f.match()
 												.field( "nestedObject.nestedObject.field2" )
 												.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 )
-										)
-								)
-						)
-				) )
+								) )
+				) ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 )
 				.hasTotalHitCount( 2 );
 	}
@@ -141,25 +129,21 @@ public class NestedPredicateLegacyIT {
 	public void search_nestedOnTwoLevels_conditionOnFirstLevel() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested().objectField( "nestedObject" )
-						.nest( f.bool()
-								.must( f.match()
+						.nest( f.and(
+								f.match()
 										.field( "nestedObject.string" )
-										.matching( MATCHING_STRING )
-								)
+										.matching( MATCHING_STRING ),
 								// This is referred to as "condition 2" in the data initialization method
-								.must( f.nested().objectField( "nestedObject.nestedObject" )
-										.nest( f.bool()
-												.must( f.match()
+								f.nested().objectField( "nestedObject.nestedObject" )
+										.nest( f.and(
+												f.match()
 														.field( "nestedObject.nestedObject.field1" )
-														.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 )
-												)
-												.must( f.match()
+														.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 ),
+												f.match()
 														.field( "nestedObject.nestedObject.field2" )
 														.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 )
-												)
-										)
-								)
-						)
+										) )
+						) )
 				) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_2 )
 				.hasTotalHitCount( 1 );
@@ -170,27 +154,25 @@ public class NestedPredicateLegacyIT {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().nested().objectField( "nestedObject.nestedObject" )
-				.nest( f -> f.bool()
-						.must( f.match()
+				.nest( f -> f.and(
+						f.match()
 								.field( "nestedObject.nestedObject.field1" )
-								.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 )
-						).must( f.match()
+								.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 ),
+						f.match()
 								.field( "nestedObject.nestedObject.field2" )
 								.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 )
-						)
-				)
+				) )
 				.toPredicate();
 
 		SearchPredicate predicate2 = scope.predicate().nested().objectField( "nestedObject.nestedObject" )
-				.nest( f -> f.bool()
-						.must( f.match()
+				.nest( f -> f.and(
+						f.match()
 								.field( "nestedObject.nestedObject.field1" )
-								.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 )
-						).must( f.match()
+								.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 ),
+						f.match()
 								.field( "nestedObject.nestedObject.field2" )
 								.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 )
-						)
-				)
+				) )
 				.toPredicate();
 
 		assertThatQuery( scope.query()
@@ -213,16 +195,14 @@ public class NestedPredicateLegacyIT {
 
 		assertThatThrownBy( () -> mainIndex.query()
 				.where( f -> f.nested().objectField( objectFieldPath )
-						.nest( f.bool()
-								.must( f.match()
+						.nest( f.and(
+								f.match()
+										.field( fieldInParentPath )
+										.matching( "irrelevant_because_this_will_fail" ),
+								f.match()
 										.field( fieldInParentPath )
 										.matching( "irrelevant_because_this_will_fail" )
-								)
-								.must( f.match()
-										.field( fieldInParentPath )
-										.matching( "irrelevant_because_this_will_fail" )
-								)
-						)
+						) )
 				) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Invalid search predicate",
@@ -239,16 +219,14 @@ public class NestedPredicateLegacyIT {
 
 		assertThatThrownBy( () -> mainIndex.query()
 				.where( f -> f.nested().objectField( objectFieldPath )
-						.nest( f.bool()
-								.must( f.match()
+						.nest( f.and(
+								f.match()
+										.field( fieldInSiblingPath )
+										.matching( "irrelevant_because_this_will_fail" ),
+								f.match()
 										.field( fieldInSiblingPath )
 										.matching( "irrelevant_because_this_will_fail" )
-								)
-								.must( f.match()
-										.field( fieldInSiblingPath )
-										.matching( "irrelevant_because_this_will_fail" )
-								)
-						)
+						) )
 				) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Invalid search predicate",
@@ -268,34 +246,28 @@ public class NestedPredicateLegacyIT {
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
 		SearchPredicateFactory f = scope.predicate();
 		SearchPredicate nestedPredicate = f.nested().objectField( "nestedObject" )
-				.nest( f.bool()
+				.nest( f.and(
 						// This is referred to as "condition 1" in the data initialization method
-						.must( f.nested().objectField( "nestedObject.nestedObject" )
-								.nest( f.bool()
-										.must( f.match()
+						f.nested().objectField( "nestedObject.nestedObject" )
+								.nest( f.and(
+										f.match()
 												.field( "nestedObject.nestedObject.field1" )
-												.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 )
-										)
-										.must( f.match()
+												.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 ),
+										f.match()
 												.field( "nestedObject.nestedObject.field2" )
 												.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 )
-										)
-								)
-						)
+								) ),
 						// This is referred to as "condition 2" in the data initialization method
-						.must( f.nested().objectField( "nestedObject.nestedObject" )
-								.nest( f.bool()
-										.must( f.match()
+						f.nested().objectField( "nestedObject.nestedObject" )
+								.nest( f.and(
+										f.match()
 												.field( "nestedObject.nestedObject.field1" )
-												.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 )
-										)
-										.must( f.match()
+												.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 ),
+										f.match()
 												.field( "nestedObject.nestedObject.field2" )
 												.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 )
-										)
-								)
-						)
-				)
+								) )
+				) )
 				.toPredicate();
 
 		// The "nested" predicate should not match anything in missingFieldIndex

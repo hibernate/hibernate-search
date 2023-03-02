@@ -94,9 +94,9 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 					// Bridged query with complex bridge: TODO HSEARCH-3320 rely on the bridge to split the String
 					String[] splitTags = tags == null ? null : tags.split( "," );
 					if ( splitTags != null && splitTags.length > 0 ) {
-						root.add( f.bool().with( b2 -> {
+						root.add( f.and().with( and -> {
 							for ( String tag : splitTags ) {
-								b2.must( f.match()
+								and.add( f.match()
 										.field( "tags" )
 										.matching( tag )
 								);

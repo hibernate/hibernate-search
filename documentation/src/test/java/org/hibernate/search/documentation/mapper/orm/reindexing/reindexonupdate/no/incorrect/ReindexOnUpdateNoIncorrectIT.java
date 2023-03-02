@@ -78,9 +78,9 @@ public class ReindexOnUpdateNoIncorrectIT {
 
 	private long countSensorsWithinOperatingParameters(EntityManager entityManager) {
 		return Search.session( entityManager ).search( Sensor.class )
-				.where( f -> f.bool()
-						.must( f.match().field( "status" ).matching( SensorStatus.ONLINE ) )
-						.must( f.range().field( "rollingAverage" ).between( 0.9, 1.1 ) ) )
+				.where( f -> f.and(
+						f.match().field( "status" ).matching( SensorStatus.ONLINE ),
+						f.range().field( "rollingAverage" ).between( 0.9, 1.1 ) ) )
 				.fetchTotalHitCount();
 	}
 

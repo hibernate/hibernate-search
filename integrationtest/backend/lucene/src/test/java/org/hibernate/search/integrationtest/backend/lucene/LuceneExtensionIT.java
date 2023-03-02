@@ -323,17 +323,14 @@ public class LuceneExtensionIT {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.bool()
-						.should( f.extension( LuceneExtension.get() )
-								.fromLuceneQuery( new TermQuery( new Term( "string", "text 1" ) ) )
-						)
-						.should( f.extension( LuceneExtension.get() )
-								.fromLuceneQuery( IntPoint.newExactQuery( "integer", 2 ) )
-						)
-						.should( f.extension( LuceneExtension.get() )
+				.where( f -> f.or(
+						f.extension( LuceneExtension.get() )
+								.fromLuceneQuery( new TermQuery( new Term( "string", "text 1" ) ) ),
+						f.extension( LuceneExtension.get() )
+								.fromLuceneQuery( IntPoint.newExactQuery( "integer", 2 ) ),
+						f.extension( LuceneExtension.get() )
 								.fromLuceneQuery( LatLonPoint.newDistanceQuery( "geoPoint", 40, -70, 200_000 ) )
-						)
-				)
+				) )
 				.toQuery();
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID )
@@ -350,11 +347,11 @@ public class LuceneExtensionIT {
 				.fromLuceneQuery( IntPoint.newExactQuery( "integer", 2 ) ).toPredicate();
 		SearchPredicate predicate3 = scope.predicate().extension( LuceneExtension.get() )
 				.fromLuceneQuery( LatLonPoint.newDistanceQuery( "geoPoint", 40, -70, 200_000 ) ).toPredicate();
-		SearchPredicate booleanPredicate = scope.predicate().bool()
-				.should( predicate1 )
-				.should( predicate2 )
-				.should( predicate3 )
-				.toPredicate();
+		SearchPredicate booleanPredicate = scope.predicate().or(
+						predicate1,
+						predicate2,
+						predicate3
+				).toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( booleanPredicate )
@@ -370,9 +367,9 @@ public class LuceneExtensionIT {
 		SearchQuery<DocumentReference> query = mainIndex.query()
 				.where( f -> {
 					LuceneSearchPredicateFactory f2 = f.extension( LuceneExtension.get() ).withRoot( "flattenedObject" );
-					return f2.bool()
-							.should( f2.fromLuceneQuery( new TermQuery( new Term( f2.toAbsolutePath( "stringInObject" ), "text 2" ) ) ) )
-							.should( f2.fromLuceneQuery( IntPoint.newExactQuery( f2.toAbsolutePath( "integerInObject" ), 3 ) ) );
+					return f2.or(
+							f2.fromLuceneQuery( new TermQuery( new Term( f2.toAbsolutePath( "stringInObject" ), "text 2" ) ) ),
+							f2.fromLuceneQuery( IntPoint.newExactQuery( f2.toAbsolutePath( "integerInObject" ), 3 ) ) );
 				} )
 				.toQuery();
 		assertThatQuery( query )

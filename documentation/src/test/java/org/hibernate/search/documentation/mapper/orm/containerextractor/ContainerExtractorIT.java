@@ -85,11 +85,11 @@ public class ContainerExtractorIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.where( f -> f.bool()
-							.must( f.match().field( "availableFormats" ).matching( BookFormat.AUDIOBOOK ) )
-							.must( f.match().field( "availableFormats" ).matching( BookFormat.HARDCOVER ) )
-							.must( f.match().field( "authorCount" ).matching( 1, ValueConvert.NO ) )
-					)
+					.where( f -> f.and(
+							f.match().field( "availableFormats" ).matching( BookFormat.AUDIOBOOK ),
+							f.match().field( "availableFormats" ).matching( BookFormat.HARDCOVER ),
+							f.match().field( "authorCount" ).matching( 1, ValueConvert.NO )
+					) )
 					.fetchHits( 20 );
 			assertThat( result ).hasSize( 1 );
 		} );

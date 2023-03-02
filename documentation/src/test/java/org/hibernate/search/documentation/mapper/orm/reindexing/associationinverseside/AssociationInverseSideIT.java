@@ -86,10 +86,10 @@ public class AssociationInverseSideIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.where( f -> f.bool()
-							.must( f.match().field( "editionsForSale.label" ).matching( "paperback" ) )
-							.must( f.match().field( "editionsForSale.label" ).matching( "kindle" ) )
-					)
+					.where( f -> f.and(
+							f.match().field( "editionsForSale.label" ).matching( "paperback" ),
+							f.match().field( "editionsForSale.label" ).matching( "kindle" )
+					) )
 					.fetchHits( 20 );
 			assertThat( result ).hasSize( 1 );
 		} );

@@ -37,17 +37,16 @@ public abstract class AbstractPredicateFieldScoreIT<V extends AbstractPredicateT
 	@Test
 	public void fieldLevelBoost() {
 		assertThatQuery( index.query()
-				.where( f -> f.bool()
-						.should( predicate( f, field0Path(), 0 ) )
-						.should( predicateWithFieldLevelBoost( f, field0Path(), 42f, 1 ) ) )
+				.where( f -> f.or(
+						predicate( f, field0Path(), 0 ),
+						predicateWithFieldLevelBoost( f, field0Path(), 42f, 1 ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 1 ), dataSet.docId( 0 ) );
 
 		assertThatQuery( index.query()
-				.where( f -> f.bool()
-						.should( predicateWithFieldLevelBoost( f, field0Path(), 42f,
-								0 ) )
-						.should( predicate( f, field0Path(), 1 ) ) )
+				.where( f -> f.or(
+						predicateWithFieldLevelBoost( f, field0Path(), 42f, 0 ),
+						predicate( f, field0Path(), 1 ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 0 ), dataSet.docId( 1 ) );
 	}
@@ -55,23 +54,23 @@ public abstract class AbstractPredicateFieldScoreIT<V extends AbstractPredicateT
 	@Test
 	public void predicateLevelBoost_fieldLevelBoost() {
 		assertThatQuery( index.query()
-				.where( f -> f.bool()
+				.where( f -> f.or(
 						// 2 * 2 => boost x4
-						.should( predicateWithFieldLevelBoostAndPredicateLevelBoost( f, field0Path(), 2f,
-								0, 2f ) )
+						predicateWithFieldLevelBoostAndPredicateLevelBoost( f, field0Path(), 2f,
+								0, 2f ),
 						// 3 * 3 => boost x9
-						.should( predicateWithFieldLevelBoostAndPredicateLevelBoost( f, field0Path(), 3f,
+						predicateWithFieldLevelBoostAndPredicateLevelBoost( f, field0Path(), 3f,
 								1, 3f ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 1 ), dataSet.docId( 0 ) );
 
 		assertThatQuery( index.query()
-				.where( f -> f.bool()
+				.where( f -> f.or(
 						// 1 * 3 => boost x3
-						.should( predicateWithFieldLevelBoostAndPredicateLevelBoost( f, field0Path(), 1f,
-								0, 3f ) )
+						predicateWithFieldLevelBoostAndPredicateLevelBoost( f, field0Path(), 1f,
+								0, 3f ),
 						// 0.1 * 3 => boost x0.3
-						.should( predicateWithFieldLevelBoostAndPredicateLevelBoost( f, field0Path(), 0.1f,
+						predicateWithFieldLevelBoostAndPredicateLevelBoost( f, field0Path(), 0.1f,
 								1, 3f ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 0 ), dataSet.docId( 1 ) );
@@ -94,19 +93,19 @@ public abstract class AbstractPredicateFieldScoreIT<V extends AbstractPredicateT
 	@Test
 	public void predicateLevelBoost_multiFields() {
 		assertThatQuery( index.query()
-				.where( f -> f.bool()
-						.should( predicateWithPredicateLevelBoost( f, new String[] { field0Path(), field1Path() },
-								0, 7f ) )
-						.should( predicateWithPredicateLevelBoost( f, new String[] { field0Path(), field1Path() },
+				.where( f -> f.or(
+						predicateWithPredicateLevelBoost( f, new String[] { field0Path(), field1Path() },
+								0, 7f ),
+						predicateWithPredicateLevelBoost( f, new String[] { field0Path(), field1Path() },
 								1, 39f ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 1 ), dataSet.docId( 0 ) );
 
 		assertThatQuery( index.query()
-				.where( f -> f.bool()
-						.should( predicateWithPredicateLevelBoost( f, new String[] { field0Path(), field1Path() },
-								0, 39f ) )
-						.should( predicateWithPredicateLevelBoost( f, new String[] { field0Path(), field1Path() },
+				.where( f -> f.or(
+						predicateWithPredicateLevelBoost( f, new String[] { field0Path(), field1Path() },
+								0, 39f ),
+						predicateWithPredicateLevelBoost( f, new String[] { field0Path(), field1Path() },
 								1, 7f ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 0 ), dataSet.docId( 1 ) );

@@ -151,9 +151,9 @@ public abstract class AbstractPredicateInObjectFieldIT {
 		// ... but it should not prevent the query from executing either:
 		// if the "nested" predicate is optional, it should be ignored for missingFieldIndex.
 		assertThatQuery( scope.query()
-				.where( f -> f.bool()
-						.should( predicate( f, binding.nested.nested, 0 ) )
-						.should( f.id().matching( dataSet.docId( MISSING_FIELD_INDEX_DOC_ORDINAL ) ) ) )
+				.where( f -> f.or(
+						predicate( f, binding.nested.nested, 0 ),
+						f.id().matching( dataSet.docId( MISSING_FIELD_INDEX_DOC_ORDINAL ) ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( c -> c
 						.doc( mainIndex.typeName(), dataSet.docId( 0 ) )

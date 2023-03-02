@@ -53,18 +53,17 @@ public class DocumentModelDslObjectIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Invoice> result = searchSession.search( Invoice.class )
-					.where( f -> f.bool()
-							.must( f.range().field( "summary.total" )
-									.atLeast( new BigDecimal( "20.0" ) ) )
-							.must( f.range().field( "summary.shipping" )
-									.atMost( new BigDecimal( "10.0" ) ) )
-							.must( f.nested( "lineItems" )
+					.where( f -> f.and(
+							f.range().field( "summary.total" )
+									.atLeast( new BigDecimal( "20.0" ) ),
+							f.range().field( "summary.shipping" )
+									.atMost( new BigDecimal( "10.0" ) ),
+							f.nested( "lineItems" )
 									.add( f.range().field( "lineItems.amount" )
 											.between( new BigDecimal( "7.0" ), new BigDecimal( "9.0" ) ) )
 									.add( f.match().field( "lineItems.category" )
-											.matching( "BOOK" )
-							) )
-					)
+											.matching( "BOOK" ) )
+					) )
 					.fetchHits( 20 );
 
 			assertThat( result ).hasSize( 1 );

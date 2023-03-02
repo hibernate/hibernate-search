@@ -97,12 +97,12 @@ public class FieldPathsIT {
 		withinSearchSession( searchSession -> {
 			// tag::withRoot[]
 			List<Book> hits = searchSession.search( Book.class )
-					.where( f -> f.bool()
-							.should( f.nested( "writers" )
+					.where( f -> f.or()
+							.add( f.nested( "writers" )
 									.add( matchFirstAndLastName( // <1>
 											f.withRoot( "writers" ), // <2>
 											"bob", "kane" ) ) )
-							.should( f.nested( "artists" )
+							.add( f.nested( "artists" )
 									.add( matchFirstAndLastName( // <3>
 											f.withRoot( "artists" ), // <4>
 											"bill", "finger" ) ) ) )

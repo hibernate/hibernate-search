@@ -53,12 +53,12 @@ public class PropertyBridgeSimpleIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Invoice> result = searchSession.search( Invoice.class )
-					.where( f -> f.bool()
-							.must( f.range().field( "summary.total" )
-									.atLeast( new BigDecimal( "20.0" ) ) )
-							.must( f.range().field( "summary.shipping" )
-									.atMost( new BigDecimal( "10.0" ) ) )
-					)
+					.where( f -> f.and(
+							f.range().field( "summary.total" )
+									.atLeast( new BigDecimal( "20.0" ) ),
+							f.range().field( "summary.shipping" )
+									.atMost( new BigDecimal( "10.0" ) )
+					) )
 					.fetchHits( 20 );
 
 			assertThat( result ).hasSize( 1 );
