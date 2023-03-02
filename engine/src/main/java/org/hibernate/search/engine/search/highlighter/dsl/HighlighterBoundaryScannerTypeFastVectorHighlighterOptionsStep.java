@@ -7,11 +7,18 @@
 package org.hibernate.search.engine.search.highlighter.dsl;
 
 /**
- * TODO
+ * The step in a highlighter definition where the boundary scanner type can be set.
+ * Refer to your particular backend documentation for more detailed information on the exposed settings.
  */
 public interface HighlighterBoundaryScannerTypeFastVectorHighlighterOptionsStep<T extends HighlighterOptionsStep<?>>
 		extends HighlighterBoundaryScannerTypeOptionsStep<T> {
 
+	/**
+	 * Break highlighted fragments at the next boundary based on a
+	 * {@link HighlighterFastVectorHighlighterOptionsStep#boundaryChars(String) provided boundary characters}
+	 *
+	 * @return The next step in a highlighter definition.
+	 */
 	HighlighterBoundaryScannerLocaleOptionsStep<T> chars();
 
 }

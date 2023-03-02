@@ -7,9 +7,15 @@
 package org.hibernate.search.engine.search.highlighter.dsl;
 
 /**
- * TODO
+ * Defines how to break up text into highlight snippets.
  */
 public enum HighlighterFragmenter {
+	/**
+	 * Breaks up text into same-sized fragments.
+	 */
 	SIMPLE,
+	/**
+	 * Breaks up text into same-sized fragments, but tries to avoid breaking up a phrase to be highlighted.
+	 */
 	SPAN;
 }
