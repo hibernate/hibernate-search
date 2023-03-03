@@ -446,12 +446,16 @@ public class ElasticsearchDialectFactoryTest {
 						ElasticsearchDistributionName.OPENSEARCH, "2.5.0", "2.5.0",
 						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
-				successWithWarning(
-						ElasticsearchDistributionName.OPENSEARCH, "2.6", "2.6.0",
+				success(
+						ElasticsearchDistributionName.OPENSEARCH, "2.6.0", "2.6.0",
 						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				successWithWarning(
-						ElasticsearchDistributionName.OPENSEARCH, "2.6.0", "2.6.0",
+						ElasticsearchDistributionName.OPENSEARCH, "2.7", "2.7.0",
+						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+				),
+				successWithWarning(
+						ElasticsearchDistributionName.OPENSEARCH, "2.7.0", "2.7.0",
 						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				successWithWarning(
