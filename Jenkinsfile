@@ -262,7 +262,8 @@ stage('Configure') {
 					new OpenSearchLocalBuildEnvironment(version: '2.2.1', condition: TestCondition.ON_DEMAND),
 					new OpenSearchLocalBuildEnvironment(version: '2.3.0', condition: TestCondition.ON_DEMAND),
 					new OpenSearchLocalBuildEnvironment(version: '2.4.1', condition: TestCondition.ON_DEMAND),
-					new OpenSearchLocalBuildEnvironment(version: '2.5.0', condition: TestCondition.AFTER_MERGE)
+					new OpenSearchLocalBuildEnvironment(version: '2.5.0', condition: TestCondition.ON_DEMAND),
+					new OpenSearchLocalBuildEnvironment(version: '2.6.0', condition: TestCondition.AFTER_MERGE)
 					// See https://opensearch.org/lines/2x.html for a list of all 2.x versions
 			],
 			esAws: [
