@@ -378,7 +378,7 @@
         <version.install.plugin>3.1.0</version.install.plugin>
         <version.io.takari.maven>0.7.7</version.io.takari.maven>
         <version.jandex.plugin>1.2.3</version.jandex.plugin>
-        <version.japicmp.plugin>0.17.1</version.japicmp.plugin>
+        <version.japicmp.plugin>0.17.2</version.japicmp.plugin>
         <version.jar.plugin>3.3.0</version.jar.plugin>
         <version.javadoc.plugin>3.5.0</version.javadoc.plugin>
         <version.jdeps.plugin>0.5.1</version.jdeps.plugin>
