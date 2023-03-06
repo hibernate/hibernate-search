@@ -11,6 +11,7 @@ import java.util.Objects;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -51,11 +52,17 @@ public abstract class SearchIndexSchemaElementContextHelper {
 	public static final SearchIndexSchemaElementContextHelper VALUE_FIELD = new SearchIndexSchemaElementContextHelper() {
 		@Override
 		protected String missingSupportHint(SearchQueryElementTypeKey<?> key) {
+			if ( ProjectionTypeKeys.HIGHLIGHT.equals( key ) ) {
+				return log.highlightNotSupported();
+			}
 			return log.missingSupportHintForValueField( key );
 		}
 
 		@Override
-		public String partialSupportHint() {
+		public String partialSupportHint(SearchQueryElementTypeKey<?> key) {
+			if ( ProjectionTypeKeys.HIGHLIGHT.equals( key ) ) {
+				return log.highlightPartiallySupported();
+			}
 			return log.partialSupportHintForValueField();
 		}
 
@@ -68,17 +75,10 @@ public abstract class SearchIndexSchemaElementContextHelper {
 		}
 
 		@Override
-		public String partialSupportHint() {
+		public String partialSupportHint(SearchQueryElementTypeKey<?> key) {
 			return log.partialSupportHintForCompositeNode();
 		}
 	};
-
-	public <T, SC extends SearchIndexScope<?>, N extends SearchIndexNodeContext<SC>>
-			SearchException cannotUseQueryElement(SearchQueryElementTypeKey<T> key, N node, String hint,
-			Exception causeOrNull) {
-		throw log.cannotUseQueryElementForIndexNode( node.relativeEventContext(), key,
-				hint, node.eventContext(), causeOrNull );
-	}
 
 	public <T, SC extends SearchIndexScope<?>, N extends SearchIndexNodeContext<SC>>
 			T queryElement(SearchQueryElementTypeKey<T> key,
@@ -94,7 +94,14 @@ public abstract class SearchIndexSchemaElementContextHelper {
 		}
 	}
 
+	public <T, SC extends SearchIndexScope<?>, N extends SearchIndexNodeContext<SC>>
+	SearchException cannotUseQueryElement(SearchQueryElementTypeKey<T> key, N node, String hint,
+			Exception causeOrNull) {
+		throw log.cannotUseQueryElementForIndexNode( node.relativeEventContext(), key,
+				hint, node.eventContext(), causeOrNull );
+	}
+
 	protected abstract String missingSupportHint(SearchQueryElementTypeKey<?> key);
 
-	public abstract String partialSupportHint();
+	public abstract String partialSupportHint(SearchQueryElementTypeKey<?> key);
 }
