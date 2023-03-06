@@ -640,9 +640,55 @@ public abstract class AbstractHighlighterIT {
 		).isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot use 'projection:highlight' on field 'notAnalyzedString':",
-						//TODO: change message for this case:
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)."
+						"Highlighting is only supported for analyzed text fields.",
+						"Additionally, in case of using a fast vector highlighter the term vector storing must be enabled for the field."
 				);
+	}
+
+	@Test
+	public void multipleIndexesScopeIncompatibleTypes() {
+		assertThatThrownBy(
+				() -> index.createScope( notMatchingTypeIndex ).query().select(
+								f -> f.highlight( "string" )
+						).where( f -> f.matchAll() )
+						.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Inconsistent support for 'projection:highlight'",
+						"'projection:highlight' can be used in some of the targeted indexes, but not all of them.",
+						"Make sure that the field has the same type in all indexes"
+				);
+	}
+
+	@Test
+	public void multipleIndexesScopeIncompatibleTypesNested() {
+		assertThatThrownBy(
+				() -> index.createScope( notMatchingTypeIndex ).query().select(
+								f -> f.highlight( "nested.nestedString" )
+						).where( f -> f.matchAll() )
+						.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Inconsistent support for 'projection:highlight'",
+						"'projection:highlight' can be used in some of the targeted indexes, but not all of them.",
+						"Make sure that the field has the same type in all indexes"
+				);
+	}
+
+	@Test
+	public void multipleIndexesScopeCompatibleTypes() {
+		SearchQuery<List<String>> highlights = index.createScope( matchingIndex ).query().select(
+						f -> f.highlight( "string" )
+				).where( f -> f.match().field( "string" ).matching( "dog" ) )
+				.highlighter( h -> highlighter( h ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder( Arrays.asList(
+						Collections.singletonList( "string with <em>dog</em>" ),
+						Collections.singletonList( "This string mentions a <em>dog</em>" ),
+						Collections.singletonList( "This string mentions a <em>dog</em> too" )
+				) );
 	}
 
 	@Test
