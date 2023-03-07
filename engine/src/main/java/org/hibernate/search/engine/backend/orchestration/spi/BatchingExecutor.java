@@ -13,6 +13,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
@@ -32,6 +33,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public final class BatchingExecutor<P extends BatchedWorkProcessor, W extends BatchedWork<? super P>> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final BiConsumer<? super BatchedWork<?>, Throwable> ASYNC_FAILURE_REPORTER = BatchedWork::markAsFailed;
 
 	private final String name;
 
@@ -127,7 +129,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor, W extends Ba
 					"Attempt to submit a work to executor '" + name + "', which is stopped."
 			);
 		}
-		operationSubmitter.submitToQueue( workQueue, work, blockingRetryProducer );
+		operationSubmitter.submitToQueue( workQueue, work, blockingRetryProducer, ASYNC_FAILURE_REPORTER );
 		processingTask.ensureScheduled();
 	}
 
