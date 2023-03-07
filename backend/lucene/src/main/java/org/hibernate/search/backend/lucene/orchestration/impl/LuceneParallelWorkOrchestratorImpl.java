@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
@@ -21,6 +22,8 @@ import org.hibernate.search.util.common.reporting.EventContext;
 public class LuceneParallelWorkOrchestratorImpl
 		extends AbstractWorkOrchestrator<LuceneParallelWorkOrchestratorImpl.WorkExecution<?>>
 		implements LuceneParallelWorkOrchestrator {
+
+	private static final BiConsumer<WorkExecution<?>, Throwable> ASYNC_FAILURE_REPORTER = WorkExecution::markAsFailed;
 
 	private final IndexAccessor indexAccessor;
 	private final IndexAccessorWorkExecutionContext context;
@@ -60,7 +63,7 @@ public class LuceneParallelWorkOrchestratorImpl
 
 	@Override
 	protected void doSubmit(WorkExecution<?> workExecution, OperationSubmitter operationSubmitter) throws InterruptedException {
-		operationSubmitter.submitToExecutor( executor, workExecution, blockingRetryProducer );
+		operationSubmitter.submitToExecutor( executor, workExecution, blockingRetryProducer, ASYNC_FAILURE_REPORTER );
 	}
 
 	@Override
@@ -95,8 +98,12 @@ public class LuceneParallelWorkOrchestratorImpl
 			}
 			catch (Throwable e) {
 				context.getIndexAccessor().cleanUpAfterFailure( e, work.getInfo() );
-				result.completeExceptionally( e );
+				markAsFailed( e );
 			}
+		}
+
+		public void markAsFailed(Throwable throwable) {
+			result.completeExceptionally( throwable );
 		}
 	}
 

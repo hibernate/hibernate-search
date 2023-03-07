@@ -8,6 +8,7 @@ package org.hibernate.search.engine.backend.work.execution;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
@@ -42,14 +43,14 @@ public abstract class OperationSubmitter {
 	 * Depending on the implementation might throw {@link RejectedExecutionException} or offload the submit operation to a provided executor.
 	 */
 	public abstract <T> void submitToQueue(BlockingQueue<? super T> queue, T element,
-			Consumer<? super T> blockingRetryProducer) throws InterruptedException;
+			Consumer<? super T> blockingRetryProducer, BiConsumer<? super T, Throwable> asyncFailureReporter) throws InterruptedException;
 
 	/**
 	 * Defines how an element will be submitted to the executor.
 	 * Depending on the implementation might throw {@link RejectedExecutionException} or offload the submit operation to an offload executor.
 	 */
 	public abstract <T extends Runnable> void submitToExecutor(SimpleScheduledExecutor executor, T element,
-			Consumer<? super T> blockingRetryProducer) throws InterruptedException;
+			Consumer<? super T> blockingRetryProducer, BiConsumer<? super T, Throwable> asyncFailureReporter) throws InterruptedException;
 
 	/**
 	 * When using this submitter, dding a new element will block the thread when the underlying
@@ -82,14 +83,14 @@ public abstract class OperationSubmitter {
 	private static final class BlockingOperationSubmitter extends OperationSubmitter {
 		@Override
 		public <T> void submitToQueue(BlockingQueue<? super T> queue, T element,
-				Consumer<? super T> blockingRetryProducer)
+				Consumer<? super T> blockingRetryProducer, BiConsumer<? super T, Throwable> asyncFailureReporter)
 				throws InterruptedException {
 			queue.put( element );
 		}
 
 		@Override
 		public <T extends Runnable> void submitToExecutor(SimpleScheduledExecutor executor, T element,
-				Consumer<? super T> blockingRetryProducer) {
+				Consumer<? super T> blockingRetryProducer, BiConsumer<? super T, Throwable> asyncFailureReporter) {
 			executor.submit( element );
 		}
 	}
@@ -97,7 +98,7 @@ public abstract class OperationSubmitter {
 	private static final class RejectedExecutionExceptionOperationSubmitter extends OperationSubmitter {
 		@Override
 		public <T> void submitToQueue(BlockingQueue<? super T> queue, T element,
-				Consumer<? super T> blockingRetryProducer) {
+				Consumer<? super T> blockingRetryProducer, BiConsumer<? super T, Throwable> asyncFailureReporter) {
 			if ( !queue.offer( element ) ) {
 				throw new RejectedExecutionException();
 			}
@@ -105,7 +106,7 @@ public abstract class OperationSubmitter {
 
 		@Override
 		public <T extends Runnable> void submitToExecutor(SimpleScheduledExecutor executor, T element,
-				Consumer<? super T> blockingRetryProducer) {
+				Consumer<? super T> blockingRetryProducer, BiConsumer<? super T, Throwable> asyncFailureReporter) {
 			executor.offer( element );
 		}
 	}
@@ -118,20 +119,43 @@ public abstract class OperationSubmitter {
 		}
 
 		@Override
-		public <T> void submitToQueue(BlockingQueue<? super T> queue, T element, Consumer<? super T> blockingRetryProducer) {
+		public <T> void submitToQueue(BlockingQueue<? super T> queue, T element, Consumer<? super T> blockingRetryProducer,
+				BiConsumer<? super T, Throwable> asyncFailureReporter) {
 			if ( !queue.offer( element ) ) {
-				executor.accept( () -> blockingRetryProducer.accept( element ) );
+				this.executor.accept( new RetryAction<>( element, blockingRetryProducer, asyncFailureReporter ) );
 			}
 		}
 
 		@Override
 		public <T extends Runnable> void submitToExecutor(SimpleScheduledExecutor executor, T element,
-				Consumer<? super T> blockingRetryProducer) {
+				Consumer<? super T> blockingRetryProducer, BiConsumer<? super T, Throwable> asyncFailureReporter) {
 			try {
 				executor.offer( element );
 			}
 			catch (RejectedExecutionException e) {
-				this.executor.accept( () -> blockingRetryProducer.accept( element ) );
+				this.executor.accept( new RetryAction<>( element, blockingRetryProducer, asyncFailureReporter ) );
+			}
+		}
+
+		private static class RetryAction<T> implements Runnable {
+			private final T element;
+			private final Consumer<? super T> blockingRetryProducer;
+			private final BiConsumer<? super T, Throwable> asyncFailureReporter;
+
+			private RetryAction(T element, Consumer<? super T> blockingRetryProducer, BiConsumer<? super T, Throwable> asyncFailureReporter) {
+				this.element = element;
+				this.blockingRetryProducer = blockingRetryProducer;
+				this.asyncFailureReporter = asyncFailureReporter;
+			}
+
+			@Override
+			public void run() {
+				try {
+					blockingRetryProducer.accept( element );
+				}
+				catch (Throwable ex) {
+					asyncFailureReporter.accept( element, ex );
+				}
 			}
 		}
 	}

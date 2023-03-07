@@ -29,15 +29,15 @@ public class OperationSubmitterQueueTest {
 	public void setUp() throws Exception {
 		this.queue = new ArrayBlockingQueue<>( 2 );
 
-		OperationSubmitter.blocking().submitToQueue( queue, 1, i -> { } );
-		OperationSubmitter.blocking().submitToQueue( queue, 2, i -> { } );
+		OperationSubmitter.blocking().submitToQueue( queue, 1, i -> { }, (e, t) -> { } );
+		OperationSubmitter.blocking().submitToQueue( queue, 2, i -> { }, (e, t) -> { } );
 	}
 
 	@Test
 	public void blockingOperationSubmitterBlocksTheOperation() throws InterruptedException {
 		CompletableFuture<Boolean> future = CompletableFuture.supplyAsync( () -> {
 			try {
-				OperationSubmitter.blocking().submitToQueue( queue, 3, i -> { } );
+				OperationSubmitter.blocking().submitToQueue( queue, 3, i -> { }, (e, t) -> { } );
 			}
 			catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
@@ -60,7 +60,7 @@ public class OperationSubmitterQueueTest {
 	@Test
 	public void nonBlockingOperationSubmitterThrowsException() {
 		Integer element = 3;
-		assertThatThrownBy( () -> OperationSubmitter.rejecting().submitToQueue( queue, element, i -> { } ) )
+		assertThatThrownBy( () -> OperationSubmitter.rejecting().submitToQueue( queue, element, i -> { }, (e, t) -> { } ) )
 				.isInstanceOf( RejectedExecutionException.class );
 	}
 
@@ -68,7 +68,21 @@ public class OperationSubmitterQueueTest {
 	public void offloadingSubmitterOffloads() throws Exception {
 		// we won't submit to the queue but just make sure that work got offloaded
 		AtomicBoolean worked = new AtomicBoolean( false );
-		OperationSubmitter.offloading( Runnable::run ).submitToQueue( queue, 1, i -> { worked.set( true ); } );
+		OperationSubmitter.offloading( Runnable::run ).submitToQueue( queue, 1, i -> { worked.set( true ); }, (e, t) -> { } );
+
+		await().untilAsserted( () -> assertThat( worked ).isTrue() );
+	}
+
+	@Test
+	public void offloadingSubmitterFailsToOffloadExceptionInProducer() throws Exception {
+		AtomicBoolean worked = new AtomicBoolean( false );
+		OperationSubmitter.offloading( Runnable::run ).submitToQueue( queue, 1, i -> { throw new IllegalStateException( "fail" ); },
+				(e, t) -> {
+					assertThat( t )
+							.isInstanceOf( IllegalStateException.class )
+							.hasMessageContaining( "fail" );
+					worked.set( true );
+				} );
 
 		await().untilAsserted( () -> assertThat( worked ).isTrue() );
 	}
