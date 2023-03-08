@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.mapper.pojo.schema.management.spi;
 
+import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A schema manager for all indexes targeted by a given POJO scope.
@@ -61,5 +63,7 @@ public interface PojoScopeSchemaManager {
 		return validate( failureCollector, OperationSubmitter.blocking() );
 	}
 
+	@Incubating
+	void exportSchema(Path targetDirectory);
 
 }

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.schema.management.impl;
 
+import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
@@ -54,6 +55,11 @@ public class SearchSchemaManagerImpl implements SearchSchemaManager {
 	@Override
 	public void dropAndCreate() {
 		doOperation( PojoScopeSchemaManager::dropAndCreate );
+	}
+
+	@Override
+	public void exportSchema(Path targetDirectory) {
+		delegate.exportSchema( targetDirectory );
 	}
 
 	private void doOperation(TriFunction<PojoScopeSchemaManager, FailureCollector, OperationSubmitter, CompletableFuture<?>> operation) {

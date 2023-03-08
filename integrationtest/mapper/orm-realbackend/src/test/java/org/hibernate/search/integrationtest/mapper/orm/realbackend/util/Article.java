@@ -9,15 +9,18 @@ package org.hibernate.search.integrationtest.mapper.orm.realbackend.util;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-@Entity(name = Book.NAME)
-@Indexed
-public class Book {
-	static final String NAME = "book";
+@Entity(name = Article.NAME)
+@Indexed(backend = Article.BACKEND_NAME)
+public class Article {
+	public static final String BACKEND_NAME = "custom-backend";
+	static final String NAME = "article";
 	@Id
 	private Integer id;
 
+	@FullTextField
 	private String title;
 
 	public Integer getId() {

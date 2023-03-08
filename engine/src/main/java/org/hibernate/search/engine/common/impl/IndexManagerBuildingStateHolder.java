@@ -126,7 +126,7 @@ class IndexManagerBuildingStateHolder {
 		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
 				BACKEND_TYPE.<BeanHolder<? extends BackendFactory>>getAndMap( backendPropertySource, beanResolver::resolve )
 						.orElseGet( () -> createDefaultBackendFactory( backendPropertySource ) ) ) {
-			BackendBuildContext backendBuildContext = new BackendBuildContextImpl( rootBuildContext, tenancyMode );
+			BackendBuildContext backendBuildContext = new BackendBuildContextImpl( rootBuildContext, tenancyMode, backendNameOptional );
 
 			BackendImplementor backend = backendFactoryHolder.get().create( eventContext, backendBuildContext, backendPropertySource );
 			return new BackendInitialBuildState( eventContext, backendPropertySourceExtractor, backendBuildContext,

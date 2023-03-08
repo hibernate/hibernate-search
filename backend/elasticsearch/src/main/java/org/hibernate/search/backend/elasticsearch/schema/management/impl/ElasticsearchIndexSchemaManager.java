@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.schema.management.impl;
 
+import java.nio.file.Path;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
@@ -25,12 +27,14 @@ public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 	private final ElasticsearchSchemaDropper schemaDropper;
 	private final ElasticsearchSchemaValidator schemaValidator;
 	private final ElasticsearchSchemaMigrator schemaMigrator;
+	private final ElasticsearchSchemaExporter schemaExporter;
 
 	private final IndexNames indexNames;
 	private final IndexMetadata expectedMetadata;
 	private final ElasticsearchIndexLifecycleExecutionOptions executionOptions;
 
-	public ElasticsearchIndexSchemaManager(ElasticsearchWorkFactory workFactory,
+	public ElasticsearchIndexSchemaManager(Optional<String> backendName,
+			ElasticsearchWorkFactory workFactory,
 			ElasticsearchParallelWorkOrchestrator workOrchestrator,
 			IndexLayoutStrategy indexLayoutStrategy,
 			IndexNames indexNames, IndexMetadata expectedMetadata,
@@ -41,6 +45,7 @@ public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 		this.schemaDropper = new ElasticsearchSchemaDropper( schemaAccessor );
 		this.schemaValidator = new ElasticsearchSchemaValidator();
 		this.schemaMigrator = new ElasticsearchSchemaMigrator( schemaAccessor, schemaValidator );
+		this.schemaExporter = new ElasticsearchSchemaExporter( backendName );
 
 		this.indexNames = indexNames;
 		this.expectedMetadata = expectedMetadata;
@@ -117,5 +122,10 @@ public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 						? CompletableFuture.completedFuture( null )
 						: schemaAccessor.waitForIndexStatus( indexNames, executionOptions, operationSubmitter )
 				);
+	}
+
+	@Override
+	public void exportSchema(Path targetDirectory, String name) {
+		schemaExporter.export( targetDirectory, name, expectedMetadata );
 	}
 }
