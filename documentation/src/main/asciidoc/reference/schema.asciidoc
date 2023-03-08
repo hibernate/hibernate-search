@@ -145,6 +145,13 @@ because <<schema-management-concepts-lucene-schema,local Lucene indexes don't ha
 |[[mapper-orm-schema-management-manager-drop-and-create]]`dropAndCreate()`
 |Drops existing indexes and re-creates them and their schema.
 |<<schema-management-concepts-drop-loses-data,All indexed data will be lost>>.
+|[[mapper-orm-schema-management-manager-export-schema]]`exportSchema(Path)`
+|Exports the schema into a provided target directory. The output is backend specific.
+In case of the <<backend-elasticsearch,Elasticsearch backend>> - json files representing index mapping
+and some additional information on the index will be generated in a directory tree grouped by backends and indexed types.
+While for the <<backend-lucene,Lucene backend>>, only a file tree will be generated representing the backends and indexed types,
+as this backend does not support the schema exporting.
+|This API is still incubating and might change in the future.
 |====
 
 Below is an example using a `SearchSchemaManager` to drop and create indexes,
