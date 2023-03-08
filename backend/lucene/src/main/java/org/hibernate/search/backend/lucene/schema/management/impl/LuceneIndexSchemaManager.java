@@ -23,10 +23,13 @@ public class LuceneIndexSchemaManager implements IndexSchemaManager {
 	private final LuceneWorkFactory luceneWorkFactory;
 	private final SchemaManagementIndexManagerContext indexManagerContext;
 
+	private final LuceneSchemaExporter schemaExporter;
+
 	public LuceneIndexSchemaManager(LuceneWorkFactory luceneWorkFactory,
 			SchemaManagementIndexManagerContext indexManagerContext) {
 		this.luceneWorkFactory = luceneWorkFactory;
 		this.indexManagerContext = indexManagerContext;
+		this.schemaExporter = new LuceneSchemaExporter( indexManagerContext.backendName() );
 	}
 
 	@Override
@@ -67,7 +70,7 @@ public class LuceneIndexSchemaManager implements IndexSchemaManager {
 
 	@Override
 	public void exportSchema(Path targetDirectory, String name) {
-		throw new UnsupportedOperationException( "Implement me please! :)" );
+		this.schemaExporter.export( targetDirectory, name );
 	}
 
 	public CompletableFuture<Long> computeSizeInBytes(OperationSubmitter operationSubmitter) {
