@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.standalone.realbackend.schema.management;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.io.IOException;
@@ -19,14 +18,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
-import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class SchemaManagerExporterIT {
+public class ElasticsearchSchemaManagerExporterIT {
 
 	@Rule
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -48,9 +46,7 @@ public class SchemaManagerExporterIT {
 				.setup( Book.class, Article.class );
 
 		Path directory = temporaryFolder.newFolder().toPath();
-		try ( SearchSession session = mapping.createSession() ) {
-			session.schemaManager().exportSchema( directory );
-		}
+		mapping.scope( Object.class ).schemaManager().exportSchema( directory );
 
 		String bookIndex = Files.readString(
 				directory.resolve( "backend" ) // as we are using the default backend
@@ -152,35 +148,6 @@ public class SchemaManagerExporterIT {
 						"}",
 				articleInfo
 		);
-	}
-
-	@Test
-	public void lucene() throws IOException {
-		SearchMapping mapping = setupHelper.start()
-				.withProperty( "hibernate.search.backend.type", "lucene" )
-
-				.withProperty( "hibernate.search.backends." + Article.BACKEND_NAME + ".type", "lucene" )
-				.setup( Book.class, Article.class );
-
-		Path directory = temporaryFolder.newFolder().toPath();
-		try ( SearchSession session = mapping.createSession() ) {
-			session.schemaManager().exportSchema( directory );
-		}
-
-		String bookIndex = Files.readString(
-				directory.resolve( "backend" ) // as we are using the default backend
-						.resolve( "indexes" )
-						.resolve( Book.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
-						.resolve( "index.txt" ) );
-		assertThat( bookIndex ).isEqualTo( "The Lucene backend does not support exporting the schema." );
-
-		String articleIndex = Files.readString(
-				directory.resolve( "backends" ) // as we are not using the default backend
-						.resolve( Article.BACKEND_NAME ) // name of a backend
-						.resolve( "indexes" )
-						.resolve( Article.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
-						.resolve( "index.txt" ) );
-		assertThat( articleIndex ).isEqualTo( "The Lucene backend does not support exporting the schema." );
 	}
 
 	@Indexed(index = Book.NAME)
