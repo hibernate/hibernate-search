@@ -622,4 +622,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 156, value = "Nonblocking operation submitter is not supported.")
 	SearchException nonblockingOperationSubmitterNotSupported();
+
+	@Message(id = ID_OFFSET + 157,
+			value = "Target path '%1$s' already exists and is not an empty directory. Use a path to an empty or non-existing directory.")
+	SearchException schemaExporterTargetIsNotEmptyDirectory(Path targetDirectory);
+
+	@Message(id = ID_OFFSET + 158, value = "Unable to export the schema: %1$s" )
+	SearchException unableToExportSchema(String cause, @Cause IOException e);
 }
