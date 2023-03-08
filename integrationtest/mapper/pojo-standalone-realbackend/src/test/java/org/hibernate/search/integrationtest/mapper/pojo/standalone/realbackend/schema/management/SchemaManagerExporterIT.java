@@ -55,8 +55,7 @@ public class SchemaManagerExporterIT {
 		String bookIndex = Files.readString(
 				directory.resolve( "backend" ) // as we are using the default backend
 						.resolve( "indexes" )
-						.resolve(
-								Book.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
+						.resolve( Book.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
 						.resolve( "index.json" ) );
 		assertJsonEquals(
 				"{" +
@@ -83,12 +82,27 @@ public class SchemaManagerExporterIT {
 				bookIndex
 		);
 
+		String bookInfo = Files.readString(
+				directory.resolve( "backend" ) // as we are using the default backend
+						.resolve( "indexes" )
+						.resolve( Book.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
+						.resolve( "additional-information.json" ) );
+
+		assertJsonEquals(
+				"{" +
+						"  \"primaryIndexName\": {" +
+						"    \"encoded\": \"book-000001\"," +
+						"    \"original\": \"book-000001\"" +
+						"  }" +
+						"}",
+				bookInfo
+		);
+
 		String articleIndex = Files.readString(
 				directory.resolve( "backends" ) // as we are not using the default backend
 						.resolve( Article.BACKEND_NAME ) // name of a backend
 						.resolve( "indexes" )
-						.resolve(
-								Article.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
+						.resolve( Article.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
 						.resolve( "index.json" ) );
 		assertJsonEquals(
 				"{" +
@@ -121,6 +135,23 @@ public class SchemaManagerExporterIT {
 						"}",
 				articleIndex
 		);
+
+		String articleInfo = Files.readString(
+				directory.resolve( "backends" ) // as we are not using the default backend
+						.resolve( Article.BACKEND_NAME ) // name of a backend
+						.resolve( "indexes" )
+						.resolve( Article.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
+						.resolve( "additional-information.json" ) );
+
+		assertJsonEquals(
+				"{" +
+						"  \"primaryIndexName\": {" +
+						"    \"encoded\": \"article-000001\"," +
+						"    \"original\": \"article-000001\"" +
+						"  }" +
+						"}",
+				articleInfo
+		);
 	}
 
 	@Test
@@ -139,8 +170,7 @@ public class SchemaManagerExporterIT {
 		String bookIndex = Files.readString(
 				directory.resolve( "backend" ) // as we are using the default backend
 						.resolve( "indexes" )
-						.resolve(
-								Book.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
+						.resolve( Book.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
 						.resolve( "index.txt" ) );
 		assertThat( bookIndex ).isEqualTo( "The Lucene backend does not support exporting the schema." );
 
@@ -148,8 +178,7 @@ public class SchemaManagerExporterIT {
 				directory.resolve( "backends" ) // as we are not using the default backend
 						.resolve( Article.BACKEND_NAME ) // name of a backend
 						.resolve( "indexes" )
-						.resolve(
-								Article.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
+						.resolve( Article.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
 						.resolve( "index.txt" ) );
 		assertThat( articleIndex ).isEqualTo( "The Lucene backend does not support exporting the schema." );
 	}
