@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl;
 
+import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
@@ -60,5 +61,10 @@ public class StubIndexSchemaManager implements IndexSchemaManager {
 			OperationSubmitter operationSubmitter) {
 		StubSchemaManagementWork work = StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.VALIDATE ).build();
 		return behavior.executeSchemaManagementWork( indexName, work, failureCollector );
+	}
+
+	@Override
+	public void exportSchema(Path targetDirectory, String name) {
+		throw new UnsupportedOperationException( "Shouldn't be called" );
 	}
 }

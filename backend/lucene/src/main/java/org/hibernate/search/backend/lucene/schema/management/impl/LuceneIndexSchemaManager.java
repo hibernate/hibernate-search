@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.schema.management.impl;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BinaryOperator;
@@ -62,6 +63,11 @@ public class LuceneIndexSchemaManager implements IndexSchemaManager {
 			OperationSubmitter operationSubmitter) {
 		// We only check that the index exists, and we throw an exception if it doesn't.
 		return doSubmit( luceneWorkFactory.validateIndexExists(), operationSubmitter );
+	}
+
+	@Override
+	public void exportSchema(Path targetDirectory, String name) {
+		throw new UnsupportedOperationException( "Implement me please! :)" );
 	}
 
 	public CompletableFuture<Long> computeSizeInBytes(OperationSubmitter operationSubmitter) {

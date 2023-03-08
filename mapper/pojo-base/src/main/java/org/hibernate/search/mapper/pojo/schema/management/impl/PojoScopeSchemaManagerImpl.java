@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.schema.management.impl;
 
+import java.nio.file.Path;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
@@ -60,6 +61,17 @@ public class PojoScopeSchemaManagerImpl implements PojoScopeSchemaManager {
 	@Override
 	public CompletableFuture<?> validate(FailureCollector failureCollector, OperationSubmitter operationSubmitter) {
 		return doOperationOnTypesTriFunction( IndexSchemaManager::validate, failureCollector, operationSubmitter );
+	}
+
+	@Override
+	public void exportSchema(Path targetDirectory) {
+		for ( PojoSchemaManagementIndexedTypeContext typeContext : targetedTypeContexts ) {
+			IndexSchemaManager delegate = typeContext.schemaManager();
+			delegate.exportSchema(
+					targetDirectory,
+					typeContext.typeIdentifier().javaClass().getName()
+			);
+		}
 	}
 
 	private CompletableFuture<?> doOperationOnTypesBiFunction(
