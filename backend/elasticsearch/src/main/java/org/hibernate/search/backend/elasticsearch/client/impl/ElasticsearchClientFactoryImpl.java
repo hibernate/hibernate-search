@@ -129,6 +129,11 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 			.asBeanReference( ElasticsearchHttpClientConfigurer.class )
 			.build();
 
+	private static final OptionalConfigurationProperty<Long> MAX_KEEP_ALIVE =
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MAX_KEEP_ALIVE )
+					.asLongStrictlyPositive()
+					.build();
+
 	@Override
 	public ElasticsearchClientImplementor create(BeanResolver beanResolver, ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix,
@@ -258,6 +263,11 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 			);
 
 			builder.setDefaultCredentialsProvider( credentialsProvider );
+		}
+
+		Optional<Long> maxKeepAlive = MAX_KEEP_ALIVE.get( propertySource );
+		if ( maxKeepAlive.isPresent() ) {
+			builder.setKeepAliveStrategy( new CustomConnectionKeepAliveStrategy( maxKeepAlive.get() ) );
 		}
 
 		ElasticsearchHttpClientConfigurationContextImpl clientConfigurationContext =
