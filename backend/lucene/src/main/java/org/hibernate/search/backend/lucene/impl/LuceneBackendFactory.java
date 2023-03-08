@@ -92,6 +92,7 @@ public class LuceneBackendFactory implements BackendFactory {
 			configureQueryCache( buildContext, propertySource, cachingContext );
 
 			return new LuceneBackendImpl(
+					buildContext.backendName(),
 					eventContext,
 					backendThreads,
 					new LuceneWorkFactory( multiTenancyStrategy ),

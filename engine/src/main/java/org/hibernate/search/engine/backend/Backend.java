@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.engine.backend;
 
+import java.util.Optional;
+
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A backend as viewed by Hibernate Search users.
@@ -30,4 +33,9 @@ public interface Backend {
 	 */
 	<T> T unwrap(Class<T> clazz);
 
+	/**
+	 * @return The name of the backend. In case of a default backend - {@link Optional#empty() an empty optional}.
+	 */
+	@Incubating
+	Optional<String> name();
 }

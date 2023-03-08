@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
@@ -24,6 +25,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBa
 
 public class StubBackend implements BackendImplementor, Backend {
 
+	private final Optional<String> backendName;
 	private final EventContext eventContext;
 	private final StubBackendBehavior behavior;
 	private final TimingSource timingSource;
@@ -31,6 +33,7 @@ public class StubBackend implements BackendImplementor, Backend {
 	StubBackend(EventContext eventContext, BackendBuildContext context, StubBackendBehavior behavior,
 			CompletionStage<BackendMappingHandle> mappingHandlePromise,
 			TimingSource timingSource) {
+		this.backendName = context.backendName();
 		this.eventContext = eventContext;
 		this.behavior = behavior;
 		this.timingSource = timingSource;
@@ -65,6 +68,11 @@ public class StubBackend implements BackendImplementor, Backend {
 	@Override
 	public <T> T unwrap(Class<T> clazz) {
 		throw new AssertionFailure( getClass().getName() + " cannot be unwrapped" );
+	}
+
+	@Override
+	public Optional<String> name() {
+		return backendName;
 	}
 
 	@Override

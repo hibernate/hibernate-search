@@ -43,6 +43,8 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final Optional<String> backendName;
+
 	private final EventContext eventContext;
 
 	private final BackendThreads threads;
@@ -53,7 +55,8 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
 	private final IndexManagerBackendContext indexManagerBackendContext;
 
-	LuceneBackendImpl(EventContext eventContext,
+	LuceneBackendImpl(Optional<String> backendName,
+			EventContext eventContext,
 			BackendThreads threads,
 			LuceneWorkFactory workFactory,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
@@ -61,6 +64,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 			MultiTenancyStrategy multiTenancyStrategy,
 			TimingSource timingSource,
 			FailureHandler failureHandler) {
+		this.backendName = backendName;
 		this.eventContext = eventContext;
 		this.threads = threads;
 
@@ -113,6 +117,11 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 		throw log.backendUnwrappingWithUnknownType(
 				clazz, LuceneBackend.class, eventContext
 		);
+	}
+
+	@Override
+	public Optional<String> name() {
+		return backendName;
 	}
 
 	@Override
