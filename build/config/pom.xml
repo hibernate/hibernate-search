@@ -28,6 +28,7 @@
          -->
         <checkstyle.skip>true</checkstyle.skip>
         <forbiddenapis.skip>true</forbiddenapis.skip>
+        <format.skip>true</format.skip>
 
         <tmpdir.dependencies-javadoc-packagelists>${project.build.directory}/dependencies-javadoc-packagelists</tmpdir.dependencies-javadoc-packagelists>
     </properties>

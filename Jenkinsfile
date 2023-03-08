@@ -404,7 +404,7 @@ stage('Default build') {
 		withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
 			String mavenArgs = """ \
 					--fail-at-end \
-					-Pdist -Pcoverage -Pjqassistant \
+					-Pdist -Pcoverage -Pjqassistant -Pci-sources-check \
 					${enableDefaultBuildIT ? '' : '-DskipITs'} \
 					${toTestJdkArg(environments.content.jdk.default)} \
 			"""

@@ -695,8 +695,8 @@
 
         <!-- Formatting -->
         <format.skip>false</format.skip>
-        <goal.impsort-maven-plugin>check</goal.impsort-maven-plugin>
-        <goal.formatter-maven-plugin>validate</goal.formatter-maven-plugin>
+        <goal.impsort-maven-plugin>sort</goal.impsort-maven-plugin>
+        <goal.formatter-maven-plugin>format</goal.formatter-maven-plugin>
 
         <!-- Sonar options -->
         <!--
@@ -3114,6 +3114,14 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <profile>
+            <id>ci-sources-check</id>
+            <properties>
+                <goal.impsort-maven-plugin>check</goal.impsort-maven-plugin>
+                <goal.formatter-maven-plugin>validate</goal.formatter-maven-plugin>
+            </properties>
         </profile>
 
         <!--
