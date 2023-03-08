@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.schema.management;
 
+import java.nio.file.Path;
+
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -99,4 +101,13 @@ public interface SearchSchemaManager {
 	void dropAndCreate();
 
 
+	/**
+	 * Exports the schema into a provided target directory. The output is backend specific.
+	 * Generates a directory tree within the target directory based on the configured backends and indexed types.
+	 *
+	 * @param targetDirectory The directory to export to. Should be an empty directory.
+	 * Exporting to a non-empty directory might result in an exception.
+	 */
+	@Incubating
+	void exportSchema(Path targetDirectory);
 }
