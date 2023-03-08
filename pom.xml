@@ -407,6 +407,7 @@
         <version.com.puppycrawl.tools.checkstyle>10.9.3</version.com.puppycrawl.tools.checkstyle>
         <version.versions.plugin>2.12.0</version.versions.plugin>
         <version.maven-wrapper-plugin>3.2.0</version.maven-wrapper-plugin>
+        <version.impsort-maven-plugin>1.8.0</version.impsort-maven-plugin>
 
         <!-- Asciidoctor -->
 
@@ -690,6 +691,10 @@
         <!-- Eclipse plugin options -->
 
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
+
+        <!-- Formatting -->
+        <format.skip>false</format.skip>
+        <goal.impsort-maven-plugin>check</goal.impsort-maven-plugin>
 
         <!-- Sonar options -->
         <!--
@@ -1744,6 +1749,10 @@
                 <groupId>de.thetaphi</groupId>
                 <artifactId>forbiddenapis</artifactId>
             </plugin>
+            <plugin>
+                <groupId>net.revelc.code</groupId>
+                <artifactId>impsort-maven-plugin</artifactId>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -2386,6 +2395,35 @@
                 <plugin>
                     <artifactId>maven-antrun-plugin</artifactId>
                     <version>3.1.0</version>
+                </plugin>
+
+                <!--
+                    Code formatting configuration:
+                -->
+
+                <plugin>
+                    <groupId>net.revelc.code</groupId>
+                    <artifactId>impsort-maven-plugin</artifactId>
+                    <version>${version.impsort-maven-plugin}</version>
+                    <configuration>
+                        <!-- store outside of target to speed up formatting when mvn clean is used -->
+                        <cachedir>.cache/impsort-maven-plugin-${version.impsort-maven-plugin}</cachedir>
+                        <groups>java.,javax.,jakarta.,org.hibernate., org.hibernate.testing., org.hibernate.test., org.junit., org.jboss., com., *</groups>
+                        <staticGroups>*</staticGroups>
+                        <!-- To make static imports go on top: -->
+                        <staticAfter>false</staticAfter>
+                        <skip>${format.skip}</skip>
+                        <removeUnused>true</removeUnused>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>import-sorting</id>
+                            <goals>
+                                <goal>${goal.impsort-maven-plugin}</goal>
+                            </goals>
+                            <phase>process-sources</phase>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
