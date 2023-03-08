@@ -408,6 +408,7 @@
         <version.versions.plugin>2.12.0</version.versions.plugin>
         <version.maven-wrapper-plugin>3.2.0</version.maven-wrapper-plugin>
         <version.impsort-maven-plugin>1.8.0</version.impsort-maven-plugin>
+        <version.formatter-maven-plugin>2.22.0</version.formatter-maven-plugin>
 
         <!-- Asciidoctor -->
 
@@ -695,6 +696,7 @@
         <!-- Formatting -->
         <format.skip>false</format.skip>
         <goal.impsort-maven-plugin>check</goal.impsort-maven-plugin>
+        <goal.formatter-maven-plugin>validate</goal.formatter-maven-plugin>
 
         <!-- Sonar options -->
         <!--
@@ -1753,6 +1755,10 @@
                 <groupId>net.revelc.code</groupId>
                 <artifactId>impsort-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -2420,6 +2426,35 @@
                             <id>import-sorting</id>
                             <goals>
                                 <goal>${goal.impsort-maven-plugin}</goal>
+                            </goals>
+                            <phase>process-sources</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>net.revelc.code.formatter</groupId>
+                    <artifactId>formatter-maven-plugin</artifactId>
+                    <version>${version.formatter-maven-plugin}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.hibernate.search</groupId>
+                            <artifactId>hibernate-search-build-config</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <!-- store outside of target to speed up formatting when mvn clean is used -->
+                        <cachedir>.cache/formatter-maven-plugin-${version.formatter-maven-plugin}</cachedir>
+                        <configFile>hibernate_noorm_style.xml</configFile>
+                        <lineEnding>LF</lineEnding>
+                        <skip>${format.skip}</skip>
+                        <removeTrailingWhitespace>true</removeTrailingWhitespace>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>source-formatting</id>
+                            <goals>
+                                <goal>${goal.formatter-maven-plugin}</goal>
                             </goals>
                             <phase>process-sources</phase>
                         </execution>
