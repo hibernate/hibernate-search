@@ -45,7 +45,7 @@ public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 		this.schemaDropper = new ElasticsearchSchemaDropper( schemaAccessor );
 		this.schemaValidator = new ElasticsearchSchemaValidator();
 		this.schemaMigrator = new ElasticsearchSchemaMigrator( schemaAccessor, schemaValidator );
-		this.schemaExporter = new ElasticsearchSchemaExporter( backendName );
+		this.schemaExporter = new ElasticsearchSchemaExporter( backendName, indexLayoutStrategy );
 
 		this.indexNames = indexNames;
 		this.expectedMetadata = expectedMetadata;
@@ -126,6 +126,6 @@ public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 
 	@Override
 	public void exportSchema(Path targetDirectory, String name) {
-		schemaExporter.export( targetDirectory, name, expectedMetadata );
+		schemaExporter.export( targetDirectory, name, expectedMetadata, indexNames );
 	}
 }
