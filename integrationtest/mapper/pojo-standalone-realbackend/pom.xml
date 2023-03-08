@@ -70,6 +70,9 @@
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>lucene</org.hibernate.search.integrationtest.backend.type>
                             </systemPropertyVariables>
+                            <excludes>
+                                <exclude>org.hibernate.search.integrationtest.mapper.pojo.standalone.realbackend.schema.management.ElasticsearchSchemaManagerExporterIT</exclude>
+                            </excludes>
                         </configuration>
                     </execution>
                     <execution>
@@ -85,6 +88,9 @@
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>
                             </systemPropertyVariables>
+                            <excludes>
+                                <exclude>org.hibernate.search.integrationtest.mapper.pojo.standalone.realbackend.schema.management.LuceneSchemaManagerExporterIT</exclude>
+                            </excludes>
                         </configuration>
                     </execution>
                     <execution>

@@ -86,6 +86,7 @@
                             </systemPropertyVariables>
                             <excludes>
                                 <exclude>org.hibernate.search.integrationtest.mapper.orm.realbackend.bootstrap.BackendTypeAutoDetectMultipleBackendTypesInClasspathIT</exclude>
+                                <exclude>org.hibernate.search.integrationtest.mapper.orm.realbackend.schema.management.ElasticsearchSchemaManagerExporterIT</exclude>
                             </excludes>
                         </configuration>
                     </execution>
@@ -104,6 +105,7 @@
                             </systemPropertyVariables>
                             <excludes>
                                 <exclude>org.hibernate.search.integrationtest.mapper.orm.realbackend.bootstrap.BackendTypeAutoDetectMultipleBackendTypesInClasspathIT</exclude>
+                                <exclude>org.hibernate.search.integrationtest.mapper.orm.realbackend.schema.management.LuceneSchemaManagerExporterIT</exclude>
                             </excludes>
                         </configuration>
                     </execution>
@@ -116,6 +118,8 @@
                             <reportNameSuffix>${surefire.reportNameSuffix}-multiplebackends</reportNameSuffix>
                             <includes>
                                 <include>org.hibernate.search.integrationtest.mapper.orm.realbackend.bootstrap.BackendTypeAutoDetectMultipleBackendTypesInClasspathIT</include>
+                                <include>org.hibernate.search.integrationtest.mapper.orm.realbackend.schema.management.ElasticsearchSchemaManagerExporterIT</include>
+                                <include>org.hibernate.search.integrationtest.mapper.orm.realbackend.schema.management.LuceneSchemaManagerExporterIT</include>
                             </includes>
                         </configuration>
                     </execution>
