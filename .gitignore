@@ -47,3 +47,5 @@ nbactions.xml
 # Bitronix transaction logs
 *.btm
 
+# Cache folders for formatting plugins:
+.cache
