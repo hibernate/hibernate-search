@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.backend.spi;
 
+import java.util.Optional;
+
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -31,5 +33,7 @@ public interface BackendBuildContext {
 	TimingSource timingSource();
 
 	boolean multiTenancyEnabled();
+
+	Optional<String> backendName();
 
 }

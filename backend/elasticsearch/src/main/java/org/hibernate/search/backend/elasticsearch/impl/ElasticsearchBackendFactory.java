@@ -143,6 +143,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			indexLayoutStrategyHolder = createIndexLayoutStrategy( buildContext, propertySource );
 
 			return new ElasticsearchBackendImpl(
+					buildContext.backendName(),
 					eventContext,
 					threads, link,
 					typeFactoryProvider,

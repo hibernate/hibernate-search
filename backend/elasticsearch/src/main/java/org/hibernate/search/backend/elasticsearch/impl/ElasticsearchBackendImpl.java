@@ -88,6 +88,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 					.asString()
 					.build();
 
+	private final Optional<String> backendName;
 	private final EventContext eventContext;
 
 	private final BackendThreads threads;
@@ -104,7 +105,8 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 	private final IndexManagerBackendContext indexManagerBackendContext;
 	private final IndexNamesRegistry indexNamesRegistry;
 
-	ElasticsearchBackendImpl(EventContext eventContext,
+	ElasticsearchBackendImpl(Optional<String> backendName,
+			EventContext eventContext,
 			BackendThreads threads,
 			ElasticsearchLinkImpl link,
 			ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
@@ -113,6 +115,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 			BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder,
 			TypeNameMapping typeNameMapping,
 			FailureHandler failureHandler, TimingSource timingSource) {
+		this.backendName = backendName;
 		this.eventContext = eventContext;
 		this.threads = threads;
 		this.link = link;
@@ -173,6 +176,11 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 			return (T) this;
 		}
 		throw log.backendUnwrappingWithUnknownType( clazz, ElasticsearchBackend.class, eventContext );
+	}
+
+	@Override
+	public Optional<String> name() {
+		return backendName;
 	}
 
 	@Override
