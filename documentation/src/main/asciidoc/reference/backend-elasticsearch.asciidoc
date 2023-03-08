@@ -291,6 +291,23 @@ The default for this property is `10`.
 +
 These properties expect a positive <<configuration-property-types,Integer value>>, such as `20`.
 
+Keep Alive::
++
+[source]
+----
+hibernate.search.backend.max_keep_alive = 10000
+----
+* `max_keep_alive` defines how long connections to the Elasticsearch cluster can be kept idle.
++
+Expects a positive <<configuration-property-types,Long value>> in milliseconds, such as `60000`.
++
+If the response from an Elasticsearch cluster contains a `Keep-Alive` header,
+then the effective max idle time will be whichever is lower:
+the duration from the `Keep-Alive` header or the value of this property (if set).
++
+If this property is not set, only the `Keep-Alive` header is considered,
+and if it's absent, idle connections will be kept forever.
+
 [[backend-elasticsearch-configuration-http-client]]
 === [[_custom_http_client_configurations]] Custom HTTP client configurations
 

@@ -49,6 +49,12 @@ public final class Contracts {
 		}
 	}
 
+	public static void assertStrictlyPositive(long number, String objectDescription) {
+		if ( number <= 0 ) {
+			throw log.mustBePositiveOrZero( objectDescription );
+		}
+	}
+
 	public static void assertNotNullNorEmpty(String object, String objectDescription) {
 		if ( object == null || object.isEmpty() ) {
 			throw log.stringMustNotBeNullNorEmpty( objectDescription );

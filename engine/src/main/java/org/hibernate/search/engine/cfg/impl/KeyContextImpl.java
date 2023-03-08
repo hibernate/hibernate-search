@@ -55,6 +55,12 @@ public class KeyContextImpl implements KeyContext {
 	}
 
 	@Override
+	public OptionalPropertyContext<Long> asLongStrictlyPositive() {
+		return new OptionalPropertyContextImpl<>( key, ConvertUtils::convertLong )
+				.validate( value -> Contracts.assertStrictlyPositive( value, "value" ) );
+	}
+
+	@Override
 	public <T> OptionalPropertyContext<BeanReference<? extends T>> asBeanReference(Class<T> expectedBeanType) {
 		return new OptionalPropertyContextImpl<>( key, v -> ConvertUtils.convertBeanReference( expectedBeanType, v ) );
 	}

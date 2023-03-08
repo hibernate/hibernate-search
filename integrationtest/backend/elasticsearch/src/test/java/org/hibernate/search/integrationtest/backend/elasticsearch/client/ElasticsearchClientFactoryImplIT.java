@@ -14,6 +14,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 import static org.junit.Assume.assumeFalse;
@@ -26,9 +27,12 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -44,10 +48,10 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.engine.common.execution.spi.DelegatingSimpleScheduledExecutor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
+import org.hibernate.search.engine.common.execution.spi.DelegatingSimpleScheduledExecutor;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -83,8 +87,21 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.conn.DefaultSchemePortResolver;
+import org.apache.http.impl.conn.SystemDefaultDnsResolver;
+import org.apache.http.impl.nio.conn.ManagedNHttpClientConnectionFactory;
+import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
+import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
+import org.apache.http.nio.NHttpClientConnection;
+import org.apache.http.nio.conn.NHttpClientConnectionManager;
+import org.apache.http.nio.conn.NoopIOSessionStrategy;
+import org.apache.http.nio.conn.SchemeIOSessionStrategy;
+import org.apache.http.nio.reactor.ConnectingIOReactor;
+import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.logging.log4j.Level;
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -1005,6 +1022,108 @@ public class ElasticsearchClientFactoryImplIT {
 
 			// Hibernate Search must not close provided client instances
 			assertThat( myRestClient ).returns( true, RestClient::isRunning );
+		}
+	}
+
+	@Test
+	public void maxKeepAliveNegativeValue() {
+		assertThatThrownBy( () -> createClient(
+				properties -> {
+					properties.accept( ElasticsearchBackendSettings.MAX_KEEP_ALIVE, -1 );
+				}
+		) ).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Invalid value for configuration property",
+						"must be positive or zero"
+				);
+	}
+
+	@Test
+	public void maxKeepAliveConnectionIsNotClosed() throws InterruptedException {
+		maxKeepAliveConnection( 100000, 1 );
+	}
+
+	@Test
+	public void maxKeepAliveConnectionIsClosed() throws InterruptedException {
+		maxKeepAliveConnection( 10, 2 );
+	}
+
+	public void maxKeepAliveConnection(long time, int connections ) throws InterruptedException {
+		String payload = "{ \"foo\": \"bar\" }";
+		String statusMessage = "StatusMessage";
+		String responseBody = "{ \"foo\": \"bar\" }";
+		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.andMatching( httpProtocol() )
+				.willReturn( elasticsearchResponse().withStatus( 200 )
+						.withStatusMessage( statusMessage )
+						.withBody( responseBody ) ) );
+
+		Set<String> usedConnections = Collections.synchronizedSet( new HashSet<>() );
+		try ( ElasticsearchClientImplementor client = createClient( properties -> {
+			properties.accept(
+					ElasticsearchBackendSettings.CLIENT_CONFIGURER,
+					(ElasticsearchHttpClientConfigurer) context -> {
+						context.clientBuilder().setConnectionManager( createPoolManager( usedConnections ) );
+					}
+			);
+			properties.accept( ElasticsearchBackendSettings.MAX_KEEP_ALIVE, time );
+		} ) ) {
+
+			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
+			assertJsonEquals( responseBody, result.body().toString() );
+
+			wireMockRule1.verify(
+					postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
+							.andMatching( httpProtocol() )
+			);
+
+			TimeUnit.SECONDS.sleep( 2 );
+
+			result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
+			assertJsonEquals( responseBody, result.body().toString() );
+
+			wireMockRule1.verify(
+					postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
+							.andMatching( httpProtocol() )
+			);
+
+			assertThat( usedConnections ).hasSize( connections );
+		}
+	}
+
+	private NHttpClientConnectionManager createPoolManager(Set<String> connections) {
+		try {
+			ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor(
+					IOReactorConfig.DEFAULT,
+					threadPoolProvider.threadProvider().createThreadFactory( getClass().getSimpleName() + " - " )
+			);
+			return new PoolingNHttpClientConnectionManager(
+					ioReactor,
+					ManagedNHttpClientConnectionFactory.INSTANCE,
+					RegistryBuilder.<SchemeIOSessionStrategy>create()
+							.register( "http", NoopIOSessionStrategy.INSTANCE )
+							.build(),
+					DefaultSchemePortResolver.INSTANCE,
+					SystemDefaultDnsResolver.INSTANCE,
+					-1,
+					TimeUnit.MILLISECONDS
+			) {
+				@Override
+				public void releaseConnection(NHttpClientConnection managedConn, Object state,
+						long keepalive, TimeUnit timeUnit) {
+					connections.add( managedConn.toString() );
+					super.releaseConnection( managedConn, state, keepalive, timeUnit );
+				}
+			};
+		}
+		catch (IOReactorException e) {
+			fail( "Cannot create a pool manager for tests: " + e.getMessage(), e );
+			throw new IllegalStateException( e );
 		}
 	}
 

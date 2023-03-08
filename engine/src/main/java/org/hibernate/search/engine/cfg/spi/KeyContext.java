@@ -41,6 +41,8 @@ public interface KeyContext {
 
 	OptionalPropertyContext<Long> asLongPositiveOrZeroOrNegative();
 
+	OptionalPropertyContext<Long> asLongStrictlyPositive();
+
 	<T> OptionalPropertyContext<BeanReference<? extends T>> asBeanReference(Class<T> expectedBeanType);
 
 	<T> OptionalPropertyContext<T> as(Class<T> expectedType, Function<String, T> parser);

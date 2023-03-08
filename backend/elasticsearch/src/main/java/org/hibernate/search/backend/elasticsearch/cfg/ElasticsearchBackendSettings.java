@@ -342,6 +342,21 @@ public final class ElasticsearchBackendSettings {
 	public static final String SCROLL_TIMEOUT = "scroll_timeout";
 
 	/**
+	 * How long connections to the Elasticsearch cluster can be kept idle.
+	 * <p>
+	 * Expects a positive Long value of milliseconds, such as 60000,
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * If the response from an Elasticsearch cluster contains a {@code Keep-Alive} header,
+	 * then the effective max idle time will be whichever is lower:
+	 * the duration from the {@code Keep-Alive} header or the value of this property (if set).
+	 * <p>
+	 * If this property is not set, only the {@code Keep-Alive} header is considered,
+	 * and if it's absent, idle connections will be kept forever.
+	 */
+	public static final String MAX_KEEP_ALIVE = "max_keep_alive";
+
+	/**
 	 * Default values for the different settings if no values are given.
 	 */
 	public static final class Defaults {
