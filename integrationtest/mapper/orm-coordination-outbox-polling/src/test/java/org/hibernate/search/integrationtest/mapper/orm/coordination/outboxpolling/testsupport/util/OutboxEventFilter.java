@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -135,7 +136,9 @@ public class OutboxEventFilter {
 
 		@Override
 		public void setParams(Query<?> query) {
-			query.setParameter( "ids", allowedIds );
+			// HSEARCH-4818: copy the values so that they don't change
+			// between the binding and when the query actually executes.
+			query.setParameter( "ids", new ArrayList<>( allowedIds ) );
 		}
 	}
 
