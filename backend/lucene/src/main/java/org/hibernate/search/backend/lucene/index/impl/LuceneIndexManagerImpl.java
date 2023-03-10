@@ -28,13 +28,13 @@ import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
-import org.hibernate.search.engine.common.resources.spi.SavedState;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.common.resources.spi.SavedState;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.spi.SearchIndexIdentifierContext;
 import org.hibernate.search.util.common.impl.Closer;
@@ -71,7 +71,7 @@ public class LuceneIndexManagerImpl
 		this.indexEntryFactory = indexEntryFactory;
 
 		this.shardHolder = new ShardHolder( backendContext, model );
-		this.schemaManager = backendContext.createSchemaManager( shardHolder );
+		this.schemaManager = backendContext.createSchemaManager( indexName, shardHolder );
 	}
 
 	@Override

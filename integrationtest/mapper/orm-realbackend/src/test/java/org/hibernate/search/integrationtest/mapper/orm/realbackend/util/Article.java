@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 @Indexed(backend = Article.BACKEND_NAME)
 public class Article {
 	public static final String BACKEND_NAME = "custom-backend";
-	static final String NAME = "article";
+	public static final String NAME = "article";
 	@Id
 	private Integer id;
 

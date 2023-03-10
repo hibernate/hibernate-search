@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.realbackend.schema.management;
 
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect.isActualVersion;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
+import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEqualsIgnoringUnknownFields;
+import static org.junit.Assume.assumeFalse;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,6 +20,7 @@ import org.hibernate.search.integrationtest.mapper.orm.realbackend.testsupport.B
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.util.Article;
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.util.Book;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.Rule;
@@ -34,25 +38,31 @@ public class ElasticsearchSchemaManagerExporterIT {
 
 	@Test
 	public void elasticsearch() throws IOException {
+		assumeFalse(
+				"Older versions of Elasticsearch would not match the mappings",
+				isActualVersion(
+						esVersion -> esVersion.isLessThan( "7.0" ),
+						osVersion -> false
+				)
+		);
+		String version = ElasticsearchTestDialect.getActualVersion().versionString();
 		entityManagerFactory = setupHelper.start()
+				// so that we don't try to do anything with the schema and allow to run without ES being up:
+				.withProperty( "hibernate.search.schema_management.strategy", "none" )
+
 				.withProperty( "hibernate.search.backend.type", "elasticsearch" )
 				.withProperty( "hibernate.search.backend.version_check.enabled", false )
-				.withProperty( "hibernate.search.backend.version", "8.6" )
+				.withProperty( "hibernate.search.backend.version", version )
 
 				.withProperty( "hibernate.search.backends." + Article.BACKEND_NAME + ".type", "elasticsearch" )
 				.withProperty( "hibernate.search.backends." + Article.BACKEND_NAME + ".version_check.enabled", false )
-				.withProperty( "hibernate.search.backends." + Article.BACKEND_NAME + ".version", "8.6" )
+				.withProperty( "hibernate.search.backends." + Article.BACKEND_NAME + ".version", version )
 				.setup( Book.class, Article.class );
 
 		Path directory = temporaryFolder.newFolder().toPath();
-		Search.mapping( entityManagerFactory ).scope( Object.class ).schemaManager().exportSchema( directory );
+		Search.mapping( entityManagerFactory ).scope( Object.class ).schemaManager().exportExpectedSchema( directory );
 
-		String bookIndex = Files.readString(
-				directory.resolve( "backend" ) // as we are using the default backend
-						.resolve( "indexes" )
-						.resolve( Book.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
-						.resolve( "index.json" ) );
-		assertJsonEquals(
+		assertJsonEqualsIgnoringUnknownFields(
 				"{" +
 						"  \"aliases\": {" +
 						"    \"book-write\": {" +
@@ -62,7 +72,7 @@ public class ElasticsearchSchemaManagerExporterIT {
 						"      \"is_write_index\": false" +
 						"    }" +
 						"  }," +
-						"  \"mapping\": {" +
+						"  \"mappings\": {" +
 						"    \"properties\": {" +
 						"      \"_entity_type\": {" +
 						"        \"type\": \"keyword\"," +
@@ -74,31 +84,22 @@ public class ElasticsearchSchemaManagerExporterIT {
 						"  }," +
 						"  \"settings\": {}" +
 						"}",
-				bookIndex
+				Files.readString(
+						directory.resolve( "backend" ) // as we are using the default backend
+								.resolve( "indexes" )
+								.resolve( Book.NAME )
+								.resolve( "create-index.json" ) )
 		);
-
-		String bookInfo = Files.readString(
-				directory.resolve( "backend" ) // as we are using the default backend
-						.resolve( "indexes" )
-						.resolve( Book.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
-						.resolve( "additional-information.json" ) );
 
 		assertJsonEquals(
-				"{" +
-						"  \"primaryIndexName\": {" +
-						"    \"encoded\": \"book-000001\"," +
-						"    \"original\": \"book-000001\"" +
-						"  }" +
-						"}",
-				bookInfo
+				"{}",
+				Files.readString(
+						directory.resolve( "backend" ) // as we are using the default backend
+								.resolve( "indexes" )
+								.resolve( Book.NAME )
+								.resolve( "create-index-query-params.json" ) )
 		);
 
-		String articleIndex = Files.readString(
-				directory.resolve( "backends" ) // as we are not using the default backend
-						.resolve( Article.BACKEND_NAME ) // name of a backend
-						.resolve( "indexes" )
-						.resolve( Article.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
-						.resolve( "index.json" ) );
 		assertJsonEquals(
 				"{" +
 						"  \"aliases\": {" +
@@ -109,7 +110,7 @@ public class ElasticsearchSchemaManagerExporterIT {
 						"      \"is_write_index\": false" +
 						"    }" +
 						"  }," +
-						"  \"mapping\": {" +
+						"  \"mappings\": {" +
 						"    \"properties\": {" +
 						"      \"_entity_type\": {" +
 						"        \"type\": \"keyword\"," +
@@ -128,24 +129,22 @@ public class ElasticsearchSchemaManagerExporterIT {
 						"  }," +
 						"  \"settings\": {}" +
 						"}",
-				articleIndex
+				Files.readString(
+						directory.resolve( "backends" ) // as we are not using the default backend
+								.resolve( Article.BACKEND_NAME ) // name of a backend
+								.resolve( "indexes" )
+								.resolve( Article.NAME )
+								.resolve( "create-index.json" ) )
 		);
 
-		String articleInfo = Files.readString(
-				directory.resolve( "backends" ) // as we are not using the default backend
-						.resolve( Article.BACKEND_NAME ) // name of a backend
-						.resolve( "indexes" )
-						.resolve( Article.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
-						.resolve( "additional-information.json" ) );
-
 		assertJsonEquals(
-				"{" +
-						"  \"primaryIndexName\": {" +
-						"    \"encoded\": \"article-000001\"," +
-						"    \"original\": \"article-000001\"" +
-						"  }" +
-						"}",
-				articleInfo
+				"{}",
+				Files.readString(
+						directory.resolve( "backends" ) // as we are not using the default backend
+								.resolve( Article.BACKEND_NAME ) // name of a backend
+								.resolve( "indexes" )
+								.resolve( Article.NAME )
+								.resolve( "create-index-query-params.json" ) )
 		);
 	}
 }

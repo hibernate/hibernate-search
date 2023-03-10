@@ -10,12 +10,13 @@ import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.mapper.pojo.schema.management.SearchSchemaCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
+import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojoEventContextMessages;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
-import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.util.common.function.TriFunction;
 import org.hibernate.search.util.common.impl.Futures;
 
@@ -58,8 +59,13 @@ public class SearchSchemaManagerImpl implements SearchSchemaManager {
 	}
 
 	@Override
-	public void exportSchema(Path targetDirectory) {
-		delegate.exportSchema( targetDirectory );
+	public void exportExpectedSchema(SearchSchemaCollector collector) {
+		delegate.exportExpectedSchema( collector );
+	}
+
+	@Override
+	public void exportExpectedSchema(Path targetDirectory) {
+		delegate.exportExpectedSchema( targetDirectory );
 	}
 
 	private void doOperation(TriFunction<PojoScopeSchemaManager, FailureCollector, OperationSubmitter, CompletableFuture<?>> operation) {

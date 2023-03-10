@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.mapper.pojo.schema.management.SearchSchemaCollector;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -64,6 +65,9 @@ public interface PojoScopeSchemaManager {
 	}
 
 	@Incubating
-	void exportSchema(Path targetDirectory);
+	void exportExpectedSchema(SearchSchemaCollector collector);
+
+	@Incubating
+	void exportExpectedSchema(Path targetDirectory);
 
 }

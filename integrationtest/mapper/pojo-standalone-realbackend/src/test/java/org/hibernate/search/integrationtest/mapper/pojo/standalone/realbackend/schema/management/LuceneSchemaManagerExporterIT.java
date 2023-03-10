@@ -42,21 +42,21 @@ public class LuceneSchemaManagerExporterIT {
 				.setup( Book.class, Article.class );
 
 		Path directory = temporaryFolder.newFolder().toPath();
-		mapping.scope( Object.class ).schemaManager().exportSchema( directory );
+		mapping.scope( Object.class ).schemaManager().exportExpectedSchema( directory );
 
 		String bookIndex = Files.readString(
 				directory.resolve( "backend" ) // as we are using the default backend
 						.resolve( "indexes" )
-						.resolve( Book.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
-						.resolve( "index.txt" ) );
+						.resolve( Book.NAME )
+						.resolve( "no-schema.txt" ) );
 		assertThat( bookIndex ).isEqualTo( "The Lucene backend does not support exporting the schema." );
 
 		String articleIndex = Files.readString(
 				directory.resolve( "backends" ) // as we are not using the default backend
 						.resolve( Article.BACKEND_NAME ) // name of a backend
 						.resolve( "indexes" )
-						.resolve( Article.class.getName() ) // we use FQN as who knows maybe someone will decide to have same class names in different packages
-						.resolve( "index.txt" ) );
+						.resolve( Article.NAME )
+						.resolve( "no-schema.txt" ) );
 		assertThat( articleIndex ).isEqualTo( "The Lucene backend does not support exporting the schema." );
 	}
 
@@ -85,7 +85,7 @@ public class LuceneSchemaManagerExporterIT {
 		}
 	}
 
-	@Indexed(index = Article.NAME, backend = Article.BACKEND_NAME )
+	@Indexed(index = Article.NAME, backend = Article.BACKEND_NAME)
 	public class Article {
 		public static final String BACKEND_NAME = "custom-backend";
 		static final String NAME = "article";

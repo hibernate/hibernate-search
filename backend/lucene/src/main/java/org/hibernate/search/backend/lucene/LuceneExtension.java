@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.schema.management.LuceneIndexSchemaExport;
 import org.hibernate.search.backend.lucene.scope.LuceneIndexScope;
 import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAggregationFactory;
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
@@ -25,6 +26,8 @@ import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryExtension;
+import org.hibernate.search.engine.common.schema.management.SchemaExport;
+import org.hibernate.search.engine.common.schema.management.SchemaExportExtension;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
@@ -72,7 +75,8 @@ public final class LuceneExtension<H, R, E, LOS>
 		SearchProjectionFactoryExtension<LuceneSearchProjectionFactory<R, E>, R, E>,
 		SearchAggregationFactoryExtension<LuceneSearchAggregationFactory>,
 		IndexFieldTypeFactoryExtension<LuceneIndexFieldTypeFactory>,
-		IndexScopeExtension<LuceneIndexScope> {
+		IndexScopeExtension<LuceneIndexScope>,
+		SchemaExportExtension<LuceneIndexSchemaExport> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -210,6 +214,19 @@ public final class LuceneExtension<H, R, E, LOS>
 	public LuceneIndexScope extendOrFail(IndexScope original) {
 		if ( original instanceof LuceneIndexScope ) {
 			return (LuceneIndexScope) original;
+		}
+		else {
+			throw log.luceneExtensionOnUnknownType( original );
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public LuceneIndexSchemaExport extendOrFail(SchemaExport original) {
+		if ( original instanceof LuceneIndexSchemaExport ) {
+			return (LuceneIndexSchemaExport) original;
 		}
 		else {
 			throw log.luceneExtensionOnUnknownType( original );

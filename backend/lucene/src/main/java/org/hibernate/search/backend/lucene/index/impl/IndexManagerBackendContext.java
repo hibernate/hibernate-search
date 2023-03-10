@@ -190,8 +190,8 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		}
 	}
 
-	LuceneIndexSchemaManager createSchemaManager(SchemaManagementIndexManagerContext context) {
-		return new LuceneIndexSchemaManager( workFactory, context );
+	LuceneIndexSchemaManager createSchemaManager(String indexName, SchemaManagementIndexManagerContext context) {
+		return new LuceneIndexSchemaManager( indexName, workFactory, context );
 	}
 
 	IndexAccessorImpl createIndexAccessor(LuceneIndexModel model, EventContext shardEventContext,

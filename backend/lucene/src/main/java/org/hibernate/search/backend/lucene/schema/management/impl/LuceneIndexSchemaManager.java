@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.schema.management.impl;
 
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BinaryOperator;
@@ -14,6 +13,7 @@ import java.util.function.BinaryOperator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
+import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaCollector;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
@@ -22,14 +22,13 @@ public class LuceneIndexSchemaManager implements IndexSchemaManager {
 
 	private final LuceneWorkFactory luceneWorkFactory;
 	private final SchemaManagementIndexManagerContext indexManagerContext;
+	private final LuceneIndexSchemaExportImpl export;
 
-	private final LuceneSchemaExporter schemaExporter;
-
-	public LuceneIndexSchemaManager(LuceneWorkFactory luceneWorkFactory,
+	public LuceneIndexSchemaManager(String indexName, LuceneWorkFactory luceneWorkFactory,
 			SchemaManagementIndexManagerContext indexManagerContext) {
 		this.luceneWorkFactory = luceneWorkFactory;
 		this.indexManagerContext = indexManagerContext;
-		this.schemaExporter = new LuceneSchemaExporter( indexManagerContext.backendName() );
+		this.export = new LuceneIndexSchemaExportImpl( indexName );
 	}
 
 	@Override
@@ -69,8 +68,8 @@ public class LuceneIndexSchemaManager implements IndexSchemaManager {
 	}
 
 	@Override
-	public void exportSchema(Path targetDirectory, String name) {
-		this.schemaExporter.export( targetDirectory, name );
+	public void exportExpectedSchema(IndexSchemaCollector collector) {
+		collector.indexSchema( indexManagerContext.backendName(), this.export.indexName(), this.export );
 	}
 
 	public CompletableFuture<Long> computeSizeInBytes(OperationSubmitter operationSubmitter) {

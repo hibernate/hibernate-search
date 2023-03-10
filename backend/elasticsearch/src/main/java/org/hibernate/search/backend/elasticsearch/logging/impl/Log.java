@@ -8,7 +8,6 @@
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -733,10 +732,6 @@ public interface Log extends BasicLogger {
 					+ " The document was probably indexed with a different configuration: full reindexing is necessary.")
 	SearchException unexpectedMappedTypeNameForByMappedTypeProjection(String typeName, Set<String> expectedTypeNames);
 
-	@Message(id = ID_OFFSET + 157,
-			value = "Target path '%1$s' already exists and is not an empty directory. Use a path to an empty or non-existing directory.")
-	SearchException schemaExporterTargetIsNotEmptyDirectory(Path targetDirectory);
-
-	@Message(id = ID_OFFSET + 158, value = "Unable to export the schema: %1$s" )
-	SearchException unableToExportSchema(String cause, @Cause IOException e);
+	@Message(id = ID_OFFSET + 157, value = "Unable to export the schema for '%1$s' index: %2$s" )
+	SearchException unableToExportSchema(String indexName, String message, @Cause IOException e);
 }

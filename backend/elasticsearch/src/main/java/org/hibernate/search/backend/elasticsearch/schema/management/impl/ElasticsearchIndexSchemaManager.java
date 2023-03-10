@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.schema.management.impl;
 
-import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -16,9 +15,12 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetad
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
+import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaCollector;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
+
+import com.google.gson.Gson;
 
 public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 
@@ -32,8 +34,10 @@ public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 	private final IndexNames indexNames;
 	private final IndexMetadata expectedMetadata;
 	private final ElasticsearchIndexLifecycleExecutionOptions executionOptions;
+	private final Optional<String> backendName;
 
 	public ElasticsearchIndexSchemaManager(Optional<String> backendName,
+			Gson userFacingGson,
 			ElasticsearchWorkFactory workFactory,
 			ElasticsearchParallelWorkOrchestrator workOrchestrator,
 			IndexLayoutStrategy indexLayoutStrategy,
@@ -45,11 +49,12 @@ public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 		this.schemaDropper = new ElasticsearchSchemaDropper( schemaAccessor );
 		this.schemaValidator = new ElasticsearchSchemaValidator();
 		this.schemaMigrator = new ElasticsearchSchemaMigrator( schemaAccessor, schemaValidator );
-		this.schemaExporter = new ElasticsearchSchemaExporter( backendName, indexLayoutStrategy );
+		this.schemaExporter = new ElasticsearchSchemaExporter( userFacingGson, workFactory, indexLayoutStrategy );
 
 		this.indexNames = indexNames;
 		this.expectedMetadata = expectedMetadata;
 		this.executionOptions = executionOptions;
+		this.backendName = backendName;
 	}
 
 	@Override
@@ -125,7 +130,8 @@ public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 	}
 
 	@Override
-	public void exportSchema(Path targetDirectory, String name) {
-		schemaExporter.export( targetDirectory, name, expectedMetadata, indexNames );
+	public void exportExpectedSchema(IndexSchemaCollector collector) {
+		collector.indexSchema(
+				backendName, indexNames.hibernateSearchIndex(), schemaExporter.export( expectedMetadata, indexNames ) );
 	}
 }
