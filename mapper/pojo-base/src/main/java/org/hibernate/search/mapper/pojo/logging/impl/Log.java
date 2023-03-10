@@ -6,12 +6,17 @@
  */
 package org.hibernate.search.mapper.pojo.logging.impl;
 
+import static org.hibernate.search.mapper.pojo.search.definition.impl.PojoConstructorProjectionDefinition.ProjectionConstructorPath;
+import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.INFO;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -36,8 +41,8 @@ import org.hibernate.search.mapper.pojo.search.definition.impl.ConstructorProjec
 import org.hibernate.search.mapper.pojo.search.definition.impl.PojoConstructorProjectionDefinition;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.data.impl.LinkedNode;
-import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormatter;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
+import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormatter;
 import org.hibernate.search.util.common.logging.impl.EventContextFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.SimpleNameClassFormatter;
@@ -47,10 +52,6 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
-
-import static org.hibernate.search.mapper.pojo.search.definition.impl.PojoConstructorProjectionDefinition.ProjectionConstructorPath;
-import static org.jboss.logging.Logger.Level.ERROR;
-import static org.jboss.logging.Logger.Level.INFO;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
@@ -779,4 +780,11 @@ public interface Log extends BasicLogger {
 			value = "%1$s failures went unreported for this operation to avoid flooding."
 					+ " To disable flooding protection, use 'massIndexer.failureFloodingThreshold(Long.MAX_VALUE)'.")
 	SearchException notReportedFailures(long count);
+
+	@Message(id = ID_OFFSET + 126,
+			value = "Target path '%1$s' already exists and is not an empty directory. Use a path to an empty or non-existing directory.")
+	SearchException schemaExporterTargetIsNotEmptyDirectory(Path targetDirectory);
+
+	@Message(id = ID_OFFSET + 127, value = "Unable to export the schema: %1$s" )
+	SearchException unableToExportSchema(String cause, @Cause Exception e, @Param EventContext context);
 }

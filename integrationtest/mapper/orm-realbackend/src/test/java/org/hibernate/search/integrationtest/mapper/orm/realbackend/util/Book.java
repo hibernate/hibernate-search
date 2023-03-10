@@ -14,7 +14,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 @Entity(name = Book.NAME)
 @Indexed
 public class Book {
-	static final String NAME = "book";
+	public static final String NAME = "book";
 	@Id
 	private Integer id;
 

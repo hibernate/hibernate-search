@@ -183,6 +183,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		IndexMetadata expectedMetadata = builder.build();
 		return new ElasticsearchIndexSchemaManager(
 				backendAPI.name(),
+				userFacingGson,
 				link.getWorkFactory(), generalPurposeOrchestrator,
 				indexLayoutStrategy, model.names(), expectedMetadata,
 				lifecycleExecutionOptions

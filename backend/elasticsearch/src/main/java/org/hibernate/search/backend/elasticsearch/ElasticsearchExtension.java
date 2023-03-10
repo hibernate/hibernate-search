@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaExport;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.ElasticsearchSearchAggregationFactory;
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.projection.dsl.ElasticsearchSearchProjectionFactory;
@@ -22,6 +23,8 @@ import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFi
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryExtension;
+import org.hibernate.search.engine.common.schema.management.SchemaExport;
+import org.hibernate.search.engine.common.schema.management.SchemaExportExtension;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
@@ -68,7 +71,8 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 		SearchSortFactoryExtension<ElasticsearchSearchSortFactory>,
 		SearchProjectionFactoryExtension<ElasticsearchSearchProjectionFactory<R, E>, R, E>,
 		SearchAggregationFactoryExtension<ElasticsearchSearchAggregationFactory>,
-		IndexFieldTypeFactoryExtension<ElasticsearchIndexFieldTypeFactory> {
+		IndexFieldTypeFactoryExtension<ElasticsearchIndexFieldTypeFactory>,
+		SchemaExportExtension<ElasticsearchIndexSchemaExport> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -194,6 +198,19 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	public ElasticsearchIndexFieldTypeFactory extendOrFail(IndexFieldTypeFactory original) {
 		if ( original instanceof ElasticsearchIndexFieldTypeFactory ) {
 			return (ElasticsearchIndexFieldTypeFactory) original;
+		}
+		else {
+			throw log.elasticsearchExtensionOnUnknownType( original );
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ElasticsearchIndexSchemaExport extendOrFail(SchemaExport original) {
+		if ( original instanceof ElasticsearchIndexSchemaExport ) {
+			return ( (ElasticsearchIndexSchemaExport) original );
 		}
 		else {
 			throw log.elasticsearchExtensionOnUnknownType( original );

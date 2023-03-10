@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.backend.schema.management.spi;
 
-import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
@@ -100,14 +99,8 @@ public interface IndexSchemaManager {
 	CompletableFuture<?> validate(ContextualFailureCollector failureCollector, OperationSubmitter operationSubmitter);
 
 	/**
-	 * Exports the generated schema based on the requirements expressed by the mapper into provided target directory.
-	 * <p>
-	 * Export results are backend specific.
-	 *
-	 * @param targetDirectory The directory to export to. Should be an empty directory.
-	 * Exporting to a non-empty directory might result in an exception.
-	 * @param name The name of the folder that will contain all files for the index represented by this schema manager.
+	 * Accepts a collector that will receive the schema export represented by this index schema manager.
 	 */
 	@Incubating
-	void exportSchema(Path targetDirectory, String name);
+	void exportExpectedSchema(IndexSchemaCollector collector);
 }

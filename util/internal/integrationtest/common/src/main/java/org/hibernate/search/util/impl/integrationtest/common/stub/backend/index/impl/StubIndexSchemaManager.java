@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl;
 
-import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaCollector;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
@@ -64,7 +64,7 @@ public class StubIndexSchemaManager implements IndexSchemaManager {
 	}
 
 	@Override
-	public void exportSchema(Path targetDirectory, String name) {
+	public void exportExpectedSchema(IndexSchemaCollector collector) {
 		throw new UnsupportedOperationException( "Shouldn't be called" );
 	}
 }

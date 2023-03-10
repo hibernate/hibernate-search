@@ -45,6 +45,10 @@ public abstract class AbstractNonBulkableWork<R> implements NonBulkableWork<R> {
 				.toString();
 	}
 
+	public ElasticsearchRequest request() {
+		return request;
+	}
+
 	@Override
 	public final CompletableFuture<R> execute(ElasticsearchWorkExecutionContext executionContext) {
 		return Futures.create( () -> beforeExecute( executionContext, request ) )
