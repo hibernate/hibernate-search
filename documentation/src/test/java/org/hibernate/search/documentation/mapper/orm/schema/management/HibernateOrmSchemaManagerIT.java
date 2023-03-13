@@ -9,20 +9,30 @@ package org.hibernate.search.documentation.mapper.orm.schema.management;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
+import org.hibernate.search.engine.common.schema.management.SchemaExport;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.pojo.schema.management.SearchSchemaCollector;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class HibernateOrmSchemaManagerIT {
 
@@ -31,6 +41,9 @@ public class HibernateOrmSchemaManagerIT {
 
 	@Rule
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
+
+	@Rule
+	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	private EntityManagerFactory entityManagerFactory;
 
@@ -81,6 +94,65 @@ public class HibernateOrmSchemaManagerIT {
 				Thread.currentThread().interrupt();
 			}
 			assertBookCount( entityManager, NUMBER_OF_BOOKS );
+		} );
+	}
+
+	@Test
+	public void walkingTheSchema() {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			List<String> indexNames = new ArrayList<>();
+			// tag::walking-the-schema[]
+			SearchSchemaManager schemaManager = searchSession.schemaManager(); // <1>
+			schemaManager.exportExpectedSchema(
+					new SearchSchemaCollector() { // <2>
+						@Override
+						public void indexSchema(Optional<String> backendName, String indexName, SchemaExport export) {
+							String name = backendName.orElse( "default" ) + ":" + indexName; // <3>
+							// perform any other actions with an index schema export
+							// end::walking-the-schema[]
+							indexNames.add( indexName );
+							// tag::walking-the-schema[]
+						}
+					}
+			);
+			// end::walking-the-schema[]
+			assertThat( indexNames ).containsOnly( Book.class.getSimpleName(), Author.class.getSimpleName() );
+		} );
+	}
+
+	@Test
+	public void exportSchemaToFiles() throws IOException {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			Path targetDirectory = temporaryFolder.newFolder().toPath();
+
+			// tag::schema-export[]
+			SearchSchemaManager schemaManager = searchSession.schemaManager(); // <1>
+			schemaManager.exportExpectedSchema( targetDirectory ); // <2>
+			// end::schema-export[]
+
+			assertThat( Files.list( targetDirectory.resolve( "backend" )
+							.resolve( "indexes" )
+							.resolve( Book.class.getSimpleName() ) )
+					.map( f -> f.getFileName().toString() )
+					.collect( Collectors.toSet() ) )
+					.containsAnyOf(
+							"create-index.json",
+							"create-index-query-params.json",
+							"no-schema.txt"
+					);
+
+			assertThat( Files.list( targetDirectory.resolve( "backend" )
+							.resolve( "indexes" )
+							.resolve( Author.class.getSimpleName() ) )
+					.map( f -> f.getFileName().toString() )
+					.collect( Collectors.toSet() ) )
+					.containsAnyOf(
+							"create-index.json",
+							"create-index-query-params.json",
+							"no-schema.txt"
+					);
 		} );
 	}
 

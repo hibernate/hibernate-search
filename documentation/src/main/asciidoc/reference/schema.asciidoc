@@ -145,13 +145,6 @@ because <<schema-management-concepts-lucene-schema,local Lucene indexes don't ha
 |[[mapper-orm-schema-management-manager-drop-and-create]]`dropAndCreate()`
 |Drops existing indexes and re-creates them and their schema.
 |<<schema-management-concepts-drop-loses-data,All indexed data will be lost>>.
-|[[mapper-orm-schema-management-manager-export-schema]]`exportSchema(Path)`
-|Exports the schema into a provided target directory. The output is backend specific.
-In case of the <<backend-elasticsearch,Elasticsearch backend>> - json files representing index mapping
-and some additional information on the index will be generated in a directory tree grouped by backends and indexed types.
-While for the <<backend-lucene,Lucene backend>>, only a file tree will be generated representing the backends and indexed types,
-as this backend does not support the schema exporting.
-|This API is still incubating and might change in the future.
 |====
 
 Below is an example using a `SearchSchemaManager` to drop and create indexes,
@@ -265,3 +258,85 @@ on an AWS Elasticsearch cluster.
 The only workaround is to avoid the schema update on AWS.
 It should be avoided in production environments regardless:
 see <<schema-management-concepts-update-failure>>.
+
+
+[[schema-management-export]]
+== Exporting the schema
+
+[[schema-management-export-filesystem]]
+=== Exporting the schema to a set of files
+
+The <<mapper-orm-schema-management-manager,schema manager>> provides a way to export schemas to the filesystem.
+The output is backend-specific.
+
+[NOTE]
+====
+Schema exports are constructed based on the mapping information and configurations (e.g. such as the backend version).
+Resulting exports are not compared to or validated against the actual backend schema.
+====
+
+For Elasticsearch, the files provide the necessary information to create indexes (along with their settings and mapping).
+The file tree structure of an export is shown below:
+[source]
+----
+# For the default backend the index schema will be written to:
+.../backend/indexes/<index name>/create-index.json
+.../backend/indexes/<index name>/create-index-query-params.json
+# For additional named backends:
+.../backends/<name of a particular backend>/indexes/<index name>/create-index.json
+.../backends/<name of a particular backend>/indexes/<index name>/create-index-query-params.json
+----
+
+.Exporting the schema to the filesystem
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/schema/management/HibernateOrmSchemaManagerIT.java[tags=schema-export]
+----
+<1> Retrieve the `SearchSchemaManager` from a `SearchSession`.
+<2> Export the schema to a target directory.
+====
+
+[[schema-management-export-custom]]
+=== Exporting to a custom collector
+
+<<mapper-orm-schema-management-manager,Search schema managers>> allow walking through the schema exports based on the data such managers contains.
+To do so a `SearchSchemaCollector` must be implemented and passed to the schema manager's `exportExpectedSchema(..)` method.
+
+[NOTE]
+====
+Schema exports are constructed based on the mapping information and configurations (e.g. such as the backend version).
+Resulting exports are not compared to or validated against the actual backend schema.
+====
+
+.Exporting to a custom collector
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/schema/management/HibernateOrmSchemaManagerIT.java[tags=walking-the-schema]
+----
+<1> Retrieve the `SearchSchemaManager` from a `SearchSession`.
+<2> Instantiate and pass the `SearchSchemaCollector` to walk a schema.
+<3> Create a name from an index and backend names.
+====
+
+[TIP]
+====
+To access backend-specific functionality, an extension to `SchemaExport` can be applied:
+=====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/schema/management/ElasticsearchHibernateOrmSchemaManagerIT.java[tags=walking-the-schema-extension]
+----
+<1> Extend the `SchemaExport` with the Elasticsearch extension.
+<2> Access an HTTP body of a request that is needed to create an index in an Elasticsearch cluster.
+=====
+====
+
+[[schema-management-export-offline]]
+=== Exporting in offline mode
+
+Sometimes it can be useful to export the schema offline,
+from an environment that doesn't have access to e.g. the Elasticsearch cluster.
+
+See <<backend-elasticsearch-configuration-version,this section>> for more information on how to achieve offline startup.
