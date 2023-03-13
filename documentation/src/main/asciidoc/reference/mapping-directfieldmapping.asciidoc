@@ -399,8 +399,8 @@ or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on 
 |<<mapping-geopoint-basics,GeoPoint>> and subtypes|-|-|Latitude as double and longitude as double, separated by a comma. Ex: `41.8919, 12.51133`.
 |===
 
-[[mapping-directfieldmapping-supported-types-date-time,Possibly lower range/resolution]]
- [[mapper-orm-directfieldmapping-supported-types-date-time,Possibly lower range/resolution]][NOTE]
+[[mapper-orm-directfieldmapping-supported-types-date-time]][[mapping-directfieldmapping-supported-types-date-time,Possibly lower range/resolution]]
+[NOTE]
 .Range and resolution of date/time fields
 ====
 With a few exceptions, most date and time values are passed as-is to the backend;
