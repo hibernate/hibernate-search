@@ -107,6 +107,12 @@ public class BackendMock implements TestRule {
 		backendBehavior().verifyExpectationsMet();
 	}
 
+	public long remainingExpectedIndexingCount() {
+		return backendBehavior().getDocumentWorkExecuteCalls().values().stream()
+				.mapToLong( CallQueue::remainingExpectedCallCount )
+				.sum();
+	}
+
 	public void inLenientMode(Runnable action) {
 		backendBehavior().lenient( true );
 		try {

@@ -142,6 +142,10 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 				ignored -> new CallQueue<>( indexingCallQueueSettings ) );
 	}
 
+	Map<DocumentKey, CallQueue<DocumentWorkExecuteCall>> getDocumentWorkExecuteCalls() {
+		return documentWorkExecuteCalls;
+	}
+
 	CallQueue<DocumentWorkExecuteCall> getDocumentWorkExecuteCalls(DocumentKey documentKey) {
 		return documentWorkExecuteCalls.computeIfAbsent( documentKey,
 				ignored -> new CallQueue<>( indexingCallQueueSettings ) );
