@@ -8,11 +8,12 @@ package org.hibernate.search.engine.search.highlighter.dsl.impl;
 
 import java.util.Collection;
 import java.util.Locale;
+import java.util.function.Consumer;
 
-import org.hibernate.search.engine.search.highlighter.dsl.HighlighterTagSchema;
-import org.hibernate.search.engine.search.highlighter.dsl.HighlighterBoundaryScannerLocaleOptionsStep;
-import org.hibernate.search.engine.search.highlighter.dsl.HighlighterBoundaryScannerTypeFastVectorHighlighterOptionsStep;
+import org.hibernate.search.engine.search.highlighter.dsl.HighlighterBoundaryScannerFastVectorHighlighterOptionsStep;
+import org.hibernate.search.engine.search.highlighter.dsl.HighlighterBoundaryScannerTypeFastVectorHighlighterStep;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFastVectorHighlighterOptionsStep;
+import org.hibernate.search.engine.search.highlighter.dsl.HighlighterTagSchema;
 import org.hibernate.search.engine.search.highlighter.spi.BoundaryScannerType;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterBuilder;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
@@ -26,24 +27,6 @@ public class HighlighterFastVectorHighlighterOptionsStepImpl
 			SearchHighlighterBuilder highlightBuilder) {
 		super( highlightBuilder );
 		this.highlighterBuilder.type( SearchHighlighterType.FAST_VECTOR );
-	}
-
-	@Override
-	public HighlighterFastVectorHighlighterOptionsStep boundaryMaxScan(int max) {
-		highlighterBuilder.boundaryMaxScan( max );
-		return this;
-	}
-
-	@Override
-	public HighlighterFastVectorHighlighterOptionsStep boundaryChars(String boundaryChars) {
-		highlighterBuilder.boundaryChars( boundaryChars );
-		return this;
-	}
-
-	@Override
-	public HighlighterFastVectorHighlighterOptionsStep boundaryChars(Character[] boundaryChars) {
-		HighlighterFastVectorHighlighterOptionsStepImpl.this.highlighterBuilder.boundaryChars( boundaryChars );
-		return this;
 	}
 
 	@Override
@@ -74,44 +57,77 @@ public class HighlighterFastVectorHighlighterOptionsStepImpl
 	}
 
 	@Override
-	public HighlighterBoundaryScannerTypeFastVectorHighlighterOptionsStep<? extends HighlighterFastVectorHighlighterOptionsStep> boundaryScanner() {
-		return new HighlighterBoundaryScannerTypeFastVectorHighlighterOptionsStepImpl();
+	public HighlighterBoundaryScannerTypeFastVectorHighlighterStep<? extends HighlighterFastVectorHighlighterOptionsStep> boundaryScanner() {
+		return new HighlighterBoundaryScannerTypeFastVectorHighlighterStepImpl();
 	}
 
-	private class HighlighterBoundaryScannerTypeFastVectorHighlighterOptionsStepImpl
+	@Override
+	public HighlighterFastVectorHighlighterOptionsStep boundaryScanner(
+			Consumer<? super HighlighterBoundaryScannerTypeFastVectorHighlighterStep<?>> boundaryScannerContributor) {
+		boundaryScannerContributor.accept( new HighlighterBoundaryScannerTypeFastVectorHighlighterStepImpl() );
+		return this;
+	}
+
+	private class HighlighterBoundaryScannerTypeFastVectorHighlighterStepImpl
 			implements
-			HighlighterBoundaryScannerTypeFastVectorHighlighterOptionsStep<HighlighterFastVectorHighlighterOptionsStep> {
+			HighlighterBoundaryScannerTypeFastVectorHighlighterStep<HighlighterFastVectorHighlighterOptionsStep> {
 
 		@Override
-		public HighlighterBoundaryScannerLocaleOptionsStep<HighlighterFastVectorHighlighterOptionsStep> chars() {
+		public HighlighterBoundaryScannerFastVectorHighlighterOptionsStep<HighlighterFastVectorHighlighterOptionsStep> chars() {
 			HighlighterFastVectorHighlighterOptionsStepImpl.this.highlighterBuilder.boundaryScannerType(
 					BoundaryScannerType.CHARS );
-			return new HighlighterBoundaryScannerLocaleOptionsStepImpl();
+			return new HighlighterBoundaryScannerFastVectorHighlighterOptionsStepImpl();
 		}
 
 		@Override
-		public HighlighterBoundaryScannerLocaleOptionsStep<HighlighterFastVectorHighlighterOptionsStep> sentence() {
+		public HighlighterBoundaryScannerFastVectorHighlighterOptionsStep<HighlighterFastVectorHighlighterOptionsStep> sentence() {
 			HighlighterFastVectorHighlighterOptionsStepImpl.this.highlighterBuilder.boundaryScannerType(
 					BoundaryScannerType.SENTENCE );
-			return new HighlighterBoundaryScannerLocaleOptionsStepImpl();
+			return new HighlighterBoundaryScannerFastVectorHighlighterOptionsStepImpl();
 		}
 
 		@Override
-		public HighlighterBoundaryScannerLocaleOptionsStep<HighlighterFastVectorHighlighterOptionsStep> word() {
+		public HighlighterBoundaryScannerFastVectorHighlighterOptionsStep<HighlighterFastVectorHighlighterOptionsStep> word() {
 			HighlighterFastVectorHighlighterOptionsStepImpl.this.highlighterBuilder.boundaryScannerType(
 					BoundaryScannerType.WORD );
-			return new HighlighterBoundaryScannerLocaleOptionsStepImpl();
+			return new HighlighterBoundaryScannerFastVectorHighlighterOptionsStepImpl();
 		}
 	}
 
-	private class HighlighterBoundaryScannerLocaleOptionsStepImpl
+	private class HighlighterBoundaryScannerFastVectorHighlighterOptionsStepImpl
 			implements
-			HighlighterBoundaryScannerLocaleOptionsStep<HighlighterFastVectorHighlighterOptionsStep> {
+			HighlighterBoundaryScannerFastVectorHighlighterOptionsStep<HighlighterFastVectorHighlighterOptionsStep> {
 
 		@Override
-		public HighlighterFastVectorHighlighterOptionsStep locale(Locale locale) {
+		public HighlighterBoundaryScannerFastVectorHighlighterOptionsStep<HighlighterFastVectorHighlighterOptionsStep> boundaryMaxScan(
+				int max) {
+			HighlighterFastVectorHighlighterOptionsStepImpl.this.highlighterBuilder.boundaryMaxScan( max );
+			return this;
+		}
+
+		@Override
+		public HighlighterBoundaryScannerFastVectorHighlighterOptionsStep<HighlighterFastVectorHighlighterOptionsStep> boundaryChars(
+				String boundaryChars) {
+			HighlighterFastVectorHighlighterOptionsStepImpl.this.highlighterBuilder.boundaryChars( boundaryChars );
+			return this;
+		}
+
+		@Override
+		public HighlighterBoundaryScannerFastVectorHighlighterOptionsStep<HighlighterFastVectorHighlighterOptionsStep> boundaryChars(Character[] boundaryChars) {
+			HighlighterFastVectorHighlighterOptionsStepImpl.this.highlighterBuilder.boundaryChars( boundaryChars );
+			return this;
+		}
+
+		@Override
+		public HighlighterBoundaryScannerFastVectorHighlighterOptionsStep<HighlighterFastVectorHighlighterOptionsStep> locale(
+				Locale locale) {
 			Contracts.assertNotNull( locale, "locale" );
 			HighlighterFastVectorHighlighterOptionsStepImpl.this.highlighterBuilder.boundaryScannerLocale( locale );
+			return this;
+		}
+
+		@Override
+		public HighlighterFastVectorHighlighterOptionsStep end() {
 			return HighlighterFastVectorHighlighterOptionsStepImpl.this;
 		}
 	}

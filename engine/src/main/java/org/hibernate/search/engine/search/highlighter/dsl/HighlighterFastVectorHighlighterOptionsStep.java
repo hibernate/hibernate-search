@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.highlighter.dsl;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * The step in a fast vector highlighter definition where options can be set. Refer to your particular backend documentation
@@ -14,40 +15,6 @@ import java.util.Collection;
  */
 public interface HighlighterFastVectorHighlighterOptionsStep
 		extends HighlighterOptionsStep<HighlighterFastVectorHighlighterOptionsStep> {
-
-	/**
-	 * Specify how far to scan for {@link #boundaryChars(String) boundary characters} when
-	 * a {@link HighlighterBoundaryScannerTypeFastVectorHighlighterOptionsStep#chars() characters boundary scanner} is used.
-	 * <p>
-	 * Specifying this value allows to include more text in the resulting fragment. After highlighter have highlighted a match
-	 * and centered it based on the {@link #fragmentSize(int) fragment size}, it can additionally move the start/end
-	 * positions of that fragment by looking for {@code max} characters to the left and to the right to find any boundary character.
-	 * As soon as such character is found - it will become a new start/end position of the fragment. Otherwise,
-	 * if boundary character is not found after moving for the {@code max} characters to the left/right - the original
-	 * position determined after centering the match will be used.
-	 *
-	 * @param max The number of characters.
-	 * @return The next step in a highlighter definition.
-	 */
-	HighlighterFastVectorHighlighterOptionsStep boundaryMaxScan(int max);
-
-	/**
-	 * Specify a string of characters to look for when scanning for boundaries when
-	 * a {@link HighlighterBoundaryScannerTypeFastVectorHighlighterOptionsStep#chars() characters boundary scanner} is used.
-	 *
-	 * @param boundaryChars The string of boundary characters.
-	 * @return The next step in a highlighter definition.
-	 */
-	HighlighterFastVectorHighlighterOptionsStep boundaryChars(String boundaryChars);
-
-	/**
-	 * Specify a string of characters to look for when scanning for boundaries when
-	 * a {@link HighlighterBoundaryScannerTypeFastVectorHighlighterOptionsStep#chars() characters boundary scanner} is used.
-	 *
-	 * @param boundaryChars The array of boundary characters.
-	 * @return The next step in a highlighter definition.
-	 */
-	HighlighterFastVectorHighlighterOptionsStep boundaryChars(Character[] boundaryChars);
 
 	/**
 	 * Specify the maximum number of matching phrases in a document that are considered for highlighting.
@@ -97,8 +64,21 @@ public interface HighlighterFastVectorHighlighterOptionsStep
 	/**
 	 * Specify how the text should be broken up into highlighting snippets.
 	 * <p>
-	 * By default, a {@link HighlighterBoundaryScannerTypeFastVectorHighlighterOptionsStep#chars() character boundary scanner} is used.
+	 * By default, a {@link HighlighterBoundaryScannerTypeFastVectorHighlighterStep#chars() character boundary scanner} is used.
+	 *
 	 * @return The next step in a highlighter definition exposing boundary scanner specific options.
 	 */
-	HighlighterBoundaryScannerTypeFastVectorHighlighterOptionsStep<? extends HighlighterFastVectorHighlighterOptionsStep> boundaryScanner();
+	HighlighterBoundaryScannerTypeFastVectorHighlighterStep<? extends HighlighterFastVectorHighlighterOptionsStep> boundaryScanner();
+
+	/**
+	 * Specify how the text should be broken up into highlighting snippets.
+	 * <p>
+	 * By default, a {@link HighlighterBoundaryScannerTypeFastVectorHighlighterStep#chars() character boundary scanner} is used.
+	 *
+	 * @param boundaryScannerContributor A consumer that will configure a boundary scanner for this highlighter.
+	 * Should generally be a lambda expression.
+	 * @return The next step in a highlighter definition.
+	 */
+	HighlighterFastVectorHighlighterOptionsStep boundaryScanner(
+			Consumer<? super HighlighterBoundaryScannerTypeFastVectorHighlighterStep<?>> boundaryScannerContributor);
 }

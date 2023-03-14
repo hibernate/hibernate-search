@@ -68,7 +68,7 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 				.highlighter( h -> h.fastVector()
 						.boundaryScanner()
 						.chars()
-						.locale( Locale.ENGLISH )
+						.end()
 				)
 				.toQuery();
 
@@ -91,6 +91,29 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 						.boundaryScanner()
 						.word()
 						.locale( Locale.ENGLISH )
+						.end()
+				)
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						Arrays.asList(
+								"Scorpions are a German <em>rock</em> band formed in Hanover in 1965 by guitarist Rudolf Schenker. Since the band's",
+								" style has ranged from hard <em>rock</em>, heavy metal and glam metal to soft <em>rock</em>."
+						)
+				);
+	}
+
+	@Test
+	public void boundaryScannerWordUsingLambda() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<List<String>> highlights = scope.query().select(
+						f -> f.highlight( "string" )
+				)
+				.where( f -> f.match().field( "string" ).matching( "rock" ) )
+				.highlighter( h -> h.fastVector()
+						.boundaryScanner( bs -> bs.word().locale( Locale.ENGLISH ) )
 				)
 				.toQuery();
 
@@ -115,6 +138,7 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 						.boundaryScanner()
 						.sentence()
 						.locale( Locale.ENGLISH )
+						.end()
 						// limit the fragment size so that the result is sentence-per-highlighted-fragment.
 						// trying to go with a lower value, e.g. with 50 would result in 3 fragments, where second sentence
 						// gets highlighted two times, once per occurrence :shrug:
@@ -208,6 +232,7 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 						.locale( Locale.ENGLISH )
 						.boundaryChars( "-" )
 						.boundaryMaxScan( 0 )
+						.end()
 				)
 				.toQuery();
 
@@ -228,6 +253,7 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 						.locale( Locale.ENGLISH )
 						.boundaryChars( "-" )
 						.boundaryMaxScan( 25 )
+						.end()
 				)
 				.toQuery();
 
@@ -255,6 +281,7 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 						.locale( Locale.ENGLISH )
 						.boundaryChars( new Character[] { '-' } )
 						.boundaryMaxScan( 25 )
+						.end()
 				)
 				.toQuery();
 

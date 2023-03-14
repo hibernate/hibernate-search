@@ -133,7 +133,7 @@ public class HighlighterUnifiedIT extends AbstractHighlighterIT {
 				.highlighter( h -> h.unified()
 						.boundaryScanner()
 						.word()
-						.locale( Locale.ENGLISH )
+						.end()
 				)
 				.toQuery();
 
@@ -157,8 +157,7 @@ public class HighlighterUnifiedIT extends AbstractHighlighterIT {
 				.where( f -> f.match().field( "string" ).matching( "rock" ) )
 				.highlighter( h -> h.unified()
 						.boundaryScanner()
-						.sentence()
-						.locale( Locale.ENGLISH )
+						.sentence().locale( Locale.ENGLISH ).end()
 						.fragmentSize( 150 ) // set the size of fragments so that sentence won't be split into multiple snippets.
 				)
 				.toQuery();

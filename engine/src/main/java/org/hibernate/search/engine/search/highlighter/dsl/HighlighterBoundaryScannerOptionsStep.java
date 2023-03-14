@@ -13,16 +13,8 @@ import java.util.Locale;
  * The step in a highlighter definition where the boundary scanner options can be set.
  * Refer to your particular backend documentation for more detailed information on the exposed settings.
  */
-public interface HighlighterBoundaryScannerLocaleOptionsStep<T extends HighlighterOptionsStep<?>> {
-
-	/**
-	 * Specify {@link Locale#ROOT a default locale} to be used when searching for boundaries by a {@link BreakIterator}.
-	 *
-	 * @return The next step in a highlighter definition.
-	 */
-	default T defaultLocale() {
-		return locale( Locale.ROOT );
-	}
+public interface HighlighterBoundaryScannerOptionsStep<T extends HighlighterBoundaryScannerOptionsStep<?, ?>, N extends HighlighterOptionsStep<?>>
+		extends HighlighterBoundaryScannerFinalStep<N> {
 
 	/**
 	 * Specify a locale to be used when searching for boundaries by a {@link BreakIterator}.

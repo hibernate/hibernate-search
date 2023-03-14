@@ -7,9 +7,10 @@
 package org.hibernate.search.engine.search.highlighter.dsl.impl;
 
 import java.util.Locale;
+import java.util.function.Consumer;
 
-import org.hibernate.search.engine.search.highlighter.dsl.HighlighterBoundaryScannerLocaleOptionsStep;
-import org.hibernate.search.engine.search.highlighter.dsl.HighlighterBoundaryScannerTypeOptionsStep;
+import org.hibernate.search.engine.search.highlighter.dsl.HighlighterBoundaryScannerOptionsStep;
+import org.hibernate.search.engine.search.highlighter.dsl.HighlighterBoundaryScannerTypeStep;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterUnifiedOptionsStep;
 import org.hibernate.search.engine.search.highlighter.spi.BoundaryScannerType;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterBuilder;
@@ -32,34 +33,47 @@ public class HighlighterUnifiedOptionsStepImpl
 	}
 
 	@Override
-	public HighlighterBoundaryScannerTypeOptionsStep<? extends HighlighterUnifiedOptionsStep> boundaryScanner() {
-		return new HighlighterBoundaryScannerTypeOptionsStepImpl();
+	public HighlighterBoundaryScannerTypeStep<?, ? extends HighlighterUnifiedOptionsStep> boundaryScanner() {
+		return new HighlighterBoundaryScannerTypeStepImpl();
 	}
 
-	private class HighlighterBoundaryScannerTypeOptionsStepImpl
-			implements HighlighterBoundaryScannerTypeOptionsStep<HighlighterUnifiedOptionsStep> {
-
-		@Override
-		public HighlighterBoundaryScannerLocaleOptionsStep<HighlighterUnifiedOptionsStep> sentence() {
-			HighlighterUnifiedOptionsStepImpl.this.highlighterBuilder.boundaryScannerType( BoundaryScannerType.SENTENCE );
-			return new HighlighterBoundaryScannerLocaleOptionsStepImpl();
-		}
-
-		@Override
-		public HighlighterBoundaryScannerLocaleOptionsStep<HighlighterUnifiedOptionsStep> word() {
-			HighlighterUnifiedOptionsStepImpl.this.highlighterBuilder.boundaryScannerType( BoundaryScannerType.WORD );
-			return new HighlighterBoundaryScannerLocaleOptionsStepImpl();
-		}
+	@Override
+	public HighlighterUnifiedOptionsStep boundaryScanner(
+			Consumer<? super HighlighterBoundaryScannerTypeStep<?, ?>> boundaryScannerContributor) {
+		boundaryScannerContributor.accept( new HighlighterBoundaryScannerTypeStepImpl() );
+		return this;
 	}
 
-	private class HighlighterBoundaryScannerLocaleOptionsStepImpl
+	private class HighlighterBoundaryScannerTypeStepImpl
 			implements
-			HighlighterBoundaryScannerLocaleOptionsStep<HighlighterUnifiedOptionsStep> {
+			HighlighterBoundaryScannerTypeStep<HighlighterBoundaryScannerOptionsStepImpl, HighlighterUnifiedOptionsStep> {
 
 		@Override
-		public HighlighterUnifiedOptionsStep locale(Locale locale) {
+		public HighlighterBoundaryScannerOptionsStepImpl sentence() {
+			HighlighterUnifiedOptionsStepImpl.this.highlighterBuilder.boundaryScannerType(
+					BoundaryScannerType.SENTENCE );
+			return new HighlighterBoundaryScannerOptionsStepImpl();
+		}
+
+		@Override
+		public HighlighterBoundaryScannerOptionsStepImpl word() {
+			HighlighterUnifiedOptionsStepImpl.this.highlighterBuilder.boundaryScannerType( BoundaryScannerType.WORD );
+			return new HighlighterBoundaryScannerOptionsStepImpl();
+		}
+	}
+
+	private class HighlighterBoundaryScannerOptionsStepImpl implements
+			HighlighterBoundaryScannerOptionsStep<HighlighterBoundaryScannerOptionsStepImpl, HighlighterUnifiedOptionsStep> {
+
+		@Override
+		public HighlighterBoundaryScannerOptionsStepImpl locale(Locale locale) {
 			Contracts.assertNotNull( locale, "locale" );
 			HighlighterUnifiedOptionsStepImpl.this.highlighterBuilder.boundaryScannerLocale( locale );
+			return this;
+		}
+
+		@Override
+		public HighlighterUnifiedOptionsStep end() {
 			return HighlighterUnifiedOptionsStepImpl.this;
 		}
 	}
