@@ -33,6 +33,9 @@ import org.junit.Test;
 
 public class OutboxPollingAutomaticIndexingLifecycleIT {
 
+	// The value doesn't matter, we just need to be sure that's the one that was configured.
+	private static final long BATCH_SIZE = HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_BATCH_SIZE;
+
 	@Rule
 	public BackendMock backendMock = new BackendMock();
 
@@ -72,23 +75,25 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 			}
 		} );
 
-		// wait for the first call to be processed (partial progressing)
+		// wait for the first batch to be processed (partial processing)
 		eventFilter.showAllEvents();
-		SessionFactory finalSessionFactory = sessionFactory;
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			with( finalSessionFactory ).runInTransaction( session -> {
-				assertThat( eventFilter.countOutboxEventsNoFilter( session ) ).isLessThan( size );
-			} );
+			// HSEARCH-4810 don't just count outbox events here, that would lead to transaction deadlocks on MS SQL Server.
+			// Instead, wait for at least two batches to have their documents indexed:
+			// since we process one batch after the other,
+			// this guarantees that at least the first batch was completely processed,
+			// up to and including event deletion.
+			assertThat( backendMock.remainingExpectedIndexingCount() ).isLessThan( size - 2 * BATCH_SIZE );
 		} );
 
-		// stop Search on partial progressing
+		// stop Search during processing
 		sessionFactory.close();
 
-		// verify some entities have not been processed
+		// verify we're in the expected state
 		eventFilter.hideAllEvents();
 		sessionFactory = setup();
 		with( sessionFactory ).runInTransaction( session -> {
-			// partial processing, meaning that the event count is *strictly* between 0 and the full size:
+			// expect partial processing, meaning that the remaining event count is *strictly* between 0 and the full size:
 			assertThat( eventFilter.countOutboxEventsNoFilter( session ) ).isBetween( 1L, size - 1L );
 		} );
 		sessionFactory.close();
@@ -160,6 +165,8 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 		sessionFactory = ormSetupHelper.start()
 				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
 						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
+				.withProperty( HibernateOrmMapperOutboxPollingSettings.COORDINATION_EVENT_PROCESSOR_BATCH_SIZE,
+						BATCH_SIZE )
 				// Override OutboxPollingOrmSetupHelperConfig.overrideHibernateSearchDefaults
 				// because a short polling interval could in theory make event processing too fast
 				// and make this test flaky.

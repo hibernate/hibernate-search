@@ -239,4 +239,8 @@ public class CallQueue<C extends Call<? super C>> {
 		}
 	}
 
+	public synchronized long remainingExpectedCallCount() {
+		return ( (long) callsExpectedInOrder.size() ) + callsExpectedOutOfOrder.size();
+	}
+
 }
