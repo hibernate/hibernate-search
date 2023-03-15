@@ -18,8 +18,6 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.MultiTenancyStrat
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-
 /**
  * Configuration properties for Elasticsearch backends.
  * <p>
@@ -39,8 +37,9 @@ public final class ElasticsearchBackendSettings {
 	}
 
 	/**
-	 * The name to use for the {@link org.hibernate.search.engine.cfg.BackendSettings#TYPE backend type}
-	 * configuration property so that an Elasticsearch backend is instantiated by Hibernate Search.
+	 * The value to set the {@link org.hibernate.search.engine.cfg.BackendSettings#TYPE backend type}
+	 * configuration property
+	 * in order to get an Elasticsearch backend instantiated by Hibernate Search.
 	 * <p>
 	 * Only useful if you have more than one backend technology in the classpath;
 	 * otherwise the backend type is automatically detected.
@@ -49,19 +48,19 @@ public final class ElasticsearchBackendSettings {
 	public static final String TYPE_NAME = "elasticsearch";
 
 	/**
-	 * The host name and ports of the Elasticsearch servers to connect to.
+	 * The hostname and ports of the Elasticsearch servers to connect to.
 	 * <p>
-	 * Expects a String representing a host and port such as {@code localhost} or {@code es.mycompany.com:4400},
-	 * or a String containing multiple such host-and-port strings separated by commas,
-	 * or a {@code Collection<String>} containing such host-and-port strings.
-	 * <p>
-	 * Cannot be used if {@link #URIS} is set.
-	 * <p>
-	 * Defaults to {@link Defaults#HOSTS}.
+	 * Expects a String representing a hostname and port such as {@code localhost} or {@code es.mycompany.com:4400},
+	 * or a String containing multiple such hostname-and-port strings separated by commas,
+	 * or a {@code Collection<String>} containing such hostname-and-port strings.
 	 * <p>
 	 * Multiple servers may be specified for load-balancing: requests will be assigned to each host in turns.
 	 * <p>
+	 * Setting this property at the same time as {@link #URIS} will lead to an exception being thrown on startup.
+	 * <p>
 	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
+	 * <p>
+	 * Defaults to {@link Defaults#HOSTS}.
 	 */
 	public static final String HOSTS = "hosts";
 
@@ -70,29 +69,29 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Expects a String: either {@code http} or {@code https}.
 	 * <p>
-	 * Cannot be used if {@link #URIS} is set.
-	 * <p>
-	 * Defaults to {@link Defaults#PROTOCOL}.
+	 * Setting this property at the same time as {@link #URIS} will lead to an exception being thrown on startup.
 	 * <p>
 	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
+	 * <p>
+	 * Defaults to {@link Defaults#PROTOCOL}.
 	 */
 	public static final String PROTOCOL = "protocol";
 
 	/**
-	 * Alternatively to {@link #HOSTS} and {@link #PROTOCOL},
-	 * it is possible to define both the protocol and hosts as one or more URIs using this property.
+	 * The protocol, hostname and ports of the Elasticsearch servers to connect to.
 	 * <p>
 	 * Expects either a String representing an URI such as {@code http://localhost}
 	 * or {@code https://es.mycompany.com:4400},
 	 * or a String containing multiple such URIs separated by commas,
 	 * or a {@code Collection<String>} containing such URIs.
 	 * <p>
-	 * All the URIs must have the same protocol.
-	 * Cannot be used if {@link #HOSTS} or {@link #PROTOCOL} are set.
+	 * All the URIs must specify the same protocol.
 	 * <p>
-	 * Defaults to {@code http://localhost:9200}, unless {@link #HOSTS} or {@link #PROTOCOL} are set, in which case they take precedence.
+	 * Setting this property at the same time as {@link #HOSTS} or {@link #PROTOCOL} will lead to an exception being thrown on startup.
 	 * <p>
 	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
+	 * <p>
+	 * Defaults to {@code http://localhost:9200}, unless {@link #HOSTS} or {@link #PROTOCOL} are set, in which case they take precedence.
 	 */
 	public static final String URIS = "uris";
 
@@ -100,9 +99,9 @@ public final class ElasticsearchBackendSettings {
 	 * Property for specifying the path prefix prepended to the request end point.
 	 * Use the path prefix if your Elasticsearch instance is located at a specific context path.
 	 * <p>
-	 * Defaults to {@link Defaults#PATH_PREFIX}.
-	 * <p>
 	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
+	 * <p>
+	 * Defaults to {@link Defaults#PATH_PREFIX}.
 	 */
 	public static final String PATH_PREFIX = "path_prefix";
 
@@ -132,9 +131,9 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Expects a String.
 	 * <p>
-	 * Defaults to no username (anonymous access).
-	 * <p>
 	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
+	 * <p>
+	 * Defaults to no username (anonymous access).
 	 */
 	public static final String USERNAME = "username";
 
@@ -143,9 +142,9 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Expects a String.
 	 * <p>
-	 * Defaults to no username (anonymous access).
-	 * <p>
 	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
+	 * <p>
+	 * Defaults to no username (anonymous access).
 	 */
 	public static final String PASSWORD = "password";
 
@@ -157,9 +156,9 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a positive Integer value in milliseconds, such as 60000,
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * Defaults to no request timeout.
-	 * <p>
 	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
+	 * <p>
+	 * Defaults to no request timeout.
 	 */
 	public static final String REQUEST_TIMEOUT = "request_timeout";
 
@@ -169,9 +168,9 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a positive Integer value in milliseconds, such as {@code 60000},
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * Defaults to {@link Defaults#READ_TIMEOUT}.
-	 * <p>
 	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
+	 * <p>
+	 * Defaults to {@link Defaults#READ_TIMEOUT}.
 	 */
 	public static final String READ_TIMEOUT = "read_timeout";
 
@@ -181,9 +180,9 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a positive Integer value in milliseconds, such as {@code 3000},
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * Defaults to {@link Defaults#CONNECTION_TIMEOUT}.
-	 * <p>
 	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
+	 * <p>
+	 * Defaults to {@link Defaults#CONNECTION_TIMEOUT}.
 	 */
 	public static final String CONNECTION_TIMEOUT = "connection_timeout";
 
@@ -194,9 +193,9 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a positive Integer value, such as {@code 20},
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * Defaults to {@link Defaults#MAX_CONNECTIONS}.
-	 * <p>
 	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
+	 * <p>
+	 * Defaults to {@link Defaults#MAX_CONNECTIONS}.
 	 */
 	public static final String MAX_CONNECTIONS = "max_connections";
 
@@ -206,9 +205,9 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a positive Integer value, such as {@code 10},
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * Defaults to {@link Defaults#MAX_CONNECTIONS_PER_ROUTE}.
-	 * <p>
 	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
+	 * <p>
+	 * Defaults to {@link Defaults#MAX_CONNECTIONS_PER_ROUTE}.
 	 */
 	public static final String MAX_CONNECTIONS_PER_ROUTE = "max_connections_per_route";
 
@@ -218,9 +217,9 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a Boolean value such as {@code true} or {@code false},
 	 * or a string that can be parsed into a Boolean value.
 	 * <p>
-	 * Defaults to {@link Defaults#DISCOVERY_ENABLED}.
-	 * <p>
 	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
+	 * <p>
+	 * Defaults to {@link Defaults#DISCOVERY_ENABLED}.
 	 */
 	public static final String DISCOVERY_ENABLED = "discovery.enabled";
 
@@ -230,30 +229,28 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a positive Integer value in seconds, such as {@code 2},
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * Defaults to {@link Defaults#DISCOVERY_REFRESH_INTERVAL}.
-	 * <p>
 	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
+	 * <p>
+	 * Defaults to {@link Defaults#DISCOVERY_REFRESH_INTERVAL}.
 	 */
 	public static final String DISCOVERY_REFRESH_INTERVAL = "discovery.refresh_interval";
 
 	/**
-	 * Allows to define a {@link ElasticsearchHttpClientConfigurer},
-	 * that can be used for instance to set custom HTTP client configurations,
-	 * using an instance of {@link HttpAsyncClientBuilder}.
+	 * A {@link ElasticsearchHttpClientConfigurer} that defines custom HTTP client configuration.
 	 * <p>
 	 * It can be used for example to tune the SSL context to accept self-signed certificates.
-	 * It allows to override other HTTP client settings, such as {@link #USERNAME} or {@link #MAX_CONNECTIONS_PER_ROUTE}.
+	 * It allows overriding other HTTP client settings, such as {@link #USERNAME} or {@link #MAX_CONNECTIONS_PER_ROUTE}.
 	 * <p>
 	 * Expects a reference to a bean of type {@link ElasticsearchHttpClientConfigurer}.
 	 * <p>
-	 * Defaults to no value.
-	 * <p>
 	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
+	 * <p>
+	 * Defaults to no value.
 	 */
 	public static final String CLIENT_CONFIGURER = "client.configurer";
 
 	/**
-	 * A external Elasticsearch client instance that Hibernate Search should use for all requests to Elasticsearch.
+	 * An external Elasticsearch client instance that Hibernate Search should use for all requests to Elasticsearch.
 	 * <p>
 	 * If this is set, Hibernate Search will not attempt to create its own Elasticsearch,
 	 * and all other client-related configuration properties
@@ -264,7 +261,7 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Defaults to nothing: if no client instance is provided, Hibernate Search will create its own.
 	 * <p>
-	 * <strong>WARNING - Incubating API:</strong> the underlying client class may change without notice.
+	 * <strong>WARNING - Incubating API:</strong> the underlying client class may change without prior notice.
 	 *
 	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
 	 * which includes a description of the "bean reference" properties and accepted values.
@@ -282,7 +279,7 @@ public final class ElasticsearchBackendSettings {
 	public static final String LOG_JSON_PRETTY_PRINTING = "log.json_pretty_printing";
 
 	/**
-	 * The multi-tenancy strategy to use.
+	 * How to implement multi-tenancy.
 	 * <p>
 	 * Expects a {@link MultiTenancyStrategyName} value, or a String representation of such value.
 	 * <p>
@@ -291,8 +288,8 @@ public final class ElasticsearchBackendSettings {
 	public static final String MULTI_TENANCY_STRATEGY = "multi_tenancy.strategy";
 
 	/**
-	 * The strategy for mapping documents to their type name,
-	 * i.e. to determine the type name of a document in search hits.
+	 * How to map documents to their type name,
+	 * i.e. how to determine the type name of a document in search hits.
 	 * <p>
 	 * Expects a {@link TypeNameMappingStrategyName} value, or a String representation of such value.
 	 * <p>
@@ -301,7 +298,7 @@ public final class ElasticsearchBackendSettings {
 	public static final String MAPPING_TYPE_NAME_STRATEGY = "mapping.type_name.strategy";
 
 	/**
-	 * The layout strategy for indexes and their aliases.
+	 * How to determine index names and aliases.
 	 * <p>
 	 * Expects a reference to a bean of type {@link IndexLayoutStrategy}.
 	 * <p>
@@ -323,15 +320,16 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a strictly positive integer value,
 	 * or a string that can be parsed into an integer value.
 	 * <p>
-	 * Defaults to the number of processor cores available to the JVM on startup.
-	 * <p>
 	 * See the reference documentation, section "Elasticsearch backend - Threads",
 	 * for more information about this setting and its implications.
+	 * <p>
+	 * Defaults to the number of processor cores available to the JVM on startup.
 	 */
 	public static final String THREAD_POOL_SIZE = "thread_pool.size";
 
 	/**
-	 * Property for specifying the maximum duration a {@code Scroll} will be usable if no
+	 * Property for specifying the maximum duration a
+	 * {@link org.hibernate.search.engine.search.query.SearchFetchable#scroll(int) scroll} will be usable if no
 	 * other results are fetched from Elasticsearch.
 	 * <p>
 	 * Expects a positive Integer value in seconds, such as 60,

@@ -41,7 +41,7 @@ public final class EngineSettings {
 	public static final String BACKENDS = PREFIX + Radicals.BACKENDS;
 
 	/**
-	 * The strategy to use when reporting the results of configuration property checking.
+	 * How to report the results of configuration property checking.
 	 * <p>
 	 * Configuration property checking will detect an configuration property that is never used,
 	 * which might indicate a configuration issue.
