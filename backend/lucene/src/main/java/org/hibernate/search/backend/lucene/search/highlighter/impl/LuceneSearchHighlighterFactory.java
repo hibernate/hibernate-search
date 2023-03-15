@@ -18,6 +18,6 @@ public class LuceneSearchHighlighterFactory extends AbstractSearchHighlighterFac
 
 	@Override
 	protected SearchHighlighterBuilder highlighterBuilder(LuceneSearchIndexScope<?> scope) {
-		return new LuceneSearchHighlighter.Builder( scope );
+		return new LuceneAbstractSearchHighlighter.Builder( scope );
 	}
 }

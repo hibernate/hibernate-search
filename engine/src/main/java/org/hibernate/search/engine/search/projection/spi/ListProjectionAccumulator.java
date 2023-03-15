@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.projection.spi;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -46,6 +47,12 @@ final class ListProjectionAccumulator<E, V> implements ProjectionAccumulator<E, 
 	@Override
 	public List<Object> accumulate(List<Object> accumulated, E value) {
 		accumulated.add( value );
+		return accumulated;
+	}
+
+	@Override
+	public List<Object> accumulateAll(List<Object> accumulated, Collection<E> values) {
+		accumulated.addAll( values );
 		return accumulated;
 	}
 

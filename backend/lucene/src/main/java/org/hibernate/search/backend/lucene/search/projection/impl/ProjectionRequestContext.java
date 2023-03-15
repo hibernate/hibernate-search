@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
-import org.hibernate.search.backend.lucene.search.highlighter.impl.LuceneSearchHighlighter;
+import org.hibernate.search.backend.lucene.search.highlighter.impl.LuceneAbstractSearchHighlighter;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -21,16 +21,16 @@ public final class ProjectionRequestContext {
 
 	private final ExtractionRequirements.Builder extractionRequirementsBuilder;
 	private final String absoluteCurrentFieldPath;
-	private final LuceneSearchHighlighter globalHighlighter;
-	private final Map<String, LuceneSearchHighlighter> namedHighlighters;
+	private final LuceneAbstractSearchHighlighter globalHighlighter;
+	private final Map<String, LuceneAbstractSearchHighlighter> namedHighlighters;
 
 	public ProjectionRequestContext(ExtractionRequirements.Builder extractionRequirementsBuilder,
-			LuceneSearchHighlighter globalHighlighter, Map<String, LuceneSearchHighlighter> namedHighlighters) {
+			LuceneAbstractSearchHighlighter globalHighlighter, Map<String, LuceneAbstractSearchHighlighter> namedHighlighters) {
 		this( extractionRequirementsBuilder, globalHighlighter, namedHighlighters, null );
 	}
 
 	private ProjectionRequestContext(ExtractionRequirements.Builder extractionRequirementsBuilder,
-			LuceneSearchHighlighter globalHighlighter, Map<String, LuceneSearchHighlighter> namedHighlighters,
+			LuceneAbstractSearchHighlighter globalHighlighter, Map<String, LuceneAbstractSearchHighlighter> namedHighlighters,
 			String absoluteCurrentFieldPath) {
 		this.globalHighlighter = globalHighlighter;
 		this.namedHighlighters = namedHighlighters;
@@ -69,12 +69,12 @@ public final class ProjectionRequestContext {
 		return absoluteCurrentFieldPath;
 	}
 
-	public LuceneSearchHighlighter highlighter(String name) {
+	public LuceneAbstractSearchHighlighter highlighter(String name) {
 		if ( name == null ) {
-			return globalHighlighter == null ? LuceneSearchHighlighter.DEFAULTS_UNIFIED : globalHighlighter;
+			return globalHighlighter == null ? LuceneAbstractSearchHighlighter.defaultHighlighter() : globalHighlighter;
 		}
 		else {
-			LuceneSearchHighlighter highlighter = namedHighlighters.get( name );
+			LuceneAbstractSearchHighlighter highlighter = namedHighlighters.get( name );
 			if ( highlighter == null ) {
 				throw log.cannotFindHighlighterWithName( name, namedHighlighters.keySet() );
 			}

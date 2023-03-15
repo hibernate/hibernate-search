@@ -24,7 +24,7 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrch
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
-import org.hibernate.search.backend.lucene.search.highlighter.impl.LuceneSearchHighlighter;
+import org.hibernate.search.backend.lucene.search.highlighter.impl.LuceneAbstractSearchHighlighter;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
@@ -74,8 +74,8 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	private TimeUnit timeUnit;
 	private boolean exceptionOnTimeout;
 	private Long totalHitCountThreshold;
-	private LuceneSearchHighlighter globalHighlighter;
-	private final Map<String, LuceneSearchHighlighter> namedHighlighters = new HashMap<>();
+	private LuceneAbstractSearchHighlighter globalHighlighter;
+	private final Map<String, LuceneAbstractSearchHighlighter> namedHighlighters = new HashMap<>();
 
 	public LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
@@ -157,7 +157,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 
 	@Override
 	public void highlighter(SearchHighlighter queryHighlighter) {
-		this.globalHighlighter = LuceneSearchHighlighter.from( scope, queryHighlighter );
+		this.globalHighlighter = LuceneAbstractSearchHighlighter.from( scope, queryHighlighter );
 	}
 
 	@Override
@@ -168,7 +168,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 		if (
 				this.namedHighlighters.put(
 						highlighterName,
-						LuceneSearchHighlighter.from( scope, highlighter )
+						LuceneAbstractSearchHighlighter.from( scope, highlighter )
 				) != null
 		) {
 			throw log.highlighterWithTheSameNameCannotBeAdded( highlighterName );
@@ -231,10 +231,10 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 				sessionContext, loadingContext, definitiveLuceneQuery, luceneSort
 		);
 
-		LuceneSearchHighlighter resolvedGlobalHighlighter = this.globalHighlighter == null ? null : this.globalHighlighter.withFallbackDefaults();
-		Map<String, LuceneSearchHighlighter> resolvedNamedHighlighters = new HashMap<>();
+		LuceneAbstractSearchHighlighter resolvedGlobalHighlighter = this.globalHighlighter == null ? null : this.globalHighlighter.withFallbackDefaults();
+		Map<String, LuceneAbstractSearchHighlighter> resolvedNamedHighlighters = new HashMap<>();
 		if ( resolvedGlobalHighlighter != null ) {
-			for ( Map.Entry<String, LuceneSearchHighlighter> entry : this.namedHighlighters.entrySet() ) {
+			for ( Map.Entry<String, LuceneAbstractSearchHighlighter> entry : this.namedHighlighters.entrySet() ) {
 				resolvedNamedHighlighters.put(
 						entry.getKey(),
 						entry.getValue().withFallback( resolvedGlobalHighlighter )
@@ -242,7 +242,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 			}
 		}
 		else {
-			for ( Map.Entry<String, LuceneSearchHighlighter> entry : this.namedHighlighters.entrySet() ) {
+			for ( Map.Entry<String, LuceneAbstractSearchHighlighter> entry : this.namedHighlighters.entrySet() ) {
 				resolvedNamedHighlighters.put(
 						entry.getKey(),
 						entry.getValue().withFallbackDefaults()
