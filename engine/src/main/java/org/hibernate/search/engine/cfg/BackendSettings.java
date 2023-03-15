@@ -31,7 +31,11 @@ public final class BackendSettings {
 	 * Expects a String, such as "lucene" or "elasticsearch".
 	 * See the documentation of your backend to find the appropriate value.
 	 * <p>
-	 * No default: this property must be set.
+	 * Defaults:
+	 * <ul>
+	 *     <li>If there is only one backend type in the classpath, defaults to that backend.</li>
+	 *     <li>Otherwise, no default: this property must be set.</li>
+	 * </ul>
 	 */
 	@HibernateSearchConfiguration(
 			prefix = EngineSettings.BACKEND + ".",

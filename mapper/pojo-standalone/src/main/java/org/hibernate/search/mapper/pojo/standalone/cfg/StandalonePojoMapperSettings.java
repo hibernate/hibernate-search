@@ -40,7 +40,7 @@ public final class StandalonePojoMapperSettings {
 	public static final String SCHEMA_MANAGEMENT_STRATEGY = PREFIX + Radicals.SCHEMA_MANAGEMENT_STRATEGY;
 
 	/**
-	 * The mapping configurer to use.
+	 * A configurer for the Hibernate Search mapping.
 	 * <p>
 	 * Expects a single-valued or multi-valued reference to beans of type {@link StandalonePojoMappingConfigurer}.
 	 * <p>
@@ -64,7 +64,7 @@ public final class StandalonePojoMapperSettings {
 
 
 	/**
-	 * The synchronization strategy to use when indexing through the
+	 * How to synchronize between application threads and indexing triggered by the
 	 * {@link org.hibernate.search.mapper.pojo.standalone.session.SearchSession SearchSession}'s
 	 * {@link org.hibernate.search.mapper.pojo.standalone.session.SearchSession#indexingPlan indexing plan}.
 	 * <p>
@@ -101,7 +101,7 @@ public final class StandalonePojoMapperSettings {
 		}
 
 		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY = SchemaManagementStrategyName.CREATE_OR_VALIDATE;
-		public static final Boolean MULTI_TENANCY_ENABLED = Boolean.FALSE;
+		public static final boolean MULTI_TENANCY_ENABLED = false;
 
 		public static final BeanReference<IndexingPlanSynchronizationStrategy> INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
 				BeanReference.of( IndexingPlanSynchronizationStrategy.class, "write-sync" );

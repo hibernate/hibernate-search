@@ -37,7 +37,7 @@ public final class HibernateOrmMapperSettings {
 	public static final String PREFIX = EngineSettings.PREFIX;
 
 	/**
-	 * Whether Hibernate Search is enabled or not.
+	 * Whether Hibernate Search is enabled or disabled.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
 	 * or a string that can be parsed into a Boolean value.
@@ -58,7 +58,7 @@ public final class HibernateOrmMapperSettings {
 	public static final String AUTOMATIC_INDEXING_ENABLED = PREFIX + Radicals.AUTOMATIC_INDEXING_ENABLED;
 
 	/**
-	 * The automatic indexing strategy to use.
+	 * How to enable or disable automatic indexing.
 	 * <p>
 	 * Expects a {@link org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName} value, or a String representation of such value.
 	 * <p>
@@ -70,8 +70,8 @@ public final class HibernateOrmMapperSettings {
 	public static final String AUTOMATIC_INDEXING_STRATEGY = PREFIX + Radicals.AUTOMATIC_INDEXING_STRATEGY;
 
 	/**
-	 * The synchronization strategy to use when indexing automatically or explicitly
-	 * through a {@link org.hibernate.search.mapper.orm.work.SearchIndexingPlan SearchIndexingPlan}.
+	 * How to synchronize between application threads and indexing triggered by the
+	 * {@link org.hibernate.search.mapper.orm.work.SearchIndexingPlan SearchIndexingPlan}.
 	 * <p>
 	 * Expects one of the strings defined in {@link org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames},
 	 * or a reference to a bean of type {@link org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy}.
@@ -96,12 +96,13 @@ public final class HibernateOrmMapperSettings {
 	 * Expects a Boolean value such as {@code true} or {@code false},
 	 * or a string that can be parsed into a Boolean value.
 	 * <p>
-	 * Defaults to {@code Defaults#AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK}.
+	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK}.
 	 */
 	public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = PREFIX + Radicals.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK;
 
 	/**
-	 * The strategy to use when loading entities during the execution of a search query.
+	 * How to look up entities in the second-level cache
+	 * when loading entities for a search query.
 	 * <p>
 	 * Expects a {@link EntityLoadingCacheLookupStrategy} value, or a String representation of such value.
 	 * <p>
@@ -112,7 +113,8 @@ public final class HibernateOrmMapperSettings {
 	public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = PREFIX + Radicals.QUERY_LOADING_CACHE_LOOKUP_STRATEGY;
 
 	/**
-	 * The fetch size to use when loading entities during the execution of a search query.
+	 * How many entities to load per database query
+	 * when loading entities for a search query.
 	 * <p>
 	 * Expects a strictly positive Integer value, such as {@code 100},
 	 * or a String that can be parsed into such Integer value.
@@ -123,7 +125,8 @@ public final class HibernateOrmMapperSettings {
 
 	/**
 	 * Whether annotations should be automatically processed for entity types,
-	 * as well as nested types in those entity types, for instance embedded types.
+	 * as well as nested types in those entity types,
+	 * for instance {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded index-embedded} types.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
 	 * or a string that can be parsed into a Boolean value.
@@ -133,7 +136,7 @@ public final class HibernateOrmMapperSettings {
 	public static final String MAPPING_PROCESS_ANNOTATIONS = PREFIX + Radicals.MAPPING_PROCESS_ANNOTATIONS;
 
 	/**
-	 * When annotation processing is enabled,
+	 * When {@link #MAPPING_PROCESS_ANNOTATIONS annotation processing is enabled} (the default),
 	 * whether Hibernate Search should automatically build Jandex indexes for types registered for annotation processing
 	 * (entities in particular),
 	 * to ensure that all "root mapping" annotations in those JARs (e.g. {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor})
@@ -147,7 +150,7 @@ public final class HibernateOrmMapperSettings {
 	public static final String MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES = PREFIX + Radicals.MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES;
 
 	/**
-	 * The mapping configurer to use.
+	 * A configurer for the Hibernate Search mapping.
 	 * <p>
 	 * Expects a single-valued or multi-valued reference to beans of type {@link HibernateOrmSearchMappingConfigurer}.
 	 * <p>
@@ -159,8 +162,7 @@ public final class HibernateOrmMapperSettings {
 	public static final String MAPPING_CONFIGURER = PREFIX + Radicals.MAPPING_CONFIGURER;
 
 	/**
-	 * The schema management strategy, controlling how indexes and their schema
-	 * are created, updated, validated or dropped on startup and shutdown.
+	 * How indexes and their schema are created, updated, validated or dropped on startup and shutdown.
 	 * <p>
 	 * Expects a {@link SchemaManagementStrategyName} value, or a String representation of such value.
 	 * <p>
@@ -173,10 +175,11 @@ public final class HibernateOrmMapperSettings {
 	/**
 	 * The root property for properties related to coordination.
 	 */
+	@HibernateSearchConfiguration(ignore = true)
 	public static final String COORDINATION = PREFIX + HibernateOrmMapperSettings.Radicals.COORDINATION;
 
 	/**
-	 * The strategy for coordinating between nodes of a distributed application.
+	 * How to coordinate between nodes of a distributed application.
 	 * <p>
 	 * Expects a reference to a coordination strategy;
 	 * see the reference documentation for available strategies
@@ -198,8 +201,8 @@ public final class HibernateOrmMapperSettings {
 	public static final String MULTI_TENANCY_TENANT_IDS = PREFIX + Radicals.MULTI_TENANCY_TENANT_IDS;
 
 	/**
-	 * The synchronization strategy to use when indexing automatically or explicitly
-	 * through a {@link org.hibernate.search.mapper.orm.work.SearchIndexingPlan SearchIndexingPlan}.
+	 * How to synchronize between application threads and indexing triggered by the
+	 * {@link org.hibernate.search.mapper.orm.work.SearchIndexingPlan SearchIndexingPlan}.
 	 * <p>
 	 * Expects one of the strings defined in {@link IndexingPlanSynchronizationStrategyNames},
 	 * or a reference to a bean of type {@link IndexingPlanSynchronizationStrategy}.

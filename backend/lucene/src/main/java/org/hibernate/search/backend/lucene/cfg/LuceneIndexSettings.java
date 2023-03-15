@@ -57,7 +57,7 @@ public final class LuceneIndexSettings {
 	public static final String DIRECTORY_TYPE = DIRECTORY_PREFIX + DirectoryRadicals.TYPE;
 
 	/**
-	 * The filesystem root the directory.
+	 * The filesystem root for the directory.
 	 * <p>
 	 * Only available for the "local-filesystem" directory type.
 	 * <p>
@@ -65,12 +65,12 @@ public final class LuceneIndexSettings {
 	 * <p>
 	 * The actual index files will be created in directory {@code <root>/<index name>}.
 	 * <p>
-	 * Defaults to the JVM's working directory ({@link Defaults#DIRECTORY_ROOT}).
+	 * Defaults to the JVM's working directory.
 	 */
 	public static final String DIRECTORY_ROOT = DIRECTORY_PREFIX + DirectoryRadicals.ROOT;
 
 	/**
-	 * The locking strategy the directory.
+	 * How to lock on the directory.
 	 * <p>
 	 * Expects a {@link LockingStrategyName} value, or a String representation of such value.
 	 * <p>
@@ -79,7 +79,7 @@ public final class LuceneIndexSettings {
 	public static final String DIRECTORY_LOCKING_STRATEGY = DIRECTORY_PREFIX + DirectoryRadicals.LOCKING_STRATEGY;
 
 	/**
-	 * The filesystem access strategy for the directory.
+	 * How to access the filesystem in the directory.
 	 * <p>
 	 * Only available for the "local-filesystem" directory type.
 	 * <p>
@@ -96,7 +96,7 @@ public final class LuceneIndexSettings {
 	public static final String IO_PREFIX = "io.";
 
 	/**
-	 * The I/O strategy, deciding how indexes are written to and read from.
+	 * How to handle input/output, i.e. how to write to and read from indexes.
 	 * <p>
 	 * Expects a {@link IOStrategyName} value, or a String representation of such value.
 	 * <p>
@@ -119,10 +119,10 @@ public final class LuceneIndexSettings {
 	 * </ul>
 	 * <p>
 	 * Note that individual write operations may trigger a forced commit
-	 * (for example with the "committed" and "searchable" automatic indexing synchronization strategies in the ORM mapper),
+	 * (for example with the {@code write-sync} and {@code sync} automatic indexing synchronization strategies in the ORM mapper),
 	 * in which case you will only benefit from a non-zero commit interval during intensive indexing (mass indexer, ...).
 	 * <p>
-	 * Note that saving is <strong>not</strong> necessary to make changes visible to search queries:
+	 * Note that committing is <strong>not</strong> necessary to make changes visible to search queries:
 	 * the two concepts are unrelated. See {@link #IO_REFRESH_INTERVAL}.
 	 * <p>
 	 * Expects a positive Integer value in milliseconds, such as {@code 1000},
@@ -147,7 +147,7 @@ public final class LuceneIndexSettings {
 	 * </ul>
 	 * <p>
 	 * Note that individual write operations may trigger a forced refresh
-	 * (for example with the "searchable" automatic indexing synchronization strategy in the ORM mapper),
+	 * (for example with the {@code read-sync} and {@code sync} automatic indexing synchronization strategies in the ORM mapper),
 	 * in which case you will only benefit from a non-zero refresh interval during intensive indexing (mass indexer, ...).
 	 * <p>
 	 * Expects a positive Integer value in milliseconds, such as {@code 1000},
@@ -297,24 +297,24 @@ public final class LuceneIndexSettings {
 	 * The number of shards to create for the index,
 	 * i.e. the number of "physical" indexes, each holding a part of the index data.
 	 * <p>
-	 * Only available for the "hash" sharding strategy.
+	 * Only available for the {@code hash} {@link #SHARDING_STRATEGY sharding strategy}.
 	 * <p>
 	 * Expects a strictly positive Integer value, such as 4,
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * No default: this property must be set when using the "hash" sharding strategy.
+	 * No default: this property must be set when using the {@code hash} sharding strategy.
 	 */
 	public static final String SHARDING_NUMBER_OF_SHARDS = SHARDING_PREFIX + ShardingRadicals.NUMBER_OF_SHARDS;
 
 	/**
 	 * The list of shard identifiers to accept for the index.
 	 * <p>
-	 * Only available for the "explicit" sharding strategy.
+	 * Only available for the {@code explicit} {@link #SHARDING_STRATEGY sharding strategy}.
 	 * <p>
 	 * Expects either a String containing multiple shard identifiers separated by commas (','),
 	 * or a {@code Collection<String>} containing such shard identifiers.
 	 * <p>
-	 * No default: this property must be set when using the "explicit" sharding strategy.
+	 * No default: this property must be set when using the {@code explicit} sharding strategy.
 	 */
 	public static final String SHARDING_SHARD_IDENTIFIERS = SHARDING_PREFIX + ShardingRadicals.SHARD_IDENTIFIERS;
 
@@ -322,6 +322,7 @@ public final class LuceneIndexSettings {
 	 * The root property whose children are shards, e.g. {@code shards.0.<some shard-scoped property> = bar}
 	 * or {@code shards.1.<some shard-scoped property> = bar} or {@code shards.main.<some shard-scoped property> = bar}.
 	 */
+	@HibernateSearchConfiguration(ignore = true)
 	public static final String SHARDS = "shards";
 
 	/**
@@ -335,10 +336,10 @@ public final class LuceneIndexSettings {
 	 * Expects a strictly positive integer value,
 	 * or a string that can be parsed into an integer value.
 	 * <p>
-	 * Defaults to {@link Defaults#INDEXING_QUEUE_COUNT}.
-	 * <p>
 	 * See the reference documentation, section "Lucene backend - Indexing",
 	 * for more information about this setting and its implications.
+	 * <p>
+	 * Defaults to {@link Defaults#INDEXING_QUEUE_COUNT}.
 	 */
 	public static final String INDEXING_QUEUE_COUNT = INDEXING_PREFIX + IndexingRadicals.QUEUE_COUNT;
 
@@ -348,10 +349,10 @@ public final class LuceneIndexSettings {
 	 * Expects a strictly positive integer value,
 	 * or a string that can be parsed into an integer value.
 	 * <p>
-	 * Defaults to {@link Defaults#INDEXING_QUEUE_SIZE}.
-	 * <p>
 	 * See the reference documentation, section "Lucene backend - Indexing",
 	 * for more information about this setting and its implications.
+	 * <p>
+	 * Defaults to {@link Defaults#INDEXING_QUEUE_SIZE}.
 	 */
 	public static final String INDEXING_QUEUE_SIZE = INDEXING_PREFIX + IndexingRadicals.QUEUE_SIZE;
 
