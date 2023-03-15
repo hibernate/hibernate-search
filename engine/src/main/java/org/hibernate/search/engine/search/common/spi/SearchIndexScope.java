@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.common.spi;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.reporting.spi.BackendHints;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
@@ -39,4 +40,5 @@ public interface SearchIndexScope<S extends SearchIndexScope<?>>
 
 	<T> T fieldQueryElement(String fieldPath, SearchQueryElementTypeKey<T> key);
 
+	BackendHints backendHints();
 }
