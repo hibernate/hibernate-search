@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
+import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchBackendHints;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.ElasticsearchSearchAggregationFactory;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.impl.ElasticsearchSearchAggregationFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregationBuilderFactory;
@@ -41,6 +42,7 @@ import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchS
 import org.hibernate.search.backend.elasticsearch.search.sort.dsl.impl.ElasticsearchSearchSortFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactory;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.reporting.spi.BackendHints;
 import org.hibernate.search.engine.backend.scope.spi.AbstractSearchIndexScope;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
@@ -144,6 +146,11 @@ public final class ElasticsearchSearchIndexScopeImpl
 	@Override
 	public ElasticsearchSearchIndexScopeImpl withRoot(String objectFieldPath) {
 		return new ElasticsearchSearchIndexScopeImpl( this, field( objectFieldPath ).toComposite() );
+	}
+
+	@Override
+	public BackendHints backendHints() {
+		return ElasticsearchBackendHints.INSTANCE;
 	}
 
 	@Override

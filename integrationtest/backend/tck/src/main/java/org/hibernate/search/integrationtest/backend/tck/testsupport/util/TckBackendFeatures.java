@@ -146,4 +146,8 @@ public abstract class TckBackendFeatures {
 	public boolean supportsHighlighterNestedStructureResultsOnNestedObjects() {
 		return true;
 	}
+
+	public boolean supportsHighlighterOnNonStoredFields() {
+		return true;
+	}
 }

@@ -131,7 +131,6 @@ class LuceneStringIndexFieldTypeOptionsStep
 			builder.searchAnalyzerName( searchAnalyzerName );
 			builder.indexingAnalyzerOrNormalizer( analyzer );
 			builder.searchAnalyzerOrNormalizer( searchAnalyzer != null ? searchAnalyzer : analyzer );
-			builder.queryElementFactory( ProjectionTypeKeys.HIGHLIGHT, new LuceneFieldHighlightProjection.Factory<>() );
 
 			if ( resolvedSortable ) {
 				throw log.cannotUseAnalyzerOnSortableField( analyzerName, buildContext.getEventContext() );
@@ -202,6 +201,9 @@ class LuceneStringIndexFieldTypeOptionsStep
 		if ( resolvedProjectable ) {
 			builder.projectable( true );
 			builder.queryElementFactory( ProjectionTypeKeys.FIELD, new LuceneFieldProjection.Factory<>( codec ) );
+			if ( analyzer != null ) {
+				builder.queryElementFactory( ProjectionTypeKeys.HIGHLIGHT, new LuceneFieldHighlightProjection.Factory<>() );
+			}
 		}
 
 		if ( resolvedAggregable ) {

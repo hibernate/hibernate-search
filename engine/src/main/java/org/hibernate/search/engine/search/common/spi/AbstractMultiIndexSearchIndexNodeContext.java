@@ -175,7 +175,8 @@ public abstract class AbstractMultiIndexSearchIndexNodeContext<
 		}
 		try {
 			if ( factory1 == null || factory2 == null ) {
-				throw log.partialSupportForQueryElement( key, helper().partialSupportHint( key ) );
+				throw log.partialSupportForQueryElement(
+						key, helper().partialSupportHint( key, scope.backendHints() ) );
 			}
 
 			factory1.checkCompatibleWith( factory2 );

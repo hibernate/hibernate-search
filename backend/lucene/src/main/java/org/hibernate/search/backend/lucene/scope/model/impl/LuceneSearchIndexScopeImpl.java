@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
+import org.hibernate.search.backend.lucene.reporting.impl.LuceneBackendHints;
 import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAggregationFactory;
 import org.hibernate.search.backend.lucene.search.aggregation.dsl.impl.LuceneSearchAggregationFactoryImpl;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationBuilderFactory;
@@ -42,6 +43,7 @@ import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFacto
 import org.hibernate.search.backend.lucene.search.sort.dsl.impl.LuceneSearchSortFactoryImpl;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactory;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.reporting.spi.BackendHints;
 import org.hibernate.search.engine.backend.scope.spi.AbstractSearchIndexScope;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
@@ -135,6 +137,11 @@ public final class LuceneSearchIndexScopeImpl
 	@Override
 	public LuceneSearchIndexScopeImpl withRoot(String objectFieldPath) {
 		return new LuceneSearchIndexScopeImpl( this, field( objectFieldPath ).toComposite() );
+	}
+
+	@Override
+	public BackendHints backendHints() {
+		return LuceneBackendHints.INSTANCE;
 	}
 
 	@Override

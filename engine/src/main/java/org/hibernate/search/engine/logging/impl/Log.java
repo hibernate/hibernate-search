@@ -538,11 +538,13 @@ public interface Log extends BasicLogger {
 	void ignoringServiceConfigurationError(Class<?> serviceContract, @Cause ServiceConfigurationError error);
 
 	@Message(value = "Highlighting is only supported for analyzed text fields. " +
-			"Additionally, in case of using a fast vector highlighter the term vector storing must be enabled for the field.")
-	String highlightNotSupported();
+			"Additionally, in case of using a fast vector highlighter the term vector storing must be enabled for the field. " +
+			"%1$s")
+	String highlightNotSupported(String additionalMessage);
 
 	@Message(value = "Highlighting is only supported for analyzed text fields. " +
 			"Additionally, in case of using a fast vector highlighter the term vector storing must be enabled for the field. " +
-			"Make sure that the field has the same type in all indexes.")
-	String highlightPartiallySupported();
+			"Make sure that the field has the same type in all indexes. " +
+			"%1$s")
+	String highlightPartiallySupported(String additionalMessage);
 }
