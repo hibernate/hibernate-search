@@ -120,7 +120,7 @@ public final class ElasticsearchIndexSettings {
 	 * The number of indexing queues assigned to each index.
 	 * <p>
 	 * Expects a strictly positive integer value,
-	 * or a string that can be parsed to such integer value.
+	 * or a string that can be parsed into an integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#INDEXING_QUEUE_COUNT}.
 	 * <p>
@@ -133,7 +133,7 @@ public final class ElasticsearchIndexSettings {
 	 * The size of indexing queues.
 	 * <p>
 	 * Expects a strictly positive integer value,
-	 * or a string that can be parsed to such integer value.
+	 * or a string that can be parsed into an integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#INDEXING_QUEUE_SIZE}.
 	 * <p>
@@ -146,7 +146,7 @@ public final class ElasticsearchIndexSettings {
 	 * The maximum size of bulk requests created when processing indexing queues.
 	 * <p>
 	 * Expects a strictly positive integer value,
-	 * or a string that can be parsed to such integer value.
+	 * or a string that can be parsed into an integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#INDEXING_MAX_BULK_SIZE}.
 	 * <p>

@@ -29,7 +29,7 @@ public final class ElasticsearchAwsBackendSettings {
 	 * Whether requests should be signed using the AWS credentials.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
-	 * or a string that can be parsed to such Boolean value.
+	 * or a string that can be parsed into a Boolean value.
 	 * <p>
 	 * Defaults to {@link Defaults#SIGNING_ENABLED}.
 	 */

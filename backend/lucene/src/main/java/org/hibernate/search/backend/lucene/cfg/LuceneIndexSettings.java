@@ -333,7 +333,7 @@ public final class LuceneIndexSettings {
 	 * The number of indexing queues assigned to each index (or each shard of each index, when sharding is enabled).
 	 * <p>
 	 * Expects a strictly positive integer value,
-	 * or a string that can be parsed to such integer value.
+	 * or a string that can be parsed into an integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#INDEXING_QUEUE_COUNT}.
 	 * <p>
@@ -346,7 +346,7 @@ public final class LuceneIndexSettings {
 	 * The size of indexing queues.
 	 * <p>
 	 * Expects a strictly positive integer value,
-	 * or a string that can be parsed to such integer value.
+	 * or a string that can be parsed into an integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#INDEXING_QUEUE_SIZE}.
 	 * <p>
