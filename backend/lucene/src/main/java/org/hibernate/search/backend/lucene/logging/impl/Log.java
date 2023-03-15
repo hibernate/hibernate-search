@@ -24,7 +24,6 @@ import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.highlighter.spi.BoundaryScannerType;
-import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.sort.SearchSort;
@@ -641,7 +640,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 160,
 			value = "Overriding a '%2$s' highlighter with a '%1$s' is not supported. " +
 					"Overriding highlighters should be of the same type as the global is if the global highlighter was configured.")
-	SearchException cannotMixDifferentHighlighterTypesAtOverrideLevel(SearchHighlighterType override, SearchHighlighterType parent);
+	SearchException cannotMixDifferentHighlighterTypesAtOverrideLevel(String override, String parent);
 
 	@Message(id = ID_OFFSET + 161,
 			value = "Cannot find a highlighter with name '%1$s'." +
@@ -651,7 +650,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 162,
 			value = "'%1$s' highlighter does not support '%2$s' boundary scanner type.")
-	SearchException unsupportedBoundaryScannerType(SearchHighlighterType type, BoundaryScannerType boundaryScannerType);
+	SearchException unsupportedBoundaryScannerType(String type, BoundaryScannerType boundaryScannerType);
 
 	@Message(id = ID_OFFSET + 163, value = "Named highlighters cannot use a blank string as name.")
 	SearchException highlighterNameCannotBeBlank();

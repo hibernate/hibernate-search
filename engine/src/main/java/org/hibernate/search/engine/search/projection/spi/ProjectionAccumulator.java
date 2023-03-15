@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
@@ -66,6 +67,24 @@ public interface ProjectionAccumulator<E, V, A, R> {
 	 * @return The new accumulated value.
 	 */
 	A accumulate(A accumulated, E value);
+
+	/**
+	 * Folds a collection of new values in the given accumulated container.
+	 * <p>
+	 * This operation should be non-blocking.
+	 *
+	 * @param accumulated The accumulated value so far.
+	 * For the first call, this is a value returned by {@link #createInitial()}.
+	 * For the next calls, this is the value returned by the previous call to {@link #accumulate(Object, Object)}.
+	 * @param values The values to accumulate.
+	 * @return The new accumulated value.
+	 */
+	default A accumulateAll(A accumulated, Collection<E> values) {
+		for ( E value : values ) {
+			accumulated = accumulate( accumulated, value );
+		}
+		return accumulated;
+	}
 
 	/**
 	 * @param accumulated The accumulated value so far,
