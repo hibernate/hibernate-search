@@ -89,7 +89,7 @@ public final class LuceneBackendSettings {
 	 * The size of the thread pool assigned to the backend.
 	 * <p>
 	 * Expects a strictly positive integer value,
-	 * or a string that can be parsed to such integer value.
+	 * or a string that can be parsed into an integer value.
 	 * <p>
 	 * Defaults to the number of processor cores available to the JVM on startup.
 	 * <p>

@@ -40,7 +40,7 @@ public final class HibernateOrmMapperSettings {
 	 * Whether Hibernate Search is enabled or not.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
-	 * or a string that can be parsed to such Boolean value.
+	 * or a string that can be parsed into a Boolean value.
 	 * <p>
 	 * Defaults to {@link Defaults#ENABLED}.
 	 */
@@ -51,7 +51,7 @@ public final class HibernateOrmMapperSettings {
 	 * are detected automatically and lead to reindexing.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
-	 * or a string that can be parsed to such Boolean value.
+	 * or a string that can be parsed into a Boolean value.
 	 * <p>
 	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_ENABLED}.
 	 */
@@ -94,7 +94,7 @@ public final class HibernateOrmMapperSettings {
 	 * This feature is considered safe and thus enabled by default.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
-	 * or a string that can be parsed to such Boolean value.
+	 * or a string that can be parsed into a Boolean value.
 	 * <p>
 	 * Defaults to {@code Defaults#AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK}.
 	 */
@@ -126,7 +126,7 @@ public final class HibernateOrmMapperSettings {
 	 * as well as nested types in those entity types, for instance embedded types.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
-	 * or a string that can be parsed to such Boolean value.
+	 * or a string that can be parsed into a Boolean value.
 	 * <p>
 	 * Defaults to {@link Defaults#MAPPING_PROCESS_ANNOTATIONS}.
 	 */
@@ -140,7 +140,7 @@ public final class HibernateOrmMapperSettings {
 	 * are taken into account..
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
-	 * or a string that can be parsed to such Boolean value.
+	 * or a string that can be parsed into a Boolean value.
 	 * <p>
 	 * Defaults to {@link Defaults#MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES}.
 	 */

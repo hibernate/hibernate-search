@@ -121,7 +121,7 @@ public final class ElasticsearchBackendSettings {
 	 * Whether check version of the Elasticsearch cluster is enabled.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
-	 * or a string that can be parsed to such Boolean value.
+	 * or a string that can be parsed into a Boolean value.
 	 * <p>
 	 * Defaults to {@link Defaults#VERSION_CHECK_ENABLED}.
 	 */
@@ -216,7 +216,7 @@ public final class ElasticsearchBackendSettings {
 	 * Whether automatic discovery of nodes in the Elasticsearch cluster is enabled.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
-	 * or a string that can be parsed to such Boolean value.
+	 * or a string that can be parsed into a Boolean value.
 	 * <p>
 	 * Defaults to {@link Defaults#DISCOVERY_ENABLED}.
 	 * <p>
@@ -275,7 +275,7 @@ public final class ElasticsearchBackendSettings {
 	 * Whether JSON included in logs should be pretty-printed (indented, with line breaks).
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
-	 * or a string that can be parsed to such Boolean value.
+	 * or a string that can be parsed into a Boolean value.
 	 * <p>
 	 * Defaults to {@link Defaults#LOG_JSON_PRETTY_PRINTING}.
 	 */
@@ -321,7 +321,7 @@ public final class ElasticsearchBackendSettings {
 	 * The size of the thread pool assigned to the backend.
 	 * <p>
 	 * Expects a strictly positive integer value,
-	 * or a string that can be parsed to such integer value.
+	 * or a string that can be parsed into an integer value.
 	 * <p>
 	 * Defaults to the number of processor cores available to the JVM on startup.
 	 * <p>

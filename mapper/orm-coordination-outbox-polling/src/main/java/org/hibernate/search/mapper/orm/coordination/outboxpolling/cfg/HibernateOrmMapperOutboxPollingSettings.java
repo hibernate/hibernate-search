@@ -59,7 +59,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
-	 * or a string that can be parsed to such Boolean value.
+	 * or a string that can be parsed into a Boolean value.
 	 * <p>
 	 * Defaults to {@link Defaults#COORDINATION_EVENT_PROCESSOR_ENABLED}.
 	 * <p>
