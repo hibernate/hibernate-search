@@ -17,8 +17,7 @@ import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import org.hibernate.dialect.Sybase11Dialect;
-import org.hibernate.dialect.SybaseASE15Dialect;
+import org.hibernate.dialect.SybaseDialect;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -41,7 +40,7 @@ import static org.junit.Assert.assertEquals;
 public class LobTest extends SearchTestBase {
 
 	@Test
-	@SkipForDialect(value = { SybaseASE15Dialect.class, Sybase11Dialect.class },
+	@SkipForDialect(value = { SybaseDialect.class },
 			comment = "Sybase does not support @Lob")
 	public void testCreateIndexSearchEntityWithLobField() {
 		// create and index
