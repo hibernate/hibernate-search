@@ -374,7 +374,7 @@
         <version.enforcer.plugin>3.2.1</version.enforcer.plugin>
         <version.exec.plugin>3.1.0</version.exec.plugin>
         <version.forbiddenapis.plugin>3.4</version.forbiddenapis.plugin>
-        <version.help.plugin>3.3.0</version.help.plugin>
+        <version.help.plugin>3.4.0</version.help.plugin>
         <version.install.plugin>3.1.0</version.install.plugin>
         <version.io.takari.maven>0.7.7</version.io.takari.maven>
         <version.jandex.plugin>1.2.3</version.jandex.plugin>
