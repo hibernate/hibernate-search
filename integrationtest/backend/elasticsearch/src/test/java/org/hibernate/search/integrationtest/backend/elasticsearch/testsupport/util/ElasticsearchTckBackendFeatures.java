@@ -300,4 +300,10 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// cannot extract the nested like structure as we can for a normal projection from source...
 		return false;
 	}
+
+	@Override
+	public boolean supportsHighlighterFastVectorNoMatchSizeOnMultivaluedFields() {
+		// https://github.com/elastic/elasticsearch/issues/94550
+		return false;
+	}
 }

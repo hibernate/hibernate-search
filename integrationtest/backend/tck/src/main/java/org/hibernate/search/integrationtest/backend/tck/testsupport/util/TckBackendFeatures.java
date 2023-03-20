@@ -150,4 +150,8 @@ public abstract class TckBackendFeatures {
 	public boolean supportsHighlighterOnNonStoredFields() {
 		return true;
 	}
+
+	public boolean supportsHighlighterFastVectorNoMatchSizeOnMultivaluedFields() {
+		return true;
+	}
 }

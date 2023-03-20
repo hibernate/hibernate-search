@@ -441,6 +441,31 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
+	public void noMatchSizeMultiField() {
+		assumeTrue( supportsNoMatchSizeOnMultivaluedFields() );
+
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<List<String>> highlights = scope.query().select(
+						f -> f.highlight( "multiValuedString" )
+				)
+				.where( f -> f.match().field( "nested.nestedString" ).matching( "dog" ) )
+				// set to max possible value so that all highlighters can return something:
+				.highlighter( h -> highlighter( h ).noMatchSize( Integer.MAX_VALUE ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						// expect first value if none match in a multi-value field:
+						Collections.singletonList( "The quick brown fox jumps right over the little lazy dog" )
+				);
+	}
+
+	protected boolean supportsNoMatchSizeOnMultivaluedFields() {
+		return true;
+	}
+
+	@Test
 	public void compositeHighlight() {
 		StubMappingScope scope = index.createScope();
 

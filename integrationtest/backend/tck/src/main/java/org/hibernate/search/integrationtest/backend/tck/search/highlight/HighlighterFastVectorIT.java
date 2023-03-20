@@ -17,6 +17,7 @@ import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFastVectorH
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterTagSchema;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Test;
@@ -55,6 +56,12 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 						"jumps right over the little lazy <em>dog</em> This"
 				)
 		);
+	}
+
+	@Override
+	protected boolean supportsNoMatchSizeOnMultivaluedFields() {
+		return TckConfiguration.get().getBackendFeatures()
+				.supportsHighlighterFastVectorNoMatchSizeOnMultivaluedFields();
 	}
 
 	@Test
