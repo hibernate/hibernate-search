@@ -1,3 +1,48 @@
+diff --git a/test/java/org/hibernate/search/test/configuration/LobTest.java b/test/java/org/hibernate/search/test/configuration/LobTest.java
+index fc90c71105..eb45ab96a2 100644
+--- a/test/java/org/hibernate/search/test/configuration/LobTest.java
++++ b/test/java/org/hibernate/search/test/configuration/LobTest.java
+@@ -17,8 +17,7 @@
+ import org.hibernate.Session;
+ import org.hibernate.Transaction;
+ 
+-import org.hibernate.dialect.Sybase11Dialect;
+-import org.hibernate.dialect.SybaseASE15Dialect;
++import org.hibernate.dialect.SybaseDialect;
+ import org.hibernate.search.FullTextQuery;
+ import org.hibernate.search.FullTextSession;
+ import org.hibernate.search.Search;
+@@ -41,7 +40,7 @@
+ public class LobTest extends SearchTestBase {
+ 
+ 	@Test
+-	@SkipForDialect(value = { SybaseASE15Dialect.class, Sybase11Dialect.class },
++	@SkipForDialect(value = { SybaseDialect.class },
+ 			comment = "Sybase does not support @Lob")
+ 	public void testCreateIndexSearchEntityWithLobField() {
+ 		// create and index
+diff --git a/test/java/org/hibernate/search/test/envers/SearchAndEnversIntegrationTest.java b/test/java/org/hibernate/search/test/envers/SearchAndEnversIntegrationTest.java
+index 7b56a4138d..fabd083ba0 100644
+--- a/test/java/org/hibernate/search/test/envers/SearchAndEnversIntegrationTest.java
++++ b/test/java/org/hibernate/search/test/envers/SearchAndEnversIntegrationTest.java
+@@ -12,7 +12,7 @@
+ import org.apache.lucene.search.Query;
+ import org.apache.lucene.search.TermQuery;
+ import org.hibernate.Transaction;
+-import org.hibernate.dialect.PostgreSQL81Dialect;
++import org.hibernate.dialect.PostgreSQLDialect;
+ import org.hibernate.envers.AuditReader;
+ import org.hibernate.envers.AuditReaderFactory;
+ import org.hibernate.envers.query.AuditEntity;
+@@ -36,7 +36,7 @@
+  *
+  * @author Davide Di Somma <davide.disomma@gmail.com>
+  */
+-@SkipForDialect(jiraKey = "HSEARCH-1943", value = PostgreSQL81Dialect.class)
++@SkipForDialect(jiraKey = "HSEARCH-1943", value = PostgreSQLDialect.class)
+ @Category(PortedToSearch6.class)
+ public class SearchAndEnversIntegrationTest extends SearchTestBase {
+ 
 diff --git a/test/java/org/hibernate/search/test/query/LuceneQueryTest.java b/test/java/org/hibernate/search/test/query/LuceneQueryTest.java
 index 94e8526ff0..0ef022a044 100644
 --- a/test/java/org/hibernate/search/test/query/LuceneQueryTest.java
