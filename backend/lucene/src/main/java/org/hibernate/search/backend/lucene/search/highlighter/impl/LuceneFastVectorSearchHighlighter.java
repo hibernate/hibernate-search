@@ -10,6 +10,7 @@ import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneF
 
 import java.io.IOException;
 import java.text.BreakIterator;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -23,10 +24,12 @@ import org.hibernate.search.engine.search.highlighter.spi.BoundaryScannerType;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.search.highlight.Encoder;
 import org.apache.lucene.search.vectorhighlight.BoundaryScanner;
 import org.apache.lucene.search.vectorhighlight.BreakIteratorBoundaryScanner;
 import org.apache.lucene.search.vectorhighlight.FastVectorHighlighter;
+import org.apache.lucene.search.vectorhighlight.FieldFragList;
 import org.apache.lucene.search.vectorhighlight.FieldQuery;
 import org.apache.lucene.search.vectorhighlight.FragListBuilder;
 import org.apache.lucene.search.vectorhighlight.FragmentsBuilder;
@@ -95,6 +98,7 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 		private final FieldQuery fieldQuery;
 		private final FragListBuilder fragListBuilder;
 		private final FragmentsBuilder fragmentsBuilder;
+		private final FragmentsBuilder noMatchFragments;
 		private final String[] preTags;
 		private final String[] postTags;
 		private final Integer maxNumFragments;
@@ -129,6 +133,7 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 				builder.setDiscreteMultiValueHighlighting( true );
 				this.fragmentsBuilder = builder;
 			}
+			this.noMatchFragments = new NoMatchFragmentsBuilder( this.preTags, this.postTags, boundaryScanner );
 			this.maxNumFragments = numberOfFragments > 0 ? numberOfFragments : Integer.MAX_VALUE;
 		}
 
@@ -179,7 +184,7 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 				SimpleFieldFragList fieldFragList = new SimpleFieldFragList( -1 );
 				fieldFragList.add( 0, LuceneFastVectorSearchHighlighter.this.noMatchSize, Collections.emptyList() );
 
-				String[] fragment = fragmentsBuilder.createFragments(
+				String[] fragment = noMatchFragments.createFragments(
 						leafReaderContext.reader(), doc, field, fieldFragList, 1, preTags, postTags,
 						LuceneFastVectorSearchHighlighter.this.encoder
 				);
@@ -187,6 +192,25 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 						fragment[0] );
 			}
 			return Collections.emptyList();
+		}
+	}
+
+	private static class NoMatchFragmentsBuilder extends SimpleFragmentsBuilder {
+		public NoMatchFragmentsBuilder(String[] preTags, String[] postTags, BoundaryScanner bs) {
+			super( preTags, postTags, bs );
+			setDiscreteMultiValueHighlighting( true );
+		}
+
+		@Override
+		protected List<FieldFragList.WeightedFragInfo> discreteMultiValueHighlighting(
+				List<FieldFragList.WeightedFragInfo> fragInfos, Field[] fields) {
+			List<FieldFragList.WeightedFragInfo> result = new ArrayList<>();
+
+			for ( Field field : fields ) {
+				result.add( new FieldFragList.WeightedFragInfo( 0, field.stringValue().length(), Collections.emptyList(), 0.0f ) );
+			}
+
+			return result;
 		}
 	}
 }
