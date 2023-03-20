@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNull;
 import java.util.List;
 
 import org.hibernate.Transaction;
-import org.hibernate.dialect.PostgreSQL81Dialect;
+import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.query.AuditEntity;
@@ -38,7 +38,7 @@ import org.apache.lucene.search.TermQuery;
  *
  * @author Davide Di Somma <davide.disomma@gmail.com>
  */
-@SkipForDialect(jiraKey = "HSEARCH-1943", value = PostgreSQL81Dialect.class)
+@SkipForDialect(jiraKey = "HSEARCH-1943", value = PostgreSQLDialect.class)
 @Category(PortedToSearch6.class)
 public class SearchAndEnversIntegrationTest extends SearchTestBase {
 
