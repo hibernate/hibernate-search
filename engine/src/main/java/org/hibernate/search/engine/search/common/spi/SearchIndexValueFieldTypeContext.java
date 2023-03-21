@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.common.spi;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 
 /**
  * Information about the type of a value (non-object) field targeted by search,
@@ -55,4 +56,5 @@ public interface SearchIndexValueFieldTypeContext<
 		}
 	}
 
+	boolean highlighterTypeSupported(SearchHighlighterType type);
 }

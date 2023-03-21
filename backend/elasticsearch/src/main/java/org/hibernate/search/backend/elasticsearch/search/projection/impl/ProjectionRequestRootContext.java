@@ -18,4 +18,5 @@ public interface ProjectionRequestRootContext extends ProjectionRequestContext {
 
 	ElasticsearchSearchHighlighter highlighter(String highlighterName);
 
+	ElasticsearchSearchHighlighter queryHighlighter();
 }

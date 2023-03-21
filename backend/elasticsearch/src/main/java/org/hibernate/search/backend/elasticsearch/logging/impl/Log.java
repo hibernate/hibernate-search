@@ -25,6 +25,7 @@ import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
+import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.sort.SearchSort;
@@ -772,4 +773,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 165,
 			value = "Highlighter with name '%1$s' is already defined. Use a different name to add another highlighter.")
 	SearchException highlighterWithTheSameNameCannotBeAdded(String highlighterName);
+
+	@Message(id = ID_OFFSET + 166,
+			value = "'%1$s' highlighter type cannot be applied to '%2$s' field. " +
+					"'%2$s' must have term vectors set to 'with_positions_offsets' or 'with_positions_offsets_payloads' in case of the Fast Vector Highlighter being used.")
+	SearchException highlighterTypeNotSupported(SearchHighlighterType type, String field);
 }

@@ -18,6 +18,9 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldTypeContext;
+import org.hibernate.search.backend.elasticsearch.search.highlighter.impl.ElasticsearchSearchHighlighter;
+import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.dsl.spi.HighlightProjectionBuilder;
@@ -36,6 +39,7 @@ public class ElasticsearchFieldHighlightProjection implements ElasticsearchSearc
 	private final String[] absoluteFieldPathComponents;
 
 	private final String highlighterName;
+	private final ElasticsearchSearchIndexValueFieldTypeContext<?> typeContext;
 
 	private ElasticsearchFieldHighlightProjection(Builder builder) {
 		this( builder.scope, builder.field, builder.highlighterName() );
@@ -48,6 +52,7 @@ public class ElasticsearchFieldHighlightProjection implements ElasticsearchSearc
 		this.absoluteFieldPath = field.absolutePath();
 		this.absoluteFieldPathComponents = field.absolutePathComponents();
 		this.highlighterName = highlighterName;
+		this.typeContext = field.type();
 	}
 
 	@Override
@@ -66,7 +71,20 @@ public class ElasticsearchFieldHighlightProjection implements ElasticsearchSearc
 	@Override
 	public FieldHighlightExtractor request(JsonObject requestBody, ProjectionRequestContext context) {
 		ProjectionRequestContext innerContext = context.forField( absoluteFieldPath, absoluteFieldPathComponents );
-		context.root().highlighter( highlighterName ).applyToField(
+		ElasticsearchSearchHighlighter highlighter = context.root().highlighter( highlighterName );
+
+		SearchHighlighterType highlighterType = highlighter.type();
+		if ( highlighterType == null ) {
+			// this can happen if field highlighter has no configuration or is using a default highlighter,
+			// if so let's try to get the type from a global config:
+			ElasticsearchSearchHighlighter queryHighlighter = context.root().queryHighlighter();
+			highlighterType = queryHighlighter != null ? queryHighlighter.type() : null;
+		}
+		if ( !typeContext.highlighterTypeSupported( highlighterType ) ) {
+			throw log.highlighterTypeNotSupported( highlighterType, absoluteFieldPath );
+		}
+
+		highlighter.applyToField(
 				absoluteFieldPath,
 				REQUEST_HIGHLIGHT_FIELDS_ACCESSOR.getOrCreate( requestBody, JsonObject::new )
 		);

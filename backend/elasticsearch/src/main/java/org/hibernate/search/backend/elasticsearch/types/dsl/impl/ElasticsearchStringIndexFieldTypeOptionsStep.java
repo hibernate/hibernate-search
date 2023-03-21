@@ -182,6 +182,8 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 
 		ElasticsearchStringFieldCodec codec = ElasticsearchStringFieldCodec.INSTANCE;
 		builder.codec( codec );
+		builder.storeTermVectorOffsets(
+				resolveTermVector().startsWith( TermVector.WITH_POSITIONS_OFFSETS.name().toLowerCase( Locale.ROOT ) ) );
 
 		if ( resolvedSearchable ) {
 			builder.searchable( true );

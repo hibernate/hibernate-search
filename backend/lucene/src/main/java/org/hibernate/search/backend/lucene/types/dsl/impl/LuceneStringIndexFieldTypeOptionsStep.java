@@ -165,13 +165,15 @@ class LuceneStringIndexFieldTypeOptionsStep
 			}
 		}
 
+		FieldType fieldType = getFieldType( resolvedProjectable, resolvedSearchable, analyzer != null, resolvedNorms, resolvedTermVector );
 		LuceneStringFieldCodec codec = new LuceneStringFieldCodec(
-				getFieldType( resolvedProjectable, resolvedSearchable, analyzer != null, resolvedNorms, resolvedTermVector ),
+				fieldType,
 				docValues,
 				indexNullAsValue,
 				builder.indexingAnalyzerOrNormalizer()
 		);
 		builder.codec( codec );
+		builder.storeTermVectorOffsets( fieldType != null && fieldType.storeTermVectorOffsets() );
 
 		if ( resolvedSearchable ) {
 			builder.searchable( true );

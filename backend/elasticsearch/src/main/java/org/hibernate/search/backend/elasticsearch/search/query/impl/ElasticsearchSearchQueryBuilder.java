@@ -245,7 +245,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 		ElasticsearchSearchQueryRequestContext requestContext = new ElasticsearchSearchQueryRequestContext(
 				scope, sessionContext, loadingContext, rootPredicateContext, distanceSorts,
-				namedHighlighters
+				namedHighlighters, queryHighlighter
 		);
 
 		ElasticsearchSearchProjection.Extractor<?, H> rootExtractor = rootProjection.request( payload, requestContext );

@@ -21,6 +21,7 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionExtractContext;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFragmenter;
 import org.hibernate.search.engine.search.highlighter.spi.BoundaryScannerType;
+import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -80,6 +81,11 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 			ProjectionAccumulator<String, ?, A, List<String>> accumulator) {
 		return new UnifiedHighlighterValues<>(
 				parentDocumentPath, nestedDocumentPath, absoluteFieldPath, analyzer, context, accumulator );
+	}
+
+	@Override
+	public SearchHighlighterType type() {
+		return SearchHighlighterType.UNIFIED;
 	}
 
 	private final class UnifiedHighlighterValues<A> extends HighlighterValues<A> {

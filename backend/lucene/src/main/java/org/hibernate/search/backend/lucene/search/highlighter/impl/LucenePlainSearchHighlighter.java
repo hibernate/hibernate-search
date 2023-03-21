@@ -23,6 +23,7 @@ import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionExtr
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionRequestContext;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFragmenter;
 import org.hibernate.search.engine.search.highlighter.spi.BoundaryScannerType;
+import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -90,6 +91,11 @@ class LucenePlainSearchHighlighter extends LuceneAbstractSearchHighlighter {
 			ProjectionAccumulator<String, ?, A, List<String>> accumulator) {
 		return new PlainHighlighterValues<>(
 				parentDocumentPath, nestedDocumentPath, absoluteFieldPath, analyzer, context, accumulator );
+	}
+
+	@Override
+	public SearchHighlighterType type() {
+		return SearchHighlighterType.PLAIN;
 	}
 
 	@Override
