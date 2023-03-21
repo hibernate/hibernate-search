@@ -8,8 +8,8 @@ package org.hibernate.search.backend.elasticsearch.search.highlighter.impl;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Objects;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -53,7 +53,7 @@ public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHi
 	private static final JsonAccessor<Integer> PHRASE_LIMIT = JsonAccessor.root().property( "phrase_limit" ).asInteger();
 
 	private final Set<String> indexNames;
-	private final String type;
+	private final SearchHighlighterType type;
 	private final String boundaryChars;
 	private final Integer boundaryMaxScan;
 	private final Integer fragmentSize;
@@ -73,7 +73,7 @@ public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHi
 	private ElasticsearchSearchHighlighterImpl(Builder builder) {
 		this(
 				builder.scope.hibernateSearchIndexNames(),
-				convertHighlighterType( builder.type() ),
+				builder.type(),
 				builder.boundaryCharsAsString(),
 				builder.boundaryMaxScan(), builder.fragmentSize(), builder.noMatchSize(), builder.numberOfFragments(),
 				Boolean.TRUE.equals( builder.orderByScore() ) ? "score" : null, builder.maxAnalyzedOffset(), builder.preTags(),
@@ -86,7 +86,7 @@ public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHi
 		);
 	}
 
-	private ElasticsearchSearchHighlighterImpl(Set<String> indexNames, String type, String boundaryChars,
+	private ElasticsearchSearchHighlighterImpl(Set<String> indexNames, SearchHighlighterType type, String boundaryChars,
 			Integer boundaryMaxScan, Integer fragmentSize, Integer noMatchSize, Integer numberOfFragments,
 			String orderByScore, Integer maxAnalyzedOffset, List<String> preTags, List<String> postTags,
 			String boundaryScannerType, String boundaryScannerLocale, String fragmenterType,
@@ -138,8 +138,13 @@ public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHi
 		return indexNames;
 	}
 
+	@Override
+	public SearchHighlighterType type() {
+		return type;
+	}
+
 	private JsonObject toJson(JsonObject result) {
-		setIfNotNull( TYPE, this.type, result );
+		setIfNotNull( TYPE, convertHighlighterType( this.type ), result );
 		setIfNotNull( BOUNDARY_CHARS, this.boundaryChars, result );
 		setIfNotNull( BOUNDARY_MAX_SCAN, this.boundaryMaxScan, result );
 		setIfNotNull( FRAGMENT_SIZE, this.fragmentSize, result );
@@ -186,6 +191,9 @@ public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHi
 		}
 	}
 	private static String convertHighlighterType(SearchHighlighterType type) {
+		if ( type == null ) {
+			return null;
+		}
 		switch ( type ) {
 			case UNIFIED:
 				return "unified";

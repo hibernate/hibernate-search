@@ -49,6 +49,7 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootCon
 	private final PredicateRequestContext rootPredicateContext;
 	private final Map<DistanceSortKey, Integer> distanceSorts;
 	private final Map<String, ElasticsearchSearchHighlighter> namedHighlighters;
+	private final ElasticsearchSearchHighlighter queryHighlighter;
 
 	ElasticsearchSearchQueryRequestContext(
 			ElasticsearchSearchIndexScope<?> scope,
@@ -56,13 +57,15 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootCon
 			SearchLoadingContext<?, ?> loadingContext,
 			PredicateRequestContext rootPredicateContext,
 			Map<DistanceSortKey, Integer> distanceSorts,
-			Map<String, ElasticsearchSearchHighlighter> namedHighlighters) {
+			Map<String, ElasticsearchSearchHighlighter> namedHighlighters,
+			ElasticsearchSearchHighlighter queryHighlighter) {
 		this.scope = scope;
 		this.sessionContext = sessionContext;
 		this.loadingContext = loadingContext;
 		this.rootPredicateContext = rootPredicateContext;
 		this.distanceSorts = distanceSorts != null ? Collections.unmodifiableMap( distanceSorts ) : null;
 		this.namedHighlighters = namedHighlighters;
+		this.queryHighlighter = queryHighlighter;
 	}
 
 	@Override
@@ -119,6 +122,11 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootCon
 			throw log.cannotFindHighlighter( highlighterName, namedHighlighters.keySet() );
 		}
 		return highlighter;
+	}
+
+	@Override
+	public ElasticsearchSearchHighlighter queryHighlighter() {
+		return queryHighlighter;
 	}
 
 	ElasticsearchSearchQueryExtractContext createExtractContext(JsonObject responseBody) {

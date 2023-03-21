@@ -25,6 +25,7 @@ import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFragmenter;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterTagSchema;
 import org.hibernate.search.engine.search.highlighter.spi.BoundaryScannerType;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterBuilder;
+import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -157,9 +158,8 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 	public LuceneAbstractSearchHighlighter withFallback(LuceneAbstractSearchHighlighter fallback) {
 		Contracts.assertNotNull( fallback, "fallback highlighter" );
 
-		if ( !this.getClass().equals( fallback.getClass() ) ) {
-			throw log.cannotMixDifferentHighlighterTypesAtOverrideLevel(
-					this.getClass().getSimpleName(), fallback.getClass().getSimpleName() );
+		if ( !this.type().equals( fallback.type() ) ) {
+			throw log.cannotMixDifferentHighlighterTypesAtOverrideLevel( this.type(), fallback.type() );
 		}
 		return createHighlighterSameType(
 				indexNames,
@@ -200,6 +200,8 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 	public abstract <A> Values<A> createValues(String parentDocumentPath, String nestedDocumentPath,
 			String absoluteFieldPath, Analyzer analyzer, ProjectionExtractContext context,
 			ProjectionAccumulator<String, ?, A, List<String>> accumulator);
+
+	public abstract SearchHighlighterType type();
 
 	public static class Builder extends SearchHighlighterBuilder {
 

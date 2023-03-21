@@ -11,6 +11,7 @@ import java.util.Objects;
 
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 
 public abstract class AbstractMultiIndexSearchIndexValueFieldContext<
 				S extends SearchIndexValueFieldContext<SC>,
@@ -93,5 +94,14 @@ public abstract class AbstractMultiIndexSearchIndexValueFieldContext<
 	public final ProjectionConverter<F, F> rawProjectionConverter() {
 		return fromTypeIfCompatible( SearchIndexValueFieldTypeContext::rawProjectionConverter,
 				ProjectionConverter::isCompatibleWith, "rawProjectionConverter" );
+	}
+
+	@Override
+	public boolean highlighterTypeSupported(SearchHighlighterType type) {
+		return fromTypeIfCompatible(
+				t -> t.highlighterTypeSupported( type ),
+				Object::equals,
+				"highlighterTypeSupported"
+		);
 	}
 }

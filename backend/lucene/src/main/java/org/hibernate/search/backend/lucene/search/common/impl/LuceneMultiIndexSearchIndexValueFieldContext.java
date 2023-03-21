@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.search.common.spi.AbstractMultiIndexSearchIndexValueFieldContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
+import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 
 import org.apache.lucene.analysis.Analyzer;
 
@@ -57,5 +58,4 @@ public class LuceneMultiIndexSearchIndexValueFieldContext<F>
 		return fromTypeIfCompatible( LuceneSearchIndexValueFieldTypeContext::searchAnalyzerOrNormalizer, Object::equals,
 				"searchAnalyzerOrNormalizer" );
 	}
-
 }

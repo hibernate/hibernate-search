@@ -883,7 +883,7 @@ public abstract class AbstractHighlighterIT {
 			anotherStringField = root.field( "anotherString", f -> f.asString()
 					.projectable( Projectable.YES )
 					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
-					.termVector( TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS )
+					.termVector( TermVector.WITH_POSITIONS_OFFSETS )
 			).toReference();
 
 			IndexSchemaObjectField objectField = root.objectField( "nested" );

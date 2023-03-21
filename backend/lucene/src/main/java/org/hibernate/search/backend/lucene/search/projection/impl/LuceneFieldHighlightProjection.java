@@ -15,6 +15,7 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldTypeContext;
 import org.hibernate.search.backend.lucene.search.highlighter.impl.LuceneAbstractSearchHighlighter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.projection.dsl.spi.HighlightProjectionBuilder;
@@ -30,6 +31,7 @@ public class LuceneFieldHighlightProjection implements LuceneSearchProjection<Li
 	private final String absoluteFieldPath;
 	private final String highlighterName;
 	private final String nestedDocumentPath;
+	private final LuceneSearchIndexValueFieldTypeContext<?> typeContext;
 
 	private LuceneFieldHighlightProjection(Builder builder) {
 		this( builder.scope, builder.field, builder.highlighterName() );
@@ -43,6 +45,7 @@ public class LuceneFieldHighlightProjection implements LuceneSearchProjection<Li
 		this.absoluteFieldPath = field.absolutePath();
 		this.highlighterName = highlighterName;
 		this.nestedDocumentPath = field.nestedDocumentPath();
+		this.typeContext = field.type();
 	}
 
 	@Override
@@ -62,6 +65,9 @@ public class LuceneFieldHighlightProjection implements LuceneSearchProjection<Li
 	public FieldHighlightExtractor<?> request(ProjectionRequestContext context) {
 		context.checkValidField( absoluteFieldPath );
 		LuceneAbstractSearchHighlighter highlighter = context.highlighter( highlighterName );
+		if ( !typeContext.highlighterTypeSupported( highlighter.type() ) ) {
+			throw log.highlighterTypeNotSupported( highlighter.type(), absoluteFieldPath );
+		}
 		highlighter.request( context, absoluteFieldPath );
 		return new FieldHighlightExtractor<>( context.absoluteCurrentFieldPath(), highlighter,
 				ProjectionAccumulator.<String>list().get() );

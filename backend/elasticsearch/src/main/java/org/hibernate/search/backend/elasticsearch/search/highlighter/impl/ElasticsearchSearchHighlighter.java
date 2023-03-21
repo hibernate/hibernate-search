@@ -12,6 +12,7 @@ import java.util.Set;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
+import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
@@ -25,6 +26,8 @@ public interface ElasticsearchSearchHighlighter extends SearchHighlighter {
 	void applyToField(String path, JsonObject fields);
 
 	Set<String> indexNames();
+
+	SearchHighlighterType type();
 
 	static ElasticsearchSearchHighlighter from(ElasticsearchSearchIndexScope<?> scope, SearchHighlighter highlighter) {
 		if ( !( highlighter instanceof ElasticsearchSearchHighlighter ) ) {
