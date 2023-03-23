@@ -93,7 +93,7 @@ public class ProjectionConversionTest {
 	public void projectingUnstoredField() {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Cannot use 'projection:field' on field 'unstoredField'" );
-		thrown.expectMessage( "Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)" );
+		thrown.expectMessage( "Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)" );
 
 		projectionTestHelper( "unstoredField", null );
 	}

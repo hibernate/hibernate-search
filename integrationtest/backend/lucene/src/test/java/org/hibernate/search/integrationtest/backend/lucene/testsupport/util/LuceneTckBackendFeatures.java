@@ -69,10 +69,4 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 		// While in ES a custom field highlighter is used that supports this setting.
 		return false;
 	}
-
-	@Override
-	public boolean supportsHighlighterOnNonStoredFields() {
-		// For highlighters in Lucene to work fields must be stored.
-		return false;
-	}
 }

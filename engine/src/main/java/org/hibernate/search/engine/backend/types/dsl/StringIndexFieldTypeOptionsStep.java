@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.engine.backend.types.dsl;
 
+import java.util.Collection;
+
+import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.TermVector;
 
@@ -65,4 +68,11 @@ public interface StringIndexFieldTypeOptionsStep<S extends StringIndexFieldTypeO
 	 */
 	S termVector(TermVector termVector);
 
+	/**
+	 * @param highlightable Whether highlighting is supported and if so which highlighter types can be applied.
+	 * Pass {@code Collections.singleton(Highlightable.NO)} to disable highlighting.
+	 * @return {@code this}, for method chaining.
+	 * @see Highlightable
+	 */
+	S highlightable(Collection<Highlightable> highlightable);
 }

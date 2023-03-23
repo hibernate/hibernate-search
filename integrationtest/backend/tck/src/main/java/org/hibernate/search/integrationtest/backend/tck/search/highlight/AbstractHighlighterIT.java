@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.backend.tck.search.highlight;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
-import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 import java.time.LocalDate;
@@ -20,12 +19,13 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterEncoder;
-import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterOptionsStep;
+import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -667,8 +667,8 @@ public abstract class AbstractHighlighterIT {
 		).isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot use 'projection:highlight' on field 'notAnalyzedString':",
-						"Highlighting is only supported for analyzed text fields.",
-						"Additionally, in case of using a fast vector highlighter the term vector storing must be enabled for the field."
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant).",
+						"If it already is, then 'projection:highlight' is not available for fields of this type."
 				);
 	}
 
@@ -683,7 +683,7 @@ public abstract class AbstractHighlighterIT {
 				.hasMessageContainingAll(
 						"Inconsistent support for 'projection:highlight'",
 						"'projection:highlight' can be used in some of the targeted indexes, but not all of them.",
-						"Make sure that the field has the same type in all indexes"
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant) in all indexes, and that the field has the same type in all indexes"
 				);
 	}
 
@@ -698,7 +698,7 @@ public abstract class AbstractHighlighterIT {
 				.hasMessageContainingAll(
 						"Inconsistent support for 'projection:highlight'",
 						"'projection:highlight' can be used in some of the targeted indexes, but not all of them.",
-						"Make sure that the field has the same type in all indexes"
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant) in all indexes, and that the field has the same type in all indexes."
 				);
 	}
 
@@ -818,50 +818,6 @@ public abstract class AbstractHighlighterIT {
 				);
 	}
 
-	@Test
-	public void nonProjectableFieldSupported() {
-		assumeTrue(
-				TckConfiguration.get().getBackendFeatures().supportsHighlighterOnNonStoredFields()
-		);
-
-
-		SearchQuery<List<String>> highlights = index.createScope().query().select(
-						f -> f.highlight( "stringNotProjectable" )
-				).where( f -> f.match().field( "stringNotProjectable" ).matching( "dog" ) )
-				.highlighter( h -> highlighter( h ).fragmentSize( 200 ) )
-				.toQuery();
-
-		assertThatHits( highlights.fetchAllHits() )
-				.hasHitsAnyOrder(
-						Arrays.asList(
-								Collections.singletonList( "The quick brown fox jumps right over the little lazy <em>dog</em>" )
-						)
-				);
-	}
-
-	@Test
-	public void nonProjectableFieldNotSupported() {
-		assumeFalse(
-				TckConfiguration.get().getBackendFeatures().supportsHighlighterOnNonStoredFields()
-		);
-
-		assertThatThrownBy(
-				() -> index.createScope().query().select(
-								f -> f.highlight( "stringNotProjectable" )
-						).where( f -> f.match().field( "stringNotProjectable" ).matching( "dog" ) )
-						.highlighter( h -> highlighter( h ) )
-						.toQuery()
-		).isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Cannot use 'projection:highlight' on field 'stringNotProjectable'",
-						"Highlighting is only supported for analyzed text fields.",
-						"Additionally, in case of using a fast vector highlighter the term vector storing must be enabled for the field.",
-						"Only stored fields can be highlighted.",
-						"Mark this field as projectable to make highlighting work for it."
-				);
-
-	}
-
 	private static class IndexBinding {
 		final IndexFieldReference<String> stringField;
 		final IndexFieldReference<String> anotherStringField;
@@ -875,13 +831,13 @@ public abstract class AbstractHighlighterIT {
 
 		IndexBinding(IndexSchemaElement root) {
 			stringField = root.field( "string", f -> f.asString()
-					.projectable( Projectable.YES )
+					.highlightable( Collections.singletonList( Highlightable.ANY ) )
 					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 					.termVector( TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS )
 			).toReference();
 
 			anotherStringField = root.field( "anotherString", f -> f.asString()
-					.projectable( Projectable.YES )
+					.highlightable( Collections.singletonList( Highlightable.ANY ) )
 					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 					.termVector( TermVector.WITH_POSITIONS_OFFSETS )
 			).toReference();
@@ -890,21 +846,19 @@ public abstract class AbstractHighlighterIT {
 			nested = objectField.toReference();
 
 			nestedString = objectField.field( "nestedString", f -> f.asString()
-					.projectable( Projectable.YES )
+					.highlightable( Collections.singletonList( Highlightable.ANY ) )
 					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
-					.termVector( TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS )
 			).toReference();
 
 			notAnalyzedString = root.field( "notAnalyzedString", f -> f.asString() ).toReference();
 
 			multiValuedString = root.field( "multiValuedString", f -> f.asString()
-					.projectable( Projectable.YES )
+					.highlightable( Collections.singletonList( Highlightable.ANY ) )
 					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
-					.termVector( TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS )
 			).multiValued().toReference();
 
 			stringNoTermVectorField = root.field( "stringNoTermVector", f -> f.asString()
-					.projectable( Projectable.YES )
+					.highlightable( Arrays.asList( Highlightable.UNIFIED, Highlightable.PLAIN ) )
 					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 			).toReference();
 
@@ -912,7 +866,6 @@ public abstract class AbstractHighlighterIT {
 
 			stringNotProjectableField = root.field( "stringNotProjectable", f -> f.asString()
 					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
-					.termVector( TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS )
 			).toReference();
 		}
 	}

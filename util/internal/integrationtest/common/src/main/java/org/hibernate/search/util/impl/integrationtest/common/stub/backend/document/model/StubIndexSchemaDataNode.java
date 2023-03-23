@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model;
 
+import java.util.Collection;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.types.Aggregable;
+import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.TermVector;
@@ -228,6 +230,11 @@ public final class StubIndexSchemaDataNode extends StubTreeNode<StubIndexSchemaD
 
 		public Builder termVector(TermVector termVector) {
 			attribute( "termVector", termVector );
+			return this;
+		}
+
+		public Builder highlightable(Collection<Highlightable> highlightable) {
+			attribute( "highlightable", highlightable.toArray() );
 			return this;
 		}
 

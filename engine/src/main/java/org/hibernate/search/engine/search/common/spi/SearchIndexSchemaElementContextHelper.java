@@ -9,10 +9,8 @@ package org.hibernate.search.engine.search.common.spi;
 import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
-import org.hibernate.search.engine.backend.reporting.spi.BackendHints;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -52,18 +50,12 @@ public abstract class SearchIndexSchemaElementContextHelper {
 
 	public static final SearchIndexSchemaElementContextHelper VALUE_FIELD = new SearchIndexSchemaElementContextHelper() {
 		@Override
-		protected String missingSupportHint(SearchQueryElementTypeKey<?> key, BackendHints hints) {
-			if ( ProjectionTypeKeys.HIGHLIGHT.equals( key ) ) {
-				return log.highlightNotSupported( hints.highlightNotSupportedAdditionalMessage() );
-			}
+		protected String missingSupportHint(SearchQueryElementTypeKey<?> key) {
 			return log.missingSupportHintForValueField( key );
 		}
 
 		@Override
-		public String partialSupportHint(SearchQueryElementTypeKey<?> key, BackendHints hints) {
-			if ( ProjectionTypeKeys.HIGHLIGHT.equals( key ) ) {
-				return log.highlightPartiallySupported( hints.highlightNotSupportedAdditionalMessage() );
-			}
+		public String partialSupportHint() {
 			return log.partialSupportHintForValueField();
 		}
 
@@ -71,12 +63,12 @@ public abstract class SearchIndexSchemaElementContextHelper {
 
 	public static final SearchIndexSchemaElementContextHelper COMPOSITE = new SearchIndexSchemaElementContextHelper() {
 		@Override
-		protected String missingSupportHint(SearchQueryElementTypeKey<?> key, BackendHints hints) {
+		protected String missingSupportHint(SearchQueryElementTypeKey<?> key) {
 			return log.missingSupportHintForCompositeNode();
 		}
 
 		@Override
-		public String partialSupportHint(SearchQueryElementTypeKey<?> key, BackendHints hints) {
+		public String partialSupportHint() {
 			return log.partialSupportHintForCompositeNode();
 		}
 	};
@@ -85,7 +77,7 @@ public abstract class SearchIndexSchemaElementContextHelper {
 			T queryElement(SearchQueryElementTypeKey<T> key,
 					SearchQueryElementFactory<? extends T, ? super SC, ? super N> factory, SC scope, N node) {
 		if ( factory == null ) {
-			throw cannotUseQueryElement( key, node, missingSupportHint( key, scope.backendHints() ), null );
+			throw cannotUseQueryElement( key, node, missingSupportHint( key ), null );
 		}
 		try {
 			return factory.create( scope, node );
@@ -102,7 +94,7 @@ public abstract class SearchIndexSchemaElementContextHelper {
 				hint, node.eventContext(), causeOrNull );
 	}
 
-	protected abstract String missingSupportHint(SearchQueryElementTypeKey<?> key, BackendHints hints);
+	protected abstract String missingSupportHint(SearchQueryElementTypeKey<?> key);
 
-	public abstract String partialSupportHint(SearchQueryElementTypeKey<?> key, BackendHints hints);
+	public abstract String partialSupportHint();
 }

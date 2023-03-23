@@ -7,17 +7,18 @@
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
-import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldHighlightProjection;
-import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LucenePredicateTypeKeys;
-import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldHighlightProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
-import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
-import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneTextTermsAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
@@ -31,11 +32,19 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextRegexp
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextTermsPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextWildcardPredicate;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneStandardFieldSort;
+import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.engine.backend.types.Norms;
+import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
+import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
+import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
+import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -62,6 +71,8 @@ class LuceneStringIndexFieldTypeOptionsStep
 	private TermVector termVector = TermVector.DEFAULT;
 
 	private Sortable sortable = Sortable.DEFAULT;
+
+	private Set<Highlightable> highlightable;
 
 	LuceneStringIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, String.class );
@@ -110,6 +121,13 @@ class LuceneStringIndexFieldTypeOptionsStep
 	}
 
 	@Override
+	public LuceneStringIndexFieldTypeOptionsStep highlightable(Collection<Highlightable> highlightable) {
+		Contracts.assertNotNull( highlightable, "highlightable" );
+		this.highlightable = highlightable.isEmpty() ? Collections.emptySet() : EnumSet.copyOf( highlightable );
+		return this;
+	}
+
+	@Override
 	public LuceneStringIndexFieldTypeOptionsStep sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
@@ -118,7 +136,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 	@Override
 	public LuceneIndexValueFieldType<String> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
-		boolean resolvedProjectable = resolveDefault( projectable );
+		boolean resolvedProjectable = resolveProjectable();
 		boolean resolvedSearchable = resolveDefault( searchable );
 		boolean resolvedAggregable = resolveDefault( aggregable );
 		boolean resolvedNorms = resolveNorms();
@@ -131,6 +149,13 @@ class LuceneStringIndexFieldTypeOptionsStep
 			builder.searchAnalyzerName( searchAnalyzerName );
 			builder.indexingAnalyzerOrNormalizer( analyzer );
 			builder.searchAnalyzerOrNormalizer( searchAnalyzer != null ? searchAnalyzer : analyzer );
+
+			Set<SearchHighlighterType> allowedHighlighterTypes = resolveAllowedHighlighterTypes();
+			builder.allowedHighlighterTypes( allowedHighlighterTypes );
+			if ( !allowedHighlighterTypes.isEmpty() ) {
+				builder.queryElementFactory(
+						ProjectionTypeKeys.HIGHLIGHT, new LuceneFieldHighlightProjection.Factory<>() );
+			}
 
 			if ( resolvedSortable ) {
 				throw log.cannotUseAnalyzerOnSortableField( analyzerName, buildContext.getEventContext() );
@@ -165,15 +190,13 @@ class LuceneStringIndexFieldTypeOptionsStep
 			}
 		}
 
-		FieldType fieldType = getFieldType( resolvedProjectable, resolvedSearchable, analyzer != null, resolvedNorms, resolvedTermVector );
 		LuceneStringFieldCodec codec = new LuceneStringFieldCodec(
-				fieldType,
+				getFieldType( resolvedProjectable, resolvedSearchable, analyzer != null, resolvedNorms, resolvedTermVector ),
 				docValues,
 				indexNullAsValue,
 				builder.indexingAnalyzerOrNormalizer()
 		);
 		builder.codec( codec );
-		builder.storeTermVectorOffsets( fieldType != null && fieldType.storeTermVectorOffsets() );
 
 		if ( resolvedSearchable ) {
 			builder.searchable( true );
@@ -203,9 +226,6 @@ class LuceneStringIndexFieldTypeOptionsStep
 		if ( resolvedProjectable ) {
 			builder.projectable( true );
 			builder.queryElementFactory( ProjectionTypeKeys.FIELD, new LuceneFieldProjection.Factory<>( codec ) );
-			if ( analyzer != null ) {
-				builder.queryElementFactory( ProjectionTypeKeys.HIGHLIGHT, new LuceneFieldHighlightProjection.Factory<>() );
-			}
 		}
 
 		if ( resolvedAggregable ) {
@@ -239,7 +259,21 @@ class LuceneStringIndexFieldTypeOptionsStep
 	}
 
 	private ResolvedTermVector resolveTermVector() {
-		switch ( termVector ) {
+		TermVector localTermVector = termVector;
+		if ( highlightable != null && ( highlightable.contains( Highlightable.ANY )
+				|| highlightable.contains( Highlightable.FAST_VECTOR ) ) ) {
+			if ( TermVector.DEFAULT.equals( termVector ) ) {
+				localTermVector = TermVector.WITH_POSITIONS_OFFSETS;
+			}
+			else if ( TermVector.WITH_POSITIONS_OFFSETS.equals( termVector )
+					|| TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS.equals( termVector ) ) {
+				localTermVector = termVector;
+			}
+			else {
+				throw log.termVectorDontAllowFastVectorHighlighter( termVector );
+			}
+		}
+		switch ( localTermVector ) {
 			// using NO as default to be consistent with Elasticsearch,
 			// the default for Lucene would be WITH_POSITIONS_OFFSETS
 			case NO:
@@ -258,7 +292,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 			case WITH_POSITIONS_OFFSETS_PAYLOADS:
 				return new ResolvedTermVector( true, true, true, true );
 			default:
-				throw new AssertionFailure( "Unexpected value for TermVector: " + termVector );
+				throw new AssertionFailure( "Unexpected value for TermVector: " + localTermVector );
 		}
 	}
 
@@ -316,5 +350,57 @@ class LuceneStringIndexFieldTypeOptionsStep
 			fieldType.setStoreTermVectorOffsets( offsets );
 			fieldType.setStoreTermVectorPayloads( payloads );
 		}
+	}
+
+	private boolean resolveProjectable() {
+		if ( highlightable != null && !highlightable.contains( Highlightable.NO ) ) {
+			return true;
+		}
+		return resolveDefault( projectable );
+	}
+
+	private Set<SearchHighlighterType> resolveAllowedHighlighterTypes() {
+		if ( highlightable == null ) {
+			highlightable = EnumSet.of( Highlightable.DEFAULT );
+		}
+		if ( highlightable.isEmpty() ) {
+			throw log.noHighlightableProvided();
+		}
+		if ( highlightable.contains( Highlightable.DEFAULT ) ) {
+			// means we have the default case, so let's check if either plain or unified highlighters can be applied:
+			if ( Projectable.YES.equals( projectable ) ) {
+				if ( TermVector.WITH_POSITIONS_OFFSETS.equals( termVector ) ||
+						TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS.equals( termVector ) ) {
+					highlightable = EnumSet.of( Highlightable.ANY );
+				}
+				else {
+					highlightable = EnumSet.of( Highlightable.UNIFIED, Highlightable.PLAIN );
+				}
+			}
+		}
+
+		if ( highlightable.contains( Highlightable.NO ) ) {
+			if ( highlightable.size() == 1 ) {
+				return Collections.emptySet();
+			}
+			else {
+				throw log.unsupportedMixOfHighlightableValues( highlightable );
+			}
+		}
+		if ( highlightable.contains( Highlightable.ANY ) ) {
+			return EnumSet.of( SearchHighlighterType.PLAIN, SearchHighlighterType.UNIFIED, SearchHighlighterType.FAST_VECTOR );
+		}
+		Set<SearchHighlighterType> highlighters = new HashSet<>();
+		if ( highlightable.contains( Highlightable.PLAIN ) ) {
+			highlighters.add( SearchHighlighterType.PLAIN );
+		}
+		if ( highlightable.contains( Highlightable.UNIFIED ) ) {
+			highlighters.add( SearchHighlighterType.UNIFIED );
+		}
+		if ( highlightable.contains( Highlightable.FAST_VECTOR ) ) {
+			highlighters.add( SearchHighlighterType.FAST_VECTOR );
+		}
+
+		return highlighters.isEmpty() ? Collections.emptySet() : EnumSet.copyOf( highlighters );
 	}
 }
