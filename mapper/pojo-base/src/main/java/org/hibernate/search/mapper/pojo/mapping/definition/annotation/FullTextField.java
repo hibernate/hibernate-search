@@ -14,6 +14,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
+import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
@@ -95,6 +96,12 @@ public @interface FullTextField {
 	 * @see Searchable
 	 */
 	Searchable searchable() default Searchable.DEFAULT;
+
+	/**
+	 * @return Whether this field can be highlighted, and if so which highlighter types can be applied to it.
+	 * @see Highlightable
+	 */
+	Highlightable[] highlightable() default Highlightable.DEFAULT;
 
 	/**
 	 * @return A reference to the value bridge to use for this field.

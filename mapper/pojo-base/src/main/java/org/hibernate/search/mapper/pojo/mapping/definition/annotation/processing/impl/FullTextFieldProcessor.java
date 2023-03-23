@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
+import java.util.Arrays;
+import java.util.Collections;
+
+import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
@@ -39,6 +43,12 @@ public class FullTextFieldProcessor extends AbstractStandardFieldAnnotationProce
 		if ( !TermVector.DEFAULT.equals( termVector ) ) {
 			fieldContext.termVector( termVector );
 		}
+		Highlightable[] highlightable = getHighlightable( annotation );
+		if ( !( highlightable.length == 1 && Highlightable.DEFAULT.equals( highlightable[0] ) ) ) {
+			fieldContext.highlightable(
+					highlightable.length == 0 ? Collections.emptyList() : Arrays.asList( highlightable )
+			);
+		}
 
 		return fieldContext;
 	}
@@ -56,6 +66,10 @@ public class FullTextFieldProcessor extends AbstractStandardFieldAnnotationProce
 	@Override
 	Searchable getSearchable(FullTextField annotation) {
 		return annotation.searchable();
+	}
+
+	Highlightable[] getHighlightable(FullTextField annotation) {
+		return annotation.highlightable();
 	}
 
 	@Override

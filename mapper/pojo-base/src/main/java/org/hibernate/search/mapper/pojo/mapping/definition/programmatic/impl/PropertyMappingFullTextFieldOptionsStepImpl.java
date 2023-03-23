@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
+import java.util.Collection;
+
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
+import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributorContext;
@@ -52,6 +55,12 @@ class PropertyMappingFullTextFieldOptionsStepImpl
 	@Override
 	public PropertyMappingFullTextFieldOptionsStep termVector(TermVector termVector) {
 		fieldModelContributor.add( c -> c.stringTypeOptionsStep().termVector( termVector ) );
+		return thisAsS();
+	}
+
+	@Override
+	public PropertyMappingFullTextFieldOptionsStep highlightable(Collection<Highlightable> highlightable) {
+		fieldModelContributor.add( c -> c.stringTypeOptionsStep().highlightable( highlightable ) );
 		return thisAsS();
 	}
 

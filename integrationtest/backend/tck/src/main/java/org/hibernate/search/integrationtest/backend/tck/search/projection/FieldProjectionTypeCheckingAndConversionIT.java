@@ -169,7 +169,7 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot use 'projection:field' on field '" + fieldPath + "'",
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)"
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)"
 				);
 	}
 
@@ -188,7 +188,7 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot use 'projection:field' on field '" + fieldPath + "'",
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)"
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)"
 				);
 	}
 

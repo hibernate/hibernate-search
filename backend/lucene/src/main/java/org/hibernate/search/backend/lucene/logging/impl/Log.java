@@ -18,6 +18,8 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
+import org.hibernate.search.engine.backend.types.Highlightable;
+import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
@@ -662,6 +664,20 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 165,
 			value = "'%1$s' highlighter type cannot be applied to '%2$s' field. " +
-					"'%2$s' must have term vectors set to 'with_positions_offsets' or 'with_positions_offsets_payloads' in case of the Fast Vector Highlighter being used.")
+					"'%2$s' must have either 'ANY' or '%1$s' among the configured highlightable values.")
 	SearchException highlighterTypeNotSupported(SearchHighlighterType type, String field);
+
+	@Message(id = ID_OFFSET + 166,
+			value = "Cannot use 'NO' in combination with other highlightable values. Applied values are: '%1$s'")
+	SearchException unsupportedMixOfHighlightableValues(Set<Highlightable> highlightable);
+
+	@Message(id = ID_OFFSET + 167,
+			value = "The '%1$s' term vector storage strategy is not compatible with the fast vector highlighter. " +
+					"Either change the strategy to one of `WITH_POSITIONS_PAYLOADS`/`WITH_POSITIONS_OFFSETS_PAYLOADS` or remove the requirement for the fast vector highlighter support.")
+	SearchException termVectorDontAllowFastVectorHighlighter(TermVector termVector);
+
+	@Message(id = ID_OFFSET + 168,
+			value = "Setting the `highlightable` attribute to an empty array is not supported. " +
+					"Set the value to `NO` if the field does not require the highlight projection.")
+	SearchException noHighlightableProvided();
 }

@@ -25,8 +25,9 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
@@ -1664,10 +1665,10 @@ public class HighlightProjectionBaseIT {
 				Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
 			absolutePath = FieldPaths.compose( parentAbsolutePath, relativeFieldName );
 			singleValuedField = SimpleFieldModelsByType.mapAll( fieldTypes, objectField, "singleValuedField_",
-					b -> b.projectable( Projectable.YES )
+					b -> ( (StringIndexFieldTypeOptionsStep<?>) b ).highlightable( Collections.singletonList( Highlightable.ANY ) )
 			);
 			multiValuedField = SimpleFieldModelsByType.mapAllMultiValued( fieldTypes, objectField, "multiValuedField_",
-					b -> b.projectable( Projectable.YES )
+					b -> ( (StringIndexFieldTypeOptionsStep<?>) b ).highlightable( Collections.singletonList( Highlightable.ANY ) )
 			);
 			reference = objectField.toReference();
 		}
@@ -1703,7 +1704,7 @@ public class HighlightProjectionBaseIT {
 				String relativeFieldName, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
 			absolutePath = FieldPaths.compose( parentAbsolutePath, relativeFieldName );
 			multiValuedField = SimpleFieldModelsByType.mapAllMultiValued( fieldTypes, objectField, "multiValuedField_",
-					b -> b.projectable( Projectable.YES )
+					b -> ( (StringIndexFieldTypeOptionsStep<?>) b ).highlightable( Collections.singletonList( Highlightable.ANY ) )
 			);
 			reference = objectField.toReference();
 		}

@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.dsl.impl;
 
+import java.util.Collection;
+
+import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
@@ -50,6 +53,12 @@ class StubStringIndexFieldTypeOptionsStep
 	@Override
 	public StubStringIndexFieldTypeOptionsStep termVector(TermVector termVector) {
 		builder.modifier( b -> b.termVector( termVector ) );
+		return this;
+	}
+
+	@Override
+	public StubStringIndexFieldTypeOptionsStep highlightable(Collection<Highlightable> highlightable) {
+		builder.modifier( b -> b.highlightable( highlightable ) );
 		return this;
 	}
 }

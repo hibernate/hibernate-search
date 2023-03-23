@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
-import org.hibernate.search.engine.backend.reporting.spi.BackendHints;
 import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 
-public final class StubMappingHints implements BackendMappingHints, BackendHints {
+public final class StubMappingHints implements BackendMappingHints {
 	public static final StubMappingHints INSTANCE = new StubMappingHints();
 
 	private StubMappingHints() {
@@ -23,10 +22,5 @@ public final class StubMappingHints implements BackendMappingHints, BackendHints
 	@Override
 	public String missingDecimalScale() {
 		return getClass().getName() + "#missingDecimalScale";
-	}
-
-	@Override
-	public String highlightNotSupportedAdditionalMessage() {
-		return getClass().getName() + "#highlightNotSupportedAdditionalMessage";
 	}
 }

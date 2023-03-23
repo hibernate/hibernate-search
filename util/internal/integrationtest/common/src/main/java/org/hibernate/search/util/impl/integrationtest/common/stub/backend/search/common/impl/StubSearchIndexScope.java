@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
-import org.hibernate.search.engine.backend.reporting.spi.BackendHints;
 import org.hibernate.search.engine.backend.scope.spi.AbstractSearchIndexScope;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
@@ -82,11 +81,6 @@ public class StubSearchIndexScope
 	@Override
 	public StubSearchIndexScope withRoot(String objectFieldPath) {
 		return new StubSearchIndexScope( this, field( objectFieldPath ).toComposite() );
-	}
-
-	@Override
-	public BackendHints backendHints() {
-		return null;
 	}
 
 	@Override

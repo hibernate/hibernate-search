@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
+import java.util.Collection;
+
+import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
@@ -49,4 +52,12 @@ public interface PropertyMappingFullTextFieldOptionsStep
 	 */
 	PropertyMappingFullTextFieldOptionsStep termVector(TermVector termVector);
 
+	/**
+	 * @param highlightable Whether this field can be highlighted, and if so which highlighter types can be applied to it.
+	 * Pass {@code Collections.singleton(Highlightable.NO)} to disable highlighting.
+	 * @return {@code this}, for method chaining.
+	 * @see FullTextField#highlightable()
+	 * @see Highlightable
+	 */
+	PropertyMappingFullTextFieldOptionsStep highlightable(Collection<Highlightable> highlightable);
 }

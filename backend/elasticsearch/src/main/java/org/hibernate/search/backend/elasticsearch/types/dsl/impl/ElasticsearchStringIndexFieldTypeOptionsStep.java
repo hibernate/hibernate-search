@@ -7,16 +7,21 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchTermsAggregation;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldHighlightProjection;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchExistsPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchPredicateTypeKeys;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchRangePredicate;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldHighlightProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjection;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchStringFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldState;
@@ -27,6 +32,7 @@ import org.hibernate.search.backend.elasticsearch.types.predicate.impl.Elasticse
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextWildcardPredicate;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSort;
 import org.hibernate.search.engine.backend.types.Aggregable;
+import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -35,10 +41,12 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
+import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
@@ -60,6 +68,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 	private Aggregable aggregable = Aggregable.DEFAULT;
 	private String indexNullAs;
 	private TermVector termVector = TermVector.DEFAULT;
+	private Set<Highlightable> highlightable;
 
 	ElasticsearchStringIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, String.class );
@@ -98,6 +107,13 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 	@Override
 	public ElasticsearchStringIndexFieldTypeOptionsStep termVector(TermVector termVector) {
 		this.termVector = termVector;
+		return this;
+	}
+
+	@Override
+	public ElasticsearchStringIndexFieldTypeOptionsStep highlightable(Collection<Highlightable> highlightable) {
+		Contracts.assertNotNull( highlightable, "highlightable" );
+		this.highlightable = highlightable.isEmpty() ? Collections.emptySet() : EnumSet.copyOf( highlightable );
 		return this;
 	}
 
@@ -144,7 +160,12 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 
 			builder.analyzerName( analyzerName );
 			builder.searchAnalyzerName( searchAnalyzerName );
-			builder.queryElementFactory( ProjectionTypeKeys.HIGHLIGHT, new ElasticsearchFieldHighlightProjection.Factory<>() );
+			Set<SearchHighlighterType> allowedHighlighterTypes = resolveAllowedHighlighterTypes();
+			builder.allowedHighlighterTypes( allowedHighlighterTypes );
+			if ( !allowedHighlighterTypes.isEmpty() ) {
+				builder.queryElementFactory(
+						ProjectionTypeKeys.HIGHLIGHT, new ElasticsearchFieldHighlightProjection.Factory<>() );
+			}
 
 			if ( normalizerName != null ) {
 				throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, buildContext.getEventContext() );
@@ -182,8 +203,6 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 
 		ElasticsearchStringFieldCodec codec = ElasticsearchStringFieldCodec.INSTANCE;
 		builder.codec( codec );
-		builder.storeTermVectorOffsets(
-				resolveTermVector().startsWith( TermVector.WITH_POSITIONS_OFFSETS.name().toLowerCase( Locale.ROOT ) ) );
 
 		if ( resolvedSearchable ) {
 			builder.searchable( true );
@@ -235,12 +254,68 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 	}
 
 	private String resolveTermVector() {
-		switch ( termVector ) {
-			case NO:
-			case DEFAULT:
-				return "no";
-			default:
+		if ( highlightable != null && ( highlightable.contains( Highlightable.FAST_VECTOR )
+				|| highlightable.contains( Highlightable.ANY ) ) ) {
+			if ( TermVector.DEFAULT.equals( termVector ) ) {
+				return TermVector.WITH_POSITIONS_OFFSETS.name().toLowerCase( Locale.ROOT );
+			}
+			else if ( TermVector.WITH_POSITIONS_OFFSETS.equals( termVector )
+					|| TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS.equals( termVector ) ) {
 				return termVector.name().toLowerCase( Locale.ROOT );
+			}
+			else {
+				throw log.termVectorDontAllowFastVectorHighlighter( termVector );
+			}
 		}
+		else {
+			switch ( termVector ) {
+				case NO:
+				case DEFAULT:
+					return "no";
+				default:
+					return termVector.name().toLowerCase( Locale.ROOT );
+			}
+		}
+	}
+
+	private Set<SearchHighlighterType> resolveAllowedHighlighterTypes() {
+		if ( highlightable == null ) {
+			highlightable = EnumSet.of( Highlightable.DEFAULT );
+		}
+		if ( highlightable.isEmpty() ) {
+			throw log.noHighlightableProvided();
+		}
+		if ( highlightable.contains( Highlightable.DEFAULT ) ) {
+			if ( TermVector.WITH_POSITIONS_OFFSETS.equals( termVector ) ||
+					TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS.equals( termVector ) ) {
+				highlightable = EnumSet.of( Highlightable.ANY );
+			}
+			else {
+				highlightable = EnumSet.of( Highlightable.UNIFIED, Highlightable.PLAIN );
+			}
+		}
+		if ( highlightable.contains( Highlightable.NO ) ) {
+			if ( highlightable.size() == 1 ) {
+				return Collections.emptySet();
+			}
+			else {
+				throw log.unsupportedMixOfHighlightableValues( highlightable );
+			}
+		}
+		if ( highlightable.contains( Highlightable.ANY ) ) {
+			return EnumSet.of( SearchHighlighterType.PLAIN, SearchHighlighterType.UNIFIED, SearchHighlighterType.FAST_VECTOR );
+		}
+		Set<SearchHighlighterType> highlighters = new HashSet<>();
+		if ( highlightable.contains( Highlightable.PLAIN ) ) {
+			highlighters.add( SearchHighlighterType.PLAIN );
+		}
+		if ( highlightable.contains( Highlightable.UNIFIED ) ) {
+			highlighters.add( SearchHighlighterType.UNIFIED );
+		}
+		if ( highlightable.contains( Highlightable.FAST_VECTOR ) ) {
+			highlighters.add( SearchHighlighterType.FAST_VECTOR );
+		}
+
+		return EnumSet.copyOf( highlighters );
 	}
 }

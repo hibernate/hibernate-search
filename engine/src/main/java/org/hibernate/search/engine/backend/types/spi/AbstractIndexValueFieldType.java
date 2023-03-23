@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.engine.backend.types.spi;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
@@ -39,7 +41,7 @@ public abstract class AbstractIndexValueFieldType<
 	private final boolean sortable;
 	private final boolean projectable;
 	private final boolean aggregable;
-	private final boolean storeTermVectorOffsets;
+	private final Set<SearchHighlighterType> allowedHighlighterTypes;
 
 	private final Map<SearchQueryElementTypeKey<?>, SearchQueryElementFactory<?, ? super SC, ? super N>> queryElementFactories;
 
@@ -57,7 +59,7 @@ public abstract class AbstractIndexValueFieldType<
 		this.sortable = builder.sortable;
 		this.projectable = builder.projectable;
 		this.aggregable = builder.aggregable;
-		this.storeTermVectorOffsets = builder.storeTermVectorOffsets;
+		this.allowedHighlighterTypes = Collections.unmodifiableSet( builder.allowedHighlighterTypes );
 		this.queryElementFactories = builder.queryElementFactories;
 		this.analyzerName = builder.analyzerName;
 		this.searchAnalyzerName = builder.searchAnalyzerName != null ? builder.searchAnalyzerName : builder.analyzerName;
@@ -154,10 +156,7 @@ public abstract class AbstractIndexValueFieldType<
 
 	@Override
 	public boolean highlighterTypeSupported(SearchHighlighterType type) {
-		if ( SearchHighlighterType.FAST_VECTOR.equals( type ) ) {
-			return storeTermVectorOffsets;
-		}
-		return true;
+		return allowedHighlighterTypes.contains( type );
 	}
 
 	public abstract static class Builder<
@@ -177,7 +176,7 @@ public abstract class AbstractIndexValueFieldType<
 		private boolean sortable;
 		private boolean projectable;
 		private boolean aggregable;
-		private boolean storeTermVectorOffsets;
+		private Set<SearchHighlighterType> allowedHighlighterTypes = Collections.emptySet();
 
 		private final Map<SearchQueryElementTypeKey<?>, SearchQueryElementFactory<?, ? super SC, ? super N>>
 				queryElementFactories = new HashMap<>();
@@ -220,8 +219,8 @@ public abstract class AbstractIndexValueFieldType<
 			this.aggregable = aggregable;
 		}
 
-		public final void storeTermVectorOffsets(boolean storeTermVectorOffsets) {
-			this.storeTermVectorOffsets = storeTermVectorOffsets;
+		public final void allowedHighlighterTypes(Set<SearchHighlighterType> allowedHighlighterTypes) {
+			this.allowedHighlighterTypes = allowedHighlighterTypes;
 		}
 
 		public final <T> void queryElementFactory(SearchQueryElementTypeKey<T> key,

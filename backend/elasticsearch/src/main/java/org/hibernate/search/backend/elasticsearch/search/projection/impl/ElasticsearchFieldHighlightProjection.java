@@ -79,6 +79,7 @@ public class ElasticsearchFieldHighlightProjection implements ElasticsearchSearc
 			// if so let's try to get the type from a global config:
 			ElasticsearchSearchHighlighter queryHighlighter = context.root().queryHighlighter();
 			highlighterType = queryHighlighter != null ? queryHighlighter.type() : null;
+			highlighterType = highlighterType == null ? SearchHighlighterType.UNIFIED : highlighterType;
 		}
 		if ( !typeContext.highlighterTypeSupported( highlighterType ) ) {
 			throw log.highlighterTypeNotSupported( highlighterType, absoluteFieldPath );

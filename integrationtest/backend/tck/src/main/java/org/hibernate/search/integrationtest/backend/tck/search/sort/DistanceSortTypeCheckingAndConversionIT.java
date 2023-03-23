@@ -110,7 +110,7 @@ public class DistanceSortTypeCheckingAndConversionIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot use 'sort:distance' on field '" + fieldPath + "'",
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)"
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)"
 				);
 	}
 

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.highlight;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 
 import java.util.Arrays;
@@ -19,7 +18,6 @@ import org.hibernate.search.engine.search.highlighter.dsl.HighlighterTagSchema;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Test;
@@ -365,19 +363,4 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 				);
 	}
 
-	@Test
-	public void highlightFieldWithNoTermVectors() {
-		assertThatThrownBy(
-				() -> index.createScope().query().select(
-								f -> f.highlight( "stringNoTermVector" )
-						)
-						.where( f -> f.match().field( "stringNoTermVector" ).matching( "boo" ) )
-						.highlighter( h -> h.fastVector() )
-						.toQuery()
-		).isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"'FAST_VECTOR' highlighter type cannot be applied to 'stringNoTermVector' field",
-						"'stringNoTermVector' must have term vectors set to 'with_positions_offsets' or 'with_positions_offsets_payloads' in case of the Fast Vector Highlighter being used"
-				);
-	}
 }
