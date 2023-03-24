@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
+import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.PojoAutomaticIndexingTypeFilterHolder;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
@@ -52,6 +53,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 
 	private final Consumer<SelectionLoadingOptionsStep> loadingOptionsContributor;
 	private final ConfiguredIndexingPlanSynchronizationStrategyHolder synchronizationStrategyHolder;
+	private final PojoAutomaticIndexingTypeFilterHolder indexingTypeFilterHolder = new PojoAutomaticIndexingTypeFilterHolder();
 
 	private SearchIndexingPlanImpl indexingPlan;
 	private SearchIndexer indexer;
@@ -175,6 +177,11 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	@Override
 	public PojoSelectionLoadingContext defaultLoadingContext() {
 		return loadingContextBuilder().build();
+	}
+
+	@Override
+	public PojoAutomaticIndexingTypeFilterHolder indexingTypeFilterHolder() {
+		return indexingTypeFilterHolder;
 	}
 
 	@Override

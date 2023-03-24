@@ -321,4 +321,11 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET + 123, value = "Configuration property '%1$s' is deprecated; use '%2$s' instead.")
 	void automaticIndexingSynchronizationStrategyIsDeprecated(String deprecatedProperty, String newProperty);
+
+	@Message(id = ID_OFFSET + 124,
+			value = "'%1$s' cannot be included and excluded at the same time within one filter. " +
+					"Already included types: '%2$s'. " +
+					"Already excluded types: '%3$s'.")
+	SearchException automaticIndexingFilterCannotIncludeExcludeSameType(PojoRawTypeIdentifier<?> typeIdentifier,
+			Set<PojoRawTypeIdentifier<?>> includes, Set<PojoRawTypeIdentifier<?>> excludes);
 }
