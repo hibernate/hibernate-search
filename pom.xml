@@ -918,6 +918,11 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-integrationtest-mapper-pojo-standalone-realbackend</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-integrationtest-showcase-library</artifactId>
                 <version>${project.version}</version>
             </dependency>
