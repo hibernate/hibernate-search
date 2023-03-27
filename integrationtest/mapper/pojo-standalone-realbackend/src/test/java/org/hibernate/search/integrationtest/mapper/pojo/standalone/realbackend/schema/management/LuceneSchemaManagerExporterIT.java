@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.hibernate.search.integrationtest.mapper.pojo.standalone.realbackend.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -44,14 +46,14 @@ public class LuceneSchemaManagerExporterIT {
 		Path directory = temporaryFolder.newFolder().toPath();
 		mapping.scope( Object.class ).schemaManager().exportExpectedSchema( directory );
 
-		String bookIndex = Files.readString(
+		String bookIndex = readString(
 				directory.resolve( "backend" ) // as we are using the default backend
 						.resolve( "indexes" )
 						.resolve( Book.NAME )
 						.resolve( "no-schema.txt" ) );
 		assertThat( bookIndex ).isEqualTo( "The Lucene backend does not support exporting the schema." );
 
-		String articleIndex = Files.readString(
+		String articleIndex = readString(
 				directory.resolve( "backends" ) // as we are not using the default backend
 						.resolve( Article.BACKEND_NAME ) // name of a backend
 						.resolve( "indexes" )
@@ -109,6 +111,12 @@ public class LuceneSchemaManagerExporterIT {
 
 		public void setTitle(String title) {
 			this.title = title;
+		}
+	}
+
+	private String readString(Path path) throws IOException {
+		try ( Stream<String> lines = Files.lines( path ) ) {
+			return lines.collect( Collectors.joining( "\n" ) );
 		}
 	}
 }

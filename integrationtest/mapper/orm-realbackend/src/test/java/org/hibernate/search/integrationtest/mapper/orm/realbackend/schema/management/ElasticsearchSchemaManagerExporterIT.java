@@ -14,6 +14,8 @@ import static org.junit.Assume.assumeFalse;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.testsupport.BackendConfigurations;
@@ -45,7 +47,7 @@ public class ElasticsearchSchemaManagerExporterIT {
 						osVersion -> false
 				)
 		);
-		String version = ElasticsearchTestDialect.getActualVersion().versionString();
+		String version = ElasticsearchTestDialect.getActualVersion().toString();
 		entityManagerFactory = setupHelper.start()
 				// so that we don't try to do anything with the schema and allow to run without ES being up:
 				.withProperty( "hibernate.search.schema_management.strategy", "none" )
@@ -84,7 +86,7 @@ public class ElasticsearchSchemaManagerExporterIT {
 						"  }," +
 						"  \"settings\": {}" +
 						"}",
-				Files.readString(
+				readString(
 						directory.resolve( "backend" ) // as we are using the default backend
 								.resolve( "indexes" )
 								.resolve( Book.NAME )
@@ -93,7 +95,7 @@ public class ElasticsearchSchemaManagerExporterIT {
 
 		assertJsonEquals(
 				"{}",
-				Files.readString(
+				readString(
 						directory.resolve( "backend" ) // as we are using the default backend
 								.resolve( "indexes" )
 								.resolve( Book.NAME )
@@ -129,7 +131,7 @@ public class ElasticsearchSchemaManagerExporterIT {
 						"  }," +
 						"  \"settings\": {}" +
 						"}",
-				Files.readString(
+				readString(
 						directory.resolve( "backends" ) // as we are not using the default backend
 								.resolve( Article.BACKEND_NAME ) // name of a backend
 								.resolve( "indexes" )
@@ -139,12 +141,18 @@ public class ElasticsearchSchemaManagerExporterIT {
 
 		assertJsonEquals(
 				"{}",
-				Files.readString(
+				readString(
 						directory.resolve( "backends" ) // as we are not using the default backend
 								.resolve( Article.BACKEND_NAME ) // name of a backend
 								.resolve( "indexes" )
 								.resolve( Article.NAME )
 								.resolve( "create-index-query-params.json" ) )
 		);
+	}
+
+	private String readString(Path path) throws IOException {
+		try ( Stream<String> lines = Files.lines( path ) ) {
+			return lines.collect( Collectors.joining( "\n" ) );
+		}
 	}
 }
