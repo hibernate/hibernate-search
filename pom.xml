@@ -386,7 +386,7 @@
         <version.processor.plugin>4.5-jdk8</version.processor.plugin>
         <version.project-info.plugin>3.4.2</version.project-info.plugin>
         <version.release.plugin>2.5.3</version.release.plugin>
-        <version.resources.plugin>3.3.0</version.resources.plugin>
+        <version.resources.plugin>3.3.1</version.resources.plugin>
         <version.shade.plugin>3.4.1</version.shade.plugin>
         <version.site.plugin>3.12.1</version.site.plugin>
         <version.source.plugin>3.2.1</version.source.plugin>
