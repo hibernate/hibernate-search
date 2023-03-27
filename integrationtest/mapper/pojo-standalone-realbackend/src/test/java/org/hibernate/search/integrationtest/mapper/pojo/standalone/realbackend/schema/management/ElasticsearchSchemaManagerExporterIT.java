@@ -13,9 +13,14 @@ import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEqualsIgn
 import static org.junit.Assume.assumeFalse;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.hibernate.search.integrationtest.mapper.pojo.standalone.realbackend.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -43,7 +48,7 @@ public class ElasticsearchSchemaManagerExporterIT {
 
 	@Before
 	public void setUp() throws Exception {
-		String version = ElasticsearchTestDialect.getActualVersion().versionString();
+		String version = ElasticsearchTestDialect.getActualVersion().toString();
 		this.mapping = setupHelper.start()
 				// so that we don't try to do anything with the schema and allow to run without ES being up:
 				.withProperty( "hibernate.search.schema_management.strategy", "none" )
@@ -92,7 +97,7 @@ public class ElasticsearchSchemaManagerExporterIT {
 						"  }," +
 						"  \"settings\": {}" +
 						"}",
-				Files.readString(
+				readString(
 						directory.resolve( "backend" ) // as we are using the default backend
 								.resolve( "indexes" )
 								.resolve( Book.NAME )
@@ -101,7 +106,7 @@ public class ElasticsearchSchemaManagerExporterIT {
 
 		assertJsonEquals(
 				"{}",
-				Files.readString(
+				readString(
 						directory.resolve( "backend" ) // as we are using the default backend
 								.resolve( "indexes" )
 								.resolve( Book.NAME )
@@ -136,7 +141,7 @@ public class ElasticsearchSchemaManagerExporterIT {
 						"  }," +
 						"  \"settings\": {}" +
 						"}",
-				Files.readString(
+				readString(
 						directory.resolve( "backends" ) // as we are not using the default backend
 								.resolve( Article.BACKEND_NAME ) // name of a backend
 								.resolve( "indexes" )
@@ -146,7 +151,7 @@ public class ElasticsearchSchemaManagerExporterIT {
 
 		assertJsonEquals(
 				"{}",
-				Files.readString(
+				readString(
 						directory.resolve( "backends" ) // as we are not using the default backend
 								.resolve( Article.BACKEND_NAME ) // name of a backend
 								.resolve( "indexes" )
@@ -162,7 +167,7 @@ public class ElasticsearchSchemaManagerExporterIT {
 				.resolve( "indexes" )
 				.resolve( Book.NAME )
 		);
-		Files.writeString(
+		writeString(
 				path
 						.resolve( "not-an-index.json" ),
 				"{}"
@@ -186,7 +191,7 @@ public class ElasticsearchSchemaManagerExporterIT {
 		Path path = Files.createDirectories( directory.resolve( "backend" )
 				.resolve( "indexes" )
 		);
-		Files.writeString(
+		writeString(
 				path.resolve( Book.NAME ),
 				"{}"
 		);
@@ -252,6 +257,19 @@ public class ElasticsearchSchemaManagerExporterIT {
 
 		public void setTitle(String title) {
 			this.title = title;
+		}
+	}
+
+	private String readString(Path path) throws IOException {
+		try ( Stream<String> lines = Files.lines( path ) ) {
+			return lines.collect( Collectors.joining( "\n" ) );
+		}
+	}
+
+	private void writeString(Path path, String string) throws IOException {
+		try ( OutputStream outputStream = Files.newOutputStream( path );
+				OutputStreamWriter writer = new OutputStreamWriter( outputStream, StandardCharsets.UTF_8 ) ) {
+			writer.write( string );
 		}
 	}
 }

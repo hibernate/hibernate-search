@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaCollector;
@@ -77,12 +79,18 @@ public class ElasticsearchIndexSchemaManagerExporterIT {
 						"    }" +
 						"  }" +
 						"}",
-				Files.readString( directory.resolve( testIndexName ).resolve( "create-index.json" ) )
+				readString( directory.resolve( testIndexName ).resolve( "create-index.json" ) )
 		);
 
 		assertJsonEquals(
 				"{}",
-				Files.readString( directory.resolve( testIndexName ).resolve( "create-index-query-params.json" ) )
+				readString( directory.resolve( testIndexName ).resolve( "create-index-query-params.json" ) )
 		);
+	}
+
+	private String readString(Path path) throws IOException {
+		try ( Stream<String> lines = Files.lines( path ) ) {
+			return lines.collect( Collectors.joining( "\n" ) );
+		}
 	}
 }

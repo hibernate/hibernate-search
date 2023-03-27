@@ -11,6 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.testsupport.BackendConfigurations;
@@ -43,19 +45,25 @@ public class LuceneSchemaManagerExporterIT {
 		Path directory = temporaryFolder.newFolder().toPath();
 		Search.mapping( entityManagerFactory ).scope( Object.class ).schemaManager().exportExpectedSchema( directory );
 
-		String bookIndex = Files.readString(
+		String bookIndex = readString(
 				directory.resolve( "backend" ) // as we are using the default backend
 						.resolve( "indexes" )
 						.resolve( Book.NAME )
 						.resolve( "no-schema.txt" ) );
 		assertThat( bookIndex ).isEqualTo( "The Lucene backend does not support exporting the schema." );
 
-		String articleIndex = Files.readString(
+		String articleIndex = readString(
 				directory.resolve( "backends" ) // as we are not using the default backend
 						.resolve( Article.BACKEND_NAME ) // name of a backend
 						.resolve( "indexes" )
 						.resolve( Article.NAME )
 						.resolve( "no-schema.txt" ) );
 		assertThat( articleIndex ).isEqualTo( "The Lucene backend does not support exporting the schema." );
+	}
+
+	private String readString(Path path) throws IOException {
+		try ( Stream<String> lines = Files.lines( path ) ) {
+			return lines.collect( Collectors.joining( "\n" ) );
+		}
 	}
 }
