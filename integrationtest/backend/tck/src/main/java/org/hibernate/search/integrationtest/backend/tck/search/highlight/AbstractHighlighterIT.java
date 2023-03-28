@@ -610,6 +610,44 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
+	public void nestedFieldWildcard() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<List<String>> highlights = scope.query().select(
+						f -> f.highlight( "nested.nestedString" )
+				)
+				.where( f -> f.wildcard().field( "nested.nestedString" ).matching( "fo?" ) )
+				.highlighter( h -> highlighter( h ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						Collections.singletonList(
+								Collections.singletonList(
+										"The quick brown <em>fox</em> jumps right over the little lazy dog" ) )
+				);
+	}
+
+	@Test
+	public void simpleFieldWildcard() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<List<String>> highlights = scope.query().select(
+						f -> f.highlight( "string" )
+				)
+				.where( f -> f.wildcard().field( "string" ).matching( "fo?" ) )
+				.highlighter( h -> highlighter( h ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						Collections.singletonList(
+								Collections.singletonList(
+										"<em>foo</em> and <em>foo</em> and <em>foo</em> much more times" ) )
+				);
+	}
+
+	@Test
 	public void orderByScore() {
 		assumeTrue(
 				"We ignore this test for the highlighters that do not support multi fragments as separate items since there's nothing to sort.",

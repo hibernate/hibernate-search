@@ -19,16 +19,18 @@ import org.apache.lucene.search.TopDocs;
 
 public class TopDocsDataCollectorExecutionContext extends CollectorExecutionContext {
 	private final Query executedQuery;
+	private final Query originalQuery;
 	private final TopDocs topDocs;
 	private final StoredFieldsValuesDelegate storedFieldsValuesDelegate;
 
 	private IntIntMap docIdToScoreDocIndex;
 
 	public TopDocsDataCollectorExecutionContext(IndexReaderMetadataResolver metadataResolver,
-			IndexSearcher indexSearcher, Query executedQuery, TopDocs topDocs,
+			IndexSearcher indexSearcher, Query executedQuery, Query originalQuery, TopDocs topDocs,
 			StoredFieldsValuesDelegate.Factory storedFieldsValuesDelegateOrNull) throws IOException {
 		super( metadataResolver, indexSearcher, topDocs.scoreDocs.length );
 		this.executedQuery = executedQuery;
+		this.originalQuery = originalQuery;
 		this.topDocs = topDocs;
 		this.storedFieldsValuesDelegate = storedFieldsValuesDelegateOrNull == null ? null
 				: storedFieldsValuesDelegateOrNull.create( this );
@@ -36,6 +38,10 @@ public class TopDocsDataCollectorExecutionContext extends CollectorExecutionCont
 
 	public Query executedQuery() {
 		return executedQuery;
+	}
+
+	public Query originalQuery() {
+		return originalQuery;
 	}
 
 	public TopDocs topDocs() {

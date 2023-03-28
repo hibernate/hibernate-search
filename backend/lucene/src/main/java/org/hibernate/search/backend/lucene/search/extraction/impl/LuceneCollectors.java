@@ -45,6 +45,7 @@ public class LuceneCollectors {
 
 	private final IndexSearcher indexSearcher;
 	private final Query rewrittenLuceneQuery;
+	private final Query originalLuceneQuery;
 
 	private final boolean requireFieldDocRescoring;
 	private final Integer scoreSortFieldIndexForRescoring;
@@ -58,7 +59,7 @@ public class LuceneCollectors {
 	private TopDocs topDocs = null;
 
 	LuceneCollectors(IndexReaderMetadataResolver metadataResolver, IndexSearcher indexSearcher,
-			Query rewrittenLuceneQuery,
+			Query rewrittenLuceneQuery, Query originalLuceneQuery,
 			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring,
 			CollectorSet collectorsForAllMatchingDocs,
 			StoredFieldsValuesDelegate.Factory storedFieldsValuesDelegateOrNull,
@@ -66,6 +67,7 @@ public class LuceneCollectors {
 		this.metadataResolver = metadataResolver;
 		this.indexSearcher = indexSearcher;
 		this.rewrittenLuceneQuery = rewrittenLuceneQuery;
+		this.originalLuceneQuery = originalLuceneQuery;
 		this.requireFieldDocRescoring = requireFieldDocRescoring;
 		this.scoreSortFieldIndexForRescoring = scoreSortFieldIndexForRescoring;
 		this.collectorsForAllMatchingDocs = collectorsForAllMatchingDocs;
@@ -232,6 +234,7 @@ public class LuceneCollectors {
 		TopDocsDataCollectorExecutionContext executionContext = new TopDocsDataCollectorExecutionContext(
 				metadataResolver, indexSearcher,
 				rewrittenLuceneQuery,
+				originalLuceneQuery,
 				topDocs,
 				storedFieldsValuesDelegateOrNull
 		);
