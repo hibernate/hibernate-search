@@ -106,6 +106,7 @@ public final class ExtractionRequirements {
 				metadataResolver,
 				indexSearcher,
 				rewrittenLuceneQuery,
+				originalLuceneQuery,
 				requireFieldDocRescoring, scoreSortFieldIndexForRescoring,
 				collectorsForAllMatchingDocs,
 				storedFieldsSourceFactoryOrNull,

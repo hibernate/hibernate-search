@@ -100,7 +100,7 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 			super( parentDocumentPath, nestedDocumentPath, context.collectorExecutionContext(), accumulator );
 			this.fieldsIn = new String[] { field };
 			this.maxPassagesIn = new int[] { LuceneUnifiedSearchHighlighter.this.numberOfFragments };
-			this.query = context.collectorExecutionContext().executedQuery();
+			this.query = context.collectorExecutionContext().originalQuery();
 			PassageFormatterWithEncoder formatter = new PassageFormatterWithEncoder(
 					LuceneUnifiedSearchHighlighter.this.preTags.get( 0 ),
 					LuceneUnifiedSearchHighlighter.this.postTags.get( 0 ),

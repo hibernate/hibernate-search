@@ -117,7 +117,7 @@ class LucenePlainSearchHighlighter extends LuceneAbstractSearchHighlighter {
 			this.analyzer = LimitTokenOffsetAnalyzer.analyzer(
 					analyzer, LucenePlainSearchHighlighter.this.maxAnalyzedOffset );
 
-			QueryScorer queryScorer = new QueryScorer( context.collectorExecutionContext().executedQuery(), field );
+			QueryScorer queryScorer = new QueryScorer( context.collectorExecutionContext().originalQuery(), field );
 			queryScorer.setExpandMultiTermQuery( true );
 
 			Fragmenter fragmenter;

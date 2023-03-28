@@ -26,12 +26,12 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.highlight.Encoder;
 import org.apache.lucene.search.vectorhighlight.BoundaryScanner;
 import org.apache.lucene.search.vectorhighlight.BreakIteratorBoundaryScanner;
 import org.apache.lucene.search.vectorhighlight.FastVectorHighlighter;
 import org.apache.lucene.search.vectorhighlight.FieldFragList;
-import org.apache.lucene.search.vectorhighlight.FieldQuery;
 import org.apache.lucene.search.vectorhighlight.FragListBuilder;
 import org.apache.lucene.search.vectorhighlight.FragmentsBuilder;
 import org.apache.lucene.search.vectorhighlight.ScoreOrderFragmentsBuilder;
@@ -101,7 +101,7 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 	private final class FastVectorHighlighterValues<A> extends HighlighterValues<A> {
 		private final FastVectorHighlighter highlighter;
 		private final String field;
-		private final FieldQuery fieldQuery;
+		private final Query query;
 		private final FragListBuilder fragListBuilder;
 		private final FragmentsBuilder fragmentsBuilder;
 		private final FragmentsBuilder noMatchFragments;
@@ -116,7 +116,7 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 
 			this.highlighter = new FastVectorHighlighter();
 			this.highlighter.setPhraseLimit( LuceneFastVectorSearchHighlighter.this.phraseLimit );
-			this.fieldQuery = highlighter.getFieldQuery( context.collectorExecutionContext().executedQuery() );
+			this.query = context.collectorExecutionContext().originalQuery();
 			this.fragListBuilder =
 					LuceneFastVectorSearchHighlighter.this.numberOfFragments == 0 ? new SingleFragListBuilder() :
 							new SimpleFragListBuilder();
@@ -171,7 +171,7 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 		@Override
 		public List<String> highlight(int doc) throws IOException {
 			String[] bestFragments = highlighter.getBestFragments(
-					fieldQuery,
+					highlighter.getFieldQuery( query, leafReaderContext.reader() ),
 					leafReaderContext.reader(),
 					doc,
 					field,
