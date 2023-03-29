@@ -26,12 +26,14 @@ public final class LuceneIndexValueFieldType<F>
 	private final LuceneFieldCodec<F> codec;
 	private final Analyzer indexingAnalyzerOrNormalizer;
 	private final Analyzer searchAnalyzerOrNormalizer;
+	private final boolean hasTermVectorsConfigured;
 
 	private LuceneIndexValueFieldType(Builder<F> builder) {
 		super( builder );
 		this.codec = builder.codec;
 		this.indexingAnalyzerOrNormalizer = builder.indexingAnalyzerOrNormalizer;
 		this.searchAnalyzerOrNormalizer = builder.searchAnalyzerOrNormalizer;
+		this.hasTermVectorsConfigured = builder.hasTermVectorsConfigured;
 	}
 
 	public LuceneFieldCodec<F> codec() {
@@ -47,6 +49,11 @@ public final class LuceneIndexValueFieldType<F>
 		return searchAnalyzerOrNormalizer;
 	}
 
+	@Override
+	public boolean hasTermVectorsConfigured() {
+		return hasTermVectorsConfigured;
+	}
+
 	public static class Builder<F>
 			extends AbstractIndexValueFieldType.Builder<
 							LuceneSearchIndexScope<?>,
@@ -57,6 +64,7 @@ public final class LuceneIndexValueFieldType<F>
 		private LuceneFieldCodec<F> codec;
 		private Analyzer indexingAnalyzerOrNormalizer;
 		private Analyzer searchAnalyzerOrNormalizer;
+		private boolean hasTermVectorsConfigured;
 
 		public Builder(Class<F> valueClass) {
 			super( valueClass );
@@ -76,6 +84,10 @@ public final class LuceneIndexValueFieldType<F>
 
 		public void searchAnalyzerOrNormalizer(Analyzer analyzer) {
 			this.searchAnalyzerOrNormalizer = analyzer;
+		}
+
+		public void hasTermVectorsConfigured(boolean hasTermVectorsConfigured) {
+			this.hasTermVectorsConfigured = hasTermVectorsConfigured;
 		}
 
 		@Override

@@ -680,4 +680,24 @@ public interface Log extends BasicLogger {
 			value = "Setting the `highlightable` attribute to an empty array is not supported. " +
 					"Set the value to `NO` if the field does not require the highlight projection.")
 	SearchException noHighlightableProvided();
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = ID_OFFSET + 169,
+			value = "Lucene's unified highlighter cannot limit the size of a fragment returned when no match is found. " +
+					"Instead if no match size was set to any positive integer - all text will be returned. " +
+					"Configured value '%1$s' will be ignored, and the fragment will not be limited. " +
+					"If you don't want to see this warning set the value to Integer.MAX_VALUE.")
+	void unifiedHighlighterNoMatchSizeWarning(Integer value);
+
+	@Message(id = ID_OFFSET + 170,
+			value = "Lucene's unified highlighter does not support the size fragment setting. " +
+					"Either use a plain or fast vector highlighters, or do not set this setting.")
+	SearchException unifiedHighlighterFragmentSizeNotSupported();
+
+	@Message(id = ID_OFFSET + 171,
+			value = "Lucene's unified highlighter does not support the max analyzed offset setting " +
+					"on fields that have non default term vector storage strategy configured. " +
+					"The strategy was either configured explicitly, or implicitly because the fast vector highlighter type was requested to be supported. " +
+					"Either use a plain or fast vector highlighters, or do not set this setting.")
+	SearchException unifiedHighlighterMaxAnalyzedOffsetNotSupported();
 }

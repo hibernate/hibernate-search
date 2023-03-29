@@ -17,6 +17,7 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldTypeContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionExtractContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionRequestContext;
 import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
@@ -203,12 +204,24 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 
 	public abstract SearchHighlighterType type();
 
+	public void checkApplicability(LuceneSearchIndexValueFieldTypeContext<?> typeContext) {
+		// do nothing
+	}
+
 	public static class Builder extends SearchHighlighterBuilder {
 
 		private final LuceneSearchIndexScope<?> scope;
 
 		public Builder(LuceneSearchIndexScope<?> scope) {
 			this.scope = scope;
+		}
+
+		@Override
+		public SearchHighlighterBuilder fragmentSize(Integer fragmentSize) {
+			if ( SearchHighlighterType.UNIFIED.equals( type() ) ) {
+				throw log.unifiedHighlighterFragmentSizeNotSupported();
+			}
+			return super.fragmentSize( fragmentSize );
 		}
 
 		public LuceneAbstractSearchHighlighter build() {
