@@ -17,6 +17,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldTypeContext;
 import org.hibernate.search.backend.lucene.search.highlighter.impl.LuceneAbstractSearchHighlighter;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.projection.dsl.spi.HighlightProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
@@ -63,6 +64,12 @@ public class LuceneFieldHighlightProjection implements LuceneSearchProjection<Li
 
 	@Override
 	public FieldHighlightExtractor<?> request(ProjectionRequestContext context) {
+		if ( context.absoluteCurrentFieldPath() != null ) {
+			throw log.cannotHighlightInNestedContext(
+					context.absoluteCurrentFieldPath(),
+					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+			);
+		}
 		context.checkValidField( absoluteFieldPath );
 		LuceneAbstractSearchHighlighter highlighter = context.highlighter( highlighterName );
 		if ( !typeContext.highlighterTypeSupported( highlighter.type() ) ) {
@@ -139,6 +146,12 @@ public class LuceneFieldHighlightProjection implements LuceneSearchProjection<Li
 		@Override
 		public HighlightProjectionBuilder create(LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<F> field) {
+			if ( field.nestedDocumentPath() != null ) {
+				// see HSEARCH-4841 to remove this limitation.
+				throw log.cannotHighlightFieldFromNestedObjectStructure(
+						EventContexts.fromIndexFieldAbsolutePath( field.absolutePath() )
+				);
+			}
 			return new Builder( scope, field );
 		}
 	}

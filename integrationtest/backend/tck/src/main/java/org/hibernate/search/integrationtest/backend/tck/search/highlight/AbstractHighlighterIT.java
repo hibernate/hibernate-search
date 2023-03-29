@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.Highlightable;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
@@ -56,12 +57,15 @@ public abstract class AbstractHighlighterIT {
 			.name( "matchingIndex" );
 	protected static final SimpleMappedIndex<NotMatchingTypeIndexBinding> notMatchingTypeIndex = SimpleMappedIndex.of( NotMatchingTypeIndexBinding::new )
 			.name( "notMatchingTypeIndex" );
+	protected static final SimpleMappedIndex<NestedIndexBinding> nestedIndex = SimpleMappedIndex.of( NestedIndexBinding::new )
+			.name( "nestedIndex" );
 
 	@BeforeClass
 	public static void setup() {
 		setupHelper.start().withIndex( index )
 				.withIndex( matchingIndex )
-				.withIndex( notMatchingTypeIndex ).setup();
+				.withIndex( notMatchingTypeIndex )
+				.withIndex( nestedIndex ).setup();
 
 		index.bulkIndexer()
 				.add( "1", d -> d.addValue( "string", "some value" ) )
@@ -858,6 +862,36 @@ public abstract class AbstractHighlighterIT {
 				);
 	}
 
+	@Test
+	public void highlightInNestedContextNotAllowed() {
+		List<String> objects = Arrays.asList( "objectDefault", "objectFlattened" );
+		for ( String object : objects ) {
+			for ( String level2 : objects ) {
+				assertThatThrownBy( () -> nestedIndex.query().select(
+								f -> f.object( object )
+										.from(
+												f.composite().from(
+														f.field( object + ".string" ),
+														f.object( object + ".level2" + level2 )
+																.from( f.highlight( object + ".level2" + level2 + ".string" ) )
+																.asList()
+												).asList()
+										)
+										.asList()
+						)
+						.where( f -> f.matchAll() )
+						.toQuery() )
+						.as( object )
+						.isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"Highlight projection cannot be applied within nested context of",
+								object,
+								level2
+						);
+			}
+		}
+	}
+
 	private static class IndexBinding {
 		final IndexFieldReference<String> stringField;
 		final IndexFieldReference<String> anotherStringField;
@@ -905,6 +939,44 @@ public abstract class AbstractHighlighterIT {
 			intField = root.field( "int", f -> f.asInteger() ).toReference();
 
 			stringNotProjectableField = root.field( "stringNotProjectable", f -> f.asString()
+					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
+			).toReference();
+		}
+	}
+
+	private static class NestedIndexBinding {
+
+		NestedIndexBinding(IndexSchemaElement root) {
+			createObjects( "", root, 2, true );
+		}
+
+		private void createObjects(String prefix, IndexSchemaElement element, int level, boolean addNested) {
+			IndexSchemaObjectField objectDefault = element.objectField( prefix + "objectDefault" );
+
+			createString( "string", objectDefault );
+			if ( addNested ) {
+				createObjects( "level" + ( level ), objectDefault, level + 1, false );
+			}
+			objectDefault.toReference();
+
+			IndexSchemaObjectField objectNested = element.objectField( prefix + "objectNested", ObjectStructure.NESTED );
+			createString( "string", objectNested );
+			if ( addNested ) {
+				createObjects( "level" + ( level ), objectNested, level + 1, false );
+			}
+			objectNested.toReference();
+
+			IndexSchemaObjectField objectFlattened = element.objectField( prefix + "objectFlattened", ObjectStructure.FLATTENED );
+			createString( "string", objectFlattened );
+			if ( addNested ) {
+				createObjects( "level" + ( level ), objectFlattened, level + 1, false );
+			}
+			objectFlattened.toReference();
+		}
+
+		private IndexFieldReference<String> createString(String name, IndexSchemaObjectField objectField) {
+			return objectField.field( name, f -> f.asString()
+					.highlightable( Arrays.asList( Highlightable.UNIFIED, Highlightable.PLAIN ) )
 					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 			).toReference();
 		}
