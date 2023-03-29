@@ -700,4 +700,13 @@ public interface Log extends BasicLogger {
 					"The strategy was either configured explicitly, or implicitly because the fast vector highlighter type was requested to be supported. " +
 					"Either use a plain or fast vector highlighters, or do not set this setting.")
 	SearchException unifiedHighlighterMaxAnalyzedOffsetNotSupported();
+
+	@Message(id = ID_OFFSET + 172,
+			value = "Highlight projection cannot be applied within nested context of '%1$s'.")
+	SearchException cannotHighlightInNestedContext(String currentNestingField,
+			@Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET + 173,
+			value = "The highlight projection cannot be applied to a field from an object using `ObjectStructure.NESTED` structure.")
+	SearchException cannotHighlightFieldFromNestedObjectStructure(@Param EventContext eventContext);
 }

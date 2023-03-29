@@ -20,6 +20,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldTypeContext;
 import org.hibernate.search.backend.elasticsearch.search.highlighter.impl.ElasticsearchSearchHighlighter;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -70,6 +71,13 @@ public class ElasticsearchFieldHighlightProjection implements ElasticsearchSearc
 
 	@Override
 	public FieldHighlightExtractor request(JsonObject requestBody, ProjectionRequestContext context) {
+		if ( context.absoluteCurrentFieldPath() != null ) {
+			throw log.cannotHighlightInNestedContext(
+					context.absoluteCurrentFieldPath(),
+					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+			);
+		}
+
 		ProjectionRequestContext innerContext = context.forField( absoluteFieldPath, absoluteFieldPathComponents );
 		ElasticsearchSearchHighlighter highlighter = context.root().highlighter( highlighterName );
 
@@ -126,6 +134,12 @@ public class ElasticsearchFieldHighlightProjection implements ElasticsearchSearc
 		@Override
 		public HighlightProjectionBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
+			if ( field.nestedDocumentPath() != null ) {
+				// see HSEARCH-4841 to remove this limitation.
+				throw log.cannotHighlightFieldFromNestedObjectStructure(
+						EventContexts.fromIndexFieldAbsolutePath( field.absolutePath() )
+				);
+			}
 			return new Builder( scope, field );
 		}
 	}

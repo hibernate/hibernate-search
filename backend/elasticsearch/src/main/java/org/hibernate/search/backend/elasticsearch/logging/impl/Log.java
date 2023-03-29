@@ -794,4 +794,13 @@ public interface Log extends BasicLogger {
 			value = "Setting the `highlightable` attribute to an empty array is not supported. " +
 					"Set the value to `NO` if the field does not require the highlight projection.")
 	SearchException noHighlightableProvided();
+
+	@Message(id = ID_OFFSET + 170,
+			value = "Highlight projection cannot be applied within nested context of '%1$s'.")
+	SearchException cannotHighlightInNestedContext(String currentNestingField,
+			@Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET + 171,
+			value = "The highlight projection cannot be applied to a field from an object using `ObjectStructure.NESTED` structure.")
+	SearchException cannotHighlightFieldFromNestedObjectStructure(@Param EventContext eventContext);
 }

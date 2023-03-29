@@ -35,10 +35,12 @@ public class HighlightProjectionTypeIndependentIT {
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+	private static final SimpleMappedIndex<NestedIndexBinding> nestedIndex =
+			SimpleMappedIndex.of( NestedIndexBinding::new ).name( "nestedIndex" );
 
 	@BeforeClass
 	public static void setup() {
-		setupHelper.start().withIndex( index ).setup();
+		setupHelper.start().withIndex( index ).withIndex( nestedIndex ).setup();
 	}
 
 	@Test
@@ -123,6 +125,19 @@ public class HighlightProjectionTypeIndependentIT {
 				);
 	}
 
+	@Test
+	public void cannotHighlightNestedObjectStructureFields() {
+		AssertionsForClassTypes.assertThatThrownBy( () -> nestedIndex.createScope().query().select(
+								f -> f.highlight( "nested.nestedString" )
+						).where( f -> f.matchAll() )
+						.toQuery() ).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Cannot use 'projection:highlight' on field 'nested.nestedString'",
+						"The highlight projection cannot be applied to a field from an object using `ObjectStructure.NESTED` structure",
+						"Context: field 'nested.nestedString'"
+				);
+	}
+
 	private static class IndexBinding {
 		final IndexFieldReference<String> string1Field;
 
@@ -149,6 +164,21 @@ public class HighlightProjectionTypeIndependentIT {
 			this.relativeFieldName = relativeFieldName;
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, structure );
 			self = objectField.toReference();
+		}
+	}
+
+	private static class NestedIndexBinding {
+		final IndexObjectFieldReference nested;
+		final IndexFieldReference<String> nestedString;
+
+		NestedIndexBinding(IndexSchemaElement root) {
+			IndexSchemaObjectField objectField = root.objectField( "nested", ObjectStructure.NESTED );
+			nested = objectField.toReference();
+
+			nestedString = objectField.field( "nestedString", f -> f.asString()
+					.highlightable( Collections.singleton( Highlightable.ANY ) )
+					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
+			).toReference();
 		}
 	}
 

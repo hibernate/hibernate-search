@@ -143,10 +143,6 @@ public abstract class TckBackendFeatures {
 		return true;
 	}
 
-	public boolean supportsHighlighterNestedStructureResultsOnNestedObjects() {
-		return true;
-	}
-
 	public boolean supportsHighlighterFastVectorNoMatchSizeOnMultivaluedFields() {
 		return true;
 	}
