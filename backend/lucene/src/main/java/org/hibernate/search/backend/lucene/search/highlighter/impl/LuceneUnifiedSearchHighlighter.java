@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.analysis.impl.LimitTokenOffsetAnalyzer;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldTypeContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionExtractContext;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFragmenter;
 import org.hibernate.search.engine.search.highlighter.spi.BoundaryScannerType;
@@ -55,6 +56,15 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 				maxAnalyzedOffset, preTags, postTags, boundaryScannerType, boundaryScannerLocale, fragmenterType,
 				phraseLimit, encoder
 		);
+
+		// to correctly support no match size we need to override UnifiedHighlighter#getFieldHighlighter() so that
+		// we can return our own custom field highlighter that would cut the text where we need rather than returning
+		// entire field value...
+		if ( this.noMatchSize > 0 && this.noMatchSize != Integer.MAX_VALUE ) {
+			// we don't want to throw an exception here as users might still want to get the no-match fragment even if
+			// they cannot limit the length of it...
+			log.unifiedHighlighterNoMatchSizeWarning( this.noMatchSize );
+		}
 	}
 
 	@Override
@@ -86,6 +96,13 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 	@Override
 	public SearchHighlighterType type() {
 		return SearchHighlighterType.UNIFIED;
+	}
+
+	@Override
+	public void checkApplicability(LuceneSearchIndexValueFieldTypeContext<?> typeContext) {
+		if ( typeContext.hasTermVectorsConfigured() && this.maxAnalyzedOffset != null && this.maxAnalyzedOffset > 0 ) {
+			throw log.unifiedHighlighterMaxAnalyzedOffsetNotSupported();
+		}
 	}
 
 	private final class UnifiedHighlighterValues<A> extends HighlighterValues<A> {

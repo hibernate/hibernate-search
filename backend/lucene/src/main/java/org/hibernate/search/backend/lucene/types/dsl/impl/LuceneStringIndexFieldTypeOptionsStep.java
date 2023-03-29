@@ -141,6 +141,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 		boolean resolvedAggregable = resolveDefault( aggregable );
 		boolean resolvedNorms = resolveNorms();
 		ResolvedTermVector resolvedTermVector = resolveTermVector();
+		builder.hasTermVectorsConfigured( resolvedTermVector.hasAnyEnabled() );
 
 		DocValues docValues = resolvedSortable || resolvedAggregable ? DocValues.ENABLED : DocValues.DISABLED;
 
@@ -349,6 +350,10 @@ class LuceneStringIndexFieldTypeOptionsStep
 			fieldType.setStoreTermVectorPositions( positions );
 			fieldType.setStoreTermVectorOffsets( offsets );
 			fieldType.setStoreTermVectorPayloads( payloads );
+		}
+
+		private boolean hasAnyEnabled() {
+			return store || positions || offsets || payloads;
 		}
 	}
 

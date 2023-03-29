@@ -15,4 +15,6 @@ public interface LuceneSearchIndexValueFieldTypeContext<F>
 
 	Analyzer searchAnalyzerOrNormalizer();
 
+	boolean hasTermVectorsConfigured();
+
 }

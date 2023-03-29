@@ -6,17 +6,20 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.highlight;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterUnifiedOptionsStep;
+import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Test;
@@ -81,6 +84,27 @@ public class HighlighterUnifiedIT extends AbstractHighlighterIT {
 		assertThatHits( highlights.fetchAllHits() )
 				.hasHitsAnyOrder(
 						Arrays.asList( "<em>foo</em> and <em>foo</em> and foo much more times" )
+				);
+	}
+
+	@Test
+	public void unifiedMaxAnalyzedOffsetWithTermVectorsNotSupported() {
+		assumeFalse(
+				TckConfiguration.get().getBackendFeatures()
+						.supportsHighlighterUnifiedTypeMaxAnalyzedOffsetOnFieldsWithTermVector()
+		);
+
+		assertThatThrownBy(
+				() -> index.createScope().query().select(
+								f -> f.highlight( "string" )
+						)
+						.where( f -> f.match().field( "string" ).matching( "foo" ) )
+						.highlighter( h -> h.unified().maxAnalyzedOffset( 1 ) )
+						.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"unified highlighter does not support the max analyzed offset setting on fields that have non default term vector storage strategy configured",
+						"Either use a plain or fast vector highlighters, or do not set this setting"
 				);
 	}
 

@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.highlight;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 import java.time.LocalDate;
@@ -33,15 +34,22 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+
+import org.apache.logging.log4j.Level;
 
 public abstract class AbstractHighlighterIT {
 
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	@Rule
+	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	protected static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 	protected static final SimpleMappedIndex<IndexBinding> matchingIndex = SimpleMappedIndex.of( IndexBinding::new )
@@ -366,6 +374,24 @@ public abstract class AbstractHighlighterIT {
 				);
 	}
 
+	@Test
+	public void fragmentSizeNotSupported() {
+		assumeFalse( supportsFragmentSize() );
+
+		assertThatThrownBy(
+				() -> index.createScope().query().select(
+								f -> f.highlight( "anotherString" )
+						)
+						.where( f -> f.match().field( "anotherString" ).matching( "ipsum" ) )
+						.highlighter( h -> highlighter( h ).fragmentSize( 18 ) )
+						.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"unified highlighter does not support the size fragment setting",
+						"Either use a plain or fast vector highlighters, or do not set this setting"
+				);
+	}
+
 	protected boolean supportsFragmentSize() {
 		return true;
 	}
@@ -434,6 +460,25 @@ public abstract class AbstractHighlighterIT {
 				.hasHitsAnyOrder(
 						Collections.singletonList( "Lorem ipsum" )
 				);
+	}
+
+	@Test
+	public void noMatchSizeNotSupported() {
+		assumeFalse( supportsNoMatchSize() );
+		StubMappingScope scope = index.createScope();
+
+		logged.expectEvent(
+				Level.WARN,
+				"Lucene's unified highlighter cannot limit the size of a fragment returned when no match is found. Instead if no match size was set to any positive integer - all text will be returned. Configured value '11' will be ignored, and the fragment will not be limited. If you don't want to see this warning set the value to Integer.MAX_VALUE."
+		);
+
+		SearchQuery<List<String>> highlights = scope.query().select(
+						f -> f.highlight( "anotherString" )
+				)
+				.where( f -> f.match().field( "string" ).matching( "foo" ) )
+				.highlighter( h -> highlighter( h ).noMatchSize( 11 ) )
+				.toQuery();
+		highlights.fetchAllHits();
 	}
 
 	protected boolean supportsNoMatchSize() {
