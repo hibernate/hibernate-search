@@ -356,23 +356,16 @@ public abstract class AbstractMassIndexingErrorIT {
 				expectationSetter.run();
 			}
 
-			// TODO HSEARCH-3728 simplify this when even indexing exceptions are propagated
-			Runnable runnable = () -> {
+			assertThatThrownBy( () -> {
 				try {
 					massIndexer.startAndWait();
 				}
 				catch (InterruptedException e) {
 					fail( "Unexpected InterruptedException: " + e.getMessage() );
 				}
-			};
-			if ( thrownExpectation == null ) {
-				runnable.run();
-			}
-			else {
-				assertThatThrownBy( runnable::run )
-						.asInstanceOf( InstanceOfAssertFactories.type( Throwable.class ) )
-						.satisfies( thrownExpectation );
-			}
+			} )
+					.asInstanceOf( InstanceOfAssertFactories.type( Throwable.class ) )
+					.satisfies( thrownExpectation );
 			backendMock.verifyExpectationsMet();
 		}
 		catch (AssertionError e) {
