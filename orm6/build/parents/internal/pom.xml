@@ -96,6 +96,18 @@
             </dependency>
 
             <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <!-- DO NOT MANAGE the version of this dependency. -->
+                <exclusions>
+                    <!-- Also imported by jakarta.xml.bind-api -->
+                    <exclusion>
+                        <groupId>jakarta.activation</groupId>
+                        <artifactId>jakarta.activation-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
                 <groupId>org.jboss.weld.se</groupId>
                 <artifactId>weld-se-shaded</artifactId>
                 <version>${version.org.jboss.weld.jakarta}</version>
