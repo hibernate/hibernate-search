@@ -40,6 +40,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.reflect.RuntimeHelper;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -791,7 +792,10 @@ public abstract class AbstractMassIndexingFailureIT {
 
 		@Id // This must be on the getter, so that Hibernate Search uses getters instead of direct field access
 		public Integer getId() {
-			if ( id == 2 && failOnBook2GetId.getAndSet( false ) ) {
+			if ( id == 2
+					// Only fail for Hibernate Search, not for Hibernate ORM
+					&& RuntimeHelper.firstNonSelfNonJdkCaller().map( RuntimeHelper::isHibernateSearch ).orElse( false )
+					&& failOnBook2GetId.getAndSet( false ) ) {
 				throw new SimulatedFailure( "getId failure" );
 			}
 			return id;
@@ -803,7 +807,10 @@ public abstract class AbstractMassIndexingFailureIT {
 
 		@GenericField
 		public String getTitle() {
-			if ( id == 2 && failOnBook2GetTitle.get() ) {
+			if ( id == 2
+					// Only fail for Hibernate Search, not for Hibernate ORM
+					&& RuntimeHelper.firstNonSelfNonJdkCaller().map( RuntimeHelper::isHibernateSearch ).orElse( false )
+					&& failOnBook2GetTitle.getAndSet( false ) ) {
 				throw new SimulatedFailure( "getTitle failure" );
 			}
 			return title;
