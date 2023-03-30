@@ -27,6 +27,11 @@ Map settings() {
 					updateProperties: ['version.org.hibernate.orm'],
 					onlyRunTestDependingOn: ['hibernate-search-mapper-orm-orm6']
 			]
+		case 'orm6.3':
+			return [
+					updateProperties: ['version.org.hibernate.orm'],
+					onlyRunTestDependingOn: ['hibernate-search-mapper-orm-orm6']
+			]
 		case 'orm6.2':
 			return [
 					updateProperties: ['version.org.hibernate.orm'],
@@ -129,7 +134,7 @@ pipeline {
 					axis {
 						name 'DEPENDENCY_UPDATE_NAME'
 						// NOTE: Remember to update the settings() method above when changing this.
-						values 'orm5.6', 'orm6.0', 'orm6.1', 'orm6.2'
+						values 'orm5.6', 'orm6.0', 'orm6.1', 'orm6.2', 'orm6.3'
 					}
 				}
 				stages {
