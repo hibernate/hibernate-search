@@ -28,6 +28,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,6 +60,14 @@ public class AutomaticIndexingFilterIT {
 
 		setupContext.withAnnotatedTypes( IndexedEntity.class, ContainedEntity.class,
 				EntityA.class, Entity1A.class, Entity1B.class, Entity2A.class
+		);
+	}
+
+	@Before
+	public void clearFilter() throws Exception {
+		Search.automaticIndexingFilter(
+				setupHolder.entityManagerFactory(),
+				ctx -> { /*clear out any settings from tests*/ }
 		);
 	}
 
@@ -96,6 +105,53 @@ public class AutomaticIndexingFilterIT {
 		setupHolder.runInTransaction( session -> {
 			Search.session( session ).automaticIndexingFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
 
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+
+			entity1.getContainedIndexedEmbedded().forEach( e -> e.setContainingAsIndexedEmbedded( null ) );
+
+			session.remove( entity1 );
+
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void directPersistUpdateDeleteApplicationFilter() {
+		Search.automaticIndexingFilter(
+				setupHolder.entityManagerFactory(),
+				ctx -> ctx.exclude( IndexedEntity.class )
+		);
+		setupHolder.runInTransaction( session -> {
+
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setIndexedField( "initialValue" );
+
+			ContainedEntity entity2 = new ContainedEntity();
+			entity2.setId( 100 );
+			entity2.setIndexedField( "initialValue" );
+
+			entity2.setContainingAsIndexedEmbedded( entity1 );
+			entity1.setContainedIndexedEmbedded( Arrays.asList( entity2 ) );
+
+			session.persist( entity1 );
+			session.persist( entity2 );
+
+		} );
+		backendMock.verifyExpectationsMet();
+
+		Search.automaticIndexingFilter(
+				setupHolder.entityManagerFactory(),
+				ctx -> ctx.exclude( IndexedEntity.class )
+		);
+		setupHolder.runInTransaction( session -> {
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+			entity1.setIndexedField( "updatedValue" );
+
+		} );
+		backendMock.verifyExpectationsMet();
+
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 
 			entity1.getContainedIndexedEmbedded().forEach( e -> e.setContainingAsIndexedEmbedded( null ) );
@@ -186,6 +242,74 @@ public class AutomaticIndexingFilterIT {
 							"Already excluded types: '[]'"
 					);
 		} );
+	}
+
+	@Test
+	public void applicationFilterDisableAll() {
+		Search.automaticIndexingFilter(
+				setupHolder.entityManagerFactory(),
+				ctx -> ctx.exclude( EntityA.class )
+		);
+		setupHolder.runInTransaction( session -> {
+			session.persist( new EntityA( 1, "test" ) );
+			session.persist( new Entity1A( 2, "test" ) );
+			session.persist( new Entity1B( 3, "test" ) );
+			session.persist( new Entity2A( 4, "test" ) );
+		} );
+		backendMock.verifyExpectationsMet();
+
+		setupHolder.runInTransaction( session -> {
+			Search.session( session ).automaticIndexingFilter( ctx -> ctx.include( Entity2A.class ) );
+
+			session.persist( new EntityA( 10, "test" ) );
+			session.persist( new Entity1A( 20, "test" ) );
+			session.persist( new Entity1B( 30, "test" ) );
+			session.persist( new Entity2A( 40, "test" ) );
+
+			backendMock.expectWorks( Entity2A.INDEX )
+					.add( "40", b -> b.field( "indexedField", "test" ) );
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void applicationFilterOnly() {
+		Search.automaticIndexingFilter(
+				setupHolder.entityManagerFactory(),
+				ctx -> ctx.exclude( EntityA.class )
+						.include( Entity2A.class )
+		);
+
+		setupHolder.runInTransaction( session -> {
+			Search.session( session ).automaticIndexingFilter( ctx -> ctx.include( Entity2A.class ) );
+
+			session.persist( new EntityA( 10, "test" ) );
+			session.persist( new Entity1A( 20, "test" ) );
+			session.persist( new Entity1B( 30, "test" ) );
+			session.persist( new Entity2A( 40, "test" ) );
+
+			backendMock.expectWorks( Entity2A.INDEX )
+					.add( "40", b -> b.field( "indexedField", "test" ) );
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void applicationFilterExcludeSessionInclude() {
+		Search.automaticIndexingFilter(
+				setupHolder.entityManagerFactory(),
+				ctx -> ctx.exclude( Entity2A.class )
+		);
+
+		setupHolder.runInTransaction( session -> {
+			Search.session( session ).automaticIndexingFilter( ctx -> ctx.include( Entity2A.class ) );
+
+			session.persist( new Entity2A( 40, "test" ) );
+
+			backendMock.expectWorks( Entity2A.INDEX )
+					.add( "40", b -> b.field( "indexedField", "test" ) );
+		} );
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Entity(name = "containing")
