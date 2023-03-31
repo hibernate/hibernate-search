@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
@@ -249,10 +250,11 @@ public interface SearchSession {
 	void indexingPlanSynchronizationStrategy(IndexingPlanSynchronizationStrategy synchronizationStrategy);
 
 	/**
-	 * Set a filter configuration and define which types must be included/excluded from indexing within the current session.
-	 * By default, all indexed types are included.
+	 * Set a filter configuration and define which types must be included/excluded when indexed within the current session.
+	 * If the type is not explicitly included/excluded directly or as a supertype the decision will be made by
+	 * {@link org.hibernate.search.mapper.orm.Search#automaticIndexingFilter(SessionFactory, PojoAutomaticIndexingTypeFilterConfigurer) an application filter}.
 	 *
-	 * @param configurer The configurer that provides access to filter configuration.
+	 * @param configurer The configurer that provides access to the filter configuration.
 	 */
 	@Incubating
 	void automaticIndexingFilter(PojoAutomaticIndexingTypeFilterConfigurer configurer);

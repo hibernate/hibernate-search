@@ -9,15 +9,17 @@ package org.hibernate.search.mapper.orm.automaticindexing.filter.impl;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.PojoAutomaticIndexingTypeFilter;
+import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.PojoAutomaticIndexingTypeFilterHolder;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public class HibernateOrmAutomaticIndexingTypeFilter implements PojoAutomaticIndexingTypeFilter {
 
-	private final PojoAutomaticIndexingTypeFilter fallback;
+	private final PojoAutomaticIndexingTypeFilterHolder fallback;
 	private final Set<PojoRawTypeIdentifier<?>> includes;
 	private final Set<PojoRawTypeIdentifier<?>> excludes;
 
-	public HibernateOrmAutomaticIndexingTypeFilter(PojoAutomaticIndexingTypeFilter fallback, Set<PojoRawTypeIdentifier<?>> includes,
+	public HibernateOrmAutomaticIndexingTypeFilter(PojoAutomaticIndexingTypeFilterHolder fallback,
+			Set<PojoRawTypeIdentifier<?>> includes,
 			Set<PojoRawTypeIdentifier<?>> excludes) {
 		this.fallback = fallback;
 		this.includes = includes;
@@ -34,6 +36,6 @@ public class HibernateOrmAutomaticIndexingTypeFilter implements PojoAutomaticInd
 			return true;
 		}
 
-		return fallback.isIncluded( typeIdentifier );
+		return fallback.filter().isIncluded( typeIdentifier );
 	}
 }

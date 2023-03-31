@@ -15,7 +15,7 @@ import java.util.Set;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.automaticindexing.filter.PojoAutomaticIndexingTypeFilterContext;
-import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.PojoAutomaticIndexingTypeFilter;
+import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.PojoAutomaticIndexingTypeFilterHolder;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -74,7 +74,7 @@ public class HibernateOrmAutomaticIndexingTypeFilterContext implements PojoAutom
 	}
 
 
-	public HibernateOrmAutomaticIndexingTypeFilter createFilter(PojoAutomaticIndexingTypeFilter fallback) {
+	public HibernateOrmAutomaticIndexingTypeFilter createFilter(PojoAutomaticIndexingTypeFilterHolder fallback) {
 		Set<PojoRawTypeIdentifier<?>> allIncludes = new HashSet<>();
 		Set<PojoRawTypeIdentifier<?>> allExcludes = new HashSet<>();
 
