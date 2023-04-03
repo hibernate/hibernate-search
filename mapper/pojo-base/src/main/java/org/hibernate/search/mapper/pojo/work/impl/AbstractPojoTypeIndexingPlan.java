@@ -17,9 +17,7 @@ import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecut
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingAssociationInverseSideResolverRootContext;
-import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingAssociationInverseSideCollector;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
-import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.automaticindexing.spi.PojoImplicitReindexingResolverSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.DocumentRouter;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.NoOpDocumentRouter;
@@ -29,6 +27,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoTypeIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
@@ -40,21 +39,30 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <S> The type of per-instance state.
  */
 abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeIndexingPlan<I, E, S>.AbstractEntityState>
-		implements PojoImplicitReindexingAssociationInverseSideResolverRootContext {
+		implements PojoImplicitReindexingAssociationInverseSideResolverRootContext, PojoTypeIndexingPlan {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	final PojoWorkSessionContext sessionContext;
+	final PojoIndexingPlanImpl root;
 	final PojoTypeIndexingPlanDelegate<I, E> delegate;
 
 	// Use a LinkedHashMap for deterministic iteration
 	final Map<I, S> statesPerId = new LinkedHashMap<>();
+	private boolean mayRequireLoading = false;
 
-	AbstractPojoTypeIndexingPlan(PojoWorkSessionContext sessionContext, PojoTypeIndexingPlanDelegate<I, E> delegate) {
+	AbstractPojoTypeIndexingPlan(PojoWorkSessionContext sessionContext,
+			PojoIndexingPlanImpl root,
+			PojoTypeIndexingPlanDelegate<I, E> delegate) {
 		this.sessionContext = sessionContext;
+		this.root = root;
 		this.delegate = delegate;
 	}
 
-	void add(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
+	@Override
+	public void add(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
+		if ( ! mayRequireLoading && entity == null ) {
+			mayRequireLoading = true;
+		}
 		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
 		I identifier = toIdentifier( providedId, entitySupplier );
 		S state = getState( identifier );
@@ -62,8 +70,12 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		state.providedRoutes( providedRoutes );
 	}
 
-	void addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity, BitSet dirtyPaths,
-			boolean forceSelfDirty, boolean forceContainingDirty) {
+	@Override
+	public void addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity,
+			boolean forceSelfDirty, boolean forceContainingDirty, BitSet dirtyPaths) {
+		if ( ! mayRequireLoading && entity == null ) {
+			mayRequireLoading = true;
+		}
 		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
 		I identifier = toIdentifier( providedId, entitySupplier );
 		S state = getState( identifier );
@@ -71,7 +83,8 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		state.providedRoutes( providedRoutes );
 	}
 
-	void delete(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
+	@Override
+	public void delete(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
 		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
 		I identifier = toIdentifier( providedId, entitySupplier );
 		S state = getState( identifier );
@@ -79,18 +92,22 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		state.providedRoutes( providedRoutes );
 	}
 
-	void addOrUpdateOrDelete(Object providedId, DocumentRoutesDescriptor providedRoutes, BitSet dirtyPaths,
-			boolean forceSelfDirty, boolean forceContainingDirty) {
+	@Override
+	public void addOrUpdateOrDelete(Object providedId, DocumentRoutesDescriptor providedRoutes, boolean forceSelfDirty,
+			boolean forceContainingDirty, BitSet dirtyPaths) {
+		if ( ! mayRequireLoading ) {
+			mayRequireLoading = true;
+		}
 		I identifier = toIdentifier( providedId, null );
 		S state = getState( identifier );
 		state.addOrUpdateOrDelete( dirtyPaths, forceSelfDirty, forceContainingDirty );
 		state.providedRoutes( providedRoutes );
 	}
 
-	void resolveDirtyAssociationInverseSide(PojoReindexingAssociationInverseSideCollector collector,
-			BitSet dirtyAssociationPaths, Object[] oldState, Object[] newState) {
+	@Override
+	public void updateAssociationInverseSide(BitSet dirtyAssociationPaths, Object[] oldState, Object[] newState) {
 		typeContext().reindexingResolver().associationInverseSideResolver()
-				.resolveEntitiesToReindex( collector, dirtyAssociationPaths, oldState, newState, this );
+				.resolveEntitiesToReindex( root, dirtyAssociationPaths, oldState, newState, this );
 	}
 
 	void updateBecauseOfContainedAssociation(Object entity, int dirtyAssociationPathOrdinal) {
@@ -102,16 +119,15 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		}
 	}
 
-	void planLoading(PojoLoadingPlanProvider loadingPlanProvider) {
+	void planLoading() {
 		for ( S state : statesPerId.values() ) {
-			state.planLoading( loadingPlanProvider );
+			state.planLoading();
 		}
 	}
 
-	void resolveDirty(PojoLoadingPlanProvider loadingPlanProvider, PojoReindexingCollector collector,
-			boolean deleteOnly) {
+	void resolveDirty(boolean deleteOnly) {
 		for ( S state : statesPerId.values() ) {
-			state.resolveDirty( loadingPlanProvider, collector, deleteOnly );
+			state.resolveDirty( deleteOnly );
 		}
 	}
 
@@ -120,6 +136,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 	}
 
 	void clearStates() {
+		this.mayRequireLoading = false;
 		this.statesPerId.clear();
 	}
 
@@ -335,14 +352,13 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 
 		abstract DocumentRoutesDescriptor providedRoutes();
 
-		void planLoading(PojoLoadingPlanProvider loadingPlanProvider) {
+		void planLoading() {
 			if ( EntityStatus.ABSENT != currentStatus && entitySupplier == null ) {
-				loadingOrdinal = loadingPlanProvider.loadingPlan().planLoading( typeContext(), identifier );
+				loadingOrdinal = root.loadingPlan().planLoading( typeContext(), identifier );
 			}
 		}
 
-		void resolveDirty(PojoLoadingPlanProvider loadingPlanProvider, PojoReindexingCollector collector,
-				boolean deleteOnly) {
+		void resolveDirty(boolean deleteOnly) {
 			// In some configurations, we will perform reindexing resolution later,
 			// after we reloaded the entities from the database;
 			// but that's not possible for deleted entities,
@@ -351,21 +367,21 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			if ( deleteOnly && !( initialStatus == EntityStatus.PRESENT && currentStatus == EntityStatus.ABSENT ) ) {
 				return;
 			}
-			Supplier<E> entitySupplier = entitySupplierOrLoad( loadingPlanProvider );
+			Supplier<E> entitySupplier = entitySupplierOrLoad( root );
 			if ( entitySupplier == null ) {
 				// We couldn't retrieve the entity.
 				// Assume it was deleted before the current transaction started and there's nothing to resolve.
 				return;
 			}
 			try {
-				typeContext().reindexingResolver().resolveEntitiesToReindex( collector, entitySupplier.get(), this );
+				typeContext().reindexingResolver().resolveEntitiesToReindex( root, entitySupplier.get(), this );
 			}
 			catch (RuntimeException e) {
 				EntityReference entityReference = sessionContext.mappingContext().entityReferenceFactoryDelegate()
 						.create( typeContext().typeIdentifier(), typeContext().entityName(), identifier );
 				throw log.errorResolvingEntitiesToReindex( entityReference, e.getMessage(), e );
 			}
-			typeContext().resolveEntitiesToReindex( collector, sessionContext, identifier,
+			typeContext().resolveEntitiesToReindex( root, sessionContext, identifier,
 					entitySupplier, this );
 		}
 
