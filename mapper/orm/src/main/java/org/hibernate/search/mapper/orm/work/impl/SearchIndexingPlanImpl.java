@@ -24,29 +24,26 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void addOrUpdate(Object entity) {
-		delegate( true )
-				.addOrUpdate( getTypeIdentifier( entity ), null, null, entity,
-						true, true, null );
+		delegate( true ).type( getTypeIdentifier( entity ) )
+				.addOrUpdate( null, null, entity, true, true, null );
 	}
 
 	@Override
 	public void delete(Object entity) {
-		delegate( true )
-				.delete( getTypeIdentifier( entity ), null, null, entity );
+		delegate( true ).type( getTypeIdentifier( entity ) )
+				.delete( null, null, entity );
 	}
 
 	@Override
 	public void purge(Class<?> entityClass, Object providedId, String providedRoutingKey) {
-		delegate( true )
-				.delete( getTypeIdentifier( entityClass ), providedId,
-						DocumentRoutesDescriptor.fromLegacyRoutingKey( providedRoutingKey ), null );
+		delegate( true ).type( getTypeIdentifier( entityClass ) )
+				.delete( providedId, DocumentRoutesDescriptor.fromLegacyRoutingKey( providedRoutingKey ), null );
 	}
 
 	@Override
 	public void purge(String entityName, Object providedId, String providedRoutingKey) {
-		delegate( true )
-				.delete( getTypeIdentifier( entityName ), providedId,
-						DocumentRoutesDescriptor.fromLegacyRoutingKey( providedRoutingKey ), null );
+		delegate( true ).type( getTypeIdentifier( entityName ) )
+				.delete( providedId, DocumentRoutesDescriptor.fromLegacyRoutingKey( providedRoutingKey ), null );
 	}
 
 	@Override

@@ -11,7 +11,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
-import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
@@ -51,18 +50,17 @@ public class PojoIndexingPlanEventSendingStrategy implements PojoIndexingPlanStr
 
 	@Override
 	public <I, E> PojoIndexedTypeIndexingPlan<I, E> createIndexedDelegate(PojoWorkIndexedTypeContext<I, E> typeContext,
-			PojoWorkSessionContext sessionContext,
-			PojoIndexingProcessorRootContext processorContext) {
+			PojoWorkSessionContext sessionContext, PojoIndexingPlanImpl root) {
 		// Will send indexing events to an external queue.
-		return new PojoIndexedTypeIndexingPlan<>( typeContext, sessionContext,
+		return new PojoIndexedTypeIndexingPlan<>( typeContext, sessionContext, root,
 				new PojoTypeIndexingPlanEventQueueDelegate<>( typeContext, sessionContext, sendingPlan ) );
 	}
 
 	@Override
 	public <I, E> PojoContainedTypeIndexingPlan<I, E> createDelegate(PojoWorkContainedTypeContext<I, E> typeContext,
-			PojoWorkSessionContext sessionContext) {
+			PojoWorkSessionContext sessionContext, PojoIndexingPlanImpl root) {
 		// Will send indexing events to an external queue.
-		return new PojoContainedTypeIndexingPlan<>( typeContext, sessionContext,
+		return new PojoContainedTypeIndexingPlan<>( typeContext, sessionContext, root,
 				new PojoTypeIndexingPlanEventQueueDelegate<>( typeContext, sessionContext, sendingPlan ) );
 	}
 }

@@ -39,12 +39,12 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void add(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
-		delegate.add( getTypeIdentifier( entity ), providedId, providedRoutes, entity );
+		delegate.type( getTypeIdentifier( entity ) ).add( providedId, providedRoutes, entity );
 	}
 
 	@Override
 	public void add(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes) {
-		delegate.add( getTypeIdentifier( entityClass ), providedId, providedRoutes, null );
+		delegate.type( getTypeIdentifier( entityClass ) ).add( providedId, providedRoutes, null );
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
-		delegate.addOrUpdate( getTypeIdentifier( entity ), providedId, providedRoutes, entity,
+		delegate.type( getTypeIdentifier( entity ) ).addOrUpdate( providedId, providedRoutes, entity,
 				true, true, null );
 	}
 
@@ -75,14 +75,14 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 		PojoRawTypeIdentifier<?> typeIdentifier = getTypeIdentifier( entity );
 		SearchIndexingPlanTypeContext<?> typeContext = typeContextProvider.forExactType( typeIdentifier );
 		BitSet dirtyPaths = typeContext.dirtyFilter().filter( dirtyPathsAsStrings );
-		delegate.addOrUpdate( typeIdentifier, providedId, providedRoutes, entity,
+		delegate.type( typeIdentifier ).addOrUpdate( providedId, providedRoutes, entity,
 				forceSelfDirty, forceContainingDirty, dirtyPaths );
 	}
 
 	@Override
 	public void addOrUpdate(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes) {
 		PojoRawTypeIdentifier<?> typeIdentifier = getTypeIdentifier( entityClass );
-		delegate.addOrUpdate( typeIdentifier, providedId, providedRoutes, null,
+		delegate.type( typeIdentifier ).addOrUpdate( providedId, providedRoutes, null,
 				true, true, null );
 	}
 
@@ -93,12 +93,12 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void delete(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
-		delegate.delete( getTypeIdentifier( entity ), providedId, providedRoutes, entity );
+		delegate.type( getTypeIdentifier( entity ) ).delete( providedId, providedRoutes, entity );
 	}
 
 	@Override
 	public void purge(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes) {
-		delegate.delete( getTypeIdentifier( entityClass ), providedId, providedRoutes, null );
+		delegate.type( getTypeIdentifier( entityClass ) ).delete( providedId, providedRoutes, null );
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 			boolean forceSelfDirty, boolean forceContainingDirty, String... dirtyPathsAsStrings) {
 		SearchIndexingPlanTypeContext<?> typeContext = typeContextProvider.forExactClass( entityClass );
 		BitSet dirtyPaths = typeContext.dirtyFilter().filter( dirtyPathsAsStrings );
-		delegate.addOrUpdateOrDelete( typeContext.typeIdentifier(), providedId, providedRoutes,
+		delegate.type( typeContext.typeIdentifier() ).addOrUpdateOrDelete( providedId, providedRoutes,
 				forceSelfDirty, forceContainingDirty, dirtyPaths );
 	}
 

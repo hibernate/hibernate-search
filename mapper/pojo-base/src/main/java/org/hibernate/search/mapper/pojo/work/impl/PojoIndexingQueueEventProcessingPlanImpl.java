@@ -15,6 +15,7 @@ import org.hibernate.search.mapper.pojo.work.spi.DirtinessDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoTypeIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndexingQueueEventProcessingPlan {
@@ -35,7 +36,8 @@ public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndex
 		PojoWorkTypeContext<?, ?> typeContext = typeContext( entityName );
 		Object id = typeContext.identifierMapping().fromDocumentIdentifier( serializedId, sessionContext );
 		DirtinessDescriptor dirtiness = payload.dirtiness;
-		delegate.addOrUpdateOrDelete( typeContext.typeIdentifier(), id, payload.routes,
+		PojoTypeIndexingPlan typePlan = delegate.type( typeContext.typeIdentifier() );
+		typePlan.addOrUpdateOrDelete( id, payload.routes,
 				// Force the reindexing now if the entity was marked as dirty because of a contained entity;
 				// this is to avoid sending events forever and to force the processing of "updateBecauseOfContained" now.
 				// See org.hibernate.search.mapper.pojo.work.impl.PojoTypeIndexingPlanIndexOrEventQueueDelegate.addOrUpdate
