@@ -76,7 +76,7 @@ By default, the analyzer named `default` will be used.
 See <<concepts-analysis>> for more details about analyzers and full-text analysis.
 For instructions on how to change the default analyzer,
 see the dedicated section in the documentation of your backend:
-<<>>
+<<backend-lucene-analysis-analyzers-default,Lucene>> or <<backend-elasticsearch-analysis-analyzers-default, Elasticsearch>>
 +
 Note you can also define <<mapping-directfieldmapping-search-analyzer,a search analyzer>>
 to analyze searched terms differently.
