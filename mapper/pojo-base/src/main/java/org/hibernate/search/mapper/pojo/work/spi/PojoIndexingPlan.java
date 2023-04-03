@@ -36,9 +36,10 @@ public interface PojoIndexingPlan {
 
 	/**
 	 * @param typeIdentifier The identifier of the entity type.
-	 * @return The indexing plan for the given entity type.
+	 * @return The indexing plan for the given entity type,
+	 * or {@code null} if that type is going to be ignored by this indexing plan.
 	 */
-	PojoTypeIndexingPlan type(PojoRawTypeIdentifier<?> typeIdentifier);
+	PojoTypeIndexingPlan typeIfIncludedOrNull(PojoRawTypeIdentifier<?> typeIdentifier);
 
 	/**
 	 * Add an entity to the index, assuming that the entity is absent from the index.
@@ -59,7 +60,7 @@ public interface PojoIndexingPlan {
 	 * the routes will be computed using that bridge instead,
 	 * and provided routes will be ignored.
 	 * @param entity The entity to add to the index.
-	 * @deprecated Use {@code type(typeIdentifier).add(...)} instead.
+	 * @deprecated Use {@code typeIfIncludedOrNull(typeIdentifier)} instead, then (if non-null) {@code .add(...)} on the result.
 	 */
 	@Deprecated
 	void add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
@@ -88,7 +89,7 @@ public interface PojoIndexingPlan {
 	 * You can build such a {@link BitSet} by obtaining the
 	 * {@link org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector#dirtyFilter(PojoPathFilter) dirty filter}
 	 * for the entity type and calling one of the {@code filter} methods.
-	 * @deprecated Use {@code type(typeIdentifier).addOrUpdate(...)} instead.
+	 * @deprecated Use {@code typeIfIncludedOrNull(typeIdentifier)} instead, then (if non-null) {@code .addOrUpdate(...)} on the result.
 	 */
 	@Deprecated
 	void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
@@ -118,7 +119,7 @@ public interface PojoIndexingPlan {
 	 * and provided routes (current and previous) will all be appended to the generated "previous routes".
 	 * @param entity The entity to delete from the index. May be {@code null} if {@code providedId} is non-{@code null}.
 	 * @throws IllegalArgumentException If both {@code providedId} and {@code entity} are {@code null}.
-	 * @deprecated Use {@code type(typeIdentifier).delete(...)} instead.
+	 * @deprecated Use {@code typeIfIncludedOrNull(typeIdentifier)} instead, then (if non-null) {@code .delete(...)} on the result.
 	 */
 	@Deprecated
 	void delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
@@ -146,7 +147,7 @@ public interface PojoIndexingPlan {
 	 * You can build such a {@link BitSet} by obtaining the
 	 * {@link org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector#dirtyFilter(PojoPathFilter) dirty filter}
 	 * for the entity type and calling one of the {@code filter} methods.
-	 * @deprecated Use {@code type(typeIdentifier).addOrUpdateOrDelete(...)} instead.
+	 * @deprecated Use {@code typeIfIncludedOrNull(typeIdentifier)} instead, then (if non-null) {@code .addOrUpdateOrDelete(...)} on the result.
 	 */
 	@Deprecated
 	void addOrUpdateOrDelete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
@@ -173,7 +174,7 @@ public interface PojoIndexingPlan {
 	 * May be {@code null}, in which case this state will not yield any reindexing.
 	 * @param newState The new state of the entity whose associations are dirty.
 	 * May be {@code null}, in which case this state will not yield any reindexing.
-	 * @deprecated Use {@code type(typeIdentifier).updateAssociationInverseSide(...)} instead.
+	 * @deprecated Use {@code typeIfIncludedOrNull(typeIdentifier)} instead, then (if non-null) {@code .updateAssociationInverseSide(...)} on the result.
 	 */
 	@Deprecated
 	void updateAssociationInverseSide(PojoRawTypeIdentifier<?> typeIdentifier,

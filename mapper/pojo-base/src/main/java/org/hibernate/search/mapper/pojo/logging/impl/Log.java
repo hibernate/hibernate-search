@@ -788,4 +788,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 127, value = "Unable to export the schema: %1$s" )
 	SearchException unableToExportSchema(String cause, @Cause Exception e, @Param EventContext context);
+
+	@Message(id = ID_OFFSET + 128,
+			value = "Indexing plan for '%1$s' cannot be created as this type is excluded by the automatic indexing type filter.")
+	SearchException attemptToCreateIndexingPlanForExcludedType(PojoRawTypeIdentifier<?> typeIdentifier);
 }

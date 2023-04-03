@@ -64,7 +64,10 @@ public class PojoIndexingPlanImpl
 	@Deprecated
 	public void add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes, Object entity) {
-		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = type( typeIdentifier );
+		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = typeIfIncludedOrNull( typeIdentifier );
+		if ( delegate == null ) {
+			return;
+		}
 		delegate.add( providedId, providedRoutes, entity );
 	}
 
@@ -73,7 +76,10 @@ public class PojoIndexingPlanImpl
 	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes, Object entity,
 			boolean forceSelfDirty, boolean forceContainingDirty, BitSet dirtyPaths) {
-		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = type( typeIdentifier );
+		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = typeIfIncludedOrNull( typeIdentifier );
+		if ( delegate == null ) {
+			return;
+		}
 		delegate.addOrUpdate( providedId, providedRoutes, entity, forceSelfDirty, forceContainingDirty, dirtyPaths );
 	}
 
@@ -82,7 +88,10 @@ public class PojoIndexingPlanImpl
 	public void delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes,
 			Object entity) {
-		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = type( typeIdentifier );
+		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = typeIfIncludedOrNull( typeIdentifier );
+		if ( delegate == null ) {
+			return;
+		}
 		delegate.delete( providedId, providedRoutes, entity );
 	}
 
@@ -91,7 +100,10 @@ public class PojoIndexingPlanImpl
 	public void addOrUpdateOrDelete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes, boolean forceSelfDirty, boolean forceContainingDirty,
 			BitSet dirtyPaths) {
-		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = type( typeIdentifier );
+		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = typeIfIncludedOrNull( typeIdentifier );
+		if ( delegate == null ) {
+			return;
+		}
 		delegate.addOrUpdateOrDelete( providedId, providedRoutes, forceSelfDirty, forceContainingDirty, dirtyPaths );
 	}
 
@@ -99,14 +111,17 @@ public class PojoIndexingPlanImpl
 	@Deprecated
 	public void updateAssociationInverseSide(PojoRawTypeIdentifier<?> typeIdentifier,
 			BitSet dirtyAssociationPaths, Object[] oldState, Object[] newState) {
-		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = type( typeIdentifier );
+		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = typeIfIncludedOrNull( typeIdentifier );
+		if ( delegate == null ) {
+			return;
+		}
 		delegate.updateAssociationInverseSide( dirtyAssociationPaths, oldState, newState );
 	}
 
 	@Override
-	public AbstractPojoTypeIndexingPlan<?, ?, ?> type(PojoRawTypeIdentifier<?> typeIdentifier) {
+	public AbstractPojoTypeIndexingPlan<?, ?, ?> typeIfIncludedOrNull(PojoRawTypeIdentifier<?> typeIdentifier) {
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = typeOrNull( typeIdentifier );
-		if ( delegate == null ) {
+		if ( delegate == null && sessionContext.indexingTypeFilterHolder().filter().isIncluded( typeIdentifier ) ) {
 			delegate = createDelegate( typeIdentifier );
 		}
 		return delegate;
@@ -208,7 +223,10 @@ public class PojoIndexingPlanImpl
 		// also disable reindexing of other entities on updates,
 		// so they won't ever call this method.
 
-		PojoIndexedTypeIndexingPlan<?, ?> delegate = getOrCreateIndexedDelegateForContainedUpdate( typeIdentifier );
+		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = typeIfIncludedOrNull( typeIdentifier );
+		if ( delegate == null ) {
+			return;
+		}
 		delegate.updateBecauseOfContained( containingEntity );
 	}
 
@@ -221,7 +239,10 @@ public class PojoIndexingPlanImpl
 		// never uses provided identifiers and always defines an identifier mapping,
 		// so this should always work.
 
-		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = type( typeIdentifier );
+		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = typeIfIncludedOrNull( typeIdentifier );
+		if ( delegate == null ) {
+			return;
+		}
 		delegate.updateBecauseOfContainedAssociation( containingEntity, dirtyAssociationPathOrdinal );
 	}
 
@@ -246,6 +267,9 @@ public class PojoIndexingPlanImpl
 	}
 
 	private AbstractPojoTypeIndexingPlan<?, ?, ?> createDelegate(PojoRawTypeIdentifier<?> typeIdentifier) {
+		if ( !sessionContext.indexingTypeFilterHolder().filter().isIncluded( typeIdentifier ) ) {
+			throw log.attemptToCreateIndexingPlanForExcludedType( typeIdentifier );
+		}
 		PojoWorkTypeContext<?, ?> typeContext = typeContextProvider.forExactType( typeIdentifier );
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> indexedTypeContextOptional =
 				typeContext.asIndexed();
@@ -264,19 +288,6 @@ public class PojoIndexingPlanImpl
 			containedTypeDelegates.put( typeIdentifier, delegate );
 			return delegate;
 		}
-	}
-
-	private PojoIndexedTypeIndexingPlan<?, ?> getOrCreateIndexedDelegateForContainedUpdate(
-			PojoRawTypeIdentifier<?> typeIdentifier) {
-		PojoIndexedTypeIndexingPlan<?, ?> delegate = indexedTypeDelegates.get( typeIdentifier );
-		if ( delegate != null ) {
-			return delegate;
-		}
-
-		PojoWorkIndexedTypeContext<?, ?> typeContext = typeContextProvider.indexedForExactType( typeIdentifier );
-		delegate = createDelegate( typeContext );
-		indexedTypeDelegates.put( typeIdentifier, delegate );
-		return delegate;
 	}
 
 	@Override

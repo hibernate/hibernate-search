@@ -36,7 +36,10 @@ public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndex
 		PojoWorkTypeContext<?, ?> typeContext = typeContext( entityName );
 		Object id = typeContext.identifierMapping().fromDocumentIdentifier( serializedId, sessionContext );
 		DirtinessDescriptor dirtiness = payload.dirtiness;
-		PojoTypeIndexingPlan typePlan = delegate.type( typeContext.typeIdentifier() );
+		PojoTypeIndexingPlan typePlan = delegate.typeIfIncludedOrNull( typeContext.typeIdentifier() );
+		if ( typePlan == null ) {
+			return;
+		}
 		typePlan.addOrUpdateOrDelete( id, payload.routes,
 				// Force the reindexing now if the entity was marked as dirty because of a contained entity;
 				// this is to avoid sending events forever and to force the processing of "updateBecauseOfContained" now.
