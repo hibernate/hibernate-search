@@ -244,13 +244,14 @@ stage('Configure') {
 					new EsLocalBuildEnvironment(version: '7.16.3', condition: TestCondition.ON_DEMAND),
 					new EsLocalBuildEnvironment(version: '7.17.9', condition: TestCondition.AFTER_MERGE),
 					// Not testing 8.0 because we know there are problems in 8.0.1 (see https://hibernate.atlassian.net/browse/HSEARCH-4497)
-					// Not testing 8.1-8.5 to make the build quicker.
+					// Not testing 8.1-8.6 to make the build quicker.
 					new EsLocalBuildEnvironment(version: '8.1.3', condition: TestCondition.ON_DEMAND),
 					new EsLocalBuildEnvironment(version: '8.2.3', condition: TestCondition.ON_DEMAND),
 					new EsLocalBuildEnvironment(version: '8.3.3', condition: TestCondition.ON_DEMAND),
 					new EsLocalBuildEnvironment(version: '8.4.3', condition: TestCondition.ON_DEMAND),
 					new EsLocalBuildEnvironment(version: '8.5.3', condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(version: '8.6.2', condition: TestCondition.BEFORE_MERGE, isDefault: true),
+					new EsLocalBuildEnvironment(version: '8.6.2', condition: TestCondition.ON_DEMAND),
+					new EsLocalBuildEnvironment(version: '8.7.0', condition: TestCondition.BEFORE_MERGE, isDefault: true),
 
 					// --------------------------------------------
 					// OpenSearch
