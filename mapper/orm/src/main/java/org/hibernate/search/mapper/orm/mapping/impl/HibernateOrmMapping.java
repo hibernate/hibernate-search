@@ -31,6 +31,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
+import org.hibernate.search.mapper.orm.automaticindexing.filter.impl.HibernateOrmApplicationAutomaticIndexingTypeFilter;
 import org.hibernate.search.mapper.orm.automaticindexing.impl.AutomaticIndexingQueueEventProcessingPlanImpl;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventProcessingPlan;
@@ -67,6 +68,7 @@ import org.hibernate.search.mapper.pojo.work.spi.ConfiguredIndexingPlanSynchroni
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoTypeIndexingPlan;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -316,14 +318,39 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public PojoIndexingPlan currentIndexingPlan(SessionImplementor session,
-			boolean createIfDoesNotExist) {
-		HibernateOrmSearchSession searchSession = HibernateOrmSearchSession.get( this, session, createIfDoesNotExist );
+	public PojoIndexingPlan currentIndexingPlanIfExisting(SessionImplementor session) {
+		HibernateOrmSearchSession searchSession = HibernateOrmSearchSession.get( this, session, false );
 		if ( searchSession == null ) {
 			// Only happens if createIfDoesNotExist is false
 			return null;
 		}
-		return searchSession.currentIndexingPlan( createIfDoesNotExist );
+		return searchSession.currentIndexingPlan( false );
+	}
+
+	@Override
+	public PojoTypeIndexingPlan currentIndexingPlanIfTypeIncluded(SessionImplementor session,
+			PojoRawTypeIdentifier<?> typeIdentifier) {
+		HibernateOrmSearchSession searchSession = HibernateOrmSearchSession.get( this, session, false );
+		if ( searchSession != null ) {
+			// If the session exist, rely on the session-level filter
+			if ( searchSession.indexingTypeFilterHolder().filter().isIncluded( typeIdentifier ) ) {
+				return searchSession.currentIndexingPlan( true ).typeIfIncludedOrNull( typeIdentifier );
+			}
+			else {
+				return null;
+			}
+		}
+		else {
+			// If the search session doesn't exist yet, we can safely rely on the global filter
+			if ( HibernateOrmApplicationAutomaticIndexingTypeFilter.applicationFilter().filter().isIncluded( typeIdentifier ) ) {
+				searchSession = HibernateOrmSearchSession.get( this, session, true );
+				return searchSession.currentIndexingPlan( true ).typeIfIncludedOrNull( typeIdentifier );
+			}
+			else {
+				return null;
+			}
+
+		}
 	}
 
 	@Override

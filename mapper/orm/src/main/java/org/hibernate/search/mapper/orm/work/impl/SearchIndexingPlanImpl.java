@@ -10,6 +10,7 @@ import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoTypeIndexingPlan;
 
 public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
@@ -24,26 +25,38 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void addOrUpdate(Object entity) {
-		delegate( true ).type( getTypeIdentifier( entity ) )
-				.addOrUpdate( null, null, entity, true, true, null );
+		PojoTypeIndexingPlan typeDelegate = delegate( true ).typeIfIncludedOrNull( getTypeIdentifier( entity ) );
+		if ( typeDelegate == null ) {
+			return;
+		}
+		typeDelegate.addOrUpdate( null, null, entity, true, true, null );
 	}
 
 	@Override
 	public void delete(Object entity) {
-		delegate( true ).type( getTypeIdentifier( entity ) )
-				.delete( null, null, entity );
+		PojoTypeIndexingPlan typeDelegate = delegate( true ).typeIfIncludedOrNull( getTypeIdentifier( entity ) );
+		if ( typeDelegate == null ) {
+			return;
+		}
+		typeDelegate.delete( null, null, entity );
 	}
 
 	@Override
 	public void purge(Class<?> entityClass, Object providedId, String providedRoutingKey) {
-		delegate( true ).type( getTypeIdentifier( entityClass ) )
-				.delete( providedId, DocumentRoutesDescriptor.fromLegacyRoutingKey( providedRoutingKey ), null );
+		PojoTypeIndexingPlan typeDelegate = delegate( true ).typeIfIncludedOrNull( getTypeIdentifier( entityClass ) );
+		if ( typeDelegate == null ) {
+			return;
+		}
+		typeDelegate.delete( providedId, DocumentRoutesDescriptor.fromLegacyRoutingKey( providedRoutingKey ), null );
 	}
 
 	@Override
 	public void purge(String entityName, Object providedId, String providedRoutingKey) {
-		delegate( true ).type( getTypeIdentifier( entityName ) )
-				.delete( providedId, DocumentRoutesDescriptor.fromLegacyRoutingKey( providedRoutingKey ), null );
+		PojoTypeIndexingPlan typeDelegate = delegate( true ).typeIfIncludedOrNull( getTypeIdentifier( entityName ) );
+		if ( typeDelegate == null ) {
+			return;
+		}
+		typeDelegate.delete( providedId, DocumentRoutesDescriptor.fromLegacyRoutingKey( providedRoutingKey ), null );
 	}
 
 	@Override

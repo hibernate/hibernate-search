@@ -110,6 +110,15 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 				.resolveEntitiesToReindex( root, dirtyAssociationPaths, oldState, newState, this );
 	}
 
+	// Should only be called on indexed types,
+	// but it's simpler to implement this method for both indexed and contained types.
+
+	void updateBecauseOfContained(Object entity) {
+		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
+		I identifier = typeContext().identifierMapping().getIdentifier( null, entitySupplier );
+		getState( identifier ).updateBecauseOfContained( entitySupplier );
+	}
+
 	void updateBecauseOfContainedAssociation(Object entity, int dirtyAssociationPathOrdinal) {
 		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext().identifierMapping().getIdentifier( null, entitySupplier );
