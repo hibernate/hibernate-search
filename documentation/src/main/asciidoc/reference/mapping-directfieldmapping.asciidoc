@@ -71,6 +71,8 @@ match fields regardless of case,
 match fields ignoring diacritics,
 ...
 +
+Full-text fields also allow <<add-link-later,highlighting>>.
++
 Full-text fields should be assigned an <<mapping-directfieldmapping-analyzer,analyzer>>, referenced by its name.
 By default, the analyzer named `default` will be used.
 See <<concepts-analysis>> for more details about analyzers and full-text analysis.
@@ -296,6 +298,30 @@ NOTE: With the <<mapper-orm,Hibernate ORM integration>>,
 a default `decimalScale` is taken automatically from the underlying `scale` value of the relative SQL `@Column`,
 using the Hibernate ORM metadata. The value could be overridden explicitly using the `decimalScale` attribute.
 
+[[mapping-directfieldmapping-highlightable]] `highlightable`::
+Whether the field can be <<search-dsl-highlighting, highlighted>> and if so which highlighter types can be applied to it.
+I.e. whether the field value is indexed/stored in a specific format to allow highlighting later when querying.
++
+While for most cases picking one highlighter type should be enough, this attribute can accept multiple, non contradicting values.
+Please refer to <<search-dsl-highlighting-highlighter-type,highlighter types section>> to see which highlighter to select.
+Available values are:
++
+[options="header"]
+|===============
+|Value|Definition
+|`Highlightable.NO`| Do not allow highlighting on the field.
+|`Highlightable.ANY`| Allow any highlighter type be applied for highlighting the field.
+|`Highlightable.PLAIN`| Allow the plain highlighter type be applied for highlighting the field.
+|`Highlightable.UNIFIED`| Allow the unified highlighter type be applied for highlighting the field.
+|`Highlightable.FAST_VECTOR`| Allow the fast vector highlighter type be applied for highlighting the field.
+|`Highlightable.DEFAULT`| Use the backend-specific default. <<backend-lucene,Lucene's>> default value is `Highlightable.NO`,
+<<backend-elasticsearch,Elasticsearch's>> default value is `[Highlightable.PLAIN, Highlightable.UNIFIED]`
+|===============
++
+[IMPORTANT]
+====
+This option is *only* available for `@FullTextField`.
+====
 [[mapping-directfieldmapping-supported-types]]
 == [[mapper-orm-directfieldmapping-supported-types]] [[section-built-in-bridges]] Supported property types
 
