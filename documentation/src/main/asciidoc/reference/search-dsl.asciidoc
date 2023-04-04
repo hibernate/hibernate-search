@@ -18,6 +18,8 @@ include::search-dsl-sort.asciidoc[]
 
 include::search-dsl-projection.asciidoc[]
 
+include::search-dsl-highlighting.asciidoc[]
+
 include::search-dsl-aggregation.asciidoc[]
 
 include::search-dsl-type-compatibility.asciidoc[]
