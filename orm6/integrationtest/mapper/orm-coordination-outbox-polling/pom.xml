@@ -102,6 +102,9 @@
                                        We will address that someday with explicit support for queries;
                                        see https://hibernate.atlassian.net/browse/HSEARCH-1937 . -->
                                 <exclude>AutomaticIndexingBridgeExplicitReindexingFunctionalIT</exclude>
+                                <!-- A session-level filter is not allowed with the outbox polling coordination strategy.
+                                      Those few cases that are acceptable are tested by an outbox polling specific test. -->
+                                <exclude>SessionAutomaticIndexingFilterIT</exclude>
                             </excludes>
                         </configuration>
                     </execution>

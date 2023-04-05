@@ -8,68 +8,14 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.MethodRule;
 
-public class AutomaticIndexingFilterIT {
-
-	@ClassRule
-	public static BackendMock backendMock = new BackendMock();
-
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
-
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
-		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
-						.field( "indexedField", String.class )
-						.objectField(
-								"containedIndexedEmbedded", b2 -> b2.field( "indexedField", String.class ).multiValued( true )
-						)
-				)
-				.expectSchema( EntityA.INDEX, b -> b.field( "indexedField", String.class ) )
-				.expectSchema( Entity1A.INDEX, b -> b.field( "indexedField", String.class ) )
-				.expectSchema( Entity2A.INDEX, b -> b.field( "indexedField", String.class ) )
-				.expectSchema( Entity1B.INDEX, b -> b.field( "indexedField", String.class ) );
-
-		setupContext.withAnnotatedTypes( IndexedEntity.class, ContainedEntity.class,
-				EntityA.class, Entity1A.class, Entity1B.class, Entity2A.class
-		);
-	}
-
-	@Before
-	public void clearFilter() throws Exception {
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
-				ctx -> { /*clear out any settings from tests*/ }
-		);
-	}
+public class SessionAutomaticIndexingFilterIT extends AbstractAutomaticIndexingFilterIT {
 
 	@Test
 	public void directPersistUpdateDelete() {
@@ -111,6 +57,72 @@ public class AutomaticIndexingFilterIT {
 
 			session.remove( entity1 );
 
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void directPersistUpdateDeleteOfNotDisabledEntity() {
+		setupHolder.runInTransaction( session -> {
+			Search.session( session ).automaticIndexingFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
+
+			IndexedEntity entity0 = new IndexedEntity();
+			entity0.setId( 1 );
+			entity0.setIndexedField( "initialValue" );
+
+			OtherIndexedEntity entity1 = new OtherIndexedEntity();
+			entity1.setId( 10 );
+			entity1.setIndexedField( "initialValue" );
+
+			ContainedEntity entity2 = new ContainedEntity();
+			entity2.setId( 100 );
+			entity2.setIndexedField( "initialValue" );
+
+
+			entity2.setContainingAsIndexedEmbedded( entity0 );
+			entity0.setContainedIndexedEmbedded( Arrays.asList( entity2 ) );
+			entity2.setOtherContainingAsIndexedEmbedded( entity1 );
+			entity1.setContainedIndexedEmbedded( Arrays.asList( entity2 ) );
+
+			session.persist( entity0 );
+			session.persist( entity1 );
+			session.persist( entity2 );
+
+			backendMock.expectWorks( OtherIndexedEntity.INDEX )
+					.add( "10", b -> b.field( "indexedField", "initialValue" )
+							.objectField(
+									"containedIndexedEmbedded", b2 -> b2.field( "indexedField", "initialValue" ) ) );
+		} );
+		backendMock.verifyExpectationsMet();
+
+		setupHolder.runInTransaction( session -> {
+			Search.session( session ).automaticIndexingFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
+
+			OtherIndexedEntity entity1 = session.get( OtherIndexedEntity.class, 10 );
+			entity1.setIndexedField( "updatedValue" );
+
+			backendMock.expectWorks( OtherIndexedEntity.INDEX )
+					.addOrUpdate( "10", b -> b.field( "indexedField", "updatedValue" )
+							.objectField(
+									"containedIndexedEmbedded", b2 -> b2.field( "indexedField", "initialValue" ) ) );
+
+		} );
+		backendMock.verifyExpectationsMet();
+
+		setupHolder.runInTransaction( session -> {
+			Search.session( session ).automaticIndexingFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
+
+			IndexedEntity entity0 = session.get( IndexedEntity.class, 1 );
+			OtherIndexedEntity entity1 = session.get( OtherIndexedEntity.class, 10 );
+
+			entity0.getContainedIndexedEmbedded().forEach( e -> e.setContainingAsIndexedEmbedded( null ) );
+			entity1.getContainedIndexedEmbedded().forEach( e -> e.setOtherContainingAsIndexedEmbedded( null ) );
+
+			session.remove( entity0 );
+			session.remove( entity1 );
+
+			backendMock.expectWorks( OtherIndexedEntity.INDEX )
+					.delete( "10" );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -245,6 +257,24 @@ public class AutomaticIndexingFilterIT {
 	}
 
 	@Test
+	public void sameNameFails() {
+		setupHolder.runInTransaction( session -> {
+			assertThatThrownBy( () ->
+					Search.session( session ).automaticIndexingFilter(
+							ctx -> ctx.include( EntityA.INDEX )
+									.exclude( EntityA.INDEX )
+					)
+			).isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							EntityA.class.getName(),
+							"cannot be included and excluded at the same time within one filter",
+							"Already included types:",
+							"Already excluded types: '[]'"
+					);
+		} );
+	}
+
+	@Test
 	public void applicationFilterDisableAll() {
 		Search.automaticIndexingFilter(
 				setupHolder.entityManagerFactory(),
@@ -257,28 +287,6 @@ public class AutomaticIndexingFilterIT {
 			session.persist( new Entity2A( 4, "test" ) );
 		} );
 		backendMock.verifyExpectationsMet();
-
-		setupHolder.runInTransaction( session -> {
-			Search.session( session ).automaticIndexingFilter( ctx -> ctx.include( Entity2A.class ) );
-
-			session.persist( new EntityA( 10, "test" ) );
-			session.persist( new Entity1A( 20, "test" ) );
-			session.persist( new Entity1B( 30, "test" ) );
-			session.persist( new Entity2A( 40, "test" ) );
-
-			backendMock.expectWorks( Entity2A.INDEX )
-					.add( "40", b -> b.field( "indexedField", "test" ) );
-		} );
-		backendMock.verifyExpectationsMet();
-	}
-
-	@Test
-	public void applicationFilterOnly() {
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
-				ctx -> ctx.exclude( EntityA.class )
-						.include( Entity2A.class )
-		);
 
 		setupHolder.runInTransaction( session -> {
 			Search.session( session ).automaticIndexingFilter( ctx -> ctx.include( Entity2A.class ) );
@@ -310,180 +318,5 @@ public class AutomaticIndexingFilterIT {
 					.add( "40", b -> b.field( "indexedField", "test" ) );
 		} );
 		backendMock.verifyExpectationsMet();
-	}
-
-	@Entity(name = "containing")
-	@Indexed(index = IndexedEntity.INDEX)
-	public static class IndexedEntity {
-
-		static final String INDEX = "IndexedEntity";
-
-		@Id
-		private Integer id;
-
-		@Basic
-		@GenericField
-		private String indexedField;
-
-		@Basic
-		private String nonIndexedField;
-
-		@OneToMany(mappedBy = "containingAsIndexedEmbedded")
-		@IndexedEmbedded
-		private Collection<ContainedEntity> containedIndexedEmbedded = new ArrayList<>();
-
-		public IndexedEntity() {
-		}
-
-		public IndexedEntity(Integer id, String indexedField) {
-			this.id = id;
-			this.indexedField = indexedField;
-		}
-
-		public Integer getId() {
-			return id;
-		}
-
-		public void setId(Integer id) {
-			this.id = id;
-		}
-
-		public String getIndexedField() {
-			return indexedField;
-		}
-
-		public void setIndexedField(String indexedField) {
-			this.indexedField = indexedField;
-		}
-
-		public String getNonIndexedField() {
-			return nonIndexedField;
-		}
-
-		public void setNonIndexedField(String nonIndexedField) {
-			this.nonIndexedField = nonIndexedField;
-		}
-
-		public Collection<ContainedEntity> getContainedIndexedEmbedded() {
-			return containedIndexedEmbedded;
-		}
-
-		public void setContainedIndexedEmbedded(Collection<ContainedEntity> containedIndexedEmbedded) {
-			this.containedIndexedEmbedded = containedIndexedEmbedded;
-		}
-	}
-
-	@Entity(name = "contained")
-	public static class ContainedEntity {
-
-		@Id
-		private Integer id;
-
-		@ManyToOne
-		private IndexedEntity containingAsIndexedEmbedded;
-
-		@Basic
-		@GenericField
-		private String indexedField;
-
-
-		public Integer getId() {
-			return id;
-		}
-
-		public void setId(Integer id) {
-			this.id = id;
-		}
-
-		public IndexedEntity getContainingAsIndexedEmbedded() {
-			return containingAsIndexedEmbedded;
-		}
-
-		public void setContainingAsIndexedEmbedded(IndexedEntity containingAsIndexedEmbedded) {
-			this.containingAsIndexedEmbedded = containingAsIndexedEmbedded;
-		}
-
-		public String getIndexedField() {
-			return indexedField;
-		}
-
-		public void setIndexedField(String indexedField) {
-			this.indexedField = indexedField;
-		}
-	}
-
-	@Entity
-	@Indexed(index = EntityA.INDEX)
-	@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-	public static class EntityA {
-
-		static final String INDEX = "A";
-
-		@Id
-		private Integer id;
-
-		@Basic
-		@GenericField
-		private String indexedField;
-
-		public EntityA() {
-		}
-
-		public EntityA(Integer id, String indexedField) {
-			this.id = id;
-			this.indexedField = indexedField;
-		}
-
-		public Integer getId() {
-			return id;
-		}
-
-		public void setId(Integer id) {
-			this.id = id;
-		}
-
-		public String getIndexedField() {
-			return indexedField;
-		}
-
-		public void setIndexedField(String indexedField) {
-			this.indexedField = indexedField;
-		}
-	}
-
-	@Entity
-	@Indexed(index = Entity1A.INDEX)
-	public static class Entity1A extends EntityA {
-		static final String INDEX = "1A";
-		public Entity1A() {
-		}
-
-		public Entity1A(Integer id, String indexedField) {
-			super( id, indexedField );
-		}
-	}
-
-	@Entity
-	@Indexed(index = Entity1B.INDEX)
-	public static class Entity1B extends EntityA {
-		static final String INDEX = "1B";
-		public Entity1B() {
-		}
-
-		public Entity1B(Integer id, String indexedField) {
-			super( id, indexedField );
-		}
-	}
-
-	@Entity
-	@Indexed(index = Entity2A.INDEX)
-	public static class Entity2A extends Entity1A {
-		static final String INDEX = "2A";
-		public Entity2A() {
-		}
-
-		public Entity2A(Integer id, String indexedField) {
-			super( id, indexedField );
-		}
 	}
 }

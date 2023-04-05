@@ -73,10 +73,14 @@ public class HibernateOrmAutomaticIndexingTypeFilterContext implements PojoAutom
 		return this;
 	}
 
+	public HibernateOrmAutomaticIndexingTypeFilter createFilter() {
+		return createFilter( null );
+	}
 
 	public HibernateOrmAutomaticIndexingTypeFilter createFilter(PojoAutomaticIndexingTypeFilterHolder fallback) {
 		Set<PojoRawTypeIdentifier<?>> allIncludes = new HashSet<>();
 		Set<PojoRawTypeIdentifier<?>> allExcludes = new HashSet<>();
+		boolean allTypesProcessed = true;
 
 		for ( PojoTypeContext<?> typeContext : contextProvider.byEntityName().values() ) {
 			PojoRawTypeIdentifier<?> typedIdentifier = typeContext.typeIdentifier();
@@ -111,15 +115,19 @@ public class HibernateOrmAutomaticIndexingTypeFilterContext implements PojoAutom
 				else if ( closestInclude.isPresent() ) {
 					allIncludes.add( typedIdentifier );
 				}
-				// if we don't find either include or exclude then we will defer the decision to either app filter or to a default (include)
-				// but that will happen in the filter.
+				else {
+					// if we don't find either include or exclude then we will defer the decision to either app filter or to a default (include)
+					// but that will happen in the filter.
+					allTypesProcessed = false;
+				}
 			}
 		}
 
-		return new HibernateOrmAutomaticIndexingTypeFilter(
+		return HibernateOrmAutomaticIndexingTypeFilter.create(
 				fallback,
 				Collections.unmodifiableSet( allIncludes ),
-				Collections.unmodifiableSet( allExcludes )
+				Collections.unmodifiableSet( allExcludes ),
+				allTypesProcessed
 		);
 	}
 

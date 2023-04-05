@@ -12,8 +12,9 @@ import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.PojoAutomat
 
 public final class HibernateOrmApplicationAutomaticIndexingTypeFilter {
 
-	private static final PojoAutomaticIndexingTypeFilterHolder INDEXING_TYPE_FILTER_HOLDER = new PojoAutomaticIndexingTypeFilterHolder();
-	private static final PojoAutomaticIndexingTypeFilterHolder INCLUDE_ALL_INDEXING_TYPE_FILTER_HOLDER = new PojoAutomaticIndexingTypeFilterHolder();
+	private static final PojoAutomaticIndexingTypeFilterHolder INDEXING_TYPE_FILTER_HOLDER = new PojoAutomaticIndexingTypeFilterHolder(
+			HibernateOrmAutomaticIndexingTypeFilter.IncludeAll.INSTANCE
+	);
 
 	private HibernateOrmApplicationAutomaticIndexingTypeFilter() {
 	}
@@ -24,7 +25,7 @@ public final class HibernateOrmApplicationAutomaticIndexingTypeFilter {
 		HibernateOrmAutomaticIndexingTypeFilterContext context = new HibernateOrmAutomaticIndexingTypeFilterContext(
 				mapping.typeContextProvider() );
 		configurer.configure( context );
-		INDEXING_TYPE_FILTER_HOLDER.filter( context.createFilter( INCLUDE_ALL_INDEXING_TYPE_FILTER_HOLDER ) );
+		INDEXING_TYPE_FILTER_HOLDER.filter( context.createFilter() );
 	}
 
 	public static PojoAutomaticIndexingTypeFilterHolder applicationFilter() {
