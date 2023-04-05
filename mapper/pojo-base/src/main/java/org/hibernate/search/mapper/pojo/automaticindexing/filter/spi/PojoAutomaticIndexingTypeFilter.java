@@ -10,8 +10,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface PojoAutomaticIndexingTypeFilter {
 
-	PojoAutomaticIndexingTypeFilter ACCEPT_ALL = typeIdentifier -> true;
-
 	boolean isIncluded(PojoRawTypeIdentifier<?> typeIdentifier);
 
 }

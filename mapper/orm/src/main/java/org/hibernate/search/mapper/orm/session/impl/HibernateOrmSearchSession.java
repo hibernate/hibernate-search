@@ -10,7 +10,6 @@ import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnore
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
-import java.util.Collections;
 import javax.persistence.EntityManager;
 import javax.transaction.Synchronization;
 
@@ -119,10 +118,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		this.runtimeIntrospector = builder.buildRuntimeIntrospector();
 		this.automaticIndexingTypeFilterHolder = new PojoAutomaticIndexingTypeFilterHolder(
 				// make sure that even if a session filter is not configured we will fall back to an application one if needed.
-				new HibernateOrmAutomaticIndexingTypeFilter(
-						HibernateOrmApplicationAutomaticIndexingTypeFilter.applicationFilter(),
-						Collections.emptySet(),
-						Collections.emptySet()
+				HibernateOrmAutomaticIndexingTypeFilter.create(
+						HibernateOrmApplicationAutomaticIndexingTypeFilter.applicationFilter()
 				)
 		);
 		this.indexingPlanSynchronizationStrategy = automaticIndexingStrategy.defaultIndexingPlanSynchronizationStrategy();
@@ -226,9 +223,13 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	public void automaticIndexingFilter(PojoAutomaticIndexingTypeFilterConfigurer configurer) {
 		HibernateOrmAutomaticIndexingTypeFilterContext context = new HibernateOrmAutomaticIndexingTypeFilterContext( typeContextProvider );
 		configurer.configure( context );
-		automaticIndexingTypeFilterHolder.filter( context.createFilter(
+		HibernateOrmAutomaticIndexingTypeFilter filter = context.createFilter(
 				HibernateOrmApplicationAutomaticIndexingTypeFilter.applicationFilter()
-		) );
+		);
+		if ( automaticIndexingStrategy.usesEventQueue() && !filter.supportsEventQueue() ) {
+			throw log.cannotApplySessionFilterWhenAsyncProcessingIsUsed();
+		}
+		automaticIndexingTypeFilterHolder.filter( filter );
 	}
 
 	@Override

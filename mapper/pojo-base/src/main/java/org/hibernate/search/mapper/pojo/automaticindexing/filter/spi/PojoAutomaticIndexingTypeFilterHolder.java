@@ -11,10 +11,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class PojoAutomaticIndexingTypeFilterHolder {
 	private AtomicReference<PojoAutomaticIndexingTypeFilter> filter = new AtomicReference<>();
 
-	public PojoAutomaticIndexingTypeFilterHolder() {
-		this( PojoAutomaticIndexingTypeFilter.ACCEPT_ALL );
-	}
-
 	public PojoAutomaticIndexingTypeFilterHolder(PojoAutomaticIndexingTypeFilter filter) {
 		this.filter.set( filter );
 	}

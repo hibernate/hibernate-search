@@ -328,4 +328,8 @@ public interface Log extends BasicLogger {
 					"Already excluded types: '%3$s'.")
 	SearchException automaticIndexingFilterCannotIncludeExcludeSameType(PojoRawTypeIdentifier<?> typeIdentifier,
 			Set<PojoRawTypeIdentifier<?>> includes, Set<PojoRawTypeIdentifier<?>> excludes);
+
+	@Message(id = ID_OFFSET + 125, value = "Unable to apply the given filter at the session level with the outbox polling coordination strategy. " +
+			"With this coordination strategy, applying a session-level indexing plan filter is only allowed if it excludes all types.")
+	SearchException cannotApplySessionFilterWhenAsyncProcessingIsUsed();
 }

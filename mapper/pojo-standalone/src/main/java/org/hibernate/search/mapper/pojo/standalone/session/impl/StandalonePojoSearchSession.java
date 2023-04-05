@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
+import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.PojoAutomaticIndexingTypeFilter;
 import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.PojoAutomaticIndexingTypeFilterHolder;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -45,6 +46,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 		implements SearchSession, StandalonePojoMassIndexingSessionContext, StandalonePojoLoadingSessionContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final PojoAutomaticIndexingTypeFilter ACCEPT_ALL = typeIdentifier -> true;
 
 	private final StandalonePojoSearchSessionMappingContext mappingContext;
 	private final StandalonePojoSearchSessionTypeContextProvider typeContextProvider;
@@ -53,7 +55,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 
 	private final Consumer<SelectionLoadingOptionsStep> loadingOptionsContributor;
 	private final ConfiguredIndexingPlanSynchronizationStrategyHolder synchronizationStrategyHolder;
-	private final PojoAutomaticIndexingTypeFilterHolder indexingTypeFilterHolder = new PojoAutomaticIndexingTypeFilterHolder();
+	private final PojoAutomaticIndexingTypeFilterHolder indexingTypeFilterHolder;
 
 	private SearchIndexingPlanImpl indexingPlan;
 	private SearchIndexer indexer;
@@ -70,6 +72,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 
 		this.indexingPlanSynchronizationStrategy = this.synchronizationStrategyHolder.configureOverriddenSynchronizationStrategy(
 				builder.synchronizationStrategy );
+		this.indexingTypeFilterHolder = new PojoAutomaticIndexingTypeFilterHolder( ACCEPT_ALL );
 	}
 
 	private void checkOpenAndThrow() {
