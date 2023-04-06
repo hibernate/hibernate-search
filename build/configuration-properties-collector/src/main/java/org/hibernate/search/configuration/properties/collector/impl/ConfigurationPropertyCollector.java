@@ -274,17 +274,17 @@ public class ConfigurationPropertyCollector {
 	private void updateLink(String className, Element link) {
 		String href = link.attr( "href" );
 		// only update links if they are not external:
-		if ( !link.hasClass( "external-link" ) ) {
+		if ( !href.startsWith( "http://" ) && !href.startsWith( "https://" ) ) {
 			if ( href.startsWith( "#" ) ) {
 				href = withoutPackagePrefix( className ) + ".html" + href;
 			}
 			String packagePath = packagePrefix( className ).replace( ".", File.separator );
 			href = javadocsBaseLink + packagePath + "/" + href;
 		}
-		else if ( href.contains( "/build/parents/" ) && href.contains( "/apidocs" ) ) {
+		else if ( href.contains( "/build/parents/" ) && href.contains( "/apidocs/org/hibernate/search/" ) ) {
 			// means a link was to a class from other module and javadoc plugin generated some external link
 			// that won't work. So we replace it:
-			href = javadocsBaseLink + href.substring( href.indexOf( "/apidocs" ) + "/apidocs".length() );
+			href = javadocsBaseLink + href.substring( href.indexOf( "/apidocs/" ) + "/apidocs/".length() );
 		}
 		link.clearAttributes();
 		link.attr( "href", href );
