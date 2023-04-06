@@ -6,17 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.cfg.spi;
 
-import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
-
 /**
  * Implementation-related settings, used for testing only.
  *
  * @deprecated Use {@link org.hibernate.search.backend.elasticsearch.cfg.impl.ElasticsearchBackendImplSettings} instead.
  */
-@HibernateSearchConfiguration(
-		title = "Hibernate Search Backend - Elasticsearch",
-		anchorPrefix = "hibernate-search-backend-elasticsearch-"
-)
 @Deprecated
 public final class ElasticsearchBackendImplSettings {
 

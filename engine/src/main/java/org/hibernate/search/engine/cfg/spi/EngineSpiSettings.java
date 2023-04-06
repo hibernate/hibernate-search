@@ -14,15 +14,10 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.engine.environment.thread.impl.EmbeddedThreadProvider;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
-import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
 /**
  * Configuration properties for the Hibernate Search engine that are considered SPI (and not API).
  */
-@HibernateSearchConfiguration(
-		title = "Hibernate Search Engine",
-		anchorPrefix = "hibernate-search-engine-"
-)
 public class EngineSpiSettings {
 
 	private EngineSpiSettings() {

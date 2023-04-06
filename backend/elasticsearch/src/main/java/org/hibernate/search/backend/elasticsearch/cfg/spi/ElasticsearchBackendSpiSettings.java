@@ -11,15 +11,10 @@ import static org.hibernate.search.backend.elasticsearch.resources.impl.DefaultE
 import org.hibernate.search.backend.elasticsearch.work.spi.ElasticsearchWorkExecutorProvider;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
 /**
  * Configuration properties for the Elasticsearch backend that are considered SPI (and not API).
  */
-@HibernateSearchConfiguration(
-		title = "Hibernate Search Backend - Elasticsearch",
-		anchorPrefix = "hibernate-search-backend-elasticsearch-"
-)
 public final class ElasticsearchBackendSpiSettings {
 
 	/**

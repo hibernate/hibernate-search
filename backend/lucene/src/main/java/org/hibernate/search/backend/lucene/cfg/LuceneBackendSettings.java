@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.cfg;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.cache.QueryCachingConfigurer;
 import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
-import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
 import org.apache.lucene.util.Version;
 
@@ -19,11 +18,6 @@ import org.apache.lucene.util.Version;
  * Constants in this class are to be appended to a prefix to form a property key;
  * see {@link org.hibernate.search.engine.cfg.BackendSettings} for details.
  */
-@HibernateSearchConfiguration(
-		prefix = { "hibernate.search.backend.", "hibernate.search.backends.<backend-name>." },
-		title = "Hibernate Search Backend - Lucene",
-		anchorPrefix = "hibernate-search-backend-lucene-"
-)
 public final class LuceneBackendSettings {
 
 	private LuceneBackendSettings() {
@@ -37,7 +31,6 @@ public final class LuceneBackendSettings {
 	 * Only useful if you have more than one backend technology in the classpath;
 	 * otherwise the backend type is automatically detected.
 	 */
-	@HibernateSearchConfiguration(ignore = true)
 	public static final String TYPE_NAME = "lucene";
 
 	/**

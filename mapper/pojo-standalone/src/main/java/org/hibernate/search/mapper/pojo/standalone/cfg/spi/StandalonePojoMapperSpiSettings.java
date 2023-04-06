@@ -7,13 +7,8 @@
 package org.hibernate.search.mapper.pojo.standalone.cfg.spi;
 
 import org.hibernate.search.util.common.annotation.Incubating;
-import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
 @Incubating
-@HibernateSearchConfiguration(
-		title = "Hibernate Search Mapper - POJO Standalone",
-		anchorPrefix = "hibernate-search-mapper-pojo-standalone-"
-)
 public final class StandalonePojoMapperSpiSettings {
 
 	private StandalonePojoMapperSpiSettings() {
