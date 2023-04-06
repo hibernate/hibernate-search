@@ -1,3 +1,4 @@
+[appendix]
 [[configuration-properties-aggregated]]
 = List of all available configuration properties
 
