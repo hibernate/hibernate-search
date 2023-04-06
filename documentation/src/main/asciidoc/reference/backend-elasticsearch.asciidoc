@@ -443,8 +443,8 @@ For Elasticsearch specifically, some fine-tuning is available through the follow
 hibernate.search.backend.schema_management.minimal_required_status = green
 hibernate.search.backend.schema_management.minimal_required_status_wait_timeout = 10000
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.schema_management.minimal_required_status = green
-hibernate.search.backend.indexes.<index name>.schema_management.minimal_required_status_wait_timeout = 10000
+hibernate.search.backend.indexes.<index-name>.schema_management.minimal_required_status = green
+hibernate.search.backend.indexes.<index-name>.schema_management.minimal_required_status_wait_timeout = 10000
 ----
 
 * `minimal_required_status` defines the minimal required status of an index before creation is considered complete.
@@ -825,7 +825,7 @@ we can use the following index-level property to change the value.
 # To configure the defaults for all indexes:
 hibernate.search.backend.dynamic_mapping = strict
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.dynamic_mapping = strict
+hibernate.search.backend.indexes.<index-name>.dynamic_mapping = strict
 ----
 The default for this property is `strict`.
 
@@ -910,7 +910,7 @@ Exercise extreme caution.
 # To configure the defaults for all indexes:
 hibernate.search.backend.schema_management.mapping_file = custom/index-mapping.json
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.schema_management.mapping_file = custom/index-mapping.json
+hibernate.search.backend.indexes.<index-name>.schema_management.mapping_file = custom/index-mapping.json
 ----
 
 .Possible content of `custom/index-mapping.json` file
@@ -1028,7 +1028,7 @@ A different analysis configurer can be assigned to each index:
 # To set the default configurer for all indexes:
 hibernate.search.backend.analysis.configurer = com.mycompany.MyAnalysisConfigurer
 # To assign a specific configurer to a specific index:
-hibernate.search.backend.indexes.<index name>.analysis.configurer = com.mycompany.MySpecificAnalysisConfigurer
+hibernate.search.backend.indexes.<index-name>.analysis.configurer = com.mycompany.MySpecificAnalysisConfigurer
 ----
 
 If a specific configurer is assigned to an index,
@@ -1169,7 +1169,7 @@ Should you need to set some link:{elasticsearchDocUrl}/index-modules.html#index-
 # To configure the defaults for all indexes:
 hibernate.search.backend.schema_management.settings_file = custom/index-settings.json
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.schema_management.settings_file = custom/index-settings.json
+hibernate.search.backend.indexes.<index-name>.schema_management.settings_file = custom/index-settings.json
 ----
 
 .Possible content of `custom/index-settings.json` file
@@ -1260,9 +1260,9 @@ hibernate.search.backend.indexing.queue_count = 10
 hibernate.search.backend.indexing.queue_size = 1000
 hibernate.search.backend.indexing.max_bulk_size = 100
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.indexing.queue_count = 10
-hibernate.search.backend.indexes.<index name>.indexing.queue_size = 1000
-hibernate.search.backend.indexes.<index name>.indexing.max_bulk_size = 100
+hibernate.search.backend.indexes.<index-name>.indexing.queue_count = 10
+hibernate.search.backend.indexes.<index-name>.indexing.queue_size = 1000
+hibernate.search.backend.indexes.<index-name>.indexing.max_bulk_size = 100
 ----
 
 * `indexing.queue_count` defines the number of queues.

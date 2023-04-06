@@ -43,14 +43,14 @@ public final class ConfigurationRules {
 
 	public static List<String> prefixes(String className, String constant, String value) {
 		if ( className.endsWith( "BackendSettings" ) ) {
-			return Arrays.asList( "hibernate.search.backend.", "hibernate.search.backends.<backend name>." );
+			return Arrays.asList( "hibernate.search.backend.", "hibernate.search.backends.<backend-name>." );
 		}
 		else if ( className.endsWith( "IndexSettings" ) ) {
 			return Arrays.asList(
 					"hibernate.search.backend.",
-					"hibernate.search.backend.indexes.<index name>.",
-					"hibernate.search.backends.<backend name>.",
-					"hibernate.search.backends.<backend name>.indexes.<index name>."
+					"hibernate.search.backend.indexes.<index-name>.",
+					"hibernate.search.backends.<backend-name>.",
+					"hibernate.search.backends.<backend-name>.indexes.<index-name>."
 			);
 		}
 		else {

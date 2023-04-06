@@ -34,7 +34,7 @@ The type of directory can be configured as follows:
 # To configure the defaults for all indexes:
 hibernate.search.backend.directory.type = local-filesystem
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.directory.type = local-filesystem
+hibernate.search.backend.indexes.<index-name>.directory.type = local-filesystem
 ----
 
 // Search 5 anchors backward compatibility
@@ -84,7 +84,7 @@ It can be configured as follows:
 # To configure the defaults for all indexes:
 hibernate.search.backend.directory.root = /path/to/my/root
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.directory.root = /path/to/my/root
+hibernate.search.backend.indexes.<index-name>.directory.root = /path/to/my/root
 ----
 
 For example, with the configuration above,
@@ -110,7 +110,7 @@ Hibernate Search exposes a configuration property:
 # To configure the defaults for all indexes:
 hibernate.search.backend.directory.filesystem_access.strategy = auto
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.directory.filesystem_access.strategy = auto
+hibernate.search.backend.indexes.<index-name>.directory.filesystem_access.strategy = auto
 ----
 
 Allowed values are:
@@ -173,7 +173,7 @@ Hibernate Search exposes a configuration property:
 # To configure the defaults for all indexes:
 hibernate.search.backend.directory.locking.strategy = native-filesystem
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.directory.locking.strategy = native-filesystem
+hibernate.search.backend.indexes.<index-name>.directory.locking.strategy = native-filesystem
 ----
 
 The following strategies are available:
@@ -235,8 +235,8 @@ Multiple strategies are available:
 hibernate.search.backend.sharding.strategy = hash
 hibernate.search.backend.sharding.number_of_shards = 2
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.sharding.strategy = hash
-hibernate.search.backend.indexes.<index name>.sharding.number_of_shards = 2
+hibernate.search.backend.indexes.<index-name>.sharding.strategy = hash
+hibernate.search.backend.indexes.<index-name>.sharding.number_of_shards = 2
 ----
 +
 The `hash` strategy requires to set a number of shards through the `number_of_shards` property.
@@ -261,8 +261,8 @@ to be brought down to a smaller number (e.g. "all integers").
 hibernate.search.backend.sharding.strategy = explicit
 hibernate.search.backend.sharding.shard_identifiers = fr,en,de
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.sharding.strategy = explicit
-hibernate.search.backend.indexes.<index name>.sharding.shard_identifiers = fr,en,de
+hibernate.search.backend.indexes.<index-name>.sharding.strategy = explicit
+hibernate.search.backend.indexes.<index-name>.sharding.shard_identifiers = fr,en,de
 ----
 +
 The `explicit` strategy requires to set a list of shard identifiers through the `shard_identifiers` property.
@@ -295,9 +295,9 @@ This can be achieved by adding configuration properties for a specific shard:
 [source]
 ----
 # Default configuration for all shards an index:
-hibernate.search.backend.indexes.<index name>.directory.root = /path/to/fast/drive/
+hibernate.search.backend.indexes.<index-name>.directory.root = /path/to/fast/drive/
 # Configuration for a specific shard:
-hibernate.search.backend.indexes.<index name>.shards.<shard identifier>.directory.root = /path/to/large/drive/
+hibernate.search.backend.indexes.<index-name>.shards.<shard-identifier>.directory.root = /path/to/large/drive/
 ----
 
 [NOTE]
@@ -842,8 +842,8 @@ This is done through the following configuration properties:
 hibernate.search.backend.indexing.queue_count = 10
 hibernate.search.backend.indexing.queue_size = 1000
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.indexing.queue_count = 10
-hibernate.search.backend.indexes.<index name>.indexing.queue_size = 1000
+hibernate.search.backend.indexes.<index-name>.indexing.queue_count = 10
+hibernate.search.backend.indexes.<index-name>.indexing.queue_size = 1000
 ----
 
 * `indexing.queue_count` defines the number of queues.
@@ -934,7 +934,7 @@ by setting the commit interval (in milliseconds):
 # To configure the defaults for all indexes:
 hibernate.search.backend.io.commit_interval = 1000
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.io.commit_interval = 1000
+hibernate.search.backend.indexes.<index-name>.io.commit_interval = 1000
 ----
 The default for this property is `1000`.
 
@@ -986,7 +986,7 @@ The refresh interval can be set this way:
 # To configure the defaults for all indexes:
 hibernate.search.backend.io.refresh_interval = 0
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.io.refresh_interval = 0
+hibernate.search.backend.indexes.<index-name>.io.refresh_interval = 0
 ----
 The default for this property is `0`.
 
@@ -1009,7 +1009,7 @@ for example, `io.writer.ram_buffer_size` can be set like this:
 # To configure the defaults for all indexes:
 hibernate.search.backend.io.writer.ram_buffer_size = 32
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.io.writer.ram_buffer_size = 32
+hibernate.search.backend.indexes.<index-name>.io.writer.ram_buffer_size = 32
 ----
 
 [[table-performance-parameters]]
@@ -1078,7 +1078,7 @@ for example, `io.merge.factor` can be set like this:
 # To configure the defaults for all indexes:
 hibernate.search.backend.io.merge.factor = 10
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.io.merge.factor = 10
+hibernate.search.backend.indexes.<index-name>.io.merge.factor = 10
 ----
 
 [cols="1,2a", options="header"]

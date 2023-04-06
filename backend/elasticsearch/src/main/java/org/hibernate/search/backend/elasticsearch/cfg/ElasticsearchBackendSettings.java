@@ -27,7 +27,7 @@ import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
  * @author Gunnar Morling
  */
 @HibernateSearchConfiguration(
-		prefix = { "hibernate.search.backend.", "hibernate.search.backends.<backend name>." },
+		prefix = { "hibernate.search.backend.", "hibernate.search.backends.<backend-name>." },
 		title = "Hibernate Search Backend - Elasticsearch",
 		anchorPrefix = "hibernate-search-backend-elasticsearch-"
 )

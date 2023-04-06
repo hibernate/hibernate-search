@@ -16,7 +16,7 @@ import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
  * see {@link org.hibernate.search.engine.cfg.BackendSettings} for details.
  */
 @HibernateSearchConfiguration(
-		prefix = { "hibernate.search.backend.", "hibernate.search.backends.<backend name>." },
+		prefix = { "hibernate.search.backend.", "hibernate.search.backends.<backend-name>." },
 		title = "Hibernate Search Backend - Elasticsearch - AWS integration",
 		anchorPrefix = "hibernate-search-backend-elasticsearch-aws-"
 )

@@ -15,7 +15,7 @@ import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
  * <p>
  * Constants in this class are to be appended to a prefix to form a property key.
  * The exact prefix will depend on the integration, but should generally look like
- * "{@code hibernate.search.backends.<backend name>.}".
+ * "{@code hibernate.search.backends.<backend-name>.}".
  */
 public final class BackendSettings {
 

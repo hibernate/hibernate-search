@@ -20,7 +20,7 @@ import org.apache.lucene.util.Version;
  * see {@link org.hibernate.search.engine.cfg.BackendSettings} for details.
  */
 @HibernateSearchConfiguration(
-		prefix = { "hibernate.search.backend.", "hibernate.search.backends.<backend name>." },
+		prefix = { "hibernate.search.backend.", "hibernate.search.backends.<backend-name>." },
 		title = "Hibernate Search Backend - Lucene",
 		anchorPrefix = "hibernate-search-backend-lucene-"
 )
