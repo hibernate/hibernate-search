@@ -81,7 +81,7 @@ public class ConfigurationPropertyCollector {
 											.key(
 													new ConfigurationProperty.Key(
 															ConfigurationRules.prefixes(
-																	className, constantText, value ),
+																	className, value ),
 															value
 													)
 											)
