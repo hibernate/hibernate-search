@@ -29,9 +29,9 @@ import org.apache.lucene.util.InfoStream;
 @HibernateSearchConfiguration(
 		prefix = {
 				"hibernate.search.backend.",
-				"hibernate.search.backend.index.<index name>.",
+				"hibernate.search.backend.indexes.<index name>.",
 				"hibernate.search.backends.<backend name>.",
-				"hibernate.search.backends.<backend name>.index.<index name>."
+				"hibernate.search.backends.<backend name>.indexes.<index name>."
 		},
 		title = "Hibernate Search Backend - Lucene",
 		anchorPrefix = "hibernate-search-backend-lucene-"

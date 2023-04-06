@@ -48,9 +48,9 @@ public final class ConfigurationRules {
 		else if ( className.endsWith( "IndexSettings" ) ) {
 			return Arrays.asList(
 					"hibernate.search.backend.",
-					"hibernate.search.backend.index.<index name>.",
+					"hibernate.search.backend.indexes.<index name>.",
 					"hibernate.search.backends.<backend name>.",
-					"hibernate.search.backends.<backend name>.index.<index name>."
+					"hibernate.search.backends.<backend name>.indexes.<index name>."
 			);
 		}
 		else {

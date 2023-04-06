@@ -20,9 +20,9 @@ import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 @HibernateSearchConfiguration(
 		prefix = {
 				"hibernate.search.backend.",
-				"hibernate.search.backend.index.<index name>.",
+				"hibernate.search.backend.indexes.<index name>.",
 				"hibernate.search.backends.<backend name>.",
-				"hibernate.search.backends.<backend name>.index.<index name>."
+				"hibernate.search.backends.<backend name>.indexes.<index name>."
 		},
 		title = "Hibernate Search Backend - Elasticsearch",
 		anchorPrefix = "hibernate-search-backend-elasticsearch-"
