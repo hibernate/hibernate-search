@@ -6,12 +6,10 @@
  */
 package org.hibernate.search.configuration.properties.collector.impl;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ConfigurationProperty implements Comparable<ConfigurationProperty> {
@@ -151,19 +149,6 @@ public class ConfigurationProperty implements Comparable<ConfigurationProperty> 
 			this.prefixes = prefixes;
 		}
 
-		public void overridePrefixes(String... prefixes) {
-			overridePrefixes( Arrays.asList( prefixes ) );
-		}
-
-		public void overridePrefixes(List<String> prefixes) {
-			this.prefixes.clear();
-			this.prefixes.addAll( prefixes );
-		}
-
-		public boolean matches(Pattern pattern) {
-			return pattern.matcher( key ).matches();
-		}
-
 		public List<String> resolvedKeys() {
 			if ( prefixes.isEmpty() ) {
 				return Collections.singletonList( key );
@@ -177,21 +162,13 @@ public class ConfigurationProperty implements Comparable<ConfigurationProperty> 
 
 		@Override
 		public String toString() {
-			return toString( "/" );
-		}
-
-		public String toHtmlString() {
-			return toString( "</br>" );
-		}
-
-		private String toString(String delimiter) {
 			if ( prefixes.isEmpty() ) {
 				return key;
 			}
 			else {
 				return prefixes.stream()
 						.map( p -> p + key )
-						.collect( Collectors.joining( delimiter ) );
+						.collect( Collectors.joining( "/" ) );
 			}
 		}
 	}

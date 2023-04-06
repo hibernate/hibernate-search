@@ -39,11 +39,11 @@ public final class ConfigurationRules {
 				className.contains( ".internal." ) || IGNORED_CLASSES.contains( className );
 	}
 
-	public static boolean isConstantIgnored(String className, String constant, String value) {
-		return value.endsWith( "." ) || IGNORED_CONSTANTS.contains( className + "#" + constant );
+	public static boolean isConstantIgnored(String className, String constantName, String constantValue) {
+		return constantValue.endsWith( "." ) || IGNORED_CONSTANTS.contains( className + "#" + constantName );
 	}
 
-	public static List<String> prefixes(String className, String constant, String value) {
+	public static List<String> prefixes(String className, String propertyKey) {
 		if ( className.endsWith( "BackendSettings" ) ) {
 			return Arrays.asList( "hibernate.search.backend.", "hibernate.search.backends.<backend-name>." );
 		}
@@ -56,7 +56,7 @@ public final class ConfigurationRules {
 			);
 		}
 		else {
-			return !value.startsWith( "hibernate.search." ) ? Collections.singletonList( "hibernate.search." ) :
+			return !propertyKey.startsWith( "hibernate.search." ) ? Collections.singletonList( "hibernate.search." ) :
 					Collections.emptyList();
 		}
 	}
