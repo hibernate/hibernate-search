@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
+import org.hibernate.search.mapper.orm.session.impl.HibernateOrmAutomaticIndexingTypeFilterTypeContextProvider;
 import org.hibernate.search.mapper.pojo.automaticindexing.filter.PojoAutomaticIndexingTypeFilterContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.PojoAutomaticIndexingTypeFilterHolder;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -24,12 +24,13 @@ public class HibernateOrmAutomaticIndexingTypeFilterContext implements PojoAutom
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final HibernateOrmSessionTypeContextProvider contextProvider;
+	private final HibernateOrmAutomaticIndexingTypeFilterTypeContextProvider contextProvider;
 
 	private final Set<PojoRawTypeIdentifier<?>> includes = new HashSet<>();
 	private final Set<PojoRawTypeIdentifier<?>> excludes = new HashSet<>();
 
-	public HibernateOrmAutomaticIndexingTypeFilterContext(HibernateOrmSessionTypeContextProvider typeManager) {
+	public HibernateOrmAutomaticIndexingTypeFilterContext(
+			HibernateOrmAutomaticIndexingTypeFilterTypeContextProvider typeManager) {
 		this.contextProvider = typeManager;
 	}
 
@@ -46,7 +47,7 @@ public class HibernateOrmAutomaticIndexingTypeFilterContext implements PojoAutom
 	@Override
 	public PojoAutomaticIndexingTypeFilterContext include(Class<?> clazz) {
 		addIfNotPresentInOther(
-				contextProvider.typeIdentifierResolver().resolveByJavaClass( clazz ),
+				contextProvider.indexedWithSuperTypesByExactClass().getOrFail( clazz ),
 				includes,
 				excludes
 		);
@@ -66,7 +67,7 @@ public class HibernateOrmAutomaticIndexingTypeFilterContext implements PojoAutom
 	@Override
 	public PojoAutomaticIndexingTypeFilterContext exclude(Class<?> clazz) {
 		addIfNotPresentInOther(
-				contextProvider.typeIdentifierResolver().resolveByJavaClass( clazz ),
+				contextProvider.indexedWithSuperTypesByExactClass().getOrFail( clazz ),
 				excludes,
 				includes
 		);
