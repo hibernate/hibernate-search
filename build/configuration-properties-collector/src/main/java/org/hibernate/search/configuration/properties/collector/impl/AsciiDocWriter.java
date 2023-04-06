@@ -91,17 +91,15 @@ public class AsciiDocWriter implements BiConsumer<Map<String, ConfigurationPrope
 		if ( keys.hasNext() ) {
 			hasMultipleKeys = true;
 			writer.write( "+\n" );
-			writer.write( ".Variants of this configuration property (Click here):\n" );
+			writer.write( "ifdef::backend-html5[.Variants of this configuration property (click to open)]\n" );
+			writer.write( "ifndef::backend-html5[.Variants of this configuration property]\n" );
 			writer.write( "[%collapsible]\n" );
 			writer.write( "====\n" );
 		}
 		while ( keys.hasNext() ) {
-			writer.write( '`' );
+			writer.write( "* `" );
 			writer.write( keys.next() );
-			writer.write( '`' );
-			if ( keys.hasNext() ) {
-				writer.write( ", " );
-			}
+			writer.write( "`\n" );
 		}
 
 		if ( hasMultipleKeys ) {
