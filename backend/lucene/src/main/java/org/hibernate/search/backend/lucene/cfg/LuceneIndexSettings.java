@@ -29,9 +29,9 @@ import org.apache.lucene.util.InfoStream;
 @HibernateSearchConfiguration(
 		prefix = {
 				"hibernate.search.backend.",
-				"hibernate.search.backend.indexes.<index name>.",
-				"hibernate.search.backends.<backend name>.",
-				"hibernate.search.backends.<backend name>.indexes.<index name>."
+				"hibernate.search.backend.indexes.<index-name>.",
+				"hibernate.search.backends.<backend-name>.",
+				"hibernate.search.backends.<backend-name>.indexes.<index-name>."
 		},
 		title = "Hibernate Search Backend - Lucene",
 		anchorPrefix = "hibernate-search-backend-lucene-"
@@ -63,7 +63,7 @@ public final class LuceneIndexSettings {
 	 * <p>
 	 * Expects a String representing a path to an existing directory accessible in read and write mode, such as "local-filesystem".
 	 * <p>
-	 * The actual index files will be created in directory {@code <root>/<index name>}.
+	 * The actual index files will be created in directory {@code <root>/<index-name>}.
 	 * <p>
 	 * Defaults to the JVM's working directory.
 	 */

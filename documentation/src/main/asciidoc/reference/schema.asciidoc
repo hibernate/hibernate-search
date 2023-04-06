@@ -280,11 +280,11 @@ The file tree structure of an export is shown below:
 [source]
 ----
 # For the default backend the index schema will be written to:
-.../backend/indexes/<index name>/create-index.json
-.../backend/indexes/<index name>/create-index-query-params.json
+.../backend/indexes/<index-name>/create-index.json
+.../backend/indexes/<index-name>/create-index-query-params.json
 # For additional named backends:
-.../backends/<name of a particular backend>/indexes/<index name>/create-index.json
-.../backends/<name of a particular backend>/indexes/<index name>/create-index-query-params.json
+.../backends/<name of a particular backend>/indexes/<index-name>/create-index.json
+.../backends/<name of a particular backend>/indexes/<index-name>/create-index-query-params.json
 ----
 
 .Exporting the schema to the filesystem

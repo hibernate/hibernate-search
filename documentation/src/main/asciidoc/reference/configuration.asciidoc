@@ -69,7 +69,7 @@ These properties affect a single backend.
 They are grouped under a common root:
 
 * `hibernate.search.backend` for the default backend (most common usage).
-* `hibernate.search.backends.<backend name>` for a named backend (advanced usage).
+* `hibernate.search.backends.<backend-name>` for a named backend (advanced usage).
 
 +
 Backend properties are explained in the relevant parts of this documentation:
@@ -83,7 +83,7 @@ These properties affect either one or multiple indexes, depending on the root.
 With the root `hibernate.search.backend`,
 they set defaults for all indexes of the backend.
 +
-With the root `hibernate.search.backend.indexes.<index name>`,
+With the root `hibernate.search.backend.indexes.<index-name>`,
 they set the value for a specific index, overriding the defaults (if any).
 The backend and index names must match the names defined in the mapping.
 For Hibernate ORM entities, the default index name is the name of the indexed class, without the package:
@@ -91,8 +91,8 @@ For Hibernate ORM entities, the default index name is the name of the indexed cl
 Index names can be customized in the mapping.
 +
 Alternatively, the backend can also be referenced by name,
-i.e. the roots above can also be `hibernate.search.backends.<backend name>`
-or `hibernate.search.backends.<backend name>.indexes.<index name>`.
+i.e. the roots above can also be `hibernate.search.backends.<backend-name>`
+or `hibernate.search.backends.<backend-name>.indexes.<index-name>`.
 +
 Examples:
 

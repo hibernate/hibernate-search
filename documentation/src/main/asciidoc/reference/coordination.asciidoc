@@ -740,7 +740,7 @@ Hibernate Search will simply duplicate event processors for each tenant identifi
 You can use different configuration for different tenants by using a different root for configuration properties:
 
 * `hibernate.search.coordination` is the default root, whose properties will be used as a default for all tenants.
-* `hibernate.search.coordination.tenants.<tenant ID>` is the tenant-specific root.
+* `hibernate.search.coordination.tenants.<tenant-identifier>` is the tenant-specific root.
 
 See below for an example.
 
