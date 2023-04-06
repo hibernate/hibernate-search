@@ -14,7 +14,6 @@ import org.hibernate.search.backend.lucene.lowlevel.directory.LockingStrategyNam
 import org.hibernate.search.backend.lucene.lowlevel.index.IOStrategyName;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
-import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
@@ -26,16 +25,6 @@ import org.apache.lucene.util.InfoStream;
  * Constants in this class are to be appended to a prefix to form a property key;
  * see {@link org.hibernate.search.engine.cfg.IndexSettings} for details.
  */
-@HibernateSearchConfiguration(
-		prefix = {
-				"hibernate.search.backend.",
-				"hibernate.search.backend.indexes.<index-name>.",
-				"hibernate.search.backends.<backend-name>.",
-				"hibernate.search.backends.<backend-name>.indexes.<index-name>."
-		},
-		title = "Hibernate Search Backend - Lucene",
-		anchorPrefix = "hibernate-search-backend-lucene-"
-)
 public final class LuceneIndexSettings {
 
 	private LuceneIndexSettings() {
@@ -322,7 +311,6 @@ public final class LuceneIndexSettings {
 	 * The root property whose children are shards, e.g. {@code shards.0.<some shard-scoped property> = bar}
 	 * or {@code shards.1.<some shard-scoped property> = bar} or {@code shards.main.<some shard-scoped property> = bar}.
 	 */
-	@HibernateSearchConfiguration(ignore = true)
 	public static final String SHARDS = "shards";
 
 	/**

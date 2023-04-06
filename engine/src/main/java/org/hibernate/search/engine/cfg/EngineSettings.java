@@ -9,15 +9,10 @@ package org.hibernate.search.engine.cfg;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.impl.LogFailureHandler;
-import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
 /**
  * Configuration properties for the Hibernate Search engine.
  */
-@HibernateSearchConfiguration(
-		title = "Hibernate Search Engine",
-		anchorPrefix = "hibernate-search-engine-"
-)
 public final class EngineSettings {
 
 	private EngineSettings() {
@@ -31,13 +26,11 @@ public final class EngineSettings {
 	/**
 	 * The root property for properties of the default backend, e.g. "hibernate.search.backend.type = elasticsearch".
 	 */
-	@HibernateSearchConfiguration(ignore = true)
 	public static final String BACKEND = PREFIX + Radicals.BACKEND;
 
 	/**
 	 * The root property for properties of named backends, e.g. "hibernate.search.backends.myBackend.type = elasticsearch".
 	 */
-	@HibernateSearchConfiguration(ignore = true)
 	public static final String BACKENDS = PREFIX + Radicals.BACKENDS;
 
 	/**

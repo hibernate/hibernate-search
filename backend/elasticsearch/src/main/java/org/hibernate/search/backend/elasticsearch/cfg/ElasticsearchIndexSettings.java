@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.cfg;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.index.DynamicMapping;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
-import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
 /**
  * Configuration properties for Elasticsearch indexes.
@@ -17,16 +16,6 @@ import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
  * Constants in this class are to be appended to a prefix to form a property key;
  * see {@link org.hibernate.search.engine.cfg.IndexSettings} for details.
  */
-@HibernateSearchConfiguration(
-		prefix = {
-				"hibernate.search.backend.",
-				"hibernate.search.backend.indexes.<index-name>.",
-				"hibernate.search.backends.<backend-name>.",
-				"hibernate.search.backends.<backend-name>.indexes.<index-name>."
-		},
-		title = "Hibernate Search Backend - Elasticsearch",
-		anchorPrefix = "hibernate-search-backend-elasticsearch-"
-)
 public final class ElasticsearchIndexSettings {
 
 	private ElasticsearchIndexSettings() {

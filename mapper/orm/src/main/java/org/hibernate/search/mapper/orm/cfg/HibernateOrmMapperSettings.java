@@ -15,16 +15,11 @@ import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrateg
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyNames;
-import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-@HibernateSearchConfiguration(
-		title = "Hibernate Search ORM Integration",
-		anchorPrefix = "hibernate-search-mapper-orm-"
-)
 public final class HibernateOrmMapperSettings {
 
 	private HibernateOrmMapperSettings() {
@@ -175,7 +170,6 @@ public final class HibernateOrmMapperSettings {
 	/**
 	 * The root property for properties related to coordination.
 	 */
-	@HibernateSearchConfiguration(ignore = true)
 	public static final String COORDINATION = PREFIX + HibernateOrmMapperSettings.Radicals.COORDINATION;
 
 	/**

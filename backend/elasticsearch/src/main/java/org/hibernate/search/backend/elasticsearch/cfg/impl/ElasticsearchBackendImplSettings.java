@@ -6,15 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.cfg.impl;
 
-import org.hibernate.search.util.common.impl.HibernateSearchConfiguration;
-
 /**
  * Implementation-related settings, used for testing only.
  */
-@HibernateSearchConfiguration(
-		title = "Hibernate Search Backend - Elasticsearch",
-		anchorPrefix = "hibernate-search-backend-elasticsearch-"
-)
 public final class ElasticsearchBackendImplSettings {
 
 	private ElasticsearchBackendImplSettings() {
