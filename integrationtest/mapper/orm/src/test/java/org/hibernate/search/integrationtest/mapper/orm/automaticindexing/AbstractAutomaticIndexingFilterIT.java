@@ -14,9 +14,11 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -58,10 +60,12 @@ public class AbstractAutomaticIndexingFilterIT {
 				.expectSchema( EntityA.INDEX, b -> b.field( "indexedField", String.class ) )
 				.expectSchema( Entity1A.INDEX, b -> b.field( "indexedField", String.class ) )
 				.expectSchema( Entity2A.INDEX, b -> b.field( "indexedField", String.class ) )
-				.expectSchema( Entity1B.INDEX, b -> b.field( "indexedField", String.class ) );
+				.expectSchema( Entity1B.INDEX, b -> b.field( "indexedField", String.class ) )
+				.expectSchema( EntityFromSuperclass.INDEX, b -> b.field( "indexedField", String.class ) );
 
 		setupContext.withAnnotatedTypes( IndexedEntity.class, OtherIndexedEntity.class, ContainedEntity.class,
-				EntityA.class, Entity1A.class, Entity1B.class, Entity2A.class
+				EntityA.class, Entity1A.class, Entity1B.class, Entity2A.class, EntityFromSuperclass.class, SuperClass.class,
+				SimpleNotIndexedEntity.class, NotIndexedEntityFromSuperclass.class
 		);
 	}
 
@@ -322,4 +326,111 @@ public class AbstractAutomaticIndexingFilterIT {
 			super( id, indexedField );
 		}
 	}
+
+
+	@MappedSuperclass
+	public static class SuperClass {
+		@Id
+		private Integer id;
+
+		@Basic
+		@GenericField
+		private String indexedField;
+
+		public SuperClass() {
+		}
+
+		public SuperClass(Integer id, String indexedField) {
+			this.id = id;
+			this.indexedField = indexedField;
+		}
+	}
+
+	public interface InterfaceA {
+	}
+
+	public interface InterfaceB {
+	}
+
+	@Entity(name = EntityFromSuperclass.INDEX)
+	@Indexed
+	public static class EntityFromSuperclass extends SuperClass implements InterfaceA, InterfaceB {
+		static final String INDEX = "EntityFromSuperclass";
+
+		public EntityFromSuperclass() {
+		}
+
+		public EntityFromSuperclass(Integer id, String indexedField) {
+			super( id, indexedField );
+		}
+	}
+
+	@Entity(name = NotIndexedEntityFromSuperclass.INDEX)
+	public static class NotIndexedEntityFromSuperclass extends SuperClass implements InterfaceA, InterfaceB {
+		static final String INDEX = "NotIndexedEntityFromSuperclass";
+
+		public NotIndexedEntityFromSuperclass() {
+		}
+
+		public NotIndexedEntityFromSuperclass(Integer id, String indexedField) {
+			super( id, indexedField );
+		}
+	}
+
+	@Entity
+	public static class SimpleNotIndexedEntity {
+		@Id
+		private Integer id;
+
+		@Basic
+		@GenericField
+		private String indexedField;
+
+		public SimpleNotIndexedEntity() {
+		}
+
+		public SimpleNotIndexedEntity(Integer id, String indexedField) {
+			this.id = id;
+			this.indexedField = indexedField;
+		}
+	}
+
+	public static class NotAnEntity {
+	}
+
+	@Indexed(index = IndexedNotAnEntity.INDEX)
+	public static class IndexedNotAnEntity {
+		static final String INDEX = "IndexedNotAnEntity";
+
+		@DocumentId
+		private Integer id;
+
+		@GenericField
+		private String indexedField;
+
+		public IndexedNotAnEntity() {
+		}
+
+		public IndexedNotAnEntity(Integer id, String indexedField) {
+			this.id = id;
+			this.indexedField = indexedField;
+		}
+
+		public Integer getId() {
+			return id;
+		}
+
+		public void setId(Integer id) {
+			this.id = id;
+		}
+
+		public String getIndexedField() {
+			return indexedField;
+		}
+
+		public void setIndexedField(String indexedField) {
+			this.indexedField = indexedField;
+		}
+	}
+
 }

@@ -319,4 +319,143 @@ public class SessionAutomaticIndexingFilterIT extends AbstractAutomaticIndexingF
 		} );
 		backendMock.verifyExpectationsMet();
 	}
+
+	@Test
+	public void filterByMappedSuperclass() {
+		setupHolder.runInTransaction( session -> {
+			Search.session( session ).automaticIndexingFilter( ctx -> ctx.exclude( SuperClass.class ) );
+
+			session.persist( new EntityFromSuperclass( 100, "test" ) );
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void filterByNotIndexedEntity() {
+		setupHolder.runInTransaction( session -> {
+			assertThatThrownBy( () ->
+					Search.session( session ).automaticIndexingFilter(
+							ctx -> ctx.exclude( SimpleNotIndexedEntity.class )
+					)
+			).isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							"No matching entity type for class",
+							SimpleNotIndexedEntity.class.getName(),
+							"Either this class is not an entity type, or the entity type is not mapped in Hibernate Search"
+					);
+		} );
+	}
+
+	@Test
+	public void filterByRandomClass() {
+		setupHolder.runInTransaction( session -> {
+			assertThatThrownBy( () ->
+					Search.session( session ).automaticIndexingFilter(
+							ctx -> ctx.exclude( NotAnEntity.class )
+					)
+			).isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							"No matching entity type for class",
+							NotAnEntity.class.getName(),
+							"Either this class is not an entity type, or the entity type is not mapped in Hibernate Search"
+					);
+		} );
+	}
+
+	@Test
+	public void filterByNotIndexedEntityFormSupertypeWithIndexedSubtype() {
+		setupHolder.runInTransaction( session -> {
+			assertThatThrownBy( () ->
+					Search.session( session ).automaticIndexingFilter(
+							ctx -> ctx.exclude( NotIndexedEntityFromSuperclass.class )
+					)
+			).isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							"No matching entity type for class",
+							NotIndexedEntityFromSuperclass.class.getName(),
+							"Either this class is not an entity type, or the entity type is not mapped in Hibernate Search"
+					);
+		} );
+	}
+
+	@Test
+	public void filterByIndexedTypeNotAnEntity() {
+		setupHolder.runInTransaction( session -> {
+			assertThatThrownBy( () ->
+					Search.session( session ).automaticIndexingFilter(
+							ctx -> ctx.exclude( IndexedNotAnEntity.class )
+					)
+			).isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							"No matching entity type for class",
+							IndexedNotAnEntity.class.getName(),
+							"Either this class is not an entity type, or the entity type is not mapped in Hibernate Search"
+					);
+		} );
+	}
+
+	@Test
+	public void filterByContainedEntityWontAffectContainingOnes() {
+		setupHolder.runInTransaction( session -> {
+			// to prepare data we ignore containing/indexed entity
+			Search.session( session ).automaticIndexingFilter(
+					ctx -> ctx.exclude( IndexedEntity.class )
+			);
+
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setIndexedField( "initialValue" );
+
+			ContainedEntity entity2 = new ContainedEntity();
+			entity2.setId( 100 );
+			entity2.setIndexedField( "initialValue" );
+
+			entity2.setContainingAsIndexedEmbedded( entity1 );
+			entity1.setContainedIndexedEmbedded( Arrays.asList( entity2 ) );
+
+			session.persist( entity1 );
+			session.persist( entity2 );
+
+		} );
+		backendMock.verifyExpectationsMet();
+
+		setupHolder.runInTransaction( session -> {
+			// now disable contained entity to not produce updates on containing:
+			Search.session( session ).automaticIndexingFilter(
+					ctx -> ctx.exclude( ContainedEntity.class )
+			);
+			ContainedEntity entity1 = session.get( ContainedEntity.class, 100 );
+			entity1.setIndexedField( "updatedValue" );
+		} );
+
+		setupHolder.runInTransaction( session -> {
+			Search.session( session ).automaticIndexingFilter(
+					ctx -> ctx.exclude( IndexedEntity.class )
+			);
+			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
+
+			entity1.getContainedIndexedEmbedded().forEach( e -> e.setContainingAsIndexedEmbedded( null ) );
+
+			session.remove( entity1 );
+
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void filterByInterfaceMustFail() {
+		setupHolder.runInTransaction( session -> {
+			assertThatThrownBy( () ->
+					Search.session( session ).automaticIndexingFilter(
+							ctx -> ctx.exclude( InterfaceA.class )
+					)
+			).isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							"No matching entity type for class",
+							InterfaceA.class.getName(),
+							"Either this class is not an entity type, or the entity type is not mapped in Hibernate Search.",
+							"Valid classes for mapped entity types are: "
+					);
+		} );
+	}
 }
