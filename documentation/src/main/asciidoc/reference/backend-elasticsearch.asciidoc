@@ -374,41 +374,45 @@ and thus all other <<backend-elasticsearch-configuration-client,client configura
 [[backend-elasticsearch-configuration-version]]
 == [[backend-elasticsearch-configuration-dialect]] Version compatibility
 
-Different distributions and versions of Elasticsearch expose slightly different APIs.
-As a result, Hibernate Search needs to be aware of the distribution and version of Elasticsearch it is talking to
+[[backend-elasticsearch-configuration-version-check]]
+=== Version check on startup
+
+Different distributions and versions of Elasticsearch/OpenSearch expose slightly different APIs.
+As a result, Hibernate Search needs to be aware of the distribution and version it is talking to
 in order to generate correct HTTP requests.
 
-By default, Hibernate Search will query the Elasticsearch cluster at boot time to retrieve this information,
+By default, Hibernate Search will query the Elasticsearch/OpenSearch cluster at boot time to retrieve this information,
 and will infer the correct behavior to adopt.
 
-If necessary, you can disable the call to the Elasticsearch cluster on startup,
-and provide the information manually.
-To do that:
+You can force Hibernate Search to expect a specific version of Elasticsearch/OpenSearch by
+setting the property `hibernate.search.backend.version` to a version string
+following the format `x.y.z-qualifier` or `<distribution>:x.y.z-qualifier`, where:
 
-* set the property `hibernate.search.backend.version_check.enabled` to `false`;
-* and set the property `hibernate.search.backend.version` to a version string.
-+
-The expected format for that string is either `x.y.z-qualifier` or `<distribution>:x.y.z-qualifier`,
-where '<distribution>' is either `elastic` or `opensearch` (defaults to `elastic`),
-'x', 'y' and 'z' are integers,
-and `qualifier` is a string of word characters (alphanumeric or `_`).
-+
-The major and minor version numbers (`x` and `y` in the formats above) are mandatory,
-but all other components (distribution, micro, qualifier) are optional.
-+
-For example, `7.0`, `7.10`, `opensearch:1.0` are all valid version strings.
+* `<distribution>` is either `elastic` or `opensearch`. Optional, defaults to `elastic`.
+* `x`, `y` and `z` are integers. `x` is mandatory, `y` and `z` are optional.
+* `qualifier` is a string of word characters (alphanumeric or `_`). Optional.
 
-[TIP]
-====
-The property `hibernate.search.backend.version` can also be set
-when `hibernate.search.backend.version_check.enabled` is `true` (the default).
+For example, `7`, 7.0`, `7.10`, `opensearch:1.0` are all valid version strings.
 
-In that case,
 Hibernate Search will still query the Elasticsearch/OpenSearch cluster
 to detect the actual distribution and version of the cluster,
-and will check that the configured distribution and version match the actual ones.
+but it will check that the configured distribution and version match the actual ones.
 This can be helpful while developing, in particular.
-====
+
+[[backend-elasticsearch-configuration-version-check-disabling]]
+=== Disabling the version check on startup
+
+If necessary, you can disable the call to the Elasticsearch/OpenSearch cluster on startup,
+and provide the information manually.
+
+To do that, set the property `hibernate.search.backend.version_check.enabled` to `false`.
+
+You will also have to set the property `hibernate.search.backend.version` to a version string
+as explained in the <<backend-elasticsearch-configuration-version-check,previous section>>.
+In this case, both major **and minor** version numbers (`x` **and `y`** in the formats above)
+are mandatory,
+but all other components (distribution, micro, qualifier) remain optional.
+For example, `7.0`, `7.10`, `opensearch:1.0` are all valid version strings in this case, but `7` is not precise enough.
 
 [[backend-elasticsearch-configuration-logging]]
 == [[elasticsearch-log-json-pretty-printing]] Request logging
