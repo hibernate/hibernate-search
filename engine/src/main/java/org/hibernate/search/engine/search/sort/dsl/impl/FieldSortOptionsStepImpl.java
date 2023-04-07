@@ -80,6 +80,18 @@ public class FieldSortOptionsStepImpl<PDF extends SearchPredicateFactory>
 	}
 
 	@Override
+	public FieldSortOptionsStepImpl<PDF> highest() {
+		builder.missingHighest();
+		return this;
+	}
+
+	@Override
+	public FieldSortOptionsStepImpl<PDF> lowest() {
+		builder.missingLowest();
+		return this;
+	}
+
+	@Override
 	public FieldSortOptionsStepImpl<PDF> use(Object value, ValueConvert convert) {
 		builder.missingAs( value, convert );
 		return this;

@@ -275,6 +275,26 @@ public class FieldSortBaseIT<F> {
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
 
+		// Explicit order with missing().lowest()
+		dataSet = dataSetForAsc;
+		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).asc().missing().lowest() );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id );
+		dataSet = dataSetForDesc;
+		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).desc().missing().lowest() );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id, dataSet.emptyDoc1Id );
+
+		// Explicit order with missing().highest()
+		dataSet = dataSetForAsc;
+		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).asc().missing().highest() );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
+		dataSet = dataSetForDesc;
+		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).desc().missing().highest() );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
+
 		// Explicit order with missing().use( ... )
 		dataSet = dataSetForAsc;
 		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).asc()
@@ -458,6 +478,35 @@ public class FieldSortBaseIT<F> {
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id );
 		assertThatQuery( query2 )
 				.hasNoHits();
+	}
+
+	@Test
+	public void missingValue_multipleOptionsSameTime() {
+		assumeTestParametersWork();
+
+		DataSet<F> dataSet;
+		SearchQuery<DocumentReference> query;
+
+		String fieldPath = getFieldPath();
+
+		// Explicit order with missing().last()
+		dataSet = dataSetForAsc;
+		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).asc().missing().last().missing().lowest().missing().first() );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id );
+		dataSet = dataSetForDesc;
+		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).desc().missing().first().missing().highest() );
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
+		dataSet = dataSetForDesc;
+		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).desc()
+				.missing().first()
+				.missing().highest()
+				.missing().last()
+				.missing().lowest()
+		);
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id, dataSet.emptyDoc1Id );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(DataSet<F> dataSet,

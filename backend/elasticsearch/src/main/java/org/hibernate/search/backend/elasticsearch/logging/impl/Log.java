@@ -734,4 +734,12 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 157, value = "Unable to export the schema for '%1$s' index: %2$s" )
 	SearchException unableToExportSchema(String indexName, String message, @Cause IOException e);
+
+	@Message(id = ID_OFFSET + 158, value = "Invalid use of 'missing().lowest()' for an ascending distance sort. " +
+			"Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized. ")
+	SearchException missingLowestOnAscSortNotSupported(@Param EventContext context);
+
+	@Message(id = ID_OFFSET + 159, value = "Invalid use of 'missing().lowest()' for a descending distance sort. " +
+			"Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized. ")
+	SearchException missingLowestOnDescSortNotSupported(@Param EventContext context);
 }

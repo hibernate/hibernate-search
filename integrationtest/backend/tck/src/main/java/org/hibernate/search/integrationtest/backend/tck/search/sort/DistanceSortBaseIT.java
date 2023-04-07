@@ -210,6 +210,46 @@ public class DistanceSortBaseIT {
 					.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id, dataSet.emptyDoc1Id );
 		}
 
+		// Explicit order with missing().lowest()
+		if ( !TckConfiguration.get().getBackendFeatures().geoDistanceSortingSupportsConfigurableMissingValues() ) {
+			assertThatThrownBy( () -> simpleQuery(
+					dataSetForDesc,
+					b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+							.desc().missing().lowest()
+			) )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContainingAll( "Invalid use of 'missing().lowest()' for a descending distance sort.",
+							"Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized." );
+
+			assertThatThrownBy( () -> simpleQuery(
+					dataSetForDesc,
+					b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+							.asc().missing().lowest()
+			) )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContainingAll( "Invalid use of 'missing().lowest()' for an ascending distance sort.",
+							"Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized." );
+		}
+		else {
+			dataSet = dataSetForAsc;
+			query = simpleQuery(
+					dataSet,
+					b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+							.asc().missing().lowest()
+			);
+			assertThatQuery( query )
+					.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id );
+
+			dataSet = dataSetForDesc;
+			query = simpleQuery(
+					dataSet,
+					b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+							.desc().missing().lowest()
+			);
+			assertThatQuery( query )
+					.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id, dataSet.emptyDoc1Id );
+		}
+
 		// Explicit order with missing().first()
 		dataSet = dataSetForDesc;
 		query = simpleQuery(
@@ -251,6 +291,25 @@ public class DistanceSortBaseIT {
 			assertThatQuery( query )
 					.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id );
 		}
+
+		// Explicit order with missing().highest()
+		dataSet = dataSetForDesc;
+		query = simpleQuery(
+				dataSet,
+				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+						.desc().missing().highest()
+		);
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
+
+		dataSet = dataSetForAsc;
+		query = simpleQuery(
+				dataSet,
+				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+						.asc().missing().highest()
+		);
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
 
 		// Explicit order with missing().use( ... )
 		if ( !TckConfiguration.get().getBackendFeatures().geoDistanceSortingSupportsConfigurableMissingValues() ) {

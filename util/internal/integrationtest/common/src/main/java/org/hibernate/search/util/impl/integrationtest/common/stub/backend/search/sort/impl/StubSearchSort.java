@@ -59,6 +59,16 @@ public class StubSearchSort implements SearchSort {
 		}
 
 		@Override
+		public void missingHighest() {
+			// No-op
+		}
+
+		@Override
+		public void missingLowest() {
+			// No-op
+		}
+
+		@Override
 		public void missingAs(GeoPoint value) {
 			// No-op
 		}

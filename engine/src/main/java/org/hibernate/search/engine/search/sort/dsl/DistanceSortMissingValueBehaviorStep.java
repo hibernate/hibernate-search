@@ -38,6 +38,26 @@ public interface DistanceSortMissingValueBehaviorStep<N> {
 	N first();
 
 	/**
+	 * Give documents with missing values the highest value when sorting.
+	 * <p>
+	 * This puts documents with missing values last when using ascending order,
+	 * or first when using descending order.
+	 *
+	 * @return The next step.
+	 */
+	N highest();
+
+	/**
+	 * Give documents with missing values the lowest value when sorting.
+	 * <p>
+	 * This puts documents with missing values first when using ascending order,
+	 * or last when using descending order.
+	 *
+	 * @return The next step.
+	 */
+	N lowest();
+
+	/**
 	 * When documents are missing a value on the sort field, use the given value instead.
 	 *
 	 * @param value The value to use as a default when a document is missing a value on the sort field.

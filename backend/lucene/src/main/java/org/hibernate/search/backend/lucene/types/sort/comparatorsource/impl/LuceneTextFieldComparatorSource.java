@@ -32,16 +32,30 @@ public class LuceneTextFieldComparatorSource extends LuceneFieldComparatorSource
 
 	@Override
 	public FieldComparator<?> newComparator(String fieldname, int numHits, int sortPos, boolean reversed) {
-		final boolean sortMissingLast = missingLast() ^ reversed;
+		final boolean considerMissingHighest;
+		if ( SortMissingValue.MISSING_LOWEST.equals( missingValue ) ) {
+			considerMissingHighest = false;
+		}
+		else if ( SortMissingValue.MISSING_HIGHEST.equals( missingValue ) ) {
+			considerMissingHighest = true;
+		}
+		else if ( SortMissingValue.MISSING_LAST.equals( missingValue ) ) {
+			// To appear last, missing values must be considered highest, or lowest if the order is reversed.
+			considerMissingHighest = !reversed;
+		}
+		else { // SortMissingValue.MISSING_FIRST, the default
+			// To appear first, missing values must be considered lowest, or highest if the order is reversed.
+			considerMissingHighest = reversed;
+		}
 		TextMultiValuesToSingleValuesSource source =
 				TextMultiValuesToSingleValuesSource.fromField( fieldname, multiValueMode, nestedDocsProvider );
 
-		return new FieldComparator.TermOrdValComparator( numHits, fieldname, sortMissingLast ) {
+		return new FieldComparator.TermOrdValComparator( numHits, fieldname, considerMissingHighest ) {
 			@Override
 			protected SortedDocValues getSortedDocValues(LeafReaderContext context, String field) throws IOException {
 				SortedDocValues sortedDocValues = source.getValues( context );
 
-				if ( missingValue == null || missingFirst() || missingLast() ) {
+				if ( missingValue == null || isOneOfSortMissingValues() ) {
 					return sortedDocValues;
 				}
 
@@ -50,11 +64,7 @@ public class LuceneTextFieldComparatorSource extends LuceneFieldComparatorSource
 		};
 	}
 
-	private boolean missingFirst() {
-		return SortMissingValue.MISSING_FIRST.equals( missingValue );
-	}
-
-	private boolean missingLast() {
-		return SortMissingValue.MISSING_LAST.equals( missingValue );
+	private boolean isOneOfSortMissingValues() {
+		return missingValue instanceof SortMissingValue;
 	}
 }
