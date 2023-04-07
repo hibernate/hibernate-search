@@ -19,6 +19,10 @@ public interface FieldSortBuilder extends SearchSortBuilder {
 
 	void missingLast();
 
+	void missingHighest();
+
+	void missingLowest();
+
 	void missingAs(Object value, ValueConvert convert);
 
 	void mode(SortMode mode);

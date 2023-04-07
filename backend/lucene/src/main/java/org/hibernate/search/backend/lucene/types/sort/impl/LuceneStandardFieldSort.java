@@ -82,6 +82,16 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		}
 
 		@Override
+		public void missingHighest() {
+			missingValue = SortMissingValue.MISSING_HIGHEST;
+		}
+
+		@Override
+		public void missingLowest() {
+			missingValue = SortMissingValue.MISSING_LOWEST;
+		}
+
+		@Override
 		public void missingAs(Object value, ValueConvert convert) {
 			DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( convert );
 			try {
@@ -111,6 +121,12 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 			else if ( missingValue == SortMissingValue.MISSING_LAST ) {
 				effectiveMissingValue = order == SortOrder.DESC ? sortMissingValueFirstPlaceholder
 						: sortMissingValueLastPlaceholder;
+			}
+			else if ( missingValue == SortMissingValue.MISSING_LOWEST ) {
+				effectiveMissingValue = sortMissingValueFirstPlaceholder;
+			}
+			else if ( missingValue == SortMissingValue.MISSING_HIGHEST ) {
+				effectiveMissingValue = sortMissingValueLastPlaceholder;
 			}
 			else {
 				effectiveMissingValue = missingValue;

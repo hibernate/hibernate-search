@@ -21,6 +21,10 @@ public interface DistanceSortBuilder extends SearchSortBuilder {
 
 	void missingLast();
 
+	void missingHighest();
+
+	void missingLowest();
+
 	void missingAs(GeoPoint value);
 
 	void mode(SortMode mode);

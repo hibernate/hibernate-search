@@ -87,6 +87,18 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 		}
 
 		@Override
+		public void missingHighest() {
+			// we don't need to do anything: this is the default and only possible behavior with Elasticsearch.
+		}
+
+		@Override
+		public void missingLowest() {
+			throw SortOrder.DESC.equals( order ) ?
+					log.missingLowestOnDescSortNotSupported( field.eventContext() ) :
+					log.missingLowestOnAscSortNotSupported( field.eventContext() );
+		}
+
+		@Override
 		public void missingAs(GeoPoint value) {
 			throw log.missingAsOnSortNotSupported( field.eventContext() );
 		}

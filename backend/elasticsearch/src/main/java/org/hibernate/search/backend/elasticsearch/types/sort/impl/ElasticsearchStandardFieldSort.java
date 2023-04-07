@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.SearchSort;
+import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -35,6 +36,8 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 	private static final JsonAccessor<JsonElement> MISSING_ACCESSOR = JsonAccessor.root().property( "missing" );
 	private static final JsonPrimitive MISSING_FIRST_KEYWORD_JSON = new JsonPrimitive( "_first" );
 	private static final JsonPrimitive MISSING_LAST_KEYWORD_JSON = new JsonPrimitive( "_last" );
+	private static final JsonPrimitive MISSING_HIGHEST_KEYWORD_JSON = new JsonPrimitive( "_highest_wont_work" );
+	private static final JsonPrimitive MISSING_LOWEST_KEYWORD_JSON = new JsonPrimitive( "_lowest_wont_work" );
 	private static final JsonAccessor<JsonElement> UNMAPPED_TYPE = JsonAccessor.root().property( "unmapped_type" );
 
 	private final JsonElement missing;
@@ -107,6 +110,16 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 		}
 
 		@Override
+		public void missingHighest() {
+			this.missing = MISSING_HIGHEST_KEYWORD_JSON;
+		}
+
+		@Override
+		public void missingLowest() {
+			this.missing = MISSING_LOWEST_KEYWORD_JSON;
+		}
+
+		@Override
 		public void missingAs(Object value, ValueConvert convert) {
 			DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( convert );
 			try {
@@ -120,6 +133,16 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 
 		@Override
 		public SearchSort build() {
+			if ( MISSING_HIGHEST_KEYWORD_JSON.equals( missing ) ) {
+				this.missing = this.order == null || SortOrder.ASC.equals( this.order ) ?
+						MISSING_LAST_KEYWORD_JSON :
+						MISSING_FIRST_KEYWORD_JSON;
+			}
+			if ( MISSING_LOWEST_KEYWORD_JSON.equals( missing ) ) {
+				this.missing = this.order == null || SortOrder.ASC.equals( this.order ) ?
+						MISSING_FIRST_KEYWORD_JSON :
+						MISSING_LAST_KEYWORD_JSON;
+			}
 			return new ElasticsearchStandardFieldSort( this );
 		}
 	}

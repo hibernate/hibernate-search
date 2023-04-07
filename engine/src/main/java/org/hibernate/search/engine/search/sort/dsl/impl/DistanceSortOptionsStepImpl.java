@@ -83,6 +83,18 @@ public class DistanceSortOptionsStepImpl<PDF extends SearchPredicateFactory>
 	}
 
 	@Override
+	public DistanceSortOptionsStepImpl<PDF> highest() {
+		builder.missingHighest();
+		return this;
+	}
+
+	@Override
+	public DistanceSortOptionsStepImpl<PDF> lowest() {
+		builder.missingLowest();
+		return this;
+	}
+
+	@Override
 	public DistanceSortOptionsStepImpl<PDF> use(GeoPoint value) {
 		builder.missingAs( value );
 		return this;

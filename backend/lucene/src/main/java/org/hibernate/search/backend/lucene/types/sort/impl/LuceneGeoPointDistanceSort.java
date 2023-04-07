@@ -65,6 +65,16 @@ public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort 
 		}
 
 		@Override
+		public void missingHighest() {
+			missingValue = SortMissingValue.MISSING_HIGHEST;
+		}
+
+		@Override
+		public void missingLowest() {
+			missingValue = SortMissingValue.MISSING_LOWEST;
+		}
+
+		@Override
 		public void missingAs(GeoPoint value) {
 			missingValue = value;
 		}
@@ -108,6 +118,14 @@ public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort 
 
 			if ( missingValue == SortMissingValue.MISSING_LAST ) {
 				return ( order == SortOrder.DESC ) ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
+			}
+
+			if ( missingValue == SortMissingValue.MISSING_LOWEST ) {
+				return Double.NEGATIVE_INFINITY;
+			}
+
+			if ( missingValue == SortMissingValue.MISSING_HIGHEST ) {
+				return Double.POSITIVE_INFINITY;
 			}
 
 			if ( missingValue instanceof GeoPoint ) {

@@ -376,6 +376,11 @@ The behavior for missing values can be controlled explicitly through the `.missi
 
 * `.missing().first()` puts documents with no value in first position (regardless of the sort order).
 * `.missing().last()` puts documents with no value in last position (regardless of the sort order).
+* `.missing().lowest()` interprets missing values as the lowest value:
+it puts documents with no value in the first position when using ascending order or in the last position when using descending order.
+* `.missing().highest()` interprets missing values as the highest value:
+it puts documents with no value in the last position when using ascending order or in the first position when using descending order.
+The documents with no value will go first if descending order is used.
 * `.missing().use(...)` uses the given value as a default for documents with no value.
 
 [NOTE]
@@ -388,6 +393,7 @@ only the following combinations are supported:
 
 * `.missing().first()` using a descending order.
 * `.missing().last()` using an ascending order.
+* `.missing().highest()` using either an ascending or a descending order.
 ====
 
 Below are a few examples with the <<search-dsl-sort-field,field sort>>.
