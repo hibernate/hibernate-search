@@ -1,0 +1,12 @@
+#Organize Import Order
+#Wed Apr 12 14:26:55 CEST 2023
+0=java
+1=javax
+2=jakarta
+3=org.hibernate
+4=org.hibernate.testing
+5=org.hibernate.test
+6=org.junit
+7=org.jboss
+8=com
+9=

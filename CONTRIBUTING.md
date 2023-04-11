@@ -74,13 +74,16 @@ Eclipse shouldn't require any particular setup besides
 
 #### <a id="setup-ide-formatting"></a> Formatting rules and style conventions
 
-The Hibernate family projects share the same style conventions,
-and we provide settings for some IDEs to help you follow these conventions.
-See:
+Hibernate Search has a strictly enforced code style. Code formatting is done by the Eclipse code formatter, 
+using the config files found in the `build/config/src/main/resources` directory. 
+By default, when you run `mvn install`, the code will be formatted automatically. 
+When submitting a pull request the CI build will fail if running the formatter results in any code changes,
+so it is recommended that you always run a full Maven build before submitting a pull request.
 
-* [here for IntelliJ IDEA](https://hibernate.org/community/contribute/intellij-idea/)
-* [here for Eclipse IDE](https://hibernate.org/community/contribute/eclipse-ide/)
-
+The [Adapter for Eclipse Code Formatter](https://plugins.jetbrains.com/plugin/6546-adapter-for-eclipse-code-formatter) plugin
+can be used by IntelliJ IDEA users to apply formatting while within the IDE. Additionally, contributors might need to 
+increase import counts to prevent star imports, as this setting is not exportable and star imports will lead to
+a build failure.
 
 ## Contributing code
 
