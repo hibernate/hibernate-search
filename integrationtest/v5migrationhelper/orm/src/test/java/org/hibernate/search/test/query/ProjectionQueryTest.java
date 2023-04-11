@@ -153,17 +153,17 @@ public class ProjectionQueryTest extends SearchTestBase {
 
 		projections.beforeFirst();
 		projections.next();
-		Object[] projection = projections.get();
+		Object[] projection = (Object[]) projections.get();
 		checkProjectionFirst( projection, s );
 		assertTrue( projections.isFirst() );
 
 		projections.last();
-		projection = projections.get();
+		projection = (Object[]) projections.get();
 		checkProjectionLast( projection, s );
 		assertTrue( projections.isLast() );
 
 		projections.next();
-		projection = projections.get();
+		projection = (Object[]) projections.get();
 		assertNull( projection );
 
 		projections.close();
@@ -171,11 +171,11 @@ public class ProjectionQueryTest extends SearchTestBase {
 		projections = hibQuery.scroll();
 
 		projections.first();
-		projection = projections.get();
+		projection = (Object[]) projections.get();
 		checkProjectionFirst( projection, s );
 
 		projections.scroll( 2 );
-		projection = projections.get();
+		projection = (Object[]) projections.get();
 		checkProjection2( projection, s );
 
 		//cleanup

@@ -7,14 +7,7 @@
 package org.hibernate.search.mapper.orm.search.query.spi;
 
 import java.lang.invoke.MethodHandles;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.function.Function;
 
 import jakarta.persistence.QueryTimeoutException;
 
@@ -25,15 +18,15 @@ import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.type.Type;
 
-public class HibernateOrmSearchScrollableResultsAdapter<H> implements ScrollableResults, ScrollableResultsImplementor {
+public class HibernateOrmSearchScrollableResultsAdapter<R, H>
+		implements ScrollableResults<R>, ScrollableResultsImplementor<R> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SearchScroll<H> scroll;
 	private final int maxResults;
-	private final ScrollHitExtractor<? super H> hitExtractor;
+	private final Function<? super H, ? extends R> hitExtractor;
 	private SearchScrollResult<H> currentChunk;
 	private H currentHit;
 	private int currentIndexInScroll;
@@ -42,7 +35,7 @@ public class HibernateOrmSearchScrollableResultsAdapter<H> implements Scrollable
 	private boolean closed;
 
 	public HibernateOrmSearchScrollableResultsAdapter(SearchScroll<H> scroll, int maxResults,
-			ScrollHitExtractor<? super H> hitExtractor) {
+			Function<? super H, ? extends R> hitExtractor) {
 		this.scroll = scroll;
 		this.maxResults = maxResults;
 		this.hitExtractor = hitExtractor;
@@ -185,6 +178,11 @@ public class HibernateOrmSearchScrollableResultsAdapter<H> implements Scrollable
 	}
 
 	@Override
+	public boolean position(int position) {
+		return setRowNumber( position );
+	}
+
+	@Override
 	public boolean setRowNumber(int rowNumber) {
 		checkNotClosed();
 
@@ -203,126 +201,12 @@ public class HibernateOrmSearchScrollableResultsAdapter<H> implements Scrollable
 	}
 
 	@Override
-	public Object[] get() {
+	public R get() {
 		checkNotClosed();
 		if ( currentIndexInScroll < 0 || afterLast ) {
 			return null;
 		}
-		return hitExtractor.toArray( currentHit );
-	}
-
-	@Override
-	public Object get(int i) {
-		checkNotClosed();
-		if ( currentIndexInScroll < 0 || afterLast ) {
-			return null;
-		}
-		return hitExtractor.toElement( currentHit, i );
-	}
-
-	@Override
-	public Type getType(int i) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public Integer getInteger(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public Long getLong(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public Float getFloat(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public Boolean getBoolean(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public Double getDouble(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public Short getShort(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public Byte getByte(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public Character getCharacter(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public byte[] getBinary(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public String getText(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public Blob getBlob(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public Clob getClob(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public String getString(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public BigDecimal getBigDecimal(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public BigInteger getBigInteger(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public Date getDate(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public Locale getLocale(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public Calendar getCalendar(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public TimeZone getTimeZone(int col) {
-		throw columnTypesNotSupported();
-	}
-
-	@Override
-	public int getNumberOfTypes() {
-		throw columnTypesNotSupported();
+		return hitExtractor.apply( currentHit );
 	}
 
 	private SearchScrollResult<H> nextChunk() {
@@ -334,42 +218,10 @@ public class HibernateOrmSearchScrollableResultsAdapter<H> implements Scrollable
 		}
 	}
 
-	private UnsupportedOperationException columnTypesNotSupported() {
-		return new UnsupportedOperationException( "column types not supported in Hibernate Search queries" );
-	}
-
 	private void checkNotClosed() {
 		if ( closed ) {
 			throw log.cannotUseClosedScrollableResults();
 		}
 	}
 
-	public interface ScrollHitExtractor<H> {
-		Object[] toArray(H hit);
-		Object toElement(H hit, int index);
-
-		@SuppressWarnings({ "unchecked", "rawtypes" }) // The instance works for any H
-		static <H> ScrollHitExtractor<H> singleObject() {
-			return (ScrollHitExtractor) SingleObjectScrollHitExtractor.INSTANCE;
-		}
-	}
-
-	private static final class SingleObjectScrollHitExtractor<H>
-			implements HibernateOrmSearchScrollableResultsAdapter.ScrollHitExtractor<H> {
-
-		private static final SingleObjectScrollHitExtractor<Object> INSTANCE = new SingleObjectScrollHitExtractor<>();
-
-		@Override
-		public Object[] toArray(H hit) {
-			return new Object[] { hit };
-		}
-
-		@Override
-		public Object toElement(H hit, int index) {
-			if ( index > 0 ) {
-				throw new IndexOutOfBoundsException();
-			}
-			return hit;
-		}
-	}
 }

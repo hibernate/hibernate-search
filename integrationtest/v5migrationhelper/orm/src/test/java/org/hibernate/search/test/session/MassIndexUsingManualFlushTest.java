@@ -60,7 +60,7 @@ public class MassIndexUsingManualFlushTest extends SearchTestBase {
 		int index = 0;
 		while ( results.next() ) {
 			index++;
-			final Email o = (Email) results.get( 0 );
+			final Email o = (Email) results.get();
 			s.index( o );
 			if ( index % 5 == 0 ) {
 				s.flushToIndexes();

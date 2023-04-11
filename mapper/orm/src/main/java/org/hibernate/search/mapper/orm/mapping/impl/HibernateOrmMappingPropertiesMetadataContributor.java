@@ -94,13 +94,18 @@ public final class HibernateOrmMappingPropertiesMetadataContributor implements P
 	}
 
 	private void collectScale(PojoAdditionalMetadataCollectorPropertyNode collector, Value value) {
-		Iterator<Selectable> ci = value.getColumnIterator();
-		while ( ci.hasNext() ) {
-			Selectable selectable = ci.next();
-			if ( selectable instanceof Column ) {
-				int scale = ( (Column) selectable ).getScale();
-				collector.value( getExtractorPath( value ) ).decimalScale( scale );
+		Iterator<Selectable> columnIterator = value.getColumnIterator();
+		while ( columnIterator.hasNext() ) {
+			Selectable mappedColumn = columnIterator.next();
+			if ( !(mappedColumn instanceof Column) ) {
+				continue;
 			}
+			Column column = (Column) mappedColumn;
+			Integer scale = column.getScale();
+			if ( scale == null ) {
+				continue;
+			}
+			collector.value( getExtractorPath( value ) ).decimalScale( scale );
 		}
 	}
 

@@ -83,7 +83,7 @@ public class ScrollableResultsTest {
 			position++;
 			int bookId = position;
 			assertEquals( position, scrollableResults.getRowNumber() );
-			AlternateBook book = (AlternateBook) scrollableResults.get()[0];
+			AlternateBook book = (AlternateBook) ( (Object[]) scrollableResults.get() )[0];
 			assertEquals( bookId, book.getId().intValue() );
 			assertEquals( "book about the number " + bookId, book.getSummary() );
 			assertTrue( sess.contains( book ) );
@@ -111,7 +111,7 @@ public class ScrollableResultsTest {
 		int position = -1;
 		while ( scrollableResults.next() ) {
 			position++;
-			AlternateBook book = (AlternateBook) scrollableResults.get()[0];
+			AlternateBook book = (AlternateBook) ( (Object[]) scrollableResults.get() )[0];
 			assertTrue( sess.contains( book ) );
 			// evict some entities:
 			if ( position % 3 == 0 ) {
@@ -158,7 +158,7 @@ public class ScrollableResultsTest {
 		int position = scrollableResults.getRowNumber();
 		while ( scrollableResults.next() ) {
 			position++;
-			Object[] objs = scrollableResults.get();
+			Object[] objs = (Object[]) scrollableResults.get();
 			assertEquals( Employee.class, objs[0] );
 			assertEquals( position, objs[1] );
 			assertTrue( objs[2] instanceof Employee );

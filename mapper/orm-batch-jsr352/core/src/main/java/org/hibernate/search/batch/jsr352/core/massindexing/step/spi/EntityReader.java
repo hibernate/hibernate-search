@@ -415,7 +415,7 @@ public class EntityReader extends AbstractItemReader {
 
 		private CheckpointInfo lastCheckpointInfo;
 		private int processedEntityCount = 0;
-		private Serializable lastProcessedEntityId;
+		private Object lastProcessedEntityId;
 
 		public ChunkState(
 				EntityManagerFactory emf, String tenantId, FetchingStrategy fetchingStrategy, int clearInterval,
@@ -446,7 +446,7 @@ public class EntityReader extends AbstractItemReader {
 			if ( !scroll.next() ) {
 				return null;
 			}
-			Object entity = scroll.get( 0 );
+			Object entity = scroll.get();
 			lastProcessedEntityId = session.getIdentifier( entity );
 			++processedEntityCount;
 			return entity;
@@ -462,13 +462,13 @@ public class EntityReader extends AbstractItemReader {
 			if ( lastCheckpointInfo != null ) {
 				processedEntityCountInPartition += lastCheckpointInfo.getProcessedEntityCount();
 			}
-			Serializable lastProcessedEntityIdInPartition = lastProcessedEntityId;
+			Object lastProcessedEntityIdInPartition = lastProcessedEntityId;
 			if ( lastCheckpointInfo != null && lastProcessedEntityIdInPartition == null ) {
 				lastProcessedEntityIdInPartition = lastCheckpointInfo.getLastProcessedEntityId();
 			}
 			processedEntityCount = 0;
 			lastProcessedEntityId = null;
-			lastCheckpointInfo = new CheckpointInfo( lastProcessedEntityIdInPartition, processedEntityCountInPartition );
+			lastCheckpointInfo = new CheckpointInfo( (Serializable) lastProcessedEntityIdInPartition, processedEntityCountInPartition );
 			return lastCheckpointInfo;
 		}
 

@@ -20,7 +20,7 @@ import jakarta.persistence.OneToMany;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.metamodel.spi.MetamodelImplementor;
+import org.hibernate.metamodel.MappingMetamodel;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -58,8 +58,8 @@ public class SyntheticPropertyIT {
 
 		// Hibernate Search started successfully.
 		// Check that there actually is a synthetic property:
-		MetamodelImplementor metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMetamodel();
-		assertThat( metamodel.entityPersister( ContainedEntity.class ).getPropertyNames() )
+		MappingMetamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMetamodel();
+		assertThat( metamodel.getEntityDescriptor( ContainedEntity.class ).getPropertyNames() )
 				.contains( "_" + IndexedEntity.class.getName().replace( '.', '_' ) + "_contained" );
 
 		// If we get here the bug was solved, but let's at least check that indexing works

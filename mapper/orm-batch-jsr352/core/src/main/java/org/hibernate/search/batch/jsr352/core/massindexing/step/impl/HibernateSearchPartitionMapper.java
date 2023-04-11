@@ -248,7 +248,7 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 
 			while ( scroll.scroll( rowsPerPartition ) ) {
 				lowerID = upperID;
-				upperID = scroll.get( 0 );
+				upperID = scroll.get();
 				partitionUnits.add( new PartitionBound( javaClass, lowerID, upperID, indexScope ) );
 			}
 

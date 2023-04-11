@@ -17,6 +17,7 @@ import java.util.Set;
 import org.hibernate.MappingException;
 import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.mapping.Any;
+import org.hibernate.mapping.BasicValue;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.ManyToOne;
 import org.hibernate.mapping.OneToMany;
@@ -352,7 +353,7 @@ final class HibernateOrmPathInterpreter
 				return baseValue;
 			}
 		}
-		else if ( SimpleValue.class.equals( valueClass ) ) { // equals() and not isAssignableFrom(), we mean it.
+		else if ( BasicValue.class.isAssignableFrom( valueClass ) ) {
 			// The path as a whole (and not just a prefix) was resolved to a non-component, non-association value
 			context.resolvedStringRepresentation( propertyNode.toPropertyString() );
 			// We don't need state extraction in this case
@@ -414,7 +415,7 @@ final class HibernateOrmPathInterpreter
 		if ( !extractorNameIterator.hasNext() ) {
 			// We managed to resolve the whole container value extractor list
 			Class<? extends Value> containedValueClass = containedValue.getClass();
-			if ( SimpleValue.class.equals( containedValueClass ) // equals() and not isAssignableFrom(), we mean it.
+			if ( BasicValue.class.isAssignableFrom( containedValueClass )
 					|| Component.class.isAssignableFrom( containedValueClass )
 					|| isWholePath && isAssociation( containedValueClass ) ) {
 				String stringRepresentationAsProperty = propertyNode.toPropertyString();

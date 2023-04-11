@@ -30,6 +30,7 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateO
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.UuidDataTypeUtils;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.UuidGenerationStrategy;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.spi.HibernateOrmMapperOutboxPollingSpiSettings;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -38,6 +39,8 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 		implements HibernateSearchOrmMappingProducer {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private static final String HIBERNATE_SEARCH = OutboxPollingAgentAdditionalJaxbMappingProducer.HIBERNATE_SEARCH;
 
 	private static final String CLASS_NAME = OutboxEvent.class.getName();
 
@@ -162,7 +165,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 		);
 
 		log.outboxEventGeneratedEntityMapping( entityDefinition );
-		Origin origin = new Origin( SourceType.OTHER, "search" );
+		Origin origin = new Origin( SourceType.OTHER, HIBERNATE_SEARCH );
 
 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( entityDefinition.getBytes() );
 		BufferedInputStream bufferedInputStream = new BufferedInputStream( byteArrayInputStream );
@@ -170,7 +173,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 
 		JaxbHbmHibernateMapping root = (JaxbHbmHibernateMapping) binding.getRoot();
 
-		MappingDocument mappingDocument = new MappingDocument( root, origin, buildingContext );
+		MappingDocument mappingDocument = new MappingDocument( HIBERNATE_SEARCH, root, origin, buildingContext );
 		return Collections.singletonList( mappingDocument );
 	}
 }
