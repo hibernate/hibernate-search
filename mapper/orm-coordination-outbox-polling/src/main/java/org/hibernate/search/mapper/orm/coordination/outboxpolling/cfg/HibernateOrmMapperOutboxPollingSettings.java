@@ -8,9 +8,9 @@ package org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg;
 
 import static java.lang.String.join;
 
-import org.hibernate.id.UUIDGenerator;
 import org.hibernate.id.uuid.CustomVersionOneStrategy;
 import org.hibernate.id.uuid.StandardRandomStrategy;
+import org.hibernate.id.uuid.UuidGenerator;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -401,14 +401,15 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_TABLE;
 
 	/**
-	 * The name of UUID generator strategy to be used by {@link UUIDGenerator} for the outbox event table.
+	 * The name of UUID generator strategy to be used by {@link UuidGenerator} for the outbox event table.
 	 * <p>
 	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * The default for this value is {@link  Defaults#COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_GEN_STRATEGY}.
 	 *
-	 * @see UUIDGenerator
+	 * @see UuidGenerator
+	 * @see org.hibernate.annotations.UuidGenerator
 	 * @see CustomVersionOneStrategy
 	 * @see StandardRandomStrategy
 	 */
@@ -460,14 +461,14 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_AGENT_TABLE;
 
 	/**
-	 * The name of UUID generator strategy to be used by {@link UUIDGenerator} for the agent table.
+	 * The name of UUID generator strategy to be used by {@link UuidGenerator} for the agent table.
 	 * <p>
 	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * The default for this value is {@link  Defaults#COORDINATION_ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY}.
 	 *
-	 * @see UUIDGenerator
+	 * @see UuidGenerator
 	 * @see CustomVersionOneStrategy
 	 * @see StandardRandomStrategy
 	 */

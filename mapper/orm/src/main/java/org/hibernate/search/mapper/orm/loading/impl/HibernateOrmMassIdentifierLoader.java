@@ -29,7 +29,7 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 	private final TransactionHelper transactionHelper;
 	private final long totalCount;
 	private long totalLoaded = 0;
-	private final ScrollableResults results;
+	private final ScrollableResults<I> results;
 
 	public HibernateOrmMassIdentifierLoader(HibernateOrmQueryLoader<E, I> typeQueryLoader,
 			HibernateOrmMassLoadingOptions options,
@@ -88,8 +88,7 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 		int batchSize = options.objectLoadingBatchSize();
 		ArrayList<I> destinationList = new ArrayList<>( batchSize );
 		while ( destinationList.size() < batchSize && totalLoaded < totalCount && results.next() ) {
-			@SuppressWarnings("unchecked")
-			I id = (I) results.get( 0 );
+			I id = results.get();
 			destinationList.add( id );
 			++totalLoaded;
 		}
