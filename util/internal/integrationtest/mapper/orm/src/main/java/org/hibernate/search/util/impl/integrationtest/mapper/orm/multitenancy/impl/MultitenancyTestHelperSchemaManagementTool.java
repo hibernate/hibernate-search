@@ -21,6 +21,7 @@ import org.hibernate.tool.schema.internal.SchemaCreatorImpl;
 import org.hibernate.tool.schema.internal.SchemaDropperImpl;
 import org.hibernate.tool.schema.internal.exec.GenerationTarget;
 import org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase;
+import org.hibernate.tool.schema.spi.ContributableMatcher;
 import org.hibernate.tool.schema.spi.DelayedDropAction;
 import org.hibernate.tool.schema.spi.ExecutionOptions;
 import org.hibernate.tool.schema.spi.ExtractionTool;
@@ -94,7 +95,8 @@ class MultitenancyTestHelperSchemaManagementTool
 			final SchemaCreatorImpl delegate = (SchemaCreatorImpl) toolDelegate.getSchemaCreator( options );
 
 			@Override
-			public void doCreation(Metadata metadata, ExecutionOptions options, SourceDescriptor sourceDescriptor,
+			public void doCreation(Metadata metadata, ExecutionOptions executionOptions,
+					ContributableMatcher contributableMatcher, SourceDescriptor sourceDescriptor,
 					TargetDescriptor targetDescriptor) {
 				delegate.doCreation( metadata, true, generationTargets );
 			}
@@ -108,14 +110,15 @@ class MultitenancyTestHelperSchemaManagementTool
 			final SchemaDropperImpl delegate = (SchemaDropperImpl) toolDelegate.getSchemaDropper( options );
 
 			@Override
-			public void doDrop(Metadata metadata, ExecutionOptions options, SourceDescriptor sourceDescriptor,
+			public void doDrop(Metadata metadata, ExecutionOptions executionOptions,
+					ContributableMatcher contributableMatcher, SourceDescriptor sourceDescriptor,
 					TargetDescriptor targetDescriptor) {
 				delegate.doDrop( metadata, true, generationTargets );
 			}
 
 			@Override
-			public DelayedDropAction buildDelayedAction(Metadata metadata, ExecutionOptions options,
-					SourceDescriptor sourceDescriptor) {
+			public DelayedDropAction buildDelayedAction(Metadata metadata, ExecutionOptions executionOptions,
+					ContributableMatcher contributableMatcher, SourceDescriptor sourceDescriptor) {
 				return new DelayedDropAction() {
 					@Override
 					public void perform(ServiceRegistry serviceRegistry) {

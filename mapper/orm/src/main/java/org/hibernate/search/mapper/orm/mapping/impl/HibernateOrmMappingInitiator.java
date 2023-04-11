@@ -8,10 +8,9 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 
 import java.util.List;
 
-import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.boot.Metadata;
-import org.hibernate.engine.config.spi.ConfigurationService;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -71,13 +70,14 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 				HibernateOrmBasicTypeMetadataProvider.create( metadata );
 		HibernateOrmBootstrapIntrospector introspector = HibernateOrmBootstrapIntrospector.create(
 				basicTypeMetadataProvider, reflectionManager, valueHandleFactory );
-		ConfigurationService ormConfigurationService =
-				HibernateOrmUtils.getServiceOrFail( serviceRegistry, ConfigurationService.class );
 		HibernateSearchPreIntegrationService preIntegrationService =
 				HibernateOrmUtils.getServiceOrFail( serviceRegistry, HibernateSearchPreIntegrationService.class );
 
+		boolean multiTenancyEnabled = ( (MetadataImplementor) metadata ).getMetadataBuildingOptions()
+				.isMultiTenancyEnabled();
+
 		return new HibernateOrmMappingInitiator( basicTypeMetadataProvider, jandexIndex, introspector,
-				ormConfigurationService, preIntegrationService );
+				preIntegrationService, multiTenancyEnabled );
 	}
 
 	private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
@@ -87,10 +87,10 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 	private BeanHolder<? extends CoordinationStrategy> coordinationStrategyHolder;
 	private ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy;
 
-	private HibernateOrmMappingInitiator(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
+	private HibernateOrmMappingInitiator(
+			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
 			IndexView jandexIndex, HibernateOrmBootstrapIntrospector introspector,
-			ConfigurationService ormConfigurationService,
-			HibernateSearchPreIntegrationService preIntegrationService) {
+			HibernateSearchPreIntegrationService preIntegrationService, boolean multiTenancyEnabled) {
 		super( introspector );
 
 		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
@@ -99,19 +99,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		}
 		this.introspector = introspector;
 
-		/*
-		 * This method is called when the session factory is created, and once again when HSearch boots.
-		 * It logs a warning when the configuration property is invalid,
-		 * so the warning will be logged twice.
-		 * Since it only happens when the configuration is invalid,
-		 * we can live with this quirk.
-		 */
-		MultiTenancyStrategy multiTenancyStrategy =
-				MultiTenancyStrategy.determineMultiTenancyStrategy( ormConfigurationService.getSettings() );
-
-		tenancyMode( MultiTenancyStrategy.NONE.equals( multiTenancyStrategy )
-				? TenancyMode.SINGLE_TENANCY
-				: TenancyMode.MULTI_TENANCY );
+		tenancyMode( multiTenancyEnabled ? TenancyMode.MULTI_TENANCY : TenancyMode.SINGLE_TENANCY );
 
 		this.preIntegrationService = preIntegrationService;
 	}
