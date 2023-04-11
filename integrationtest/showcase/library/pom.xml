@@ -13,8 +13,12 @@
     <description>Hibernate Search showcase based on the ORM and Elasticsearch integrations, using libraries and books as business objects</description>
 
     <properties>
+        <!-- Override the version of Hibernate ORM pulled by Spring Boot -->
+        <hibernate.version>${version.org.hibernate.orm}</hibernate.version>
+
         <test.elasticsearch.run.skip>${test.elasticsearch.connection.uris.defined}</test.elasticsearch.run.skip>
         <test.database.run.skip>false</test.database.run.skip>
+
         <!--
             Remove Hibernate system properties from parent settings:
             They are supposed to be handled by the spring.datasource subsystem
@@ -73,6 +77,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
             <exclusions>
+                <!-- Using a newer version of Hibernate ORM, with a different groupID -->
+                <exclusion>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-core</artifactId>
+                </exclusion>
                 <!-- Using JBoss Logging -->
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>

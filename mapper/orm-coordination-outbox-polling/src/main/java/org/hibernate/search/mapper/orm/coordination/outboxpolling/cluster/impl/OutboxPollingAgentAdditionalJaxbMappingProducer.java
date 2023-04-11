@@ -39,6 +39,8 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	public static final String HIBERNATE_SEARCH = "hibernate-search";
+
 	public static final String CLASS_NAME = Agent.class.getName();
 
 	// Setting both the JPA entity name and the native entity name to the FQCN so that:
@@ -180,7 +182,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 
 		JaxbHbmHibernateMapping root = (JaxbHbmHibernateMapping) binding.getRoot();
 
-		MappingDocument mappingDocument = new MappingDocument( root, origin, buildingContext );
+		MappingDocument mappingDocument = new MappingDocument( HIBERNATE_SEARCH, root, origin, buildingContext );
 		return Collections.singletonList( mappingDocument );
 	}
 }
