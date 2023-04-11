@@ -253,8 +253,6 @@ public interface Log extends BasicLogger {
 			+ " Currently configured tenant identifiers: %2$s.")
 	SearchException invalidTenantId(String tenantId, Set<String> allTenantIds, String tenantIdsConfigurationPropertyKey);
 
-	// NOTE: This is used in -orm6 modules
-	@SuppressWarnings("unused")
 	@LogMessage(level = Logger.Level.INFO)
 	@Message(id = ID_OFFSET + 56, value = "Ignoring unrecognized query hint [%s]")
 	void ignoringUnrecognizedQueryHint(String hintName);

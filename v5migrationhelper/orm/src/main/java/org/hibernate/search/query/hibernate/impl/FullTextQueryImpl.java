@@ -7,22 +7,18 @@
 package org.hibernate.search.query.hibernate.impl;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import jakarta.persistence.FlushModeType;
 import jakarta.persistence.LockModeType;
-import jakarta.persistence.Parameter;
+import jakarta.persistence.PersistenceException;
 import jakarta.persistence.QueryTimeoutException;
-import jakarta.persistence.TemporalType;
 
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
@@ -30,12 +26,14 @@ import org.hibernate.LockOptions;
 import org.hibernate.ScrollMode;
 import org.hibernate.TypeMismatchException;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
-import org.hibernate.hql.internal.QueryExecutionRequestException;
-import org.hibernate.query.QueryParameter;
-import org.hibernate.query.internal.AbstractProducedQuery;
-import org.hibernate.query.internal.ParameterMetadataImpl;
+import org.hibernate.graph.spi.RootGraphImplementor;
+import org.hibernate.query.IllegalQueryOperationException;
+import org.hibernate.query.internal.QueryOptionsImpl;
+import org.hibernate.query.spi.AbstractQuery;
+import org.hibernate.query.spi.ParameterMetadataImplementor;
 import org.hibernate.query.spi.QueryImplementor;
 import org.hibernate.query.spi.QueryParameterBindings;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
@@ -46,7 +44,6 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchQueryHints;
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter;
-import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter.ScrollHitExtractor;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.FacetManager;
@@ -56,7 +53,6 @@ import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.transform.ResultTransformer;
-import org.hibernate.type.Type;
 
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Query;
@@ -69,14 +65,14 @@ import org.apache.lucene.search.Sort;
  * @author Hardy Ferentschik
  */
 @SuppressWarnings("rawtypes") // We extend the raw version of AbstractProducedQuery on purpose, see HSEARCH-2564
-public class FullTextQueryImpl extends AbstractProducedQuery implements FullTextQuery {
+public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 
 	private final V5MigrationSearchSession<SearchLoadingOptionsStep> searchSession;
 
 	private final HSQuery hSearchQuery;
 
-	private Integer firstResult;
-	private Integer maxResults;
+	private final SessionImplementor sessionImplementor;
+	private final QueryOptionsImpl queryOptions = new QueryOptionsImpl();
 	//initialized at 0 since we don't expect to use hints at this stage
 	private final Map<String, Object> hints = new HashMap<String, Object>( 0 );
 
@@ -97,11 +93,12 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	private ResultTransformer resultTransformer;
 
-	public FullTextQueryImpl(Query luceneQuery, SessionImplementor session,
+	public FullTextQueryImpl(Query luceneQuery, SessionImplementor sessionImplementor,
 			V5MigrationOrmSearchIntegratorAdapter searchIntegrator,
 			V5MigrationSearchSession<SearchLoadingOptionsStep> searchSession,
 			Class<?>... entities) {
-		super( session, new ParameterMetadataImpl( null, null ) );
+		super( sessionImplementor );
+		this.sessionImplementor = sessionImplementor;
 		this.searchSession = searchSession;
 		this.hSearchQuery = searchIntegrator.createHSQuery( luceneQuery, searchSession,
 				loadingOptionsContributor, entities );
@@ -119,15 +116,10 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	@Override
-	public Iterator iterate() {
-		throw new UnsupportedOperationException(
-				"iterate() is not implemented in Hibernate Search queries. Use scroll() instead." );
-	}
-
-	@Override
 	public ScrollableResultsImplementor scroll() {
-		SearchScroll<?> scroll = hSearchQuery.scroll(
-				fetchSize != null ? fetchSize : 100 );
+		extractQueryOptions();
+		SearchScroll<?> scroll = hSearchQuery.scroll( fetchSize != null ? fetchSize : 100 );
+		Integer maxResults = hSearchQuery.maxResults();
 		return new HibernateOrmSearchScrollableResultsAdapter<>( scroll,
 				maxResults != null ? maxResults : Integer.MAX_VALUE,
 				Search5ScrollHitExtractor.INSTANCE );
@@ -140,32 +132,43 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	@Override
 	public List list() {
-		// Reproduce the behavior of AbstractProducedQuery.list() regarding exceptions
 		try {
-			return doHibernateSearchList();
+			return super.list();
 		}
 		catch (SearchTimeoutException e) {
 			throw new QueryTimeoutException( e );
 		}
-		catch (QueryExecutionRequestException he) {
-			throw new IllegalStateException( he );
-		}
-		catch (TypeMismatchException e) {
-			throw new IllegalArgumentException( e );
-		}
-		catch (HibernateException he) {
-			throw getExceptionConverter().convert( he );
-		}
 	}
 
-	protected List doHibernateSearchList() {
+	@Override
+	protected List doList() {
 		List list = hSearchQuery.fetch();
-
 		if ( resultTransformer != null ) {
 			list = resultTransformer.transformList( list );
 		}
-
 		return list;
+	}
+
+	@Override
+	protected void beforeQuery(boolean requiresTxn) {
+		super.beforeQuery( requiresTxn );
+
+		extractQueryOptions();
+	}
+
+	private void extractQueryOptions() {
+		Integer limit = getQueryOptions().getLimit().getMaxRows();
+		hSearchQuery.maxResults( limit );
+		Integer offset = getQueryOptions().getLimit().getFirstRow();
+		hSearchQuery.firstResult( offset == null ? 0 : offset );
+		Integer queryFetchSize = getQueryOptions().getFetchSize();
+		if ( queryFetchSize != null ) {
+			fetchSize = queryFetchSize;
+		}
+		Integer queryTimeout = getQueryOptions().getTimeout();
+		if ( queryTimeout != null ) {
+			hSearchQuery.failAfter( queryTimeout, TimeUnit.SECONDS );
+		}
 	}
 
 	@Override
@@ -181,8 +184,14 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 		catch (SearchTimeoutException e) {
 			throw new QueryTimeoutException( e );
 		}
+		catch (IllegalQueryOperationException e) {
+			throw new IllegalStateException( e );
+		}
+		catch (TypeMismatchException e) {
+			throw new IllegalArgumentException( e );
+		}
 		catch (HibernateException he) {
-			throw getExceptionConverter().convert( he );
+			throw getSession().getExceptionConverter().convert( he, getLockOptions() );
 		}
 	}
 
@@ -216,42 +225,14 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	@Override
 	public FullTextQuery setMaxResults(int maxResults) {
-		if ( maxResults < 0 ) {
-			throw new IllegalArgumentException(
-					"Negative ("
-							+ maxResults
-							+ ") parameter passed in to setMaxResults"
-			);
-		}
-		hSearchQuery.maxResults( maxResults );
-		this.maxResults = maxResults;
+		super.setMaxResults( maxResults );
 		return this;
-	}
-
-	@Override
-	public int getMaxResults() {
-		return maxResults == null || maxResults == -1
-				? Integer.MAX_VALUE
-				: maxResults;
 	}
 
 	@Override
 	public FullTextQuery setFirstResult(int firstResult) {
-		if ( firstResult < 0 ) {
-			throw new IllegalArgumentException(
-					"Negative ("
-							+ firstResult
-							+ ") parameter passed in to setFirstResult"
-			);
-		}
-		hSearchQuery.firstResult( firstResult );
-		this.firstResult = firstResult;
+		super.setFirstResult( firstResult );
 		return this;
-	}
-
-	@Override
-	public int getFirstResult() {
-		return firstResult == null ? 0 : firstResult;
 	}
 
 	@Override
@@ -268,17 +249,20 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 				break;
 			case HibernateOrmSearchQueryHints.JAVAX_FETCHGRAPH:
 			case HibernateOrmSearchQueryHints.JAKARTA_FETCHGRAPH:
-				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.FETCH );
-				break;
 			case HibernateOrmSearchQueryHints.JAVAX_LOADGRAPH:
 			case HibernateOrmSearchQueryHints.JAKARTA_LOADGRAPH:
-				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.LOAD );
+				applyEntityGraphQueryHint( hintName, hintValueToEntityGraph( value ) );
 				break;
 			default:
-				handleUnrecognizedHint( hintName, value );
 				break;
 		}
 		return this;
+	}
+
+	@Override
+	protected void applyEntityGraphQueryHint(String hintName, RootGraphImplementor entityGraph) {
+		GraphSemantic graphSemantic = GraphSemantic.fromJpaHintName( hintName );
+		this.applyGraph( entityGraph, graphSemantic );
 	}
 
 	@Override
@@ -286,99 +270,35 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 		return hints;
 	}
 
-	@Override // No generics, see unwrap() (same issue)
-	public FullTextQueryImpl setParameter(Parameter tParameter, Object t) {
-		throw parametersNoSupported();
-	}
-
-	@Override // No generics, see unwrap() (same issue)
-	public FullTextQueryImpl setParameter(Parameter calendarParameter, Calendar calendar, TemporalType temporalType) {
-		throw parametersNoSupported();
-	}
-
-	@Override // No generics, see unwrap() (same issue)
-	public FullTextQueryImpl setParameter(Parameter dateParameter, Date date, TemporalType temporalType) {
+	@Override
+	public ParameterMetadataImplementor getParameterMetadata() {
 		throw parametersNoSupported();
 	}
 
 	@Override
-	public FullTextQueryImpl setParameter(String name, Object value) {
-		throw parametersNoSupported();
-	}
-
-	@Override
-	public FullTextQueryImpl setParameter(String name, Date value, TemporalType temporalType) {
-		throw parametersNoSupported();
-	}
-
-	@Override
-	public FullTextQueryImpl setParameter(String name, Calendar value, TemporalType temporalType) {
-		throw parametersNoSupported();
-	}
-
-	@Override
-	public FullTextQueryImpl setParameter(int position, Object value) {
-		throw parametersNoSupported();
-	}
-
-	@Override
-	public FullTextQueryImpl setParameter(int position, Date value, TemporalType temporalType) {
-		throw parametersNoSupported();
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public Set<Parameter<?>> getParameters() {
-		return Collections.EMPTY_SET;
+	public QueryParameterBindings getParameterBindings() {
+		// parameters not supported in Hibernate Search queries
+		return QueryParameterBindings.NO_PARAM_BINDINGS;
 	}
 
 	@Override
 	protected QueryParameterBindings getQueryParameterBindings() {
+		// parameters not supported in Hibernate Search queries
+		return QueryParameterBindings.NO_PARAM_BINDINGS;
+	}
+
+	@Override
+	public QueryImplementor<?> setParameterList(String name, Object[] values) {
 		throw parametersNoSupported();
 	}
 
 	@Override
-	public FullTextQueryImpl setParameter(int position, Calendar value, TemporalType temporalType) {
+	public QueryImplementor<?> setParameterList(String s, Collection collection, Class aClass) {
 		throw parametersNoSupported();
 	}
 
 	@Override
-	public QueryParameter<?> getParameter(String name) {
-		throw parametersNoSupported();
-	}
-
-	@Override
-	public QueryParameter<?> getParameter(int position) {
-		throw parametersNoSupported();
-	}
-
-	@Override // No generics, see unwrap() (same issue)
-	public QueryParameter getParameter(String name, Class type) {
-		throw parametersNoSupported();
-	}
-
-	@Override // No generics, see unwrap() (same issue)
-	public QueryParameter getParameter(int position, Class type) {
-		throw parametersNoSupported();
-	}
-
-	@Override // No generics, see unwrap() (same issue)
-	public boolean isBound(Parameter param) {
-		throw parametersNoSupported();
-	}
-
-	@Override // No generics, see unwrap() (same issue)
-	public Object getParameterValue(Parameter param) {
-		throw parametersNoSupported();
-	}
-
-	@Override
-	public Object getParameterValue(String name) {
-		throw parametersNoSupported();
-	}
-
-	@Override
-	public Object getParameterValue(int position) {
+	public QueryImplementor<?> setParameterList(int i, Collection collection, Class aClass) {
 		throw parametersNoSupported();
 	}
 
@@ -393,12 +313,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	@Override
 	public FullTextQueryImpl setFetchSize(int fetchSize) {
-		super.setFetchSize( fetchSize );
-		if ( fetchSize <= 0 ) {
-			throw new IllegalArgumentException( "'fetch size' parameter less than or equals to 0" );
-		}
-		this.fetchSize = fetchSize;
-		return this;
+		return (FullTextQueryImpl) super.setFetchSize( fetchSize );
 	}
 
 	@Override
@@ -436,7 +351,12 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 		if ( type == org.apache.lucene.search.Query.class ) {
 			return hSearchQuery.getLuceneQuery();
 		}
-		throw new IllegalArgumentException( "Cannot unwrap " + type.getName() );
+		else if ( type.isInstance( this ) ) {
+			return this;
+		}
+		else {
+			throw new PersistenceException( "Unrecognized unwrap type [" + type.getName() + "]" );
+		}
 	}
 
 	@Override
@@ -459,7 +379,12 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	@Override
-	public int executeUpdate() {
+	public int executeUpdate() throws HibernateException {
+		return doExecuteUpdate();
+	}
+
+	@Override
+	protected int doExecuteUpdate() {
 		throw new UnsupportedOperationException( "executeUpdate is not supported in Hibernate Search queries" );
 	}
 
@@ -517,32 +442,13 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	@Override
-	protected boolean isNativeQuery() {
-		return false;
+	public QueryOptionsImpl getQueryOptions() {
+		return queryOptions;
 	}
 
-	@Deprecated
 	@Override
-	public Type[] getReturnTypes() {
-		throw new UnsupportedOperationException( "getReturnTypes() is not implemented in Hibernate Search queries" );
-	}
-
-	@Deprecated
-	@Override
-	public String[] getReturnAliases() {
-		throw new UnsupportedOperationException( "getReturnAliases() is not implemented in Hibernate Search queries" );
-	}
-
-	@Deprecated
-	@Override
-	public FullTextQueryImpl setEntity(int position, Object val) {
-		throw new UnsupportedOperationException( "setEntity(int,Object) is not implemented in Hibernate Search queries" );
-	}
-
-	@Deprecated
-	@Override
-	public FullTextQueryImpl setEntity(String name, Object val) {
-		throw new UnsupportedOperationException( "setEntity(String,Object) is not implemented in Hibernate Search queries" );
+	public SharedSessionContractImplementor getSession() {
+		return sessionImplementor;
 	}
 
 	@Override
@@ -551,30 +457,17 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	private static final class Search5ScrollHitExtractor
-			implements ScrollHitExtractor<Object> {
+			implements Function<Object, Object[]> {
 
 		private static final Search5ScrollHitExtractor INSTANCE = new Search5ScrollHitExtractor();
 
 		@Override
-		public Object[] toArray(Object hit) {
+		public Object[] apply(Object hit) {
 			if ( hit instanceof Object[] ) {
 				return (Object[]) hit;
 			}
 			else {
 				return new Object[] { hit };
-			}
-		}
-
-		@Override
-		public Object toElement(Object hit, int index) {
-			if ( hit instanceof Object[] ) {
-				return ( (Object[]) hit )[index];
-			}
-			else if ( index != 0 ) {
-				throw new IndexOutOfBoundsException();
-			}
-			else {
-				return hit;
 			}
 		}
 	}
@@ -588,7 +481,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 		}
 	}
 
-	private static RootGraph<?> hintValueToEntityGraph(Object value) {
-		return (RootGraph) value;
+	private static RootGraphImplementor<?> hintValueToEntityGraph(Object value) {
+		return (RootGraphImplementor) value;
 	}
 }
