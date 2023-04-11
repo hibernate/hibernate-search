@@ -69,11 +69,11 @@
                             <skip>${maven.javadoc.skip}</skip>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-core-jakarta</artifactId>
+                                    <groupId>org.hibernate.orm</groupId>
+                                    <artifactId>hibernate-core</artifactId>
                                     <classifier>javadoc</classifier>
                                     <type>jar</type>
-                                    <version>${version.org.hibernate}</version>
+                                    <version>${version.org.hibernate.orm}</version>
                                     <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/hibernate-core</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>

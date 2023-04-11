@@ -13,8 +13,7 @@
 |
 |Hibernate ORM (for the <<mapper-orm,Hibernate ORM mapper>>
 |{hibernateVersion}
-|Also compatible with version {hibernateOrm6Version}
-but requires <<other-integrations-orm6,different Maven artifacts>>.
+|
 |Jakarta Persistence (for the <<mapper-orm,Hibernate ORM mapper>>
 |{jakartaPersistenceVersion}
 |
