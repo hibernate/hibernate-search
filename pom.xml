@@ -257,24 +257,12 @@
              when the versions start diverging, thanks to the maven-enforcer-plugin
              and to our own explicit dependencies in the relevant artifacts.
           -->
-        <version.org.jboss.jandex>2.4.2.Final</version.org.jboss.jandex>
-        <version.org.hibernate.commons.annotations>5.1.2.Final</version.org.hibernate.commons.annotations>
-        <version.net.bytebuddy>1.12.9</version.net.bytebuddy>
-
-        <!-- >>> ORM 5 with Jakarta Persistence -->
-        <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM 5 -jakarta artifacts.
-             DO NOT USE DEPENDENCY MANAGEMENT FOR THESE DEPENDENCIES!
-             Thanks to not using dependency management for these dependencies, we get a build failure
-             when the versions start diverging, thanks to the maven-enforcer-plugin
-             and to our own explicit dependencies in the relevant artifacts.
-          -->
-        <version.jakarta.persistence.orm5>3.0.0</version.jakarta.persistence.orm5>
-        <version.jakarta.transaction-api.orm5>2.0.0</version.jakarta.transaction-api.orm5>
-        <version.jakarta.enterprise.orm5>3.0.1</version.jakarta.enterprise.orm5>
-        <version.jakarta.xml.bind.orm5>3.0.1</version.jakarta.xml.bind.orm5>
+        <version.org.jboss.jandex>2.2.3.Final</version.org.jboss.jandex>
+        <version.org.hibernate.commons.annotations>${version.org.hibernate.commons.annotations.orm6}</version.org.hibernate.commons.annotations>
+        <version.net.bytebuddy>${version.net.bytebuddy.orm6}</version.net.bytebuddy>
 
         <!-- >>> ORM 6 with Jakarta Persistence -->
-        <version.org.hibernate.orm>6.2.9.Final</version.org.hibernate.orm>
+        <version.org.hibernate.orm>6.0.0.Beta3</version.org.hibernate.orm>
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
         <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM 6.
@@ -284,13 +272,13 @@
              and to our own explicit dependencies in the relevant artifacts.
           -->
         <version.io.smallrye.jandex>3.0.5</version.io.smallrye.jandex>
-        <version.org.hibernate.commons.annotations.orm6>6.0.6.Final</version.org.hibernate.commons.annotations.orm6>
-        <version.jakarta.persistence>3.1.0</version.jakarta.persistence>
-        <version.jakarta.transaction-api>2.0.1</version.jakarta.transaction-api>
+        <version.org.hibernate.commons.annotations.orm6>5.1.3.Final</version.org.hibernate.commons.annotations.orm6>
+        <version.jakarta.persistence>3.0.0</version.jakarta.persistence>
+        <version.jakarta.transaction-api>2.0.0</version.jakarta.transaction-api>
         <version.jakarta.interceptor-api>2.0.1</version.jakarta.interceptor-api>
         <version.jakarta.enterprise>3.0.1</version.jakarta.enterprise>
         <version.jakarta.xml.bind>4.0.0</version.jakarta.xml.bind>
-        <version.net.bytebuddy.orm6>1.14.7</version.net.bytebuddy.orm6>
+        <version.net.bytebuddy.orm6>1.12.18</version.net.bytebuddy.orm6>
 
         <!-- >>> JSR 352 -->
         <version.jakarta.batch>2.1.1</version.jakarta.batch>
@@ -750,11 +738,6 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-test-orm-orm6</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-engine</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -790,11 +773,6 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-orm-orm6</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-v5migrationhelper-engine</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -805,17 +783,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-v5migrationhelper-orm-orm6</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-orm-batch-jsr352-core-orm6</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -825,17 +793,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-orm-batch-jsr352-jberet-orm6</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-mapper-orm-coordination-outbox-polling</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-orm-coordination-outbox-polling-orm6</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -926,27 +884,17 @@
             </dependency>
 
             <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-core-jakarta</artifactId>
-                <version>${version.org.hibernate}</version>
+                <groupId>org.hibernate.orm</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${version.org.hibernate.orm}</version>
                 <exclusions>
-                    <!-- hibernate-core-jakarta already depends on jakarta.xml.bind-api,
+                    <!-- hibernate-core already depends on jakarta.xml.bind-api,
                          which depends on com.sun.activation, which bundles the activation API already -->
                     <exclusion>
                         <groupId>jakarta.activation</groupId>
                         <artifactId>jakarta.activation-api</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.orm</groupId>
-                <artifactId>hibernate-core</artifactId>
-                <version>${version.org.hibernate.orm}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-envers-jakarta</artifactId>
-                <version>${version.org.hibernate}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.orm</groupId>
@@ -1238,18 +1186,6 @@
 
             <!-- Hibernate ORM testing tools -->
             <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-testing-jakarta</artifactId>
-                <version>${version.org.hibernate}</version>
-                <exclusions>
-                    <!-- we use Log4J 2 -->
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
                 <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-testing</artifactId>
                 <version>${version.org.hibernate.orm}</version>
@@ -1258,6 +1194,11 @@
                     <exclusion>
                         <groupId>log4j</groupId>
                         <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <!-- We don't need this stuff, and it causes dependency divergence errors -->
+                    <exclusion>
+                        <groupId>org.wildfly.transaction</groupId>
+                        <artifactId>wildfly-transaction-client-jakarta</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -1487,8 +1428,8 @@
                             <goal>parse-version</goal>
                         </goals>
                         <configuration>
-                            <propertyPrefix>parsed-version.org.hibernate</propertyPrefix>
-                            <versionString>${version.org.hibernate}</versionString>
+                            <propertyPrefix>parsed-version.org.hibernate.orm</propertyPrefix>
+                            <versionString>${version.org.hibernate.orm}</versionString>
                         </configuration>
                     </execution>
                     <execution>
