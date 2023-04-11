@@ -92,7 +92,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
+				assertThat( scroll.get() ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				for ( int i = 0; i < ENTITY_COUNT; i++ ) {
@@ -103,18 +103,14 @@ public class ToHibernateOrmScrollableResultsIT {
 					assertThat( scroll.getRowNumber() ).isEqualTo( i );
 					assertThat( scroll.isFirst() ).isEqualTo( i == 0 );
 					assertThat( scroll.isLast() ).isEqualTo( i == ( ENTITY_COUNT - 1 ) );
-					assertThat( scroll.get( 0 ) )
+					assertThat( scroll.get() )
 							.isEqualTo( session.getReference( IndexedEntity.class, i ) );
-					Object[] row = scroll.get();
-					assertThat( row ).hasSize( 1 );
-					assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, i ) );
 				}
 
 				assertThat( scroll.next() ).isFalse();
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				// Call next() again after reaching the end: should not do anything
@@ -123,7 +119,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				expectScrollClose();
@@ -141,7 +136,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				// Going to the previous element means going backwards: it's forbidden
@@ -155,7 +149,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
@@ -166,7 +159,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 0 );
 				assertThat( scroll.isFirst() ).isTrue();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 0 ) );
 
 				// Going to the previous element means going backwards: it's forbidden
@@ -180,7 +173,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 0 );
 				assertThat( scroll.isFirst() ).isTrue();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 0 ) );
 
 				expectScrollClose();
@@ -198,7 +191,7 @@ public class ToHibernateOrmScrollableResultsIT {
 					expectScrollNextIfNecessary( i, DEFAULT_FETCH_SIZE, ENTITY_COUNT );
 					assertThat( scroll.next() ).isTrue();
 					backendMock.verifyExpectationsMet();
-					assertThat( scroll.get( 0 ) )
+					assertThat( scroll.get() )
 							.isEqualTo( session.getReference( IndexedEntity.class, i ) );
 				}
 
@@ -242,7 +235,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				for ( int i = 0; i < ENTITY_COUNT; i++ ) {
@@ -253,18 +245,14 @@ public class ToHibernateOrmScrollableResultsIT {
 					assertThat( scroll.getRowNumber() ).isEqualTo( i );
 					assertThat( scroll.isFirst() ).isEqualTo( i == 0 );
 					assertThat( scroll.isLast() ).isEqualTo( i == ( ENTITY_COUNT - 1 ) );
-					assertThat( scroll.get( 0 ) )
+					assertThat( scroll.get() )
 							.isEqualTo( session.getReference( IndexedEntity.class, i ) );
-					Object[] row = scroll.get();
-					assertThat( row ).hasSize( 1 );
-					assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, i ) );
 				}
 
 				assertThat( scroll.next() ).isFalse();
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				expectScrollClose();
@@ -288,7 +276,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				for ( int i = 0; i < maxResults; i++ ) {
@@ -299,18 +286,14 @@ public class ToHibernateOrmScrollableResultsIT {
 					assertThat( scroll.getRowNumber() ).isEqualTo( i );
 					assertThat( scroll.isFirst() ).isEqualTo( i == 0 );
 					assertThat( scroll.isLast() ).isEqualTo( i == ( maxResults - 1 ) );
-					assertThat( scroll.get( 0 ) )
+					assertThat( scroll.get() )
 							.isEqualTo( session.getReference( IndexedEntity.class, i ) );
-					Object[] row = scroll.get();
-					assertThat( row ).hasSize( 1 );
-					assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, i ) );
 				}
 
 				assertThat( scroll.next() ).isFalse();
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				expectScrollClose();
@@ -328,7 +311,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
@@ -339,11 +321,8 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 9 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 9 ) );
-				Object[] row = scroll.get();
-				assertThat( row ).hasSize( 1 );
-				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 9 ) );
 
 				// Scroll 0 positions: should not do anything
 				assertThat( scroll.scroll( 0 ) ).isTrue();
@@ -352,11 +331,8 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 9 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 9 ) );
-				row = scroll.get();
-				assertThat( row ).hasSize( 1 );
-				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 9 ) );
 
 				// No call to the underlying scroll.next() is expected here
 				assertThat( scroll.scroll( 50 ) ).isTrue();
@@ -365,11 +341,8 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 59 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 59 ) );
-				row = scroll.get();
-				assertThat( row ).hasSize( 1 );
-				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 59 ) );
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
 						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
@@ -383,11 +356,8 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 259 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 259 ) );
-				row = scroll.get();
-				assertThat( row ).hasSize( 1 );
-				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 259 ) );
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
 						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
@@ -418,7 +388,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				// Calling scroll(<positive number>) again after reaching the end should not do anything
@@ -427,7 +396,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				assertThat( scroll.scroll( 1 ) ).isFalse();
@@ -435,7 +403,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				expectScrollClose();
@@ -453,7 +420,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				// scroll(<negative integer>) means going backwards: it's forbidden
@@ -467,7 +433,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
@@ -478,7 +443,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 9 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 9 ) );
 
 				// scroll(<negative integer>) means going backwards: it's forbidden
@@ -492,7 +457,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 9 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 9 ) );
 
 				expectScrollClose();
@@ -510,7 +475,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
@@ -521,11 +485,8 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
-				Object[] row = scroll.get();
-				assertThat( row ).hasSize( 1 );
-				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
 
 				// No call to the underlying scroll.next() is expected here
 				assertThat( scroll.setRowNumber( 50 ) ).isTrue();
@@ -534,11 +495,8 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 50 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 50 ) );
-				row = scroll.get();
-				assertThat( row ).hasSize( 1 );
-				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 50 ) );
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
 						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
@@ -552,11 +510,8 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 220 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 220 ) );
-				row = scroll.get();
-				assertThat( row ).hasSize( 1 );
-				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 220 ) );
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
 						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
@@ -587,7 +542,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				expectScrollClose();
@@ -605,7 +559,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
@@ -616,7 +569,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
 
 				// setRowNumber(<previous row number>) means going backwards: it's forbidden
@@ -630,7 +583,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
 
 				expectScrollClose();
@@ -648,7 +601,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
@@ -659,7 +611,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
 
 				// setRowNumber(<negative integer>) means going to a position relative to the end: it's forbidden
@@ -673,7 +625,175 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
+						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
+
+				expectScrollClose();
+			}
+		} );
+	}
+
+	@Test
+	public void position() {
+		setupHolder.runInTransaction( session -> {
+			expectScrollCreate();
+			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+				backendMock.verifyExpectationsMet();
+
+				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+				assertThat( scroll.isFirst() ).isFalse();
+				assertThat( scroll.isLast() ).isFalse();
+				assertThat( scroll.get() ).isNull();
+
+				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
+				assertThat( scroll.position( 10 ) ).isTrue();
+				backendMock.verifyExpectationsMet();
+
+				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
+				assertThat( scroll.isFirst() ).isFalse();
+				assertThat( scroll.isLast() ).isFalse();
+				assertThat( scroll.get() )
+						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
+
+				// No call to the underlying scroll.next() is expected here
+				assertThat( scroll.position( 50 ) ).isTrue();
+				backendMock.verifyExpectationsMet();
+
+				assertThat( scroll.getRowNumber() ).isEqualTo( 50 );
+				assertThat( scroll.isFirst() ).isFalse();
+				assertThat( scroll.isLast() ).isFalse();
+				assertThat( scroll.get() )
+						.isEqualTo( session.getReference( IndexedEntity.class, 50 ) );
+
+				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( DEFAULT_FETCH_SIZE, 2 * DEFAULT_FETCH_SIZE ) ) );
+				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 2 * DEFAULT_FETCH_SIZE, 3 * DEFAULT_FETCH_SIZE ) ) );
+				assertThat( scroll.position( 220 ) ).isTrue();
+				backendMock.verifyExpectationsMet();
+
+				assertThat( scroll.getRowNumber() ).isEqualTo( 220 );
+				assertThat( scroll.isFirst() ).isFalse();
+				assertThat( scroll.isLast() ).isFalse();
+				assertThat( scroll.get() )
+						.isEqualTo( session.getReference( IndexedEntity.class, 220 ) );
+
+				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 3 * DEFAULT_FETCH_SIZE, 4 * DEFAULT_FETCH_SIZE ) ) );
+				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 4 * DEFAULT_FETCH_SIZE, 5 * DEFAULT_FETCH_SIZE ) ) );
+				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 5 * DEFAULT_FETCH_SIZE, 6 * DEFAULT_FETCH_SIZE ) ) );
+				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 6 * DEFAULT_FETCH_SIZE, 7 * DEFAULT_FETCH_SIZE ) ) );
+				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 7 * DEFAULT_FETCH_SIZE, 8 * DEFAULT_FETCH_SIZE ) ) );
+				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 8 * DEFAULT_FETCH_SIZE, 9 * DEFAULT_FETCH_SIZE ) ) );
+				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 9 * DEFAULT_FETCH_SIZE, 10 * DEFAULT_FETCH_SIZE ) ) );
+				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+						StubNextScrollWorkBehavior.afterLast() );
+				assertThat( scroll.position( 10000 ) ).isFalse();
+				backendMock.verifyExpectationsMet();
+
+				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+				assertThat( scroll.isFirst() ).isFalse();
+				assertThat( scroll.isLast() ).isFalse();
+				assertThat( scroll.get() ).isNull();
+
+				expectScrollClose();
+			}
+		} );
+	}
+
+	@Test
+	public void position_backwards() {
+		setupHolder.runInTransaction( session -> {
+			expectScrollCreate();
+			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+				backendMock.verifyExpectationsMet();
+
+				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+				assertThat( scroll.isFirst() ).isFalse();
+				assertThat( scroll.isLast() ).isFalse();
+				assertThat( scroll.get() ).isNull();
+
+				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
+				assertThat( scroll.position( 10 ) ).isTrue();
+				backendMock.verifyExpectationsMet();
+
+				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
+				assertThat( scroll.isFirst() ).isFalse();
+				assertThat( scroll.isLast() ).isFalse();
+				assertThat( scroll.get() )
+						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
+
+				// position(<previous row number>) means going backwards: it's forbidden
+				assertThatThrownBy( () -> scroll.position( 5 ) )
+						.isInstanceOf( SearchException.class )
+						.hasMessageContaining(
+								"Cannot scroll backwards with Hibernate Search scrolls: they are forwards-only",
+								"Ensure you always increment the scroll position, and never decrement it" );
+
+				// We're still on the same element
+				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
+				assertThat( scroll.isFirst() ).isFalse();
+				assertThat( scroll.isLast() ).isFalse();
+				assertThat( scroll.get() )
+						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
+
+				expectScrollClose();
+			}
+		} );
+	}
+
+	@Test
+	public void position_relativeToEnd() {
+		setupHolder.runInTransaction( session -> {
+			expectScrollCreate();
+			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+				backendMock.verifyExpectationsMet();
+
+				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+				assertThat( scroll.isFirst() ).isFalse();
+				assertThat( scroll.isLast() ).isFalse();
+				assertThat( scroll.get() ).isNull();
+
+				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
+				assertThat( scroll.position( 10 ) ).isTrue();
+				backendMock.verifyExpectationsMet();
+
+				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
+				assertThat( scroll.isFirst() ).isFalse();
+				assertThat( scroll.isLast() ).isFalse();
+				assertThat( scroll.get() )
+						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
+
+				// position(<negative integer>) means going to a position relative to the end: it's forbidden
+				assertThatThrownBy( () -> scroll.position( -500 ) )
+						.isInstanceOf( SearchException.class )
+						.hasMessageContaining(
+								"Cannot set the scroll position relative to the end with Hibernate Search scrolls",
+								"Ensure you always pass a positive number to position()" );
+
+				// We're still on the same element
+				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
+				assertThat( scroll.isFirst() ).isFalse();
+				assertThat( scroll.isLast() ).isFalse();
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
 
 				expectScrollClose();
@@ -691,7 +811,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				// Calling beforeFirst() when we're before the first element should not do anything
@@ -700,7 +819,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				// next() still works after a call to beforeFirst()
@@ -712,7 +830,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 0 );
 				assertThat( scroll.isFirst() ).isTrue();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 0 ) );
 
 				expectScrollClose();
@@ -730,7 +848,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
@@ -742,7 +859,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 0 );
 				assertThat( scroll.isFirst() ).isTrue();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 0 ) );
 
 				// Going before the first element would means going backwards: it's forbidden
@@ -767,7 +884,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
@@ -779,7 +895,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 0 );
 				assertThat( scroll.isFirst() ).isTrue();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 0 ) );
 
 				// Calling first() when we're on the first element should not do anything
@@ -788,7 +904,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 0 );
 				assertThat( scroll.isFirst() ).isTrue();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 0 ) );
 
 				// next() still works after a call to first()
@@ -797,7 +913,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 1 ) );
 
 				// Going to the first element would means going backwards: it's forbidden
@@ -828,7 +944,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 1 ) );
 
 				// Going to the first element would means going backwards: it's forbidden
@@ -888,7 +1004,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( ENTITY_COUNT - 1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isTrue();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, ENTITY_COUNT - 1 ) );
 
 				// Calling last() when we're on the last element should not do anything
@@ -897,7 +1013,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( ENTITY_COUNT - 1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isTrue();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, ENTITY_COUNT - 1 ) );
 
 				// next() still works after a call to last()
@@ -906,7 +1022,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				// Going to the last element would means going backwards: it's forbidden
@@ -936,7 +1051,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( 9 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) )
+				assertThat( scroll.get() )
 						.isEqualTo( session.getReference( IndexedEntity.class, 9 ) );
 
 				scroll.afterLast();
@@ -944,7 +1059,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				expectScrollClose();
@@ -996,7 +1110,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				scroll.afterLast();
@@ -1005,7 +1118,6 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
-				assertThat( scroll.get( 0 ) ).isNull();
 				assertThat( scroll.get() ).isNull();
 
 				expectScrollClose();

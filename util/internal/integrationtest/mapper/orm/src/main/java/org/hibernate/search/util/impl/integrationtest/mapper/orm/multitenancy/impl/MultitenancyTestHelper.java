@@ -8,7 +8,6 @@ package org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.i
 
 import static org.junit.Assume.assumeTrue;
 
-import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.H2Dialect;
@@ -39,7 +38,6 @@ public class MultitenancyTestHelper {
 		builder.onServiceRegistryBuilder( srb -> srb.addInitiator(
 				new MultitenancyTestHelperSchemaManagementTool.Initiator( tenantIds ) ) );
 
-		builder.setProperty( AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name() );
 		builder.setProperty( AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER,
 				new H2LazyMultiTenantConnectionProvider( tenantIds ) );
 		// any required backend-multi-tenancy property (e.g.:*.backend.multi_tenancy.strategy = discriminator)

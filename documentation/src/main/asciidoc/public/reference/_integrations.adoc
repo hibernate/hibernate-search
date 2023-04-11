@@ -17,64 +17,20 @@ Use <<other-integrations-jakarta,Jakarta EE>> instead.
 [[other-integrations-orm6]]
 == Hibernate ORM 6
 
-include::../components/_incubating-warning.adoc[]
+In previous versions, Hibernate Search's main Maven artifacts used to target Hibernate ORM 5,
+while separate, dedicated Maven artifacts targeted Hibernate ORM 6.
 
-Hibernate Search includes experimental support for link:{hibernateOrm6DocUrl}[Hibernate ORM 6],
-and it requires only one small change:
-when declaring the dependencies of your project,
-you must add `-orm6` to some artifact identifiers.
+This is no longer the case: the main Maven artifacts now target Hibernate ORM 6,
+and Hibernate ORM 5 is no longer compatible.
 
-[WARNING]
-====
-The experimental support for Hibernate ORM 6 in Hibernate Search {hibernateSearchVersion}
-targets Hibernate ORM version {hibernateOrm6Version}.
+If your dependencies include references to artifacts ending with `-orm6`
+(e.g. `hibernate-search-mapper-orm-orm6`)
+just remove the `-orm6` (e.g. use `hibernate-search-mapper-orm` instead)
+when you upgrade to this version of Hibernate Search.
 
-Newer versions of Hibernate ORM 6 may introduce breaking changes,
-in which case they will no longer be compatible with
-the experimental support for Hibernate ORM 6 in Hibernate Search {hibernateSearchVersion},
-until Hibernate Search catches up in its next release.
-====
+[[other-integrations-orm5]]
+== Hibernate ORM 5
 
+Hibernate Search no longer supports Hibernate ORM 5.
 
-For example, an application using Hibernate ORM 6 and the Elasticsearch backend
-will need to update its dependencies as follows:
-
-[source, XML, subs="+attributes"]
-----
-<dependency>
-   <groupId>org.hibernate.orm</groupId> <!--1-->
-   <artifactId>hibernate-core</artifactId>
-   <version>{hibernateOrm6Version}</version>
-</dependency>
-<dependency>
-   <groupId>org.hibernate.search</groupId>
-   <artifactId>hibernate-search-mapper-orm-orm6</artifactId> <!--2-->
-   <version>{hibernateSearchVersion}</version>
-</dependency>
-<dependency>
-   <groupId>org.hibernate.search</groupId>
-   <artifactId>hibernate-search-backend-elasticsearch</artifactId> <!--3-->
-   <version>{hibernateSearchVersion}</version>
-</dependency>
-----
-<1> Replaces `org.hibernate:hibernate-core`; notice how the groupId changed in Hibernate ORM 6.
-<2> Replaces `hibernate-search-mapper-orm`.
-<3> No replacement necessary: this artifact does not rely on Java EE or Hibernate ORM.
-
-All artifacts relying directly or indirectly on Java EE or Hibernate ORM must be replaced with their ORM 6 counterpart.
-This includes in particular:
-
-* https://in.relation.to/2018/12/06/hibernate-orm-600-alpha1-out/#artifacts[Hibernate ORM artifacts]
-* `hibernate-search-mapper-orm` => `hibernate-search-mapper-orm-orm6`
-* `hibernate-search-mapper-orm-batch-jsr352-core` => `hibernate-search-mapper-orm-batch-jsr352-core-orm6`
-* ...
-
-Artifacts that do not rely on Java EE or Hibernate ORM at all, on the other hand,
-do not have an ORM 6 counterpart and must not be replaced.
-These artifacts should be excluded from your replacements in particular:
-
-* `hibernate-search-engine`
-* `hibernate-search-backend-lucene`
-* `hibernate-search-backend-elasticsearch`
-* `hibernate-search-backend-elasticsearch-aws`
-* ...
+Use <<other-integrations-jakarta,Hibernate ORM 6>> instead.

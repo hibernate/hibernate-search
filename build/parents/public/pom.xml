@@ -72,7 +72,7 @@
                           -->
                         <offlineLinks>
                             <offlineLink>
-                                <url>${javadoc.org.hibernate.url}</url>
+                                <url>${javadoc.org.hibernate.orm.url}</url>
                                 <location>${javadoc.packagelists.directory}/hibernate-core</location>
                             </offlineLink>
                             <offlineLink>
