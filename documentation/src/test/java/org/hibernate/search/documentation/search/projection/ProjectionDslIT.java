@@ -821,6 +821,63 @@ public class ProjectionDslIT {
 		} );
 	}
 
+	@Test
+	public void highlight() {
+		withinSearchSession( searchSession -> {
+			// tag::highlight[]
+			List<List<String>> hits = searchSession.search( Book.class )
+					.select( f -> f.highlight( "title" ) )
+					.where( f -> f.match().field( "title" ).matching( "detective" ) )
+					.fetchHits( 20 );
+			// end::highlight[]
+			assertThat( hits ).containsExactlyInAnyOrder(
+					Collections.singletonList( "The Automatic <em>Detective</em>" )
+			);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::highlight-multiValued[]
+			List<List<String>> hits = searchSession.search( Book.class )
+					.select( f -> f.highlight( "flattenedAuthors.lastName" ) )
+					.where( f -> f.match().field( "flattenedAuthors.lastName" ).matching( "martinez" ) )
+					.fetchHits( 20 );
+			// end::highlight-multiValued[]
+			assertThat( hits ).containsExactlyInAnyOrder(
+					Collections.singletonList( "<em>Martinez</em>" )
+			);
+		} );
+		withinSearchSession( searchSession -> {
+			// tag::highlighter-default[]
+			List<List<String>> hits = searchSession.search( Book.class )
+					.select( f -> f.highlight( "title" ) ) // <1>
+					.where( f -> f.match().field( "title" ).matching( "detective" ) )
+					.highlighter( f -> f.unified().tag( "<b>", "</b>" ) ) // <2>
+					.fetchHits( 20 );
+			// end::highlighter-default[]
+			assertThat( hits ).containsExactlyInAnyOrder(
+					Collections.singletonList( "The Automatic <b>Detective</b>" )
+			);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::highlighter-named[]
+			List<List<?>> hits = searchSession.search( Book.class )
+					.select( f -> f.composite().from(
+							f.highlight( "title" ),
+							f.highlight( "description" ).highlighter( "description-highlighter" ) // <1>
+					).asList() )
+					.where( f -> f.match().field( "title" ).matching( "detective" ) )
+					.highlighter( f -> f.unified().tag( "<b>", "</b>" ) ) // <2>
+					.highlighter( "description-highlighter", f -> f.unified().tag( "<span>", "</span>" ) ) // <3>
+					.fetchHits( 20 );
+			// end::highlighter-named[]
+			Session session = searchSession.toOrmSession();
+			assertThat( hits ).containsExactlyInAnyOrder(
+					Arrays.asList( Collections.singletonList( "The Automatic <b>Detective</b>" ), Collections.emptyList() )
+			);
+		} );
+	}
+
 	private void withinSearchSession(Consumer<SearchSession> action) {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
@@ -850,8 +907,7 @@ public class ProjectionDslIT {
 			book1.setDescription( "A robot becomes self-aware." );
 			book1.setPageCount( 250 );
 			book1.setGenre( Genre.SCIENCE_FICTION );
-			book1.getAuthors().add( isaacAsimov );
-			isaacAsimov.getBooks().add( book1 );
+			book1.addAuthor( isaacAsimov );
 
 			Book book2 = new Book();
 			book2.setId( BOOK2_ID );
@@ -859,8 +915,7 @@ public class ProjectionDslIT {
 			book2.setDescription( "A robot helps investigate a murder on an extrasolar colony." );
 			book2.setPageCount( 206 );
 			book2.setGenre( Genre.SCIENCE_FICTION );
-			book2.getAuthors().add( isaacAsimov );
-			isaacAsimov.getBooks().add( book2 );
+			book2.addAuthor( isaacAsimov );
 
 			Book book3 = new Book();
 			book3.setId( BOOK3_ID );
@@ -868,8 +923,7 @@ public class ProjectionDslIT {
 			book3.setDescription( "A crime story about the first \"roboticide\"." );
 			book3.setPageCount( 435 );
 			book3.setGenre( Genre.SCIENCE_FICTION );
-			book3.getAuthors().add( isaacAsimov );
-			isaacAsimov.getBooks().add( book3 );
+			book3.addAuthor( isaacAsimov );
 
 			Book book4 = new Book();
 			book4.setId( BOOK4_ID );
@@ -877,8 +931,7 @@ public class ProjectionDslIT {
 			book4.setDescription( "A robot cab driver turns PI after the disappearance of a neighboring family." );
 			book4.setPageCount( 222 );
 			book4.setGenre( Genre.CRIME_FICTION );
-			book4.getAuthors().add( aLeeMartinez );
-			aLeeMartinez.getBooks().add( book3 );
+			book4.addAuthor( aLeeMartinez );
 			entityManager.persist( isaacAsimov );
 			entityManager.persist( aLeeMartinez );
 

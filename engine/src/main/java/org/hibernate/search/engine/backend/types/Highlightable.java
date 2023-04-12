@@ -11,7 +11,7 @@ package org.hibernate.search.engine.backend.types;
  */
 public enum Highlightable {
 	/**
-	 * Use the backend-specific default.
+	 * Use the backend-specific default that is dependent on an overall field configuration.
 	 * <ul>
 	 *     <li>
 	 *         Lucene's default value is dependent on the {@link Projectable projectable value} configured for the field.
@@ -19,6 +19,11 @@ public enum Highlightable {
 	 *         {@link Projectable#NO Otherwise} it defaults to {@code NO}.
 	 *     </li>
 	 *     <li>Elasticsearch's default value is {@code [PLAIN, UNIFIED]} </li>
+	 *     <li>
+	 *         Additionally, if the {@link TermVector term vector storing strategy} is set to {@link TermVector#WITH_POSITIONS_OFFSETS}
+	 *         or {@link TermVector#WITH_POSITIONS_OFFSETS_PAYLOADS} both backends, would support the {@code FAST_VECTOR}
+	 *         highlighter, if they already support the other two ({@code [PLAIN, UNIFIED]}).
+	 *     </li>
 	 * </ul>
 	 */
 	DEFAULT,
