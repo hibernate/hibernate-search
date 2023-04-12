@@ -71,7 +71,7 @@ match fields regardless of case,
 match fields ignoring diacritics,
 ...
 +
-Full-text fields also allow <<add-link-later,highlighting>>.
+Full-text fields also allow <<mapping-directfieldmapping-highlightable,highlighting>>.
 +
 Full-text fields should be assigned an <<mapping-directfieldmapping-analyzer,analyzer>>, referenced by its name.
 By default, the analyzer named `default` will be used.
@@ -248,7 +248,7 @@ Disabling norms will reduce the disk space used by the index.
 +
 Value: `Norms.YES`, `Norms.NO`, `Norms.DEFAULT`.
 
-`termVector`::
+[[mapping-directfieldmapping-term-vector]]`termVector`::
 The term vector storing strategy.
 Only available on `@FullTextField`.
 +
@@ -271,6 +271,12 @@ The different values of this attribute are:
 |`TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS`|Store the term vector, token position, offset information and token payloads.
 	This is the same as `TermVector.WITH_POSITION_OFFSETS` plus it contains the payload of each occurrence of a term in a document.
 |===============
++
+Note that <<mapping-directfieldmapping-highlightable,highlighter types requested>> by the full-text field might affect the finally resolved term vector storing strategy.
+Since the fast vector highlighter type has <<mapping-directfieldmapping-highlightable-fast-vector,specific requirements>> regarding the term vector storing strategy,
+if it is requested explicitly or implicitly through the usage of `Highlightable.ANY`,
+it will set the strategy to `TermVector.WITH_POSITIONS_OFFSETS` unless a strategy was already specified.
+An exception will be thrown if a non-default strategy that is not compatible with the fast vector highlighter is used.
 
 [[mapping-directfieldmapping-decimalscale]] [[mapper-orm-directfieldmapping-decimalscale]] `decimalScale`::
 How the scale of a large number (`BigInteger` or `BigDecimal`) should be adjusted before it is indexed as a fixed-precision integer.
@@ -301,6 +307,7 @@ using the Hibernate ORM metadata. The value could be overridden explicitly using
 [[mapping-directfieldmapping-highlightable]] `highlightable`::
 Whether the field can be <<search-dsl-highlighting, highlighted>> and if so which highlighter types can be applied to it.
 I.e. whether the field value is indexed/stored in a specific format to allow highlighting later when querying.
+Only available on `@FullTextField`.
 +
 While for most cases picking one highlighter type should be enough, this attribute can accept multiple, non contradicting values.
 Please refer to <<search-dsl-highlighting-highlighter-type,highlighter types section>> to see which highlighter to select.
@@ -310,18 +317,25 @@ Available values are:
 |===============
 |Value|Definition
 |`Highlightable.NO`| Do not allow highlighting on the field.
+[[mapping-directfieldmapping-highlightable-any]]
 |`Highlightable.ANY`| Allow any highlighter type be applied for highlighting the field.
 |`Highlightable.PLAIN`| Allow the plain highlighter type be applied for highlighting the field.
 |`Highlightable.UNIFIED`| Allow the unified highlighter type be applied for highlighting the field.
+[[mapping-directfieldmapping-highlightable-fast-vector]]
 |`Highlightable.FAST_VECTOR`| Allow the fast vector highlighter type be applied for highlighting the field.
-|`Highlightable.DEFAULT`| Use the backend-specific default. <<backend-lucene,Lucene's>> default value is `Highlightable.NO`,
-<<backend-elasticsearch,Elasticsearch's>> default value is `[Highlightable.PLAIN, Highlightable.UNIFIED]`
+This highlighter type requires a <<mapping-directfieldmapping-term-vector,term vector storage strategy>> to be set to `WITH_POSITIONS_OFFSETS`
+or `WITH_POSITIONS_OFFSETS_PAYLOADS`.
+[[mapping-directfieldmapping-highlightable-default]]
+|`Highlightable.DEFAULT`| Use the backend-specific default that is dependent on an overall field configuration.
+<<backend-elasticsearch,Elasticsearch's>> default value is `[Highlightable.PLAIN, Highlightable.UNIFIED]`.
+<<backend-lucene,Lucene's>> default value is dependent on the <<mapping-directfieldmapping-projectable,projectable value>> configured for the field.
+If the field is projectable then `[PLAIN, UNIFIED]` highlighters are supported.
+Otherwise, highlighting is not supported (`Highlightable.NO`).
+Additionally, if the <<mapping-directfieldmapping-term-vector,term vector storing strategy>> is set to `WITH_POSITIONS_OFFSETS`
+or `WITH_POSITIONS_OFFSETS_PAYLOADS`, both backends would support the `FAST_VECTOR`
+highlighter, if they already support the other two (`[PLAIN, UNIFIED]`).
 |===============
-+
-[IMPORTANT]
-====
-This option is *only* available for `@FullTextField`.
-====
+
 [[mapping-directfieldmapping-supported-types]]
 == [[mapper-orm-directfieldmapping-supported-types]] [[section-built-in-bridges]] Supported property types
 

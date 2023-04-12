@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
@@ -44,6 +45,11 @@ public class Book {
 	@ManyToMany
 	@IndexedEmbedded(structure = ObjectStructure.NESTED)
 	private List<Author> authors = new ArrayList<>();
+
+	@ManyToMany
+	@JoinTable(name = "BOOK_AUTHOR_FLATTENED")
+	@IndexedEmbedded(structure = ObjectStructure.FLATTENED)
+	private List<Author> flattenedAuthors = new ArrayList<>();
 
 	public Book() {
 	}
@@ -94,5 +100,21 @@ public class Book {
 
 	public void setAuthors(List<Author> authors) {
 		this.authors = authors;
+	}
+
+	public List<Author> getFlattenedAuthors() {
+		return flattenedAuthors;
+	}
+
+	public void setFlattenedAuthors(List<Author> flattenedAuthors) {
+		this.flattenedAuthors = flattenedAuthors;
+	}
+
+	public void addAuthor(Author author) {
+		authors.add( author );
+		flattenedAuthors.add( author );
+
+		author.getBooks().add( this );
+		author.getFlattenedBooks().add( this );
 	}
 }

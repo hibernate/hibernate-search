@@ -42,6 +42,9 @@ public class Author {
 	@ManyToMany(mappedBy = "authors")
 	private List<Book> books = new ArrayList<>();
 
+	@ManyToMany(mappedBy = "flattenedAuthors")
+	private List<Book> flattenedBooks = new ArrayList<>();
+
 	public Author() {
 	}
 
@@ -91,5 +94,13 @@ public class Author {
 
 	public void setBooks(List<Book> books) {
 		this.books = books;
+	}
+
+	public List<Book> getFlattenedBooks() {
+		return flattenedBooks;
+	}
+
+	public void setFlattenedBooks(List<Book> flattenedBooks) {
+		this.flattenedBooks = flattenedBooks;
 	}
 }

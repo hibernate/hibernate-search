@@ -740,6 +740,88 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
+[[search-dsl-projection-highlight]]
+== `highlight`: return highlighted field values from matched documents
+
+The `highlight` projection returns fragments from full-text fields of matched documents that caused a query match.
+
+[IMPORTANT]
+====
+In order to use highlight projections of a given field,
+you need to provide the list of <<mapping-directfieldmapping-highlightable,highlighters supported by the field>> in the mapping.
+
+The <<mapping-directfieldmapping-highlightable,highlightable>> default may already enable the support of highlighting
+in some cases. For more details see <<mapping-directfieldmapping-highlightable-default, how the `DEFAULT` highlightable value behaves>>.
+====
+
+
+[[search-dsl-projection-highlight-syntax]]
+=== Syntax
+
+The `highlight` projection always returns a list of string values per highlighted field, no matter if the field is
+a single or a multivalued one:
+
+.Returning highlights for matched documents
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlight]
+----
+====
+
+[[search-dsl-projection-highlight-multivalued]]
+=== Multivalued fields
+
+Each value of a multivalued field is being highlighted. See <<search-dsl-highlighting-highlighter-options, how highlighter can be configured>>
+to adjust the returned results' behaviour and structure.
+
+[IMPORTANT]
+====
+At the moment, highlighting a field within a <<mapping-indexedembedded-structure-nested,nested object>> is https://hibernate.atlassian.net/browse/HSEARCH-4841[not supported] and attempting to do so will lead to an exception.
+Highlighting a field within a <<mapping-indexedembedded-structure-flattened,flattened object>> will work correctly.
+
+Placing a highlight projection inside an <<search-dsl-projection-object,object projection>> is not supported.
+====
+
+.Returning highlights for flattened objects from matched documents
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlight-multiValued]
+----
+====
+
+[[search-dsl-projection-highlight-options]]
+=== Highlighting options
+
+A highlighter can be fine-tuned through its options to change the highlighted output.
+
+.Configuring the default highlighter
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlighter-default]
+----
+<1> Building the highlight query as usual.
+<2> Configure the default highlighter. Change the highlighting tag option.
+====
+
+Additionally, if multiple fields are highlighted, and they need different highlighter options then a named highlighter
+can be used to override the default one.
+
+.Configuring default and named highlighters
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlighter-named]
+----
+<1> Specifying the name of a named highlighter to be applied to the `description` field highlight projection.
+<2> Configure the default highlighter.
+<3> Configure the named highlighter.
+====
+
+See <<search-dsl-highlighting>> for more information on highlighter configuration.
+
 [[search-dsl-projection-extensions]]
 == Backend-specific extensions
 
