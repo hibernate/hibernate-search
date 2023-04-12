@@ -17,6 +17,10 @@ junit.framework.**
 java.beans.**
 
 ################################################################################################################
+# Nobody should be using java.lang.StringBuffer anymore
+java.lang.StringBuffer @ Do not use java.lang.StringBuffer: use java.lang.StringBuilder
+
+################################################################################################################
 # These APIs have side effects beyond Hibernate Search
 @defaultMessage Do not set properties in main code; for tests, use org.hibernate.search.util.impl.test.SystemHelper.setSystemProperty
 java.lang.System.setProperty
@@ -48,3 +52,23 @@ org.hibernate.Session.save(java.lang.String, java.lang.Object) @ Use persist() i
 org.hibernate.Session.load(java.lang.Class<T>, java.lang.Object) @ Use getReference() instead
 org.hibernate.Session.delete(java.lang.Object) @ Use remove() instead
 org.hibernate.Session.delete(java.lang.String, java.lang.Object) @ Use remove() instead
+
+################################################################################################################
+# Nobody should be using the deprecated annotations for JBoss Logger: migrate to org.jboss.logging.annotations.*
+org.jboss.logging.Cause @ Migrate to org.jboss.logging.annotations.*
+org.jboss.logging.LogMessage @ Migrate to org.jboss.logging.annotations.*
+org.jboss.logging.Message @ Migrate to org.jboss.logging.annotations.*
+org.jboss.logging.MessageLogger @ Migrate to org.jboss.logging.annotations.*
+
+################################################################################################################
+# Nobody should be using the AssertionFailure from commons-annotations.
+org.hibernate.annotations.common.AssertionFailure @ AssertionFailure from commons-annotations is not allowed.
+
+################################################################################################################
+# Nobody should be using the Util class from JGroups for assertions which should use JUnit.
+org.jgroups.util.Util @ Use AssertJ or non-deprecated JUnit assertions instead
+junit.framework.Assert @ Use AssertJ or non-deprecated JUnit assertions instead
+
+################################################################################################################
+# Nobody should be using the StringHelper from commons-annotations: use org.hibernate.search.util.StringHelper.
+org.hibernate.annotations.common.util.StringHelper @ Use org.hibernate.search.util.StringHelper instead.

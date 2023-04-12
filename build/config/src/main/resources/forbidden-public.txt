@@ -106,3 +106,23 @@ java.util.concurrent.CompletableFuture#join()
 @defaultMessage CompletableFuture#runAsync(...) returns a CompletableFuture whose cancel() method will never actually cancel the task. Use Futures.runAsync(...) instead.
 java.util.concurrent.CompletableFuture#runAsync(java.lang.Runnable)
 java.util.concurrent.CompletableFuture#runAsync(java.lang.Runnable, java.util.concurrent.Executor)
+
+################################################################################################################
+# Nobody should be using the deprecated annotations for JBoss Logger: migrate to org.jboss.logging.annotations.*
+org.jboss.logging.Cause @ Migrate to org.jboss.logging.annotations.*
+org.jboss.logging.LogMessage @ Migrate to org.jboss.logging.annotations.*
+org.jboss.logging.Message @ Migrate to org.jboss.logging.annotations.*
+org.jboss.logging.MessageLogger @ Migrate to org.jboss.logging.annotations.*
+
+################################################################################################################
+# Nobody should be using the AssertionFailure from commons-annotations.
+org.hibernate.annotations.common.AssertionFailure @ AssertionFailure from commons-annotations is not allowed.
+
+################################################################################################################
+# Nobody should be using the Util class from JGroups for assertions which should use JUnit.
+org.jgroups.util.Util @ Use AssertJ or non-deprecated JUnit assertions instead
+junit.framework.Assert @ Use AssertJ or non-deprecated JUnit assertions instead
+
+################################################################################################################
+# Nobody should be using the StringHelper from commons-annotations: use org.hibernate.search.util.StringHelper.
+org.hibernate.annotations.common.util.StringHelper @ Use org.hibernate.search.util.StringHelper instead.
