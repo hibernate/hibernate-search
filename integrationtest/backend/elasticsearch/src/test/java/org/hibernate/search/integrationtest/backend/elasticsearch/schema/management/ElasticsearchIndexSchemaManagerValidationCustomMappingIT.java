@@ -75,7 +75,8 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 				"   }, " +
 				"   '_source': { " +
 				"     'enabled': false " +
-				"   } " +
+				"   }, " +
+				"   'dynamic':'strict' " +
 				" } "
 		);
 
@@ -105,7 +106,8 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 				"   }, " +
 				"   '_source': { " +
 				"     'enabled': true " +
-				"   } " +
+				"   }, " +
+				"   'dynamic':'strict' " +
 				" } "
 		);
 
@@ -137,7 +139,8 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 				"       'dynamic':'true', " +
 				"       'type':'object' " +
 				"     } " +
-				"   } " +
+				"   }, " +
+				"   'dynamic':'strict' " +
 				" } "
 		);
 
@@ -170,7 +173,8 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 				"   }, " +
 				"   '_source': { " +
 				"     'enabled': false " +
-				"   } " +
+				"   }, " +
+				"   'dynamic':'strict' " +
 				" } "
 		);
 
@@ -205,7 +209,8 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 				"   }, " +
 				"   '_source': { " +
 				"     'enabled': false " +
-				"   } " +
+				"   }, " +
+				"   'dynamic':'strict' " +
 				" } "
 		);
 

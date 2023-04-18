@@ -1,0 +1,40 @@
+{
+  "dynamic_templates": [
+    {
+      "myTemplate1": {
+        "path_match": "*_obj",
+        "match_mapping_type": "object",
+        "mapping": {
+          "dynamic": "true",
+          "type": "nested"
+        }
+      }
+    },
+    {
+      "myTemplate2": {
+        "path_match": "*_kw",
+        "mapping": {
+          "doc_values": false,
+          "index": true,
+          "norms": false,
+          "type": "keyword"
+        }
+      }
+    }
+  ],
+  "properties": {
+    "userField": {
+      "type": "keyword",
+      "index": true,
+      "norms": true,
+      "doc_values": true
+    },
+    "userObject": {
+      "dynamic": "true",
+      "type": "object"
+    }
+  },
+  "_source": {
+    "enabled": false
+  }
+}

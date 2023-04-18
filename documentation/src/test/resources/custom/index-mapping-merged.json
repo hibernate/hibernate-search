@@ -2,6 +2,7 @@
   "_source":{
     "enabled":false
   },
+  "dynamic":"strict",
   "properties":{
     "_entity_type":{ // <1>
       "type":"keyword",
