@@ -52,6 +52,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomMappingIT {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
+				"    'dynamic':'strict', " +
 				"    '_source':{ " +
 				"       'enabled':false " +
 				"    }, " +
@@ -105,6 +106,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomMappingIT {
 		setupAndUpdateIndex( "no-overlapping.json" );
 		assertJsonEquals(
 				" { " +
+				"    'dynamic':'strict', " +
 				"    '_source':{ " +
 				"       'enabled':false " +
 				"    }, " +
