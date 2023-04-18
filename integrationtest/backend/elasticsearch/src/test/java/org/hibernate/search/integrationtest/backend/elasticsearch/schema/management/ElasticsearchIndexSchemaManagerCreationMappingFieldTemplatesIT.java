@@ -11,6 +11,7 @@ import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.util.EnumSet;
+import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
@@ -146,8 +147,205 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 		);
 	}
 
+	@Test
+	public void rootFieldTemplatesWithFileOverride() {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.objectFieldTemplate( "myTemplate1", ObjectStructure.NESTED )
+					.matchingPathGlob( "*_obj" );
+			root.fieldTemplate( "myTemplate2", f -> f.asString() )
+					.matchingPathGlob( "*_kw" );
+		} );
+
+		elasticSearchClient.index( index.name() )
+				.ensureDoesNotExist().registerForCleanup();
+
+		setupAndCreateIndex( index, Optional.of( "no-overlapping.json" ) );
+
+		assertJsonEquals(
+				"{" +
+						"  'dynamic': 'true'," +
+						"  '_source': {" +
+						"    'enabled': false" +
+						"  }," +
+						"  'dynamic_templates': [" +
+						"    {" +
+						"      'myTemplate1': {" +
+						"        'path_match': '*_obj'," +
+						"        'match_mapping_type': 'object'," +
+						"        'mapping': {" +
+						"          'dynamic': 'true'," +
+						"          'type': 'nested'" +
+						"        }" +
+						"      }" +
+						"    }," +
+						"    {" +
+						"      'myTemplate2': {" +
+						"        'path_match': '*_kw'," +
+						"        'mapping': {" +
+						"          'doc_values': false," +
+						"          'index': true," +
+						"          'norms': false," +
+						"          'type': 'keyword'" +
+						"        }" +
+						"      }" +
+						"    }" +
+						"  ]," +
+						"  'properties': {" +
+						"    '_entity_type': {" +
+						"      'type': 'keyword'," +
+						"      'index': false" +
+						"    }," +
+						"    'userField': {" +
+						"      'type': 'keyword'," +
+						"      'norms': true" +
+						"    }," +
+						"    'userObject': {" +
+						"      'type': 'object'," +
+						"      'dynamic': 'true'" +
+						"    }" +
+						"  }" +
+						"}",
+				elasticSearchClient.index( index.name() ).type().getMapping()
+		);
+	}
+
+	@Test
+	public void rootFieldTemplatesInTheFileNoOverride() {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			// these templates should get ignored since a mapping file already contains some dynamic templates in it
+			root.objectFieldTemplate( "myTemplate3", ObjectStructure.NESTED )
+					.matchingPathGlob( "*_obj" );
+			root.fieldTemplate( "myTemplate4", f -> f.asString() )
+					.matchingPathGlob( "*_kw" );
+		} );
+
+		elasticSearchClient.index( index.name() )
+				.ensureDoesNotExist().registerForCleanup();
+
+		setupAndCreateIndex( index, Optional.of( "no-overlapping-with-templates.json" ) );
+
+		assertJsonEquals(
+				"{" +
+						"  'dynamic': 'true'," +
+						"  '_source': {" +
+						"    'enabled': false" +
+						"  }," +
+						"  'dynamic_templates': [" +
+						"    {" +
+						"      'myTemplate1': {" +
+						"        'path_match': '*_obj'," +
+						"        'match_mapping_type': 'object'," +
+						"        'mapping': {" +
+						"          'dynamic': 'true'," +
+						"          'type': 'nested'" +
+						"        }" +
+						"      }" +
+						"    }," +
+						"    {" +
+						"      'myTemplate2': {" +
+						"        'path_match': '*_kw'," +
+						"        'mapping': {" +
+						"          'doc_values': false," +
+						"          'index': true," +
+						"          'norms': false," +
+						"          'type': 'keyword'" +
+						"        }" +
+						"      }" +
+						"    }" +
+						"  ]," +
+						"  'properties': {" +
+						"    '_entity_type': {" +
+						"      'type': 'keyword'," +
+						"      'index': false" +
+						"    }," +
+						"    'userField': {" +
+						"      'type': 'keyword'," +
+						"      'norms': true" +
+						"    }," +
+						"    'userObject': {" +
+						"      'type': 'object'," +
+						"      'dynamic': 'true'" +
+						"    }" +
+						"  }" +
+						"}",
+				elasticSearchClient.index( index.name() ).type().getMapping()
+		);
+	}
+
+	@Test
+	public void nonRootFieldTemplatesWithFileOverride() {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			IndexSchemaObjectField objectField = root.objectField( "staticObject" );
+			objectField.toReference();
+			objectField.objectFieldTemplate( "myTemplate1", ObjectStructure.NESTED )
+					.matchingPathGlob( "*_obj" );
+			objectField.fieldTemplate( "myTemplate2", f -> f.asString() )
+					.matchingPathGlob( "*_kw" );
+		} );
+
+		elasticSearchClient.index( index.name() )
+				.ensureDoesNotExist().registerForCleanup();
+
+		setupAndCreateIndex( index, Optional.of( "no-overlapping.json" ) );
+
+		assertJsonEquals(
+				"{" +
+						"  'dynamic': 'strict'," +
+						"  '_source': {" +
+						"    'enabled': false" +
+						"  }," +
+						"  'dynamic_templates': [" +
+						"    {" +
+						"      'staticObject.myTemplate1': {" +
+						"        'path_match': 'staticObject.*_obj'," +
+						"        'match_mapping_type': 'object'," +
+						"        'mapping': {" +
+						"          'dynamic': 'true'," +
+						"          'type': 'nested'" +
+						"        }" +
+						"      }" +
+						"    }," +
+						"    {" +
+						"      'staticObject.myTemplate2': {" +
+						"        'path_match': 'staticObject.*_kw'," +
+						"        'mapping': {" +
+						"          'doc_values': false," +
+						"          'index': true," +
+						"          'norms': false," +
+						"          'type': 'keyword'" +
+						"        }" +
+						"      }" +
+						"    }" +
+						"  ]," +
+						"  'properties': {" +
+						"    '_entity_type': {" +
+						"      'type': 'keyword'," +
+						"      'index': false" +
+						"    }," +
+						"    'staticObject': {" +
+						"      'type': 'object'," +
+						"      'dynamic': 'true'" +
+						"    }," +
+						"    'userField': {" +
+						"      'type': 'keyword'," +
+						"      'norms': true" +
+						"    }," +
+						"    'userObject': {" +
+						"      'type': 'object'," +
+						"      'dynamic': 'true'" +
+						"    }" +
+						"  }" +
+						"}",
+				elasticSearchClient.index( index.name() ).type().getMapping()
+		);
+	}
+
 	private void setupAndCreateIndex(StubMappedIndex index) {
-		setupHelper.start()
+		setupAndCreateIndex( index, Optional.empty() );
+	}
+
+	private void setupAndCreateIndex(StubMappedIndex index, Optional<String> mappingFile) {
+		SearchSetupHelper.SetupContext setupContext = setupHelper.start()
 				.withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(
@@ -156,8 +354,14 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {
 							// No-op
 						}
-				)
-				.setup();
+				);
+		mappingFile.ifPresent( file -> setupContext.withIndexProperty(
+				index.name(),
+				ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MAPPING_FILE,
+				"custom-index-mapping/" + file
+		) );
+
+		setupContext.setup();
 
 		operation.apply( index.schemaManager() ).join();
 	}

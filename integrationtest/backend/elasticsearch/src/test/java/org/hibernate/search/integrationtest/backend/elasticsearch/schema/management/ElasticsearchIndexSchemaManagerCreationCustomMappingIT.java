@@ -58,6 +58,7 @@ public class ElasticsearchIndexSchemaManagerCreationCustomMappingIT {
 		setupAndCreateIndex( "no-overlapping.json" );
 		assertJsonEquals(
 				" { " +
+				"    'dynamic':'strict', " +
 				"    '_source':{ " +
 				"       'enabled':false " +
 				"    }, " +
