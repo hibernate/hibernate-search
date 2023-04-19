@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import org.hibernate.search.backend.lucene.reporting.impl.LuceneSearchHints;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.IdentifierValues;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
+import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 
 public class LuceneIdProjection<I> extends AbstractLuceneProjection<I>
 		implements LuceneSearchProjection.Extractor<String, I> {
@@ -29,6 +31,10 @@ public class LuceneIdProjection<I> extends AbstractLuceneProjection<I>
 
 	@Override
 	public Extractor<?, I> request(ProjectionRequestContext context) {
+		context.checkNotNested(
+				ProjectionTypeKeys.ID,
+				LuceneSearchHints.INSTANCE.idProjectionNestingNotSupportedHint()
+		);
 		return this;
 	}
 

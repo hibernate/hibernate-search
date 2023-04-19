@@ -1102,6 +1102,54 @@ public class ElasticsearchExtensionIT {
 				);
 	}
 
+	@Test
+	public void jsonHitProjectionInsideNested() {
+		assertThatThrownBy( () -> mainIndex.createScope().query()
+				.select( f -> f.object( "nestedObject" ).from(
+								f.extension( ElasticsearchExtension.get() ).jsonHit()
+						).asList().multi()
+				)
+				.where( f -> f.matchAll() )
+				.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"'projection:json-hit' cannot be nested in an object projection",
+						"A JSON hit projection represents a root hit object and adding it as a part of the nested object projection might produce misleading results."
+				);
+	}
+
+	@Test
+	public void sourceProjectionInsideNested() {
+		assertThatThrownBy( () -> mainIndex.createScope().query()
+				.select( f -> f.object( "nestedObject" ).from(
+								f.extension( ElasticsearchExtension.get() ).source()
+						).asList().multi()
+				)
+				.where( f -> f.matchAll() )
+				.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"'projection:source' cannot be nested in an object projection",
+						"A source projection represents a root source object and adding it as a part of the nested object projection might produce misleading results."
+				);
+	}
+
+	@Test
+	public void explanationProjectionInsideNested() {
+		assertThatThrownBy( () -> mainIndex.createScope().query()
+				.select( f -> f.object( "nestedObject" ).from(
+								f.extension( ElasticsearchExtension.get() ).explanation()
+						).asList().multi()
+				)
+				.where( f -> f.matchAll() )
+				.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"'projection:explanation' cannot be nested in an object projection",
+						"An explanation projection describes the score computation for the hit and adding it as a part of the nested object projection might produce misleading results."
+				);
+	}
+
 	private void initData() {
 		mainIndex.bulkIndexer()
 				.add( SECOND_ID, document -> {

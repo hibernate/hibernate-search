@@ -11,6 +11,8 @@ import java.util.Arrays;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class FieldProjectionRequestContext implements ProjectionRequestContext {
@@ -42,6 +44,17 @@ public class FieldProjectionRequestContext implements ProjectionRequestContext {
 	public void checkValidField(String absoluteFieldPath) {
 		if ( !FieldPaths.isStrictPrefix( absoluteCurrentFieldPath, absoluteFieldPath ) ) {
 			throw log.invalidContextForProjectionOnField( absoluteFieldPath, absoluteCurrentFieldPath );
+		}
+	}
+
+	@Override
+	public void checkNotNested(SearchQueryElementTypeKey<?> projectionKey, String hint) {
+		if ( absoluteCurrentFieldPath() != null ) {
+			throw log.cannotUseProjectionInNestedContext(
+					projectionKey.toString(),
+					hint,
+					EventContexts.fromIndexFieldAbsolutePath( absoluteCurrentFieldPath() )
+			);
 		}
 	}
 

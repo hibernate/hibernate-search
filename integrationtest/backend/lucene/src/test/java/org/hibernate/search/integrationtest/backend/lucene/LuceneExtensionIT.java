@@ -874,6 +874,38 @@ public class LuceneExtensionIT {
 		}
 	}
 
+	@Test
+	public void documentProjectionInsideNested() {
+		assertThatThrownBy( () -> mainIndex.createScope().query()
+				.select( f -> f.object( "nestedObject" ).from(
+								f.extension( LuceneExtension.get() ).document()
+						).asList().multi()
+				)
+				.where( f -> f.matchAll() )
+				.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"'projection:document' cannot be nested in an object projection",
+						"A document projection represents a root document and adding it as a part of the nested object projection might produce misleading results."
+				);
+	}
+
+	@Test
+	public void explanationProjectionInsideNested() {
+		assertThatThrownBy( () -> mainIndex.createScope().query()
+				.select( f -> f.object( "nestedObject" ).from(
+								f.extension( LuceneExtension.get() ).explanation()
+						).asList().multi()
+				)
+				.where( f -> f.matchAll() )
+				.toQuery()
+		).isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"'projection:explanation' cannot be nested in an object projection",
+						"An explanation projection describes the score computation for the hit and adding it as a part of the nested object projection might produce misleading results."
+				);
+	}
+
 	private void initData() {
 		indexDataSet( mainIndex );
 

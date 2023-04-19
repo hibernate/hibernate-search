@@ -67,6 +67,11 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	}
 
 	@Override
+	public <T> SearchProjection<T> entityComposite(SearchProjection<T> delegate) {
+		return new LuceneEntityCompositeProjection<>( scope, LuceneSearchProjection.from( scope, delegate ) );
+	}
+
+	@Override
 	public <T> SearchProjection<T> throwing(Supplier<SearchException> exceptionSupplier) {
 		return new LuceneThrowingProjection<>( scope, exceptionSupplier );
 	}

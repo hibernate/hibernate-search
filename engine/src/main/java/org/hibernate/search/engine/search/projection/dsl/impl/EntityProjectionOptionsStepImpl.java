@@ -68,7 +68,7 @@ public final class EntityProjectionOptionsStepImpl<E>
 		else {
 			Class<?> javaClass = mappedTypeContext.javaClass();
 			if ( scope.projectionRegistry().compositeOptional( javaClass ).isPresent() ) {
-				return scope.projectionBuilders().rootContext(
+				return scope.projectionBuilders().entityComposite(
 						(SearchProjection<E>) projectionFactory.composite().as( javaClass ).toProjection()
 				);
 			}

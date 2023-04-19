@@ -22,5 +22,9 @@ public final class ProjectionTypeKeys {
 	public static final SearchQueryElementTypeKey<DistanceToFieldProjectionBuilder> DISTANCE = key( "distance" );
 	public static final SearchQueryElementTypeKey<CompositeProjectionBuilder> OBJECT = key( "object" );
 	public static final SearchQueryElementTypeKey<HighlightProjectionBuilder> HIGHLIGHT = key( "highlight" );
-
+	public static final SearchQueryElementTypeKey<?> ID = key( "id" );
+	public static final SearchQueryElementTypeKey<?> DOCUMENT_REFERENCE = key( "document-reference" );
+	public static final SearchQueryElementTypeKey<?> ENTITY = key( "entity" );
+	public static final SearchQueryElementTypeKey<?> ENTITY_REFERENCE = key( "entity-reference" );
+	public static final SearchQueryElementTypeKey<?> SCORE = key( "score" );
 }

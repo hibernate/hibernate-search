@@ -35,6 +35,8 @@ public interface SearchProjectionBuilderFactory {
 
 	<T> SearchProjection<T> constant(T value);
 
+	<T> SearchProjection<T> entityComposite(SearchProjection<T> delegate);
+
 	/**
 	 * @param exceptionSupplier A supplier of the exception to throw.
 	 * @return A projection that throws an exception as soon as it's applied to at least one document.

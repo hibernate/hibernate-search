@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
+import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchSearchHints;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -32,6 +33,10 @@ class ElasticsearchSourceProjection extends AbstractElasticsearchProjection<Json
 
 	@Override
 	public Extractor<?, JsonObject> request(JsonObject requestBody, ProjectionRequestContext context) {
+		context.checkNotNested(
+				ElasticsearchProjectionTypeKeys.SOURCE,
+				ElasticsearchSearchHints.INSTANCE.sourceProjectionNestingNotSupportedHint()
+		);
 		REQUEST_SOURCE_ACCESSOR.addElementIfAbsent( requestBody, WILDCARD_ALL );
 		return this;
 	}
