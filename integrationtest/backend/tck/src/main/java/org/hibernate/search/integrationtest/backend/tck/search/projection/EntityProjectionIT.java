@@ -88,6 +88,7 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 	@TestForIssue(jiraKey = "HSEARCH-4579")
 	public void projectionRegistryFallback_noLoadingAvailable_withProjectionRegistryEntry_inObjectProjection_ignoresObjectContext() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
+		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 
 		ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
 		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
@@ -114,14 +115,14 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 							mainIndex.createGenericScope( loadingContextMock );
 
 					IndexBinding binding = mainIndex.binding();
-					SearchQuery<List<List<?>>> query = scope.query( loadingContextMock )
-							.select( f -> f.object( binding.nested.absolutePath )
-									.from(
-											f.field( binding.nested.fieldPath(), String.class ),
+					SearchQuery<List<?>> query = scope.query( loadingContextMock )
+							.select( f -> f.composite().from(
+											f.object( binding.nested.absolutePath )
+													.from( f.field( binding.nested.fieldPath(), String.class ) )
+													.asList().multi(),
 											f.entity()
-									)
-									.asList()
-									.multi() )
+									).asList()
+							)
 							.where( f -> f.matchAll() )
 							.toQuery();
 
@@ -136,10 +137,16 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 									Arrays.asList(
 											// The projection on the root entity will appear once per child object,
 											// because that's what was requested.
-											Arrays.asList( TEXT_VALUE_1_1, new StubEntity( doc1Reference ) ),
-											Arrays.asList( TEXT_VALUE_1_2, new StubEntity( doc1Reference ) )
+											Arrays.asList(
+													Collections.singletonList( TEXT_VALUE_1_1 ),
+													Collections.singletonList( TEXT_VALUE_1_2 )
+											),
+											new StubEntity( doc1Reference )
 									),
-									Collections.emptyList()
+									Arrays.asList(
+											Collections.emptyList(),
+											new StubEntity( doc2Reference )
+									)
 							);
 				} );
 	}

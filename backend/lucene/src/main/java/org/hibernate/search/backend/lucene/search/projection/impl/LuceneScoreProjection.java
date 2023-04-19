@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import org.hibernate.search.backend.lucene.reporting.impl.LuceneSearchHints;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.ScoreValues;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
+import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 
 class LuceneScoreProjection extends AbstractLuceneProjection<Float>
 		implements LuceneSearchProjection.Extractor<Float, Float> {
@@ -25,6 +27,10 @@ class LuceneScoreProjection extends AbstractLuceneProjection<Float>
 
 	@Override
 	public Extractor<?, Float> request(ProjectionRequestContext context) {
+		context.checkNotNested(
+				ProjectionTypeKeys.SCORE,
+				LuceneSearchHints.INSTANCE.scoreProjectionNestingNotSupportedHint()
+		);
 		context.requireScore();
 		return this;
 	}

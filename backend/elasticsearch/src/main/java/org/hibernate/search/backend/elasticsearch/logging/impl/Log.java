@@ -803,4 +803,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 171,
 			value = "The highlight projection cannot be applied to a field from an object using `ObjectStructure.NESTED` structure.")
 	SearchException cannotHighlightFieldFromNestedObjectStructure(@Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET + 172, value = "'%1$s' cannot be nested in an object projection. "
+			+ "%2$s")
+	SearchException cannotUseProjectionInNestedContext(String projection, String hint, @Param EventContext eventContext);
 }

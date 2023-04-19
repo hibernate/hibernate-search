@@ -7,9 +7,11 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchSearchHints;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 
 import com.google.gson.JsonObject;
 
@@ -30,6 +32,10 @@ class ElasticsearchScoreProjection extends AbstractElasticsearchProjection<Float
 
 	@Override
 	public Extractor<?, Float> request(JsonObject requestBody, ProjectionRequestContext context) {
+		context.checkNotNested(
+				ProjectionTypeKeys.SCORE,
+				ElasticsearchSearchHints.INSTANCE.scoreProjectionNestingNotSupportedHint()
+		);
 		TRACK_SCORES_ACCESSOR.set( requestBody, true );
 		return this;
 	}

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import org.hibernate.search.backend.lucene.reporting.impl.LuceneSearchHints;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsValuesDelegate;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -28,6 +29,10 @@ class LuceneDocumentProjection extends AbstractLuceneProjection<Document>
 
 	@Override
 	public Extractor<?, Document> request(ProjectionRequestContext context) {
+		context.checkNotNested(
+				LuceneProjectionTypeKeys.DOCUMENT,
+				LuceneSearchHints.INSTANCE.documentProjectionNestingNotSupportedHint()
+		);
 		context.requireAllStoredFields();
 		return this;
 	}

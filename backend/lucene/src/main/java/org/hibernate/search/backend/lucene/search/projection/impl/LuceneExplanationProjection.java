@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.ExplanationValues;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
+import org.hibernate.search.backend.lucene.reporting.impl.LuceneSearchHints;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 
@@ -22,6 +23,10 @@ class LuceneExplanationProjection extends AbstractLuceneProjection<Explanation>
 
 	@Override
 	public Extractor<?, Explanation> request(ProjectionRequestContext context) {
+		context.checkNotNested(
+				LuceneProjectionTypeKeys.EXPLANATION,
+				LuceneSearchHints.INSTANCE.explanationProjectionNestingNotSupportedHint()
+		);
 		return this;
 	}
 

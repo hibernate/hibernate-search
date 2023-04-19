@@ -22,6 +22,7 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.FieldPr
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionRequestRootContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -90,6 +91,11 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootCon
 	@Override
 	public void checkValidField(String absoluteFieldPath) {
 		// All fields are valid at the root.
+	}
+
+	@Override
+	public void checkNotNested(SearchQueryElementTypeKey<?> projectionKey, String hint) {
+		// root is not nested
 	}
 
 	@Override

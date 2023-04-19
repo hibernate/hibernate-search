@@ -64,6 +64,11 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	}
 
 	@Override
+	public <T> SearchProjection<T> entityComposite(SearchProjection<T> delegate) {
+		return new StubEntityCompositeProjection<>( StubSearchProjection.from( delegate ) );
+	}
+
+	@Override
 	public <T> SearchProjection<T> throwing(Supplier<SearchException> exceptionSupplier) {
 		return new StubThrowingProjection<>( exceptionSupplier );
 	}

@@ -74,6 +74,12 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	}
 
 	@Override
+	public <T> SearchProjection<T> entityComposite(SearchProjection<T> delegate) {
+		return new ElasticsearchEntityCompositeProjection<>(
+				scope, ElasticsearchSearchProjection.from( scope, delegate ) );
+	}
+
+	@Override
 	public <T> SearchProjection<T> throwing(Supplier<SearchException> exceptionSupplier) {
 		return new ElasticsearchThrowingProjection<>( scope, exceptionSupplier );
 	}
