@@ -25,7 +25,13 @@ public final class IdentifierValues implements Values<String> {
 
 	@Override
 	public String get(int doc) throws IOException {
-		currentLeafIdDocValues.advance( doc );
+		// Only move forward if the current doc position is not far enough already.
+		// Without this check we might end up calling advance() more than we need to in case we have an id projection within
+		// a multivalued object. Even though we are within the same top-level object advance() will be called for each
+		// element in the list of nested objects messing up the result.
+		if ( currentLeafIdDocValues.docID() < doc ) {
+			currentLeafIdDocValues.advance( doc );
+		}
 		return currentLeafIdDocValues.binaryValue().utf8ToString();
 	}
 }

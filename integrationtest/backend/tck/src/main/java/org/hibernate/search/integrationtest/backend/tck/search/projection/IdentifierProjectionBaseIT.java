@@ -12,11 +12,15 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -161,6 +165,28 @@ public class IdentifierProjectionBaseIT {
 				);
 	}
 
+	@Test
+	public void idProjectionInsideNestedObject() {
+		StubMappingScope scope = index.createScope();
+		SearchQuery<List<?>> query = scope.query()
+				.select( f -> f.composite().from(
+						f.id( String.class ),
+						f.object( "nested" )
+								.from(
+										f.id()
+								).asList().multi()
+				).asList() )
+				.where( f -> f.id().matching( ids[0] ) )
+				.toQuery();
+
+		List<List<?>> results = query.fetchAllHits();
+		assertThat( results ).containsExactlyInAnyOrder(
+				Arrays.asList(
+						ids[0], Arrays.asList( Collections.singletonList( ids[0] ), Collections.singletonList( ids[0] ), Collections.singletonList( ids[0] ) )
+				)
+		);
+	}
+
 	private void initValues() {
 		for ( int i = 0; i < 7; i++ ) {
 			int suffix = i + 1;
@@ -183,7 +209,15 @@ public class IdentifierProjectionBaseIT {
 		index.bulkIndexer()
 				.add( 7, i -> documentProvider(
 						ids[i],
-						document -> document.addValue( index.binding().name, names[i] )
+						document -> {
+							document.addValue( index.binding().name, names[i] );
+							document.addObject( index.binding().nested )
+									.addValue( index.binding().nestedString, names[i] );
+							document.addObject( index.binding().nested )
+									.addValue( index.binding().nestedString, names[i] );
+							document.addObject( index.binding().nested )
+									.addValue( index.binding().nestedString, names[i] );
+						}
 				) )
 				.join();
 		compatibleIndex.bulkIndexer()
@@ -196,10 +230,16 @@ public class IdentifierProjectionBaseIT {
 
 	private static class IndexBinding {
 		private final IndexFieldReference<String> name;
+		private final IndexObjectFieldReference nested;
+		private final IndexFieldReference<String> nestedString;
 
 		IndexBinding(IndexSchemaElement root) {
 			// this field is irrelevant for the test
 			name = root.field( "name", f -> f.asString() ).toReference();
+			IndexSchemaObjectField nested = root.objectField( "nested", ObjectStructure.NESTED ).multiValued();
+			nestedString = nested.field( "string", f -> f.asString() ).toReference();
+
+			this.nested = nested.toReference();
 		}
 	}
 
