@@ -96,12 +96,12 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 		else {
 			context.checkValidField( absoluteFieldPath );
 			if ( requiredContextAbsoluteFieldPath != null
-					&& !requiredContextAbsoluteFieldPath.equals( context.absoluteCurrentFieldPath() ) ) {
+					&& !requiredContextAbsoluteFieldPath.equals( context.absoluteCurrentNestedFieldPath() ) ) {
 				throw log.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
 						absoluteFieldPath, requiredContextAbsoluteFieldPath );
 			}
 			return new DocValuesBasedDistanceExtractor<>( accumulatorProvider.get(),
-					context.absoluteCurrentFieldPath() );
+					context.absoluteCurrentNestedFieldPath() );
 		}
 	}
 

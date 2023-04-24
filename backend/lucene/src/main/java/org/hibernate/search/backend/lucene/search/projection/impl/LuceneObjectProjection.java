@@ -76,16 +76,9 @@ public class LuceneObjectProjection<E, V, P>
 
 	@Override
 	public Extractor<?, P> request(ProjectionRequestContext context) {
-		ProjectionRequestContext innerContext;
-		if ( nested ) {
-			innerContext = context.forField( absoluteFieldPath );
-		}
-		else {
-			context.checkValidField( absoluteFieldPath );
-			innerContext = context;
-		}
+		ProjectionRequestContext innerContext = context.forField( absoluteFieldPath, nested );
 		if ( requiredContextAbsoluteFieldPath != null
-				&& !requiredContextAbsoluteFieldPath.equals( context.absoluteCurrentFieldPath() ) ) {
+				&& !requiredContextAbsoluteFieldPath.equals( context.absoluteCurrentNestedFieldPath() ) ) {
 			throw log.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
 					absoluteFieldPath, requiredContextAbsoluteFieldPath );
 		}
@@ -93,7 +86,7 @@ public class LuceneObjectProjection<E, V, P>
 		for ( int i = 0; i < inners.length; i++ ) {
 			innerExtractors[i] = inners[i].request( innerContext );
 		}
-		return new ObjectFieldExtractor<>( context.absoluteCurrentFieldPath(), innerExtractors,
+		return new ObjectFieldExtractor<>( context.absoluteCurrentNestedFieldPath(), innerExtractors,
 				accumulatorProvider.get() );
 	}
 

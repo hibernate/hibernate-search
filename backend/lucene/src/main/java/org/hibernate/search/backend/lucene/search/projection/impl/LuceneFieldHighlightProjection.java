@@ -71,7 +71,7 @@ public class LuceneFieldHighlightProjection implements LuceneSearchProjection<Li
 		highlighter.checkApplicability( typeContext );
 		highlighter.request( context, absoluteFieldPath );
 
-		return new FieldHighlightExtractor<>( context.absoluteCurrentFieldPath(), highlighter,
+		return new FieldHighlightExtractor<>( context.absoluteCurrentNestedFieldPath(), highlighter,
 				ProjectionAccumulator.<String>list().get() );
 	}
 
