@@ -100,7 +100,7 @@ class LucenePlainSearchHighlighter extends LuceneAbstractSearchHighlighter {
 
 	@Override
 	public void request(ProjectionRequestContext context, String absoluteFieldPath) {
-		context.requireStoredField( absoluteFieldPath, context.absoluteCurrentFieldPath() );
+		context.requireStoredField( absoluteFieldPath, context.absoluteCurrentNestedFieldPath() );
 	}
 
 	private final class PlainHighlighterValues<A> extends HighlighterValues<A> {

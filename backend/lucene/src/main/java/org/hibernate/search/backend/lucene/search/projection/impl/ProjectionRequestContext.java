@@ -20,21 +20,23 @@ public final class ProjectionRequestContext {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ExtractionRequirements.Builder extractionRequirementsBuilder;
+	private final String absoluteCurrentNestedFieldPath;
 	private final String absoluteCurrentFieldPath;
 	private final LuceneAbstractSearchHighlighter globalHighlighter;
 	private final Map<String, LuceneAbstractSearchHighlighter> namedHighlighters;
 
 	public ProjectionRequestContext(ExtractionRequirements.Builder extractionRequirementsBuilder,
 			LuceneAbstractSearchHighlighter globalHighlighter, Map<String, LuceneAbstractSearchHighlighter> namedHighlighters) {
-		this( extractionRequirementsBuilder, globalHighlighter, namedHighlighters, null );
+		this( extractionRequirementsBuilder, globalHighlighter, namedHighlighters, null, null );
 	}
 
 	private ProjectionRequestContext(ExtractionRequirements.Builder extractionRequirementsBuilder,
 			LuceneAbstractSearchHighlighter globalHighlighter, Map<String, LuceneAbstractSearchHighlighter> namedHighlighters,
-			String absoluteCurrentFieldPath) {
+			String absoluteCurrentFieldPath, String absoluteCurrentNestedFieldPath) {
 		this.globalHighlighter = globalHighlighter;
 		this.namedHighlighters = namedHighlighters;
 		this.extractionRequirementsBuilder = extractionRequirementsBuilder;
+		this.absoluteCurrentNestedFieldPath = absoluteCurrentNestedFieldPath;
 		this.absoluteCurrentFieldPath = absoluteCurrentFieldPath;
 	}
 
@@ -51,18 +53,25 @@ public final class ProjectionRequestContext {
 	}
 
 	public void checkValidField(String absoluteFieldPath) {
-		if ( !FieldPaths.isStrictPrefix( absoluteCurrentFieldPath, absoluteFieldPath ) ) {
-			throw log.invalidContextForProjectionOnField( absoluteFieldPath, absoluteCurrentFieldPath );
+		if ( !FieldPaths.isStrictPrefix( absoluteCurrentNestedFieldPath, absoluteFieldPath ) ) {
+			throw log.invalidContextForProjectionOnField( absoluteFieldPath, absoluteCurrentNestedFieldPath );
 		}
 	}
 
 	public ProjectionRequestContext root() {
-		return new ProjectionRequestContext( extractionRequirementsBuilder, globalHighlighter, namedHighlighters, null );
+		return new ProjectionRequestContext( extractionRequirementsBuilder, globalHighlighter, namedHighlighters );
 	}
 
-	public ProjectionRequestContext forField(String absoluteFieldPath) {
+	public ProjectionRequestContext forField(String absoluteFieldPath, boolean nestedObject) {
 		checkValidField( absoluteFieldPath );
-		return new ProjectionRequestContext( extractionRequirementsBuilder, globalHighlighter, namedHighlighters, absoluteFieldPath );
+		return new ProjectionRequestContext(
+				extractionRequirementsBuilder, globalHighlighter, namedHighlighters,
+				absoluteFieldPath, nestedObject ? absoluteFieldPath : absoluteCurrentFieldPath
+		);
+	}
+
+	public String absoluteCurrentNestedFieldPath() {
+		return absoluteCurrentNestedFieldPath;
 	}
 
 	public String absoluteCurrentFieldPath() {

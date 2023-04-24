@@ -41,13 +41,13 @@ public class LuceneRootContextProjection<P>
 
 	@Override
 	public Extractor<?, P> request(ProjectionRequestContext context) {
-		if ( context.absoluteCurrentFieldPath() == null ) {
+		if ( context.absoluteCurrentNestedFieldPath() == null ) {
 			// Already being executed in the root context.
 			// Avoid unnecessary overhead and skip the wrapping completely:
 			return inner.request( context );
 		}
 		ProjectionRequestContext innerContext = context.root();
-		return new RootContextExtractor<>( context.absoluteCurrentFieldPath(), inner.request( innerContext ) );
+		return new RootContextExtractor<>( context.absoluteCurrentNestedFieldPath(), inner.request( innerContext ) );
 	}
 
 	private static class RootContextExtractor<E, P> implements Extractor<E, P> {
