@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionExtractContext;
@@ -121,11 +122,12 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 					LuceneUnifiedSearchHighlighter.this.encoder
 			);
 
-			this.highlighter = new MultiValueUnifiedHighlighter(
-					context.collectorExecutionContext().getIndexSearcher(), analyzer );
-			highlighter.setFormatter( formatter );
-			highlighter.setBreakIterator( this::breakIterator );
-			highlighter.setMaxNoHighlightPassages( LuceneUnifiedSearchHighlighter.this.noMatchSize > 0 ? 1 : 0 );
+			this.highlighter =
+					MultiValueUnifiedHighlighter.builder( context.collectorExecutionContext().getIndexSearcher(), analyzer )
+							.withFormatter( formatter )
+							.withBreakIterator( this::breakIterator )
+							.withMaxNoHighlightPassages( LuceneUnifiedSearchHighlighter.this.noMatchSize > 0 ? 1 : 0 )
+							.build();
 		}
 
 		private BreakIterator breakIterator() {
@@ -165,9 +167,10 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 
 	private static class MultiValueUnifiedHighlighter extends UnifiedHighlighter {
 
-		public MultiValueUnifiedHighlighter(IndexSearcher indexSearcher, Analyzer indexAnalyzer) {
-			super( indexSearcher, indexAnalyzer );
+		private MultiValueUnifiedHighlighter(MultiValueUnifiedHighlighter.Builder builder) {
+			super( builder );
 		}
+
 
 		@SuppressWarnings("unchecked")
 		public List<TextFragment> highlightField(String[] fieldIn, Query query, int doc, int[] maxPassagesIn)
@@ -175,6 +178,49 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 			assert fieldIn.length == 1;
 			return (List<TextFragment>) highlightFieldsAsObjects( fieldIn, query, new int[] { doc }, maxPassagesIn )
 					.get( fieldIn[0] )[0];
+		}
+
+		public static class Builder extends UnifiedHighlighter.Builder {
+
+			/**
+			 * Constructor for UH builder which accepts {@link IndexSearcher} and {@link Analyzer} objects.
+			 * {@link IndexSearcher} object can only be null when {@link #highlightWithoutSearcher(String,
+			 * Query, String, int)} is used.
+			 *
+			 * @param searcher - {@link IndexSearcher}
+			 * @param indexAnalyzer - {@link Analyzer}
+			 */
+			public Builder(IndexSearcher searcher, Analyzer indexAnalyzer) {
+				super( searcher, indexAnalyzer );
+			}
+
+			// with* methods overridden only to return the builder type we need.
+			@Override
+			public Builder withBreakIterator(Supplier<BreakIterator> value) {
+				super.withBreakIterator( value );
+				return this;
+			}
+
+			@Override
+			public Builder withMaxNoHighlightPassages(int value) {
+				super.withMaxNoHighlightPassages( value );
+				return this;
+			}
+
+			@Override
+			public Builder withFormatter(PassageFormatter value) {
+				super.withFormatter( value );
+				return this;
+			}
+
+			@Override
+			public MultiValueUnifiedHighlighter build() {
+				return new MultiValueUnifiedHighlighter( this );
+			}
+		}
+
+		public static Builder builder(IndexSearcher searcher, Analyzer indexAnalyzer) {
+			return new Builder( searcher, indexAnalyzer );
 		}
 	}
 

@@ -19,12 +19,12 @@ import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.CharFilterFactory;
+import org.apache.lucene.analysis.TokenFilterFactory;
+import org.apache.lucene.analysis.TokenizerFactory;
 import org.apache.lucene.analysis.core.KeywordTokenizerFactory;
-import org.apache.lucene.analysis.util.CharFilterFactory;
-import org.apache.lucene.analysis.util.ResourceLoader;
-import org.apache.lucene.analysis.util.ResourceLoaderAware;
-import org.apache.lucene.analysis.util.TokenFilterFactory;
-import org.apache.lucene.analysis.util.TokenizerFactory;
+import org.apache.lucene.util.ResourceLoader;
+import org.apache.lucene.util.ResourceLoaderAware;
 import org.apache.lucene.util.Version;
 
 /**

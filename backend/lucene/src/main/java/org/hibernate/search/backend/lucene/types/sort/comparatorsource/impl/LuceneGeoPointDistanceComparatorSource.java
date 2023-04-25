@@ -29,10 +29,11 @@ public class LuceneGeoPointDistanceComparatorSource extends LuceneFieldComparato
 	}
 
 	@Override
-	public FieldComparator<?> newComparator(String fieldname, int numHits, int sortPos, boolean reversed) {
+	public FieldComparator<?> newComparator(String fieldname, int numHits, boolean enableSkipping, boolean reversed) {
 		GeoPointDistanceMultiValuesToSingleValuesSource source = new GeoPointDistanceMultiValuesToSingleValuesSource(
 				fieldname, mode, nestedDocsProvider, center
 		);
-		return new DoubleValuesSourceComparator( numHits, fieldname, missingValue, reversed, sortPos, source );
+		// forcing to not skipping documents
+		return new DoubleValuesSourceComparator( numHits, fieldname, missingValue, reversed, false, source );
 	}
 }

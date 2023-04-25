@@ -30,7 +30,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-common</artifactId>
+            <artifactId>lucene-analysis-common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -44,11 +44,9 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-facet</artifactId>
         </dependency>
-        <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
         <dependency>
             <groupId>com.carrotsearch</groupId>
             <artifactId>hppc</artifactId>
-            <version>${version.com.carrotsearch.hppc}</version>
         </dependency>
 
         <dependency>

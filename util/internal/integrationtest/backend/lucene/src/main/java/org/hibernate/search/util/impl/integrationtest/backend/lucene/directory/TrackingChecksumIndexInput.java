@@ -109,11 +109,6 @@ class TrackingChecksumIndexInput extends ChecksumIndexInput {
 	}
 
 	@Override
-	public void readLELongs(long[] dst, int offset, int length) throws IOException {
-		delegate.readLELongs( dst, offset, length );
-	}
-
-	@Override
 	public long readVLong() throws IOException {
 		return delegate.readVLong();
 	}

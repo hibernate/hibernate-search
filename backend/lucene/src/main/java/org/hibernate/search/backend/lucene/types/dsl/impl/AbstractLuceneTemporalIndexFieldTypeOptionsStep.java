@@ -65,7 +65,7 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 			builder.queryElementFactory( PredicateTypeKeys.TERMS, new LuceneNumericTermsPredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS,
 					DocValues.ENABLED.equals( docValues )
-							? new LuceneExistsPredicate.DocValuesBasedFactory<>()
+							? new LuceneExistsPredicate.DocValuesOrNormsBasedFactory<>()
 							: new LuceneExistsPredicate.DefaultFactory<>() );
 		}
 
