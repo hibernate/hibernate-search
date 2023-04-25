@@ -19,9 +19,9 @@ public class DoubleValuesSourceComparator extends DoubleComparator {
 
 	private final DoubleMultiValuesToSingleValuesSource source;
 
-	public DoubleValuesSourceComparator(int numHits, String field, Double missingValue, boolean reversed, int sortPos,
-			DoubleMultiValuesToSingleValuesSource source) {
-		super( numHits, field, missingValue, reversed, sortPos );
+	public DoubleValuesSourceComparator(int numHits, String field, Double missingValue, boolean reversed,
+			boolean enableSkipping, DoubleMultiValuesToSingleValuesSource source) {
+		super( numHits, field, missingValue, reversed, enableSkipping );
 		this.source = source;
 	}
 

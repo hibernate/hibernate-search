@@ -19,9 +19,9 @@ public class LongValuesSourceComparator extends LongComparator {
 
 	private final LongMultiValuesToSingleValuesSource source;
 
-	public LongValuesSourceComparator(int numHits, String field, Long missingValue, boolean reversed, int sortPos,
+	public LongValuesSourceComparator(int numHits, String field, Long missingValue, boolean reversed, boolean enableSkipping,
 			LongMultiValuesToSingleValuesSource source) {
-		super( numHits, field, missingValue, reversed, sortPos );
+		super( numHits, field, missingValue, reversed, enableSkipping );
 		this.source = source;
 	}
 

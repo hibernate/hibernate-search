@@ -60,7 +60,7 @@ class LuceneBooleanIndexFieldTypeOptionsStep
 			builder.queryElementFactory( PredicateTypeKeys.TERMS, new LuceneNumericTermsPredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS,
 					DocValues.ENABLED.equals( docValues )
-							? new LuceneExistsPredicate.DocValuesBasedFactory<>()
+							? new LuceneExistsPredicate.DocBasedFactory<>()
 							: new LuceneExistsPredicate.DefaultFactory<>() );
 		}
 

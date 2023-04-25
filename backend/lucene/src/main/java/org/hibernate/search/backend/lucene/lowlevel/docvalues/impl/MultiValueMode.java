@@ -167,8 +167,8 @@ public enum MultiValueMode {
 		@Override
 		long pick(SortedSetDocValues values) throws IOException {
 			long result = Long.MAX_VALUE;
-			for ( long ord; ( ord = values.nextOrd() ) != SortedSetDocValues.NO_MORE_ORDS; ) {
-				result = Math.min( result, ord );
+			for ( int i = 0; i < values.docValueCount(); i++ ) {
+				result = Math.min( result, values.nextOrd() );
 			}
 			return result;
 		}
@@ -177,8 +177,8 @@ public enum MultiValueMode {
 		long pick(SortedSetDocValues values, ChildDocIds childDocsWithValues) throws IOException {
 			long result = Long.MAX_VALUE;
 			while ( childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS ) {
-				for ( long ord; ( ord = values.nextOrd() ) != SortedSetDocValues.NO_MORE_ORDS; ) {
-					result = Math.min( result, ord );
+				for ( int i = 0; i < values.docValueCount(); i++ ) {
+					result = Math.min( result, values.nextOrd() );
 				}
 			}
 			return result;
@@ -237,8 +237,8 @@ public enum MultiValueMode {
 		@Override
 		long pick(SortedSetDocValues values) throws IOException {
 			long result = Long.MIN_VALUE;
-			for ( long ord; ( ord = values.nextOrd() ) != SortedSetDocValues.NO_MORE_ORDS; ) {
-				result = Math.max( result, ord );
+			for ( int i = 0; i < values.docValueCount(); i++ ) {
+				result = Math.max( result, values.nextOrd() );
 			}
 			return result;
 		}
@@ -247,8 +247,8 @@ public enum MultiValueMode {
 		long pick(SortedSetDocValues values, ChildDocIds childDocsWithValues) throws IOException {
 			long returnValue = Long.MIN_VALUE;
 			while ( childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS ) {
-				for ( long ord; ( ord = values.nextOrd() ) != SortedSetDocValues.NO_MORE_ORDS; ) {
-					returnValue = Math.max( returnValue, ord );
+				for ( int i = 0; i < values.docValueCount(); i++ ) {
+					returnValue = Math.max( returnValue, values.nextOrd() );
 				}
 			}
 			return returnValue;

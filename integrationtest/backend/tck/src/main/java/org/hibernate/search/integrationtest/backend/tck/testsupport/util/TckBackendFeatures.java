@@ -142,4 +142,8 @@ public abstract class TckBackendFeatures {
 	public boolean supportsHighlighterPlainOrderByScoreMultivaluedField() {
 		return true;
 	}
+
+	public boolean supportsHighlighterUnifiedPhraseMatching() {
+		return false;
+	}
 }

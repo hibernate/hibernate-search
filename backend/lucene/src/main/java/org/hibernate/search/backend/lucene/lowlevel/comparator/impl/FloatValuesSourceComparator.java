@@ -19,9 +19,9 @@ public class FloatValuesSourceComparator extends FloatComparator {
 
 	private final DoubleMultiValuesToSingleValuesSource source;
 
-	public FloatValuesSourceComparator(int numHits, String field, Float missingValue, boolean reversed, int sortPos,
+	public FloatValuesSourceComparator(int numHits, String field, Float missingValue, boolean reversed, boolean enableSkipping,
 			DoubleMultiValuesToSingleValuesSource source) {
-		super( numHits, field, missingValue, reversed, sortPos );
+		super( numHits, field, missingValue, reversed, enableSkipping );
 		this.source = source;
 	}
 
