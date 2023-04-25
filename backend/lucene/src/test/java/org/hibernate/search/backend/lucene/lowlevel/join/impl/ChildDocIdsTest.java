@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.lowlevel.query.impl.ExplicitDocIdSetI
 
 import org.junit.Test;
 
-import org.apache.lucene.search.ConjunctionDISI;
+import org.apache.lucene.search.ConjunctionUtils;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.BitSet;
 
@@ -69,7 +69,7 @@ public class ChildDocIdsTest {
 	public void joinedNextChild() throws IOException {
 		DocIdSetIterator other = docIdSetIterator( 1, 5, 6, 8, 18, 20, 26, 28, 31, 36 );
 		ChildDocIds childDocs = new ChildDocIds( bitSet( 2, 20, 24, 30, 35, 37 ),
-				ConjunctionDISI.intersectIterators( Arrays.asList( docIdSetIterator( 4, 6, 9, 17, 18, 21, 22, 31, 34, 36 ), other ) ) );
+				ConjunctionUtils.intersectIterators( Arrays.asList( docIdSetIterator( 4, 6, 9, 17, 18, 21, 22, 31, 34, 36 ), other ) ) );
 		assertThat( childDocs.advanceExactParent( 2 ) ).isFalse();
 		assertThat( childDocs.nextChild() ).isEqualTo( DocIdSetIterator.NO_MORE_DOCS );
 		assertThat( childDocs.nextChild() ).isEqualTo( DocIdSetIterator.NO_MORE_DOCS );

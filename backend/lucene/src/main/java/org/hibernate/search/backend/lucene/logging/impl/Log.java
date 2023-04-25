@@ -546,13 +546,6 @@ public interface Log extends BasicLogger {
 			value = "Field codec differs: '%1$s' vs. '%2$s'.")
 	SearchException differentFieldCodecForQueryElement(Object codec1, Object codec2);
 
-	@LogMessage(level = WARN)
-	@Message(id = ID_OFFSET + 138, value = "Using deprecated filesystem access strategy '%1$s',"
-			+ " which will be removed in a future version of Lucene."
-			+ " %2$s")
-	void deprecatedFileSystemAccessStrategy(String accessStrategyName,
-			@FormatWith(EventContextFormatter.class) EventContext eventContext);
-
 	@Message(id = ID_OFFSET + 141,
 			value = "Unable to compute size of index: %1$s")
 	SearchException unableToComputeIndexSize(String causeMessage, @Param EventContext context, @Cause Exception cause);

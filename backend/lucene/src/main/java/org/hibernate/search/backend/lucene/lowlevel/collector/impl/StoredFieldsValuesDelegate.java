@@ -101,13 +101,13 @@ public class StoredFieldsValuesDelegate {
 		if ( currentLeafChildDocs != null && currentLeafChildDocs.advanceExactParent( parentDoc ) ) {
 			for ( int childDoc = currentLeafChildDocs.nextChild(); childDoc != DocIdSetIterator.NO_MORE_DOCS;
 					childDoc = currentLeafChildDocs.nextChild() ) {
-				currentLeafReader.document( childDoc, storedFieldVisitor );
+				currentLeafReader.storedFields().document( childDoc, storedFieldVisitor );
 				currentChildDocValues.put( childDoc, storedFieldVisitor.getDocumentAndReset() );
 			}
 		}
 
 		// collect root document
-		currentLeafReader.document( parentDoc, storedFieldVisitor );
+		currentLeafReader.storedFields().document( parentDoc, storedFieldVisitor );
 		this.currentRootDocValue = storedFieldVisitor.getDocumentAndReset();
 	}
 

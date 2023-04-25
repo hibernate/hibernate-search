@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.apache.lucene.index.IndexReaderContext;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.ReaderUtil;
-import org.apache.lucene.search.ConjunctionDISI;
+import org.apache.lucene.search.ConjunctionUtils;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -83,7 +83,7 @@ public class NestedDocsProvider {
 		}
 
 		if ( childFilter != null ) {
-			childDocs = ConjunctionDISI.intersectIterators( Arrays.asList( childDocs, childFilter ) );
+			childDocs = ConjunctionUtils.intersectIterators( Arrays.asList( childDocs, childFilter ) );
 		}
 
 		return new ChildDocIds( parentDocs, childDocs );

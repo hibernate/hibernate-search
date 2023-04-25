@@ -59,6 +59,12 @@ public class TextMultiValueFacetCounts extends Facets {
 	}
 
 	@Override
+	public FacetResult getAllChildren(String dim, String... path) {
+		throw new UnsupportedOperationException(
+				"Getting all children is not supported by " + this.getClass().getSimpleName() );
+	}
+
+	@Override
 	public FacetResult getTopChildren(int topN, String dim, String... path) throws IOException {
 		if ( topN <= 0 ) {
 			throw new IllegalArgumentException( "topN must be > 0 (got: " + topN + ")" );

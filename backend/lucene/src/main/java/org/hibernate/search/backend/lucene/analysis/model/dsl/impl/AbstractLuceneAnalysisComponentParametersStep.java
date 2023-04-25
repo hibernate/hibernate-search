@@ -15,8 +15,8 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisOpti
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import org.apache.lucene.analysis.util.CharFilterFactory;
-import org.apache.lucene.analysis.util.TokenFilterFactory;
+import org.apache.lucene.analysis.CharFilterFactory;
+import org.apache.lucene.analysis.TokenFilterFactory;
 
 
 abstract class AbstractLuceneAnalysisComponentParametersStep<T>

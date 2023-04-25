@@ -49,10 +49,6 @@ public class LocalFileSystemDirectoryProvider implements DirectoryProvider {
 		ConfigurationPropertySource propertySource = context.configurationPropertySource();
 		Path directoryRoot = ROOT.get( propertySource ).toAbsolutePath();
 		FileSystemAccessStrategyName accessStrategyName = FILESYSTEM_ACCESS_STRATEGY.get( propertySource );
-		if ( FileSystemAccessStrategyName.SIMPLE.equals( accessStrategyName ) ) {
-			log.deprecatedFileSystemAccessStrategy( accessStrategyName.externalRepresentation(),
-					context.eventContext() );
-		}
 		FileSystemAccessStrategy accessStrategy = FileSystemAccessStrategy.get( accessStrategyName );
 		Supplier<LockFactory> lockFactorySupplier = context.createConfiguredLockFactorySupplier()
 				.orElseGet( () -> FSLockFactory::getDefault );

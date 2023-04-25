@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.dsl;
 
-import org.apache.lucene.analysis.util.TokenizerFactory;
+import org.apache.lucene.analysis.TokenizerFactory;
 
 /**
  * The step in an analyzer definition where the tokenizer can be set.

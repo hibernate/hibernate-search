@@ -83,14 +83,6 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
-	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testSimpleDirectoryType")
-	@SuppressWarnings("deprecation")
-	public void filesystemAccessStrategy_simple() {
-		testFileSystemAccessStrategy( "simple", org.apache.lucene.store.SimpleFSDirectory.class, true );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testNIODirectoryType")
 	public void filesystemAccessStrategy_nio() {
 		testFileSystemAccessStrategy( "nio", NIOFSDirectory.class, false );
@@ -117,7 +109,7 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 						.failure(
 								"Invalid filesystem access strategy name",
 								"'some_invalid_name'",
-								"Valid names are: [auto, simple, nio, mmap]"
+								"Valid names are: [auto, nio, mmap]"
 						)
 				);
 	}

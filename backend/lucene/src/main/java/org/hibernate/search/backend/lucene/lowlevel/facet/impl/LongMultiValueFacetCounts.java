@@ -14,7 +14,8 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValu
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
 
 import com.carrotsearch.hppc.LongHashSet;
-import com.carrotsearch.hppc.LongIntScatterMap;
+import com.carrotsearch.hppc.LongIntHashMap;
+import com.carrotsearch.hppc.LongIntMap;
 import com.carrotsearch.hppc.cursors.LongIntCursor;
 import com.carrotsearch.hppc.procedures.LongProcedure;
 import org.apache.lucene.facet.FacetResult;
@@ -33,7 +34,7 @@ public class LongMultiValueFacetCounts extends Facets {
 
 	private final int[] counts = new int[1024];
 
-	private final LongIntScatterMap hashCounts = new LongIntScatterMap();
+	private final LongIntMap hashCounts = new LongIntHashMap();
 
 	private final String field;
 
@@ -74,6 +75,12 @@ public class LongMultiValueFacetCounts extends Facets {
 		else {
 			hashCounts.addTo( value, 1 );
 		}
+	}
+
+	@Override
+	public FacetResult getAllChildren(String dim, String... path) {
+		throw new UnsupportedOperationException(
+				"Getting all children is not supported by " + this.getClass().getSimpleName() );
 	}
 
 	@Override

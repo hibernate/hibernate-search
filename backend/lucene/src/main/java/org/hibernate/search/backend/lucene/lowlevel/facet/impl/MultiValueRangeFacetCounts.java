@@ -36,6 +36,12 @@ public class MultiValueRangeFacetCounts extends Facets {
 	}
 
 	@Override
+	public FacetResult getAllChildren(String dim, String... path) {
+		throw new UnsupportedOperationException(
+				"Getting all children is not supported by " + this.getClass().getSimpleName() );
+	}
+
+	@Override
 	public FacetResult getTopChildren(int topN, String dim, String... path) {
 		if ( !dim.equals( field ) ) {
 			throw new IllegalArgumentException( "invalid dim \"" + dim + "\"; should be \"" + field + "\"" );

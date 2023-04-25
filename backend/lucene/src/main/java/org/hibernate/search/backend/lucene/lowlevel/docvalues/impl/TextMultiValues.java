@@ -22,6 +22,10 @@ import org.apache.lucene.index.SortedSetDocValues;
  */
 public abstract class TextMultiValues {
 
+	@SuppressWarnings( "deprecation" )
+	// TODO: monitor when this is removed in Lucene?
+	protected static final long NO_MORE_ORDS = SortedSetDocValues.NO_MORE_ORDS;
+
 	/**
 	 * Sole constructor. (For invocation by subclass
 	 * constructors, typically implicit.)
@@ -97,13 +101,13 @@ public abstract class TextMultiValues {
 		@Override
 		public boolean advanceExact(int doc) throws IOException {
 			boolean found = values.advanceExact( doc );
-			nextOrd = found ? values.nextOrd() : SortedSetDocValues.NO_MORE_ORDS;
+			nextOrd = found ? values.nextOrd() : NO_MORE_ORDS;
 			return found;
 		}
 
 		@Override
 		public boolean hasNextValue() throws IOException {
-			return nextOrd != SortedSetDocValues.NO_MORE_ORDS;
+			return nextOrd != NO_MORE_ORDS;
 		}
 
 		@Override

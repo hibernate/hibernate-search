@@ -24,16 +24,6 @@ enum FileSystemAccessStrategy {
 			return FSDirectory.open( indexDir, factory );
 		}
 	},
-	/**
-	 * @deprecated This strategy will be removed in a future version of Lucene.
-	 */
-	@Deprecated
-	SIMPLE {
-		@Override
-		public FSDirectory createDirectory(Path indexDir, LockFactory factory) throws IOException {
-			return new org.apache.lucene.store.SimpleFSDirectory( indexDir, factory );
-		}
-	},
 	NIO {
 		@Override
 		public FSDirectory createDirectory(Path indexDir, LockFactory factory) throws IOException {
@@ -54,8 +44,6 @@ enum FileSystemAccessStrategy {
 		switch ( name ) {
 			case AUTO:
 				return AUTO;
-			case SIMPLE:
-				return SIMPLE;
 			case NIO:
 				return NIO;
 			case MMAP:

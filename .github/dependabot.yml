@@ -62,5 +62,3 @@ updates:
       # (see https://search.maven.org/artifact/software.amazon.awssdk/aws-sdk-java-pom/2.17.257/pom)
       - dependency-name: "org.slf4j:*"
         update-types: ["version-update:semver-major"]
-      # We strictly align this dependency on the version used in Lucene.
-      - dependency-name: "com.carrotsearch:hppc"

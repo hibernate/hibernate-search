@@ -85,14 +85,14 @@ public abstract class JoiningTextMultiValuesSource extends TextMultiValuesSource
 				}
 
 				currentParentDoc = parentDoc;
-				nextOrd = SortedSetDocValues.NO_MORE_ORDS; // To be set in the next call to hasNextValue()
+				nextOrd = NO_MORE_ORDS; // To be set in the next call to hasNextValue()
 
 				return childDocsWithValues.advanceExactParent( parentDoc );
 			}
 
 			@Override
 			public boolean hasNextValue() throws IOException {
-				if ( nextOrd != SortedSetDocValues.NO_MORE_ORDS ) {
+				if ( nextOrd != NO_MORE_ORDS ) {
 					return true;
 				}
 
@@ -101,7 +101,7 @@ public abstract class JoiningTextMultiValuesSource extends TextMultiValuesSource
 					return true;
 				}
 				else {
-					nextOrd = SortedSetDocValues.NO_MORE_ORDS;
+					nextOrd = NO_MORE_ORDS;
 					return false;
 				}
 			}

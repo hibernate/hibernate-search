@@ -120,10 +120,10 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 
 	@Override
 	public FieldComparator<Long> createFieldComparator(String fieldName, int numHits,
-			Long missingValue, boolean reversed, int sortPos, MultiValueMode multiValueMode,
+			Long missingValue, boolean reversed, boolean enableSkipping, MultiValueMode multiValueMode,
 			NestedDocsProvider nestedDocsProvider) {
 		LongMultiValuesToSingleValuesSource source =
 				LongMultiValuesToSingleValuesSource.fromLongField( fieldName, multiValueMode, nestedDocsProvider );
-		return new LongValuesSourceComparator( numHits, fieldName, missingValue, reversed, sortPos, source );
+		return new LongValuesSourceComparator( numHits, fieldName, missingValue, reversed, enableSkipping, source );
 	}
 }

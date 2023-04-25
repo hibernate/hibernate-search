@@ -204,14 +204,9 @@ class LuceneStringIndexFieldTypeOptionsStep
 			builder.queryElementFactory( PredicateTypeKeys.MATCH, new LuceneTextMatchPredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.RANGE, new LuceneTextRangePredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.TERMS, new LuceneTextTermsPredicate.Factory<>( codec ) );
-			if ( resolvedNorms ) {
-				builder.queryElementFactory( PredicateTypeKeys.EXISTS, new LuceneExistsPredicate.NormsBasedFactory() );
-			}
-			else {
-				builder.queryElementFactory( PredicateTypeKeys.EXISTS,
-						DocValues.ENABLED.equals( docValues ) ? new LuceneExistsPredicate.DocValuesBasedFactory<>()
-								: new LuceneExistsPredicate.DefaultFactory<>() );
-			}
+			builder.queryElementFactory( PredicateTypeKeys.EXISTS,
+					resolvedNorms || DocValues.ENABLED.equals( docValues ) ? new LuceneExistsPredicate.DocBasedFactory<>()
+							: new LuceneExistsPredicate.DefaultFactory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.PHRASE, new LuceneTextPhrasePredicate.Factory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.WILDCARD, new LuceneTextWildcardPredicate.Factory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.REGEXP, new LuceneTextRegexpPredicate.Factory<>() );

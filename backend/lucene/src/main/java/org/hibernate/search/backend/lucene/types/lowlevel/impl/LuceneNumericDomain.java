@@ -52,6 +52,6 @@ public interface LuceneNumericDomain<E extends Number> {
 	IndexableField createSortedDocValuesField(String absoluteFieldPath, E numericValue);
 
 	FieldComparator<E> createFieldComparator(String absoluteFieldPath, int numHits,
-			E missingValue, boolean reversed, int sortPos, MultiValueMode multiValueMode,
+			E missingValue, boolean reversed, boolean enableSkipping, MultiValueMode multiValueMode,
 			NestedDocsProvider nestedDocsProvider);
 }

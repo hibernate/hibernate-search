@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.dsl;
 
-import org.apache.lucene.analysis.util.CharFilterFactory;
-import org.apache.lucene.analysis.util.TokenFilterFactory;
+import org.apache.lucene.analysis.CharFilterFactory;
+import org.apache.lucene.analysis.TokenFilterFactory;
 
 /**
  * The step in an analyzer/normalizer definition

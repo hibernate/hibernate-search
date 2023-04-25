@@ -127,11 +127,11 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 
 	@Override
 	public FieldComparator<Double> createFieldComparator(String fieldName, int numHits,
-			Double missingValue, boolean reversed, int sortPos, MultiValueMode multiValueMode,
+			Double missingValue, boolean reversed, boolean enableSkipping, MultiValueMode multiValueMode,
 			NestedDocsProvider nestedDocsProvider) {
 		DoubleMultiValuesToSingleValuesSource source = DoubleMultiValuesToSingleValuesSource
 				.fromDoubleField( fieldName, multiValueMode, nestedDocsProvider );
-		return new DoubleValuesSourceComparator( numHits, fieldName, missingValue, reversed, sortPos, source );
+		return new DoubleValuesSourceComparator( numHits, fieldName, missingValue, reversed, enableSkipping, source );
 	}
 
 }

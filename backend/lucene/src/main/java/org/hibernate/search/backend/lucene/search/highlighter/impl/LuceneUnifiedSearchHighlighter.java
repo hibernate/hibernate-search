@@ -116,10 +116,11 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 					LuceneUnifiedSearchHighlighter.this.encoder
 			);
 
-			this.highlighter = new UnifiedHighlighter( context.collectorExecutionContext().getIndexSearcher(), analyzer );
-			highlighter.setFormatter( formatter );
-			highlighter.setBreakIterator( this::breakIterator );
-			highlighter.setMaxNoHighlightPassages( LuceneUnifiedSearchHighlighter.this.noMatchSize > 0 ? 1 : 0 );
+			this.highlighter = UnifiedHighlighter.builder( context.collectorExecutionContext().getIndexSearcher(), analyzer )
+					.withFormatter( formatter )
+					.withBreakIterator( this::breakIterator )
+					.withMaxNoHighlightPassages( LuceneUnifiedSearchHighlighter.this.noMatchSize > 0 ? 1 : 0 )
+					.build();
 		}
 
 		private BreakIterator breakIterator() {

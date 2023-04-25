@@ -118,9 +118,6 @@ Allowed values are:
 * `auto`: lets Lucene select the most appropriate implementation
 based on the operating system and architecture.
 This is the default value for the property.
-* `simple`: a straightforward strategy based on `Files.newByteChannel`.
-See `org.apache.lucene.store.SimpleFSDirectory`.
-**This strategy is deprecated and will be removed in a future version of Lucene.**
 * `mmap`: uses `mmap` for reading, and `FSDirectory.FSIndexOutput` for writing.
 See `org.apache.lucene.store.MMapDirectory`.
 * `nio`: uses ``java.nio.channels.FileChannel``'s positional read for concurrent reading,
@@ -692,9 +689,9 @@ This is the name that should be passed to use that factory when defining analyze
 
 Instead of names, you may also pass Lucene factory classes to refer to a particular tokenizer,
 char filter or token filter implementation.
-Those classes extend `org.apache.lucene.analysis.util.TokenizerFactory`,
-`org.apache.lucene.analysis.util.TokenFilterFactory`
-or `org.apache.lucene.analysis.util.CharFilterFactory`.
+Those classes extend `org.apache.lucene.analysis.TokenizerFactory`,
+`org.apache.lucene.analysis.TokenFilterFactory`
+or `org.apache.lucene.analysis.CharFilterFactory`.
 
 This avoids string constants in your code, at the cost of having a direct compile-time dependency to Lucene.
 
