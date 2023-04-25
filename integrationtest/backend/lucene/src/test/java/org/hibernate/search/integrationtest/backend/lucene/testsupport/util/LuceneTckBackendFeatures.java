@@ -54,4 +54,8 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 		return false;
 	}
 
+	@Override
+	public boolean supportsHighlighterUnifiedPhraseMatching() {
+		return true;
+	}
 }

@@ -19,9 +19,9 @@ public class IntValuesSourceComparator extends IntComparator {
 
 	private final LongMultiValuesToSingleValuesSource source;
 
-	public IntValuesSourceComparator(int numHits, String field, Integer missingValue, boolean reversed, int sortPos,
+	public IntValuesSourceComparator(int numHits, String field, Integer missingValue, boolean reversed, boolean enableSkipping,
 			LongMultiValuesToSingleValuesSource source) {
-		super( numHits, field, missingValue, reversed, sortPos );
+		super( numHits, field, missingValue, reversed, enableSkipping );
 		this.source = source;
 	}
 

@@ -15,8 +15,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.DocValuesFieldExistsQuery;
-import org.apache.lucene.search.NormsFieldExistsQuery;
+import org.apache.lucene.search.FieldExistsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
@@ -43,41 +42,23 @@ public class LuceneExistsPredicate extends AbstractLuceneLeafSingleFieldPredicat
 		protected abstract Query buildQuery();
 	}
 
-	public static class NormsBasedFactory
-			extends AbstractLuceneValueFieldSearchQueryElementFactory<ExistsPredicateBuilder, String> {
-		@Override
-		public NormsBasedBuilder create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<String> field) {
-			return new NormsBasedBuilder( scope, field );
-		}
-	}
-
-	private static class NormsBasedBuilder extends AbstractBuilder<String> implements ExistsPredicateBuilder {
-		private NormsBasedBuilder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<String> field) {
-			super( scope, field );
-		}
-
-		@Override
-		protected Query buildQuery() {
-			return new NormsFieldExistsQuery( absoluteFieldPath );
-		}
-	}
-
-	public static class DocValuesBasedFactory<F>
+	public static class DocValuesOrNormsBasedFactory<F>
 			extends AbstractLuceneValueFieldSearchQueryElementFactory<ExistsPredicateBuilder, F> {
 		@Override
-		public DocValuesBasedBuilder<F> create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
-			return new DocValuesBasedBuilder<>( scope, field );
+		public DocValuesOrNormsBasedBuilder<F> create(LuceneSearchIndexScope<?> scope,
+				LuceneSearchIndexValueFieldContext<F> field) {
+			return new DocValuesOrNormsBasedBuilder<>( scope, field );
 		}
 	}
 
-	private static class DocValuesBasedBuilder<F> extends AbstractBuilder<F> implements ExistsPredicateBuilder {
-		private DocValuesBasedBuilder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
+	private static class DocValuesOrNormsBasedBuilder<F> extends AbstractBuilder<F> implements ExistsPredicateBuilder {
+		private DocValuesOrNormsBasedBuilder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 		}
 
 		@Override
 		protected Query buildQuery() {
-			return new DocValuesFieldExistsQuery( absoluteFieldPath );
+			return new FieldExistsQuery( absoluteFieldPath );
 		}
 	}
 
