@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
@@ -48,7 +49,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends RestClient>>
-			CLIENT_INSTANCE = ConfigurationProperty.forKey( ElasticsearchBackendSettings.CLIENT_INSTANCE )
+			CLIENT_INSTANCE = ConfigurationProperty.forKey( ElasticsearchBackendSpiSettings.CLIENT_INSTANCE )
 					.asBeanReference( RestClient.class )
 					.build();
 

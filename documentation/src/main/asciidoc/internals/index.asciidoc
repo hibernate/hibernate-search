@@ -549,4 +549,24 @@ and in the `resolveEntitiesToReindex` method of `PojoImplicitReindexingResolverD
 
 The JSON mapper does not currently exist, but there are plans to work on it.
 
+[[backend-elasticsearch-configuration-client-instance]]
+== Providing a client instance
+
+If you already use a low-level Elasticsearch client (an instance of `org.elasticsearch.client.RestClient`)
+in your application,
+you can tell Hibernate Search to use that client instead of creating its own.
+
+Providing a `RestClient` requires two steps:
+
+. Define the `org.elasticsearch.client.RestClient` instance
+as a bean in your supported dependency injection framework,
+for example by defining a CDI bean producer annotated with `@Named("myRestClient")`.
+. Configure Hibernate Search to use that instance by setting the configuration property
+`hibernate.search.backend.client.instance`
+to a bean reference pointing to the bean,
+for example `bean:myRestClient`.
+
+IMPORTANT: If Hibernate Search uses a provided client, it won't create its own client,
+and thus all other client configuration properties will be ignored.
+
 include::configuration-properties-aggregated.asciidoc[]

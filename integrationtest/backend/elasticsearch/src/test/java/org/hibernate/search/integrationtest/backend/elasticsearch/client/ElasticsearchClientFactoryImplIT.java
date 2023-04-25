@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 import javax.net.ssl.SSLContext;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
@@ -1007,7 +1008,7 @@ public class ElasticsearchClientFactoryImplIT {
 							.withBody( responseBody ) ) );
 
 			try ( ElasticsearchClientImplementor client = createClient( properties -> {
-				properties.accept( ElasticsearchBackendSettings.CLIENT_INSTANCE, BeanReference.ofInstance( myRestClient ) );
+				properties.accept( ElasticsearchBackendSpiSettings.CLIENT_INSTANCE, BeanReference.ofInstance( myRestClient ) );
 			} ) ) {
 				ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
 				assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );

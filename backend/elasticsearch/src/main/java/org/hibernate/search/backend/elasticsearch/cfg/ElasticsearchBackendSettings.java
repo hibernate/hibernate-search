@@ -51,8 +51,6 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Setting this property at the same time as {@link #URIS} will lead to an exception being thrown on startup.
 	 * <p>
-	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
-	 * <p>
 	 * Defaults to {@link Defaults#HOSTS}.
 	 */
 	public static final String HOSTS = "hosts";
@@ -63,8 +61,6 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a String: either {@code http} or {@code https}.
 	 * <p>
 	 * Setting this property at the same time as {@link #URIS} will lead to an exception being thrown on startup.
-	 * <p>
-	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 * <p>
 	 * Defaults to {@link Defaults#PROTOCOL}.
 	 */
@@ -82,8 +78,6 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Setting this property at the same time as {@link #HOSTS} or {@link #PROTOCOL} will lead to an exception being thrown on startup.
 	 * <p>
-	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
-	 * <p>
 	 * Defaults to {@code http://localhost:9200}, unless {@link #HOSTS} or {@link #PROTOCOL} are set, in which case they take precedence.
 	 */
 	public static final String URIS = "uris";
@@ -91,8 +85,6 @@ public final class ElasticsearchBackendSettings {
 	/**
 	 * Property for specifying the path prefix prepended to the request end point.
 	 * Use the path prefix if your Elasticsearch instance is located at a specific context path.
-	 * <p>
-	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 * <p>
 	 * Defaults to {@link Defaults#PATH_PREFIX}.
 	 */
@@ -124,8 +116,6 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Expects a String.
 	 * <p>
-	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
-	 * <p>
 	 * Defaults to no username (anonymous access).
 	 */
 	public static final String USERNAME = "username";
@@ -134,8 +124,6 @@ public final class ElasticsearchBackendSettings {
 	 * The password to send when connecting to the Elasticsearch servers (HTTP authentication).
 	 * <p>
 	 * Expects a String.
-	 * <p>
-	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 * <p>
 	 * Defaults to no username (anonymous access).
 	 */
@@ -149,8 +137,6 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a positive Integer value in milliseconds, such as 60000,
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
-	 * <p>
 	 * Defaults to no request timeout.
 	 */
 	public static final String REQUEST_TIMEOUT = "request_timeout";
@@ -161,8 +147,6 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a positive Integer value in milliseconds, such as {@code 60000},
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
-	 * <p>
 	 * Defaults to {@link Defaults#READ_TIMEOUT}.
 	 */
 	public static final String READ_TIMEOUT = "read_timeout";
@@ -172,8 +156,6 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Expects a positive Integer value in milliseconds, such as {@code 3000},
 	 * or a String that can be parsed into such Integer value.
-	 * <p>
-	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 * <p>
 	 * Defaults to {@link Defaults#CONNECTION_TIMEOUT}.
 	 */
@@ -186,8 +168,6 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a positive Integer value, such as {@code 20},
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
-	 * <p>
 	 * Defaults to {@link Defaults#MAX_CONNECTIONS}.
 	 */
 	public static final String MAX_CONNECTIONS = "max_connections";
@@ -197,8 +177,6 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Expects a positive Integer value, such as {@code 10},
 	 * or a String that can be parsed into such Integer value.
-	 * <p>
-	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 * <p>
 	 * Defaults to {@link Defaults#MAX_CONNECTIONS_PER_ROUTE}.
 	 */
@@ -210,8 +188,6 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a Boolean value such as {@code true} or {@code false},
 	 * or a string that can be parsed into a Boolean value.
 	 * <p>
-	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
-	 * <p>
 	 * Defaults to {@link Defaults#DISCOVERY_ENABLED}.
 	 */
 	public static final String DISCOVERY_ENABLED = "discovery.enabled";
@@ -221,8 +197,6 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Expects a positive Integer value in seconds, such as {@code 2},
 	 * or a String that can be parsed into such Integer value.
-	 * <p>
-	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 * <p>
 	 * Defaults to {@link Defaults#DISCOVERY_REFRESH_INTERVAL}.
 	 */
@@ -236,30 +210,9 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Expects a reference to a bean of type {@link ElasticsearchHttpClientConfigurer}.
 	 * <p>
-	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
-	 * <p>
 	 * Defaults to no value.
 	 */
 	public static final String CLIENT_CONFIGURER = "client.configurer";
-
-	/**
-	 * An external Elasticsearch client instance that Hibernate Search should use for all requests to Elasticsearch.
-	 * <p>
-	 * If this is set, Hibernate Search will not attempt to create its own Elasticsearch,
-	 * and all other client-related configuration properties
-	 * (hosts/uris, authentication, discovery, timeouts, max connections, configurer, ...)
-	 * will be ignored.
-	 * <p>
-	 * Expects a reference to a bean of type {@link org.elasticsearch.client.RestClient}.
-	 * <p>
-	 * Defaults to nothing: if no client instance is provided, Hibernate Search will create its own.
-	 * <p>
-	 * <strong>WARNING - Incubating API:</strong> the underlying client class may change without prior notice.
-	 *
-	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
-	 * which includes a description of the "bean reference" properties and accepted values.
-	 */
-	public static final String CLIENT_INSTANCE = "client.instance";
 
 	/**
 	 * Whether JSON included in logs should be pretty-printed (indented, with line breaks).
