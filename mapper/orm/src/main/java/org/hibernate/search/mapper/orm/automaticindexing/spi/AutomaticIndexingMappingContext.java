@@ -33,6 +33,6 @@ public interface AutomaticIndexingMappingContext {
 	 */
 	AutomaticIndexingQueueEventProcessingPlan createIndexingQueueEventProcessingPlan(Session session);
 
-	EntityReferenceFactory<?> entityReferenceFactory();
+	EntityReferenceFactory entityReferenceFactory();
 
 }

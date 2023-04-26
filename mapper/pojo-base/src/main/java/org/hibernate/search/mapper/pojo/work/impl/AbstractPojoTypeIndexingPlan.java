@@ -360,7 +360,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 				typeContext().reindexingResolver().resolveEntitiesToReindex( collector, entitySupplier.get(), this );
 			}
 			catch (RuntimeException e) {
-				EntityReferenceFactory<?> entityReferenceFactory = sessionContext.mappingContext().entityReferenceFactory();
+				EntityReferenceFactory entityReferenceFactory = sessionContext.mappingContext().entityReferenceFactory();
 				EntityReference entityReference = EntityReferenceFactory.safeCreateEntityReference(
 						entityReferenceFactory, typeContext().entityName(), identifier, e::addSuppressed );
 				throw log.errorResolvingEntitiesToReindex( entityReference, e.getMessage(), e );

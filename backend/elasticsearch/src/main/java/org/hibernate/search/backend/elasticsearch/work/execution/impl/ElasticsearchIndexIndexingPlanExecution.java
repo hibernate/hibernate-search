@@ -22,14 +22,14 @@ import org.hibernate.search.util.common.impl.Futures;
 class ElasticsearchIndexIndexingPlanExecution {
 
 	private final ElasticsearchSerialWorkOrchestrator orchestrator;
-	private final EntityReferenceFactory<?> entityReferenceFactory;
+	private final EntityReferenceFactory entityReferenceFactory;
 
 	private final List<SingleDocumentIndexingWork> works;
 	private final CompletableFuture<Void>[] futures;
 
 	@SuppressWarnings("unchecked")
 	ElasticsearchIndexIndexingPlanExecution(ElasticsearchSerialWorkOrchestrator orchestrator,
-			EntityReferenceFactory<?> entityReferenceFactory,
+			EntityReferenceFactory entityReferenceFactory,
 			List<SingleDocumentIndexingWork> works) {
 		this.orchestrator = orchestrator;
 		this.entityReferenceFactory = entityReferenceFactory;

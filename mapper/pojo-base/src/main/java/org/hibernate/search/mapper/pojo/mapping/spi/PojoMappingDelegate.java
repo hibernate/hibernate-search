@@ -41,7 +41,7 @@ public interface PojoMappingDelegate extends AutoCloseable {
 
 	ProjectionRegistry projectionRegistry();
 
-	EntityReferenceFactory<?> createEntityReferenceFactory(PojoEntityReferenceFactoryDelegate delegate);
+	EntityReferenceFactory createEntityReferenceFactory(PojoEntityReferenceFactoryDelegate delegate);
 
 	<R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> createPojoScope(
 			PojoScopeMappingContext mappingContext,

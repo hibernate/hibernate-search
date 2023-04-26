@@ -31,7 +31,7 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan {
 	private final ElasticsearchWorkFactory workFactory;
 	private final ElasticsearchSerialWorkOrchestrator orchestrator;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
-	private final EntityReferenceFactory<?> entityReferenceFactory;
+	private final EntityReferenceFactory entityReferenceFactory;
 	private final String tenantId;
 	private final DocumentRefreshStrategy refreshStrategy;
 

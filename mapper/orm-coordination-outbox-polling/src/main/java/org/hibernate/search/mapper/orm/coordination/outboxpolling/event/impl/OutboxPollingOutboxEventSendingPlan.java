@@ -31,11 +31,11 @@ public final class OutboxPollingOutboxEventSendingPlan implements AutomaticIndex
 	// otherwise existing indexes will no longer work correctly.
 	private static final RangeCompatibleHashFunction HASH_FUNCTION = ShardAssignment.HASH_FUNCTION;
 
-	private final EntityReferenceFactory<?> entityReferenceFactory;
+	private final EntityReferenceFactory entityReferenceFactory;
 	private final Session session;
 	private final List<OutboxEvent> events = new ArrayList<>();
 
-	public OutboxPollingOutboxEventSendingPlan(EntityReferenceFactory<?> entityReferenceFactory,
+	public OutboxPollingOutboxEventSendingPlan(EntityReferenceFactory entityReferenceFactory,
 			Session session) {
 		this.entityReferenceFactory = entityReferenceFactory;
 		this.session = session;
@@ -79,8 +79,8 @@ public final class OutboxPollingOutboxEventSendingPlan implements AutomaticIndex
 		}
 	}
 
-	private <R> CompletableFuture<MultiEntityOperationExecutionReport> sendAndReportOnSession(
-			Session currentSession, EntityReferenceFactory<? extends R> entityReferenceFactory) {
+	private CompletableFuture<MultiEntityOperationExecutionReport> sendAndReportOnSession(
+			Session currentSession, EntityReferenceFactory entityReferenceFactory) {
 		try {
 			MultiEntityOperationExecutionReport.Builder builder = MultiEntityOperationExecutionReport.builder();
 			for ( OutboxEvent event : events ) {

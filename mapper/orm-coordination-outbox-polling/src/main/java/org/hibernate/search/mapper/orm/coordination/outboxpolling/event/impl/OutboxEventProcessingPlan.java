@@ -29,7 +29,7 @@ final class OutboxEventProcessingPlan {
 
 	private final AutomaticIndexingQueueEventProcessingPlan processingPlan;
 	private final FailureHandler failureHandler;
-	private final EntityReferenceFactory<?> entityReferenceFactory;
+	private final EntityReferenceFactory entityReferenceFactory;
 	private final List<OutboxEvent> failedEvents = new ArrayList<>();
 
 	private List<OutboxEvent> events = new ArrayList<>();

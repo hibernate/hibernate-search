@@ -43,7 +43,7 @@ public abstract class AbstractPojoMappingImplementor<M>
 	private boolean stopped = false;
 
 	private final PojoEntityReferenceFactoryDelegate entityReferenceFactoryDelegate;
-	private final EntityReferenceFactory<?> entityReferenceFactory;
+	private final EntityReferenceFactory entityReferenceFactory;
 	private final ToDocumentValueConvertContext toDocumentValueConvertContext;
 	private final IdentifierBridgeToDocumentIdentifierContext toDocumentIdentifierContext;
 	private final ValueBridgeToIndexedValueContext toIndexedValueContext;
@@ -115,7 +115,7 @@ public abstract class AbstractPojoMappingImplementor<M>
 	}
 
 	@Override
-	public final EntityReferenceFactory<?> entityReferenceFactory() {
+	public final EntityReferenceFactory entityReferenceFactory() {
 		return entityReferenceFactory;
 	}
 

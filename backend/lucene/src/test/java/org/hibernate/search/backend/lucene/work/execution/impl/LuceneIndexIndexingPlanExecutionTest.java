@@ -74,7 +74,7 @@ public class LuceneIndexIndexingPlanExecutionTest {
 	private LuceneSerialWorkOrchestrator orchestratorMock;
 
 	@Mock(strictness = Mock.Strictness.LENIENT)
-	private EntityReferenceFactory<EntityReference> entityReferenceFactoryMock;
+	private EntityReferenceFactory entityReferenceFactoryMock;
 
 	private final List<SingleDocumentIndexingWork> workMocks = new ArrayList<>();
 
