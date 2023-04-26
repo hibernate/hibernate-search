@@ -86,7 +86,7 @@ class StubIndexIndexingPlan implements IndexIndexingPlan {
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
+			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
 		List<StubDocumentWork> worksToExecute = new ArrayList<>( works );
 		works.clear();
 		CompletableFuture<?>[] workFutures = worksToExecute.stream()
@@ -99,7 +99,7 @@ class StubIndexIndexingPlan implements IndexIndexingPlan {
 				} ) );
 	}
 
-	private <R> MultiEntityOperationExecutionReport<R> buildResult(EntityReferenceFactory<R> entityReferenceFactory,
+	private <R> MultiEntityOperationExecutionReport<R> buildResult(EntityReferenceFactory<? extends R> entityReferenceFactory,
 			List<StubDocumentWork> worksToExecute,
 			CompletableFuture<?>[] finishedWorkFutures) {
 		MultiEntityOperationExecutionReport.Builder<R> builder = MultiEntityOperationExecutionReport.builder();

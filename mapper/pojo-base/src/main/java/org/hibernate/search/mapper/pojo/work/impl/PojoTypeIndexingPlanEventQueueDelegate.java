@@ -102,7 +102,7 @@ final class PojoTypeIndexingPlanEventQueueDelegate<I, E> implements PojoTypeInde
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
+			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
 		throw new AssertionFailure( "executeAndReport() should be handled at the strategy level" );
 	}
 

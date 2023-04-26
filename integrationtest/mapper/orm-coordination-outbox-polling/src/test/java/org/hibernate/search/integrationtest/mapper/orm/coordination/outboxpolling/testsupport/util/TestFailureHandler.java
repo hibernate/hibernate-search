@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.impl.LogFailureHandler;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 
 public class TestFailureHandler implements FailureHandler {
 	public final List<FailureContext> genericFailures = Collections.synchronizedList( new ArrayList<>() );

@@ -78,7 +78,7 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan {
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
+			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
 		try {
 			ElasticsearchIndexIndexingPlanExecution<R> execution = new ElasticsearchIndexIndexingPlanExecution<>(
 					orchestrator, entityReferenceFactory,

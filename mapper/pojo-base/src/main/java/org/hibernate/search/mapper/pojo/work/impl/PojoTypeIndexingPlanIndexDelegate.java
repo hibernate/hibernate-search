@@ -103,7 +103,7 @@ final class PojoTypeIndexingPlanIndexDelegate<I, E> implements PojoTypeIndexingP
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
+			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
 		return indexPlan.executeAndReport( entityReferenceFactory, operationSubmitter );
 	}
 

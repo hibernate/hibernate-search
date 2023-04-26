@@ -16,7 +16,6 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyConfigurationContext;
 
@@ -57,9 +56,9 @@ public class HibernateOrmIndexingPlanSynchronizationStrategyAdapter implements I
 											}
 
 											@Override
-											public List<EntityReference> failingEntities() {
+											public List<org.hibernate.search.mapper.orm.common.EntityReference> failingEntities() {
 												return r.failingEntities().stream()
-														.map( EntityReference.class::cast )
+														.map( org.hibernate.search.mapper.orm.common.EntityReference.class::cast )
 														.collect( Collectors.toList() );
 											}
 										}

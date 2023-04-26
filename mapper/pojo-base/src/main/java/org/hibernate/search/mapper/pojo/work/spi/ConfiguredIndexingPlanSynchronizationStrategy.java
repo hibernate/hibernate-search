@@ -21,15 +21,15 @@ import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.impl.Contracts;
 
 @Incubating
-public class ConfiguredIndexingPlanSynchronizationStrategy<E> {
+public class ConfiguredIndexingPlanSynchronizationStrategy {
 
 	private final DocumentCommitStrategy documentCommitStrategy;
 	private final DocumentRefreshStrategy documentRefreshStrategy;
 	private final Consumer<? super CompletableFuture<? extends SearchIndexingPlanExecutionReport>> indexingFutureHandler;
 	private final OperationSubmitter operationSubmitter;
-	private final EntityReferenceFactory<E> entityReferenceFactory;
+	private final EntityReferenceFactory<?> entityReferenceFactory;
 
-	protected ConfiguredIndexingPlanSynchronizationStrategy(Builder<E> configurationContext) {
+	protected ConfiguredIndexingPlanSynchronizationStrategy(Builder configurationContext) {
 		this.documentCommitStrategy = configurationContext.documentCommitStrategy;
 		this.documentRefreshStrategy = configurationContext.documentRefreshStrategy;
 		this.indexingFutureHandler = configurationContext.indexingFutureHandler;
@@ -52,7 +52,7 @@ public class ConfiguredIndexingPlanSynchronizationStrategy<E> {
 		indexingFutureHandler.accept( reportFuture );
 	}
 
-	public static final class Builder<E>
+	public static final class Builder
 			implements IndexingPlanSynchronizationStrategyConfigurationContext {
 
 		private final FailureHandler failureHandler;
@@ -62,9 +62,9 @@ public class ConfiguredIndexingPlanSynchronizationStrategy<E> {
 		private Consumer<? super CompletableFuture<? extends SearchIndexingPlanExecutionReport>> indexingFutureHandler = future -> { };
 		private OperationSubmitter operationSubmitter = OperationSubmitter.blocking();
 
-		private final EntityReferenceFactory<E> entityReferenceFactory;
+		private final EntityReferenceFactory<?> entityReferenceFactory;
 
-		public Builder(FailureHandler failureHandler, EntityReferenceFactory<E> entityReferenceFactory) {
+		public Builder(FailureHandler failureHandler, EntityReferenceFactory<?> entityReferenceFactory) {
 			this.failureHandler = failureHandler;
 			this.entityReferenceFactory = entityReferenceFactory;
 		}
@@ -97,8 +97,8 @@ public class ConfiguredIndexingPlanSynchronizationStrategy<E> {
 			this.operationSubmitter = operationSubmitter;
 		}
 
-		public ConfiguredIndexingPlanSynchronizationStrategy<E> build() {
-			return new ConfiguredIndexingPlanSynchronizationStrategy<>( this );
+		public ConfiguredIndexingPlanSynchronizationStrategy build() {
+			return new ConfiguredIndexingPlanSynchronizationStrategy( this );
 		}
 	}
 

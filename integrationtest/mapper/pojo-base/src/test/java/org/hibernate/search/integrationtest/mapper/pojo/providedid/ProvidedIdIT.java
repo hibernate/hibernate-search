@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -23,8 +24,7 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.standalone.common.impl.EntityReferenceImpl;
-import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
@@ -82,7 +82,7 @@ public class ProvidedIdIT {
 					.toQuery();
 
 			assertThat( query.fetchAll().hits() )
-					.containsExactly( EntityReferenceImpl.withName( IndexedEntity.class, entityAndIndexName, "42" ) );
+					.containsExactly( PojoEntityReference.withName( IndexedEntity.class, entityAndIndexName, "42" ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}

@@ -16,7 +16,6 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
 import org.junit.Before;
@@ -50,12 +49,12 @@ public class IdentifierBridgeOrmContextIT {
 
 			SearchSession searchSession = Search.session( entityManager );
 
-			List<EntityReference> result = searchSession.search( MyEntity.class )
-					.select( f -> f.entityReference() )
+			List<MyData> result = searchSession.search( MyEntity.class )
+					.select( f -> f.id( MyData.class ) )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 
-			assertThat( result ).extracting( EntityReference::id ).containsExactly( MyData.VALUE2 );
+			assertThat( result ).containsExactly( MyData.VALUE2 );
 		} );
 	}
 

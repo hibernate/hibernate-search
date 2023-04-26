@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -62,6 +63,11 @@ public interface SearchQuerySelectStep<
 	/**
 	 * Select a reference to the entity that was originally indexed
 	 * as a representation of the search hit for each matching document.
+	 * <p>
+	 * Entity references are instances of type {@link EntityReference},
+	 * but some mappers may expose a different type for backwards compatibility reasons.
+	 * {@link EntityReference} should be favored wherever possible
+	 * as mapper-specific types will eventually be removed.
 	 *
 	 * @return The next step.
 	 * @see SearchQueryWhereStep

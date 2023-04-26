@@ -75,7 +75,7 @@ public interface IndexIndexingPlan {
 	 * but the report will contain an exception.
 	 */
 	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter);
+			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter);
 
 	/**
 	 * Discard all works that are present in this plan.

@@ -15,7 +15,6 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
@@ -42,7 +41,8 @@ public interface SearchSession {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	default <T> SearchQuerySelectStep<?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(Class<T> type) {
+	@SuppressWarnings("deprecation")
+	default <T> SearchQuerySelectStep<?, org.hibernate.search.mapper.orm.common.EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(Class<T> type) {
 		return search( Collections.singleton( type ) );
 	}
 
@@ -56,7 +56,8 @@ public interface SearchSession {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	<T> SearchQuerySelectStep<?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
+	@SuppressWarnings("deprecation")
+	<T> SearchQuerySelectStep<?, org.hibernate.search.mapper.orm.common.EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
 			Collection<? extends Class<? extends T>> types);
 
 	/**
@@ -69,7 +70,8 @@ public interface SearchSession {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	<T> SearchQuerySelectStep<?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(SearchScope<T> scope);
+	@SuppressWarnings("deprecation")
+	<T> SearchQuerySelectStep<?, org.hibernate.search.mapper.orm.common.EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(SearchScope<T> scope);
 
 	/**
 	 * Create a {@link SearchSchemaManager} for all indexes.

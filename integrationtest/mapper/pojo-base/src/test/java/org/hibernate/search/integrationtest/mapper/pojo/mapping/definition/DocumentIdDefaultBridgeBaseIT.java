@@ -28,9 +28,9 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.PropertyTypeDescriptor;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
+import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
-import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
-import org.hibernate.search.mapper.pojo.standalone.common.impl.EntityReferenceImpl;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
@@ -134,7 +134,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 						.toQuery();
 
 				assertThat( query.fetchAll().hits() )
-						.containsExactly( EntityReferenceImpl.withName(
+						.containsExactly( PojoEntityReference.withName(
 								expectations.getTypeWithIdentifierBridge1(),
 								DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
 								entityIdentifierValue

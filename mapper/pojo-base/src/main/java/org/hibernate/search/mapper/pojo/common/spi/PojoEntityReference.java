@@ -4,21 +4,26 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.common.impl;
+package org.hibernate.search.mapper.pojo.common.spi;
 
 import java.util.Objects;
 
-import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
-public class EntityReferenceImpl implements EntityReference {
+/**
+ * A simple, default implementation for {@link EntityReference} for POJO-based mappers.
+ * <p>
+ * Should be used instead of custom implementations, whose support is going to be removed in the future.
+ */
+public final class PojoEntityReference implements EntityReference {
 
 	public static EntityReference withDefaultName(Class<?> javaClass, Object id) {
 		return withName( javaClass, javaClass.getSimpleName(), id );
 	}
 
 	public static EntityReference withName(Class<?> javaClass, String entityName, Object id) {
-		return new EntityReferenceImpl( PojoRawTypeIdentifier.of( javaClass ), entityName, id );
+		return new PojoEntityReference( PojoRawTypeIdentifier.of( javaClass ), entityName, id );
 	}
 
 	private final PojoRawTypeIdentifier<?> typeIdentifier;
@@ -27,7 +32,7 @@ public class EntityReferenceImpl implements EntityReference {
 
 	private final Object id;
 
-	public EntityReferenceImpl(PojoRawTypeIdentifier<?> typeIdentifier, String name, Object id) {
+	public PojoEntityReference(PojoRawTypeIdentifier<?> typeIdentifier, String name, Object id) {
 		this.typeIdentifier = typeIdentifier;
 		this.name = name;
 		this.id = id;
@@ -50,11 +55,11 @@ public class EntityReferenceImpl implements EntityReference {
 
 	@Override
 	public boolean equals(Object obj) {
-		if ( obj == null || obj.getClass() != getClass() ) {
+		if ( !( obj instanceof EntityReference ) ) {
 			return false;
 		}
-		EntityReferenceImpl other = (EntityReferenceImpl) obj;
-		return name.equals( other.name ) && Objects.equals( id, other.id );
+		EntityReference other = (EntityReference) obj;
+		return name.equals( other.name() ) && Objects.equals( id, other.id() );
 	}
 
 	@Override

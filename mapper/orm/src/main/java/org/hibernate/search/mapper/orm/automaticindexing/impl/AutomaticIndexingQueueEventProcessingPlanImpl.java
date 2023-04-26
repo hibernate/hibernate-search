@@ -11,18 +11,18 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventProcessingPlan;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
 
 public class AutomaticIndexingQueueEventProcessingPlanImpl implements AutomaticIndexingQueueEventProcessingPlan {
 
 	private final PojoIndexingQueueEventProcessingPlan delegate;
-	private final EntityReferenceFactory<EntityReference> entityReferenceFactory;
+	private final EntityReferenceFactory<? extends EntityReference> entityReferenceFactory;
 
 	public AutomaticIndexingQueueEventProcessingPlanImpl(PojoIndexingQueueEventProcessingPlan delegate,
-			EntityReferenceFactory<EntityReference> entityReferenceFactory) {
+			EntityReferenceFactory<? extends EntityReference> entityReferenceFactory) {
 		this.delegate = delegate;
 		this.entityReferenceFactory = entityReferenceFactory;
 	}

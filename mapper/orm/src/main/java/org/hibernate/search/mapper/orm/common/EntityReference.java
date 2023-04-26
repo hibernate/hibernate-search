@@ -7,26 +7,18 @@
 package org.hibernate.search.mapper.orm.common;
 
 /**
- * A reference to an indexed entity.
+ * The (legacy) EntityReference interface specific to the Hibernate ORM mapper.
+ *
+ * @deprecated Use {@link org.hibernate.search.engine.common.EntityReference} instead.
  */
-public interface EntityReference {
-
-	/**
-	 * @return The type of the referenced entity.
-	 */
-	Class<?> type();
+@Deprecated
+public interface EntityReference extends org.hibernate.search.engine.common.EntityReference {
 
 	/**
 	 * @return The name of the referenced entity in the Hibernate ORM mapping.
 	 * @see javax.persistence.Entity#name()
 	 */
+	@Override
 	String name();
-
-	/**
-	 * @return The identifier of the referenced entity,
-	 * Generally this is the entity ID,
-	 * but a different value may be returned if another property than the entity ID is defined as {@code @DocumentId}.
-	 */
-	Object id();
 
 }

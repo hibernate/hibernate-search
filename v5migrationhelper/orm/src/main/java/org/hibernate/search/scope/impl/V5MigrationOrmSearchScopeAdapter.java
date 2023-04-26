@@ -10,12 +10,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.scope.spi.V5MigrationSearchScope;
@@ -55,7 +55,7 @@ public class V5MigrationOrmSearchScopeAdapter implements V5MigrationSearchScope 
 
 	@Override
 	public SearchProjection<Object> idProjection() {
-		SearchProjectionFactory<EntityReference, ?> factory = delegate.projection();
+		SearchProjectionFactory<? extends EntityReference, ?> factory = delegate.projection();
 		// Not using factory.id() because that one throws an exception if IDs have inconsistent types.
 		return factory.composite().from( factory.entityReference() )
 				.as( EntityReference::id ).toProjection();
@@ -63,7 +63,7 @@ public class V5MigrationOrmSearchScopeAdapter implements V5MigrationSearchScope 
 
 	@Override
 	public SearchProjection<? extends Class<?>> objectClassProjection() {
-		SearchProjectionFactory<EntityReference, ?> factory = delegate.projection();
+		SearchProjectionFactory<? extends EntityReference, ?> factory = delegate.projection();
 		return factory.composite().from( factory.entityReference() )
 				.as( EntityReference::type ).toProjection();
 	}

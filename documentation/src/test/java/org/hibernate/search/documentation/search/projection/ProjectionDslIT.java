@@ -25,13 +25,13 @@ import org.hibernate.Session;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.common.EntityReference;
-import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
+import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators;
@@ -40,6 +40,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 
 public class ProjectionDslIT {
@@ -133,16 +134,16 @@ public class ProjectionDslIT {
 	public void reference() {
 		withinSearchSession( searchSession -> {
 			// tag::reference[]
-			List<EntityReference> hits = searchSession.search( Book.class )
+			List<? extends EntityReference> hits = searchSession.search( Book.class )
 					.select( f -> f.entityReference() )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::reference[]
-			assertThat( hits ).containsExactlyInAnyOrder(
-					EntityReferenceImpl.withDefaultName( Book.class, BOOK1_ID ),
-					EntityReferenceImpl.withDefaultName( Book.class, BOOK2_ID ),
-					EntityReferenceImpl.withDefaultName( Book.class, BOOK3_ID ),
-					EntityReferenceImpl.withDefaultName( Book.class, BOOK4_ID )
+			Assertions.<EntityReference>assertThat( hits ).containsExactlyInAnyOrder(
+					PojoEntityReference.withDefaultName( Book.class, BOOK1_ID ),
+					PojoEntityReference.withDefaultName( Book.class, BOOK2_ID ),
+					PojoEntityReference.withDefaultName( Book.class, BOOK3_ID ),
+					PojoEntityReference.withDefaultName( Book.class, BOOK4_ID )
 			);
 		} );
 	}

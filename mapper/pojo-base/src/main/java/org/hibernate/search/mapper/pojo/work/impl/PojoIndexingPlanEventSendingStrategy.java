@@ -38,7 +38,7 @@ public class PojoIndexingPlanEventSendingStrategy implements PojoIndexingPlanStr
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> doExecuteAndReport(
 			Collection<PojoIndexedTypeIndexingPlan<?, ?>> indexedTypeDelegates,
-			PojoLoadingPlanProvider loadingPlanProvider, EntityReferenceFactory<R> entityReferenceFactory,
+			PojoLoadingPlanProvider loadingPlanProvider, EntityReferenceFactory<? extends R> entityReferenceFactory,
 			OperationSubmitter operationSubmitter) {
 
 		// No need to go through every single type: the state is global.

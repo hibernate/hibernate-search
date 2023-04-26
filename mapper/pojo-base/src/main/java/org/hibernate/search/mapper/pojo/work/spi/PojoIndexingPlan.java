@@ -187,7 +187,7 @@ public interface PojoIndexingPlan {
 	 * @return A {@link CompletableFuture} that will be completed with an execution report when all the works are complete.
 	 */
 	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter);
+			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter);
 
 	/**
 	 * @see #executeAndReport(EntityReferenceFactory, OperationSubmitter)

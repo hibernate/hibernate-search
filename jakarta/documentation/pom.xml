@@ -93,6 +93,17 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- For some reason we're getting deprecation warnings about
+                         org.hibernate.search.mapper.orm.common.EntityReference
+                         even though we don't explicitly use it.
+                         This is probably a compiler bug, so here we need to work around it. -->
+                    <showDeprecation>false</showDeprecation>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
             </plugin>
             <plugin>

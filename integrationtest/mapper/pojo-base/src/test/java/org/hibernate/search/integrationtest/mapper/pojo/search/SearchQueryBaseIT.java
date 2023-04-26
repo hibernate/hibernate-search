@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -24,8 +25,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
-import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
-import org.hibernate.search.mapper.pojo.standalone.common.impl.EntityReferenceImpl;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -85,9 +85,9 @@ public class SearchQueryBaseIT {
 			);
 
 			assertThat( query.fetchAllHits() ).containsExactly(
-					EntityReferenceImpl.withName( Book.class, Book.NAME, 1 ),
-					EntityReferenceImpl.withName( Book.class, Book.NAME, 2 ),
-					EntityReferenceImpl.withName( Book.class, Book.NAME, 3 )
+					PojoEntityReference.withName( Book.class, Book.NAME, 1 ),
+					PojoEntityReference.withName( Book.class, Book.NAME, 2 ),
+					PojoEntityReference.withName( Book.class, Book.NAME, 3 )
 			);
 		}
 	}
@@ -111,8 +111,8 @@ public class SearchQueryBaseIT {
 			);
 
 			assertThat( query.fetchAllHits() ).containsExactly(
-					EntityReferenceImpl.withName( Book.class, Book.NAME, 1 ),
-					EntityReferenceImpl.withName( Author.class, Author.NAME, 2 )
+					PojoEntityReference.withName( Book.class, Book.NAME, 1 ),
+					PojoEntityReference.withName( Author.class, Author.NAME, 2 )
 			);
 		}
 	}

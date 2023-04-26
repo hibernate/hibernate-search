@@ -92,7 +92,7 @@ public class LuceneIndexIndexingPlan implements IndexIndexingPlan {
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
+			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
 		try {
 			List<CompletableFuture<MultiEntityOperationExecutionReport<R>>> shardReportFutures = new ArrayList<>();
 			for ( Map.Entry<LuceneSerialWorkOrchestrator, List<SingleDocumentIndexingWork>> entry : worksByOrchestrator.entrySet() ) {

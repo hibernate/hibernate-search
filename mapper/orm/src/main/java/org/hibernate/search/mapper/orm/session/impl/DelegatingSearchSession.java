@@ -13,7 +13,6 @@ import javax.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
@@ -42,13 +41,15 @@ public class DelegatingSearchSession implements SearchSession {
 	}
 
 	@Override
-	public <T> SearchQuerySelectStep<?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
+	@SuppressWarnings("deprecation")
+	public <T> SearchQuerySelectStep<?, org.hibernate.search.mapper.orm.common.EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
 			Collection<? extends Class<? extends T>> types) {
 		return getDelegate().search( types );
 	}
 
 	@Override
-	public <T> SearchQuerySelectStep<?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
+	@SuppressWarnings("deprecation")
+	public <T> SearchQuerySelectStep<?, org.hibernate.search.mapper.orm.common.EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
 			SearchScope<T> scope) {
 		return getDelegate().search( scope );
 	}

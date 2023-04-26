@@ -14,7 +14,6 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
-import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSearchSessionMappingContext;
 import org.hibernate.search.util.common.impl.Closer;
 
@@ -27,7 +26,7 @@ public class ConfiguredIndexingPlanSynchronizationStrategyHolder {
 
 	private final StandalonePojoSearchSessionMappingContext mappingContext;
 	private BeanHolder<? extends IndexingPlanSynchronizationStrategy> defaultSynchronizationStrategyHolder;
-	private ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> defaultSynchronizationStrategy;
+	private ConfiguredIndexingPlanSynchronizationStrategy defaultSynchronizationStrategy;
 
 	public ConfiguredIndexingPlanSynchronizationStrategyHolder(
 			StandalonePojoSearchSessionMappingContext mappingContext) {
@@ -44,11 +43,11 @@ public class ConfiguredIndexingPlanSynchronizationStrategyHolder {
 		this.defaultSynchronizationStrategy = configure( defaultSynchronizationStrategyHolder.get() );
 	}
 
-	public ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> defaultSynchronizationStrategy() {
+	public ConfiguredIndexingPlanSynchronizationStrategy defaultSynchronizationStrategy() {
 		return defaultSynchronizationStrategy;
 	}
 
-	public ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> configureOverriddenSynchronizationStrategy(
+	public ConfiguredIndexingPlanSynchronizationStrategy configureOverriddenSynchronizationStrategy(
 			IndexingPlanSynchronizationStrategy synchronizationStrategy) {
 		if ( synchronizationStrategy == null ) {
 			return defaultSynchronizationStrategy();
@@ -56,10 +55,10 @@ public class ConfiguredIndexingPlanSynchronizationStrategyHolder {
 		return configure( synchronizationStrategy );
 	}
 
-	private ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> configure(
+	private ConfiguredIndexingPlanSynchronizationStrategy configure(
 			IndexingPlanSynchronizationStrategy synchronizationStrategy) {
-		ConfiguredIndexingPlanSynchronizationStrategy.Builder<EntityReference> builder =
-				new ConfiguredIndexingPlanSynchronizationStrategy.Builder<>(
+		ConfiguredIndexingPlanSynchronizationStrategy.Builder builder =
+				new ConfiguredIndexingPlanSynchronizationStrategy.Builder(
 						mappingContext.failureHandler(),
 						mappingContext.entityReferenceFactory()
 				);

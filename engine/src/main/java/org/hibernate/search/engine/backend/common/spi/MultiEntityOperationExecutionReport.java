@@ -99,7 +99,7 @@ public final class MultiEntityOperationExecutionReport<R> {
 			return this;
 		}
 
-		public Builder<R> failingEntityReference(EntityReferenceFactory<R> referenceFactory,
+		public Builder<R> failingEntityReference(EntityReferenceFactory<? extends R> referenceFactory,
 				String typeName, Object entityIdentifier) {
 			R reference = EntityReferenceFactory.safeCreateEntityReference( referenceFactory,
 					typeName, entityIdentifier, this::throwable );

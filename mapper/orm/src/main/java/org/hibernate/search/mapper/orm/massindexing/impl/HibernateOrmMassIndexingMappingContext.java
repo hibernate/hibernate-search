@@ -9,8 +9,6 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 import javax.persistence.EntityManager;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
@@ -18,9 +16,6 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMapping
 public interface HibernateOrmMassIndexingMappingContext extends PojoMassIndexingMappingContext {
 
 	SessionFactoryImplementor sessionFactory();
-
-	@Override
-	EntityReferenceFactory<EntityReference> entityReferenceFactory();
 
 	HibernateOrmScopeSessionContext sessionContext(EntityManager entityManager);
 

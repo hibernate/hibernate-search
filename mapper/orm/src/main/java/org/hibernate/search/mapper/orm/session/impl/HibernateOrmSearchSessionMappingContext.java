@@ -10,9 +10,7 @@ import java.util.Collection;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.loading.impl.LoadingMappingContext;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionMappingContext;
@@ -22,9 +20,6 @@ public interface HibernateOrmSearchSessionMappingContext
 
 	@Override
 	FailureHandler failureHandler();
-
-	@Override
-	EntityReferenceFactory<EntityReference> entityReferenceFactory();
 
 	SessionFactoryImplementor sessionFactory();
 

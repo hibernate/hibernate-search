@@ -94,7 +94,7 @@ final class PojoTypeIndexingPlanIndexOrEventQueueDelegate<I, E> implements PojoT
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
+			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
 		return indexDelegate.executeAndReport( entityReferenceFactory, operationSubmitter );
 	}
 

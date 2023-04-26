@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.scope.spi.V5MigrationSearchScope;

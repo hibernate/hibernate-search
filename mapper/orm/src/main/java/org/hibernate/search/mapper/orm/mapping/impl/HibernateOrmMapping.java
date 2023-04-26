@@ -36,8 +36,6 @@ import org.hibernate.search.mapper.orm.automaticindexing.impl.AutomaticIndexingQ
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventProcessingPlan;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.common.EntityReference;
-import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
@@ -74,8 +72,10 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+@SuppressWarnings("deprecation")
 public class HibernateOrmMapping extends AbstractPojoMappingImplementor<HibernateOrmMapping>
-		implements SearchMapping, AutoCloseable, HibernateOrmMappingContext, EntityReferenceFactory<EntityReference>,
+		implements SearchMapping, AutoCloseable, HibernateOrmMappingContext,
+				EntityReferenceFactory<org.hibernate.search.mapper.orm.common.EntityReference>,
 				HibernateOrmListenerContextProvider, BatchMappingContext,
 				HibernateOrmScopeMappingContext, HibernateOrmSearchSessionMappingContext,
 				AutomaticIndexingMappingContext, CoordinationStrategyContext {
@@ -223,14 +223,14 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public EntityReferenceFactory<EntityReference> entityReferenceFactory() {
+	public EntityReferenceFactory<org.hibernate.search.mapper.orm.common.EntityReference> entityReferenceFactory() {
 		return this;
 	}
 
 	@Override
-	public EntityReference createEntityReference(String typeName, Object identifier) {
+	public org.hibernate.search.mapper.orm.common.EntityReference createEntityReference(String typeName, Object identifier) {
 		HibernateOrmSessionTypeContext<?> typeContext = typeContextContainer.byJpaEntityName().getOrFail( typeName );
-		return new EntityReferenceImpl( typeContext.typeIdentifier(), typeContext.jpaEntityName(), identifier );
+		return new org.hibernate.search.mapper.orm.common.impl.HibernateOrmEntityReference( typeContext.typeIdentifier(), typeContext.jpaEntityName(), identifier );
 	}
 
 	@Override
@@ -348,7 +348,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> currentAutomaticIndexingSynchronizationStrategy(
+	public ConfiguredIndexingPlanSynchronizationStrategy currentAutomaticIndexingSynchronizationStrategy(
 			SessionImplementor session) {
 		return HibernateOrmSearchSession.get( this, session )
 				.configuredAutomaticIndexingSynchronizationStrategy();
@@ -418,7 +418,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	private Optional<SearchScopeImpl<Object>> createAllScope() {
 		return delegate()
-				.<EntityReference, HibernateOrmScopeIndexedTypeContext<?>>createPojoAllScope(
+				.<org.hibernate.search.mapper.orm.common.EntityReference, HibernateOrmScopeIndexedTypeContext<?>>createPojoAllScope(
 						this,
 						typeContextContainer::indexedForExactType
 				)
@@ -426,7 +426,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	private <T> SearchScopeImpl<T> doCreateScope(Collection<PojoRawTypeIdentifier<? extends T>> typeIdentifiers) {
-		PojoScopeDelegate<EntityReference, T, HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
+		PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference, T, HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
 				delegate().createPojoScope(
 						this,
 						typeIdentifiers,

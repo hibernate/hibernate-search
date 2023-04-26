@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeSessionContext;
-import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLoadingContext;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;

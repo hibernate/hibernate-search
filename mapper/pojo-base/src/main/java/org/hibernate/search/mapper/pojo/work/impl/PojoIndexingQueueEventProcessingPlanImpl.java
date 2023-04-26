@@ -48,7 +48,7 @@ public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndex
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
+			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
 		return delegate.executeAndReport( entityReferenceFactory, operationSubmitter );
 	}
 

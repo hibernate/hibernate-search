@@ -20,7 +20,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
