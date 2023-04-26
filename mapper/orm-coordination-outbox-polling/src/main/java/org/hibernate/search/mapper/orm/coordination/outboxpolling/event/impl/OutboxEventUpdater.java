@@ -102,7 +102,7 @@ public class OutboxEventUpdater {
 		SearchException exception = log.maxRetryExhausted( MAX_RETRIES );
 		builder.throwable( exception );
 		builder.failingOperation( "Processing an outbox event." );
-		builder.entityReference( processingPlan.entityReference(
+		builder.failingEntityReference( processingPlan.entityReference(
 				failedEvent.getEntityName(), failedEvent.getEntityId(), exception ) );
 		failureHandler.handle( builder.build() );
 	}

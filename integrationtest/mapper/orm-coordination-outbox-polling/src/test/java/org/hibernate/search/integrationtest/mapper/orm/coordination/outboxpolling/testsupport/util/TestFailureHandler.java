@@ -32,8 +32,7 @@ public class TestFailureHandler implements FailureHandler {
 
 	@Override
 	public void handle(EntityIndexingFailureContext context) {
-		for ( Object item : context.entityReferences() ) {
-			EntityReference entityReference = (EntityReference) item;
+		for ( EntityReference entityReference : context.failingEntityReferences() ) {
 			Integer id = (Integer) entityReference.id();
 
 			entityFailures.computeIfAbsent( id, key -> Collections.synchronizedList( new ArrayList<>() ) );

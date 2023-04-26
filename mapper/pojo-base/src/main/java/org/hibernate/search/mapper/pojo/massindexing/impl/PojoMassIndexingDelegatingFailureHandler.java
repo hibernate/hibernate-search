@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -34,8 +35,8 @@ public class PojoMassIndexingDelegatingFailureHandler implements MassIndexingFai
 		EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
 		builder.throwable( context.throwable() );
 		builder.failingOperation( context.failingOperation() );
-		for ( Object entityReference : context.entityReferences() ) {
-			builder.entityReference( entityReference );
+		for ( EntityReference entityReference : context.failingEntityReferences() ) {
+			builder.failingEntityReference( entityReference );
 		}
 		delegate.handle( builder.build() );
 	}
