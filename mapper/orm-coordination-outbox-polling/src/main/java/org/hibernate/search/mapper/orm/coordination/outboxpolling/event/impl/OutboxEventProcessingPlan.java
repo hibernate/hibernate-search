@@ -29,7 +29,7 @@ final class OutboxEventProcessingPlan {
 
 	private final AutomaticIndexingQueueEventProcessingPlan processingPlan;
 	private final FailureHandler failureHandler;
-	private final EntityReferenceFactory<? extends EntityReference> entityReferenceFactory;
+	private final EntityReferenceFactory<?> entityReferenceFactory;
 	private final List<OutboxEvent> failedEvents = new ArrayList<>();
 
 	private List<OutboxEvent> events = new ArrayList<>();
@@ -95,7 +95,7 @@ final class OutboxEventProcessingPlan {
 		}
 	}
 
-	private void reportBackendResult(MultiEntityOperationExecutionReport<EntityReference> report) {
+	private void reportBackendResult(MultiEntityOperationExecutionReport report) {
 		Optional<Throwable> throwable = report.throwable();
 		if ( !throwable.isPresent() ) {
 			return;

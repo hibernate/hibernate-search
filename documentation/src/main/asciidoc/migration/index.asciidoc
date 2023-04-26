@@ -362,10 +362,8 @@ Note the new API is still incubating and might change.
 [[spi]]
 == SPI changes
 
-The https://hibernate.org/community/compatibility-policy/#code-categorization[SPI]
-is mostly backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
-
-Below are the most notable SPI changes:
+Below are the most notable https://hibernate.org/community/compatibility-policy/#code-categorization[SPI] changes
+compared to {hibernateSearchPreviousStableVersionShort}:
 
 * `PojoGenericTypeModel` no longer exists; its methods moved to `PojoTypeModel`.
 * `org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator#annotatedTypeDiscoveryEnabled` is deprecated.
@@ -376,6 +374,13 @@ Use/implement `org.hibernate.search.util.common.reflect.spi.ValueHandleFactory` 
 Use `PojoAdditionalMetadataCollectorTypeNode#markAsEntity(String, org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvider)` instead.
 * `AutomaticIndexingStrategyStartContext` is deprecated.
 It was introduced by mistake and does not have any use.
+* Mappers are no longer expected to provide a custom class to represent entity references,
+e.g. in search projections or in indexing failure reports.
+They should use `org.hibernate.search.engine.common.EntityReference` instead.
+* Many `execute*(...)`/`send*(...)` methods related to indexing plans now take an `OperationSubmitter` as an argument
+(see the javadoc of `OperationSubmitter`)
+and no longer take an `EntityReferenceFactory` as an argument
+(which is provided through `AbstractPojoMappingImplementor#entityReferenceFactory` instead).
 
 [[behavior]]
 == Behavior changes

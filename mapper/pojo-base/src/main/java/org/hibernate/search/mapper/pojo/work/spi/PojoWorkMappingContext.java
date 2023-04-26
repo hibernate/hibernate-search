@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.work.spi;
 
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
 
@@ -14,7 +13,5 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
  * Mapping-scoped information and operations for use in POJO work execution.
  */
 public interface PojoWorkMappingContext extends BackendMappingContext, BridgeMappingContext {
-
-	EntityReferenceFactory<?> entityReferenceFactory();
 
 }

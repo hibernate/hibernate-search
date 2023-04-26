@@ -32,6 +32,7 @@ public class LuceneIndexIndexingPlan implements IndexIndexingPlan {
 	private final LuceneWorkFactory factory;
 	private final LuceneIndexEntryFactory indexEntryFactory;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
+	private final EntityReferenceFactory<?> entityReferenceFactory;
 	private final String tenantId;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
@@ -46,6 +47,7 @@ public class LuceneIndexIndexingPlan implements IndexIndexingPlan {
 		this.factory = factory;
 		this.indexEntryFactory = indexEntryFactory;
 		this.indexManagerContext = indexManagerContext;
+		this.entityReferenceFactory = sessionContext.mappingContext().entityReferenceFactory();
 		this.tenantId = sessionContext.tenantIdentifier();
 		this.commitStrategy = commitStrategy;
 		this.refreshStrategy = refreshStrategy;
@@ -91,14 +93,13 @@ public class LuceneIndexIndexingPlan implements IndexIndexingPlan {
 	}
 
 	@Override
-	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
+	public CompletableFuture<MultiEntityOperationExecutionReport> executeAndReport(OperationSubmitter operationSubmitter) {
 		try {
-			List<CompletableFuture<MultiEntityOperationExecutionReport<R>>> shardReportFutures = new ArrayList<>();
+			List<CompletableFuture<MultiEntityOperationExecutionReport>> shardReportFutures = new ArrayList<>();
 			for ( Map.Entry<LuceneSerialWorkOrchestrator, List<SingleDocumentIndexingWork>> entry : worksByOrchestrator.entrySet() ) {
 				LuceneSerialWorkOrchestrator orchestrator = entry.getKey();
 				List<SingleDocumentIndexingWork> works = entry.getValue();
-				LuceneIndexIndexingPlanExecution<R> execution = new LuceneIndexIndexingPlanExecution<>(
+				LuceneIndexIndexingPlanExecution execution = new LuceneIndexIndexingPlanExecution(
 						orchestrator, entityReferenceFactory,
 						commitStrategy, refreshStrategy,
 						works

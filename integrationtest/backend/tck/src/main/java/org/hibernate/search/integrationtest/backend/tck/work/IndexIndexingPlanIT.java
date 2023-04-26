@@ -17,6 +17,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -247,8 +248,8 @@ public class IndexIndexingPlanIT {
 		// Trigger failures in the next operations
 		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );
 
-		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> future =
-				plan.executeAndReport( StubEntityReference.FACTORY, OperationSubmitter.blocking() );
+		CompletableFuture<MultiEntityOperationExecutionReport> future =
+				plan.executeAndReport( OperationSubmitter.blocking() );
 		Awaitility.await().until( future::isDone );
 
 		// The operation should succeed, but the report should indicate a failure.
@@ -258,8 +259,8 @@ public class IndexIndexingPlanIT {
 				softly.assertThat( report.throwable() ).containsInstanceOf( SearchException.class );
 				softly.assertThat( report.failingEntityReferences() )
 						.containsExactly(
-								new StubEntityReference( index.typeName(), "1" ),
-								new StubEntityReference( index.typeName(), "2" )
+								new StubEntityReference( DocumentReference.class, index.typeName(), "1" ),
+								new StubEntityReference( DocumentReference.class, index.typeName(), "2" )
 						);
 			} );
 		} );

@@ -10,20 +10,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
-import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
-import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 
 class StubIndexIndexingPlan implements IndexIndexingPlan {
 	private final String indexName;
@@ -85,8 +84,7 @@ class StubIndexIndexingPlan implements IndexIndexingPlan {
 	}
 
 	@Override
-	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
+	public CompletableFuture<MultiEntityOperationExecutionReport> executeAndReport(OperationSubmitter operationSubmitter) {
 		List<StubDocumentWork> worksToExecute = new ArrayList<>( works );
 		works.clear();
 		CompletableFuture<?>[] workFutures = worksToExecute.stream()
@@ -95,20 +93,20 @@ class StubIndexIndexingPlan implements IndexIndexingPlan {
 		return CompletableFuture.allOf( workFutures )
 				.handle( Futures.handler( (ignored1, ignored2) -> {
 					// The throwable is ignored, because it comes from a work future and we'll address this below.
-					return buildResult( entityReferenceFactory, worksToExecute, workFutures );
+					return buildResult( worksToExecute, workFutures );
 				} ) );
 	}
 
-	private <R> MultiEntityOperationExecutionReport<R> buildResult(EntityReferenceFactory<? extends R> entityReferenceFactory,
-			List<StubDocumentWork> worksToExecute,
+	private MultiEntityOperationExecutionReport buildResult(List<StubDocumentWork> worksToExecute,
 			CompletableFuture<?>[] finishedWorkFutures) {
-		MultiEntityOperationExecutionReport.Builder<R> builder = MultiEntityOperationExecutionReport.builder();
+		MultiEntityOperationExecutionReport.Builder builder = MultiEntityOperationExecutionReport.builder();
 		for ( int i = 0; i < finishedWorkFutures.length; i++ ) {
 			CompletableFuture<?> future = finishedWorkFutures[i];
 			if ( future.isCompletedExceptionally() ) {
 				builder.throwable( Futures.getThrowableNow( future ) );
 				StubDocumentWork work = worksToExecute.get( i );
-				builder.failingEntityReference( entityReferenceFactory, typeName, work.getEntityIdentifier() );
+				builder.failingEntityReference( sessionContext.mappingContext().entityReferenceFactory(),
+						typeName, work.getEntityIdentifier() );
 			}
 		}
 		return builder.build();

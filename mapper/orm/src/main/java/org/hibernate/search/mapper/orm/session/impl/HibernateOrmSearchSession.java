@@ -21,6 +21,7 @@ import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.DelegatingAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
@@ -115,6 +116,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
+	public HibernateOrmSearchSessionMappingContext mappingContext() {
+		return mappingContext;
+	}
+
+	@Override
 	public String tenantIdentifier() {
 		return session().getTenantIdentifier();
 	}
@@ -206,6 +212,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	@Override
 	public SessionImplementor session() {
 		return sessionImplementor;
+	}
+
+	@Override
+	public EntityReferenceFactory<?> entityReferenceFactory() {
+		return mappingContext.entityReferenceFactory();
 	}
 
 	@Override

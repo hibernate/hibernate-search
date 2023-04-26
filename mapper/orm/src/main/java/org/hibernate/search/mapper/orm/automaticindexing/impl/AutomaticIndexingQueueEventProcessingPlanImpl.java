@@ -8,10 +8,8 @@ package org.hibernate.search.mapper.orm.automaticindexing.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
-import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventProcessingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
@@ -19,12 +17,9 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessin
 public class AutomaticIndexingQueueEventProcessingPlanImpl implements AutomaticIndexingQueueEventProcessingPlan {
 
 	private final PojoIndexingQueueEventProcessingPlan delegate;
-	private final EntityReferenceFactory<? extends EntityReference> entityReferenceFactory;
 
-	public AutomaticIndexingQueueEventProcessingPlanImpl(PojoIndexingQueueEventProcessingPlan delegate,
-			EntityReferenceFactory<? extends EntityReference> entityReferenceFactory) {
+	public AutomaticIndexingQueueEventProcessingPlanImpl(PojoIndexingQueueEventProcessingPlan delegate) {
 		this.delegate = delegate;
-		this.entityReferenceFactory = entityReferenceFactory;
 	}
 
 	@Override
@@ -33,9 +28,9 @@ public class AutomaticIndexingQueueEventProcessingPlanImpl implements AutomaticI
 	}
 
 	@Override
-	public CompletableFuture<MultiEntityOperationExecutionReport<EntityReference>> executeAndReport(
+	public CompletableFuture<MultiEntityOperationExecutionReport> executeAndReport(
 			OperationSubmitter operationSubmitter) {
-		return delegate.executeAndReport( entityReferenceFactory, operationSubmitter );
+		return delegate.executeAndReport( operationSubmitter );
 	}
 
 	@Override

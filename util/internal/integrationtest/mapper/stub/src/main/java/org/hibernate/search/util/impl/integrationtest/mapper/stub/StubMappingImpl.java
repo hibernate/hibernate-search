@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
@@ -26,7 +27,8 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeCon
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Futures;
 
-public class StubMappingImpl implements StubMapping, MappingImplementor<StubMappingImpl> {
+public class StubMappingImpl
+		implements StubMapping, MappingImplementor<StubMappingImpl>, EntityReferenceFactory<StubEntityReference> {
 
 	private final Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier;
 	private final StubMappingSchemaManagementStrategy schemaManagementStrategy;
@@ -60,6 +62,16 @@ public class StubMappingImpl implements StubMapping, MappingImplementor<StubMapp
 	@Override
 	public ProjectionMappedTypeContext mappedTypeContext(String mappedTypeName) {
 		return fixture.typeContext( mappedTypeName );
+	}
+
+	@Override
+	public EntityReferenceFactory<?> entityReferenceFactory() {
+		return this;
+	}
+
+	@Override
+	public StubEntityReference createEntityReference(String typeName, Object identifier) {
+		return new StubEntityReference( mappedTypeContext( typeName ).javaClass(), typeName, identifier );
 	}
 
 	@Override

@@ -11,7 +11,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
-import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.reporting.FailureHandler;
 
 public interface AutomaticIndexingMappingContext {
@@ -34,6 +33,6 @@ public interface AutomaticIndexingMappingContext {
 	 */
 	AutomaticIndexingQueueEventProcessingPlan createIndexingQueueEventProcessingPlan(Session session);
 
-	EntityReferenceFactory<? extends EntityReference> entityReferenceFactory();
+	EntityReferenceFactory<?> entityReferenceFactory();
 
 }

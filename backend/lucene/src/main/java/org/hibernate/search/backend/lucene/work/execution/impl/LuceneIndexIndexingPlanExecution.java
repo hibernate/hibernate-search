@@ -20,13 +20,11 @@ import org.hibernate.search.util.common.impl.Futures;
 
 /**
  * A single-use, stateful execution of a set of works as part of an indexing plan.
- *
- * @param <R> The type of entity references in the {@link #execute(OperationSubmitter) execution report}.
  */
-class LuceneIndexIndexingPlanExecution<R> {
+class LuceneIndexIndexingPlanExecution {
 
 	private final LuceneSerialWorkOrchestrator orchestrator;
-	private final EntityReferenceFactory<? extends R> entityReferenceFactory;
+	private final EntityReferenceFactory<?> entityReferenceFactory;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
@@ -35,7 +33,7 @@ class LuceneIndexIndexingPlanExecution<R> {
 
 	@SuppressWarnings("unchecked")
 	LuceneIndexIndexingPlanExecution(LuceneSerialWorkOrchestrator orchestrator,
-			EntityReferenceFactory<? extends R> entityReferenceFactory,
+			EntityReferenceFactory<?> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy,
 			List<SingleDocumentIndexingWork> works) {
@@ -59,12 +57,12 @@ class LuceneIndexIndexingPlanExecution<R> {
 	 * @return A future that completes when all works and optionally commit/refresh have completed,
 	 * holding an execution report.
 	 */
-	CompletableFuture<MultiEntityOperationExecutionReport<R>> execute(OperationSubmitter operationSubmitter) {
+	CompletableFuture<MultiEntityOperationExecutionReport> execute(OperationSubmitter operationSubmitter) {
 		// Add the handler to the future *before* submitting the works,
 		// so as to be sure that onAllWorksFinished is executed in the background,
 		// not in the current thread.
 		// It's important because we don't want to block the current thread.
-		CompletableFuture<MultiEntityOperationExecutionReport<R>> reportFuture = CompletableFuture.allOf( futures )
+		CompletableFuture<MultiEntityOperationExecutionReport> reportFuture = CompletableFuture.allOf( futures )
 				// We don't care about the throwable, as it comes from a work and
 				// work failures are handled in onAllWorksFinished
 				.handle( (result, throwable) -> onAllWorksFinished() );
@@ -78,7 +76,7 @@ class LuceneIndexIndexingPlanExecution<R> {
 		return reportFuture;
 	}
 
-	private MultiEntityOperationExecutionReport<R> onAllWorksFinished() {
+	private MultiEntityOperationExecutionReport onAllWorksFinished() {
 		Throwable commitOrRefreshThrowable = null;
 		try {
 			commitOrRefreshAsNecessary();
@@ -102,8 +100,8 @@ class LuceneIndexIndexingPlanExecution<R> {
 		}
 	}
 
-	private MultiEntityOperationExecutionReport<R> buildReport(Throwable commitOrRefreshThrowable) {
-		MultiEntityOperationExecutionReport.Builder<R> reportBuilder = MultiEntityOperationExecutionReport.builder();
+	private MultiEntityOperationExecutionReport buildReport(Throwable commitOrRefreshThrowable) {
+		MultiEntityOperationExecutionReport.Builder reportBuilder = MultiEntityOperationExecutionReport.builder();
 		for ( int i = 0; i < futures.length; i++ ) {
 			CompletableFuture<?> future = futures[i];
 			if ( future.isCompletedExceptionally() ) {

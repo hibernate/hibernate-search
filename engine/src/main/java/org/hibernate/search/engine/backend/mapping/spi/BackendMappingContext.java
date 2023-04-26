@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.backend.mapping.spi;
 
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
@@ -24,5 +25,10 @@ public interface BackendMappingContext {
 	ProjectionRegistry projectionRegistry();
 
 	ProjectionMappedTypeContext mappedTypeContext(String mappedTypeName);
+
+	/**
+	 * @return A {@link EntityReferenceFactory}.
+	 */
+	EntityReferenceFactory<?> entityReferenceFactory();
 
 }

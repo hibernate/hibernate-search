@@ -32,6 +32,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -73,7 +74,7 @@ public class LuceneIndexIndexingPlanExecutionTest {
 	private LuceneSerialWorkOrchestrator orchestratorMock;
 
 	@Mock(strictness = Mock.Strictness.LENIENT)
-	private EntityReferenceFactory<StubEntityReference> entityReferenceFactoryMock;
+	private EntityReferenceFactory<EntityReference> entityReferenceFactoryMock;
 
 	private final List<SingleDocumentIndexingWork> workMocks = new ArrayList<>();
 
@@ -101,9 +102,9 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport> planExecutionFuture;
 
-		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
+		LuceneIndexIndexingPlanExecution execution = new LuceneIndexIndexingPlanExecution(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				commitStrategy, refreshStrategy,
@@ -156,9 +157,9 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport> planExecutionFuture;
 
-		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
+		LuceneIndexIndexingPlanExecution execution = new LuceneIndexIndexingPlanExecution(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				commitStrategy, refreshStrategy,
@@ -214,9 +215,9 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Long>> work4FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport> planExecutionFuture;
 
-		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
+		LuceneIndexIndexingPlanExecution execution = new LuceneIndexIndexingPlanExecution(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				commitStrategy, refreshStrategy,
@@ -279,9 +280,9 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Long>> work4FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport> planExecutionFuture;
 
-		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
+		LuceneIndexIndexingPlanExecution execution = new LuceneIndexIndexingPlanExecution(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				commitStrategy, refreshStrategy,
@@ -353,9 +354,9 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport> planExecutionFuture;
 
-		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
+		LuceneIndexIndexingPlanExecution execution = new LuceneIndexIndexingPlanExecution(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				commitStrategy, refreshStrategy,
@@ -411,9 +412,9 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport> planExecutionFuture;
 
-		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
+		LuceneIndexIndexingPlanExecution execution = new LuceneIndexIndexingPlanExecution(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				commitStrategy, DocumentRefreshStrategy.FORCE,
@@ -471,9 +472,9 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport> planExecutionFuture;
 
-		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
+		LuceneIndexIndexingPlanExecution execution = new LuceneIndexIndexingPlanExecution(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				commitStrategy, refreshStrategy,
@@ -530,9 +531,9 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport> planExecutionFuture;
 
-		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
+		LuceneIndexIndexingPlanExecution execution = new LuceneIndexIndexingPlanExecution(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				commitStrategy, DocumentRefreshStrategy.FORCE,
@@ -603,7 +604,7 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		return workMock;
 	}
 
-	private StubEntityReference entityReference(int id) {
+	private EntityReference entityReference(int id) {
 		return new StubEntityReference( TYPE_NAME, id );
 	}
 
@@ -611,7 +612,7 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		return "work_" + index;
 	}
 
-	private static class StubEntityReference {
+	private static class StubEntityReference implements EntityReference {
 		private final String typeName;
 		private final Object identifier;
 
@@ -644,6 +645,21 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		@Override
 		public int hashCode() {
 			return Objects.hash( typeName, identifier );
+		}
+
+		@Override
+		public Class<?> type() {
+			return Object.class;
+		}
+
+		@Override
+		public String name() {
+			return typeName;
+		}
+
+		@Override
+		public Object id() {
+			return identifier;
 		}
 	}
 }

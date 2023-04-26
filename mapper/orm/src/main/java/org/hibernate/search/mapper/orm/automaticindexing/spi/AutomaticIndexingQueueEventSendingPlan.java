@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.orm.automaticindexing.spi;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
@@ -22,7 +21,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 public interface AutomaticIndexingQueueEventSendingPlan {
 
 	/**
-	 * Appends an event to the plan, to be sent {@link #sendAndReport(EntityReferenceFactory, OperationSubmitter) later}
+	 * Appends an event to the plan, to be sent {@link #sendAndReport(OperationSubmitter) later}
 	 * and ultimately added to an {@link AutomaticIndexingQueueEventProcessingPlan}.
 	 *
 	 * @param entityName The name of the entity type.
@@ -44,14 +43,12 @@ public interface AutomaticIndexingQueueEventSendingPlan {
 	 * When the returned future completes, events are guaranteed to be stored in secure storage
 	 * in such a way that they will eventually be processed.
 	 *
-	 * @param <R> The type of entity references in the returned execution report.
-	 * @param entityReferenceFactory A factory for entity references in the returned execution report.
 	 * @param operationSubmitter How to handle request to submit operation when the queue is full.
+	 *
 	 * @return A {@link CompletableFuture} that will hold an execution report when all the events are sent.
 	 * If sending an event failed, the future will be completed normally,
 	 * but the report will contain an exception.
 	 */
-	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReport(
-			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter);
+	CompletableFuture<MultiEntityOperationExecutionReport> sendAndReport(OperationSubmitter operationSubmitter);
 
 }

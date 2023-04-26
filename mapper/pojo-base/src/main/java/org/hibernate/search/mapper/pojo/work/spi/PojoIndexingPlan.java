@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.pojo.work.spi;
 import java.util.BitSet;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
@@ -25,11 +24,11 @@ import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
  * the entities will be processed and index documents will be built
  * and stored in an internal buffer.
  * <p>
- * When {@link #executeAndReport(EntityReferenceFactory)} is called,
+ * When {@link #executeAndReport(OperationSubmitter)} is called,
  * the operations will be actually sent to the index.
  * <p>
- * Note that {@link #executeAndReport(EntityReferenceFactory)} will implicitly trigger processing of documents that weren't processed yet,
- * if any, so calling {@link #process()} is not necessary if you call {@link #executeAndReport(EntityReferenceFactory)} just next.
+ * Note that {@link #executeAndReport(OperationSubmitter)} will implicitly trigger processing of documents that weren't processed yet,
+ * if any, so calling {@link #process()} is not necessary if you call {@link #executeAndReport(OperationSubmitter)} just next.
  * <p>
  * Implementations may not be thread-safe.
  */
@@ -172,7 +171,7 @@ public interface PojoIndexingPlan {
 	 * In particular, ensure that all data is extracted from the POJOs
 	 * and converted to the backend-specific format.
 	 * <p>
-	 * Calling this method is optional: the {@link #executeAndReport(EntityReferenceFactory)} method
+	 * Calling this method is optional: the {@link #executeAndReport(OperationSubmitter)} method
 	 * will perform the processing if necessary.
 	 */
 	void process();
@@ -182,22 +181,9 @@ public interface PojoIndexingPlan {
 	 * without waiting for a Hibernate ORM flush event or transaction commit,
 	 * and clear the plan so that it can be re-used.
 	 *
-	 * @param <R> The type of entity references in the returned execution report.
-	 * @param entityReferenceFactory A factory for entity references in the returned execution report.
 	 * @return A {@link CompletableFuture} that will be completed with an execution report when all the works are complete.
 	 */
-	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter);
-
-	/**
-	 * @see #executeAndReport(EntityReferenceFactory, OperationSubmitter)
-	 * @deprecated Use {@link #executeAndReport(EntityReferenceFactory, OperationSubmitter)} instead.
-	 */
-	@Deprecated
-	default <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory) {
-		return executeAndReport( entityReferenceFactory, OperationSubmitter.blocking() );
-	}
+	CompletableFuture<MultiEntityOperationExecutionReport> executeAndReport(OperationSubmitter operationSubmitter);
 
 	/**
 	 * Discard all plans of indexing.

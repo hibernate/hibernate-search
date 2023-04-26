@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -39,14 +38,14 @@ public class PojoIndexingPlanLocalStrategy implements PojoIndexingPlanStrategy {
 	}
 
 	@Override
-	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> doExecuteAndReport(
+	public CompletableFuture<MultiEntityOperationExecutionReport> doExecuteAndReport(
 			Collection<PojoIndexedTypeIndexingPlan<?, ?>> indexedTypeDelegates,
 			PojoLoadingPlanProvider loadingPlanProvider,
-			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
-		List<CompletableFuture<MultiEntityOperationExecutionReport<R>>> futures = new ArrayList<>();
+			OperationSubmitter operationSubmitter) {
+		List<CompletableFuture<MultiEntityOperationExecutionReport>> futures = new ArrayList<>();
 		// Each type has its own index indexing plan to execute.
 		for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates ) {
-			futures.add( delegate.executeAndReport( entityReferenceFactory, operationSubmitter ) );
+			futures.add( delegate.executeAndReport( operationSubmitter ) );
 		}
 		return MultiEntityOperationExecutionReport.allOf( futures );
 	}

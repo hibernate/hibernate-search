@@ -12,26 +12,24 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.util.common.AssertionFailure;
 
-/**
- * @param <R> The type of entity references.
- */
-public final class MultiEntityOperationExecutionReport<R> {
+public final class MultiEntityOperationExecutionReport {
 
-	public static <R> MultiEntityOperationExecutionReport.Builder<R> builder() {
-		return new MultiEntityOperationExecutionReport.Builder<>();
+	public static MultiEntityOperationExecutionReport.Builder builder() {
+		return new MultiEntityOperationExecutionReport.Builder();
 	}
 
-	public static <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> allOf(
-			List<CompletableFuture<MultiEntityOperationExecutionReport<R>>> reportFutures) {
+	public static CompletableFuture<MultiEntityOperationExecutionReport> allOf(
+			List<CompletableFuture<MultiEntityOperationExecutionReport>> reportFutures) {
 		if ( reportFutures.size() == 1 ) {
 			return reportFutures.get( 0 );
 		}
 		else {
-			CompletableFuture<MultiEntityOperationExecutionReport.Builder<R>> reportBuilderFuture =
+			CompletableFuture<MultiEntityOperationExecutionReport.Builder> reportBuilderFuture =
 					CompletableFuture.completedFuture( MultiEntityOperationExecutionReport.builder() );
-			for ( CompletableFuture<MultiEntityOperationExecutionReport<R>> future : reportFutures ) {
+			for ( CompletableFuture<MultiEntityOperationExecutionReport> future : reportFutures ) {
 				reportBuilderFuture = reportBuilderFuture.thenCombine(
 						future, MultiEntityOperationExecutionReport.Builder::add
 				);
@@ -42,9 +40,9 @@ public final class MultiEntityOperationExecutionReport<R> {
 
 	private final Throwable throwable;
 
-	private final List<R> failingEntityReferences;
+	private final List<EntityReference> failingEntityReferences;
 
-	private MultiEntityOperationExecutionReport(Builder<R> builder) {
+	private MultiEntityOperationExecutionReport(Builder builder) {
 		this.failingEntityReferences = builder.failingEntityReferences == null
 				? Collections.emptyList() : Collections.unmodifiableList( builder.failingEntityReferences );
 		if ( builder.throwable == null && !failingEntityReferences.isEmpty() ) {
@@ -61,27 +59,27 @@ public final class MultiEntityOperationExecutionReport<R> {
 		return Optional.ofNullable( throwable );
 	}
 
-	public List<R> failingEntityReferences() {
+	public List<EntityReference> failingEntityReferences() {
 		return failingEntityReferences;
 	}
 
-	public static final class Builder<R> {
+	public static final class Builder {
 
 		private Throwable throwable;
-		private List<R> failingEntityReferences;
+		private List<EntityReference> failingEntityReferences;
 
 		private Builder() {
 		}
 
-		public Builder<R> add(MultiEntityOperationExecutionReport<R> report) {
+		public Builder add(MultiEntityOperationExecutionReport report) {
 			report.throwable().ifPresent( this::throwable );
-			for ( R failingEntityReference : report.failingEntityReferences() ) {
+			for ( EntityReference failingEntityReference : report.failingEntityReferences() ) {
 				failingEntityReference( failingEntityReference );
 			}
 			return this;
 		}
 
-		public Builder<R> throwable(Throwable throwable) {
+		public Builder throwable(Throwable throwable) {
 			if ( this.throwable == null ) {
 				this.throwable = throwable;
 			}
@@ -91,7 +89,7 @@ public final class MultiEntityOperationExecutionReport<R> {
 			return this;
 		}
 
-		public Builder<R> failingEntityReference(R reference) {
+		public Builder failingEntityReference(EntityReference reference) {
 			if ( failingEntityReferences == null ) {
 				failingEntityReferences = new ArrayList<>();
 			}
@@ -99,9 +97,9 @@ public final class MultiEntityOperationExecutionReport<R> {
 			return this;
 		}
 
-		public Builder<R> failingEntityReference(EntityReferenceFactory<? extends R> referenceFactory,
+		public Builder failingEntityReference(EntityReferenceFactory<?> referenceFactory,
 				String typeName, Object entityIdentifier) {
-			R reference = EntityReferenceFactory.safeCreateEntityReference( referenceFactory,
+			EntityReference reference = EntityReferenceFactory.safeCreateEntityReference( referenceFactory,
 					typeName, entityIdentifier, this::throwable );
 			if ( reference != null ) {
 				failingEntityReference( reference );
@@ -109,8 +107,8 @@ public final class MultiEntityOperationExecutionReport<R> {
 			return this;
 		}
 
-		public MultiEntityOperationExecutionReport<R> build() {
-			return new MultiEntityOperationExecutionReport<>( this );
+		public MultiEntityOperationExecutionReport build() {
+			return new MultiEntityOperationExecutionReport( this );
 		}
 
 	}

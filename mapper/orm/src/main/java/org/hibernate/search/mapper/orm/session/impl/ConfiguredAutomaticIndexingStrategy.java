@@ -222,8 +222,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 			IndexingPlanSynchronizationStrategy synchronizationStrategy) {
 		ConfiguredIndexingPlanSynchronizationStrategy.Builder builder =
 				new ConfiguredIndexingPlanSynchronizationStrategy.Builder(
-						mappingContext.failureHandler(),
-						mappingContext.entityReferenceFactory()
+						mappingContext.failureHandler()
 				);
 		synchronizationStrategy.apply( builder );
 		return builder.build();

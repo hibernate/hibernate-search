@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
@@ -51,7 +52,7 @@ public final class PojoDocumentContributor<E> implements DocumentContributor {
 		}
 		catch (RuntimeException e) {
 			EntityReferenceFactory<?> entityReferenceFactory = sessionContext.mappingContext().entityReferenceFactory();
-			Object entityReference = EntityReferenceFactory.safeCreateEntityReference(
+			EntityReference entityReference = EntityReferenceFactory.safeCreateEntityReference(
 					entityReferenceFactory, entityName, identifier, e::addSuppressed );
 			throw log.errorBuildingDocument( entityReference, e.getMessage(), e );
 		}

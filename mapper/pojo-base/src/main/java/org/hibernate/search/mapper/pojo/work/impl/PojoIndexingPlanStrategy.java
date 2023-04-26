@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.pojo.work.impl;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
@@ -22,10 +21,10 @@ interface PojoIndexingPlanStrategy {
 
 	boolean shouldResolveDirtyForDeleteOnly();
 
-	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> doExecuteAndReport(
+	CompletableFuture<MultiEntityOperationExecutionReport> doExecuteAndReport(
 			Collection<PojoIndexedTypeIndexingPlan<?, ?>> indexedTypeDelegates,
 			PojoLoadingPlanProvider loadingPlanProvider,
-			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter);
+			OperationSubmitter operationSubmitter);
 
 	void doDiscard(Collection<PojoIndexedTypeIndexingPlan<?, ?>> indexedTypeDelegates);
 
