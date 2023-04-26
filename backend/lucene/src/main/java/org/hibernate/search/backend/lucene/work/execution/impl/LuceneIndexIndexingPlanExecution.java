@@ -24,7 +24,7 @@ import org.hibernate.search.util.common.impl.Futures;
 class LuceneIndexIndexingPlanExecution {
 
 	private final LuceneSerialWorkOrchestrator orchestrator;
-	private final EntityReferenceFactory<?> entityReferenceFactory;
+	private final EntityReferenceFactory entityReferenceFactory;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
@@ -33,7 +33,7 @@ class LuceneIndexIndexingPlanExecution {
 
 	@SuppressWarnings("unchecked")
 	LuceneIndexIndexingPlanExecution(LuceneSerialWorkOrchestrator orchestrator,
-			EntityReferenceFactory<?> entityReferenceFactory,
+			EntityReferenceFactory entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy,
 			List<SingleDocumentIndexingWork> works) {

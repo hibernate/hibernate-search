@@ -11,7 +11,7 @@ import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 
 public interface AutomaticIndexingEventSendingSessionContext {
 
-	EntityReferenceFactory<?> entityReferenceFactory();
+	EntityReferenceFactory entityReferenceFactory();
 
 	Session session();
 

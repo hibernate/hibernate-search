@@ -213,7 +213,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public EntityReferenceFactory<?> entityReferenceFactory() {
+	public EntityReferenceFactory entityReferenceFactory() {
 		return mappingContext.entityReferenceFactory();
 	}
 

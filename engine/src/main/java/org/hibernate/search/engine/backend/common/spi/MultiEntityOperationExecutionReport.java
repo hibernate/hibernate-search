@@ -97,7 +97,7 @@ public final class MultiEntityOperationExecutionReport {
 			return this;
 		}
 
-		public Builder failingEntityReference(EntityReferenceFactory<?> referenceFactory,
+		public Builder failingEntityReference(EntityReferenceFactory referenceFactory,
 				String typeName, Object entityIdentifier) {
 			EntityReference reference = EntityReferenceFactory.safeCreateEntityReference( referenceFactory,
 					typeName, entityIdentifier, this::throwable );

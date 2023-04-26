@@ -53,7 +53,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest {
 	private ElasticsearchSerialWorkOrchestrator orchestratorMock;
 
 	@Mock(strictness = Mock.Strictness.LENIENT)
-	private EntityReferenceFactory<StubEntityReference> entityReferenceFactoryMock;
+	private EntityReferenceFactory entityReferenceFactoryMock;
 
 	private final List<SingleDocumentIndexingWork> workMocks = new ArrayList<>();
 

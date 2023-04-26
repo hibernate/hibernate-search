@@ -29,6 +29,6 @@ public interface BackendMappingContext {
 	/**
 	 * @return A {@link EntityReferenceFactory}.
 	 */
-	EntityReferenceFactory<?> entityReferenceFactory();
+	EntityReferenceFactory entityReferenceFactory();
 
 }

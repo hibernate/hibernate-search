@@ -11,7 +11,7 @@ import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReferenceFactoryDelegate;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkTypeContext;
 
-final class PojoEntityReferenceFactory implements EntityReferenceFactory<EntityReference> {
+final class PojoEntityReferenceFactory implements EntityReferenceFactory {
 
 	public final PojoEntityReferenceFactoryDelegate delegate;
 	private final PojoTypeManagerContainer typeManagers;

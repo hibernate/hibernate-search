@@ -159,7 +159,7 @@ public class AbstractPojoTypeManager<I, E>
 			reindexingResolver.resolveEntitiesToReindex( collector, entitySupplier.get(), context );
 		}
 		catch (RuntimeException e) {
-			EntityReferenceFactory<?> entityReferenceFactory = sessionContext.mappingContext().entityReferenceFactory();
+			EntityReferenceFactory entityReferenceFactory = sessionContext.mappingContext().entityReferenceFactory();
 			EntityReference entityReference = EntityReferenceFactory.safeCreateEntityReference(
 					entityReferenceFactory, entityName, identifier, e::addSuppressed );
 			throw log.errorResolvingEntitiesToReindex( entityReference, e.getMessage(), e );

@@ -28,7 +28,7 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Futures;
 
 public class StubMappingImpl
-		implements StubMapping, MappingImplementor<StubMappingImpl>, EntityReferenceFactory<StubEntityReference> {
+		implements StubMapping, MappingImplementor<StubMappingImpl>, EntityReferenceFactory {
 
 	private final Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier;
 	private final StubMappingSchemaManagementStrategy schemaManagementStrategy;
@@ -65,7 +65,7 @@ public class StubMappingImpl
 	}
 
 	@Override
-	public EntityReferenceFactory<?> entityReferenceFactory() {
+	public EntityReferenceFactory entityReferenceFactory() {
 		return this;
 	}
 

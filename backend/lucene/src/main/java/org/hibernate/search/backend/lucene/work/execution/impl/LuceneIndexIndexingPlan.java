@@ -32,7 +32,7 @@ public class LuceneIndexIndexingPlan implements IndexIndexingPlan {
 	private final LuceneWorkFactory factory;
 	private final LuceneIndexEntryFactory indexEntryFactory;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
-	private final EntityReferenceFactory<?> entityReferenceFactory;
+	private final EntityReferenceFactory entityReferenceFactory;
 	private final String tenantId;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
