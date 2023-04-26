@@ -18,6 +18,7 @@ import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
+import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReferenceFactoryDelegate;
 import org.hibernate.search.mapper.pojo.search.definition.impl.PojoSearchQueryElementRegistry;
 import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingPlanEventProcessingStrategy;
 import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingPlanEventSendingStrategy;
@@ -81,6 +82,11 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	@Override
 	public ProjectionRegistry projectionRegistry() {
 		return searchQueryElementRegistry;
+	}
+
+	@Override
+	public PojoEntityReferenceFactory createEntityReferenceFactory(PojoEntityReferenceFactoryDelegate delegate) {
+		return new PojoEntityReferenceFactory( delegate, typeManagers );
 	}
 
 	@Override

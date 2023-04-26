@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.pojo.standalone.scope.impl;
 import java.util.Collections;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
@@ -96,9 +95,8 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	}
 
 	public SearchQuerySelectStep<?, EntityReference, E, ?, ?, ?> search(PojoScopeSessionContext sessionContext,
-			DocumentReferenceConverter<EntityReference> documentReferenceConverter,
 			PojoSelectionLoadingContextBuilder<?> loadingContextBuilder) {
-		return delegate.search( sessionContext, documentReferenceConverter, loadingContextBuilder );
+		return delegate.search( sessionContext, loadingContextBuilder );
 	}
 
 	@Override

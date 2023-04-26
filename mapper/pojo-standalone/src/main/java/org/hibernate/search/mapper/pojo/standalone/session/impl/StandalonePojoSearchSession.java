@@ -12,10 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
@@ -44,8 +41,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class StandalonePojoSearchSession extends AbstractPojoSearchSession
-		implements SearchSession, StandalonePojoMassIndexingSessionContext, StandalonePojoLoadingSessionContext,
-				DocumentReferenceConverter<EntityReference> {
+		implements SearchSession, StandalonePojoMassIndexingSessionContext, StandalonePojoLoadingSessionContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -177,15 +173,6 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public EntityReference fromDocumentReference(DocumentReference reference) {
-		StandalonePojoSessionIndexedTypeContext<?> typeContext =
-				typeContextProvider.indexedByEntityName().getOrFail( reference.typeName() );
-		Object id = typeContext.identifierMapping()
-				.fromDocumentIdentifier( reference.id(), this );
-		return new PojoEntityReference( typeContext.typeIdentifier(), typeContext.name(), id );
-	}
-
-	@Override
 	public PojoSelectionLoadingContext defaultLoadingContext() {
 		return loadingContextBuilder().build();
 	}
@@ -196,7 +183,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	}
 
 	private <T> SearchQuerySelectStep<?, EntityReference, T, ?, ?, ?> search(SearchScopeImpl<T> scope) {
-		return scope.search( this, this, loadingContextBuilder() );
+		return scope.search( this, loadingContextBuilder() );
 	}
 
 	private StandalonePojoSelectionLoadingContextBuilder loadingContextBuilder() {

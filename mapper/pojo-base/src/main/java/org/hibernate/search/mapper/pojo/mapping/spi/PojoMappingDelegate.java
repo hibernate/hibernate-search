@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 import java.util.Collection;
 import java.util.Optional;
 
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.common.EntityReference;
@@ -16,6 +17,7 @@ import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
+import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReferenceFactoryDelegate;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -38,6 +40,8 @@ public interface PojoMappingDelegate extends AutoCloseable {
 	TenancyMode tenancyMode();
 
 	ProjectionRegistry projectionRegistry();
+
+	EntityReferenceFactory<?> createEntityReferenceFactory(PojoEntityReferenceFactoryDelegate delegate);
 
 	<R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> createPojoScope(
 			PojoScopeMappingContext mappingContext,

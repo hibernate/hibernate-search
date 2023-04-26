@@ -18,7 +18,6 @@ import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityLoadingStr
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmNonEntityIdPropertyEntityLoadingStrategy;
 import org.hibernate.search.mapper.orm.loading.impl.LoadingTypeContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContext;
-import org.hibernate.search.mapper.pojo.identity.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -35,7 +34,6 @@ abstract class AbstractHibernateOrmTypeContext<E>
 	private final EntityPersister entityPersister;
 	private final boolean documentIdIsEntityId;
 	private final HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy;
-	private final IdentifierMapping identifierMapping;
 	private final PojoPathFilter dirtyFilter;
 	private final PojoPathFilter dirtyContainingAssociationFilter;
 	private final List<PojoRawTypeIdentifier<? super E>> ascendingSuperTypes;
@@ -47,7 +45,6 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		this.jpaEntityName = builder.jpaEntityName;
 		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
 		this.entityPersister = metamodel.entityPersister( builder.hibernateOrmEntityName );
-		this.identifierMapping = builder.identifierMapping;
 		this.ascendingSuperTypes = builder.ascendingSuperTypes;
 		if ( builder.documentIdSourcePropertyName != null ) {
 			if ( builder.documentIdSourcePropertyName.equals( entityPersister().getIdentifierPropertyName() ) ) {
@@ -99,11 +96,6 @@ abstract class AbstractHibernateOrmTypeContext<E>
 	}
 
 	@Override
-	public IdentifierMapping identifierMapping() {
-		return identifierMapping;
-	}
-
-	@Override
 	public HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy() {
 		return loadingStrategy;
 	}
@@ -141,7 +133,6 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		private final String hibernateOrmEntityName;
 		private String documentIdSourcePropertyName;
 		private ValueReadHandle<?> documentIdSourcePropertyHandle;
-		private IdentifierMapping identifierMapping;
 		private PojoPathFilter dirtyFilter;
 		private PojoPathFilter dirtyContainingAssociationFilter;
 		private final List<PojoRawTypeIdentifier<? super E>> ascendingSuperTypes;
@@ -159,11 +150,6 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		public void documentIdSourceProperty(PojoPropertyModel<?> documentIdSourceProperty) {
 			this.documentIdSourcePropertyName = documentIdSourceProperty.name();
 			this.documentIdSourcePropertyHandle = documentIdSourceProperty.handle();
-		}
-
-		@Override
-		public void identifierMapping(IdentifierMapping identifierMapping) {
-			this.identifierMapping = identifierMapping;
 		}
 
 		@Override

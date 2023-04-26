@@ -242,7 +242,7 @@ index ba51476ada..9341b77f8a 100644
  			+ " If you want to define the size of batches for entity loading, set loading options when defining the query instead,"
  			+ " for example with .loading(o -> o.fetchSize(50))."
 diff --git a/main/java/org/hibernate/search/mapper/orm/mapping/impl/AbstractHibernateOrmTypeContext.java b/main/java/org/hibernate/search/mapper/orm/mapping/impl/AbstractHibernateOrmTypeContext.java
-index c09968682b..057510b863 100644
+index c27a8cf81b..32a4796285 100644
 --- a/main/java/org/hibernate/search/mapper/orm/mapping/impl/AbstractHibernateOrmTypeContext.java
 +++ b/main/java/org/hibernate/search/mapper/orm/mapping/impl/AbstractHibernateOrmTypeContext.java
 @@ -10,7 +10,7 @@
@@ -254,7 +254,7 @@ index c09968682b..057510b863 100644
  import org.hibernate.persister.entity.EntityPersister;
  import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContext;
  import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityIdEntityLoadingStrategy;
-@@ -45,8 +45,8 @@
+@@ -43,8 +43,8 @@
  	AbstractHibernateOrmTypeContext(AbstractBuilder<E> builder, SessionFactoryImplementor sessionFactory) {
  		this.typeIdentifier = builder.typeIdentifier;
  		this.jpaEntityName = builder.jpaEntityName;
@@ -262,9 +262,9 @@ index c09968682b..057510b863 100644
 -		this.entityPersister = metamodel.entityPersister( builder.hibernateOrmEntityName );
 +		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
 +		this.entityPersister = metamodel.getEntityDescriptor( builder.hibernateOrmEntityName );
- 		this.identifierMapping = builder.identifierMapping;
  		this.ascendingSuperTypes = builder.ascendingSuperTypes;
  		if ( builder.documentIdSourcePropertyName != null ) {
+ 			if ( builder.documentIdSourcePropertyName.equals( entityPersister().getIdentifierPropertyName() ) ) {
 diff --git a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingConfigurationContributor.java b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingConfigurationContributor.java
 index 661f94b149..bdd369055b 100644
 --- a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingConfigurationContributor.java

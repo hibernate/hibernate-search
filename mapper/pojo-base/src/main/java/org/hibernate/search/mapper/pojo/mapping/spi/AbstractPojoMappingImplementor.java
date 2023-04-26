@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;
@@ -23,6 +24,8 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumen
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierBridgeToDocumentIdentifierContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ValueBridgeToIndexedValueContextImpl;
+import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReferenceFactoryDelegate;
+import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionMappingContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
@@ -39,12 +42,29 @@ public abstract class AbstractPojoMappingImplementor<M>
 
 	private boolean stopped = false;
 
+	private final PojoEntityReferenceFactoryDelegate entityReferenceFactoryDelegate;
+	private final EntityReferenceFactory<?> entityReferenceFactory;
 	private final ToDocumentValueConvertContext toDocumentValueConvertContext;
 	private final IdentifierBridgeToDocumentIdentifierContext toDocumentIdentifierContext;
 	private final ValueBridgeToIndexedValueContext toIndexedValueContext;
 
 	public AbstractPojoMappingImplementor(PojoMappingDelegate delegate) {
+		this( delegate, PojoEntityReference::new );
+	}
+
+	/**
+	 * @param delegate The {@link PojoMappingDelegate}
+	 * @param entityReferenceFactoryDelegate The {@link PojoEntityReferenceFactoryDelegate},
+	 * used to implement the {@link EntityReferenceFactory}.
+	 * @deprecated Use {@link AbstractPojoMappingImplementor}.
+	 * This constructor is only present for backwards compatibility, for mappers that expose a custom entity reference type.
+	 */
+	@Deprecated
+	public AbstractPojoMappingImplementor(PojoMappingDelegate delegate,
+			PojoEntityReferenceFactoryDelegate entityReferenceFactoryDelegate) {
 		this.delegate = delegate;
+		this.entityReferenceFactoryDelegate = entityReferenceFactoryDelegate;
+		this.entityReferenceFactory = delegate.createEntityReferenceFactory( entityReferenceFactoryDelegate );
 		this.toDocumentValueConvertContext = new ToDocumentValueConvertContextImpl( this );
 		this.toDocumentIdentifierContext = new IdentifierBridgeToDocumentIdentifierContextImpl( this );
 		this.toIndexedValueContext = new ValueBridgeToIndexedValueContextImpl( this );
@@ -87,6 +107,16 @@ public abstract class AbstractPojoMappingImplementor<M>
 	@Override
 	public FailureHandler failureHandler() {
 		return delegate().failureHandler();
+	}
+
+	@Override
+	public final PojoEntityReferenceFactoryDelegate entityReferenceFactoryDelegate() {
+		return entityReferenceFactoryDelegate;
+	}
+
+	@Override
+	public final EntityReferenceFactory<?> entityReferenceFactory() {
+		return entityReferenceFactory;
 	}
 
 	@Override

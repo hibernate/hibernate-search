@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
@@ -114,14 +113,15 @@ public final class PojoScopeDelegateImpl<R extends EntityReference, E, C> implem
 
 	@Override
 	public <LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
-			PojoScopeSessionContext sessionContext, DocumentReferenceConverter<R> documentReferenceConverter,
+			PojoScopeSessionContext sessionContext,
 			PojoSelectionLoadingContextBuilder<LOS> loadingContextBuilder) {
 		Map<String, PojoSearchLoadingIndexedTypeContext<? extends E>> targetTypesByEntityName = new LinkedHashMap<>();
 		for ( PojoScopeIndexedTypeContext<?, ? extends E> type : targetedTypeContexts ) {
 			targetTypesByEntityName.put( type.entityName(), type );
 		}
 		return getIndexScope().search( sessionContext, new PojoSearchLoadingContextBuilder<>(
-				targetTypesByEntityName, documentReferenceConverter, sessionContext, loadingContextBuilder ) );
+				targetTypesByEntityName, sessionContext.mappingContext().entityReferenceFactoryDelegate(),
+				sessionContext, loadingContextBuilder ) );
 	}
 
 	@Override

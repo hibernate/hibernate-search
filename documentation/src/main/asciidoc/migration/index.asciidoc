@@ -376,7 +376,12 @@ Use `PojoAdditionalMetadataCollectorTypeNode#markAsEntity(String, org.hibernate.
 It was introduced by mistake and does not have any use.
 * Mappers are no longer expected to provide a custom class to represent entity references,
 e.g. in search projections or in indexing failure reports.
-They should use `org.hibernate.search.engine.common.EntityReference` instead.
+They should use `org.hibernate.search.engine.common.EntityReference` instead,
+which is the type that will be instantiated by default.
+Mappers that for some reason still need to rely on custom entity references classes
+will need to have their custom entity references class implement `org.hibernate.search.engine.common.EntityReference`,
+and will need to call `org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor.AbstractPojoMappingImplementor(org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate, org.hibernate.search.mapper.pojo.mapping.spi.PojoEntityReferenceFactory)`
+when their mapping gets instantiated.
 * Many `execute*(...)`/`send*(...)` methods related to indexing plans now take an `OperationSubmitter` as an argument
 (see the javadoc of `OperationSubmitter`)
 and no longer take an `EntityReferenceFactory` as an argument

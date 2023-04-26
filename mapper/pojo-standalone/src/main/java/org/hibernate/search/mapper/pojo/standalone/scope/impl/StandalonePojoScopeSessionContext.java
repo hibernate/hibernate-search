@@ -6,14 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.scope.impl;
 
-import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
-import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.impl.StandalonePojoMassIndexingSessionContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeSessionContext;
 
 public interface StandalonePojoScopeSessionContext
 		extends PojoScopeSessionContext, StandalonePojoMassIndexingSessionContext {
-
-	DocumentReferenceConverter<EntityReference> documentReferenceConverter();
 
 }

@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.scope.spi;
 
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
@@ -38,7 +37,7 @@ public interface PojoScopeDelegate<R extends EntityReference, E, C> {
 	Set<C> includedIndexedTypes();
 
 	<LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
-			PojoScopeSessionContext sessionContext, DocumentReferenceConverter<R> documentReferenceConverter,
+			PojoScopeSessionContext sessionContext,
 			PojoSelectionLoadingContextBuilder<LOS> loadingContextBuilder);
 
 	SearchPredicateFactory predicate();
