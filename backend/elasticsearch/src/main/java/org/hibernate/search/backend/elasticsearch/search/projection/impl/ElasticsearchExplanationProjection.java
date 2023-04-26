@@ -41,14 +41,14 @@ class ElasticsearchExplanationProjection extends AbstractElasticsearchProjection
 	}
 
 	@Override
-	public JsonObject extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+	public JsonObject extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit,
 			JsonObject source, ProjectionExtractContext context) {
 		// We expect the optional to always be non-empty.
 		return HIT_EXPLANATION_ACCESSOR.get( hit ).get();
 	}
 
 	@Override
-	public JsonObject transform(LoadingResult<?, ?> loadingResult, JsonObject extractedData,
+	public JsonObject transform(LoadingResult<?> loadingResult, JsonObject extractedData,
 			ProjectionTransformContext context) {
 		return extractedData;
 	}

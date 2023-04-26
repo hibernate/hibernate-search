@@ -152,7 +152,7 @@ public class SearchProjectionIT {
 		StubEntity document3LoadedEntity = new StubEntity( document3Reference );
 		StubEntity emptyLoadedEntity = new StubEntity( emptyReference );
 
-		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );

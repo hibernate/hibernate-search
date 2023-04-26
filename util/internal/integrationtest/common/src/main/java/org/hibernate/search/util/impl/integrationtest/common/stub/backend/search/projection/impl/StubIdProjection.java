@@ -22,14 +22,14 @@ public class StubIdProjection<I> implements StubSearchProjection<I> {
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Iterator<?> projectionFromIndex,
+	public Object extract(ProjectionHitMapper<?> projectionHitMapper, Iterator<?> projectionFromIndex,
 			StubSearchProjectionContext context) {
 		return projectionFromIndex.next();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public I transform(LoadingResult<?, ?> loadingResult, Object extractedData,
+	public I transform(LoadingResult<?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
 		DocumentReference documentReference = (DocumentReference) extractedData;
 

@@ -26,14 +26,14 @@ public class StubEntityLoadingProjection<T> implements StubSearchProjection<T> {
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Iterator<?> projectionFromIndex,
+	public Object extract(ProjectionHitMapper<?> projectionHitMapper, Iterator<?> projectionFromIndex,
 			StubSearchProjectionContext context) {
 		return projectionHitMapper.planLoading( (DocumentReference) projectionFromIndex.next() );
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public T transform(LoadingResult<?, ?> loadingResult, Object extractedData,
+	public T transform(LoadingResult<?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
 		T loaded = (T) loadingResult.get( extractedData );
 		if ( loaded == null ) {

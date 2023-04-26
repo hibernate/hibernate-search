@@ -12,10 +12,9 @@ import org.hibernate.search.engine.common.timing.Deadline;
 /**
  * Contract binding result hits and the mapper.
  *
- * @param <R> The type of entity references.
  * @param <E> The type of entities.
  */
-public interface ProjectionHitMapper<R, E> {
+public interface ProjectionHitMapper<E> {
 
 	/**
 	 * Plan the loading of an entity.
@@ -31,6 +30,6 @@ public interface ProjectionHitMapper<R, E> {
 	 * @param deadline The deadline for loading the entities, or null if there is no deadline.
 	 * @return The loaded entities.
 	 */
-	LoadingResult<R, E> loadBlocking(Deadline deadline);
+	LoadingResult<E> loadBlocking(Deadline deadline);
 
 }

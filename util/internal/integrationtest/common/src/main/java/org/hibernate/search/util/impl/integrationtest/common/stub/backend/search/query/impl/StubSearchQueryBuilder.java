@@ -31,12 +31,12 @@ public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H> {
 	private final StubSearchIndexScope scope;
 	private final StubSearchWork.Builder workBuilder;
 	private final StubSearchProjectionContext projectionContext;
-	private final SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder;
+	private final SearchLoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final StubSearchProjection<H> rootProjection;
 
 	public StubSearchQueryBuilder(StubBackend backend, StubSearchIndexScope scope,
 			BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, StubSearchProjection<H> rootProjection) {
+			SearchLoadingContextBuilder<?, ?> loadingContextBuilder, StubSearchProjection<H> rootProjection) {
 		this.backend = backend;
 		this.scope = scope;
 		this.workBuilder = StubSearchWork.builder();

@@ -35,7 +35,7 @@ public interface LuceneSearchQueryIndexScope<S extends LuceneSearchQueryIndexSco
 
 	@Override
 	<P> LuceneSearchQueryBuilder<P> select(BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<P> projection);
+			SearchLoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection);
 
 	@Override
 	LuceneSearchPredicateFactory predicateFactory();

@@ -50,7 +50,7 @@ public abstract class StubBackendBehavior {
 	public abstract CompletableFuture<?> executeDocumentWork(String indexName, StubDocumentWork work);
 
 	public abstract <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
-			StubSearchProjectionContext projectionContext, SearchLoadingContext<?, ?> loadingContext,
+			StubSearchProjectionContext projectionContext, SearchLoadingContext<?> loadingContext,
 			StubSearchProjection<T> rootProjection, Deadline deadline);
 
 	public abstract CompletableFuture<?> executeIndexScaleWork(String indexName, StubIndexScaleWork work);
@@ -58,13 +58,13 @@ public abstract class StubBackendBehavior {
 	public abstract long executeCountWork(Set<String> indexNames);
 
 	public abstract <T> SearchScroll<T> executeScrollWork(Set<String> indexNames, StubSearchWork work, int chunkSize,
-			StubSearchProjectionContext projectionContext, SearchLoadingContext<?, ?> loadingContext,
+			StubSearchProjectionContext projectionContext, SearchLoadingContext<?> loadingContext,
 			StubSearchProjection<T> rootProjection, TimingSource timingSource);
 
 	public abstract void executeCloseScrollWork(Set<String> indexNames);
 
 	public abstract <T> SearchScrollResult<T> executeNextScrollWork(Set<String> indexNames, StubSearchWork work,
-			StubSearchProjectionContext projectionContext, SearchLoadingContext<?, ?> loadingContext,
+			StubSearchProjectionContext projectionContext, SearchLoadingContext<?> loadingContext,
 			StubSearchProjection<T> rootProjection, Deadline deadline);
 
 }

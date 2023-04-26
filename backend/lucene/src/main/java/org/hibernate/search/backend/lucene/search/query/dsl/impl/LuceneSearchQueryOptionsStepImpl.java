@@ -38,7 +38,7 @@ class LuceneSearchQueryOptionsStepImpl<H, LOS>
 
 	LuceneSearchQueryOptionsStepImpl(LuceneSearchQueryIndexScope<?> scope,
 			LuceneSearchQueryBuilder<H> searchQueryBuilder,
-			SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<?, LOS> loadingContextBuilder) {
 		super( scope, searchQueryBuilder, loadingContextBuilder );
 		this.searchQueryBuilder = searchQueryBuilder;
 	}

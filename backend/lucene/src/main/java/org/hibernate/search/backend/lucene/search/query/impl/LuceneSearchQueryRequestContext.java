@@ -19,13 +19,13 @@ import org.apache.lucene.search.Sort;
 class LuceneSearchQueryRequestContext {
 
 	private final BackendSessionContext sessionContext;
-	private final SearchLoadingContext<?, ?> loadingContext;
+	private final SearchLoadingContext<?> loadingContext;
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 
 	LuceneSearchQueryRequestContext(
 			BackendSessionContext sessionContext,
-			SearchLoadingContext<?, ?> loadingContext,
+			SearchLoadingContext<?> loadingContext,
 			Query luceneQuery,
 			Sort luceneSort) {
 		this.sessionContext = sessionContext;
@@ -38,7 +38,7 @@ class LuceneSearchQueryRequestContext {
 		return sessionContext;
 	}
 
-	SearchLoadingContext<?, ?> getLoadingContext() {
+	SearchLoadingContext<?> getLoadingContext() {
 		return loadingContext;
 	}
 

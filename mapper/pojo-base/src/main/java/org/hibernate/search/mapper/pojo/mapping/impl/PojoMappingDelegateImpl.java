@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
@@ -83,7 +84,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public <R, E, C> PojoScopeDelegate<R, E, C> createPojoScope(
+	public <R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> createPojoScope(
 			PojoScopeMappingContext mappingContext,
 			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
@@ -96,7 +97,8 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public <R, C> Optional<PojoScopeDelegate<R, Object, C>> createPojoAllScope(PojoScopeMappingContext mappingContext,
+	public <R extends EntityReference, C> Optional<PojoScopeDelegate<R, Object, C>> createPojoAllScope(
+			PojoScopeMappingContext mappingContext,
 			PojoScopeTypeExtendedContextProvider<Object, C> indexedTypeExtendedContextProvider) {
 		if ( typeManagers.allIndexed().isEmpty() ) {
 			return Optional.empty();

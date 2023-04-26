@@ -102,7 +102,7 @@ public abstract class AbstractEntityProjectionIT {
 		StubEntity doc1LoadedEntity = new StubEntity( doc1Reference );
 		StubEntity doc2LoadedEntity = new StubEntity( doc2Reference );
 
-		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
@@ -147,7 +147,7 @@ public abstract class AbstractEntityProjectionIT {
 		StubEntity doc1LoadedEntity = new StubEntity( doc1Reference );
 		StubEntity doc2LoadedEntity = new StubEntity( doc2Reference );
 
-		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
@@ -206,7 +206,7 @@ public abstract class AbstractEntityProjectionIT {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 
-		SearchLoadingContext<DocumentReference, DocumentReference> loadingContextMock =
+		SearchLoadingContext<DocumentReference> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
@@ -252,7 +252,7 @@ public abstract class AbstractEntityProjectionIT {
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 		StubEntity doc2LoadedObject = new StubEntity( doc2Reference );
 
-		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
@@ -283,7 +283,7 @@ public abstract class AbstractEntityProjectionIT {
 	public void noLoadingAvailable_noProjectionRegistryEntry_fails() {
 		ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
 
-		SearchLoadingContext<DocumentReference, DocumentReference> loadingContextMock =
+		SearchLoadingContext<DocumentReference> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( mainTypeContextMock.loadingAvailable() ).thenReturn( false );
@@ -329,7 +329,7 @@ public abstract class AbstractEntityProjectionIT {
 		StubEntity doc2LoadedEntity = new StubEntity( doc2Reference );
 
 		ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
-		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
@@ -366,7 +366,7 @@ public abstract class AbstractEntityProjectionIT {
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 
 		ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
-		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( mainTypeContextMock.loadingAvailable() ).thenReturn( false );
@@ -394,7 +394,7 @@ public abstract class AbstractEntityProjectionIT {
 							.toQuery();
 
 					@SuppressWarnings("unchecked")
-					ProjectionHitMapper<EntityReference, StubEntity> projectionHitMapperMock =
+					ProjectionHitMapper<StubEntity> projectionHitMapperMock =
 							Mockito.mock( ProjectionHitMapper.class );
 					when( loadingContextMock.createProjectionHitMapper() )
 							.thenReturn( projectionHitMapperMock );
@@ -429,7 +429,7 @@ public abstract class AbstractEntityProjectionIT {
 		ProjectionMappedTypeContext type3ContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
 		ProjectionMappedTypeContext type4ContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
 		ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
-		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( type1ContextMock.name() ).thenReturn( multiIndex1.typeName() );

@@ -91,7 +91,7 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 
 		ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
-		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( mainTypeContextMock.loadingAvailable() ).thenReturn( false );
@@ -127,7 +127,7 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 							.toQuery();
 
 					@SuppressWarnings("unchecked")
-					ProjectionHitMapper<EntityReference, StubEntity> projectionHitMapperMock =
+					ProjectionHitMapper<StubEntity> projectionHitMapperMock =
 							Mockito.mock( ProjectionHitMapper.class );
 					when( loadingContextMock.createProjectionHitMapper() )
 							.thenReturn( projectionHitMapperMock );

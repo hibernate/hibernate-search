@@ -55,7 +55,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private final ElasticsearchParallelWorkOrchestrator queryOrchestrator;
 	private final ElasticsearchSearchIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
-	private final SearchLoadingContext<?, ?> loadingContext;
+	private final SearchLoadingContext<?> loadingContext;
 	private final Set<String> routingKeys;
 	private final JsonObject payload;
 	private final ElasticsearchSearchRequestTransformer requestTransformer;
@@ -74,7 +74,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			ElasticsearchParallelWorkOrchestrator queryOrchestrator,
 			ElasticsearchSearchIndexScope<?> scope,
 			BackendSessionContext sessionContext,
-			SearchLoadingContext<?, ?> loadingContext,
+			SearchLoadingContext<?> loadingContext,
 			Set<String> routingKeys,
 			JsonObject payload,
 			ElasticsearchSearchRequestTransformer requestTransformer,

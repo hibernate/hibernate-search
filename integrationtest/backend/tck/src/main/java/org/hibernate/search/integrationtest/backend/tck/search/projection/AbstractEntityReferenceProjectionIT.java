@@ -63,7 +63,7 @@ public abstract class AbstractEntityReferenceProjectionIT {
 		EntityReference doc1EntityReference = StubEntity.reference( doc1Reference );
 		EntityReference doc2EntityReference = StubEntity.reference( doc2Reference );
 
-		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		mainIndex.mapping().with()

@@ -46,7 +46,7 @@ public class LuceneThrowingProjection<T> extends AbstractLuceneProjection<T>
 	}
 
 	@Override
-	public T transform(LoadingResult<?, ?> loadingResult, Object extractedData, ProjectionTransformContext context) {
+	public T transform(LoadingResult<?> loadingResult, Object extractedData, ProjectionTransformContext context) {
 		throw exceptionSupplier.get();
 	}
 }

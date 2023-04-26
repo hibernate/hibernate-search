@@ -32,7 +32,7 @@ final class StubByMappedTypeProjection<P> implements StubSearchProjection<P> {
 	}
 
 	@Override
-	public DelegateAndExtractedValue<P> extract(ProjectionHitMapper<?, ?> projectionHitMapper, Iterator<?> projectionFromIndex,
+	public DelegateAndExtractedValue<P> extract(ProjectionHitMapper<?> projectionHitMapper, Iterator<?> projectionFromIndex,
 			StubSearchProjectionContext context) {
 		Object selfProjectionFromIndex = projectionFromIndex.next();
 		String typeName;
@@ -62,7 +62,7 @@ final class StubByMappedTypeProjection<P> implements StubSearchProjection<P> {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public P transform(LoadingResult<?, ?> loadingResult, Object extractedData, StubSearchProjectionContext context) {
+	public P transform(LoadingResult<?> loadingResult, Object extractedData, StubSearchProjectionContext context) {
 		return ((DelegateAndExtractedValue<P>) extractedData).transform( loadingResult, context );
 	}
 
@@ -71,13 +71,13 @@ final class StubByMappedTypeProjection<P> implements StubSearchProjection<P> {
 		private final Object extractedValue;
 
 		private DelegateAndExtractedValue(StubSearchProjection<? extends P> delegate,
-				ProjectionHitMapper<?, ?> projectionHitMapper, Iterator<?> projectionFromIndex,
+				ProjectionHitMapper<?> projectionHitMapper, Iterator<?> projectionFromIndex,
 				StubSearchProjectionContext context) {
 			this.delegate = delegate;
 			this.extractedValue = delegate.extract( projectionHitMapper, projectionFromIndex, context );
 		}
 
-		P transform(LoadingResult<?, ?> loadingResult, StubSearchProjectionContext context) {
+		P transform(LoadingResult<?> loadingResult, StubSearchProjectionContext context) {
 			return delegate.transform( loadingResult, extractedValue, context );
 		}
 	}

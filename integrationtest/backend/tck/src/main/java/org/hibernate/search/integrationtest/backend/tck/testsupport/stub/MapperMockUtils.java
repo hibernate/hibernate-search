@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
@@ -38,14 +39,14 @@ public final class MapperMockUtils {
 	 * @param <E> The entity type.
 	 */
 	public static <R, E> void expectHitMapping(
-			SearchLoadingContext<R, E> loadingContextMock,
-			Consumer<HitMappingDefinitionContext<R, E>> hitMappingDefinition) {
+			SearchLoadingContext<E> loadingContextMock,
+			Consumer<HitMappingDefinitionContext<E>> hitMappingDefinition) {
 		reset( (Object) loadingContextMock );
 
 		@SuppressWarnings("unchecked")
-		ProjectionHitMapper<R, E> projectionHitMapperMock = Mockito.mock( ProjectionHitMapper.class );
+		ProjectionHitMapper<E> projectionHitMapperMock = Mockito.mock( ProjectionHitMapper.class );
 		@SuppressWarnings("unchecked")
-		LoadingResult<R, E> loadingResultMock = Mockito.mock( LoadingResult.class );
+		LoadingResult<E> loadingResultMock = Mockito.mock( LoadingResult.class );
 
 		/*
 		 * We expect getProjectionHitMapper to be called *every time* a load is performed,
@@ -57,7 +58,7 @@ public final class MapperMockUtils {
 		when( projectionHitMapperMock.loadBlocking( any() ) )
 				.thenReturn( loadingResultMock );
 
-		HitMappingDefinitionContext<R, E> context = new HitMappingDefinitionContext<>();
+		HitMappingDefinitionContext<E> context = new HitMappingDefinitionContext<>();
 		hitMappingDefinition.accept( context );
 
 		List<StubLoadingKey> loadingKeys = new ArrayList<>();
@@ -77,26 +78,26 @@ public final class MapperMockUtils {
 					.thenReturn( context.loadedObjects.get( i ) );
 		}
 
-		for ( Map.Entry<DocumentReference, Set<R>> entry : context.referenceMap.entrySet() ) {
-			for ( R transformedReference : entry.getValue() ) {
+		for ( Map.Entry<DocumentReference, Set<EntityReference>> entry : context.referenceMap.entrySet() ) {
+			for ( EntityReference transformedReference : entry.getValue() ) {
 				when( loadingResultMock.convertReference( referenceMatcher( entry.getKey() ) ) )
 						.thenReturn( transformedReference );
 			}
 		}
 	}
 
-	public static class HitMappingDefinitionContext<R, E> {
-		private final Map<DocumentReference, Set<R>> referenceMap = new HashMap<>();
+	public static class HitMappingDefinitionContext<E> {
+		private final Map<DocumentReference, Set<EntityReference>> referenceMap = new HashMap<>();
 		private final List<DocumentReference> referencesToLoad = new ArrayList<>();
 		private final List<E> loadedObjects = new ArrayList<>();
 
-		public HitMappingDefinitionContext<R, E> entityReference(DocumentReference documentReference, R transformedReference) {
+		public HitMappingDefinitionContext<E> entityReference(DocumentReference documentReference, EntityReference transformedReference) {
 			referenceMap.computeIfAbsent( documentReference, ignored -> new LinkedHashSet<>() )
 					.add( transformedReference );
 			return this;
 		}
 
-		public HitMappingDefinitionContext<R, E> load(DocumentReference documentReference, E loadedObject) {
+		public HitMappingDefinitionContext<E> load(DocumentReference documentReference, E loadedObject) {
 			referencesToLoad.add( documentReference );
 			loadedObjects.add( loadedObject );
 			return this;

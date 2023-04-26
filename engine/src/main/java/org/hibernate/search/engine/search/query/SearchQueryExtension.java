@@ -36,6 +36,6 @@ public interface SearchQueryExtension<Q, H> {
 	 * @return An optional containing the extended search query ({@link Q}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<Q> extendOptional(SearchQuery<H> original, SearchLoadingContext<?, ?> loadingContext);
+	Optional<Q> extendOptional(SearchQuery<H> original, SearchLoadingContext<?> loadingContext);
 
 }

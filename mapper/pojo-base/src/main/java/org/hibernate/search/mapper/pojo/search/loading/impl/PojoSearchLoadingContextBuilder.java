@@ -9,21 +9,22 @@ package org.hibernate.search.mapper.pojo.search.loading.impl;
 import java.util.Map;
 
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
 
-public class PojoSearchLoadingContextBuilder<R, E, LOS> implements SearchLoadingContextBuilder<R, E, LOS> {
+public class PojoSearchLoadingContextBuilder<E, LOS> implements SearchLoadingContextBuilder<E, LOS> {
 
 	private final Map<String, PojoSearchLoadingIndexedTypeContext<? extends E>> targetTypesByEntityName;
-	private final DocumentReferenceConverter<R> documentReferenceConverter;
+	private final DocumentReferenceConverter<? extends EntityReference> documentReferenceConverter;
 	private final BridgeSessionContext sessionContext;
 	private final PojoSelectionLoadingContextBuilder<LOS> delegate;
 
 	public PojoSearchLoadingContextBuilder(
 			Map<String, PojoSearchLoadingIndexedTypeContext<? extends E>> targetTypesByEntityName,
-			DocumentReferenceConverter<R> documentReferenceConverter,
+			DocumentReferenceConverter<? extends EntityReference> documentReferenceConverter,
 			BridgeSessionContext sessionContext,
 			PojoSelectionLoadingContextBuilder<LOS> delegate) {
 		this.targetTypesByEntityName = targetTypesByEntityName;
@@ -38,7 +39,7 @@ public class PojoSearchLoadingContextBuilder<R, E, LOS> implements SearchLoading
 	}
 
 	@Override
-	public SearchLoadingContext<R, E> build() {
+	public SearchLoadingContext<E> build() {
 		return new PojoSearchLoadingContext<>( targetTypesByEntityName, documentReferenceConverter, sessionContext,
 				delegate.build() );
 	}

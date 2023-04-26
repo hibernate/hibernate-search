@@ -31,13 +31,13 @@ public class ElasticsearchThrowingProjection<T> extends AbstractElasticsearchPro
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit, JsonObject source,
+	public Object extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit, JsonObject source,
 			ProjectionExtractContext context) {
 		throw exceptionSupplier.get();
 	}
 
 	@Override
-	public T transform(LoadingResult<?, ?> loadingResult, Object extractedData, ProjectionTransformContext context) {
+	public T transform(LoadingResult<?> loadingResult, Object extractedData, ProjectionTransformContext context) {
 		throw exceptionSupplier.get();
 	}
 }

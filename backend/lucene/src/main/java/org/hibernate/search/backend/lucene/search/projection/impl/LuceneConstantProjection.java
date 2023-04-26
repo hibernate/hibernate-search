@@ -44,7 +44,7 @@ public class LuceneConstantProjection<T> extends AbstractLuceneProjection<T>
 	}
 
 	@Override
-	public T transform(LoadingResult<?, ?> loadingResult, T extractedData, ProjectionTransformContext context) {
+	public T transform(LoadingResult<?> loadingResult, T extractedData, ProjectionTransformContext context) {
 		return extractedData;
 	}
 }

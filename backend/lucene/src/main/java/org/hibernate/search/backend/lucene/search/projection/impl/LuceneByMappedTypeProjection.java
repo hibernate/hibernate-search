@@ -74,7 +74,7 @@ public class LuceneByMappedTypeProjection<P>
 		}
 
 		@Override
-		public P transform(LoadingResult<?, ?> loadingResult, DelegateAndExtractedValue<?, P> extracted,
+		public P transform(LoadingResult<?> loadingResult, DelegateAndExtractedValue<?, P> extracted,
 				ProjectionTransformContext context) {
 			return extracted.transform( loadingResult, context );
 		}
@@ -138,7 +138,7 @@ public class LuceneByMappedTypeProjection<P>
 			this.extractedValue = extractedValue;
 		}
 
-		P transform(LoadingResult<?, ?> loadingResult, ProjectionTransformContext context) {
+		P transform(LoadingResult<?> loadingResult, ProjectionTransformContext context) {
 			return delegate.transform( loadingResult, extractedValue, context );
 		}
 	}

@@ -354,7 +354,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	@Override
 	public <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
-			StubSearchProjectionContext projectionContext, SearchLoadingContext<?, ?> loadingContext,
+			StubSearchProjectionContext projectionContext, SearchLoadingContext<?> loadingContext,
 			StubSearchProjection<T> rootProjection, Deadline deadline) {
 		return searchCalls.verify(
 				new SearchWorkCall<>( indexNames, work, projectionContext, loadingContext, rootProjection,
@@ -386,7 +386,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	@Override
 	public <T> SearchScroll<T> executeScrollWork(Set<String> indexNames, StubSearchWork work, int chunkSize,
-			StubSearchProjectionContext projectionContext, SearchLoadingContext<?, ?> loadingContext,
+			StubSearchProjectionContext projectionContext, SearchLoadingContext<?> loadingContext,
 			StubSearchProjection<T> rootProjection, TimingSource timingSource) {
 		return scrollCalls.verify(
 				new ScrollWorkCall<>( indexNames, work, chunkSize, this, projectionContext, loadingContext,
@@ -409,7 +409,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	@Override
 	public <T> SearchScrollResult<T> executeNextScrollWork(Set<String> indexNames, StubSearchWork work,
-			StubSearchProjectionContext projectionContext, SearchLoadingContext<?, ?> loadingContext,
+			StubSearchProjectionContext projectionContext, SearchLoadingContext<?> loadingContext,
 			StubSearchProjection<T> rootProjection, Deadline deadline) {
 		return nextScrollCalls.verify(
 				new NextScrollWorkCall<>( indexNames, work, projectionContext, loadingContext, rootProjection,

@@ -141,7 +141,7 @@ public class LuceneFieldProjection<F, V, P> extends AbstractLuceneProjection<P> 
 		}
 
 		@Override
-		public P transform(LoadingResult<?, ?> loadingResult, A extractedData,
+		public P transform(LoadingResult<?> loadingResult, A extractedData,
 				ProjectionTransformContext context) {
 			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 			A transformedData = accumulator.transformAll( extractedData, converter, convertContext );

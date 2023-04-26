@@ -109,7 +109,7 @@ public class ElasticsearchFieldHighlightProjection implements ElasticsearchSearc
 		}
 
 		@Override
-		public List<String> extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit, JsonObject source,
+		public List<String> extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit, JsonObject source,
 				ProjectionExtractContext context) {
 			Optional<JsonArray> highlights = highlightAccessor.get( hit );
 			if ( highlights.isPresent() ) {
@@ -123,7 +123,7 @@ public class ElasticsearchFieldHighlightProjection implements ElasticsearchSearc
 		}
 
 		@Override
-		public List<String> transform(LoadingResult<?, ?> loadingResult, List<String> extractedData,
+		public List<String> transform(LoadingResult<?> loadingResult, List<String> extractedData,
 				ProjectionTransformContext context) {
 			return extractedData;
 		}

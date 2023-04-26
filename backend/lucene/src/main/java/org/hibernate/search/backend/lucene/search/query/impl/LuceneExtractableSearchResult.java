@@ -70,7 +70,7 @@ public class LuceneExtractableSearchResult<H> {
 			endExclusive = Math.min( endExclusive, scoreDocs.length );
 		}
 
-		ProjectionHitMapper<?, ?> projectionHitMapper = requestContext.getLoadingContext().createProjectionHitMapper();
+		ProjectionHitMapper<?> projectionHitMapper = requestContext.getLoadingContext().createProjectionHitMapper();
 		List<Object> extractedData = extractHits( projectionHitMapper, startInclusive, endExclusive );
 
 		Map<AggregationKey<?>, ?> extractedAggregations = aggregations.isEmpty() ?
@@ -95,7 +95,7 @@ public class LuceneExtractableSearchResult<H> {
 		return luceneCollectors.getResultTotal();
 	}
 
-	private List<Object> extractHits(ProjectionHitMapper<?, ?> projectionHitMapper, int startInclusive,
+	private List<Object> extractHits(ProjectionHitMapper<?> projectionHitMapper, int startInclusive,
 			int endExclusive) throws IOException {
 		TopDocs topDocs = luceneCollectors.getTopDocs();
 		if ( topDocs == null ) {
@@ -134,9 +134,9 @@ public class LuceneExtractableSearchResult<H> {
 	}
 
 	private class TopDocsDataCollectorFactory implements TopDocsDataCollector.Factory<Object> {
-		private final ProjectionHitMapper<?, ?> projectionHitMapper;
+		private final ProjectionHitMapper<?> projectionHitMapper;
 
-		public TopDocsDataCollectorFactory(ProjectionHitMapper<?, ?> projectionHitMapper) {
+		public TopDocsDataCollectorFactory(ProjectionHitMapper<?> projectionHitMapper) {
 			this.projectionHitMapper = projectionHitMapper;
 		}
 

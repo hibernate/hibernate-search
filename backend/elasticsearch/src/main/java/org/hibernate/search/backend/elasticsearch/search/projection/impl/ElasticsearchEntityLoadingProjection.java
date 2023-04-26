@@ -41,14 +41,14 @@ public class ElasticsearchEntityLoadingProjection<E> extends AbstractElasticsear
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+	public Object extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit,
 			JsonObject source, ProjectionExtractContext context) {
 		return projectionHitMapper.planLoading( helper.extract( hit, context ) );
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public E transform(LoadingResult<?, ?> loadingResult, Object extractedData,
+	public E transform(LoadingResult<?> loadingResult, Object extractedData,
 			ProjectionTransformContext context) {
 		E loaded = (E) loadingResult.get( extractedData );
 		if ( loaded == null ) {

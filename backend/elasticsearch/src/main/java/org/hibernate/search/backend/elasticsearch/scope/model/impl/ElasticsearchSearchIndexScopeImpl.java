@@ -168,7 +168,7 @@ public final class ElasticsearchSearchIndexScopeImpl
 
 	@Override
 	public <P> ElasticsearchSearchQueryBuilder<P> select(BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<P> projection) {
+			SearchLoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection) {
 		return backendContext.createSearchQueryBuilder( this, sessionContext, loadingContextBuilder,
 				ElasticsearchSearchProjection.from( this, projection ) );
 	}

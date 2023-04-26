@@ -109,7 +109,7 @@ public class LuceneFieldHighlightProjection implements LuceneSearchProjection<Li
 		}
 
 		@Override
-		public List<String> transform(LoadingResult<?, ?> loadingResult, A extractedData,
+		public List<String> transform(LoadingResult<?> loadingResult, A extractedData,
 				ProjectionTransformContext context) {
 			return accumulator.finish( extractedData );
 		}

@@ -102,7 +102,7 @@ public class ElasticsearchObjectProjection<E, V, P>
 		}
 
 		@Override
-		protected E extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit, JsonElement sourceElement,
+		protected E extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit, JsonElement sourceElement,
 				ProjectionExtractContext context) {
 			if ( sourceElement == null || sourceElement.isJsonNull() ) {
 				return null;
@@ -117,7 +117,7 @@ public class ElasticsearchObjectProjection<E, V, P>
 		}
 
 		@Override
-		public final P transform(LoadingResult<?, ?> loadingResult, A accumulated,
+		public final P transform(LoadingResult<?> loadingResult, A accumulated,
 				ProjectionTransformContext context) {
 			for ( int i = 0; i < accumulator.size( accumulated ); i++ ) {
 				E transformedData = accumulator.get( accumulated, i );

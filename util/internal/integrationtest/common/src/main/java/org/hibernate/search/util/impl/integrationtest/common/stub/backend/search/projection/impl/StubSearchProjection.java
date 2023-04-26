@@ -15,10 +15,10 @@ import org.hibernate.search.util.common.AssertionFailure;
 
 public interface StubSearchProjection<P> extends SearchProjection<P> {
 
-	Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Iterator<?> projectionFromIndex,
+	Object extract(ProjectionHitMapper<?> projectionHitMapper, Iterator<?> projectionFromIndex,
 			StubSearchProjectionContext context);
 
-	P transform(LoadingResult<?, ?> loadingResult, Object extractedData, StubSearchProjectionContext context);
+	P transform(LoadingResult<?> loadingResult, Object extractedData, StubSearchProjectionContext context);
 
 	static <U> StubSearchProjection<U> from(SearchProjection<U> projection) {
 		if ( !( projection instanceof StubSearchProjection ) ) {

@@ -47,7 +47,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private final LuceneWorkFactory workFactory;
 	private final LuceneSearchQueryIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
-	private final SearchLoadingContext<?, ?> loadingContext;
+	private final SearchLoadingContext<?> loadingContext;
 	private final Set<String> routingKeys;
 	private final Query luceneQuery;
 	private final Sort luceneSort;
@@ -59,7 +59,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	LuceneSearchQueryImpl(LuceneSyncWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, LuceneSearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext,
-			SearchLoadingContext<?, ?> loadingContext,
+			SearchLoadingContext<?> loadingContext,
 			Set<String> routingKeys,
 			TimeoutManager timeoutManager,
 			Query luceneQuery, Sort luceneSort,

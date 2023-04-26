@@ -210,7 +210,7 @@ public abstract class StubMappedIndex {
 	 * @return A scope containing this index and the given other indexes.
 	 */
 	public <R, E> GenericStubMappingScope<R, E> createGenericScope(
-			SearchLoadingContext<R, E> loadingContext, StubMappedIndex... others) {
+			SearchLoadingContext<E> loadingContext, StubMappedIndex... others) {
 		if ( ( (StubMappingImpl) mapping ).fixture.typeContexts == null ) {
 			throw new AssertionFailure( "When testing loading with a \"generic\" scope,"
 					+ " you must also set custom type contexts with consistent types."

@@ -26,7 +26,7 @@ public interface ElasticsearchSearchQueryIndexScope<S extends ElasticsearchSearc
 
 	@Override
 	<P> ElasticsearchSearchQueryBuilder<P> select(BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<P> projection);
+			SearchLoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection);
 
 	@Override
 	ElasticsearchSearchPredicateFactory predicateFactory();

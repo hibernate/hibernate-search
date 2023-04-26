@@ -174,7 +174,7 @@ public class LuceneExtensionIT {
 
 		// Unsupported extension
 		assertThatThrownBy(
-				() -> query.extension( (SearchQuery<DocumentReference> original, SearchLoadingContext<?, ?> loadingContext) -> Optional.empty() )
+				() -> query.extension( (SearchQuery<DocumentReference> original, SearchLoadingContext<?> loadingContext) -> Optional.empty() )
 		)
 				.isInstanceOf( SearchException.class );
 	}

@@ -35,14 +35,14 @@ abstract class AccumulatingSourceExtractor<E, V, A, P>
 	}
 
 	@Override
-	public final A extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+	public final A extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit,
 			JsonObject source, ProjectionExtractContext context) {
 		A accumulated = accumulator.createInitial();
 		accumulated = collect( projectionHitMapper, hit, source, context, accumulated, 0 );
 		return accumulated;
 	}
 
-	private A collect(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+	private A collect(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit,
 			JsonObject parent, ProjectionExtractContext context,
 			A accumulated, int currentPathComponentIndex) {
 		if ( parent == null ) {
@@ -77,7 +77,7 @@ abstract class AccumulatingSourceExtractor<E, V, A, P>
 		}
 	}
 
-	private A collectTargetField(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit, JsonElement fieldValue,
+	private A collectTargetField(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit, JsonElement fieldValue,
 			ProjectionExtractContext context, A accumulated) {
 		if ( fieldValue == null ) {
 			// Not present
@@ -99,7 +99,7 @@ abstract class AccumulatingSourceExtractor<E, V, A, P>
 		}
 	}
 
-	protected abstract E extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+	protected abstract E extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit,
 			JsonElement sourceElement, ProjectionExtractContext context);
 
 	private JsonObject toJsonObject(JsonElement childElement, int currentPathComponentIndex) {

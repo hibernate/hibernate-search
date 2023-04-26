@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
@@ -38,12 +39,12 @@ public interface PojoMappingDelegate extends AutoCloseable {
 
 	ProjectionRegistry projectionRegistry();
 
-	<R, E, C> PojoScopeDelegate<R, E, C> createPojoScope(
+	<R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> createPojoScope(
 			PojoScopeMappingContext mappingContext,
 			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider);
 
-	<R, C> Optional<PojoScopeDelegate<R, Object, C>> createPojoAllScope(
+	<R extends EntityReference, C> Optional<PojoScopeDelegate<R, Object, C>> createPojoAllScope(
 			PojoScopeMappingContext mappingContext,
 			PojoScopeTypeExtendedContextProvider<Object, C> indexedTypeExtendedContextProvider);
 

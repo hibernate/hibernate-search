@@ -67,7 +67,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private final BackendSessionContext sessionContext;
 
 	private final PredicateRequestContext rootPredicateContext;
-	private final SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder;
+	private final SearchLoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final ElasticsearchSearchProjection<H> rootProjection;
 	private final Integer scrollTimeout;
 
@@ -90,7 +90,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 			ElasticsearchParallelWorkOrchestrator queryOrchestrator,
 			ElasticsearchSearchIndexScope<?> scope,
 			BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
+			SearchLoadingContextBuilder<?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<H> rootProjection,
 			Integer scrollTimeout) {
 		this.workFactory = workFactory;
@@ -241,7 +241,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 			payload.add( "sort", jsonSort );
 		}
 
-		SearchLoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
+		SearchLoadingContext<?> loadingContext = loadingContextBuilder.build();
 
 		ElasticsearchSearchQueryRequestContext requestContext = new ElasticsearchSearchQueryRequestContext(
 				scope, sessionContext, loadingContext, rootPredicateContext, distanceSorts,

@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -32,7 +33,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
  * {@link #includedIndexedTypes()}.
  * or the type of objects returned for {@link SearchProjectionFactory#entity() entity projections}.
  */
-public interface PojoScopeDelegate<R, E, C> {
+public interface PojoScopeDelegate<R extends EntityReference, E, C> {
 
 	Set<C> includedIndexedTypes();
 

@@ -41,13 +41,13 @@ class ElasticsearchScoreProjection extends AbstractElasticsearchProjection<Float
 	}
 
 	@Override
-	public Float extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+	public Float extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit,
 			JsonObject source, ProjectionExtractContext context) {
 		return hit.get( "_score" ).getAsFloat();
 	}
 
 	@Override
-	public Float transform(LoadingResult<?, ?> loadingResult, Float extractedData,
+	public Float transform(LoadingResult<?> loadingResult, Float extractedData,
 			ProjectionTransformContext context) {
 		return extractedData;
 	}

@@ -39,7 +39,7 @@ class ElasticsearchSearchQueryOptionsStepImpl<H, LOS>
 
 	ElasticsearchSearchQueryOptionsStepImpl(ElasticsearchSearchQueryIndexScope<?> scope,
 			ElasticsearchSearchQueryBuilder<H> searchQueryBuilder,
-			SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<?, LOS> loadingContextBuilder) {
 		super( scope, searchQueryBuilder, loadingContextBuilder );
 		this.searchQueryBuilder = searchQueryBuilder;
 	}

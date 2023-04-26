@@ -61,7 +61,7 @@ public interface ElasticsearchSearchProjection<P> extends SearchProjection<P> {
 		 * {@link ProjectionHitMapper}.
 		 * This returned object will be passed to {@link #transform(LoadingResult, Object, ProjectionTransformContext)}.
 		 */
-		E extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+		E extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit,
 				JsonObject source, ProjectionExtractContext context);
 
 		/**
@@ -74,7 +74,7 @@ public interface ElasticsearchSearchProjection<P> extends SearchProjection<P> {
 		 * @param context An execution context for the transforming.
 		 * @return The final result considered as a hit.
 		 */
-		P transform(LoadingResult<?, ?> loadingResult, E extractedData, ProjectionTransformContext context);
+		P transform(LoadingResult<?> loadingResult, E extractedData, ProjectionTransformContext context);
 
 		/**
 		 * Transforms the extracted data and casts it to the right type.
@@ -82,7 +82,7 @@ public interface ElasticsearchSearchProjection<P> extends SearchProjection<P> {
 		 * This should be used with care as it's unsafe.
 		 */
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		static <Z> Z transformUnsafe(Extractor<?, Z> extractor, LoadingResult<?, ?> loadingResult,
+		static <Z> Z transformUnsafe(Extractor<?, Z> extractor, LoadingResult<?> loadingResult,
 				Object extractedData, ProjectionTransformContext context) {
 			return (Z) ( (Extractor) extractor ).transform( loadingResult, extractedData, context );
 		}

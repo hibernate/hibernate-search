@@ -22,7 +22,6 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -228,7 +227,7 @@ public class SearchQueryBaseIT {
 	private static class SupportedQueryExtension<H> implements SearchQueryExtension<QueryWrapper<H>, H> {
 		@Override
 		public Optional<QueryWrapper<H>> extendOptional(SearchQuery<H> original,
-				SearchLoadingContext<?, ?> loadingContext) {
+				SearchLoadingContext<?> loadingContext) {
 			assertThat( original ).isNotNull();
 			assertThat( loadingContext ).isNotNull().isInstanceOf( StubSearchLoadingContext.class );
 			return Optional.of( new QueryWrapper<>( original ) );
@@ -238,7 +237,7 @@ public class SearchQueryBaseIT {
 	private static class UnSupportedQueryExtension<H> implements SearchQueryExtension<QueryWrapper<H>, H> {
 		@Override
 		public Optional<QueryWrapper<H>> extendOptional(SearchQuery<H> original,
-				SearchLoadingContext<?, ?> loadingContext) {
+				SearchLoadingContext<?> loadingContext) {
 			assertThat( original ).isNotNull();
 			assertThat( loadingContext ).isNotNull().isInstanceOf( StubSearchLoadingContext.class );
 			return Optional.empty();
@@ -250,7 +249,7 @@ public class SearchQueryBaseIT {
 		@Override
 		public Optional<MyExtendedDslContext<E>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
 				SearchQueryIndexScope<?> scope, BackendSessionContext sessionContext,
-				SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
+				SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
 			assertThat( original ).isNotNull();
 			assertThat( scope ).isNotNull();
 			assertThat( sessionContext ).isNotNull();
@@ -264,7 +263,7 @@ public class SearchQueryBaseIT {
 		@Override
 		public Optional<MyExtendedDslContext<E>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
 				SearchQueryIndexScope<?> scope, BackendSessionContext sessionContext,
-				SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
+				SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
 			assertThat( original ).isNotNull();
 			assertThat( scope ).isNotNull();
 			assertThat( sessionContext ).isNotNull();

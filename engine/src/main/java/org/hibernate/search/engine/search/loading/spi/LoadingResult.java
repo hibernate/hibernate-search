@@ -8,14 +8,14 @@ package org.hibernate.search.engine.search.loading.spi;
 
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.common.EntityReference;
 
 /**
  * The result of the loading of the entities by the {@link ProjectionHitMapper}.
  *
- * @param <R> The type of entity references.
  * @param <E> The type of entities.
  */
-public interface LoadingResult<R, E> {
+public interface LoadingResult<E> {
 
 	/**
 	 * @param key The key that was previously returned by {@link ProjectionHitMapper#planLoading(DocumentReference)}.
@@ -29,6 +29,6 @@ public interface LoadingResult<R, E> {
 	 * @param reference The document reference.
 	 * @return The reference specific to the mapper.
 	 */
-	R convertReference(DocumentReference reference);
+	EntityReference convertReference(DocumentReference reference);
 
 }

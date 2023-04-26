@@ -41,7 +41,7 @@ class LuceneScoreProjection extends AbstractLuceneProjection<Float>
 	}
 
 	@Override
-	public Float transform(LoadingResult<?, ?> loadingResult, Float extractedData,
+	public Float transform(LoadingResult<?> loadingResult, Float extractedData,
 			ProjectionTransformContext context) {
 		return extractedData;
 	}

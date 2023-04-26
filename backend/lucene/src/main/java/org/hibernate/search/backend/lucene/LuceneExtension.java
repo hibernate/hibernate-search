@@ -116,7 +116,7 @@ public final class LuceneExtension<H, R, E, LOS>
 			SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
 			SearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
 		if ( scope instanceof LuceneSearchQueryIndexScope ) {
 			return Optional.of( new LuceneSearchQuerySelectStepImpl<>(
 					(LuceneSearchQueryIndexScope<?>) scope, sessionContext, loadingContextBuilder
@@ -132,7 +132,7 @@ public final class LuceneExtension<H, R, E, LOS>
 	 */
 	@Override
 	public Optional<LuceneSearchQuery<H>> extendOptional(SearchQuery<H> original,
-			SearchLoadingContext<?, ?> loadingContext) {
+			SearchLoadingContext<?> loadingContext) {
 		if ( original instanceof LuceneSearchQuery ) {
 			return Optional.of( (LuceneSearchQuery<H>) original );
 		}

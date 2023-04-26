@@ -46,7 +46,7 @@ public class StubCompositeProjection<E, V, A, P> implements StubSearchProjection
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Iterator<?> projectionFromIndex,
+	public Object extract(ProjectionHitMapper<?> projectionHitMapper, Iterator<?> projectionFromIndex,
 			StubSearchProjectionContext context) {
 		List<?> allInnerProjectionsFromIndex;
 		if ( singleValued ) {
@@ -72,7 +72,7 @@ public class StubCompositeProjection<E, V, A, P> implements StubSearchProjection
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public P transform(LoadingResult<?, ?> loadingResult, Object extractedData, StubSearchProjectionContext context) {
+	public P transform(LoadingResult<?> loadingResult, Object extractedData, StubSearchProjectionContext context) {
 		A accumulated = (A) extractedData;
 		for ( int i = 0; i < accumulator.size( accumulated ); i++ ) {
 			E transformedData = accumulator.get( accumulated, i );

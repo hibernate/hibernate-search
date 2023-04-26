@@ -31,7 +31,7 @@ final class DefaultSearchQueryOptionsStep<H, LOS>
 				SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, LOS>, H, LOS, SearchSortFactory, SearchAggregationFactory> {
 
 	DefaultSearchQueryOptionsStep(SearchQueryIndexScope<?> scope, SearchQueryBuilder<H> searchQueryBuilder,
-			SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<?, LOS> loadingContextBuilder) {
 		super( scope, searchQueryBuilder, loadingContextBuilder );
 	}
 

@@ -41,14 +41,14 @@ public class ElasticsearchEntityReferenceProjection<R> extends AbstractElasticse
 	}
 
 	@Override
-	public DocumentReference extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+	public DocumentReference extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit,
 			JsonObject source, ProjectionExtractContext context) {
 		return helper.extract( hit, context );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public R transform(LoadingResult<?, ?> loadingResult, DocumentReference extractedData,
+	public R transform(LoadingResult<?> loadingResult, DocumentReference extractedData,
 			ProjectionTransformContext context) {
 		return (R) loadingResult.convertReference( extractedData );
 	}

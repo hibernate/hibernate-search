@@ -104,13 +104,13 @@ public class ElasticsearchFieldProjection<F, V, P> extends AbstractElasticsearch
 		}
 
 		@Override
-		protected F extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit, JsonElement sourceElement,
+		protected F extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit, JsonElement sourceElement,
 				ProjectionExtractContext context) {
 			return decodeFunction.apply( sourceElement );
 		}
 
 		@Override
-		public P transform(LoadingResult<?, ?> loadingResult, A extractedData,
+		public P transform(LoadingResult<?> loadingResult, A extractedData,
 				ProjectionTransformContext context) {
 			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 			A transformedData = accumulator.transformAll( extractedData, converter, convertContext );

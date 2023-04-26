@@ -23,12 +23,12 @@ public class StubSearchScroll<T> implements SearchScroll<T> {
 	private final Set<String> indexNames;
 	private final StubSearchWork work;
 	private final StubSearchProjectionContext projectionContext;
-	private final SearchLoadingContext<?, ?> loadingContext;
+	private final SearchLoadingContext<?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 	private final StubTimeoutManager timeoutManager;
 
 	public StubSearchScroll(StubBackendBehavior behavior, Set<String> indexNames, StubSearchWork work,
-			StubSearchProjectionContext projectionContext, SearchLoadingContext<?, ?> loadingContext,
+			StubSearchProjectionContext projectionContext, SearchLoadingContext<?> loadingContext,
 			StubSearchProjection<T> rootProjection, TimingSource timingSource) {
 		this.behavior = behavior;
 		this.indexNames = indexNames;

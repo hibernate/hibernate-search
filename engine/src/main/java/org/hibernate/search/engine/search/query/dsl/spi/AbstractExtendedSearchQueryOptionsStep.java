@@ -32,7 +32,7 @@ public abstract class AbstractExtendedSearchQueryOptionsStep<
 
 	public AbstractExtendedSearchQueryOptionsStep(SC scope,
 			SearchQueryBuilder<H> searchQueryBuilder,
-			SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<?, LOS> loadingContextBuilder) {
 		super( scope, searchQueryBuilder, loadingContextBuilder );
 	}
 
