@@ -8,27 +8,26 @@ package org.hibernate.search.mapper.pojo.search.loading.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
-import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
+import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReferenceFactoryDelegate;
 import org.hibernate.search.mapper.pojo.loading.impl.PojoLoadingPlan;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 
 public class PojoSearchLoadingContext<E> implements SearchLoadingContext<E> {
 	private final Map<String, PojoSearchLoadingIndexedTypeContext<? extends E>> targetTypesByEntityName;
-	private final DocumentReferenceConverter<? extends EntityReference> documentReferenceConverter;
+	private final PojoEntityReferenceFactoryDelegate entityReferenceFactoryDelegate;
 	private final BridgeSessionContext sessionContext;
 	private final PojoSelectionLoadingContext delegate;
 
 	public PojoSearchLoadingContext(
 			Map<String, PojoSearchLoadingIndexedTypeContext<? extends E>> targetTypesByEntityName,
-			DocumentReferenceConverter<? extends EntityReference> documentReferenceConverter,
+			PojoEntityReferenceFactoryDelegate entityReferenceFactoryDelegate,
 			BridgeSessionContext sessionContext,
 			PojoSelectionLoadingContext delegate) {
 		this.targetTypesByEntityName = targetTypesByEntityName;
-		this.documentReferenceConverter = documentReferenceConverter;
+		this.entityReferenceFactoryDelegate = entityReferenceFactoryDelegate;
 		this.sessionContext = sessionContext;
 		this.delegate = delegate;
 	}
@@ -41,7 +40,7 @@ public class PojoSearchLoadingContext<E> implements SearchLoadingContext<E> {
 	@Override
 	public ProjectionHitMapper<E> createProjectionHitMapper() {
 		PojoLoadingPlan<E> loadingPlan = PojoLoadingPlan.create( delegate, targetTypesByEntityName.values() );
-		return new PojoProjectionHitMapper<>( targetTypesByEntityName, documentReferenceConverter, sessionContext,
+		return new PojoProjectionHitMapper<>( targetTypesByEntityName, entityReferenceFactoryDelegate, sessionContext,
 				loadingPlan );
 	}
 }

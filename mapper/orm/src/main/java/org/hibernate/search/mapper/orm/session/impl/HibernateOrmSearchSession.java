@@ -19,8 +19,6 @@ import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.DelegatingAutomaticIndexingSynchronizationStrategy;
@@ -56,7 +54,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 @SuppressWarnings("deprecation")
 public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		implements SearchSession, HibernateOrmSessionContext, HibernateOrmScopeSessionContext,
-		SearchIndexingPlanSessionContext, DocumentReferenceConverter<org.hibernate.search.mapper.orm.common.EntityReference>,
+		SearchIndexingPlanSessionContext,
 		AutomaticIndexingEventSendingSessionContext {
 
 	/**
@@ -217,20 +215,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	@Override
 	public EntityReferenceFactory<?> entityReferenceFactory() {
 		return mappingContext.entityReferenceFactory();
-	}
-
-	@Override
-	public DocumentReferenceConverter<org.hibernate.search.mapper.orm.common.EntityReference> documentReferenceConverter() {
-		return this;
-	}
-
-	@Override
-	public org.hibernate.search.mapper.orm.common.EntityReference fromDocumentReference(DocumentReference reference) {
-		HibernateOrmSessionTypeContext<?> typeContext =
-				typeContextProvider.byJpaEntityName().getOrFail( reference.typeName() );
-		Object id = typeContext.identifierMapping()
-				.fromDocumentIdentifier( reference.id(), this );
-		return new org.hibernate.search.mapper.orm.common.impl.HibernateOrmEntityReference( typeContext.typeIdentifier(), typeContext.jpaEntityName(), id );
 	}
 
 	@Override

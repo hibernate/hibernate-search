@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.standalone.session.impl;
 
 import java.util.Collection;
 
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.impl.StandalonePojoMassIndexingMappingContext;
 import org.hibernate.search.mapper.pojo.standalone.scope.impl.StandalonePojoScopeMappingContext;
 import org.hibernate.search.mapper.pojo.standalone.scope.impl.SearchScopeImpl;

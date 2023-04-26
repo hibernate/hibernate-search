@@ -21,7 +21,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.Backend;
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -57,7 +56,6 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 import org.hibernate.search.mapper.orm.session.impl.ConfiguredAutomaticIndexingStrategy;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionMappingContext;
-import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContext;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
 import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
@@ -75,7 +73,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 @SuppressWarnings("deprecation")
 public class HibernateOrmMapping extends AbstractPojoMappingImplementor<HibernateOrmMapping>
 		implements SearchMapping, AutoCloseable, HibernateOrmMappingContext,
-				EntityReferenceFactory<org.hibernate.search.mapper.orm.common.EntityReference>,
 				HibernateOrmListenerContextProvider, BatchMappingContext,
 				HibernateOrmScopeMappingContext, HibernateOrmSearchSessionMappingContext,
 				AutomaticIndexingMappingContext, CoordinationStrategyContext {
@@ -114,7 +111,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		SchemaManagementListener schemaManagementListener = new SchemaManagementListener( schemaManagementStrategyName );
 
 		return new HibernateOrmMapping(
-				mappingDelegate, typeContextContainer, sessionFactory,
+				mappingDelegate,
+				typeContextContainer, sessionFactory,
 				coordinationStrategyHolder,
 				configuredAutomaticIndexingStrategy,
 				cacheLookupStrategy, fetchSize,
@@ -145,7 +143,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			int fetchSize,
 			SchemaManagementListener schemaManagementListener) {
-		super( mappingDelegate );
+		super( mappingDelegate, org.hibernate.search.mapper.orm.common.impl.HibernateOrmEntityReference::new );
 		this.typeContextContainer = typeContextContainer;
 		this.sessionFactory = sessionFactory;
 		this.coordinationStrategyHolder = coordinationStrategyHolder;
@@ -220,17 +218,6 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	public ProjectionMappedTypeContext mappedTypeContext(String mappedTypeName) {
 		return typeContextContainer.indexedByJpaEntityName().getOrFail( mappedTypeName );
-	}
-
-	@Override
-	public EntityReferenceFactory<org.hibernate.search.mapper.orm.common.EntityReference> entityReferenceFactory() {
-		return this;
-	}
-
-	@Override
-	public org.hibernate.search.mapper.orm.common.EntityReference createEntityReference(String typeName, Object identifier) {
-		HibernateOrmSessionTypeContext<?> typeContext = typeContextContainer.byJpaEntityName().getOrFail( typeName );
-		return new org.hibernate.search.mapper.orm.common.impl.HibernateOrmEntityReference( typeContext.typeIdentifier(), typeContext.jpaEntityName(), identifier );
 	}
 
 	@Override

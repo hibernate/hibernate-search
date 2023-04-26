@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
 import java.util.Optional;
 
-import org.hibernate.search.mapper.pojo.identity.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -24,14 +23,12 @@ abstract class AbstractStandalonePojoTypeContext<E>
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final String entityName;
 	private final StandalonePojoEntityTypeMetadata<E> metadata;
-	private final IdentifierMapping identifierMapping;
 	private final PojoPathFilter dirtyFilter;
 
 	AbstractStandalonePojoTypeContext(AbstractBuilder<E> builder) {
 		this.typeIdentifier = builder.typeIdentifier;
 		this.entityName = builder.entityName;
 		this.metadata = builder.metadata;
-		this.identifierMapping = builder.identifierMapping;
 		this.dirtyFilter = builder.dirtyFilter;
 	}
 
@@ -54,10 +51,6 @@ abstract class AbstractStandalonePojoTypeContext<E>
 		return typeIdentifier.javaClass();
 	}
 
-	public IdentifierMapping identifierMapping() {
-		return identifierMapping;
-	}
-
 	@Override
 	public Optional<SelectionLoadingStrategy<? super E>> selectionLoadingStrategy() {
 		return metadata.selectionLoadingStrategy;
@@ -77,7 +70,6 @@ abstract class AbstractStandalonePojoTypeContext<E>
 		private final PojoRawTypeIdentifier<E> typeIdentifier;
 		private final String entityName;
 		private final StandalonePojoEntityTypeMetadata<E> metadata;
-		private IdentifierMapping identifierMapping;
 		private PojoPathFilter dirtyFilter;
 
 		AbstractBuilder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName,
@@ -85,11 +77,6 @@ abstract class AbstractStandalonePojoTypeContext<E>
 			this.typeIdentifier = typeIdentifier;
 			this.entityName = entityName;
 			this.metadata = metadata;
-		}
-
-		@Override
-		public void identifierMapping(IdentifierMapping identifierMapping) {
-			this.identifierMapping = identifierMapping;
 		}
 
 		@Override

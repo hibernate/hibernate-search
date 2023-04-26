@@ -51,8 +51,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	public SearchQuerySelectStep<?, org.hibernate.search.mapper.orm.common.EntityReference, E, SearchLoadingOptionsStep, ?, ?> search(
 			HibernateOrmScopeSessionContext sessionContext, HibernateOrmSelectionLoadingContext.Builder loadingContextBuilder) {
-		return delegate.search( sessionContext, sessionContext.documentReferenceConverter(),
-				loadingContextBuilder );
+		return delegate.search( sessionContext, loadingContextBuilder );
 	}
 
 	@Override

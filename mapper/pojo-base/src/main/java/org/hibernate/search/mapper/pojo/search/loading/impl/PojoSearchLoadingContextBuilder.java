@@ -8,27 +8,26 @@ package org.hibernate.search.mapper.pojo.search.loading.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
-import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
+import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReferenceFactoryDelegate;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
 
 public class PojoSearchLoadingContextBuilder<E, LOS> implements SearchLoadingContextBuilder<E, LOS> {
 
 	private final Map<String, PojoSearchLoadingIndexedTypeContext<? extends E>> targetTypesByEntityName;
-	private final DocumentReferenceConverter<? extends EntityReference> documentReferenceConverter;
+	private final PojoEntityReferenceFactoryDelegate entityReferenceFactoryDelegate;
 	private final BridgeSessionContext sessionContext;
 	private final PojoSelectionLoadingContextBuilder<LOS> delegate;
 
 	public PojoSearchLoadingContextBuilder(
 			Map<String, PojoSearchLoadingIndexedTypeContext<? extends E>> targetTypesByEntityName,
-			DocumentReferenceConverter<? extends EntityReference> documentReferenceConverter,
+			PojoEntityReferenceFactoryDelegate entityReferenceFactoryDelegate,
 			BridgeSessionContext sessionContext,
 			PojoSelectionLoadingContextBuilder<LOS> delegate) {
 		this.targetTypesByEntityName = targetTypesByEntityName;
-		this.documentReferenceConverter = documentReferenceConverter;
+		this.entityReferenceFactoryDelegate = entityReferenceFactoryDelegate;
 		this.sessionContext = sessionContext;
 		this.delegate = delegate;
 	}
@@ -40,7 +39,7 @@ public class PojoSearchLoadingContextBuilder<E, LOS> implements SearchLoadingCon
 
 	@Override
 	public SearchLoadingContext<E> build() {
-		return new PojoSearchLoadingContext<>( targetTypesByEntityName, documentReferenceConverter, sessionContext,
+		return new PojoSearchLoadingContext<>( targetTypesByEntityName, entityReferenceFactoryDelegate, sessionContext,
 				delegate.build() );
 	}
 }

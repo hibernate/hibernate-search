@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.session.impl;
 
-import org.hibernate.search.mapper.pojo.identity.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 /**
@@ -17,7 +16,5 @@ public interface StandalonePojoSessionIndexedTypeContext<E> {
 	PojoRawTypeIdentifier<E> typeIdentifier();
 
 	String name();
-
-	IdentifierMapping identifierMapping();
 
 }
