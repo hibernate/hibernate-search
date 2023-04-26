@@ -26,7 +26,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
@@ -91,7 +91,7 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 
 		ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
-		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( mainTypeContextMock.loadingAvailable() ).thenReturn( false );
@@ -111,7 +111,7 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.projectionRegistry( projectionRegistryMock )
 				.run( () -> {
-					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 
 					IndexBinding binding = mainIndex.binding();
@@ -127,7 +127,7 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 							.toQuery();
 
 					@SuppressWarnings("unchecked")
-					ProjectionHitMapper<StubTransformedReference, StubEntity> projectionHitMapperMock =
+					ProjectionHitMapper<EntityReference, StubEntity> projectionHitMapperMock =
 							Mockito.mock( ProjectionHitMapper.class );
 					when( loadingContextMock.createProjectionHitMapper() )
 							.thenReturn( projectionHitMapperMock );

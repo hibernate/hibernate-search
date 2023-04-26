@@ -39,7 +39,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -103,7 +103,7 @@ public class SearchProjectionIT {
 	}
 
 	@Test
-	public void references() {
+	public void references_noLoadingContext() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<List<?>> query;
@@ -118,51 +118,41 @@ public class SearchProjectionIT {
 		 */
 		SearchProjection<DocumentReference> documentReferenceProjection =
 				scope.projection().documentReference().toProjection();
-		SearchProjection<DocumentReference> entityReferenceProjection =
-				scope.projection().entityReference().toProjection();
-		SearchProjection<DocumentReference> objectProjection =
-				scope.projection().entity().toProjection();
 		SearchProjection<Object> idProjection =
 				scope.projection().id().toProjection();
 
 		query = scope.query()
 				.select(
 						documentReferenceProjection,
-						entityReferenceProjection,
-						objectProjection,
 						idProjection
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThatQuery( query ).hasListHitsAnyOrder( b -> {
-			b.list( document1Reference, document1Reference, document1Reference, DOCUMENT_1 );
-			b.list( document2Reference, document2Reference, document2Reference, DOCUMENT_2 );
-			b.list( document3Reference, document3Reference, document3Reference, DOCUMENT_3 );
-			b.list( emptyReference, emptyReference, emptyReference, EMPTY );
+			b.list( document1Reference, DOCUMENT_1 );
+			b.list( document2Reference, DOCUMENT_2 );
+			b.list( document3Reference, DOCUMENT_3 );
+			b.list( emptyReference, EMPTY );
 		} );
 	}
 
-	/**
-	 * Test documentReference/entityReference/entity projections as they are likely to be used by mappers,
-	 * i.e. with a custom reference transformer and a custom entity loader.
-	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3395")
-	public void references_transformed() {
+	public void references() {
 		DocumentReference document1Reference = reference( mainIndex.typeName(), DOCUMENT_1 );
 		DocumentReference document2Reference = reference( mainIndex.typeName(), DOCUMENT_2 );
 		DocumentReference document3Reference = reference( mainIndex.typeName(), DOCUMENT_3 );
 		DocumentReference emptyReference = reference( mainIndex.typeName(), EMPTY );
-		StubTransformedReference document1TransformedReference = new StubTransformedReference( document1Reference );
-		StubTransformedReference document2TransformedReference = new StubTransformedReference( document2Reference );
-		StubTransformedReference document3TransformedReference = new StubTransformedReference( document3Reference );
-		StubTransformedReference emptyTransformedReference = new StubTransformedReference( emptyReference );
+		EntityReference document1EntityReference = StubEntity.reference( document1Reference );
+		EntityReference document2EntityReference = StubEntity.reference( document2Reference );
+		EntityReference document3EntityReference = StubEntity.reference( document3Reference );
+		EntityReference emptyEntityReference = StubEntity.reference( emptyReference );
 		StubEntity document1LoadedEntity = new StubEntity( document1Reference );
 		StubEntity document2LoadedEntity = new StubEntity( document2Reference );
 		StubEntity document3LoadedEntity = new StubEntity( document3Reference );
 		StubEntity emptyLoadedEntity = new StubEntity( emptyReference );
 
-		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
@@ -170,7 +160,7 @@ public class SearchProjectionIT {
 		mainIndex.mapping().with()
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 					SearchQuery<List<?>> query;
 					/*
@@ -179,7 +169,7 @@ public class SearchProjectionIT {
 					 */
 					SearchProjection<DocumentReference> documentReferenceProjection =
 							scope.projection().documentReference().toProjection();
-					SearchProjection<StubTransformedReference> entityReferenceProjection =
+					SearchProjection<EntityReference> entityReferenceProjection =
 							scope.projection().entityReference().toProjection();
 					SearchProjection<StubEntity> entityProjection =
 							scope.projection().entity().toProjection();
@@ -199,20 +189,20 @@ public class SearchProjectionIT {
 							 * but also loaded because of the entity projection.
 							 */
 							c -> c
-									.entityReference( document1Reference, document1TransformedReference )
+									.entityReference( document1Reference, document1EntityReference )
 									.load( document1Reference, document1LoadedEntity )
-									.entityReference( document2Reference, document2TransformedReference )
+									.entityReference( document2Reference, document2EntityReference )
 									.load( document2Reference, document2LoadedEntity )
-									.entityReference( document3Reference, document3TransformedReference )
+									.entityReference( document3Reference, document3EntityReference )
 									.load( document3Reference, document3LoadedEntity )
-									.entityReference( emptyReference, emptyTransformedReference )
+									.entityReference( emptyReference, emptyEntityReference )
 									.load( emptyReference, emptyLoadedEntity )
 					);
 					assertThatQuery( query ).hasListHitsAnyOrder( b -> {
-						b.list( document1Reference, document1TransformedReference, document1LoadedEntity );
-						b.list( document2Reference, document2TransformedReference, document2LoadedEntity );
-						b.list( document3Reference, document3TransformedReference, document3LoadedEntity );
-						b.list( emptyReference, emptyTransformedReference, emptyLoadedEntity );
+						b.list( document1Reference, document1EntityReference, document1LoadedEntity );
+						b.list( document2Reference, document2EntityReference, document2LoadedEntity );
+						b.list( document3Reference, document3EntityReference, document3LoadedEntity );
+						b.list( emptyReference, emptyEntityReference, emptyLoadedEntity );
 					} );
 				} );
 	}

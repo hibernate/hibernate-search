@@ -64,6 +64,7 @@ import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -118,7 +119,7 @@ public class LuceneExtensionIT {
 		StubMappingScope scope = mainIndex.createScope();
 
 		// Put intermediary contexts into variables to check they have the right type
-		LuceneSearchQuerySelectStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> context1 =
+		LuceneSearchQuerySelectStep<EntityReference, DocumentReference, StubLoadingOptionsStep> context1 =
 				scope.query().extension( LuceneExtension.get() );
 		LuceneSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> context2 = context1.select(
 				f -> f.composite()
@@ -142,7 +143,7 @@ public class LuceneExtensionIT {
 				.hasTotalHitCount( 5 );
 
 		// Also check (at compile time) the context type for other asXXX() methods, since we need to override each method explicitly
-		LuceneSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> selectEntityReferenceContext =
+		LuceneSearchQueryWhereStep<EntityReference, StubLoadingOptionsStep> selectEntityReferenceContext =
 				scope.query().extension( LuceneExtension.get() ).selectEntityReference();
 		LuceneSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> selectEntityContext =
 				scope.query().extension( LuceneExtension.get() ).selectEntity();

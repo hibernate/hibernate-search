@@ -23,11 +23,10 @@ import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,46 +57,31 @@ public abstract class AbstractEntityReferenceProjectionIT {
 			SearchQuerySelectStep<?, R, E, LOS, ?, ?> step);
 
 	@Test
-	public void noReferenceTransformer() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		SearchQuery<DocumentReference> query = select( scope.query() )
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThatQuery( query )
-				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1_ID, DOCUMENT_2_ID );
-
-		// check the same for the scroll API
-		assertThatHits( hitsUsingScroll( query ) )
-				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1_ID, DOCUMENT_2_ID );
-	}
-
-	@Test
-	public void referenceTransformer() {
+	public void test() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
-		StubTransformedReference doc1TransformedReference = new StubTransformedReference( doc1Reference );
-		StubTransformedReference doc2TransformedReference = new StubTransformedReference( doc2Reference );
+		EntityReference doc1EntityReference = StubEntity.reference( doc1Reference );
+		EntityReference doc2EntityReference = StubEntity.reference( doc2Reference );
 
-		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		mainIndex.mapping().with()
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
-					SearchQuery<StubTransformedReference> referencesQuery = select( scope.query() )
+					SearchQuery<EntityReference> referencesQuery = select( scope.query() )
 							.where( f -> f.matchAll() )
 							.toQuery();
 
 					expectHitMapping(
 							loadingContextMock,
 							c -> c
-									.entityReference( doc1Reference, doc1TransformedReference )
-									.entityReference( doc2Reference, doc2TransformedReference )
+									.entityReference( doc1Reference, doc1EntityReference )
+									.entityReference( doc2Reference, doc2EntityReference )
 					);
-					assertThatQuery( referencesQuery ).hasHitsAnyOrder( doc1TransformedReference, doc2TransformedReference );
+					assertThatQuery( referencesQuery ).hasHitsAnyOrder( doc1EntityReference, doc2EntityReference );
 					// Check in particular that the backend gets the projection hit mapper from the loading context,
 					// which must happen every time we execute the query,
 					// so that the mapper can run state checks (session is still open, ...).
@@ -107,10 +91,10 @@ public abstract class AbstractEntityReferenceProjectionIT {
 					expectHitMapping(
 							loadingContextMock,
 							c -> c
-									.entityReference( doc1Reference, doc1TransformedReference )
-									.entityReference( doc2Reference, doc2TransformedReference )
+									.entityReference( doc1Reference, doc1EntityReference )
+									.entityReference( doc2Reference, doc2EntityReference )
 					);
-					assertThatHits( hitsUsingScroll( referencesQuery ) ).hasHitsAnyOrder( doc1TransformedReference, doc2TransformedReference );
+					assertThatHits( hitsUsingScroll( referencesQuery ) ).hasHitsAnyOrder( doc1EntityReference, doc2EntityReference );
 					verify( loadingContextMock ).createProjectionHitMapper();
 				} );
 	}

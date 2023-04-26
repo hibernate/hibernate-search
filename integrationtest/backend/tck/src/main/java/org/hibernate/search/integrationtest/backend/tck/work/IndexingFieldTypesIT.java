@@ -130,7 +130,7 @@ public class IndexingFieldTypesIT<F> {
 
 		SearchQuery<IdAndValue<F>> query = scope.query()
 				.select( f -> f.composite()
-						.from( f.entityReference(),
+						.from( f.documentReference(),
 								f.field( absoluteFieldPath, typeDescriptor.getJavaType() ) )
 						.as( (ref, val) -> new IdAndValue<>( ref.id(), val ) ) )
 				.where( f -> f.matchAll() )
@@ -174,7 +174,7 @@ public class IndexingFieldTypesIT<F> {
 
 		SearchQuery<IdAndValue<F>> query = scope.query()
 				.select( f -> f.composite()
-						.from( f.entityReference(),
+						.from( f.documentReference(),
 								f.field( absoluteFieldPath, typeDescriptor.getJavaType() ) )
 						.as( (ref, val) -> new IdAndValue<>( ref.id(), val ) ) )
 				.where( f -> f.matchAll() )

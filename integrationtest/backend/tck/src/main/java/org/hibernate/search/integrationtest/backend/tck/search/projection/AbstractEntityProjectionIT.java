@@ -41,7 +41,7 @@ import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
@@ -102,7 +102,7 @@ public abstract class AbstractEntityProjectionIT {
 		StubEntity doc1LoadedEntity = new StubEntity( doc1Reference );
 		StubEntity doc2LoadedEntity = new StubEntity( doc2Reference );
 
-		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
@@ -110,7 +110,7 @@ public abstract class AbstractEntityProjectionIT {
 		mainIndex.mapping().with()
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 					SearchQuery<StubEntity> query = select( scope.query() )
 							.where( f -> f.matchAll() )
@@ -147,7 +147,7 @@ public abstract class AbstractEntityProjectionIT {
 		StubEntity doc1LoadedEntity = new StubEntity( doc1Reference );
 		StubEntity doc2LoadedEntity = new StubEntity( doc2Reference );
 
-		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
@@ -155,7 +155,7 @@ public abstract class AbstractEntityProjectionIT {
 		mainIndex.mapping().with()
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 					SearchQuery<StubEntity> query = select( scope.query() )
 							.where( f -> f.matchAll() )
@@ -252,7 +252,7 @@ public abstract class AbstractEntityProjectionIT {
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 		StubEntity doc2LoadedObject = new StubEntity( doc2Reference );
 
-		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
@@ -260,7 +260,7 @@ public abstract class AbstractEntityProjectionIT {
 		mainIndex.mapping().with()
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 					SearchQuery<StubEntity> query = select( scope.query() )
 							.where( f -> f.matchAll() )
@@ -329,7 +329,7 @@ public abstract class AbstractEntityProjectionIT {
 		StubEntity doc2LoadedEntity = new StubEntity( doc2Reference );
 
 		ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
-		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
@@ -338,7 +338,7 @@ public abstract class AbstractEntityProjectionIT {
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.projectionRegistry( projectionRegistryMock )
 				.run( () -> {
-					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 
 					expectHitMapping(
@@ -366,7 +366,7 @@ public abstract class AbstractEntityProjectionIT {
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
 
 		ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
-		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( mainTypeContextMock.loadingAvailable() ).thenReturn( false );
@@ -386,7 +386,7 @@ public abstract class AbstractEntityProjectionIT {
 				.typeContext( mainIndex.typeName(), mainTypeContextMock )
 				.projectionRegistry( projectionRegistryMock )
 				.run( () -> {
-					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
 							mainIndex.createGenericScope( loadingContextMock );
 
 					SearchQuery<StubEntity> query = select( scope.query( loadingContextMock ) )
@@ -394,7 +394,7 @@ public abstract class AbstractEntityProjectionIT {
 							.toQuery();
 
 					@SuppressWarnings("unchecked")
-					ProjectionHitMapper<StubTransformedReference, StubEntity> projectionHitMapperMock =
+					ProjectionHitMapper<EntityReference, StubEntity> projectionHitMapperMock =
 							Mockito.mock( ProjectionHitMapper.class );
 					when( loadingContextMock.createProjectionHitMapper() )
 							.thenReturn( projectionHitMapperMock );
@@ -429,7 +429,7 @@ public abstract class AbstractEntityProjectionIT {
 		ProjectionMappedTypeContext type3ContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
 		ProjectionMappedTypeContext type4ContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
 		ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
-		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( type1ContextMock.name() ).thenReturn( multiIndex1.typeName() );
@@ -473,7 +473,7 @@ public abstract class AbstractEntityProjectionIT {
 				.typeContext( multiIndex4.typeName(), type4ContextMock )
 				.projectionRegistry( projectionRegistryMock )
 				.run( () -> {
-					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
 							multiIndex1.createGenericScope( loadingContextMock, multiIndex2, multiIndex3, multiIndex4 );
 
 					SearchQuery<StubEntity> query = select( scope.query( loadingContextMock ) )

@@ -42,6 +42,7 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -107,7 +108,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = mainIndex.createScope();
 
 		// Put intermediary contexts into variables to check they have the right type
-		ElasticsearchSearchQuerySelectStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> context1 =
+		ElasticsearchSearchQuerySelectStep<EntityReference, DocumentReference, StubLoadingOptionsStep> context1 =
 				scope.query().extension( ElasticsearchExtension.get() );
 		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> context2 = context1.select(
 				f -> f.composite()
@@ -131,7 +132,7 @@ public class ElasticsearchExtensionIT {
 				.hasTotalHitCount( 6 );
 
 		// Also check (at compile time) the context type for other asXXX() methods, since we need to override each method explicitly
-		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> selectEntityReferenceContext =
+		ElasticsearchSearchQueryWhereStep<EntityReference, StubLoadingOptionsStep> selectEntityReferenceContext =
 				scope.query().extension( ElasticsearchExtension.get() ).selectEntityReference();
 		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> selectEntityContext =
 				scope.query().extension( ElasticsearchExtension.get() ).selectEntity();
