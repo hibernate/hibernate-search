@@ -22,6 +22,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -245,23 +246,23 @@ public class SearchQueryBaseIT {
 	}
 
 	private static class SupportedQueryDslExtension<R, E, LOS> implements
-			SearchQueryDslExtension<MyExtendedDslContext<R>, R, E, LOS> {
+			SearchQueryDslExtension<MyExtendedDslContext<E>, R, E, LOS> {
 		@Override
-		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
+		public Optional<MyExtendedDslContext<E>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
 				SearchQueryIndexScope<?> scope, BackendSessionContext sessionContext,
 				SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 			assertThat( original ).isNotNull();
 			assertThat( scope ).isNotNull();
 			assertThat( sessionContext ).isNotNull();
 			assertThat( loadingContextBuilder ).isNotNull();
-			return Optional.of( new MyExtendedDslContext<R>( original.selectEntityReference() ) );
+			return Optional.of( new MyExtendedDslContext<E>( original.selectEntity() ) );
 		}
 	}
 
 	private static class UnSupportedQueryDslExtension<R, E, LOS> implements
-			SearchQueryDslExtension<MyExtendedDslContext<R>, R, E, LOS> {
+			SearchQueryDslExtension<MyExtendedDslContext<E>, R, E, LOS> {
 		@Override
-		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
+		public Optional<MyExtendedDslContext<E>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
 				SearchQueryIndexScope<?> scope, BackendSessionContext sessionContext,
 				SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 			assertThat( original ).isNotNull();

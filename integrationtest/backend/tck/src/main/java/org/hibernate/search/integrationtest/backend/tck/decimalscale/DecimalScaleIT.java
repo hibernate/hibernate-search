@@ -13,7 +13,6 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -725,36 +724,16 @@ public class DecimalScaleIT {
 		projection( index, new BigInteger( "73911111" ) );
 	}
 
-	private void matchGreaterThan(StubMappedIndex index, BigDecimal value) {
-		SearchQuery<DocumentReference> query = index.createScope()
-				.query().selectEntityReference()
-				.where( p -> p.range().field( "scaled" ).greaterThan( value ) )
-				.toQuery();
-		assertThatQuery( query ).hasDocRefHitsAnyOrder( index.typeName(), "1" );
+	private void matchGreaterThan(StubMappedIndex index, Object value) {
+		assertThatQuery( index.query()
+				.where( p -> p.range().field( "scaled" ).greaterThan( value ) ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), "1" );
 	}
 
-	private void matchGreaterThan(StubMappedIndex index, BigInteger value) {
-		SearchQuery<DocumentReference> query = index.createScope()
-				.query().selectEntityReference()
-				.where( p -> p.range().field( "scaled" ).greaterThan( value ) )
-				.toQuery();
-		assertThatQuery( query ).hasDocRefHitsAnyOrder( index.typeName(), "1" );
-	}
-
-	public void doNotMatchGreaterThan(StubMappedIndex index, BigDecimal value) {
-		SearchQuery<DocumentReference> query = index.createScope()
-				.query().selectEntityReference()
-				.where( p -> p.range().field( "scaled" ).greaterThan( value ) )
-				.toQuery();
-		assertThatQuery( query ).hasNoHits();
-	}
-
-	public void doNotMatchGreaterThan(StubMappedIndex index, BigInteger value) {
-		SearchQuery<DocumentReference> query = index.createScope()
-				.query().selectEntityReference()
-				.where( p -> p.range().field( "scaled" ).greaterThan( value ) )
-				.toQuery();
-		assertThatQuery( query ).hasNoHits();
+	public void doNotMatchGreaterThan(StubMappedIndex index, Object value) {
+		assertThatQuery( index.query()
+				.where( p -> p.range().field( "scaled" ).greaterThan( value ) ) )
+				.hasNoHits();
 	}
 
 	public void projection(StubMappedIndex index, BigDecimal value) {
@@ -773,20 +752,10 @@ public class DecimalScaleIT {
 		assertThatQuery( query ).hasHitsExactOrder( value );
 	}
 
-	private void match(StubMappedIndex index, BigDecimal matching, String match1, String match2) {
-		SearchQuery<DocumentReference> query = index.createScope()
-				.query().selectEntityReference()
-				.where( p -> p.match().field( "scaled" ).matching( matching ) )
-				.toQuery();
-		assertThatQuery( query ).hasDocRefHitsAnyOrder( index.typeName(), match1, match2 );
-	}
-
-	private void match(StubMappedIndex index, BigInteger matching, String match1, String match2) {
-		SearchQuery<DocumentReference> query = index.createScope()
-				.query().selectEntityReference()
-				.where( p -> p.match().field( "scaled" ).matching( matching ) )
-				.toQuery();
-		assertThatQuery( query ).hasDocRefHitsAnyOrder( index.typeName(), match1, match2 );
+	private void match(StubMappedIndex index, Object matching, String match1, String match2) {
+		assertThatQuery( index.query()
+				.where( p -> p.match().field( "scaled" ).matching( matching ) ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), match1, match2 );
 	}
 
 	/**

@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributo
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
@@ -180,7 +181,7 @@ public abstract class StubMappedIndex {
 	/**
 	 * @return {@code createScope().query()}.
 	 */
-	public SearchQuerySelectStep<?, DocumentReference, DocumentReference, StubLoadingOptionsStep, ?, ?> query() {
+	public SearchQuerySelectStep<?, EntityReference, DocumentReference, StubLoadingOptionsStep, ?, ?> query() {
 		return createScope().query();
 	}
 
@@ -188,7 +189,7 @@ public abstract class StubMappedIndex {
 	 * @return A scope containing this index only.
 	 */
 	public StubMappingScope createScope() {
-		MappedIndexScopeBuilder<DocumentReference, DocumentReference> builder =
+		MappedIndexScopeBuilder<EntityReference, DocumentReference> builder =
 				delegate().createScopeBuilder( mapping );
 		return new StubMappingScope( mapping, builder.build() );
 	}
@@ -197,7 +198,7 @@ public abstract class StubMappedIndex {
 	 * @return A scope containing this index and the given other indexes.
 	 */
 	public StubMappingScope createScope(StubMappedIndex... others) {
-		MappedIndexScopeBuilder<DocumentReference, DocumentReference> builder =
+		MappedIndexScopeBuilder<EntityReference, DocumentReference> builder =
 				delegate().createScopeBuilder( mapping );
 		for ( StubMappedIndex other : others ) {
 			other.delegate().addTo( builder );

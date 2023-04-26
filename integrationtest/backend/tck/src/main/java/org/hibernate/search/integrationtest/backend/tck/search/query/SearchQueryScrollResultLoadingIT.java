@@ -26,7 +26,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
@@ -72,7 +72,7 @@ public class SearchQueryScrollResultLoadingIT {
 	@Test
 	public void resultLoadingOnScrolling() {
 		@SuppressWarnings("unchecked")
-		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( typeContextMock.loadingAvailable() ).thenReturn( true );
@@ -80,7 +80,7 @@ public class SearchQueryScrollResultLoadingIT {
 		index.mapping().with()
 				.typeContext( index.typeName(), typeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<StubTransformedReference, StubEntity> scope = index.createGenericScope( loadingContextMock );
+					GenericStubMappingScope<EntityReference, StubEntity> scope = index.createGenericScope( loadingContextMock );
 					SearchQuery<StubEntity> query = scope.query()
 							.where( f -> f.matchAll() )
 							.sort( f -> f.field( "integer" ) )
@@ -94,7 +94,7 @@ public class SearchQueryScrollResultLoadingIT {
 	@Test
 	public void resultLoadingOnScrolling_entityLoadingTimeout() {
 		@SuppressWarnings("unchecked")
-		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( typeContextMock.loadingAvailable() ).thenReturn( true );
@@ -102,7 +102,7 @@ public class SearchQueryScrollResultLoadingIT {
 		index.mapping().with()
 				.typeContext( index.typeName(), typeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
 							index.createGenericScope( loadingContextMock );
 					SearchQuery<StubEntity> query = scope.query()
 							.where( f -> f.matchAll() )
@@ -118,7 +118,7 @@ public class SearchQueryScrollResultLoadingIT {
 	@Test
 	public void resultLoadingOnScrolling_softTimeout() {
 		@SuppressWarnings("unchecked")
-		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( typeContextMock.loadingAvailable() ).thenReturn( true );
@@ -126,7 +126,7 @@ public class SearchQueryScrollResultLoadingIT {
 		index.mapping().with()
 				.typeContext( index.typeName(), typeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
 							index.createGenericScope( loadingContextMock );
 					SearchQuery<StubEntity> query = scope.query()
 							.where( f -> f.matchAll() )
@@ -140,7 +140,7 @@ public class SearchQueryScrollResultLoadingIT {
 				} );
 	}
 
-	private void verifyLoading(SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock,
+	private void verifyLoading(SearchLoadingContext<EntityReference, StubEntity> loadingContextMock,
 			SearchScroll<StubEntity> scroll) {
 		// 7 full size pages
 		for ( int j = 0; j < 7; j++ ) {

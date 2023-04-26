@@ -10,11 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.util.common.AssertionFailure;
 
-final class StubProjectionHitMapper implements ProjectionHitMapper<DocumentReference, DocumentReference> {
+final class StubProjectionHitMapper implements ProjectionHitMapper<EntityReference, DocumentReference> {
 
 	private final List<DocumentReference> referencesToLoad = new ArrayList<>();
 
@@ -25,11 +27,11 @@ final class StubProjectionHitMapper implements ProjectionHitMapper<DocumentRefer
 	}
 
 	@Override
-	public LoadingResult<DocumentReference, DocumentReference> loadBlocking(Deadline deadline) {
+	public LoadingResult<EntityReference, DocumentReference> loadBlocking(Deadline deadline) {
 		return new StubLoadingResult( referencesToLoad );
 	}
 
-	private static class StubLoadingResult implements LoadingResult<DocumentReference, DocumentReference> {
+	private static class StubLoadingResult implements LoadingResult<EntityReference, DocumentReference> {
 
 		private final List<DocumentReference> referencesToLoad;
 
@@ -43,8 +45,9 @@ final class StubProjectionHitMapper implements ProjectionHitMapper<DocumentRefer
 		}
 
 		@Override
-		public DocumentReference convertReference(DocumentReference reference) {
-			return reference;
+		public EntityReference convertReference(DocumentReference reference) {
+			throw new AssertionFailure( "Entity references cannot be retrieved with the default loading context."
+					+ " Use StubMappedIndex#createGenericScope(...) to test loading/reference-related features" );
 		}
 	}
 }

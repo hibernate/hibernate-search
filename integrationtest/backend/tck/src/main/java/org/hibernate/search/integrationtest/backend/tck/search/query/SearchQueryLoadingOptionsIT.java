@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -54,7 +54,7 @@ public class SearchQueryLoadingOptionsIT {
 
 	@Test
 	public void defaultResultType() {
-		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock = mock( SearchLoadingContext.class );
+		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock = mock( SearchLoadingContext.class );
 		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
@@ -64,7 +64,7 @@ public class SearchQueryLoadingOptionsIT {
 		index.mapping().with()
 				.typeContext( index.typeName(), typeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
 							index.createGenericScope( loadingContextMock );
 					scope.query( loadingOptionsStepMock )
 							.where( f -> f.matchAll() )
@@ -77,7 +77,7 @@ public class SearchQueryLoadingOptionsIT {
 
 	@Test
 	public void selectEntity() {
-		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock = mock( SearchLoadingContext.class );
+		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock = mock( SearchLoadingContext.class );
 		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
@@ -87,7 +87,7 @@ public class SearchQueryLoadingOptionsIT {
 		index.mapping().with()
 				.typeContext( index.typeName(), typeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
 							index.createGenericScope( loadingContextMock );
 					scope.query( loadingOptionsStepMock )
 							.selectEntity()
@@ -101,7 +101,7 @@ public class SearchQueryLoadingOptionsIT {
 
 	@Test
 	public void selectEntityReference() {
-		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock = mock( SearchLoadingContext.class );
+		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock = mock( SearchLoadingContext.class );
 		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
@@ -109,7 +109,7 @@ public class SearchQueryLoadingOptionsIT {
 		index.mapping().with()
 				.typeContext( index.typeName(), typeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
 							index.createGenericScope( loadingContextMock );
 					scope.query( loadingOptionsStepMock )
 							.selectEntityReference()
@@ -123,7 +123,7 @@ public class SearchQueryLoadingOptionsIT {
 
 	@Test
 	public void select() {
-		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
@@ -134,7 +134,7 @@ public class SearchQueryLoadingOptionsIT {
 		index.mapping().with()
 				.typeContext( index.typeName(), typeContextMock )
 				.run( () -> {
-					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
 							index.createGenericScope( loadingContextMock );
 					scope.query( loadingOptionsStepMock )
 							.select( f -> f.composite( f.entity(), f.field( "string" ) ) )
