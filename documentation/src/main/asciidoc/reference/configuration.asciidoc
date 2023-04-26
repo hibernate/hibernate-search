@@ -425,7 +425,9 @@ include::{sourcedir}/org/hibernate/search/documentation/reporting/failurehandler
 <5> `handle(EntityIndexingFailureContext)` is called for failures occurring when indexing entities.
 <6> On top of the failing operation and throwable,
 the context also lists references to entities that could not be indexed correctly because of the failure.
-<7> Use the context-provided information to report the failure in any relevant way.
+<7> Entity references expose the entity type, name and identifier.
+<8> Entity references may be converted to a human-readable string using `toString()`.
+<9> Use the context-provided information to report the failure in any relevant way.
 
 [source, XML, indent=0, subs="+callouts"]
 ----

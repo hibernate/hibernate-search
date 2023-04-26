@@ -9,6 +9,7 @@ package org.hibernate.search.engine.reporting.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -59,13 +60,13 @@ public class LogFailureHandler implements FailureHandler {
 	}
 
 	private StringBuilder formatMessage(EntityIndexingFailureContext context) {
-		final List<?> entityReferences = context.entityReferences();
+		final List<EntityReference> entityReferences = context.failingEntityReferences();
 
 		final StringBuilder messageBuilder = formatMessage( (FailureContext) context );
 
 		if ( ! entityReferences.isEmpty() ) {
 			messageBuilder.append( "Entities that could not be indexed correctly:\n" );
-			for ( Object entityReference : entityReferences ) {
+			for ( EntityReference entityReference : entityReferences ) {
 				messageBuilder.append( entityReference );
 				messageBuilder.append( " " );
 			}

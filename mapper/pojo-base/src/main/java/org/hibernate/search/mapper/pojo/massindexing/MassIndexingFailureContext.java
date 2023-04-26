@@ -20,9 +20,9 @@ public class MassIndexingFailureContext {
 		return new Builder();
 	}
 
-	private final Throwable throwable;
+	protected final Throwable throwable;
 
-	private final Object failingOperation;
+	protected final Object failingOperation;
 
 	MassIndexingFailureContext(Builder builder) {
 		/*
@@ -36,6 +36,14 @@ public class MassIndexingFailureContext {
 		this.failingOperation = builder.failingOperation == null
 				? "Unknown operation: missing operation when reporting the failure."
 				: builder.failingOperation;
+	}
+
+	@Override
+	public String toString() {
+		return "MassIndexingFailureContext{" +
+				"throwable=" + throwable +
+				", failingOperation=" + failingOperation +
+				'}';
 	}
 
 	/**

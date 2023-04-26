@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -50,8 +51,8 @@ public final class AsyncIndexingPlanSynchronizationStrategy implements IndexingP
 								EntityIndexingFailureContext.Builder contextBuilder = EntityIndexingFailureContext.builder();
 								contextBuilder.throwable( result.throwable().get() );
 								contextBuilder.failingOperation( log.automaticIndexing() );
-								for ( Object entityReference : result.failingEntities() ) {
-									contextBuilder.entityReference( entityReference );
+								for ( EntityReference entityReference : result.failingEntities() ) {
+									contextBuilder.failingEntityReference( entityReference );
 								}
 								failureHandler.handle( contextBuilder.build() );
 							}

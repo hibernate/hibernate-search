@@ -286,7 +286,7 @@ public class OutboxPollingAutomaticIndexingBackendFailureIT {
 		assertThat( entityFailure.throwable() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Max '3' retries exhausted to process the event. Event will be aborted." );
-		hasOneReference( entityFailure.entityReferences(), "indexed", 2 );
+		hasOneReference( entityFailure.failingEntityReferences(), "indexed", 2 );
 	}
 
 	private void setup(int retryDelay) {
@@ -306,12 +306,12 @@ public class OutboxPollingAutomaticIndexingBackendFailureIT {
 		assertThat( entityFailure.throwable() )
 				.isInstanceOf( SimulatedFailure.class )
 				.hasMessageContaining( "Indexing work #2 failed!" );
-		hasOneReference( entityFailure.entityReferences(), "indexed", 2 );
+		hasOneReference( entityFailure.failingEntityReferences(), "indexed", 2 );
 	}
 
-	private void hasOneReference(List<Object> entityReferences, String entityName, Object id) {
+	private void hasOneReference(List<EntityReference> entityReferences, String entityName, Object id) {
 		assertThat( entityReferences ).hasSize( 1 );
-		EntityReference entityReference = (EntityReference) entityReferences.get( 0 );
+		EntityReference entityReference = entityReferences.get( 0 );
 		assertThat( entityReference.name() ).isEqualTo( entityName );
 		assertThat( entityReference.id() ).isEqualTo( id );
 	}

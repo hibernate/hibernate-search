@@ -112,7 +112,7 @@ final class OutboxEventProcessingPlan {
 					extractReferenceOrSuppress( entityReference, throwable.get() )
 			);
 
-			builder.entityReference( entityReference );
+			builder.failingEntityReference( entityReference );
 			failedEvents.addAll( eventsMap.get( outboxEventReference ) );
 		}
 		failureHandler.handle( builder.build() );
@@ -135,7 +135,7 @@ final class OutboxEventProcessingPlan {
 		builder.failingOperation( "Processing an outbox event." );
 
 		for ( OutboxEvent event : events ) {
-			builder.entityReference( entityReference( event.getEntityName(), event.getEntityId(), throwable ) );
+			builder.failingEntityReference( entityReference( event.getEntityName(), event.getEntityId(), throwable ) );
 		}
 		failureHandler.handle( builder.build() );
 	}

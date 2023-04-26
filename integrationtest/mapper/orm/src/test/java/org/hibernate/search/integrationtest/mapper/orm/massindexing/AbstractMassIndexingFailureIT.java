@@ -25,10 +25,12 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
+import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
@@ -195,12 +197,12 @@ public abstract class AbstractMassIndexingFailureIT {
 		SessionFactory sessionFactory = setup();
 
 		String entityName = Book.NAME;
-		String entityReferenceAsString = Book.NAME + "#2";
+		EntityReference entityReference = PojoEntityReference.withName( Book.class, Book.NAME, 2 );
 		String exceptionMessage = "Indexing failure";
 		String failingOperationAsString = "Indexing instance of entity '" + entityName + "' during mass indexing";
 
 		expectEntityIndexingFailureHandling(
-				entityName, entityReferenceAsString,
+				entityName, entityReference,
 				exceptionMessage, failingOperationAsString
 		);
 
@@ -223,7 +225,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		);
 
 		assertEntityIndexingFailureHandling(
-				entityName, entityReferenceAsString,
+				entityName, entityReference,
 				exceptionMessage, failingOperationAsString
 		);
 	}
@@ -233,12 +235,12 @@ public abstract class AbstractMassIndexingFailureIT {
 		SessionFactory sessionFactory = setup();
 
 		String entityName = Book.NAME;
-		String entityReferenceAsString = Book.NAME + "#2";
+		EntityReference entityReference = PojoEntityReference.withName( Book.class, Book.NAME, 2 );
 		String exceptionMessage = "getId failure";
 		String failingOperationAsString = "Indexing instance of entity '" + entityName + "' during mass indexing";
 
 		expectEntityIdGetterFailureHandling(
-				entityName, entityReferenceAsString,
+				entityName, entityReference,
 				exceptionMessage, failingOperationAsString
 		);
 
@@ -264,7 +266,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		);
 
 		assertEntityIdGetterFailureHandling(
-				entityName, entityReferenceAsString,
+				entityName, entityReference,
 				exceptionMessage, failingOperationAsString
 		);
 	}
@@ -274,12 +276,12 @@ public abstract class AbstractMassIndexingFailureIT {
 		SessionFactory sessionFactory = setup();
 
 		String entityName = Book.NAME;
-		String entityReferenceAsString = Book.NAME + "#2";
+		EntityReference entityReference = PojoEntityReference.withName( Book.class, Book.NAME, 2 );
 		String exceptionMessage = "getTitle failure";
 		String failingOperationAsString = "Indexing instance of entity '" + entityName + "' during mass indexing";
 
 		expectEntityNonIdGetterFailureHandling(
-				entityName, entityReferenceAsString,
+				entityName, entityReference,
 				exceptionMessage, failingOperationAsString
 		);
 
@@ -305,7 +307,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		);
 
 		assertEntityNonIdGetterFailureHandling(
-				entityName, entityReferenceAsString,
+				entityName, entityReference,
 				exceptionMessage, failingOperationAsString
 		);
 	}
@@ -479,14 +481,14 @@ public abstract class AbstractMassIndexingFailureIT {
 		SessionFactory sessionFactory = setup();
 
 		String entityName = Book.NAME;
-		String entityReferenceAsString = Book.NAME + "#2";
+		EntityReference entityReference = PojoEntityReference.withName( Book.class, Book.NAME, 2 );
 		String failingEntityIndexingExceptionMessage = "Indexing failure";
 		String failingEntityIndexingOperationAsString = "Indexing instance of entity '" + entityName + "' during mass indexing";
 		String failingMassIndexerOperationExceptionMessage = "FLUSH failure";
 		String failingMassIndexerOperationAsString = "MassIndexer operation";
 
 		expectEntityIndexingAndMassIndexerOperationFailureHandling(
-				entityName, entityReferenceAsString,
+				entityName, entityReference,
 				failingEntityIndexingExceptionMessage, failingEntityIndexingOperationAsString,
 				failingMassIndexerOperationExceptionMessage, failingMassIndexerOperationAsString
 		);
@@ -516,7 +518,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		);
 
 		assertEntityIndexingAndMassIndexerOperationFailureHandling(
-				entityName, entityReferenceAsString,
+				entityName, entityReference,
 				failingEntityIndexingExceptionMessage, failingEntityIndexingOperationAsString,
 				failingMassIndexerOperationExceptionMessage, failingMassIndexerOperationAsString
 		);
@@ -527,14 +529,14 @@ public abstract class AbstractMassIndexingFailureIT {
 		SessionFactory sessionFactory = setup();
 
 		String entityName = Book.NAME;
-		String entityReferenceAsString = Book.NAME + "#2";
+		EntityReference entityReference = PojoEntityReference.withName( Book.class, Book.NAME, 2 );
 		String failingEntityIndexingExceptionMessage = "Indexing failure";
 		String failingEntityIndexingOperationAsString = "Indexing instance of entity '" + entityName + "' during mass indexing";
 		String failingMassIndexerOperationExceptionMessage = "REFRESH failure";
 		String failingMassIndexerOperationAsString = "MassIndexer operation";
 
 		expectEntityIndexingAndMassIndexerOperationFailureHandling(
-				entityName, entityReferenceAsString,
+				entityName, entityReference,
 				failingEntityIndexingExceptionMessage, failingEntityIndexingOperationAsString,
 				failingMassIndexerOperationExceptionMessage, failingMassIndexerOperationAsString
 		);
@@ -565,7 +567,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		);
 
 		assertEntityIndexingAndMassIndexerOperationFailureHandling(
-				entityName, entityReferenceAsString,
+				entityName, entityReference,
 				failingEntityIndexingExceptionMessage, failingEntityIndexingOperationAsString,
 				failingMassIndexerOperationExceptionMessage, failingMassIndexerOperationAsString
 		);
@@ -581,22 +583,22 @@ public abstract class AbstractMassIndexingFailureIT {
 	protected void assertAfterSetup() {
 	}
 
-	protected abstract void expectEntityIndexingFailureHandling(String entityName, String entityReferenceAsString,
+	protected abstract void expectEntityIndexingFailureHandling(String entityName, EntityReference entityReference,
 			String exceptionMessage, String failingOperationAsString);
 
-	protected abstract void assertEntityIndexingFailureHandling(String entityName, String entityReferenceAsString,
+	protected abstract void assertEntityIndexingFailureHandling(String entityName, EntityReference entityReference,
 			String exceptionMessage, String failingOperationAsString);
 
-	protected abstract void expectEntityIdGetterFailureHandling(String entityName, String entityReferenceAsString,
+	protected abstract void expectEntityIdGetterFailureHandling(String entityName, EntityReference entityReference,
 			String exceptionMessage, String failingOperationAsString);
 
-	protected abstract void assertEntityIdGetterFailureHandling(String entityName, String entityReferenceAsString,
+	protected abstract void assertEntityIdGetterFailureHandling(String entityName, EntityReference entityReference,
 			String exceptionMessage, String failingOperationAsString);
 
-	protected abstract void expectEntityNonIdGetterFailureHandling(String entityName, String entityReferenceAsString,
+	protected abstract void expectEntityNonIdGetterFailureHandling(String entityName, EntityReference entityReference,
 			String exceptionMessage, String failingOperationAsString);
 
-	protected abstract void assertEntityNonIdGetterFailureHandling(String entityName, String entityReferenceAsString,
+	protected abstract void assertEntityNonIdGetterFailureHandling(String entityName, EntityReference entityReference,
 			String exceptionMessage, String failingOperationAsString);
 
 	protected abstract void expectMassIndexerOperationFailureHandling(
@@ -617,12 +619,12 @@ public abstract class AbstractMassIndexingFailureIT {
 			String closingExceptionMessage, String closingFailingOperationAsString);
 
 	protected abstract void expectEntityIndexingAndMassIndexerOperationFailureHandling(
-			String entityName, String entityReferenceAsString,
+			String entityName, EntityReference entityReference,
 			String failingEntityIndexingExceptionMessage, String failingEntityIndexingOperationAsString,
 			String failingMassIndexerOperationExceptionMessage, String failingMassIndexerOperationAsString);
 
 	protected abstract void assertEntityIndexingAndMassIndexerOperationFailureHandling(
-			String entityName, String entityReferenceAsString,
+			String entityName, EntityReference entityReference,
 			String failingEntityIndexingExceptionMessage, String failingEntityIndexingOperationAsString,
 			String failingMassIndexerOperationExceptionMessage, String failingMassIndexerOperationAsString);
 

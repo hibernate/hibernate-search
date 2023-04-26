@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEntityFailureContext;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureContext;
@@ -109,9 +110,9 @@ public class PojoMassIndexingNotifier {
 		contextBuilder.failingOperation( failingOperation );
 		// Add more information here, but information that may not be available if the session completely broke down
 		// (we're being extra careful here because we don't want to throw an exception while handling and exception)
-		Object entityReference = extractReferenceOrSuppress( typeGroup, sessionContext, entity, exception );
+		EntityReference entityReference = extractReferenceOrSuppress( typeGroup, sessionContext, entity, exception );
 		if ( entityReference != null ) {
-			contextBuilder.entityReference( entityReference );
+			contextBuilder.failingEntityReference( entityReference );
 			recordedFailure.entityReference = entityReference;
 		}
 		failureHandler.handle( contextBuilder.build() );
@@ -135,7 +136,7 @@ public class PojoMassIndexingNotifier {
 		// Add more information here:
 		for ( Object id : idList ) {
 			try {
-				contextBuilder.entityReference( typeGroup.makeSuperTypeReference( id ) );
+				contextBuilder.failingEntityReference( typeGroup.makeSuperTypeReference( id ) );
 			}
 			catch (Exception e) {
 				exception.addSuppressed( e );
@@ -203,7 +204,7 @@ public class PojoMassIndexingNotifier {
 		return recordedFailure;
 	}
 
-	private Object extractReferenceOrSuppress(PojoMassIndexingIndexedTypeGroup<?> typeGroup,
+	private EntityReference extractReferenceOrSuppress(PojoMassIndexingIndexedTypeGroup<?> typeGroup,
 			PojoMassIndexingSessionContext sessionContext, Object entity, Throwable throwable) {
 		try {
 			return typeGroup.extractReference( sessionContext, entity );

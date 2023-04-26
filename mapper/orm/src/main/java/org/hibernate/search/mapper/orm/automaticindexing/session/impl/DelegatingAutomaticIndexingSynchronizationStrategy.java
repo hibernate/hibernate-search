@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategyConfigurationContext;
@@ -78,7 +79,7 @@ public class DelegatingAutomaticIndexingSynchronizationStrategy implements org.h
 		}
 
 		@Override
-		public List<?> failingEntities() {
+		public List<? extends EntityReference> failingEntities() {
 			return report.failingEntities();
 		}
 	}

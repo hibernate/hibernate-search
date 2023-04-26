@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport;
 
 public class DelegatingSearchIndexingPlanExecutionReport implements SearchIndexingPlanExecutionReport {
@@ -26,7 +27,7 @@ public class DelegatingSearchIndexingPlanExecutionReport implements SearchIndexi
 	}
 
 	@Override
-	public List<?> failingEntities() {
+	public List<EntityReference> failingEntities() {
 		return delegate.failingEntityReferences();
 	}
 

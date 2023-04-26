@@ -14,6 +14,7 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoadingStrategy;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
@@ -112,7 +113,7 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 	}
 
-	public Object extractReference(PojoMassIndexingSessionContext sessionContext, Object entity) {
+	public EntityReference extractReference(PojoMassIndexingSessionContext sessionContext, Object entity) {
 		PojoRawTypeIdentifier<?> targetType = sessionContext.runtimeIntrospector().detectEntityType( entity );
 		PojoMassIndexingIndexedTypeContext<?> typeContext = typeContextProvider.indexedForExactType( targetType );
 		String entityName = typeContext.entityName();
@@ -120,7 +121,7 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 		return mappingContext.entityReferenceFactory().createEntityReference( entityName, identifier );
 	}
 
-	public Object makeSuperTypeReference(Object identifier) {
+	public EntityReference makeSuperTypeReference(Object identifier) {
 		return mappingContext.entityReferenceFactory().createEntityReference(
 				commonSuperType.entityName(),
 				identifier

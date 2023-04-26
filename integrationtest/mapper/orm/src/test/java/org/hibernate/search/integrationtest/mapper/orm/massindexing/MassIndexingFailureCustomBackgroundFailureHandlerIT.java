@@ -12,6 +12,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import java.util.List;
+import java.util.function.Consumer;
+
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -55,88 +59,70 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	}
 
 	@Override
-	protected void expectEntityIndexingFailureHandling(String entityName, String entityReferenceAsString,
+	protected void expectEntityIndexingFailureHandling(String entityName, EntityReference entityReference,
 			String exceptionMessage, String failingOperationAsString) {
 		// We'll check in the assert*() method, see below.
 	}
 
 	@Override
-	protected void assertEntityIndexingFailureHandling(String entityName, String entityReferenceAsString,
+	protected void assertEntityIndexingFailureHandling(String entityName, EntityReference entityReference,
 			String exceptionMessage, String failingOperationAsString) {
 		verify( failureHandler ).failureFloodingThreshold();
 		verify( failureHandler ).handle( entityFailureContextCapture.capture() );
 		verifyNoMoreInteractions( failureHandler );
 
 		EntityIndexingFailureContext context = entityFailureContextCapture.getValue();
-		assertThat( context.throwable() )
+		assertSingleEntityFailure( context, entityReference, failingOperationAsString,
+				e -> assertThat( e )
 				.isInstanceOf( SimulatedFailure.class )
-				.hasMessage( exceptionMessage );
-		assertThat( context.failingOperation() ).asString()
-				.isEqualTo( failingOperationAsString );
-		assertThat( context.entityReferences() )
-				.hasSize( 1 )
-				.element( 0 )
-				.asString()
-				.isEqualTo( entityReferenceAsString );
+						.hasMessage( exceptionMessage ) );
 	}
 
 	@Override
-	protected void expectEntityIdGetterFailureHandling(String entityName, String entityReferenceAsString,
+	protected void expectEntityIdGetterFailureHandling(String entityName, EntityReference entityReference,
 			String exceptionMessage, String failingOperationAsString) {
 		// We'll check in the assert*() method, see below.
 	}
 
 	@Override
-	protected void assertEntityIdGetterFailureHandling(String entityName, String entityReferenceAsString,
+	protected void assertEntityIdGetterFailureHandling(String entityName, EntityReference entityReference,
 			String exceptionMessage, String failingOperationAsString) {
 		verify( failureHandler ).failureFloodingThreshold();
 		verify( failureHandler ).handle( entityFailureContextCapture.capture() );
 		verifyNoMoreInteractions( failureHandler );
 
 		EntityIndexingFailureContext context = entityFailureContextCapture.getValue();
-		assertThat( context.throwable() )
+		assertSingleEntityFailure( context, entityReference, failingOperationAsString,
+				e -> assertThat( e )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Exception while invoking" )
 				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
 				.isInstanceOf( SimulatedFailure.class )
-				.hasMessageContaining( exceptionMessage );
-		assertThat( context.failingOperation() ).asString()
-				.isEqualTo( failingOperationAsString );
-		assertThat( context.entityReferences() )
-				.hasSize( 1 )
-				.element( 0 )
-				.asString()
-				.isEqualTo( entityReferenceAsString );
+						.hasMessageContaining( exceptionMessage ) );
 	}
 
 	@Override
-	protected void expectEntityNonIdGetterFailureHandling(String entityName, String entityReferenceAsString,
+	protected void expectEntityNonIdGetterFailureHandling(String entityName, EntityReference entityReference,
 			String exceptionMessage, String failingOperationAsString) {
 		// We'll check in the assert*() method, see below.
 	}
 
 	@Override
-	protected void assertEntityNonIdGetterFailureHandling(String entityName, String entityReferenceAsString,
+	protected void assertEntityNonIdGetterFailureHandling(String entityName, EntityReference entityReference,
 			String exceptionMessage, String failingOperationAsString) {
 		verify( failureHandler ).failureFloodingThreshold();
 		verify( failureHandler ).handle( entityFailureContextCapture.capture() );
 		verifyNoMoreInteractions( failureHandler );
 
 		EntityIndexingFailureContext context = entityFailureContextCapture.getValue();
-		assertThat( context.throwable() )
+		assertSingleEntityFailure( context, entityReference, failingOperationAsString,
+				e -> assertThat( e )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Exception while building document for entity '" + entityReferenceAsString + "'",
+								"Exception while building document for entity '" + entityReference + "'",
 						"Exception while invoking",
 						exceptionMessage )
-				.hasRootCauseInstanceOf( SimulatedFailure.class );
-		assertThat( context.failingOperation() ).asString()
-				.isEqualTo( failingOperationAsString );
-		assertThat( context.entityReferences() )
-				.hasSize( 1 )
-				.element( 0 )
-				.asString()
-				.isEqualTo( entityReferenceAsString );
+						.hasRootCauseInstanceOf( SimulatedFailure.class ) );
 	}
 
 	@Override
@@ -169,24 +155,21 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	}
 
 	@Override
-	protected void assertMassIndexerLoadingOperationFailureHandling(Class<? extends Throwable> exceptionType,
-			String exceptionMessage, String failingOperationAsString,
+	protected void assertMassIndexerLoadingOperationFailureHandling(
+			Class<? extends Throwable> exceptionType, String exceptionMessage,
+			String failingOperationAsString,
 			int failureFloodingThreshold, Class<? extends Throwable> closingExceptionType,
 			String closingExceptionMessage, String closingFailingOperationAsString) {
 		if ( failureFloodingThreshold == getDefaultFailureFloodingThreshold() ) {
 			verify( failureHandler ).failureFloodingThreshold();
 		}
-		verify( failureHandler, times( failureFloodingThreshold ) ).handle(
-				entityFailureContextCapture.capture() );
+		verify( failureHandler, times( failureFloodingThreshold ) ).handle( entityFailureContextCapture.capture() );
 
 		EntityIndexingFailureContext context = entityFailureContextCapture.getValue();
-		assertThat( context.throwable() )
+		assertSingleEntityFailure( context, null, failingOperationAsString,
+				e -> assertThat( e )
 				.isInstanceOf( exceptionType )
-				.hasMessageContainingAll( exceptionMessage );
-		assertThat( context.failingOperation() ).asString()
-				.isEqualTo( failingOperationAsString );
-		assertThat( context.entityReferences() )
-				.hasSize( 1 );
+						.hasMessageContainingAll( exceptionMessage ) );
 
 		verify( failureHandler, times( 1 ) ).handle( genericFailureContextCapture.capture() );
 
@@ -202,7 +185,7 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 
 	@Override
 	protected void expectEntityIndexingAndMassIndexerOperationFailureHandling(String entityName,
-			String entityReferenceAsString,
+			EntityReference entityReference,
 			String failingEntityIndexingExceptionMessage, String failingEntityIndexingOperationAsString,
 			String failingMassIndexerOperationExceptionMessage, String failingMassIndexerOperationAsString) {
 		// We'll check in the assert*() method, see below.
@@ -210,7 +193,7 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 
 	@Override
 	protected void assertEntityIndexingAndMassIndexerOperationFailureHandling(String entityName,
-			String entityReferenceAsString,
+			EntityReference entityReference,
 			String failingEntityIndexingExceptionMessage, String failingEntityIndexingOperationAsString,
 			String failingMassIndexerOperationExceptionMessage, String failingMassIndexerOperationAsString) {
 		verify( failureHandler ).failureFloodingThreshold();
@@ -218,17 +201,11 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 		verify( failureHandler ).handle( genericFailureContextCapture.capture() );
 		verifyNoMoreInteractions( failureHandler );
 
-		EntityIndexingFailureContext entityFailureContext = entityFailureContextCapture.getValue();
-		assertThat( entityFailureContext.throwable() )
+		EntityIndexingFailureContext context = entityFailureContextCapture.getValue();
+		assertSingleEntityFailure( context, entityReference, failingEntityIndexingOperationAsString,
+				e -> assertThat( e )
 				.isInstanceOf( SimulatedFailure.class )
-				.hasMessage( failingEntityIndexingExceptionMessage );
-		assertThat( entityFailureContext.failingOperation() ).asString()
-				.isEqualTo( failingEntityIndexingOperationAsString );
-		assertThat( entityFailureContext.entityReferences() )
-				.hasSize( 1 )
-				.element( 0 )
-				.asString()
-				.isEqualTo( entityReferenceAsString );
+						.hasMessage( failingEntityIndexingExceptionMessage ) );
 
 		FailureContext massIndexerOperationFailureContext = genericFailureContextCapture.getValue();
 		assertThat( massIndexerOperationFailureContext.throwable() )
@@ -247,6 +224,32 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	@Override
 	public int getDefaultFailureFloodingThreshold() {
 		return DEFAULT_FAILURE_FLOODING_THRESHOLD;
+	}
+
+	private static void assertSingleEntityFailure(EntityIndexingFailureContext context, EntityReference entityReference,
+			String failingOperationAsString,
+			Consumer<Throwable> throwableAssertion) {
+		assertThat( context.throwable() )
+				.satisfies( throwableAssertion );
+		assertThat( context.failingOperation() ).asString()
+				.isEqualTo( failingOperationAsString );
+		assertThat( context.failingEntityReferences() )
+				.hasSize( 1 );
+		// Also check the legacy method
+		@SuppressWarnings("deprecation")
+		List<Object> legacyReferences = context.entityReferences();
+		assertThat( legacyReferences )
+				.hasSize( 1 );
+
+		if ( entityReference != null ) {
+			assertThat( context.failingEntityReferences() )
+					.element( 0 )
+					.isEqualTo( entityReference );
+			assertThat( legacyReferences )
+					.element( 0 )
+					.asString()
+					.isEqualTo( entityReference.toString() );
+		}
 	}
 
 }
