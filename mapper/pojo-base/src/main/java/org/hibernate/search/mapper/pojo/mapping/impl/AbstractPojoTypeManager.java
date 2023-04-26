@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
@@ -159,9 +158,8 @@ public class AbstractPojoTypeManager<I, E>
 			reindexingResolver.resolveEntitiesToReindex( collector, entitySupplier.get(), context );
 		}
 		catch (RuntimeException e) {
-			EntityReferenceFactory entityReferenceFactory = sessionContext.mappingContext().entityReferenceFactory();
-			EntityReference entityReference = EntityReferenceFactory.safeCreateEntityReference(
-					entityReferenceFactory, entityName, identifier, e::addSuppressed );
+			EntityReference entityReference = sessionContext.mappingContext().entityReferenceFactoryDelegate()
+					.create( typeIdentifier, entityName, identifier );
 			throw log.errorResolvingEntitiesToReindex( entityReference, e.getMessage(), e );
 		}
 	}
