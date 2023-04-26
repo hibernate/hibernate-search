@@ -56,6 +56,10 @@ public class FailureReportChecker implements Consumer<Throwable> {
 		return contextLiteral( "constructor with parameter types [" + CommaSeparatedClassesFormatter.format( parameterTypes ) + "]" );
 	}
 
+	public FailureReportChecker methodParameterContext(int index) {
+		return methodParameterContext( index, "<unknown name>" );
+	}
+
 	public FailureReportChecker methodParameterContext(int index, String name) {
 		return contextLiteral( "parameter at index " + index + " (" + name + ")" );
 	}
