@@ -225,7 +225,7 @@ public final class PojoConstructorProjectionDefinition<T>
 			PojoRawTypeModel<?> boundParameterElementRawType = boundParameterElementPath.getExtractedType().rawType();
 			Optional<String> paramName = parameter.name();
 			if ( !paramName.isPresent() ) {
-				throw log.missingParameterNameForProjectionConstructor( parent.constructor.typeModel() );
+				throw log.missingParameterNameForProjectionConstructor();
 			}
 			String innerRelativeFieldPath = paramName.get();
 			String innerAbsoluteFieldPath = FieldPaths.compose( parent.absoluteFieldPath, innerRelativeFieldPath );

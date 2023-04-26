@@ -707,9 +707,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 114,
 			value = "Missing parameter names in Java metadata for projection constructor."
 					+ " When inferring inner projections from constructor parameters, constructor parameter names must be known."
-					+ " Make sure that '%1$s' was compiled with the '-parameters' compiler flag.")
-	SearchException missingParameterNameForProjectionConstructor(
-			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> parentTypeModel);
+					+ " Make sure this class was compiled with the '-parameters' compiler flag.")
+	SearchException missingParameterNameForProjectionConstructor();
 
 	@Message(id = ID_OFFSET + 115,
 			value = "Invalid parameter type for projection constructor: %1$s."
