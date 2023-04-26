@@ -11,6 +11,10 @@ import java.util.Optional;
 
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
+/**
+ * @deprecated Use {@link org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport}
+ */
+@Deprecated
 public interface SearchIndexingPlanExecutionReport {
 
 	/**

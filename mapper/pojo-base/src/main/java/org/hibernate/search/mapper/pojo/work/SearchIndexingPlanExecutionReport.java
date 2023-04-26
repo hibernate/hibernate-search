@@ -9,6 +9,9 @@ package org.hibernate.search.mapper.pojo.work;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
+@Incubating
 public interface SearchIndexingPlanExecutionReport {
 
 	/**
