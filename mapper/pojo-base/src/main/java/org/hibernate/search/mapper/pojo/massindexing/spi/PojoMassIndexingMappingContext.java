@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.massindexing.spi;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
+import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReferenceFactoryDelegate;
 
 /**
  * Contextual information about a search mapping.
@@ -33,5 +34,10 @@ public interface PojoMassIndexingMappingContext extends BackendMappingContext {
 	 * @return An agent.
 	 */
 	PojoMassIndexerAgent createMassIndexerAgent(PojoMassIndexerAgentCreateContext context);
+
+	/**
+	 * @return A {@link PojoEntityReferenceFactoryDelegate}.
+	 */
+	PojoEntityReferenceFactoryDelegate entityReferenceFactoryDelegate();
 
 }

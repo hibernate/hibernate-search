@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.common.EntityReference;
@@ -360,9 +359,8 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 				typeContext().reindexingResolver().resolveEntitiesToReindex( collector, entitySupplier.get(), this );
 			}
 			catch (RuntimeException e) {
-				EntityReferenceFactory entityReferenceFactory = sessionContext.mappingContext().entityReferenceFactory();
-				EntityReference entityReference = EntityReferenceFactory.safeCreateEntityReference(
-						entityReferenceFactory, typeContext().entityName(), identifier, e::addSuppressed );
+				EntityReference entityReference = sessionContext.mappingContext().entityReferenceFactoryDelegate()
+						.create( typeContext().typeIdentifier(), typeContext().entityName(), identifier );
 				throw log.errorResolvingEntitiesToReindex( entityReference, e.getMessage(), e );
 			}
 			typeContext().resolveEntitiesToReindex( collector, sessionContext, identifier,

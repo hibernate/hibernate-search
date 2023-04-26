@@ -118,14 +118,12 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 		PojoMassIndexingIndexedTypeContext<?> typeContext = typeContextProvider.indexedForExactType( targetType );
 		String entityName = typeContext.entityName();
 		Object identifier = extractIdentifier( typeContext, sessionContext, entity );
-		return mappingContext.entityReferenceFactory().createEntityReference( entityName, identifier );
+		return mappingContext.entityReferenceFactoryDelegate().create( targetType, entityName, identifier );
 	}
 
 	public EntityReference makeSuperTypeReference(Object identifier) {
-		return mappingContext.entityReferenceFactory().createEntityReference(
-				commonSuperType.entityName(),
-				identifier
-		);
+		return mappingContext.entityReferenceFactoryDelegate().create( commonSuperType.typeIdentifier(),
+				commonSuperType.entityName(), identifier );
 	}
 
 	public <E2> Object extractIdentifier(PojoMassIndexingIndexedTypeContext<E2> typeContext,

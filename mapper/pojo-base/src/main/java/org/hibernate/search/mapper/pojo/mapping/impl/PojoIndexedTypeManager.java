@@ -95,7 +95,7 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 	public PojoDocumentContributor<E> toDocumentContributor(PojoWorkSessionContext sessionContext,
 			PojoIndexingProcessorRootContext processorContext,
 			I identifier, Supplier<E> entitySupplier) {
-		return new PojoDocumentContributor<>( entityName, processor, sessionContext, processorContext,
+		return new PojoDocumentContributor<>( typeIdentifier, entityName, processor, sessionContext, processorContext,
 				identifier, entitySupplier );
 	}
 
