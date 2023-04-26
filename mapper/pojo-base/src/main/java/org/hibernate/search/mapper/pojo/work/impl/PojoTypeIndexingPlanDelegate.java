@@ -41,6 +41,6 @@ interface PojoTypeIndexingPlanDelegate<I, E> {
 	void discard();
 
 	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter);
+			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter);
 
 }

@@ -12,7 +12,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.work.spi.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
-import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
@@ -21,12 +20,12 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	private final SearchIndexingPlanTypeContextProvider typeContextProvider;
 	private final PojoRuntimeIntrospector introspector;
 	private final PojoIndexingPlan delegate;
-	private final ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> indexingPlanSynchronizationStrategy;
+	private final ConfiguredIndexingPlanSynchronizationStrategy indexingPlanSynchronizationStrategy;
 
 	public SearchIndexingPlanImpl(
 			SearchIndexingPlanTypeContextProvider typeContextProvider, PojoRuntimeIntrospector introspector,
 			PojoIndexingPlan delegate,
-			ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> indexingPlanSynchronizationStrategy) {
+			ConfiguredIndexingPlanSynchronizationStrategy indexingPlanSynchronizationStrategy) {
 		this.typeContextProvider = typeContextProvider;
 		this.introspector = introspector;
 		this.delegate = delegate;

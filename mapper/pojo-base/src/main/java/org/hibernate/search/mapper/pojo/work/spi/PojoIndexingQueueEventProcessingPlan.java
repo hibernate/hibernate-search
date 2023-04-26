@@ -34,7 +34,7 @@ public interface PojoIndexingQueueEventProcessingPlan {
 	 * @return A {@link CompletableFuture} that will be completed with an execution report when all the works are complete.
 	 */
 	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory,
+			EntityReferenceFactory<? extends R> entityReferenceFactory,
 			OperationSubmitter operationSubmitter);
 
 	/**

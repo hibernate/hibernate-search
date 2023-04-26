@@ -25,7 +25,7 @@ interface PojoIndexingPlanStrategy {
 	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> doExecuteAndReport(
 			Collection<PojoIndexedTypeIndexingPlan<?, ?>> indexedTypeDelegates,
 			PojoLoadingPlanProvider loadingPlanProvider,
-			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter);
+			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter);
 
 	void doDiscard(Collection<PojoIndexedTypeIndexingPlan<?, ?>> indexedTypeDelegates);
 

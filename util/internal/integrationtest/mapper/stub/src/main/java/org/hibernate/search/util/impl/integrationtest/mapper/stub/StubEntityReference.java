@@ -33,7 +33,7 @@ public class StubEntityReference {
 
 	@Override
 	public boolean equals(Object obj) {
-		if ( obj == null || obj.getClass() != getClass() ) {
+		if ( !( obj instanceof EntityReference ) ) {
 			return false;
 		}
 		StubEntityReference other = (StubEntityReference) obj;

@@ -19,19 +19,19 @@ import org.hibernate.search.util.common.impl.Futures;
 /**
  * A single-use, stateful execution of a set of works as part of an indexing plan.
  *
- * @param <R> The type of entity references in the {@link #execute() execution report}.
+ * @param <R> The type of entity references in the {@link #execute(OperationSubmitter) execution report}.
  */
 class ElasticsearchIndexIndexingPlanExecution<R> {
 
 	private final ElasticsearchSerialWorkOrchestrator orchestrator;
-	private final EntityReferenceFactory<R> entityReferenceFactory;
+	private final EntityReferenceFactory<? extends R> entityReferenceFactory;
 
 	private final List<SingleDocumentIndexingWork> works;
 	private final CompletableFuture<Void>[] futures;
 
 	@SuppressWarnings("unchecked")
 	ElasticsearchIndexIndexingPlanExecution(ElasticsearchSerialWorkOrchestrator orchestrator,
-			EntityReferenceFactory<R> entityReferenceFactory,
+			EntityReferenceFactory<? extends R> entityReferenceFactory,
 			List<SingleDocumentIndexingWork> works) {
 		this.orchestrator = orchestrator;
 		this.entityReferenceFactory = entityReferenceFactory;

@@ -55,7 +55,7 @@ public final class OutboxPollingOutboxEventSendingPlan implements AutomaticIndex
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
+			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
 		if ( !OperationSubmitter.blocking().equals( operationSubmitter ) ) {
 			throw log.nonblockingOperationSubmitterNotSupported();
 		}
@@ -78,7 +78,7 @@ public final class OutboxPollingOutboxEventSendingPlan implements AutomaticIndex
 	}
 
 	private <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReportOnSession(
-			Session currentSession, EntityReferenceFactory<R> entityReferenceFactory) {
+			Session currentSession, EntityReferenceFactory<? extends R> entityReferenceFactory) {
 		try {
 			MultiEntityOperationExecutionReport.Builder<R> builder = MultiEntityOperationExecutionReport.builder();
 			for ( OutboxEvent event : events ) {

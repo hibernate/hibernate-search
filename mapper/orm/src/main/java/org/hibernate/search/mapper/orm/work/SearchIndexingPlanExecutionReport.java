@@ -9,8 +9,6 @@ package org.hibernate.search.mapper.orm.work;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.mapper.orm.common.EntityReference;
-
 /**
  * @deprecated Use {@link org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport}
  */
@@ -27,6 +25,6 @@ public interface SearchIndexingPlanExecutionReport {
 	 * @return A list of references to entities that may not be indexed correctly as a result of the failure.
 	 * Never {@code null}, but may be empty.
 	 */
-	List<EntityReference> failingEntities();
+	List<org.hibernate.search.mapper.orm.common.EntityReference> failingEntities();
 
 }

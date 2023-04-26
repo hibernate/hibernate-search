@@ -51,7 +51,7 @@ public interface PojoIndexingQueueEventSendingPlan {
 	 * but the report will contain an exception.
 	 */
 	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter);
+			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter);
 
 	/**
 	 * @see #sendAndReport(EntityReferenceFactory, OperationSubmitter)

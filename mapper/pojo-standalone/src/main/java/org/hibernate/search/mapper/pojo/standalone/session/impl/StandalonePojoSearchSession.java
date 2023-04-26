@@ -15,11 +15,11 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
+import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
-import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
-import org.hibernate.search.mapper.pojo.standalone.common.impl.EntityReferenceImpl;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.loading.dsl.SelectionLoadingOptionsStep;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLoadingContext;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLoadingSessionContext;
@@ -60,7 +60,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	private SearchIndexingPlanImpl indexingPlan;
 	private SearchIndexer indexer;
 	private boolean open = true;
-	private ConfiguredIndexingPlanSynchronizationStrategy<EntityReference> indexingPlanSynchronizationStrategy;
+	private ConfiguredIndexingPlanSynchronizationStrategy indexingPlanSynchronizationStrategy;
 
 	private StandalonePojoSearchSession(Builder builder) {
 		super( builder.mappingContext );
@@ -182,7 +182,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 				typeContextProvider.indexedByEntityName().getOrFail( reference.typeName() );
 		Object id = typeContext.identifierMapping()
 				.fromDocumentIdentifier( reference.id(), this );
-		return new EntityReferenceImpl( typeContext.typeIdentifier(), typeContext.name(), id );
+		return new PojoEntityReference( typeContext.typeIdentifier(), typeContext.name(), id );
 	}
 
 	@Override

@@ -21,6 +21,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
+import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
@@ -28,8 +29,7 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentCre
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
-import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
-import org.hibernate.search.mapper.pojo.standalone.common.impl.EntityReferenceImpl;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLoadingContext;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
@@ -137,7 +137,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 	public EntityReference createEntityReference(String typeName, Object identifier) {
 		StandalonePojoSessionIndexedTypeContext<?> typeContext = typeContextContainer.indexedByEntityName()
 				.getOrFail( typeName );
-		return new EntityReferenceImpl( typeContext.typeIdentifier(), typeContext.name(), identifier );
+		return new PojoEntityReference( typeContext.typeIdentifier(), typeContext.name(), identifier );
 	}
 
 	@Override

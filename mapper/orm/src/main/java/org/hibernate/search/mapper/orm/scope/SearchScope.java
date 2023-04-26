@@ -20,7 +20,6 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
@@ -88,7 +87,8 @@ public interface SearchScope<E> {
 	 * @return A projection factory.
 	 * @see SearchProjectionFactory
 	 */
-	SearchProjectionFactory<EntityReference, E> projection();
+	@SuppressWarnings("deprecation")
+	SearchProjectionFactory<org.hibernate.search.mapper.orm.common.EntityReference, E> projection();
 
 	/**
 	 * Initiate the building of a search aggregation that will be valid for the indexes in this scope.

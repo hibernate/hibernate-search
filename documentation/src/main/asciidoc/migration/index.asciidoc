@@ -336,6 +336,7 @@ is now `org.hibernate.search.engine.search.predicate.definition.PredicateDefinit
 
 Parts of the API have been deprecated, and may be removed in the next major version:
 
+* `org.hibernate.search.mapper.orm.common.EntityReference`: use `org.hibernate.search.engine.common.EntityReference` instead.
 * `SearchPredicateFactory#bool(Consumer)`, which enables the syntax `f.bool(b -> { b.must(...); b.must(...); }`:
 use the syntax `f.bool().with(b -> { b.must(...); b.must(...); })` instead,
 or (if possible) take advantage of the new `.where(BiConsumer)` method in the Search Query DSL:

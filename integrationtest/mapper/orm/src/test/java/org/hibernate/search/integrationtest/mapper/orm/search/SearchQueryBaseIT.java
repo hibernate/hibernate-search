@@ -22,6 +22,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -29,8 +30,7 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.common.EntityReference;
-import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
+import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -56,6 +56,8 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.MethodRule;
+
+import org.assertj.core.api.Assertions;
 
 /**
  * Test everything related to the search query itself.
@@ -523,21 +525,21 @@ public class SearchQueryBaseIT {
 					Arrays.asList(
 							TITLE_4_3_2_1,
 							1,
-							EntityReferenceImpl.withName( Book.class, Book.NAME, 1 ),
+							PojoEntityReference.withName( Book.class, Book.NAME, 1 ),
 							reference( Book.NAME, "1" ),
 							AUTHOR_4_3_2_1
 					),
 					Arrays.asList(
 							TITLE_CIDER_HOUSE,
 							2,
-							EntityReferenceImpl.withName( Book.class, Book.NAME, 2 ),
+							PojoEntityReference.withName( Book.class, Book.NAME, 2 ),
 							reference( Book.NAME, "2" ),
 							AUTHOR_CIDER_HOUSE
 					),
 					Arrays.asList(
 							TITLE_AVENUE_OF_MYSTERIES,
 							3,
-							EntityReferenceImpl.withName( Book.class, Book.NAME, 3 ),
+							PojoEntityReference.withName( Book.class, Book.NAME, 3 ),
 							reference( Book.NAME, "3" ),
 							AUTHOR_AVENUE_OF_MYSTERIES
 					)
@@ -643,7 +645,7 @@ public class SearchQueryBaseIT {
 		 * The backend is a stub, so these components are stub too:
 		 * we simply test that the mapper correctly delegates to the backend.
 		 */
-		SearchProjection<EntityReference> projection = scope.projection().entityReference().toProjection();
+		SearchProjection<? extends EntityReference> projection = scope.projection().entityReference().toProjection();
 		SearchPredicate predicate = scope.predicate().matchAll().toPredicate();
 		SearchSort sort = scope.sort().field( "title" ).toSort();
 		SearchAggregation<Map<String, Long>> aggregation = scope.aggregation().terms()
@@ -664,7 +666,7 @@ public class SearchQueryBaseIT {
 		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
-			SearchQuery<EntityReference> query = searchSession.search( scope )
+			SearchQuery<? extends EntityReference> query = searchSession.search( scope )
 					.select( projection )
 					.where( predicate )
 					.sort( sort )
@@ -681,10 +683,71 @@ public class SearchQueryBaseIT {
 					)
 			);
 
-			assertThat( query.fetchAllHits() ).containsExactlyInAnyOrder(
-					EntityReferenceImpl.withName( Book.class, Book.NAME, 1 ),
-					EntityReferenceImpl.withName( Book.class, Book.NAME, 2 ),
-					EntityReferenceImpl.withName( Book.class, Book.NAME, 3 )
+			Assertions.<EntityReference>assertThat( query.fetchAllHits() ).containsExactlyInAnyOrder(
+					PojoEntityReference.withName( Book.class, Book.NAME, 1 ),
+					PojoEntityReference.withName( Book.class, Book.NAME, 2 ),
+					PojoEntityReference.withName( Book.class, Book.NAME, 3 )
+			);
+		} );
+	}
+
+	@Test
+	public void select_searchProjection_entityReference() {
+		setupHolder.runInTransaction( session -> {
+			SearchSession searchSession = Search.session( session );
+
+			SearchScope<Book> scope = searchSession.scope( Book.class );
+
+			SearchQuery<? extends EntityReference> query = searchSession.search( scope )
+					.select( f -> f.entityReference() )
+					.where( f -> f.matchAll() )
+					.toQuery();
+
+			backendMock.expectSearchProjection(
+					Book.NAME,
+					StubSearchWorkBehavior.of(
+							3L,
+							StubBackendUtils.reference( Book.NAME, "1" ),
+							StubBackendUtils.reference( Book.NAME, "2" ),
+							StubBackendUtils.reference( Book.NAME, "3" )
+					)
+			);
+
+			Assertions.<EntityReference>assertThat( query.fetchAllHits() ).containsExactly(
+					PojoEntityReference.withName( Book.class, Book.NAME, 1 ),
+					PojoEntityReference.withName( Book.class, Book.NAME, 2 ),
+					PojoEntityReference.withName( Book.class, Book.NAME, 3 )
+			);
+		} );
+	}
+
+	@Test
+	@SuppressWarnings("deprecation")
+	public void select_searchProjection_entityReference_deprecatedEntityReferenceType() {
+		setupHolder.runInTransaction( session -> {
+			SearchSession searchSession = Search.session( session );
+
+			SearchScope<Book> scope = searchSession.scope( Book.class );
+
+			SearchQuery<org.hibernate.search.mapper.orm.common.EntityReference> query = searchSession.search( scope )
+					.select( f -> f.entityReference() )
+					.where( f -> f.matchAll() )
+					.toQuery();
+
+			backendMock.expectSearchProjection(
+					Book.NAME,
+					StubSearchWorkBehavior.of(
+							3L,
+							StubBackendUtils.reference( Book.NAME, "1" ),
+							StubBackendUtils.reference( Book.NAME, "2" ),
+							StubBackendUtils.reference( Book.NAME, "3" )
+					)
+			);
+
+			assertThat( query.fetchAllHits() ).containsExactly(
+					org.hibernate.search.mapper.orm.common.impl.HibernateOrmEntityReference.withName( Book.class, Book.NAME, 1 ),
+					org.hibernate.search.mapper.orm.common.impl.HibernateOrmEntityReference.withName( Book.class, Book.NAME, 2 ),
+					org.hibernate.search.mapper.orm.common.impl.HibernateOrmEntityReference.withName( Book.class, Book.NAME, 3 )
 			);
 		} );
 	}

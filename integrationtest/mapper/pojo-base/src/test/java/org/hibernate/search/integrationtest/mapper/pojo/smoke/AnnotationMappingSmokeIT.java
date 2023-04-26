@@ -25,10 +25,10 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomPropertyBinding;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomTypeBinding;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.IntegerAsStringValueBridge;
+import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
-import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
-import org.hibernate.search.mapper.pojo.standalone.common.impl.EntityReferenceImpl;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
@@ -369,8 +369,8 @@ public class AnnotationMappingSmokeIT {
 			SearchResult<EntityReference> result = query.fetch( 3, 2 );
 			assertThat( result.hits() )
 					.containsExactly(
-							EntityReferenceImpl.withDefaultName( IndexedEntity.class, 0 ),
-							EntityReferenceImpl.withDefaultName( YetAnotherIndexedEntity.class, 1 )
+							PojoEntityReference.withDefaultName( IndexedEntity.class, 0 ),
+							PojoEntityReference.withDefaultName( YetAnotherIndexedEntity.class, 1 )
 					);
 			assertThat( result.total().hitCount() ).isEqualTo( 6L );
 
@@ -460,7 +460,7 @@ public class AnnotationMappingSmokeIT {
 					.containsExactly(
 							Arrays.asList(
 									"text1",
-									EntityReferenceImpl.withDefaultName( IndexedEntity.class, 0 ),
+									PojoEntityReference.withDefaultName( IndexedEntity.class, 0 ),
 									0,
 									LocalDate.of( 2017, 11, 1 ),
 									reference( IndexedEntity.INDEX, "0" ),
@@ -468,7 +468,7 @@ public class AnnotationMappingSmokeIT {
 							),
 							Arrays.asList(
 									null,
-									EntityReferenceImpl.withDefaultName( YetAnotherIndexedEntity.class, 1 ),
+									PojoEntityReference.withDefaultName( YetAnotherIndexedEntity.class, 1 ),
 									1,
 									LocalDate.of( 2017, 11, 2 ),
 									reference( YetAnotherIndexedEntity.INDEX, "1" ),

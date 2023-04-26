@@ -15,9 +15,9 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -96,8 +96,7 @@ public class DatabaseMultitenancyIT {
 
 	@Test
 	public void searchReferences() {
-		List<EntityReference> entityReferences = searchReferences( GEOCHRON_TID, GEOCHRON_MODELS );
-		assertThat( entityReferences ).hasSize( GEOCHRON_MODELS.length );
+		assertThat( searchReferences( GEOCHRON_TID, GEOCHRON_MODELS ) ).hasSize( GEOCHRON_MODELS.length );
 	}
 
 	private void persist(String tenantId, Clock[] models) {
@@ -148,9 +147,9 @@ public class DatabaseMultitenancyIT {
 		}
 	}
 
-	private List<EntityReference> searchReferences(String tenantId, Clock[] models) {
+	private List<? extends EntityReference> searchReferences(String tenantId, Clock[] models) {
 		try ( Session session = openSessionWithTenantId( tenantId ) ) {
-			SearchQuery<EntityReference> query = Search.session( session )
+			SearchQuery<? extends EntityReference> query = Search.session( session )
 					.search( Clock.class )
 					.selectEntityReference()
 					.where( f -> f.matchAll() )

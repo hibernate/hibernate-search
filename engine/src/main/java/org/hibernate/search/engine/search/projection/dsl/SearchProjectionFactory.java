@@ -11,6 +11,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -52,8 +53,10 @@ public interface SearchProjectionFactory<R, E> {
 	/**
 	 * Project to a reference to the entity that was originally indexed.
 	 * <p>
-	 * The actual type of the reference depends on the mapper used to create the query:
-	 * the ORM mapper will return a class/identifier pair, for example.
+	 * Entity references are instances of type {@link EntityReference},
+	 * but some mappers may expose a different type for backwards compatibility reasons.
+	 * {@link EntityReference} should be favored wherever possible
+	 * as mapper-specific types will eventually be removed.
 	 *
 	 * @return A DSL step where the "entity reference" projection can be defined in more details.
 	 */

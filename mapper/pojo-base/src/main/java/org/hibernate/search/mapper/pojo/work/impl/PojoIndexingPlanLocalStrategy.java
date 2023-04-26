@@ -42,7 +42,7 @@ public class PojoIndexingPlanLocalStrategy implements PojoIndexingPlanStrategy {
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> doExecuteAndReport(
 			Collection<PojoIndexedTypeIndexingPlan<?, ?>> indexedTypeDelegates,
 			PojoLoadingPlanProvider loadingPlanProvider,
-			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
+			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
 		List<CompletableFuture<MultiEntityOperationExecutionReport<R>>> futures = new ArrayList<>();
 		// Each type has its own index indexing plan to execute.
 		for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates ) {

@@ -18,7 +18,6 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmSelectionLoadingContext;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -35,20 +34,22 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
+@SuppressWarnings("deprecation")
 public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	private final HibernateOrmScopeMappingContext mappingContext;
 	private final TenancyConfiguration tenancyConfiguration;
-	private final PojoScopeDelegate<EntityReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate;
+	private final PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate;
 
 	public SearchScopeImpl(HibernateOrmScopeMappingContext mappingContext,
-			TenancyConfiguration tenancyConfiguration, PojoScopeDelegate<EntityReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate) {
+			TenancyConfiguration tenancyConfiguration,
+			PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate) {
 		this.mappingContext = mappingContext;
 		this.tenancyConfiguration = tenancyConfiguration;
 		this.delegate = delegate;
 	}
 
-	public SearchQuerySelectStep<?, EntityReference, E, SearchLoadingOptionsStep, ?, ?> search(
+	public SearchQuerySelectStep<?, org.hibernate.search.mapper.orm.common.EntityReference, E, SearchLoadingOptionsStep, ?, ?> search(
 			HibernateOrmScopeSessionContext sessionContext, HibernateOrmSelectionLoadingContext.Builder loadingContextBuilder) {
 		return delegate.search( sessionContext, sessionContext.documentReferenceConverter(),
 				loadingContextBuilder );
@@ -65,7 +66,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	}
 
 	@Override
-	public SearchProjectionFactory<EntityReference, E> projection() {
+	public SearchProjectionFactory<org.hibernate.search.mapper.orm.common.EntityReference, E> projection() {
 		return delegate.projection();
 	}
 

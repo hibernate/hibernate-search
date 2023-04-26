@@ -36,7 +36,7 @@ public class HibernateOrmIndexingQueueEventSendingPlan implements PojoIndexingQu
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
+			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
 		return delegate.sendAndReport( entityReferenceFactory, operationSubmitter );
 	}
 
