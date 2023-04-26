@@ -44,6 +44,12 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-facet</artifactId>
         </dependency>
+        <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
+        <dependency>
+            <groupId>com.carrotsearch</groupId>
+            <artifactId>hppc</artifactId>
+            <version>${version.com.carrotsearch.hppc}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.jboss.logging</groupId>

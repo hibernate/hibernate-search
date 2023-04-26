@@ -198,6 +198,13 @@
         <javadoc.org.apache.lucene.core.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/core/</javadoc.org.apache.lucene.core.url>
         <javadoc.org.apache.lucene.analyzers-common.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/analyzers-common/</javadoc.org.apache.lucene.analyzers-common.url>
         <javadoc.org.apache.lucene.queryparser.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/queryparser/</javadoc.org.apache.lucene.queryparser.url>
+        <!-- These version must be kept in sync with the version of the dependency in Lucene.
+            DO NOT USE DEPENDENCY MANAGEMENT FOR THESE DEPENDENCIES!
+            Thanks to not using dependency management for these dependencies, we get a build failure
+            when the versions start diverging, thanks to the maven-enforcer-plugin
+            and to our own explicit dependencies in the relevant artifacts.
+         -->
+        <version.com.carrotsearch.hppc>0.8.1</version.com.carrotsearch.hppc>
 
         <!-- >>> Elasticsearch -->
         <!-- The version of the Elasticsearch client used by Hibernate Search, independently of the version of the remote cluster -->

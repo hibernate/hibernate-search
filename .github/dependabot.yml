@@ -71,3 +71,5 @@ updates:
       # https://github.com/mockito/mockito/releases/tag/v5.0.0
       - dependency-name: "org.mockito:*"
         versions: ["[5.0.0,)"]
+      # We strictly align this dependency on the version used in Lucene.
+      - dependency-name: "com.carrotsearch:hppc"
