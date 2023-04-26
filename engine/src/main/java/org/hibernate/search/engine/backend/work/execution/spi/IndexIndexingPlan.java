@@ -8,7 +8,6 @@ package org.hibernate.search.engine.backend.work.execution.spi;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.util.common.impl.Throwables;
@@ -56,7 +55,7 @@ public interface IndexIndexingPlan {
 	 * The future will be completed with an exception if a work failed.
 	 */
 	default CompletableFuture<?> execute(OperationSubmitter operationSubmitter) {
-		return executeAndReport( EntityReferenceFactory.asString(), operationSubmitter ).thenApply( report -> {
+		return executeAndReport( operationSubmitter ).thenApply( report -> {
 				report.throwable().ifPresent( t -> {
 					throw Throwables.toRuntimeException( t );
 				} );
@@ -67,15 +66,13 @@ public interface IndexIndexingPlan {
 	/**
 	 * Start executing all the works in this plan, and clear the plan so that it can be re-used.
 	 *
-	 * @param <R> The type of entity references in the returned execution report.
-	 * @param entityReferenceFactory A factory for entity references in the returned execution report.
 	 * @param operationSubmitter How to handle request to submit operation when the queue is full
+	 *
 	 * @return A {@link CompletableFuture} that will hold an execution report when all the works are complete.
 	 * The future will be completed normally even if a work failed,
 	 * but the report will contain an exception.
 	 */
-	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter);
+	CompletableFuture<MultiEntityOperationExecutionReport> executeAndReport(OperationSubmitter operationSubmitter);
 
 	/**
 	 * Discard all works that are present in this plan.

@@ -31,10 +31,13 @@ public final class OutboxPollingOutboxEventSendingPlan implements AutomaticIndex
 	// otherwise existing indexes will no longer work correctly.
 	private static final RangeCompatibleHashFunction HASH_FUNCTION = ShardAssignment.HASH_FUNCTION;
 
+	private final EntityReferenceFactory<?> entityReferenceFactory;
 	private final Session session;
 	private final List<OutboxEvent> events = new ArrayList<>();
 
-	public OutboxPollingOutboxEventSendingPlan(Session session) {
+	public OutboxPollingOutboxEventSendingPlan(EntityReferenceFactory<?> entityReferenceFactory,
+			Session session) {
+		this.entityReferenceFactory = entityReferenceFactory;
 		this.session = session;
 	}
 
@@ -54,8 +57,7 @@ public final class OutboxPollingOutboxEventSendingPlan implements AutomaticIndex
 	}
 
 	@Override
-	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReport(
-			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
+	public CompletableFuture<MultiEntityOperationExecutionReport> sendAndReport(OperationSubmitter operationSubmitter) {
 		if ( !OperationSubmitter.blocking().equals( operationSubmitter ) ) {
 			throw log.nonblockingOperationSubmitterNotSupported();
 		}
@@ -77,10 +79,10 @@ public final class OutboxPollingOutboxEventSendingPlan implements AutomaticIndex
 		}
 	}
 
-	private <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReportOnSession(
+	private <R> CompletableFuture<MultiEntityOperationExecutionReport> sendAndReportOnSession(
 			Session currentSession, EntityReferenceFactory<? extends R> entityReferenceFactory) {
 		try {
-			MultiEntityOperationExecutionReport.Builder<R> builder = MultiEntityOperationExecutionReport.builder();
+			MultiEntityOperationExecutionReport.Builder builder = MultiEntityOperationExecutionReport.builder();
 			for ( OutboxEvent event : events ) {
 				try {
 					currentSession.persist( event );

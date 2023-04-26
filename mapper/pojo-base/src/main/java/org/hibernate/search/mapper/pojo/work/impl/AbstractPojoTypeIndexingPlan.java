@@ -16,6 +16,7 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingAssociationInverseSideResolverRootContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingAssociationInverseSideCollector;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
@@ -133,9 +134,8 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		}
 	}
 
-	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
-		return delegate.executeAndReport( entityReferenceFactory, operationSubmitter );
+	CompletableFuture<MultiEntityOperationExecutionReport> executeAndReport(OperationSubmitter operationSubmitter) {
+		return delegate.executeAndReport( operationSubmitter );
 	}
 
 	abstract PojoWorkTypeContext<I, E> typeContext();
@@ -361,7 +361,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			}
 			catch (RuntimeException e) {
 				EntityReferenceFactory<?> entityReferenceFactory = sessionContext.mappingContext().entityReferenceFactory();
-				Object entityReference = EntityReferenceFactory.safeCreateEntityReference(
+				EntityReference entityReference = EntityReferenceFactory.safeCreateEntityReference(
 						entityReferenceFactory, typeContext().entityName(), identifier, e::addSuppressed );
 				throw log.errorResolvingEntitiesToReindex( entityReference, e.getMessage(), e );
 			}

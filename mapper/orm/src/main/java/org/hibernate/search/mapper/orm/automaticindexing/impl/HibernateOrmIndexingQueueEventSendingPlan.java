@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.orm.automaticindexing.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventSendingPlan;
@@ -35,9 +34,8 @@ public class HibernateOrmIndexingQueueEventSendingPlan implements PojoIndexingQu
 	}
 
 	@Override
-	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReport(
-			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
-		return delegate.sendAndReport( entityReferenceFactory, operationSubmitter );
+	public CompletableFuture<MultiEntityOperationExecutionReport> sendAndReport(OperationSubmitter operationSubmitter) {
+		return delegate.sendAndReport( operationSubmitter );
 	}
 
 }

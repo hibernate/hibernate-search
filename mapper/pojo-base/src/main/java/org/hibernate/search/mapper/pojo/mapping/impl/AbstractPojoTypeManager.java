@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
@@ -159,7 +160,7 @@ public class AbstractPojoTypeManager<I, E>
 		}
 		catch (RuntimeException e) {
 			EntityReferenceFactory<?> entityReferenceFactory = sessionContext.mappingContext().entityReferenceFactory();
-			Object entityReference = EntityReferenceFactory.safeCreateEntityReference(
+			EntityReference entityReference = EntityReferenceFactory.safeCreateEntityReference(
 					entityReferenceFactory, entityName, identifier, e::addSuppressed );
 			throw log.errorResolvingEntitiesToReindex( entityReference, e.getMessage(), e );
 		}

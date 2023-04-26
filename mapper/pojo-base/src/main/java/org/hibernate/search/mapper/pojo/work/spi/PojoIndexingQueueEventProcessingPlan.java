@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.work.spi;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 
@@ -28,24 +27,11 @@ public interface PojoIndexingQueueEventProcessingPlan {
 	 * Writes all pending changes to the index now,
 	 * and clears the plan so that it can be re-used.
 	 *
-	 * @param <R> The type of entity references in the returned execution report.
-	 * @param entityReferenceFactory A factory for entity references in the returned execution report.
 	 * @param operationSubmitter How to handle request to submit operation when the queue is full
+	 *
 	 * @return A {@link CompletableFuture} that will be completed with an execution report when all the works are complete.
 	 */
-	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<? extends R> entityReferenceFactory,
-			OperationSubmitter operationSubmitter);
-
-	/**
-	 * @see #executeAndReport(EntityReferenceFactory, OperationSubmitter)
-	 * @deprecated Use {@link #executeAndReport(EntityReferenceFactory, OperationSubmitter)} instead.
-	 */
-	@Deprecated
-	default <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory) {
-		return executeAndReport( entityReferenceFactory, OperationSubmitter.blocking() );
-	}
+	CompletableFuture<MultiEntityOperationExecutionReport> executeAndReport(OperationSubmitter operationSubmitter);
 
 	/**
 	 * Convert the identifier to its serialized form.

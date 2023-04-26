@@ -31,6 +31,7 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan {
 	private final ElasticsearchWorkFactory workFactory;
 	private final ElasticsearchSerialWorkOrchestrator orchestrator;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
+	private final EntityReferenceFactory<?> entityReferenceFactory;
 	private final String tenantId;
 	private final DocumentRefreshStrategy refreshStrategy;
 
@@ -44,6 +45,7 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan {
 		this.workFactory = workFactory;
 		this.orchestrator = orchestrator;
 		this.indexManagerContext = indexManagerContext;
+		this.entityReferenceFactory = sessionContext.mappingContext().entityReferenceFactory();
 		this.tenantId = sessionContext.tenantIdentifier();
 		this.refreshStrategy = refreshStrategy;
 	}
@@ -77,10 +79,9 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan {
 	}
 
 	@Override
-	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<? extends R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
+	public CompletableFuture<MultiEntityOperationExecutionReport> executeAndReport(OperationSubmitter operationSubmitter) {
 		try {
-			ElasticsearchIndexIndexingPlanExecution<R> execution = new ElasticsearchIndexIndexingPlanExecution<>(
+			ElasticsearchIndexIndexingPlanExecution execution = new ElasticsearchIndexIndexingPlanExecution(
 					orchestrator, entityReferenceFactory,
 					new ArrayList<>( works ) // Copy the list, as we're going to clear it below
 			);

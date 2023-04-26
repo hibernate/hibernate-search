@@ -28,6 +28,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentIndexi
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -70,9 +71,9 @@ public class ElasticsearchIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Void>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport> planExecutionFuture;
 
-		ElasticsearchIndexIndexingPlanExecution<StubEntityReference> execution = new ElasticsearchIndexIndexingPlanExecution<>(
+		ElasticsearchIndexIndexingPlanExecution execution = new ElasticsearchIndexIndexingPlanExecution(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				workMocks( 3 )
@@ -116,9 +117,9 @@ public class ElasticsearchIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Void>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport> planExecutionFuture;
 
-		ElasticsearchIndexIndexingPlanExecution<StubEntityReference> execution = new ElasticsearchIndexIndexingPlanExecution<>(
+		ElasticsearchIndexIndexingPlanExecution execution = new ElasticsearchIndexIndexingPlanExecution(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				workMocks( 3 )
@@ -165,9 +166,9 @@ public class ElasticsearchIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Void>> work4FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport> planExecutionFuture;
 
-		ElasticsearchIndexIndexingPlanExecution<StubEntityReference> execution = new ElasticsearchIndexIndexingPlanExecution<>(
+		ElasticsearchIndexIndexingPlanExecution execution = new ElasticsearchIndexIndexingPlanExecution(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				workMocks( 4 )
@@ -221,9 +222,9 @@ public class ElasticsearchIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Void>> work4FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport> planExecutionFuture;
 
-		ElasticsearchIndexIndexingPlanExecution<StubEntityReference> execution = new ElasticsearchIndexIndexingPlanExecution<>(
+		ElasticsearchIndexIndexingPlanExecution execution = new ElasticsearchIndexIndexingPlanExecution(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				workMocks( 4 )
@@ -307,7 +308,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest {
 		return "work_" + index;
 	}
 
-	private static class StubEntityReference {
+	private static class StubEntityReference implements EntityReference {
 		private final String typeName;
 		private final Object identifier;
 
@@ -340,6 +341,21 @@ public class ElasticsearchIndexIndexingPlanExecutionTest {
 		@Override
 		public int hashCode() {
 			return Objects.hash( typeName, identifier );
+		}
+
+		@Override
+		public Class<?> type() {
+			return Object.class;
+		}
+
+		@Override
+		public String name() {
+			return typeName;
+		}
+
+		@Override
+		public Object id() {
+			return identifier;
 		}
 	}
 }

@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.DerivedDependencyWalkingInfo;
 import org.hibernate.search.mapper.pojo.common.annotation.impl.SearchProcessingWithContextException;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
@@ -581,12 +582,12 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 83,
 			value = "Exception while building document for entity '%1$s': %2$s")
-	SearchException errorBuildingDocument(Object entityReference,
+	SearchException errorBuildingDocument(EntityReference entityReference,
 			String message, @Cause Exception e);
 
 	@Message(id = ID_OFFSET + 84,
 			value = "Exception while resolving other entities to reindex as a result of changes on entity '%1$s': %2$s")
-	SearchException errorResolvingEntitiesToReindex(Object entityReference,
+	SearchException errorResolvingEntitiesToReindex(EntityReference entityReference,
 			String message, @Cause Exception e);
 
 	@LogMessage(level = Logger.Level.WARN)

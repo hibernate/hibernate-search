@@ -14,9 +14,9 @@ import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanExecutionReport;
 
 public class DelegatingSearchIndexingPlanExecutionReport implements SearchIndexingPlanExecutionReport {
 
-	private final MultiEntityOperationExecutionReport<?> delegate;
+	private final MultiEntityOperationExecutionReport delegate;
 
-	public DelegatingSearchIndexingPlanExecutionReport(MultiEntityOperationExecutionReport<?> delegate) {
+	public DelegatingSearchIndexingPlanExecutionReport(MultiEntityOperationExecutionReport delegate) {
 		this.delegate = delegate;
 	}
 

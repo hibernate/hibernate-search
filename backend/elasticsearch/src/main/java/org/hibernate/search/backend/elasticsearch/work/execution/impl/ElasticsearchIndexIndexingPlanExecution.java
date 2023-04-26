@@ -18,20 +18,18 @@ import org.hibernate.search.util.common.impl.Futures;
 
 /**
  * A single-use, stateful execution of a set of works as part of an indexing plan.
- *
- * @param <R> The type of entity references in the {@link #execute(OperationSubmitter) execution report}.
  */
-class ElasticsearchIndexIndexingPlanExecution<R> {
+class ElasticsearchIndexIndexingPlanExecution {
 
 	private final ElasticsearchSerialWorkOrchestrator orchestrator;
-	private final EntityReferenceFactory<? extends R> entityReferenceFactory;
+	private final EntityReferenceFactory<?> entityReferenceFactory;
 
 	private final List<SingleDocumentIndexingWork> works;
 	private final CompletableFuture<Void>[] futures;
 
 	@SuppressWarnings("unchecked")
 	ElasticsearchIndexIndexingPlanExecution(ElasticsearchSerialWorkOrchestrator orchestrator,
-			EntityReferenceFactory<? extends R> entityReferenceFactory,
+			EntityReferenceFactory<?> entityReferenceFactory,
 			List<SingleDocumentIndexingWork> works) {
 		this.orchestrator = orchestrator;
 		this.entityReferenceFactory = entityReferenceFactory;
@@ -51,11 +49,11 @@ class ElasticsearchIndexIndexingPlanExecution<R> {
 	 * @return A future that completes when all works and optionally commit/refresh have completed,
 	 * holding an execution report.
 	 */
-	CompletableFuture<MultiEntityOperationExecutionReport<R>> execute(OperationSubmitter operationSubmitter) {
+	CompletableFuture<MultiEntityOperationExecutionReport> execute(OperationSubmitter operationSubmitter) {
 		// Add the handler to the future *before* submitting the works,
 		// so as to be sure that onAllWorksFinished is executed in the background,
 		// not in the current thread.
-		CompletableFuture<MultiEntityOperationExecutionReport<R>> reportFuture = CompletableFuture.allOf( futures )
+		CompletableFuture<MultiEntityOperationExecutionReport> reportFuture = CompletableFuture.allOf( futures )
 				// We don't care about the throwable, as it comes from a work and
 				// work failures are handled in onAllWorksFinished
 				.handle( (result, throwable) -> onAllWorksFinished() );
@@ -69,12 +67,12 @@ class ElasticsearchIndexIndexingPlanExecution<R> {
 		return reportFuture;
 	}
 
-	private MultiEntityOperationExecutionReport<R> onAllWorksFinished() {
+	private MultiEntityOperationExecutionReport onAllWorksFinished() {
 		return buildReport();
 	}
 
-	private MultiEntityOperationExecutionReport<R> buildReport() {
-		MultiEntityOperationExecutionReport.Builder<R> reportBuilder = MultiEntityOperationExecutionReport.builder();
+	private MultiEntityOperationExecutionReport buildReport() {
+		MultiEntityOperationExecutionReport.Builder reportBuilder = MultiEntityOperationExecutionReport.builder();
 		for ( int i = 0; i < futures.length; i++ ) {
 			CompletableFuture<?> future = futures[i];
 			if ( future.isCompletedExceptionally() ) {

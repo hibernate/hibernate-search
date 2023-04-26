@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
-import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 
 public interface AutomaticIndexingQueueEventProcessingPlan {
@@ -33,7 +32,7 @@ public interface AutomaticIndexingQueueEventProcessingPlan {
 	 *
 	 * @return A {@link CompletableFuture} that will be completed with an execution report when all the works are complete.
 	 */
-	CompletableFuture<MultiEntityOperationExecutionReport<EntityReference>> executeAndReport(
+	CompletableFuture<MultiEntityOperationExecutionReport> executeAndReport(
 			OperationSubmitter operationSubmitter);
 
 	/**

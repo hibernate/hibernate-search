@@ -93,7 +93,7 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 	public void configure(CoordinationConfigurationContext context) {
 		context.mappingProducer( new OutboxPollingOutboxEventAdditionalJaxbMappingProducer() );
 		context.mappingProducer( new OutboxPollingAgentAdditionalJaxbMappingProducer() );
-		context.sendIndexingEventsTo( ctx -> new OutboxPollingOutboxEventSendingPlan( ctx.session() ), true );
+		context.sendIndexingEventsTo( ctx -> new OutboxPollingOutboxEventSendingPlan( ctx.entityReferenceFactory(), ctx.session() ), true );
 	}
 
 	@Override

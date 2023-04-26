@@ -343,8 +343,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	public AutomaticIndexingQueueEventProcessingPlan createIndexingQueueEventProcessingPlan(Session session) {
 		HibernateOrmSearchSession searchSession =
 				HibernateOrmSearchSession.get( this, session.unwrap( SessionImplementor.class ), true );
-		return new AutomaticIndexingQueueEventProcessingPlanImpl( searchSession.createIndexingQueueEventProcessingPlan(),
-				entityReferenceFactory() );
+		return new AutomaticIndexingQueueEventProcessingPlanImpl( searchSession.createIndexingQueueEventProcessingPlan() );
 	}
 
 	@Override
