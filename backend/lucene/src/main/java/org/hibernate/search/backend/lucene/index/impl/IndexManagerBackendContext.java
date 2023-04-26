@@ -154,7 +154,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	public <H> LuceneSearchQueryBuilder<H> createSearchQueryBuilder(
 			LuceneSearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
+			SearchLoadingContextBuilder<?, ?> loadingContextBuilder,
 			LuceneSearchProjection<H> rootProjection) {
 		multiTenancyStrategy.checkTenantId( sessionContext.tenantIdentifier(), eventContext );
 

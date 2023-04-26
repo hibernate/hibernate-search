@@ -25,7 +25,7 @@ final class HibernateOrmSearchQueryAdapterExtension<H> implements
 	}
 
 	@Override
-	public Optional<HibernateOrmSearchQueryAdapter<H>> extendOptional(SearchQuery<H> original, SearchLoadingContext<?, ?> loadingContext) {
+	public Optional<HibernateOrmSearchQueryAdapter<H>> extendOptional(SearchQuery<H> original, SearchLoadingContext<?> loadingContext) {
 		Object unwrapped = loadingContext.unwrap();
 		if ( unwrapped instanceof HibernateOrmSelectionLoadingContext ) {
 			HibernateOrmSelectionLoadingContext castedLoadingContext = (HibernateOrmSelectionLoadingContext) unwrapped;

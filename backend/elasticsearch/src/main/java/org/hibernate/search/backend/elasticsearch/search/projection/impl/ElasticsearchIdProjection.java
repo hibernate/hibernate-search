@@ -45,13 +45,13 @@ public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjectio
 	}
 
 	@Override
-	public String extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+	public String extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit,
 			JsonObject source, ProjectionExtractContext context) {
 		return extractionHelper.extract( hit, context );
 	}
 
 	@Override
-	public I transform(LoadingResult<?, ?> loadingResult, String extractedData,
+	public I transform(LoadingResult<?> loadingResult, String extractedData,
 			ProjectionTransformContext context) {
 		return converter.fromDocumentValue( extractedData, context.fromDocumentValueConvertContext() );
 	}

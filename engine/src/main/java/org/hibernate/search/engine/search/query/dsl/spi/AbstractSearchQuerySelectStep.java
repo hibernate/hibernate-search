@@ -38,5 +38,5 @@ public abstract class AbstractSearchQuerySelectStep<
 
 	protected abstract BackendSessionContext sessionContext();
 
-	protected abstract SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder();
+	protected abstract SearchLoadingContextBuilder<E, LOS> loadingContextBuilder();
 }

@@ -112,7 +112,7 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 			SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
 			SearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
 		if ( scope instanceof ElasticsearchSearchQueryIndexScope ) {
 			return Optional.of( new ElasticsearchSearchQuerySelectStepImpl<>(
 					(ElasticsearchSearchQueryIndexScope<?>) scope, sessionContext, loadingContextBuilder
@@ -128,7 +128,7 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	 */
 	@Override
 	public Optional<ElasticsearchSearchQuery<H>> extendOptional(SearchQuery<H> original,
-			SearchLoadingContext<?, ?> loadingContext) {
+			SearchLoadingContext<?> loadingContext) {
 		if ( original instanceof ElasticsearchSearchQuery ) {
 			return Optional.of( (ElasticsearchSearchQuery<H>) original );
 		}

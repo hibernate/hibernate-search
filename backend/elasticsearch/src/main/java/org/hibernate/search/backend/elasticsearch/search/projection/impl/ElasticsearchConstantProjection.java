@@ -28,13 +28,13 @@ public class ElasticsearchConstantProjection<T> extends AbstractElasticsearchPro
 
 
 	@Override
-	public T extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit, JsonObject source,
+	public T extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit, JsonObject source,
 			ProjectionExtractContext context) {
 		return value;
 	}
 
 	@Override
-	public T transform(LoadingResult<?, ?> loadingResult, T extractedData, ProjectionTransformContext context) {
+	public T transform(LoadingResult<?> loadingResult, T extractedData, ProjectionTransformContext context) {
 		return extractedData;
 	}
 

@@ -54,7 +54,7 @@ class LuceneDocumentProjection extends AbstractLuceneProjection<Document>
 	}
 
 	@Override
-	public Document transform(LoadingResult<?, ?> loadingResult, Document extractedData,
+	public Document transform(LoadingResult<?> loadingResult, Document extractedData,
 			ProjectionTransformContext context) {
 		return extractedData;
 	}

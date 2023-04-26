@@ -26,14 +26,14 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 	private final Set<String> indexNames;
 	private final StubSearchWork work;
 	private final StubSearchProjectionContext projectionContext;
-	private final SearchLoadingContext<?, ?> loadingContext;
+	private final SearchLoadingContext<?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 	private final StubNextScrollWorkBehavior<?> behavior;
 	private final Deadline deadline;
 
 	NextScrollWorkCall(Set<String> indexNames, StubSearchWork work,
 			StubSearchProjectionContext projectionContext,
-			SearchLoadingContext<?, ?> loadingContext,
+			SearchLoadingContext<?> loadingContext,
 			StubSearchProjection<T> rootProjection,
 			Deadline deadline) {
 		this.indexNames = indexNames;

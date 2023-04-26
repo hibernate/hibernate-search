@@ -20,13 +20,13 @@ public class StubEntityCompositeProjection<T> implements StubSearchProjection<T>
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Iterator<?> projectionFromIndex,
+	public Object extract(ProjectionHitMapper<?> projectionHitMapper, Iterator<?> projectionFromIndex,
 			StubSearchProjectionContext context) {
 		return delegate.extract( projectionHitMapper, projectionFromIndex, context );
 	}
 
 	@Override
-	public T transform(LoadingResult<?, ?> loadingResult, Object extractedData, StubSearchProjectionContext context) {
+	public T transform(LoadingResult<?> loadingResult, Object extractedData, StubSearchProjectionContext context) {
 		return delegate.transform( loadingResult, extractedData, context );
 	}
 }

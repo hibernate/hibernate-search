@@ -47,7 +47,7 @@ public class StubFieldProjection<F, V, A, P> implements StubSearchProjection<P> 
 	}
 
 	@Override
-	public A extract(ProjectionHitMapper<?, ?> projectionHitMapper, Iterator<?> projectionFromIndex,
+	public A extract(ProjectionHitMapper<?> projectionHitMapper, Iterator<?> projectionFromIndex,
 			StubSearchProjectionContext context) {
 		List<?> fieldValues;
 		if ( singleValued ) {
@@ -66,7 +66,7 @@ public class StubFieldProjection<F, V, A, P> implements StubSearchProjection<P> 
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public P transform(LoadingResult<?, ?> loadingResult, Object extractedData,
+	public P transform(LoadingResult<?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
 		A accumulated = (A) extractedData;
 		A transformedData = accumulator.transformAll( accumulated, converter, context.fromDocumentValueConvertContext() );

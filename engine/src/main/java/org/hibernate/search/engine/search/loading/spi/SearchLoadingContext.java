@@ -10,13 +10,12 @@ package org.hibernate.search.engine.search.loading.spi;
  * An execution context for queries,
  * providing components allowing to load data from an external source (relational database, ...).
  *
- * @param <R> The type of entity references.
  * @param <E> The type of loaded entities.
  */
-public interface SearchLoadingContext<R, E> {
+public interface SearchLoadingContext<E> {
 
 	Object unwrap();
 
-	ProjectionHitMapper<R, E> createProjectionHitMapper();
+	ProjectionHitMapper<E> createProjectionHitMapper();
 
 }

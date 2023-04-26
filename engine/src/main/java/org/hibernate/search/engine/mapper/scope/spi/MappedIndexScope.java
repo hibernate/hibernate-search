@@ -34,7 +34,7 @@ public interface MappedIndexScope<R, E> {
 	 */
 	<LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
 			BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder);
+			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder);
 
 	SearchPredicateFactory predicate();
 

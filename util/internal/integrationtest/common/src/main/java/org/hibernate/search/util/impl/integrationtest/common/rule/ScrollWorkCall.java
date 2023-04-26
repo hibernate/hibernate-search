@@ -28,12 +28,12 @@ public class ScrollWorkCall<T> extends Call<ScrollWorkCall<?>> {
 	private final int chunkSize;
 	private final StubBackendBehavior behavior;
 	private final StubSearchProjectionContext projectionContext;
-	private final SearchLoadingContext<?, ?> loadingContext;
+	private final SearchLoadingContext<?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 	private final TimingSource timingSource;
 
 	ScrollWorkCall(Set<String> indexNames, StubSearchWork work, int chunkSize, StubBackendBehavior behavior,
-			StubSearchProjectionContext projectionContext, SearchLoadingContext<?, ?> loadingContext,
+			StubSearchProjectionContext projectionContext, SearchLoadingContext<?> loadingContext,
 			StubSearchProjection<T> rootProjection, TimingSource timingSource) {
 		this.indexNames = indexNames;
 		this.work = work;

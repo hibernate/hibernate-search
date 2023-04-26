@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
@@ -47,11 +48,11 @@ import org.hibernate.search.mapper.pojo.work.impl.PojoScopeWorkspaceImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public final class PojoScopeDelegateImpl<R, E, C> implements PojoScopeDelegate<R, E, C> {
+public final class PojoScopeDelegateImpl<R extends EntityReference, E, C> implements PojoScopeDelegate<R, E, C> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static <R, E, C> PojoScopeDelegate<R, E, C> create(
+	public static <R extends EntityReference, E, C> PojoScopeDelegate<R, E, C> create(
 			PojoScopeMappingContext mappingContext,
 			PojoScopeTypeContextProvider typeContextProvider,
 			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,

@@ -65,7 +65,7 @@ final class ElasticsearchByMappedTypeProjection<P>
 		}
 
 		@Override
-		public DelegateAndExtractedValue<?, P> extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+		public DelegateAndExtractedValue<?, P> extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit,
 				JsonObject source, ProjectionExtractContext context) {
 			String typeName = mappedTypeNameHelper.extract( hit, context );
 			Extractor<?, ? extends P> inner = inners.get( typeName );
@@ -76,7 +76,7 @@ final class ElasticsearchByMappedTypeProjection<P>
 		}
 
 		@Override
-		public P transform(LoadingResult<?, ?> loadingResult, DelegateAndExtractedValue<?, P> extracted,
+		public P transform(LoadingResult<?> loadingResult, DelegateAndExtractedValue<?, P> extracted,
 				ProjectionTransformContext context) {
 			return extracted.transform( loadingResult, context );
 		}
@@ -87,13 +87,13 @@ final class ElasticsearchByMappedTypeProjection<P>
 		private final E extractedValue;
 
 		private DelegateAndExtractedValue(Extractor<E, ? extends P> delegate,
-				ProjectionHitMapper<?, ?> projectionHitMapper,
+				ProjectionHitMapper<?> projectionHitMapper,
 				JsonObject hit, JsonObject source, ProjectionExtractContext context) {
 			this.delegate = delegate;
 			this.extractedValue = delegate.extract( projectionHitMapper, hit, source, context );
 		}
 
-		P transform(LoadingResult<?, ?> loadingResult, ProjectionTransformContext context) {
+		P transform(LoadingResult<?> loadingResult, ProjectionTransformContext context) {
 			return delegate.transform( loadingResult, extractedValue, context );
 		}
 	}

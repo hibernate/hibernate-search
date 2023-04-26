@@ -159,7 +159,7 @@ public final class LuceneSearchIndexScopeImpl
 
 	@Override
 	public <P> LuceneSearchQueryBuilder<P> select(BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<P> projection) {
+			SearchLoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection) {
 		return backendContext.createSearchQueryBuilder( this, sessionContext, loadingContextBuilder,
 				LuceneSearchProjection.from( this, projection ) );
 	}

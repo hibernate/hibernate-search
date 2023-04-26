@@ -33,7 +33,7 @@ public interface SearchBackendContext {
 	<H> LuceneSearchQueryBuilder<H> createSearchQueryBuilder(
 			LuceneSearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
+			SearchLoadingContextBuilder<?, ?> loadingContextBuilder,
 			LuceneSearchProjection<H> rootProjection);
 
 }

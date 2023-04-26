@@ -44,7 +44,7 @@ public class LuceneIdProjection<I> extends AbstractLuceneProjection<I>
 	}
 
 	@Override
-	public I transform(LoadingResult<?, ?> loadingResult, String extractedData,
+	public I transform(LoadingResult<?> loadingResult, String extractedData,
 			ProjectionTransformContext context) {
 		return converter.fromDocumentValue( extractedData, context.fromDocumentValueConvertContext() );
 	}

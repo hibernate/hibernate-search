@@ -42,11 +42,11 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 
 	private final ElasticsearchSearchQueryIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
-	private final SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder;
+	private final SearchLoadingContextBuilder<E, LOS> loadingContextBuilder;
 
 	public ElasticsearchSearchQuerySelectStepImpl(ElasticsearchSearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
 		this.scope = scope;
 		this.sessionContext = sessionContext;
 		this.loadingContextBuilder = loadingContextBuilder;
@@ -116,7 +116,7 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 	}
 
 	@Override
-	protected SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder() {
+	protected SearchLoadingContextBuilder<E, LOS> loadingContextBuilder() {
 		return loadingContextBuilder;
 	}
 

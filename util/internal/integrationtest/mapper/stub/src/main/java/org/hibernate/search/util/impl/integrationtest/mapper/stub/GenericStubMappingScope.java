@@ -25,10 +25,10 @@ public class GenericStubMappingScope<R, E> {
 
 	private final StubMapping mapping;
 	private final MappedIndexScope<R, E> delegate;
-	private final SearchLoadingContext<R, E> loadingContext;
+	private final SearchLoadingContext<E> loadingContext;
 
 	GenericStubMappingScope(StubMapping mapping, MappedIndexScope<R, E> delegate,
-			SearchLoadingContext<R, E> loadingContext) {
+			SearchLoadingContext<E> loadingContext) {
 		this.mapping = mapping;
 		this.delegate = delegate;
 		this.loadingContext = loadingContext;
@@ -48,14 +48,14 @@ public class GenericStubMappingScope<R, E> {
 
 	public <LOS> SearchQuerySelectStep<?, R, E, LOS, ?, ?> query(StubSession sessionContext,
 			LOS loadingOptionsStep) {
-		SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder = new SearchLoadingContextBuilder<R, E, LOS>() {
+		SearchLoadingContextBuilder<E, LOS> loadingContextBuilder = new SearchLoadingContextBuilder<E, LOS>() {
 			@Override
 			public LOS toAPI() {
 				return loadingOptionsStep;
 			}
 
 			@Override
-			public SearchLoadingContext<R, E> build() {
+			public SearchLoadingContext<E> build() {
 				return loadingContext;
 			}
 		};

@@ -38,7 +38,7 @@ public class LuceneEntityLoadingProjection<E> extends AbstractLuceneProjection<E
 
 	@Override
 	public Values<Object> values(ProjectionExtractContext context) {
-		ProjectionHitMapper<?, ?> mapper = context.projectionHitMapper();
+		ProjectionHitMapper<?> mapper = context.projectionHitMapper();
 		return new DocumentReferenceValues<Object>( context.collectorExecutionContext() ) {
 			@Override
 			protected Object toReference(String typeName, String identifier) {
@@ -49,7 +49,7 @@ public class LuceneEntityLoadingProjection<E> extends AbstractLuceneProjection<E
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public E transform(LoadingResult<?, ?> loadingResult, Object extractedData,
+	public E transform(LoadingResult<?> loadingResult, Object extractedData,
 			ProjectionTransformContext context) {
 		E loaded = (E) loadingResult.get( extractedData );
 		if ( loaded == null ) {

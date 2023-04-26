@@ -120,7 +120,7 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 
 	private List<Object> extractHits(ElasticsearchSearchQueryExtractContext extractContext) {
 		JsonObject responseBody = extractContext.getResponseBody();
-		ProjectionHitMapper<?, ?> hitMapper = extractContext.getProjectionHitMapper();
+		ProjectionHitMapper<?> hitMapper = extractContext.getProjectionHitMapper();
 		JsonArray jsonHits = HITS_HITS_ACCESSOR.get( responseBody ).orElseGet( JsonArray::new );
 
 		ProjectionExtractContext projectionExtractContext = extractContext.createProjectionExtractContext();

@@ -45,7 +45,7 @@ public class LuceneLoadableSearchResult<H> {
 
 	private List<Object> extractedData;
 	private final Map<AggregationKey<?>, ?> extractedAggregations;
-	private final ProjectionHitMapper<?, ?> projectionHitMapper;
+	private final ProjectionHitMapper<?> projectionHitMapper;
 	private final Duration took;
 	private final Boolean timedOut;
 	private final TimeoutManager timeoutManager;
@@ -54,7 +54,7 @@ public class LuceneLoadableSearchResult<H> {
 			LuceneSearchProjection.Extractor<?, H> rootExtractor,
 			SearchResultTotal resultTotal, TopDocs topDocs, List<Object> extractedData,
 			Map<AggregationKey<?>, ?> extractedAggregations,
-			ProjectionHitMapper<?, ?> projectionHitMapper,
+			ProjectionHitMapper<?> projectionHitMapper,
 			Duration took, boolean timedOut, TimeoutManager timeoutManager) {
 		this.fromDocumentValueConvertContext = fromDocumentValueConvertContext;
 		this.rootExtractor = rootExtractor;
@@ -71,7 +71,7 @@ public class LuceneLoadableSearchResult<H> {
 	LuceneSearchResult<H> loadBlocking() {
 		ProjectionTransformContext transformContext = new ProjectionTransformContext(
 				fromDocumentValueConvertContext );
-		LoadingResult<?, ?> loadingResult = projectionHitMapper.loadBlocking( timeoutManager.hardDeadlineOrNull() );
+		LoadingResult<?> loadingResult = projectionHitMapper.loadBlocking( timeoutManager.hardDeadlineOrNull() );
 
 		int readIndex = 0;
 		int writeIndex = 0;

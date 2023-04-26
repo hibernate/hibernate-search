@@ -35,7 +35,7 @@ class MappedIndexScopeImpl<R, E> implements MappedIndexScope<R, E> {
 	@Override
 	public <LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
 			BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
 		return new DefaultSearchQuerySelectStep<>( delegate.searchScope(), sessionContext, loadingContextBuilder );
 	}
 

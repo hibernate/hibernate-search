@@ -23,14 +23,14 @@ import com.google.gson.JsonObject;
 class ElasticsearchSearchQueryExtractContext implements AggregationExtractContext {
 
 	private final ElasticsearchSearchQueryRequestContext requestContext;
-	private final ProjectionHitMapper<?, ?> projectionHitMapper;
+	private final ProjectionHitMapper<?> projectionHitMapper;
 	private final FromDocumentValueConvertContext fromDocumentValueConvertContext;
 
 	private final JsonObject responseBody;
 
 	ElasticsearchSearchQueryExtractContext(ElasticsearchSearchQueryRequestContext requestContext,
 			BackendSessionContext sessionContext,
-			ProjectionHitMapper<?, ?> projectionHitMapper,
+			ProjectionHitMapper<?> projectionHitMapper,
 			JsonObject responseBody) {
 		this.requestContext = requestContext;
 		this.projectionHitMapper = projectionHitMapper;
@@ -47,7 +47,7 @@ class ElasticsearchSearchQueryExtractContext implements AggregationExtractContex
 		return responseBody;
 	}
 
-	ProjectionHitMapper<?, ?> getProjectionHitMapper() {
+	ProjectionHitMapper<?> getProjectionHitMapper() {
 		return projectionHitMapper;
 	}
 

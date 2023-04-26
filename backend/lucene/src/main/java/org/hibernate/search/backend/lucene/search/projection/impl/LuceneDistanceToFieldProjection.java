@@ -164,7 +164,7 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 		}
 
 		@Override
-		public P transform(LoadingResult<?, ?> loadingResult, A extractedData,
+		public P transform(LoadingResult<?> loadingResult, A extractedData,
 				ProjectionTransformContext context) {
 			// Nothing to transform: we take the values as they are.
 			return accumulator.finish( extractedData );

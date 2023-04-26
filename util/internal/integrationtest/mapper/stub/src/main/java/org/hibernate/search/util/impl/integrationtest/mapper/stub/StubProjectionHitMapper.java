@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.util.common.AssertionFailure;
 
-final class StubProjectionHitMapper implements ProjectionHitMapper<EntityReference, DocumentReference> {
+final class StubProjectionHitMapper implements ProjectionHitMapper<DocumentReference> {
 
 	private final List<DocumentReference> referencesToLoad = new ArrayList<>();
 
@@ -27,11 +27,11 @@ final class StubProjectionHitMapper implements ProjectionHitMapper<EntityReferen
 	}
 
 	@Override
-	public LoadingResult<EntityReference, DocumentReference> loadBlocking(Deadline deadline) {
+	public LoadingResult<DocumentReference> loadBlocking(Deadline deadline) {
 		return new StubLoadingResult( referencesToLoad );
 	}
 
-	private static class StubLoadingResult implements LoadingResult<EntityReference, DocumentReference> {
+	private static class StubLoadingResult implements LoadingResult<DocumentReference> {
 
 		private final List<DocumentReference> referencesToLoad;
 

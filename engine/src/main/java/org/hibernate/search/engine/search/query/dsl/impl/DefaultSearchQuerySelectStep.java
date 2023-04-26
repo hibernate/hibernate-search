@@ -39,10 +39,10 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS>
 
 	private final SearchQueryIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
-	private final SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder;
+	private final SearchLoadingContextBuilder<E, LOS> loadingContextBuilder;
 
 	public DefaultSearchQuerySelectStep(SearchQueryIndexScope<?> scope, BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<E, LOS> loadingContextBuilder) {
 		this.scope = scope;
 		this.sessionContext = sessionContext;
 		this.loadingContextBuilder = loadingContextBuilder;
@@ -111,7 +111,7 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS>
 	}
 
 	@Override
-	protected SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder() {
+	protected SearchLoadingContextBuilder<E, LOS> loadingContextBuilder() {
 		return loadingContextBuilder;
 	}
 }

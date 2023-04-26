@@ -12,10 +12,10 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 public class ProjectionExtractContext {
 
 	private final TopDocsDataCollectorExecutionContext collectorExecutionContext;
-	private final ProjectionHitMapper<?, ?> projectionHitMapper;
+	private final ProjectionHitMapper<?> projectionHitMapper;
 
 	public ProjectionExtractContext(TopDocsDataCollectorExecutionContext collectorExecutionContext,
-			ProjectionHitMapper<?, ?> projectionHitMapper) {
+			ProjectionHitMapper<?> projectionHitMapper) {
 		this.collectorExecutionContext = collectorExecutionContext;
 		this.projectionHitMapper = projectionHitMapper;
 	}
@@ -24,7 +24,7 @@ public class ProjectionExtractContext {
 		return collectorExecutionContext;
 	}
 
-	public ProjectionHitMapper<?, ?> projectionHitMapper() {
+	public ProjectionHitMapper<?> projectionHitMapper() {
 		return projectionHitMapper;
 	}
 }

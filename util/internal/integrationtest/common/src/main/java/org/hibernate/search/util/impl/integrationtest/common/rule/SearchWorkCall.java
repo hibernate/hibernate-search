@@ -32,7 +32,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 	private final Set<String> indexNames;
 	private final StubSearchWork work;
 	private final StubSearchProjectionContext projectionContext;
-	private final SearchLoadingContext<?, ?> loadingContext;
+	private final SearchLoadingContext<?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 	private final StubSearchWorkBehavior<?> behavior;
 	private final Deadline deadline;
@@ -40,7 +40,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 	SearchWorkCall(Set<String> indexNames,
 			StubSearchWork work,
 			StubSearchProjectionContext projectionContext,
-			SearchLoadingContext<?, ?> loadingContext,
+			SearchLoadingContext<?> loadingContext,
 			StubSearchProjection<T> rootProjection,
 			Deadline deadline) {
 		this.indexNames = indexNames;
@@ -91,7 +91,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 	}
 
 	static <H> List<H> getResults(StubSearchProjectionContext actualProjectionContext,
-			ProjectionHitMapper<?, ?> actualProjectionHitMapper,
+			ProjectionHitMapper<?> actualProjectionHitMapper,
 			StubSearchProjection<H> actualRootProjection,
 			List<?> rawHits, Deadline deadline) {
 		List<Object> extractedElements = new ArrayList<>( rawHits.size() );
@@ -104,7 +104,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 			);
 		}
 
-		LoadingResult<?, ?> loadingResult = actualProjectionHitMapper.loadBlocking( deadline );
+		LoadingResult<?> loadingResult = actualProjectionHitMapper.loadBlocking( deadline );
 
 		List<H> hits = new ArrayList<>( rawHits.size() );
 

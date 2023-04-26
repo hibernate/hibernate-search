@@ -125,7 +125,7 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 	}
 
 	@Override
-	public A extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+	public A extract(ProjectionHitMapper<?> projectionHitMapper, JsonObject hit,
 			JsonObject source, ProjectionExtractContext context) {
 		Integer distanceSortIndex = singleValuedInRoot ? context.getDistanceSortIndex( absoluteFieldPath, center ) : null;
 
@@ -142,7 +142,7 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 	}
 
 	@Override
-	public P transform(LoadingResult<?, ?> loadingResult, A extractedData,
+	public P transform(LoadingResult<?> loadingResult, A extractedData,
 			ProjectionTransformContext context) {
 		// Nothing to transform: we take the values as they are.
 		return accumulator.finish( extractedData );

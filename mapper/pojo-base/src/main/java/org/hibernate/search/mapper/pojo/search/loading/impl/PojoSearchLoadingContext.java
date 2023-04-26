@@ -9,21 +9,22 @@ package org.hibernate.search.mapper.pojo.search.loading.impl;
 import java.util.Map;
 
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
+import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 import org.hibernate.search.mapper.pojo.loading.impl.PojoLoadingPlan;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 
-public class PojoSearchLoadingContext<R, E> implements SearchLoadingContext<R, E> {
+public class PojoSearchLoadingContext<E> implements SearchLoadingContext<E> {
 	private final Map<String, PojoSearchLoadingIndexedTypeContext<? extends E>> targetTypesByEntityName;
-	private final DocumentReferenceConverter<R> documentReferenceConverter;
+	private final DocumentReferenceConverter<? extends EntityReference> documentReferenceConverter;
 	private final BridgeSessionContext sessionContext;
 	private final PojoSelectionLoadingContext delegate;
 
 	public PojoSearchLoadingContext(
 			Map<String, PojoSearchLoadingIndexedTypeContext<? extends E>> targetTypesByEntityName,
-			DocumentReferenceConverter<R> documentReferenceConverter,
+			DocumentReferenceConverter<? extends EntityReference> documentReferenceConverter,
 			BridgeSessionContext sessionContext,
 			PojoSelectionLoadingContext delegate) {
 		this.targetTypesByEntityName = targetTypesByEntityName;
@@ -38,7 +39,7 @@ public class PojoSearchLoadingContext<R, E> implements SearchLoadingContext<R, E
 	}
 
 	@Override
-	public ProjectionHitMapper<R, E> createProjectionHitMapper() {
+	public ProjectionHitMapper<E> createProjectionHitMapper() {
 		PojoLoadingPlan<E> loadingPlan = PojoLoadingPlan.create( delegate, targetTypesByEntityName.values() );
 		return new PojoProjectionHitMapper<>( targetTypesByEntityName, documentReferenceConverter, sessionContext,
 				loadingPlan );

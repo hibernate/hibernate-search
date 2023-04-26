@@ -51,11 +51,11 @@ public abstract class AbstractSearchQueryOptionsStep<
 
 	protected final SC scope;
 	private final SearchQueryBuilder<H> searchQueryBuilder;
-	private final SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder;
+	private final SearchLoadingContextBuilder<?, LOS> loadingContextBuilder;
 
 	public AbstractSearchQueryOptionsStep(SC scope,
 			SearchQueryBuilder<H> searchQueryBuilder,
-			SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<?, LOS> loadingContextBuilder) {
 		this.scope = scope;
 		this.searchQueryBuilder = searchQueryBuilder;
 		this.loadingContextBuilder = loadingContextBuilder;

@@ -65,7 +65,7 @@ public interface LuceneSearchProjection<P> extends SearchProjection<P> {
 		 * @param context An execution context for the transforming.
 		 * @return The final result considered as a hit.
 		 */
-		P transform(LoadingResult<?, ?> loadingResult, E extractedData,
+		P transform(LoadingResult<?> loadingResult, E extractedData,
 				ProjectionTransformContext context);
 
 		/**
@@ -74,7 +74,7 @@ public interface LuceneSearchProjection<P> extends SearchProjection<P> {
 		 * This should be used with care as it's unsafe.
 		 */
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		static <Z> Z transformUnsafe(Extractor<?, Z> extractor, LoadingResult<?, ?> loadingResult,
+		static <Z> Z transformUnsafe(Extractor<?, Z> extractor, LoadingResult<?> loadingResult,
 				Object extractedData, ProjectionTransformContext context) {
 			return (Z) ( (Extractor) extractor ).transform( loadingResult, extractedData, context );
 		}

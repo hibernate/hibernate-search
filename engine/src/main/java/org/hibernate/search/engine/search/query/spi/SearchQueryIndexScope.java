@@ -25,7 +25,7 @@ public interface SearchQueryIndexScope<S extends SearchQueryIndexScope<?>>
 				SearchProjectionIndexScope<S>, SearchAggregationIndexScope<S> {
 
 	<P> SearchQueryBuilder<P> select(BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<P> projection);
+			SearchLoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection);
 
 	SearchPredicateFactory predicateFactory();
 

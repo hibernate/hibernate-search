@@ -36,7 +36,7 @@ class LuceneExplanationProjection extends AbstractLuceneProjection<Explanation>
 	}
 
 	@Override
-	public Explanation transform(LoadingResult<?, ?> loadingResult, Explanation extractedData,
+	public Explanation transform(LoadingResult<?> loadingResult, Explanation extractedData,
 			ProjectionTransformContext context) {
 		return extractedData;
 	}

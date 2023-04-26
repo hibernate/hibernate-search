@@ -72,7 +72,7 @@ public class SearchQueryScrollResultLoadingIT {
 	@Test
 	public void resultLoadingOnScrolling() {
 		@SuppressWarnings("unchecked")
-		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( typeContextMock.loadingAvailable() ).thenReturn( true );
@@ -94,7 +94,7 @@ public class SearchQueryScrollResultLoadingIT {
 	@Test
 	public void resultLoadingOnScrolling_entityLoadingTimeout() {
 		@SuppressWarnings("unchecked")
-		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( typeContextMock.loadingAvailable() ).thenReturn( true );
@@ -118,7 +118,7 @@ public class SearchQueryScrollResultLoadingIT {
 	@Test
 	public void resultLoadingOnScrolling_softTimeout() {
 		@SuppressWarnings("unchecked")
-		SearchLoadingContext<EntityReference, StubEntity> loadingContextMock =
+		SearchLoadingContext<StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
 		when( typeContextMock.loadingAvailable() ).thenReturn( true );
@@ -140,7 +140,7 @@ public class SearchQueryScrollResultLoadingIT {
 				} );
 	}
 
-	private void verifyLoading(SearchLoadingContext<EntityReference, StubEntity> loadingContextMock,
+	private void verifyLoading(SearchLoadingContext<StubEntity> loadingContextMock,
 			SearchScroll<StubEntity> scroll) {
 		// 7 full size pages
 		for ( int j = 0; j < 7; j++ ) {

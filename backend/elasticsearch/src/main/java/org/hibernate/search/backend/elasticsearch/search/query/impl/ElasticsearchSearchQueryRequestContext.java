@@ -46,7 +46,7 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootCon
 
 	private final ElasticsearchSearchIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
-	private final SearchLoadingContext<?, ?> loadingContext;
+	private final SearchLoadingContext<?> loadingContext;
 	private final PredicateRequestContext rootPredicateContext;
 	private final Map<DistanceSortKey, Integer> distanceSorts;
 	private final Map<String, ElasticsearchSearchHighlighter> namedHighlighters;
@@ -55,7 +55,7 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootCon
 	ElasticsearchSearchQueryRequestContext(
 			ElasticsearchSearchIndexScope<?> scope,
 			BackendSessionContext sessionContext,
-			SearchLoadingContext<?, ?> loadingContext,
+			SearchLoadingContext<?> loadingContext,
 			PredicateRequestContext rootPredicateContext,
 			Map<DistanceSortKey, Integer> distanceSorts,
 			Map<String, ElasticsearchSearchHighlighter> namedHighlighters,

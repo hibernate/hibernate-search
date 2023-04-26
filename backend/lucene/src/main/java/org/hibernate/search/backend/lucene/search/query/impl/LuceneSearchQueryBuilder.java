@@ -64,7 +64,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	private final BackendSessionContext sessionContext;
 	private final Set<String> routingKeys;
 
-	private final SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder;
+	private final SearchLoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final LuceneSearchProjection<H> rootProjection;
 
 	private Query luceneQuery;
@@ -82,7 +82,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 			LuceneSyncWorkOrchestrator queryOrchestrator,
 			LuceneSearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
+			SearchLoadingContextBuilder<?, ?> loadingContextBuilder,
 			LuceneSearchProjection<H> rootProjection) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
@@ -202,7 +202,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 
 	@Override
 	public LuceneSearchQuery<H> build() {
-		SearchLoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
+		SearchLoadingContext<?> loadingContext = loadingContextBuilder.build();
 
 		BooleanQuery.Builder luceneQueryBuilder = new BooleanQuery.Builder();
 		luceneQueryBuilder.add( luceneQuery, Occur.MUST );

@@ -164,7 +164,7 @@ public class LuceneObjectProjection<E, V, P>
 		}
 
 		@Override
-		public final P transform(LoadingResult<?, ?> loadingResult, A accumulated,
+		public final P transform(LoadingResult<?> loadingResult, A accumulated,
 				ProjectionTransformContext context) {
 			for ( int i = 0; i < accumulator.size( accumulated ); i++ ) {
 				E transformedData = accumulator.get( accumulated, i );
