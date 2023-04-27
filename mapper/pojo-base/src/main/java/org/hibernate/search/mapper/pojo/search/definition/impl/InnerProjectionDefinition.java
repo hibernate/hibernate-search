@@ -10,7 +10,7 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 
-interface InnerProjectionDefinition extends ToStringTreeAppendable {
+public interface InnerProjectionDefinition extends ToStringTreeAppendable {
 
 	SearchProjection<?> create(SearchProjectionFactory<?, ?> f);
 

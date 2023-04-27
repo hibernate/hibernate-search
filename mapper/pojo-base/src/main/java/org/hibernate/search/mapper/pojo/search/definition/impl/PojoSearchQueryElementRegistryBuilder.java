@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataCon
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
+import org.hibernate.search.mapper.pojo.search.definition.binding.impl.ProjectionConstructorBinder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class PojoSearchQueryElementRegistryBuilder {
@@ -67,7 +68,7 @@ public final class PojoSearchQueryElementRegistryBuilder {
 		if ( constructorMapping.isProjectionConstructor() ) {
 			Class<T> instantiatedJavaClass = type.typeIdentifier().javaClass();
 			PojoConstructorProjectionDefinition<T> definition =
-					PojoConstructorProjectionDefinition.create( mappingHelper, constructor );
+					new ProjectionConstructorBinder<>( mappingHelper, constructor ).bind();
 			CompositeProjectionDefinition<?> existing =
 					projectionDefinitions.putIfAbsent( instantiatedJavaClass, definition );
 			log.constructorProjection( type, definition );

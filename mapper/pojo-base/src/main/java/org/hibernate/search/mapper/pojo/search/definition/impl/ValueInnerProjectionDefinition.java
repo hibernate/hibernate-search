@@ -10,12 +10,12 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
-final class ValueInnerProjectionDefinition implements InnerProjectionDefinition {
+public final class ValueInnerProjectionDefinition implements InnerProjectionDefinition {
 	final String path;
 	final boolean multi;
 	final Class<?> type;
 
-	ValueInnerProjectionDefinition(String path, boolean multi, Class<?> type) {
+	public ValueInnerProjectionDefinition(String path, boolean multi, Class<?> type) {
 		this.path = path;
 		this.multi = multi;
 		this.type = type;

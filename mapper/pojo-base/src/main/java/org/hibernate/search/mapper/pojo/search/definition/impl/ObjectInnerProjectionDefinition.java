@@ -11,12 +11,12 @@ import org.hibernate.search.engine.search.projection.definition.spi.CompositePro
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
-final class ObjectInnerProjectionDefinition implements InnerProjectionDefinition {
+public final class ObjectInnerProjectionDefinition implements InnerProjectionDefinition {
 	final String path;
 	final boolean multi;
 	final CompositeProjectionDefinition<?> composite;
 
-	ObjectInnerProjectionDefinition(String path, boolean multi, CompositeProjectionDefinition<?> composite) {
+	public ObjectInnerProjectionDefinition(String path, boolean multi, CompositeProjectionDefinition<?> composite) {
 		this.path = path;
 		this.multi = multi;
 		this.composite = composite;
