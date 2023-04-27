@@ -1,5 +1,5 @@
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/realbackend/limitations/ConcurrentEmbeddedUpdateLimitationIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/realbackend/limitations/ConcurrentEmbeddedUpdateLimitationIT.java
-index d15ea93d5a..dd4194a91d 100644
+index c4da50d67a..683b124631 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/realbackend/limitations/ConcurrentEmbeddedUpdateLimitationIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/realbackend/limitations/ConcurrentEmbeddedUpdateLimitationIT.java
 @@ -26,7 +26,7 @@
