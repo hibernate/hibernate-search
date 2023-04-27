@@ -433,7 +433,7 @@ the context also lists references to entities that could not be indexed correctl
 ----
 include::{resourcesdir}/reporting/failurehandler.properties[]
 ----
-<1> Assign the background failure handler using a Hibernate Search configuration property.
+Assign the background failure handler using a Hibernate Search configuration property.
 ====
 
 [NOTE]
