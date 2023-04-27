@@ -250,8 +250,13 @@ public interface SearchSession {
 	void indexingPlanSynchronizationStrategy(IndexingPlanSynchronizationStrategy synchronizationStrategy);
 
 	/**
-	 * Set a filter configuration and define which types must be included/excluded when indexed within the current session.
-	 * If the type is not explicitly included/excluded directly or as a supertype the decision will be made by
+	 * Set a filter configuration and define which types must be included/excluded when indexed within indexing plans
+	 * of the current session (either automatically or manually).
+	 * <p>
+	 * This does not affect indexing that does not rely on indexing plans, like the mass indexer.
+	 * <p>
+	 * If a type is not explicitly included/excluded directly or through an included/excluded supertype,
+	 * the decision will be made by
 	 * {@link SearchMapping#indexingPlanFilter(SearchIndexingPlanFilter) an application filter}, which defaults to including all types.
 	 *
 	 * @param filter The filter that includes/excludes types when indexed.

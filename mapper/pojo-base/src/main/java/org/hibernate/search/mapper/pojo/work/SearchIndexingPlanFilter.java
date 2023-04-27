@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.work;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * Configurer implementers are responsible for specifying which indexed types should be included/excluded from indexing.
+ * Configurer implementers are responsible for specifying which types should be included/excluded from indexing.
  * <p>
  * Usually a lambda is expected by the method that receive this type as an input parameter.
  */
@@ -17,7 +17,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
 @FunctionalInterface
 public interface SearchIndexingPlanFilter {
 	/**
-	 * This method is invoked filtering of types to be indexed.
+	 * This method is invoked while filtering types to be indexed.
 	 *
 	 * @param context The context exposing include/exclude methods to configure the filter.
 	 */
