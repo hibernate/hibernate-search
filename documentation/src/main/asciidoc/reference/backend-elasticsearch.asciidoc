@@ -1010,9 +1010,9 @@ A different analysis configurer can be assigned to each index:
 [source]
 ----
 # To set the default configurer for all indexes:
-hibernate.search.backend.analysis.configurer = com.mycompany.MyAnalysisConfigurer
+hibernate.search.backend.analysis.configurer = class:com.mycompany.MyAnalysisConfigurer
 # To assign a specific configurer to a specific index:
-hibernate.search.backend.indexes.<index-name>.analysis.configurer = com.mycompany.MySpecificAnalysisConfigurer
+hibernate.search.backend.indexes.<index-name>.analysis.configurer = class:com.mycompany.MySpecificAnalysisConfigurer
 ----
 
 If a specific configurer is assigned to an index,
@@ -1030,7 +1030,7 @@ The Elasticsearch backend comes with several built-in analyzers.
 The exact list depends on the version of Elasticsearch and can be found
 link:{elasticsearchDocUrl}/analysis-analyzers.html[here].
 
-Regardless of the Elasticsearch version;
+Regardless of the Elasticsearch version,
 analyzers whose name is listed as a constant in `org.hibernate.search.engine.backend.analysis.AnalyzerNames`
 are always available:
 
