@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.massindexing.impl.PojoMassIndexingTypeContextProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.work.impl.PojoWorkTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkTypeContextProvider;
 
 public interface PojoScopeTypeContextProvider
@@ -21,8 +22,16 @@ public interface PojoScopeTypeContextProvider
 
 	Set<PojoRawTypeIdentifier<?>> allIndexedSuperTypes();
 
+	Set<PojoRawTypeIdentifier<?>> allNonInterfaceSuperTypes();
+
+	Set<PojoRawTypeIdentifier<?>> allIndexedAndContainedTypes();
+
+	Set<Class<?>> allNonInterfaceSuperTypesClasses();
+
 	@Override
 	<E> Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>>> allIndexedForSuperType(
 			PojoRawTypeIdentifier<E> typeIdentifier);
+
+	<E> Set<? extends PojoWorkTypeContext<?, ? extends E>> allByNonInterfaceSuperType(PojoRawTypeIdentifier<E> typeIdentifier);
 
 }

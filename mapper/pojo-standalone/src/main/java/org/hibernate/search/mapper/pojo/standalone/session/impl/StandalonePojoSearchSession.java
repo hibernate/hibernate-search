@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.ConfiguredSearchIndexingPlanFilter;
+import org.hibernate.search.mapper.pojo.work.spi.ConfiguredSearchIndexingPlanFilter;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
@@ -54,7 +54,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 
 	private final Consumer<SelectionLoadingOptionsStep> loadingOptionsContributor;
 	private final ConfiguredIndexingPlanSynchronizationStrategyHolder synchronizationStrategyHolder;
-	private final ConfiguredSearchIndexingPlanFilter indexingTypeFilterHolder;
+	private final ConfiguredSearchIndexingPlanFilter configuredIndexingPlanFilter;
 
 	private SearchIndexingPlanImpl indexingPlan;
 	private SearchIndexer indexer;
@@ -71,7 +71,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 
 		this.indexingPlanSynchronizationStrategy = this.synchronizationStrategyHolder.configureOverriddenSynchronizationStrategy(
 				builder.synchronizationStrategy );
-		this.indexingTypeFilterHolder = ACCEPT_ALL;
+		this.configuredIndexingPlanFilter = ACCEPT_ALL;
 	}
 
 	private void checkOpenAndThrow() {
@@ -182,8 +182,8 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public ConfiguredSearchIndexingPlanFilter automaticIndexingTypeFilter() {
-		return indexingTypeFilterHolder;
+	public ConfiguredSearchIndexingPlanFilter configuredIndexingPlanFilter() {
+		return configuredIndexingPlanFilter;
 	}
 
 	@Override

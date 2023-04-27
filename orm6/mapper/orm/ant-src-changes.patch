@@ -403,20 +403,7 @@ index 44069a5558..9cd86db6e5 100644
 +			collector.value( getExtractorPath( value ) ).decimalScale( scale );
  		}
  	}
-
-diff --git a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmTypeContextContainer.java b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmTypeContextContainer.java
-index 0c3962117b..75ea12397e 100644
---- a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmTypeContextContainer.java
-+++ b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmTypeContextContainer.java
-@@ -128,7 +128,7 @@ private HibernateOrmTypeContextContainer(Builder builder, SessionFactoryImplemen
-
- 	private boolean isManagedType(SessionFactoryImplementor sessionFactory, Class<?> javaClass) {
- 		try {
--			sessionFactory.getMetamodel().managedType( javaClass );
-+			sessionFactory.getJpaMetamodel().managedType( javaClass );
- 		}
- 		catch (Exception e) {
- 			return false;
+ 
 diff --git a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmBasicTypeMetadataProvider.java b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmBasicTypeMetadataProvider.java
 index 77d7b8f982..d03fcba6e2 100644
 --- a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmBasicTypeMetadataProvider.java

@@ -21,8 +21,8 @@ import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
-import org.hibernate.search.mapper.pojo.automaticindexing.filter.SearchIndexingPlanFilter;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanFilter;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -254,8 +254,8 @@ public interface SearchSession {
 	 * If the type is not explicitly included/excluded directly or as a supertype the decision will be made by
 	 * {@link SearchMapping#indexingPlanFilter(SearchIndexingPlanFilter) an application filter}, which defaults to including all types.
 	 *
-	 * @param configurer The configurer that provides access to the filter configuration.
+	 * @param filter The filter that includes/excludes types when indexed.
 	 */
 	@Incubating
-	void automaticIndexingFilter(SearchIndexingPlanFilter configurer);
+	void indexingPlanFilter(SearchIndexingPlanFilter filter);
 }

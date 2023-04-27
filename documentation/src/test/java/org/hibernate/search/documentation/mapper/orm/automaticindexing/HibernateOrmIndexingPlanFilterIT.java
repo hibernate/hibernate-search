@@ -69,7 +69,7 @@ public class HibernateOrmIndexingPlanFilterIT {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::session-filter[]
 			Search.session( entityManager ) // <1>
-					.automaticIndexingFilter( // <2>
+					.indexingPlanFilter( // <2>
 							ctx -> ctx.exclude( EntityA.class )
 									.include( EntityExtendsA2.class )
 					);

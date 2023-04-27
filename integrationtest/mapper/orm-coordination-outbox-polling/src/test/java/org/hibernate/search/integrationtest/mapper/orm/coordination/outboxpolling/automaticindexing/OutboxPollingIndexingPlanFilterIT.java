@@ -28,7 +28,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.MethodRule;
 
-public class OutboxPollingAutomaticIndexingFilterIT {
+public class OutboxPollingIndexingPlanFilterIT {
 
 	@ClassRule
 	public static BackendMock backendMock = new BackendMock();
@@ -63,12 +63,12 @@ public class OutboxPollingAutomaticIndexingFilterIT {
 	public void partialSessionFilterFails() {
 		setupHolder.runInTransaction( session -> {
 			assertThatThrownBy( () ->
-					Search.session( session ).automaticIndexingFilter(
+					Search.session( session ).indexingPlanFilter(
 							ctx -> ctx.exclude( Entity1A.class ) )
 			).isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
 							"Unable to apply the given filter at the session level with the outbox polling coordination strategy.",
-							"With this coordination strategy, applying a session-level automatic indexing filter is only allowed if it excludes all types."
+							"With this coordination strategy, applying a session-level indexing plan filter is only allowed if it excludes all types."
 					);
 		} );
 	}
@@ -77,7 +77,7 @@ public class OutboxPollingAutomaticIndexingFilterIT {
 	public void allTypesMixSessionFilterFails() {
 		setupHolder.runInTransaction( session -> {
 			assertThatThrownBy( () ->
-					Search.session( session ).automaticIndexingFilter(
+					Search.session( session ).indexingPlanFilter(
 							ctx -> ctx.exclude( EntityA.class )
 									.exclude( Entity1A.class )
 									.exclude( Entity1B.class )
@@ -85,7 +85,7 @@ public class OutboxPollingAutomaticIndexingFilterIT {
 			).isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
 							"Unable to apply the given filter at the session level with the outbox polling coordination strategy.",
-							"With this coordination strategy, applying a session-level automatic indexing filter is only allowed if it excludes all types."
+							"With this coordination strategy, applying a session-level indexing plan filter is only allowed if it excludes all types."
 					);
 		} );
 	}
@@ -93,7 +93,7 @@ public class OutboxPollingAutomaticIndexingFilterIT {
 	@Test
 	public void allTypesExcludeExplicitlySessionFilter() {
 		setupHolder.runInTransaction( session -> {
-			Search.session( session ).automaticIndexingFilter(
+			Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( EntityA.class )
 							.exclude( Entity1A.class )
 							.exclude( Entity1B.class )
@@ -110,7 +110,7 @@ public class OutboxPollingAutomaticIndexingFilterIT {
 	@Test
 	public void allTypesExcludeInheritanceSessionFilter() {
 		setupHolder.runInTransaction( session -> {
-			Search.session( session ).automaticIndexingFilter(
+			Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( EntityA.class )
 			);
 

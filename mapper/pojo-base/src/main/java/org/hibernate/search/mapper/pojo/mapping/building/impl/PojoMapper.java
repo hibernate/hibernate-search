@@ -311,6 +311,20 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 								.add( e );
 					}
 				}
+				// we want to have a map of all entities by their name so that we can later use this information
+				// when looking up supertypes by an entity name. E.g.
+				// NotIndexedEntity(name=A); IndexedEntity(name=B) extends NotIndexedEntity
+				// and let's say we want to do indexing plan filtering by "A" - this type is neither indexed nor contained
+				// but we still need to be able to identify it.
+				typeManagerContainerBuilder.addEntity(
+						typeAdditionalMetadataProvider.get( entityType )
+								.getEntityTypeMetadata()
+								// This should not be possible since this method is only called for entity types (see caller)
+								.orElseThrow( () -> new AssertionFailure(
+										"Missing metadata for entity type '" + entityType ) )
+								.getEntityName(),
+						entityType
+				);
 			}
 			if ( failureCollector.hasFailure() ) {
 				throw new MappingAbortedException();
@@ -405,7 +419,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 					reindexingResolver
 			);
 			log.containedTypeManager( entityType, typeManager );
-			typeManagerContainerBuilder.addContained( typeManager );
+			typeManagerContainerBuilder.addContained( entityType, typeManager );
 		}
 	}
 

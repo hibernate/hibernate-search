@@ -33,6 +33,7 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 		this.typeContext = typeContext;
 	}
 
+	@Override
 	void updateBecauseOfContained(Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.identifierMapping().getIdentifier( null, entitySupplier );

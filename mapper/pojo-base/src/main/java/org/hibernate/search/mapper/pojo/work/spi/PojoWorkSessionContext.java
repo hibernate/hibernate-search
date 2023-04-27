@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.work.spi;
 
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.ConfiguredSearchIndexingPlanFilter;
 import org.hibernate.search.mapper.pojo.automaticindexing.spi.PojoImplicitReindexingResolverSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
@@ -27,6 +26,6 @@ public interface PojoWorkSessionContext
 	PojoSelectionLoadingContext defaultLoadingContext();
 
 	@Incubating
-	ConfiguredSearchIndexingPlanFilter automaticIndexingTypeFilter();
+	ConfiguredSearchIndexingPlanFilter configuredIndexingPlanFilter();
 
 }
