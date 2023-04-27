@@ -23,7 +23,7 @@ shift
 for subdir in $(cd orm6; grep -R --include pom.xml -L '<packaging>pom</packaging>' | xargs dirname)
 do
   patchPath="orm6/$subdir/ant-src-changes.patch"
-  git diff -p "$REV_RANGE" --relative="$subdir/src" -- > "$patchPath"
+  git diff -p "$REV_RANGE" --relative="$subdir/src" -- "$subdir/src" ":^$subdir/src/main/asciidoc" > "$patchPath"
   if ! [ -s "$patchPath" ]
   then
     rm "$patchPath"
