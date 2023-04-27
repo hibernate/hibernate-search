@@ -10,9 +10,9 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
-final class NullInnerProjectionDefinition
+public final class NullInnerProjectionDefinition
 		implements InnerProjectionDefinition {
-	static final NullInnerProjectionDefinition INSTANCE = new NullInnerProjectionDefinition();
+	public static final NullInnerProjectionDefinition INSTANCE = new NullInnerProjectionDefinition();
 
 	private NullInnerProjectionDefinition() {
 	}
