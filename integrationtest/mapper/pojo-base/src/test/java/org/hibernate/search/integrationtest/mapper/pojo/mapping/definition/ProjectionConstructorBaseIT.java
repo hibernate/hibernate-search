@@ -633,10 +633,16 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 						.typeContext( Model.ProjectionLevel2.class.getName() )
 						.constructorContext( Model.class, String.class, Model.ProjectionLevel1.class )
 						.methodParameterContext( 2, "level1" )
-						.failure( "Infinite object projection recursion starting from projection constructor "
-								+ Model.ProjectionLevel1.class.getName() + "(" + Model.class.getName() + ", "
-								+ String.class.getName() + ", " + Model.ProjectionLevel2.class.getName() + ")"
-								+ " and involving field path '.level2.level1'" ) );
+						.multilineFailure( "Infinite object projection recursion:",
+								Model.ProjectionLevel1.class.getName() + "("
+										+ Model.class.getName() + ", " + String.class.getName() + ", "
+										+ Model.ProjectionLevel2.class.getName() + ")",
+								"for parameter #2 in " + Model.ProjectionLevel2.class.getName() + "("
+										+ Model.class.getName() + ", " + String.class.getName() + ", *"
+										+ Model.ProjectionLevel1.class.getName() + "*)",
+								"for parameter #2 in " + Model.ProjectionLevel1.class.getName() + "("
+										+ Model.class.getName() + ", " + String.class.getName() + ", *"
+										+ Model.ProjectionLevel2.class.getName() + "*)" ) );
 	}
 
 	@Test
@@ -710,10 +716,19 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 						.typeContext( Model.ProjectionLevel3.class.getName() )
 						.constructorContext( Model.class, String.class, Model.ProjectionLevel1.class )
 						.methodParameterContext( 2, "level1" )
-						.failure( "Infinite object projection recursion starting from projection constructor "
-								+ Model.ProjectionLevel1.class.getName() + "(" + Model.class.getName() + ", "
-								+ String.class.getName() + ", " + Model.ProjectionLevel2.class.getName() + ")"
-								+ " and involving field path '.level2.level3.level1'" ) );
+						.multilineFailure( "Infinite object projection recursion:",
+								Model.ProjectionLevel1.class.getName() + "("
+										+ Model.class.getName() + ", " + String.class.getName() + ", "
+										+ Model.ProjectionLevel2.class.getName() + ")",
+								"for parameter #2 in " + Model.ProjectionLevel3.class.getName() + "("
+										+ Model.class.getName() + ", " + String.class.getName() + ", *"
+										+ Model.ProjectionLevel1.class.getName() + "*)",
+								"for parameter #2 in " + Model.ProjectionLevel2.class.getName() + "("
+										+ Model.class.getName() + ", " + String.class.getName() + ", *"
+										+ Model.ProjectionLevel3.class.getName() + "*)",
+								"for parameter #2 in " + Model.ProjectionLevel1.class.getName() + "("
+										+ Model.class.getName() + ", " + String.class.getName() + ", *"
+										+ Model.ProjectionLevel2.class.getName() + "*)" ) );
 	}
 
 	@Test
@@ -787,10 +802,16 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 						.typeContext( Model.ProjectionLevel3.class.getName() )
 						.constructorContext( Model.class, String.class, Model.ProjectionLevel2.class )
 						.methodParameterContext( 2, "level2" )
-						.failure( "Infinite object projection recursion starting from projection constructor "
-								+ Model.ProjectionLevel2.class.getName() + "(" + Model.class.getName() + ", "
-								+ String.class.getName() + ", " + Model.ProjectionLevel3.class.getName() + ")"
-								+ " and involving field path '.level3.level2'" ) );
+						.multilineFailure( "Infinite object projection recursion:",
+								Model.ProjectionLevel2.class.getName() + "("
+										+ Model.class.getName() + ", " + String.class.getName() + ", "
+										+ Model.ProjectionLevel3.class.getName() + ")",
+								"for parameter #2 in " + Model.ProjectionLevel3.class.getName() + "("
+										+ Model.class.getName() + ", " + String.class.getName() + ", *"
+										+ Model.ProjectionLevel2.class.getName() + "*)",
+								"for parameter #2 in " + Model.ProjectionLevel2.class.getName() + "("
+										+ Model.class.getName() + ", " + String.class.getName() + ", *"
+										+ Model.ProjectionLevel3.class.getName() + "*)" ) );
 	}
 
 	// This checks that everything works correctly when a constructor projection

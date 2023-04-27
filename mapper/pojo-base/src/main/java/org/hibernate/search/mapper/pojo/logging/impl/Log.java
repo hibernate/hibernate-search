@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.logging.impl;
 
-import static org.hibernate.search.mapper.pojo.search.definition.impl.PojoConstructorProjectionDefinition.ProjectionConstructorPath;
+import org.hibernate.search.mapper.pojo.model.path.spi.ProjectionConstructorPath;
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
 
@@ -730,10 +730,8 @@ public interface Log extends BasicLogger {
 			@FormatWith(ToStringTreeMultilineFormatter.class) PojoConstructorProjectionDefinition<?> projectionDefinition);
 
 	@Message(id = ID_OFFSET + 118,
-			value = "Infinite object projection recursion starting from projection constructor %1$s and involving field path '%2$s'.")
-	SearchException infiniteRecursionForProjectionConstructor(
-			@FormatWith(PojoConstructorModelFormatter.class) PojoConstructorModel<?> constructorModel,
-			String fieldPath);
+			value = "Infinite object projection recursion:\n%1$s")
+	SearchException infiniteRecursionForProjectionConstructor(ProjectionConstructorPath path);
 
 	@Message(id = ID_OFFSET + 119,
 			value = "Exception while retrieving the Jandex index for code source location '%1$s': %2$s")
