@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -31,7 +32,8 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
-import org.hibernate.search.mapper.orm.automaticindexing.filter.impl.HibernateOrmApplicationAutomaticIndexingTypeFilter;
+import org.hibernate.search.mapper.orm.automaticindexing.filter.impl.HibernateOrmConfiguredSearchIndexingPlanFilter;
+import org.hibernate.search.mapper.orm.automaticindexing.filter.impl.HibernateOrmSearchIndexingPlanFilterContext;
 import org.hibernate.search.mapper.orm.automaticindexing.impl.AutomaticIndexingQueueEventProcessingPlanImpl;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventProcessingPlan;
@@ -59,6 +61,8 @@ import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionMappingContext;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
 import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
+import org.hibernate.search.mapper.pojo.automaticindexing.filter.SearchIndexingPlanFilter;
+import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.ConfiguredSearchIndexingPlanFilter;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
@@ -130,6 +134,9 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	private final int fetchSize;
 
 	private final SchemaManagementListener schemaManagementListener;
+	private final AtomicReference<HibernateOrmConfiguredSearchIndexingPlanFilter> applicationAutomaticIndexingFilter = new AtomicReference<>(
+			HibernateOrmConfiguredSearchIndexingPlanFilter.IncludeAll.INSTANCE
+	);
 
 	private TenancyConfiguration tenancyConfiguration;
 
@@ -273,6 +280,20 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
+	public void indexingPlanFilter(SearchIndexingPlanFilter filter) {
+		HibernateOrmSearchIndexingPlanFilterContext context = new HibernateOrmSearchIndexingPlanFilterContext(
+				typeContextContainer );
+
+		filter.apply( context );
+
+		applicationAutomaticIndexingFilter.set( context.createFilter() );
+	}
+
+	public ConfiguredSearchIndexingPlanFilter applicationAutomaticIndexingFilter() {
+		return applicationAutomaticIndexingFilter.get();
+	}
+
+	@Override
 	public HibernateOrmMapping toConcreteType() {
 		return this;
 	}
@@ -333,7 +354,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		HibernateOrmSearchSession searchSession = HibernateOrmSearchSession.get( this, session, false );
 		if ( searchSession != null ) {
 			// If the session exist, rely on the session-level filter
-			if ( searchSession.indexingTypeFilterHolder().filter().isIncluded( typeIdentifier ) ) {
+			if ( searchSession.automaticIndexingTypeFilter().isIncluded( typeIdentifier ) ) {
 				return searchSession.currentIndexingPlan( true ).typeIfIncludedOrNull( typeIdentifier );
 			}
 			else {
@@ -342,7 +363,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		}
 		else {
 			// If the search session doesn't exist yet, we can safely rely on the global filter
-			if ( HibernateOrmApplicationAutomaticIndexingTypeFilter.applicationFilter().filter().isIncluded( typeIdentifier ) ) {
+			if ( applicationAutomaticIndexingFilter.get().isIncluded( typeIdentifier ) ) {
 				searchSession = HibernateOrmSearchSession.get( this, session, true );
 				return searchSession.currentIndexingPlan( true ).typeIfIncludedOrNull( typeIdentifier );
 			}

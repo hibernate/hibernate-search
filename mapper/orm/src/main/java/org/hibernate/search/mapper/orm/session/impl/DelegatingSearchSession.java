@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsSt
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
-import org.hibernate.search.mapper.pojo.automaticindexing.filter.PojoAutomaticIndexingTypeFilterConfigurer;
+import org.hibernate.search.mapper.pojo.automaticindexing.filter.SearchIndexingPlanFilter;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 
 /**
@@ -107,7 +107,7 @@ public class DelegatingSearchSession implements SearchSession {
 	}
 
 	@Override
-	public void automaticIndexingFilter(PojoAutomaticIndexingTypeFilterConfigurer configurer) {
+	public void automaticIndexingFilter(SearchIndexingPlanFilter configurer) {
 		getDelegate().automaticIndexingFilter( configurer );
 	}
 

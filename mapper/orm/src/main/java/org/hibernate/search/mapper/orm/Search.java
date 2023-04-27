@@ -15,16 +15,12 @@ import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.mapper.orm.automaticindexing.filter.impl.HibernateOrmApplicationAutomaticIndexingTypeFilter;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
 import org.hibernate.search.mapper.orm.search.query.impl.HibernateOrmSearchQueryAdapter;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.impl.DelegatingSearchSession;
-import org.hibernate.search.mapper.pojo.automaticindexing.filter.PojoAutomaticIndexingTypeFilterConfigurer;
-import org.hibernate.search.util.common.annotation.Incubating;
 
 public final class Search {
 
@@ -123,43 +119,7 @@ public final class Search {
 		return HibernateOrmSearchQueryAdapter.create( searchQuery );
 	}
 
-	/**
-	 * Set a filter configuration and define which types must be included/excluded when indexed within the current application
-	 * using a Hibernate ORM {@link SessionFactory}.
-	 * <p>
-	 * By default, all indexed types are included.
-	 *
-	 * @param sessionFactory A Hibernate ORM session factory.
-	 * @param configurer The configurer that provides access to the filter configuration.
-	 */
-	@Incubating
-	public static void automaticIndexingFilter(SessionFactory sessionFactory,
-			PojoAutomaticIndexingTypeFilterConfigurer configurer) {
-		HibernateOrmApplicationAutomaticIndexingTypeFilter.configureFilter(
-				getSearchMapping( HibernateOrmUtils.toSessionFactoryImplementor( sessionFactory ) ),
-				configurer
-		);
-	}
-
-	/**
-	 * Set a filter configuration and define which types must be included/excluded when indexed within the current application
-	 * using a JPA {@link EntityManagerFactory}.
-	 * <p>
-	 * By default, all indexed types are included.
-	 *
-	 * @param entityManagerFactory A JPA entity manager factory.
-	 * @param configurer The configurer that provides access to the filter configuration.
-	 */
-	@Incubating
-	public static void automaticIndexingFilter(EntityManagerFactory entityManagerFactory,
-			PojoAutomaticIndexingTypeFilterConfigurer configurer) {
-		HibernateOrmApplicationAutomaticIndexingTypeFilter.configureFilter(
-				getSearchMapping( HibernateOrmUtils.toSessionFactoryImplementor( entityManagerFactory ) ),
-				configurer
-		);
-	}
-
-	private static HibernateOrmMapping getSearchMapping(SessionFactoryImplementor sessionFactoryImplementor) {
+	private static SearchMapping getSearchMapping(SessionFactoryImplementor sessionFactoryImplementor) {
 		HibernateSearchContextProviderService mappingContextProvider =
 				HibernateSearchContextProviderService.get( sessionFactoryImplementor );
 		return mappingContextProvider.get();

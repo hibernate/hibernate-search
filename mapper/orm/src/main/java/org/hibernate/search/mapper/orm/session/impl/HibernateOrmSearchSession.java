@@ -21,9 +21,8 @@ import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.mapper.orm.automaticindexing.filter.impl.HibernateOrmApplicationAutomaticIndexingTypeFilter;
-import org.hibernate.search.mapper.orm.automaticindexing.filter.impl.HibernateOrmAutomaticIndexingTypeFilter;
-import org.hibernate.search.mapper.orm.automaticindexing.filter.impl.HibernateOrmAutomaticIndexingTypeFilterContext;
+import org.hibernate.search.mapper.orm.automaticindexing.filter.impl.HibernateOrmConfiguredSearchIndexingPlanFilter;
+import org.hibernate.search.mapper.orm.automaticindexing.filter.impl.HibernateOrmSearchIndexingPlanFilterContext;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.DelegatingAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmSelectionLoadingContext;
@@ -41,8 +40,8 @@ import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanSessionContext;
-import org.hibernate.search.mapper.pojo.automaticindexing.filter.PojoAutomaticIndexingTypeFilterConfigurer;
-import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.PojoAutomaticIndexingTypeFilterHolder;
+import org.hibernate.search.mapper.pojo.automaticindexing.filter.SearchIndexingPlanFilter;
+import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.ConfiguredSearchIndexingPlanFilter;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
@@ -104,7 +103,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	private final SessionImplementor sessionImplementor;
 	private final HibernateOrmRuntimeIntrospector runtimeIntrospector;
 	private final ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy;
-	private final PojoAutomaticIndexingTypeFilterHolder automaticIndexingTypeFilterHolder;
+	private ConfiguredSearchIndexingPlanFilter automaticIndexingTypeFilter;
 	private ConfiguredIndexingPlanSynchronizationStrategy indexingPlanSynchronizationStrategy;
 
 	private SearchIndexingPlanImpl indexingPlan;
@@ -116,12 +115,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		this.automaticIndexingStrategy = builder.automaticIndexingStrategy;
 		this.sessionImplementor = builder.sessionImplementor;
 		this.runtimeIntrospector = builder.buildRuntimeIntrospector();
-		this.automaticIndexingTypeFilterHolder = new PojoAutomaticIndexingTypeFilterHolder(
-				// make sure that even if a session filter is not configured we will fall back to an application one if needed.
-				HibernateOrmAutomaticIndexingTypeFilter.create(
-						HibernateOrmApplicationAutomaticIndexingTypeFilter.applicationFilter()
-				)
-		);
+		// make sure that even if a session filter is not configured we will fall back to an application one if needed.
+		this.automaticIndexingTypeFilter = mappingContext.applicationAutomaticIndexingFilter();
 		this.indexingPlanSynchronizationStrategy = automaticIndexingStrategy.defaultIndexingPlanSynchronizationStrategy();
 	}
 
@@ -220,21 +215,21 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public void automaticIndexingFilter(PojoAutomaticIndexingTypeFilterConfigurer configurer) {
-		HibernateOrmAutomaticIndexingTypeFilterContext context = new HibernateOrmAutomaticIndexingTypeFilterContext( typeContextProvider );
-		configurer.configure( context );
-		HibernateOrmAutomaticIndexingTypeFilter filter = context.createFilter(
-				HibernateOrmApplicationAutomaticIndexingTypeFilter.applicationFilter()
+	public void automaticIndexingFilter(SearchIndexingPlanFilter configurer) {
+		HibernateOrmSearchIndexingPlanFilterContext context = new HibernateOrmSearchIndexingPlanFilterContext( typeContextProvider );
+		configurer.apply( context );
+		HibernateOrmConfiguredSearchIndexingPlanFilter filter = context.createFilter(
+				mappingContext.applicationAutomaticIndexingFilter()
 		);
 		if ( automaticIndexingStrategy.usesAsyncProcessing() && !filter.supportsEventQueue() ) {
 			throw log.cannotApplySessionFilterWhenAsyncProcessingIsUsed();
 		}
-		automaticIndexingTypeFilterHolder.filter( filter );
+		automaticIndexingTypeFilter = filter;
 	}
 
 	@Override
-	public PojoAutomaticIndexingTypeFilterHolder indexingTypeFilterHolder() {
-		return automaticIndexingTypeFilterHolder;
+	public ConfiguredSearchIndexingPlanFilter automaticIndexingTypeFilter() {
+		return automaticIndexingTypeFilter;
 	}
 
 	@Override

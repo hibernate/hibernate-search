@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.automaticindexing.filter.spi;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
-public interface PojoAutomaticIndexingTypeFilter {
+public interface ConfiguredSearchIndexingPlanFilter {
 
 	boolean isIncluded(PojoRawTypeIdentifier<?> typeIdentifier);
 

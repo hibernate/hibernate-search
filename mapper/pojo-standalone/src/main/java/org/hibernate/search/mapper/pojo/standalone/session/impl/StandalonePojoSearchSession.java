@@ -13,8 +13,7 @@ import java.util.Collection;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.PojoAutomaticIndexingTypeFilter;
-import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.PojoAutomaticIndexingTypeFilterHolder;
+import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.ConfiguredSearchIndexingPlanFilter;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
@@ -46,7 +45,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 		implements SearchSession, StandalonePojoMassIndexingSessionContext, StandalonePojoLoadingSessionContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-	private static final PojoAutomaticIndexingTypeFilter ACCEPT_ALL = typeIdentifier -> true;
+	private static final ConfiguredSearchIndexingPlanFilter ACCEPT_ALL = typeIdentifier -> true;
 
 	private final StandalonePojoSearchSessionMappingContext mappingContext;
 	private final StandalonePojoSearchSessionTypeContextProvider typeContextProvider;
@@ -55,7 +54,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 
 	private final Consumer<SelectionLoadingOptionsStep> loadingOptionsContributor;
 	private final ConfiguredIndexingPlanSynchronizationStrategyHolder synchronizationStrategyHolder;
-	private final PojoAutomaticIndexingTypeFilterHolder indexingTypeFilterHolder;
+	private final ConfiguredSearchIndexingPlanFilter indexingTypeFilterHolder;
 
 	private SearchIndexingPlanImpl indexingPlan;
 	private SearchIndexer indexer;
@@ -72,7 +71,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 
 		this.indexingPlanSynchronizationStrategy = this.synchronizationStrategyHolder.configureOverriddenSynchronizationStrategy(
 				builder.synchronizationStrategy );
-		this.indexingTypeFilterHolder = new PojoAutomaticIndexingTypeFilterHolder( ACCEPT_ALL );
+		this.indexingTypeFilterHolder = ACCEPT_ALL;
 	}
 
 	private void checkOpenAndThrow() {
@@ -183,7 +182,7 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public PojoAutomaticIndexingTypeFilterHolder indexingTypeFilterHolder() {
+	public ConfiguredSearchIndexingPlanFilter automaticIndexingTypeFilter() {
 		return indexingTypeFilterHolder;
 	}
 
