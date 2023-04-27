@@ -125,19 +125,17 @@ class ProjectionConstructorParameterBinder<P> implements EventContextProvider {
 
 	@SuppressWarnings("resource") // ECJ (Eclipse compiler) incorrectly complains about a resource leak
 	private BeanHolder<? extends ProjectionDefinition<?>> defaultInnerProjection(PojoRawTypeModel<?> elementType, boolean multi) {
-		String innerRelativeFieldPath = paramNameOrFail();
-		PojoConstructorProjectionDefinition<?> definition = createConstructorProjectionDefinitionOrNull(
-				elementType, innerRelativeFieldPath );
+		PojoConstructorProjectionDefinition<?> definition = createConstructorProjectionDefinitionOrNull( elementType );
 		if ( definition != null ) {
 			return BeanHolder.ofCloseable( multi
-					? new ObjectProjectionDefinition.MultiValued<>( innerRelativeFieldPath, definition )
-					: new ObjectProjectionDefinition.SingleValued<>( innerRelativeFieldPath, definition ) );
+					? new ObjectProjectionDefinition.MultiValued<>( paramNameOrFail(), definition )
+					: new ObjectProjectionDefinition.SingleValued<>( paramNameOrFail(), definition ) );
 		}
 		else {
 			// No projection constructor for this type; assume it's a projection on value field
 			return BeanHolder.of( multi
-					? new FieldProjectionDefinition.MultiValued<>( innerRelativeFieldPath, elementType.typeIdentifier().javaClass() )
-					: new FieldProjectionDefinition.SingleValued<>( innerRelativeFieldPath, elementType.typeIdentifier().javaClass() ) );
+					? new FieldProjectionDefinition.MultiValued<>( paramNameOrFail(), elementType.typeIdentifier().javaClass() )
+					: new FieldProjectionDefinition.SingleValued<>( paramNameOrFail(), elementType.typeIdentifier().javaClass() ) );
 		}
 	}
 
@@ -150,8 +148,7 @@ class ProjectionConstructorParameterBinder<P> implements EventContextProvider {
 	}
 
 	<T> PojoConstructorProjectionDefinition<T> createConstructorProjectionDefinitionOrNull(
-			PojoRawTypeModel<T> projectedType,
-			String relativeFieldPath) {
+			PojoRawTypeModel<T> projectedType) {
 		PojoConstructorProjectionDefinition<T> result = null;
 		for ( PojoTypeMetadataContributor contributor : mappingHelper.contributorProvider()
 				// Constructor mapping is not inherited
@@ -164,8 +161,7 @@ class ProjectionConstructorParameterBinder<P> implements EventContextProvider {
 					}
 					PojoConstructorModel<T> constructor = projectedType.constructor(
 							constructorMapping.parametersJavaTypes() );
-					result = new ProjectionConstructorBinder<>(
-							mappingHelper, constructor, this, relativeFieldPath )
+					result = new ProjectionConstructorBinder<>( mappingHelper, constructor, this )
 							.bind();
 				}
 			}

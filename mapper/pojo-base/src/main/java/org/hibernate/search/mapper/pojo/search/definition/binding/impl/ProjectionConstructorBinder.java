@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -19,7 +18,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoMethodParameterModel;
 import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
+import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorIdentifier;
 import org.hibernate.search.mapper.pojo.search.definition.impl.PojoConstructorProjectionDefinition;
+import org.hibernate.search.mapper.pojo.model.path.spi.ProjectionConstructorPath;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
@@ -29,19 +30,19 @@ public class ProjectionConstructorBinder<T> implements EventContextProvider {
 
 	private final PojoMappingHelper mappingHelper;
 	private final ProjectionConstructorParameterBinder<?> parent;
-	private final String relativeFieldPath;
 	final PojoConstructorModel<T> constructor;
+	final PojoConstructorIdentifier constructorIdentifier;
 
 	public ProjectionConstructorBinder(PojoMappingHelper mappingHelper, PojoConstructorModel<T> constructor) {
-		this( mappingHelper, constructor, null, null );
+		this( mappingHelper, constructor, null );
 	}
 
 	public ProjectionConstructorBinder(PojoMappingHelper mappingHelper, PojoConstructorModel<T> constructor,
-			ProjectionConstructorParameterBinder<?> parent, String relativeFieldPath) {
+			ProjectionConstructorParameterBinder<?> parent) {
 		this.mappingHelper = mappingHelper;
 		this.parent = parent;
-		this.relativeFieldPath = relativeFieldPath;
 		this.constructor = constructor;
+		this.constructorIdentifier = new PojoConstructorIdentifier( constructor );
 	}
 
 	@Override
@@ -58,14 +59,9 @@ public class ProjectionConstructorBinder<T> implements EventContextProvider {
 			throw log.invalidAbstractTypeForProjectionConstructor(
 					constructor.typeModel() );
 		}
-		if ( parent != null ) {
-			String path = parent.parent.getPathFromSameProjectionConstructor( constructor );
-			if ( path != null ) {
-				throw log.infiniteRecursionForProjectionConstructor(
-						constructor,
-						FieldPaths.compose( path, relativeFieldPath )
-				);
-			}
+		ProjectionConstructorPath path = getPathFromSameProjectionConstructor();
+		if ( path != null ) {
+			throw log.infiniteRecursionForProjectionConstructor( path );
 		}
 		List<BeanHolder<? extends ProjectionDefinition<?>>> parameterDefinitions = new ArrayList<>();
 		for ( PojoMethodParameterModel<?> parameter : constructor.declaredParameters() ) {
@@ -85,16 +81,24 @@ public class ProjectionConstructorBinder<T> implements EventContextProvider {
 			}
 			parameterDefinitions.add( parameterDefinition );
 		}
-		return new PojoConstructorProjectionDefinition<>( constructor, parameterDefinitions );
+		return new PojoConstructorProjectionDefinition<>( constructorIdentifier, constructor.handle(), parameterDefinitions );
 	}
 
-	private String getPathFromSameProjectionConstructor(PojoConstructorModel<?> constructorToMatch) {
+	private ProjectionConstructorPath getPathFromSameProjectionConstructor() {
+		if ( parent == null ) {
+			return null;
+		}
+		ProjectionConstructorBinder<?> matchingAncestor = parent.parent.getMatchingAncestor( constructor );
+		return matchingAncestor == null ? null : parent.parent.createPath( matchingAncestor,
+				new ProjectionConstructorPath( constructorIdentifier ), parent.parameter.index() );
+	}
+
+	private ProjectionConstructorBinder<?> getMatchingAncestor(PojoConstructorModel<?> constructorToMatch) {
 		if ( this.constructor.equals( constructorToMatch ) ) {
-			return "";
+			return this;
 		}
 		else if ( parent != null ) {
-			String path = parent.parent.getPathFromSameProjectionConstructor( constructorToMatch );
-			return path == null ? null : FieldPaths.compose( path, relativeFieldPath );
+			return parent.parent.getMatchingAncestor( constructorToMatch );
 		}
 		else {
 			// This is the root.
@@ -103,4 +107,15 @@ public class ProjectionConstructorBinder<T> implements EventContextProvider {
 		}
 	}
 
+	private ProjectionConstructorPath createPath(ProjectionConstructorBinder<?> firstElement, ProjectionConstructorPath child, int childPosition) {
+		ProjectionConstructorPath pathFromSelf = new ProjectionConstructorPath( new PojoConstructorIdentifier( constructor ), child, childPosition );
+		if ( this == firstElement ) {
+			return pathFromSelf;
+		}
+		else {
+			return parent.parent.createPath( firstElement, pathFromSelf, parent.parameter.index() );
+		}
+	}
+
 }
+

@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.search.definition.impl;
 
-import static org.hibernate.search.mapper.pojo.search.definition.impl.PojoConstructorProjectionDefinition.ProjectionConstructorPath;
-
+import org.hibernate.search.mapper.pojo.model.path.spi.ProjectionConstructorPath;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 
