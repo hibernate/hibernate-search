@@ -14,13 +14,13 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmAutomaticIndexingTypeFilterTypeContextProvider;
-import org.hibernate.search.mapper.pojo.automaticindexing.filter.PojoAutomaticIndexingTypeFilterContext;
-import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.PojoAutomaticIndexingTypeFilterHolder;
+import org.hibernate.search.mapper.pojo.automaticindexing.filter.SearchIndexingPlanFilterContext;
+import org.hibernate.search.mapper.pojo.automaticindexing.filter.spi.ConfiguredSearchIndexingPlanFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class HibernateOrmAutomaticIndexingTypeFilterContext implements PojoAutomaticIndexingTypeFilterContext {
+public class HibernateOrmSearchIndexingPlanFilterContext implements SearchIndexingPlanFilterContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -29,13 +29,13 @@ public class HibernateOrmAutomaticIndexingTypeFilterContext implements PojoAutom
 	private final Set<PojoRawTypeIdentifier<?>> includes = new HashSet<>();
 	private final Set<PojoRawTypeIdentifier<?>> excludes = new HashSet<>();
 
-	public HibernateOrmAutomaticIndexingTypeFilterContext(
+	public HibernateOrmSearchIndexingPlanFilterContext(
 			HibernateOrmAutomaticIndexingTypeFilterTypeContextProvider typeManager) {
 		this.contextProvider = typeManager;
 	}
 
 	@Override
-	public PojoAutomaticIndexingTypeFilterContext include(String name) {
+	public SearchIndexingPlanFilterContext include(String name) {
 		addIfNotPresentInOther(
 				contextProvider.byEntityName().getOrFail( name ).typeIdentifier(),
 				includes,
@@ -45,7 +45,7 @@ public class HibernateOrmAutomaticIndexingTypeFilterContext implements PojoAutom
 	}
 
 	@Override
-	public PojoAutomaticIndexingTypeFilterContext include(Class<?> clazz) {
+	public SearchIndexingPlanFilterContext include(Class<?> clazz) {
 		addIfNotPresentInOther(
 				contextProvider.indexedWithSuperTypesByExactClass().getOrFail( clazz ),
 				includes,
@@ -55,7 +55,7 @@ public class HibernateOrmAutomaticIndexingTypeFilterContext implements PojoAutom
 	}
 
 	@Override
-	public PojoAutomaticIndexingTypeFilterContext exclude(String name) {
+	public SearchIndexingPlanFilterContext exclude(String name) {
 		addIfNotPresentInOther(
 				contextProvider.byEntityName().getOrFail( name ).typeIdentifier(),
 				excludes,
@@ -65,7 +65,7 @@ public class HibernateOrmAutomaticIndexingTypeFilterContext implements PojoAutom
 	}
 
 	@Override
-	public PojoAutomaticIndexingTypeFilterContext exclude(Class<?> clazz) {
+	public SearchIndexingPlanFilterContext exclude(Class<?> clazz) {
 		addIfNotPresentInOther(
 				contextProvider.indexedWithSuperTypesByExactClass().getOrFail( clazz ),
 				excludes,
@@ -74,11 +74,11 @@ public class HibernateOrmAutomaticIndexingTypeFilterContext implements PojoAutom
 		return this;
 	}
 
-	public HibernateOrmAutomaticIndexingTypeFilter createFilter() {
+	public HibernateOrmConfiguredSearchIndexingPlanFilter createFilter() {
 		return createFilter( null );
 	}
 
-	public HibernateOrmAutomaticIndexingTypeFilter createFilter(PojoAutomaticIndexingTypeFilterHolder fallback) {
+	public HibernateOrmConfiguredSearchIndexingPlanFilter createFilter(ConfiguredSearchIndexingPlanFilter fallback) {
 		Set<PojoRawTypeIdentifier<?>> allIncludes = new HashSet<>();
 		Set<PojoRawTypeIdentifier<?>> allExcludes = new HashSet<>();
 		boolean allTypesProcessed = true;
@@ -117,18 +117,25 @@ public class HibernateOrmAutomaticIndexingTypeFilterContext implements PojoAutom
 					allIncludes.add( typedIdentifier );
 				}
 				else {
-					// if we don't find either include or exclude then we will defer the decision to either app filter or to a default (include)
-					// but that will happen in the filter.
-					allTypesProcessed = false;
+					if ( fallback == null ) {
+						// types are included by default
+						allIncludes.add( typedIdentifier );
+					}
+					else {
+						if ( fallback.isIncluded( typedIdentifier ) ) {
+							allIncludes.add( typedIdentifier );
+						}
+						else {
+							allExcludes.add( typedIdentifier );
+						}
+					}
 				}
 			}
 		}
 
-		return HibernateOrmAutomaticIndexingTypeFilter.create(
-				fallback,
+		return HibernateOrmConfiguredSearchIndexingPlanFilter.create(
 				Collections.unmodifiableSet( allIncludes ),
-				Collections.unmodifiableSet( allExcludes ),
-				allTypesProcessed
+				Collections.unmodifiableSet( allExcludes )
 		);
 	}
 

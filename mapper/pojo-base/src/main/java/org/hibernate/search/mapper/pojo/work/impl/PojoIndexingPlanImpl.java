@@ -121,7 +121,7 @@ public class PojoIndexingPlanImpl
 	@Override
 	public AbstractPojoTypeIndexingPlan<?, ?, ?> typeIfIncludedOrNull(PojoRawTypeIdentifier<?> typeIdentifier) {
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = typeOrNull( typeIdentifier );
-		if ( delegate == null && sessionContext.indexingTypeFilterHolder().filter().isIncluded( typeIdentifier ) ) {
+		if ( delegate == null && sessionContext.automaticIndexingTypeFilter().isIncluded( typeIdentifier ) ) {
 			delegate = createDelegate( typeIdentifier );
 		}
 		return delegate;
@@ -267,7 +267,7 @@ public class PojoIndexingPlanImpl
 	}
 
 	private AbstractPojoTypeIndexingPlan<?, ?, ?> createDelegate(PojoRawTypeIdentifier<?> typeIdentifier) {
-		if ( !sessionContext.indexingTypeFilterHolder().filter().isIncluded( typeIdentifier ) ) {
+		if ( !sessionContext.automaticIndexingTypeFilter().isIncluded( typeIdentifier ) ) {
 			throw log.attemptToCreateIndexingPlanForExcludedType( typeIdentifier );
 		}
 		PojoWorkTypeContext<?, ?> typeContext = typeContextProvider.forExactType( typeIdentifier );

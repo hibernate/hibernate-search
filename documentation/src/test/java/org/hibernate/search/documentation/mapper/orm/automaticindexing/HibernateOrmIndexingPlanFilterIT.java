@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HibernateOrmAutomaticIndexingFilterIT {
+public class HibernateOrmIndexingPlanFilterIT {
 
 	@Rule
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
@@ -40,19 +40,10 @@ public class HibernateOrmAutomaticIndexingFilterIT {
 				.setup( EntityA.class, EntityExtendsA1.class, EntityExtendsA2.class );
 	}
 
-	@Before
-	public void clearFilter() throws Exception {
-		Search.automaticIndexingFilter(
-				entityManagerFactory,
-				ctx -> { /*clear out any settings from tests*/ }
-		);
-	}
-
 	@Test
 	public void applicationFilterOnly() {
 		// tag::application-filter[]
-		Search.automaticIndexingFilter( // <1>
-				entityManagerFactory,
+		Search.mapping( entityManagerFactory ).indexingPlanFilter( // <1>
 				ctx -> ctx.exclude( EntityA.class ) // <2>
 						.include( EntityExtendsA2.class )
 		);

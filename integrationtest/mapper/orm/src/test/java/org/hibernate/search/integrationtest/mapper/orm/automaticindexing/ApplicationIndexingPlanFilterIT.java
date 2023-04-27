@@ -15,12 +15,11 @@ import org.hibernate.search.util.common.SearchException;
 
 import org.junit.Test;
 
-public class ApplicationAutomaticIndexingFilterIT extends AbstractAutomaticIndexingFilterIT {
+public class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 
 	@Test
 	public void directPersistUpdateDeleteApplicationFilter() {
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
+		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
 				ctx -> ctx.exclude( IndexedEntity.class )
 		);
 		setupHolder.runInTransaction( session -> {
@@ -42,8 +41,7 @@ public class ApplicationAutomaticIndexingFilterIT extends AbstractAutomaticIndex
 		} );
 		backendMock.verifyExpectationsMet();
 
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
+		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
 				ctx -> ctx.exclude( IndexedEntity.class )
 		);
 		setupHolder.runInTransaction( session -> {
@@ -66,8 +64,7 @@ public class ApplicationAutomaticIndexingFilterIT extends AbstractAutomaticIndex
 
 	@Test
 	public void directPersistUpdateDeleteApplicationFilterByName() {
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
+		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
 				ctx -> ctx.exclude( IndexedEntity.INDEX )
 		);
 		setupHolder.runInTransaction( session -> {
@@ -89,8 +86,7 @@ public class ApplicationAutomaticIndexingFilterIT extends AbstractAutomaticIndex
 		} );
 		backendMock.verifyExpectationsMet();
 
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
+		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
 				ctx -> ctx.exclude( IndexedEntity.INDEX )
 		);
 		setupHolder.runInTransaction( session -> {
@@ -114,8 +110,7 @@ public class ApplicationAutomaticIndexingFilterIT extends AbstractAutomaticIndex
 	@Test
 	public void hierarchyFiltering() {
 		// exclude all except one specific class.
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
+		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
 				ctx -> ctx.exclude( EntityA.class )
 						.include( Entity2A.class )
 		);
@@ -132,8 +127,7 @@ public class ApplicationAutomaticIndexingFilterIT extends AbstractAutomaticIndex
 		backendMock.verifyExpectationsMet();
 
 		// exclude all except one class branch.
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
+		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
 				ctx -> ctx.exclude( EntityA.class )
 						.include( Entity1A.class )
 		);
@@ -151,8 +145,7 @@ public class ApplicationAutomaticIndexingFilterIT extends AbstractAutomaticIndex
 		backendMock.verifyExpectationsMet();
 
 		// only include - should include all since no excludes.
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
+		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
 				ctx -> ctx.include( Entity1A.class )
 		);
 		setupHolder.runInTransaction( session -> {
@@ -176,8 +169,7 @@ public class ApplicationAutomaticIndexingFilterIT extends AbstractAutomaticIndex
 	@Test
 	public void sameClassFails() {
 		assertThatThrownBy( () ->
-				Search.automaticIndexingFilter(
-						setupHolder.entityManagerFactory(),
+				Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
 						ctx -> ctx.exclude( EntityA.class )
 								.include( EntityA.class )
 				)
@@ -190,8 +182,7 @@ public class ApplicationAutomaticIndexingFilterIT extends AbstractAutomaticIndex
 				);
 
 		assertThatThrownBy( () ->
-				Search.automaticIndexingFilter(
-						setupHolder.entityManagerFactory(),
+				Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
 						ctx -> ctx.include( EntityA.class )
 								.exclude( EntityA.class )
 				)
@@ -207,8 +198,7 @@ public class ApplicationAutomaticIndexingFilterIT extends AbstractAutomaticIndex
 	@Test
 	public void sameNameFails() {
 		assertThatThrownBy( () ->
-				Search.automaticIndexingFilter(
-						setupHolder.entityManagerFactory(),
+				Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
 						ctx -> ctx.include( EntityA.INDEX )
 								.exclude( EntityA.INDEX )
 				)
@@ -223,8 +213,7 @@ public class ApplicationAutomaticIndexingFilterIT extends AbstractAutomaticIndex
 
 	@Test
 	public void applicationFilterDisableAll() {
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
+		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
 				ctx -> ctx.exclude( EntityA.class )
 		);
 		setupHolder.runInTransaction( session -> {
@@ -238,8 +227,7 @@ public class ApplicationAutomaticIndexingFilterIT extends AbstractAutomaticIndex
 
 	@Test
 	public void applicationFilterDisableAllByName() {
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
+		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
 				ctx -> ctx.exclude( EntityA.INDEX )
 		);
 		setupHolder.runInTransaction( session -> {
@@ -247,26 +235,6 @@ public class ApplicationAutomaticIndexingFilterIT extends AbstractAutomaticIndex
 			session.persist( new Entity1A( 2, "test" ) );
 			session.persist( new Entity1B( 3, "test" ) );
 			session.persist( new Entity2A( 4, "test" ) );
-		} );
-		backendMock.verifyExpectationsMet();
-	}
-
-	@Test
-	public void applicationFilterOnly() {
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
-				ctx -> ctx.exclude( EntityA.class )
-						.include( Entity2A.class )
-		);
-
-		setupHolder.runInTransaction( session -> {
-			session.persist( new EntityA( 10, "test" ) );
-			session.persist( new Entity1A( 20, "test" ) );
-			session.persist( new Entity1B( 30, "test" ) );
-			session.persist( new Entity2A( 40, "test" ) );
-
-			backendMock.expectWorks( Entity2A.INDEX )
-					.add( "40", b -> b.field( "indexedField", "test" ) );
 		} );
 		backendMock.verifyExpectationsMet();
 	}

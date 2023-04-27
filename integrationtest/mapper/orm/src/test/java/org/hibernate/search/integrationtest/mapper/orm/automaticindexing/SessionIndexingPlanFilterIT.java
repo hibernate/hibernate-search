@@ -15,7 +15,7 @@ import org.hibernate.search.util.common.SearchException;
 
 import org.junit.Test;
 
-public class SessionAutomaticIndexingFilterIT extends AbstractAutomaticIndexingFilterIT {
+public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 
 	@Test
 	public void directPersistUpdateDelete() {
@@ -128,53 +128,6 @@ public class SessionAutomaticIndexingFilterIT extends AbstractAutomaticIndexingF
 	}
 
 	@Test
-	public void directPersistUpdateDeleteApplicationFilter() {
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
-				ctx -> ctx.exclude( IndexedEntity.class )
-		);
-		setupHolder.runInTransaction( session -> {
-
-			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
-			entity1.setIndexedField( "initialValue" );
-
-			ContainedEntity entity2 = new ContainedEntity();
-			entity2.setId( 100 );
-			entity2.setIndexedField( "initialValue" );
-
-			entity2.setContainingAsIndexedEmbedded( entity1 );
-			entity1.setContainedIndexedEmbedded( Arrays.asList( entity2 ) );
-
-			session.persist( entity1 );
-			session.persist( entity2 );
-
-		} );
-		backendMock.verifyExpectationsMet();
-
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
-				ctx -> ctx.exclude( IndexedEntity.class )
-		);
-		setupHolder.runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
-			entity1.setIndexedField( "updatedValue" );
-
-		} );
-		backendMock.verifyExpectationsMet();
-
-		setupHolder.runInTransaction( session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
-
-			entity1.getContainedIndexedEmbedded().forEach( e -> e.setContainingAsIndexedEmbedded( null ) );
-
-			session.remove( entity1 );
-
-		} );
-		backendMock.verifyExpectationsMet();
-	}
-
-	@Test
 	public void hierarchyFiltering() {
 		// exclude all except one specific class.
 		setupHolder.runInTransaction( session -> {
@@ -276,8 +229,7 @@ public class SessionAutomaticIndexingFilterIT extends AbstractAutomaticIndexingF
 
 	@Test
 	public void applicationFilterDisableAll() {
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
+		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
 				ctx -> ctx.exclude( EntityA.class )
 		);
 		setupHolder.runInTransaction( session -> {
@@ -304,8 +256,7 @@ public class SessionAutomaticIndexingFilterIT extends AbstractAutomaticIndexingF
 
 	@Test
 	public void applicationFilterExcludeSessionInclude() {
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
+		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
 				ctx -> ctx.exclude( Entity2A.class )
 		);
 
@@ -390,6 +341,23 @@ public class SessionAutomaticIndexingFilterIT extends AbstractAutomaticIndexingF
 							"No matching entity type for class",
 							IndexedNotAnEntity.class.getName(),
 							"Either this class is not an entity type, or the entity type is not mapped in Hibernate Search"
+					);
+		} );
+	}
+
+	@Test
+	public void filterBySomeString() {
+		setupHolder.runInTransaction( session -> {
+			String name = "this is not a name that should work";
+			assertThatThrownBy( () ->
+					Search.session( session ).automaticIndexingFilter(
+							ctx -> ctx.exclude( name )
+					)
+			).isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							"No matching entity type for name",
+							name,
+							"Either this is not the name of an entity type, or the entity type is not mapped in Hibernate Search"
 					);
 		} );
 	}

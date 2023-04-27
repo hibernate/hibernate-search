@@ -13,15 +13,15 @@ import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
-import org.hibernate.search.mapper.pojo.automaticindexing.filter.PojoAutomaticIndexingTypeFilterConfigurer;
+import org.hibernate.search.mapper.pojo.automaticindexing.filter.SearchIndexingPlanFilter;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -252,10 +252,10 @@ public interface SearchSession {
 	/**
 	 * Set a filter configuration and define which types must be included/excluded when indexed within the current session.
 	 * If the type is not explicitly included/excluded directly or as a supertype the decision will be made by
-	 * {@link org.hibernate.search.mapper.orm.Search#automaticIndexingFilter(SessionFactory, PojoAutomaticIndexingTypeFilterConfigurer) an application filter}.
+	 * {@link SearchMapping#indexingPlanFilter(SearchIndexingPlanFilter) an application filter}, which defaults to including all types.
 	 *
 	 * @param configurer The configurer that provides access to the filter configuration.
 	 */
 	@Incubating
-	void automaticIndexingFilter(PojoAutomaticIndexingTypeFilterConfigurer configurer);
+	void automaticIndexingFilter(SearchIndexingPlanFilter configurer);
 }

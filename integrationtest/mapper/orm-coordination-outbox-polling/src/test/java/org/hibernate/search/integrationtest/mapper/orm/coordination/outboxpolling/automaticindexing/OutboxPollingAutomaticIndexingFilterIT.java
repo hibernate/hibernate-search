@@ -54,8 +54,7 @@ public class OutboxPollingAutomaticIndexingFilterIT {
 
 	@Before
 	public void clearFilter() throws Exception {
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
+		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
 				ctx -> { /*clear out any settings from tests*/ }
 		);
 	}

@@ -14,12 +14,13 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * Usually a lambda is expected by the method that receive this type as an input parameter.
  */
 @Incubating
-public interface PojoAutomaticIndexingTypeFilterConfigurer {
+@FunctionalInterface
+public interface SearchIndexingPlanFilter {
 	/**
-	 * This method is invoked by the indexing filter to configure itself.
+	 * This method is invoked filtering of types to be indexed.
 	 *
 	 * @param context The context exposing include/exclude methods to configure the filter.
 	 */
-	void configure(PojoAutomaticIndexingTypeFilterContext context);
+	void apply(SearchIndexingPlanFilterContext context);
 
 }

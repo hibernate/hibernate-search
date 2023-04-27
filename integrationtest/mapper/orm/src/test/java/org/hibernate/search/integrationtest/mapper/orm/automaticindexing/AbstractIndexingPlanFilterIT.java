@@ -31,7 +31,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.MethodRule;
 
-public class AbstractAutomaticIndexingFilterIT {
+public abstract class AbstractIndexingPlanFilterIT {
 
 	@ClassRule
 	public static BackendMock backendMock = new BackendMock();
@@ -71,8 +71,7 @@ public class AbstractAutomaticIndexingFilterIT {
 
 	@Before
 	public void clearFilter() throws Exception {
-		Search.automaticIndexingFilter(
-				setupHolder.entityManagerFactory(),
+		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
 				ctx -> { /*clear out any settings from tests*/ }
 		);
 	}

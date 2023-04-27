@@ -154,7 +154,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			// Can happen with contained types depending on the strategy.
 			return;
 		}
-		if ( sessionContext.indexingTypeFilterHolder().filter().isIncluded( typeContext().typeIdentifier() ) ) {
+		if ( sessionContext.automaticIndexingTypeFilter().isIncluded( typeContext().typeIdentifier() ) ) {
 			for ( S state : statesPerId.values() ) {
 				state.sendCommandsToDelegate( loadingPlanProvider );
 			}

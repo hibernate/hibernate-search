@@ -34,42 +34,42 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * </ul>
  */
 @Incubating
-public interface PojoAutomaticIndexingTypeFilterContext {
+public interface SearchIndexingPlanFilterContext {
 
 	/**
-	 * Specify an indexed type to include.
+	 * Specify an indexed type to include, along with (unless specified otherwise) all its subtypes.
 	 *
 	 * @param name The name of an indexed type.
 	 * @return The same context, for chained calls.
 	 *
 	 * @see Indexed#index()
 	 */
-	PojoAutomaticIndexingTypeFilterContext include(String name);
+	SearchIndexingPlanFilterContext include(String name);
 
 	/**
-	 * Specify an indexed type to include.
+	 * Specify an indexed type to include, along with (unless specified otherwise) all its subtypes.
 	 *
 	 * @param clazz The class of an indexed type.
 	 * @return The same context, for chained calls.
 	 */
-	PojoAutomaticIndexingTypeFilterContext include(Class<?> clazz);
+	SearchIndexingPlanFilterContext include(Class<?> clazz);
 
 	/**
-	 * Specify an indexed type to exclude.
+	 * Specify an indexed type to exclude, along with (unless specified otherwise) all its subtypes.
 	 *
 	 * @param name The name of an indexed type.
 	 * @return The same context, for chained calls.
 	 *
 	 * @see Indexed#index()
 	 */
-	PojoAutomaticIndexingTypeFilterContext exclude(String name);
+	SearchIndexingPlanFilterContext exclude(String name);
 
 	/**
-	 * Specify an indexed type to exclude.
+	 * Specify an indexed type to exclude, along with (unless specified otherwise) all its subtypes.
 	 *
 	 * @param clazz The class of an indexed type.
 	 * @return The same context, for chained calls.
 	 */
-	PojoAutomaticIndexingTypeFilterContext exclude(Class<?> clazz);
+	SearchIndexingPlanFilterContext exclude(Class<?> clazz);
 
 }
