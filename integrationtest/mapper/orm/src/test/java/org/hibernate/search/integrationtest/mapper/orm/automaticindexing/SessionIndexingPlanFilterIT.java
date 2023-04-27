@@ -20,7 +20,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	@Test
 	public void directPersistUpdateDelete() {
 		setupHolder.runInTransaction( session -> {
-			Search.session( session ).automaticIndexingFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
 
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -40,7 +40,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		backendMock.verifyExpectationsMet();
 
 		setupHolder.runInTransaction( session -> {
-			Search.session( session ).automaticIndexingFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
 
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.setIndexedField( "updatedValue" );
@@ -49,7 +49,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		backendMock.verifyExpectationsMet();
 
 		setupHolder.runInTransaction( session -> {
-			Search.session( session ).automaticIndexingFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
 
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 
@@ -64,7 +64,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	@Test
 	public void directPersistUpdateDeleteOfNotDisabledEntity() {
 		setupHolder.runInTransaction( session -> {
-			Search.session( session ).automaticIndexingFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
 
 			IndexedEntity entity0 = new IndexedEntity();
 			entity0.setId( 1 );
@@ -96,7 +96,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		backendMock.verifyExpectationsMet();
 
 		setupHolder.runInTransaction( session -> {
-			Search.session( session ).automaticIndexingFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
 
 			OtherIndexedEntity entity1 = session.get( OtherIndexedEntity.class, 10 );
 			entity1.setIndexedField( "updatedValue" );
@@ -110,7 +110,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		backendMock.verifyExpectationsMet();
 
 		setupHolder.runInTransaction( session -> {
-			Search.session( session ).automaticIndexingFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( IndexedEntity.class ) );
 
 			IndexedEntity entity0 = session.get( IndexedEntity.class, 1 );
 			OtherIndexedEntity entity1 = session.get( OtherIndexedEntity.class, 10 );
@@ -131,7 +131,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	public void hierarchyFiltering() {
 		// exclude all except one specific class.
 		setupHolder.runInTransaction( session -> {
-			Search.session( session ).automaticIndexingFilter( ctx -> ctx.exclude( EntityA.class )
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( EntityA.class )
 					.include( Entity2A.class ) );
 
 			session.persist( new EntityA( 1, "test" ) );
@@ -146,7 +146,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 
 		// exclude all except one class branch.
 		setupHolder.runInTransaction( session -> {
-			Search.session( session ).automaticIndexingFilter( ctx -> ctx.exclude( EntityA.class )
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( EntityA.class )
 					.include( Entity1A.class ) );
 
 			session.persist( new EntityA( 10, "test" ) );
@@ -163,7 +163,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 
 		// only include - should include all since no excludes.
 		setupHolder.runInTransaction( session -> {
-			Search.session( session ).automaticIndexingFilter( ctx -> ctx.include( Entity1A.class ) );
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.include( Entity1A.class ) );
 
 			session.persist( new EntityA( 100, "test" ) );
 			session.persist( new Entity1A( 200, "test" ) );
@@ -186,7 +186,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	public void sameClassFails() {
 		setupHolder.runInTransaction( session -> {
 			assertThatThrownBy( () ->
-					Search.session( session ).automaticIndexingFilter( ctx -> ctx.exclude( EntityA.class )
+					Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( EntityA.class )
 							.include( EntityA.class ) )
 			).isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
@@ -197,7 +197,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 					);
 
 			assertThatThrownBy( () ->
-					Search.session( session ).automaticIndexingFilter( ctx -> ctx.include( EntityA.class )
+					Search.session( session ).indexingPlanFilter( ctx -> ctx.include( EntityA.class )
 							.exclude( EntityA.class ) )
 			).isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
@@ -213,7 +213,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	public void sameNameFails() {
 		setupHolder.runInTransaction( session -> {
 			assertThatThrownBy( () ->
-					Search.session( session ).automaticIndexingFilter(
+					Search.session( session ).indexingPlanFilter(
 							ctx -> ctx.include( EntityA.INDEX )
 									.exclude( EntityA.INDEX )
 					)
@@ -241,7 +241,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		backendMock.verifyExpectationsMet();
 
 		setupHolder.runInTransaction( session -> {
-			Search.session( session ).automaticIndexingFilter( ctx -> ctx.include( Entity2A.class ) );
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.include( Entity2A.class ) );
 
 			session.persist( new EntityA( 10, "test" ) );
 			session.persist( new Entity1A( 20, "test" ) );
@@ -261,7 +261,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		);
 
 		setupHolder.runInTransaction( session -> {
-			Search.session( session ).automaticIndexingFilter( ctx -> ctx.include( Entity2A.class ) );
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.include( Entity2A.class ) );
 
 			session.persist( new Entity2A( 40, "test" ) );
 
@@ -272,9 +272,30 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	}
 
 	@Test
+	public void applicationFilterIncludeOneSubtypeSessionIncludesAnother() {
+		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+				ctx -> ctx.exclude( EntityA.class )
+						.include( Entity1B.class )
+		);
+
+		setupHolder.runInTransaction( session -> {
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.include( Entity2A.class ) );
+
+			session.persist( new Entity1B( 30, "test" ) );
+			session.persist( new Entity2A( 40, "test" ) );
+
+			backendMock.expectWorks( Entity1B.INDEX )
+					.add( "30", b -> b.field( "indexedField", "test" ) );
+			backendMock.expectWorks( Entity2A.INDEX )
+					.add( "40", b -> b.field( "indexedField", "test" ) );
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
 	public void filterByMappedSuperclass() {
 		setupHolder.runInTransaction( session -> {
-			Search.session( session ).automaticIndexingFilter( ctx -> ctx.exclude( SuperClass.class ) );
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( SuperClass.class ) );
 
 			session.persist( new EntityFromSuperclass( 100, "test" ) );
 		} );
@@ -285,14 +306,14 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	public void filterByNotIndexedEntity() {
 		setupHolder.runInTransaction( session -> {
 			assertThatThrownBy( () ->
-					Search.session( session ).automaticIndexingFilter(
+					Search.session( session ).indexingPlanFilter(
 							ctx -> ctx.exclude( SimpleNotIndexedEntity.class )
 					)
 			).isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
 							"No matching entity type for class",
 							SimpleNotIndexedEntity.class.getName(),
-							"Either this class is not an entity type, or the entity type is not mapped in Hibernate Search"
+							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type"
 					);
 		} );
 	}
@@ -301,14 +322,14 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	public void filterByRandomClass() {
 		setupHolder.runInTransaction( session -> {
 			assertThatThrownBy( () ->
-					Search.session( session ).automaticIndexingFilter(
+					Search.session( session ).indexingPlanFilter(
 							ctx -> ctx.exclude( NotAnEntity.class )
 					)
 			).isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
 							"No matching entity type for class",
 							NotAnEntity.class.getName(),
-							"Either this class is not an entity type, or the entity type is not mapped in Hibernate Search"
+							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type"
 					);
 		} );
 	}
@@ -317,14 +338,14 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	public void filterByNotIndexedEntityFormSupertypeWithIndexedSubtype() {
 		setupHolder.runInTransaction( session -> {
 			assertThatThrownBy( () ->
-					Search.session( session ).automaticIndexingFilter(
+					Search.session( session ).indexingPlanFilter(
 							ctx -> ctx.exclude( NotIndexedEntityFromSuperclass.class )
 					)
 			).isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
 							"No matching entity type for class",
 							NotIndexedEntityFromSuperclass.class.getName(),
-							"Either this class is not an entity type, or the entity type is not mapped in Hibernate Search"
+							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type"
 					);
 		} );
 	}
@@ -333,14 +354,42 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	public void filterByIndexedTypeNotAnEntity() {
 		setupHolder.runInTransaction( session -> {
 			assertThatThrownBy( () ->
-					Search.session( session ).automaticIndexingFilter(
+					Search.session( session ).indexingPlanFilter(
 							ctx -> ctx.exclude( IndexedNotAnEntity.class )
 					)
 			).isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
 							"No matching entity type for class",
 							IndexedNotAnEntity.class.getName(),
-							"Either this class is not an entity type, or the entity type is not mapped in Hibernate Search"
+							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type"
+					);
+		} );
+	}
+
+	@Test
+	public void filterByIntegerShouldFail() {
+		setupHolder.runInTransaction( session -> {
+			assertThatThrownBy( () ->
+					Search.session( session ).indexingPlanFilter(
+							ctx -> ctx.include( Integer.class )
+					)
+			).isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							"No matching entity type for class",
+							Integer.class.getName(),
+							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type"
+					);
+		} );
+		setupHolder.runInTransaction( session -> {
+			assertThatThrownBy( () ->
+					Search.session( session ).indexingPlanFilter(
+							ctx -> ctx.exclude( Integer.class )
+					)
+			).isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							"No matching entity type for class",
+							Integer.class.getName(),
+							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type"
 					);
 		} );
 	}
@@ -350,14 +399,26 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		setupHolder.runInTransaction( session -> {
 			String name = "this is not a name that should work";
 			assertThatThrownBy( () ->
-					Search.session( session ).automaticIndexingFilter(
+					Search.session( session ).indexingPlanFilter(
 							ctx -> ctx.exclude( name )
 					)
 			).isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
-							"No matching entity type for name",
+							"No matching entity type for the name",
 							name,
-							"Either this is not the name of an entity type, or the entity type is not mapped in Hibernate Search"
+							"This name represents neither an entity type mapped in Hibernate Search nor a superclass of such entity type",
+							"Valid entity type names are"
+					);
+			assertThatThrownBy( () ->
+					Search.session( session ).indexingPlanFilter(
+							ctx -> ctx.include( name )
+					)
+			).isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							"No matching entity type for the name",
+							name,
+							"This name represents neither an entity type mapped in Hibernate Search nor a superclass of such entity type",
+							"Valid entity type names are"
 					);
 		} );
 	}
@@ -366,7 +427,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	public void filterByContainedEntityWontAffectContainingOnes() {
 		setupHolder.runInTransaction( session -> {
 			// to prepare data we ignore containing/indexed entity
-			Search.session( session ).automaticIndexingFilter(
+			Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( IndexedEntity.class )
 			);
 
@@ -389,7 +450,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 
 		setupHolder.runInTransaction( session -> {
 			// now disable contained entity to not produce updates on containing:
-			Search.session( session ).automaticIndexingFilter(
+			Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( ContainedEntity.class )
 			);
 			ContainedEntity entity1 = session.get( ContainedEntity.class, 100 );
@@ -397,7 +458,7 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 		} );
 
 		setupHolder.runInTransaction( session -> {
-			Search.session( session ).automaticIndexingFilter(
+			Search.session( session ).indexingPlanFilter(
 					ctx -> ctx.exclude( IndexedEntity.class )
 			);
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
@@ -414,16 +475,35 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 	public void filterByInterfaceMustFail() {
 		setupHolder.runInTransaction( session -> {
 			assertThatThrownBy( () ->
-					Search.session( session ).automaticIndexingFilter(
+					Search.session( session ).indexingPlanFilter(
 							ctx -> ctx.exclude( InterfaceA.class )
 					)
 			).isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
 							"No matching entity type for class",
 							InterfaceA.class.getName(),
-							"Either this class is not an entity type, or the entity type is not mapped in Hibernate Search.",
-							"Valid classes for mapped entity types are: "
+							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type."
+					);
+			assertThatThrownBy( () ->
+					Search.session( session ).indexingPlanFilter(
+							ctx -> ctx.include( InterfaceA.class )
+					)
+			).isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							"No matching entity type for class",
+							InterfaceA.class.getName(),
+							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type."
 					);
 		} );
+	}
+
+	@Test
+	public void excludeByNameOfNotIndexedSupertype() {
+		setupHolder.runInTransaction( session -> {
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( NotIndexedEntity.NAME ) );
+
+			session.persist( new IndexedSubtypeOfNotIndexedEntity( 40, "test", "test" ) );
+		} );
+		backendMock.verifyExpectationsMet();
 	}
 }

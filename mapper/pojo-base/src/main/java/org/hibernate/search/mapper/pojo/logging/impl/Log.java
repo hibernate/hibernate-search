@@ -790,6 +790,32 @@ public interface Log extends BasicLogger {
 	SearchException unableToExportSchema(String cause, @Cause Exception e, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 128,
-			value = "Indexing plan for '%1$s' cannot be created as this type is excluded by the automatic indexing type filter.")
+			value = "Indexing plan for '%1$s' cannot be created as this type is excluded by the indexing plan filter.")
 	SearchException attemptToCreateIndexingPlanForExcludedType(PojoRawTypeIdentifier<?> typeIdentifier);
+
+	@Message(id = ID_OFFSET + 129,
+			value = "'%1$s' cannot be included and excluded at the same time within one filter. " +
+					"Already included types: '%2$s'. " +
+					"Already excluded types: '%3$s'.")
+	SearchException indexingPlanFilterCannotIncludeExcludeSameType(PojoRawTypeIdentifier<?> typeIdentifier,
+			Set<PojoRawTypeIdentifier<?>> includes, Set<PojoRawTypeIdentifier<?>> excludes);
+
+	@Message(id = ID_OFFSET + 130,
+			value = "No matching entity type for class '%1$s'."
+					+ " This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type."
+					+ " Note interfaces are not considered superclasses and are not permitted here."
+					+ " Valid classes are: %2$s")
+	SearchException unknownClassForNonInterfaceSuperType(@FormatWith(ClassFormatter.class) Class<?> invalidClass,
+			@FormatWith(CommaSeparatedClassesFormatter.class) Collection<Class<?>> validClasses);
+
+	@Message(id = ID_OFFSET + 131,
+			value = "No matching entity type for the name '%1$s'."
+					+ " This name represents neither an entity type mapped in Hibernate Search nor a superclass of such entity type."
+					+ " Valid entity type names are: %2$s")
+	SearchException unknownEntityNameForAnyEntityByName(String invalidName, Collection<String> validNames);
+
+	@Message(id = ID_OFFSET + 132,
+			value = "No matching supertype type for type identifier '%1$s'."
+					+ " Valid identifiers for indexed entity types are: %2$s")
+	SearchException unknownSupertypeTypeIdentifier(PojoRawTypeIdentifier<?> typeIdentifier, Set<PojoRawTypeIdentifier<?>> availableTypeIdentifiers);
 }

@@ -18,14 +18,16 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReferenceFactoryDelegate;
-import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
-import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider;
+import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanFilter;
+import org.hibernate.search.mapper.pojo.work.spi.ConfiguredSearchIndexingPlanFilter;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 public interface PojoMappingDelegate extends AutoCloseable {
@@ -62,4 +64,7 @@ public interface PojoMappingDelegate extends AutoCloseable {
 			PojoIndexingQueueEventSendingPlan sendingPlan);
 
 	PojoIndexer createIndexer(PojoWorkSessionContext context);
+
+	ConfiguredSearchIndexingPlanFilter configuredSearchIndexingPlanFilter(SearchIndexingPlanFilter filter,
+			ConfiguredSearchIndexingPlanFilter fallback);
 }

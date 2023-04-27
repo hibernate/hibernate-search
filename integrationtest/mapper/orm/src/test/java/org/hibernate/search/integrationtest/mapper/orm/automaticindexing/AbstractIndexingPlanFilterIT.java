@@ -61,11 +61,13 @@ public abstract class AbstractIndexingPlanFilterIT {
 				.expectSchema( Entity1A.INDEX, b -> b.field( "indexedField", String.class ) )
 				.expectSchema( Entity2A.INDEX, b -> b.field( "indexedField", String.class ) )
 				.expectSchema( Entity1B.INDEX, b -> b.field( "indexedField", String.class ) )
-				.expectSchema( EntityFromSuperclass.INDEX, b -> b.field( "indexedField", String.class ) );
+				.expectSchema( EntityFromSuperclass.INDEX, b -> b.field( "indexedField", String.class ) )
+				.expectSchema( IndexedSubtypeOfNotIndexedEntity.INDEX, b -> b.field( "indexedField", String.class ) );
 
 		setupContext.withAnnotatedTypes( IndexedEntity.class, OtherIndexedEntity.class, ContainedEntity.class,
 				EntityA.class, Entity1A.class, Entity1B.class, Entity2A.class, EntityFromSuperclass.class, SuperClass.class,
-				SimpleNotIndexedEntity.class, NotIndexedEntityFromSuperclass.class
+				SimpleNotIndexedEntity.class, NotIndexedEntityFromSuperclass.class,
+				NotIndexedEntity.class, IndexedSubtypeOfNotIndexedEntity.class
 		);
 	}
 
@@ -432,4 +434,65 @@ public abstract class AbstractIndexingPlanFilterIT {
 		}
 	}
 
+	@Entity(name = NotIndexedEntity.NAME)
+	public static class NotIndexedEntity {
+		public static final String NAME = "NotIndexedEntity";
+
+		@Id
+		private Integer id;
+
+		@Basic
+		private String nonIndexedField;
+
+		public NotIndexedEntity() {
+		}
+
+		public NotIndexedEntity(Integer id, String nonIndexedField) {
+			this.id = id;
+			this.nonIndexedField = nonIndexedField;
+		}
+
+		public Integer getId() {
+			return id;
+		}
+
+		public void setId(Integer id) {
+			this.id = id;
+		}
+
+		public String getNonIndexedField() {
+			return nonIndexedField;
+		}
+
+		public void setNonIndexedField(String nonIndexedField) {
+			this.nonIndexedField = nonIndexedField;
+		}
+	}
+
+	@Entity(name = IndexedSubtypeOfNotIndexedEntity.INDEX)
+	@Indexed
+	public static class IndexedSubtypeOfNotIndexedEntity extends NotIndexedEntity {
+
+		public static final String INDEX = "IndexedSubtypeOfNotIndexed";
+		@Basic
+		@GenericField
+		private String indexedField;
+
+		public IndexedSubtypeOfNotIndexedEntity() {
+			super();
+		}
+
+		public IndexedSubtypeOfNotIndexedEntity(Integer id, String nonIndexedField, String indexedField) {
+			super( id, nonIndexedField );
+			this.indexedField = indexedField;
+		}
+
+		public String getIndexedField() {
+			return indexedField;
+		}
+
+		public void setIndexedField(String indexedField) {
+			this.indexedField = indexedField;
+		}
+	}
 }

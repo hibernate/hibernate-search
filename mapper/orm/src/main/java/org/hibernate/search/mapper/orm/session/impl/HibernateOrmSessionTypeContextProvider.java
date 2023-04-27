@@ -13,7 +13,6 @@ import org.hibernate.search.util.common.data.spi.KeyValueProvider;
 
 public interface HibernateOrmSessionTypeContextProvider
 		extends HibernateOrmRuntimeIntrospectorTypeContextProvider,
-		HibernateOrmAutomaticIndexingTypeFilterTypeContextProvider,
 		SearchIndexingPlanTypeContextProvider, LoadingIndexedTypeContextProvider {
 
 	KeyValueProvider<String, ? extends HibernateOrmSessionTypeContext<?>> byJpaEntityName();

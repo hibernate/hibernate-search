@@ -17,4 +17,6 @@ public interface PojoWorkTypeContextProvider {
 
 	KeyValueProvider<String, ? extends PojoWorkTypeContext<?,?>> byEntityName();
 
+	KeyValueProvider<String, PojoRawTypeIdentifier<?>> typeIdentifierByEntityName();
+
 }

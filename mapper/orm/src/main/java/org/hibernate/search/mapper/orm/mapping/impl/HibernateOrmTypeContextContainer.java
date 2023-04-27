@@ -44,7 +44,6 @@ class HibernateOrmTypeContextContainer
 	private final KeyValueProvider<String, AbstractHibernateOrmTypeContext<?>> byHibernateOrmEntityName;
 	private final KeyValueProvider<String, AbstractHibernateOrmTypeContext<?>> byJpaEntityName;
 	private final KeyValueProvider<String, HibernateOrmIndexedTypeContext<?>> indexedByJpaEntityName;
-	private final KeyValueProvider<Class<?>, PojoRawTypeIdentifier<?>> indexedWithSuperTypesByExactClass;
 
 	private HibernateOrmTypeContextContainer(Builder builder, SessionFactoryImplementor sessionFactory) {
 		this.typeIdentifierResolver = builder.basicTypeMetadataProvider.getTypeIdentifierResolver();
@@ -58,7 +57,6 @@ class HibernateOrmTypeContextContainer
 		Map<String, AbstractHibernateOrmTypeContext<?>> byJpaEntityNameContent = new LinkedHashMap<>();
 		Map<String, HibernateOrmIndexedTypeContext<?>> indexedByJpaEntityNameContent = new LinkedHashMap<>();
 		Map<String, AbstractHibernateOrmTypeContext<?>> byHibernateOrmEntityNameContent = new LinkedHashMap<>();
-		Map<Class<?>, PojoRawTypeIdentifier<?>> indexedWithSuperTypesByExactClassContent = new LinkedHashMap<>();
 		for ( HibernateOrmIndexedTypeContext.Builder<?> contextBuilder : builder.indexedTypeContextBuilders ) {
 			HibernateOrmIndexedTypeContext<?> typeContext = contextBuilder.build( sessionFactory );
 			PojoRawTypeIdentifier<?> typeIdentifier = typeContext.typeIdentifier();
@@ -82,12 +80,6 @@ class HibernateOrmTypeContextContainer
 			indexedByJpaEntityNameContent.put( typeContext.jpaEntityName(), typeContext );
 
 			byHibernateOrmEntityNameContent.put( typeContext.hibernateOrmEntityName(), typeContext );
-
-			for ( PojoRawTypeIdentifier<?> superType : typeContext.ascendingSuperTypes() ) {
-				if ( isManagedType( sessionFactory, superType.javaClass() ) ) {
-					indexedWithSuperTypesByExactClassContent.put( superType.javaClass(), superType );
-				}
-			}
 		}
 		for ( HibernateOrmContainedTypeContext.Builder<?> contextBuilder : builder.containedTypeContextBuilders ) {
 			HibernateOrmContainedTypeContext<?> typeContext = contextBuilder.build( sessionFactory );
@@ -107,12 +99,6 @@ class HibernateOrmTypeContextContainer
 			byJpaEntityNameContent.put( typeContext.jpaEntityName(), typeContext );
 
 			byHibernateOrmEntityNameContent.put( typeContext.hibernateOrmEntityName(), typeContext );
-
-			for ( PojoRawTypeIdentifier<?> superType : typeContext.ascendingSuperTypes() ) {
-				if ( isManagedType( sessionFactory, superType.javaClass() ) ) {
-					indexedWithSuperTypesByExactClassContent.put( superType.javaClass(), superType );
-				}
-			}
 		}
 		this.byTypeIdentifier = new KeyValueProvider<>( byTypeIdentifierContent, log::unknownTypeIdentifierForMappedEntityType );
 		this.indexedByTypeIdentifier = new KeyValueProvider<>( indexedByTypeIdentifierContent, log::unknownTypeIdentifierForIndexedEntityType );
@@ -123,17 +109,6 @@ class HibernateOrmTypeContextContainer
 		this.byJpaEntityName = new KeyValueProvider<>( byJpaEntityNameContent, log::unknownJpaEntityNameForMappedEntityType );
 		this.indexedByJpaEntityName = new KeyValueProvider<>( indexedByJpaEntityNameContent, log::unknownJpaEntityNameForIndexedEntityType );
 		this.byHibernateOrmEntityName = new KeyValueProvider<>( byHibernateOrmEntityNameContent, log::unknownHibernateOrmEntityNameForMappedEntityType );
-		this.indexedWithSuperTypesByExactClass = new KeyValueProvider<>( indexedWithSuperTypesByExactClassContent, log::unknownClassForMappedEntityType );
-	}
-
-	private boolean isManagedType(SessionFactoryImplementor sessionFactory, Class<?> javaClass) {
-		try {
-			sessionFactory.getMetamodel().managedType( javaClass );
-		}
-		catch (Exception e) {
-			return false;
-		}
-		return true;
 	}
 
 	@Override
@@ -185,10 +160,6 @@ class HibernateOrmTypeContextContainer
 	@Override
 	public KeyValueProvider<String, AbstractHibernateOrmTypeContext<?>> byHibernateOrmEntityName() {
 		return byHibernateOrmEntityName;
-	}
-
-	public KeyValueProvider<Class<?>, PojoRawTypeIdentifier<?>> indexedWithSuperTypesByExactClass() {
-		return indexedWithSuperTypesByExactClass;
 	}
 
 	Collection<? extends HibernateOrmIndexedTypeContext<?>> allIndexed() {
