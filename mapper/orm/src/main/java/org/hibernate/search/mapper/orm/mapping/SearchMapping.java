@@ -123,9 +123,11 @@ public interface SearchMapping {
 	Backend backend(String backendName);
 
 	/**
-	 * Set a filter defining which types must be included/excluded when indexed within the current application.
+	 * Set a filter defining which types must be included/excluded when indexed within indexing plans (either automatically or manually).
 	 * <p>
-	 * By default, all indexed types are included.
+	 * This does not affect indexing that does not rely on indexing plans, like the mass indexer.
+	 * <p>
+	 * By default, all indexed and contained types are included.
 	 *
 	 * @param filter The filter that includes/excludes types when indexed.
 	 */

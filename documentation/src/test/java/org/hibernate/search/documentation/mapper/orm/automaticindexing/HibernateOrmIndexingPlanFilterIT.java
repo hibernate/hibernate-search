@@ -19,6 +19,8 @@ import javax.persistence.InheritanceType;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
@@ -43,8 +45,12 @@ public class HibernateOrmIndexingPlanFilterIT {
 	@Test
 	public void applicationFilterOnly() {
 		// tag::application-filter[]
-		Search.mapping( entityManagerFactory ).indexingPlanFilter( // <1>
-				ctx -> ctx.exclude( EntityA.class ) // <2>
+		SearchMapping searchMapping = /* ... */ // <1>
+				// end::application-filter[]
+				Search.mapping( entityManagerFactory );
+		// tag::application-filter[]
+		searchMapping.indexingPlanFilter( // <2>
+				ctx -> ctx.exclude( EntityA.class ) // <3>
 						.include( EntityExtendsA2.class )
 		);
 		// end::application-filter[]
@@ -68,11 +74,14 @@ public class HibernateOrmIndexingPlanFilterIT {
 	public void sessionFilterOnly() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::session-filter[]
-			Search.session( entityManager ) // <1>
-					.indexingPlanFilter( // <2>
-							ctx -> ctx.exclude( EntityA.class )
-									.include( EntityExtendsA2.class )
-					);
+			SearchSession session = /* ... */ // <1>
+					// end::session-filter[]
+					Search.session( entityManager );
+			// tag::session-filter[]
+			session.indexingPlanFilter(
+					ctx -> ctx.exclude( EntityA.class ) // <2>
+							.include( EntityExtendsA2.class )
+			);
 			// end::session-filter[]
 
 			entityManager.persist( new EntityA( 10, "test" ) );
@@ -87,6 +96,73 @@ public class HibernateOrmIndexingPlanFilterIT {
 					.where( f -> f.matchAll() )
 					.fetchAllHits()
 			).containsOnly( 30 );
+		} );
+	}
+
+	@Test
+	public void disableAll() {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			// tag::session-filter-exclude-all[]
+			SearchSession searchSession = /* ... */ // <1>
+					// end::session-filter-exclude-all[]
+					Search.session( entityManager );
+			// tag::session-filter-exclude-all[]
+			searchSession.indexingPlanFilter(
+					ctx -> ctx.exclude( Object.class ) // <2>
+			);
+			// end::session-filter-exclude-all[]
+
+			entityManager.persist( new EntityA( 10, "test" ) );
+			entityManager.persist( new EntityExtendsA1( 20, "test" ) );
+			entityManager.persist( new EntityExtendsA2( 30, "test" ) );
+		} );
+
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			// Nothing is getting indexed:
+			assertThat( Search.session( entityManager ).search( EntityA.class )
+					.select( f -> f.id() )
+					.where( f -> f.matchAll() )
+					.fetchAllHits()
+			).isEmpty();
+		} );
+	}
+
+	@Test
+	public void disableAllApplicationEnableSession() {
+		// tag::session-filter-exclude-include-all-application[]
+		SearchMapping searchMapping = /* ... */ // <1>
+				// end::session-filter-exclude-include-all-application[]
+				Search.mapping( entityManagerFactory );
+		// tag::session-filter-exclude-include-all-application[]
+		searchMapping.indexingPlanFilter(
+				ctx -> ctx.exclude( Object.class ) // <2>
+		);
+		// end::session-filter-exclude-include-all-application[]
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			// tag::session-filter-exclude-include-all-session[]
+			SearchSession searchSession = /* ... */ // <3>
+					// end::session-filter-exclude-include-all-session[]
+					Search.session( entityManager );
+			// tag::session-filter-exclude-include-all-session[]
+			searchSession.indexingPlanFilter(
+					ctx -> ctx.include( Object.class ) // <4>
+			);
+			// end::session-filter-exclude-include-all-session[]
+
+			entityManager.persist( new EntityA( 10, "test" ) );
+			entityManager.persist( new EntityExtendsA1( 20, "test" ) );
+			entityManager.persist( new EntityExtendsA2( 30, "test" ) );
+		} );
+
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			// Nothing is getting indexed:
+			assertThat( Search.session( entityManager ).search( EntityA.class )
+					.select( f -> f.id() )
+					.where( f -> f.matchAll() )
+					.fetchAllHits()
+			).containsOnly(
+					10, 20, 30
+			);
 		} );
 	}
 
