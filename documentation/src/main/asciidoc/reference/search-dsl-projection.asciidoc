@@ -248,6 +248,9 @@ or (failing that) are projected from the index if the entity type declares a <<m
 If neither loading configuration nor projection constructor are found,
 the `entity` projection will simply fail.
 
+[[search-dsl-projection-entity-syntax]]
+=== Syntax
+
 .Returning matched entities loaded from the database
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -260,6 +263,63 @@ NOTE: If an entity cannot be loaded from the external datastore/database
 (e.g. it was deleted there, and the index wasn't updated yet),
 the hit will be omitted and won't appear in the returned `List` at all.
 The total hit count, however, will not take this omission into account.
+
+[[search-dsl-projection-entity-requested-type]]
+=== Requesting a specific entity type
+
+In some (rare) cases, the code creating the projection
+may have to work with a `SearchProjectionFactory<?, ?>`,
+i.e. a factory that carries no information regarding the type of loaded entities.
+
+In those cases, it's possible to request a specific type of entities:
+Hibernate Search will check when the projection is created that
+the requested type matches the type of loaded entities.
+
+.Requesting a specific entity type when for the `entity` projection
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=entity-requested-type]
+----
+====
+
+[[search-dsl-projection-entity-mapping]]
+=== `@EntityProjection` in projections to custom types
+
+To achieve a `entity` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+use the `@EntityProjection` annotation:
+
+.Returning matched entities loaded from the database within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookEntityAndTitleProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the entity with `@EntityProjection`.
+<3> The type of the constructor parameter must be assignable from the searched entity type --
+*all* of them in the case of <<search-dsl-query-targeting-multiple,queries targeting multiple indexes>>.
+<4> You can of course also declare other parameters with different projections;
+in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-entity]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested entity and field.
+====
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `EntityProjectionBinder.create()`.
+
+.Programmatic mapping of an `entity` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-entity-projection]
+----
+====
 
 [[search-dsl-projection-field]]
 == `field`: return field values from matched documents

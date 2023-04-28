@@ -13,7 +13,7 @@ public final class StubBackendUtils {
 	private StubBackendUtils() {
 	}
 
-	public static DocumentReference reference(String indexName, String id) {
-		return new StubDocumentReference( indexName, id );
+	public static DocumentReference reference(String typeName, String id) {
+		return new StubDocumentReference( typeName, id );
 	}
 }

@@ -85,7 +85,13 @@ public abstract class AbstractSearchProjectionFactory<
 
 	@Override
 	public EntityProjectionOptionsStep<?, E> entity() {
-		return new EntityProjectionOptionsStepImpl<>( dslContext, this );
+		return new EntityProjectionOptionsStepImpl<>( dslContext, this, null );
+	}
+
+	@Override
+	public <T> EntityProjectionOptionsStep<?, T> entity(Class<T> requestedEntityType) {
+		Contracts.assertNotNull( requestedEntityType, "requestedEntityType" );
+		return new EntityProjectionOptionsStepImpl<>( dslContext, this, requestedEntityType );
 	}
 
 	@Override

@@ -85,15 +85,29 @@ public interface SearchProjectionFactory<R, E> {
 	<I> IdProjectionOptionsStep<?, I> id(Class<I> requestedIdentifierType);
 
 	/**
-	 * Project to the entity was originally indexed.
+	 * Project to the entity that was originally indexed.
 	 * <p>
 	 * The actual type of the entity depends on the mapper used to create the query
 	 * and on the indexes targeted by your query:
-	 * the ORM mapper will return a managed entity loaded from the database, for example.
+	 * the Hibernate ORM mapper will return a managed entity loaded from the database, for example.
 	 *
 	 * @return A DSL step where the "entity" projection can be defined in more details.
 	 */
 	EntityProjectionOptionsStep<?, E> entity();
+
+	/**
+	 * Project to the entity that was originally indexed.
+	 * <p>
+	 * The expected type will be checked against the actual type of the entity,
+	 * which depends on the mapper used to create the query
+	 * and on the indexes targeted by your query:
+	 * the Hibernate ORM mapper will return a managed entity loaded from the database, for example.
+	 *
+	 * @param requestedEntityType The requested type for returned entities.
+	 * Must be exactly the type of entities targeted by the search, or a supertype.
+	 * @return A DSL step where the "entity" projection can be defined in more details.
+	 */
+	<T> EntityProjectionOptionsStep<?, T> entity(Class<T> requestedEntityType);
 
 	/**
 	 * Project to the value of a field in the indexed document.

@@ -198,6 +198,27 @@ public class ProjectionDslIT {
 	}
 
 	@Test
+	public void entity_requestedType() {
+		withinSearchSession( searchSession -> {
+			List<Book> hits = searchSession.search( Book.class )
+					.select( f ->
+							// tag::entity-requested-type[]
+							f.entity( Book.class )
+							// end::entity-requested-type[]
+					)
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 );
+			Session session = searchSession.toOrmSession();
+			assertThat( hits ).containsExactlyInAnyOrder(
+					session.getReference( Book.class, BOOK1_ID ),
+					session.getReference( Book.class, BOOK2_ID ),
+					session.getReference( Book.class, BOOK3_ID ),
+					session.getReference( Book.class, BOOK4_ID )
+			);
+		} );
+	}
+
+	@Test
 	public void field() {
 		withinSearchSession( searchSession -> {
 			// tag::field[]

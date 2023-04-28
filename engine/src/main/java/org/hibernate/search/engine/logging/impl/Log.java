@@ -542,4 +542,10 @@ public interface Log extends BasicLogger {
 			value = "Parameter with name '%1$s' was not defined on projection definition '%2$s'.")
 	SearchException paramNotDefined(String paramName, ProjectionDefinition<?> definition);
 
+	@Message(id = ID_OFFSET + 118,
+			value = "Invalid type for entity projection on type '%1$s':"
+					+ " the entity type's Java class '%2$s' does not extend the requested projection type '%3$s'.")
+	SearchException invalidTypeForEntityProjection(String name, @FormatWith(ClassFormatter.class) Class<?> entityType,
+			@FormatWith(ClassFormatter.class) Class<?> requestedEntityType);
+
 }
