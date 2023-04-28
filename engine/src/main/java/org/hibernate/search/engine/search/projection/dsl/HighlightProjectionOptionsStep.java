@@ -16,7 +16,8 @@ public interface HighlightProjectionOptionsStep extends HighlightProjectionFinal
 	/**
 	 * Defines a name of a named highlighter to be used by this field projection.
 	 *
-	 * @param highlighterName a name of a named highlighter.
+	 * @param highlighterName The name of a highlighter
+	 * {@link org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep#highlighter(String, Function) defined on the query}.
 	 *
 	 * @return A final step to finish the definition of a highlight projection.
 	 *

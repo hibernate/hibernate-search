@@ -857,4 +857,17 @@ public interface Log extends BasicLogger {
 					+ " or set the path explicitly with '@ObjectProjection(path = ...)'.")
 	SearchException missingParameterNameForObjectProjectionInProjectionConstructor();
 
+	@Message(id = ID_OFFSET + 140,
+			value = "Missing parameter names in Java metadata for projection constructor."
+					+ " When mapping a projection constructor parameter to a highlight projection without providing a field path,"
+					+ " constructor parameter names must be known."
+					+ " Either make sure this class was compiled with the '-parameters' compiler flag,"
+					+ " or set the path explicitly with '@HighlightProjection(path = ...)'.")
+	SearchException missingParameterNameForHighlightProjectionInProjectionConstructor();
+
+	@Message(id = ID_OFFSET + 141,
+			value = "Invalid constructor parameter type: '%1$s'. The highlight projection results in values of type 'List<String>'.")
+	SearchException invalidParameterTypeForHighlightProjectionInProjectionConstructor(
+			@FormatWith(ClassFormatter.class) Class<?> rawClass);
+
 }
