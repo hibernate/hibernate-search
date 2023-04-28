@@ -16,7 +16,7 @@ import org.apache.lucene.util.BytesRef;
 public class MetadataFields {
 
 	private static final FieldType METADATA_FIELD_TYPE_WITH_INDEX;
-	private static final FieldType METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES;
+	private static final FieldType METADATA_FIELD_TYPE_WITH_DOCVALUES;
 	static {
 		METADATA_FIELD_TYPE_WITH_INDEX = new FieldType();
 		METADATA_FIELD_TYPE_WITH_INDEX.setTokenized( false );
@@ -24,17 +24,19 @@ public class MetadataFields {
 		METADATA_FIELD_TYPE_WITH_INDEX.setIndexOptions( IndexOptions.DOCS );
 		METADATA_FIELD_TYPE_WITH_INDEX.freeze();
 
-		METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES = new FieldType();
-		METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES.setTokenized( false );
-		METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES.setOmitNorms( true );
-		METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES.setIndexOptions( IndexOptions.DOCS );
-		METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES.setDocValuesType( DocValuesType.BINARY );
-		METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES.freeze();
+		METADATA_FIELD_TYPE_WITH_DOCVALUES = new FieldType();
+		METADATA_FIELD_TYPE_WITH_DOCVALUES.setTokenized( false );
+		METADATA_FIELD_TYPE_WITH_DOCVALUES.setOmitNorms( true );
+		METADATA_FIELD_TYPE_WITH_DOCVALUES.setIndexOptions( IndexOptions.NONE );
+		METADATA_FIELD_TYPE_WITH_DOCVALUES.setDocValuesType( DocValuesType.BINARY );
+		METADATA_FIELD_TYPE_WITH_DOCVALUES.freeze();
 	}
 
 	private static final String INTERNAL_FIELD_PREFIX = "__HSEARCH_";
 
 	private static final String ID_FIELD_NAME = internalFieldName( "id" );
+
+	private static final String ID_DOCVALUE_FIELD_NAME = internalFieldName( "id_docvalue" );
 
 	private static final String ROUTING_KEY_FIELD_NAME = internalFieldName( "routing_key" );
 
@@ -64,12 +66,16 @@ public class MetadataFields {
 		return new Field( name, value, METADATA_FIELD_TYPE_WITH_INDEX );
 	}
 
-	public static IndexableField searchableRetrievableMetadataField(String name, String value) {
-		return new Field( name, new BytesRef( value ), METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES );
+	public static IndexableField retrievableMetadataField(String name, String value) {
+		return new Field( name, new BytesRef( value ), METADATA_FIELD_TYPE_WITH_DOCVALUES );
 	}
 
 	public static String idFieldName() {
 		return ID_FIELD_NAME;
+	}
+
+	public static String idDocValueFieldName() {
+		return ID_DOCVALUE_FIELD_NAME;
 	}
 
 	public static String routingKeyFieldName() {
