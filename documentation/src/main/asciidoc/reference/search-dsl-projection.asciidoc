@@ -155,6 +155,9 @@ include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/
 
 The `entityReference` projection returns a reference to the matched entity as an `EntityReference` object.
 
+[[search-dsl-projection-reference-syntax]]
+=== Syntax
+
 .Returning references to matched entities
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -165,6 +168,43 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 
 NOTE: The entity does not get loaded as part of the projection.
 If you want the actual entity instance, use the <<search-dsl-projection-entity,`entity` projection>>
+
+[[search-dsl-projection-reference-mapping]]
+=== `@EntityReferenceProjection` in projections to custom types
+
+To achieve an `entityReference` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+use the `@EntityReferenceProjection` annotation:
+
+.Returning references to matched entities within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookEntityRefAndTitleProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the entity reference with `@EntityReferenceProjection`.
+<3> The type of the constructor parameter must be assignable from `EntityReference`.
+<4> You can of course also declare other parameters with different projections;
+in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-entity-reference]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested entity reference and field.
+====
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `EntityReferenceProjectionBinder.create()`.
+
+.Programmatic mapping of an `entityReference` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-entity-reference-projection]
+----
+====
 
 [[search-dsl-projection-id]]
 == [[_id_return_identifiers_of_matched_entities]] `id`: return identifiers of matched entities
