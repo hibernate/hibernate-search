@@ -33,14 +33,14 @@ public abstract class DocumentReferenceValues<R> implements Values<R> {
 	private String currentLeafMappedTypeName;
 	private BinaryDocValues currentLeafIdDocValues;
 
-	public DocumentReferenceValues(CollectorExecutionContext executionContext) {
+	protected DocumentReferenceValues(CollectorExecutionContext executionContext) {
 		this.metadataResolver = executionContext.getMetadataResolver();
 	}
 
 	@Override
 	public final void context(LeafReaderContext context) throws IOException {
 		this.currentLeafMappedTypeName = metadataResolver.resolveMappedTypeName( context );
-		this.currentLeafIdDocValues = DocValues.getBinary( context.reader(), MetadataFields.idFieldName() );
+		this.currentLeafIdDocValues = DocValues.getBinary( context.reader(), MetadataFields.idDocValueFieldName() );
 	}
 
 	@Override
