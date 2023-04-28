@@ -21,6 +21,12 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * <p>
  * The content of the object projection is defined in the constructor parameter type
  * by another {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor}.
+ * <p>
+ * Compared to the basic {@link CompositeProjectionBinder composite projection},
+ * an object projection is bound to a specific object field,
+ * and thus it yields zero, one or many values, as many as there are objects in the targeted object field.
+ * Therefore, you must take care of using a {@code List<...>} as your constructor parameter type
+ * if the object field is multi-valued.
  *
  * @see org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory#object(String)
  * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)

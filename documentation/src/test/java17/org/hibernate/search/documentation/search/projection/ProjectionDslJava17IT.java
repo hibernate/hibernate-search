@@ -26,6 +26,7 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
+import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.CompositeProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.DocumentReferenceProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.EntityProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.EntityReferenceProjectionBinder;
@@ -67,7 +68,8 @@ public class ProjectionDslJava17IT {
 						MyBookScoreAndTitleProjection.class,
 						MyBookDocRefAndTitleProjection.class,
 						MyBookEntityAndTitleProjection.class,
-						MyBookEntityRefAndTitleProjection.class ),
+						MyBookEntityRefAndTitleProjection.class,
+						MyBookMiscInfoAndTitleProjection.class, MyBookMiscInfoAndTitleProjection.MiscInfo.class ),
 				mapping -> {
 					var bookMapping = mapping.type( Book.class );
 					bookMapping.indexed();
@@ -77,6 +79,10 @@ public class ProjectionDslJava17IT {
 					bookMapping.property( "description" )
 							.fullTextField()
 							.analyzer( "english" ).projectable( Projectable.YES );
+					bookMapping.property( "genre" )
+							.keywordField().projectable( Projectable.YES );
+					bookMapping.property( "pageCount" )
+							.genericField().projectable( Projectable.YES );
 					bookMapping.property( "authors" )
 							.indexedEmbedded()
 							.structure( ObjectStructure.NESTED );
@@ -172,6 +178,18 @@ public class ProjectionDslJava17IT {
 					myBookTitleAndAuthorsProjection.mainConstructor().parameter( 1 )
 							.projection( ObjectProjectionBinder.create( "mainAuthor" ) );
 					//end::programmatic-object-projection[]
+
+					//tag::programmatic-composite-projection[]
+					TypeMappingStep myBookMiscInfoAndTitleProjection =
+							mapping.type( MyBookMiscInfoAndTitleProjection.class );
+					myBookMiscInfoAndTitleProjection.mainConstructor()
+							.projectionConstructor();
+					myBookMiscInfoAndTitleProjection.mainConstructor().parameter( 0 )
+							.projection( CompositeProjectionBinder.create() );
+					TypeMappingStep miscInfoProjection =
+							mapping.type( MyBookMiscInfoAndTitleProjection.MiscInfo.class );
+					miscInfoProjection.mainConstructor().projectionConstructor();
+					//end::programmatic-composite-projection[]
 				}
 		);
 	}
@@ -421,6 +439,28 @@ public class ProjectionDslJava17IT {
 											.map( a -> new MyAuthorProjection( a.getFirstName(), a.getLastName() ) )
 											.collect( Collectors.toList() ),
 									new MyAuthorProjection( book.getMainAuthor().getFirstName(), book.getMainAuthor().getLastName() ),
+									book.getTitle()
+							) )
+							.collect( Collectors.toList() )
+			);
+		} );
+	}
+
+	@Test
+	public void projectionConstructor_composite() {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			// tag::projection-constructor-composite[]
+			List<MyBookMiscInfoAndTitleProjection> hits = searchSession.search( Book.class )
+					.select( MyBookMiscInfoAndTitleProjection.class )// <1>
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 ); // <2>
+			// end::projection-constructor-composite[]
+			assertThat( hits ).containsExactlyInAnyOrderElementsOf(
+					entityManager.createQuery( "select b from Book b", Book.class ).getResultList().stream()
+							.map( book -> new MyBookMiscInfoAndTitleProjection(
+									new MyBookMiscInfoAndTitleProjection.MiscInfo( book.getGenre(), book.getPageCount() ),
 									book.getTitle()
 							) )
 							.collect( Collectors.toList() )

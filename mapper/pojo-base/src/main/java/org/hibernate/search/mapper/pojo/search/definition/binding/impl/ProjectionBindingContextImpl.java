@@ -139,6 +139,11 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		}
 	}
 
+	@Override
+	public <T> BeanHolder<? extends ProjectionDefinition<T>> createCompositeDefinition(Class<T> projectedType) {
+		return BeanHolder.ofCloseable( createCompositeProjectionDefinition( projectedType ) );
+	}
+
 	private <T> CompositeProjectionDefinition<T> createCompositeProjectionDefinition(Class<T> projectedType) {
 		CompositeProjectionDefinition<T> composite = parameterBinder.createConstructorProjectionDefinitionOrNull(
 				mappingHelper.introspector().typeModel( projectedType ) );

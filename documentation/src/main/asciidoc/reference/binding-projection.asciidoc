@@ -137,6 +137,9 @@ or by delegating to it in a custom projection definition.
 Other methods exposed on the binding context work similarly:
 
 * `.createObjectDefinitionMulti(...)` returns a <<binding-projection-multi,multi-valued>> object projection definition.
+* `.createCompositeDefinition(...)` returns a (single-valued)
+<<search-dsl-projection-composite,composite projection>> definition
+(which, on contrary to an <<search-dsl-projection-object,object projection>>, is not bound to an object field in the index).
 
 Below is an example using `.createObjectDefinition(...)` to delegate to another projection constructor.
 

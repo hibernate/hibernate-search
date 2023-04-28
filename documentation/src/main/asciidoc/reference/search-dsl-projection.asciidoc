@@ -788,6 +788,44 @@ include::components/custom-projection-type-nonrecord-tip.asciidoc[]
 
 NOTE: For more information about mapping custom projection types, see <<mapping-projection>>.
 
+[[search-dsl-projection-composite-mapping]]
+=== `@CompositeProjection` in projections to custom types
+
+To achieve a `composite` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+use the `@CompositeProjection` annotation on the constructor parameter:
+
+.Returning custom objects created from multiple projections within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookMiscInfoAndTitleProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the composite projection with `@CompositeProjection`.
+<3> The type of the constructor parameter must have a projection constructor itself.
+See <<mapping-projection-inner-inference-type>> for more information.
+<4> You can of course also declare other parameters with different projections;
+in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-composite]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested composite projection.
+====
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `CompositeProjectionBinder.create()`.
+
+.Programmatic mapping of a `composite` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-composite-projection]
+----
+====
+
 [[search-dsl-projection-composite-deprecated-variants]]
 === Deprecated variants
 
