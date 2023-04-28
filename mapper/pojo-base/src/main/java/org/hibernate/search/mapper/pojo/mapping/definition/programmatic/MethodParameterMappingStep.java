@@ -36,6 +36,7 @@ public interface MethodParameterMappingStep {
 	 * @see org.hibernate.search.mapper.pojo.search.definition.binding.builtin.EntityReferenceProjectionBinder
 	 * @see org.hibernate.search.mapper.pojo.search.definition.binding.builtin.ObjectProjectionBinder
 	 * @see org.hibernate.search.mapper.pojo.search.definition.binding.builtin.CompositeProjectionBinder
+	 * @see org.hibernate.search.mapper.pojo.search.definition.binding.builtin.HighlightProjectionBinder
 	 */
 	default MethodParameterMappingStep projection(ProjectionBinder binder) {
 		return projection( BeanReference.ofInstance( binder ), Collections.emptyMap() );

@@ -31,6 +31,7 @@ import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.Docume
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.EntityProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.EntityReferenceProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.FieldProjectionBinder;
+import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.HighlightProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.IdProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.ObjectProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.ScoreProjectionBinder;
@@ -69,7 +70,8 @@ public class ProjectionDslJava17IT {
 						MyBookDocRefAndTitleProjection.class,
 						MyBookEntityAndTitleProjection.class,
 						MyBookEntityRefAndTitleProjection.class,
-						MyBookMiscInfoAndTitleProjection.class, MyBookMiscInfoAndTitleProjection.MiscInfo.class ),
+						MyBookMiscInfoAndTitleProjection.class, MyBookMiscInfoAndTitleProjection.MiscInfo.class,
+						MyBookTitleAndHighlightedDescriptionProjection.class ),
 				mapping -> {
 					var bookMapping = mapping.type( Book.class );
 					bookMapping.indexed();
@@ -190,6 +192,15 @@ public class ProjectionDslJava17IT {
 							mapping.type( MyBookMiscInfoAndTitleProjection.MiscInfo.class );
 					miscInfoProjection.mainConstructor().projectionConstructor();
 					//end::programmatic-composite-projection[]
+
+					//tag::programmatic-highlight-projection[]
+					TypeMappingStep myBookIdAndHighlightedTitleProjection =
+							mapping.type( MyBookTitleAndHighlightedDescriptionProjection.class );
+					myBookIdAndHighlightedTitleProjection.mainConstructor()
+							.projectionConstructor();
+					myBookIdAndHighlightedTitleProjection.mainConstructor().parameter( 0 )
+							.projection( HighlightProjectionBinder.create() );
+					//end::programmatic-highlight-projection[]
 				}
 		);
 	}
@@ -464,6 +475,26 @@ public class ProjectionDslJava17IT {
 									book.getTitle()
 							) )
 							.collect( Collectors.toList() )
+			);
+		} );
+	}
+
+	@Test
+	public void projectionConstructor_highlight() {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			// tag::projection-constructor-highlight[]
+			List<MyBookTitleAndHighlightedDescriptionProjection> hits = searchSession.search( Book.class )
+					.select( MyBookTitleAndHighlightedDescriptionProjection.class )// <1>
+					.where( f -> f.match().field( "description" ).matching( "self-aware" ) )
+					.fetchHits( 20 ); // <2>
+			// end::projection-constructor-highlight[]
+			assertThat( hits ).containsExactlyInAnyOrder(
+					new MyBookTitleAndHighlightedDescriptionProjection(
+							List.of( "A robot becomes <em>self</em>-<em>aware</em>." ),
+							"I, Robot"
+					)
 			);
 		} );
 	}

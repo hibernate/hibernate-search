@@ -1232,6 +1232,60 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 
 See <<search-dsl-highlighting>> for more information on highlighter configuration.
 
+[[search-dsl-projection-highlight-mapping]]
+=== `@HighlightProjection` in projections to custom types
+
+To achieve a `highlight` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+use the `@HighlightProjection` annotation on the constructor parameter:
+
+.Returning highlights for matched documents within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookTitleAndHighlightedDescriptionProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the highlights value with `@HighlightProjection`.
+<3> The type of the constructor parameter must be assignable from `List<String>`.
+<4> You can of course also declare other parameters with different projections;
+in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-highlight]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested highlights and field.
+====
+
+The annotation exposes the following attributes:
+
+`path`::
+The path to the highlighted field.
++
+If not set, it is inferred from the constructor parameter name.
++
+[WARNING]
+====
+Field path inference will <<mapping-projection-inner-inference-fieldpath,fail if constructor parameter names are not included in the Java bytecode>>.
+====
+`highlighter`::
+The name of a highlighter configured in the query;
+useful to <<search-dsl-projection-highlight-options,apply different options>> to each highlight projection.
++
+If not set, the projection will use the default highlighter as configured in the query.
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `HighlightProjectionBinder.create()`.
+
+.Programmatic mapping of a `highlight` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-highlight-projection]
+----
+====
+
 [[search-dsl-projection-extensions]]
 == Backend-specific extensions
 
