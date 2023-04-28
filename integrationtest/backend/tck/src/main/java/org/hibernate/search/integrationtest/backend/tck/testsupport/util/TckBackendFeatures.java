@@ -131,10 +131,6 @@ public abstract class TckBackendFeatures {
 		return true;
 	}
 
-	public boolean supportsHighlighterUnifiedTypeMultipleFragmentsAsSeparateItems() {
-		return true;
-	}
-
 	public boolean supportsHighlighterUnifiedTypeFragmentSize() {
 		return true;
 	}

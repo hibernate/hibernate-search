@@ -404,11 +404,6 @@ public abstract class AbstractHighlighterIT {
 
 	@Test
 	public void numberOfFragments() {
-		assumeTrue(
-				"We want to ignore this test since the highlighters that cannot return multiple fragments " +
-						"cannot also limit the number of \"matched fragments\"",
-				supportsMultipleFragmentsAsSeparateItems()
-		);
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -628,15 +623,11 @@ public abstract class AbstractHighlighterIT {
 				);
 	}
 
-	protected boolean supportsMultipleFragmentsAsSeparateItems() {
-		return true;
-	}
-
 	protected List<String> multivaluedFieldResult() {
-		return supportsMultipleFragmentsAsSeparateItems() ? Arrays.asList(
+		return Arrays.asList(
 				"The quick brown fox jumps right over the little lazy <em>dog</em>",
 				"This string mentions a <em>dog</em>"
-		) : Collections.singletonList( "The quick brown fox jumps right over the little lazy <em>dog</em>This string mentions a <em>dog</em>" );
+		);
 	}
 
 	@Test
@@ -698,10 +689,6 @@ public abstract class AbstractHighlighterIT {
 
 	@Test
 	public void orderByScore() {
-		assumeTrue(
-				"We ignore this test for the highlighters that do not support multi fragments as separate items since there's nothing to sort.",
-				supportsMultipleFragmentsAsSeparateItems()
-		);
 		assumeTrue(
 				"Some versions of the backend have a bug that prevents them from correctly sorting the results.",
 				supportsOrderByScoreMultivaluedField()

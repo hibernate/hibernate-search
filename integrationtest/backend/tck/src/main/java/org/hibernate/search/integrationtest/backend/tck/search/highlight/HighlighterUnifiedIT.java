@@ -39,22 +39,12 @@ public class HighlighterUnifiedIT extends AbstractHighlighterIT {
 	}
 
 	@Override
-	protected boolean supportsMultipleFragmentsAsSeparateItems() {
-		return TckConfiguration.get().getBackendFeatures().supportsHighlighterUnifiedTypeMultipleFragmentsAsSeparateItems();
-	}
-
-	@Override
 	protected boolean supportsFragmentSize() {
 		return TckConfiguration.get().getBackendFeatures().supportsHighlighterUnifiedTypeFragmentSize();
 	}
 
 	@Test
 	public void boundaryScannerWord() {
-		assumeTrue(
-				"With Lucene the items will just be in a single string.",
-				TckConfiguration.get().getBackendFeatures()
-						.supportsHighlighterUnifiedTypeMultipleFragmentsAsSeparateItems()
-		);
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -77,8 +67,7 @@ public class HighlighterUnifiedIT extends AbstractHighlighterIT {
 	@Test
 	public void boundaryScannerSentenceExplicit() {
 		assumeTrue(
-				TckConfiguration.get().getBackendFeatures().supportsHighlighterUnifiedTypeFragmentSize() &&
-						TckConfiguration.get().getBackendFeatures().supportsHighlighterUnifiedTypeMultipleFragmentsAsSeparateItems()
+				TckConfiguration.get().getBackendFeatures().supportsHighlighterUnifiedTypeFragmentSize()
 		);
 		StubMappingScope scope = index.createScope();
 
