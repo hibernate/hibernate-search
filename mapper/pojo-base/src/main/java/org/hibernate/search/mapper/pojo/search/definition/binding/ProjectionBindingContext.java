@@ -14,6 +14,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.model.PojoModelConstructorParameter;
 import org.hibernate.search.util.common.SearchException;
@@ -115,5 +116,16 @@ public interface ProjectionBindingContext {
 	@Incubating
 	<T> BeanHolder<? extends ProjectionDefinition<List<T>>> createObjectDefinitionMulti(String fieldPath,
 			Class<T> projectedType);
+
+	/**
+	 * @param projectedType A type expected to have a corresponding projection mapping
+	 * (e.g. using {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor})
+	 * @return A composite projection definition for the given type.
+	 * @throws SearchException If mapping the given type to a projection definition fails.
+	 * @see SearchProjectionFactory#composite()
+	 * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
+	 */
+	@Incubating
+	<T> BeanHolder<? extends ProjectionDefinition<T>> createCompositeDefinition(Class<T> projectedType);
 
 }
