@@ -8,19 +8,23 @@ package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
 import java.io.IOException;
 
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
+import org.hibernate.search.backend.lucene.document.impl.LuceneIdReader;
 
 import org.apache.lucene.index.BinaryDocValues;
-import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 
 public final class IdentifierValues implements Values<String> {
 
+	private final LuceneIdReader idReader;
 	private BinaryDocValues currentLeafIdDocValues;
+
+	public IdentifierValues(LuceneIdReader idReader) {
+		this.idReader = idReader;
+	}
 
 	@Override
 	public void context(LeafReaderContext context) throws IOException {
-		this.currentLeafIdDocValues = DocValues.getBinary( context.reader(), MetadataFields.idFieldName() );
+		this.currentLeafIdDocValues = idReader.idDocValues( context.reader() );
 	}
 
 	@Override

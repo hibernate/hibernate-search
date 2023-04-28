@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.cfg;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.cache.QueryCachingConfigurer;
 import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
+import org.hibernate.search.backend.lucene.schema.SchemaIdStrategy;
 
 import org.apache.lucene.util.Version;
 
@@ -94,6 +95,15 @@ public final class LuceneBackendSettings {
 	public static final String THREAD_POOL_SIZE = "thread_pool.size";
 
 	/**
+	 * Strategy that defines how to read/write IDs to/from a document.
+	 * <p>
+	 * Expects a {@link SchemaIdStrategy} value, or a String representation of such value.
+	 * <p>
+	 * Defaults to {@link Defaults#SCHEMA_ID_STRATEGY}.
+	 */
+	public static final String SCHEMA_ID_STRATEGY = "schema.id.strategy";
+
+	/**
 	 * Default values for the different settings if no values are given.
 	 */
 	public static final class Defaults {
@@ -110,5 +120,8 @@ public final class LuceneBackendSettings {
 		 */
 		@Deprecated
 		public static final MultiTenancyStrategyName MULTI_TENANCY_STRATEGY = MultiTenancyStrategyName.NONE;
+
+		@SuppressWarnings("deprecation")
+		public static final SchemaIdStrategy SCHEMA_ID_STRATEGY = SchemaIdStrategy.LUCENE_8;
 	}
 }

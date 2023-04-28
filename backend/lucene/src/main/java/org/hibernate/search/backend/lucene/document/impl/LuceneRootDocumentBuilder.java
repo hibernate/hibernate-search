@@ -18,10 +18,13 @@ import org.apache.lucene.document.Document;
 public class LuceneRootDocumentBuilder extends AbstractLuceneDocumentElementBuilder {
 
 	private final MultiTenancyStrategy multiTenancyStrategy;
+	private final LuceneIdWriter idWriter;
 
-	LuceneRootDocumentBuilder(LuceneIndexModel model, MultiTenancyStrategy multiTenancyStrategy) {
+	LuceneRootDocumentBuilder(LuceneIndexModel model, MultiTenancyStrategy multiTenancyStrategy,
+			LuceneIdWriter idWriter) {
 		super( model, model.root(), new LuceneDocumentContentImpl() );
 		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.idWriter = idWriter;
 	}
 
 	public LuceneIndexEntry build(String tenantId, String id, String routingKey) {
@@ -42,7 +45,7 @@ public class LuceneRootDocumentBuilder extends AbstractLuceneDocumentElementBuil
 		Document document = documentContent.finalizeDocument( multiTenancyStrategy, tenantId, routingKey );
 		document.add(
 				MetadataFields.searchableMetadataField( MetadataFields.typeFieldName(), MetadataFields.TYPE_MAIN_DOCUMENT ) );
-		document.add( MetadataFields.searchableRetrievableMetadataField( MetadataFields.idFieldName(), id ) );
+		idWriter.write( id, document );
 
 		// In the list of documents, a child must appear before its parent,
 		// so we let children contribute their document first.

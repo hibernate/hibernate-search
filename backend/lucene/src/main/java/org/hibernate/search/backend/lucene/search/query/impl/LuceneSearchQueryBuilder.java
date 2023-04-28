@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.backend.lucene.document.impl.LuceneIdReader;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
@@ -66,6 +67,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 
 	private final SearchLoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final LuceneSearchProjection<H> rootProjection;
+	private final LuceneIdReader idReader;
 
 	private Query luceneQuery;
 	private List<SortField> sortFields;
@@ -83,12 +85,13 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 			LuceneSearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?> loadingContextBuilder,
-			LuceneSearchProjection<H> rootProjection) {
+			LuceneSearchProjection<H> rootProjection, LuceneIdReader idReader) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 
 		this.scope = scope;
 		this.sessionContext = sessionContext;
+		this.idReader = idReader;
 		this.routingKeys = new HashSet<>();
 
 		this.loadingContextBuilder = loadingContextBuilder;
@@ -275,7 +278,8 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 				rootExtractor,
 				aggregations == null ? Collections.emptyMap() : aggregations,
 				extractionRequirements,
-				timeoutManager
+				timeoutManager,
+				idReader
 		);
 
 		return new LuceneSearchQueryImpl<>(

@@ -559,6 +559,40 @@ When indexing, a discriminator field holding the tenant ID is populated transpar
 When searching, a filter targeting the tenant ID field is added transparently to the search query
 to only return search hits for the current tenant.
 
+[[backend-lucene-schema-id-strategy]]
+=== ID strategy
+
+With the upcoming Lucene 9 upgrade, Hibernate Search will require backward incompatible schema changes.
+In particular, the way it works with IDs will change.
+This means that once the change happens, all Lucene indexes must be recreated, and data needs to be repopulated.
+
+To give users more flexibility in deciding when to prepare for these upcoming changes,
+Hibernate Search offers a backend-level configuration property
+that switches the schema id strategy to be compatible with future versions:
+
+[source]
+----
+hibernate.search.backend.schema.id.strategy = lucene9
+----
+
+See the following subsections for details about available strategies.
+
+[[backend-lucene-schema-id-strategy-lucene8]]
+==== `lucene8`
+
+Currently used strategy that is compatible with the current indexes.
+It is deprecated and will be removed in a future version of Hibernate Search that will support Lucene 9.
+
+[[backend-lucene-schema-id-strategy-lucene9]]
+==== `lucene9`
+
+This strategy will create documents compatible with future versions of Hibernate Search.
+Switching to this strategy for existing applications will require indexes to be recreated and repopulated.
+The easiest way to do so is to use <<indexing-massindexer,the `MassIndexer`>> with <<indexing-massindexer-parameters-drop-and-create-schema,`dropAndCreateSchemaOnStart(true)`>>.
+
+NOTE: Switching to this strategy as soon as an opportunity arises is recommended.
+Doing so should allow for a smoother future upgrade of Hibernate Search.
+
 [[backend-lucene-analysis]]
 == Analysis
 

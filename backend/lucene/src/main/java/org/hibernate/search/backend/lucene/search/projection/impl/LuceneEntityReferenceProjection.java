@@ -37,7 +37,7 @@ public class LuceneEntityReferenceProjection<R> extends AbstractLuceneProjection
 
 	@Override
 	public Values<DocumentReference> values(ProjectionExtractContext context) {
-		return DocumentReferenceValues.simple( context.collectorExecutionContext() );
+		return DocumentReferenceValues.simple( context );
 	}
 
 	@Override

@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.cache.impl.LuceneQueryCachingContext;
+import org.hibernate.search.backend.lucene.document.impl.LuceneIdReaderWriter;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexRootBuilder;
 import org.hibernate.search.backend.lucene.index.impl.IndexManagerBackendContext;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerBuilder;
@@ -61,6 +62,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			LuceneQueryCachingContext cachingContext,
 			MultiTenancyStrategy multiTenancyStrategy,
+			LuceneIdReaderWriter idReaderWriter,
 			TimingSource timingSource,
 			FailureHandler failureHandler) {
 		this.backendName = backendName;
@@ -77,7 +79,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 		this.indexManagerBackendContext = new IndexManagerBackendContext(
 				this, eventContext, threads, similarity,
 				workFactory, multiTenancyStrategy,
-				timingSource, analysisDefinitionRegistry,
+				idReaderWriter, timingSource, analysisDefinitionRegistry,
 				failureHandler,
 				readOrchestrator
 		);

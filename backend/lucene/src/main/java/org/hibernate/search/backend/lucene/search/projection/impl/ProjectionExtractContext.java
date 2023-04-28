@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import org.hibernate.search.backend.lucene.document.impl.LuceneIdReader;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCollectorExecutionContext;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
@@ -13,11 +14,13 @@ public class ProjectionExtractContext {
 
 	private final TopDocsDataCollectorExecutionContext collectorExecutionContext;
 	private final ProjectionHitMapper<?> projectionHitMapper;
+	private final LuceneIdReader idReader;
 
 	public ProjectionExtractContext(TopDocsDataCollectorExecutionContext collectorExecutionContext,
-			ProjectionHitMapper<?> projectionHitMapper) {
+			ProjectionHitMapper<?> projectionHitMapper, LuceneIdReader idReader) {
 		this.collectorExecutionContext = collectorExecutionContext;
 		this.projectionHitMapper = projectionHitMapper;
+		this.idReader = idReader;
 	}
 
 	public TopDocsDataCollectorExecutionContext collectorExecutionContext() {
@@ -26,5 +29,9 @@ public class ProjectionExtractContext {
 
 	public ProjectionHitMapper<?> projectionHitMapper() {
 		return projectionHitMapper;
+	}
+
+	public LuceneIdReader idReader() {
+		return idReader;
 	}
 }

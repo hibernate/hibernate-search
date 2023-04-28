@@ -40,7 +40,7 @@ public class LuceneIdProjection<I> extends AbstractLuceneProjection<I>
 
 	@Override
 	public Values<String> values(ProjectionExtractContext context) {
-		return new IdentifierValues();
+		return new IdentifierValues( context.idReader() );
 	}
 
 	@Override

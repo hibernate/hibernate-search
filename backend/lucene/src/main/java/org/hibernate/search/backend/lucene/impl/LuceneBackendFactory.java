@@ -21,12 +21,16 @@ import org.hibernate.search.backend.lucene.cache.QueryCachingConfigurationContex
 import org.hibernate.search.backend.lucene.cache.QueryCachingConfigurer;
 import org.hibernate.search.backend.lucene.cache.impl.LuceneQueryCachingContext;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
+import org.hibernate.search.backend.lucene.document.impl.LuceneIdReaderWriter;
+import org.hibernate.search.backend.lucene.document.impl.LuceneLegacyIdReaderWriter;
+import org.hibernate.search.backend.lucene.document.impl.LuceneModernIdReaderWriter;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
 import org.hibernate.search.backend.lucene.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.NoMultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
+import org.hibernate.search.backend.lucene.schema.SchemaIdStrategy;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
@@ -72,6 +76,12 @@ public class LuceneBackendFactory implements BackendFactory {
 							.multivalued()
 							.build();
 
+	private static final ConfigurationProperty<SchemaIdStrategy> SCHEMA_ID_STRATEGY =
+			ConfigurationProperty.forKey( LuceneBackendSettings.SCHEMA_ID_STRATEGY )
+					.as( SchemaIdStrategy.class, SchemaIdStrategy::of )
+					.withDefault( LuceneBackendSettings.Defaults.SCHEMA_ID_STRATEGY )
+					.build();
+
 	@Override
 	public BackendImplementor create(EventContext eventContext, BackendBuildContext buildContext,
 			ConfigurationPropertySource propertySource) {
@@ -83,6 +93,8 @@ public class LuceneBackendFactory implements BackendFactory {
 			Version luceneVersion = getLuceneVersion( eventContext, propertySource );
 
 			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( propertySource, buildContext );
+
+			LuceneIdReaderWriter idReaderWriter = getIdReaderWriter( propertySource );
 
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry = getAnalysisDefinitionRegistry(
 					buildContext, propertySource, luceneVersion
@@ -100,6 +112,7 @@ public class LuceneBackendFactory implements BackendFactory {
 					analysisDefinitionRegistry,
 					cachingContext,
 					multiTenancyStrategy,
+					idReaderWriter,
 					buildContext.timingSource(),
 					buildContext.failureHandler()
 			);
@@ -161,6 +174,22 @@ public class LuceneBackendFactory implements BackendFactory {
 				throw new AssertionFailure( String.format(
 						Locale.ROOT, "Unsupported multi-tenancy strategy '%1$s'",
 						multiTenancyStrategy
+				) );
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	private LuceneIdReaderWriter getIdReaderWriter(ConfigurationPropertySource propertySource) {
+		SchemaIdStrategy schemaIdStrategy = SCHEMA_ID_STRATEGY.get( propertySource );
+		switch ( schemaIdStrategy ) {
+			case LUCENE_8:
+				return LuceneLegacyIdReaderWriter.INSTANCE;
+			case LUCENE_9:
+				return LuceneModernIdReaderWriter.INSTANCE;
+			default:
+				throw new AssertionFailure( String.format(
+						Locale.ROOT, "Unsupported schema id strategy strategy '%1$s'",
+						schemaIdStrategy
 				) );
 		}
 	}

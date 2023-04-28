@@ -14,16 +14,19 @@ public class LuceneIndexEntryFactory {
 
 	private final LuceneIndexModel model;
 	private final MultiTenancyStrategy multiTenancyStrategy;
+	private final LuceneIdWriter idWriter;
 
-	public LuceneIndexEntryFactory(LuceneIndexModel model, MultiTenancyStrategy multiTenancyStrategy) {
+	public LuceneIndexEntryFactory(LuceneIndexModel model, MultiTenancyStrategy multiTenancyStrategy,
+			LuceneIdWriter idWriter) {
 		this.model = model;
 		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.idWriter = idWriter;
 	}
 
 	public LuceneIndexEntry create(String tenantId, String id, String routingKey,
 			DocumentContributor documentContributor) {
 		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder(
-				model, multiTenancyStrategy
+				model, multiTenancyStrategy, idWriter
 		);
 		documentContributor.contribute( builder );
 		return builder.build( tenantId, id, routingKey );
