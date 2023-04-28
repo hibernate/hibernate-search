@@ -8,19 +8,19 @@ package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
 import java.io.IOException;
 
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
+import org.hibernate.search.backend.lucene.document.impl.LuceneIdReader;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneDocumentReference;
+import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionExtractContext;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 
 import org.apache.lucene.index.BinaryDocValues;
-import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 
 public abstract class DocumentReferenceValues<R> implements Values<R> {
 
-	public static DocumentReferenceValues<DocumentReference> simple(CollectorExecutionContext executionContext) {
-		return new DocumentReferenceValues<DocumentReference>( executionContext ) {
+	public static DocumentReferenceValues<DocumentReference> simple(ProjectionExtractContext context) {
+		return new DocumentReferenceValues<DocumentReference>( context.idReader(), context.collectorExecutionContext() ) {
 			@Override
 			protected DocumentReference toReference(String typeName, String identifier) {
 				return new LuceneDocumentReference( typeName, identifier );
@@ -28,19 +28,21 @@ public abstract class DocumentReferenceValues<R> implements Values<R> {
 		};
 	}
 
+	private final LuceneIdReader idReader;
 	private final IndexReaderMetadataResolver metadataResolver;
 
 	private String currentLeafMappedTypeName;
 	private BinaryDocValues currentLeafIdDocValues;
 
-	protected DocumentReferenceValues(CollectorExecutionContext executionContext) {
+	protected DocumentReferenceValues(LuceneIdReader idReader, CollectorExecutionContext executionContext) {
+		this.idReader = idReader;
 		this.metadataResolver = executionContext.getMetadataResolver();
 	}
 
 	@Override
 	public final void context(LeafReaderContext context) throws IOException {
 		this.currentLeafMappedTypeName = metadataResolver.resolveMappedTypeName( context );
-		this.currentLeafIdDocValues = DocValues.getBinary( context.reader(), MetadataFields.idFieldName() );
+		this.currentLeafIdDocValues = idReader.idDocValues( context.reader() );
 	}
 
 	@Override

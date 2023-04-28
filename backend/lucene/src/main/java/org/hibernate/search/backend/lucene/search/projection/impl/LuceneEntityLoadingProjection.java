@@ -39,7 +39,7 @@ public class LuceneEntityLoadingProjection<E> extends AbstractLuceneProjection<E
 	@Override
 	public Values<Object> values(ProjectionExtractContext context) {
 		ProjectionHitMapper<?> mapper = context.projectionHitMapper();
-		return new DocumentReferenceValues<Object>( context.collectorExecutionContext() ) {
+		return new DocumentReferenceValues<Object>( context.idReader(), context.collectorExecutionContext() ) {
 			@Override
 			protected Object toReference(String typeName, String identifier) {
 				return mapper.planLoading( new LuceneDocumentReference( typeName, identifier ) );

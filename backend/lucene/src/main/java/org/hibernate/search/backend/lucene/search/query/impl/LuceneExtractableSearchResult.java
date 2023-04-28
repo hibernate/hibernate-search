@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.backend.lucene.document.impl.LuceneIdReader;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCollector;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCollectorExecutionContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
@@ -39,12 +40,14 @@ public class LuceneExtractableSearchResult<H> {
 	private final LuceneSearchProjection.Extractor<?, H> rootExtractor;
 	private final Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
 	private final TimeoutManager timeoutManager;
+	private final LuceneIdReader idReader;
 
 	public LuceneExtractableSearchResult(LuceneSearchQueryRequestContext requestContext,
 			IndexSearcher indexSearcher,
 			LuceneCollectors luceneCollectors,
 			LuceneSearchProjection.Extractor<?, H> rootExtractor,
-			Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations, TimeoutManager timeoutManager) {
+			Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations, TimeoutManager timeoutManager,
+			LuceneIdReader idReader) {
 		this.requestContext = requestContext;
 		this.fromDocumentValueConvertContext = new FromDocumentValueConvertContextImpl( requestContext.getSessionContext() );
 		this.indexSearcher = indexSearcher;
@@ -52,6 +55,7 @@ public class LuceneExtractableSearchResult<H> {
 		this.rootExtractor = rootExtractor;
 		this.aggregations = aggregations;
 		this.timeoutManager = timeoutManager;
+		this.idReader = idReader;
 	}
 
 	public LuceneLoadableSearchResult<H> extract() throws IOException {
@@ -103,7 +107,7 @@ public class LuceneExtractableSearchResult<H> {
 			return Collections.emptyList();
 		}
 
-		TopDocsDataCollectorFactory collectorFactory = new TopDocsDataCollectorFactory( projectionHitMapper );
+		TopDocsDataCollectorFactory collectorFactory = new TopDocsDataCollectorFactory( projectionHitMapper, idReader );
 
 		return luceneCollectors.collectTopDocsData( collectorFactory, startInclusive, endExclusive );
 	}
@@ -136,15 +140,17 @@ public class LuceneExtractableSearchResult<H> {
 
 	private class TopDocsDataCollectorFactory implements TopDocsDataCollector.Factory<Object> {
 		private final ProjectionHitMapper<?> projectionHitMapper;
+		private final LuceneIdReader idReader;
 
-		public TopDocsDataCollectorFactory(ProjectionHitMapper<?> projectionHitMapper) {
+		public TopDocsDataCollectorFactory(ProjectionHitMapper<?> projectionHitMapper, LuceneIdReader idReader) {
 			this.projectionHitMapper = projectionHitMapper;
+			this.idReader = idReader;
 		}
 
 		@Override
 		public TopDocsDataCollector<Object> create(TopDocsDataCollectorExecutionContext context) throws IOException {
 			ProjectionExtractContext projectionExtractContext =
-					new ProjectionExtractContext( context, projectionHitMapper );
+					new ProjectionExtractContext( context, projectionHitMapper, idReader );
 			return new TopDocsDataCollector<>( context, rootExtractor.values( projectionExtractContext ) );
 		}
 	}

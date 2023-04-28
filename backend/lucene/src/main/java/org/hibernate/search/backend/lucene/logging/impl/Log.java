@@ -712,4 +712,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 173, value = "'%1$s' cannot be nested in an object projection. "
 			+ "%2$s")
 	SearchException cannotUseProjectionInNestedContext(String projection, String hint, @Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET + 174, value = "Invalid Lucene schema ID strategy name: '%1$s'."
+			+ " Valid names are: %2$s.")
+	SearchException invalidLuceneIdStrategy(String invalidRepresentation, List<String> validRepresentations);
+
 }

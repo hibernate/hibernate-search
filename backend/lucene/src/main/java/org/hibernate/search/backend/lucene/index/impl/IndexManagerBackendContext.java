@@ -11,6 +11,7 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
+import org.hibernate.search.backend.lucene.document.impl.LuceneIdReaderWriter;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
@@ -71,6 +72,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	private final Similarity similarity;
 	private final LuceneWorkFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
+	private final LuceneIdReaderWriter idReaderWriter;
 	private final TimingSource timingSource;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private final FailureHandler failureHandler;
@@ -82,7 +84,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 			Similarity similarity,
 			LuceneWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy,
-			TimingSource timingSource,
+			LuceneIdReaderWriter idReaderWriter, TimingSource timingSource,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			FailureHandler failureHandler,
 			LuceneSyncWorkOrchestrator readOrchestrator) {
@@ -91,6 +93,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		this.threads = threads;
 		this.similarity = similarity;
 		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.idReaderWriter = idReaderWriter;
 		this.timingSource = timingSource;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.workFactory = workFactory;
@@ -164,7 +167,8 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 				scope,
 				sessionContext,
 				loadingContextBuilder,
-				rootProjection
+				rootProjection,
+				idReaderWriter
 		);
 	}
 
@@ -177,7 +181,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	}
 
 	LuceneIndexEntryFactory createLuceneIndexEntryFactory(LuceneIndexModel model) {
-		return new LuceneIndexEntryFactory( model, multiTenancyStrategy );
+		return new LuceneIndexEntryFactory( model, multiTenancyStrategy, idReaderWriter );
 	}
 
 	IOStrategy createIOStrategy(ConfigurationPropertySource propertySource) {

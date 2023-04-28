@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
+import org.hibernate.search.backend.lucene.document.impl.LuceneIdReader;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TimeoutCountCollectorManager;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
@@ -44,17 +45,19 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	private final ExtractionRequirements extractionRequirements;
 
 	private TimeoutManager timeoutManager;
+	private final LuceneIdReader idReader;
 
 	LuceneSearcherImpl(LuceneSearchQueryRequestContext requestContext,
 			LuceneSearchProjection.Extractor<?, H> rootExtractor,
 			Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations,
 			ExtractionRequirements extractionRequirements,
-			TimeoutManager timeoutManager) {
+			TimeoutManager timeoutManager, LuceneIdReader idReader) {
 		this.requestContext = requestContext;
 		this.rootExtractor = rootExtractor;
 		this.aggregations = aggregations;
 		this.extractionRequirements = extractionRequirements;
 		this.timeoutManager = timeoutManager;
+		this.idReader = idReader;
 	}
 
 	@Override
@@ -100,7 +103,8 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 						totalHitCountThreshold );
 
 		return new LuceneExtractableSearchResult<>( requestContext, indexSearcher, luceneCollectors,
-				rootExtractor, aggregations, timeoutManager );
+				rootExtractor, aggregations, timeoutManager, idReader
+		);
 	}
 
 	@Override
