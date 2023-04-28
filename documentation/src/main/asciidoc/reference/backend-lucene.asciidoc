@@ -249,7 +249,7 @@ When routing, the routing key will be hashed to assign it to a shard.
 If the routing key is null, the document ID will be used instead.
 +
 This strategy is suitable when there is no explicit routing key
-<<bridge-routingbridge-routingkey,configured in the mapping>>,
+<<binding-routingbridge-routingkey,configured in the mapping>>,
 or when the routing key has a large number of possible values that need
 to be brought down to a smaller number (e.g. "all integers").
 
@@ -278,7 +278,7 @@ If it does not, an exception will be thrown.
 The routing key cannot be null, and the document ID will be ignored.
 +
 This strategy is suitable when there is an explicit routing key
-<<bridge-routingbridge-routingkey,configured in the mapping>>,
+<<binding-routingbridge-routingkey,configured in the mapping>>,
 and that routing key has a limited number of possible values that are known before starting the application.
 
 
@@ -404,7 +404,7 @@ Field types that are not in this list can still be used with a bit more work:
 
 * If a property in the entity model has an unsupported type,
 but can be converted to a supported type, you will need a bridge.
-See <<bridge>>.
+See <<binding>>.
 * If you need an index field with a specific type that is not supported by Hibernate Search,
 you will need a bridge that defines a native field type.
 See <<backend-lucene-field-types-extension>>.
@@ -487,12 +487,12 @@ Below is an example of how to use the Lucene "native" type.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/type/asnative/PageRankValueBinder.java[tags=include]
 ----
-<1> Define a <<bridge,custom binder>> and its bridge.
+<1> Define a <<binding,custom binder>> and its bridge.
 The "native" type can only be used from a binder,
 it cannot be used directly with annotation mapping.
-Here we're defining a <<bridge-valuebridge,value binder>>,
-but a <<bridge-typebridge,type binder>>,
-or a <<bridge-propertybridge,property binder>>
+Here we're defining a <<binding-valuebridge,value binder>>,
+but a <<binding-typebridge,type binder>>,
+or a <<binding-propertybridge,property binder>>
 would work as well.
 <2> Get the context's type factory.
 <3> Apply the Lucene extension to the type factory.

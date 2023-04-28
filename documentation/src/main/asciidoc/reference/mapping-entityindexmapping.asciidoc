@@ -101,7 +101,7 @@ because each user has a specific language and only searches for entities in thei
 These behaviors can be implemented in Hibernate Search by assigning a routing bridge
 to the indexed entity type through `@Indexed(routingBinder = ...)`.
 
-For more information about routing bridges, see <<bridge-routingbridge>>.
+For more information about routing bridges, see <<binding-routingbridge>>.
 
 [[mapping-entityindexmapping-programmatic]]
 == [[mapper-orm-entityindexmapping-programmatic]] Programmatic mapping

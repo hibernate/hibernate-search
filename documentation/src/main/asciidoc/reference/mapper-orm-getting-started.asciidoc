@@ -197,7 +197,7 @@ some of them allowing finer-grained configuration for field of a certain type.
 You can find out more about `@*Field` annotations in <<mapping-directfieldmapping>>.
 * Properties, or even types, can be mapped with finer-grained control using "bridges".
 This allows the mapping of types that are not supported out-of-the-box.
-See <<bridge>> for more information.
+See <<binding>> for more information.
 
 [[mapper-orm-getting-started-initialization]]
 == [[getting-started-initialization]] Initialization
@@ -509,7 +509,7 @@ distributed applications in particular require a specific setup involving a <<co
 
 You may also want to explore the basic features in more detail.
 Two topics which were only briefly touched in this tutorial
-were analysis configuration (<<concepts-analysis>>) and bridges (<<bridge>>).
+were analysis configuration (<<concepts-analysis>>) and bridges (<<binding>>).
 Both are important features required for more fine-grained indexing.
 
 When it comes to initializing your index, you will be interested

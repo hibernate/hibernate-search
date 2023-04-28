@@ -384,7 +384,7 @@ potentially increasing search performance.
 [IMPORTANT]
 ====
 A pre-requisite to using routing in search queries is to map your entity in such a way that
-<<bridge-routingbridge-routingkey,it is assigned a routing key>> at indexing time.
+<<binding-routingbridge-routingkey,it is assigned a routing key>> at indexing time.
 ====
 
 Specifying routing keys is done by calling the `.routing(String)` or `.routing(Collection<String>)` methods
@@ -394,7 +394,7 @@ when building the query:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/routingbridge/routingkey/RoutingBridgeRoutingKeyIT.java[tags=routing-single]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/routingbridge/routingkey/RoutingBridgeRoutingKeyIT.java[tags=routing-single]
 ----
 <1> Start building the query.
 <2> Define that only documents matching the given `genre` should be returned.

@@ -39,7 +39,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/identifiermap
 ====
 
 When the property type is not supported,
-it is also necessary to <<bridge-identifierbridge,implement a custom identifier bridge>>,
+it is also necessary to <<binding-identifierbridge,implement a custom identifier bridge>>,
 then refer to it in the `@DocumentId` annotation:
 
 .Mapping a property with unsupported type to the document identifier with `@DocumentId`

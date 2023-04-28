@@ -1477,13 +1477,13 @@ A `named` predicate, i.e. a predicate defined in the mapping,
 can be called and included in a query.
 
 Below is an example that calls the named predicate
-from the example of section <<bridge-named-predicate>>.
+from the example of section <<binding-named-predicate>>.
 
 .Calling a named predicate
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/namedpredicate/NamedPredicateIT.java[tags=named-predicate]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/namedpredicate/NamedPredicateIT.java[tags=named-predicate]
 ----
 <1> The named predicate is referred to by its name,
 prefixed with the path of the object where the predicate was defined and a dot.
@@ -1492,7 +1492,7 @@ Here, the predicate is named `skuIdMatch` and was defined on an object field nam
 For named predicates defined at the root of the index,
 you can pass the predicate name directly, without any prefix.
 <2> Named predicates can accept parameters,
-which will be handled as explained in <<bridge-named-predicate>>.
+which will be handled as explained in <<binding-named-predicate>>.
 ====
 
 [[search-dsl-predicate-extensions]]

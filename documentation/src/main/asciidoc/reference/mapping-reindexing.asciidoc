@@ -6,7 +6,7 @@
 
 When an entity property is mapped to the index,
 be it through `@GenericField`, `@IndexedEmbedded`,
-or a <<bridge,custom bridge>>,
+or a <<binding,custom bridge>>,
 this mapping introduces a dependency:
 the document will need to be updated when the property changes.
 

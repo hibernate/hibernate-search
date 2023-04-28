@@ -853,7 +853,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Lucene
 The returned document is similar to the one that was indexed.
 
 For example, if a value was transformed by the `toIndexedValue` method
-of a <<bridge-valuebridge,value bridge>> upon indexing,
+of a <<binding-valuebridge,value bridge>> upon indexing,
 this transformed value (after encoding) will be the value included in the document:
 Hibernate Search will not convert it back using `ValueBridge#fromIndexedValue`.
 
@@ -864,7 +864,7 @@ However, there are some differences between the returned document and the one th
 * The document structure flattened,
 i.e. even fields from <<mapping-indexedembedded-structure-nested,nested documents>>
 are all added to same returned document.
-* <<bridge-index-field-dsl-dynamic,Dynamic fields>> may be missing.
+* <<binding-index-field-dsl-dynamic,Dynamic fields>> may be missing.
 
 If you want a projection that retrieves the value as it was in your entity upon indexing,
 use a <<search-dsl-projection-field,`field` projection>>.
@@ -916,7 +916,7 @@ In particular, Hibernate Search will not apply any kind of the conversions
 described in <<search-dsl-projected-value-type>>.
 
 For example, if a value was transformed by the `toIndexedValue` method
-of a <<bridge-valuebridge,value bridge>> upon indexing,
+of a <<binding-valuebridge,value bridge>> upon indexing,
 this transformed value will be the value included in the source:
 Hibernate Search will not convert it back using `ValueBridge#fromIndexedValue`.
 

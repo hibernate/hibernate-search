@@ -52,7 +52,7 @@ But what if we want users to type in some words instead, i.e. what if we want fu
 Then we will not have an `AuthenticationOutcome` instance to pass to the DSL, only a `String`...
 
 In that case, we will first need to assign some text to each enum.
-This can be achieved by defining a custom <<bridge-valuebridge,`ValueBridge<AuthenticationOutcome, String>`>>
+This can be achieved by defining a custom <<binding-valuebridge,`ValueBridge<AuthenticationOutcome, String>`>>
 and applying it to the `outcome` property to index a textual description of the outcome,
 instead of the default `Enum#name()`.
 
@@ -77,7 +77,7 @@ All methods that apply DSL converters offer a variant that accepts a `ValueConve
 A DSL converter is always automatically generated for value bridges.
 However, more complex bridges will require explicit configuration.
 
-See <<bridge-typebridge>> or <<bridge-propertybridge>> for more information.
+See <<binding-typebridge>> or <<binding-propertybridge>> for more information.
 ====
 
 [[search-dsl-projected-value-type]]
@@ -138,8 +138,8 @@ include::{sourcedir}/org/hibernate/search/documentation/search/converter/Project
 ====
 Projection converters must be configured explicitly in custom bridges.
 
-See <<bridge-valuebridge>>,
-<<bridge-propertybridge>> or <<bridge-typebridge>> for more information.
+See <<binding-valuebridge>>,
+<<binding-propertybridge>> or <<binding-typebridge>> for more information.
 ====
 
 [[search-dsl-multiple-fields]]

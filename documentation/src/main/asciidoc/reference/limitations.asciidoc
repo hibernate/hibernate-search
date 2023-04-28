@@ -73,7 +73,7 @@ this indexing will be cancelled, with no way to cancel the corresponding databas
 the index will thus become out of sync.
 
 NOTE: The risk is exclusively related to errors in the backend, mostly to filesystem or network issues.
-Errors occurring in user code (getters, custom <<bridge,bridges>>, ...)
+Errors occurring in user code (getters, custom <<binding,bridges>>, ...)
 will safely cancel the whole database transaction without indexing anything,
 ensuring that indexes are still in sync with the database.
 
