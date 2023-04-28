@@ -98,6 +98,9 @@ For more information about  mapping projection types, see <<mapping-projection>>
 
 The `documentReference` projection returns a reference to the matched document as a `DocumentReference` object.
 
+[[search-dsl-projection-documentReference-syntax]]
+=== Syntax
+
 .Returning references to matched documents
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -109,6 +112,43 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 NOTE: Since it's a reference to the _document_, not the entity,
 `DocumentReference` only exposes low-level concepts such as the type name and the document identifier (a `String`).
 Use the <<search-dsl-projection-reference,`entityReference`>> projection to get a reference to the entity.
+
+[[search-dsl-projection-documentReference-mapping]]
+=== `@DocumentReferenceProjection` in projections to custom types
+
+To achieve a `documentReference` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+use the `@DocumentReferenceProjection` annotation:
+
+.Returning references to matched documents within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookDocRefAndTitleProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the document reference with `@DocumentReferenceProjection`.
+<3> The type of the constructor parameter must be assignable from `DocumentReference`.
+<4> You can of course also declare other parameters with different projections;
+in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-document-reference]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested document reference and field.
+====
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `DocumentReferenceProjectionBinder.create()`.
+
+.Programmatic mapping of a `documentReference` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-document-reference-projection]
+----
+====
 
 [[search-dsl-projection-reference]]
 == `entityReference`: return references to matched entities
