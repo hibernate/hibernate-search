@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.mapper.orm.alternative.alternativebinder;
+package org.hibernate.search.documentation.mapper.orm.binding.propertybridge.param.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -12,8 +12,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.AlternativeBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
@@ -24,28 +22,23 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 @Retention(RetentionPolicy.RUNTIME) // <1>
 @Target({ ElementType.METHOD, ElementType.FIELD }) // <2>
 @PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef( // <3>
-		type = MultiLanguageField.Processor.class
+		type = InvoiceLineItemsSummaryBinding.Processor.class
 ))
 @Documented // <4>
-public @interface MultiLanguageField {
+public @interface InvoiceLineItemsSummaryBinding {
 
-	String name() default ""; // <5>
+	String fieldName() default ""; // <5>
 
 	class Processor // <6>
-			implements PropertyMappingAnnotationProcessor<MultiLanguageField> { // <7>
+			implements PropertyMappingAnnotationProcessor<InvoiceLineItemsSummaryBinding> { // <7>
 		@Override
-		public void process(PropertyMappingStep mapping, MultiLanguageField annotation,
+		public void process(PropertyMappingStep mapping, InvoiceLineItemsSummaryBinding annotation,
 				PropertyMappingAnnotationProcessorContext context) {
-			LanguageAlternativeBinderDelegate delegate = new LanguageAlternativeBinderDelegate( // <8>
-					annotation.name().isEmpty() ? null : annotation.name()
-			);
-			mapping.hostingType() // <9>
-					.binder( AlternativeBinder.create( // <10>
-							Language.class, // <11>
-							context.annotatedElement().name(), // <12>
-							String.class, // <13>
-							BeanReference.ofInstance( delegate ) // <14>
-					) );
+			InvoiceLineItemsSummaryBinder binder = new InvoiceLineItemsSummaryBinder(); // <8>
+			if ( !annotation.fieldName().isEmpty() ) { // <9>
+				binder.fieldName( annotation.fieldName() );
+			}
+			mapping.binder( binder ); // <10>
 		}
 	}
 }

@@ -1,8 +1,8 @@
 [[binding-routingbridge]]
 = [[mapper-orm-bridge-routingbridge]] [[mapper-orm-bridge-routingkeybridge]] Routing bridge
 
-[[mapper-orm-bridge-routingbridge-basics]]
-== Basics
+[[binding-routingbridge-basics]]
+== [[mapper-orm-bridge-routingbridge-basics]] Basics
 
 A routing bridge is a pluggable component that defines, at runtime,
 whether an entity should be indexed and <<concepts-sharding-routing,to which shard the corresponding indexed document should be routed>>.
@@ -53,22 +53,23 @@ for more information about declaring dependencies.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/routingbridge/conditionalindexing/BookStatusRoutingBinder.java[tags=bridge]
 ----
-<1> The bridge must implement the `RoutingBridge` interface.
-Here the bridge class is nested in the binder class,
+<1> Here the bridge class is nested in the binder class,
 because it is more convenient,
-but you are obviously free to implement it in a separate java file.
-<2> Implement the `route(...)` method in the bridge.
+but you are obviously free to implement it as you wish:
+as a lambda expression, in a separate Java file...
+<2> The bridge must implement the `RoutingBridge` interface.
+<3> Implement the `route(...)` method in the bridge.
 This method is called on indexing.
-<3> Extract data from the bridged element and inspect it.
-<4> If the `Book` status is `PUBLISHED`, then we want to proceed with indexing:
+<4> Extract data from the bridged element and inspect it.
+<5> If the `Book` status is `PUBLISHED`, then we want to proceed with indexing:
 add a route so that Hibernate Search indexes the entity as usual.
-<5> If the `Book` status is `ARCHIVED`, then we don't want to index it:
+<6> If the `Book` status is `ARCHIVED`, then we don't want to index it:
 call `notIndexed()` so that Hibernate Search knows it should *not* index the entity.
-<6> When a book gets archived, there might be a previously indexed document that needs to be deleted.
+<7> When a book gets archived, there might be a previously indexed document that needs to be deleted.
 The `previousRoutes(...)` method allows you to tell Hibernate Search where this document can possibly be.
 When necessary, Hibernate Search will follow each given route, look for documents corresponding to this entity,
 and delete them.
-<7> In this case, routing is very simple: there is only one possible previous route, so we only register that route.
+<8> In this case, routing is very simple: there is only one possible previous route, so we only register that route.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -166,7 +167,7 @@ There are two ways to pass parameters to routing bridges:
 Refer to <<binding-typebridge-parameters,this example for `TypeBinder`>>,
 which is fairly similar to what you'll need for a `RoutingBinder`.
 
-[[binding-routingbridge-ormsession]]
+[[binding-routingbridge-access-orm]]
 == [[mapper-orm-bridge-routingbridge-ormsession]] Accessing the ORM session from the bridge
 
 include::components/mapper-orm-only-note.asciidoc[]
@@ -189,12 +190,12 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/routi
 With <<configuration-bean-frameworks,compatible frameworks>>,
 Hibernate Search supports injecting beans into:
 
-* the `TypeMappingAnnotationProcessor` if you use custom annotations and instantiate the binder yourself.
-* the `RoutingBinder` if you use `@Indexed(routingBinder = ...)` and let Hibernate Search
-instantiate the binder using your dependency injection framework.
+* the `TypeMappingAnnotationProcessor` if you use <<binding-routingbridge-parameters,custom annotations>>.
+* the `RoutingBinder` if you use <<binding-routingbridge-basics,`@Indexed(routingBinder = ...)`>>.
 
-NOTE: This only applies to binders instantiated by Hibernate Search itself.
-As a rule of thumb, if you need to call `new MyBinder()` at some point,
+NOTE: This only applies to beans instantiated
+through Hibernate Search's <<configuration-bean-resolution,bean resolution>>.
+As a rule of thumb, if you need to call `new MyBinder()` explicitly at some point,
 the binder won't get auto-magically injected.
 
 The context passed to the routing binder's `bind` method

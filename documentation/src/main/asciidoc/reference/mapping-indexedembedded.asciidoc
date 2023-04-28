@@ -504,7 +504,7 @@ For example a `Book` entity might index-embed `BookEdition` instances,
 but some editions might be retired and thus need to be filtered out before indexing.
 
 Such filtering can be achieved by applying `@IndexedEmbedded` to a transient getter representing the filtered association,
-and configuring reindexing with <<mapper-orm-reindexing-associationinverseside,`@AssociationInverseSide`>>
+and configuring reindexing with <<mapping-reindexing-associationinverseside,`@AssociationInverseSide`>>
 and <<mapping-reindexing-derivedfrom,`@IndexingDependency.derivedFrom`>>.
 
 .Filtered an `@IndexedEmbedded` association with a transient getter, `@AssociationInverseSide` and `@IndexingDependency.derivedFrom`

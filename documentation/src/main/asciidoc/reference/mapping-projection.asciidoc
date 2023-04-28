@@ -28,7 +28,7 @@ include::{sourcedirJava17}/org/hibernate/search/documentation/mapper/orm/project
 ----
 <1> Annotate the record type with `@ProjectionConstructor`,
 either at the type level (if there's only one constructor)
-or at the constructor level (if there are multiple constructors).
+or at the constructor level (if there are <<mapping-projection-multiple-constructors,multiple constructors>>).
 <2> To project on the entity identifier, annotate the relevant constructor parameter with <<search-dsl-projection-id-mapping,`@IdProjection`>>.
 +
 Most projections have a corresponding annotation that can be used on constructor parameters.
@@ -105,7 +105,7 @@ for the target field, which in general is the type of the property annotated wit
 set the parameter type to another custom type annotated with `@ProjectionConstructor`,
 whose constructor will define which fields to extract from that object field.
 * For a multivalued projection, follow the rules above then wrap the type with `Iterable`, `Collection` or `List`,
-e.g. `Iterable<SometType>`, `Collection<SomeType>` or `List<SomeType>`.
+e.g. `Iterable<SomeType>`, `Collection<SomeType>` or `List<SomeType>`.
 
 [IMPORTANT]
 ====

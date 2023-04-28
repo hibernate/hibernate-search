@@ -135,7 +135,7 @@ public final class HibernateOrmMapperSettings {
 	 * whether Hibernate Search should automatically build Jandex indexes for types registered for annotation processing
 	 * (entities in particular),
 	 * to ensure that all "root mapping" annotations in those JARs (e.g. {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor})
-	 * are taken into account..
+	 * are taken into account.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
 	 * or a string that can be parsed into a Boolean value.

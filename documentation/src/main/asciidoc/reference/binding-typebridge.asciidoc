@@ -54,27 +54,28 @@ Since we're indexing a full name,
 we will use a `String` type with a `name` analyzer (defined separately, see <<concepts-analysis>>).
 See <<binding-index-field-type-dsl>>
 for more information about declaring index field types.
-<6> Call `context.bridge(...)` to define the type bridge to use,
-and pass an instance of the bridge.
+<6> Call `context.bridge(...)` to define the type bridge to use.
 <7> Pass the expected type of the entity.
-<8> Pass a reference to the `fullName` field to the bridge.
+<8> Pass the type bridge instance.
+<9> Pass a reference to the `fullName` field to the bridge.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/simple/FullNameBinder.java[tags=bridge]
 ----
-<1> The bridge must implement the `TypeBridge` interface.
-One generic type argument must be provided: the type of the "bridged element".
-Here the bridge class is nested in the binder class,
+<1> Here the bridge class is nested in the binder class,
 because it is more convenient,
-but you are obviously free to implement it in a separate java file.
-<2> The bridge stores references to the fields:
+but you are obviously free to implement it as you wish:
+as a lambda expression, in a separate Java file...
+<2> The bridge must implement the `TypeBridge` interface.
+One generic type argument must be provided: the type of the "bridged element".
+<3> The bridge stores references to the fields --
 it will need them when indexing.
-<3> Implement the `write` method in the bridge.
+<4> Implement the `write` method in the bridge.
 This method is called on indexing.
-<4> Extract data from the bridged element,
+<5> Extract data from the bridged element,
 and optionally transform it.
-<5> Set the value of the `fullName` field.
+<6> Set the value of the `fullName` field.
 Note the `fullName` field was declared at the root,
 so we call `addValue` directly on the `target` argument.
 
@@ -115,11 +116,12 @@ You can pass string parameters to the `@TypeBinderRef` annotation and then use t
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/context/FullNameBinder.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/string/FullNameBinder.java[tags=include]
 ----
 <1> Use the binding context to get the parameter value.
-Getting the param using the `param` method assumes that the param has been defined.
-Alternatively it is possible to use `paramOptional` to get the `java.util.Optional` of the param.
++
+The `param` method will throw an exception if the parameter has not been defined.
+Alternatively, use `paramOptional` to get an `java.util.Optional` that will be empty if the parameter has not been defined.
 <2> In the `bind` method, use the value of parameters.
 Here use the `sortField` parameter to decide whether to add another, sortable field,
 but we could pass parameters for any purpose:
@@ -129,7 +131,7 @@ defining a normalizer,custom annotation
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/context/Author.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/string/Author.java[tags=include;!getters-setters]
 ----
 <1> Define the binder to use on the type,
 setting the `sortField` parameter.
@@ -145,9 +147,9 @@ a <<mapping-custom-annotations,custom annotation>> with attributes:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/FullNameBinding.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/annotation/FullNameBinding.java[tags=include]
 ----
-<1> Define an annotation with retention `RUNTIME`.
+<1> Define an annotation with `RUNTIME` retention.
 *Any other retention policy will cause the annotation to be ignored by Hibernate Search*.
 <2> Since we're defining a type bridge, allow the annotation to target types.
 <3> Mark this annotation as a type mapping,
@@ -156,19 +158,20 @@ It is also possible to reference the binder by its name, in the case of a CDI/Sp
 <4> Optionally, mark the annotation as documented,
 so that it is included in the javadoc of your entities.
 <5> Define an attribute of type `boolean` to specify whether a sort field should be added.
-<6> The processor must implement the `TypeMappingAnnotationProcessor` interface,
-setting its generic type argument to the type of the corresponding annotation.
-Here the processor class is nested in the annotation class,
+<6> Here the processor class is nested in the annotation class,
 because it is more convenient,
 but you are obviously free to implement it in a separate Java file.
-<7> In the annotation processor, instantiate the binder.
-<8> Process the annotation attributes and pass the data to the binder.
+<7> The processor must implement the `TypeMappingAnnotationProcessor` interface,
+setting its generic type argument to the type of the corresponding annotation.
+<8> In the annotation processor, instantiate the binder.
+<9> Process the annotation attributes and pass the data to the binder.
++
 Here we're using a setter, but passing the data through the constructor would work, too.
-<9> Apply the binder to the type.
+<10> Apply the binder to the type.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/FullNameBinder.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/annotation/FullNameBinder.java[tags=include]
 ----
 <1> Implement setters in the binder.
 Alternatively, we could expose a parameterized constructor.
@@ -181,7 +184,7 @@ defining a normalizer,custom annotation
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/Author.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/annotation/Author.java[tags=include;!getters-setters]
 ----
 <1> Apply the bridge using its custom annotation,
 setting the `sortField` parameter.
@@ -210,12 +213,12 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typeb
 With <<configuration-bean-frameworks,compatible frameworks>>,
 Hibernate Search supports injecting beans into:
 
-* the `TypeMappingAnnotationProcessor` if you use custom annotations and instantiate the binder yourself.
-* the `TypeBinder` if you use the `@TypeBinding` annotation and let Hibernate Search
-instantiate the binder using your dependency injection framework.
+* the `TypeMappingAnnotationProcessor` if you use <<binding-typebridge-parameters-custom-annotation,custom annotations>>.
+* the `TypeBinder` if you use the <<binding-typebridge-basics,`@TypeBinding` annotation>>.
 
-NOTE: This only applies to binders instantiated by Hibernate Search itself.
-As a rule of thumb, if you need to call `new MyBinder()` at some point,
+NOTE: This only applies to beans instantiated
+through Hibernate Search's <<configuration-bean-resolution,bean resolution>>.
+As a rule of thumb, if you need to call `new MyBinder()` explicitly at some point,
 the binder won't get auto-magically injected.
 
 The context passed to the routing key binder's `bind` method
@@ -233,7 +236,7 @@ Just pass an instance of the binder. You can pass arguments either through the b
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/TypeBridgeParamIT.java[tags=programmatic]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/typebridge/param/annotation/TypeBridgeParamAnnotationIT.java[tags=programmatic]
 ----
 ====
 

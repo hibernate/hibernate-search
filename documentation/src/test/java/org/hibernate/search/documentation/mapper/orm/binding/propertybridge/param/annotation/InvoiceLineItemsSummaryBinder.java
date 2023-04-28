@@ -4,12 +4,11 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.mapper.orm.binding.propertybridge.bridgedelement;
+package org.hibernate.search.documentation.mapper.orm.binding.propertybridge.param.annotation;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.hibernate.search.documentation.mapper.orm.binding.propertybridge.param.annotation.InvoiceLineItem;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -19,21 +18,25 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
-import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 
 //tag::include[]
 public class InvoiceLineItemsSummaryBinder implements PropertyBinder {
 
+	private String fieldName = "summary";
+
+	public InvoiceLineItemsSummaryBinder fieldName(String fieldName) { // <1>
+		this.fieldName = fieldName;
+		return this;
+	}
+
 	@Override
-	@SuppressWarnings("uncheked")
 	public void bind(PropertyBindingContext context) {
 		context.dependencies()
 				.use( "category" )
 				.use( "amount" );
 
-		PojoModelProperty bridgedElement = context.bridgedElement(); // <1>
 		IndexSchemaObjectField summaryField = context.indexSchemaElement()
-				.objectField( bridgedElement.name() ); // <2>
+				.objectField( this.fieldName ); // <2>
 
 		IndexFieldType<BigDecimal> amountFieldType = context.typeFactory()
 				.asBigDecimal().decimalScale( 2 ).toIndexFieldType();

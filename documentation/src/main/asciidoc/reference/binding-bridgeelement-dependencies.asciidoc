@@ -40,7 +40,7 @@ For example:
 * for a property bridge on the property `author` of `ScientificPaper`,
 path `name` will refer to the value of property `name` on `Author` instances.
 Every component of given paths will be considered as a dependency::
-You do not need to declare every sub-path.
+You do not need to declare any parent path.
 +
 For example, if the path `myProperty.someOtherProperty` is declared as used,
 Hibernate Search will automatically assume that `myProperty` is also used.

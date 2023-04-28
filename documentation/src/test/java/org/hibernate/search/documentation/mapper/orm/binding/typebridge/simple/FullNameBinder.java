@@ -28,8 +28,8 @@ public class FullNameBinder implements TypeBinder { // <1>
 
 		context.bridge( // <6>
 				Author.class, // <7>
-				new Bridge(
-					fullNameField // <8>
+				new Bridge( // <8>
+					fullNameField // <9>
 				)
 		);
 	}
@@ -39,18 +39,19 @@ public class FullNameBinder implements TypeBinder { // <1>
 	//tag::bridge[]
 	// ... class FullNameBinder (continued)
 
-	private static class Bridge implements TypeBridge<Author> { // <1>
+	private static class Bridge // <1>
+			implements TypeBridge<Author> { // <2>
 
 		private final IndexFieldReference<String> fullNameField;
 
-		private Bridge(IndexFieldReference<String> fullNameField) { // <2>
+		private Bridge(IndexFieldReference<String> fullNameField) { // <3>
 			this.fullNameField = fullNameField;
 		}
 
 		@Override
-		public void write(DocumentElement target, Author author, TypeBridgeWriteContext context) { // <3>
-			String fullName = author.getLastName() + " " + author.getFirstName(); // <4>
-			target.addValue( this.fullNameField, fullName ); // <5>
+		public void write(DocumentElement target, Author author, TypeBridgeWriteContext context) { // <4>
+			String fullName = author.getLastName() + " " + author.getFirstName(); // <5>
+			target.addValue( this.fullNameField, fullName ); // <6>
 		}
 	}
 }

@@ -61,7 +61,7 @@ include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/
 ----
 <1> Annotate the record type with `@ProjectionConstructor`,
 either at the type level (if there's only one constructor)
-or at the constructor level (if there are multiple constructors).
+or at the constructor level (if there are <<mapping-projection-multiple-constructors,multiple constructors>>).
 <2> To project on the entity identifier, annotate the relevant constructor parameter with <<search-dsl-projection-id-mapping,`@IdProjection`>>.
 +
 Most projections have a corresponding annotation that can be used on constructor parameters.
@@ -758,7 +758,7 @@ include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/
 ----
 <1> Annotate the record type with `@ProjectionConstructor`,
 either at the type level (if there's only one constructor)
-or at the constructor level (if there are multiple constructors).
+or at the constructor level (if there are <<mapping-projection-multiple-constructors,multiple constructors>>).
 <2> To project on the entity identifier, annotate the relevant constructor parameter with <<search-dsl-projection-id-mapping,`@IdProjection`>>.
 +
 Most projections have a corresponding annotation that can be used on constructor parameters.
@@ -895,7 +895,7 @@ or a `org.hibernate.search.util.common.function.TriFunction`,
 depending on the number of inner projections.
 It will receive values returned by inner projections and return an object combining these values.
 
-.Returning custom objects created from multiple projected values with `.object(...).from(...).as(...)`
+.Returning custom objects created from an object field with `.object(...).from(...).as(...)`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -927,7 +927,7 @@ If you pass more than 3 projections as arguments,
 then the transform function will have to take a `List<?>` as an argument,
 and will be set using `asList(...)` instead of `as(..,)`:
 
-.Returning custom objects created from multiple projected values with `.object(...).from(...).asList(...)`
+.Returning custom objects created from an object field with `.object(...).from(...).asList(...)`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -952,7 +952,7 @@ Thus, the list of hits will be an instance of `List<List<MyAuthorNameAndBirthDat
 
 Similarly, `asArray(...)` can be used to get passed an `Object[]` argument instead of `List<?>`.
 
-.Returning custom objects created from multiple projected values with `.object(...).from(...).asArray(...)`
+.Returning custom objects created from an object field with `.object(...).from(...).asArray(...)`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -1033,7 +1033,7 @@ This is similar to the <<search-dsl-projection-mapped,projection to a custom (an
 
 include::components/custom-projection-type-important.asciidoc[]
 
-.Using a custom record type to project data from the index
+.Using a custom record type to project data created from an object field
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -1041,7 +1041,7 @@ include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/
 ----
 <1> Annotate the record type with `@ProjectionConstructor`,
 either at the type level (if there's only one constructor)
-or at the constructor level (if there are multiple constructors).
+or at the constructor level (if there are <<mapping-projection-multiple-constructors,multiple constructors>>).
 <2> To project on a value field, add a constructor parameter named after that field and with the same type as that field.
 See <<mapping-projection-inner-inference>> for more information on how constructor parameters should be defined.
 +
@@ -1332,11 +1332,6 @@ are all added to same returned document.
 
 If you want a projection that retrieves the value as it was in your entity upon indexing,
 use a <<search-dsl-projection-field,`field` projection>>.
-====
-
-
-[NOTE]
-====
 ====
 
 [[search-dsl-projection-extensions-lucene-explanation]]

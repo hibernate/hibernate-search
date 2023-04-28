@@ -35,7 +35,8 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/named
 ----
 <1> Here the bridge class is nested in the binder class,
 because it is more convenient,
-but you are obviously free to implement it in a separate java file.
+but you are obviously free to implement it as you wish:
+as a lambda expression, in a separate Java file...
 <2> The bridge creates an object to hold the various components of the SKU identifier.
 <3> The bridge populates the various components of the SKU identifier.
 
@@ -52,8 +53,9 @@ but you are obviously free to implement it in a separate java file.
 which is the entry point to the <<search-dsl-predicate,predicate DSL>>,
 used to create predicates.
 <3> The definition can access parameters that are passed when calling the named predicates.
-Getting the param using the `param` method assumes that the param has been defined.
-Alternatively it is possible to use `paramOptional` to get the `java.util.Optional` of the param.
++
+The `param` method will throw an exception if the parameter has not been defined.
+Alternatively, use `paramOptional` to get an `java.util.Optional` that will be empty if the parameter has not been defined.
 <4> The definition uses the predicate factory to create predicates.
 In this example, this implementation transforms a pattern with a custom format into three patterns,
 one for each field populated by the bridge.

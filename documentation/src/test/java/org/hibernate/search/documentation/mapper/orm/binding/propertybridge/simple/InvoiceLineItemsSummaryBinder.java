@@ -34,12 +34,15 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder { // <1>
 		IndexFieldType<BigDecimal> amountFieldType = context.typeFactory() // <5>
 				.asBigDecimal().decimalScale( 2 ).toIndexFieldType();
 
-		context.bridge( List.class, new Bridge( // <6>
-				summaryField.toReference(), // <7>
-				summaryField.field( "total", amountFieldType ).toReference(), // <8>
-				summaryField.field( "books", amountFieldType ).toReference(), // <8>
-				summaryField.field( "shipping", amountFieldType ).toReference() // <8>
-		) );
+		context.bridge( // <6>
+				List.class, // <7>
+				new Bridge( // <8>
+						summaryField.toReference(), // <9>
+						summaryField.field( "total", amountFieldType ).toReference(), // <10>
+						summaryField.field( "books", amountFieldType ).toReference(), // <10>
+						summaryField.field( "shipping", amountFieldType ).toReference() // <10>
+				)
+		);
 	}
 
 	// ... class continues below
@@ -48,14 +51,15 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder { // <1>
 	// ... class InvoiceLineItemsSummaryBinder (continued)
 
 	@SuppressWarnings("rawtypes")
-	private static class Bridge implements PropertyBridge<List> { // <1>
+	private static class Bridge // <1>
+			implements PropertyBridge<List> { // <2>
 
 		private final IndexObjectFieldReference summaryField;
 		private final IndexFieldReference<BigDecimal> totalField;
 		private final IndexFieldReference<BigDecimal> booksField;
 		private final IndexFieldReference<BigDecimal> shippingField;
 
-		private Bridge(IndexObjectFieldReference summaryField, // <2>
+		private Bridge(IndexObjectFieldReference summaryField, // <3>
 				IndexFieldReference<BigDecimal> totalField,
 				IndexFieldReference<BigDecimal> booksField,
 				IndexFieldReference<BigDecimal> shippingField) {
@@ -66,14 +70,14 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder { // <1>
 		}
 
 		@Override
-		public void write(DocumentElement target, List bridgedElement, PropertyBridgeWriteContext context) { // <3>
+		public void write(DocumentElement target, List bridgedElement, PropertyBridgeWriteContext context) { // <4>
 			@SuppressWarnings("unchecked")
 			List<InvoiceLineItem> lineItems = (List<InvoiceLineItem>) bridgedElement;
 
 			BigDecimal total = BigDecimal.ZERO;
 			BigDecimal books = BigDecimal.ZERO;
 			BigDecimal shipping = BigDecimal.ZERO;
-			for ( InvoiceLineItem lineItem : lineItems ) { // <4>
+			for ( InvoiceLineItem lineItem : lineItems ) { // <5>
 				BigDecimal amount = lineItem.getAmount();
 				total = total.add( amount );
 				switch ( lineItem.getCategory() ) {
@@ -86,10 +90,10 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder { // <1>
 				}
 			}
 
-			DocumentElement summary = target.addObject( this.summaryField ); // <5>
-			summary.addValue( this.totalField, total ); // <6>
-			summary.addValue( this.booksField, books ); // <6>
-			summary.addValue( this.shippingField, shipping ); // <6>
+			DocumentElement summary = target.addObject( this.summaryField ); // <6>
+			summary.addValue( this.totalField, total ); // <7>
+			summary.addValue( this.booksField, books ); // <7>
+			summary.addValue( this.shippingField, shipping ); // <7>
 		}
 	}
 }

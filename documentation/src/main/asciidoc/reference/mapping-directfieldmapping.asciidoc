@@ -89,7 +89,7 @@ it is recommended to use `@KeywordField`, with a normalizer if necessary (see be
 Note that multiple fields can be added to the same property,
 so you can use both `@FullTextField` and `@KeywordField` if you need both
 full-text search and sorting:
-you will just need to use a distinct <<mapper-orm-directfieldmapping-name,name>> for each of those two fields.
+you will just need to use a distinct <<mapping-directfieldmapping-name,name>> for each of those two fields.
 
 [[mapping-directfieldmapping-annotations-keywordfield]] [[mapper-orm-directfieldmapping-annotations-keywordfield]] `@KeywordField`::
 A text field whose value is considered as a single keyword.

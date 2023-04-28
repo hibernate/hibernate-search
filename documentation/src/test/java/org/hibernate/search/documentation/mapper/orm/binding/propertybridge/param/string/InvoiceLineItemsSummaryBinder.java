@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.mapper.orm.binding.propertybridge.bridgedelement;
+package org.hibernate.search.documentation.mapper.orm.binding.propertybridge.param.string;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
-import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 
 //tag::include[]
 public class InvoiceLineItemsSummaryBinder implements PropertyBinder {
@@ -31,9 +30,9 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder {
 				.use( "category" )
 				.use( "amount" );
 
-		PojoModelProperty bridgedElement = context.bridgedElement(); // <1>
+		String fieldName = (String) context.param( "fieldName" ); // <1>
 		IndexSchemaObjectField summaryField = context.indexSchemaElement()
-				.objectField( bridgedElement.name() ); // <2>
+				.objectField( fieldName ); // <2>
 
 		IndexFieldType<BigDecimal> amountFieldType = context.typeFactory()
 				.asBigDecimal().decimalScale( 2 ).toIndexFieldType();

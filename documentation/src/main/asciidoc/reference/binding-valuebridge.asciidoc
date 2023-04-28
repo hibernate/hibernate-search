@@ -245,9 +245,11 @@ but they can be overridden.
 Type configuration is similar to the attributes found in the various `@*Field` annotations.
 See <<binding-index-field-type-dsl>> for more information.
 <9> The value bridge must still be implemented.
++
 Here the bridge class is nested in the binder class,
 because it is more convenient,
-but you are obviously free to implement it in a separate java file.
+but you are obviously free to implement it as you wish:
+as a lambda expression, in a separate Java file...
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -300,7 +302,7 @@ You can define string parameters to the `@ValueBinderRef` annotation and then us
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/valuebridge/param/BooleanAsStringBridge.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/valuebridge/param/annotation/BooleanAsStringBridge.java[tags=include]
 ----
 <1> Implement a bridge that does not index booleans directly,
 but indexes them as strings instead.
@@ -309,16 +311,17 @@ the string representing `true` and the string representing `false`.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/valuebridge/param/context/BooleanAsStringBinder.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/valuebridge/param/string/BooleanAsStringBinder.java[tags=include]
 ----
 <1> Use the binding context to get the parameter values.
-Getting the param using the `param` method assumes that the param has been defined.
-Alternatively it is possible to use `paramOptional` to get the `java.util.Optional` of the param.
++
+The `param` method will throw an exception if the parameter has not been defined.
+Alternatively, use `paramOptional` to get an `java.util.Optional` that will be empty if the parameter has not been defined.
 <2> Pass them as arguments to the bridge constructor.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/valuebridge/param/context/Book.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/valuebridge/param/string/Book.java[tags=include;!getters-setters]
 ----
 <1> Define the binder to use on the property,
 setting the `fieldName` parameter.
@@ -337,7 +340,7 @@ a <<mapping-custom-annotations,custom annotation>> with attributes:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/valuebridge/param/BooleanAsStringBridge.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/valuebridge/param/annotation/BooleanAsStringBridge.java[tags=include]
 ----
 <1> Implement a bridge that does not index booleans directly,
 but indexes them as strings instead.
@@ -346,15 +349,15 @@ the string representing `true` and the string representing `false`.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/valuebridge/param/BooleanAsStringField.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/valuebridge/param/annotation/BooleanAsStringField.java[tags=include]
 ----
-<1> Define an annotation with retention `RUNTIME`.
+<1> Define an annotation with `RUNTIME` retention.
 *Any other retention policy will cause the annotation to be ignored by Hibernate Search*.
 <2> Since we're defining a value bridge, allow the annotation
 to target either methods (getters) or fields.
 <3> Mark this annotation as a property mapping,
 and instruct Hibernate Search to apply the given processor whenever it finds this annotation.
-It is also possible to reference the processor by its name, in the case of a CDI/Spring bean.
+It is also possible to reference the processor by its CDI/Spring bean name.
 <4> Optionally, mark the annotation as documented,
 so that it is included in the javadoc of your entities.
 <5> Optionally, mark the annotation as repeatable,
@@ -364,18 +367,18 @@ Here we define two strings that the bridge should use to represent the boolean v
 <7> Since we will be using a custom annotation,
 and not the built-in <<mapping-directfieldmapping-annotations,`@*Field` annotation>>,
 the standard parameters that make sense for this bridge need to be declared here, too.
-<8> The processor must implement the `PropertyMappingAnnotationProcessor` interface,
-setting its generic type argument to the type of the corresponding annotation.
-Here the processor class is nested in the annotation class,
+<8> Here the processor class is nested in the annotation class,
 because it is more convenient,
 but you are obviously free to implement it in a separate Java file.
-<9> In the `process` method, instantiate the bridge
+<9> The processor must implement the `PropertyMappingAnnotationProcessor` interface,
+setting its generic type argument to the type of the corresponding annotation.
+<10> In the `process` method, instantiate the bridge
 and pass the annotation attributes as constructor arguments.
-<10> Declare the field with the configured name (if provided).
-<11> Assign our bridge to the field.
+<11> Declare the field with the configured name (if provided).
+<12> Assign our bridge to the field.
 Alternatively, we could assign a value binder instead,
 using the `valueBinder()` method.
-<12> Configure the remaining standard parameters.
+<13> Configure the remaining standard parameters.
 Note that the `context` object passed to the `process` method
 exposes utility methods to convert standard Hibernate Search annotations
 to something that can be passed to the mapping
@@ -383,7 +386,7 @@ to something that can be passed to the mapping
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/valuebridge/param/Book.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/valuebridge/param/annotation/Book.java[tags=include;!getters-setters]
 ----
 <1> Apply the bridge using its custom annotation,
 setting the parameters.
@@ -418,8 +421,9 @@ The `Session` is not available here.
 With <<configuration-bean-frameworks,compatible frameworks>>,
 Hibernate Search supports injecting beans into both the `ValueBridge` and the `ValueBinder`.
 
-NOTE: This only applies to bridges/binders instantiated by Hibernate Search itself.
-As a rule of thumb, if you need to call `new MyBridge()` at some point,
+NOTE: This only applies to beans instantiated
+through Hibernate Search's <<configuration-bean-resolution,bean resolution>>.
+As a rule of thumb, if you need to call `new MyBridge()` explicitly at some point,
 the bridge won't get auto-magically injected.
 
 The context passed to the value binder's `bind` method
