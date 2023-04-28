@@ -56,7 +56,7 @@ public abstract class AbstractProjectionConstructorIT {
 			List<?> rawProjectionResults,
 			Function<SearchProjectionFactory<?, ?>, ProjectionFinalStep<?>> expectedProjection,
 			List<P> expectedProjectionResults) {
-		try ( SearchSession session = mapping.createSession() ) {
+		try ( SearchSession session = createSession( mapping ) ) {
 			backendMock.expectSearchProjection(
 					INDEX_NAME,
 					b -> b.projection( expectedProjection.apply( mapping.scope( indexedType ).projection() ) ),
@@ -74,5 +74,9 @@ public abstract class AbstractProjectionConstructorIT {
 					.containsExactlyElementsOf( expectedProjectionResults );
 		}
 		backendMock.verifyExpectationsMet();
+	}
+
+	protected SearchSession createSession(SearchMapping mapping) {
+		return mapping.createSession();
 	}
 }

@@ -25,6 +25,7 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.DocumentReferenceProjectionBinder;
+import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.EntityProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.FieldProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.IdProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.ScoreProjectionBinder;
@@ -58,7 +59,8 @@ public class ProjectionDslJava17IT {
 				CollectionHelper.asSet( MyBookProjection.class, MyBookProjection.Author.class, MyAuthorProjection.class,
 						MyBookIdAndTitleProjection.class, MyBookTitleAndAuthorNamesProjection.class,
 						MyBookScoreAndTitleProjection.class,
-						MyBookDocRefAndTitleProjection.class ),
+						MyBookDocRefAndTitleProjection.class,
+						MyBookEntityAndTitleProjection.class ),
 				mapping -> {
 					var bookMapping = mapping.type( Book.class );
 					bookMapping.indexed();
@@ -129,6 +131,15 @@ public class ProjectionDslJava17IT {
 					myBookDocRefAndTitleProjection.mainConstructor().parameter( 0 )
 							.projection( DocumentReferenceProjectionBinder.create() );
 					//end::programmatic-document-reference-projection[]
+
+					//tag::programmatic-entity-projection[]
+					TypeMappingStep myBookEntityAndTitleProjection =
+							mapping.type( MyBookEntityAndTitleProjection.class );
+					myBookEntityAndTitleProjection.mainConstructor()
+							.projectionConstructor();
+					myBookEntityAndTitleProjection.mainConstructor().parameter( 0 )
+							.projection( EntityProjectionBinder.create() );
+					//end::programmatic-entity-projection[]
 				}
 		);
 	}
@@ -306,6 +317,30 @@ public class ProjectionDslJava17IT {
 							entityManager.createQuery( "select b from Book b", Book.class ).getResultList().stream()
 									.map( book -> new MyBookDocRefAndTitleProjection(
 											NormalizationUtils.reference( Book.NAME, book.getId().toString() ),
+											book.getTitle()
+									) )
+									.collect( Collectors.toList() )
+					);
+		} );
+	}
+
+	@Test
+	public void projectionConstructor_entity() {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			// tag::projection-constructor-entity[]
+			List<MyBookEntityAndTitleProjection> hits = searchSession.search( Book.class )
+					.select( MyBookEntityAndTitleProjection.class )// <1>
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 ); // <2>
+			// end::projection-constructor-entity[]
+			assertThat( hits )
+					.usingRecursiveFieldByFieldElementComparator()
+					.containsExactlyInAnyOrderElementsOf(
+							entityManager.createQuery( "select b from Book b", Book.class ).getResultList().stream()
+									.map( book -> new MyBookEntityAndTitleProjection(
+											book,
 											book.getTitle()
 									) )
 									.collect( Collectors.toList() )

@@ -28,12 +28,14 @@ public final class EntityProjectionOptionsStepImpl<E>
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SearchProjectionIndexScope<?> scope;
-	private final SearchProjectionFactory<?, E> projectionFactory;
+	private final SearchProjectionFactory<?, ?> projectionFactory;
+	private final Class<E> requestedEntityType;
 
 	public EntityProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext,
-			SearchProjectionFactory<?, E> projectionFactory) {
+			SearchProjectionFactory<?, ?> projectionFactory, Class<E> requestedEntityType) {
 		this.scope = dslContext.scope();
 		this.projectionFactory = projectionFactory;
+		this.requestedEntityType = requestedEntityType;
 	}
 
 	@Override
@@ -62,6 +64,11 @@ public final class EntityProjectionOptionsStepImpl<E>
 	// The casts are safe because a query making use of this projection can only target entity types extending E
 	@SuppressWarnings({ "unchecked" })
 	private SearchProjection<E> toProjection(ProjectionMappedTypeContext mappedTypeContext) {
+		if ( requestedEntityType != null && !requestedEntityType.isAssignableFrom( mappedTypeContext.javaClass() ) ) {
+			throw log.invalidTypeForEntityProjection( mappedTypeContext.name(), mappedTypeContext.javaClass(),
+					requestedEntityType
+			);
+		}
 		if ( mappedTypeContext.loadingAvailable() ) {
 			return scope.projectionBuilders().entityLoading();
 		}

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.integrationtest.backend.tck.testsupport.stub.MapperMockUtils.expectHitMapping;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.mockito.Mockito.doReturn;
@@ -28,6 +30,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -147,6 +150,99 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 											Collections.emptyList(),
 											new StubEntity( doc2Reference )
 									)
+							);
+				} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4574")
+	public void expectedType_exact() {
+		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
+		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
+		StubEntity doc1LoadedEntity = new StubEntity( doc1Reference );
+		StubEntity doc2LoadedEntity = new StubEntity( doc2Reference );
+
+		SearchLoadingContext<StubEntity> loadingContextMock =
+				mock( SearchLoadingContext.class );
+
+		doReturn( StubEntity.class )
+				.when( mainTypeContextMock ).javaClass();
+		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
+
+		mainIndex.mapping().with()
+				.typeContext( mainIndex.typeName(), mainTypeContextMock )
+				.run( () -> {
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
+							mainIndex.createGenericScope( loadingContextMock );
+					SearchQuery<StubEntity> query = scope.query().select( f -> f.entity( StubEntity.class ) )
+							.where( f -> f.matchAll() )
+							.toQuery();
+
+					expectHitMapping(
+							loadingContextMock,
+							c -> c
+									.load( doc1Reference, doc1LoadedEntity )
+									.load( doc2Reference, doc2LoadedEntity )
+					);
+					assertThatQuery( query ).hasHitsAnyOrder( doc1LoadedEntity, doc2LoadedEntity );
+				} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4574")
+	public void expectedType_superType() {
+		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
+		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
+		StubEntity doc1LoadedEntity = new StubEntity( doc1Reference );
+		StubEntity doc2LoadedEntity = new StubEntity( doc2Reference );
+
+		SearchLoadingContext<StubEntity> loadingContextMock =
+				mock( SearchLoadingContext.class );
+
+		doReturn( StubEntity.class )
+				.when( mainTypeContextMock ).javaClass();
+		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
+
+		mainIndex.mapping().with()
+				.typeContext( mainIndex.typeName(), mainTypeContextMock )
+				.run( () -> {
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
+							mainIndex.createGenericScope( loadingContextMock );
+					SearchQuery<Object> query = scope.query().select( f -> f.entity( Object.class ) )
+							.where( f -> f.matchAll() )
+							.toQuery();
+
+					expectHitMapping(
+							loadingContextMock,
+							c -> c
+									.load( doc1Reference, doc1LoadedEntity )
+									.load( doc2Reference, doc2LoadedEntity )
+					);
+					assertThatQuery( query ).hasHitsAnyOrder( doc1LoadedEntity, doc2LoadedEntity );
+				} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4574")
+	public void expectedType_invalid() {
+		SearchLoadingContext<StubEntity> loadingContextMock =
+				mock( SearchLoadingContext.class );
+
+		when( mainTypeContextMock.name() ).thenReturn( mainIndex.typeName() );
+		doReturn( StubEntity.class )
+				.when( mainTypeContextMock ).javaClass();
+
+		mainIndex.mapping().with()
+				.typeContext( mainIndex.typeName(), mainTypeContextMock )
+				.run( () -> {
+					GenericStubMappingScope<EntityReference, StubEntity> scope =
+							mainIndex.createGenericScope( loadingContextMock );
+					assertThatThrownBy( () -> scope.query().select( f -> f.entity( Integer.class ) ) )
+							.isInstanceOf( SearchException.class )
+							.hasMessageContainingAll(
+									"Invalid type for entity projection on type '" + mainIndex.typeName() + "'",
+									"the entity type's Java class '" + StubEntity.class.getName()
+											+ "' does not extend the requested projection type '" + Integer.class.getName() + "'"
 							);
 				} );
 	}
