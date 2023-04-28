@@ -48,14 +48,6 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
-	public boolean supportsHighlighterUnifiedTypeMultipleFragmentsAsSeparateItems() {
-		// Lucene default unified highlighter will combine all fragments into one string separating them with `ellipses` parameter.
-		// While in ES a custom highlighter is used that adds each fragment as a separate item to the result list.
-		// See https://hibernate.atlassian.net/browse/HSEARCH-4828
-		return false;
-	}
-
-	@Override
 	public boolean supportsHighlighterUnifiedTypeFragmentSize() {
 		// Break iterators from `java.text.BreakIterator` do not allow for such config.
 		// While in ES a custom iterator is available that wraps sentence and word break iterators and is using the max size option.

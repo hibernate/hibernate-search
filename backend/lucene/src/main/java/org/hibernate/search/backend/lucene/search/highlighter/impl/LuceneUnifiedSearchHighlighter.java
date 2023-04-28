@@ -11,9 +11,9 @@ import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneF
 import java.io.IOException;
 import java.text.BreakIterator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
@@ -24,10 +24,11 @@ import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.highlight.Encoder;
-import org.apache.lucene.search.uhighlight.DefaultPassageFormatter;
 import org.apache.lucene.search.uhighlight.Passage;
+import org.apache.lucene.search.uhighlight.PassageFormatter;
 import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
 
 class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
@@ -103,7 +104,7 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 		private final String[] fieldsIn;
 		private final int[] maxPassagesIn;
 		private final Query query;
-		private final UnifiedHighlighter highlighter;
+		private final MultiValueUnifiedHighlighter highlighter;
 
 		UnifiedHighlighterValues(String parentDocumentPath, String nestedDocumentPath, String field, Analyzer analyzer,
 				ProjectionExtractContext context, ProjectionAccumulator<String, ?, A, List<String>> accumulator) {
@@ -117,7 +118,8 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 					LuceneUnifiedSearchHighlighter.this.encoder
 			);
 
-			this.highlighter = new UnifiedHighlighter( context.collectorExecutionContext().getIndexSearcher(), analyzer );
+			this.highlighter = new MultiValueUnifiedHighlighter(
+					context.collectorExecutionContext().getIndexSearcher(), analyzer );
 			highlighter.setFormatter( formatter );
 			highlighter.setBreakIterator( this::breakIterator );
 			highlighter.setMaxNoHighlightPassages( LuceneUnifiedSearchHighlighter.this.noMatchSize > 0 ? 1 : 0 );
@@ -140,16 +142,21 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 
 		@Override
 		public List<String> highlight(int doc) throws IOException {
-			Map<String, String[]> highlights = highlighter.highlightFields(
-					fieldsIn, query, new int[] { leafReaderContext.docBase + doc }, maxPassagesIn );
+			List<String> highlights = highlighter.highlightField( fieldsIn, query, leafReaderContext.docBase + doc, maxPassagesIn );
+			return highlights == null ? Collections.emptyList() : highlights;
+		}
+	}
 
-			List<String> result = new ArrayList<>();
-			for ( String highlight : highlights.get( fieldsIn[0] ) ) {
-				if ( highlight != null ) {
-					result.add( highlight );
-				}
-			}
-			return result;
+	private static class MultiValueUnifiedHighlighter extends UnifiedHighlighter {
+
+		public MultiValueUnifiedHighlighter(IndexSearcher indexSearcher, Analyzer indexAnalyzer) {
+			super( indexSearcher, indexAnalyzer );
+		}
+
+		@SuppressWarnings( "unchecked" )
+		public List<String> highlightField(String[] fieldIn, Query query, int doc, int[] maxPassagesIn) throws IOException {
+			assert fieldIn.length == 1;
+			return (List<String>) highlightFieldsAsObjects( fieldIn, query, new int[] { doc }, maxPassagesIn ).get( fieldIn[0] )[0];
 		}
 	}
 
@@ -161,57 +168,53 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 	 * {@code org.apache.lucene.search.uhighlight.DefaultPassageFormatter}
 	 * of <a href="https://lucene.apache.org/">Apache Lucene project</a>.
 	 */
-	private static class PassageFormatterWithEncoder extends DefaultPassageFormatter {
+	static class PassageFormatterWithEncoder extends PassageFormatter {
+		private final String preTag;
+		private final String postTag;
 		private final Encoder encoder;
 
 		public PassageFormatterWithEncoder(String preTag, String postTag, Encoder encoder) {
-			super( preTag, postTag,
-					"", // don't do any ellipsis to mimic the Elasticsearch behavior
-					false
-					// doesn't really matter as we override append() to use encoder rather than rely on this property
-			);
+			this.preTag = preTag;
+			this.postTag = postTag;
 			this.encoder = encoder;
 		}
 
-		@Override
-		public String format(Passage passages[], String content) {
-			StringBuilder sb = new StringBuilder();
+		public List<String> format(Passage[] passages, String content) {
+			List<String> result = new ArrayList<>( passages.length );
+
 			int pos = 0;
-			for (Passage passage : passages) {
-				// don't add ellipsis if its the first one, or if its connected.
-				if (passage.getStartOffset() > pos && pos > 0) {
-					sb.append(ellipsis);
-				}
+			for ( Passage passage : passages ) {
+				StringBuilder sb = new StringBuilder();
 				pos = passage.getStartOffset();
-				for (int i = 0; i < passage.getNumMatches(); i++) {
+				for ( int i = 0; i < passage.getNumMatches(); i++ ) {
 					int start = passage.getMatchStarts()[i];
 					assert start >= pos && start < passage.getEndOffset();
 					//append content before this start
-					append(sb, content, pos, start);
+					append( sb, content, pos, start );
 
 					int end = passage.getMatchEnds()[i];
 					assert end > start;
-					// its possible to have overlapping terms.
+					// it's possible to have overlapping terms.
 					//   Look ahead to expand 'end' past all overlapping:
-					while (i + 1 < passage.getNumMatches() && passage.getMatchStarts()[i+1] < end) {
+					while ( i + 1 < passage.getNumMatches() && passage.getMatchStarts()[i + 1] < end ) {
 						end = passage.getMatchEnds()[++i];
 					}
-					end = Math.min(end, passage.getEndOffset()); // in case match straddles past passage
+					end = Math.min( end, passage.getEndOffset() ); // in case match straddles past passage
 
-					sb.append(preTag);
-					append(sb, content, start, end);
-					sb.append(postTag);
+					sb.append( preTag );
+					append( sb, content, start, end );
+					sb.append( postTag );
 
 					pos = end;
 				}
 				// its possible a "term" from the analyzer could span a sentence boundary.
-				append(sb, content, pos, Math.max(pos, passage.getEndOffset()));
-				pos = passage.getEndOffset();
+				append( sb, content, pos, Math.max( pos, passage.getEndOffset() ) );
+
+				result.add( sb.toString() );
 			}
-			return sb.toString();
+			return result;
 		}
 
-		@Override
 		protected void append(StringBuilder dest, String content, int start, int end) {
 			dest.append( encoder.encodeText( content.substring( start, end ) ) );
 		}
