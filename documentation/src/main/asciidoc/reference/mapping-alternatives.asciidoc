@@ -11,7 +11,7 @@ For example there may be an entity that has text properties whose content
 is in a different language depending on the value of another property, say `language`.
 In that case, you probably want to analyze the text differently depending on the language.
 
-While this could definitely be solved with a custom <<bridge-typebridge,type bridge>>,
+While this could definitely be solved with a custom <<binding-typebridge,type bridge>>,
 a convenient solution to that problem is to use the `AlternativeBinder`.
 This binder solves the problem this way:
 

@@ -67,7 +67,7 @@ and refer to <<mapping-geopoint-geopointbinding>> instead.
 [TIP]
 ====
 If your geo-point type is immutable, but extending the `GeoPoint` interface is not an option,
-you can also use a custom <<bridge-valuebridge,value bridge>>
+you can also use a custom <<binding-valuebridge,value bridge>>
 converting between the custom geo-point type and `GeoPoint`.
 `GeoPoint` offers static methods to quickly build a `GeoPoint` instance.
 ====

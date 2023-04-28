@@ -113,7 +113,7 @@ Programmatic mapping is declarative and exposes the exact same features as annot
 
 In order to implement more complex, "imperative" mapping,
 for example to combine two entity properties into a single index field,
-use <<bridge,custom bridges>>.
+use <<binding,custom bridges>>.
 ====
 
 [TIP]

@@ -1,0 +1,279 @@
+[[binding-index-field-dsl]]
+= [[mapper-orm-bridge-index-field-dsl]] Declaring and writing to index fields
+
+[[binding-index-field-dsl-basics]]
+== [[mapper-orm-bridge-index-field-dsl-basics]] Basics
+
+When implementing a <<binding-propertybridge,`PropertyBinder`>>
+or <<binding-typebridge,`TypeBinder`>>,
+it is necessary to declare the index fields that the bridge will contribute to.
+This declaration is performed using a dedicated DSL.
+
+The entry point to this DSL is the `IndexNode`,
+which represents the part of the document structure that the binder will push data to.
+From the `IndexNode`, it is possible to declare fields.
+
+The declaration of each field yields a field _reference_.
+This reference is to be stored in the bridge,
+which will use it at runtime to set the value of this field in a given document,
+represented by a `DocumentElement`.
+
+Below is a simple example using the DSL to declare a single field in a property binder
+and then write to that field in a property bridge.
+
+.Declaring a simple index field and writing to that field
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/simple/ISBNBinder.java[tags=bind]
+----
+<1> Get the `IndexNode`, the entry point to the index field declaration DSL.
+<2> Declare a field.
+<3> Pass the name of the field.
+<4> Declare the type of the field.
+This is done through a lambda taking advantage of another DSL.
+See <<binding-index-field-type-dsl>> for more information.
+<5> Get a reference to the declared field.
+<6> Call `context.bridge(...)` to define the bridge to use.
+<7> Pass the expected type of values.
+<8> Pass the bridge instance.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/simple/ISBNBinder.java[tags=write]
+----
+<1> In the bridge, use the reference obtained above to add a value to the field for the current document.
+====
+
+[[binding-index-field-dsl-type-objects]]
+== [[mapper-orm-bridge-index-field-dsl-type-objects]] [[_type_objects]] Type objects
+
+The lambda syntax to declare the type of each field is convenient,
+but sometimes gets in the way,
+in particular when multiple fields must be declared with the exact same type.
+
+For that reason, the context object passed to binders exposes a `typeFactory()` method.
+Using this factory, it is possible to build `IndexFieldType` objects
+that can be re-used in multiple field declarations.
+
+.Re-using an index field type in multiple field declarations
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/simple/SingleValuedNamesBinder.java[tags=bind]
+----
+<1> Get the type factory.
+<2> Define the type.
+<3> Get the resulting type.
+<4> Pass the type directly instead of using a lambda when defining the field.
+====
+
+[[binding-index-field-dsl-multi-valued-fields]]
+== [[mapper-orm-bridge-index-field-dsl-multi-valued-fields]] [[_multi_valued_fields]] Multivalued fields
+
+Fields are considered single-valued by default:
+if you attempt to add multiple values to a single-valued field during indexing,
+an exception will be thrown.
+
+In order to add multiple values to a field,
+this field must be marked as multivalued during its declaration:
+
+.Declaring a field as multivalued
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/simple/MultiValuedNamesBinder.java[tags=bind]
+----
+<1> Declare the field as multivalued.
+====
+
+[[binding-index-field-dsl-object]]
+== [[mapper-orm-bridge-index-field-dsl-object]] Object fields
+
+The previous sections only presented flat schemas with value fields,
+but the index schema can actually be organized in a tree structure,
+with two categories of index fields:
+
+* Value fields, often simply called "fields", which hold an atomic value of a specific type:
+string, integer, date, ...
+* Object fields, which hold a composite value.
+
+Object fields are declared similarly to value fields,
+with an additional step to declare each subfield,
+as shown below.
+
+.Declaring an object field
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/object/InvoiceLineItemsSummaryBinder.java[tags=bind]
+----
+<1> Declare an object field with `objectField`, passing its name in parameter.
+<2> Get a reference to the declared object field
+and pass it to the bridge for later use.
+<3> Create subfields, get references to these fields
+and pass them to the bridge for later use.
+====
+
+[NOTE]
+====
+The subfields of an object field can include object fields.
+====
+
+[NOTE]
+====
+Just as value fields, object fields are single-valued by default.
+Be sure to call `.multiValued()` during the object field definition
+if you want to make it multivalued.
+====
+
+Object fields as well as their subfields are each assigned a reference,
+which will be used by the bridge to write to documents,
+as shown in the example below.
+
+.Writing to an object field
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/object/InvoiceLineItemsSummaryBinder.java[tags=write]
+----
+<1> Add an object to the `summary` object field for the current document,
+and get a reference to that object.
+<2> Add a value to the subfields for the object we just added.
+Note we're calling `addValue` on the object we just added, not on `target`.
+====
+
+[[binding-index-field-dsl-object-structure]]
+== [[mapper-orm-bridge-index-field-dsl-object-structure]] [[_object_structure]] Object structure
+
+By default, object fields are flattened,
+meaning that the tree structure is not preserved.
+See <<mapping-indexedembedded-structure-flattened>> for more information.
+
+It is possible to switch to <<mapping-indexedembedded-structure-nested,a nested structure>>
+by passing an argument to the `objectField` method, as shown below.
+Each value of the object field will then transparently be indexed as a separate nested document,
+without any change to the `write` method of the bridge.
+
+.Declaring an object field as nested
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/object/InvoiceLineItemsDetailBinder.java[tags=bind]
+----
+<1> Declare an object field with `objectField`.
+<2> Define the name of the object field.
+<3> Define the structure of the object field, here `NESTED`.
+<4> Define the object field as multivalued.
+<5> Get a reference to the declared object field
+and pass it to the bridge for later use.
+<6> Create subfields, get references to these fields
+and pass them to the bridge for later use.
+====
+
+[[binding-index-field-dsl-dynamic]]
+== [[mapper-orm-bridge-index-field-dsl-dynamic]] Dynamic fields with field templates
+
+Field declared in the sections above are all _static_:
+their path and type are known on bootstrap.
+
+In some very specific cases, the path of a field is not known until you actually index it;
+for example, you may want to index a `Map<String, Integer>` by using the map keys as field names,
+or index the properties of a JSON object whose schema is not known in advance.
+The fields, then, are considered _dynamic_.
+
+Dynamic fields are not declared on bootstrap,
+but need to match a field _template_ that is declared on bootstrap.
+The template includes the field types and structural information (multivalued or not, ...),
+but omits the field names.
+
+A field template is always declared in a binder: either in a <<binding-typebridge,type binder>>
+or in a <<binding-propertybridge,property binder>>.
+As for static fields, the entry point to declaring a template is the `IndexNode`
+passed to the binder's `bind(...)` method.
+A call to the `fieldTemplate` method on the schema element will declare a field template.
+
+Assuming a field template was declared during binding,
+the bridge can then add dynamic fields to the `DocumentElement` when indexing,
+by calling `addValue` and passing the field name (as a string) and the field value.
+
+Below is a simple example using the DSL to declare a field template in a property binder
+and then write to that field in a property bridge.
+
+.Declaring a field template and writing to a dynamic field
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/dynamic/UserMetadataBinder.java[tags=bind]
+----
+<1> Declare an object field with `objectField`.
+It's better to always host your dynamic fields on a dedicated object field,
+to avoid conflicts with other templates.
+<2> Declare a field template with `fieldTemplate`.
+<3> Pass the *template* name -- this is not the field name, and is only used to uniquely identify the template.
+<4> Define the field type.
+<5> On contrary to static field declarations, field template declarations do not return a field reference,
+because you won't need it when writing to the document.
+<6> Get a reference to the declared object field
+and pass it to the bridge for later use.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/dynamic/UserMetadataBinder.java[tags=write]
+----
+<1> Add an object to the `userMetadata` object field for the current document,
+and get a reference to that object.
+<2> Add one field per user metadata entry,
+with the field name and field value defined by the user.
+Note that field names should usually be validated before that point,
+in order to avoid exotic characters (whitespaces, dots, ...).
+====
+
+[NOTE]
+====
+Though rarely necessary, you can also declare templates for object fields using the `objectFieldTemplate` methods.
+====
+
+It is also possible to add multiple fields with different types to the same object.
+To that end, make sure that the format of a field can be inferred from the field name.
+You can then declare multiple templates and assign a path pattern to each template,
+as shown below.
+
+.Declaring multiple field templates with different types
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/dynamic/MultiTypeUserMetadataBinder.java[tags=bind]
+----
+<1> Declare an object field with `objectField`.
+<2> Declare a field template for integer with `fieldTemplate`.
+<3> Pass the *template* name.
+<4> Define the field type as integer, sortable.
+<5> Assign a path pattern to the template, so that only fields ending with `_int` will be considered as integers.
+<6> Declare another field template,
+so that fields are considered as english text if they do not match the previous template.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/document/model/dsl/dynamic/MultiTypeUserMetadataBinder.java[tags=write]
+----
+<1> Add an object to the `userMetadata` object field for the current document,
+and get a reference to that object.
+<2> Add one field per user metadata entry,
+with the field name and field value defined by the user.
+Note that field values should be validated before that point;
+in this case, adding a field named `foo_int` with a value of type `String`
+will lead to a `SearchException` when indexing.
+====
+
+[NOTE]
+.Precedence of field templates
+====
+Hibernate Search tries to match templates in the order they are declared,
+so you should always declare the templates with the most specific path pattern first.
+
+Templates declared on a given schema element can be matched in children of that element.
+For example, if you declare templates at the root of your entity (through a <<binding-typebridge,type bridge>>),
+these templates will be implicitly available in every single property bridge of that entity.
+In such cases, templates declared in property bridges will take precedence over those declared in the type bridge.
+====

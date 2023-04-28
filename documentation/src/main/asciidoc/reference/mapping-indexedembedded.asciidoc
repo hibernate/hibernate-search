@@ -195,7 +195,7 @@ will lead to complex, undocumented, legacy behavior.
 Do this at your own risk.
 
 In particular, a prefix that does not end with a dot will lead to incorrect behavior
-in <<bridge-index-field-dsl,some APIs exposed to custom bridges>>:
+in <<binding-index-field-dsl,some APIs exposed to custom bridges>>:
 the `addValue`/`addObject` methods that accept a field name.
 ====
 
@@ -290,7 +290,7 @@ if `includePaths` is *not* empty, the default is `0`
 [NOTE]
 .Dynamic fields and filtering
 ====
-<<bridge-index-field-dsl-dynamic,Dynamic fields>> are not directly affected by filtering rules:
+<<binding-index-field-dsl-dynamic,Dynamic fields>> are not directly affected by filtering rules:
 a dynamic field will be included if and only if its parent is included.
 
 This means in particular that `includeDepth` and `includePaths`

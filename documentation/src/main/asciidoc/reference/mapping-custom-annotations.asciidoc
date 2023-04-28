@@ -30,16 +30,16 @@ using the <<mapping-programmatic,programmatic mapping API>>.
 * An `annotation` parameter representing the annotation instance.
 * A `context` object with various helpers.
 
-Custom annotations are most frequently used to apply custom, parameterized bridges.
+Custom annotations are most frequently used to apply custom, parameterized binders or bridges.
 You can find examples in these sections in particular:
 
-* <<bridge-valuebridge-parameters,Passing parameters to a value bridge>>
-* <<bridge-propertybridge-parameters,Passing parameters to a property bridge>>
-* <<bridge-typebridge-parameters,Passing parameters to a type bridge>>
+* <<binding-valuebridge-parameters,Passing parameters to a value binder/bridge>>
+* <<binding-propertybridge-parameters,Passing parameters to a property binder/bridge>>
+* <<binding-typebridge-parameters,Passing parameters to a type binder/bridge>>
 
 [TIP]
 ====
-It is completely possible to use custom annotations for parameter-less bridges,
+It is completely possible to use custom annotations for parameter-less binders or bridges,
 or even for more complex features such as indexed-embedded:
 every feature available in the <<mapping-programmatic,programmatic mapping API>>
 can be triggered by a custom annotation.

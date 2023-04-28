@@ -80,6 +80,24 @@ that takes advantage of the mapping to be closer to the entity model,
 in particular by returning hits as entities instead of just document identifiers,
 see <<search-dsl>>.
 
+[[concepts-binding]]
+== Binding
+
+While the <<concepts-mapping,mapping>> definition is declarative,
+these declarations need to be interpreted and actually applied to the domain model.
+
+That's what Hibernate Search calls "binding":
+during startup, a given mapping instruction (e.g. `@GenericField`) will result in a "binder"
+being instantiated and called, giving it an opportunity to inspect the part of the domain model it's applied to
+and to "bind" (assign) a component to that part of the model -- for example a "bridge",
+responsible for extracting data from an entity during indexing.
+
+Hibernate Search comes with binders and bridges for many common use cases,
+and also provides the ability to plug in custom binders and bridges.
+
+For more information, in particular on how to plug in custom binders and bridges,
+see <<binding>>.
+
 [[concepts-analysis]]
 == [[analyzer]] Analysis
 
@@ -256,7 +274,7 @@ which can be located on different disks (Lucene)
 or different servers (Elasticsearch).
 * When searching: if one property, let's call it `category`,
 is often used to select a subset of documents,
-this property can be <<bridge-routingbridge-routingkey,defined as a routing key in the mapping>>,
+this property can be <<binding-routingbridge-routingkey,defined as a routing key in the mapping>>,
 so that it's used to route documents instead of the document ID.
 As a result, documents with the same value for `category` will be indexed in the same shard.
 Then when searching, if a query already filters documents so that it is known that the hits
@@ -274,7 +292,7 @@ This does not allow taking advantage of routing when searching,
 which requires multiple documents to share the same routing key.
 Applying routing to a search query in that case will return at most one result.
 To explicitly define the routing key to assign to each document,
-assign <<bridge-routingbridge-routingkey,routing bridges>> to your entities.
+assign <<binding-routingbridge-routingkey,routing bridges>> to your entities.
 
 [WARNING]
 ====

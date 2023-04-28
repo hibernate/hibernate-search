@@ -39,7 +39,7 @@ include::mapping.asciidoc[]
 
 include::mapping-projection.asciidoc[]
 
-include::bridge.asciidoc[]
+include::binding.asciidoc[]
 
 include::schema.asciidoc[]
 

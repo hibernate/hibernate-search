@@ -599,7 +599,7 @@ Field types that are not in this list can still be used with a little bit more w
 
 * If a property in the entity model has an unsupported type,
 but can be converted to a supported type, you will need a bridge.
-See <<bridge>>.
+See <<binding>>.
 * If you need an index field with a specific type that is not supported by Hibernate Search,
 you will need a bridge that defines a native field type.
 See <<backend-elasticsearch-field-types-extension>>.
@@ -705,12 +705,12 @@ Below is an example of how to use the Elasticearch "native" type.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/type/asnative/IpAddressValueBinder.java[tags=include]
 ----
-<1> Define a <<bridge,custom binder>> and its bridge.
+<1> Define a <<binding,custom binder>> and its bridge.
 The "native" type can only be used from a binder,
 it cannot be used directly with annotation mapping.
-Here we're defining a <<bridge-valuebridge,value binder>>,
-but a <<bridge-typebridge,type binder>>,
-or a <<bridge-propertybridge,property binder>>
+Here we're defining a <<binding-valuebridge,value binder>>,
+but a <<binding-typebridge,type binder>>,
+or a <<binding-propertybridge,property binder>>
 would work as well.
 <2> Get the context's type factory.
 <3> Apply the Elasticsearch extension to the type factory.
@@ -814,7 +814,7 @@ hibernate.search.backend.indexes.<index-name>.dynamic_mapping = strict
 The default for this property is `strict`.
 
 We said that Hibernate Search **usually** works on declared schema fields. More precisely, it always does
-if no <<bridge-index-field-dsl-dynamic>> are defined.
+if no <<binding-index-field-dsl-dynamic>> are defined.
 When field templates are defined, `dynamic` will be forced to `true`, in order to allow for dynamic fields. In that case, the value of the `dynamic_mapping` property is ignored.
 
 [[backend-elasticsearch-multi-tenancy]]
@@ -911,7 +911,7 @@ Properties that are only defined in the custom mappings file but not mapped by H
 will not be visible to Hibernate Search.
 
 This means Hibernate Search will throw exceptions if you try to reference these properties in the <<search-dsl,Search DSL>>,
-or when <<bridge-index-field-dsl-dynamic,writing to a document from a bridge>>
+or when <<binding-index-field-dsl-dynamic,writing to a document from a bridge>>
 ====
 
 The file does not need to contain the full mapping: Hibernate Search will automatically inject
