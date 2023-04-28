@@ -26,6 +26,7 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.FieldProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.IdProjectionBinder;
+import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.ScoreProjectionBinder;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 import org.junit.Before;
@@ -53,7 +54,8 @@ public class ProjectionDslJava17IT {
 				// we need to register annotated projection types explicitly.
 				// This wouldn't be needed in a typical application.
 				CollectionHelper.asSet( MyBookProjection.class, MyBookProjection.Author.class, MyAuthorProjection.class,
-						MyBookIdAndTitleProjection.class, MyBookTitleAndAuthorNamesProjection.class ),
+						MyBookIdAndTitleProjection.class, MyBookTitleAndAuthorNamesProjection.class,
+						MyBookScoreAndTitleProjection.class ),
 				mapping -> {
 					var bookMapping = mapping.type( Book.class );
 					bookMapping.indexed();
@@ -107,6 +109,14 @@ public class ProjectionDslJava17IT {
 							.projection( FieldProjectionBinder.create( "authors.lastName" ) );
 					//end::programmatic-field-projection[]
 
+					//tag::programmatic-score-projection[]
+					TypeMappingStep myBookScoreAndTitleProjection =
+							mapping.type( MyBookScoreAndTitleProjection.class );
+					myBookScoreAndTitleProjection.mainConstructor()
+							.projectionConstructor();
+					myBookScoreAndTitleProjection.mainConstructor().parameter( 0 )
+							.projection( ScoreProjectionBinder.create() );
+					//end::programmatic-score-projection[]
 				}
 		);
 	}
@@ -239,6 +249,31 @@ public class ProjectionDslJava17IT {
 							) )
 							.collect( Collectors.toList() )
 			);
+		} );
+	}
+
+	@Test
+	public void projectionConstructor_score() {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			// tag::projection-constructor-score[]
+			List<MyBookScoreAndTitleProjection> hits = searchSession.search( Book.class )
+					.select( MyBookScoreAndTitleProjection.class )// <1>
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 ); // <2>
+			// end::projection-constructor-score[]
+			assertThat( hits )
+					// Ignore scores, we can't guess their value
+					.usingRecursiveFieldByFieldElementComparatorIgnoringFields( "score" )
+					.containsExactlyInAnyOrderElementsOf(
+							entityManager.createQuery( "select b from Book b", Book.class ).getResultList().stream()
+									.map( book -> new MyBookScoreAndTitleProjection(
+											0f,
+											book.getTitle()
+									) )
+									.collect( Collectors.toList() )
+					);
 		} );
 	}
 

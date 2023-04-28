@@ -30,6 +30,7 @@ public interface MethodParameterMappingStep {
 	 * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionBinding
 	 * @see org.hibernate.search.mapper.pojo.search.definition.binding.builtin.IdProjectionBinder
 	 * @see org.hibernate.search.mapper.pojo.search.definition.binding.builtin.FieldProjectionBinder
+	 * @see org.hibernate.search.mapper.pojo.search.definition.binding.builtin.ScoreProjectionBinder
 	 */
 	default MethodParameterMappingStep projection(ProjectionBinder binder) {
 		return projection( BeanReference.ofInstance( binder ), Collections.emptyMap() );

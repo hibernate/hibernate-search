@@ -367,6 +367,9 @@ include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/
 
 The `score` projection returns the <<search-dsl-predicate-common-score,score>> of the matched document.
 
+[[search-dsl-projection-score-syntax]]
+=== Syntax
+
 .Returning the score of matched documents
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -385,6 +388,43 @@ if the content of the index changed enough to alter the frequency of some terms 
 On a related note, exposing scores to end users is generally not an easy task.
 See https://cwiki.apache.org/confluence/display/LUCENE/ScoresAsPercentages[this article] for some insight
 into what's wrong with displaying the score as a percentage, specifically.
+====
+
+[[search-dsl-projection-score-mapping]]
+=== `@ScoreProjection` in projections to custom types
+
+To achieve a `score` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+use the `@ScoreProjection` annotation:
+
+.Returning the score of matched documents within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookScoreAndTitleProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the score with `@ScoreProjection`.
+<3> The type of the constructor parameter must be assignable from `float`.
+<4> You can of course also declare other parameters with different projections;
+in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-score]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested score and field.
+====
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `ScoreProjectionBinder.create()`.
+
+.Programmatic mapping of a `score` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-score-projection]
+----
 ====
 
 [[search-dsl-projection-distance]]
