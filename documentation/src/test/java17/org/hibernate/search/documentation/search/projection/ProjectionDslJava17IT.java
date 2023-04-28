@@ -220,9 +220,9 @@ public class ProjectionDslJava17IT {
 	@Test
 	public void entryPoint_mapped_record() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
-			// tag::entryPoint-mapped-record[]
 			SearchSession searchSession = Search.session( entityManager );
 
+			// tag::entryPoint-mapped-record[]
 			List<MyBookProjection> hits = searchSession.search( Book.class )
 					.select( MyBookProjection.class )// <1>
 					.where( f -> f.matchAll() )

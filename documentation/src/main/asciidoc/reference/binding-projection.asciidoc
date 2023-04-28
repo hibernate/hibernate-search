@@ -221,13 +221,13 @@ a <<mapping-custom-annotations,custom annotation>> with attributes:
 ----
 include::{sourcedirJava17}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/param/annotation/MyFieldProjectionBinding.java[tags=include]
 ----
-<1> Define an annotation with retention `RUNTIME`.
+<1> Define an annotation with `RUNTIME` retention.
 *Any other retention policy will cause the annotation to be ignored by Hibernate Search*.
 <2> Since we will be mapping a projection definition to a projection constructor,
 allow the annotation to target method parameters (constructors are methods).
 <3> Mark this annotation as a method parameter mapping,
 and instruct Hibernate Search to apply the given processor whenever it finds this annotation.
-It is also possible to reference the processor by its name, in the case of a CDI/Spring bean.
+It is also possible to reference the processor by its CDI/Spring bean name.
 <4> Optionally, mark the annotation as documented,
 so that it is included in the javadoc of your entities.
 <5> Define an attribute of type `String` to specify the field name.

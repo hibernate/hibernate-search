@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.mapper.orm.binding.propertybridge.bridgedelement;
+package org.hibernate.search.documentation.mapper.orm.binding.propertybridge.param.string;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.OrderColumn;
 
 import org.hibernate.search.documentation.mapper.orm.binding.propertybridge.param.annotation.InvoiceLineItem;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyBinding;
@@ -30,7 +31,9 @@ public class Invoice {
 
 	@ElementCollection
 	@OrderColumn
-	@PropertyBinding(binder = @PropertyBinderRef(type = InvoiceLineItemsSummaryBinder.class)) // <1>
+	@PropertyBinding(binder = @PropertyBinderRef( // <1>
+			type = InvoiceLineItemsSummaryBinder.class,
+			params = @Param(name = "fieldName", value = "itemSummary")))
 	private List<InvoiceLineItem> lineItems = new ArrayList<>();
 
 	// Getters and setters

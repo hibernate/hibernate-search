@@ -43,7 +43,8 @@ public class LanguageAlternativeBinderDelegate implements AlternativeBinderDeleg
 		return new Bridge( fields ); // <7>
 	}
 
-	private static class Bridge implements AlternativeValueBridge<Language, String> { // <8>
+	private static class Bridge // <8>
+			implements AlternativeValueBridge<Language, String> { // <9>
 		private final EnumMap<Language, IndexFieldReference<String>> fields;
 
 		private Bridge(EnumMap<Language, IndexFieldReference<String>> fields) {
@@ -52,7 +53,7 @@ public class LanguageAlternativeBinderDelegate implements AlternativeBinderDeleg
 
 		@Override
 		public void write(DocumentElement target, Language discriminator, String bridgedElement) {
-			target.addValue( fields.get( discriminator ), bridgedElement ); // <9>
+			target.addValue( fields.get( discriminator ), bridgedElement ); // <10>
 		}
 	}
 }

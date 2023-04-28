@@ -118,9 +118,11 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/ident
 <4> Pass the expected type of property values.
 <5> Pass the identifier bridge instance.
 <6> The identifier bridge must still be implemented.
++
 Here the bridge class is nested in the binder class,
 because it is more convenient,
-but you are obviously free to implement it in a separate java file.
+but you are obviously free to implement it as you wish:
+as a lambda expression, in a separate Java file...
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -149,7 +151,7 @@ You can pass string parameters to the `@IdentifierBinderRef` annotation and then
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/OffsetIdentifierBridge.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/annotation/OffsetIdentifierBridge.java[tags=include]
 ----
 <1> Implement a bridge that indexes the identifier as is,
 but adds a configurable offset,
@@ -159,16 +161,17 @@ the offset to apply to identifiers.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/context/OffsetIdentifierBinder.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/string/OffsetIdentifierBinder.java[tags=include]
 ----
 <1> Use the binding context to get the parameter value.
-Getting the param using the `param` method assumes that the param has been defined.
-Alternatively it is possible to use `paramOptional` to get the `java.util.Optional` of the param.
-<2> Pass it as argument to the bridge constructor.
++
+The `param` method will throw an exception if the parameter has not been defined.
+Alternatively, use `paramOptional` to get an `java.util.Optional` that will be empty if the parameter has not been defined.
+<2> Pass the parameter value as an argument to the bridge constructor.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/context/Book.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/string/Book.java[tags=include;!getters-setters]
 ----
 <1> Define the binder to use on the identifier,
 setting the parameter.
@@ -184,7 +187,7 @@ a <<mapping-custom-annotations,custom annotation>> with attributes:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/OffsetIdentifierBridge.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/annotation/OffsetIdentifierBridge.java[tags=include]
 ----
 <1> Implement a bridge that index the identifier as is,
 but adds a configurable offset,
@@ -194,34 +197,34 @@ the offset to apply to identifiers.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/OffsetDocumentId.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/annotation/OffsetDocumentId.java[tags=include]
 ----
-<1> Define an annotation with retention `RUNTIME`.
+<1> Define an annotation with `RUNTIME` retention.
 *Any other retention policy will cause the annotation to be ignored by Hibernate Search*.
 <2> Since we're defining an identifier bridge, allow the annotation
 to target either methods (getters) or fields.
 <3> Mark this annotation as a property mapping,
 and instruct Hibernate Search to apply the given processor whenever it finds this annotation.
-It is also possible to reference the processor by its name, in the case of a CDI/Spring bean.
+It is also possible to reference the processor by its CDI/Spring bean name.
 <4> Optionally, mark the annotation as documented,
 so that it is included in the javadoc of your entities.
 <5> Define custom attributes to configure the value bridge.
 Here we define an offset that the bridge should add to entity identifiers.
-<6> The processor must implement the `PropertyMappingAnnotationProcessor` interface,
-setting its generic type argument to the type of the corresponding annotation.
-Here the processor class is nested in the annotation class,
+<6> Here the processor class is nested in the annotation class,
 because it is more convenient,
 but you are obviously free to implement it in a separate Java file.
-<7> In the `process` method, instantiate the bridge
+<7> The processor must implement the `PropertyMappingAnnotationProcessor` interface,
+setting its generic type argument to the type of the corresponding annotation.
+<8> In the `process` method, instantiate the bridge
 and pass the annotation attribute as constructor argument.
-<8> Declare that this property is to be used to generate the document identifier.
-<9> Instruct Hibernate Search to use our bridge to convert between the property and the document identifiers.
+<9> Declare that this property is to be used to generate the document identifier.
+<10> Instruct Hibernate Search to use our bridge to convert between the property and the document identifiers.
 Alternatively, we could pass an identifier binder instead,
 using the `identifierBinder()` method.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/Book.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/annotation/Book.java[tags=include;!getters-setters]
 ----
 <1> Apply the bridge using its custom annotation,
 setting the parameter.
@@ -253,8 +256,9 @@ The `Session` is not available here.
 With <<configuration-bean-frameworks,compatible frameworks>>,
 Hibernate Search supports injection of beans into both the `IdentifierBridge` and the `IdentifierBinder`.
 
-NOTE: This only applies to beans instantiated by Hibernate Search itself.
-As a rule of thumb, if you need to call `new MyBridge()` at some point,
+NOTE: This only applies to beans instantiated
+through Hibernate Search's <<configuration-bean-resolution,bean resolution>>.
+As a rule of thumb, if you need to call `new MyBridge()` explicitly at some point,
 the bridge won't get auto-magically injected.
 
 The context passed to the identifier binder's `bind` method

@@ -611,7 +611,7 @@ The default value.
 +
 Picks the safest, most appropriate order based on the dialect and other settings:
 +
-* When using time-based UUIDs for outbox events (see <<coordination-database-polling-schema>>), picks `id`.
+* When using time-based UUIDs for outbox events (see <<coordination-outbox-polling-schema>>), picks `id`.
 * Otherwise, if using a Microsoft SQL Server dialect, picks `none`.
 * Otherwise, picks `time`.
 `none`::
@@ -641,10 +641,10 @@ but may reduce performance and lead to unnecessary noise in logs.
 `id`::
 Process outbox events in identifier order.
 +
-If outbox event identifiers are time-based UUIDs (see <<coordination-database-polling-schema>>),
+If outbox event identifiers are time-based UUIDs (see <<coordination-outbox-polling-schema>>),
 this behaves similarly to `time`, but without the risk of deadlocks.
 +
-If outbox event identifiers are random UUIDs (see <<coordination-database-polling-schema>>),
+If outbox event identifiers are random UUIDs (see <<coordination-outbox-polling-schema>>),
 this behaves similarly to `none`.
 
 [[coordination-outbox-polling-mass-indexer]]

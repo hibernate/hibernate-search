@@ -33,10 +33,11 @@ using the <<mapping-programmatic,programmatic mapping API>>.
 Custom annotations are most frequently used to apply custom, parameterized binders or bridges.
 You can find examples in these sections in particular:
 
-* <<binding-valuebridge-parameters,Passing parameters to a value binder/bridge>>
-* <<binding-propertybridge-parameters,Passing parameters to a property binder/bridge>>
-* <<binding-typebridge-parameters,Passing parameters to a type binder/bridge>>
-* <<binding-projection-parameters-custom-annotation,Passing parameters to a projection binder>>
+* <<binding-valuebridge-parameters-custom-annotation,Passing parameters to a value binder/bridge through a custom annotation>>
+* <<binding-propertybridge-parameters-custom-annotation,Passing parameters to a property binder/bridge through a custom annotation>>
+* <<binding-typebridge-parameters-custom-annotation,Passing parameters to a type binder/bridge through a custom annotation>>
+* <<binding-identifierbridge-parameters-custom-annotation,Passing parameters to an identifier binder/bridge through a custom annotation>>
+* <<binding-projection-parameters-custom-annotation,Passing parameters to a projection binder through a custom annotation>>
 
 [TIP]
 ====

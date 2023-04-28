@@ -65,10 +65,11 @@ We're going to index monetary amounts,
 so we will use a `BigDecimal` type with two digits after the decimal point.
 See <<binding-index-field-type-dsl>>
 for more information about declaring index field types.
-<6> Call `context.bridge(...)` to define the property bridge to use,
-and pass an instance of the bridge.
-<7> Pass a reference to the `summary` object field to the bridge.
-<8> Create a subfield for the `total` amount of the invoice,
+<6> Call `context.bridge(...)` to define the property bridge to use.
+<7> Pass the expected type of property.
+<8> Pass the property bridge instance.
+<9> Pass a reference to the `summary` object field to the bridge.
+<10> Create a subfield for the `total` amount of the invoice,
 a subfield for the subtotal for `books`,
 and a subfield for the subtotal for `shipping`.
 Pass references to these fields to the bridge.
@@ -77,22 +78,23 @@ Pass references to these fields to the bridge.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/simple/InvoiceLineItemsSummaryBinder.java[tags=bridge]
 ----
-<1> The bridge must implement the `PropertyBridge` interface.
+<1> Here the bridge class is nested in the binder class,
+because it is more convenient,
+but you are obviously free to implement it as you wish:
+as a lambda expression, in a separate Java file...
+<2> The bridge must implement the `PropertyBridge` interface.
 One generic type argument must be provided: the type of the property,
 i.e. the type of the "bridged element".
-Here the bridge class is nested in the binder class,
-because it is more convenient,
-but you are obviously free to implement it in a separate java file.
-<2> The bridge stores references to the fields:
+<3> The bridge stores references to the fields --
 it will need them when indexing.
-<3> Implement the `write` method in the bridge.
+<4> Implement the `write` method in the bridge.
 This method is called on indexing.
-<4> Extract data from the bridged element,
+<5> Extract data from the bridged element,
 and optionally transform it.
-<5> Add an object to the `summary` object field.
+<6> Add an object to the `summary` object field.
 Note the `summary` field was declared at the root,
 so we call `addObject` directly on the `target` argument.
-<6> Add a value to each of the `summary.total`, `summary.books`
+<7> Add a value to each of the `summary.total`, `summary.books`
 and `summary.shipping` fields.
 Note the fields were declared as subfields of `summary`,
 so we call `addValue` on `summaryValue` instead of `target`.
@@ -136,11 +138,12 @@ You can pass string parameters to the `@PropertyBinderRef` annotation and then u
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/context/InvoiceLineItemsSummaryBinder.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/string/InvoiceLineItemsSummaryBinder.java[tags=include]
 ----
 <1> Use the binding context to get the parameter value.
-Getting the param using the `param` method assumes that the param has been defined.
-Alternatively it is possible to use `paramOptional` to get the `java.util.Optional` of the param.
++
+The `param` method will throw an exception if the parameter has not been defined.
+Alternatively, use `paramOptional` to get an `java.util.Optional` that will be empty if the parameter has not been defined.
 <2> In the `bind` method, use the value of parameters.
 Here use the `fieldName` parameter to set the field name,
 but we could pass parameters for any purpose:
@@ -150,7 +153,7 @@ defining a normalizer,
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/context/Invoice.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/string/Invoice.java[tags=include;!getters-setters]
 ----
 <1> Define the binder to use on the property,
 setting the `fieldName` parameter.
@@ -166,31 +169,32 @@ a <<mapping-custom-annotations,custom annotation>> with attributes:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/InvoiceLineItemsSummaryBinding.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/annotation/InvoiceLineItemsSummaryBinding.java[tags=include]
 ----
-<1> Define an annotation with retention `RUNTIME`.
+<1> Define an annotation with `RUNTIME` retention.
 *Any other retention policy will cause the annotation to be ignored by Hibernate Search*.
 <2> Since we're defining a property bridge, allow the annotation
 to target either methods (getters) or fields.
 <3> Mark this annotation as a property mapping,
 and instruct Hibernate Search to apply the given processor whenever it finds this annotation.
-It is also possible to reference the processor by its name, in the case of a CDI/Spring bean.
+It is also possible to reference the processor by its CDI/Spring bean name.
 <4> Optionally, mark the annotation as documented,
 so that it is included in the javadoc of your entities.
 <5> Define an attribute of type `String` to specify the field name.
-<6> The processor must implement the `PropertyMappingAnnotationProcessor` interface,
-setting its generic type argument to the type of the corresponding annotation.
-Here the processor class is nested in the annotation class,
+<6> Here the processor class is nested in the annotation class,
 because it is more convenient,
 but you are obviously free to implement it in a separate Java file.
-<7> In the annotation processor, instantiate the binder.
-<8> Process the annotation attributes and pass the data to the binder.
+<7> The processor must implement the `PropertyMappingAnnotationProcessor` interface,
+setting its generic type argument to the type of the corresponding annotation.
+<8> In the annotation processor, instantiate the binder.
+<9> Process the annotation attributes and pass the data to the binder.
++
 Here we're using a setter, but passing the data through the constructor would work, too.
-<9> Apply the binder to the property.
+<10> Apply the binder to the property.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/InvoiceLineItemsSummaryBinder.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/annotation/InvoiceLineItemsSummaryBinder.java[tags=include]
 ----
 <1> Implement setters in the binder.
 Alternatively, we could expose a parameterized constructor.
@@ -203,13 +207,13 @@ defining a normalizer,
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/Invoice.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/annotation/Invoice.java[tags=include;!getters-setters]
 ----
 <1> Apply the bridge using its custom annotation,
 setting the `fieldName` parameter.
 ====
 
-[[binding-propertybridge-parameters-access-orm]]
+[[binding-propertybridge-access-orm]]
 == [[mapper-orm-bridge-propertybridge-parameters-access-orm]] Accessing the ORM session from the bridge
 
 include::components/mapper-orm-only-note.asciidoc[]
@@ -226,18 +230,18 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/prope
 <2> Retrieve the `Session` from the extended context.
 ====
 
-[[binding-propertybridge-parameters-injecting-beans]]
+[[binding-propertybridge-injecting-beans]]
 == [[mapper-orm-bridge-propertybridge-parameters-injecting-beans]] Injecting beans into the binder
 
 With <<configuration-bean-frameworks,compatible frameworks>>,
 Hibernate Search supports injecting beans into:
 
-* the `PropertyMappingAnnotationProcessor` if you use custom annotations and instantiate the binder yourself.
-* the `PropertyBinder` if you use the `@PropertyBinding` annotation and let Hibernate Search
-instantiate the binder using your dependency injection framework.
+* the `PropertyMappingAnnotationProcessor` if you use <<binding-propertybridge-parameters-custom-annotation,custom annotations>>.
+* the `PropertyBinder` if you use the <<binding-propertybridge-basics,`@PropertyBinding` annotation>>.
 
-NOTE: This only applies to binders instantiated by Hibernate Search itself.
-As a rule of thumb, if you need to call `new MyBinder()` at some point,
+NOTE: This only applies to beans instantiated
+through Hibernate Search's <<configuration-bean-resolution,bean resolution>>.
+As a rule of thumb, if you need to call `new MyBinder()` explicitly at some point,
 the binder won't get auto-magically injected.
 
 The context passed to the property binder's `bind` method
@@ -255,11 +259,11 @@ Just pass an instance of the binder. You can pass arguments either through the b
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/PropertyBridgeParamIT.java[tags=programmatic]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/propertybridge/param/annotation/PropertyBridgeParamAnnotationIT.java[tags=programmatic]
 ----
 ====
 
-[[binding-propertybridge-parameters-incubating]]
+[[binding-propertybridge-incubating]]
 == [[mapper-orm-bridge-propertybridge-parameters-incubating]] Incubating features
 
 include::components/incubating-warning.asciidoc[]

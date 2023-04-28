@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.mapper.orm.binding.propertybridge.bridgedelement;
+package org.hibernate.search.documentation.mapper.orm.binding.propertybridge.param.annotation;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,8 +14,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.search.documentation.mapper.orm.binding.propertybridge.param.annotation.InvoiceLineItem;
-import org.hibernate.search.documentation.mapper.orm.binding.propertybridge.param.annotation.InvoiceLineItemCategory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
@@ -29,7 +27,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class PropertyBridgeBridgedElementIT {
+public class PropertyBridgeParamAnnotationIT {
 	@Parameterized.Parameters(name = "{0}")
 	public static List<?> params() {
 		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
@@ -38,7 +36,8 @@ public class PropertyBridgeBridgedElementIT {
 					//tag::programmatic[]
 					TypeMappingStep invoiceMapping = mapping.type( Invoice.class );
 					invoiceMapping.indexed();
-					invoiceMapping.property( "lineItems" ).binder( new InvoiceLineItemsSummaryBinder() );
+					invoiceMapping.property( "lineItems" )
+							.binder( new InvoiceLineItemsSummaryBinder().fieldName( "itemSummary" ) );
 					//end::programmatic[]
 				} );
 	}
@@ -74,9 +73,9 @@ public class PropertyBridgeBridgedElementIT {
 
 			List<Invoice> result = searchSession.search( Invoice.class )
 					.where( f -> f.and(
-							f.range().field( "lineItems.total" )
+							f.range().field( "itemSummary.total" )
 									.atLeast( new BigDecimal( "20.0" ) ),
-							f.range().field( "lineItems.shipping" )
+							f.range().field( "itemSummary.shipping" )
 									.atMost( new BigDecimal( "10.0" ) )
 					) )
 					.fetchHits( 20 );
