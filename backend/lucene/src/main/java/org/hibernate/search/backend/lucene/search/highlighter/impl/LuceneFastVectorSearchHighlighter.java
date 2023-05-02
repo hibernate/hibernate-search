@@ -57,13 +57,13 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 
 	private LuceneFastVectorSearchHighlighter(Set<String> indexNames,
 			Character[] boundaryChars, Integer boundaryMaxScan, Integer fragmentSize, Integer noMatchSize,
-			Integer numberOfFragments, Boolean orderByScore, Integer maxAnalyzedOffset, List<String> preTags,
+			Integer numberOfFragments, Boolean orderByScore, List<String> preTags,
 			List<String> postTags, BoundaryScannerType boundaryScannerType, Locale boundaryScannerLocale,
 			HighlighterFragmenter fragmenterType,
 			Integer phraseLimit, Encoder encoder) {
 		super( indexNames, boundaryChars, boundaryMaxScan, fragmentSize, noMatchSize, numberOfFragments,
 				orderByScore,
-				maxAnalyzedOffset, preTags, postTags, boundaryScannerType, boundaryScannerLocale, fragmenterType,
+				preTags, postTags, boundaryScannerType, boundaryScannerLocale, fragmenterType,
 				phraseLimit, encoder
 		);
 	}
@@ -71,12 +71,12 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 	@Override
 	protected LuceneAbstractSearchHighlighter createHighlighterSameType(Set<String> indexNames,
 			Character[] boundaryChars, Integer boundaryMaxScan, Integer fragmentSize, Integer noMatchSize,
-			Integer numberOfFragments, Boolean orderByScore, Integer maxAnalyzedOffset, List<String> preTags,
+			Integer numberOfFragments, Boolean orderByScore, List<String> preTags,
 			List<String> postTags, BoundaryScannerType boundaryScannerType, Locale boundaryScannerLocale,
 			HighlighterFragmenter fragmenterType, Integer phraseLimit, Encoder encoder) {
 		return new LuceneFastVectorSearchHighlighter(
 				indexNames, boundaryChars, boundaryMaxScan, fragmentSize, noMatchSize, numberOfFragments,
-				orderByScore, maxAnalyzedOffset, preTags, postTags, boundaryScannerType, boundaryScannerLocale,
+				orderByScore, preTags, postTags, boundaryScannerType, boundaryScannerLocale,
 				fragmenterType, phraseLimit, encoder
 		);
 	}

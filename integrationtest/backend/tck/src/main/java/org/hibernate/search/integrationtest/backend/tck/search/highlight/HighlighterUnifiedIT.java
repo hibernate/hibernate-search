@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.highlight;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
-import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.Arrays;
@@ -19,7 +17,6 @@ import org.hibernate.search.engine.search.highlighter.dsl.HighlighterUnifiedOpti
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Test;
@@ -49,96 +46,6 @@ public class HighlighterUnifiedIT extends AbstractHighlighterIT {
 	@Override
 	protected boolean supportsFragmentSize() {
 		return TckConfiguration.get().getBackendFeatures().supportsHighlighterUnifiedTypeFragmentSize();
-	}
-
-	@Test
-	public void unifiedMaxAnalyzedOffset() {
-		assumeTrue(
-				TckConfiguration.get().getBackendFeatures().supportsHighlighterUnifiedTypeMaxAnalyzedOffsetOnFieldsWithTermVector()
-		);
-		StubMappingScope scope = index.createScope();
-
-		SearchQuery<List<String>> highlights = scope.query().select(
-						f -> f.highlight( "string" )
-				)
-				.where( f -> f.match().field( "string" ).matching( "foo" ) )
-				.highlighter( h -> h.unified()
-						.maxAnalyzedOffset( 1 )
-				)
-				.toQuery();
-
-		assertThatHits( highlights.fetchAllHits() )
-				.hasHitsAnyOrder(
-						Arrays.asList( "<em>foo</em> and foo and foo much more times" )
-				);
-
-		highlights = scope.query().select(
-						f -> f.highlight( "string" )
-				)
-				.where( f -> f.match().field( "string" ).matching( "foo" ) )
-				.highlighter( h -> h.unified()
-						.maxAnalyzedOffset( "foo and foo".length() )
-				)
-				.toQuery();
-
-		assertThatHits( highlights.fetchAllHits() )
-				.hasHitsAnyOrder(
-						Arrays.asList( "<em>foo</em> and <em>foo</em> and foo much more times" )
-				);
-	}
-
-	@Test
-	public void unifiedMaxAnalyzedOffsetWithTermVectorsNotSupported() {
-		assumeFalse(
-				TckConfiguration.get().getBackendFeatures()
-						.supportsHighlighterUnifiedTypeMaxAnalyzedOffsetOnFieldsWithTermVector()
-		);
-
-		assertThatThrownBy(
-				() -> index.createScope().query().select(
-								f -> f.highlight( "string" )
-						)
-						.where( f -> f.match().field( "string" ).matching( "foo" ) )
-						.highlighter( h -> h.unified().maxAnalyzedOffset( 1 ) )
-						.toQuery()
-		).isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"unified highlighter does not support the max analyzed offset setting on fields that have non default term vector storage strategy configured",
-						"Either use a plain or fast vector highlighters, or do not set this setting"
-				);
-	}
-
-	@Test
-	public void unifiedMaxAnalyzedOffsetWithoutTermVector() {
-		StubMappingScope scope = index.createScope();
-
-		SearchQuery<List<String>> highlights = scope.query().select(
-						f -> f.highlight( "stringNoTermVector" )
-				)
-				.where( f -> f.match().field( "stringNoTermVector" ).matching( "boo" ) )
-				.highlighter( h -> h.unified()
-						.maxAnalyzedOffset( 1 )
-				)
-				.toQuery();
-
-		assertThatHits( highlights.fetchAllHits() )
-				.hasHitsAnyOrder(
-						Arrays.asList( "<em>boo</em> and boo and boo much more times" )
-				);
-
-		highlights = scope.query().select(
-						f -> f.highlight( "stringNoTermVector" )
-				)
-				.where( f -> f.match().field( "stringNoTermVector" ).matching( "boo" ) )
-				.highlighter( h -> h.unified()
-						.maxAnalyzedOffset( "boo and boo".length() )
-				)
-				.toQuery();
-
-		assertThatHits( highlights.fetchAllHits() )
-				.hasHitsAnyOrder(
-						Arrays.asList( "<em>boo</em> and <em>boo</em> and boo much more times" )
-				);
 	}
 
 	@Test

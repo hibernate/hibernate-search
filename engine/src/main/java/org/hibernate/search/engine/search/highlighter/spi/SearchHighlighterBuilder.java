@@ -26,7 +26,6 @@ public abstract class SearchHighlighterBuilder {
 	protected Integer noMatchSize;
 	protected Integer numberOfFragments;
 	protected Boolean orderByScore;
-	protected Integer maxAnalyzedOffset;
 	protected List<String> preTags;
 	protected List<String> postTags;
 	protected BoundaryScannerType boundaryScannerType = BoundaryScannerType.DEFAULT;
@@ -82,11 +81,6 @@ public abstract class SearchHighlighterBuilder {
 
 	public SearchHighlighterBuilder orderByScore(Boolean orderByScore) {
 		this.orderByScore = orderByScore;
-		return this;
-	}
-
-	public SearchHighlighterBuilder maxAnalyzedOffset(Integer maxAnalyzedOffset) {
-		this.maxAnalyzedOffset = maxAnalyzedOffset;
 		return this;
 	}
 
@@ -199,10 +193,6 @@ public abstract class SearchHighlighterBuilder {
 
 	public Boolean orderByScore() {
 		return orderByScore;
-	}
-
-	public Integer maxAnalyzedOffset() {
-		return maxAnalyzedOffset;
 	}
 
 	public List<String> preTags() {

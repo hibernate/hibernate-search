@@ -508,28 +508,6 @@ public class HighlightingDslIT {
 		} );
 	}
 
-	@Test
-	public void maxAnalyzedOffset() {
-		with( entityManagerFactory ).runInTransaction( entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-
-			// tag::max-analyzed-offset[]
-			List<List<String>> result = searchSession.search( Book.class )
-					.select( f -> f.highlight( "description" ) )
-					.where( f -> f.match().fields( "description" ).matching( "help" ) )
-					.highlighter( f -> f.plain()
-							.maxAnalyzedOffset( 100 ) // <1>
-					)
-					.fetchHits( 20 );
-			// end::max-analyzed-offset[]
-			assertThat( result ).containsExactlyInAnyOrder(
-					Arrays.asList(
-							"Inspector Lestrade asks for Holmes's <em>help</em> after Charles McCarthy is murdered, and his son, James"
-					)
-			);
-		} );
-	}
-
 	private void initData() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 

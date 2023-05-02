@@ -16,9 +16,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.analysis.impl.LimitTokenOffsetAnalyzer;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldTypeContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionExtractContext;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFragmenter;
 import org.hibernate.search.engine.search.highlighter.spi.BoundaryScannerType;
@@ -47,13 +45,13 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 
 	private LuceneUnifiedSearchHighlighter(Set<String> indexNames,
 			Character[] boundaryChars, Integer boundaryMaxScan, Integer fragmentSize, Integer noMatchSize,
-			Integer numberOfFragments, Boolean orderByScore, Integer maxAnalyzedOffset, List<String> preTags,
+			Integer numberOfFragments, Boolean orderByScore, List<String> preTags,
 			List<String> postTags, BoundaryScannerType boundaryScannerType, Locale boundaryScannerLocale,
 			HighlighterFragmenter fragmenterType,
 			Integer phraseLimit, Encoder encoder) {
 		super( indexNames, boundaryChars, boundaryMaxScan, fragmentSize, noMatchSize, numberOfFragments,
 				orderByScore,
-				maxAnalyzedOffset, preTags, postTags, boundaryScannerType, boundaryScannerLocale, fragmenterType,
+				preTags, postTags, boundaryScannerType, boundaryScannerLocale, fragmenterType,
 				phraseLimit, encoder
 		);
 
@@ -70,12 +68,12 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 	@Override
 	protected LuceneAbstractSearchHighlighter createHighlighterSameType(Set<String> indexNames,
 			Character[] boundaryChars, Integer boundaryMaxScan, Integer fragmentSize, Integer noMatchSize,
-			Integer numberOfFragments, Boolean orderByScore, Integer maxAnalyzedOffset, List<String> preTags,
+			Integer numberOfFragments, Boolean orderByScore, List<String> preTags,
 			List<String> postTags, BoundaryScannerType boundaryScannerType, Locale boundaryScannerLocale,
 			HighlighterFragmenter fragmenterType, Integer phraseLimit, Encoder encoder) {
 		return new LuceneUnifiedSearchHighlighter(
 				indexNames, boundaryChars, boundaryMaxScan, fragmentSize, noMatchSize, numberOfFragments,
-				orderByScore, maxAnalyzedOffset, preTags, postTags, boundaryScannerType, boundaryScannerLocale,
+				orderByScore, preTags, postTags, boundaryScannerType, boundaryScannerLocale,
 				fragmenterType, phraseLimit, encoder
 		);
 	}
@@ -98,12 +96,6 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 		return SearchHighlighterType.UNIFIED;
 	}
 
-	@Override
-	public void checkApplicability(LuceneSearchIndexValueFieldTypeContext<?> typeContext) {
-		if ( typeContext.hasTermVectorsConfigured() && this.maxAnalyzedOffset != null && this.maxAnalyzedOffset > 0 ) {
-			throw log.unifiedHighlighterMaxAnalyzedOffsetNotSupported();
-		}
-	}
 
 	private final class UnifiedHighlighterValues<A> extends HighlighterValues<A> {
 
@@ -124,10 +116,7 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 					LuceneUnifiedSearchHighlighter.this.encoder
 			);
 
-			this.highlighter = new UnifiedHighlighter(
-					context.collectorExecutionContext().getIndexSearcher(),
-					LimitTokenOffsetAnalyzer.analyzer( analyzer, LuceneUnifiedSearchHighlighter.this.maxAnalyzedOffset )
-			);
+			this.highlighter = new UnifiedHighlighter( context.collectorExecutionContext().getIndexSearcher(), analyzer );
 			highlighter.setFormatter( formatter );
 			highlighter.setBreakIterator( this::breakIterator );
 			highlighter.setMaxNoHighlightPassages( LuceneUnifiedSearchHighlighter.this.noMatchSize > 0 ? 1 : 0 );
