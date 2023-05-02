@@ -448,24 +448,3 @@ include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/High
 ====
 This option is supported only by the fast vector highlighter type.
 ====
-
-
-== Maximum analyzed offset
-
-The maximum analyzed offset option allows specifying the limit of characters to be analyzed by the highlighter.
-Can be used to truncate long texts and only perform the highlighting on an initial text portion.
-
-.Setting the maximum analyzed offset
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=phrase-limit]
-----
-<1> Configuring the maximum analyzed offset.
-====
-
-[NOTE]
-====
-This option is supported only by plain and unified highlighter types with the <<backend-elasticsearch, Elasticsearch backend>>
-and only by the plain highlighter with the <<backend-lucene,Lucene backend>>.
-====

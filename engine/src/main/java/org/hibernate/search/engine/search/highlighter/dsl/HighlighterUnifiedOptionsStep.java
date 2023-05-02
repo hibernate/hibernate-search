@@ -16,14 +16,6 @@ public interface HighlighterUnifiedOptionsStep
 		extends HighlighterOptionsStep<HighlighterUnifiedOptionsStep> {
 
 	/**
-	 * Specify the maximum number of characters to be analyzed by the highlighter.
-	 *
-	 * @param max The maximum number of characters to consider when highlighting.
-	 * @return The next step in a highlighter definition.
-	 */
-	HighlighterUnifiedOptionsStep maxAnalyzedOffset(int max);
-
-	/**
 	 * Specify how the text should be broken up into highlighting snippets.
 	 * <p>
 	 * By default, a {@link HighlighterBoundaryScannerTypeStep#sentence() sentence boundary scanner} is used.

@@ -17,7 +17,6 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldTypeContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionExtractContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionRequestContext;
 import org.hibernate.search.engine.search.highlighter.SearchHighlighter;
@@ -66,7 +65,6 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 	protected final Integer noMatchSize;
 	protected final Integer numberOfFragments;
 	protected final Boolean orderByScore;
-	protected final Integer maxAnalyzedOffset;
 	protected final List<String> preTags;
 	protected final List<String> postTags;
 	protected final BoundaryScannerType boundaryScannerType;
@@ -79,7 +77,6 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 		this( builder.scope.hibernateSearchIndexNames(),
 				builder.boundaryChars(), builder.boundaryMaxScan(),
 				builder.fragmentSize(), builder.noMatchSize(), builder.numberOfFragments(), builder.orderByScore(),
-				builder.maxAnalyzedOffset(),
 				HighlighterTagSchema.STYLED.equals( builder.tagSchema() ) ? STYLED_SCHEMA_PRE_TAG : builder.preTags(),
 				HighlighterTagSchema.STYLED.equals( builder.tagSchema() ) ? STYLED_SCHEMA_POST_TAGS :
 						builder.postTags(),
@@ -101,7 +98,6 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 				0,
 				5,
 				false,
-				null,
 				DEFAULT_PRE_TAGS,
 				DEFAULT_POST_TAGS,
 				scannerType,
@@ -116,7 +112,6 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 			Character[] boundaryChars,
 			Integer boundaryMaxScan,
 			Integer fragmentSize, Integer noMatchSize, Integer numberOfFragments, Boolean orderByScore,
-			Integer maxAnalyzedOffset,
 			List<String> preTags, List<String> postTags, BoundaryScannerType boundaryScannerType,
 			Locale boundaryScannerLocale, HighlighterFragmenter fragmenterType,
 			Integer phraseLimit,
@@ -129,7 +124,6 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 		this.noMatchSize = noMatchSize;
 		this.numberOfFragments = numberOfFragments;
 		this.orderByScore = orderByScore;
-		this.maxAnalyzedOffset = maxAnalyzedOffset;
 		this.preTags = preTags;
 		this.postTags = postTags;
 		this.boundaryScannerType = boundaryScannerType;
@@ -170,7 +164,6 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 				noMatchSize != null ? noMatchSize : fallback.noMatchSize,
 				numberOfFragments != null ? numberOfFragments : fallback.numberOfFragments,
 				orderByScore != null ? orderByScore : fallback.orderByScore,
-				maxAnalyzedOffset != null ? maxAnalyzedOffset : fallback.maxAnalyzedOffset,
 				preTags != null && !preTags.isEmpty() ? preTags : fallback.preTags,
 				postTags != null && !postTags.isEmpty() ? postTags : fallback.postTags,
 				boundaryScannerType != null ? boundaryScannerType : fallback.boundaryScannerType,
@@ -185,7 +178,6 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 			Character[] boundaryChars,
 			Integer boundaryMaxScan,
 			Integer fragmentSize, Integer noMatchSize, Integer numberOfFragments, Boolean orderByScore,
-			Integer maxAnalyzedOffset,
 			List<String> preTags, List<String> postTags, BoundaryScannerType boundaryScannerType,
 			Locale boundaryScannerLocale, HighlighterFragmenter fragmenterType,
 			Integer phraseLimit,
@@ -203,10 +195,6 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 			ProjectionAccumulator<String, ?, A, List<String>> accumulator);
 
 	public abstract SearchHighlighterType type();
-
-	public void checkApplicability(LuceneSearchIndexValueFieldTypeContext<?> typeContext) {
-		// do nothing
-	}
 
 	public static class Builder extends SearchHighlighterBuilder {
 

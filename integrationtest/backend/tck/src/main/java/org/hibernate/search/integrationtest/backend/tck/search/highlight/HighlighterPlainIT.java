@@ -12,8 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFragmenter;
-import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterPlainOptionsStep;
+import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
@@ -35,39 +35,6 @@ public class HighlighterPlainIT extends AbstractHighlighterIT {
 		return Arrays.asList(
 				"Lorem <em>ipsum</em> dolor sit amet, consectetur adipiscing elit. Proin nec <em>ipsum</em> ultricies, blandit velit"
 		);
-	}
-
-	@Test
-	public void plainMaxAnalyzedOffset() {
-		StubMappingScope scope = index.createScope();
-
-		SearchQuery<List<String>> highlights = scope.query().select(
-						f -> f.highlight( "string" )
-				)
-				.where( f -> f.match().field( "string" ).matching( "foo" ) )
-				.highlighter( h -> h.plain()
-						.maxAnalyzedOffset( 1 )
-				)
-				.toQuery();
-
-		assertThatHits( highlights.fetchAllHits() )
-				.hasHitsAnyOrder(
-						Arrays.asList( "<em>foo</em> and foo and foo much more times" )
-				);
-
-		highlights = scope.query().select(
-						f -> f.highlight( "string" )
-				)
-				.where( f -> f.match().field( "string" ).matching( "foo" ) )
-				.highlighter( h -> h.plain()
-						.maxAnalyzedOffset( "foo and foo".length() )
-				)
-				.toQuery();
-
-		assertThatHits( highlights.fetchAllHits() )
-				.hasHitsAnyOrder(
-						Arrays.asList( "<em>foo</em> and <em>foo</em> and foo much more times" )
-				);
 	}
 
 	@Test

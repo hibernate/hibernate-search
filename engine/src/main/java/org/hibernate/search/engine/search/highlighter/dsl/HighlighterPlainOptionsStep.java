@@ -14,14 +14,6 @@ public interface HighlighterPlainOptionsStep
 		extends HighlighterOptionsStep<HighlighterPlainOptionsStep> {
 
 	/**
-	 * Specify the maximum number of characters to be analyzed by the highlighter.
-	 *
-	 * @param max The maximum number of characters to consider when highlighting.
-	 * @return The next step in a highlighter definition.
-	 */
-	HighlighterPlainOptionsStep maxAnalyzedOffset(int max);
-
-	/**
 	 * Specify how the text should be broken up into highlighting snippets.
 	 *
 	 * @param type The type of fragmeter to be applied.

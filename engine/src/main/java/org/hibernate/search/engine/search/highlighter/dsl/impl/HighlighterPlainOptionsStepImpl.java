@@ -20,12 +20,6 @@ public class HighlighterPlainOptionsStepImpl
 	}
 
 	@Override
-	public HighlighterPlainOptionsStep maxAnalyzedOffset(int max) {
-		highlighterBuilder.maxAnalyzedOffset( max );
-		return this;
-	}
-
-	@Override
 	public HighlighterPlainOptionsStep fragmenter(HighlighterFragmenter type) {
 		this.highlighterBuilder.fragmenter( type );
 		return this;

@@ -62,11 +62,4 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 		return false;
 	}
 
-	@Override
-	public boolean supportsHighlighterUnifiedTypeMaxAnalyzedOffsetOnFieldsWithTermVector() {
-		// In default unified highlighter if term vectors are set the analyzer is not used when highlighting.
-		// This leads to wrapped analyzer with this setting being not used.
-		// While in ES a custom field highlighter is used that supports this setting.
-		return false;
-	}
 }

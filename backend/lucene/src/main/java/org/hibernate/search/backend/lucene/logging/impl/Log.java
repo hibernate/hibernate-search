@@ -695,22 +695,15 @@ public interface Log extends BasicLogger {
 	SearchException unifiedHighlighterFragmentSizeNotSupported();
 
 	@Message(id = ID_OFFSET + 171,
-			value = "Lucene's unified highlighter does not support the max analyzed offset setting " +
-					"on fields that have non default term vector storage strategy configured. " +
-					"The strategy was either configured explicitly, or implicitly because the fast vector highlighter type was requested to be supported. " +
-					"Either use a plain or fast vector highlighters, or do not set this setting.")
-	SearchException unifiedHighlighterMaxAnalyzedOffsetNotSupported();
-
-	@Message(id = ID_OFFSET + 172,
 			value = "Highlight projection cannot be applied within nested context of '%1$s'.")
 	SearchException cannotHighlightInNestedContext(String currentNestingField,
 			@Param EventContext eventContext);
 
-	@Message(id = ID_OFFSET + 173,
+	@Message(id = ID_OFFSET + 172,
 			value = "The highlight projection cannot be applied to a field from an object using `ObjectStructure.NESTED` structure.")
 	SearchException cannotHighlightFieldFromNestedObjectStructure(@Param EventContext eventContext);
 
-	@Message(id = ID_OFFSET + 174, value = "'%1$s' cannot be nested in an object projection. "
+	@Message(id = ID_OFFSET + 173, value = "'%1$s' cannot be nested in an object projection. "
 			+ "%2$s")
 	SearchException cannotUseProjectionInNestedContext(String projection, String hint, @Param EventContext eventContext);
 }

@@ -27,12 +27,6 @@ public class HighlighterUnifiedOptionsStepImpl
 	}
 
 	@Override
-	public HighlighterUnifiedOptionsStep maxAnalyzedOffset(int max) {
-		highlighterBuilder.maxAnalyzedOffset( max );
-		return this;
-	}
-
-	@Override
 	public HighlighterBoundaryScannerTypeStep<?, ? extends HighlighterUnifiedOptionsStep> boundaryScanner() {
 		return new HighlighterBoundaryScannerTypeStepImpl();
 	}

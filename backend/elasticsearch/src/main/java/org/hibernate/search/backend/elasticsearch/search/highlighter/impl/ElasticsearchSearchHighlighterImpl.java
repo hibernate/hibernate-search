@@ -30,7 +30,7 @@ import com.google.gson.JsonObject;
 public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHighlighter {
 
 	public static final ElasticsearchSearchHighlighter NO_OPTIONS_CONFIGURATION = new ElasticsearchSearchHighlighterImpl(
-			Collections.emptySet(), null, null, null, null, null, null, null, null, null, null, null, null, null,
+			Collections.emptySet(), null, null, null, null, null, null, null, null, null, null, null, null,
 			null, null, null
 	);
 
@@ -43,7 +43,6 @@ public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHi
 	private static final JsonAccessor<Integer> NO_MATCH_SIZE = JsonAccessor.root().property( "no_match_size" ).asInteger();
 	private static final JsonAccessor<Integer> NUMBER_OF_FRAGMENTS = JsonAccessor.root().property( "number_of_fragments" ).asInteger();
 	private static final JsonAccessor<String> ORDER = JsonAccessor.root().property( "order" ).asString();
-	private static final JsonAccessor<Integer> MAX_ANALYZED_OFFSET = JsonAccessor.root().property( "max_analyzed_offset" ).asInteger();
 	private static final JsonAccessor<String> TAGS_SCHEMA = JsonAccessor.root().property( "tags_schema" ).asString();
 	private static final JsonArrayAccessor PRE_TAGS = JsonAccessor.root().property( "pre_tags" ).asArray();
 	private static final JsonArrayAccessor POST_TAGS = JsonAccessor.root().property( "post_tags" ).asArray();
@@ -60,7 +59,6 @@ public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHi
 	private final Integer noMatchSize;
 	private final Integer numberOfFragments;
 	private final String orderByScore;
-	private final Integer maxAnalyzedOffset;
 	private final List<String> preTags;
 	private final List<String> postTags;
 	private final String boundaryScannerType;
@@ -76,7 +74,7 @@ public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHi
 				builder.type(),
 				builder.boundaryCharsAsString(),
 				builder.boundaryMaxScan(), builder.fragmentSize(), builder.noMatchSize(), builder.numberOfFragments(),
-				Boolean.TRUE.equals( builder.orderByScore() ) ? "score" : null, builder.maxAnalyzedOffset(), builder.preTags(),
+				Boolean.TRUE.equals( builder.orderByScore() ) ? "score" : null, builder.preTags(),
 				builder.postTags(),
 				convertBoundaryScannerType( builder.boundaryScannerType() ),
 				Objects.toString( builder.boundaryScannerLocale(), null ),
@@ -88,7 +86,7 @@ public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHi
 
 	private ElasticsearchSearchHighlighterImpl(Set<String> indexNames, SearchHighlighterType type, String boundaryChars,
 			Integer boundaryMaxScan, Integer fragmentSize, Integer noMatchSize, Integer numberOfFragments,
-			String orderByScore, Integer maxAnalyzedOffset, List<String> preTags, List<String> postTags,
+			String orderByScore, List<String> preTags, List<String> postTags,
 			String boundaryScannerType, String boundaryScannerLocale, String fragmenterType,
 			Integer phraseLimit, String encoder, String tagSchema) {
 		this.indexNames = indexNames;
@@ -99,7 +97,6 @@ public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHi
 		this.noMatchSize = noMatchSize;
 		this.numberOfFragments = numberOfFragments;
 		this.orderByScore = orderByScore;
-		this.maxAnalyzedOffset = maxAnalyzedOffset;
 		this.preTags = preTags;
 		this.postTags = postTags;
 		this.boundaryScannerType = boundaryScannerType;
@@ -151,7 +148,6 @@ public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHi
 		setIfNotNull( NO_MATCH_SIZE, this.noMatchSize, result );
 		setIfNotNull( NUMBER_OF_FRAGMENTS, this.numberOfFragments, result );
 		setIfNotNull( ORDER, this.orderByScore, result );
-		setIfNotNull( MAX_ANALYZED_OFFSET, this.maxAnalyzedOffset, result );
 		setIfNotNull( BOUNDARY_SCANNER, this.boundaryScannerType, result );
 		setIfNotNull( BOUNDARY_SCANNER_LOCALE, this.boundaryScannerLocale, result );
 		setIfNotNull( FRAGMENTER, this.fragmenterType, result );

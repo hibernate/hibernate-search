@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.analysis.impl.LimitTokenOffsetAnalyzer;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsValuesDelegate;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionExtractContext;
@@ -56,13 +55,13 @@ class LucenePlainSearchHighlighter extends LuceneAbstractSearchHighlighter {
 
 	private LucenePlainSearchHighlighter(Set<String> indexNames,
 			Character[] boundaryChars, Integer boundaryMaxScan, Integer fragmentSize, Integer noMatchSize,
-			Integer numberOfFragments, Boolean orderByScore, Integer maxAnalyzedOffset, List<String> preTags,
+			Integer numberOfFragments, Boolean orderByScore, List<String> preTags,
 			List<String> postTags, BoundaryScannerType boundaryScannerType, Locale boundaryScannerLocale,
 			HighlighterFragmenter fragmenterType, Integer phraseLimit,
 			Encoder encoder) {
 		super( indexNames, boundaryChars, boundaryMaxScan, fragmentSize, noMatchSize, numberOfFragments,
 				orderByScore,
-				maxAnalyzedOffset, preTags, postTags, boundaryScannerType, boundaryScannerLocale, fragmenterType,
+				preTags, postTags, boundaryScannerType, boundaryScannerLocale, fragmenterType,
 				phraseLimit, encoder
 		);
 	}
@@ -70,12 +69,12 @@ class LucenePlainSearchHighlighter extends LuceneAbstractSearchHighlighter {
 	@Override
 	protected LuceneAbstractSearchHighlighter createHighlighterSameType(Set<String> indexNames,
 			Character[] boundaryChars, Integer boundaryMaxScan, Integer fragmentSize, Integer noMatchSize,
-			Integer numberOfFragments, Boolean orderByScore, Integer maxAnalyzedOffset, List<String> preTags,
+			Integer numberOfFragments, Boolean orderByScore, List<String> preTags,
 			List<String> postTags, BoundaryScannerType boundaryScannerType, Locale boundaryScannerLocale,
 			HighlighterFragmenter fragmenterType, Integer phraseLimit, Encoder encoder) {
 		return new LucenePlainSearchHighlighter(
 				indexNames, boundaryChars, boundaryMaxScan, fragmentSize, noMatchSize, numberOfFragments,
-				orderByScore, maxAnalyzedOffset, preTags, postTags, boundaryScannerType, boundaryScannerLocale,
+				orderByScore, preTags, postTags, boundaryScannerType, boundaryScannerLocale,
 				fragmenterType, phraseLimit, encoder
 		);
 	}
@@ -114,8 +113,7 @@ class LucenePlainSearchHighlighter extends LuceneAbstractSearchHighlighter {
 			super( parentDocumentPath, nestedDocumentPath, context.collectorExecutionContext(), accumulator );
 			this.storedFieldsValuesDelegate = context.collectorExecutionContext().storedFieldsValuesDelegate();
 			this.field = field;
-			this.analyzer = LimitTokenOffsetAnalyzer.analyzer(
-					analyzer, LucenePlainSearchHighlighter.this.maxAnalyzedOffset );
+			this.analyzer = analyzer;
 
 			QueryScorer queryScorer = new QueryScorer( context.collectorExecutionContext().originalQuery(), field );
 			queryScorer.setExpandMultiTermQuery( true );
