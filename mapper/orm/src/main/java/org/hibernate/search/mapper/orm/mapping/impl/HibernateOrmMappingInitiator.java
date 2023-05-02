@@ -140,7 +140,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		// If the automatic indexing strategy uses an event queue,
 		// it will need to send events relative to contained entities,
 		// and thus contained entities need to have an identity mapping.
-		containedEntityIdentityMappingRequired( configuredAutomaticIndexingStrategy.usesEventQueue() );
+		containedEntityIdentityMappingRequired( configuredAutomaticIndexingStrategy.usesAsyncProcessing() );
 
 		// Enable annotation mapping if necessary
 		boolean processAnnotations = MAPPING_PROCESS_ANNOTATIONS.get( propertySource );

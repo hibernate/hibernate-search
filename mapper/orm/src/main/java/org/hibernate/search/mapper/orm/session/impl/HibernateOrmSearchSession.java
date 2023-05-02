@@ -226,7 +226,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		HibernateOrmAutomaticIndexingTypeFilter filter = context.createFilter(
 				HibernateOrmApplicationAutomaticIndexingTypeFilter.applicationFilter()
 		);
-		if ( automaticIndexingStrategy.usesEventQueue() && !filter.supportsEventQueue() ) {
+		if ( automaticIndexingStrategy.usesAsyncProcessing() && !filter.supportsEventQueue() ) {
 			throw log.cannotApplySessionFilterWhenAsyncProcessingIsUsed();
 		}
 		automaticIndexingTypeFilterHolder.filter( filter );
