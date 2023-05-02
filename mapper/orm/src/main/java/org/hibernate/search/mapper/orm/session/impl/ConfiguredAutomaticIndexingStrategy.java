@@ -79,7 +79,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 		this.enlistsInTransaction = enlistsInTransaction;
 	}
 
-	public boolean usesEventQueue() {
+	public boolean usesAsyncProcessing() {
 		return senderFactory != null;
 	}
 
@@ -123,7 +123,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 			);
 		}
 
-		if ( usesEventQueue() ) {
+		if ( usesAsyncProcessing() ) {
 			if ( legacyStrategySet || newStrategySet ) {
 				// If we send events to a queue, we're mostly asynchronous
 				// and thus configuring the synchronization strategy does not make sense.
@@ -175,7 +175,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 
 	public ConfiguredIndexingPlanSynchronizationStrategy configureOverriddenSynchronizationStrategy(
 			IndexingPlanSynchronizationStrategy synchronizationStrategy) {
-		if ( usesEventQueue() ) {
+		if ( usesAsyncProcessing() ) {
 			throw log.cannotConfigureSynchronizationStrategyWithIndexingEventQueue();
 		}
 
@@ -184,7 +184,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 
 	public PojoIndexingPlan createIndexingPlan(HibernateOrmSearchSession context,
 			ConfiguredIndexingPlanSynchronizationStrategy synchronizationStrategy) {
-		if ( usesEventQueue() ) {
+		if ( usesAsyncProcessing() ) {
 			AutomaticIndexingQueueEventSendingPlan delegate = senderFactory.apply( context );
 			return mappingContext.createIndexingPlan( context, new HibernateOrmIndexingQueueEventSendingPlan( delegate ) );
 		}
