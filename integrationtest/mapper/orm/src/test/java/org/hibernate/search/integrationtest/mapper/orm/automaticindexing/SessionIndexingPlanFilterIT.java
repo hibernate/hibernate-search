@@ -8,7 +8,11 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.util.common.SearchException;
@@ -503,6 +507,121 @@ public class SessionIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( NotIndexedEntity.NAME ) );
 
 			session.persist( new IndexedSubtypeOfNotIndexedEntity( 40, "test", "test" ) );
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	// Maps are used to represent dynamic types and we want to make sure that passing a Map won't work.
+	@Test
+	public void filterByMapInterfaceMustFail() {
+		setupHolder.runInTransaction( session -> {
+			assertThatThrownBy( () ->
+					Search.session( session ).indexingPlanFilter(
+							ctx -> ctx.exclude( Map.class )
+					)
+			).isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							"No matching entity type for class",
+							Map.class.getName(),
+							"This class is neither an entity type mapped in Hibernate Search nor a superclass of such entity type."
+					);
+		} );
+	}
+
+	@Test
+	public void dynamicTypeByNameDirectPersistUpdateDelete() {
+		setupHolder.runInTransaction( session -> {
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( DYNAMIC_BASE_TYPE_A ) );
+
+			Map<String, Object> entity1 = new HashMap<>();
+			entity1.put( "id", 1 );
+			entity1.put( "propertyOfA", "string1" );
+			entity1.put( "propertyOfB", 1 );
+
+			Map<String, Object> entity2 = new HashMap<>();
+			entity2.put( "id", 2 );
+			entity2.put( "propertyOfA", "string2" );
+			entity2.put( "propertyOfC", LocalDate.of( 2023, Month.MAY, 2 ) );
+
+			session.persist( DYNAMIC_SUBTYPE_B, entity1 );
+			session.persist( DYNAMIC_SUBTYPE_C, entity2 );
+		} );
+		backendMock.verifyExpectationsMet();
+
+		setupHolder.runInTransaction( session -> {
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( DYNAMIC_BASE_TYPE_A ) );
+
+			@SuppressWarnings("unchecked")
+			Map<String, Object> entity1 = (Map<String, Object>) session.get( DYNAMIC_SUBTYPE_B, 1 );
+			entity1.put( "propertyOfA", "updatedValue" );
+		} );
+		backendMock.verifyExpectationsMet();
+
+		setupHolder.runInTransaction( session -> {
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( DYNAMIC_BASE_TYPE_A ) );
+
+			session.remove( session.get( DYNAMIC_SUBTYPE_B, 1 ) );
+			session.remove( session.get( DYNAMIC_SUBTYPE_C, 2 ) );
+
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void dynamicTypeByNameApplicationDisableAllSessionEnableSubtype() {
+		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+				ctx -> ctx.exclude( DYNAMIC_BASE_TYPE_A )
+		);
+		setupHolder.runInTransaction( session -> {
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.include( DYNAMIC_SUBTYPE_B ) );
+
+			Map<String, Object> entity1 = new HashMap<>();
+			entity1.put( "id", 1 );
+			entity1.put( "propertyOfA", "string1" );
+			entity1.put( "propertyOfB", 1 );
+
+			Map<String, Object> entity2 = new HashMap<>();
+			entity2.put( "id", 2 );
+			entity2.put( "propertyOfA", "string2" );
+			entity2.put( "propertyOfC", LocalDate.of( 2023, Month.MAY, 2 ) );
+
+			session.persist( DYNAMIC_SUBTYPE_B, entity1 );
+			session.persist( DYNAMIC_SUBTYPE_C, entity2 );
+
+			backendMock.expectWorks( DYNAMIC_SUBTYPE_B )
+					.add( "1", b -> b.field( "propertyOfA", "string1" )
+							.field( "propertyOfB", 1 ) );
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void excludeByNameOfNotIndexedSupertypeDynamicTypes() {
+		setupHolder.runInTransaction( session -> {
+			Search.session( session ).indexingPlanFilter( ctx -> ctx.exclude( DYNAMIC_NOT_INDEXED_BASE_TYPE_A ) );
+
+			Map<String, Object> entity1 = new HashMap<>();
+			entity1.put( "id", 1 );
+			entity1.put( "propertyOfB", 1 );
+
+			session.persist( DYNAMIC_INDEXED_SUBTYPE_A_B, entity1 );
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void excludeByNameOfNotIndexedSupertypeThatHasNoIndexedOrContainedSubtypesDynamicTypes() {
+		setupHolder.runInTransaction( session -> {
+			assertThatThrownBy( () ->
+					Search.session( session ).indexingPlanFilter(
+							ctx -> ctx.exclude( DYNAMIC_NOT_INDEXED_BASE_TYPE_B )
+					)
+			).isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							"No matching entity type for the name",
+							DYNAMIC_NOT_INDEXED_BASE_TYPE_B,
+							"This name represents neither an entity type mapped in Hibernate Search nor a superclass of such entity type."
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}

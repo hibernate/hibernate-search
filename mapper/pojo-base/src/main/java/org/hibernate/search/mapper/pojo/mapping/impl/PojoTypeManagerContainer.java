@@ -192,7 +192,7 @@ public class PojoTypeManagerContainer
 					.forEach( clazz -> {
 						indexedBySuperType.computeIfAbsent( clazz, ignored -> new LinkedHashSet<>() )
 								.add( typeManager );
-						if ( !clazz.javaClass().isInterface() ) {
+						if ( clazz.isNamed() || !clazz.javaClass().isInterface() ) {
 							allByNonInterfaceSuperType.computeIfAbsent( clazz, ignored -> new LinkedHashSet<>() )
 									.add( typeManager );
 						}
@@ -203,7 +203,7 @@ public class PojoTypeManagerContainer
 			contained.add( typeManager );
 			typeModel.descendingSuperTypes()
 					.map( PojoRawTypeModel::typeIdentifier )
-					.filter( clazz -> !clazz.javaClass().isInterface() )
+					.filter( clazz -> clazz.isNamed() || !clazz.javaClass().isInterface() )
 					.forEach( clazz -> allByNonInterfaceSuperType.computeIfAbsent( clazz, ignored -> new LinkedHashSet<>() )
 							.add( typeManager ) );
 		}
