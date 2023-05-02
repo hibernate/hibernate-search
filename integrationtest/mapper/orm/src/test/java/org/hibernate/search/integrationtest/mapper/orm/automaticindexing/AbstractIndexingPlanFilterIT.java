@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import javax.persistence.Basic;
@@ -18,10 +19,13 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
@@ -41,6 +45,16 @@ public abstract class AbstractIndexingPlanFilterIT {
 
 	@Rule
 	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+	protected static final String DYNAMIC_BASE_TYPE_A = "DynamicA";
+	protected static final String DYNAMIC_SUBTYPE_B = "DynamicA_B";
+	protected static final String DYNAMIC_SUBTYPE_C = "DynamicA_C";
+	protected static final String DYNAMIC_NOT_INDEXED_BASE_TYPE_A = "DynamicNotIndexedA";
+	protected static final String DYNAMIC_INDEXED_SUBTYPE_A_B = "DynamicIndexedSubTypeA_B";
+
+	protected static final String DYNAMIC_NOT_INDEXED_BASE_TYPE_B = "DynamicNotIndexedB";
+	protected static final String DYNAMIC_NOT_INDEXED_SUBTYPE_B_B = "DynamicNotIndexedSubTypeB_B";
+
+
 
 	@ReusableOrmSetupHolder.Setup
 	public void setup(OrmSetupHelper.SetupContext setupContext) {
@@ -69,6 +83,42 @@ public abstract class AbstractIndexingPlanFilterIT {
 				SimpleNotIndexedEntity.class, NotIndexedEntityFromSuperclass.class,
 				NotIndexedEntity.class, IndexedSubtypeOfNotIndexedEntity.class
 		);
+
+		// Add dynamic type mappings:
+		String hbmPath = "/AbstractIndexingPlanFilterIT/inheritance.hbm.xml";
+
+		setupContext.withConfiguration( builder -> builder.addHbmFromClassPath( hbmPath ) )
+				.withProperty(
+						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
+						(HibernateOrmSearchMappingConfigurer) context -> {
+							TypeMappingStep entityATypeMapping = context.programmaticMapping().type( DYNAMIC_BASE_TYPE_A );
+							entityATypeMapping.indexed();
+							entityATypeMapping.property( "propertyOfA" ).genericField();
+
+							TypeMappingStep entityA_BTypeMapping = context.programmaticMapping().type( DYNAMIC_SUBTYPE_B );
+							entityA_BTypeMapping.indexed();
+							entityA_BTypeMapping.property( "propertyOfB" ).genericField();
+
+							TypeMappingStep entityA_CTypeMapping = context.programmaticMapping().type( DYNAMIC_SUBTYPE_C );
+							entityA_CTypeMapping.indexed();
+							entityA_CTypeMapping.property( "propertyOfC" ).genericField();
+
+							TypeMappingStep entityIndexedBTypeMapping = context.programmaticMapping().type(
+									DYNAMIC_INDEXED_SUBTYPE_A_B );
+							entityIndexedBTypeMapping.indexed();
+							entityIndexedBTypeMapping.property( "propertyOfB" ).genericField();
+						}
+				);
+		backendMock.expectSchema( DYNAMIC_BASE_TYPE_A, b -> b
+						.field( "propertyOfA", String.class ) )
+				.expectSchema( DYNAMIC_SUBTYPE_B, b -> b
+						.field( "propertyOfA", String.class )
+						.field( "propertyOfB", Integer.class ) )
+				.expectSchema( DYNAMIC_SUBTYPE_C, b -> b
+						.field( "propertyOfA", String.class )
+						.field( "propertyOfC", LocalDate.class ) )
+				.expectSchema( DYNAMIC_INDEXED_SUBTYPE_A_B, b -> b
+						.field( "propertyOfB", Integer.class ) );
 	}
 
 	@Before
