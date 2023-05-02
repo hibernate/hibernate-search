@@ -160,6 +160,7 @@ public class AutomaticIndexingOneToManyCollectionBaseIT
 		 * TODO use mappedBy when the above gets fixed in Hibernate ORM
 		 */
 		@OneToMany
+		@OrderColumn(name = "idx")
 		@JoinTable(name = "i_containedECAssocIdxEmb",
 				joinColumns = @JoinColumn(name = "containing"),
 				inverseJoinColumns = @JoinColumn(name = "contained"))
@@ -175,6 +176,7 @@ public class AutomaticIndexingOneToManyCollectionBaseIT
 		 * TODO use mappedBy when the above gets fixed in Hibernate ORM
 		 */
 		@OneToMany
+		@OrderColumn(name = "idx")
 		@JoinTable(name = "i_containedECAssocNonIdxEmb",
 				joinColumns = @JoinColumn(name = "containing"),
 				inverseJoinColumns = @JoinColumn(name = "contained"))

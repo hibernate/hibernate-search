@@ -397,10 +397,12 @@ public class AutomaticIndexingOneToManyListBaseIT
 	public static class ContainingEmbeddable {
 
 		@OneToMany(mappedBy = "embeddedAssociations.containingAsIndexedEmbedded")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		private List<ContainedEntity> containedIndexedEmbedded = new ArrayList<>();
 
 		@OneToMany(mappedBy = "embeddedAssociations.containingAsNonIndexedEmbedded")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainedEntity> containedNonIndexedEmbedded = new ArrayList<>();
 
 		public List<ContainedEntity> getContainedIndexedEmbedded() {
