@@ -291,7 +291,7 @@ public class ElasticsearchDialectFactoryTest {
 						Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
 				),
 				success(
-						ElasticsearchDistributionName.ELASTIC, "8", "8.7.0",
+						ElasticsearchDistributionName.ELASTIC, "8", "8.7.1",
 						Elasticsearch8ModelDialect.class, Elasticsearch81ProtocolDialect.class
 				),
 				success(
@@ -351,7 +351,7 @@ public class ElasticsearchDialectFactoryTest {
 						Elasticsearch8ModelDialect.class, Elasticsearch81ProtocolDialect.class
 				),
 				success(
-						ElasticsearchDistributionName.ELASTIC, "8.7", "8.7.0",
+						ElasticsearchDistributionName.ELASTIC, "8.7", "8.7.1",
 						Elasticsearch8ModelDialect.class, Elasticsearch81ProtocolDialect.class
 				),
 				success(
