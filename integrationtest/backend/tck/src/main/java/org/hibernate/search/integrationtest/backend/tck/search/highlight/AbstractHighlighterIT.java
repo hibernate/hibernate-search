@@ -702,6 +702,10 @@ public abstract class AbstractHighlighterIT {
 				"We ignore this test for the highlighters that do not support multi fragments as separate items since there's nothing to sort.",
 				supportsMultipleFragmentsAsSeparateItems()
 		);
+		assumeTrue(
+				"Some versions of the backend have a bug that prevents them from correctly sorting the results.",
+				supportsOrderByScoreMultivaluedField()
+		);
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -725,6 +729,10 @@ public abstract class AbstractHighlighterIT {
 						"The quick brown fox jumps right over the little lazy <em>dog</em>"
 				)
 		);
+	}
+
+	protected boolean supportsOrderByScoreMultivaluedField() {
+		return true;
 	}
 
 	@Test

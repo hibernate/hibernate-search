@@ -15,6 +15,7 @@ import org.hibernate.search.engine.search.highlighter.dsl.HighlighterFragmenter;
 import org.hibernate.search.engine.search.highlighter.dsl.HighlighterPlainOptionsStep;
 import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Test;
@@ -31,10 +32,16 @@ public class HighlighterPlainIT extends AbstractHighlighterIT {
 		return Arrays.asList( "Lorem <em>ipsum</em> dolor", " <em>ipsum</em> ultricies" );
 	}
 
+	@Override
 	protected List<String> numberOfFragmentsResult() {
 		return Arrays.asList(
 				"Lorem <em>ipsum</em> dolor sit amet, consectetur adipiscing elit. Proin nec <em>ipsum</em> ultricies, blandit velit"
 		);
+	}
+
+	@Override
+	protected boolean supportsOrderByScoreMultivaluedField() {
+		return TckConfiguration.get().getBackendFeatures().supportsHighlighterPlainOrderByScoreMultivaluedField();
 	}
 
 	@Test
