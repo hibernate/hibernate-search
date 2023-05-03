@@ -299,4 +299,15 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// https://github.com/elastic/elasticsearch/issues/94550
 		return false;
 	}
+
+	@Override
+	public boolean supportsHighlighterPlainOrderByScoreMultivaluedField() {
+		// A plain highlighter implementation in ES had a bug
+		// https://github.com/elastic/elasticsearch/issues/87210
+		// that is now fixed with https://github.com/elastic/elasticsearch/pull/87414
+		return isActualVersion(
+				esVersion -> !esVersion.isBetween( "7.15", "8.3" ),
+				osVersion -> true
+		);
+	}
 }

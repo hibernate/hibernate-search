@@ -142,4 +142,8 @@ public abstract class TckBackendFeatures {
 	public boolean supportsHighlighterFastVectorNoMatchSizeOnMultivaluedFields() {
 		return true;
 	}
+
+	public boolean supportsHighlighterPlainOrderByScoreMultivaluedField() {
+		return true;
+	}
 }
