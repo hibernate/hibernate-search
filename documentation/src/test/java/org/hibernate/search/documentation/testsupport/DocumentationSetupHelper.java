@@ -44,7 +44,7 @@ public final class DocumentationSetupHelper
 			Set<Class<?>> additionalAnnotatedClasses,
 			Consumer<ProgrammaticMappingConfigurationContext> programmaticMappingContributor) {
 		return testParamsForBothAnnotationsAndProgrammatic(
-				BackendSetupStrategy.withSingleBackend( backendConfiguration ), backendConfiguration,
+				BackendSetupStrategy.withSingleBackend( backendConfiguration ),
 				additionalAnnotatedClasses, programmaticMappingContributor );
 	}
 
@@ -63,13 +63,11 @@ public final class DocumentationSetupHelper
 			Consumer<ProgrammaticMappingConfigurationContext> programmaticMappingContributor) {
 		return testParamsForBothAnnotationsAndProgrammatic(
 				BackendSetupStrategy.withMultipleBackends( defaultBackendConfiguration, namedBackendConfigurations ),
-				defaultBackendConfiguration,
 				additionalAnnotatedClasses, programmaticMappingContributor );
 	}
 
 	public static List<DocumentationSetupHelper> testParamsForBothAnnotationsAndProgrammatic(
 			BackendSetupStrategy backendSetupStrategy,
-			BackendConfiguration defaultBackendConfiguration,
 			Set<Class<?>> additionalAnnotatedClasses,
 			Consumer<ProgrammaticMappingConfigurationContext> programmaticMappingContributor) {
 		List<DocumentationSetupHelper> result = new ArrayList<>();
