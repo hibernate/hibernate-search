@@ -388,7 +388,7 @@
         <version.javadoc.plugin>3.5.0</version.javadoc.plugin>
         <version.jdeps.plugin>0.5.1</version.jdeps.plugin>
         <version.nexus-staging.plugin>1.6.13</version.nexus-staging.plugin>
-        <version.processor.plugin>4.5-jdk8</version.processor.plugin>
+        <version.processor.plugin>4.5</version.processor.plugin>
         <version.project-info.plugin>3.4.5</version.project-info.plugin>
         <version.resources.plugin>3.3.1</version.resources.plugin>
         <version.shade.plugin>3.5.0</version.shade.plugin>
@@ -442,11 +442,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <!-- JDK version required for the build; we target 8 but require at least 17 for the build -->
+        <!-- JDK version required for the build; we target 11 but require at least 17 for the build -->
         <jdk.min.version>17</jdk.min.version>
         <!-- The lowest supported version of Java for applications using Hibernate Search -->
         <!-- Set statically, independently from the current JDK: we want our code to comply with this version -->
-        <java-version.main.release>8</java-version.main.release>
+        <java-version.main.release>11</java-version.main.release>
         <java-version.main.compiler.java_home>${java.home}</java-version.main.compiler.java_home>
         <java-version.main.compiler>${java-version.main.compiler.java_home}/bin/javac</java-version.main.compiler>
         <!-- The version of test bytecode, useful for testing compatibility with newer JDKs -->
@@ -460,9 +460,7 @@
 
         <!-- Properties overridden in profiles to disable certain tests that only work with specific Java versions -->
         <!-- These are only used in integration tests, hence the default to "none", which is overridden in integration tests -->
-        <java-version.test.java11.add-main-source-phase.default>none</java-version.test.java11.add-main-source-phase.default>
         <java-version.test.java17.add-main-source-phase.default>none</java-version.test.java17.add-main-source-phase.default>
-        <java-version.test.java11.add-main-source-phase>${java-version.test.java11.add-main-source-phase.default}</java-version.test.java11.add-main-source-phase>
         <java-version.test.java17.add-main-source-phase>${java-version.test.java17.add-main-source-phase.default}</java-version.test.java17.add-main-source-phase>
         <!-- These are used in all modules -->
         <java-version.test.java11.add-test-source-phase>generate-test-sources</java-version.test.java11.add-test-source-phase>
@@ -1613,18 +1611,6 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>add-main-source-java11</id>
-                        <phase>${java-version.test.java11.add-main-source-phase}</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/main/java11</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>add-main-source-java17</id>
                         <phase>${java-version.test.java17.add-main-source-phase}</phase>
                         <goals>
@@ -1633,18 +1619,6 @@
                         <configuration>
                             <sources>
                                 <source>src/main/java17</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>add-test-source-java11</id>
-                        <phase>${java-version.test.java11.add-test-source-phase}</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/test/java11</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -2624,32 +2598,6 @@
                      Since the main build is supposed to catch all forbidden API invocations already,
                      we can safely disable ForbiddenAPIs in builds that target other JDKs. -->
                 <forbiddenapis.skip>true</forbiddenapis.skip>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>testWithJdk8</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>8</value>
-                </property>
-            </activation>
-            <properties>
-                <!-- JDK 8 doesn't support the settings mentioned in the default value of this property,
-                     but it doesn't need them either, so we just omit them. -->
-                <surefire.jvm.args.java-version></surefire.jvm.args.java-version>
-                <!-- JDK 8 produces so many false positives that warnings are worthless -->
-                <maven.compiler.failOnWarning>false</maven.compiler.failOnWarning>
-                <!-- JDK 8 doesn't support the add-opens mentioned in the default value of this property,
-                     but it doesn't need them either, so we just omit them. -->
-                <test.weld.jvm.args></test.weld.jvm.args>
-                <!-- Tests specific to Java 11+ won't work with JDK 8, so we disable them. -->
-                <java-version.test.java11.add-main-source-phase>none</java-version.test.java11.add-main-source-phase>
-                <java-version.test.java17.add-main-source-phase>none</java-version.test.java17.add-main-source-phase>
-                <java-version.test.java11.add-test-source-phase>none</java-version.test.java11.add-test-source-phase>
-                <java-version.test.java17.add-test-source-phase>none</java-version.test.java17.add-test-source-phase>
-                <java-version.test.java17.noParameters.skip>true</java-version.test.java17.noParameters.skip>
             </properties>
         </profile>
 
