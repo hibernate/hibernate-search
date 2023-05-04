@@ -584,7 +584,7 @@
                 <test.database.run.mysql.skip>${test.database.run.skip}</test.database.run.mysql.skip>
                 <db.dialect>org.hibernate.dialect.MySQL8Dialect</db.dialect>
                 <jdbc.driver.groupId>mysql</jdbc.driver.groupId>
-                <jdbc.driver.artifactId>mysql-connector-java</jdbc.driver.artifactId>
+                <jdbc.driver.artifactId>mysql-connector-j</jdbc.driver.artifactId>
                 <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
                 <jdbc.url>jdbc:mysql://localhost/hibernate_orm_test</jdbc.url>
                 <jdbc.user>hibernate_orm_test</jdbc.user>
