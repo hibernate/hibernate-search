@@ -1,8 +1,8 @@
 diff --git a/main/java/module-info.java b/main/java/module-info.java
-index de9b64d55f..56efa76484 100644
+index 11aee01366..47a5e2599e 100644
 --- a/main/java/module-info.java
 +++ b/main/java/module-info.java
-@@ -17,16 +17,16 @@
+@@ -17,12 +17,6 @@
  	requires org.hibernate.search.backend.elasticsearch;
  	requires org.hibernate.search.mapper.orm.coordination.outboxpolling;
  
@@ -15,9 +15,10 @@ index de9b64d55f..56efa76484 100644
  	/*
  	 * This is necessary in order to use SessionFactory,
  	 * which extends "javax.naming.Referenceable".
- 	 * Without this, compilation as a Java module fails.
- 	 */
- 	requires java.naming;
+@@ -32,4 +26,10 @@
+ 
+ 	// Since Avro is using log4j we need to explicitly require it to make things work:
+ 	requires org.apache.logging.log4j;
 +
 +	/*
 +	 * This is necessary in order to put ByteBuddy in the modulepath and make module exports effective.
