@@ -9,7 +9,6 @@ package org.hibernate.search.engine.environment.thread.impl;
 import java.util.concurrent.ThreadFactory;
 
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
-import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 
 public final class EmbeddedThreadProvider implements ThreadProvider {
 
@@ -31,11 +30,8 @@ public final class EmbeddedThreadProvider implements ThreadProvider {
 	}
 
 	@Override
-	@SuppressForbiddenApis(reason = "It's unclear how we will handle this without the security manager;"
-			+ " we'll see when the security manager actually gets removed from the JDK")
 	public ThreadFactory createThreadFactory(String prefix) {
-		SecurityManager s = System.getSecurityManager();
-		ThreadGroup group = ( s != null ) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+		ThreadGroup group = Thread.currentThread().getThreadGroup();
 		String namePrefix = createFullThreadNamePrefix( prefix );
 		return new SimpleThreadFactory( group, namePrefix );
 	}

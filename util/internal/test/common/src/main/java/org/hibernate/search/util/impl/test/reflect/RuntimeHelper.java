@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.util.impl.test.reflect;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Function;
@@ -19,25 +16,7 @@ public final class RuntimeHelper {
 	private static final CallerClassWalker CALLER_CLASS_WALKER;
 
 	static {
-		Class<?> stackWalkerClass = null;
-		try {
-			stackWalkerClass = Class.forName( "java.lang.StackWalker" );
-		}
-		catch (ClassNotFoundException ignored) {
-		}
-		if ( stackWalkerClass != null ) {
-			// JDK 9+, where StackWalker is available
-			try {
-				CALLER_CLASS_WALKER = new StackWalkerCallerClassWalker( stackWalkerClass );
-			}
-			catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | RuntimeException e) {
-				throw new IllegalStateException( "Unable to initialize ClassWalker based on java.lang.StackWaker", e );
-			}
-		}
-		else {
-			// JDK 8
-			CALLER_CLASS_WALKER = new SecurityManagerCallerClassWalker();
-		}
+		CALLER_CLASS_WALKER = new StackWalkerCallerClassWalker();
 	}
 
 	private RuntimeHelper() {
@@ -101,61 +80,25 @@ public final class RuntimeHelper {
 	}
 
 	/**
-	 * Retrieves the caller stack from the security manager class context.
-	 */
-	@SuppressWarnings("removal")
-	private static class SecurityManagerCallerClassWalker extends SecurityManager
-			implements CallerClassWalker {
-		@Override
-		public <T> T walk(Function<? super Stream<Class<?>>, ? extends T> function) {
-			// The type arguments *are* necessary for some reason.
-			// Without them, we get strange compilation errors when targeting JDK 8.
-			return function.apply( Arrays.<Class<?>>stream( getClassContext() )
-					.skip( 1 ) // Skip this method
-					.filter( c -> !c.isSynthetic() ) // Skip lambdas, like StackWalker does
-			);
-		}
-	}
-
-	/**
 	 * Retrieves the caller stack using a StackWalker.
 	 */
-	private static class StackWalkerCallerClassWalker
-			implements CallerClassWalker {
-		private final Object stackWalker;
-		private final Method stackWalkerWalkMethod;
-		private final Function<Object, Class<?>> stackFrameGetDeclaringClassFunction;
+	private static class StackWalkerCallerClassWalker implements CallerClassWalker {
+		private final StackWalker stackWalker;
 
-		private StackWalkerCallerClassWalker(Class<?> stackWalkerClass)
-				throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-			Class<?> optionClass = Class.forName( "java.lang.StackWalker$Option" );
-			this.stackWalker = stackWalkerClass.getMethod( "getInstance", optionClass )
-					.invoke( null, optionClass.getEnumConstants()[0] );
-
-			this.stackWalkerWalkMethod = stackWalkerClass.getMethod( "walk", Function.class );
-			Method stackFrameGetDeclaringClass = Class.forName( "java.lang.StackWalker$StackFrame" )
-					.getMethod( "getDeclaringClass" );
-			stackFrameGetDeclaringClassFunction = frame -> {
-				try {
-					return (Class<?>) stackFrameGetDeclaringClass.invoke( frame );
-				}
-				catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-					throw new IllegalStateException( "Unable to get stack frame declaring class", e );
-				}
-			};
+		private StackWalkerCallerClassWalker() {
+			this.stackWalker = StackWalker.getInstance( StackWalker.Option.RETAIN_CLASS_REFERENCE );
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
 		public <T> T walk(Function<? super Stream<Class<?>>, ? extends T> function) {
-			Function<Stream<?>, T> stackFrameExtractFunction =
+			Function<Stream<StackWalker.StackFrame>, T> stackFrameExtractFunction =
 					stream -> function.apply( stream
 							.skip( 1 ) // Skip this method
-							.map( stackFrameGetDeclaringClassFunction ) );
+							.map( StackWalker.StackFrame::getDeclaringClass ) );
 			try {
-				return (T) stackWalkerWalkMethod.invoke( stackWalker, stackFrameExtractFunction );
+				return stackWalker.walk( stackFrameExtractFunction );
 			}
-			catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			catch (IllegalArgumentException e) {
 				throw new IllegalStateException( "Unable to walk the stack using StackWalker", e );
 			}
 		}

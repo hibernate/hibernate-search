@@ -285,13 +285,13 @@ and then you will need to pass additional properties to Maven.
 To test Hibernate Search against JDK 8:
 
 ```bash
-./mvnw clean install -Djava-version.test.release=8 -Djava-version.test.launcher.java_home=/path/to/jdk8
+./mvnw clean install -Djava-version.test.release=11 -Djava-version.test.launcher.java_home=/path/to/jdk11
 ```
 
-To test Hibernate Search against JDKs other than 8 or the default 17:
+To test Hibernate Search against JDKs other than 11 or the default 17:
 
 ```bash
-./mvnw clean install -Djava-version.test.release=11 -Djava-version.test.compiler.java_home=/path/to/jdk11
+./mvnw clean install -Djava-version.test.release=15 -Djava-version.test.compiler.java_home=/path/to/jdk15
 ```
 
 Or more simply, if the newer JDK you want to test against is newer than 17 and is your default JDK:

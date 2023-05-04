@@ -2596,32 +2596,6 @@
         </profile>
 
         <profile>
-            <id>testWithJdk8</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>8</value>
-                </property>
-            </activation>
-            <properties>
-                <!-- JDK 8 doesn't support the settings mentioned in the default value of this property,
-                     but it doesn't need them either, so we just omit them. -->
-                <surefire.jvm.args.java-version></surefire.jvm.args.java-version>
-                <!-- JDK 8 produces so many false positives that warnings are worthless -->
-                <maven.compiler.failOnWarning>false</maven.compiler.failOnWarning>
-                <!-- JDK 8 doesn't support the add-opens mentioned in the default value of this property,
-                     but it doesn't need them either, so we just omit them. -->
-                <test.weld.jvm.args></test.weld.jvm.args>
-                <!-- Tests specific to Java 11+ won't work with JDK 8, so we disable them. -->
-                <java-version.test.java11.add-main-source-phase>none</java-version.test.java11.add-main-source-phase>
-                <java-version.test.java17.add-main-source-phase>none</java-version.test.java17.add-main-source-phase>
-                <java-version.test.java11.add-test-source-phase>none</java-version.test.java11.add-test-source-phase>
-                <java-version.test.java17.add-test-source-phase>none</java-version.test.java17.add-test-source-phase>
-                <java-version.test.java17.noParameters.skip>true</java-version.test.java17.noParameters.skip>
-            </properties>
-        </profile>
-
-        <profile>
             <id>testWithJdk11</id>
             <activation>
                 <property>
