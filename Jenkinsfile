@@ -159,9 +159,6 @@ stage('Configure') {
 			jdk: [
 					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
 					// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
-					// We only run the tests with JDK8, but we compile them with JDK17 (with --release 8).
-					new JdkBuildEnvironment(version: '8', testLauncherTool: 'OpenJDK 8 Latest',
-							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '11', testCompilerTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '17', testCompilerTool: 'OpenJDK 17 Latest',
