@@ -29,4 +29,7 @@ module org.hibernate.search.integrationtest.java.module.orm.elasticsearch.coordi
 	 * Without this, compilation as a Java module fails.
 	 */
 	requires java.naming;
+
+	// Since Avro is using log4j we need to explicitly require it to make things work:
+	requires org.apache.logging.log4j;
 }
