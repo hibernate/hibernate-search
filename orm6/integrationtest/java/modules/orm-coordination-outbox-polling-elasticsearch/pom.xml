@@ -54,6 +54,12 @@
             <version>${version.net.bytebuddy}</version>
         </dependency>
 
+        <!-- Only needed here so we can require it in module info for Avro -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-test-orm-orm6</artifactId>

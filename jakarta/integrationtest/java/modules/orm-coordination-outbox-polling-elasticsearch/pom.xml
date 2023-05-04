@@ -46,6 +46,12 @@
             <artifactId>hibernate-search-mapper-orm-coordination-outbox-polling-jakarta</artifactId>
         </dependency>
 
+        <!-- Only needed here so we can require it in module info for Avro -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-test-orm-jakarta</artifactId>
