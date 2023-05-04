@@ -36,6 +36,11 @@ Map settings() {
 					updateProperties: ['version.org.hibernate.orm']
 					// In this case we'll rebuild and test everything.
 			]
+		case 'lucene9':
+			return [
+					updateProperties: ['version.org.apache.lucene'],
+					onlyRunTestDependingOn: ['hibernate-search-backend-lucene']
+			]
 		default:
 			return [:]
 	}
@@ -133,7 +138,7 @@ pipeline {
 					axis {
 						name 'DEPENDENCY_UPDATE_NAME'
 						// NOTE: Remember to update the settings() method above when changing this.
-						values 'jandex3', 'orm5.6', 'orm6.2', 'orm6.3', 'orm6-in-main-code'
+						values 'jandex3', 'orm5.6', 'orm6.2', 'orm6.3', 'orm6-in-main-code', 'lucene9'
 					}
 				}
 				stages {
