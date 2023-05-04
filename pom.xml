@@ -339,9 +339,9 @@
 
         <!-- >>> JDBC Drivers -->
         <version.com.h2database>2.1.214</version.com.h2database>
-        <!-- Sticking to Derby 10.14 for now since later versions require JDK 9+, and we need to test with JDK 8.
+        <!-- Sticking to Derby 10.15 for now since later versions require JDK 17+, and we need to test with JDK 11.
              See https://db.apache.org/derby/derby_downloads.html -->
-        <version.org.apache.derby>10.14.2.0</version.org.apache.derby>
+        <version.org.apache.derby>10.15.2.0</version.org.apache.derby>
         <version.org.postgresql>42.5.1</version.org.postgresql>
         <version.org.mariadb.jdbc>3.1.0</version.org.mariadb.jdbc>
         <version.mysql.mysql-connector-java>8.0.31</version.mysql.mysql-connector-java>
