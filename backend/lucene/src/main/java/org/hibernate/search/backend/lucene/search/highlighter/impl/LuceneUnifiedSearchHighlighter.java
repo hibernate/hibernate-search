@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -142,8 +143,20 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 
 		@Override
 		public List<String> highlight(int doc) throws IOException {
-			List<String> highlights = highlighter.highlightField( fieldsIn, query, leafReaderContext.docBase + doc, maxPassagesIn );
-			return highlights == null ? Collections.emptyList() : highlights;
+			List<TextFragment> highlights = highlighter.highlightField( fieldsIn, query, leafReaderContext.docBase + doc, maxPassagesIn );
+			if ( highlights == null ) {
+				return Collections.emptyList();
+			}
+			else {
+				if ( Boolean.TRUE.equals( LuceneUnifiedSearchHighlighter.this.orderByScore ) ) {
+					highlights.sort( Comparator.comparingDouble( TextFragment::score ).reversed() );
+				}
+				List<String> result = new ArrayList<>( highlights.size() );
+				for ( TextFragment highlight : highlights ) {
+					result.add( highlight.highlightedText() );
+				}
+				return result;
+			}
 		}
 	}
 
@@ -154,9 +167,9 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 		}
 
 		@SuppressWarnings( "unchecked" )
-		public List<String> highlightField(String[] fieldIn, Query query, int doc, int[] maxPassagesIn) throws IOException {
+		public List<TextFragment> highlightField(String[] fieldIn, Query query, int doc, int[] maxPassagesIn) throws IOException {
 			assert fieldIn.length == 1;
-			return (List<String>) highlightFieldsAsObjects( fieldIn, query, new int[] { doc }, maxPassagesIn ).get( fieldIn[0] )[0];
+			return (List<TextFragment>) highlightFieldsAsObjects( fieldIn, query, new int[] { doc }, maxPassagesIn ).get( fieldIn[0] )[0];
 		}
 	}
 
@@ -179,15 +192,16 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 			this.encoder = encoder;
 		}
 
-		public List<String> format(Passage[] passages, String content) {
-			List<String> result = new ArrayList<>( passages.length );
+		public List<TextFragment> format(Passage[] passages, String content) {
+			List<TextFragment> result = new ArrayList<>( passages.length );
 
 			int pos = 0;
 			for ( Passage passage : passages ) {
 				StringBuilder sb = new StringBuilder();
 				pos = passage.getStartOffset();
+				int start = 0;
 				for ( int i = 0; i < passage.getNumMatches(); i++ ) {
-					int start = passage.getMatchStarts()[i];
+					start = passage.getMatchStarts()[i];
 					assert start >= pos && start < passage.getEndOffset();
 					//append content before this start
 					append( sb, content, pos, start );
@@ -197,7 +211,10 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 					// it's possible to have overlapping terms.
 					//   Look ahead to expand 'end' past all overlapping:
 					while ( i + 1 < passage.getNumMatches() && passage.getMatchStarts()[i + 1] < end ) {
+						//CHECKSTYLE:OFF: ModifiedControlVariable - this comes from the Lucene lib and we'd better keep
+						// changes to a minimum
 						end = passage.getMatchEnds()[++i];
+						//CHECKSTYLE:ON
 					}
 					end = Math.min( end, passage.getEndOffset() ); // in case match straddles past passage
 
@@ -210,13 +227,31 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 				// its possible a "term" from the analyzer could span a sentence boundary.
 				append( sb, content, pos, Math.max( pos, passage.getEndOffset() ) );
 
-				result.add( sb.toString() );
+				result.add( new TextFragment( sb.toString().trim(), passage.getScore() ) );
 			}
 			return result;
 		}
 
 		protected void append(StringBuilder dest, String content, int start, int end) {
 			dest.append( encoder.encodeText( content.substring( start, end ) ) );
+		}
+	}
+
+	static class TextFragment {
+
+		private final String highlightedText;
+		private final float score;
+		public TextFragment(String highlightedText, float score) {
+			this.highlightedText = highlightedText;
+			this.score = score;
+		}
+
+		public String highlightedText() {
+			return highlightedText;
+		}
+
+		public float score() {
+			return score;
 		}
 	}
 }
