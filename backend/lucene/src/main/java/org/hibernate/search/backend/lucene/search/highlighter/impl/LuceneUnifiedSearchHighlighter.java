@@ -27,6 +27,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.highlight.Encoder;
 import org.apache.lucene.search.uhighlight.DefaultPassageFormatter;
+import org.apache.lucene.search.uhighlight.Passage;
 import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
 
 class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
@@ -152,9 +153,14 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 		}
 	}
 
-	// `DefaultPassageFormatter` uses a string builder to create a resulting highlighted string.
-	// Elasticsearch uses their own formatter that creates an array of snippets instead.
-	// Hence, the results won't match if more than one snipped is needed to provide the results.
+	/**
+	 * `DefaultPassageFormatter` uses a string builder to create a resulting highlighted string.
+	 * We'll keep passages separate, while keeping the remaining logic unchanged, to provide multiple fragments as a result of highlighting.
+	 * <p>
+	 * Some of this code was copied and adapted from
+	 * {@code org.apache.lucene.search.uhighlight.DefaultPassageFormatter}
+	 * of <a href="https://lucene.apache.org/">Apache Lucene project</a>.
+	 */
 	private static class PassageFormatterWithEncoder extends DefaultPassageFormatter {
 		private final Encoder encoder;
 
@@ -165,6 +171,44 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 					// doesn't really matter as we override append() to use encoder rather than rely on this property
 			);
 			this.encoder = encoder;
+		}
+
+		@Override
+		public String format(Passage passages[], String content) {
+			StringBuilder sb = new StringBuilder();
+			int pos = 0;
+			for (Passage passage : passages) {
+				// don't add ellipsis if its the first one, or if its connected.
+				if (passage.getStartOffset() > pos && pos > 0) {
+					sb.append(ellipsis);
+				}
+				pos = passage.getStartOffset();
+				for (int i = 0; i < passage.getNumMatches(); i++) {
+					int start = passage.getMatchStarts()[i];
+					assert start >= pos && start < passage.getEndOffset();
+					//append content before this start
+					append(sb, content, pos, start);
+
+					int end = passage.getMatchEnds()[i];
+					assert end > start;
+					// its possible to have overlapping terms.
+					//   Look ahead to expand 'end' past all overlapping:
+					while (i + 1 < passage.getNumMatches() && passage.getMatchStarts()[i+1] < end) {
+						end = passage.getMatchEnds()[++i];
+					}
+					end = Math.min(end, passage.getEndOffset()); // in case match straddles past passage
+
+					sb.append(preTag);
+					append(sb, content, start, end);
+					sb.append(postTag);
+
+					pos = end;
+				}
+				// its possible a "term" from the analyzer could span a sentence boundary.
+				append(sb, content, pos, Math.max(pos, passage.getEndOffset()));
+				pos = passage.getEndOffset();
+			}
+			return sb.toString();
 		}
 
 		@Override
