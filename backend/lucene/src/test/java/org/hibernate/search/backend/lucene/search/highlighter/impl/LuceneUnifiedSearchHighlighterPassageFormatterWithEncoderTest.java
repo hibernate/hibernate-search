@@ -33,6 +33,7 @@ public class LuceneUnifiedSearchHighlighterPassageFormatterWithEncoderTest {
 		passage.addMatch( startOffset, endOffset, null, 1 );
 
 		assertThat( formatter.format( passages, text ) )
+				.extracting( LuceneUnifiedSearchHighlighter.TextFragment::highlightedText )
 				.containsOnly( "The quick brown fox jumps right over the little lazy <em>dog</em>" );
 	}
 
@@ -60,6 +61,7 @@ public class LuceneUnifiedSearchHighlighterPassageFormatterWithEncoderTest {
 		passage.addMatch( startOffset, endOffset, null, 1 );
 
 		assertThat( formatter.format( passages, text ) )
+				.extracting( LuceneUnifiedSearchHighlighter.TextFragment::highlightedText )
 				.containsOnly(
 						"The quick brown fox jumps right over the little lazy <em>dog</em>",
 						"The five boxing <em>wizards</em> jump quickly"
@@ -90,6 +92,7 @@ public class LuceneUnifiedSearchHighlighterPassageFormatterWithEncoderTest {
 		passage.addMatch( startOffset, endOffset, null, 1 );
 
 		assertThat( formatter.format( passages, text ) )
+				.extracting( LuceneUnifiedSearchHighlighter.TextFragment::highlightedText )
 				.containsOnly( "The <em>quick brown</em> fox jumps right over the little lazy <em>dog</em>" );
 	}
 
@@ -112,6 +115,7 @@ public class LuceneUnifiedSearchHighlighterPassageFormatterWithEncoderTest {
 		passage.addMatch( startOffset, endOffset, null, 1 );
 
 		assertThat( formatter.format( passages, text ) )
+				.extracting( LuceneUnifiedSearchHighlighter.TextFragment::highlightedText )
 				.containsOnly( "The <em>quick brown fox</em> jumps right over the little lazy dog" );
 	}
 }
