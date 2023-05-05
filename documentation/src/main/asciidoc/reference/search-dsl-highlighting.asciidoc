@@ -304,8 +304,9 @@ include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/High
 
 [NOTE]
 ====
-These options are supported by all highlighter types on the Elasticsearch backend,
-but only by plain and fast-vector highlighters with the Lucene backend.
+These options are supported by all highlighter types on the Elasticsearch backend.
+As for the Lucene backend -- the number of fragments is also supported by all highlighter types,
+while only plain and fast-vector highlighters support fragment size.
 ====
 
 [[search-dsl-highlighting-highlighter-options-order]]
