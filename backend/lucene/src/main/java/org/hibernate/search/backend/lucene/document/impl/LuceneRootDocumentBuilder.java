@@ -42,8 +42,7 @@ public class LuceneRootDocumentBuilder extends AbstractLuceneDocumentElementBuil
 		// We own the document content, so we finalize it ourselves.
 		Document document = documentContent.finalizeDocument( multiTenancyStrategy, tenantId, routingKey );
 		document.add( MetadataFields.searchableMetadataField( MetadataFields.typeFieldName(), MetadataFields.TYPE_MAIN_DOCUMENT ) );
-		document.add( MetadataFields.searchableMetadataField( MetadataFields.idFieldName(), id ) );
-		document.add( MetadataFields.retrievableMetadataField( MetadataFields.idDocValueFieldName(), id ) );
+		document.add( MetadataFields.searchableRetrievableMetadataField( MetadataFields.idFieldName(), id ) );
 
 		// In the list of documents, a child must appear before its parent,
 		// so we let children contribute their document first.

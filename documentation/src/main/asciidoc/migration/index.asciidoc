@@ -43,12 +43,8 @@ Hibernate Search's requirements did not change in version {hibernateSearchVersio
 [[data-format]]
 == Data format and schema changes
 
-Elasticsearch indexes created with Hibernate Search {hibernateSearchPreviousStableVersionShort}
+Indexes created with Hibernate Search {hibernateSearchPreviousStableVersionShort}
 can be read from and written to with Hibernate Search {hibernateSearchVersion}.
-
-Reading and writing to Lucene indexes created with Hibernate Search {hibernateSearchPreviousStableVersionShort}
-using Hibernate Search {hibernateSearchVersion} may lead to exceptions, since there were incompatible changes applied to internal fields.
-You must recreate your Lucene indexes and reindex your database. The easiest way to do so is to use link:{hibernateSearchDocUrl}#indexing-massindexer[the `MassIndexer`] with link:{hibernateSearchDocUrl}#indexing-massindexer-parameters-drop-and-create-schema[`dropAndCreateSchemaOnStart(true)`].
 
 If your Hibernate Search mapping includes `GeoPoint` fields that are using the default value for the `projectable` option,
 and are using either the default value or `Sortable.NO` for the `sortable` option, Elasticsearch schema validation
