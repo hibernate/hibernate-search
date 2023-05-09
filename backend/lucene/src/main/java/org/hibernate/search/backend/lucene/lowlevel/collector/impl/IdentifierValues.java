@@ -20,7 +20,7 @@ public final class IdentifierValues implements Values<String> {
 
 	@Override
 	public void context(LeafReaderContext context) throws IOException {
-		this.currentLeafIdDocValues = DocValues.getBinary( context.reader(), MetadataFields.idDocValueFieldName() );
+		this.currentLeafIdDocValues = DocValues.getBinary( context.reader(), MetadataFields.idFieldName() );
 	}
 
 	@Override

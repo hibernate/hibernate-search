@@ -40,7 +40,7 @@ public abstract class DocumentReferenceValues<R> implements Values<R> {
 	@Override
 	public final void context(LeafReaderContext context) throws IOException {
 		this.currentLeafMappedTypeName = metadataResolver.resolveMappedTypeName( context );
-		this.currentLeafIdDocValues = DocValues.getBinary( context.reader(), MetadataFields.idDocValueFieldName() );
+		this.currentLeafIdDocValues = DocValues.getBinary( context.reader(), MetadataFields.idFieldName() );
 	}
 
 	@Override
