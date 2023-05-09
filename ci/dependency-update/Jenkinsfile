@@ -39,7 +39,10 @@ Map settings() {
 		case 'lucene9':
 			return [
 					updateProperties: ['version.org.apache.lucene'],
-					onlyRunTestDependingOn: ['hibernate-search-backend-lucene']
+					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
+					// Need to rebuild this module in order to get Lucene upgrade changes built and used in tests.
+					// No need to rebuild modules on which this one depends since those should stay unchanged.
+					additionalMavenArgs: '-pl :hibernate-search-backend-lucene'
 			]
 		default:
 			return [:]
