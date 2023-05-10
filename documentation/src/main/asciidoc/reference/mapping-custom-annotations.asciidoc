@@ -13,8 +13,10 @@ two steps are required:
 . Implementing a processor for that annotation:
 `TypeMappingAnnotationProcessor` for type annotations,
 `PropertyMappingAnnotationProcessor` for method/field annotations,
-or `ConstructorMappingAnnotationProcessor` for constructor annotations.
-. Annotating the custom annotation with either `@TypeMapping`, `@PropertyMapping` or `@ConstructorMapping`,
+`ConstructorMappingAnnotationProcessor` for constructor annotations,
+or `MethodParameterMappingAnnotationProcessor` for constructor parameter annotations.
+. Annotating the custom annotation with either `@TypeMapping`, `@PropertyMapping`, `@ConstructorMapping`,
+or `@MethodParameterMapping`,
 passing as an argument the reference to the annotation processor.
 
 Once this is done, Hibernate Search will be able to detect custom annotations in **indexed classes**
@@ -23,7 +25,7 @@ Whenever a custom annotation is encountered,
 Hibernate Search will instantiate the annotation processor
 and call its `process` method, passing the following as arguments:
 
-* A `mapping` parameter allowing to define the mapping for the type or property
+* A `mapping` parameter allowing to define the mapping for the type, property, constructor, or constructor parameter
 using the <<mapping-programmatic,programmatic mapping API>>.
 * An `annotation` parameter representing the annotation instance.
 * A `context` object with various helpers.

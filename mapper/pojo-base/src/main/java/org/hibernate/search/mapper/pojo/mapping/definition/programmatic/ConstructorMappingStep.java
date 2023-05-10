@@ -24,4 +24,12 @@ public interface ConstructorMappingStep {
 	 */
 	ConstructorMappingStep projectionConstructor();
 
+	/**
+	 * Starts the definition of the mapping of a specific constructor parameter.
+	 *
+	 * @param index The zero-based index of the parameter in this constructor.
+	 * @return A DSL step where the property mapping can be defined in more details.
+	 */
+	MethodParameterMappingStep parameter(int index);
+
 }

@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.model.hcann.spi;
 
+import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoMethodParameterModel;
@@ -26,14 +29,19 @@ public final class PojoHCAnnMethodParameterModel<T> implements PojoMethodParamet
 	private final Parameter parameter;
 	private final AnnotatedType annotatedType;
 
+	private Annotation[] annotations;
 	private PojoTypeModel<T> typeModelCache;
 
 	public PojoHCAnnMethodParameterModel(PojoHCAnnConstructorModel<?> constructorModel, int index,
-			Parameter parameter, AnnotatedType annotatedType) {
+			Parameter parameter, AnnotatedType annotatedType,
+			// If non-null, we're working around https://bugs.openjdk.org/browse/JDK-8303112;
+			// normally we wouldn't need eager initialization here.
+			Annotation[] annotationsForJDK8303112) {
 		this.constructorModel = constructorModel;
 		this.index = index;
 		this.parameter = parameter;
 		this.annotatedType = annotatedType;
+		this.annotations = annotationsForJDK8303112;
 	}
 
 	@Override
@@ -49,6 +57,14 @@ public final class PojoHCAnnMethodParameterModel<T> implements PojoMethodParamet
 	@Override
 	public Optional<String> name() {
 		return parameter.isNamePresent() ? Optional.of( parameter.getName() ) : Optional.empty();
+	}
+
+	@Override
+	public Stream<Annotation> annotations() {
+		if ( annotations == null ) {
+			annotations = parameter.getAnnotations();
+		}
+		return Arrays.stream( annotations );
 	}
 
 	@Override

@@ -30,6 +30,13 @@ public interface PojoConstructorModel<T> {
 	ValueCreateHandle<T> handle();
 
 	/**
+	 * @param index The index of a {@link #declaredParameters() declared parameter} in this constructor.
+	 * @return A representation of the parameter with the given index.
+	 * @throws org.hibernate.search.util.common.SearchException If there is no parameter with the given index in this constructor.
+	 */
+	PojoMethodParameterModel<?> parameter(int index);
+
+	/**
 	 * @return All declared parameters of this constructor.
 	 */
 	List<PojoMethodParameterModel<?>> declaredParameters();
@@ -38,5 +45,4 @@ public interface PojoConstructorModel<T> {
 	 * @return An array containing the Java types of all {@link #declaredParameters() declared parameters} of this constructor.
 	 */
 	Class<?>[] parametersJavaTypes();
-
 }
