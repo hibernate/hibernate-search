@@ -34,6 +34,8 @@ import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
 
 class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 
+	private static final Comparator<TextFragment> SCORE_COMPARATOR = Comparator.comparingDouble( TextFragment::score )
+			.reversed();
 	public static final LuceneUnifiedSearchHighlighter DEFAULTS = new LuceneUnifiedSearchHighlighter(
 			BoundaryScannerType.SENTENCE
 	);
@@ -149,7 +151,7 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 			}
 			else {
 				if ( Boolean.TRUE.equals( LuceneUnifiedSearchHighlighter.this.orderByScore ) ) {
-					highlights.sort( Comparator.comparingDouble( TextFragment::score ).reversed() );
+					highlights.sort( SCORE_COMPARATOR );
 				}
 				List<String> result = new ArrayList<>( highlights.size() );
 				for ( TextFragment highlight : highlights ) {

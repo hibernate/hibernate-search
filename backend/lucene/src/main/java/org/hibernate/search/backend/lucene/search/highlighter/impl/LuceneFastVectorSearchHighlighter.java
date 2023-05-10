@@ -128,7 +128,7 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 
 			BoundaryScanner boundaryScanner = boundaryScanner();
 			if ( Boolean.TRUE.equals( LuceneFastVectorSearchHighlighter.this.orderByScore ) ) {
-				ScoreOrderFragmentsBuilder builder = new ScoreOrderFragmentsBuilder(
+				ScoreOrderFragmentsBuilder builder = new CustomScoreOrderFragmentsBuilder(
 						this.preTags, this.postTags, boundaryScanner );
 				builder.setDiscreteMultiValueHighlighting( true );
 				this.fragmentsBuilder = builder;
@@ -219,4 +219,19 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 			return result;
 		}
 	}
+
+	private static class CustomScoreOrderFragmentsBuilder extends ScoreOrderFragmentsBuilder {
+		private static final ScoreComparator SCORE_COMPARATOR = new ScoreComparator();
+
+		public CustomScoreOrderFragmentsBuilder(String[] preTags, String[] postTags, BoundaryScanner bs) {
+			super( preTags, postTags, bs );
+		}
+
+		@Override
+		public List<FieldFragList.WeightedFragInfo> getWeightedFragInfoList(List<FieldFragList.WeightedFragInfo> src) {
+			Collections.sort( src, SCORE_COMPARATOR );
+			return src;
+		}
+	}
+
 }
