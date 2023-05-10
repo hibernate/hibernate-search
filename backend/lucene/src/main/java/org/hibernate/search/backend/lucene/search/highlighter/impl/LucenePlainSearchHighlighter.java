@@ -40,6 +40,8 @@ import org.apache.lucene.search.highlight.TextFragment;
 
 class LucenePlainSearchHighlighter extends LuceneAbstractSearchHighlighter {
 
+	private static final Comparator<TextFragment> SCORE_COMPARATOR = Comparator.comparingDouble(
+			TextFragment::getScore ).reversed();
 	private static final NullFragmenter NULL_FRAGMENTER = new NullFragmenter();
 	private static final LucenePlainSearchHighlighter DEFAULTS = new LucenePlainSearchHighlighter(
 			BoundaryScannerType.SENTENCE
@@ -168,7 +170,7 @@ class LucenePlainSearchHighlighter extends LuceneAbstractSearchHighlighter {
 				}
 				if ( !result.isEmpty() ) {
 					if ( Boolean.TRUE.equals( LucenePlainSearchHighlighter.this.orderByScore ) ) {
-						result.sort( Comparator.comparingDouble( TextFragment::getScore ).reversed() );
+						result.sort( SCORE_COMPARATOR );
 					}
 					List<String> converted = new ArrayList<>( result.size() );
 					for ( TextFragment textFragment : result ) {
