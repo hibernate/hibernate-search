@@ -43,6 +43,11 @@ public class HighlighterUnifiedIT extends AbstractHighlighterIT {
 		return TckConfiguration.get().getBackendFeatures().supportsHighlighterUnifiedTypeFragmentSize();
 	}
 
+	@Override
+	protected boolean supportsPhraseMatching() {
+		return false;
+	}
+
 	@Test
 	public void boundaryScannerWord() {
 		StubMappingScope scope = index.createScope();

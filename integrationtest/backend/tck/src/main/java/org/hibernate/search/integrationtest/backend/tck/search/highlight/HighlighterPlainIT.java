@@ -44,6 +44,11 @@ public class HighlighterPlainIT extends AbstractHighlighterIT {
 		return TckConfiguration.get().getBackendFeatures().supportsHighlighterPlainOrderByScoreMultivaluedField();
 	}
 
+	@Override
+	protected boolean supportsPhraseMatching() {
+		return false;
+	}
+
 	@Test
 	public void plainFragmenterSimple() {
 		StubMappingScope scope = index.createScope();

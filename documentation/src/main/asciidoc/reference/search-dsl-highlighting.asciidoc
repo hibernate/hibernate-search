@@ -130,6 +130,10 @@ to control the highlighted snippet.
 This is the only highlighter that can assign different weights to highlighted fragments, allowing it to show
 a fragment score differences by wrapping it with a different tag.
 For more on tags, see <<search-dsl-highlighting-highlighter-options-tags,the corresponding section>>.
++
+The fast vector highlighter is also the one which can highlight entire matched phrases.
+Using <<search-dsl-predicate-phrase, phrase predicates>> with other highlighter types will lead to each word in a phrase
+being highlighted separately.
 
 [[search-dsl-highlighting-highlighter-named-highlighters]]
 == Named highlighters
