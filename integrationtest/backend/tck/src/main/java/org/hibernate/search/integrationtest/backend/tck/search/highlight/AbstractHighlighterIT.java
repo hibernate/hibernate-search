@@ -887,6 +887,39 @@ public abstract class AbstractHighlighterIT {
 		}
 	}
 
+	@Test
+	public void phraseMatching() {
+		SearchQuery<List<String>> highlights = index.createScope().query().select(
+						f -> f.highlight( "multiValuedString" )
+				).where( f -> f.phrase().field( "multiValuedString" ).matching( "brown fox" ) )
+				.highlighter( h -> highlighter( h ) )
+				.toQuery();
+
+		assertThatHits( highlights.fetchAllHits() )
+				.hasHitsAnyOrder(
+						phraseMatchingResult()
+				);
+	}
+
+	protected boolean supportsPhraseMatching() {
+		return true;
+	}
+
+	private List<List<String>> phraseMatchingResult() {
+		if ( supportsPhraseMatching() ) {
+			return Collections.singletonList(
+					Collections.singletonList(
+							"The quick <em>brown fox</em> jumps right over the little lazy dog" )
+			);
+		}
+		else {
+			return Collections.singletonList(
+					Collections.singletonList(
+							"The quick <em>brown</em> <em>fox</em> jumps right over the little lazy dog" )
+			);
+		}
+	}
+
 	private static class IndexBinding {
 		final IndexFieldReference<String> stringField;
 		final IndexFieldReference<String> anotherStringField;
