@@ -71,16 +71,82 @@ public class PojoHCAnnConstructorModel<T> implements PojoConstructorModel<T> {
 	}
 
 	@Override
+	public PojoMethodParameterModel<?> parameter(int index) {
+		if ( index < 0 ) {
+			throw log.cannotFindConstructorParameter( this, index );
+		}
+		List<PojoMethodParameterModel<?>> params = declaredParameters();
+		if ( index >= params.size() ) {
+			throw log.cannotFindConstructorParameter( this, index );
+		}
+		return params.get( index );
+	}
+
+	@Override
 	public List<PojoMethodParameterModel<?>> declaredParameters() {
 		if ( declaredParameters == null ) {
 			declaredParameters = new ArrayList<>();
 			Parameter[] parameters = constructor.getParameters();
 			AnnotatedType[] annotatedTypes = constructor.getAnnotatedParameterTypes();
+
+			Annotation[][] parameterAnnotationsArray = constructor.getParameterAnnotations();
+			Annotation[][] annotationsForJDK8303112 =
+					recomputeParameterAnnotationsForJDK8303112( parameters, parameterAnnotationsArray );
+
 			for ( int i = 0; i < parameters.length; i++ ) {
-				declaredParameters.add( new PojoHCAnnMethodParameterModel<>( this, i, parameters[i], annotatedTypes[i] ) );
+				declaredParameters.add( new PojoHCAnnMethodParameterModel<>( this, i, parameters[i], annotatedTypes[i],
+						annotationsForJDK8303112 != null ? annotationsForJDK8303112[i] : null ) );
 			}
 		}
 		return declaredParameters;
+	}
+
+	/**
+	 * This is a workaround for <a href="https://bugs.openjdk.org/browse/JDK-8303112">JDK-8303112</a>.
+	 * @param parameters The result of calling {@link Constructor#getParameters()}
+	 * @param parameterAnnotationsArray The result of calling  {@link Constructor#getParameterAnnotations()}
+	 * @return A fixed version of {@code parameterAnnotationsArray},
+	 * or {@code null} if {@code parameterAnnotationsArray} is fine an unaffected by JDK-8303112.
+	 */
+	private static Annotation[][] recomputeParameterAnnotationsForJDK8303112(Parameter[] parameters,
+			Annotation[][] parameterAnnotationsArray) {
+		int parameterCount = parameters.length;
+		if ( parameterAnnotationsArray.length == parameterCount ) {
+			// Not affected by JDK-8303112
+			return null;
+		}
+
+		// We're in a situation where parameter.getAnnotation()/parameter.getAnnotations()
+		// is buggy when there are implicit/synthetic parameters,
+		// because constructor.getParameterAnnotations() (wrongly) ignores implicit/synthetic parameters
+		// while parameter.getAnnotations() (rightly) assumes they are present in the array.
+
+		Annotation[][] annotationsForJDK8303112;
+		annotationsForJDK8303112 = new Annotation[parameterCount][];
+		int nonImplicitNorSyntheticParamIndex = 0;
+		for ( int i = 0; i < parameterCount; i++ ) {
+			Parameter parameter = parameters[i];
+			if ( parameter.isImplicit() || parameter.isSynthetic() ) {
+				annotationsForJDK8303112[i] = new Annotation[0];
+			}
+			else if ( nonImplicitNorSyntheticParamIndex < parameterAnnotationsArray.length ) {
+				annotationsForJDK8303112[i] =
+						parameterAnnotationsArray[nonImplicitNorSyntheticParamIndex];
+				++nonImplicitNorSyntheticParamIndex;
+			}
+			else {
+				// Something is wrong; most likely the class wasn't compiled with -parameters
+				// and so isImplicit/isSynthetic always return false.
+				// As a last resort, assume the implicit/synthetic parameters are the first ones.
+				nonImplicitNorSyntheticParamIndex = parameterCount - parameterAnnotationsArray.length;
+				Arrays.fill( annotationsForJDK8303112, 0, nonImplicitNorSyntheticParamIndex,
+						new Annotation[0] );
+				System.arraycopy( parameterAnnotationsArray, 0, annotationsForJDK8303112,
+						nonImplicitNorSyntheticParamIndex, parameterAnnotationsArray.length );
+				return annotationsForJDK8303112;
+			}
+		}
+		return annotationsForJDK8303112;
 	}
 
 	@Override

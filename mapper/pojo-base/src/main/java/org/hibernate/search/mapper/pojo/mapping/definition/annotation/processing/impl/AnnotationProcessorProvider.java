@@ -20,6 +20,9 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.ConstructorMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.ConstructorMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.ConstructorMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMappingAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
@@ -43,9 +46,10 @@ public class AnnotationProcessorProvider {
 
 	private final Map<Class<? extends Annotation>, Optional<BeanReference<? extends TypeMappingAnnotationProcessor>>>
 			typeAnnotationProcessorReferenceCache = new HashMap<>();
-
 	private final Map<Class<? extends Annotation>, Optional<BeanReference<? extends ConstructorMappingAnnotationProcessor>>>
 			constructorAnnotationProcessorReferenceCache = new HashMap<>();
+	private final Map<Class<? extends Annotation>, Optional<BeanReference<? extends MethodParameterMappingAnnotationProcessor>>>
+			methodParameterAnnotationProcessorReferenceCache = new HashMap<>();
 	private final Map<Class<? extends Annotation>, Optional<BeanReference<? extends PropertyMappingAnnotationProcessor>>>
 			propertyAnnotationProcessorReferenceCache = new HashMap<>();
 
@@ -105,6 +109,31 @@ public class AnnotationProcessorProvider {
 	}
 
 	@SuppressWarnings("unchecked") // Checked using reflection in createProcessorBean
+	public <A extends Annotation> Optional<BeanHolder<? extends MethodParameterMappingAnnotationProcessor<? super A>>>
+			createMethodParameterAnnotationProcessor(A annotation) {
+		Class<? extends A> annotationType = (Class<? extends A>) annotation.annotationType();
+		BeanHolder<? extends MethodParameterMappingAnnotationProcessor<? super A>> processor = null;
+		try {
+			Optional<BeanReference<? extends MethodParameterMappingAnnotationProcessor>> processorReference =
+					getMethodParameterAnnotationProcessorReference( annotationType );
+			if ( !processorReference.isPresent() ) {
+				return Optional.empty();
+			}
+			processor = (BeanHolder<? extends MethodParameterMappingAnnotationProcessor<? super A>>) createProcessorBean(
+					MethodParameterMappingAnnotationProcessor.class, annotationType, processorReference.get()
+			);
+		}
+		catch (RuntimeException e) {
+			rootFailureCollector
+					.withContext( PojoEventContexts.fromAnnotationType( annotationType ) )
+					.add( e );
+			// Ignore this annotation from now on.
+			typeAnnotationProcessorReferenceCache.put( annotationType, Optional.empty() );
+		}
+		return Optional.ofNullable( processor );
+	}
+
+	@SuppressWarnings("unchecked") // Checked using reflection in createProcessorBean
 	public <A extends Annotation> Optional<BeanHolder<? extends PropertyMappingAnnotationProcessor<? super A>>>
 			createPropertyAnnotationProcessor(A annotation) {
 		Class<? extends A> annotationType = (Class<? extends A>) annotation.annotationType();
@@ -147,6 +176,17 @@ public class AnnotationProcessorProvider {
 		if ( processorReference == null ) { // We really mean to check for null here (missing key in the map), not isPresent().
 			processorReference = createConstructorAnnotationProcessorReference( annotationType );
 			constructorAnnotationProcessorReferenceCache.put( annotationType, processorReference );
+		}
+		return processorReference;
+	}
+
+	private Optional<BeanReference<? extends MethodParameterMappingAnnotationProcessor>>
+			getMethodParameterAnnotationProcessorReference(Class<? extends Annotation> annotationType) {
+		Optional<BeanReference<? extends MethodParameterMappingAnnotationProcessor>> processorReference =
+				methodParameterAnnotationProcessorReferenceCache.get( annotationType );
+		if ( processorReference == null ) { // We really mean to check for null here (missing key in the map), not isPresent().
+			processorReference = createMethodParameterAnnotationProcessorReference( annotationType );
+			methodParameterAnnotationProcessorReferenceCache.put( annotationType, processorReference );
 		}
 		return processorReference;
 	}
@@ -202,6 +242,28 @@ public class AnnotationProcessorProvider {
 				);
 		if ( !processorReference.isPresent() ) {
 			throw log.missingProcessorReferenceInMappingAnnotation( ConstructorMapping.class );
+		}
+		return processorReference;
+	}
+
+	private <A extends Annotation> Optional<BeanReference<? extends MethodParameterMappingAnnotationProcessor>>
+			createMethodParameterAnnotationProcessorReference(Class<? extends A> annotationType) {
+		MethodParameterMapping mapping = annotationType.getAnnotation( MethodParameterMapping.class );
+		if ( mapping == null ) {
+			// Not a MethodParameter mapping annotation: ignore it.
+			return Optional.empty();
+		}
+
+		MethodParameterMappingAnnotationProcessorRef referenceAnnotation = mapping.processor();
+		Optional<BeanReference<? extends MethodParameterMappingAnnotationProcessor>> processorReference =
+				MappingAnnotationProcessorUtils.toBeanReference(
+						MethodParameterMappingAnnotationProcessor.class,
+						MethodParameterMappingAnnotationProcessorRef.UndefinedProcessorImplementationType.class,
+						referenceAnnotation.type(), referenceAnnotation.name(),
+						referenceAnnotation.retrieval()
+				);
+		if ( !processorReference.isPresent() ) {
+			throw log.missingProcessorReferenceInMappingAnnotation( MethodParameterMapping.class );
 		}
 		return processorReference;
 	}

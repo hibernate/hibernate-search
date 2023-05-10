@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.model.spi;
 
+import java.lang.annotation.Annotation;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
@@ -15,6 +17,8 @@ public interface PojoMethodParameterModel<T> {
 	int index();
 
 	Optional<String> name();
+
+	Stream<Annotation> annotations();
 
 	PojoTypeModel<T> typeModel();
 

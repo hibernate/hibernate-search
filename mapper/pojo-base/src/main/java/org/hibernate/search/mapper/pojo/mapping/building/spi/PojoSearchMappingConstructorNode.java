@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
+import java.util.Optional;
+
 public interface PojoSearchMappingConstructorNode {
 
 	Class<?>[] parametersJavaTypes();
@@ -15,6 +17,10 @@ public interface PojoSearchMappingConstructorNode {
 	 */
 	default boolean isProjectionConstructor() {
 		return false;
+	}
+
+	default Optional<PojoSearchMappingMethodParameterNode> parameterNode(int index) {
+		return Optional.empty();
 	}
 
 }

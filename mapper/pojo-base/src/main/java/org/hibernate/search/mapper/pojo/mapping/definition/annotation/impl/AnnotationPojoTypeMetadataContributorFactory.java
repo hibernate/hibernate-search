@@ -17,20 +17,25 @@ import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.ConstructorMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.ConstructorMappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMappingAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MethodParameterMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.AnnotationProcessorProvider;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.ConstructorMappingAnnotationProcessorContextImpl;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.MethodParameterMappingAnnotationProcessorContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.PropertyMappingAnnotationProcessorContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.TypeMappingAnnotationProcessorContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ConstructorMappingStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MethodParameterMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.TypeMappingStepImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoMethodParameterModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
@@ -79,9 +84,15 @@ class AnnotationPojoTypeMetadataContributorFactory {
 
 		for ( PojoConstructorModel<?> constructorModel : typeModel.declaredConstructors() ) {
 			Class<?>[] parametersJavaTypes = constructorModel.parametersJavaTypes();
-			ConstructorMappingStep mappingContext = typeMappingContext.constructor( parametersJavaTypes );
-			if ( processConstructorLevelAnnotations( mappingContext, typeModel, constructorModel ) ) {
+			ConstructorMappingStep constructorMappingContext = typeMappingContext.constructor( parametersJavaTypes );
+			if ( processConstructorLevelAnnotations( constructorMappingContext, typeModel, constructorModel ) ) {
 				processedAtLeastOneAnnotation = true;
+			}
+			for ( PojoMethodParameterModel<?> parameterModel : constructorModel.declaredParameters() ) {
+				MethodParameterMappingStep mappingContext = constructorMappingContext.parameter( parameterModel.index() );
+				if ( processMethodParameterLevelAnnotations( mappingContext, constructorModel, parameterModel ) ) {
+					processedAtLeastOneAnnotation = true;
+				}
 			}
 		}
 
@@ -104,6 +115,20 @@ class AnnotationPojoTypeMetadataContributorFactory {
 				.collect( Collectors.toList() );
 		for ( Annotation annotation : annotationList ) {
 			if ( tryApplyProcessor( mappingContext, typeModel, constructorModel, annotation ) ) {
+				processedAtLeastOneAnnotation = true;
+			}
+		}
+		return processedAtLeastOneAnnotation;
+	}
+
+	private boolean processMethodParameterLevelAnnotations(MethodParameterMappingStep mappingContext,
+			PojoConstructorModel<?> constructorModel, PojoMethodParameterModel<?> methodParameterModel) {
+		boolean processedAtLeastOneAnnotation = false;
+		List<Annotation> annotationList = methodParameterModel.annotations()
+				.flatMap( annotationHelper::expandRepeatableContainingAnnotation )
+				.collect( Collectors.toList() );
+		for ( Annotation annotation : annotationList ) {
+			if ( tryApplyProcessor( mappingContext, constructorModel, methodParameterModel, annotation ) ) {
 				processedAtLeastOneAnnotation = true;
 			}
 		}
@@ -161,6 +186,30 @@ class AnnotationPojoTypeMetadataContributorFactory {
 						annotationHelper );
 
 		try ( BeanHolder<? extends ConstructorMappingAnnotationProcessor<? super A>> processorHolder =
+				processorOptional.get() ) {
+			processorHolder.get().process( mapping, annotation, context );
+		}
+		catch (RuntimeException e) {
+			rootFailureCollector.withContext( context.eventContext() ).add( e );
+		}
+
+		return true;
+	}
+
+	private <A extends Annotation> boolean tryApplyProcessor(MethodParameterMappingStep mapping,
+			PojoConstructorModel<?> constructorModel, PojoMethodParameterModel<?> methodParameterModel,
+			A annotation) {
+		Optional<BeanHolder<? extends MethodParameterMappingAnnotationProcessor<? super A>>> processorOptional =
+				annotationProcessorProvider.createMethodParameterAnnotationProcessor( annotation );
+		if ( !processorOptional.isPresent() ) {
+			return false;
+		}
+
+		MethodParameterMappingAnnotationProcessorContext context =
+				new MethodParameterMappingAnnotationProcessorContextImpl( constructorModel, methodParameterModel, annotation,
+						annotationHelper );
+
+		try ( BeanHolder<? extends MethodParameterMappingAnnotationProcessor<? super A>> processorHolder =
 				processorOptional.get() ) {
 			processorHolder.get().process( mapping, annotation, context );
 		}

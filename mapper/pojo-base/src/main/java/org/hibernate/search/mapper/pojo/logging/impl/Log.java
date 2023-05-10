@@ -815,4 +815,9 @@ public interface Log extends BasicLogger {
 			value = "No matching supertype type for type identifier '%1$s'."
 					+ " Valid identifiers for indexed entity types are: %2$s")
 	SearchException unknownSupertypeTypeIdentifier(PojoRawTypeIdentifier<?> typeIdentifier, Set<PojoRawTypeIdentifier<?>> availableTypeIdentifiers);
+
+	@Message(id = ID_OFFSET + 133,
+			value = "No parameter at index '%2$s' for constructor '%1$s'.")
+	SearchException cannotFindConstructorParameter(@FormatWith(PojoConstructorModelFormatter.class) PojoConstructorModel<?> constructorModel, int index);
+
 }
