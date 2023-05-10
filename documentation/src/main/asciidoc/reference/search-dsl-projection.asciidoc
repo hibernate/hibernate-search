@@ -619,6 +619,18 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
+[[search-dsl-projection-distance-mapping]]
+=== In projections to custom types
+
+There is no built-in annotation to use the `distance` projection
+inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>
+https://hibernate.atlassian.net/browse/HSEARCH-4807[at the moment].
+
+You can <<binding-projection-parameters-custom-annotation,create your own annotation>> if you need one,
+backed by a <<binding-projection,custom projection binder>>,
+but the center of the distance projection won't be able to change from query to query,
+which limits its usefulness drastically at the moment.
+
 [[search-dsl-projection-composite]]
 == `composite`: combine projections
 
@@ -1142,6 +1154,9 @@ In this case, the `constant` value will most likely be used together with
 a <<search-dsl-projection-composite,`composite` projection>>
 or an <<search-dsl-projection-object,`object` projection>>.
 
+[[search-dsl-projection-constant-syntax]]
+=== Syntax
+
 .Returning a constant value for every single matched document
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -1149,6 +1164,15 @@ or an <<search-dsl-projection-object,`object` projection>>.
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=constant-incomposite]
 ----
 ====
+
+[[search-dsl-projection-constant-mapping]]
+=== In projections to custom types
+
+There is no built-in annotation to use the `constant` projection
+inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>.
+
+You can <<binding-projection-parameters-custom-annotation,create your own annotation>> if you need one,
+backed by a <<binding-projection,custom projection binder>>.
 
 [[search-dsl-projection-highlight]]
 == `highlight`: return highlighted field values from matched documents
@@ -1304,6 +1328,9 @@ The `.document()` projection returns the matched document as a native Lucene `Do
 
 include::components/lucene-api-warning.asciidoc[]
 
+[[search-dsl-projection-extensions-lucene-document-syntax]]
+==== Syntax
+
 .Returning the matched document as a native `org.apache.lucene.document.Document`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -1334,6 +1361,15 @@ If you want a projection that retrieves the value as it was in your entity upon 
 use a <<search-dsl-projection-field,`field` projection>>.
 ====
 
+[[search-dsl-projection-extensions-lucene-document-mapping]]
+==== In projections to custom types
+
+There is no built-in annotation to use the `document` projection
+inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>.
+
+You can <<binding-projection-parameters-custom-annotation,create your own annotation>> if you need one,
+backed by a <<binding-projection,custom projection binder>>.
+
 [[search-dsl-projection-extensions-lucene-explanation]]
 === Lucene: `explanation`
 
@@ -1344,6 +1380,9 @@ include::components/explanation-warning.asciidoc[]
 
 include::components/lucene-api-warning.asciidoc[]
 
+[[search-dsl-projection-extensions-lucene-explanation-syntax]]
+==== Syntax
+
 .Returning the score explanation as a native `org.apache.lucene.search.Explanation`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -1352,6 +1391,15 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Lucene
 ----
 ====
 
+[[search-dsl-projection-extensions-lucene-explanation-mapping]]
+==== In projections to custom types
+
+There is no built-in annotation to use the `explanation` projection
+inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>.
+
+You can <<binding-projection-parameters-custom-annotation,create your own annotation>> if you need one,
+backed by a <<binding-projection,custom projection binder>>.
+
 [[search-dsl-projection-extensions-elasticsearch-source]]
 === Elasticsearch: `source`
 
@@ -1359,6 +1407,9 @@ The `.source()` projection returns the JSON of the document as it was indexed in
 as a `JsonObject`.
 
 include::components/elasticsearch-json-warning.asciidoc[]
+
+[[search-dsl-projection-extensions-elasticsearch-source-syntax]]
+==== Syntax
 
 .Returning the matched document source as a `JsonObject`
 ====
@@ -1383,6 +1434,15 @@ If you want a projection that retrieves the value as it was in your entity upon 
 use a <<search-dsl-projection-field,`field` projection>>.
 ====
 
+[[search-dsl-projection-extensions-elasticsearch-source-mapping]]
+==== In projections to custom types
+
+There is no built-in annotation to use the `source` projection
+inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>.
+
+You can <<binding-projection-parameters-custom-annotation,create your own annotation>> if you need one,
+backed by a <<binding-projection,custom projection binder>>.
+
 [[search-dsl-projection-extensions-elasticsearch-explanation]]
 === Elasticsearch: `explanation`
 
@@ -1393,6 +1453,9 @@ include::components/explanation-warning.asciidoc[]
 
 include::components/elasticsearch-json-warning.asciidoc[]
 
+[[search-dsl-projection-extensions-elasticsearch-explanation-syntax]]
+==== Syntax
+
 .Returning the score explanation as a `JsonObject`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -1400,6 +1463,15 @@ include::components/elasticsearch-json-warning.asciidoc[]
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ElasticsearchProjectionDslIT.java[tags=elasticsearch-explanation]
 ----
 ====
+
+[[search-dsl-projection-extensions-elasticsearch-explanation-mapping]]
+==== In projections to custom types
+
+There is no built-in annotation to use the `explanation` projection
+inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>.
+
+You can <<binding-projection-parameters-custom-annotation,create your own annotation>> if you need one,
+backed by a <<binding-projection,custom projection binder>>.
 
 [[search-dsl-projection-extensions-elasticsearch-jsonHit]]
 === Elasticsearch: `jsonHit`
@@ -1414,6 +1486,9 @@ to ask for additional data within each hit.
 
 include::components/elasticsearch-json-warning.asciidoc[]
 
+[[search-dsl-projection-extensions-elasticsearch-jsonHit-syntax]]
+==== Syntax
+
 .Returning the Elasticsearch hit as a `JsonObject`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -1421,3 +1496,12 @@ include::components/elasticsearch-json-warning.asciidoc[]
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ElasticsearchProjectionDslIT.java[tags=elasticsearch-jsonHit]
 ----
 ====
+
+[[search-dsl-projection-extensions-elasticsearch-jsonHit-mapping]]
+==== In projections to custom types
+
+There is no built-in annotation to use the `jsonHit` projection
+inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>.
+
+You can <<binding-projection-parameters-custom-annotation,create your own annotation>> if you need one,
+backed by a <<binding-projection,custom projection binder>>.
