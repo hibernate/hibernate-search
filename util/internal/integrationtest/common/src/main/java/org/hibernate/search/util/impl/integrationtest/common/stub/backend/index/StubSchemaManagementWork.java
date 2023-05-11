@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index;
 
-import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 public final class StubSchemaManagementWork implements ToStringTreeAppendable {
 
@@ -36,13 +36,13 @@ public final class StubSchemaManagementWork implements ToStringTreeAppendable {
 
 	@Override
 	public String toString() {
-		return new ToStringTreeBuilder().value( this ).toString();
+		return toStringTree();
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "class", getClass().getSimpleName() );
-		builder.attribute( "type", type );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "class", getClass().getSimpleName() );
+		appender.attribute( "type", type );
 	}
 
 	public static class Builder {

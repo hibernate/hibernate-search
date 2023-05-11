@@ -13,8 +13,8 @@ import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.impl.Murmur3HashFunction;
 import org.hibernate.search.util.common.data.impl.RangeCompatibleHashFunction;
 import org.hibernate.search.util.common.data.impl.RangeHashTable;
-import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 final class ShardAssignment {
 	// Note the hash function / table implementations MUST NOT CHANGE,
@@ -30,12 +30,12 @@ final class ShardAssignment {
 
 		@Override
 		public String toString() {
-			return new ToStringTreeBuilder().value( this ).toString();
+			return toStringTree();
 		}
 
 		@Override
-		public void appendTo(ToStringTreeBuilder builder) {
-			builder.attribute( "finderProvider", finderProvider );
+		public void appendTo(ToStringTreeAppender appender) {
+			appender.attribute( "finderProvider", finderProvider );
 		}
 
 		ShardAssignment create(ShardAssignmentDescriptor descriptor) {

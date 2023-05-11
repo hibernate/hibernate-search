@@ -12,7 +12,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for applying a {@link ValueBridge} to a value.
@@ -40,10 +40,10 @@ public class PojoIndexingProcessorValueBridgeNode<V, F> extends PojoIndexingProc
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "operation", "apply value bridge" );
-		builder.attribute( "bridge", bridgeHolder );
-		builder.attribute( "indexField", indexFieldReference );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "operation", "apply value bridge" );
+		appender.attribute( "bridge", bridgeHolder );
+		appender.attribute( "indexField", indexFieldReference );
 	}
 
 	@Override

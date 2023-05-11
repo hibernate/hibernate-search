@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for applying processor nodes
@@ -37,11 +37,11 @@ public class PojoIndexingProcessorOriginalTypeNode<T> extends PojoIndexingProces
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "operation", "process type" );
-		builder.attribute( "objectFieldsToCreate", parentIndexObjectReferences );
-		builder.attribute( "nested", nested );
-		builder.attribute( "isEntityType", isEntityType );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "operation", "process type" );
+		appender.attribute( "objectFieldsToCreate", parentIndexObjectReferences );
+		appender.attribute( "nested", nested );
+		appender.attribute( "isEntityType", isEntityType );
 	}
 
 	@Override

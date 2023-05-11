@@ -11,7 +11,7 @@ import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for extracting elements from a container
@@ -43,10 +43,10 @@ public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexin
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "operation", "process container element" );
-		builder.attribute( "extractor", extractorHolder );
-		builder.attribute( "nested", nested );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "operation", "process container element" );
+		appender.attribute( "extractor", extractorHolder );
+		appender.attribute( "nested", nested );
 	}
 
 	@Override

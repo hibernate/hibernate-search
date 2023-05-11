@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 
@@ -30,8 +30,8 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 		}
 
 		@Override
-		public void appendTo(ToStringTreeBuilder builder) {
-			builder.attribute( "order", order );
+		public void appendTo(ToStringTreeAppender appender) {
+			appender.attribute( "order", order );
 		}
 
 		@Override

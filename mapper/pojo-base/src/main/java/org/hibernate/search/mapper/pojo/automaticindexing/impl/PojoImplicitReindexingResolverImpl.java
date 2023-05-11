@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 public class PojoImplicitReindexingResolverImpl<T> implements PojoImplicitReindexingResolver<T> {
 
@@ -29,7 +29,7 @@ public class PojoImplicitReindexingResolverImpl<T> implements PojoImplicitReinde
 
 	@Override
 	public String toString() {
-		return new ToStringTreeBuilder().value( this ).toString();
+		return toStringTree();
 	}
 
 	@Override
@@ -41,11 +41,11 @@ public class PojoImplicitReindexingResolverImpl<T> implements PojoImplicitReinde
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "operation", "root" );
-		builder.attribute( "dirtyPathsTriggeringSelfReindexing", dirtySelfFilter );
-		builder.attribute( "associationPaths", associationInverseSideResolver );
-		builder.attribute( "containingEntitiesResolverRoot", containingEntitiesResolverRoot );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "operation", "root" );
+		appender.attribute( "dirtyPathsTriggeringSelfReindexing", dirtySelfFilter );
+		appender.attribute( "associationPaths", associationInverseSideResolver );
+		appender.attribute( "containingEntitiesResolverRoot", containingEntitiesResolverRoot );
 	}
 
 	@Override

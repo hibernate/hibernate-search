@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.search.definition.impl;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 
 interface InnerProjectionDefinition extends ToStringTreeAppendable {
 

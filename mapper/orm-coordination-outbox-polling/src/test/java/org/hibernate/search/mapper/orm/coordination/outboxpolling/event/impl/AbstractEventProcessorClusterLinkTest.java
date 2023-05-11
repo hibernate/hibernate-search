@@ -29,7 +29,7 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.A
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 import org.junit.After;
 import org.junit.Before;
@@ -84,8 +84,8 @@ abstract class AbstractEventProcessorClusterLinkTest {
 				}
 
 				@Override
-				public void appendTo(ToStringTreeBuilder builder) {
-					builder.attribute( "stub", true );
+				public void appendTo(ToStringTreeAppender appender) {
+					appender.attribute( "stub", true );
 				}
 			} );
 

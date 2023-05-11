@@ -27,9 +27,9 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.L
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentStartContext;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent, ToStringTreeAppendable {
 
@@ -134,12 +134,12 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 
 	@Override
 	public String toString() {
-		return new ToStringTreeBuilder().value( this ).toString();
+		return toStringTree();
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "name", name )
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "name", name )
 				.attribute( "pollingInterval", pollingInterval )
 				.attribute( "clusterLink", clusterLink );
 	}

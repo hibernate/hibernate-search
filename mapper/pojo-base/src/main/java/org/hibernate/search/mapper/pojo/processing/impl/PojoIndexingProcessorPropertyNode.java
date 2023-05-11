@@ -15,9 +15,9 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for extracting the value of a property,
@@ -50,10 +50,10 @@ public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcess
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "operation", "process property" );
-		builder.attribute( "handle", handle );
-		builder.attribute( "nested", nested );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "operation", "process property" );
+		appender.attribute( "handle", handle );
+		appender.attribute( "nested", nested );
 	}
 
 	@Override

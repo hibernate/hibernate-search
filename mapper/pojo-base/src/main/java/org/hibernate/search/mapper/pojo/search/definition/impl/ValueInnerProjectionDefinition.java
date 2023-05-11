@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.search.definition.impl;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 final class ValueInnerProjectionDefinition implements InnerProjectionDefinition {
 	final String path;
@@ -30,8 +30,8 @@ final class ValueInnerProjectionDefinition implements InnerProjectionDefinition 
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "path", path )
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "path", path )
 				.attribute( "multi", multi )
 				.attribute( "type", type );
 	}

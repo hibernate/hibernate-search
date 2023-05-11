@@ -19,9 +19,9 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.A
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentPersister;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentReference;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
-import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 abstract class AbstractAgentClusterLink<R> implements ToStringTreeAppendable {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -47,12 +47,12 @@ abstract class AbstractAgentClusterLink<R> implements ToStringTreeAppendable {
 
 	@Override
 	public String toString() {
-		return new ToStringTreeBuilder().value( this ).toString();
+		return toStringTree();
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "agentPersister", agentPersister )
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "agentPersister", agentPersister )
 				.attribute( "pollingInterval", pollingInterval )
 				.attribute( "pulseInterval", pulseInterval )
 				.attribute( "pulseExpiration", pulseExpiration );

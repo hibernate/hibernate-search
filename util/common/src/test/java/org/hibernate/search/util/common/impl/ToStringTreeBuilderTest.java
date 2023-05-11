@@ -10,6 +10,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
+
 import org.junit.Test;
 
 public class ToStringTreeBuilderTest {
@@ -26,8 +29,8 @@ public class ToStringTreeBuilderTest {
 						+ " list=[ { name=foo }, object={ name=foo, attr=bar }, { nestedList=[ first, second ], name=bar, nestedList2=[ first, second ] } ]"
 						+ " }, bar=value"
 				);
-		assertThat( new ToStringTreeBuilder().toString() ).isEqualTo( "" );
-		assertThat( new ToStringTreeBuilder().startObject( "" ).endObject().toString() )
+		assertThat( new ToStringTreeBuilder( ToStringStyle.inlineDelimiterStructure() ).toString() ).isEqualTo( "" );
+		assertThat( new ToStringTreeBuilder( ToStringStyle.inlineDelimiterStructure() ).startObject( "" ).endObject().toString() )
 				.isEqualTo( "{ }" );
 	}
 
@@ -182,11 +185,11 @@ public class ToStringTreeBuilderTest {
 
 	private static class Appendable implements ToStringTreeAppendable {
 		@Override
-		public void appendTo(ToStringTreeBuilder builder) {
-			builder.attribute( "attr", "val" );
-			builder.startObject( "nested" );
-			builder.attribute( "attr", "val2" );
-			builder.endObject();
+		public void appendTo(ToStringTreeAppender appender) {
+			appender.attribute( "attr", "val" );
+			appender.startObject( "nested" );
+			appender.attribute( "attr", "val2" );
+			appender.endObject();
 		}
 	}
 
