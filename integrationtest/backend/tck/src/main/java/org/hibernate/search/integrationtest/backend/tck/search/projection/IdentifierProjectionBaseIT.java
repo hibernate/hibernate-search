@@ -157,7 +157,7 @@ public class IdentifierProjectionBaseIT {
 		assertThatThrownBy( () -> scope.projection().id( (Class<?>) null ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContainingAll(
-						"must not be null", "identifierType"
+						"must not be null", "requestedIdentifierType"
 				);
 	}
 

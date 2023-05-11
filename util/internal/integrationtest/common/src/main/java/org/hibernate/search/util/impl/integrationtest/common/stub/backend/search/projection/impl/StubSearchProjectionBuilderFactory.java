@@ -42,10 +42,11 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	}
 
 	@Override
-	public <I> SearchProjection<I> id(Class<I> identifierType) {
+	public <I> SearchProjection<I> id(Class<I> requestedIdentifierType) {
 		SearchIndexIdentifierContext identifier = scope.identifier();
-		return new StubIdProjection<>( identifierType,
-				identifier.projectionConverter().withConvertedType( identifierType, identifier ) );
+		return new StubIdProjection<>(
+				requestedIdentifierType,
+				identifier.projectionConverter().withConvertedType( requestedIdentifierType, identifier ) );
 	}
 
 	@Override

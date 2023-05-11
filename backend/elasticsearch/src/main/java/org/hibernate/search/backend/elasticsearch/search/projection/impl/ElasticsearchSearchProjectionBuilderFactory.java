@@ -52,10 +52,10 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	}
 
 	@Override
-	public <I> SearchProjection<I> id(Class<I> identifierType) {
+	public <I> SearchProjection<I> id(Class<I> requestedIdentifierType) {
 		SearchIndexIdentifierContext identifier = scope.identifier();
 		return new ElasticsearchIdProjection<>( scope, idProjectionExtractionHelper,
-				identifier.projectionConverter().withConvertedType( identifierType, identifier ) );
+				identifier.projectionConverter().withConvertedType( requestedIdentifierType, identifier ) );
 	}
 
 	@Override

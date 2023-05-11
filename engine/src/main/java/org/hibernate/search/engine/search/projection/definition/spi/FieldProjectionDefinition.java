@@ -8,6 +8,7 @@ package org.hibernate.search.engine.search.projection.definition.spi;
 
 import java.util.List;
 
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -19,10 +20,12 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 
 	protected final String fieldPath;
 	protected final Class<F> fieldType;
+	protected final ValueConvert valueConvert;
 
-	private FieldProjectionDefinition(String fieldPath, Class<F> fieldType) {
+	private FieldProjectionDefinition(String fieldPath, Class<F> fieldType, ValueConvert valueConvert) {
 		this.fieldPath = fieldPath;
 		this.fieldType = fieldType;
+		this.valueConvert = valueConvert;
 	}
 
 	@Override
@@ -35,15 +38,16 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 		super.appendTo( appender );
 		appender.attribute( "fieldPath", fieldPath )
 				.attribute( "fieldType", fieldType )
-				.attribute( "multi", multi() );
+				.attribute( "multi", multi() )
+				.attribute( "valueConvert", valueConvert );
 	}
 
 	protected abstract boolean multi();
 
 	@Incubating
 	public static final class SingleValued<F> extends FieldProjectionDefinition<F, F> {
-		public SingleValued(String fieldPath, Class<F> fieldType) {
-			super( fieldPath, fieldType );
+		public SingleValued(String fieldPath, Class<F> fieldType, ValueConvert valueConvert) {
+			super( fieldPath, fieldType, valueConvert );
 		}
 
 		@Override
@@ -54,14 +58,14 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 		@Override
 		public SearchProjection<F> create(SearchProjectionFactory<?, ?> factory,
 				ProjectionDefinitionContext context) {
-			return factory.field( fieldPath, fieldType ).toProjection();
+			return factory.field( fieldPath, fieldType, valueConvert ).toProjection();
 		}
 	}
 
 	@Incubating
 	public static final class MultiValued<F> extends FieldProjectionDefinition<List<F>, F> {
-		public MultiValued(String fieldPath, Class<F> fieldType) {
-			super( fieldPath, fieldType );
+		public MultiValued(String fieldPath, Class<F> fieldType, ValueConvert valueConvert) {
+			super( fieldPath, fieldType, valueConvert );
 		}
 
 		@Override
@@ -72,7 +76,7 @@ public abstract class FieldProjectionDefinition<P, F> extends AbstractProjection
 		@Override
 		public SearchProjection<List<F>> create(SearchProjectionFactory<?, ?> factory,
 				ProjectionDefinitionContext context) {
-			return factory.field( fieldPath, fieldType ).multi().toProjection();
+			return factory.field( fieldPath, fieldType, valueConvert ).multi().toProjection();
 		}
 	}
 }

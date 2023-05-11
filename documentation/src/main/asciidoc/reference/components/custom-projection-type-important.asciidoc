@@ -4,8 +4,12 @@ There are a few constraints to keep in mind when annotating a custom projection 
 
 * The custom projection type must be in the same JAR as entity types,
 or Hibernate Search will <<mapping-projection-type-detection,require additional configuration>>.
-* The custom projection type must be compiled in such a way that
-<<mapping-projection-inner-inference-basics,constructor parameter names are included in the Java bytecode>>.
+* When projecting on value fields or object fields, the path to the projected field
+is inferred from the constructor parameter name by default,
+but <<mapping-projection-inner-inference-fieldpath,inference will fail if constructor parameter names are not included in the Java bytecode>>.
+Alternatively the path can be provided explicitly
+through <<search-dsl-projection-field-mapping,`@FieldProjection(path = ...)`>>,
+in which case Hibernate Search won't rely on constructor parameter names.
 * When projecting on value fields, the constraints of the <<search-dsl-projection-field,`field`>> projection still apply.
 In particular, with the <<backend-lucene,Lucene backend>>, value fields involved in the projection
 must be configured as <<mapping-directfieldmapping-projectable,projectable>>.

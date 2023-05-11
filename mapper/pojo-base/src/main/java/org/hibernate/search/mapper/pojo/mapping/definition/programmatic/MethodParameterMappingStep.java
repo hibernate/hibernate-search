@@ -28,6 +28,8 @@ public interface MethodParameterMappingStep {
 	 * @see ProjectionDefinition
 	 * @see SearchProjectionFactory
 	 * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionBinding
+	 * @see org.hibernate.search.mapper.pojo.search.definition.binding.builtin.IdProjectionBinder
+	 * @see org.hibernate.search.mapper.pojo.search.definition.binding.builtin.FieldProjectionBinder
 	 */
 	default MethodParameterMappingStep projection(ProjectionBinder binder) {
 		return projection( BeanReference.ofInstance( binder ), Collections.emptyMap() );
@@ -78,7 +80,5 @@ public interface MethodParameterMappingStep {
 	 * @see org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionBinding
 	 */
 	MethodParameterMappingStep projection(BeanReference<? extends ProjectionBinder> binder, Map<String, Object> params);
-
-	// TODO HSEARCH-4574 add more mapping options here
 
 }

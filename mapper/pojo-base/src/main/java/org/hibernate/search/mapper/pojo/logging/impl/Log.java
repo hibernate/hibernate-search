@@ -707,7 +707,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 114,
 			value = "Missing parameter names in Java metadata for projection constructor."
 					+ " When inferring inner projections from constructor parameters, constructor parameter names must be known."
-					+ " Make sure this class was compiled with the '-parameters' compiler flag.")
+					+ " Either make sure this class was compiled with the '-parameters' compiler flag,"
+					+ " or set the path explicitly with '@FieldProjection(path = ...)'.")
 	SearchException missingParameterNameForProjectionConstructor();
 
 	@Message(id = ID_OFFSET + 115,
@@ -838,5 +839,13 @@ public interface Log extends BasicLogger {
 	SearchException invalidOutputTypeForMultiValuedProjectionDefinition(Object definition,
 			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> typeModel,
 			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> expectedValueModel);
+
+	@Message(id = ID_OFFSET + 138,
+			value = "Missing parameter names in Java metadata for projection constructor."
+					+ " When mapping a projection constructor parameter to a field projection without providing a field path,"
+					+ " constructor parameter names must be known."
+					+ " Either make sure this class was compiled with the '-parameters' compiler flag,"
+					+ " or set the path explicitly with '@FieldProjection(path = ...)'.")
+	SearchException missingParameterNameForFieldProjectionInProjectionConstructor();
 
 }

@@ -45,10 +45,10 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	}
 
 	@Override
-	public <I> SearchProjection<I> id(Class<I> identifierType) {
+	public <I> SearchProjection<I> id(Class<I> requestedIdentifierType) {
 		SearchIndexIdentifierContext identifier = scope.identifier();
 		return new LuceneIdProjection<>( scope,
-				identifier.projectionConverter().withConvertedType( identifierType, identifier ) );
+				identifier.projectionConverter().withConvertedType( requestedIdentifierType, identifier ) );
 	}
 
 	@Override

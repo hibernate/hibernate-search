@@ -4,6 +4,12 @@
 [[binding-projection-basics]]
 == Basics
 
+NOTE: Projection binders are an advanced feature that application developers generally shouldn't need to bother with.
+Before resorting to custom projection binders,
+consider relying on <<mapping-projection-inner-explicit,explicit projection constructor parameter mapping>>
+using built-in annotations such as <<search-dsl-projection-id-mapping,`@IdProjection`>>
+or <<search-dsl-projection-field-mapping,`@FieldProjection`>>.
+
 A projection binder is a pluggable component that implements
 the binding of a constructor parameter to a <<search-dsl-projection,projection>>.
 It is applied to a parameter of a <<mapping-projection,projection constructor>>

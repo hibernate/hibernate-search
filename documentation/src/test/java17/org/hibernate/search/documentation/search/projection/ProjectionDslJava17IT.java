@@ -19,14 +19,22 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.Session;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.FieldProjectionBinder;
+import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.IdProjectionBinder;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class ProjectionDslJava17IT {
 
 	private static final int ASIMOV_ID = 1;
@@ -37,14 +45,75 @@ public class ProjectionDslJava17IT {
 	private static final int BOOK3_ID = 3;
 	private static final int BOOK4_ID = 4;
 
+	@Parameterized.Parameters(name = "{0}")
+	public static List<?> params() {
+		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
+				BackendConfigurations.simple(),
+				// Since we disable classpath scanning in tests for performance reasons,
+				// we need to register annotated projection types explicitly.
+				// This wouldn't be needed in a typical application.
+				CollectionHelper.asSet( MyBookProjection.class, MyBookProjection.Author.class, MyAuthorProjection.class,
+						MyBookIdAndTitleProjection.class, MyBookTitleAndAuthorNamesProjection.class ),
+				mapping -> {
+					var bookMapping = mapping.type( Book.class );
+					bookMapping.indexed();
+					bookMapping.property( "title" )
+							.fullTextField()
+							.analyzer( "english" ).projectable( Projectable.YES );
+					bookMapping.property( "description" )
+							.fullTextField()
+							.analyzer( "english" ).projectable( Projectable.YES );
+					bookMapping.property( "authors" )
+							.indexedEmbedded()
+							.structure( ObjectStructure.NESTED );
+					var authorMapping = mapping.type( Author.class );
+					authorMapping.indexed();
+					authorMapping.property( "firstName" )
+							.fullTextField()
+							.analyzer( "name" ).projectable( Projectable.YES );
+					authorMapping.property( "lastName" )
+							.fullTextField()
+							.analyzer( "name" ).projectable( Projectable.YES );
+
+					var myBookProjectionMapping = mapping.type( MyBookProjection.class );
+					myBookProjectionMapping.mainConstructor()
+							.projectionConstructor();
+					myBookProjectionMapping.mainConstructor().parameter( 0 )
+							.projection( IdProjectionBinder.create() );
+					var myBookAuthorProjectionMapping = mapping.type( MyBookProjection.Author.class );
+					myBookAuthorProjectionMapping.mainConstructor()
+							.projectionConstructor();
+					var myAuthorProjectionMapping = mapping.type( MyAuthorProjection.class );
+					myAuthorProjectionMapping.mainConstructor()
+							.projectionConstructor();
+
+					//tag::programmatic-id-projection[]
+					TypeMappingStep myBookIdAndTitleProjectionMapping =
+							mapping.type( MyBookIdAndTitleProjection.class );
+					myBookIdAndTitleProjectionMapping.mainConstructor()
+							.projectionConstructor();
+					myBookIdAndTitleProjectionMapping.mainConstructor().parameter( 0 )
+							.projection( IdProjectionBinder.create() );
+					//end::programmatic-id-projection[]
+
+					//tag::programmatic-field-projection[]
+					TypeMappingStep myBookTitleAndAuthorNamesProjectionMapping =
+							mapping.type( MyBookTitleAndAuthorNamesProjection.class );
+					myBookTitleAndAuthorNamesProjectionMapping.mainConstructor()
+							.projectionConstructor();
+					myBookTitleAndAuthorNamesProjectionMapping.mainConstructor().parameter( 0 )
+							.projection( FieldProjectionBinder.create() );
+					myBookTitleAndAuthorNamesProjectionMapping.mainConstructor().parameter( 1 )
+							.projection( FieldProjectionBinder.create( "authors.lastName" ) );
+					//end::programmatic-field-projection[]
+
+				}
+		);
+	}
+
+	@Parameterized.Parameter
 	@Rule
-	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
-			BackendConfigurations.simple(), true,
-			// Since we disable classpath scanning in tests for performance reasons,
-			// we need to register annotated projection types explicitly.
-			// This wouldn't be needed in a typical application.
-			context -> context.annotationMapping().add( CollectionHelper.asSet(
-					MyBookProjection.class, MyBookProjection.Author.class, MyAuthorProjection.class ) ) );
+	public DocumentationSetupHelper setupHelper;
 
 	private EntityManagerFactory entityManagerFactory;
 
@@ -68,6 +137,7 @@ public class ProjectionDslJava17IT {
 			assertThat( hits ).containsExactlyInAnyOrderElementsOf(
 					entityManager.createQuery( "select b from Book b", Book.class ).getResultList().stream()
 							.map( book -> new MyBookProjection(
+									book.getId(),
 									book.getTitle(),
 									book.getAuthors().stream()
 											.map( author -> new MyBookProjection.Author(
@@ -93,6 +163,7 @@ public class ProjectionDslJava17IT {
 			assertThat( hits ).containsExactlyInAnyOrderElementsOf(
 					session.createQuery( "select b from Book b", Book.class ).list().stream()
 							.map( book -> new MyBookProjection(
+									book.getId(),
 									book.getTitle(),
 									book.getAuthors().stream()
 											.map( author -> new MyBookProjection.Author( author.getFirstName(), author.getLastName() ) )
@@ -120,6 +191,52 @@ public class ProjectionDslJava17IT {
 							.map( book -> book.getAuthors().stream()
 									.map( author -> new MyAuthorProjection( author.getFirstName(), author.getLastName() ) )
 									.collect( Collectors.toList() ) )
+							.collect( Collectors.toList() )
+			);
+		} );
+	}
+
+	@Test
+	public void projectionConstructor_id() {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			// tag::projection-constructor-id[]
+			List<MyBookIdAndTitleProjection> hits = searchSession.search( Book.class )
+					.select( MyBookIdAndTitleProjection.class )// <1>
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 ); // <2>
+			// end::projection-constructor-id[]
+			assertThat( hits ).containsExactlyInAnyOrderElementsOf(
+					entityManager.createQuery( "select b from Book b", Book.class ).getResultList().stream()
+							.map( book -> new MyBookIdAndTitleProjection(
+									book.getId(),
+									book.getTitle()
+							) )
+							.collect( Collectors.toList() )
+			);
+		} );
+	}
+
+	@Test
+	public void projectionConstructor_field() {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			// tag::projection-constructor-field[]
+			List<MyBookTitleAndAuthorNamesProjection> hits = searchSession.search( Book.class )
+					.select( MyBookTitleAndAuthorNamesProjection.class )// <1>
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 ); // <2>
+			// end::projection-constructor-field[]
+			assertThat( hits ).containsExactlyInAnyOrderElementsOf(
+					entityManager.createQuery( "select b from Book b", Book.class ).getResultList().stream()
+							.map( book -> new MyBookTitleAndAuthorNamesProjection(
+									book.getTitle(),
+									book.getAuthors().stream()
+											.map( Author::getLastName )
+											.collect( Collectors.toList() )
+							) )
 							.collect( Collectors.toList() )
 			);
 		} );

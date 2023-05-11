@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.IdProjectionBinder;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 import org.junit.Before;
@@ -76,7 +77,9 @@ public class ProjectionConstructorMappingJava17IT {
 					//tag::programmatic-mainConstructor[]
 					TypeMappingStep myBookProjectionMapping = mapping.type( MyBookProjection.class );
 					myBookProjectionMapping.mainConstructor()
-							.projectionConstructor();
+							.projectionConstructor(); // <1>
+					myBookProjectionMapping.mainConstructor().parameter( 0 )
+							.projection( IdProjectionBinder.create() ); // <2>
 					TypeMappingStep myAuthorProjectionMapping = mapping.type( MyBookProjection.Author.class );
 					myAuthorProjectionMapping.mainConstructor()
 							.projectionConstructor();
@@ -120,6 +123,7 @@ public class ProjectionConstructorMappingJava17IT {
 			assertThat( hits ).containsExactlyInAnyOrderElementsOf(
 					entityManager.createQuery( "select b from Book b", Book.class ).getResultList().stream()
 							.map( book -> new MyBookProjection(
+									book.getId(),
 									book.getTitle(),
 									book.getAuthors().stream()
 											.map( author -> new MyBookProjection.Author(
@@ -137,6 +141,7 @@ public class ProjectionConstructorMappingJava17IT {
 			List<MyBookProjection> hits = searchSession.search( Book.class )
 					.select( f -> f.composite()
 							.from(
+									f.id( Integer.class ),
 									f.field( "title", String.class ),
 									f.object( "authors" )
 											.from(
@@ -154,6 +159,7 @@ public class ProjectionConstructorMappingJava17IT {
 			assertThat( hits ).containsExactlyInAnyOrderElementsOf(
 					entityManager.createQuery( "select b from Book b", Book.class ).getResultList().stream()
 							.map( book -> new MyBookProjection(
+									book.getId(),
 									book.getTitle(),
 									book.getAuthors().stream()
 											.map( author -> new MyBookProjection.Author(
