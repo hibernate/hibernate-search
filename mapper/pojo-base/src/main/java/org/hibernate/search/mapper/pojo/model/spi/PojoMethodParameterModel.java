@@ -18,7 +18,11 @@ public interface PojoMethodParameterModel<T> {
 
 	PojoTypeModel<T> typeModel();
 
-	boolean isImplicit();
+	/**
+	 * @return {@code true} if this parameter is expected to receive an "enclosing instance",
+	 * e.g. an instance of the enclosing class in the case of Java inner classes or method-local classes.
+	 */
+	boolean isEnclosingInstance();
 
 	/**
 	 * @return {@code true} if {@code obj} is a {@link MappableTypeModel} referencing the exact same type

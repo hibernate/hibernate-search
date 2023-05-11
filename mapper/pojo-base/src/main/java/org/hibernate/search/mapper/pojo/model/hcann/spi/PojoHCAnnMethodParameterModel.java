@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.model.hcann.spi;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.Optional;
 
@@ -66,7 +67,11 @@ public final class PojoHCAnnMethodParameterModel<T> implements PojoMethodParamet
 	}
 
 	@Override
-	public boolean isImplicit() {
-		return parameter.isImplicit();
+	public boolean isEnclosingInstance() {
+		// HSEARCH-4853: we can't simply use `Parameter#isImplicit()` because, starting with JDK 21-ea+21,
+		// this returns `true` for parameters of canonical constructors of record types.
+		return index == 0
+				&& constructorModel.declaringTypeModel.javaClass().getEnclosingClass() != null
+				&& !Modifier.isStatic( constructorModel.declaringTypeModel.javaClass().getModifiers() );
 	}
 }

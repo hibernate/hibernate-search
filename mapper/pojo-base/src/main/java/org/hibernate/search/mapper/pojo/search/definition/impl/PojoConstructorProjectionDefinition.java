@@ -190,9 +190,11 @@ public final class PojoConstructorProjectionDefinition<T>
 		}
 
 		InnerProjectionDefinition inferInnerProjection() {
-			if ( parameter.isImplicit() ) {
-				// Inner class: the constructor has an implicit parameter for the instance of the surrounding class.
-				// Let's ignore that, because there isn't much we can do about it anyway.
+			if ( parameter.isEnclosingInstance() ) {
+				// Let's ignore this parameter, because we are not able to provide an enclosing instance,
+				// and it's often useful to be able to declare a method-local type for projections
+				// (those types have a "enclosing instance" parameter in their constructor
+				// even if they don't use it).
 				return NullInnerProjectionDefinition.INSTANCE;
 			}
 			PojoTypeModel<P> parameterType = parameter.typeModel();
