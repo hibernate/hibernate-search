@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
-import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 
 /**
  * An object responsible for resolving the set of entities that should be reindexed when a given entity changes.

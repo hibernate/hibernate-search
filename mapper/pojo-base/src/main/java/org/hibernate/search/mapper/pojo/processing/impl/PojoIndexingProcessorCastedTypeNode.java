@@ -11,7 +11,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for casting the value to a given type,
@@ -46,12 +46,12 @@ public class PojoIndexingProcessorCastedTypeNode<T, U> extends PojoIndexingProce
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "operation", "process type (with cast)" );
-		builder.attribute( "caster", caster );
-		builder.attribute( "objectFieldsToCreate", parentIndexObjectReferences );
-		builder.attribute( "nested", nested );
-		builder.attribute( "isEntityType", isEntityType );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "operation", "process type (with cast)" );
+		appender.attribute( "caster", caster );
+		appender.attribute( "objectFieldsToCreate", parentIndexObjectReferences );
+		appender.attribute( "nested", nested );
+		appender.attribute( "isEntityType", isEntityType );
 	}
 
 	@Override

@@ -12,8 +12,8 @@ import java.util.List;
 import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinals;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 /**
  * Information about associations involved in reindexing.
@@ -36,20 +36,20 @@ public final class PojoImplicitReindexingAssociationInverseSideResolver implemen
 
 	@Override
 	public String toString() {
-		return new ToStringTreeBuilder().value( this ).toString();
+		return toStringTree();
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "dirtyContainingAssociationFilter", dirtyContainingAssociationFilter );
-		builder.startObject( "resolversByAssociationPath" );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "dirtyContainingAssociationFilter", dirtyContainingAssociationFilter );
+		appender.startObject( "resolversByAssociationPath" );
 		for ( int i = 0; i < resolversByOrdinal.size(); i++ ) {
 			List<PojoImplicitReindexingAssociationInverseSideResolverNode<Object>> resolvers = resolversByOrdinal.get( i );
 			if ( resolvers != null ) {
-				builder.attribute( pathOrdinals.toPath( i ), resolvers );
+				appender.attribute( pathOrdinals.toPath( i ), resolvers );
 			}
 		}
-		builder.endObject();
+		appender.endObject();
 	}
 
 	@Override

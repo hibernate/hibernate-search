@@ -27,7 +27,7 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.Out
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEventFinderProvider;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEventOrder;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEventPredicate;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 public class OutboxEventFilter {
 
@@ -55,9 +55,9 @@ public class OutboxEventFilter {
 		visibleEventsAllShardsFinder = delegate.create( Optional.of( new FilterById() ) );
 		return new OutboxEventFinderProvider() {
 			@Override
-			public void appendTo(ToStringTreeBuilder builder) {
-				builder.attribute( "filter", OutboxEventFilter.this );
-				builder.attribute( "delegate", delegate );
+			public void appendTo(ToStringTreeAppender appender) {
+				appender.attribute( "filter", OutboxEventFilter.this );
+				appender.attribute( "delegate", delegate );
 			}
 
 			@Override

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 class NoOpPojoImplicitReindexingResolverNode extends PojoImplicitReindexingResolverNode<Object> {
 
@@ -30,7 +30,7 @@ class NoOpPojoImplicitReindexingResolverNode extends PojoImplicitReindexingResol
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "operation", "no op" );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "operation", "no op" );
 	}
 }

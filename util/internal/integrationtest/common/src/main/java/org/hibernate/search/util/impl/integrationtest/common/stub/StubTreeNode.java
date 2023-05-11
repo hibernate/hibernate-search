@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.util.common.impl.StreamHelper;
-import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 public abstract class StubTreeNode<N extends StubTreeNode<N>> implements ToStringTreeAppendable {
 
@@ -49,29 +49,29 @@ public abstract class StubTreeNode<N extends StubTreeNode<N>> implements ToStrin
 
 	@Override
 	public String toString() {
-		return new ToStringTreeBuilder().value( this ).toString();
+		return toStringTree();
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
+	public void appendTo(ToStringTreeAppender appender) {
 		for ( Map.Entry<String, List<Object>> entry : attributes.entrySet() ) {
-			builder.attribute( entry.getKey(), entry.getValue() );
+			appender.attribute( entry.getKey(), entry.getValue() );
 		}
 		for ( Map.Entry<String, List<N>> entry : children.entrySet() ) {
 			List<N> list = entry.getValue();
 			if ( list.size() == 1 ) {
-				builder.startObject( entry.getKey() );
-				list.get( 0 ).appendTo( builder );
-				builder.endObject();
+				appender.startObject( entry.getKey() );
+				list.get( 0 ).appendTo( appender );
+				appender.endObject();
 			}
 			else {
-				builder.startList( entry.getKey() );
+				appender.startList( entry.getKey() );
 				for ( N child : entry.getValue() ) {
-					builder.startObject();
-					child.appendTo( builder );
-					builder.endObject();
+					appender.startObject();
+					child.appendTo( appender );
+					appender.endObject();
 				}
-				builder.endList();
+				appender.endList();
 			}
 		}
 	}

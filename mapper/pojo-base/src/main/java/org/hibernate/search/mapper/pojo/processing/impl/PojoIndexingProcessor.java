@@ -8,8 +8,7 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
-import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 
 /**
  * A POJO processor responsible for transferring data from the POJO to a document to index.
@@ -20,7 +19,7 @@ public abstract class PojoIndexingProcessor<T> implements AutoCloseable, ToStrin
 
 	@Override
 	public String toString() {
-		return new ToStringTreeBuilder().value( this ).toString();
+		return toStringTree();
 	}
 
 	@Override

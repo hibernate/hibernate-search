@@ -11,7 +11,7 @@ import java.util.Collection;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for applying multiple processors.
@@ -34,8 +34,8 @@ public class PojoIndexingProcessorMultiNode<T> extends PojoIndexingProcessor<T> 
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( null, elements );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( null, elements );
 	}
 
 	@Override

@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.search.definition.impl;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 final class NullInnerProjectionDefinition
 		implements InnerProjectionDefinition {
@@ -23,8 +23,8 @@ final class NullInnerProjectionDefinition
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.value( "<null projection>" );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.value( "<null projection>" );
 	}
 
 	@Override

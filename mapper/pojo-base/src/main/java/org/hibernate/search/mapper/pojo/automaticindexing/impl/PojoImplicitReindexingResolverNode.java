@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
-import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 
 /**
  * An node within a {@link PojoImplicitReindexingResolver}.
@@ -21,7 +20,7 @@ public abstract class PojoImplicitReindexingResolverNode<T> implements AutoClose
 
 	@Override
 	public String toString() {
-		return new ToStringTreeBuilder().value( this ).toString();
+		return toStringTree();
 	}
 
 	@Override

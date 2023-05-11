@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinalReference;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 /**
  * A {@link PojoImplicitReindexingAssociationInverseSideResolverNode} marking as "to reindex"
@@ -32,9 +32,9 @@ public class PojoImplicitReindexingAssociationInverseSideResolverMarkingNode
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "operation", "mark association inverse side as dirty" );
-		builder.attribute( "inverseSidePathOrdinalByType", inverseSidePathOrdinalByType );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "operation", "mark association inverse side as dirty" );
+		appender.attribute( "inverseSidePathOrdinalByType", inverseSidePathOrdinalByType );
 	}
 
 	@Override

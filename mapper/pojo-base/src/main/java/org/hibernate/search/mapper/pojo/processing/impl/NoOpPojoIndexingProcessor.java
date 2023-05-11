@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 class NoOpPojoIndexingProcessor extends PojoIndexingProcessor<Object> {
 
@@ -25,7 +25,7 @@ class NoOpPojoIndexingProcessor extends PojoIndexingProcessor<Object> {
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "operation", "no op" );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "operation", "no op" );
 	}
 }

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
-import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 public abstract class Call<S extends Call<S>> implements ToStringTreeAppendable {
 
@@ -17,8 +17,8 @@ public abstract class Call<S extends Call<S>> implements ToStringTreeAppendable 
 	}
 
 	@Override
-	public final void appendTo(ToStringTreeBuilder builder) {
-		details( builder );
+	public final void appendTo(ToStringTreeAppender appender) {
+		details( appender );
 	}
 
 	/**
@@ -30,7 +30,7 @@ public abstract class Call<S extends Call<S>> implements ToStringTreeAppendable 
 
 	protected abstract String summary();
 
-	protected void details(ToStringTreeBuilder builder) {
+	protected void details(ToStringTreeAppender appender) {
 		// No details by default.
 	}
 

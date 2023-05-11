@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 /**
  * A {@link PojoImplicitReindexingResolverNode} applying a filter to decide whether to apply a delegate.
@@ -37,10 +37,10 @@ public class PojoImplicitReindexingResolverDirtinessFilterNode<T> extends PojoIm
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "operation", "reindex only if paths are dirty" );
-		builder.attribute( "dirtyPathFilter", dirtyPathFilter );
-		builder.attribute( "nested", nested );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "operation", "reindex only if paths are dirty" );
+		appender.attribute( "dirtyPathFilter", dirtyPathFilter );
+		appender.attribute( "nested", nested );
 	}
 
 	@Override

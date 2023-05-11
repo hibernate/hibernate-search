@@ -10,7 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.St
 
 import java.util.Objects;
 
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeDiffer;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
@@ -56,8 +56,8 @@ class DocumentWorkDiscardCall extends Call<DocumentWorkDiscardCall> {
 	}
 
 	@Override
-	protected void details(ToStringTreeBuilder builder) {
-		builder.attribute( "documentKey", documentKey );
-		builder.attribute( "work", work );
+	protected void details(ToStringTreeAppender appender) {
+		appender.attribute( "documentKey", documentKey );
+		appender.attribute( "work", work );
 	}
 }

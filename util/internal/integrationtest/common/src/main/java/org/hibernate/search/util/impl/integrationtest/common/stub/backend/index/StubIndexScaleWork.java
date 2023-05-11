@@ -12,8 +12,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 public final class StubIndexScaleWork implements ToStringTreeAppendable {
 
@@ -49,15 +49,15 @@ public final class StubIndexScaleWork implements ToStringTreeAppendable {
 
 	@Override
 	public String toString() {
-		return new ToStringTreeBuilder().value( this ).toString();
+		return toStringTree();
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "class", getClass().getSimpleName() );
-		builder.attribute( "type", type );
-		builder.attribute( "tenantIdentifiers", tenantIdentifiers );
-		builder.attribute( "routingKeys", routingKeys );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "class", getClass().getSimpleName() );
+		appender.attribute( "type", type );
+		appender.attribute( "tenantIdentifiers", tenantIdentifiers );
+		appender.attribute( "routingKeys", routingKeys );
 	}
 
 	public static class Builder {

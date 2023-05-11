@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 import java.util.Collection;
 
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 /**
  * A {@link PojoImplicitReindexingResolverNode} responsible for applying multiple resolvers.
@@ -33,8 +33,8 @@ public class PojoImplicitReindexingResolverMultiNode<T> extends PojoImplicitRein
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( null, elements );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( null, elements );
 	}
 
 	@Override

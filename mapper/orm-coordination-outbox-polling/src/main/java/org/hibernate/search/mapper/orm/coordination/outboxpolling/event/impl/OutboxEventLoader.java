@@ -21,9 +21,9 @@ import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
-import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 final class OutboxEventLoader implements ToStringTreeAppendable {
 
@@ -65,12 +65,12 @@ final class OutboxEventLoader implements ToStringTreeAppendable {
 
 	@Override
 	public String toString() {
-		return new ToStringTreeBuilder().value( this ).toString();
+		return toStringTree();
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.startObject( "lockOptions" )
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.startObject( "lockOptions" )
 				.attribute( "lockMode", lockOptions.getLockMode() )
 				.attribute( "timeout", lockOptions.getTimeOut() )
 				.endObject();

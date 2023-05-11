@@ -11,7 +11,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for applying a {@link TypeBridge}.
@@ -35,9 +35,9 @@ public class PojoIndexingProcessorTypeBridgeNode<T> extends PojoIndexingProcesso
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "operation", "apply type bridge" );
-		builder.attribute( "bridge", bridgeHolder );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "operation", "apply type bridge" );
+		appender.attribute( "bridge", bridgeHolder );
 	}
 
 	@Override

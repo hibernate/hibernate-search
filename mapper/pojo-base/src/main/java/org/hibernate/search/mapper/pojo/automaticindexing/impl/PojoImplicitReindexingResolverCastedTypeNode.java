@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 /**
  * A {@link PojoImplicitReindexingResolverNode} working at the type level, but applying a cast before anything else.
@@ -41,10 +41,10 @@ public class PojoImplicitReindexingResolverCastedTypeNode<T, U> extends PojoImpl
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "operation", "process type (with cast, ignore if it fails)" );
-		builder.attribute( "caster", caster );
-		builder.attribute( "nested", nested );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "operation", "process type (with cast, ignore if it fails)" );
+		appender.attribute( "caster", caster );
+		appender.attribute( "nested", nested );
 	}
 
 	@Override

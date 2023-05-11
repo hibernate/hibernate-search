@@ -36,11 +36,11 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoConstructorProjectionDefinitionMessages;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
-import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormatter;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 public final class PojoConstructorProjectionDefinition<T>
 		implements CompositeProjectionDefinition<T>, ToStringTreeAppendable {
@@ -66,8 +66,8 @@ public final class PojoConstructorProjectionDefinition<T>
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "valueCreateHandle", valueCreateHandle )
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "valueCreateHandle", valueCreateHandle )
 				.attribute( "innerDefinitions", innerDefinitions );
 	}
 

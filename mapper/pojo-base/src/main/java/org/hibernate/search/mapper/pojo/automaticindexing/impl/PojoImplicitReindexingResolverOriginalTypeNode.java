@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 /**
  * A {@link PojoImplicitReindexingResolverNode} working at the type level, without casting.
@@ -34,9 +34,9 @@ public class PojoImplicitReindexingResolverOriginalTypeNode<T> extends PojoImpli
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "operation", "process type" );
-		builder.attribute( "nested", nested );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "operation", "process type" );
+		appender.attribute( "nested", nested );
 	}
 
 	@Override

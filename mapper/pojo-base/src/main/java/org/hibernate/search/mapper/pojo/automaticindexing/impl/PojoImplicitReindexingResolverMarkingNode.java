@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 /**
  * A {@link PojoImplicitReindexingResolverNode} marking as "to reindex" any dirty object passed as an input.
@@ -21,8 +21,8 @@ public class PojoImplicitReindexingResolverMarkingNode<T> extends PojoImplicitRe
 	}
 
 	@Override
-	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "operation", "mark for reindexing" );
+	public void appendTo(ToStringTreeAppender appender) {
+		appender.attribute( "operation", "mark for reindexing" );
 	}
 
 	@Override
