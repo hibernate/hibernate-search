@@ -25,11 +25,13 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.DocumentReferenceProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.EntityProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.EntityReferenceProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.FieldProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.IdProjectionBinder;
+import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.ObjectProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.ScoreProjectionBinder;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
@@ -60,6 +62,8 @@ public class ProjectionDslJava17IT {
 				// This wouldn't be needed in a typical application.
 				CollectionHelper.asSet( MyBookProjection.class, MyBookProjection.Author.class, MyAuthorProjection.class,
 						MyBookIdAndTitleProjection.class, MyBookTitleAndAuthorNamesProjection.class,
+						MyBookTitleAndAuthorsProjection.class,
+						MyBookIdAndTitleProjection.class, MyBookTitleAndAuthorNamesProjection.class,
 						MyBookScoreAndTitleProjection.class,
 						MyBookDocRefAndTitleProjection.class,
 						MyBookEntityAndTitleProjection.class,
@@ -76,6 +80,11 @@ public class ProjectionDslJava17IT {
 					bookMapping.property( "authors" )
 							.indexedEmbedded()
 							.structure( ObjectStructure.NESTED );
+					bookMapping.property( "mainAuthor" )
+							.indexedEmbedded()
+							.structure( ObjectStructure.NESTED )
+							.indexingDependency().derivedFrom( PojoModelPath.ofValue( "authors" ) )
+							.associationInverseSide( PojoModelPath.ofValue( "books" ) );
 					var authorMapping = mapping.type( Author.class );
 					authorMapping.indexed();
 					authorMapping.property( "firstName" )
@@ -152,6 +161,17 @@ public class ProjectionDslJava17IT {
 					myBookEntityRefAndTitleProjection.mainConstructor().parameter( 0 )
 							.projection( EntityReferenceProjectionBinder.create() );
 					//end::programmatic-entity-reference-projection[]
+
+					//tag::programmatic-object-projection[]
+					TypeMappingStep myBookTitleAndAuthorsProjection =
+							mapping.type( MyBookTitleAndAuthorsProjection.class );
+					myBookTitleAndAuthorsProjection.mainConstructor()
+							.projectionConstructor();
+					myBookTitleAndAuthorsProjection.mainConstructor().parameter( 0 )
+							.projection( ObjectProjectionBinder.create() );
+					myBookTitleAndAuthorsProjection.mainConstructor().parameter( 1 )
+							.projection( ObjectProjectionBinder.create( "mainAuthor" ) );
+					//end::programmatic-object-projection[]
 				}
 		);
 	}
@@ -380,6 +400,31 @@ public class ProjectionDslJava17IT {
 									) )
 									.collect( Collectors.toList() )
 					);
+		} );
+	}
+
+	@Test
+	public void projectionConstructor_object() {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			// tag::projection-constructor-object[]
+			List<MyBookTitleAndAuthorsProjection> hits = searchSession.search( Book.class )
+					.select( MyBookTitleAndAuthorsProjection.class )// <1>
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 ); // <2>
+			// end::projection-constructor-object[]
+			assertThat( hits ).containsExactlyInAnyOrderElementsOf(
+					entityManager.createQuery( "select b from Book b", Book.class ).getResultList().stream()
+							.map( book -> new MyBookTitleAndAuthorsProjection(
+									book.getAuthors().stream()
+											.map( a -> new MyAuthorProjection( a.getFirstName(), a.getLastName() ) )
+											.collect( Collectors.toList() ),
+									new MyAuthorProjection( book.getMainAuthor().getFirstName(), book.getMainAuthor().getLastName() ),
+									book.getTitle()
+							) )
+							.collect( Collectors.toList() )
+			);
 		} );
 	}
 

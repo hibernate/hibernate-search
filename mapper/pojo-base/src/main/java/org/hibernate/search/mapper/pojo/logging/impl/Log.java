@@ -708,7 +708,8 @@ public interface Log extends BasicLogger {
 			value = "Missing parameter names in Java metadata for projection constructor."
 					+ " When inferring inner projections from constructor parameters, constructor parameter names must be known."
 					+ " Either make sure this class was compiled with the '-parameters' compiler flag,"
-					+ " or set the path explicitly with '@FieldProjection(path = ...)'.")
+					+ " or set the path explicitly with '@FieldProjection(path = ...)'"
+					+ " or '@ObjectProjection(path = ...)'.")
 	SearchException missingParameterNameForProjectionConstructor();
 
 	@Message(id = ID_OFFSET + 115,
@@ -847,5 +848,13 @@ public interface Log extends BasicLogger {
 					+ " Either make sure this class was compiled with the '-parameters' compiler flag,"
 					+ " or set the path explicitly with '@FieldProjection(path = ...)'.")
 	SearchException missingParameterNameForFieldProjectionInProjectionConstructor();
+
+	@Message(id = ID_OFFSET + 139,
+			value = "Missing parameter names in Java metadata for projection constructor."
+					+ " When mapping a projection constructor parameter to an object projection without providing a field path,"
+					+ " constructor parameter names must be known."
+					+ " Either make sure this class was compiled with the '-parameters' compiler flag,"
+					+ " or set the path explicitly with '@ObjectProjection(path = ...)'.")
+	SearchException missingParameterNameForObjectProjectionInProjectionConstructor();
 
 }

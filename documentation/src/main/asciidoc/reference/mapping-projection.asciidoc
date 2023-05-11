@@ -38,6 +38,8 @@ See <<mapping-projection-inner-inference>> for more information on how construct
 Alternatively, the field projection can be configured explicitly with <<search-dsl-projection-field-mapping,`@FieldProjection`>>.
 <4> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
 Multivalued projections <<mapping-projection-inner-inference-type,must be modeled as a `List<...>`>> or supertype.
++
+Alternatively, the object projection can be configured explicitly with <<search-dsl-projection-object-mapping,`@ObjectProjection`>>.
 <5> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
 
 [source, JAVA, indent=0, subs="+callouts"]

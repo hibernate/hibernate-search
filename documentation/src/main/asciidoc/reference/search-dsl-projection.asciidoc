@@ -71,6 +71,8 @@ See <<mapping-projection-inner-inference>> for more information on how construct
 Alternatively, the field projection can be configured explicitly with <<search-dsl-projection-field-mapping,`@FieldProjection`>>.
 <4> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
 Multivalued projections <<mapping-projection-inner-inference-type,must be modeled as a `List<...>`>> or supertype.
++
+Alternatively, the object projection can be configured explicitly with <<search-dsl-projection-object-mapping,`@ObjectProjection`>>.
 <5> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
 
 [source, JAVA, indent=0, subs="+callouts"]
@@ -766,6 +768,8 @@ See <<mapping-projection-inner-inference>> for more information on how construct
 Alternatively, the field projection can be configured explicitly with <<search-dsl-projection-field-mapping,`@FieldProjection`>>.
 <4> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
 Multivalued projections <<mapping-projection-inner-inference-type,must be modeled as a `List<...>`>> or supertype.
++
+Alternatively, the object projection can be configured explicitly with <<search-dsl-projection-object-mapping,`@ObjectProjection`>>.
 <5> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
 
 [source, JAVA, indent=0, subs="+callouts"]
@@ -1022,6 +1026,72 @@ populated with data retrieved from the index.
 include::components/custom-projection-type-nonrecord-tip.asciidoc[]
 
 NOTE: For more information about mapping custom projection types, see <<mapping-projection>>.
+
+[[search-dsl-projection-object-mapping]]
+=== `@ObjectProjection` in projections to custom types
+
+To achieve an `object` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+you can rely on the default <<mapping-projection-inner-inference,inferred projection>>:
+when no annotations are present on a constructor parameter,
+it will be inferred to an object projection to the field with the same name as the constructor parameter
+(or a <<search-dsl-projection-field,field projection>>,
+see <<mapping-projection-inner-inference-type,here for details>>).
+
+To force an object projection,
+or to customize the object projection further (for example to set the field path explicitly),
+use the `@ObjectProjection` annotation on the constructor parameter:
+
+.Returning custom objects created from an object field within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookTitleAndAuthorsProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the objects with `@ObjectProjection`.
+<3> For multi-valued projections,
+the type of the constructor parameter must be assignable from `List<T>`,
+where `T` is a type that has a projection constructor itself.
+See <<mapping-projection-inner-inference-type>> for more information.
+<4> Annotation attributes allow customization.
++
+Here we're using a path that is different from the name of the Java constructor parameter.
+<5> For single-valued projections,
+the type of the constructor parameter must have a projection constructor itself.
+See <<mapping-projection-inner-inference-type>> for more information.
+<6> You can of course also declare other parameters with different projections;
+in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-object]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested objects.
+====
+
+The annotation exposes the following attributes:
+
+`path`::
+The path to the projected field.
++
+If not set, it is inferred from the constructor parameter name.
++
+[WARNING]
+====
+Field path inference will <<mapping-projection-inner-inference-fieldpath,fail if constructor parameter names are not included in the Java bytecode>>.
+====
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `ObjectProjectionBinder.create()`.
+
+.Programmatic mapping of an `object` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-object-projection]
+----
+====
 
 [[search-dsl-projection-constant]]
 == `constant`: return a provided constant

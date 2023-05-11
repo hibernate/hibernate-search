@@ -184,7 +184,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * <p>
 	 * Compared to the basic {@link #composite() composite projection},
 	 * an object projection is bound to a specific object field,
-	 * and thus it yield zero, one or many values, as many as there are objects in the targeted object field.
+	 * and thus it yields zero, one or many values, as many as there are objects in the targeted object field.
 	 * Therefore, you must take care of calling {@link CompositeProjectionValueStep#multi()}
 	 * if the object field is multi-valued.
 	 *
