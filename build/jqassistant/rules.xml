@@ -569,6 +569,7 @@
         <requiresConcept refId="hsearch:Generated" />
         <requiresConcept refId="hsearch:Main" />
         <requiresConcept refId="hsearch:HibernateSearch" />
+        <requiresConcept refId="hsearch:Impl" />
         <requiresConcept refId="hsearch:ArtifactMetadata" />
         <description>
             Main (non-test) types extending/implementing a Hibernate Search type from another module must have a module-specific keyword in their name,
@@ -578,8 +579,8 @@
             - the misnamed type is an anonymous type or a generated type;
             - or the misnamed type is deprecated;
             - or the implemented type is deprecated;
-            - or the implementing type is an inner/nested type;
-            and its surrounding type does use the module-specific keyword;
+            - or the implementing type is an inner/nested type and is non-public (implementation) --
+            in which case only the surrounding type must comply, if relevant;
             - or the implemented type is in a util module,
             in which case the implemented interface may just be a detail.
         </description>
@@ -599,7 +600,7 @@
                 AND NOT misnamedType:Generated
                 AND NOT (
                         misnamedType.nameWithoutContainingTypeName <> misnamedType.name
-                        AND misnamedType.name =~ ("^(Abstract)?\\Q" + misnamedTypeArtifact.moduleSpecificKeyword + "\\E.*")
+                        AND misnamedType:Impl
                 )
                 AND NOT externalParentTypeArtifact.name STARTS WITH "hibernate-search-util-"
             RETURN misnamedTypeArtifact.moduleSpecificKeyword, misnamedType, externalParentType
