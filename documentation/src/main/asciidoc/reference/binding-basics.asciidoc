@@ -82,3 +82,7 @@ Value fields as well as <<binding-index-field-dsl-object,object fields>> (compos
 |[red]*No*
 |Yes
 |===
+
+Not all binders are about indexing, however.
+The constructor parameters involved in <<mapping-projection,projection constructors>>
+can be bound as well; you will find more information about that in <<binding-projection,this section>>.

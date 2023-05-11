@@ -212,10 +212,15 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 
 		PojoSearchQueryElementRegistryBuilder searchQueryElementRegistryBuilder =
 				new PojoSearchQueryElementRegistryBuilder( mappingHelper );
-		for ( PojoRawTypeModel<?> type : initialMappedTypes ) {
-			searchQueryElementRegistryBuilder.process( type );
+		try {
+			for ( PojoRawTypeModel<?> type : initialMappedTypes ) {
+				searchQueryElementRegistryBuilder.process( type );
+			}
+			searchQueryElementRegistry = searchQueryElementRegistryBuilder.build();
 		}
-		searchQueryElementRegistry = searchQueryElementRegistryBuilder.build();
+		catch (RuntimeException e) {
+			searchQueryElementRegistryBuilder.closeOnFailure();
+		}
 	}
 
 	private <E> void mapIndexedType(PojoRawTypeModel<E> indexedEntityType,
@@ -331,6 +336,10 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		}
 		catch (MappingAbortedException | RuntimeException e) {
 			new SuppressingCloser( e )
+					.push(
+							PojoSearchQueryElementRegistry::close,
+							searchQueryElementRegistry
+					)
 					.push(
 							PojoImplicitReindexingResolverBuildingHelper::closeOnFailure,
 							reindexingResolverBuildingHelper

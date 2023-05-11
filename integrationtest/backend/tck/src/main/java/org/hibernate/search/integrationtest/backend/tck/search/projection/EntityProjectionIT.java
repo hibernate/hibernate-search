@@ -100,7 +100,7 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 		CompositeProjectionDefinition<StubEntity> projectionDefinitionStub =
 				// Simulate a projection that instantiates the entity based on field values extracted from the index.
 				// Here we're just retrieving a field containing the ID.
-				(f, initialStep) -> initialStep.from( f.field( mainIndex.binding().idField.relativeFieldName, String.class ) )
+				(f, initialStep, ctx) -> initialStep.from( f.field( mainIndex.binding().idField.relativeFieldName, String.class ) )
 						.as( id -> new StubEntity( reference( mainIndex.typeName(), id ) ) );
 		when( projectionRegistryMock.compositeOptional( StubEntity.class ) )
 				.thenReturn( Optional.of( projectionDefinitionStub ) );

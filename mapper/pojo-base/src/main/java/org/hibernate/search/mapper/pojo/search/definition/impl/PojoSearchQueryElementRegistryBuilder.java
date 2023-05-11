@@ -20,6 +20,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.search.definition.binding.impl.ProjectionConstructorBinder;
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class PojoSearchQueryElementRegistryBuilder {
@@ -31,6 +32,12 @@ public final class PojoSearchQueryElementRegistryBuilder {
 
 	public PojoSearchQueryElementRegistryBuilder(PojoMappingHelper mappingHelper) {
 		this.mappingHelper = mappingHelper;
+	}
+
+	public void closeOnFailure() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( CompositeProjectionDefinition::close, projectionDefinitions.values() );
+		}
 	}
 
 	public void process(PojoRawTypeModel<?> type) {
@@ -67,8 +74,8 @@ public final class PojoSearchQueryElementRegistryBuilder {
 			PojoSearchMappingConstructorNode constructorMapping) {
 		if ( constructorMapping.isProjectionConstructor() ) {
 			Class<T> instantiatedJavaClass = type.typeIdentifier().javaClass();
-			PojoConstructorProjectionDefinition<T> definition =
-					new ProjectionConstructorBinder<>( mappingHelper, constructor ).bind();
+			ProjectionConstructorBinder<T> binder = new ProjectionConstructorBinder<>( mappingHelper, constructor );
+			PojoConstructorProjectionDefinition<T> definition = binder.bind();
 			CompositeProjectionDefinition<?> existing =
 					projectionDefinitions.putIfAbsent( instantiatedJavaClass, definition );
 			log.constructorProjection( type, definition );

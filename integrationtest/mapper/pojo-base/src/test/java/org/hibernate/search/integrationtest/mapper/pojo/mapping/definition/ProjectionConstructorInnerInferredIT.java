@@ -263,7 +263,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 						.methodParameterContext( 1, "text" )
 						.failure( "Invalid parameter type for projection constructor",
 								"java.util.Set<java.lang.String>",
-								"When inferring inner projections from constructor parameters,"
+								"When inferring the cardinality of inner projections from constructor parameters,"
 										+ " multi-valued constructor parameters must be lists (java.util.List<...>)"
 										+ " or list supertypes (java.lang.Iterable<...>, java.util.Collection<...>)" ) );
 	}
@@ -726,7 +726,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 						.methodParameterContext( 2, "contained" )
 						.failure( "Invalid parameter type for projection constructor",
 								"java.util.Set<" + MyInnerProjection.class.getName() + ">",
-								"When inferring inner projections from constructor parameters,"
+								"When inferring the cardinality of inner projections from constructor parameters,"
 										+ " multi-valued constructor parameters must be lists (java.util.List<...>)"
 										+ " or list supertypes (java.lang.Iterable<...>, java.util.Collection<...>)" ) );
 	}

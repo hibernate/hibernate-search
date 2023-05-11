@@ -173,7 +173,7 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 				// We simulate a projection definition on the mapper side;
 				// normally this would involve annotation mapping.
 				when( projectionRegistryMock.composite( ValueWrapper.class ) )
-						.thenReturn( (f, initialStep) ->
+						.thenReturn( (f, initialStep, ctx) ->
 								// Critically, in a real-world scenario the inner projections
 								// will be defined relative to the composite node
 								// (which may not be the root in the case of object projections).
@@ -198,7 +198,7 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 				// We simulate a projection definition on the mapper side;
 				// normally this would involve annotation mapping.
 				when( projectionRegistryMock.composite( ValueWrapper.class ) )
-						.thenReturn( (f, initialStep) ->
+						.thenReturn( (f, initialStep, ctx) ->
 								// Inner projections need to be defined relative to the composite node;
 								// see as_class.
 								doFrom( f, index.binding().compositeForMulti(), CompositeBinding::relativePath, initialStep )

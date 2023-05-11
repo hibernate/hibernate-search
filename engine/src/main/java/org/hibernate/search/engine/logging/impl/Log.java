@@ -23,6 +23,7 @@ import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.SearchTimeoutException;
@@ -536,5 +537,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 116,
 			value = "Ignoring ServiceConfigurationError caught while trying to instantiate service '%s'.")
 	void ignoringServiceConfigurationError(Class<?> serviceContract, @Cause ServiceConfigurationError error);
+
+	@Message(id = ID_OFFSET + 117,
+			value = "Parameter with name '%1$s' was not defined on projection definition '%2$s'.")
+	SearchException paramNotDefined(String paramName, ProjectionDefinition<?> definition);
 
 }

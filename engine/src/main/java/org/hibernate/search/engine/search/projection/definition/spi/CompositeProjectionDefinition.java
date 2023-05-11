@@ -6,13 +6,23 @@
  */
 package org.hibernate.search.engine.search.projection.definition.spi;
 
+import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 
-public interface CompositeProjectionDefinition<T> {
+public interface CompositeProjectionDefinition<T> extends AutoCloseable {
 
 	CompositeProjectionValueStep<?, T> apply(SearchProjectionFactory<?, ?> projectionFactory,
-			CompositeProjectionInnerStep initialStep);
+			CompositeProjectionInnerStep initialStep,
+			ProjectionDefinitionContext context);
+
+	/**
+	 * Close any resource before the projection definition is discarded.
+	 */
+	@Override
+	default void close() {
+		// Do nothing by default
+	}
 
 }
