@@ -176,7 +176,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
-                            <reportsDirectory>target/failsafe-reports/lucene</reportsDirectory>
+                            <reportsDirectory>${project.build.directory}/failsafe-reports/lucene</reportsDirectory>
                             <systemPropertyVariables>
                                 <org.hibernate.search.jsr352.persistence_unit>lucene_pu</org.hibernate.search.jsr352.persistence_unit>
                             </systemPropertyVariables>
@@ -188,7 +188,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
-                            <reportsDirectory>target/failsafe-reports/elasticsearch</reportsDirectory>
+                            <reportsDirectory>${project.build.directory}/failsafe-reports/elasticsearch</reportsDirectory>
                             <systemPropertyVariables>
                                 <org.hibernate.search.jsr352.persistence_unit>elasticsearch_pu</org.hibernate.search.jsr352.persistence_unit>
                             </systemPropertyVariables>
