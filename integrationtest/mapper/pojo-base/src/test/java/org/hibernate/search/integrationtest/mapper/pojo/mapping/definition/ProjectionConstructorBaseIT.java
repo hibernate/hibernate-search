@@ -17,8 +17,10 @@ import java.util.regex.Pattern;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FieldProjection;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdProjection;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
@@ -963,6 +965,39 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 							Pattern.quote( MyProjectionBook.class.getName() ) + "\\(.+\\*java\\.util\\.List\\*\\)"
 					);
 		}
+	}
+
+	@Test
+	public void multipleParameterProjectionAnnotations() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				@GenericField
+				public Integer id;
+			}
+
+			class MyProjection {
+				public final Integer id;
+
+				@ProjectionConstructor
+				public MyProjection(@IdProjection @FieldProjection Integer id) {
+					this.id = id;
+				}
+			}
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withAnnotatedTypes( Model.MyProjection.class )
+				.setup( Model.IndexedEntity.class ) )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( Model.MyProjection.class.getName() )
+						.constructorContext( Model.class, Integer.class )
+						.methodParameterContext( 1, "id" )
+						.failure(
+								"Multiple projections are mapped for this parameter",
+								"At most one projection is allowed for each parameter" ) );
 	}
 
 }

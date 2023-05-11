@@ -62,11 +62,16 @@ include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/
 <1> Annotate the record type with `@ProjectionConstructor`,
 either at the type level (if there's only one constructor)
 or at the constructor level (if there are multiple constructors).
-<2> To project on a value field, add a constructor parameter named after that field and with the same type as that field.
+<2> To project on the entity identifier, annotate the relevant constructor parameter with <<search-dsl-projection-id-mapping,`@IdProjection`>>.
++
+Most projections have a corresponding annotation that can be used on constructor parameters.
+<3> To project on a value field, add a constructor parameter named after that field and with the same type as that field.
 See <<mapping-projection-inner-inference>> for more information on how constructor parameters should be defined.
-<3> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
++
+Alternatively, the field projection can be configured explicitly with <<search-dsl-projection-field-mapping,`@FieldProjection`>>.
+<4> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
 Multivalued projections <<mapping-projection-inner-inference-type,must be modeled as a `List<...>`>> or supertype.
-<4> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
+<5> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -124,7 +129,10 @@ If you want the actual entity instance, use the <<search-dsl-projection-entity,`
 [[search-dsl-projection-id]]
 == [[_id_return_identifiers_of_matched_entities]] `id`: return identifiers of matched entities
 
-The `identifier` projection returns the identifier of the matched entity.
+The `id` projection returns the identifier of the matched entity.
+
+[[search-dsl-projection-id-syntax]]
+=== Syntax
 
 .Returning ids to matched entities, providing the identity type.
 ====
@@ -133,6 +141,7 @@ The `identifier` projection returns the identifier of the matched entity.
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=id-int]
 ----
 ====
+
 If the provided identifier type does not match the type of identifiers for targeted entity types,
 an exception will be thrown. See also <<search-dsl-projected-value-type>>. 
 
@@ -143,6 +152,44 @@ You can omit the "identifier type" argument, but then you will get projections o
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=id-object]
+----
+====
+
+[[search-dsl-projection-id-mapping]]
+=== `@IdProjection` in projections to custom types
+
+To achieve an `id` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+use the `@IdProjection` annotation:
+
+.Returning ids to matched entities within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookIdAndTitleProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the entity identifier with `@IdProjection`.
+<3> The type of the constructor parameter must be assignable from
+the type of the target entity's identifier.
+<4> You can of course also declare other parameters with different projections;
+in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-id]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested identifier and field.
+====
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `IdProjectionBinder.create()`.
+
+.Programmatic mapping of an `id` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-id-projection]
 ----
 ====
 
@@ -248,6 +295,72 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ====
 
 See <<search-dsl-projected-value-type>> for more information.
+
+[[search-dsl-projection-field-mapping]]
+=== `@FieldProjection` in projections to custom types
+
+To achieve a `field` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+you can rely on the default <<mapping-projection-inner-inference,inferred projection>>:
+when no annotations are present on a constructor parameter,
+it will be inferred to a field projection to the field with the same name as the constructor parameter
+(or an <<search-dsl-projection-object,object projection>>,
+see <<mapping-projection-inner-inference-type,here for details>>).
+
+To force a field projection,
+or to customize the field projection further (for example to set the field path explicitly),
+use the `@FieldProjection` annotation on the constructor parameter:
+
+.Returning field values from matched documents within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookTitleAndAuthorNamesProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the field value with `@FieldProjection`.
+<3> For single-valued projections,
+the type of the constructor parameter must be assignable from the type of the projected field.
+<4> Annotation attributes allow customization.
++
+Here we're using a path that contains a dot,
+which we can't possibly include in the name of the Java constructor parameter.
+<5> For multi-valued projections,
+the type of the constructor parameter must be assignable from `List<T>`,
+where `T` is the type of the projected field or a supertype.
+See <<mapping-projection-inner-inference-type>> for more information.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-field]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested fields.
+====
+
+The annotation exposes the following attributes:
+
+`path`::
+The path to the projected field.
++
+If not set, it is inferred from the constructor parameter name.
++
+[WARNING]
+====
+Field path inference will <<mapping-projection-inner-inference-fieldpath,fail if constructor parameter names are not included in the Java bytecode>>.
+====
+`convert`::
+How to <<search-dsl-projection-field-skipping-conversion,convert>> values retrieved from the index.
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `FieldProjectionBinder.create()`.
+
+.Programmatic mapping of a `field` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-field-projection]
+----
+====
 
 [[search-dsl-projection-score]]
 == `score`: return the score of matched documents
@@ -464,11 +577,16 @@ include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/
 <1> Annotate the record type with `@ProjectionConstructor`,
 either at the type level (if there's only one constructor)
 or at the constructor level (if there are multiple constructors).
-<2> To project on a value field, add a constructor parameter named after that field and with the same type as that field.
+<2> To project on the entity identifier, annotate the relevant constructor parameter with <<search-dsl-projection-id-mapping,`@IdProjection`>>.
++
+Most projections have a corresponding annotation that can be used on constructor parameters.
+<3> To project on a value field, add a constructor parameter named after that field and with the same type as that field.
 See <<mapping-projection-inner-inference>> for more information on how constructor parameters should be defined.
-<3> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
++
+Alternatively, the field projection can be configured explicitly with <<search-dsl-projection-field-mapping,`@FieldProjection`>>.
+<4> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
 Multivalued projections <<mapping-projection-inner-inference-type,must be modeled as a `List<...>`>> or supertype.
-<4> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
+<5> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -704,6 +822,10 @@ either at the type level (if there's only one constructor)
 or at the constructor level (if there are multiple constructors).
 <2> To project on a value field, add a constructor parameter named after that field and with the same type as that field.
 See <<mapping-projection-inner-inference>> for more information on how constructor parameters should be defined.
++
+Alternatively, the field projection can be configured explicitly with <<search-dsl-projection-field-mapping,`@FieldProjection`>>.
++
+Most projections have a corresponding annotation that can be used on constructor parameters.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----

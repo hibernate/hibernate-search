@@ -27,7 +27,7 @@ public interface SearchProjectionBuilderFactory {
 
 	<R> SearchProjection<R> entityReference();
 
-	<I> SearchProjection<I> id(Class<I> identifierType);
+	<I> SearchProjection<I> id(Class<I> requestedIdentifierType);
 
 	SearchProjection<Float> score();
 

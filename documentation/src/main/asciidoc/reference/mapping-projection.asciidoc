@@ -29,11 +29,16 @@ include::{sourcedirJava17}/org/hibernate/search/documentation/mapper/orm/project
 <1> Annotate the record type with `@ProjectionConstructor`,
 either at the type level (if there's only one constructor)
 or at the constructor level (if there are multiple constructors).
-<2> To project on a value field, add a constructor parameter named after that field and with the same type as that field.
+<2> To project on the entity identifier, annotate the relevant constructor parameter with <<search-dsl-projection-id-mapping,`@IdProjection`>>.
++
+Most projections have a corresponding annotation that can be used on constructor parameters.
+<3> To project on a value field, add a constructor parameter named after that field and with the same type as that field.
 See <<mapping-projection-inner-inference>> for more information on how constructor parameters should be defined.
-<3> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
++
+Alternatively, the field projection can be configured explicitly with <<search-dsl-projection-field-mapping,`@FieldProjection`>>.
+<4> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
 Multivalued projections <<mapping-projection-inner-inference-type,must be modeled as a `List<...>`>> or supertype.
-<4> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
+<5> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -68,13 +73,14 @@ For more information about classpath scanning and how to tune it
 see <<mapping-classpath-scanning>>.
 
 [[mapping-projection-inner-inference]]
-== [[mapper-orm-mapping-projection-inner-inference]] Inner projection inference
+== [[mapper-orm-mapping-projection-inner-inference]] Implicit inner projection inference
 
 [[mapping-projection-inner-inference-basics]]
 === [[mapper-orm-mapping-projection-inner-inference-basics]] Basics
 
-In order to interpret constructor parameters as (inner) projections,
-Hibernate Search applies some basic inference rules based on the name and type of those parameters.
+When constructor parameters are not annotated with <<mapping-projection-inner-explicit,explicit projection annotations>>,
+Hibernate Search applies some basic inference rules based on the name and type of those parameters
+in order to select (inner) projections.
 
 The following sections explain how to define the name and type of constructor parameters
 to get the desired projection.
@@ -82,6 +88,7 @@ to get the desired projection.
 [[mapping-projection-inner-inference-type]]
 === [[mapper-orm-mapping-projection-inner-inference-type]] Inner projection and type
 
+When a constructor parameter is not annotated with an <<mapping-projection-inner-explicit,explicit projection annotation>>,
 Hibernate Search infers the type of the inner projection from the type of the corresponding constructor parameter.
 
 You should set the type of a constructor parameter according to the following rules:
@@ -110,6 +117,8 @@ https://hibernate.atlassian.net/browse/HSEARCH-4577[at the moment].
 [[mapping-projection-inner-inference-fieldpath]]
 === [[mapper-orm-mapping-projection-inner-inference-fieldpath]] Inner projection and field path
 
+When a constructor parameter is not annotated with an <<mapping-projection-inner-explicit,explicit projection annotation>>
+or when it is but that annotation does not provide an explicit path,
 Hibernate Search infers the path of the field to project on from the name of the corresponding constructor parameter.
 
 In that case, you should set the name of a constructor parameter (in the Java code) to the name of the field to project on.
@@ -122,6 +131,23 @@ Hibernate Search can only retrieve the name of the constructor parameter:
 * For constructors of non-record types or non-canonical constructors of record types
 if and only if the type was compiled with the `-parameters` compiler flag.
 ====
+
+[[mapping-projection-inner-explicit]]
+== Explicit inner projection
+
+Constructor parameters can be annotated with explicit projection annotations such as `@IdProjection` or `@FieldProjection`.
+
+For projections that would normally be <<mapping-projection-inner-inference,inferred automatically>>,
+this allows further customization, for example in a <<search-dsl-projection-field-mapping,field projection>>
+to set the target field path explicitly or to disable value conversion.
+
+For other projections such as <<search-dsl-projection-id-mapping,identifier projection>>,
+this is actually the only way to use them in a projection constructor,
+because they would never be inferred automatically.
+
+See the <<search-dsl-projection,documentation of each projection>>
+for more information about the corresponding built-in annotation
+to be applied to projection constructor parameters.
 
 [[mapping-projection-multiple-constructors]]
 == [[mapper-orm-mapping-projection-multiple-constructors]] Mapping types with multiple constructors
@@ -162,12 +188,16 @@ but they **must not** be annotated with `@ProjectionConstructor` (only one such 
 You can map projection constructors through the <<mapping-programmatic,programmatic mapping>> too.
 Behavior and options are identical to annotation-based mapping.
 
-.Mapping the main projection constructor with `.projectionConstructor()`
+.Mapping the main projection constructor with `.projectionConstructor()` and `.projection(<binder>)`
 ====
 [source, JAVA, indent=0]
 ----
 include::{sourcedirJava17}/org/hibernate/search/documentation/mapper/orm/projection/ProjectionConstructorMappingJava17IT.java[tags=programmatic-mainConstructor]
 ----
+<1> Mark the constructor as a projection constructor.
+<2> The equivalent to <<mapping-projection-inner-explicit,explicit projection annotations>>
+is to pass <<binding-projection,projection binder>> instances:
+there is a built-in projection binder for every built-in projection annotation.
 ====
 
 If the projection type (record or class) has multiple constructors,

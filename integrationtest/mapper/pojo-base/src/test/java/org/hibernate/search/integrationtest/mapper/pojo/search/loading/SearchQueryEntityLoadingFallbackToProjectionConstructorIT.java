@@ -19,6 +19,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.Stub
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdProjection;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
@@ -97,15 +98,12 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
-			// Necessary because there's no way to project on the id with @ProjectionConstructor yet
-			// TODO HSEARCH-4574 remove this field and use @IdProjection or similar in the constructor instead
-			@GenericField
 			public Integer id;
 			@FullTextField
 			public String text;
 
 			@ProjectionConstructor
-			public IndexedEntity(Integer id, String text) {
+			public IndexedEntity(@IdProjection Integer id, String text) {
 				this.id = id;
 				this.text = text;
 			}
@@ -127,9 +125,9 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 					ENTITY_NAME,
 					StubSearchWorkBehavior.of(
 							3,
-							Arrays.asList( instance1.id, instance1.text ),
-							Arrays.asList( instance2.id, instance2.text ),
-							Arrays.asList( instance3.id, instance3.text )
+							Arrays.asList( String.valueOf( instance1.id ), instance1.text ),
+							Arrays.asList( String.valueOf( instance2.id ), instance2.text ),
+							Arrays.asList( String.valueOf( instance3.id ), instance3.text )
 					)
 			);
 
@@ -148,15 +146,12 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
-			// Necessary because there's no way to project on the id with @ProjectionConstructor yet
-			// TODO HSEARCH-4574 remove this field and use @IdProjection or similar in the constructor instead
-			@GenericField
 			public Integer id;
 			@FullTextField
 			public String text;
 
 			@ProjectionConstructor
-			public IndexedEntity(Integer id, String text) {
+			public IndexedEntity(@IdProjection Integer id, String text) {
 				this.id = id;
 				this.text = text;
 			}
@@ -222,8 +217,6 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 			@Indexed
 			class IndexedEntityWithLoadingStrategy {
 				@DocumentId
-				// Necessary because there's no way to project on the id with @ProjectionConstructor yet
-				// TODO HSEARCH-4574 remove this field and use @IdProjection or similar in the constructor instead
 				@GenericField
 				public Integer id;
 				@FullTextField
@@ -241,7 +234,7 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 
 				// A projection constructor unlike the parent class, but the loading strategy is inherited
 				@ProjectionConstructor
-				public IndexedEntityWithLoadingStrategyChild(Integer id, String text) {
+				public IndexedEntityWithLoadingStrategyChild(@IdProjection Integer id, String text) {
 					super( id, text );
 				}
 			}
@@ -250,15 +243,12 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 			class IndexedEntityWithProjectionConstructor {
 				public static final String NAME = "WithProj";
 				@DocumentId
-				// Necessary because there's no way to project on the id with @ProjectionConstructor yet
-				// TODO HSEARCH-4574 remove this field and use @IdProjection or similar in the constructor instead
-				@GenericField
 				public Integer id;
 				@FullTextField
 				public String text;
 
 				@ProjectionConstructor
-				public IndexedEntityWithProjectionConstructor(Integer id, String text) {
+				public IndexedEntityWithProjectionConstructor(@IdProjection Integer id, String text) {
 					this.id = id;
 					this.text = text;
 				}
@@ -346,12 +336,15 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 							entityWithProjectionConstructorName, entityWithProjectionConstructorChildName ),
 					StubSearchWorkBehavior.of(
 							4,
-							reference( entityWithLoadingStrategyName, String.valueOf( withLoadingStrategyInstance.id ) ),
+							reference( entityWithLoadingStrategyName,
+									String.valueOf( withLoadingStrategyInstance.id ) ),
 							// The loading strategy takes precedence over the projection constructor,
 							// so expect IndexedEntityWithLoadingStrategyChild to be loaded.
-							reference( entityWithLoadingStrategyChildName, String.valueOf( withLoadingStrategyChildInstance.id ) ),
+							reference( entityWithLoadingStrategyChildName,
+									String.valueOf( withLoadingStrategyChildInstance.id ) ),
 							new Pair<>( entityWithProjectionConstructorName,
-									Arrays.asList( withProjectionConstructorInstance.id, withProjectionConstructorInstance.text ) ),
+									Arrays.asList( String.valueOf( withProjectionConstructorInstance.id ),
+											withProjectionConstructorInstance.text ) ),
 							// The loading strategy takes precedence over the projection constructor,
 							// so expect IndexedEntityWithProjectionConstructorChild to be loaded.
 							reference( entityWithProjectionConstructorChildName,

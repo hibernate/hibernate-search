@@ -13,6 +13,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
@@ -132,10 +133,10 @@ class ProjectionConstructorParameterBinder<P> implements EventContextProvider {
 					: new ObjectProjectionDefinition.SingleValued<>( paramNameOrFail(), definition ) );
 		}
 		else {
-			// No projection constructor for this type; assume it's a projection on value field
+			// No projection constructor for this type; assume it's a projection on a value field
 			return BeanHolder.of( multi
-					? new FieldProjectionDefinition.MultiValued<>( paramNameOrFail(), elementType.typeIdentifier().javaClass() )
-					: new FieldProjectionDefinition.SingleValued<>( paramNameOrFail(), elementType.typeIdentifier().javaClass() ) );
+					? new FieldProjectionDefinition.MultiValued<>( paramNameOrFail(), elementType.typeIdentifier().javaClass(), ValueConvert.YES )
+					: new FieldProjectionDefinition.SingleValued<>( paramNameOrFail(), elementType.typeIdentifier().javaClass(), ValueConvert.YES ) );
 		}
 	}
 

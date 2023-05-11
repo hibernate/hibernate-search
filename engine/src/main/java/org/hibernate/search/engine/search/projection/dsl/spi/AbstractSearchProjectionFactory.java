@@ -78,9 +78,9 @@ public abstract class AbstractSearchProjectionFactory<
 	}
 
 	@Override
-	public <I> IdProjectionOptionsStep<?, I> id(Class<I> identifierType) {
-		Contracts.assertNotNull( identifierType, "identifierType" );
-		return new IdProjectionOptionsStepImpl<>( dslContext, identifierType );
+	public <I> IdProjectionOptionsStep<?, I> id(Class<I> requestedIdentifierType) {
+		Contracts.assertNotNull( requestedIdentifierType, "requestedIdentifierType" );
+		return new IdProjectionOptionsStepImpl<>( dslContext, requestedIdentifierType );
 	}
 
 	@Override

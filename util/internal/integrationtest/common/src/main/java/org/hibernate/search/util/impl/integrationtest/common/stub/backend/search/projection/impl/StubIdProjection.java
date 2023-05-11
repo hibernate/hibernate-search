@@ -14,11 +14,11 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 public class StubIdProjection<I> extends StubSearchProjection<I> {
 
-	private final Class<I> expectedType;
+	private final Class<I> requestedIdentifierType;
 	private final ProjectionConverter<String, ? extends I> converter;
 
-	StubIdProjection(Class<I> expectedType, ProjectionConverter<String, ? extends I> converter) {
-		this.expectedType = expectedType;
+	StubIdProjection(Class<I> requestedIdentifierType, ProjectionConverter<String, ? extends I> converter) {
+		this.requestedIdentifierType = requestedIdentifierType;
 		this.converter = converter;
 	}
 
@@ -45,7 +45,7 @@ public class StubIdProjection<I> extends StubSearchProjection<I> {
 
 	@Override
 	protected void toNode(StubProjectionNode.Builder self) {
-		self.attribute( "expectedType", expectedType );
+		self.attribute( "requestedIdentifierType", requestedIdentifierType );
 		self.attribute( "converter", converter );
 	}
 }

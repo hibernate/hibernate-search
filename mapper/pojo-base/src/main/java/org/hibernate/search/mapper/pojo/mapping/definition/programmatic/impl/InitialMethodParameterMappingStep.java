@@ -45,4 +45,5 @@ class InitialMethodParameterMappingStep
 	public List<ProjectionBindingData> projectionBindings() {
 		return projectionDefinitions == null ? Collections.emptyList() : projectionDefinitions;
 	}
+
 }

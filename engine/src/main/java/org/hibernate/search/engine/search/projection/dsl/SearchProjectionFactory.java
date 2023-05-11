@@ -76,12 +76,13 @@ public interface SearchProjectionFactory<R, E> {
 	 * Project to the identifier of the referenced entity,
 	 * i.e. the value of the property marked as {@code @DocumentId}.
 	 *
-	 * @param <I> The expected type of the identifier
-	 * @param identifierType The expected type of the identifier
+	 * @param <I> The requested type for returned identifiers.
+	 * @param requestedIdentifierType The requested type for returned identifiers.
+	 * Must be exactly the type of identifiers of the entity types targeted by the search, or a supertype.
 	 * @return A DSL step where the "id" projection can be defined in more details.
 	 * @throws SearchException if the identifier type doesn't match
 	 */
-	<I> IdProjectionOptionsStep<?, I> id(Class<I> identifierType);
+	<I> IdProjectionOptionsStep<?, I> id(Class<I> requestedIdentifierType);
 
 	/**
 	 * Project to the entity was originally indexed.

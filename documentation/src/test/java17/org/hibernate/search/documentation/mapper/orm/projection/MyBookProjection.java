@@ -8,13 +8,16 @@ package org.hibernate.search.documentation.mapper.orm.projection;
 
 import java.util.List;
 
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdProjection;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
 
 //tag::include[]
 @ProjectionConstructor // <1>
-public record MyBookProjection(String title, // <2>
-		List<Author> authors) { // <3>
-	@ProjectionConstructor // <4>
+public record MyBookProjection(
+		@IdProjection Integer id, // <2>
+		String title, // <3>
+		List<Author> authors) { // <4>
+	@ProjectionConstructor // <5>
 	public record Author(String firstName, String lastName) {
 	}
 }
