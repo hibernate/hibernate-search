@@ -383,7 +383,6 @@
         <version.forbiddenapis.plugin>3.4</version.forbiddenapis.plugin>
         <version.help.plugin>3.4.0</version.help.plugin>
         <version.install.plugin>3.1.1</version.install.plugin>
-        <version.io.takari.maven>0.7.7</version.io.takari.maven>
         <version.jandex.plugin>1.2.3</version.jandex.plugin>
         <version.japicmp.plugin>0.17.2</version.japicmp.plugin>
         <version.jar.plugin>3.3.0</version.jar.plugin>
@@ -408,6 +407,7 @@
         <version.org.codehaus.groovy-jsr223>3.0.17</version.org.codehaus.groovy-jsr223>
         <version.com.puppycrawl.tools.checkstyle>10.9.3</version.com.puppycrawl.tools.checkstyle>
         <version.versions.plugin>2.12.0</version.versions.plugin>
+        <version.maven-wrapper-plugin>3.2.0</version.maven-wrapper-plugin>
 
         <!-- Asciidoctor -->
 
@@ -1751,13 +1751,12 @@
                 <!--
                     Build configuration
                  -->
-
                 <plugin>
-                    <groupId>io.takari</groupId>
-                    <artifactId>maven</artifactId>
-                    <version>${version.io.takari.maven}</version>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-wrapper-plugin</artifactId>
+                    <version>${version.maven-wrapper-plugin}</version>
                     <configuration>
-                        <maven>${maven.min.version}</maven>
+                        <mavenVersion>${maven.min.version}</mavenVersion>
                     </configuration>
                 </plugin>
                 <plugin>
