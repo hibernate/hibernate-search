@@ -76,9 +76,8 @@ public abstract class AbstractPojoHCAnnRawTypeModel<T, I extends AbstractPojoHCA
 				.collect( Collectors.toList() );
 	}
 
-	@SuppressWarnings("unchecked")
 	Class<T> javaClass() {
-		return (Class<T>) introspector.toClass( xClass );
+		return typeIdentifier.javaClass();
 	}
 
 	@Override
