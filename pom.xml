@@ -394,7 +394,6 @@
         <version.project-info.plugin>3.4.3</version.project-info.plugin>
         <version.resources.plugin>3.3.1</version.resources.plugin>
         <version.shade.plugin>3.4.1</version.shade.plugin>
-        <version.site.plugin>3.12.1</version.site.plugin>
         <version.source.plugin>3.3.0</version.source.plugin>
         <!-- Surefire versions are a minefield of bugs: be careful with upgrades -->
         <version.surefire.plugin>3.0.0-M8</version.surefire.plugin>
@@ -1780,11 +1779,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>${version.resources.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-site-plugin</artifactId>
-                    <version>${version.site.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
