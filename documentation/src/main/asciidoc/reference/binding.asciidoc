@@ -25,4 +25,6 @@ include::binding-named-predicate.asciidoc[]
 
 include::binding-bridge-resolver.asciidoc[]
 
+include::binding-projection.asciidoc[]
+
 :leveloffset: -1

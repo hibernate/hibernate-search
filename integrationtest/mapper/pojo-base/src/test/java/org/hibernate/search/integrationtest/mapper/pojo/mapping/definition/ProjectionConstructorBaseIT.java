@@ -872,8 +872,6 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 				this.firstName = firstName;
 				this.lastName = lastName;
 			}
-
-
 		}
 
 		@Indexed(index = Book.INDEX_NAME)

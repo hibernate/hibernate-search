@@ -9,7 +9,10 @@ package org.hibernate.search.mapper.pojo.search.definition.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
+import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
 import org.hibernate.search.engine.search.projection.definition.spi.CompositeProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
@@ -18,6 +21,7 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoConstructorProjectionDefinitionMessages;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormatter;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -31,39 +35,50 @@ public final class PojoConstructorProjectionDefinition<T>
 	private static final PojoConstructorProjectionDefinitionMessages MESSAGES = PojoConstructorProjectionDefinitionMessages.INSTANCE;
 
 	private final ConstructorIdentifier constructor;
-	private final ValueCreateHandle<? extends T> valueCreateHandle;
-	private final List<InnerProjectionDefinition> innerDefinitions;
+	private final ValueCreateHandle<? extends T> handle;
+	private final List<BeanHolder<? extends ProjectionDefinition<?>>> parameters;
 
 	public PojoConstructorProjectionDefinition(PojoConstructorModel<T> constructor,
-			List<InnerProjectionDefinition> innerDefinitions) {
+			List<BeanHolder<? extends ProjectionDefinition<?>>> parameters) {
 		this.constructor = new ConstructorIdentifier( constructor );
-		this.valueCreateHandle = constructor.handle();
-		this.innerDefinitions = innerDefinitions;
+		this.handle = constructor.handle();
+		this.parameters = parameters;
 	}
 
 	@Override
 	public String toString() {
 		return "PojoConstructorProjectionDefinition["
-				+ "valueCreateHandle=" + valueCreateHandle
+				+ "constructor=" + constructor
 				+ ']';
 	}
 
 	@Override
 	public void appendTo(ToStringTreeAppender appender) {
-		appender.attribute( "valueCreateHandle", valueCreateHandle )
-				.attribute( "innerDefinitions", innerDefinitions );
+		appender.attribute( "constructor", constructor );
+		appender.startList( "parameters" );
+		for ( BeanHolder<? extends ProjectionDefinition<?>> innerDefinition : parameters ) {
+			appender.value( innerDefinition.get() );
+		}
+		appender.endList();
+	}
+
+	@Override
+	public void close() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( BeanHolder::close, parameters );
+		}
 	}
 
 	@Override
 	public CompositeProjectionValueStep<?, T> apply(SearchProjectionFactory<?, ?> projectionFactory,
-			CompositeProjectionInnerStep initialStep) {
+			CompositeProjectionInnerStep initialStep, ProjectionDefinitionContext context) {
 		int i = -1;
 		try {
-			SearchProjection<?>[] innerProjections = new SearchProjection<?>[innerDefinitions.size()];
-			for ( i = 0; i < innerDefinitions.size(); i++ ) {
-				innerProjections[i] = innerDefinitions.get( i ).create( projectionFactory );
+			SearchProjection<?>[] innerProjections = new SearchProjection<?>[parameters.size()];
+			for ( i = 0; i < parameters.size(); i++ ) {
+				innerProjections[i] = parameters.get( i ).get().create( projectionFactory, context );
 			}
-			return initialStep.from( innerProjections ).asArray( valueCreateHandle );
+			return initialStep.from( innerProjections ).asArray( handle );
 		}
 		catch (ConstructorProjectionApplicationException e) {
 			// We already know what prevented from applying a projection constructor correctly,

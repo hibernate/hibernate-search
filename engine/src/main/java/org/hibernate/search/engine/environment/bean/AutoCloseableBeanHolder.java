@@ -6,19 +6,18 @@
  */
 package org.hibernate.search.engine.environment.bean;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 
 /**
- * A bean holder that calls {@link Closeable#close()} on its instance upon being {@link #close() closed}.
+ * A bean holder that calls {@link AutoCloseable#close()} on its instance upon being {@link #close() closed}.
  * @param <T>
  */
-final class CloseableBeanHolder<T extends Closeable> implements BeanHolder<T> {
+final class AutoCloseableBeanHolder<T extends AutoCloseable> implements BeanHolder<T> {
 
 	private final T instance;
 
-	CloseableBeanHolder(T instance) {
+	AutoCloseableBeanHolder(T instance) {
 		this.instance = instance;
 	}
 
@@ -41,6 +40,13 @@ final class CloseableBeanHolder<T extends Closeable> implements BeanHolder<T> {
 		}
 		catch (IOException e) {
 			throw new UncheckedIOException( e.getMessage(), e );
+		}
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new RuntimeException( e );
+		}
+		catch (Exception e) {
+			throw new RuntimeException( e );
 		}
 	}
 }

@@ -36,6 +36,7 @@ You can find examples in these sections in particular:
 * <<binding-valuebridge-parameters,Passing parameters to a value binder/bridge>>
 * <<binding-propertybridge-parameters,Passing parameters to a property binder/bridge>>
 * <<binding-typebridge-parameters,Passing parameters to a type binder/bridge>>
+* <<binding-projection-parameters-custom-annotation,Passing parameters to a projection binder>>
 
 [TIP]
 ====

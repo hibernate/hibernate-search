@@ -712,7 +712,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 115,
 			value = "Invalid parameter type for projection constructor: %1$s."
-					+ " When inferring inner projections from constructor parameters,"
+					+ " When inferring the cardinality of inner projections from constructor parameters,"
 					+ " multi-valued constructor parameters must be lists (java.util.List<...>)"
 					+ " or list supertypes (java.lang.Iterable<...>, java.util.Collection<...>)")
 	SearchException invalidMultiValuedParameterTypeForProjectionConstructor(
@@ -819,5 +819,26 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 133,
 			value = "No parameter at index '%2$s' for constructor '%1$s'.")
 	SearchException cannotFindConstructorParameter(@FormatWith(PojoConstructorModelFormatter.class) PojoConstructorModel<?> constructorModel, int index);
+
+	@Message(id = ID_OFFSET + 134,
+			value = "Multiple projections are mapped for this parameter."
+					+ " At most one projection is allowed for each parameter.")
+	SearchException multipleProjectionMappingsForParameter();
+
+	@Message(id = ID_OFFSET + 135,
+			value = "Incorrect binder implementation: binder '%1$s' did not call context.definition(...).")
+	SearchException missingProjectionDefinitionForBinder(Object binder);
+
+	@Message(id = ID_OFFSET + 136,
+			value = "Invalid projection definition for constructor parameter type '%2$s': '%1$s'. This projection results in values of type '%3$s'.")
+	SearchException invalidOutputTypeForProjectionDefinition(Object definition,
+			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> typeModel,
+			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> expectedValueModel);
+
+	@Message(id = ID_OFFSET + 137,
+			value = "Invalid multi-valued projection definition for constructor parameter type '%2$s': '%1$s'. This projection results in values of type '%3$s'.")
+	SearchException invalidOutputTypeForMultiValuedProjectionDefinition(Object definition,
+			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> typeModel,
+			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> expectedValueModel);
 
 }

@@ -11,38 +11,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoMethodParameterModel;
 import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
-import org.hibernate.search.mapper.pojo.search.definition.impl.InnerProjectionDefinition;
-import org.hibernate.search.mapper.pojo.search.definition.impl.NullInnerProjectionDefinition;
+import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
 import org.hibernate.search.mapper.pojo.search.definition.impl.PojoConstructorProjectionDefinition;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
 public class ProjectionConstructorBinder<T> implements EventContextProvider {
-
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final PojoMappingHelper mappingHelper;
 	private final ProjectionConstructorParameterBinder<?> parent;
 	private final String relativeFieldPath;
-	final String absoluteFieldPath;
 	final PojoConstructorModel<T> constructor;
 
 	public ProjectionConstructorBinder(PojoMappingHelper mappingHelper, PojoConstructorModel<T> constructor) {
 		this( mappingHelper, constructor, null, null );
 	}
 
-	ProjectionConstructorBinder(PojoMappingHelper mappingHelper, PojoConstructorModel<T> constructor,
+	public ProjectionConstructorBinder(PojoMappingHelper mappingHelper, PojoConstructorModel<T> constructor,
 			ProjectionConstructorParameterBinder<?> parent, String relativeFieldPath) {
 		this.mappingHelper = mappingHelper;
 		this.parent = parent;
 		this.relativeFieldPath = relativeFieldPath;
-		this.absoluteFieldPath = FieldPaths.compose( parent == null ? null : parent.parent.absoluteFieldPath,
-				relativeFieldPath );
 		this.constructor = constructor;
 	}
 
@@ -69,26 +67,25 @@ public class ProjectionConstructorBinder<T> implements EventContextProvider {
 				);
 			}
 		}
-		List<InnerProjectionDefinition> innerDefinitions = new ArrayList<>();
+		List<BeanHolder<? extends ProjectionDefinition<?>>> parameterDefinitions = new ArrayList<>();
 		for ( PojoMethodParameterModel<?> parameter : constructor.declaredParameters() ) {
-			ProjectionConstructorParameterBinder<?> parameterNode =
-					new ProjectionConstructorParameterBinder<>(
-							mappingHelper, this, parameter );
-			InnerProjectionDefinition innerProjection;
+			ProjectionConstructorParameterBinder<?> parameterBinder =
+					new ProjectionConstructorParameterBinder<>( mappingHelper, this, parameter );
+			BeanHolder<? extends ProjectionDefinition<?>> parameterDefinition;
 			try {
-				innerProjection = parameterNode.bind();
+				parameterDefinition = parameterBinder.bind();
 			}
 			catch (RuntimeException e) {
 				mappingHelper.failureCollector()
-						.withContext( parameterNode.eventContext() )
+						.withContext( parameterBinder.eventContext() )
 						.add( e );
 				// Here the result no longer matters, bootstrap will fail anyway.
 				// We just pick a neutral value that won't trigger cascading failures.
-				innerProjection = NullInnerProjectionDefinition.INSTANCE;
+				parameterDefinition = ConstantProjectionDefinition.nullValue();
 			}
-			innerDefinitions.add( innerProjection );
+			parameterDefinitions.add( parameterDefinition );
 		}
-		return new PojoConstructorProjectionDefinition<>( constructor, innerDefinitions );
+		return new PojoConstructorProjectionDefinition<>( constructor, parameterDefinitions );
 	}
 
 	private String getPathFromSameProjectionConstructor(PojoConstructorModel<?> constructorToMatch) {
@@ -105,4 +102,5 @@ public class ProjectionConstructorBinder<T> implements EventContextProvider {
 			return null;
 		}
 	}
+
 }

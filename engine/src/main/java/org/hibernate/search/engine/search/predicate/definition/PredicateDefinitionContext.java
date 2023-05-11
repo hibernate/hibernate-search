@@ -33,7 +33,7 @@ public interface PredicateDefinitionContext {
 	/**
 	 * @param name The name of the parameter.
 	 * @return The value provided to {@link NamedPredicateOptionsStep#param(String, Object)} for this parameter.
-	 * @throws SearchException no value was provided for this parameter.
+	 * @throws SearchException If no value was provided for this parameter.
 	 * @see NamedPredicateOptionsStep#param(String, Object)
 	 */
 	Object param(String name);
