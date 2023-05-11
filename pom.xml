@@ -381,7 +381,6 @@
         <version.enforcer.plugin>3.3.0</version.enforcer.plugin>
         <version.exec.plugin>3.1.0</version.exec.plugin>
         <version.forbiddenapis.plugin>3.4</version.forbiddenapis.plugin>
-        <version.help.plugin>3.4.0</version.help.plugin>
         <version.install.plugin>3.1.1</version.install.plugin>
         <version.jandex.plugin>1.2.3</version.jandex.plugin>
         <version.japicmp.plugin>0.17.2</version.japicmp.plugin>
@@ -1894,11 +1893,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>${version.dependency.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-help-plugin</artifactId>
-                    <version>${version.help.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
