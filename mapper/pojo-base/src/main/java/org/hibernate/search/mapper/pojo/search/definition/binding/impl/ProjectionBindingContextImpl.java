@@ -14,6 +14,8 @@ import java.util.Optional;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
+import org.hibernate.search.engine.search.projection.definition.spi.CompositeProjectionDefinition;
+import org.hibernate.search.engine.search.projection.definition.spi.ObjectProjectionDefinition;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
@@ -36,6 +38,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoMappingHelper mappingHelper;
+	private final ProjectionConstructorParameterBinder<P> parameterBinder;
 	private final Map<String, Object> params;
 	private final PojoTypeModel<?> parameterTypeModel;
 	private final PojoModelConstructorParameterRootElement<P> parameterRootElement;
@@ -45,6 +48,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 	public ProjectionBindingContextImpl(ProjectionConstructorParameterBinder<P> parameterBinder,
 			Map<String, Object> params) {
 		this.mappingHelper = parameterBinder.mappingHelper;
+		this.parameterBinder = parameterBinder;
 		this.params = params;
 		this.parameterTypeModel = parameterBinder.parameter.typeModel();
 		this.parameterRootElement = parameterBinder.parameterRootElement;
@@ -105,6 +109,43 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 	@Override
 	public PojoModelConstructorParameter constructorParameter() {
 		return parameterRootElement;
+	}
+
+	@Override
+	public <T> BeanHolder<? extends ProjectionDefinition<T>> createObjectDefinition(String fieldPath,
+			Class<T> projectedType) {
+		CompositeProjectionDefinition<T> composite = createCompositeProjectionDefinition( projectedType );
+		try {
+			return BeanHolder.ofCloseable( new ObjectProjectionDefinition.SingleValued<>( fieldPath, composite ) );
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( composite );
+			throw e;
+		}
+	}
+
+	@Override
+	public <T> BeanHolder<? extends ProjectionDefinition<List<T>>> createObjectDefinitionMulti(String fieldPath,
+			Class<T> projectedType) {
+		CompositeProjectionDefinition<T> composite = createCompositeProjectionDefinition( projectedType );
+		try {
+			return BeanHolder.ofCloseable( new ObjectProjectionDefinition.MultiValued<>( fieldPath, composite ) );
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( composite );
+			throw e;
+		}
+	}
+
+	private <T> CompositeProjectionDefinition<T> createCompositeProjectionDefinition(Class<T> projectedType) {
+		CompositeProjectionDefinition<T> composite = parameterBinder.createConstructorProjectionDefinitionOrNull(
+				mappingHelper.introspector().typeModel( projectedType ) );
+		if ( composite == null ) {
+			throw log.invalidObjectClassForProjection( projectedType );
+		}
+		return composite;
 	}
 
 	public BeanHolder<? extends ProjectionDefinition<? extends P>> applyBinder(ProjectionBinder binder) {

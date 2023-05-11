@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.search.definition.binding;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -89,5 +90,30 @@ public interface ProjectionBindingContext {
 	 * @see org.hibernate.search.mapper.pojo.mapping.definition.programmatic.MethodParameterMappingStep#projection(BeanReference, Map)
 	 */
 	Optional<Object> paramOptional(String name);
+
+	/**
+	 * @param fieldPath The (relative) path to an object field in the indexed document.
+	 * @param projectedType A type expected to have a corresponding projection mapping
+	 * (e.g. using {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor})
+	 * @return A single-valued object projection definition for the given type.
+	 * @throws SearchException If mapping the given type to a projection definition fails.
+	 * @see org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory#object(String)
+	 * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
+	 */
+	@Incubating
+	<T> BeanHolder<? extends ProjectionDefinition<T>> createObjectDefinition(String fieldPath, Class<T> projectedType);
+
+	/**
+	 * @param fieldPath The (relative) path to an object field in the indexed document.
+	 * @param projectedType A type expected to have a corresponding projection mapping
+	 * (e.g. using {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor})
+	 * @return A multi-valued object projection definition for the given type.
+	 * @throws SearchException If mapping the given type to a projection definition fails.
+	 * @see org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory#object(String)
+	 * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
+	 */
+	@Incubating
+	<T> BeanHolder<? extends ProjectionDefinition<List<T>>> createObjectDefinitionMulti(String fieldPath,
+			Class<T> projectedType);
 
 }

@@ -7,8 +7,9 @@
 NOTE: Projection binders are an advanced feature that application developers generally shouldn't need to bother with.
 Before resorting to custom projection binders,
 consider relying on <<mapping-projection-inner-explicit,explicit projection constructor parameter mapping>>
-using built-in annotations such as <<search-dsl-projection-id-mapping,`@IdProjection`>>
-or <<search-dsl-projection-field-mapping,`@FieldProjection`>>.
+using built-in annotations such as <<search-dsl-projection-id-mapping,`@IdProjection`>>,
+<<search-dsl-projection-field-mapping,`@FieldProjection`>>,
+<<search-dsl-projection-object-mapping,`@ObjectProjection`>>, ...
 
 A projection binder is a pluggable component that implements
 the binding of a constructor parameter to a <<search-dsl-projection,projection>>.
@@ -117,6 +118,57 @@ and its `tags` parameter will be initialized with values returned by the custom 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedirJava17}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/multi/ProjectionBinderMultiIT.java[tags=call]
+----
+====
+
+[[binding-projection-composing]]
+== Composing projection constructors
+
+include::components/incubating-warning.asciidoc[]
+
+You can call `.createObjectDefinition( "someFieldPath", SomeType.class )` on the context passed to the projection binder
+in order to retrieve the definition of an <<search-dsl-projection-object,object projection>>
+based on the <<mapping-projection,projection constructor mapping>> of `SomeType`.
+
+This effectively allows using projection constructors within projection binders,
+simply by passing the resulting definition to `.definition(...)`
+or by delegating to it in a custom projection definition.
+
+Other methods exposed on the binding context work similarly:
+
+* `.createObjectDefinitionMulti(...)` returns a <<binding-projection-multi,multi-valued>> object projection definition.
+
+Below is an example using `.createObjectDefinition(...)` to delegate to another projection constructor.
+
+NOTE: A similar result can be achieved without a custom projection binder,
+simply by relying on <<mapping-projection-inner-inference,implicit inner projection inference>>
+or by using <<search-dsl-projection-object-mapping,`@ObjectProjection`>>.
+This is just to keep the example simple.
+
+.Implementing and using a `ProjectionBinder` that delegates to a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/composing/MyObjectFieldProjectionBinder.java[tags=include]
+----
+<1> Call `createObjectDefinition(...)` to create a definition to delegate to.
+<2> Pass the <<search-dsl-projection-object-syntax,name of the object field to project on>>.
+<3> Pass the <<search-dsl-projection-object-as-mapped,projected type>>.
+<4> Call `definition(...)` and pass the definition created just above.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/composing/MyBookProjection.java[tags=include]
+----
+<1> Apply the binder using the `@ProjectionBinding` annotation.
+<2> Make sure the projected type passed to `createObjectDefinition(...)` has a projection constructor.
+
+The book projection can then be used as any <<search-dsl-projection-mapped,custom projection type>>,
+and its `author` parameter will be initialized with values returned by the custom projection definition:
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/mapper/orm/binding/projectionbinder/composing/ProjectionBinderComposingIT.java[tags=call]
 ----
 ====
 
