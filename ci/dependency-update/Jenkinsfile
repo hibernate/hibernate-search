@@ -38,11 +38,10 @@ Map settings() {
 			]
 		case 'lucene9':
 			return [
-					updateProperties: ['version.org.apache.lucene'],
-					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
-					// Need to rebuild this module in order to get Lucene upgrade changes built and used in tests.
-					// No need to rebuild modules on which this one depends since those should stay unchanged.
-					additionalMavenArgs: '-pl :hibernate-search-backend-lucene'
+					updateProperties: ['version.org.apache.lucene']
+					// In this case we'll rebuild and test everything. Since we have some JDK 11 changes as well as
+					// some driver updates. These changes spans across multiple modules and we would either need to
+					// closely monitor which ones are affected and add them to the build, or ... build everything.
 			]
 		default:
 			return [:]
