@@ -268,7 +268,7 @@ public class DocumentElementStaticFieldNameIT<F> {
 			IndexedEmbeddedDefinition indexedEmbeddedDefinition = new IndexedEmbeddedDefinition(
 					new StubTypeModel( "embedded" ),
 					"excludingObject.", ObjectStructure.FLATTENED,
-					null, Collections.singleton( "pathThatDoesNotMatchAnything" )
+					null, Collections.singleton( "pathThatDoesNotMatchAnything" ), Collections.emptySet()
 			);
 			IndexedEmbeddedBindingContext excludingEmbeddedContext =
 					ctx.addIndexedEmbeddedIfIncluded( indexedEmbeddedDefinition, true ).get();

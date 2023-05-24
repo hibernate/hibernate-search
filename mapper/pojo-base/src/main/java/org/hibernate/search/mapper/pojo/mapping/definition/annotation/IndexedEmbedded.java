@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerEx
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.IndexedEmbeddedProcessor;
+import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.annotation.Search5DeprecatedAPI;
 
 /**
@@ -134,6 +135,9 @@ public @interface IndexedEmbedded {
 	 * i.e. they must not include the {@link #name()}.
 	 */
 	String[] includePaths() default {};
+
+	@Incubating
+	String[] excludePaths() default {};
 
 	/**
 	 * The number of levels of indexed-embedded that will have all their fields included by default.

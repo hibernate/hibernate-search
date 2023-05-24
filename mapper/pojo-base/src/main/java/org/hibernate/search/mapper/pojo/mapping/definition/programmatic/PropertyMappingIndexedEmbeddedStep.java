@@ -53,6 +53,8 @@ public interface PropertyMappingIndexedEmbeddedStep extends PropertyMappingStep 
 	 */
 	PropertyMappingIndexedEmbeddedStep includePaths(Collection<String> paths);
 
+	PropertyMappingIndexedEmbeddedStep excludePaths(Collection<String> paths);
+
 	/**
 	 * @param include Whether the identifier of embedded objects should be included as an index field.
 	 * @return {@code this}, for method chaining.

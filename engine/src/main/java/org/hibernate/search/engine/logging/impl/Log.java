@@ -548,4 +548,9 @@ public interface Log extends BasicLogger {
 	SearchException invalidTypeForEntityProjection(String name, @FormatWith(ClassFormatter.class) Class<?> entityType,
 			@FormatWith(ClassFormatter.class) Class<?> requestedEntityType);
 
+	@Message(id = ID_OFFSET + 119,
+			value = "Include/exclude paths of an indexed embedded are mutually exclusive. " +
+					"Use either `includePaths` or `excludePaths` leaving the other one empty. " +
+					"Included paths are: '%1$s', excluded paths are: '%2$s'.")
+	SearchException cannotIncludeAndExcludePathsWithinSameIndexedEmbedded(Set<String> includePaths, Set<String> excludePaths);
 }
