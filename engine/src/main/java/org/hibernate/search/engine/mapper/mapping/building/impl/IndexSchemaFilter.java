@@ -119,20 +119,27 @@ class IndexSchemaFilter {
 	 */
 	private boolean isPathIncludedInternal(int relativeDepth, String relativePath,
 			boolean markAsEncountered, boolean includedByChild) {
-		boolean includedByThis = depthFilter.isEveryPathIncludedAtDepth( relativeDepth )
-				|| pathFilter.isExplicitlyIncluded( relativePath );
+		boolean includedByThis = ( depthFilter.isEveryPathIncludedAtDepth( relativeDepth )
+				|| pathFilter.isExplicitlyIncluded( relativePath ) )
+				&& !pathFilter.isExplicitlyExcluded( relativePath );
 
 		boolean includedByParent = true;
 		/*
 		 * The parent can filter out paths that are considered as included by a child,
 		 * by reducing the includeDepth in particular,
 		 * but it cannot include paths that are filtered out by a child.
+		 *
+		 * Note: If we only go into recursion when `includedByThis == true` path tracking of parent nodes will not record
+		 * the route.
 		 */
-		if ( parent != null ) {
+		if ( includedByThis && parent != null ) {
 			includedByParent = parent.isPathIncludedInternal(
 					relativeDepth + 1,
 					definition.relativePrefix() + relativePath,
-					markAsEncountered, includedByThis
+					markAsEncountered,
+					// need to include a results from the previous step as it may be that we have an include at the current level
+					// but it was excluded at some ancestor level, and we want to pass it up to the parent.
+					includedByThis && includedByChild
 			);
 		}
 
@@ -140,7 +147,7 @@ class IndexSchemaFilter {
 
 		if ( markAsEncountered && pathTracker != null ) {
 			pathTracker.markAsEncountered(
-					relativePath, includedByThis && includedByChild
+					relativePath, includedByThis, includedByChild
 			);
 		}
 
@@ -227,7 +234,7 @@ class IndexSchemaFilter {
 		DepthFilter newDepthFilter = DepthFilter.of( definition.includeDepth() );
 
 		// The new path filter according to the given includedPaths
-		PathFilter newPathFilter = PathFilter.of( definition.includePaths() );
+		PathFilter newPathFilter = PathFilter.of( definition.includePaths(), definition.excludePaths() );
 
 		return new IndexSchemaFilter(
 				this, definition, pathTracker,

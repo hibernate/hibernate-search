@@ -208,7 +208,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 46, value = "Cyclic @IndexedEmbedded recursion starting from type '%2$s'."
 			+ " Path starting from that type and ending with a cycle: '%1$s'."
 			+ " A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly."
-			+ " To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, ...")
+			+ " To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ...")
 	SearchException indexedEmbeddedCyclicRecursion(String cyclicRecursionPath,
 			@FormatWith(MappableTypeModelFormatter.class) MappableTypeModel parentTypeModel);
 
@@ -548,4 +548,10 @@ public interface Log extends BasicLogger {
 	SearchException invalidTypeForEntityProjection(String name, @FormatWith(ClassFormatter.class) Class<?> entityType,
 			@FormatWith(ClassFormatter.class) Class<?> requestedEntityType);
 
+	@Message(id = ID_OFFSET + 119,
+			value = "'includePaths' and 'excludePaths' cannot be used together in an @IndexedEmbedded. "
+					+ "Use either `includePaths` or `excludePaths` leaving the other one empty. "
+					+ "Included paths are: '%1$s', excluded paths are: '%2$s'.")
+	SearchException cannotIncludeAndExcludePathsWithinSameIndexedEmbedded(Set<String> includePaths,
+			Set<String> excludePaths);
 }

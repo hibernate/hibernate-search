@@ -10,54 +10,122 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-class PathFilter {
-
-	private static final PathFilter UNCONSTRAINED = new PathFilter( Collections.emptySet() );
+abstract class PathFilter {
 
 	static PathFilter unconstrained() {
-		return UNCONSTRAINED;
+		return Unconstrained.INSTANCE;
 	}
 
-	static PathFilter of(Set<String> paths) {
-		if ( paths == null || paths.isEmpty() ) {
+	static PathFilter of(Set<String> includedPaths, Set<String> excludedPaths) {
+		if ( includedPaths == null || includedPaths.isEmpty() ) {
+			if ( excludedPaths != null && !excludedPaths.isEmpty() ) {
+				return new ExcludePathFilter( excludedPaths );
+			}
 			return unconstrained();
 		}
 
 		// The included paths in the filter
-		Set<String> includedPaths = new HashSet<>();
+		Set<String> actualIncludedPaths = new HashSet<>();
 
-		for ( String path : paths ) {
-			includedPaths.add( path );
+		for ( String path : includedPaths ) {
+			actualIncludedPaths.add( path );
 			// Also add paths leading to this path (so that object nodes are not excluded)
-			addSubPathsFromRoot( includedPaths, path );
+			addSubPathsFromRoot( actualIncludedPaths, path );
 		}
 
-		return new PathFilter( includedPaths );
+		return new IncludePathFilter( actualIncludedPaths );
 	}
 
 	/**
-	 * Paths to be included even when the default behavior is to exclude paths.
+	 * Paths that filter works with.
 	 */
-	private final Set<String> includedPaths;
+	protected final Set<String> paths;
 
-	private PathFilter(Set<String> includedPaths) {
-		this.includedPaths = includedPaths;
+	private PathFilter(Set<String> paths) {
+		this.paths = paths;
 	}
 
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "["
-				+ "includedPaths=" + includedPaths
+				+ "paths=" + paths
 				+ "]";
 	}
 
-	boolean isExplicitlyIncluded(String relativePath) {
-		return includedPaths.contains( relativePath );
+	abstract boolean isExplicitlyIncluded(String relativePath);
+	abstract boolean isExplicitlyExcluded(String relativePath);
+
+	abstract boolean isAnyPathExplicitlyIncluded();
+
+	private static class IncludePathFilter extends PathFilter {
+		private IncludePathFilter(Set<String> paths) {
+			super( paths );
+		}
+
+		@Override
+		boolean isExplicitlyIncluded(String relativePath) {
+			return paths.contains( relativePath );
+		}
+
+		@Override
+		boolean isExplicitlyExcluded(String relativePath) {
+			return false;
+		}
+
+		@Override
+		boolean isAnyPathExplicitlyIncluded() {
+			return true;
+		}
 	}
 
-	boolean isAnyPathExplicitlyIncluded() {
-		return !includedPaths.isEmpty();
+	private static class ExcludePathFilter extends PathFilter {
+		private ExcludePathFilter(Set<String> paths) {
+			super( paths );
+		}
+
+		@Override
+		boolean isExplicitlyIncluded(String relativePath) {
+			return false;
+		}
+
+		@Override
+		boolean isExplicitlyExcluded(String relativePath) {
+			for ( String path : paths ) {
+				if ( relativePath.startsWith( path ) ) {
+					return true;
+				}
+			}
+			return paths.contains( relativePath );
+		}
+
+		@Override
+		boolean isAnyPathExplicitlyIncluded() {
+			return false;
+		}
 	}
+
+	private static class Unconstrained extends PathFilter {
+		private static final PathFilter INSTANCE = new Unconstrained();
+		private Unconstrained() {
+			super( Collections.emptySet() );
+		}
+
+		@Override
+		boolean isExplicitlyIncluded(String relativePath) {
+			return false;
+		}
+
+		@Override
+		boolean isExplicitlyExcluded(String relativePath) {
+			return false;
+		}
+
+		@Override
+		boolean isAnyPathExplicitlyIncluded() {
+			return false;
+		}
+	}
+
 
 	private static void addSubPathsFromRoot(Set<String> collector, String path) {
 		int afterPreviousDotIndex = 0;

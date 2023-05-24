@@ -380,6 +380,16 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 						EventContexts.fromType( entry.getKey().definingTypeModel() )
 				) );
 			}
+
+			Set<String> uselessExcludePaths = pathTracker.uselessExcludePaths();
+			// this would mean that we have a path in excludes that is unavailable
+			if ( !uselessExcludePaths.isEmpty() ) {
+				Set<String> encounteredFieldPaths = pathTracker.encounteredFieldPaths();
+				failureCollector.add( log.uselessExcludePathFilters(
+						uselessExcludePaths, encounteredFieldPaths,
+						EventContexts.fromType( entry.getKey().definingTypeModel() )
+				) );
+			}
 		}
 	}
 

@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerEx
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.IndexedEmbeddedProcessor;
+import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.annotation.Search5DeprecatedAPI;
 
 /**
@@ -126,8 +127,10 @@ public @interface IndexedEmbedded {
 	 * <p>
 	 * This takes precedence over {@link #includeDepth()}.
 	 * <p>
-	 * By default, if neither {@code includePaths} nor {@link #includeDepth()} is defined,
+	 * By default, if none of {@code includePaths}, {@code excludePaths} or {@link #includeDepth()} are defined,
 	 * all index fields are included.
+	 * <p>
+	 * Cannot be used when {@link #excludePaths()} contains any paths.
 	 *
 	 * @return The paths of index fields to include explicitly.
 	 * Provided paths must be relative to the indexed-embedded element,
@@ -135,25 +138,45 @@ public @interface IndexedEmbedded {
 	 */
 	String[] includePaths() default {};
 
+	@Incubating
+	/**
+	 * The paths of index fields from the indexed-embedded element that should not be embedded.
+	 * <p>
+	 * This takes precedence over {@link #includeDepth()}.
+	 * <p>
+	 * By default, if none of {@code includePaths}, {@code excludePaths} or {@link #includeDepth()} are defined,
+	 * all index fields are included.
+	 * <p>
+	 * Cannot be used when {@link #includePaths()} contains any paths.
+	 *
+	 * @return The paths of index fields to exclude explicitly.
+	 * Provided paths must be relative to the indexed-embedded element,
+	 * i.e. they must not include the {@link #name()}.
+	 */
+	String[] excludePaths() default {};
+
 	/**
 	 * The number of levels of indexed-embedded that will have all their fields included by default.
 	 * <p>
 	 * {@code includeDepth} is the number of `@IndexedEmbedded` that will be traversed
 	 * and for which all fields of the indexed-embedded element will be included,
-	 * even if these fields are not included explicitly through {@code includePaths}:
+	 * even if these fields are not included explicitly through {@code includePaths},
+	 * unless these fields are excluded explicitly through {@code excludePaths}:
 	 * <ul>
 	 * <li>{@code includeDepth=0} means fields of the indexed-embedded element are <strong>not</strong> included,
 	 * nor is any field of nested indexed-embedded elements,
 	 * unless these fields are included explicitly through {@link #includePaths()}.
 	 * <li>{@code includeDepth=1} means fields of the indexed-embedded element <strong>are</strong> included,
+	 * unless these fields are explicitly excluded through {@code excludePaths},
 	 * but <strong>not</strong> fields of nested indexed-embedded elements,
 	 * unless these fields are included explicitly through {@link #includePaths()}.
 	 * <li>And so on.
 	 * </ul>
-	 * The default value depends on the value of the {@link #includePaths()} attribute:
-	 * if {@link #includePaths()} is empty, the default is {@code Integer.MAX_VALUE} (include all fields at every level)
-	 * if {@link #includePaths()} is <strong>not</strong> empty, the default is {@code 0}
-	 * (only include fields included explicitly).
+	 * The default value depends on the value of {@link #includePaths()}/{@link #excludePaths()} attributes:
+	 * <ul>
+	 * <li>if {@link #includePaths()} is empty, the default is {@code Integer.MAX_VALUE} (include all fields at every level)</li>
+	 * <li>if {@link #includePaths()} is <strong>not</strong> empty, the default is {@code 0} (only include fields included explicitly).</li>
+	 * </ul>
 	 *
 	 * @return The number of levels of indexed-embedded that will have all their fields included by default.
 	 */

@@ -12,6 +12,7 @@ import java.util.Collection;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.annotation.Search5DeprecatedAPI;
 
 /**
@@ -52,6 +53,26 @@ public interface PropertyMappingIndexedEmbeddedStep extends PropertyMappingStep 
 	 * @see IndexedEmbedded#includePaths()
 	 */
 	PropertyMappingIndexedEmbeddedStep includePaths(Collection<String> paths);
+
+	/**
+	 * @param paths The paths of index fields to exclude.
+	 * @return {@code this}, for method chaining.
+	 *
+	 * @see IndexedEmbedded#excludePaths()
+	 */
+	@Incubating
+	default PropertyMappingIndexedEmbeddedStep excludePaths(String... paths) {
+		return excludePaths( Arrays.asList( paths ) );
+	}
+
+	/**
+	 * @param paths The paths of index fields to exclude.
+	 * @return {@code this}, for method chaining.
+	 *
+	 * @see IndexedEmbedded#excludePaths()
+	 */
+	@Incubating
+	PropertyMappingIndexedEmbeddedStep excludePaths(Collection<String> paths);
 
 	/**
 	 * @param include Whether the identifier of embedded objects should be included as an index field.

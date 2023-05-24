@@ -870,4 +870,13 @@ public interface Log extends BasicLogger {
 	SearchException invalidParameterTypeForHighlightProjectionInProjectionConstructor(
 			@FormatWith(ClassFormatter.class) Class<?> rawClass);
 
+	@Message(id = ID_OFFSET + 142,
+			value = "An @IndexedEmbedded defines excludePaths filters that do not match anything."
+					+ " Non-matching excludePaths filters: %1$s."
+					+ " Encountered field paths: %2$s."
+					+ " Check the filters for typos, or remove them if they are not useful."
+	)
+	SearchException uselessExcludePathFilters(Set<String> nonMatchingExcludePaths, Set<String> encounteredFieldPaths,
+			@Param EventContext eventContext);
+
 }

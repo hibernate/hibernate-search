@@ -257,7 +257,7 @@ which Hibernate Search will detect and reject with an exception.
 
 To address these problems, it is possible to filter the fields to embed,
 to only include those that are actually useful.
-Two filtering attributes are available on `@IndexedEmbedded` and may be combined:
+Available filtering attributes on `@IndexedEmbedded` are:
 
 `includePaths`::
 The paths of index fields from the indexed-embedded element that should be embedded.
@@ -267,24 +267,39 @@ i.e. they must not include its <<mapping-indexedembedded-name,name>>
 or <<mapping-indexedembedded-prefix,prefix>>.
 +
 This takes precedence over `includeDepth` (see below).
++
+Cannot be used in combination with `excludePaths` in the same `@IndexedEmbedded`.
+`excludePaths`::
+The paths of index fields from the indexed-embedded element that must *not* be embedded.
++
+Provided paths must be relative to the indexed-embedded element,
+i.e. they must not include its <<mapping-indexedembedded-name,name>>
+or <<mapping-indexedembedded-prefix,prefix>>.
++
+This takes precedence over `includeDepth` (see below).
++
+Cannot be used in combination with `includePaths` in the same `@IndexedEmbedded`.
 `includeDepth`::
 The number of levels of indexed-embedded that will have all their fields included by default.
 +
 `includeDepth` is the number of `@IndexedEmbedded` that will be traversed
 and for which all fields of the indexed-embedded element will be included,
-even if these fields are not included explicitly through `includePaths`:
+even if these fields are not included explicitly through `includePaths`,
+unless these fields are excluded explicitly through `excludePaths`:
 +
  * `includeDepth=0` means that fields of the indexed-embedded element are *not* included,
 nor is any field of nested indexed-embedded elements,
 unless these fields are included explicitly through `includePaths`.
  * `includeDepth=1` means that fields of the indexed-embedded element *are* included,
+unless these fields are excluded explicitly through `excludePaths`,
 but *not* fields of nested indexed-embedded elements,
 unless these fields are included explicitly through `includePaths`.
  * And so on.
 +
 The default value depends on the value of the `includePaths` attribute:
-if `includePaths` is empty, the default is `Integer.MAX_VALUE` (include all fields at every level)
-if `includePaths` is *not* empty, the default is `0`
++
+* if `includePaths` is empty, the default is `Integer.MAX_VALUE` (include all fields at every level)
+* if `includePaths` is *not* empty, the default is `0`
 (only include fields included explicitly).
 
 [NOTE]
@@ -298,8 +313,16 @@ constraints only need to match the nearest static parent of a dynamic field
 in order for that field to be included.
 ====
 
-Below are two examples: one leveraging `includePaths` only,
-and one leveraging `includePaths` and `includeDepth`.
+[NOTE]
+.Mixing `includePaths` and `excludePaths` at different nesting levels
+====
+In general, it is possible to use `includePaths` and `excludePaths` at different levels of nested `@IndexedEmbedded`.
+When doing so, keep in mind that the filter at each level can only reference reachable paths,
+i.e. a filter cannot reference a path that was excluded by a nested `@IndexedEmbedded` (implicitly or explicitly).
+====
+
+Below are three examples: one leveraging `includePaths` only,
+one leveraging `excludePaths`, and one leveraging `includePaths` and `includeDepth`
 
 [[indexedembedded-includePath]]
 .Filtering indexed-embedded fields with `includePaths`
@@ -322,6 +345,29 @@ and *not* explicitly included either because `includePaths` on `parents` does no
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/includepaths/Human.java[tags=include;!getters-setters]
+----
+====
+
+[[indexedembedded-excludePath]]
+.Filtering indexed-embedded fields with `excludePaths`
+====
+This mapping will result in the same schema as in the <<indexedembedded-includePath>> example, but through using the `excludePaths` instead.
+Following fields in the `Human` index will be declared:
+
+* `name`
+* `nickname`
+* `parents.name`: implicitly included because `includeDepth` on `parents` defaults to `Integer.MAX_VALUE`.
+* `parents.nickname`: implicitly included because `includeDepth` on `parents` defaults to `Integer.MAX_VALUE`.
+* `parents.parents.name`: implicitly included because `includeDepth` on `parents` defaults to `Integer.MAX_VALUE`.
+
+The following fields in particular are excluded:
+
+* `parents.parents.nickname`: *not* included because `excludePaths` explicitly excludes `parents.nickname`.
+* `parents.parents.parents`/`parents.parents.parents.<any-field>`: *not* included because `excludePaths` explicitly excludes `parents.parents` stopping any further traversing.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/excludepaths/Human.java[tags=include;!getters-setters]
 ----
 ====
 
