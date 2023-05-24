@@ -30,14 +30,7 @@ public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProces
 		Integer cleanedUpIncludeDepth = context.toNullIfDefault( annotation.includeDepth(), -1 );
 
 		String[] includePathsArray = annotation.includePaths();
-		Set<String> cleanedUpIncludePaths;
-		if ( includePathsArray.length > 0 ) {
-			cleanedUpIncludePaths = new HashSet<>();
-			Collections.addAll( cleanedUpIncludePaths, includePathsArray );
-		}
-		else {
-			cleanedUpIncludePaths = Collections.emptySet();
-		}
+		String[] excludePathsArray = annotation.excludePaths();
 
 		ContainerExtractorPath extractorPath = context.toContainerExtractorPath( annotation.extraction() );
 
@@ -50,8 +43,21 @@ public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProces
 				.prefix( cleanedUpPrefix )
 				.structure( structure )
 				.includeDepth( cleanedUpIncludeDepth )
-				.includePaths( cleanedUpIncludePaths )
+				.includePaths( cleanUpPaths( includePathsArray ) )
+				.excludePaths( cleanUpPaths( excludePathsArray ) )
 				.includeEmbeddedObjectId( annotation.includeEmbeddedObjectId() )
 				.targetType( cleanedUpTargetType );
+	}
+
+	private Set<String> cleanUpPaths(String[] pathsArray) {
+		Set<String> paths;
+		if ( pathsArray.length > 0 ) {
+			paths = new HashSet<>();
+			Collections.addAll( paths, pathsArray );
+		}
+		else {
+			paths = Collections.emptySet();
+		}
+		return paths;
 	}
 }

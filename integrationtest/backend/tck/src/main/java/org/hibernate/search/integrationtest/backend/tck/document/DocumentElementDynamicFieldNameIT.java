@@ -265,7 +265,7 @@ public class DocumentElementDynamicFieldNameIT<F> {
 			IndexedEmbeddedDefinition indexedEmbeddedDefinition = new IndexedEmbeddedDefinition(
 					new StubTypeModel( "embedded" ),
 					"excludingObject.", ObjectStructure.FLATTENED,
-					null, Collections.singleton( "pathThatDoesNotMatchAnything" )
+					null, Collections.singleton( "pathThatDoesNotMatchAnything" ), Collections.emptySet()
 			);
 			// Ignore the result, we'll just reference "excludingObject" by its name
 			ctx.addIndexedEmbeddedIfIncluded( indexedEmbeddedDefinition, true ).get();

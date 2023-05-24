@@ -27,6 +27,8 @@ public final class IndexedEmbeddedPathTracker {
 	// Use a LinkedHashSet, since the set will be exposed through a getter and may be iterated on
 	private final Map<String, Boolean> encounteredFieldPaths = new LinkedHashMap<>();
 
+	private final Map<String, Boolean> childEncounteredFieldPaths = new LinkedHashMap<>();
+
 	public IndexedEmbeddedPathTracker(IndexedEmbeddedDefinition definition) {
 		this.definition = definition;
 	}
@@ -43,13 +45,35 @@ public final class IndexedEmbeddedPathTracker {
 		return uselessIncludePaths;
 	}
 
+	public Set<String> uselessExcludePaths() {
+		Set<String> uselessExcludePaths = new LinkedHashSet<>();
+		for ( String path : definition.excludePaths() ) {
+			if (
+				// since it's exclude we should always get a FALSE value from this map for such key.
+				// Hence, we only want to check for fields that we never encountered i.e. some typos in property names or just some "pointless" text :)
+					!encounteredFieldPaths.containsKey( path )
+							// OR the field was also "explicitly" excluded by a child, which would be redundant...
+							// If it wasn't encountered then it is already covered by a containsKey check above.
+							|| !childEncounteredFieldPaths.getOrDefault( path, Boolean.TRUE )
+			) {
+				// An "excludePaths" filter that does not result in exclusion is useless
+				uselessExcludePaths.add( path );
+			}
+		}
+		return uselessExcludePaths;
+	}
+
 	public Set<String> encounteredFieldPaths() {
 		return encounteredFieldPaths.keySet();
 	}
 
-	public void markAsEncountered(String relativePath, boolean included) {
+	public void markAsEncountered(String relativePath, boolean includedByThis, boolean includedByChild) {
 		encounteredFieldPaths.merge(
-				relativePath, included,
+				relativePath, includedByThis,
+				(included1, included2) -> included1 || included2
+		);
+		childEncounteredFieldPaths.merge(
+				relativePath, includedByChild,
 				(included1, included2) -> included1 || included2
 		);
 	}

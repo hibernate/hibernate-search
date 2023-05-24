@@ -8,6 +8,7 @@ package org.hibernate.search.engine.mapper.mapping.building.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.common.impl.CollectionHelper.asSet;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
@@ -30,7 +31,6 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDe
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -99,7 +99,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.prefix1_",
-				null, null
+				null, null, null
 		);
 		checkFooBarIncluded( "prefix1_", level1Context );
 
@@ -113,7 +113,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"prefix1_level2", level1Context, typeModel2Mock, "level2.prefix2_",
-				null, null
+				null, null, null
 		);
 		checkFooBarIncluded( "prefix2_", level2Context );
 	}
@@ -124,14 +124,14 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.prefix1_",
-				null, null
+				null, null, null
 		);
 		checkFooBarIncluded( "prefix1_", level1Context );
 
 		assertThatThrownBy( () -> {
 				IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
 						typeModel1Mock, "level1.prefix1_", ObjectStructure.DEFAULT,
-						null, null
+						null, null, null
 				);
 				level1Context.addIndexedEmbeddedIfIncluded(
 						level1Definition, new IndexedEmbeddedPathTracker( level1Definition ),
@@ -151,18 +151,18 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.prefix1_",
-				null, null
+				null, null, null
 		);
 
 		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"prefix1_level2", level1Context, typeModel1Mock, "level2.prefix2_",
-				null, null
+				null, null, null
 		);
 
 		assertThatThrownBy( () -> {
 			IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
 					typeModel1Mock, "level1.prefix1_", ObjectStructure.DEFAULT,
-					null, null
+					null, null, null
 			);
 			level2Context.addIndexedEmbeddedIfIncluded(
 					level2Definition, new IndexedEmbeddedPathTracker( level2Definition ),
@@ -191,7 +191,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 				.thenReturn( expectedReturn );
 		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition(
 				typeModel1Mock, "level1.level2.level3.prefix1_", ObjectStructure.DEFAULT,
-				null, null
+				null, null, null
 		);
 		actualReturn = rootContext.addIndexedEmbeddedIfIncluded(
 				definition, new IndexedEmbeddedPathTracker( definition ),
@@ -224,7 +224,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.",
-				null, includePaths
+				null, includePaths, null
 		);
 		checkFooBarExcluded( "", level1Context );
 		checkFooBarIndexedEmbeddedExcluded( level1Context, typeModel2Mock );
@@ -251,7 +251,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.",
-				null, null
+				null, null, null
 		);
 		checkFooBarExcluded( "", level2Context );
 		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
@@ -266,7 +266,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.prefix2_",
-				null, null
+				null, null, null
 		);
 		checkFooBarExcluded( "prefix2_", level2Context );
 		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
@@ -284,7 +284,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.",
-				null, includePaths
+				null, includePaths, null
 		);
 		checkFooBarExcluded( "", level2Context );
 		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
@@ -312,7 +312,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		includePaths.add( "level2IndexedEmbedded.notEncountered" );
 		includePaths.add( "level2IndexedEmbedded.excludedBecauseOfLevel2" );
 		IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
-				typeModel1Mock, "level1.", ObjectStructure.DEFAULT, null, includePaths
+				typeModel1Mock, "level1.", ObjectStructure.DEFAULT, null, includePaths, null
 		);
 		IndexedEmbeddedPathTracker level1PathTracker = new IndexedEmbeddedPathTracker( level1Definition );
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
@@ -322,6 +322,8 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		// Initially no path was encountered so all includePaths are useless
 		assertThat( level1PathTracker.encounteredFieldPaths() )
 				.isEmpty();
+		// We have no exclude paths so it should be empty all the time:
+		assertThat( level1PathTracker.uselessExcludePaths() ).isEmpty();
 		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						"included",
@@ -342,6 +344,8 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 						"included", // Added
 						"excludedBecauseOfLevel1" // Added
 				);
+		// We have no exclude paths so it should be empty all the time:
+		assertThat( level1PathTracker.uselessExcludePaths() ).isEmpty();
 		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						// "included" removed
@@ -363,6 +367,8 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 						"excludedBecauseOfLevel1",
 						"level2NonIndexedEmbedded" // Added
 				);
+		// We have no exclude paths so it should be empty all the time:
+		assertThat( level1PathTracker.uselessExcludePaths() ).isEmpty();
 		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
@@ -385,6 +391,8 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 						"level2NonIndexedEmbedded.included", // Added
 						"level2NonIndexedEmbedded.excludedBecauseOfLevel1" // Added
 				);
+		// We have no exclude paths so it should be empty all the time:
+		assertThat( level1PathTracker.uselessExcludePaths() ).isEmpty();
 		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
@@ -402,7 +410,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		includePaths.add( "excludedBecauseOfLevel1" );
 		IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
 				typeModel2Mock, "level2IndexedEmbedded.", ObjectStructure.DEFAULT,
-				null, includePaths
+				null, includePaths, null
 		);
 		IndexedEmbeddedPathTracker level2PathTracker = new IndexedEmbeddedPathTracker( level2Definition );
 		ConfiguredIndexSchemaNestingContext level2IndexedEmbeddedContext = checkSimpleIndexedEmbeddedIncluded(
@@ -426,6 +434,8 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 						"notEncountered",
 						"excludedBecauseOfLevel1"
 				);
+		// We have no exclude paths so it should be empty all the time:
+		assertThat( level1PathTracker.uselessExcludePaths() ).isEmpty();
 		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						// No change expected
@@ -461,6 +471,8 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 						"notEncountered"
 						// "excludedBecauseOfLevel1" removed
 				);
+		// We have no exclude paths so it should be empty all the time:
+		assertThat( level1PathTracker.uselessExcludePaths() ).isEmpty();
 		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
@@ -487,14 +499,16 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 						"level2NonIndexedEmbedded.excludedBecauseOfLevel1",
 						"level2IndexedEmbedded",
 						"level2IndexedEmbedded.included",
-						"level2IndexedEmbedded.excludedBecauseOfLevel1",
-						"level2IndexedEmbedded.excludedBecauseOfLevel2" // Added
+						"level2IndexedEmbedded.excludedBecauseOfLevel1"
+						//"level2IndexedEmbedded.excludedBecauseOfLevel2" // should not be added since it is excluded at lvl2, hence it wasn't encountered at lvl1.
 				);
 		assertThat( level2PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						// No change expected
 						"notEncountered"
 				);
+		// We have no exclude paths so it should be empty all the time:
+		assertThat( level1PathTracker.uselessExcludePaths() ).isEmpty();
 		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
@@ -505,6 +519,394 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 				);
 	}
 
+	/*
+	 * Test is using the following pseudo model ( all IndexedEmbedded has "notEncountered" excludes ):
+	 *
+	 * public static class Indexed {
+	 * 		String exclude;
+	 * 		String include;
+	 * 		@IndexedEmbedded( exclude Level1( exclude, level2.exclude, level2.level3.exclude ))
+	 * 		Level1 level1;
+	 * 		Level1 level1NotIndexed;
+	 * 	}
+	 *
+	 * 	public static class Level1 {
+	 * 		String exclude;
+	 * 		String include;
+	 * 		@IndexedEmbedded( exclude Level2(String exclude) )
+	 * 		Level2 level2;
+	 * 	}
+	 *
+	 * 	public static class Level2 {
+	 * 		String exclude;
+	 * 		String include;
+	 * 		String excludedInLevel1Embedded;
+	 * 		@IndexedEmbedded
+	 * 		Level3 level3;
+	 * 		Level3 level3NotAnnotated;
+	 * 	}
+	 *
+	 * 	public static class Level3 {
+	 * 		String exclude;
+	 * 		String include;
+	 * 	}
+	 */
+
+	@Test
+	public void indexedEmbedded_excludePaths_tracking() {
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+
+		Set<String> excludePaths = new HashSet<>();
+		excludePaths.add( "exclude" );
+		excludePaths.add( "notEncountered" );
+		excludePaths.add( "level2.exclude" );
+		excludePaths.add( "level2.notEncountered" );
+		excludePaths.add( "level2.level3.exclude" );
+		excludePaths.add( "level2.level3.notEncountered" );
+
+		IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
+				typeModel1Mock, "level1.", ObjectStructure.DEFAULT, null, null, excludePaths
+		);
+		IndexedEmbeddedPathTracker level1PathTracker = new IndexedEmbeddedPathTracker( level1Definition );
+		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+				"level1", rootContext,
+				level1Definition, level1PathTracker
+		);
+		// Initially no path was encountered so all excludePaths are useless and there's no include paths so no useless included paths as a result
+		assertThat( level1PathTracker.encounteredFieldPaths() ).isEmpty();
+		assertThat( level1PathTracker.uselessIncludePaths() ).isEmpty();
+		assertThat( level1PathTracker.uselessExcludePaths() ).containsOnlyOnceElementsOf( excludePaths );
+
+
+		// Encounter "excluded" and "included"
+		checkLeafExcluded( "exclude", level1Context, "exclude" );
+		checkLeafIncluded( "include", level1Context, "include" );
+		assertThat( level1PathTracker.encounteredFieldPaths() )
+				.containsOnly(
+						"exclude", // Added
+						"include" // Added
+				);
+		// We have no include paths so it should be empty all the time:
+		assertThat( level1PathTracker.uselessIncludePaths() ).isEmpty();
+		assertThat( level1PathTracker.uselessExcludePaths() )
+				.containsOnly(
+						// "exclude", // removed
+						"notEncountered",
+						"level2.exclude",
+						"level2.notEncountered",
+						"level2.level3.exclude",
+						"level2.level3.notEncountered"
+				);
+
+		IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
+				typeModel2Mock, "level2.", ObjectStructure.DEFAULT,
+				null, null, asSet( "excludedInLevel1Embedded", "notEncountered" )
+		);
+		IndexedEmbeddedPathTracker level2PathTracker = new IndexedEmbeddedPathTracker( level2Definition );
+		ConfiguredIndexSchemaNestingContext level2IndexedEmbeddedContext = checkSimpleIndexedEmbeddedIncluded(
+				"level2", level1Context,
+				level2Definition, level2PathTracker
+		);
+		assertThat( level2PathTracker.encounteredFieldPaths() ).isEmpty();
+		assertThat( level1PathTracker.encounteredFieldPaths() )
+				.containsOnly(
+						"exclude",
+						"include",
+						"level2" // Added
+				);
+		assertThat( level2PathTracker.uselessIncludePaths() ).isEmpty();
+		assertThat( level2PathTracker.uselessExcludePaths() )
+				.containsOnly(
+						"notEncountered",
+						"excludedInLevel1Embedded"
+				);
+
+		// go through level2 properties:
+		checkLeafIncluded( "include", level2IndexedEmbeddedContext, "include" );
+		checkLeafExcluded( "exclude", level2IndexedEmbeddedContext, "exclude" );
+		checkLeafExcluded( "excludedInLevel1Embedded", level2IndexedEmbeddedContext, "excludedInLevel1Embedded" );
+
+		assertThat( level2PathTracker.encounteredFieldPaths() )
+				.containsOnly(
+						"include", // Added
+						"exclude", // Added
+						"excludedInLevel1Embedded" // Added
+				);
+		assertThat( level1PathTracker.encounteredFieldPaths() )
+				.containsOnly(
+						"exclude",
+						"include",
+						"level2",
+						"level2.include", // Added
+						"level2.exclude" // Added
+						// "level2.excludedInLevel1Embedded" // Should not be added since it was excluded at lvl2 tracking.
+				);
+		assertThat( level2PathTracker.uselessIncludePaths() ).isEmpty();
+		assertThat( level2PathTracker.uselessExcludePaths() )
+				.containsOnly(
+						"notEncountered"
+						// "excludedInLevel1Embedded" // Removed
+				);
+		assertThat( level1PathTracker.uselessIncludePaths() ).isEmpty();
+		assertThat( level1PathTracker.uselessExcludePaths() )
+				.containsOnly(
+						// "exclude", // removed
+						"notEncountered",
+						// "level2.exclude", // removed
+						"level2.notEncountered",
+						"level2.level3.exclude",
+						"level2.level3.notEncountered"
+				);
+
+
+		IndexedEmbeddedDefinition level3Definition = new IndexedEmbeddedDefinition(
+				typeModel3Mock, "level3.", ObjectStructure.DEFAULT,
+				null, null, asSet( "notEncountered" )
+		);
+		IndexedEmbeddedPathTracker level3PathTracker = new IndexedEmbeddedPathTracker( level3Definition );
+		ConfiguredIndexSchemaNestingContext level3IndexedEmbeddedContext = checkSimpleIndexedEmbeddedIncluded(
+				"level3", level2IndexedEmbeddedContext,
+				level3Definition, level3PathTracker
+		);
+		assertThat( level3PathTracker.encounteredFieldPaths() ).isEmpty();
+		assertThat( level2PathTracker.encounteredFieldPaths() ).containsOnly(
+				"include",
+				"exclude",
+				"excludedInLevel1Embedded",
+				"level3" // Added
+		);
+		assertThat( level1PathTracker.encounteredFieldPaths() )
+				.containsOnly(
+						"exclude",
+						"include",
+						"level2",
+						"level2.include",
+						"level2.exclude",
+						"level2.level3"
+				);
+		assertThat( level2PathTracker.uselessIncludePaths() ).isEmpty();
+		assertThat( level2PathTracker.uselessExcludePaths() )
+				.containsOnly(
+						"notEncountered"
+				);
+		assertThat( level1PathTracker.uselessIncludePaths() ).isEmpty();
+		assertThat( level1PathTracker.uselessExcludePaths() )
+				.containsOnly(
+						"notEncountered",
+						"level2.notEncountered",
+						"level2.level3.exclude",
+						"level2.level3.notEncountered"
+				);
+
+		checkLeafIncluded( "include", level3IndexedEmbeddedContext, "include" );
+		checkLeafExcluded( "exclude", level3IndexedEmbeddedContext, "exclude" );
+
+		assertThat( level3PathTracker.encounteredFieldPaths() ).containsOnly(
+				"include", // Added
+				"exclude" // Added
+		);
+		assertThat( level2PathTracker.encounteredFieldPaths() ).containsOnly(
+				"include",
+				"exclude",
+				"excludedInLevel1Embedded",
+				"level3",
+				"level3.include", // Added
+				"level3.exclude" // Added
+		);
+		assertThat( level1PathTracker.encounteredFieldPaths() )
+				.containsOnly(
+						"exclude",
+						"include",
+						"level2",
+						"level2.include",
+						"level2.exclude",
+						"level2.level3",
+						"level2.level3.include", // Added
+						"level2.level3.exclude" // Added
+				);
+		assertThat( level2PathTracker.uselessIncludePaths() ).isEmpty();
+		assertThat( level2PathTracker.uselessExcludePaths() )
+				.containsOnly(
+						"notEncountered"
+				);
+		assertThat( level1PathTracker.uselessIncludePaths() ).isEmpty();
+		assertThat( level1PathTracker.uselessExcludePaths() )
+				.containsOnly(
+						"notEncountered",
+						"level2.notEncountered",
+						// "level2.level3.exclude", // removed
+						"level2.level3.notEncountered"
+				);
+	}
+
+	/*
+	 * Test is using the following pseudo model:
+	 *
+	 * public static class Indexed {
+	 * 		String exclude;
+	 * 		String include;
+	 * 		@IndexedEmbedded( depth = 1 exclude = level2.exclude))
+	 * 		Level1 level1;
+	 * 		Level1 level1NotIndexed;
+	 * 	}
+	 *
+	 * 	public static class Level1 {
+	 * 		String exclude;
+	 * 		String include;
+	 * 		@IndexedEmbedded
+	 * 		Level2 level2;
+	 * 	}
+	 *
+	 * 	public static class Level2 {
+	 * 		String exclude;
+	 * 		String include;
+	 * 		String excludedInLevel1Embedded;
+	 * 		@IndexedEmbedded
+	 * 		Level3 level3;
+	 * 		Level3 level3NotAnnotated;
+	 * 	}
+	 *
+	 * 	public static class Level3 {
+	 * 		String exclude;
+	 * 		String include;
+	 * 	}
+	 */
+
+	@Test
+	public void indexedEmbedded_excludePaths_depth1_exclude_level2() {
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+
+		Set<String> excludePaths = new HashSet<>();
+		excludePaths.add( "level2.exclude" );
+
+		IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
+				typeModel1Mock, "level1.", ObjectStructure.DEFAULT, 1, null, excludePaths
+		);
+		IndexedEmbeddedPathTracker level1PathTracker = new IndexedEmbeddedPathTracker( level1Definition );
+		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+				"level1", rootContext,
+				level1Definition, level1PathTracker
+		);
+		// Initially no path was encountered so all excludePaths are useless and there's no include paths so no useless included paths as a result
+		assertThat( level1PathTracker.encounteredFieldPaths() ).isEmpty();
+		assertThat( level1PathTracker.uselessIncludePaths() ).isEmpty();
+		assertThat( level1PathTracker.uselessExcludePaths() ).containsOnlyOnceElementsOf( excludePaths );
+
+
+		// Encounter "excluded" and "included"
+		checkLeafIncluded( "exclude", level1Context, "exclude" );
+		checkLeafIncluded( "include", level1Context, "include" );
+
+		// We have no include paths so it should be empty all the time:
+		assertThat( level1PathTracker.uselessIncludePaths() ).isEmpty();
+		assertThat( level1PathTracker.uselessExcludePaths() )
+				.containsOnly(
+						"level2.exclude" // so far it is useless
+				);
+
+		IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
+				typeModel2Mock, "level2.", ObjectStructure.DEFAULT,
+				null, null, null
+		);
+		IndexedEmbeddedPathTracker level2PathTracker = new IndexedEmbeddedPathTracker( level2Definition );
+		checkSimpleIndexedEmbeddedExcluded(
+				level1Context,
+				level2Definition, level2PathTracker
+		);
+
+		assertThat( level1PathTracker.uselessExcludePaths() )
+				.containsOnly(
+						"level2.exclude" // it is still useless
+				);
+
+		assertThat( level2PathTracker.uselessExcludePaths() ).isEmpty();
+	}
+
+	/*
+	 * Test is using the following pseudo model:
+	 *
+	 * public static class Indexed {
+	 * 		String exclude;
+	 * 		String include;
+	 * 		@IndexedEmbedded( exclude = level2.exclude ))
+	 * 		Level1 level1;
+	 * 		Level1 level1NotIndexed;
+	 * 	}
+	 *
+	 * 	public static class Level1 {
+	 * 		String exclude;
+	 * 		String include;
+	 * 		@IndexedEmbedded( exclude = exclude ))
+	 * 		Level2 level2;
+	 * 	}
+	 *
+	 * 	public static class Level2 {
+	 * 		String exclude;
+	 * 		String include;
+	 * 		String excludedInLevel1Embedded;
+	 * 		@IndexedEmbedded
+	 * 		Level3 level3;
+	 * 		Level3 level3NotAnnotated;
+	 * 	}
+	 *
+	 * 	public static class Level3 {
+	 * 		String exclude;
+	 * 		String include;
+	 * 	}
+	 */
+
+	@Test
+	public void indexedEmbedded_excludePaths_same_field_different_levels() {
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+
+		Set<String> excludePaths = new HashSet<>();
+		excludePaths.add( "level2.exclude" );
+
+		IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
+				typeModel1Mock, "level1.", ObjectStructure.DEFAULT, null, null, excludePaths
+		);
+		IndexedEmbeddedPathTracker level1PathTracker = new IndexedEmbeddedPathTracker( level1Definition );
+		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+				"level1", rootContext,
+				level1Definition, level1PathTracker
+		);
+		// Initially no path was encountered so all excludePaths are useless and there's no include paths so no useless included paths as a result
+		assertThat( level1PathTracker.encounteredFieldPaths() ).isEmpty();
+		assertThat( level1PathTracker.uselessIncludePaths() ).isEmpty();
+		assertThat( level1PathTracker.uselessExcludePaths() ).containsOnlyOnceElementsOf( excludePaths );
+
+
+		// Encounter "excluded" and "included"
+		checkLeafIncluded( "exclude", level1Context, "exclude" );
+		checkLeafIncluded( "include", level1Context, "include" );
+
+		// We have no include paths so it should be empty all the time:
+		assertThat( level1PathTracker.uselessIncludePaths() ).isEmpty();
+		assertThat( level1PathTracker.uselessExcludePaths() )
+				.containsOnly(
+						"level2.exclude" // so far it is useless
+				);
+
+		IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
+				typeModel2Mock, "level2.", ObjectStructure.DEFAULT,
+				null, null, asSet( "exclude" )
+		);
+		IndexedEmbeddedPathTracker level2PathTracker = new IndexedEmbeddedPathTracker( level2Definition );
+		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
+				"level2", level1Context,
+				level2Definition, level2PathTracker
+		);
+
+		checkLeafExcluded( "exclude", level2Context, "exclude" );
+		checkLeafIncluded( "include", level2Context, "include" );
+
+		assertThat( level1PathTracker.uselessExcludePaths() ).containsOnly(
+				"level2.exclude" // added since we have an exclude filter at lvl2 already...
+		);
+
+		assertThat( level2PathTracker.uselessExcludePaths() ).isEmpty();
+	}
+
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2194")
 	public void indexedEmbedded_noFilterThenIncludePaths() {
@@ -513,13 +915,13 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		// First level of @IndexedEmbedded: no filter
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"professionnelGC", rootContext, typeModel1Mock, "professionnelGC.",
-				null, null
+				null, null, null
 		);
 
 		// Second level of @IndexedEmbedded: includePaths filter
 		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"groupe", level1Context, typeModel1Mock, "groupe.",
-				null, CollectionHelper.asSet( "raisonSociale" )
+				null, asSet( "raisonSociale" ), null
 		);
 
 		checkLeafIncluded( "raisonSociale", level2Context, "raisonSociale" );
@@ -535,7 +937,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		checkSimpleIndexedEmbeddedExcluded(
 				rootContext, typeModel1Mock,
-				"level1.", 0, null
+				"level1.", 0, null, null
 		);
 	}
 
@@ -544,12 +946,13 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		// Depth == 1 => implicitly include all fields at the first level,
+		// unless a field is explicitly excluded,
 		// but only include nested indexed-embeddeds and their fields if they are explicitly included.
-		// (which they won't, because we don't use includePaths here).
+		// (which they won't, because we don't use includePaths/excludePaths here).
 
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock,
-				"level1.", 1, null
+				"level1.", 1, null, null
 		);
 		checkFooBarIncluded( "", level1Context );
 		checkFooBarIndexedEmbeddedExcluded( level1Context, typeModel2Mock );
@@ -574,7 +977,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock,
-				"level1.", 3, null
+				"level1.", 3, null, null
 		);
 		checkFooBarIncluded( "", level1Context );
 
@@ -596,7 +999,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"level2", level1Context, typeModel2Mock,
-				"level2.", null, null
+				"level2.", null, null, null
 		);
 		checkFooBarIncluded( "", level2Context );
 		level3NonIndexedEmbeddedContext =
@@ -608,7 +1011,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		ConfiguredIndexSchemaNestingContext level3Context = checkSimpleIndexedEmbeddedIncluded(
 				"level3", level2Context, typeModel3Mock,
-				"level3.", null, null
+				"level3.", null, null, null
 		);
 		checkFooBarIncluded( "", level3Context );
 		level4NonIndexedEmbeddedContext =
@@ -617,20 +1020,20 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		checkSimpleIndexedEmbeddedExcluded(
 				level3Context, typeModel4Mock,
-				"level4.", null, null
+				"level4.", null, null, null
 		);
 
 		// Check IndexedEmbedded composition with a depth override
 
 		level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"level2", level1Context, typeModel2Mock,
-				"level2.", 1, null
+				"level2.", 1, null, null
 		);
 		checkFooBarIncluded( "", level2Context );
 
 		checkSimpleIndexedEmbeddedExcluded(
 				level2Context, typeModel3Mock,
-				"level3.", null, null
+				"level3.", null, null, null
 		);
 	}
 
@@ -645,7 +1048,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.",
-				1, includePaths
+				1, includePaths, null
 		);
 		checkFooBarIncluded( "", level1Context );
 		checkFooBarIndexedEmbeddedExcluded( level1Context, typeModel2Mock );
@@ -661,7 +1064,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.",
-				null, null
+				null, null, null
 		);
 		checkFooBarExcluded( "", level2Context );
 		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
@@ -676,7 +1079,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.prefix2_",
-				null, null
+				null, null, null
 		);
 		checkFooBarExcluded( "prefix2_", level2Context );
 		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
@@ -694,7 +1097,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.",
-				null, includePaths
+				null, includePaths, null
 		);
 		checkFooBarExcluded( "", level2Context );
 		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
@@ -719,7 +1122,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		includePaths.add( "level2.level3.included" );
 		includePaths.add( "level2.level3.notEncountered" );
 		IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
-				typeModel1Mock, "level1.", ObjectStructure.DEFAULT, 1, includePaths
+				typeModel1Mock, "level1.", ObjectStructure.DEFAULT, 1, includePaths, null
 		);
 		IndexedEmbeddedPathTracker level1PathTracker = new IndexedEmbeddedPathTracker( level1Definition );
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
@@ -755,14 +1158,14 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 		// Encounter a nested indexedEmbedded
 		IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
-				typeModel2Mock, "level2.", ObjectStructure.DEFAULT, null, null
+				typeModel2Mock, "level2.", ObjectStructure.DEFAULT, null, null, null
 		);
 		IndexedEmbeddedPathTracker level2PathTracker = new IndexedEmbeddedPathTracker( level2Definition );
 		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"level2", level1Context, level2Definition, level2PathTracker
 		);
 		IndexedEmbeddedDefinition level3Definition = new IndexedEmbeddedDefinition(
-				typeModel2Mock, "level3.", ObjectStructure.DEFAULT, null, null
+				typeModel2Mock, "level3.", ObjectStructure.DEFAULT, null, null, null
 		);
 		IndexedEmbeddedPathTracker level3PathTracker = new IndexedEmbeddedPathTracker( level3Definition );
 		ConfiguredIndexSchemaNestingContext level3Context = checkSimpleIndexedEmbeddedIncluded(
@@ -817,7 +1220,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		includePaths.add( "level2.level3" );
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.",
-				null, includePaths
+				null, includePaths, null
 		);
 		checkFooBarExcluded( "", level1Context );
 		checkFooBarIndexedEmbeddedExcluded( level1Context, typeModel2Mock );
@@ -828,7 +1231,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		includePaths.add( "level3-alt.level4" );
 		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.",
-				null, includePaths
+				null, includePaths, null
 		);
 		checkFooBarExcluded( "", level2Context );
 		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
@@ -841,7 +1244,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		includePaths.add( "level3-alt.level4" );
 		checkSimpleIndexedEmbeddedExcluded(
 				level1Context, typeModel2Mock, "level2.",
-				null, includePaths
+				null, includePaths, null
 		);
 
 		IndexSchemaNestingContext level3Context =
@@ -858,7 +1261,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		includePaths.add( "level2.level3" );
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.",
-				null, includePaths
+				null, includePaths, null
 		);
 		checkFooBarExcluded( "", level1Context );
 		checkFooBarIndexedEmbeddedExcluded( level1Context, typeModel2Mock );
@@ -868,7 +1271,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		includePaths.add( "level3-alt.level4" );
 		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.",
-				1, includePaths
+				1, includePaths, null
 		);
 		checkFooBarExcluded( "", level2Context );
 		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
@@ -893,13 +1296,13 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		includePaths.add( "nested.nested.text" );
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.",
-				2, includePaths
+				2, includePaths, null
 		);
 
 		// Same includePaths as above
 		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"nested", level1Context, typeModel2Mock, "nested.",
-				2, includePaths
+				2, includePaths, null
 		);
 		checkFooBarIncluded( "", level2Context );
 		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
@@ -910,7 +1313,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		// Same includePaths as above
 		ConfiguredIndexSchemaNestingContext level3Context = checkSimpleIndexedEmbeddedIncluded(
 				"nested", level2Context, typeModel3Mock, "nested.",
-				2, includePaths
+				2, includePaths, null
 		);
 		checkFooBarExcluded( "", level3Context );
 		checkFooBarIndexedEmbeddedExcluded( level3Context, typeModel3Mock );
@@ -921,7 +1324,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		// Same includePaths as above
 		checkSimpleIndexedEmbeddedExcluded(
 				level3Context, typeModel4Mock, "nested.",
-				2, includePaths
+				2, includePaths, null
 		);
 	}
 
@@ -1011,10 +1414,10 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 	private ConfiguredIndexSchemaNestingContext checkSimpleIndexedEmbeddedIncluded(String expectedObjectName,
 			ConfiguredIndexSchemaNestingContext context, MappableTypeModel typeModel,
-			String relativePrefix, Integer depth, Set<String> includePaths) {
+			String relativePrefix, Integer depth, Set<String> includePaths, Set<String> excludePaths) {
 		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition(
 				typeModel, relativePrefix, ObjectStructure.DEFAULT,
-				depth, includePaths
+				depth, includePaths, excludePaths
 		);
 		return checkSimpleIndexedEmbeddedIncluded(
 				expectedObjectName, context, definition, new IndexedEmbeddedPathTracker( definition )
@@ -1044,10 +1447,10 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	}
 
 	private void checkSimpleIndexedEmbeddedExcluded(ConfiguredIndexSchemaNestingContext context, MappableTypeModel typeModel,
-			String relativePrefix, Integer depth, Set<String> includePaths) {
+			String relativePrefix, Integer depth, Set<String> includePaths, Set<String> excludePaths) {
 		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition(
 				typeModel, relativePrefix, ObjectStructure.DEFAULT,
-				depth, includePaths
+				depth, includePaths, excludePaths
 		);
 		checkSimpleIndexedEmbeddedExcluded(
 				context, definition, new IndexedEmbeddedPathTracker( definition )
@@ -1095,22 +1498,22 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 	private void checkFooBarIndexedEmbeddedExcluded(ConfiguredIndexSchemaNestingContext context, MappableTypeModel typeModel) {
 		checkSimpleIndexedEmbeddedExcluded(
-				context, typeModel, "foo.", null, null
+				context, typeModel, "foo.", null, null, null
 		);
 		checkSimpleIndexedEmbeddedExcluded(
-				context, typeModel, "prefix1_", null, null
+				context, typeModel, "prefix1_", null, null, null
 		);
 		checkSimpleIndexedEmbeddedExcluded(
-				context, typeModel, "foo.prefix1_", null, null
+				context, typeModel, "foo.prefix1_", null, null, null
 		);
 		checkSimpleIndexedEmbeddedExcluded(
-				context, typeModel, "foo.bar.prefix1_", null, null
+				context, typeModel, "foo.bar.prefix1_", null, null, null
 		);
 		Set<String> includePaths = new HashSet<>();
 		includePaths.add( "foo" );
 		includePaths.add( "bar" );
 		checkSimpleIndexedEmbeddedExcluded(
-				context, typeModel, "foo", 3, includePaths
+				context, typeModel, "foo", 3, includePaths, null
 		);
 	}
 

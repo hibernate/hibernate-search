@@ -25,9 +25,7 @@ import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.AnnotationMappingSmokeIT;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.ProgrammaticMappingSmokeIT;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubBridge;
-import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
-import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
-import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge;
@@ -35,24 +33,29 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LatitudeMark
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LongitudeMarker;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
-import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
@@ -64,7 +67,7 @@ import org.junit.Test;
  * <p>
  * Does not test all the corner cases of filtering when using {@link IndexedEmbedded#includePaths()} and
  * {@link IndexedEmbedded#includeDepth()}, which are tested in a unit test in the engine module
- * (the test is named {@code ConfiguredIndexSchemaNestingContextTest} at the time of this writing).
+ * (the test is named {@code ConfiguredIndexSchemaManagerNestingContextTest} at the time of this writing).
  * <p>
  * Does not test uses of container value extractors (for now). Some of them are tested in
  * {@link AnnotationMappingSmokeIT} and {@link ProgrammaticMappingSmokeIT}.
@@ -274,6 +277,11 @@ public class IndexedEmbeddedBaseIT {
 					structure = ObjectStructure.FLATTENED)
 			@IndexedEmbedded(name = "nest", includePaths = {"nest", "common"},
 					structure = ObjectStructure.NESTED)
+			@IndexedEmbedded(name = "default_but_exclude", excludePaths = {"flat", "nest"})
+			@IndexedEmbedded(name = "flat_but_exclude", excludePaths = {"default", "nest"},
+					structure = ObjectStructure.FLATTENED)
+			@IndexedEmbedded(name = "nest_but_exclude", excludePaths = {"default", "flat"},
+					structure = ObjectStructure.NESTED)
 			Embedded embedded;
 			public IndexedEntity(int id, String value) {
 				this.id = id;
@@ -296,6 +304,20 @@ public class IndexedEmbeddedBaseIT {
 					b2.field( "common", String.class );
 				} );
 				b.objectField( "nest", b2 -> {
+					b2.objectStructure( ObjectStructure.NESTED );
+					b2.field( "nest", String.class );
+					b2.field( "common", String.class );
+				} );
+				b.objectField( "default_but_exclude", b2 -> {
+					b2.field( "default", String.class );
+					b2.field( "common", String.class );
+				} );
+				b.objectField( "flat_but_exclude", b2 -> {
+					b2.objectStructure( ObjectStructure.FLATTENED );
+					b2.field( "flat", String.class );
+					b2.field( "common", String.class );
+				} );
+				b.objectField( "nest_but_exclude", b2 -> {
 					b2.objectStructure( ObjectStructure.NESTED );
 					b2.field( "nest", String.class );
 					b2.field( "common", String.class );
@@ -558,20 +580,66 @@ public class IndexedEmbeddedBaseIT {
 			}
 		}
 
+		pathsWork(
+				IndexedEntity.class, IndexedEmbeddedLevel1.class,
+				id -> new IndexedEntity( id, "valueForIgnored", "valueForIncluded" )
+		);
+	}
+
+	/**
+	 * Check that the "excludePaths" parameter is at least taken into account.
+	 * <p>
+	 * Details of how filtering handles all corner cases is tested in the engine (see this class' javadoc).
+	 */
+	@Test
+	public void excludePaths() {
+		class IndexedEmbeddedLevel1 {
+			String ignoredProperty;
+			String includedProperty;
+			@GenericField
+			public String getIgnoredProperty() {
+				return ignoredProperty;
+			}
+			@GenericField
+			public String getIncludedProperty() {
+				return includedProperty;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@IndexedEmbedded(excludePaths = "ignoredProperty")
+			IndexedEmbeddedLevel1 level1;
+			public IndexedEntity(int id, String ignoredProperty, String includedProperty) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1();
+				this.level1.ignoredProperty = ignoredProperty;
+				this.level1.includedProperty = includedProperty;
+			}
+		}
+
+		pathsWork(
+				IndexedEntity.class, IndexedEmbeddedLevel1.class,
+				id -> new IndexedEntity( id, "valueForIgnored", "valueForIncluded" )
+		);
+	}
+
+	private <E> void pathsWork(Class<E> entity, Class<?> embedded, Function<Integer, E> newEntityFunction) {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.objectField( "level1", b2 -> b2
 						.field( "includedProperty", String.class )
 				)
 		);
 		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
-				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
+				.withAnnotatedEntityTypes( entity )
+				.withAnnotatedTypes( embedded )
 				.setup();
 		backendMock.verifyExpectationsMet();
 
 		doTestEmbeddedRuntime(
 				mapping,
-				id -> new IndexedEntity( id, "valueForIgnored", "valueForIncluded" ),
+				newEntityFunction,
 				document -> document.objectField( "level1", b2 -> b2
 						.field( "includedProperty", "valueForIncluded" )
 				)
@@ -604,18 +672,50 @@ public class IndexedEmbeddedBaseIT {
 			}
 		}
 
+		nonMatchedError( IndexedEntity.class, IndexedEmbeddedLevel1.class, "includePaths" );
+	}
+
+	/**
+	 * Check that an "excludePaths" parameter that doesn't match anything is reported to the user.
+	 */
+	@Test
+	public void error_excludePaths_nonMatched() {
+		class IndexedEmbeddedLevel1 {
+			@GenericField
+			String ignoredProperty;
+			@GenericField
+			String includedProperty;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@IndexedEmbedded(excludePaths = { "includedProperty", "nonMatchingPath" })
+			IndexedEmbeddedLevel1 level1;
+			public IndexedEntity(int id, String ignoredProperty, String includedProperty) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1();
+				this.level1.ignoredProperty = ignoredProperty;
+				this.level1.includedProperty = includedProperty;
+			}
+		}
+
+		nonMatchedError( IndexedEntity.class, IndexedEmbeddedLevel1.class, "excludePaths" );
+	}
+
+	private void nonMatchedError(Class<?> entityClass, Class<?> embeddedClass, String attribute) {
 		assertThatThrownBy(
 				() -> setupHelper.start()
-						.withAnnotatedEntityTypes( IndexedEntity.class )
-						.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
+						.withAnnotatedEntityTypes( entityClass )
+						.withAnnotatedTypes( embeddedClass )
 						.setup()
 		)
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.typeContext( IndexedEntity.class.getName() )
+						.typeContext( entityClass.getName() )
 						.failure(
-								"An @IndexedEmbedded defines includePaths filters that do not match anything",
-								"Non-matching includePaths filters:",
+								"An @IndexedEmbedded defines " + attribute + " filters that do not match anything",
+								"Non-matching " + attribute + " filters:",
 								CollectionHelper.asLinkedHashSet( "nonMatchingPath" ).toString(),
 								"Encountered field paths:",
 								CollectionHelper.asLinkedHashSet( "ignoredProperty", "includedProperty" ).toString(),
@@ -738,6 +838,18 @@ public class IndexedEmbeddedBaseIT {
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3212", "HSEARCH-3213" })
 	public void includePaths_excludesBridges() {
+		excludesBridges( true, "level1IncludedField" );
+	}
+
+	@Test
+	public void excludePaths_excludesBridges() {
+		excludesBridges( false,
+				"location", "filteredOut", "startupStubBridgeFieldFromTypeBridge",
+				"startupStubBridgeFieldFromPropertyBridge"
+		);
+	}
+
+	private void excludesBridges(boolean include, String... paths) {
 		StaticCounters.Key getLongitudeKey = StaticCounters.createKey();
 		StaticCounters.Key getLatitudeKey = StaticCounters.createKey();
 
@@ -775,9 +887,16 @@ public class IndexedEmbeddedBaseIT {
 					TypeMappingStep indexedEntityMapping = b.programmaticMapping().type( IndexedEntity.class );
 					indexedEntityMapping.indexed().index( INDEX_NAME );
 					indexedEntityMapping.property( "id" ).documentId();
-					indexedEntityMapping.property( "level1" )
-							.indexedEmbedded()
-									.includePaths( "level1IncludedField" );
+					if ( include ) {
+						indexedEntityMapping.property( "level1" )
+								.indexedEmbedded()
+								.includePaths( paths );
+					}
+					else {
+						indexedEntityMapping.property( "level1" )
+								.indexedEmbedded()
+								.excludePaths( paths );
+					}
 					TypeMappingStep indexedEmbeddedLevel1Mapping = b.programmaticMapping().type( IndexedEmbeddedLevel1.class );
 					indexedEmbeddedLevel1Mapping.binder( StartupStubBridge.binder( filteredOutBridgeCounterKeys ) );
 					indexedEmbeddedLevel1Mapping.binder( new GeoPointBridge.Binder().fieldName( "location" ) );
@@ -787,7 +906,7 @@ public class IndexedEmbeddedBaseIT {
 							.binder( StartupStubBridge.binder( filteredOutBridgeCounterKeys ) )
 							.genericField( "level1IncludedField" )
 							.genericField( "filteredOut" )
-									.valueBinder( StartupStubBridge.binder( String.class, filteredOutBridgeCounterKeys ) );
+							.valueBinder( StartupStubBridge.binder( String.class, filteredOutBridgeCounterKeys ) );
 				} )
 				.setup();
 		backendMock.verifyExpectationsMet();
@@ -1555,6 +1674,92 @@ public class IndexedEmbeddedBaseIT {
 	}
 
 	@Test
+	public void cycleBrokenByExcludePaths() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class EntityA {
+				@DocumentId
+				Integer id;
+				@KeywordField
+				String aString;
+
+				@IndexedEmbedded
+				@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW) // just to not bother with inverse sides
+				EntityB b;
+
+				public EntityA(Integer id, String aString, EntityB b) {
+					this.id = id;
+					this.aString = aString;
+					this.b = b;
+				}
+			}
+
+			class EntityB {
+				Integer id;
+
+				@KeywordField
+				String bString;
+				@IndexedEmbedded(excludePaths = "b.a")
+				EntityA a;
+
+				public EntityB(Integer id, String bString, EntityA a) {
+					this.id = id;
+					this.bString = bString;
+					this.a = a;
+				}
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "aString", String.class )
+				.objectField( "b", b2 -> b2
+						.field( "bString", String.class )
+						.objectField( "a", b3 -> b3
+								.field( "aString", String.class )
+								.objectField( "b", b4 -> b4
+										.field( "bString", String.class )
+								)
+						)
+				)
+		);
+
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.setup();
+
+		backendMock.verifyExpectationsMet();
+
+		Model model = new Model();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> model.new EntityA(
+						id, "a",
+						model.new EntityB(
+								1, "b",
+								model.new EntityA( 2, "aa",
+										model.new EntityB( 3, "bb",
+												model.new EntityA( 4, "aaa",
+														model.new EntityB( 5, "bbb", model.new EntityA( 6, "aaaa", null ) )
+												)
+										)
+								)
+						)
+				),
+				document -> document.field( "aString", "a" )
+						.objectField( "b", b2 -> b2
+								.field( "bString", "b" )
+								.objectField( "a", b3 -> b3
+										.field( "aString", "aa" )
+										.objectField( "b", b4 -> b4
+												.field( "bString", "bb" )
+										)
+								)
+						)
+		);
+	}
+
+	@Test
 	public void cycle() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
@@ -1581,7 +1786,7 @@ public class IndexedEmbeddedBaseIT {
 						.failure( "Cyclic @IndexedEmbedded recursion starting from type '" + Model.EntityA.class.getName() + "'",
 								"Path starting from that type and ending with a cycle: 'b.a.b.'",
 								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
-								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, ..." )
+								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ..." )
 				);
 	}
 
@@ -1617,8 +1822,682 @@ public class IndexedEmbeddedBaseIT {
 						.failure( "Cyclic @IndexedEmbedded recursion starting from type '" + Model.EntityB.class.getName() + "'",
 								"Path starting from that type and ending with a cycle: 'c.b.c.'",
 								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
-								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, ..." )
+								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ..." )
 				);
+	}
+
+	/*
+	 * We are trying to include something that is not reachable
+	 * (even though the property is there it is explicitly excluded by a child, so we must fail)
+	 */
+	@Test
+	public void parentIncludeChildExclude() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				Integer id;
+				@KeywordField
+				String indexedEntityString;
+
+				@IndexedEmbedded(includePaths = { "includedString", "subIncluded.subSubIncluded.subSubIncludedString" })
+				Included included;
+
+				public IndexedEntity(Integer id, String indexedEntityString, Included included) {
+					this.id = id;
+					this.indexedEntityString = indexedEntityString;
+					this.included = included;
+				}
+			}
+
+			class Included {
+				@KeywordField
+				String includedString;
+
+				@IndexedEmbedded
+				SubIncluded subIncluded;
+
+				public Included(String includedString, SubIncluded subIncluded) {
+					this.includedString = includedString;
+					this.subIncluded = subIncluded;
+				}
+			}
+
+			class SubIncluded {
+				@KeywordField
+				String subIncludedString;
+
+				@IndexedEmbedded(excludePaths = "subSubIncludedString")
+				SubSubIncluded subSubIncluded;
+
+				public SubIncluded(String subIncludedString) {
+					this.subIncludedString = subIncludedString;
+				}
+			}
+
+			class SubSubIncluded {
+				@KeywordField
+				String subSubIncludedString;
+
+				public SubSubIncluded(String subSubIncludedString) {
+					this.subSubIncludedString = subSubIncludedString;
+				}
+			}
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.setup() )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( Model.IndexedEntity.class.getName() )
+						.failure(
+								"An @IndexedEmbedded defines includePaths filters that do not match anything.",
+								"Non-matching includePaths filters: [subIncluded.subSubIncluded.subSubIncludedString].",
+								"Encountered field paths: [includedString, subIncluded, subIncluded.subIncludedString]. Check the filters for typos, or remove them if they are not useful."
+						)
+				);
+	}
+
+	/*
+	 * Child has a property (that we included explicitly), so if we are trying to exclude it at a parent level it should
+	 * get excluded without complains. *BUT*, because it's a single field in that embedded we end up dropping the entire embedded
+	 * resulting in an error.
+	 */
+	@Test
+	public void parentExcludeChildIncludeResultingInEmbeddedNotIncludedEntirely() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				Integer id;
+				@KeywordField
+				String indexedEntityString;
+
+				@IndexedEmbedded(excludePaths = "subIncluded.subSubIncluded.subSubIncludedString")
+				Included included;
+
+				public IndexedEntity(Integer id, String indexedEntityString, Included included) {
+					this.id = id;
+					this.indexedEntityString = indexedEntityString;
+					this.included = included;
+				}
+			}
+
+			class Included {
+				@KeywordField
+				String includedString;
+
+				@IndexedEmbedded
+				SubIncluded subIncluded;
+
+				public Included(String includedString, SubIncluded subIncluded) {
+					this.includedString = includedString;
+					this.subIncluded = subIncluded;
+				}
+			}
+
+			class SubIncluded {
+				@KeywordField
+				String subIncludedString;
+
+				@IndexedEmbedded(includePaths = "subSubIncludedString")
+				SubSubIncluded subSubIncluded;
+
+				public SubIncluded(String subIncludedString) {
+					this.subIncludedString = subIncludedString;
+				}
+			}
+
+			class SubSubIncluded {
+				@KeywordField
+				String subSubIncludedString;
+
+				public SubSubIncluded(String subSubIncludedString) {
+					this.subSubIncludedString = subSubIncludedString;
+				}
+			}
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.setup() )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( Model.IndexedEntity.class.getName() )
+						.failure(
+								"An @IndexedEmbedded defines excludePaths filters that do not match anything.",
+								"Non-matching excludePaths filters: [subIncluded.subSubIncluded.subSubIncludedString]",
+								"Encountered field paths: [includedString, subIncluded, subIncluded.subIncludedString].",
+								"Check the filters for typos, or remove them if they are not useful"
+						)
+				);
+	}
+
+	/*
+	 * Child has a couple properties (that we included explicitly), so if we are trying to exclude one of them at a parent level it should
+	 * get excluded without complains.
+	 */
+	@Test
+	public void parentExcludeChildIncludeMultipleResultingInEmbeddedBeingIncludedPartially() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				Integer id;
+				@KeywordField
+				String indexedEntityString;
+
+				@IndexedEmbedded(excludePaths = "subIncluded.subSubIncluded.subSubExcludedString")
+				Included included;
+
+				public IndexedEntity(Integer id, String indexedEntityString, Included included) {
+					this.id = id;
+					this.indexedEntityString = indexedEntityString;
+					this.included = included;
+				}
+			}
+
+			class Included {
+				@KeywordField
+				String includedString;
+
+				@IndexedEmbedded
+				SubIncluded subIncluded;
+
+				public Included(String includedString, SubIncluded subIncluded) {
+					this.includedString = includedString;
+					this.subIncluded = subIncluded;
+				}
+			}
+
+			class SubIncluded {
+				@KeywordField
+				String subIncludedString;
+
+				@IndexedEmbedded(includePaths = { "subSubIncludedString", "subSubExcludedString" })
+				SubSubIncluded subSubIncluded;
+
+				public SubIncluded(String subIncludedString, SubSubIncluded subSubIncluded) {
+					this.subIncludedString = subIncludedString;
+					this.subSubIncluded = subSubIncluded;
+				}
+			}
+
+			class SubSubIncluded {
+				@KeywordField
+				String subSubIncludedString;
+				@KeywordField
+				String subSubExcludedString;
+
+				public SubSubIncluded(String subSubIncludedString) {
+					this.subSubIncludedString = subSubIncludedString;
+					this.subSubExcludedString = subSubIncludedString;
+				}
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "indexedEntityString", String.class )
+				.objectField( "included", b2 -> b2
+						.field( "includedString", String.class )
+						.objectField( "subIncluded", b3 -> b3
+								.field( "subIncludedString", String.class )
+								.objectField( "subSubIncluded", b4 -> b4
+										.field( "subSubIncludedString", String.class )
+								)
+						)
+				)
+		);
+
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.setup();
+
+		backendMock.verifyExpectationsMet();
+
+		Model model = new Model();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> model.new IndexedEntity(
+						id, "a",
+						model.new Included( "b", model.new SubIncluded(
+								"c",
+								model.new SubSubIncluded( "d" )
+						) )
+				),
+				document -> document.field( "indexedEntityString", "a" )
+						.objectField( "included", b2 -> b2
+								.field( "includedString", "b" )
+								.objectField( "subIncluded", b3 -> b3
+										.field( "subIncludedString", "c" )
+										.objectField( "subSubIncluded", b4 -> b4
+												.field( "subSubIncludedString", "d" )
+										)
+								)
+						)
+		);
+	}
+
+	/*
+	 * Since parent adds a path to be excluded and child uses an include filter that explicitly includes a different field -- parent won't find a field it tries to exclude
+	 */
+	@Test
+	public void parentExcludeChildIncludeForDifferentFields() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				Integer id;
+				@KeywordField
+				String indexedEntityString;
+
+				@IndexedEmbedded(excludePaths = "subIncluded.subSubIncluded.subSubIncludedString")
+				Included included;
+
+				public IndexedEntity(Integer id, String indexedEntityString, Included included) {
+					this.id = id;
+					this.indexedEntityString = indexedEntityString;
+					this.included = included;
+				}
+			}
+
+			class Included {
+				@KeywordField
+				String includedString;
+
+				@IndexedEmbedded
+				SubIncluded subIncluded;
+
+				public Included(String includedString, SubIncluded subIncluded) {
+					this.includedString = includedString;
+					this.subIncluded = subIncluded;
+				}
+			}
+
+			class SubIncluded {
+				@KeywordField
+				String subIncludedString;
+
+				@IndexedEmbedded(includePaths = "subSubOtherIncludedString")
+				SubSubIncluded subSubIncluded;
+
+				public SubIncluded(String subIncludedString, SubSubIncluded subSubIncluded) {
+					this.subIncludedString = subIncludedString;
+					this.subSubIncluded = subSubIncluded;
+				}
+			}
+
+			class SubSubIncluded {
+				@KeywordField
+				String subSubIncludedString;
+				@KeywordField
+				String subSubOtherIncludedString;
+
+				public SubSubIncluded(String subSubIncludedString, String subSubOtherIncludedString) {
+					this.subSubIncludedString = subSubIncludedString;
+					this.subSubOtherIncludedString = subSubOtherIncludedString;
+				}
+			}
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.setup() )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( Model.IndexedEntity.class.getName() )
+						.failure(
+								"An @IndexedEmbedded defines excludePaths filters that do not match anything",
+								"Non-matching excludePaths filters: [subIncluded.subSubIncluded.subSubIncludedString].",
+								"Encountered field paths: [includedString, subIncluded, subIncluded.subIncludedString, subIncluded.subSubIncluded, subIncluded.subSubIncluded.subSubOtherIncludedString].",
+								"Check the filters for typos, or remove them if they are not useful."
+						)
+				);
+	}
+
+	/*
+	 * Since we only really care if a parent is not trying to access a field that is not present on a child (either it's not there or it is excluded for some reason)
+	 * it is ok to exclude a field in SubIncluded even if the IndexedEntity embedded doesn't need it anyway.
+	 */
+	@Test
+	public void parentIncludeChildExcludeForDifferentFieldsIsFine() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				Integer id;
+				@KeywordField
+				String indexedEntityString;
+
+				@IndexedEmbedded(includePaths = "subIncluded.subSubIncluded.subSubIncludedString")
+				Included included;
+
+				public IndexedEntity(Integer id, String indexedEntityString, Included included) {
+					this.id = id;
+					this.indexedEntityString = indexedEntityString;
+					this.included = included;
+				}
+			}
+
+			class Included {
+				@KeywordField
+				String includedString;
+
+				@IndexedEmbedded
+				SubIncluded subIncluded;
+
+				public Included(String includedString, SubIncluded subIncluded) {
+					this.includedString = includedString;
+					this.subIncluded = subIncluded;
+				}
+			}
+
+			class SubIncluded {
+				@KeywordField
+				String subIncludedString;
+
+				// NOTE: since include paths were used in the parent filter this `subSubOtherIncludedString` was already excluded so it is a redundant exclude:
+				@IndexedEmbedded(excludePaths = "subSubOtherIncludedString")
+				SubSubIncluded subSubIncluded;
+
+				public SubIncluded(String subIncludedString, SubSubIncluded subSubIncluded) {
+					this.subIncludedString = subIncludedString;
+					this.subSubIncluded = subSubIncluded;
+				}
+			}
+
+			class SubSubIncluded {
+				@KeywordField
+				String subSubIncludedString;
+				@KeywordField
+				String subSubOtherIncludedString;
+				@KeywordField
+				String subSubAnotherIncludedString;
+
+				public SubSubIncluded(String subSubIncludedString, String subSubOtherIncludedString, String subSubAnotherIncludedString) {
+					this.subSubIncludedString = subSubIncludedString;
+					this.subSubOtherIncludedString = subSubOtherIncludedString;
+					this.subSubAnotherIncludedString = subSubAnotherIncludedString;
+				}
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "indexedEntityString", String.class )
+				.objectField( "included", b2 -> b2
+						.objectField( "subIncluded", b3 -> b3
+								.objectField( "subSubIncluded", b4 -> b4
+										.field( "subSubIncludedString", String.class )
+								) ) )
+		);
+
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.setup();
+
+		backendMock.verifyExpectationsMet();
+
+		Model model = new Model();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> model.new IndexedEntity(
+						id, "a",
+						model.new Included( "b", model.new SubIncluded(
+								"c", model.new SubSubIncluded( "d", "e", "f" ) )
+						)
+				),
+				document -> document.field( "indexedEntityString", "a" )
+						.objectField( "included", b2 -> b2
+								.objectField( "subIncluded", b3 -> b3
+										.objectField( "subSubIncluded", b4 -> b4
+												.field( "subSubIncludedString", "d" )
+										) ) )
+		);
+	}
+
+	@Test
+	public void parentIncludeByDepthChildExcludeSomething() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				Integer id;
+				@KeywordField
+				String indexedEntityString;
+
+				@IndexedEmbedded(includeDepth = 2)
+				Included included;
+
+				public IndexedEntity(Integer id, String indexedEntityString, Included included) {
+					this.id = id;
+					this.indexedEntityString = indexedEntityString;
+					this.included = included;
+				}
+			}
+
+			class Included {
+				@KeywordField
+				String includedString;
+
+				@IndexedEmbedded(excludePaths = "subIncludedStringA")
+				SubIncluded subIncluded;
+
+				public Included(String includedString, SubIncluded subIncluded) {
+					this.includedString = includedString;
+					this.subIncluded = subIncluded;
+				}
+			}
+
+			class SubIncluded {
+				@KeywordField
+				String subIncludedStringA;
+				@KeywordField
+				String subIncludedStringB;
+				@KeywordField
+				String subIncludedStringC;
+
+				public SubIncluded(String subIncludedStringA, String subIncludedStringB, String subIncludedStringC) {
+					this.subIncludedStringA = subIncludedStringA;
+					this.subIncludedStringB = subIncludedStringB;
+					this.subIncludedStringC = subIncludedStringC;
+				}
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "indexedEntityString", String.class )
+				.objectField( "included", b2 -> b2
+						.field( "includedString", String.class )
+						.objectField( "subIncluded", b3 -> b3
+								.field( "subIncludedStringB", String.class )
+								.field( "subIncludedStringC", String.class )
+						)
+				)
+		);
+
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.setup();
+
+		backendMock.verifyExpectationsMet();
+
+		Model model = new Model();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> model.new IndexedEntity(
+						id, "a",
+						model.new Included( "b", model.new SubIncluded(
+								"c", "d", "e" )
+						)
+				),
+				document -> document.field( "indexedEntityString", "a" )
+						.objectField( "included", b2 -> b2
+								.field( "includedString", "b" )
+								.objectField( "subIncluded", b3 -> b3
+										.field( "subIncludedStringB", "d" )
+										.field( "subIncludedStringC", "e" )
+								)
+						)
+		);
+	}
+
+	@Test
+	public void parentExcludeChildExcludeSameProperty() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				Integer id;
+				@KeywordField
+				String indexedEntityString;
+
+				@IndexedEmbedded(excludePaths = "subIncluded.subIncludedStringA")
+				Included included;
+
+				public IndexedEntity(Integer id, String indexedEntityString, Included included) {
+					this.id = id;
+					this.indexedEntityString = indexedEntityString;
+					this.included = included;
+				}
+			}
+
+			class Included {
+				@KeywordField
+				String includedString;
+
+				@IndexedEmbedded(excludePaths = "subIncludedStringA")
+				SubIncluded subIncluded;
+
+				public Included(String includedString, SubIncluded subIncluded) {
+					this.includedString = includedString;
+					this.subIncluded = subIncluded;
+				}
+			}
+
+			class SubIncluded {
+				@KeywordField
+				String subIncludedStringA;
+				@KeywordField
+				String subIncludedStringB;
+				@KeywordField
+				String subIncludedStringC;
+
+				public SubIncluded(String subIncludedStringA, String subIncludedStringB, String subIncludedStringC) {
+					this.subIncludedStringA = subIncludedStringA;
+					this.subIncludedStringB = subIncludedStringB;
+					this.subIncludedStringC = subIncludedStringC;
+				}
+			}
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.setup() )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( Model.IndexedEntity.class.getName() )
+						.failure(
+								"An @IndexedEmbedded defines excludePaths filters that do not match anything",
+								"Non-matching excludePaths filters: [subIncluded.subIncludedStringA].",
+								"Encountered field paths: [includedString, subIncluded, subIncluded.subIncludedStringB, subIncluded.subIncludedStringC].",
+								"Check the filters for typos, or remove them if they are not useful."
+						)
+				);
+	}
+
+	@Test
+	public void includeExcludeInTheSameAnnotation() {
+		class Included {
+			@KeywordField
+			String includedString;
+			@KeywordField
+			String excludedString;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@KeywordField
+			String indexedEntityString;
+
+			@IndexedEmbedded(excludePaths = "excludedString", includePaths = "includedString")
+			Included included;
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.setup() )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".included" )
+						.failure(
+								"'includePaths' and 'excludePaths' cannot be used together in an @IndexedEmbedded",
+								"Use either `includePaths` or `excludePaths` leaving the other one empty.",
+								"Included paths are: '[includedString]', excluded paths are: '[excludedString]'."
+						)
+				);
+	}
+
+	@Test
+	public void parentExcludeByPrefix() {
+		class Included {
+			@KeywordField
+			String includedString;
+			@IndexedEmbedded(prefix = "foo.bar.")
+			Included excludedIncluded;
+
+			public Included(String includedString, Included excludedIncluded) {
+				this.includedString = includedString;
+				this.excludedIncluded = excludedIncluded;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@KeywordField
+			String indexedEntityString;
+			@IndexedEmbedded(excludePaths = "foo.bar")
+			Included included;
+
+			public IndexedEntity(Integer id, String indexedEntityString, Included included) {
+				this.id = id;
+				this.indexedEntityString = indexedEntityString;
+				this.included = included;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "indexedEntityString", String.class )
+				.objectField( "included", b2 -> b2
+						.field( "includedString", String.class )
+						// TODO: if we don't want this foo to hang around here -- we can have a objectNameList in ConfiguredIndexSchemaNestingContext
+						// that we will only trough and add objects to context if  while loop wasn't stopped by returning an empty optional
+						.objectField( "foo", b3 -> { } ) )
+		);
+
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.setup();
+
+		backendMock.verifyExpectationsMet();
+
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> new IndexedEntity(
+						id, "a",
+						new Included( "b", new Included( "c", null ) )
+				),
+				document -> document.field( "indexedEntityString", "a" )
+						.objectField( "included", b2 -> b2
+								.field( "includedString", "b" ) )
+		);
 	}
 
 	private <E> void doTestEmbeddedRuntime(SearchMapping mapping,

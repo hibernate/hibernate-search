@@ -80,18 +80,22 @@ class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 			IndexedEmbeddedPathTracker pathTracker,
 			NestedContextBuilder<T> contextBuilder) {
 		IndexSchemaFilter composedFilter = filter.compose( definition, pathTracker );
+
 		if ( !composedFilter.isEveryPathExcluded() ) {
 			String prefixToParse = unconsumedPrefix + definition.relativePrefix();
 			int afterPreviousDotIndex = 0;
 			int nextDotIndex = prefixToParse.indexOf( '.', afterPreviousDotIndex );
 			while ( nextDotIndex >= 0 ) {
-				String objectName = prefixToParse.substring( afterPreviousDotIndex, nextDotIndex );
-				contextBuilder.appendObject( objectName );
-
 				// Make sure to mark the paths as encountered in the filter
 				String objectNameRelativeToFilter = prefixToParse.substring( 0, nextDotIndex );
-				// We only use isPathIncluded for its side effect: it marks the path as encountered
-				filter.isPathIncluded( objectNameRelativeToFilter );
+
+				// we don't want to proceed if a subpath is already excluded:
+				if ( !filter.isPathIncluded( objectNameRelativeToFilter ) ) {
+					return Optional.empty();
+				}
+
+				String objectName = prefixToParse.substring( afterPreviousDotIndex, nextDotIndex );
+				contextBuilder.appendObject( objectName );
 
 				afterPreviousDotIndex = nextDotIndex + 1;
 				nextDotIndex = prefixToParse.indexOf( '.', afterPreviousDotIndex );
