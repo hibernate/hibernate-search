@@ -368,7 +368,7 @@
 
         <version.assembly.plugin>3.4.2</version.assembly.plugin>
         <version.buildhelper.plugin>3.3.0</version.buildhelper.plugin>
-        <version.checkstyle.plugin>3.2.2</version.checkstyle.plugin>
+        <version.checkstyle.plugin>3.3.0</version.checkstyle.plugin>
         <version.bundle.plugin>5.1.9</version.bundle.plugin>
         <version.clean.plugin>3.2.0</version.clean.plugin>
         <!-- Needing 3.6.2 at least because of MCOMPILER-294 -->
