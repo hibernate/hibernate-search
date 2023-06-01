@@ -122,9 +122,6 @@ public class ProjectionConstructorFieldProjectionIT extends AbstractProjectionCo
 
 	@Test
 	public void valueConvert() {
-		enum MyEnum {
-			FOO, BAR;
-		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -162,6 +159,10 @@ public class ProjectionConstructorFieldProjectionIT extends AbstractProjectionCo
 						new MyProjection( "result2" )
 				)
 		);
+	}
+
+	enum MyEnum {
+		FOO, BAR;
 	}
 
 	@Test
