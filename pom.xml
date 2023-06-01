@@ -261,7 +261,7 @@
         <version.net.bytebuddy>${version.net.bytebuddy.orm6}</version.net.bytebuddy>
 
         <!-- >>> ORM 6 with Jakarta Persistence -->
-        <version.org.hibernate.orm>6.2.3.Final</version.org.hibernate.orm>
+        <version.org.hibernate.orm>6.2.4.Final</version.org.hibernate.orm>
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
         <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM 6.
