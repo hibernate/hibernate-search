@@ -168,7 +168,6 @@ and the documentation to [docs.jboss.org](https://docs.jboss.org/hibernate/searc
 * Send an email to hibernate-announce and CC hibernate-dev.
 * Tweet about the release via the @Hibernate account.
   Try to engage with the Elasticsearch/Lucene community or other communities depending on the release highlights.
-* Update our forum's [sticky post](https://discourse.hibernate.org/t/26).
 
 ### Updating depending projects
 
@@ -176,15 +175,15 @@ If you just released the latest stable, you will need to update other projects:
 
 * Approve and merge automatic updates that dependabot will send (it might take ~24h):
   * In the [test case templates](https://github.com/hibernate/hibernate-test-case-templates/tree/master/search).
-* Upgrade the Hibernate Search dependency manually:
   * In the [demos](https://github.com/hibernate/hibernate-demos/tree/master/hibernate-search).
+* **If it's a `.Final` release**, upgrade the Hibernate Search dependency manually:
   * In the [Quarkus BOM](https://github.com/quarkusio/quarkus/blob/main/bom/application/pom.xml).
   * In the [WildFly root POM](https://github.com/wildfly/wildfly/blob/main/pom.xml).
   * In any other relevant project.
 
 ### Updating Hibernate Search
 
-* If not already done, create a maintenance branch for the previous series:
+* **If it is a new major or minor release**, and if not already done, create a maintenance branch for the previous series:
   * `git branch <x.(y-1)>`
   * `mvn versions:set -DnewVersion=<x.(y-1).z>-SNAPSHOT`
   * `git add`, `commit`, `push upstream` the new branch.
