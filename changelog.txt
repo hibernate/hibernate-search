@@ -1,6 +1,72 @@
 Hibernate Search Changelog
 ==========================
 
+6.2.0.Beta1 (2023-06-02)
+-------------------------
+
+** Bug
+    * HSEARCH-4853 On JDK 21-ea+21, projection constructors relying on canonical record constructor result in all-null records
+    * HSEARCH-4828 Lucene's unified highlighter should produce multiple highlighted snippets for multi-valued fields
+    * HSEARCH-4825 Hibernate Search's dynamic templates are lost when using a custom mapping through schema_management.mapping_file
+    * HSEARCH-4803 ServiceConfigurationError thrown by non aggregated classloader when loading services should be ignored
+
+** Improvement
+    * HSEARCH-4860 Upgrade -orm6 artifacts to Hibernate ORM 6.2.4.Final
+    * HSEARCH-4858 Upgrade to Hibernate ORM 6.2.3.Final
+    * HSEARCH-4857 Upgrade to Elasticsearch client 8.8.0 and test against Elasticsearch 8.8.0
+    * HSEARCH-4850 Add compatibility with OpenSearch 2.7.0
+    * HSEARCH-4849 Upgrade to Elasticsearch client 8.7.1 and test against Elasticsearch 8.7.1
+    * HSEARCH-4846 Upgrade -orm6 artifacts to Hibernate ORM 6.2.2.Final
+    * HSEARCH-4843 Introduce a common EntityReference interface and deprecate mapper-specific ones
+    * HSEARCH-4842 Upgrade -orm6 artifacts to Hibernate ORM 6.2.1.Final
+    * HSEARCH-4833 Upgrade -orm6 artifacts to Hibernate ORM 6.2.0.Final
+    * HSEARCH-4832 Upgrade to Elasticsearch client 8.7.0 and add compatibility with Elasticsearch 8.7.0
+    * HSEARCH-4829 Upgrade -orm6 artifacts to Hibernate ORM 6.2.0.CR4
+    * HSEARCH-4822 Extend @FullTextField with `highlightable` configuration
+    * HSEARCH-4814 Propagate failures to submit operations through OperationSubmitter.offloading()
+    * HSEARCH-4812 Add compatibility with OpenSearch 2.6.0
+    * HSEARCH-4809 Upgrade to Hibernate ORM 6.2.0.CR3
+    * HSEARCH-4802 Upgrade to Elasticsearch client 8.6.2 and test against Elasticsearch 8.6.2
+    * HSEARCH-4772 Add failsafe to prevent log flooding for mass indexing with lots of non-critical failures
+    * HSEARCH-4767 Handle multiple tenant IDs in a single PojoWorkspace/IndexWorkspace
+
+** New Feature
+    * HSEARCH-4808 Add configuration option for Elasticsearch connection keep-alive
+    * HSEARCH-4574 Explicit binding of constructor parameters for @ProjectionConstructor
+    * HSEARCH-4149 Support more missing() sort options
+    * HSEARCH-2366 Add an Elasticsearch mapping export tool
+    * HSEARCH-2192 Highlighting in the Search API
+    * HSEARCH-1383 Ability to disable automatic indexing programmatically at the session level
+    * HSEARCH-168 Ability to disable automatic indexing programmatically, ideally per-index, at the application level (all sessions)
+
+** Task
+    * HSEARCH-4856 Test against latest OpenSearch 1.3.10
+    * HSEARCH-4855 Run tests against Elasticsearch 7.17.10
+    * HSEARCH-4848 Fix unpredictable order of some associations in automatic reindexing tests
+    * HSEARCH-4844 Add an explicit dependency on HPPC
+    * HSEARCH-4840 Test against AWS OpenSearch Service 2.5
+    * HSEARCH-4839 Test Hibernate Search regularly against the latest version of Lucene
+    * HSEARCH-4836 Turn hibernate.search.backend.client.instance into an SPI property
+    * HSEARCH-4831 Fix Hibernate Search tests against latest ORM 6.2/6.3
+    * HSEARCH-4830 Test Hibernate Search regularly against Hibernate ORM 6.3.0-SNAPSHOT
+    * HSEARCH-4827 Only allow nesting-aware projections within `object` projections
+    * HSEARCH-4826 Remove unused Maven plugins from the POM
+    * HSEARCH-4823 Clarify the documentation of the configuration property about the Elasticsearch version 
+    * HSEARCH-4821 Test against latest OpenSearch 1.3.9
+    * HSEARCH-4819 Remove uses of outdated dialects in Hibernate ORM integration tests
+    * HSEARCH-4818 Fix failures in tests caused by concurrent use of OutboxEventFilter#allowedIds
+    * HSEARCH-4815 Provide a user with a meaningful error when Fast Vector Highlighter is used on a field without term vectors
+    * HSEARCH-4813 Test against latest OpenSearch 1.3.8
+    * HSEARCH-4810 Fix flaky test with MSSQL
+    * HSEARCH-4804 Fix flaky test OutboxPollingAutomaticIndexingLifecycleIT with postgresql 
+    * HSEARCH-4801 Upgrade build dependencies to the latest version in Search 6.2.0.Beta1
+    * HSEARCH-4800 The list of configuration properties is empty on releases
+    * HSEARCH-4799 Fix deprecation warnings in tests with JDK 21
+    * HSEARCH-4788 Fix some out-of-date javadoc for configuration properties
+    * HSEARCH-4766 Change how executors are created in OutboxPollingMassIndexerAgent
+    * HSEARCH-4721 Re-enable tests disabled because of HHH-15606/HHH-15967
+    * HSEARCH-4675 Use .and()/.or() rather than .bool() where possible in documentation and tests
+
 6.2.0.Alpha2 (2023-02-13)
 -------------------------
 
