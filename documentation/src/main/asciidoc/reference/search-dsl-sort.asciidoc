@@ -380,7 +380,6 @@ The behavior for missing values can be controlled explicitly through the `.missi
 it puts documents with no value in the first position when using ascending order or in the last position when using descending order.
 * `.missing().highest()` interprets missing values as the highest value:
 it puts documents with no value in the last position when using ascending order or in the first position when using descending order.
-The documents with no value will go first if descending order is used.
 * `.missing().use(...)` uses the given value as a default for documents with no value.
 
 [NOTE]
