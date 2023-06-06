@@ -17,7 +17,7 @@
     <artifactId>hibernate-search-backend-elasticsearch-aws</artifactId>
 
     <name>Hibernate Search Backend - Elasticsearch - AWS integration</name>
-    <description>Configurer for the Hibernate Search Elasticsearch backend enabling connection to an AWS-hosted Elasticsearch cluster</description>
+    <description>Configurer for the Hibernate Search Elasticsearch backend enabling connection to an AWS-hosted Elasticsearch/OpenSearch cluster</description>
 
     <properties>
         <!-- This is a publicly distributed module that should be published: -->

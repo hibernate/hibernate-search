@@ -182,9 +182,9 @@ your password will be transmitted in clear text over the network.
 === [[elasticsearch-integration-configuration-aws]] Authentication on Amazon Web Services
 
 The Hibernate Search Elasticsearch backend, once configured, will work just fine in most setups.
-However, if you need to use Amazon's https://docs.aws.amazon.com/elasticsearch-service/[managed Elasticsearch service],
+However, if you need to use Amazon's link:{amazonOpenSearchServiceUrl}[managed OpenSearch service],
 you will find it requires a proprietary authentication method:
-https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-request-signing.html[request signing].
+https://docs.aws.amazon.com/opensearch-service/latest/developerguide/request-signing.html[request signing].
 
 While request signing is not supported by default,
 you can enable it with an additional dependency and a bit of configuration.
