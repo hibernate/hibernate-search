@@ -1,5 +1,5 @@
 [[search-dsl-highlighting]]
-= Highlighting
+= Highlight DSL
 
 include::components/incubating-warning.asciidoc[]
 
@@ -18,19 +18,19 @@ with an attribute configuration that allows it:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/BookWithHighlights.java[tags=basics]
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/Book.java[tags=basics]
 ----
 <1> A regular full-text field.
 Such field can allow highlight projections if the <<backend-elasticsearch,Elasticsearch backend>> is used.
 See the definition of the <<mapping-directfieldmapping-highlightable-default, default highlightable>> for any details.
-<2> A full-text field that explicitly allows any highlighter types to be applied to it.
-See the definition of the <<mapping-directfieldmapping-highlightable-any, `ANY` highlightable>> for any details.
-<3> A full-text field that implicitly allows any highlighter types to be applied to it.
+<2> A full-text field that explicitly allows for plain and unified highlighters to be applied to it.
+<3> A full-text field that explicitly allows any highlighter types to be applied to it.
+See the definition of the <<mapping-directfieldmapping-highlightable-any, `ANY` highlightable>> for further details.
+<4> A full-text field that implicitly allows any highlighter types to be applied to it.
 Allowing projection and setting the term vector storage strategy to `WITH_POSITIONS_OFFSETS`
 implies that any highlighter type can be used to create a highlight projection with both <<backend-lucene,Lucene>>
 or <<backend-elasticsearch, Elasticsearch>> backends.
-<4> A generic text field -- such field will not allow highlight projections.
-<5> A full-text field that explicitly allows for plain and unified highlighters to be applied to it.
+<5> A generic text field -- such field will not allow highlight projections.
 ====
 
 [[search-dsl-highlighting-using-highlight-projection]]
@@ -54,6 +54,24 @@ If there's no match within the field we want to highlight, be it because the doc
 of some other predicate condition, or because the highlighted field wasn't a part of a predicate at all, an empty list will be returned by default.
 See <<search-dsl-highlighting-highlighter-options-no-match-size,no match size configuration>> option for more details on how this can be adjusted.
 <5> Fetch the results, which will have highlighted fragments.
+
+Note that the result of applying a highlight projection is always a list of `String`.
+
+As an example, the result may look like:
+[source, JSON]
+----
+[
+    ["The Boscombe Valley <em>Mystery</em>"], <1>
+    [
+      "A Caribbean <em>Mystery</em>",
+      "Miss Marple: A Caribbean <em>Mystery</em> by Agatha Christie"
+    ], <2>
+    ["A <em>Mystery</em> of <em>Mysteries</em>: The Death and Life of Edgar Allan Poe"] <3>
+]
+----
+<1> First hit.
+<2> Second hit with multiple highlighted snippets.
+<3> Third hit.
 ====
 
 Highlight projections, just like <<search-dsl-projection-field,field projections>>, can also be used in a combination with
@@ -96,15 +114,29 @@ that we want to get some text back even if there will be nothing to highlight in
 Before a highlighter can be configured, you need to pick its type.
 Picking the highlighter type is the first step in a highlighter definition:
 
-.Specifying the highlighter type
+.Specifying the plain highlighter type
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=various-highlighter-types]
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=various-highlighter-types-plain]
 ----
 <1> Starting the definition of a plain highlighter.
-<2> Starting the definition of a unified highlighter.
-<3> Starting the definition of a fast vector highlighter.
+====
+.Specifying the unified highlighter type
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=various-highlighter-types-unified]
+----
+<1> Starting the definition of a unified highlighter.
+====
+.Specifying the fast vector highlighter type
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=various-highlighter-types-fvh]
+----
+<1> Starting the definition of a fast vector highlighter.
 ====
 
 There are three options to choose from when it comes to the highlighter type:

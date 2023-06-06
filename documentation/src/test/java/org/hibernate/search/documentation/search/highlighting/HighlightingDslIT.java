@@ -57,11 +57,11 @@ public class HighlightingDslIT {
 
 			List<List<String>> result = searchSession.search( Book.class ) // <2>
 					.select( f -> f.highlight( "title" ) ) // <3>
-					.where( f -> f.match().field( "title" ).matching( "scandal" ) ) // <4>
+					.where( f -> f.match().field( "title" ).matching( "mystery" ) ) // <4>
 					.fetchHits( 20 ); // <5>
 			// end::basics[]
 			assertThat( result ).containsExactlyInAnyOrder(
-					Collections.singletonList( "A <em>Scandal</em> in Bohemia" )
+					Collections.singletonList( "The Boscombe Valley <em>Mystery</em>" )
 			);
 		} );
 	}
@@ -143,42 +143,56 @@ public class HighlightingDslIT {
 	}
 
 	@Test
-	public void variousHighlighterTypes() {
+	public void variousHighlighterTypesPlain() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<List<String>> result =
-					// tag::various-highlighter-types[]
+					// tag::various-highlighter-types-plain[]
 					searchSession.search( Book.class )
 							.select( f -> f.highlight( "title" ) )
 							.where( f -> f.match().fields( "title", "description" ).matching( "scandal" ) )
 							.highlighter( f -> f.plain() /* ... */ ) // <1>
 							.fetchHits( 20 );
-			// end::various-highlighter-types[]
+			// end::various-highlighter-types-plain[]
 			assertThat( result ).containsExactlyInAnyOrder(
 					Collections.singletonList( "A <em>Scandal</em> in Bohemia" )
 			);
+		} );
+	}
 
-			result =
-					// tag::various-highlighter-types[]
+	@Test
+	public void variousHighlighterTypesUnified() {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			List<List<String>> result =
+					// tag::various-highlighter-types-unified[]
 					searchSession.search( Book.class )
 							.select( f -> f.highlight( "title" ) )
 							.where( f -> f.match().fields( "title", "description" ).matching( "scandal" ) )
-							.highlighter( f -> f.unified() /* ... */ ) // <2>
+							.highlighter( f -> f.unified() /* ... */ ) // <1>
 							.fetchHits( 20 );
-			// end::various-highlighter-types[]
+			// end::various-highlighter-types-unified[]
 			assertThat( result ).containsExactlyInAnyOrder(
 					Collections.singletonList( "A <em>Scandal</em> in Bohemia" )
 			);
+		} );
+	}
 
-			result =
-					// tag::various-highlighter-types[]
+	@Test
+	public void variousHighlighterTypesFvh() {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			List<List<String>> result =
+					// tag::various-highlighter-types-fvh[]
 					searchSession.search( Book.class )
 							.select( f -> f.highlight( "description" ) )
 							.where( f -> f.match().fields( "title", "description" ).matching( "scandal" ) )
-							.highlighter( f -> f.fastVector() /* ... */ ) // <3>
+							.highlighter( f -> f.fastVector() /* ... */ ) // <1>
 							.fetchHits( 20 );
-			// end::various-highlighter-types[]
+			// end::various-highlighter-types-fvh[]
 			assertThat( result ).containsExactlyInAnyOrder(
 					Collections.emptyList()
 			);
