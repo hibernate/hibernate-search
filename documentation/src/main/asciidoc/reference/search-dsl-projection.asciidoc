@@ -1201,6 +1201,21 @@ a single or a multivalued one:
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlight]
 ----
+As an example, the result may look like:
+[source, JSON]
+----
+[
+    ["The Automatic <em>Detective</em>"], <1>
+    ["Dirk Gently's Holistic <em>Detective</em> Agency"], <2>
+    [
+      "The Paris <em>Detective</em>",
+      "<em>Detective</em> Luc Moncrief series"
+    ], <3>
+]
+----
+<1> First hit.
+<2> Second hit.
+<3> Third hit with multiple highlighted snippets.
 ====
 
 [[search-dsl-projection-highlight-multivalued]]
