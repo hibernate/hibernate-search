@@ -56,7 +56,7 @@ public class TestInvalidPaths {
 					.hasMessageContainingAll(
 							"type '" + DeepPathWithLeadingPrefixCase.class.getName() + "'",
 							"Non-matching includePaths filters: [b.c.dne]",
-							"Encountered field paths: [notJustAb, b.c, b.c.indexed]"
+							"Encountered field paths: [b, b.c, b.c.indexed]"
 					);
 		}
 	}
