@@ -59,6 +59,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 					.asBeanReference( IndexingPlanSynchronizationStrategy.class )
 					.build();
 
+	@SuppressWarnings("deprecation")
 	private static final ConfigurationProperty<Boolean> AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK )
 					.asBoolean()
@@ -101,8 +102,19 @@ public final class ConfiguredAutomaticIndexingStrategy {
 				} )
 				.orElse( true ) ) {
 			log.debug( "Hibernate Search event listeners activated" );
+			@SuppressWarnings("deprecation")
 			HibernateSearchEventListener hibernateSearchEventListener = new HibernateSearchEventListener(
-					contextProvider, AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK.get( startContext.configurationPropertySource() ) );
+					contextProvider, AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK.getAndTransform(
+					startContext.configurationPropertySource(), dirtyCheckingEnabled -> {
+						//we want to log a warning if the user set a non-default value
+						if ( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK != dirtyCheckingEnabled ) {
+							log.automaticIndexingEnableDirtyCheckIsDeprecated(
+									AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK.resolveOrRaw(
+											startContext.configurationPropertySource() ) );
+						}
+						return dirtyCheckingEnabled;
+					}
+			) );
 			hibernateSearchEventListener.registerTo( mappingContext.sessionFactory() );
 		}
 		else {

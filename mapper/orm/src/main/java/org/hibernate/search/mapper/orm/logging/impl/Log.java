@@ -325,4 +325,11 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 124, value = "Unable to apply the given filter at the session level with the outbox polling coordination strategy. " +
 			"With this coordination strategy, applying a session-level indexing plan filter is only allowed if it excludes all types.")
 	SearchException cannotApplySessionFilterWhenAsyncProcessingIsUsed();
+
+	@LogMessage(level = WARN)
+	@Message(id = ID_OFFSET + 125, value = "Configuration property '%1$s' is deprecated. "
+			+ "This setting will be removed in a future version. "
+			+ "There will be no alternative provided to replace it. "
+			+ "A dirty check will always be performed when considering triggering the reindexing.")
+	void automaticIndexingEnableDirtyCheckIsDeprecated(String deprecatedProperty);
 }

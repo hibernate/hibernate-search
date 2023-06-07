@@ -92,7 +92,11 @@ public final class HibernateOrmMapperSettings {
 	 * or a string that can be parsed into a Boolean value.
 	 * <p>
 	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK}.
+	 *
+	 * @deprecated This setting will be removed in a future version. There will be no alternative provided to replace it.
+	 * A dirty check will always be performed when considering triggering the reindexing.
 	 */
+	@Deprecated
 	public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = PREFIX + Radicals.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK;
 
 	/**
@@ -231,6 +235,11 @@ public final class HibernateOrmMapperSettings {
 		 */
 		@Deprecated
 		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.SYNCHRONIZATION_STRATEGY;
+		/**
+		 * @deprecated This setting will be removed in a future version. There will be no alternative provided to replace it.
+		 * A dirty check will always be performed when considering triggering the reindexing.
+		 */
+		@Deprecated
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.ENABLE_DIRTY_CHECK;
 		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup.strategy";
 		public static final String QUERY_LOADING_FETCH_SIZE = "query.loading.fetch_size";
@@ -268,6 +277,11 @@ public final class HibernateOrmMapperSettings {
 		 */
 		@Deprecated
 		public static final String SYNCHRONIZATION_STRATEGY = "synchronization.strategy";
+		/**
+		 * @deprecated This setting will be removed in a future version. There will be no alternative provided to replace it.
+		 * A dirty check will always be performed when considering triggering the reindexing.
+		 */
+		@Deprecated
 		public static final String ENABLE_DIRTY_CHECK = "enable_dirty_check";
 	}
 
@@ -328,6 +342,11 @@ public final class HibernateOrmMapperSettings {
 		@Deprecated
 		public static final BeanReference<org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 				BeanReference.of( org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy.class, "write-sync" );
+		/**
+		 * @deprecated This setting will be removed in a future version. There will be no alternative provided to replace it.
+		 * A dirty check will always be performed when considering triggering the reindexing.
+		 */
+		@Deprecated
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
 		public static final EntityLoadingCacheLookupStrategy QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
 				EntityLoadingCacheLookupStrategy.SKIP;
