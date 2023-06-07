@@ -87,7 +87,7 @@ class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 			int nextDotIndex = prefixToParse.indexOf( '.', afterPreviousDotIndex );
 			while ( nextDotIndex >= 0 ) {
 				// Make sure to mark the paths as encountered in the filter
-				String objectNameRelativeToFilter = prefixToParse.substring( 0, nextDotIndex );
+				String objectNameRelativeToFilter = prefixToParse.substring( unconsumedPrefix.length(), nextDotIndex );
 
 				// we don't want to proceed if a subpath is already excluded:
 				if ( !filter.isPathIncluded( objectNameRelativeToFilter ) ) {
