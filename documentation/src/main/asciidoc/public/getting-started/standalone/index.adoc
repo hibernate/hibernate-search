@@ -1,3 +1,5 @@
+:reference-documentation-location: ../../reference/index.adoc
+
 [[mapper-pojo-standalone-getting-started]]
 = Getting started with the Standalone POJO Mapper
 
@@ -7,17 +9,17 @@ This section will guide you through the initial steps required
 to index and query your entities using Hibernate Search,
 when your entities are not defined in Hibernate ORM.
 
-If your entities **are** defined in Hibernate ORM, see <<mapper-orm-getting-started,this other guide>> instead.
+If your entities **are** defined in Hibernate ORM, see xref:../orm/index.adoc#mapper-orm-getting-started[this other guide] instead.
 
 [[mapper-pojo-standalone-getting-started-assumptions]]
 == Assumptions
 
 This getting-started guide aims to be generic and does not tie itself to any framework in particular.
 If you use link:{springBootUrl}[Spring Boot] or link:{quarkusUrl}[Quarkus],
-make sure to first have a look at <<compatibility-framework,framework support>> for tips and to learn about quirks.
+make sure to first have a look at xref:{reference-documentation-location}#compatibility-framework[framework support] for tips and to learn about quirks.
 
 For the sake of simplicity, this guide assumes you are building an application deployed as a single instance on a single node.
-For more advanced setups, you are encouraged to have a look at the <<architecture-examples>>.
+For more advanced setups, you are encouraged to have a look at the xref:{reference-documentation-location}#architecture-examples[Examples of architectures].
 
 [[mapper-pojo-standalone-getting-started-dependencies]]
 == Dependencies
@@ -34,7 +36,7 @@ In order to use Hibernate Search, you will need at least two direct dependencies
 * and a dependency to the "backend", which allows indexing and searching these documents.
 
 Below are the most common setups and matching dependencies for a quick start;
-read <<architecture>> for more information.
+read xref:{reference-documentation-location}#architecture[Architecture] for more information.
 
 Standalone POJO Mapper + Lucene::
 Allows indexing of entities that are not defined in Hibernate ORM,
@@ -91,7 +93,7 @@ and their respective `lib` subdirectories.
 Once you have added all required dependencies to your application,
 it's time to have a look at the configuration.
 
-The configuration properties of Hibernate Search with the <<mapper-pojo-standalone,Standalone POJO Mapper>>
+The configuration properties of Hibernate Search with the xref:{reference-documentation-location}#mapper-pojo-standalone[Standalone POJO Mapper]
 are set programmatically when building the mapping.
 
 .Hibernate Search properties for a "Standalone POJO Mapper + Lucene" setup
@@ -119,13 +121,13 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/g
 By default, the backend will attempt to connect to `localhost:9200`.
 <4> Set the protocol. The default is `http`, but you may need to use `https`.
 <5> Set the username and password for basic HTTP authentication.
-You may also be interested in <<backend-elasticsearch-configuration-aws,AWS IAM authentication>>.
+You may also be interested in xref:{reference-documentation-location}#backend-elasticsearch-configuration-aws[AWS IAM authentication].
 <6> Build the `SearchMapping`.
 ====
 
 [TIP]
 ====
-A few <<configuration-builder,util methods>> are available to simplify
+A few xref:{reference-documentation-location}#configuration-builder[util methods] are available to simplify
 the dynamic building of property keys.
 ====
 
@@ -150,7 +152,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/g
 To make these entities searchable, you will need to map them to an index structure.
 The mapping can be defined using annotations, or using a programmatic API;
 this getting started guide will show you a simple annotation mapping.
-For more details, refer to <<mapping>>.
+For more details, refer to xref:{reference-documentation-location}#mapping[Mapping entities to indexes].
 
 Below is an example of how the model above can be mapped.
 
@@ -174,7 +176,7 @@ this will be addressed further down.
 <4> `@KeywordField` maps a property to a non-analyzed index field.
 Useful for identifiers, for example.
 <5> Hibernate Search is not just for full-text search: you can index non-`String` types with the `@GenericField` annotation,
-A <<mapping-directfieldmapping-supported-types,broad range of property types>> are supported out-of-the-box,
+A xref:{reference-documentation-location}#mapping-directfieldmapping-supported-types[broad range of property types] are supported out-of-the-box,
 such as primitive types (`int`, `double`, ...) and their boxed counterpart (`Integer`, `Double`, ...),
 enums, date/time types, `BigInteger`/`BigDecimal`, etc.
 <6> `@IndexedEmbedded` "embeds" the indexed form of associated objects (entities or embeddables)
@@ -185,7 +187,7 @@ Thus adding `@IndexedEmbedded` to the `authors` property of `Book`
 will add a single field named `authors.name` to the `Book` index.
 This field will be populated automatically based on the content of the `authors` property,
 and the books will be re-indexed automatically whenever the `name` property of their author changes.
-See <<mapping-indexedembedded>> for more information.
+See xref:{reference-documentation-location}#mapping-indexedembedded[Mapping associated elements with `@IndexedEmbedded`] for more information.
 <7> Entities that are only `@IndexedEmbedded` in other entities,
 but do not require to be searchable by themselves, do not need to be annotated with `@Indexed`.
 <8> Most of the time, you will need to put `@DocumentId` on contained, non-indexed entity types such as `Author`,
@@ -200,10 +202,10 @@ Just remember that Hibernate Search allows more complex mappings:
 
 * Multiple `@*Field` annotations exist, some of them allowing full-text search,
 some of them allowing finer-grained configuration for field of a certain type.
-You can find out more about `@*Field` annotations in <<mapping-directfieldmapping>>.
+You can find out more about `@*Field` annotations in xref:{reference-documentation-location}#mapping-directfieldmapping[Mapping a property to an index field with `@GenericField`, `@FullTextField`, ...].
 * Properties, or even types, can be mapped with finer-grained control using "bridges".
 This allows the mapping of types that are not supported out-of-the-box.
-See <<binding>> for more information.
+See xref:{reference-documentation-location}#binding[Binding and bridges] for more information.
 
 [[mapper-pojo-standalone-getting-started-initialization]]
 == Initialization
@@ -232,7 +234,7 @@ between two restarts of the application
 will require an update to the index schema.
 
 This will require some special handling, though it can easily be solved by dropping and re-creating the index.
-See <<mapping-changes>> for more information.
+See xref:{reference-documentation-location}#mapping-changes[Changing the mapping of an existing application] for more information.
 ====
 
 [[mapper-pojo-standalone-getting-started-initialization-indexing]]
@@ -247,12 +249,12 @@ That data is unknown to Hibernate Search, and thus has to be indexed through a b
 
 This is possible thanks to the mass indexer API,
 but a little more involved than
-with the <<mapper-orm-getting-started-initialization-indexing,Hibernate ORM mapper>>,
+with the xref:../orm/index.adoc#mapper-orm-getting-started-initialization-indexing[Hibernate ORM mapper],
 because a way to load entities from the other datastore needs to be plugged in.
 
 Due to this (relative) complexity, we won't cover it in this guide,
 but if you want to know more,
-have a look at <<mapper-pojo-standalone-indexing-massindexer>>.
+have a look at xref:{reference-documentation-location}#mapper-pojo-standalone-indexing-massindexer[Mass indexing].
 
 [[mapper-pojo-standalone-getting-started-indexing]]
 == Indexing
@@ -269,7 +271,7 @@ For that reason, if you modify entities in a session,
 and then execute a search query right after that session is closed,
 the search results may not be consistent with the changes you just performed.
 
-See <<indexing-automatic-synchronization>> for more information about this behavior and how to tune it.
+See xref:{reference-documentation-location}#indexing-automatic-synchronization[Synchronization with the indexes] for more information about this behavior and how to tune it.
 ====
 
 Use `add` when the entity is first added and you are absolutely certain it does not exist in the index yet:
@@ -322,7 +324,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/g
 <1> Create a Hibernate Search session, called `SearchSession`.
 <2> Initiate a search query on the index mapped to the `Book` entity.
 <3> Define that we will only retrieve entity identifiers.
-Retrieving entities directly is possible, but requires <<mapper-pojo-standalone-search-query-loading,more configuration>>,
+Retrieving entities directly is possible, but requires xref:{reference-documentation-location}#mapper-pojo-standalone-search-query-loading[more configuration],
 so we won't discuss it in this guide.
 <4> Define that only documents matching the given predicate should be returned.
 The predicate is created using a factory `f` passed as an argument to the lambda expression.
@@ -346,7 +348,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/g
 <2> Create a "search scope", representing the indexed types that will be queried.
 <3> Initiate a search query targeting the search scope.
 <4> Define that we will only retrieve entity identifiers.
-Retrieving entities directly is possible, but requires <<mapper-pojo-standalone-search-query-loading,more configuration>>,
+Retrieving entities directly is possible, but requires xref:{reference-documentation-location}#mapper-pojo-standalone-search-query-loading[more configuration],
 so we won't discuss it in this guide.
 <5> Define that only documents matching the given predicate should be returned.
 The predicate is created using the same search scope as the query.
@@ -372,7 +374,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/g
 ====
 While the examples above retrieved hits as entity identifiers,
 it is just one of the possible hit types.
-See <<search-dsl-projection>> for more information.
+See xref:{reference-documentation-location}#search-dsl-projection[Projection DSL] for more information.
 ====
 
 [[mapper-pojo-standalone-getting-started-analysis]]
@@ -409,7 +411,7 @@ by picking the tokenizer and filters most suited to your specific needs.
 The following paragraphs will explain how to configure and use
 a simple yet reasonably useful analyzer.
 For more information about analysis and how to configure it,
-refer to the <<concepts-analysis>> section.
+refer to the xref:{reference-documentation-location}#concepts-analysis[Analysis] section.
 
 Each custom analyzer needs to be given a name in Hibernate Search.
 This is done through analysis configurers, which are defined per backend:
@@ -446,16 +448,16 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/g
 <1> Define a custom analyzer named "english", to analyze English text such as book titles.
 <2> Set the tokenizer to a standard tokenizer.
 You need to pass Lucene-specific names to refer to tokenizers;
-see <<backend-lucene-analysis-analyzers>> for information about available tokenizers, their name and their parameters.
+see xref:{reference-documentation-location}#backend-lucene-analysis-analyzers[Custom analyzers and normalizers] for information about available tokenizers, their name and their parameters.
 <3> Set the token filters. Token filters are applied in the order they are given.
 Here too, Lucene-specific names are expected;
-see <<backend-lucene-analysis-analyzers>> for information about available token filters, their name and their parameters.
+see xref:{reference-documentation-location}#backend-lucene-analysis-analyzers[Custom analyzers and normalizers] for information about available token filters, their name and their parameters.
 <4> Set the value of a parameter for the last added char filter/tokenizer/token filter.
 <5> Define another custom analyzer, called "name", to analyze author names.
 On contrary to the first one, do not use enable stemming,
 as it is unlikely to lead to useful results on proper nouns.
 <6> Assign the configurer to the backend in the Hibernate Search configuration properties.
-For more information about the bean references, see <<configuration-bean-reference>>.
+For more information about the bean references, see xref:{reference-documentation-location}#configuration-bean-reference[Bean references].
 ====
 
 .Analysis configurer implementation and configuration for a "Standalone POJO Mapper + Elasticsearch/OpenSearch" setup
@@ -471,10 +473,10 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/g
 <1> Define a custom analyzer named "english", to analyze English text such as book titles.
 <2> Set the tokenizer to a standard tokenizer.
 You need to pass Elasticsearch-specific names to refer to tokenizers;
-see <<backend-elasticsearch-analysis-analyzers>> for information about available tokenizers, their name and their parameters.
+see xref:{reference-documentation-location}#backend-elasticsearch-analysis-analyzers[Custom analyzers and normalizers] for information about available tokenizers, their name and their parameters.
 <3> Set the token filters. Token filters are applied in the order they are given.
 Here too, Elasticsearch-specific names are expected;
-see <<backend-elasticsearch-analysis-analyzers>> for information about available token filters, their name and their parameters.
+see xref:{reference-documentation-location}#backend-elasticsearch-analysis-analyzers[Custom analyzers and normalizers] for information about available token filters, their name and their parameters.
 <4> Note that, for Elasticsearch, any parameterized char filter, tokenizer or token filter
 must be defined separately and assigned a new name.
 <5> Set the value of a parameter for the char filter/tokenizer/token filter being defined.
@@ -482,7 +484,7 @@ must be defined separately and assigned a new name.
 On contrary to the first one, do not use enable stemming,
 as it is unlikely to lead to useful results on proper nouns.
 <7> Assign the configurer to the backend in the Hibernate Search configuration properties.
-For more information about the bean references, see <<configuration-bean-reference>>.
+For more information about the bean references, see xref:{reference-documentation-location}#configuration-bean-reference[Bean references].
 ====
 
 Once analysis is configured, the mapping must be adapted to assign the relevant analyzer to each field:
@@ -529,20 +531,20 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/g
 The above paragraphs gave you an overview of Hibernate Search.
 
 The next step after this tutorial is to get more familiar
-with the overall architecture of Hibernate Search (<<architecture>>)
-and review the <<architecture-examples>> to pick the most appropriate for your use case.
+with the overall architecture of Hibernate Search (xref:{reference-documentation-location}#architecture[Architecture])
+and review the xref:{reference-documentation-location}#architecture-examples[Examples of architectures] to pick the most appropriate for your use case.
 
 You may also want to explore the basic features in more detail.
 Two topics which were only briefly touched in this tutorial
-were analysis configuration (<<concepts-analysis>>) and bridges (<<binding>>).
+were analysis configuration (xref:{reference-documentation-location}#concepts-analysis[Analysis]) and bridges (xref:{reference-documentation-location}#binding[Binding and bridges]).
 Both are important features required for more fine-grained indexing.
 
 When it comes to initializing your index, you will be interested
-in <<schema-management,schema management>>
-and <<mapper-pojo-standalone-indexing-massindexer,mass indexing>>.
+in xref:{reference-documentation-location}#schema-management[schema management]
+and xref:{reference-documentation-location}#mapper-pojo-standalone-indexing-massindexer[mass indexing].
 
 When querying, you will probably want to know more about
-<<search-dsl-predicate,predicates>>,
-<<search-dsl-sort,sorts>>, <<search-dsl-projection,projections>>,
-<<search-dsl-aggregation,aggregations>>.
+xref:{reference-documentation-location}#search-dsl-predicate[predicates],
+xref:{reference-documentation-location}#search-dsl-sort[sorts], xref:{reference-documentation-location}#search-dsl-projection[projections],
+xref:{reference-documentation-location}#search-dsl-aggregation[aggregations].
 
