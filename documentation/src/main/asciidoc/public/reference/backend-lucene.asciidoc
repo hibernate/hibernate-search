@@ -1,0 +1,1300 @@
+[[backend-lucene]]
+= [[search-lucene-native]] Lucene backend
+
+[[backend-lucene-configuration]]
+== Basic configuration
+
+All configuration properties of the Lucene backend are optional,
+but the defaults might not suit everyone.
+In particular, you might want to
+<<backend-lucene-configuration-directory-local-filesystem-location,set the location of your indexes in the filesystem>>.
+
+Other configuration properties are mentioned in the relevant parts of this documentation.
+You can find a full reference of available properties in the Hibernate Search javadoc:
+
+* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneBackendSettings.html[org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings].
+* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneIndexSettings.html[org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings].
+
+[[backend-lucene-configuration-directory]]
+== [[search-configuration-directory]] Index storage (`Directory`)
+
+The component responsible for index storage in Lucene is the `org.apache.lucene.store.Directory`.
+The implementation of the directory determines where the index will be stored:
+on the filesystem, in the JVM's heap, ...
+
+By default, the Lucene backend stores the indexes on the filesystem,
+in the JVM's working directory.
+
+The type of directory can be configured as follows:
+
+// Search 5 anchors backward compatibility
+[[example-configuring-directory-providers]]
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.directory.type = local-filesystem
+# To configure a specific index:
+hibernate.search.backend.indexes.<index-name>.directory.type = local-filesystem
+----
+
+// Search 5 anchors backward compatibility
+[[directory-provider-table]]
+The following directory types are available:
+
+* `local-filesystem`: Store the index on the local filesystem.
+See <<backend-lucene-configuration-directory-local-filesystem>>
+for details and configuration options.
+* `local-heap`: Store the index in the local JVM heap.
+*Local heap directories and all contained indexes are lost when the JVM shuts down.*
+See <<backend-lucene-configuration-directory-local-heap>>
+for details and configuration options.
+
+[[backend-lucene-configuration-directory-local-filesystem]]
+=== Local filesystem storage
+
+The `local-filesystem` directory type will store each index in
+a subdirectory of a configured filesystem directory.
+
+[NOTE]
+====
+Local filesystem directories really are designed to be *local* to one server and one application.
+
+In particular, they should not be shared between multiple Hibernate Search instances.
+Even if network shares allow to share the raw content of indexes,
+using the same index files from multiple Hibernate Search
+would require more than that:
+non-exclusive locking, routing of write requests from one node to another, ...
+These additional features are simply not available on `local-filesystem` directories.
+
+If you need to share indexes between multiple Hibernate Search instances,
+the Elasticsearch backend will be a better choice.
+Refer to <<architecture>> for more information.
+====
+
+[[backend-lucene-configuration-directory-local-filesystem-location]]
+==== Index location
+
+Each index is assigned a subdirectory under a root directory.
+
+By default, the root directory is the JVM's working directory.
+It can be configured as follows:
+
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.directory.root = /path/to/my/root
+# To configure a specific index:
+hibernate.search.backend.indexes.<index-name>.directory.root = /path/to/my/root
+----
+
+For example, with the configuration above,
+an entity type named `Order` will be indexed in directory
+`/path/to/my/root/Order/`.
+If that entity is explicitly assigned the index name `orders`
+(see `@Indexed(index = ...)` in <<mapping-entityindexmapping>>),
+it will instead be indexed in directory
+`/path/to/my/root/orders/`.
+
+[[backend-lucene-configuration-directory-filesystem-access-strategy]]
+==== [[_filesystem_access_strategy]] Filesystem access strategy
+
+The default strategy for accessing the filesystem is determined automatically
+based on the operating system and architecture.
+It should work well in most situations.
+
+For situations where a different filesystem access strategy is needed,
+Hibernate Search exposes a configuration property:
+
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.directory.filesystem_access.strategy = auto
+# To configure a specific index:
+hibernate.search.backend.indexes.<index-name>.directory.filesystem_access.strategy = auto
+----
+
+Allowed values are:
+
+* `auto`: lets Lucene select the most appropriate implementation
+based on the operating system and architecture.
+This is the default value for the property.
+* `simple`: a straightforward strategy based on `Files.newByteChannel`.
+See `org.apache.lucene.store.SimpleFSDirectory`.
+**This strategy is deprecated and will be removed in a future version of Lucene.**
+* `mmap`: uses `mmap` for reading, and `FSDirectory.FSIndexOutput` for writing.
+See `org.apache.lucene.store.MMapDirectory`.
+* `nio`: uses ``java.nio.channels.FileChannel``'s positional read for concurrent reading,
+and `FSDirectory.FSIndexOutput` for writing.
+See `org.apache.lucene.store.NIOFSDirectory`.
+
+[NOTE]
+====
+Make sure to refer to Javadocs of these `Directory`
+implementations before changing this setting.
+Implementations offering better performance
+also bring issues of their own.
+====
+
+[[backend-lucene-configuration-directory-other]]
+==== Other configuration options
+
+The `local-filesystem` directory also allows configuring a
+<<backend-lucene-configuration-directory-locking-strategy,locking strategy>>.
+
+[[backend-lucene-configuration-directory-local-heap]]
+=== Local heap storage
+
+The `local-heap` directory type will store indexes in the local JVM's heap.
+
+As a result, indexes contained in a `local-heap` directory are *lost when the JVM shuts down*.
+
+This directory type is only provided for use in *testing configurations*
+with *small indexes* and *low concurrency*,
+where it could slightly improve performance.
+In setups requiring larger indexes and/or high concurrency,
+a <<backend-lucene-configuration-directory-local-filesystem,filesystem-based directory>>
+will achieve better performance.
+
+The `local-heap` directory does not offer any specific option
+beyond the <<backend-lucene-configuration-directory-locking-strategy,locking strategy>>.
+
+[[backend-lucene-configuration-directory-locking-strategy]]
+=== [[search-configuration-directory-lockfactories]] Locking strategy
+
+In order to write to an index, Lucene needs to acquire a lock to ensure no other application instance
+writes to the same index concurrently.
+Each directory type comes with a default locking strategy that should work well enough in most situations.
+
+For those (very) rare situations where a different locking strategy is needed,
+Hibernate Search exposes a configuration property:
+
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.directory.locking.strategy = native-filesystem
+# To configure a specific index:
+hibernate.search.backend.indexes.<index-name>.directory.locking.strategy = native-filesystem
+----
+
+The following strategies are available:
+
+* `simple-filesystem`:
+Locks the index by creating a marker file and checking it before write operations.
+This implementation is very simple and based Java's File API.
+If for some reason an application ends abruptly,
+the marker file will stay on the filesystem and will need to be removed manually.
++
+This strategy is only available for filesystem-based directories.
++
+See `org.apache.lucene.store.SimpleFSLockFactory`.
+* `native-filesystem`:
+Similarly to `simple-filesystem`, locks the index by creating a marker file,
+but using native OS file locks instead of Java's File API,
+so that locks will be cleaned up if the application ends abruptly.
++
+This is the default strategy for the `local-filesystem` directory type.
++
+This implementation has known problems with NFS: it should be avoided on network shares.
++
+This strategy is only available for filesystem-based directories.
++
+See `org.apache.lucene.store.NativeFSLockFactory`.
+* `single-instance`:
+Locks using a Java object held in the JVM's heap.
+Since the lock is only accessible by the same JVM,
+this strategy will only work properly when it is known
+that only a single application will ever try to access the indexes.
++
+This is the default strategy for the `local-heap` directory type.
++
+See `org.apache.lucene.store.SingleInstanceLockFactory`.
+* `none`:
+Does not use any lock.
+Concurrent writes from another application will result in index corruption.
+Test your application carefully and make sure you know what it means.
++
+See `org.apache.lucene.store.NoLockFactory`.
+
+[[backend-lucene-configuration-sharding]]
+== [[advanced-features-sharding]] Sharding
+
+[[backend-lucene-configuration-sharding-basics]]
+=== Basics
+
+include::../components/sharding-intro-note.asciidoc[]
+
+In the Lucene backend, sharding is disabled by default,
+but can be enabled by selecting a sharding strategy.
+Multiple strategies are available:
+
+[[backend-lucene-configuration-sharding-strategy-hash]]`hash`::
++
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.sharding.strategy = hash
+hibernate.search.backend.sharding.number_of_shards = 2
+# To configure a specific index:
+hibernate.search.backend.indexes.<index-name>.sharding.strategy = hash
+hibernate.search.backend.indexes.<index-name>.sharding.number_of_shards = 2
+----
++
+The `hash` strategy requires to set a number of shards through the `number_of_shards` property.
++
+This strategy will set up an explicitly configured number of shards,
+numbered from 0 to the chosen number minus one
+(e.g. for 2 shards, there will be shard "0" and shard "1").
++
+When routing, the routing key will be hashed to assign it to a shard.
+If the routing key is null, the document ID will be used instead.
++
+This strategy is suitable when there is no explicit routing key
+<<binding-routingbridge-routingkey,configured in the mapping>>,
+or when the routing key has a large number of possible values that need
+to be brought down to a smaller number (e.g. "all integers").
+
+[[backend-lucene-configuration-sharding-strategy-explicit]]`explicit`::
++
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.sharding.strategy = explicit
+hibernate.search.backend.sharding.shard_identifiers = fr,en,de
+# To configure a specific index:
+hibernate.search.backend.indexes.<index-name>.sharding.strategy = explicit
+hibernate.search.backend.indexes.<index-name>.sharding.shard_identifiers = fr,en,de
+----
++
+The `explicit` strategy requires to set a list of shard identifiers through the `shard_identifiers` property.
+The identifiers must be provided as a String containing multiple shard identifiers separated by commas,
+or a `Collection<String>` containing shard identifiers.
+A shard identifier can be any string.
++
+This strategy will set up one shard per configured shard identifier.
++
+When routing, the routing key will be validated to make sure it matches a shard identifier exactly.
+If it does, the document will be routed to that shard.
+If it does not, an exception will be thrown.
+The routing key cannot be null, and the document ID will be ignored.
++
+This strategy is suitable when there is an explicit routing key
+<<binding-routingbridge-routingkey,configured in the mapping>>,
+and that routing key has a limited number of possible values that are known before starting the application.
+
+
+[[backend-lucene-configuration-sharding-configuration]]
+=== Per-shard configuration
+
+In some cases, in particular when using the <<backend-lucene-configuration-sharding-strategy-explicit,`explicit`>>
+sharding strategy, it may be necessary to configure some shards in a slightly different way.
+For example, one of the shards may hold massive, but infrequently-accessed data,
+which should be stored on a different drive.
+
+This can be achieved by adding configuration properties for a specific shard:
+
+[source]
+----
+# Default configuration for all shards an index:
+hibernate.search.backend.indexes.<index-name>.directory.root = /path/to/fast/drive/
+# Configuration for a specific shard:
+hibernate.search.backend.indexes.<index-name>.shards.<shard-identifier>.directory.root = /path/to/large/drive/
+----
+
+[NOTE]
+====
+Not all settings can be overridden per shard; for example you can't override the sharding strategy on a per-shard basis.
+
+Per-shard overriding is primarily intended for settings
+related to the <<backend-lucene-configuration-directory,directory>> and <<backend-lucene-io,I/O>>.
+====
+
+Valid shard identifiers depend on the sharding strategy:
+
+* For the <<backend-lucene-configuration-sharding-strategy-hash,`hash`>> strategy,
+each shard is assigned a positive integer, from `0` to the chosen number of shards minus one.
+* For the <<backend-lucene-configuration-sharding-strategy-explicit,`explicit`>> strategy,
+each shard is assigned one of the identifiers defined with the `shard_identifiers` property.
+
+[[backend-lucene-configuration-lucene-version]]
+== [[_index_format_compatibility]] Index format compatibility
+
+While Hibernate Search strives to offer a backwards compatible API,
+making it easy to port your application to newer versions,
+it still delegates to Apache Lucene to handle the index writing and searching.
+This creates a dependency to the Lucene index format.
+The Lucene developers of course attempt to keep a stable index format,
+but sometimes a change in the format can not be avoided.
+In those cases you either have to re-index all your data or use an index upgrade tool.
+Sometimes, Lucene is also able to read the old format, so you don't need to take specific actions
+(beside making backup of your index).
+
+While an index format incompatibility is a rare event,
+it can happen more often that Lucene's Analyzer implementations might slightly change its behavior.
+This can lead to some documents not matching anymore, even though they used to.
+
+To avoid this analyzer incompatibility,
+Hibernate Search allows configuring to which version of Lucene
+the analyzers and other Lucene classes should conform their behavior.
+
+This configuration property is set at the backend level:
+
+[source]
+----
+hibernate.search.backend.lucene_version = LUCENE_8_1_1
+----
+
+Depending on the specific version of Lucene you're using,
+you might have different options available:
+see `org.apache.lucene.util.Version` contained in `lucene-core.jar`
+for a list of allowed values.
+
+When this option is not set, Hibernate Search will instruct Lucene to use the latest version,
+which is usually the best option for new projects.
+Still, it's recommended to define the version you're using explicitly in the configuration,
+so that when you happen to upgrade, Lucene the analyzers will not change behavior.
+You can then choose to update this value at a later time,
+for example when you have the chance to rebuild the index from scratch.
+
+[NOTE]
+====
+The setting will be applied consistently when using Hibernate Search APIs,
+but if you are also making use of Lucene bypassing Hibernate Search
+(for example when instantiating an Analyzer yourself),
+make sure to use the same value.
+====
+
+[TIP]
+====
+For information about which versions of Hibernate Search you can upgrade to,
+while retaining backward compatibility with a given version of Lucene APIs,
+refer to the https://hibernate.org/community/compatibility-policy/#compatibility-third-party-hsearch-lucene[compatibility policy].
+====
+
+[[backend-lucene-schema]]
+== Schema
+
+Lucene does not really have a concept of centralized schema to specify the data type and capabilities of each field,
+but Hibernate Search maintains such a schema in memory,
+in order to remember which predicates/projections/sorts can be applied to each field.
+
+For the most part, the schema is inferred from
+<<mapping,the mapping configured through Hibernate Search's mapping APIs>>,
+which are generic and independent of Lucene.
+
+Aspects that are specific to the Lucene backend are explained in this section.
+
+[[backend-lucene-field-types]]
+=== Field types
+
+[[backend-lucene-field-types-available]]
+==== Available field types
+
+[NOTE]
+====
+Some types are not supported directly by the Lucene backend,
+but will work anyway because they are "bridged" by the mapper.
+For example a `java.util.Date` in your entity model is "bridged" to `java.time.Instant`,
+which is supported by the Lucene backend.
+See <<mapping-directfieldmapping-supported-types>> for more information.
+====
+
+[NOTE]
+====
+Field types that are not in this list can still be used with a bit more work:
+
+* If a property in the entity model has an unsupported type,
+but can be converted to a supported type, you will need a bridge.
+See <<binding>>.
+* If you need an index field with a specific type that is not supported by Hibernate Search,
+you will need a bridge that defines a native field type.
+See <<backend-lucene-field-types-extension>>.
+====
+
+[cols="l,1",options="header"]
+.Field types supported by the Lucene backend
+|====
+|Field type|Limitations
+|java.lang.String|-
+|java.lang.Byte|-
+|java.lang.Short|-
+|java.lang.Integer|-
+|java.lang.Long|-
+|java.lang.Double|-
+|java.lang.Float|-
+|java.lang.Boolean|-
+|java.math.BigDecimal|-
+|java.math.BigInteger|-
+|java.time.Instant|<<backend-lucene-field-types-date-time>>
+|java.time.LocalDate|<<backend-lucene-field-types-date-time>>
+|java.time.LocalTime|<<backend-lucene-field-types-date-time>>
+|java.time.LocalDateTime|<<backend-lucene-field-types-date-time>>
+|java.time.ZonedDateTime|<<backend-lucene-field-types-date-time>>
+|java.time.OffsetDateTime|<<backend-lucene-field-types-date-time>>
+|java.time.OffsetTime|<<backend-lucene-field-types-date-time>>
+|java.time.Year|<<backend-lucene-field-types-date-time>>
+|java.time.YearMonth|<<backend-lucene-field-types-date-time>>
+|java.time.MonthDay|-
+|org.hibernate.search.<wbr>engine.<wbr>spatial.<wbr>GeoPoint|<<backend-lucene-field-types-geopoint>>
+|====
+
+[[backend-lucene-field-types-date-time,Lower range/resolution]]
+[NOTE]
+.Range and resolution of date/time fields
+====
+Date/time types do not support the whole range of years that can be represented in `java.time` types:
+
+* `java.time` can represent years ranging from `-999.999.999` to `999.999.999`.
+* The Lucene backend supports dates ranging from year `-292.275.054` to year `292.278.993`.
+
+Values that are out of range will trigger indexing failures.
+
+Resolution for time types is also lower:
+
+* `java.time` supports nanosecond-resolution.
+* The Lucene backend supports millisecond-resolution.
+
+Precision beyond the millisecond will be lost when indexing.
+====
+
+[[backend-lucene-field-types-geopoint,Lower resolution]]
+[NOTE]
+.Range and resolution of `GeoPoint` fields
+====
+``GeoPoint``s are indexed as ``LatLonPoint``s in the Lucene backend.
+According to ``LatLonPoint``'s javadoc, there is a loss of precision when the values are encoded:
+
+> Values are indexed with some loss of precision from the
+> original `double` values (`4.190951585769653E-8` for the latitude component
+> and `8.381903171539307E-8` for longitude).
+
+This effectively means indexed points can be off by about 13 centimeters (5.2 inches) in the worst case.
+====
+
+[[backend-lucene-field-types-extension]]
+==== Index field type DSL extensions
+
+Not all Lucene field types have built-in support in Hibernate Search.
+Unsupported field types can still be used, however,
+by taking advantage of the "native" field type.
+Using this field type, Lucene `IndexableField` instances can be created directly,
+giving access to everything Lucene can offer.
+
+Below is an example of how to use the Lucene "native" type.
+
+.Using the Lucene "native" type
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/type/asnative/PageRankValueBinder.java[tags=include]
+----
+<1> Define a <<binding,custom binder>> and its bridge.
+The "native" type can only be used from a binder,
+it cannot be used directly with annotation mapping.
+Here we're defining a <<binding-valuebridge,value binder>>,
+but a <<binding-typebridge,type binder>>,
+or a <<binding-propertybridge,property binder>>
+would work as well.
+<2> Get the context's type factory.
+<3> Apply the Lucene extension to the type factory.
+<4> Call `asNative` to start defining a native type.
+<5> Define the field value type.
+<6> Define the `LuceneFieldContributor`.
+The contributor will be called upon indexing to add as many fields as necessary to the document.
+All fields must be named after the `absoluteFieldPath` passed to the contributor.
+<7> Optionally, if projections are necessary, define the `LuceneFieldValueExtractor`.
+The extractor will be called upon projecting to extract the projected value from a *single* stored field.
+<8> The value bridge is free to apply a preliminary conversion
+before passing the value to Hibernate Search, which will pass it along to the `LuceneFieldContributor`.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/type/asnative/WebPage.java[tags=include;!getters-setters]
+----
+<1> Map the property to an index field.
+Note that value bridges using a non-standard field type (such as Lucene's "native" type)
+must be mapped using the `@NonStandardField` annotation:
+other annotations such as `@GenericField` will fail.
+<2> Instruct Hibernate Search to use our custom value binder.
+====
+
+[[backend-lucene-multi-tenancy]]
+=== [[section-multi-tenancy]] Multi-tenancy
+
+Multi-tenancy is supported and handled transparently,
+according to the tenant ID defined in the current session:
+
+* documents will be indexed with the appropriate values, allowing later filtering;
+* queries will filter results appropriately.
+
+The multi-tenancy is automatically enabled in the backend if it is enabled in the mapper,
+e.g. if link:{hibernateDocUrl}#multitenacy[a multi-tenancy strategy is selected in Hibernate ORM],
+or if <<mapper-pojo-standalone-multi-tenancy,multi-tenancy is explicitly configured in the Standalone POJO mapper>>.
+
+However, it is possible to enable multi-tenancy manually.
+
+The multi-tenancy strategy is set at the backend level:
+
+[source]
+----
+hibernate.search.backend.multi_tenancy.strategy = none
+----
+
+See the following subsections for details about available strategies.
+
+[[backend-lucene-multi-tenancy-none]]
+==== `none`: single-tenancy
+
+The `none` strategy (the default) disables multi-tenancy completely.
+
+Attempting to set a tenant ID will lead to a failure when indexing.
+
+[[backend-lucene-multi-tenancy-discriminator]]
+==== `discriminator`: type name mapping using the index name
+
+With the `discriminator` strategy,
+all documents from all tenants are stored in the same index.
+
+When indexing, a discriminator field holding the tenant ID is populated transparently for each document.
+
+When searching, a filter targeting the tenant ID field is added transparently to the search query
+to only return search hits for the current tenant.
+
+[[backend-lucene-analysis]]
+== Analysis
+
+[[backend-lucene-analysis-basics]]
+=== Basics
+
+<<concepts-analysis,Analysis>> is the text processing performed by analyzers,
+both when indexing (document processing)
+and when searching (query processing).
+
+The Lucene backend comes with some <<backend-lucene-analysis-builtin,default analyzers>>,
+but analysis can also be configured explicitly.
+
+To configure analysis in a Lucene backend, you will need to:
+
+. Define a class that implements the `org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer` interface.
+. Configure the backend to use that implementation by setting the configuration property
+`hibernate.search.backend.analysis.configurer`
+to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
+for example `class:com.mycompany.MyAnalysisConfigurer`.
+
+TIP: You can pass multiple bean references separated by commas. See <<configuration-property-types>>.
+
+Hibernate Search will call the `configure` method of this implementation on startup,
+and the configurer will be able to take advantage of a DSL to define
+<<backend-lucene-analysis-analyzers,analyzers and normalizers>> or even (for more advanced use) the <<backend-lucene-analysis-similarity,similarity>>.
+See below for examples.
+
+[[backend-lucene-analysis-builtin]]
+=== Built-in analyzers
+
+Built-in analyzers are available out-of-the-box and don't require explicit configuration.
+If necessary, they can be overridden by defining your own analyzer with the same name.
+
+The Lucene backend comes with a series of built-in analyzer;
+their names are listed as constants in `org.hibernate.search.engine.backend.analysis.AnalyzerNames`:
+
+`default`::
+The analyzer used by default with <<mapping-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>.
++
+Default implementation: `org.apache.lucene.analysis.standard.StandardAnalyzer`.
++
+Default behavior: first, tokenize using the standard tokenizer, which follows Word Break rules from the
+Unicode Text Segmentation algorithm, as specified in http://unicode.org/reports/tr29/[Unicode Standard Annex #29].
+Then, lowercase each token.
+`standard`::
+Default implementation: `org.apache.lucene.analysis.standard.StandardAnalyzer`.
++
+Default behavior: first, tokenize using the standard tokenizer, which follows Word Break rules from the
+Unicode Text Segmentation algorithm, as specified in http://unicode.org/reports/tr29/[Unicode Standard Annex #29].
+Then, lowercase each token.
+`simple`::
+Default implementation: `org.apache.lucene.analysis.core.SimpleAnalyzer`.
++
+Default behavior: first, split the text at non-letter characters.
+Then, lowercase each token.
+`whitespace`::
+Default implementation: `org.apache.lucene.analysis.core.WhitespaceAnalyzer`.
++
+Default behavior: split the text at whitespace characters.
+Do not change the tokens.
+`stop`::
+Default implementation: `org.apache.lucene.analysis.core.StopAnalyzer`.
++
+Default behavior: first, split the text at non-letter characters.
+Then, lowercase each token.
+Finally, remove English stop words.
+`keyword`::
+Default implementation: `org.apache.lucene.analysis.core.KeywordAnalyzer`.
++
+Default behavior: do not change the text in any way.
++
+With this analyzer a full text field would behave similarly to a keyword field,
+but with fewer features: no terms aggregations, for example.
++
+Consider using a <<mapping-directfieldmapping-annotations-keywordfield,`@KeywordField`>> instead.
+
+[[backend-lucene-analysis-builtin-normalizer]]
+=== Built-in normalizers
+
+The Lucene backend does not provide any built-in normalizer.
+
+[[backend-lucene-analysis-analyzers]]
+=== Custom analyzers and normalizers
+
+[[backend-lucene-analysis-analyzers-component-by-factory-name]]
+==== Referencing components by name
+
+The context passed to the configurer exposes a DSL to define analyzers and normalizers:
+
+.Implementing and using an analysis configurer to define analyzers and normalizers with the Lucene backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/MyLuceneAnalysisConfigurer.java[tags=include]
+----
+<1> Define a custom analyzer named "english", because it will be used to analyze English text such as book titles.
+<2> Set the tokenizer to a standard tokenizer: components are referenced by their name.
+<3> Set the char filters. Char filters are applied in the order they are given, before the tokenizer.
+<4> Set the token filters. Token filters are applied in the order they are given, after the tokenizer.
+<5> Set the value of a parameter for the last added char filter/tokenizer/token filter.
+<6> Normalizers are defined in a similar way, the only difference being that they cannot use a tokenizer.
+<7> Multiple analyzers/normalizers can be defined in the same configurer.
+
+[source, XML, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/analysis/lucene-simple.properties[]
+----
+<1> Assign the configurer to the backend using a Hibernate Search configuration property.
+====
+
+To know which character filters, tokenizers and token filters are available,
+you can call `context.availableTokenizers()`, `context.availableTokenizers()`
+and `context.availableTokenFilters()` on the context passed to your analysis configurer;
+this will return a set of all valid names.
+
+To know more about the behavior of these character filters, tokenizers and token filters,
+either browse the link:{luceneJavadocUrl}[Lucene Javadoc] or read the corresponding section on the
+link:http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[Solr Wiki]
+(you don't need Solr to use these analyzers,
+it's just that there is no documentation page for Lucene proper).
+
+[TIP]
+====
+In the Lucene Javadoc, the description of each factory class includes the mention "SPI Name" followed by a string constant.
+This is the name that should be passed to use that factory when defining analyzers.
+====
+
+[[backend-lucene-analysis-analyzers-component-by-factory-class]]
+==== Referencing components by factory class
+
+Instead of names, you may also pass Lucene factory classes to refer to a particular tokenizer,
+char filter or token filter implementation.
+Those classes extend `org.apache.lucene.analysis.util.TokenizerFactory`,
+`org.apache.lucene.analysis.util.TokenFilterFactory`
+or `org.apache.lucene.analysis.util.CharFilterFactory`.
+
+This avoids string constants in your code, at the cost of having a direct compile-time dependency to Lucene.
+
+.Analysis configurer implementation using Lucene factory classes
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/LuceneClassesAnalysisConfigurer.java[tags=include]
+----
+====
+
+To know which character filters, tokenizers and token filters are available,
+either browse the link:{luceneJavadocUrl}[Lucene Javadoc] or read the corresponding section on the
+link:http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[Solr Wiki]
+(you don't need Solr to use these analyzers,
+it's just that there is no documentation page for Lucene proper).
+
+[[backend-lucene-analysis-analyzers-instance]]
+==== Assigning names to analyzer instances
+
+It is also possible to assign a name to an analyzer instance:
+
+.Naming an analyzer instance in the Lucene backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/AdvancedLuceneAnalysisConfigurer.java[tags=instance]
+----
+====
+
+[[backend-lucene-analysis-analyzers-default]]
+=== Overriding the default analyzer
+
+The default analyzer when using <<mapping-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>
+without specifying an analyzer explicitly, is named `default`.
+
+Like any other <<backend-lucene-analysis-builtin,built-in analyzer>>, it is possible to override the default analyzer
+by defining a <<backend-lucene-analysis-analyzers,custom analyzer>> with the same name:
+
+.Overriding the default analyzer in the Lucene backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/MyLuceneAnalysisConfigurer.java[tags=include]
+----
+<1> Start the definition of a custom analyzer that happens to be named `default`.
+Here we rely on constants from `org.hibernate.search.engine.backend.analysis.AnalyzerNames` to use the correct name,
+but hardcoding `"default"` would work just as well.
+<2> Continue the analyzer definition <<backend-lucene-analysis-analyzers,as we would for any other custom analyzer>>.
+
+[source, XML, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/analysis/lucene-default-override.properties[]
+----
+<1> Assign the configurer to the backend using a Hibernate Search configuration property.
+====
+
+[[backend-lucene-analysis-similarity]]
+=== [[section-custom-similarity]] Similarity
+
+When searching, scores are assigned to documents based on statistics recorded at index time, using a specific formula.
+Those statistics and the formula are defined by a single component called the similarity,
+implementing Lucene's `org.apache.lucene.search.similarities.Similarity` interface.
+
+By default, Hibernate Search uses `BM25Similarity` with its defaults parameters (`k1 = 1.2`, `b = 0.75`).
+This should provide satisfying scoring in most situations.
+
+If you have advanced needs, you can set a custom `Similarity` in your analysis configurer, as shown below.
+
+[NOTE]
+====
+Remember to also reference the analysis configurer from your configuration properties,
+as explained in <<backend-lucene-analysis-analyzers>>.
+====
+
+.Implementing an analysis configurer to change the Similarity with the Lucene backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/CustomSimilarityLuceneAnalysisConfigurer.java[tags=include]
+----
+<1> Set the similarity to `ClassicSimilarity`.
+<2> Define analyzers and normalizers as usual.
+====
+
+[TIP]
+====
+For more information about `Similarity`, its various implementations, and the pros and cons of each implementation,
+see the javadoc of `Similarity` and Lucene's source code.
+
+You can also find useful resources on the web, for example in Elasticsearch's documentation.
+====
+
+[[backend-lucene-threads]]
+== Threads
+
+The Lucene backend relies on an internal thread pool to execute write operations on the index.
+
+By default, the pool contains exactly as many threads as the number of processors available to the JVM on bootstrap.
+That can be changed using a configuration property:
+
+[source]
+----
+hibernate.search.backend.thread_pool.size = 4
+----
+
+[NOTE]
+====
+This number is _per backend_, not per index.
+Adding more indexes will not add more threads.
+====
+
+[TIP]
+====
+Operations happening in this thread-pool include blocking I/O,
+so raising its size above the number of processor cores available to the JVM
+can make sense and may improve performance.
+====
+
+[[backend-lucene-indexing-queues]]
+== Indexing queues
+
+Among all the write operations performed by Hibernate Search on the indexes,
+it is expected that there will be a lot of "indexing" operations to create/update/delete a specific document.
+We generally want to preserve the relative order of these requests
+when they are about the same documents.
+
+For this reason, Hibernate Search pushes these operations to internal queues and applies them in batches.
+Each index maintains 10 queues holding at most 1000 elements each.
+Queues operate independently (in parallel), but each queue applies one operation after the other,
+so at any given time there can be at most 10 batches of indexing requests being applied for each index.
+
+[NOTE]
+====
+Indexing operations relative to the same document ID are always pushed to the same queue.
+====
+
+It is possible to customize the queues in order to reduce resource consumption,
+or on the contrary to improve throughput.
+This is done through the following configuration properties:
+
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.indexing.queue_count = 10
+hibernate.search.backend.indexing.queue_size = 1000
+# To configure a specific index:
+hibernate.search.backend.indexes.<index-name>.indexing.queue_count = 10
+hibernate.search.backend.indexes.<index-name>.indexing.queue_size = 1000
+----
+
+* `indexing.queue_count` defines the number of queues.
+Expects a strictly positive integer value.
+The default for this property is `10`.
++
+Higher values will lead to more indexing operations being performed in parallel,
+which may lead to higher indexing throughput if CPU power is the bottleneck when indexing.
++
+Note that raising this number above the <<backend-lucene-threads,number of threads>> is never useful,
+as the number of threads limits how many queues can be processed in parallel.
+* `indexing.queue_size` defines the maximum number of elements each queue can hold.
+Expects a strictly positive integer value.
+The default for this property is `1000`.
++
+Lower values may lead to lower memory usage, especially if there are many queues,
+but values that are too low will increase the likeliness of
+<<backend-lucene-indexing-queues-blocking,application threads blocking>>
+because the queue is full,
+which may lead to lower indexing throughput.
+
+[TIP]
+[[backend-lucene-indexing-queues-blocking]]
+====
+When a queue is full, any attempt to request indexing will block until the request can be put into the queue.
+
+In order to achieve a reasonable level of performance,
+be sure to set the size of queues to a high enough number that this kind of blocking only happens
+when the application is under very high load.
+====
+
+[TIP]
+====
+When <<backend-lucene-configuration-sharding,sharding>> is enabled,
+each shard will be assigned its own set of queues.
+
+If you use the `hash` sharding strategy *based on the document ID* (and not based on a provided routing key),
+make sure to set the number of queues to a number with no common denominator with the number of shards;
+otherwise, some queues may be used much less than others.
+
+For example, if you set the number of shards to 8 and the number of queues to 4,
+documents ending up in the shard #0 will always end up in queue #0 of that shard.
+That's because both the routing to a shard and the routing to a queue take the hash of the document ID
+then apply a modulo operation to that hash,
+and `<some hash> % 8 == 0` (routed to shard #0) implies `<some hash> % 4 == 0` (routed to queue #0 of shard #0).
+Again, this is only true if you rely on the document ID and not on a provided routing key for sharding.
+====
+
+[[backend-lucene-io]]
+== Writing and reading
+
+[[backend-lucene-io-commit]]
+=== Commit
+
+include::../components/writing-reading-intro-note.asciidoc[]
+
+In Lucene terminology, a _commit_ is when changes buffered in an index writer
+are pushed to the index itself,
+so that a crash or power loss will no longer result in data loss.
+
+Some operations are critical and are always committed before they are considered complete.
+This is the case for changes triggered by <<indexing-automatic,automatic indexing>>
+(unless <<indexing-plan-synchronization,configured otherwise>>),
+and also for large-scale operations such as a <<indexing-workspace,purge>>.
+When such an operation is encountered, a commit will be performed immediately,
+guaranteeing that the operation is only considered complete after all changes are safely stored on disk.
+
+Other operations, however, are not expected to be committed immediately.
+This is the case for changes contributed by the <<indexing-massindexer,mass indexer>>,
+or by automatic indexing when using the
+<<indexing-plan-synchronization,`async` synchronization strategy>>.
+
+Performance-wise, committing may be an expensive operation,
+which is why Hibernate Search tries not to commit too often.
+By default, when changes that do not require an immediate commit are applied to the index,
+Hibernate Search will delay the commit by one second.
+If other changes are applied during that second,
+they will be included in the same commit.
+This dramatically reduces the amount of commits in write-intensive scenarios
+(e.g. <<indexing-massindexer,mass indexing>>),
+leading to much better performance.
+
+It is possible to control exactly how often Hibernate Search will commit
+by setting the commit interval (in milliseconds):
+
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.io.commit_interval = 1000
+# To configure a specific index:
+hibernate.search.backend.indexes.<index-name>.io.commit_interval = 1000
+----
+The default for this property is `1000`.
+
+[WARNING]
+====
+Setting the commit interval to 0 will force Hibernate Search to commit after every batch of changes,
+which may result in a much lower throughput,
+both for <<indexing-automatic,automatic indexing>>
+and <<indexing-massindexer,mass indexing>>.
+====
+
+[NOTE]
+====
+Remember that individual write operations may force a commit,
+which may cancel out the potential performance gains from setting a higher commit interval.
+
+By default, the commit interval may only improve throughput
+of the <<indexing-massindexer,mass indexer>>.
+If you want changes triggered by <<indexing-automatic,automatic indexing>>
+to benefit from it too, you will need to select a non-default
+<<indexing-plan-synchronization,synchronization strategy>>,
+so as not to require a commit after each change.
+====
+
+[[backend-lucene-io-refresh]]
+=== Refresh
+
+include::../components/writing-reading-intro-note.asciidoc[]
+
+In Lucene terminology, a _refresh_ is when a new index reader is opened,
+so that the next search queries will take into account the latest changes to the index.
+
+Performance-wise, refreshing may be an expensive operation,
+which is why Hibernate Search tries not to refresh too often.
+The index reader is refreshed upon every search query,
+but only if writes have occurred since the last refresh.
+
+In write-intensive scenarios where refreshing after each write is still too frequent,
+it is possible to refresh less frequently
+and thus improve read throughput by setting a refresh interval in milliseconds.
+When set to a value higher than 0, the index reader will no longer be refreshed upon every search query:
+if, when a search query starts, the refresh occurred less than X milliseconds ago,
+then the index reader will not be refreshed, even though it may be out-of-date.
+
+The refresh interval can be set this way:
+
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.io.refresh_interval = 0
+# To configure a specific index:
+hibernate.search.backend.indexes.<index-name>.io.refresh_interval = 0
+----
+The default for this property is `0`.
+
+[[backend-lucene-io-writer]]
+=== [[lucene-indexing-performance]] `IndexWriter` settings
+
+Lucene's `IndexWriter`, used by Hibernate Search to write to indexes,
+exposes several settings that can be tweaked to better fit your application,
+and ultimately get better performance.
+
+Hibernate Search exposes these settings through configuration properties prefixed with `io.writer.`,
+at the index level.
+
+Below is a list of all index writer settings.
+They can all be set similarly through configuration properties;
+for example, `io.writer.ram_buffer_size` can be set like this:
+
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.io.writer.ram_buffer_size = 32
+# To configure a specific index:
+hibernate.search.backend.indexes.<index-name>.io.writer.ram_buffer_size = 32
+----
+
+[[table-performance-parameters]]
+.Configuration properties for the `IndexWriter`
+[cols="1,2a", options="header"]
+|===============
+|Property
+|Description
+
+|`[...].io.writer.max_buffered_docs`
+|The maximum number of documents that can be buffered in-memory
+before they are flushed to the Directory.
+
+Large values mean faster indexing, but more RAM usage.
+
+When used together with `ram_buffer_size` a flush occurs for whichever event happens first.
+
+|`[...].io.writer.ram_buffer_size`
+|The maximum amount of RAM that may be used for buffering added documents and deletions
+before they are flushed to the Directory.
+
+Large values mean faster indexing, but more RAM usage.
+
+Generally for faster indexing performance it's best to use this setting rather than `max_buffered_docs`.
+
+When used together with `max_buffered_docs` a flush occurs for whichever event happens first.
+
+|[[backend-lucene-io-writer-infostream]]`[...].io.writer.infostream`
+|Enables low level trace information about Lucene's internal components; `true` or `false`.
+
+Logs will be appended to the logger
+<<troubleshooting-logging-lucene-infostream,`org.hibernate.search.backend.lucene.infostream`>> at the `TRACE` level.
+
+This may cause significant performance degradation, even if the logger ignores the TRACE level,
+so this should only be used for troubleshooting purposes.
+
+Disabled by default.
+|===============
+
+[TIP]
+====
+Refer to Lucene's documentation, in particular the javadoc and source code of `IndexWriterConfig`,
+for more information about the settings and their defaults.
+====
+
+[[backend-lucene-io-merge]]
+=== [[search-optimize]] Merge settings
+
+A Lucene index is not stored in a single, continuous file.
+Instead, each flush to the index will generate a small file containing all the documents added to the index.
+This file is called a "segment".
+Search can be slower on an index with too many segments,
+so Lucene regularly merges small segments to create fewer, larger segments.
+
+Lucene's merge behavior is controlled through a `MergePolicy`.
+Hibernate Search uses the `LogByteSizeMergePolicy`,
+which exposes several settings that can be tweaked to better fit your application,
+and ultimately get better performance.
+
+Below is a list of all merge settings.
+They can all be set similarly through configuration properties;
+for example, `io.merge.factor` can be set like this:
+
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.io.merge.factor = 10
+# To configure a specific index:
+hibernate.search.backend.indexes.<index-name>.io.merge.factor = 10
+----
+
+[cols="1,2a", options="header"]
+.Configuration properties related to merges
+|===============
+|Property
+|Description
+
+|`[...].io.merge.max_docs`
+|The maximum number of documents that a segment can have before merging.
+Segments with more than this number of documents will not be merged.
+
+Smaller values perform better on frequently changing indexes,
+larger values provide better search performance if the index does not change often.
+
+|`[...].io.merge.factor`
+|The number of segments that are merged at once.
+
+With smaller values, merging happens more often and thus uses more resources,
+but the total number of segments will be lower on average, increasing read performance.
+Thus, larger values (`> 10`) are best for <<indexing-massindexer,mass indexing>>,
+and smaller values (`< 10`) are best for <<indexing-automatic,automatic indexing>>.
+
+The value must not be lower than `2`.
+
+|`[...].io.merge.min_size`
+|The minimum target size of segments, in MB, for background merges.
+
+Segments smaller than this size are merged more aggressively.
+
+Setting this too large might result in expensive merge operations, even tough they are less frequent.
+
+|`[...].io.merge.max_size`
+|The maximum size of segments, in MB, for background merges.
+
+Segments larger than this size are never merged in the background.
+
+Settings this to a lower value helps reduce memory requirements and avoids some merging operations at the
+cost of optimal search speed.
+
+When <<indexing-workspace-merge,forcefully merging>> an index, this value is ignored and `max_forced_size` is used instead (see below).
+
+|`[...].io.merge.max_forced_size`
+|The maximum size of segments, in MB, for forced merges.
+
+This is the equivalent of `io.merge.max_size` for <<indexing-workspace-merge,forceful merges>>.
+You will generally want to set this to the same value as `max_size` or lower,
+but setting it too low will <<indexing-workspace-merge-segments,degrade search performance as documents are deleted>>.
+
+|`[...].io.merge.calibrate_by_deletes`
+|Whether the number of deleted documents in an index should be taken into account; `true` or `false`.
+
+When enabled, Lucene will consider that a segment with 100 documents, 50 of which are deleted,
+actually contains 50 documents.
+When disabled, Lucene will consider that such a segment contains 100 documents.
+
+Setting `calibrate_by_deletes` to `false` will lead to more frequent merges caused by `io.merge.max_docs`,
+but will more aggressively merge segments with many deleted documents, improving search performance.
+|===============
+
+[NOTE]
+====
+Refer to Lucene's documentation, in particular the javadoc and source code of `LogByteSizeMergePolicy`,
+for more information about the settings and their defaults.
+====
+
+[TIP]
+[[lucene-segment-size]]
+========
+The options `io.merge.max_size` and `io.merge.max_forced_size`
+do not *directly* define the maximum size of all segment files.
+
+First, consider that merging a segment is about adding it together with another existing segment to form a larger one.
+`io.merge.max_size` is the maximum size of segments *before* merging,
+so newly merged segments can be up to twice that size.
+
+Second, merge options do not affect the size of segments initially created by the index writer, before they are merged.
+This size can be limited with the setting `io.writer.ram_buffer_size`,
+but Lucene relies on estimates to implement this limit;
+when these estimates are off,
+it is possible for newly created segments to be slightly larger than `io.writer.ram_buffer_size`.
+
+So, for example, to be fairly confident no file grows larger than 15MB,
+use something like this:
+
+[source]
+----
+hibernate.search.backend.io.writer.ram_buffer_size = 10
+hibernate.search.backend.io.merge.max_size = 7
+hibernate.search.backend.io.merge.max_forced_size = 7
+----
+========
+
+[[backend-lucene-search]]
+== Searching
+
+Searching with the Lucene backend relies on the <<search-dsl,same APIs as any other backend>>.
+
+This section details Lucene-specific configuration related to searching.
+
+[[backend-lucene-search-caching]]
+=== Low-level hit caching
+
+include::../components/lucene-api-warning.asciidoc[]
+
+Lucene supports caching low-level hits,
+i.e. caching the list of documents that match a given `org.apache.lucene.search.Query`
+in a given index segment.
+
+This cache can be useful in read-intensive scenarios,
+where the same query is executed very often on the same index,
+and the index is rarely written to.
+
+NOTE: This is different from Hibernate ORM caching,
+which caches the content of entities or the results of *database* queries.
+Hibernate ORM caching can also be leveraged in Hibernate Search, but through a different API:
+see <<search-dsl-query-cache-lookup-strategy>>.
+
+To configure caching in a Lucene backend, you will need to:
+
+. Define a class that implements the `org.hibernate.search.backend.lucene.cache.QueryCachingConfigurer` interface.
+. Configure the backend to use that implementation by setting the configuration property
+`hibernate.search.backend.query.caching.configurer`
+to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
+for example `class:com.mycompany.MyQueryCachingConfigurer`.
+
+TIP: You can pass multiple bean references separated by commas. See <<configuration-property-types>>.
+
+Hibernate Search will call the `configure` method of this implementation on startup,
+and the configurer will be able to take advantage of a DSL to define
+the `org.apache.lucene.search.QueryCache` and the `org.apache.lucene.search.QueryCachingPolicy`.
+
+[[backend-lucene-access-analyzers]]
+== Retrieving analyzers and normalizers
+
+Lucene analyzers and normalizers <<backend-lucene-analysis,defined in Hibernate Search>>
+can be retrieved from the Lucene backend.
+
+.Retrieving the Lucene analyzers by name from the backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/analyzer/LuceneGetAnalyzerIT.java[tags=fromBackend]
+----
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> Retrieve the `Backend`.
+<3> Narrow down the backend to the `LuceneBackend` type.
+<4> Get an analyzer by name.
+The method returns an `Optional`, which is empty if the analyzer does not exist.
+The analyzer must have been <<backend-lucene-analysis,defined in Hibernate Search>>,
+otherwise it won't exist.
+<5> Get a normalizer by name.
+The method returns an `Optional`, which is empty if the normalizer does not exist.
+The normalizer must have been <<backend-lucene-analysis,defined in Hibernate Search>>,
+otherwise it won't exist.
+====
+
+Alternatively, you can also retrieve the (composite) analyzers for a whole index.
+These analyzers behave differently for each field,
+delegating to the analyzer configured in the mapping for each field.
+
+.Retrieving the Lucene analyzers for a whole index
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/analyzer/LuceneGetAnalyzerIT.java[tags=fromIndexManager]
+----
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> Retrieve the `IndexManager`.
+<3> Narrow down the index manager to the `LuceneIndexManager` type.
+<4> Get the indexing analyzer.
+This is the analyzer used when indexing documents.
+It ignores the <<mapping-directfieldmapping-search-analyzer,search analyzer>> in particular.
+<5> Get the search analyzer.
+This is the analyzer used when building search queries through the <<search-dsl,Search DSL>>.
+On contrary to the indexing analyzer, it takes into account the <<mapping-directfieldmapping-search-analyzer,search analyzer>>.
+====
+
+
+[[backend-lucene-access-size]]
+== Retrieving the index size
+
+The size of a Lucene index can be retrieved from the `LuceneIndexManager`.
+
+.Retrieving the index size from a Lucene index manager
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/indexmanager/LuceneGetIndexSizeIT.java[tags=computeIndexSize]
+----
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> Retrieve the `IndexManager`.
+<3> Narrow down the index manager to the `LuceneIndexManager` type.
+<4> Compute the index size and get the result.
+<5> An asynchronous version of the method is also available.
+====
+
+[[backend-lucene-access-index-reader]]
+== [[_retrieving_a_lucene_indexreader]] Retrieving a Lucene `IndexReader`
+
+The low-level `IndexReader` can be retrieved from the `LuceneIndexScope`.
+
+.Retrieving the index reader from a Lucene index scope
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/lowlevel/LuceneLowLevelIndexReaderIT.java[tags=indexReader]
+----
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> Retrieve the `LuceneIndexScope` extending the search scope with the `LuceneExtension`.
+<3> Open an instance of `IndexReader`. Optionally it is possible to provide the routing keys
+to target only some shards of the indexes using the method `openIndexReader(Set<String>)`.
+The IndexReader **must be closed** after use.
+====
+
+[WARNING]
+====
+Even if multi-tenancy is enabled, the returned reader exposes documents of *all* tenants.
+====
