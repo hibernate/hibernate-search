@@ -1,0 +1,1385 @@
+[[backend-elasticsearch]]
+= [[elasticsearch-integration]] Elasticsearch backend
+
+[[backend-elasticsearch-compatibility]]
+== Compatibility
+
+Hibernate Search expects an link:{elasticsearchUrl}[Elasticsearch] cluster running version {elasticsearchExpectedRunningVersions},
+or an link:{openSearchUrl}[OpenSearch] cluster running version {opensearchExpectedRunningVersions}.
+
+The version running on your cluster will be automatically detected on startup,
+and Hibernate Search will adapt based on the detected version;
+see <<backend-elasticsearch-configuration-version>> for details.
+
+[TIP]
+====
+For information about which versions of Hibernate Search you can upgrade to,
+while retaining backward compatibility with a given version of Elasticsearch/OpenSearch,
+refer to the https://hibernate.org/community/compatibility-policy/#compatibility-third-party-hsearch-elasticsearch[compatibility policy].
+====
+
+The targeted version is mostly transparent to Hibernate Search users,
+but there are a few differences in how Hibernate Search behaves depending
+on the Elasticsearch version that may affect you.
+The following table details those differences.
+
+[cols="h,6*",options="header"]
+|===============
+| 4+|Elasticsearch 2+|OpenSearch
+||5.6|6.x|7.x|8.x|1.x|2.x
+|Formats for date fields in the Elasticsearch schema 6+|Formats changed in ES 7, see <<backend-elasticsearch-field-types>>
+|`indexNullAs` on `geo_point` fields |Not available 5+|Available
+|===============
+
+[[backend-elasticsearch-upgrading]]
+=== [[_upgrading_elasticsearch]] Upgrading Elasticsearch
+
+When upgrading your Elasticsearch cluster, some
+https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.html[administrative tasks]
+are still required on your cluster: Hibernate Search will not take care of those.
+
+On top of that, there are some fundamental differences between some versions of Elasticsearch.
+For example date formats changed in Elasticsearch 7,
+meaning the schema defined in Elasticsearch 6 may not be compatible
+with the one expected by Hibernate Search for Elasticsearch 7.
+
+In such cases, the easiest way to upgrade is to delete your indexes manually,
+make Hibernate Search re-create the indexes along with their schema,
+and <<indexing-massindexer,reindex your data>>.
+
+[[backend-elasticsearch-configuration]]
+== [[elasticsearch-integration-configuration]] Basic configuration
+
+All configuration properties of the Elasticsearch backend are optional,
+but the defaults might not suit everyone.
+In particular your production Elasticsearch cluster is probably not reachable at `http://localhost:9200`,
+so you will need to set the address of your cluster by <<backend-elasticsearch-configuration-client,configuring the client>>.
+
+Configuration properties are mentioned in the relevant parts of this documentation.
+You can find a full reference of available properties in the Hibernate Search javadoc:
+
+* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchBackendSettings.html[org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings].
+* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchIndexSettings.html[org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings].
+
+[[backend-elasticsearch-configuration-elasticsearch-cluster]]
+== [[elasticsearch-integration-server-configuration]] Configuration of the Elasticsearch cluster
+
+Most of the time, Hibernate Search does not require any specific configuration
+to be applied by hand to the Elasticsearch cluster,
+beyond the index mapping (schema)
+which <<schema-management,can be automatically generated>>.
+
+The only exception is <<backend-elasticsearch-configuration-sharding>>,
+which needs to be enabled explicitly.
+
+[[backend-elasticsearch-configuration-client]]
+== Client configuration
+
+An Elasticsearch backend communicates with an Elasticsearch cluster through a REST client.
+Below are the options that affect this client.
+
+[[backend-elasticsearch-configuration-hosts]]
+=== Target hosts
+
+The following property configures the Elasticsearch host (or hosts)
+to send indexing requests and search queries to:
+
+[source]
+----
+hibernate.search.backend.hosts = localhost:9200
+----
+The default for this property is `localhost:9200`.
+
+This property may be set to a String representing a host and port such as `localhost` or `es.mycompany.com:4400`,
+or a String containing multiple such host-and-port strings separated by commas,
+or a `Collection<String>` containing such host-and-port strings.
+
+You may change the protocol used to communicate with the hosts using this configuration property:
+
+[source]
+----
+hibernate.search.backend.protocol = http
+----
+The default for this property is `http`.
+
+This property may be set to either `http` or `https`.
+
+
+Alternatively, it is possible to define both the protocol and hosts as one or more URIs using a single property:
+
+[source]
+----
+hibernate.search.backend.uris = http://localhost:9200
+----
+
+This property may be set to a String representing a URI such as `http://localhost` or `https://es.mycompany.com:4400`,
+or a String containing multiple such URI strings separated by commas,
+or a `Collection<String>` containing such URI strings.
+
+[WARNING]
+====
+There are some constraints regarding the use of this property:
+
+* All the uris must have the same protocol.
+* Cannot be used if `hosts` or `protocol` are set.
+* The provided list of URIs must not be empty.
+====
+
+[[backend-elasticsearch-configuration-path-prefix]]
+=== Path prefix
+
+By default, the REST API is expected to be available to the root path (`/`).
+For example a search query target all indexes will be sent to path `/_search`.
+This is what you need for a standard Elasticsearch setup.
+
+If your setup is non-standard, for example because of a non-transparent proxy
+between the application and the Elasticsearch cluster,
+you can use a configuration similar to this:
+
+[source]
+----
+hibernate.search.backend.path_prefix = my/path
+----
+
+With the above, a search query targeting all indexes will be sent to path `/my/path/_search` instead of `/_search`.
+The path will be prefixed similarly for all requests sent to Elasticsearch.
+
+[[backend-elasticsearch-configuration-discovery]]
+=== Node discovery
+
+When using automatic discovery, the Elasticsearch client will periodically probe for new nodes in the cluster,
+and will add those to the host list (see `hosts` in <<backend-elasticsearch-configuration-client>>).
+
+Automatic discovery is controlled by the following properties:
+
+[source]
+----
+hibernate.search.backend.discovery.enabled = false
+hibernate.search.backend.discovery.refresh_interval = 10
+----
+
+* `discovery.enabled` defines whether the feature is enabled.
+Expects a boolean value. The default for this property is `false`.
+* `discovery.refresh_interval` defines the interval between two executions of the automatic discovery.
+Expects a positive integer, in seconds. The default for this property is `10`.
+
+[[backend-elasticsearch-authentication-http]]
+=== HTTP authentication
+
+HTTP authentication is disabled by default,
+but may be enabled by setting the following configuration properties:
+
+[source]
+----
+hibernate.search.backend.username = ironman
+hibernate.search.backend.password = j@rv1s
+----
+The default for these properties is an empty string.
+
+The username and password to send when connecting to the Elasticsearch servers.
+
+[CAUTION]
+====
+If you use HTTP instead of HTTPS (see above),
+your password will be transmitted in clear text over the network.
+====
+
+[[backend-elasticsearch-configuration-aws]]
+=== [[elasticsearch-integration-configuration-aws]] Authentication on Amazon Web Services
+
+The Hibernate Search Elasticsearch backend, once configured, will work just fine in most setups.
+However, if you need to use Amazon's https://docs.aws.amazon.com/elasticsearch-service/[managed Elasticsearch service],
+you will find it requires a proprietary authentication method:
+https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-request-signing.html[request signing].
+
+While request signing is not supported by default,
+you can enable it with an additional dependency and a bit of configuration.
+
+You will need to add this dependency:
+
+[source, XML, subs="+attributes"]
+----
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-backend-elasticsearch-aws</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+----
+
+With that dependency in your classpath, you will still need to configure it.
+
+The following configuration is mandatory:
+
+[source]
+----
+hibernate.search.backend.aws.signing.enabled = true
+hibernate.search.backend.aws.region = us-east-1
+----
+
+* `aws.signing.enabled` defines whether request signing is enabled.
+Expects a boolean value. Defaults to `false`.
+* `aws.region` defines the http://docs.aws.amazon.com/general/latest/gr/rande.html[AWS region].
+Expects a string value.
+This property has no default and must be provided for the AWS authentication to work.
+
+By default, Hibernate Search will rely on the default credentials provider from the AWS SDK.
+This provider will look for credentials in various places
+(Java system properties, environment variables, AWS-specific configuration, ...).
+For more information about how the default credentials provider works,
+see
+https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/credentials.html#credentials-default[its official documentation].
+
+Optionally, you can set static credentials with the following options:
+
+[source]
+----
+hibernate.search.backend.aws.credentials.type = static
+hibernate.search.backend.aws.credentials.access_key_id = AKIDEXAMPLE
+hibernate.search.backend.aws.credentials.secret_access_key = wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY
+----
+
+* `aws.credentials.type` defines the type of credentials.
+Set to `default` to get the default behavior (as explained above),
+or to `static` to provide credentials using the properties below.
+* `aws.credentials.access_key_id` defines the
+http://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html[access key ID].
+Expects a string value.
+This property has no default and must be provided when the credentials type is set to `static`.
+* `aws.credentials.secret_access_key` defines the
+http://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html[secret access key].
+Expects a string value.
+This property has no default and must be provided when the credentials type is set to `static`.
+
+[[backend-elasticsearch-configuration-connection-tuning]]
+=== [[_connection_tuning]] Connection tuning
+
+Timeouts::
++
+[source]
+----
+# hibernate.search.backend.request_timeout = 30000
+hibernate.search.backend.connection_timeout = 1000
+hibernate.search.backend.read_timeout = 30000
+----
+
+* `request_timeout` defines the timeout when executing a request.
+This includes the time needed to establish a connection,
+send the request and read the response.
+This property is not defined by default.
+* `connection_timeout` defines the timeout when establishing a connection.
+The default for this property is `1000`.
+* `read_timeout` defines the timeout when reading a response.
+The default for this property is `30000`.
++
+These properties expect a positive <<configuration-property-types,Integer value>> in milliseconds, such as `3000`.
+
+Connection pool::
++
+[source]
+----
+hibernate.search.backend.max_connections = 20
+hibernate.search.backend.max_connections_per_route = 10
+----
+
+* `max_connections` defines maximum number of simultaneous connections
+to the Elasticsearch cluster, all hosts taken together.
+The default for this property is `20`.
+* `max_connections_per_route` defines maximum number of simultaneous connections
+to each host of the Elasticsearch cluster.
+The default for this property is `10`.
+
++
+These properties expect a positive <<configuration-property-types,Integer value>>, such as `20`.
+
+Keep Alive::
++
+[source]
+----
+hibernate.search.backend.max_keep_alive = 10000
+----
+* `max_keep_alive` defines how long connections to the Elasticsearch cluster can be kept idle.
++
+Expects a positive <<configuration-property-types,Long value>> in milliseconds, such as `60000`.
++
+If the response from an Elasticsearch cluster contains a `Keep-Alive` header,
+then the effective max idle time will be whichever is lower:
+the duration from the `Keep-Alive` header or the value of this property (if set).
++
+If this property is not set, only the `Keep-Alive` header is considered,
+and if it's absent, idle connections will be kept forever.
+
+[[backend-elasticsearch-configuration-http-client]]
+=== [[_custom_http_client_configurations]] Custom HTTP client configurations
+
+It is possible to configure the HTTP client directly
+using an instance of `org.apache.http.impl.nio.client.HttpAsyncClientBuilder`.
+
+With this API you can add interceptors, change the keep alive, the max connections,
+the SSL key/trust store settings and many other client configurations.
+
+Configure the HTTP client directly requires two steps:
+
+. Define a class that implements the `org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer` interface.
+. Configure Hibernate Search to use that implementation by setting the configuration property
+`hibernate.search.backend.client.configurer`
+to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
+for example `class:org.hibernate.search.documentation.backend.elasticsearch.client.HttpClientConfigurer`.
+
+.Implementing and using a `ElasticsearchHttpClientConfigurer`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/client/HttpClientConfigurer.java[tags=include]
+----
+<1> The class has to implement the `ElasticsearchHttpClientConfigurer` interface.
+<2> The `configure` method provides the access to the `ElasticsearchHttpClientConfigurationContext`.
+<3> From the context it is possible to get the `HttpAsyncClientBuilder`.
+<4> Finally, you can use the builder to configure the client with your custom settings.
+====
+
+.Define a custom http client configurer in the properties
+====
+[source, XML, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/configuration/http-client-configurer.properties[]
+----
+<1> Specify the HTTP client configurer.
+====
+
+[NOTE]
+====
+Any setting defined by a custom http client configurer will override any other setting defined by Hibernate Search.
+====
+
+[[backend-elasticsearch-configuration-version]]
+== [[backend-elasticsearch-configuration-dialect]] Version compatibility
+
+[[backend-elasticsearch-configuration-version-check]]
+=== Version check on startup
+
+Different distributions and versions of Elasticsearch/OpenSearch expose slightly different APIs.
+As a result, Hibernate Search needs to be aware of the distribution and version it is talking to
+in order to generate correct HTTP requests.
+
+By default, Hibernate Search will query the Elasticsearch/OpenSearch cluster at boot time to retrieve this information,
+and will infer the correct behavior to adopt.
+
+You can force Hibernate Search to expect a specific version of Elasticsearch/OpenSearch by
+setting the property `hibernate.search.backend.version` to a version string
+following the format `x.y.z-qualifier` or `<distribution>:x.y.z-qualifier`, where:
+
+* `<distribution>` is either `elastic` or `opensearch`. Optional, defaults to `elastic`.
+* `x`, `y` and `z` are integers. `x` is mandatory, `y` and `z` are optional.
+* `qualifier` is a string of word characters (alphanumeric or `_`). Optional.
+
+For example, `7`, 7.0`, `7.10`, `opensearch:1.0` are all valid version strings.
+
+Hibernate Search will still query the Elasticsearch/OpenSearch cluster
+to detect the actual distribution and version of the cluster,
+but it will check that the configured distribution and version match the actual ones.
+This can be helpful while developing, in particular.
+
+[[backend-elasticsearch-configuration-version-check-disabling]]
+=== Disabling the version check on startup
+
+If necessary, you can disable the call to the Elasticsearch/OpenSearch cluster on startup,
+and provide the information manually.
+
+To do that, set the property `hibernate.search.backend.version_check.enabled` to `false`.
+
+You will also have to set the property `hibernate.search.backend.version` to a version string
+as explained in the <<backend-elasticsearch-configuration-version-check,previous section>>.
+In this case, both major **and minor** version numbers (`x` **and `y`** in the formats above)
+are mandatory,
+but all other components (distribution, micro, qualifier) remain optional.
+For example, `7.0`, `7.10`, `opensearch:1.0` are all valid version strings in this case, but `7` is not precise enough.
+
+[[backend-elasticsearch-configuration-logging]]
+== [[elasticsearch-log-json-pretty-printing]] Request logging
+
+The `hibernate.search.backend.log.json_pretty_printing` <<configuration-property-types,boolean property>>
+defines whether JSON included in <<troubleshooting-logging,request logs>> should be pretty-printed (indented, with line breaks).
+It defaults to `false`.
+
+[[backend-elasticsearch-configuration-sharding]]
+== Sharding
+
+include::../components/sharding-intro-note.asciidoc[]
+
+Elasticsearch disables sharding by default.
+To enable it,
+link:{elasticsearchDocUrl}/index-modules.html#_static_index_settings[set the property `index.number_of_shards` in your cluster].
+
+[[backend-elasticsearch-schema-management]]
+== [[elasticsearch-schema-management-strategy]] Schema management
+
+Elasticsearch indexes need to be created before they can be used for indexing and searching;
+see <<schema-management>> for more information about how to create indexes and their schema
+in Hibernate Search.
+
+// Search 6 anchors backward compatibility
+[[backend-elasticsearch-index-lifecycle]]
+For Elasticsearch specifically, some fine-tuning is available through the following options:
+
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.schema_management.minimal_required_status = green
+hibernate.search.backend.schema_management.minimal_required_status_wait_timeout = 10000
+# To configure a specific index:
+hibernate.search.backend.indexes.<index-name>.schema_management.minimal_required_status = green
+hibernate.search.backend.indexes.<index-name>.schema_management.minimal_required_status_wait_timeout = 10000
+----
+
+* `minimal_required_status` defines the minimal required status of an index before creation is considered complete.
+The default for this property is `yellow`.
+* `minimal_required_status_wait_timeout` defines the maximum time to wait for this status,
+as an <<configuration-property-types,integer value>> in milliseconds.
+The default for this property is `10000`.
+
+These properties are only effective when creating or validating an index as part of schema management.
+
+[[backend-elasticsearch-indexlayout]]
+== Index layout
+
+Hibernate Search works with link:{elasticsearchDocUrl}/indices-aliases.html[aliased] indexes.
+This means an index with a given name in Hibernate Search will not directly be mapped
+to an index with the same name in Elasticsearch.
+
+The index layout is how Hibernate Search index names are mapped to Elasticsearch indexes,
+and the strategy controlling that layout is set at the backend level:
+
+[source]
+----
+hibernate.search.backend.layout.strategy = simple
+----
+
+The default for this property is `simple`.
+
+See the following subsections for details about available strategies.
+
+[[backend-elasticsearch-indexlayout-strategy-simple]]
+=== `simple`: the default, future-proof strategy
+
+For an index whose name in Hibernate Search is `myIndex`:
+
+* If Hibernate Search <<backend-elasticsearch-schema-management,creates the index automatically>>,
+it will name the index `myindex-000001` and will automatically create the write and read aliases.
+* Write operations (indexing, purge, ...) will target the alias `myindex-write`.
+* Read operations (searching, explaining, ...) will target the alias `myindex-read`.
+
+[TIP]
+====
+The `simple` layout is a bit more complex than it could be, but it follows the best practices.
+
+Using aliases has a significant advantage over directly targeting the index:
+it makes full reindexing on a live application possible without downtime,
+which is useful in particular when <<indexing-automatic,automatic indexing>> is disabled
+(<<indexing-automatic-configuration,completely>> or <<mapping-reindexing-reindexonupdate,partially>>)
+and you need to fully reindex periodically (for example on a daily basis).
+
+With aliases, you just need to direct the read alias (used by search queries) to an old copy of the index,
+while the write alias (used by document writes) is redirected to a new copy of the index.
+Without aliases (in particular with the `no-alias` layout), this is impossible.
+
+This "zero-downtime" reindexing,
+which shares some characteristics with link:https://martinfowler.com/bliki/BlueGreenDeployment.html["blue/green" deployment],
+is not currently provided by Hibernate Search itself.
+However, you can implement it in your application
+by directly issuing commands to Elasticsearch's REST APIs.
+The basic sequence of actions is the following:
+
+1. Create a new index, `myindex-000002`.
+2. Switch the write alias, `myindex-write`, from `myindex-000001` to `myindex-000002`.
+3. Reindex, for example using the <<indexing-massindexer,mass indexer>>.
+4. Switch the read alias, `myindex-read`, from `myindex-000001` to `myindex-000002`.
+5. Delete `myindex-000001`.
+
+Note this will only work if the Hibernate Search mapping did not change;
+a zero-downtime upgrade with a changing schema would be considerably more complex.
+You will find discussions on this topic in https://hibernate.atlassian.net/browse/HSEARCH-2861[HSEARCH-2861]
+and https://hibernate.atlassian.net/browse/HSEARCH-3499[HSEARCH-3499].
+====
+
+[[backend-elasticsearch-indexlayout-strategy-no-alias]]
+=== `no-alias`: a strategy without index aliases
+
+This strategy is mostly useful on legacy clusters.
+
+For an index whose name in Hibernate Search is `myIndex`:
+
+* If Hibernate Search <<backend-elasticsearch-schema-management,creates the index automatically>>,
+it will name the index `myindex` and will not create any alias.
+* Write operations (indexing, purge, ...) will target the index directly by its name, `myindex`.
+* Read operations (searching, explaining, ...) will target the index directly by its name `myindex`.
+
+[[backend-elasticsearch-indexlayout-strategy-custom]]
+=== Custom strategy
+
+If the built-in layout strategies do not fit your requirements,
+you can define a custom layout in two simple steps:
+
+. Define a class that implements the interface `org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy`.
+. Configure the backend to use that implementation by setting the configuration property
+`hibernate.search.backend.layout.strategy`
+to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
+for example `class:com.mycompany.MyLayoutStrategy`.
+
+For example, the implementation below will lead to the following layout for an index named `myIndex`:
+
+* Write operations (indexing, purge, ...) will target the alias `myindex-write`.
+* Read operations (searching, explaining, ...) will target the alias `myindex` (no suffix).
+* If Hibernate Search <<backend-elasticsearch-schema-management,creates the index automatically>>
+at exactly 19:19:00 on November 6th, 2017,
+it will name the index `myindex-20171106-191900-000000000`.
+
+.Implementing a custom index layout strategy with the Elasticsearch backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/layout/CustomLayoutStrategy.java[tags=include]
+----
+====
+
+[[backend-elasticsearch-indexlayout-metamodel]]
+=== Retrieving index or alias names
+
+Index or alias names used to read and write can be retrieved from the <<mapping-inspect,metamodel>>.
+
+.Retrieving the index names from an Elasticsearch index manager
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/indexmanager/ElasticsearchIndexManagerIT.java[tags=readWriteName]
+----
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> Retrieve the `IndexManager`.
+<3> Narrow down the index manager to the `ElasticsearchIndexManager` type.
+<4> Get the index descriptor.
+<5> Get the index (or alias) read and write names.
+====
+
+[[backend-elasticsearch-schema]]
+== Schema ("mapping")
+
+What Elasticsearch calls the link:{elasticsearchDocUrl}/mapping.html["mapping"]
+is the schema assigned to each index,
+specifying the data type and capabilities of each "property" (called an "index field" in Hibernate Search).
+
+For the most part, the Elasticsearch mapping is inferred from
+<<mapping,the mapping configured through Hibernate Search's mapping APIs>>,
+which are generic and independent of Elasticsearch.
+
+Aspects that are specific to the Elasticsearch backend are explained in this section.
+
+[TIP]
+====
+Hibernate Search can be configured to push the mapping to Elasticsearch when creating the indexes
+through <<backend-elasticsearch-schema-management,schema management>>.
+====
+
+[[backend-elasticsearch-field-types]]
+=== Field types
+
+[[backend-elasticsearch-field-types-available]]
+==== Available field types
+
+[NOTE]
+====
+Some types are not supported directly by the Elasticsearch backend,
+but will work anyway because they are "bridged" by the mapper.
+For example a `java.util.Date` in your entity model is "bridged" to `java.time.Instant`,
+which is supported by the Elasticsearch backend.
+See <<mapping-directfieldmapping-supported-types>> for more information.
+====
+
+[NOTE]
+====
+Field types that are not in this list can still be used with a little bit more work:
+
+* If a property in the entity model has an unsupported type,
+but can be converted to a supported type, you will need a bridge.
+See <<binding>>.
+* If you need an index field with a specific type that is not supported by Hibernate Search,
+you will need a bridge that defines a native field type.
+See <<backend-elasticsearch-field-types-extension>>.
+====
+
+[cols="m,1,1",options="header"]
+.Field types supported by the Elasticsearch backend
+|====
+|Field type|link:{elasticsearchDocUrl}/mapping-types.html[Data type] in Elasticsearch|Limitations
+|java.lang.String|`text` if an analyzer is defined, `keyword` otherwise|-
+|java.lang.Byte|`byte`|-
+|java.lang.Short|`short`|-
+|java.lang.Integer|`integer`|-
+|java.lang.Long|`long`|-
+|java.lang.Double|`double`|-
+|java.lang.Float|`float`|-
+|java.lang.Boolean|`boolean`|-
+|java.math.BigDecimal
+ |`scaled_float` with a `scaling_factor` equal to 10^(`decimalScale`)
+ |-
+|java.math.BigInteger
+ |`scaled_float` with a `scaling_factor` equal to 10^(`decimalScale`)
+ |-
+|java.time.Instant
+ |`date` with format `uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above, OpenSearch)
+ or `yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS'Z'` (ES6 and below)
+ |<<backend-elasticsearch-field-types-date-time>>
+|java.time.LocalDate
+ |`date` with format `uuuu-MM-dd` (ES7 and above, OpenSearch)
+ or `yyyy-MM-dd\|\|yyyyyyyyy-MM-dd` (ES6 and below)
+ |<<backend-elasticsearch-field-types-date-time>>
+|java.time.LocalTime
+ |`date` with format `HH:mm:ss.SSSSSSSSS` (ES7 and above, OpenSearch)
+ or `HH:mm:ss.SSS\|\|HH:mm:ss.SSSSSSSSS` (ES6 and below)
+ |<<backend-elasticsearch-field-types-date-time>>
+|java.time.LocalDateTime
+ |`date` with format `uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS` (ES7 and above, OpenSearch)
+ or `yyyy-MM-dd'T'HH:mm:ss.SSS\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS` (ES6 and below)
+ |<<backend-elasticsearch-field-types-date-time>>
+|java.time.ZonedDateTime
+ |`date` with format `uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ'['VV']'` (ES7 and above, OpenSearch)
+ or `yyyy-MM-dd'T'HH:mm:ss.SSSZZ'['ZZZ']'\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZZ']'\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZ']'` (ES6 and below)
+ |<<backend-elasticsearch-field-types-date-time>>
+|java.time.OffsetDateTime
+ |`date` with format `uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above, OpenSearch)
+ or `yyyy-MM-dd'T'HH:mm:ss.SSSZZ\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ` (ES6 and below)
+ |<<backend-elasticsearch-field-types-date-time>>
+|java.time.OffsetTime
+ |`date` with format `HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above, OpenSearch)
+ or `HH:mm:ss.SSSZZ\|\|HH:mm:ss.SSSSSSSSSZZ` (ES6 and below)
+ |<<backend-elasticsearch-field-types-date-time>>
+|java.time.Year
+ |`date` with format `uuuu` (ES7 and above, OpenSearch)
+ or `yyyy\|\|yyyyyyyyy` (ES6 and below)
+ |<<backend-elasticsearch-field-types-date-time>>
+|java.time.YearMonth
+ |`date` with format `uuuu-MM` (ES7 and above, OpenSearch)
+ or `yyyy-MM\|\|yyyyyyyyy-MM` (ES6 and below)
+ |<<backend-elasticsearch-field-types-date-time>>
+|java.time.MonthDay
+ |`date` with format `uuuu-MM-dd` (ES7 and above, OpenSearch)
+ or `yyyy-MM-dd` (ES6 and below).
+ **The year is always set to 0**.
+ |-
+|<<mapping-geopoint-basics,GeoPoint>>
+ |`geo_point`
+ |-
+|====
+
+[[backend-elasticsearch-field-types-date-time,Lower range/resolution]]
+[NOTE]
+.Range and resolution of date/time fields
+====
+The Elasticsearch `date` type does not support the whole range of years that can be represented in `java.time` types:
+
+* `java.time` can represent years ranging from `-999.999.999` to `999.999.999`.
+* Elasticsearch's `date` type supports dates ranging from year `-292.275.054` to year `292.278.993`.
+
+Values that are out of range will trigger indexing failures.
+
+Resolution is also lower:
+
+* `java.time` supports nanosecond-resolution.
+* Elasticsearch's `date` type supports millisecond-resolution.
+
+Precision beyond the millisecond will be lost when indexing.
+====
+
+[[backend-elasticsearch-field-types-extension]]
+==== Index field type DSL extension
+
+Not all Elasticsearch field types have built-in support in Hibernate Search.
+Unsupported field types can still be used, however,
+by taking advantage of the "native" field type.
+Using this field type, the Elasticsearch "mapping" can be defined as JSON directly,
+giving access to everything Elasticsearch can offer.
+
+Below is an example of how to use the Elasticearch "native" type.
+
+.Using the Elasticearch "native" type
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/type/asnative/IpAddressValueBinder.java[tags=include]
+----
+<1> Define a <<binding,custom binder>> and its bridge.
+The "native" type can only be used from a binder,
+it cannot be used directly with annotation mapping.
+Here we're defining a <<binding-valuebridge,value binder>>,
+but a <<binding-typebridge,type binder>>,
+or a <<binding-propertybridge,property binder>>
+would work as well.
+<2> Get the context's type factory.
+<3> Apply the Elasticsearch extension to the type factory.
+<4> Call `asNative` to start defining a native type.
+<5> Pass the Elasticsearch mapping as JSON.
+<6> Values of native fields are represented as a `JsonElement` in Hibernate Search.
+`JsonElement` is a type from the link:{gsonUrl}[Gson] library.
+Do not forget to format them correctly before you pass them to the backend.
+Here we are creating a `JsonPrimitive` (a subtype of `JsonElement`) from a `String`
+because we just need a JSON string,
+but it's completely possible to handle more complex objects,
+or even to convert directly from POJOs to JSON using Gson.
+<7> For nicer projections, you can also implement this method to convert
+from `JsonElement` to the mapped type (here, `String`).
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/type/asnative/CompanyServer.java[tags=include;!getters-setters]
+----
+<1> Map the property to an index field.
+Note that value bridges using a non-standard type (such as Elasticsearch's "native" type)
+must be mapped using the `@NonStandardField` annotation:
+other annotations such as `@GenericField` will fail.
+<2> Instruct Hibernate Search to use our custom value binder.
+====
+
+[[backend-elasticsearch-type-name]]
+=== Type name mapping
+
+When Hibernate Search performs a search query targeting multiple entity types, and thus multiple indexes,
+it needs to determine the type of each search hit in order to map it back to an entity.
+
+There are multiple strategies to handle this "type name resolution",
+and each has pros and cons.
+
+The strategy is set at the backend level:
+
+[source]
+----
+hibernate.search.backend.mapping.type_name.strategy = discriminator
+----
+The default for this property is `discriminator`.
+
+See the following subsections for details about available strategies.
+
+[[backend-elasticsearch-type-name-discriminator]]
+==== `discriminator`: type name mapping using a discriminator field
+
+With the `discriminator` strategy, a discriminator field is used to retrieve the type name directly from each document.
+
+When indexing, the `_entity_type` field is populated transparently with type name for each document.
+
+When searching, the docvalues for the type field is transparently requested to Elasticsearch
+and extracted from the response.
+
+Pros:
+
+* Works correctly when targeting link:{elasticsearchDocUrl}/indices-add-alias.html[index aliases].
+
+Cons:
+
+* Small storage overhead: a few bytes of storage per document.
+* Requires reindexing if an entity name changes, even if the index name doesn't change.
+
+[[backend-elasticsearch-type-name-index-name]]
+==== `index-name`: type name mapping using the index name
+
+With the `index-name` strategy, the `_index` meta-field returned for each search hit
+is used to resolve the index name, and from that the type name.
+
+Pros:
+
+* No storage overhead.
+
+Cons:
+
+* Relies on the actual index name, not aliases,
+because the `_index` meta-field returned by Elasticsearch
+contains the actual index name (e.g. `myindex-000001`), not the alias (e.g. `myindex-read`).
+If indexes do not follow the default naming scheme `<hibernateSearchIndexName>-<6 digits>`,
+a custom <<backend-elasticsearch-indexlayout,index layout>> must be configured.
+
+[[backend-elasticsearch-mapping-dynamic]]
+=== Dynamic mapping
+
+By default, Hibernate Search sets the link:{elasticsearchDocUrl}/dynamic.html[`dynamic`] property in Elasticsearch index mappings to `strict`.
+This means that attempting to index documents with fields that are not present in the mapping will lead to an indexing failure.
+
+If Hibernate Search is the only client, that won't be a problem,
+since Hibernate Search usually works on declared schema fields only.
+For the other cases in which we need to change this setting,
+we can use the following index-level property to change the value.
+
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.dynamic_mapping = strict
+# To configure a specific index:
+hibernate.search.backend.indexes.<index-name>.dynamic_mapping = strict
+----
+The default for this property is `strict`.
+
+We said that Hibernate Search **usually** works on declared schema fields. More precisely, it always does
+if no <<binding-index-field-dsl-dynamic>> are defined.
+When field templates are defined, `dynamic` will be forced to `true`, in order to allow for dynamic fields. In that case, the value of the `dynamic_mapping` property is ignored.
+
+[[backend-elasticsearch-multi-tenancy]]
+=== Multi-tenancy
+
+Multi-tenancy is supported and handled transparently,
+according to the tenant ID defined in the current session:
+
+* documents will be indexed with the appropriate values, allowing later filtering;
+* queries will filter results appropriately.
+
+The multi-tenancy is automatically enabled in the backend if it is enabled in the mapper,
+e.g. if link:{hibernateDocUrl}#multitenacy[a multi-tenancy strategy is selected in Hibernate ORM],
+or if <<mapper-pojo-standalone-multi-tenancy,multi-tenancy is explicitly configured in the Standalone POJO mapper>>.
+
+However, it is possible to enable multi-tenancy manually.
+
+The multi-tenancy strategy is set at the backend level:
+
+[source]
+----
+hibernate.search.backend.multi_tenancy.strategy = none
+----
+
+See the following subsections for details about available strategies.
+
+[[backend-elasticsearch-multi-tenancy-none]]
+==== `none`: single-tenancy
+
+The `none` strategy (the default) disables multi-tenancy completely.
+
+Attempting to set a tenant ID will lead to a failure when indexing.
+
+[[backend-elasticsearch-multi-tenancy-discriminator]]
+==== `discriminator`: type name mapping using the index name
+
+With the `discriminator` strategy,
+all documents from all tenants are stored in the same index.
+The Elasticsearch ID of each document is set to the concatenation of the tenant ID and original ID.
+
+When indexing, two fields are populated transparently for each document:
+
+* `+_tenant_id+`: the "discriminator" field holding the tenant ID.
+* `+_tenant_doc_id+`: a field holding the original (tenant-scoped) document ID.
+
+When searching, a filter targeting the tenant ID field is added transparently to the search query
+to only return search hits for the current tenant.
+The ID field is used to retrieve the original document IDs.
+
+[[backend-elasticsearch-mapping-custom]]
+=== [[_custom_index_mapping]] Custom index mapping
+
+[[backend-elasticsearch-mapping-custom-basics]]
+==== Basics
+
+Hibernate Search can <<schema-management,create and validate indexes>>,
+but by default created indexes will only include the bare minimum required to index and search:
+the mapping, and the analysis settings.
+Should you need to customize some link:{elasticsearchDocUrl}/mapping-params.html[mapping parameters],
+it is possible to provide a custom mapping to Hibernate Search:
+it will include the custom mapping when creating an index.
+
+[CAUTION]
+====
+The consistency of the custom Elasticsearch mapping with the Hibernate Search mapping will not get checked in any way.
+You are responsible for making sure that any override in your mapping can work,
+e.g. that you're not changing the type of an index field from `text` to `integer`,
+or disabling `doc_values` on a field used for sorting.
+
+An invalid custom mapping may not trigger any exception on bootstrap, but later while indexing or querying.
+In the worst case, it could not trigger any exception, but simply lead to incorrect search results.
+Exercise extreme caution.
+====
+
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.schema_management.mapping_file = custom/index-mapping.json
+# To configure a specific index:
+hibernate.search.backend.indexes.<index-name>.schema_management.mapping_file = custom/index-mapping.json
+----
+
+.Possible content of `custom/index-mapping.json` file
+====
+[source, JSON, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/custom/index-mapping.json[]
+----
+====
+
+[WARNING]
+====
+Properties that are only defined in the custom mappings file but not mapped by Hibernate Search
+will not be visible to Hibernate Search.
+
+This means Hibernate Search will throw exceptions if you try to reference these properties in the <<search-dsl,Search DSL>>,
+or when <<binding-index-field-dsl-dynamic,writing to a document from a bridge>>
+====
+
+The file does not need to contain the full mapping: Hibernate Search will automatically inject
+missing properties (index fields) in the given mapping.
+
+Conflicts between the given mapping and the mapping generated by Hibernate Search will be handled as follows:
+
+1. The `dynamic_templates`/`_routing`/`dynamic` mapping parameters
+will be those from the given mapping, falling back to the value generated by Hibernate Search (if any).
+2. Any other mapping parameters besides the `properties` at the root of the mapping
+will be those from the given mapping; those generated by Hibernate Search will be ignored.
+3. `properties` will be merged, using properties defined in both the
+given mapping and the mapping generated by Hibernate Search.
+4. If a property is defined on both sides, it will be merged recursively, following steps 1-4.
+
+In the example above, the resulting, merged mapping could look like this:
+
+.Possible resulting mapping after merging the content of `custom/index-mapping.json` with the Hibernate Search mapping
+====
+[source, JSON, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/custom/index-mapping-merged.json[]
+----
+<1> This property is always added by Hibernate Search for internal implementation purposes.
+<2> This is a property generated by Hibernate Search because the indexed entity
+has a `String name` property annotated with `@FullTextField`.
+====
+
+[[backend-elasticsearch-mapping-custom-disabling-source]]
+==== [[_disable_source]] Disabling `_source`
+
+Using this feature it is possible to link:{elasticsearchDocUrl}/mapping-source-field.html[disable the `_source` field].
+For instance, you could pass a `custom/index-mapping.json` file like the following:
+
+.Possible content of `custom/index-mapping.json` file to disable the `_source` field
+====
+[source, JSON, indent=0, subs="+callouts"]
+----
+{
+  "_source": {
+    "enabled": false
+  }
+}
+----
+====
+[WARNING]
+====
+Disabling the `_source` is useful to reduce the size of Elasticsearch indexes on the filesystem, but it comes at a cost.
+
+Several <<search-dsl-projection,projections>> rely on the `_source` being enabled.
+If you try to use projections with `_source` disabled, behavior is undefined: the search query may return `null` hits, or it may fail completely with exceptions.
+====
+
+[[backend-elasticsearch-analysis]]
+== [[elasticsearch-mapping-analyzer]] Analysis
+
+[[backend-elasticsearch-analysis-basics]]
+=== Basics
+
+<<concepts-analysis,Analysis>> is the text processing performed by analyzers,
+both when indexing (document processing)
+and when searching (query processing).
+
+All <<backend-elasticsearch-analysis-builtin,built-in Elasticsearch analyzers>> can be used transparently,
+without any configuration in Hibernate Search:
+just use their name wherever Hibernate Search expects an analyzer name.
+However, analysis can also be configured explicitly.
+
+[CAUTION]
+====
+Elasticsearch analysis configuration is not applied immediately on startup:
+it needs to be pushed to the Elasticsearch cluster.
+
+Hibernate Search will only push the configuration to the cluster if instructed to do so
+through <<schema-management,schema management>>.
+====
+
+To configure analysis in an Elasticsearch backend, you will need to:
+
+. Define a class that implements the `org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer` interface.
+. Configure the backend to use that implementation by setting the configuration property
+`hibernate.search.backend.analysis.configurer`
+to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
+for example `class:com.mycompany.MyAnalysisConfigurer`.
+
+TIP: You can pass multiple bean references separated by commas. See <<configuration-property-types>>.
+
+Hibernate Search will call the `configure` method of this implementation on startup,
+and the configurer will be able to take advantage of a DSL to define
+<<backend-elasticsearch-analysis-analyzers,analyzers and normalizers>>.
+
+[NOTE]
+====
+A different analysis configurer can be assigned to each index:
+
+[source]
+----
+# To set the default configurer for all indexes:
+hibernate.search.backend.analysis.configurer = class:com.mycompany.MyAnalysisConfigurer
+# To assign a specific configurer to a specific index:
+hibernate.search.backend.indexes.<index-name>.analysis.configurer = class:com.mycompany.MySpecificAnalysisConfigurer
+----
+
+If a specific configurer is assigned to an index,
+the default configurer will be ignored for that index:
+only definitions from the specific configurer will be taken into account.
+====
+
+[[backend-elasticsearch-analysis-builtin]]
+=== Built-in analyzers
+
+Built-in analyzers are available out-of-the-box and don't require explicit configuration.
+If necessary, they can be overridden by defining your own analyzer with the same name.
+
+The Elasticsearch backend comes with several built-in analyzers.
+The exact list depends on the version of Elasticsearch and can be found
+link:{elasticsearchDocUrl}/analysis-analyzers.html[here].
+
+Regardless of the Elasticsearch version,
+analyzers whose name is listed as a constant in `org.hibernate.search.engine.backend.analysis.AnalyzerNames`
+are always available:
+
+`default`::
+The analyzer used by default with <<mapping-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>.
++
+This is just an alias for `standard` by default.
+`standard`::
+Default behavior: first, tokenize using the standard tokenizer, which follows Word Break rules from the
+Unicode Text Segmentation algorithm, as specified in http://unicode.org/reports/tr29/[Unicode Standard Annex #29].
+Then, lowercase each token.
+`simple`::
+Default behavior: first, split the text at non-letter characters.
+Then, lowercase each token.
+`whitespace`::
+Default behavior: split the text at whitespace characters.
+Do not change the tokens.
+`stop`::
+Default behavior: first, split the text at non-letter characters.
+Then, lowercase each token.
+Finally, remove English stop words.
+`keyword`::
+Default behavior: do not change the text in any way.
++
+With this analyzer a full text field would behave similarly to a keyword field,
+but with fewer features: no terms aggregations, for example.
++
+Consider using a <<mapping-directfieldmapping-annotations-keywordfield,`@KeywordField`>> instead.
+
+[[backend-elasticsearch-analysis-builtin-normalizer]]
+=== Built-in normalizers
+
+The Elasticsearch backend does not provide any built-in normalizer.
+
+[[backend-elasticsearch-analysis-analyzers]]
+=== Custom analyzers and normalizers
+
+The context passed to the configurer exposes a DSL to define analyzers and normalizers:
+
+.Implementing and using an analysis configurer to define analyzers and normalizers with the Elasticsearch backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/MyElasticsearchAnalysisConfigurer.java[tags=include]
+----
+<1> Define a custom analyzer named "english", because it will be used to analyze English text such as book titles.
+<2> Set the tokenizer to a standard tokenizer.
+<3> Set the char filters. Char filters are applied in the order they are given, before the tokenizer.
+<4> Set the token filters. Token filters are applied in the order they are given, after the tokenizer.
+<5> Note that, for Elasticsearch, any parameterized char filter, tokenizer or token filter
+must be defined separately and assigned a name.
+<6> Set the value of a parameter for the char filter/tokenizer/token filter being defined.
+<7> Normalizers are defined in a similar way, the only difference being that they cannot use a tokenizer.
+<8> Multiple analyzers/normalizers can be defined in the same configurer.
+
+[source, XML, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/analysis/elasticsearch-simple.properties[]
+----
+<1> Assign the configurer to the backend using a Hibernate Search configuration property.
+====
+
+It is also possible to assign a name to a parameterized built-in analyzer:
+
+.Naming a parameterized built-in analyzer in the Elasticsearch backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/AdvancedElasticsearchAnalysisConfigurer.java[tags=type]
+----
+<1> Define an analyzer with the given name and type.
+<2> Set the value of a parameter for the analyzer being defined.
+====
+
+To know which analyzers, character filters, tokenizers and token filters are available,
+refer to the documentation:
+
+* If you want to use a built-in analyzer and not create your own:
+{elasticsearchDocUrl}/analysis-analyzers.html[analyzers];
+* If you want to define your own analyzer:
+{elasticsearchDocUrl}/analysis-charfilters.html[character filters],
+{elasticsearchDocUrl}/analysis-tokenizers.html[tokenizers],
+{elasticsearchDocUrl}/analysis-tokenfilters.html[token filters].
+
+[[backend-elasticsearch-analysis-analyzers-default]]
+=== Overriding the default analyzer
+
+The default analyzer when using <<mapping-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>
+without specifying an analyzer explicitly, is named `default`.
+
+Like any other <<backend-elasticsearch-analysis-builtin,built-in analyzer>>, it is possible to override the default analyzer
+by defining a <<backend-elasticsearch-analysis-analyzers,custom analyzer>> with the same name:
+
+.Overriding the default analyzer in the Elasticsearch backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/MyElasticsearchAnalysisConfigurer.java[tags=include]
+----
+<1> Start the definition of a custom analyzer that happens to be named `default`.
+Here we rely on constants from `org.hibernate.search.engine.backend.analysis.AnalyzerNames` to use the correct name,
+but hardcoding `"default"` would work just as well.
+<2> Continue the analyzer definition <<backend-elasticsearch-analysis-analyzers,as we would for any other custom analyzer>>.
+
+[source, XML, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/analysis/elasticsearch-default-override.properties[]
+----
+<1> Assign the configurer to the backend using a Hibernate Search configuration property.
+====
+
+[[backend-elasticsearch-configuration-index-settings]]
+== [[_custom_index_settings]] Custom index settings
+
+Hibernate Search can <<schema-management,create and validate indexes>>, but by default created indexes will only include the bare minimum required to index and search: the mapping, and the analysis settings.
+Should you need to set some link:{elasticsearchDocUrl}/index-modules.html#index-modules-settings[custom index settings], it is possible to provide these settings to Hibernate Search: it will include them when creating an index and take them into account when validating an index.
+
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.schema_management.settings_file = custom/index-settings.json
+# To configure a specific index:
+hibernate.search.backend.indexes.<index-name>.schema_management.settings_file = custom/index-settings.json
+----
+
+.Possible content of `custom/index-settings.json` file
+====
+[source, JSON, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/custom/index-settings.json[]
+----
+====
+
+The provided settings will be merged with those generated by Hibernate Search, including analyzer definitions.
+When analysis is configured both through an <<backend-elasticsearch-analysis-analyzers,analysis configurer>> and these custom settings, the behavior is undefined; it should not be relied upon.
+
+[NOTE]
+====
+Custom index setting must be provided in the simplified form, the one without the attribute the `index` attribute.
+====
+
+[[backend-elasticsearch-configuration-index-settings-max-result-window-size]]
+=== [[_max_result_window_size]] Max result window size
+
+If the setting `index.max_result_window` is used,
+Hibernate Search will use this value to limit the returning hits size
+if no limit has been defined on the query by the user.
+In this case if Hibernate Search notices there are more results, a warning will be logged.
+
+[[backend-elasticsearch-threads]]
+== Threads
+
+The Elasticsearch backend relies on an internal thread pool to orchestrate indexing requests (add/update/delete)
+and to schedule request timeouts.
+
+By default, the pool contains exactly as many threads as the number of processors available to the JVM on bootstrap.
+That can be changed using a configuration property:
+
+[source]
+----
+hibernate.search.backend.thread_pool.size = 4
+----
+
+[NOTE]
+====
+This number is _per backend_, not per index.
+Adding more indexes will not add more threads.
+====
+
+[TIP]
+====
+As all operations happening in this thread-pool are non-blocking,
+raising its size above the number of processor cores available to the JVM will not bring
+noticeable performance benefits.
+
+The only reason to alter this setting would be to reduce the number of threads;
+for example, in an application with a single index with a single indexing queue,
+running on a machine with 64 processor cores,
+you might want to bring down the number of threads.
+====
+
+[[backend-elasticsearch-indexing-queues]]
+== Indexing queues
+
+Among all the requests sent by Hibernate Search to Elasticsearch,
+it is expected that there will be a lot of "indexing" requests to create/update/delete a specific document.
+Sending these requests one by one would be inefficient (mainly because of network latency).
+Also, we generally want to preserve the relative order of these requests
+when they are about the same documents.
+
+For these reasons, Hibernate Search pushes these requests to ordered queues
+and relies on the link:{elasticsearchDocUrl}/docs-bulk.html[Bulk API] to send them in batches.
+Each index maintains 10 queues holding at most 1000 elements each,
+and each queue will send bulk requests of at most 100 indexing requests.
+Queues operate independently (in parallel), but each queue sends one bulk request after the other,
+so at any given time there can be at most 10 bulk requests being sent for each index.
+
+[NOTE]
+====
+Indexing operations relative to the same document ID are always pushed to the same queue.
+====
+
+It is possible to customize the queues in order to reduce the load on the Elasticsearch server,
+or on the contrary to improve throughput.
+This is done through the following configuration properties:
+
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.indexing.queue_count = 10
+hibernate.search.backend.indexing.queue_size = 1000
+hibernate.search.backend.indexing.max_bulk_size = 100
+# To configure a specific index:
+hibernate.search.backend.indexes.<index-name>.indexing.queue_count = 10
+hibernate.search.backend.indexes.<index-name>.indexing.queue_size = 1000
+hibernate.search.backend.indexes.<index-name>.indexing.max_bulk_size = 100
+----
+
+* `indexing.queue_count` defines the number of queues.
+Expects a strictly positive integer value.
+The default for this property is `10`.
++
+Higher values will lead to more connections being used in parallel,
+which may lead to higher indexing throughput,
+but incurs a risk of <<backend-elasticsearch-indexing-queues-circuit-breaker,overloading Elasticsearch>>,
+leading to Elasticsearch giving up on some requests and resulting in indexing failures.
+* `indexing.queue_size` defines the maximum number of elements each queue can hold.
+Expects a strictly positive integer value.
+The default for this property is `1000`.
++
+Lower values may lead to lower memory usage, especially if there are many queues,
+but values that are too low will reduce the likeliness of reaching the max bulk size
+and increase the likeliness of <<backend-elasticsearch-indexing-queues-blocking,application threads blocking>>
+because the queue is full,
+which may lead to lower indexing throughput.
+* `indexing.max_bulk_size` defines the maximum number of indexing requests in each bulk request.
+Expects a strictly positive integer value.
+The default for this property is `100`.
++
+Higher values will lead to more documents being sent in each HTTP request sent to Elasticsearch,
+which may lead to higher indexing throughput,
+but incurs a risk of <<backend-elasticsearch-indexing-queues-circuit-breaker,overloading Elasticsearch>>,
+leading to Elasticsearch giving up on some requests and resulting in indexing failures.
++
+Note that raising this number above the queue size has no effect,
+as bulks cannot include more requests than are contained in the queue.
+
+[TIP]
+[[backend-elasticsearch-indexing-queues-blocking]]
+====
+When a queue is full, any attempt to request indexing will block until the request can be put into the queue.
+
+In order to achieve a reasonable level of performance,
+be sure to set the size of queues to a high enough number that this kind of blocking only happens
+when the application is under very high load.
+====
+
+[WARNING]
+[[backend-elasticsearch-indexing-queues-circuit-breaker]]
+====
+Elasticsearch nodes can only handle so many parallel requests,
+and in particular they link:{elasticsearchDocUrl}/circuit-breaker.html[limit the amount of memory]
+available to store all pending requests at any given time.
+
+In order to avoid indexing failures, avoid using overly large numbers
+for the number of queues and the maximum bulk size,
+especially if you expect your index to hold large documents.
+====
+
+[[backend-elasticsearch-io]]
+== Writing and reading
+
+include::../components/writing-reading-intro-note.asciidoc[]
+
+[[backend-elasticsearch-io-commit]]
+=== Commit
+
+When writing to indexes, Elasticsearch relies on a link:{elasticsearchDocUrl}/index-modules-translog.html[transaction log]
+to make sure that changes, even uncommitted, are always safe as soon as the REST API call returns.
+
+For that reason, the concept of "commit" is not as important to the Elasticsearch backend,
+and commit requirements are largely irrelevant.
+
+[[backend-elasticsearch-io-refresh]]
+=== Refresh
+
+When reading from indexes, Elasticsearch relies on a periodically refreshed index reader,
+meaning that search queries will return slightly out-of-date results,
+unless a refresh was forced:
+this is called link:{elasticsearchDocUrl}/getting-started-concepts.html#_near_realtime_nrt[near-real-time] behavior.
+
+By default, the index reader is refreshed every second,
+but this can be customized on the Elasticsearch side through index settings:
+see the `refresh_interval` setting on link:{elasticsearchDocUrl}/index-modules.html[this page].
+
+[[backend-elasticsearch-search]]
+== Searching
+
+Searching with the Elasticsearch backend relies on the <<search-dsl,same APIs as any other backend>>.
+
+This section details Elasticsearch-specific configuration related to searching.
+
+[[backend-elasticsearch-search-scroll-timeout]]
+=== Scroll timeout
+
+With the Elasticsearch backend, <<search-dsl-query-fetching-results-scrolling,scrolls>> are subject to timeout.
+If `next()` is not called for a long period of time (default: 60 seconds),
+the scroll will be closed automatically and the next call to `next()` will fail.
+
+Use the following configuration property at the backend level to configure the timeout (in seconds):
+
+[source]
+----
+hibernate.search.backend.scroll_timeout = 60
+----
+The default for this property is `60`.
+
+[[backend-elasticsearch-access-client]]
+== [[elasticsearch-client-access]] Retrieving the REST client
+
+When writing complex applications with advanced requirements,
+it may be necessary from time to time to send requests to the Elasticsearch cluster directly,
+in particular if Hibernate Search does not support this kind of requests out of the box.
+
+To that end, you can retrieve the Elasticsearch backend,
+then get access the Elasticsearch client used by Hibernate Search internally.
+See below for an example.
+
+.Accessing the low-level REST client
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/client/ElasticsearchGetClientIT.java[tags=client]
+----
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> Retrieve the `Backend`.
+<3> Narrow down the backend to the `ElasticsearchBackend` type.
+<4> Get the client, passing the expected type of the client as an argument.
+====
+
+[WARNING]
+====
+The client itself is not part of the Hibernate Search API,
+but of the
+link:{elasticsearchDocUrl}/index-modules.html#_static_index_settings[official Elasticsearch REST client API].
+
+Hibernate Search may one day switch to another client with a different Java type,
+without prior notice.
+If that happens, the snippet of code above will throw an exception.
+====
+
+
