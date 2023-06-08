@@ -1,0 +1,508 @@
+[[search-dsl-sort]]
+= [[query-sorting]] Sort DSL
+
+[[search-dsl-sort-concepts]]
+== Basics
+
+By default, query results are sorted by <<search-dsl-sort-score,matching score (relevance)>>.
+Other sorts, including the sort by field value, can be configured when building the search query:
+
+.Using custom sorts
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=entryPoint-lambdas]
+----
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
+<2> Start building the query as usual.
+<3> Mention that the results of the query are expected to be sorted on field "pageCount" in descending order,
+then (for those with the same page count) on field "title_sort" in ascending order.
+If the field does not exist or cannot be sorted on, an exception will be thrown.
+<4> Fetch the results, which will be sorted according to instructions.
+====
+
+Alternatively, if you don't want to use lambdas:
+
+.Using custom sorts -- object-based syntax
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=entryPoint-objects]
+----
+====
+
+include::../components/_field-sort-important.adoc[]
+
+The sort DSL offers more sort types, and multiple options for each type of sort.
+To learn more about the `field` sort, and all the other types of sort,
+refer to the following sections.
+
+[[search-dsl-sort-score]]
+== `score`: sort by matching score (relevance)
+
+`score` sorts on the score of each document:
+
+* in descending order (the default), documents with a higher score appear first in the list of hits.
+* in ascending order, documents with a lower score appear first in the list of hits.
+
+The score is computed differently for each query,
+but roughly speaking you can consider that a higher score means that more <<search-dsl-predicate,predicates>>
+were matched, or they were matched better.
+Thus, the score of a given document is a representation of how relevant that document is to a particular query.
+
+[TIP]
+====
+To get the most out of a sort by score, you will need
+to <<search-dsl-predicate-common-score,assign weight to your predicates by boosting some of them>>.
+
+Advanced users may even want to change the scoring formula by specifying a different <<backend-lucene-analysis-similarity,Similarity>>.
+====
+
+Sorting by score is the default, so it's generally not necessary to ask for a sort by score explicitly,
+but below is an example of how you can do it.
+
+.Sorting by relevance
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=score]
+----
+====
+
+[[search-dsl-sort-score-options]]
+=== Options
+
+* You can sort by ascending score by <<search-dsl-sort-common-order,changing the sort order>>.
+However, this means the least relevant hits will appear first,
+which is completely pointless. This option is only provided for completeness.
+
+[[search-dsl-sort-index-order]]
+== `indexOrder`: sort according to the order of documents on storage
+
+`indexOrder` sorts on the position of documents on internal storage.
+
+This sort is not predictable, but is the most efficient.
+Use it when performance matters more than the order of hits.
+
+.Sorting according to the order of documents on storage
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=indexOrder]
+----
+====
+
+NOTE: `indexOrder` should *not* be used to stabilize sorts.
+That's because the index order may change when the index is updated,
+or even without any change, after index segments are <<backend-lucene-io-merge,merged>>.
+See <<search-dsl-sort-stabilize>> for a solution to unstable sorts.
+
+[[search-dsl-sort-field]]
+== `field`: sort by field values
+
+`field` sorts on the value of a given field for each document.
+
+[[search-dsl-sort-field-prerequisites]]
+include::../components/_field-sort-important.adoc[]
+
+[NOTE]
+====
+The values of <<mapping-geopoint,GeoPoint>> fields cannot be compared directly
+and thus the `field` sort cannot be used on those fields.
+
+Refer to the <<search-dsl-sort-distance,distance sort>> for these fields.
+====
+
+The sort order is defined as follows:
+
+* in ascending order (the default), documents with a lower value appear first in the list of hits.
+* in descending order, documents with a higher value appear first in the list of hits.
+
+[NOTE]
+====
+For text fields, "lower" means "lower in the alphabetical order".
+====
+
+[[search-dsl-sort-field-syntax]]
+=== Syntax
+
+.Sorting by field values
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=field]
+----
+====
+
+[[search-dsl-sort-field-options]]
+=== Options
+
+* The sort order is ascending by default,
+but can be <<search-dsl-sort-common-order,controlled explicitly with `.asc()`/`.desc()`>>.
+* The behavior on missing values
+can be <<search-dsl-sort-common-missing,controlled explicitly with `.missing()`>>.
+* The behavior on multivalued fields
+can be <<search-dsl-sort-common-multi-value-mode,controlled explicitly with `.mode(...)`>>.
+* For fields in nested objects, all nested objects are considered by default,
+but that can be <<search-dsl-sort-common-filter,controlled explicitly with `.filter(...)`>>.
+
+[[search-dsl-sort-distance]]
+== `distance`: sort by distance to a point
+
+`distance` sorts on the distance from a given center to the geo-point value of a given field for each document.
+
+* in ascending order (the default), documents with a lower distance appear first in the list of hits.
+* in descending order, documents with a higher distance appear first in the list of hits.
+
+[[search-dsl-sort-distance-prerequisites]]
+=== Prerequisites
+
+In order for the `distance` sort to be available on a given field,
+you need to mark the field as <<mapping-directfieldmapping-sortable,sortable>> in the mapping.
+
+[[search-dsl-sort-distance-syntax]]
+=== Syntax
+
+.Sorting by distance to a point
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=distance]
+----
+====
+
+[[search-dsl-sort-distance-options]]
+=== Options
+
+* The sort order is ascending by default,
+but can be <<search-dsl-sort-common-order,controlled explicitly with `.asc()`/`.desc()`>>.
+* The behavior on multivalued fields
+can be <<search-dsl-sort-common-multi-value-mode,controlled explicitly with `.mode(...)`>>.
+* For fields in nested objects, all nested objects are considered by default,
+but that can be <<search-dsl-sort-common-filter,controlled explicitly with `.filter(...)`>>.
+
+[[search-dsl-sort-composite]]
+== `composite`: combine sorts
+
+`composite` applies multiple sorts one after the other.
+It is useful when applying incomplete sorts.
+
+.Sorting by multiple composed sorts using `composite()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=composite]
+----
+<1> Start a `composite` sort.
+<2> Add a `field` sort on the `genre_sort` field.
+Since many books share the same genre, this sort is incomplete:
+the relative order of books with the same genre is undetermined,
+and may change from one query execution to the other.
+<3> Add a `field` sort on the `title_sort` field.
+When two books have the same genre,
+their relative order will be determined by comparing their titles.
+If two books can have the same title,
+we can <<search-dsl-sort-stabilize,stabilize the sort even further by adding a last sort on the id>>.
+<4> The hits will be sorted by genre, then by title.
+====
+
+Alternatively, you can append a sort to another simply by calling `.then()` after the first sort:
+
+.Sorting by multiple composed sorts using `then()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=then]
+----
+====
+
+[[search-dsl-sort-composite-lambda]]
+=== Adding sorts dynamically with the lambda syntax
+
+It is possible to define the `composite` sort inside a lambda expression.
+This is especially useful when inner sorts need to be added dynamically to the `composite` sort,
+for example based on user input.
+
+.Easily composing sorts dynamically with the lambda syntax
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=composite_dynamicParameters]
+----
+<1> Get a custom object holding the search parameters provided by the user through a web form, for example.
+<2> Call `.composite(Consumer)`.
+The consumer, implemented by a lambda expression, will receive a builder as an argument
+and will add sorts to that builder as necessary.
+<3> Inside the lambda, the code is free to do whatever is necessary before adding sorts.
+In this case, we iterate over user-selected sorts and add sorts accordingly.
+<4> The hits will be sorted according to sorts added by the lambda expression.
+====
+
+[[search-dsl-sort-stabilize]]
+=== Stabilizing a sort
+
+If your first sort (e.g. by <<search-dsl-sort-field,field value>>)
+results in a tie for many documents (e.g. many documents have the same field value),
+you may want to append an arbitrary sort just to stabilize your sort:
+to make sure the search hits will always be in the same order if you execute the same query.
+
+In most cases, a quick and easy solution for stabilizing a sort is
+to change your mapping to add a <<mapping-directfieldmapping-sortable,sortable field>> on your entity ID,
+and to append a `field` sort by id to your unstable sort:
+
+.Stabilizing a sort
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=stabilization]
+----
+====
+
+[[search-dsl-sort-extensions]]
+== Backend-specific extensions
+
+By calling `.extension(...)` while building a query,
+it is possible to access backend-specific sorts.
+
+[NOTE]
+====
+As their name suggests, backend-specific sorts are not portable from one backend technology to the other.
+====
+
+[[search-dsl-sort-extensions-lucene-from-lucene-sort]]
+=== Lucene: `fromLuceneSort`
+
+`.fromLuceneSort(...)` turns a native Lucene `Sort` into a Hibernate Search sort.
+
+include::../components/_lucene-api-warning.adoc[]
+
+.Sorting by a native `org.apache.lucene.search.Sort`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/LuceneSortDslIT.java[tags=lucene-fromLuceneSort]
+----
+====
+
+[[search-dsl-sort-extensions-lucene-from-lucene-sort-field]]
+=== [[_using_native_sorts_within_the_sort_dsl]] Lucene: `fromLuceneSortField`
+
+`.fromLuceneSortField(...)` turns a native Lucene `SortField` into a Hibernate Search sort.
+
+include::../components/_lucene-api-warning.adoc[]
+
+.Sorting by a native `org.apache.lucene.search.SortField`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/LuceneSortDslIT.java[tags=lucene-fromLuceneSortField]
+----
+====
+
+[[search-dsl-sort-extensions-elasticsearch-from-json]]
+=== Elasticsearch: `fromJson`
+
+`.fromJson(...)` turns JSON representing an Elasticsearch sort into a Hibernate Search sort.
+
+include::../components/_elasticsearch-json-warning.adoc[]
+
+.Sorting by a native Elasticsearch JSON sort provided as a `JsonObject`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/ElasticsearchSortDslIT.java[tags=elasticsearch-fromJson-jsonObject]
+----
+====
+
+.Sorting by a native Elasticsearch JSON sort provided as a JSON-formatted string
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/ElasticsearchSortDslIT.java[tags=elasticsearch-fromJson-string]
+----
+====
+
+[[search-dsl-sort-common]]
+== Options common to multiple sort types
+
+[[search-dsl-sort-common-order]]
+=== Sort order
+
+Most sorts use the ascending order by default, with the notable exception of the <<search-dsl-sort-score,score sort>>.
+
+The order controlled explicitly through the following options:
+
+* `.asc()` for an ascending order.
+* `.desc()` for a descending order.
+* `.order(...)` for an order defined by the given argument: `SortOrder.ASC`/`SortOrder.DESC`.
+
+Below are a few examples with the <<search-dsl-sort-field,field sort>>.
+
+.Sorting by field values in explicitly ascending order with `asc()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=order-asc]
+----
+====
+
+.Sorting by field values in explicitly descending order with `desc()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=order-desc]
+----
+====
+
+.Sorting by field values in explicitly descending order with `order(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=order-order]
+----
+====
+
+[[search-dsl-sort-common-missing]]
+=== [[_handling_missing_values]] Missing values
+
+By default:
+
+* For <<search-dsl-sort-field,sorts by field values>>, the documents that do not have any value for a sort field
+  will appear in the last position.
+* For <<search-dsl-sort-distance,sorts by distance to a point>>, the documents that do not have any value for a sort field
+  will be treated as if their distance from the given point was infinite.
+
+The behavior for missing values can be controlled explicitly through the `.missing()` option:
+
+* `.missing().first()` puts documents with no value in first position (regardless of the sort order).
+* `.missing().last()` puts documents with no value in last position (regardless of the sort order).
+* `.missing().lowest()` interprets missing values as the lowest value:
+it puts documents with no value in the first position when using ascending order or in the last position when using descending order.
+* `.missing().highest()` interprets missing values as the highest value:
+it puts documents with no value in the last position when using ascending order or in the first position when using descending order.
+* `.missing().use(...)` uses the given value as a default for documents with no value.
+
+[NOTE]
+====
+All these options are supported for sorts by field values and sorts by distance to a point
+using the Lucene backend.
+
+When sorting by distance to a point using the Elasticsearch backend, due to limitations of the Elasticsearch APIs,
+only the following combinations are supported:
+
+* `.missing().first()` using a descending order.
+* `.missing().last()` using an ascending order.
+* `.missing().highest()` using either an ascending or a descending order.
+====
+
+Below are a few examples with the <<search-dsl-sort-field,field sort>>.
+
+.Sorting by field values, documents with no value in first position
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=missing-first]
+----
+====
+
+.Sorting by field values, documents with no value in last position
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=missing-last]
+----
+====
+
+.Sorting by field values, documents with no value using a given default value
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=missing-use]
+----
+====
+
+[[search-dsl-sort-common-missing-argument-type]]
+==== Expected type of arguments
+
+By default, `.use(...)` expects its argument to have the same type as
+the entity property corresponding to the target field.
+
+For example, if an entity property is of type `java.util.Date`,
+<<mapping-directfieldmapping-supported-types,the corresponding field may be of type `java.time.Instant`>>.
+`.use(...)` will expect its argument to be of type `java.util.Date` regardless.
+
+This should generally be what you want,
+but if you ever need to bypass conversion and pass an unconverted argument
+(of type `java.time.Instant` in the example above)
+to `.use(...)`, see <<search-dsl-argument-type>>.
+
+[[search-dsl-sort-common-multi-value-mode]]
+=== Sort mode for multivalued fields
+
+Documents that have multiple values for a sort field can be sorted too.
+A single value is picked for each document in order to compare it with order documents.
+How the value is picked is called the *sort mode*, specified using the `.mode(...)` option.
+The following sort modes are available:
+
+|====
+|Mode|Description|Supported value types|Unsupported value types
+|`SortMode.MIN`
+|Picks the lowest value for field sorts, the lowest distance for distance sorts.
+
+This is default for ascending sorts.
+|All.
+|-
+|`SortMode.MAX`
+|Picks the highest value for field sorts, the highest distance for distance sorts.
+
+This is default for descending sorts.
+|All.
+|-
+|`SortMode.SUM`
+|Computes the sum of all values for each document,
+and picks that sum for comparison with other documents.
+|Numeric fields (`long`, ...).
+|Text and temporal fields (`String`, `LocalDate`, ...), <<search-dsl-sort-distance,distance>>.
+|`SortMode.AVG`
+|Computes the https://en.wikipedia.org/wiki/Arithmetic_mean[arithmetic mean] of all values for each document
+and picks that average for comparison with other documents.
+|Numeric and temporal fields (`long`, `LocalDate`, ...), <<search-dsl-sort-distance,distance>>.
+|Text fields (`String`, ...).
+|`SortMode.MEDIAN`
+|Computes the https://en.wikipedia.org/wiki/Median[median] of all values for each document,
+and picks that median for comparison with other documents.
+|Numeric and temporal fields (`long`, `LocalDate`, ...), <<search-dsl-sort-distance,distance>>.
+|Text fields (`String`, ...).
+|====
+
+Below is an example with the <<search-dsl-sort-field,field sort>>.
+
+.Sorting by field values using the average value for each document
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=mode-avg]
+----
+====
+
+[[search-dsl-sort-common-filter]]
+=== Filter for fields in nested objects
+
+When the sort field is located in a <<mapping-indexedembedded-structure-nested,nested object>>,
+by default all nested objects will be considered for the sort
+and their values will be combined using the configured <<search-dsl-sort-common-multi-value-mode,sort mode>>.
+
+It is possible to filter the nested documents whose values will be considered for the sort
+using one of the `filter(...)` methods.
+
+Below is an example with the <<search-dsl-sort-field,field sort>>:
+authors are sorted by the average page count of their books,
+but only books of the "crime fiction" genre are considered:
+
+.Sorting by field values using a filter for nested objects
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=filter]
+----
+====

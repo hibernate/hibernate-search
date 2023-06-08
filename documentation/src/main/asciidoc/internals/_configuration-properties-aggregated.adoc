@@ -1,0 +1,10 @@
+[[configuration-properties-aggregated]]
+== List of all available configuration properties
+
+include::{documentationConfigPropertiesOutputDirectory}/_hibernate-search-engine-spi.adoc[opts=optional]
+include::{documentationConfigPropertiesOutputDirectory}/_hibernate-search-backend-lucene-spi.adoc[opts=optional]
+include::{documentationConfigPropertiesOutputDirectory}/_hibernate-search-backend-elasticsearch-spi.adoc[opts=optional]
+include::{documentationConfigPropertiesOutputDirectory}/_hibernate-search-backend-elasticsearch-aws-spi.adoc[opts=optional]
+include::{documentationConfigPropertiesOutputDirectory}/_hibernate-search-mapper-orm-spi.adoc[opts=optional]
+include::{documentationConfigPropertiesOutputDirectory}/_hibernate-search-mapper-orm-coordination-outbox-polling-spi.adoc[opts=optional]
+include::{documentationConfigPropertiesOutputDirectory}/_hibernate-search-mapper-pojo-standalone-spi.adoc[opts=optional]

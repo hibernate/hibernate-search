@@ -1,0 +1,11 @@
+[appendix]
+[[configuration-properties-aggregated]]
+= List of all available configuration properties
+
+include::{documentationConfigPropertiesOutputDirectory}/_hibernate-search-engine.adoc[opts=optional]
+include::{documentationConfigPropertiesOutputDirectory}/_hibernate-search-backend-lucene.adoc[opts=optional]
+include::{documentationConfigPropertiesOutputDirectory}/_hibernate-search-backend-elasticsearch.adoc[opts=optional]
+include::{documentationConfigPropertiesOutputDirectory}/_hibernate-search-backend-elasticsearch-aws.adoc[opts=optional]
+include::{documentationConfigPropertiesOutputDirectory}/_hibernate-search-mapper-orm.adoc[opts=optional]
+include::{documentationConfigPropertiesOutputDirectory}/_hibernate-search-mapper-orm-coordination-outbox-polling.adoc[opts=optional]
+include::{documentationConfigPropertiesOutputDirectory}/_hibernate-search-mapper-pojo-standalone.adoc[opts=optional]

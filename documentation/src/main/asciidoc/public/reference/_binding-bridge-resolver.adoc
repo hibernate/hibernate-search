@@ -1,0 +1,62 @@
+[[binding-bridge-resolver]]
+= [[mapper-orm-bridge-resolver]] [[_bridgeprovider_associate_a_bridge_to_a_given_return_type]] Assigning default bridges with the bridge resolver
+
+[[binding-bridge-resolver-basics]]
+== [[mapper-orm-bridge-resolver-basics]] Basics
+
+Both the <<mapping-directfieldmapping-supported-types,`@*Field` annotations>>
+and the <<mapping-identifiermapping-supported-types,`@DocumentId` annotation>>
+support a broad range of standard types by default,
+without needing to tell Hibernate Search how to convert values to something that can be indexed.
+
+Under the hood, the support for default types is handled by the bridge resolver.
+For example, when a property is mapped with `@GenericField`
+and neither `@GenericField.valueBridge` nor `@GenericField.valueBinder` is set,
+Hibernate Search will resolve the type of this property,
+then pass it to the bridge resolver,
+which will return an appropriate bridge, or fail if there isn't any.
+
+It is possible to customize the bridge resolver,
+to override existing default bridges (indexing `java.util.Date` differently, for example)
+or to define default bridges for additional types (a geospatial type from an external library, for example).
+
+To that end, define a mapping configurer as explained in <<mapping-programmatic>>,
+then define bridges as shown below:
+
+.Defining default bridges with a mapping configurer
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/bridgeresolver/MyDefaultBridgesConfigurer.java[tags=include]
+----
+<1> Use our custom bridge (`MyCoordinatesBridge`) by default when a property of type `MyCoordinates`
+is mapped to an index field (e.g. with `@GenericField`).
+<2> Use our custom bridge (`MyProductBridge`) by default when a property of type `MyProductId`
+is mapped to a document identifier (e.g. with `@DocumentId`).
+<3> It's also possible to specify a binder instead of a bridge,
+so that additional settings can be tuned.
+Here we're assigning the "isbn" normalizer every time we map an ISBN to an index field.
+====
+
+[[binding-bridge-resolver-single-binder-multiple-types]]
+== [[mapper-orm-bridge-resolver-single-binder-multiple-types]] [[_assigning_a_single_binder_to_multiple_types]] Assigning a single binder to multiple types
+
+include::../components/_incubating-warning.adoc[]
+
+For more advanced use cases, it is also possible to assign a single binder to subtypes of a given type.
+This is useful when many types should be indexed similarly.
+
+Below is an example where enums are not indexed as their `.name()` (which is the default),
+but instead are indexed as their label retrieved from an external service.
+
+.Assigning a single default binder to multiple types with a mapping configurer
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/bridgeresolver/MyDefaultBridgesConfigurer.java[tags=advanced]
+----
+<1> Match all subtypes of `Enum`.
+<2> <<binding-valuebridge-incubating,Retrieve the type of the element being bridged>>.
+<3> <<binding-valuebridge-injection,Retrieve an external service>> (through CDI/Spring).
+<4> Create and assign the bridge.
+====

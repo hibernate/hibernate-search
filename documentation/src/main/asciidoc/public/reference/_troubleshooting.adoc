@@ -1,0 +1,102 @@
+[[troubleshooting]]
+= Troubleshooting
+
+[[troubleshooting-under-the-hood]]
+== Finding out what is executed under the hood
+
+For search queries, you can get a human-readable representation of a <<search-dsl-query-object,`SearchQuery` object>>
+by calling `toString()` or `queryString()`.
+Alternatively, rely on the logs:
+<<troubleshooting-logging-query,`org.hibernate.search.query`>> will log every query at the `TRACE` level
+before it is executed.
+
+For more general information about what is being executed, rely on loggers:
+
+* <<troubleshooting-logging-lucene-infostream,`org.hibernate.search.backend.lucene.infostream`>>
+for Lucene.
+* <<troubleshooting-logging-elasticsearch-request,`org.hibernate.search.elasticsearch.request`>>
+for Elasticsearch.
+
+[[troubleshooting-logging]]
+== Loggers
+
+Here are a few loggers that can be useful when debugging an application that uses Hibernate Search:
+
+[[troubleshooting-logging-query]]`org.hibernate.search.query`::
+Available for all backends.
++
+Logs every single search query at the `TRACE` level, before its execution.
+[[troubleshooting-logging-elasticsearch-request]]`org.hibernate.search.elasticsearch.request`::
+Available for Elasticsearch backends only.
++
+Logs requests sent to Elasticsearch at the `DEBUG` or `TRACE` level after their execution.
+All available request and response information is logged:
+method, path, execution time, status code, but also the full request and response.
++
+Use the `DEBUG` level to only log non-success requests (status code different from `2xx`),
+or the `TRACE` level to log every single request.
++
+You can enable pretty-printing (line breaks and indentation) for the request and response
+using a <<backend-elasticsearch-configuration-logging,configuration property>>.
+[[troubleshooting-logging-lucene-infostream]]`org.hibernate.search.backend.lucene.infostream`::
+Available for Lucene backends only.
++
+Logs low level trace information about Lucene's internal components, at the `TRACE` level.
++
+Enabling the `TRACE` level on this logger is not enough:
+you must also enable the infostream using a <<backend-lucene-io-writer-infostream,configuration property>>.
+
+[[troubleshooting-faq]]
+== Frequently asked questions
+
+[[troubleshooting-faq-search-matches]]
+=== [[search-dsl-query-debugging-matches]] Unexpected or missing documents in search hits
+
+When some documents unexpectedly match or don't match a query,
+you will need information about the exact query being executed,
+and about the index content.
+
+To find out what the query being executed looks like exactly,
+see <<troubleshooting-under-the-hood>>.
+
+To inspect the content of the index:
+
+* With the Elasticsearch backend, run simpler queries using either Hibernate Search or the REST APIs directly.
+* With the Lucene backend, run simpler queries using Hibernate Search or
+https://medium.com/@mocobeta/luke-become-an-apache-lucene-module-as-of-lucene-8-1-7d139c998b2[use the Luke tool]
+distributed as part of the https://lucene.apache.org/core/downloads.html[Lucene binary packages].
+
+[[troubleshooting-faq-search-score]]
+=== [[_understanding_results]] Unsatisfying order of search hits when sorting by score
+[[search-dsl-query-debugging-score]]
+
+When sorting by score, if the documents don't appear in the order you expect,
+it means some documents have a score that is higher or lower than what you want.
+
+The best way to gain insight into these scores
+is to just ask the backend to explain how the score was computed.
+The returned explanation will include a human-readable description of
+how the score of a specific document was computed.
+
+include::../components/_explanation-warning.adoc[]
+
+There are two ways to retrieve explanations:
+
+* If you are interested in a particular entity and know its identifier: use the `explain(...)` method on the query.
+See <<search-dsl-query-explain>>.
+* If you just want an explanation for all the top hits: use an `explanation` projection.
+See <<search-dsl-projection-extensions-lucene-explanation,here for Lucene>>
+and <<search-dsl-projection-extensions-elasticsearch-explanation,here for Elasticsearch>>.
+
+[[troubleshooting-faq-search-time]]
+=== Search query execution takes too long
+
+When the execution of a search query is too long,
+you may need more information about how long it took exactly,
+and what was executed exactly.
+
+To find out how long a query execution took,
+use the <<search-dsl-query-took-timedout,`took()` method>> on the search result.
+
+To find out what the query being executed looks like exactly,
+see <<troubleshooting-under-the-hood>>.

@@ -1,0 +1,302 @@
+[[binding-identifierbridge]]
+= [[mapper-orm-bridge-identifierbridge]] Identifier bridge
+
+[[binding-identifierbridge-basics]]
+== [[mapper-orm-bridge-identifierbridge-basics]] Basics
+
+An identifier bridge is a pluggable component that implements
+the mapping of an entity property to a document identifier.
+It is applied to a property with the `@DocumentId` annotation
+or with a <<mapping-custom-annotations,custom annotation>>.
+
+Implementing an identifier bridge boils down to implementing two methods:
+
+* one method to convert the property value (any type) to the document identifier (a string);
+* one method to convert the document identifier back to the original property value.
+
+Below is an example of a custom identifier bridge that converts
+a custom `BookId` type to its string representation and back:
+
+.Implementing and using an `IdentifierBridge`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/simple/BookIdBridge.java[tags=include]
+----
+<1> The bridge must implement the `IdentifierBridge` interface.
+One generic parameters must be provided:
+the type of property values (values in the entity model).
+<2> The `toDocumentIdentifier` method takes the property value and a context object as parameters,
+and is expected to return the corresponding document identifier.
+It is called when indexing,
+but also when parameters to the search DSL
+<<search-dsl-argument-type,must be transformed>>,
+in particular for the <<search-dsl-predicate-id,ID predicate>>.
+<3> The `fromDocumentIdentifier` methods takes the document identifier and a context object as parameters,
+and is expected to return the original property value.
+It is called when mapping search hits to the corresponding entity.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/simple/Book.java[tags=include;!getters-setters]
+----
+<1> Map the property to the document identifier.
+<2> Instruct Hibernate Search to use our custom identifier bridge.
+It is also possible to reference the bridge by its name, in the case of a CDI/Spring bean.
+====
+
+[[binding-identifierbridge-type-resolution]]
+== [[mapper-orm-bridge-identifierbridge-type-resolution]] Type resolution
+
+By default, the identifier bridge's property type is determined automatically,
+using reflection to extract the generic type argument of the `IdentifierBridge` interface.
+
+For example, in `public class MyBridge implements IdentifierBridge<BookId>`,
+the property type is resolved to `BookId`:
+the bridge will be applied to properties of type `BookId`.
+
+The fact that the type is resolved automatically using reflection brings a few limitations.
+In particular, it means the generic type argument cannot be just anything;
+as a general rule, you should stick to literal types (`MyBridge implements IdentifierBridge<BookId>`)
+and avoid generic type parameters and wildcards
+(`MyBridge<T extends Number> implements IdentifierBridge<T>`,
+`MyBridge implements IdentifierBridge<List<? extends Number>>).
+
+If you need more complex types,
+you can bypass the automatic resolution and specify types explicitly
+using an <<binding-identifierbridge-identifierbinder,`IdentifierBinder`>>.
+
+[[binding-identifierbridge-iscompatiblewith]]
+== [[mapper-orm-bridge-identifierbridge-iscompatiblewith]] Compatibility across indexes with `isCompatibleWith()`
+
+An identifier bridge is involved in indexing,
+but also in the search DSLs,
+to convert values passed to the <<search-dsl-predicate-id,`id` predicate>>
+to a document identifier that the backend will understand.
+
+When creating an `id` predicate targeting multiple entity types (and their indexes),
+Hibernate Search will have multiple bridges to choose from: one per entity type.
+Since only one predicate with a single value can be created,
+Hibernate Search needs to pick a single bridge.
+
+By default, when a custom bridge is assigned to the field,
+Hibernate Search will throw an exception because it cannot decide which bridge to pick.
+
+If the bridges assigned to the field in all indexes produce the same result,
+it is possible to indicate to Hibernate Search that any bridge will do
+by implementing `isCompatibleWith`.
+
+This method accepts another bridge in parameter,
+and returns `true` if that bridge can be expected to always behave the same as `this`.
+
+.Implementing `isCompatibleWith` to support multi-index search
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/compatible/BookOrMagazineIdBridge.java[tags=include]
+----
+<1> Implement `isCompatibleWith` as necessary.
+Here we just deem any instance of the same class to be compatible.
+====
+
+[[binding-identifierbridge-identifierbinder]]
+== [[mapper-orm-bridge-identifierbridge-identifierbinder]] Configuring the bridge more finely with `IdentifierBinder`
+
+To configure a bridge more finely,
+it is possible to implement a value binder that will be executed at bootstrap.
+This binder will be able in particular to inspect the type of the property.
+
+.Implementing an `IdentifierBinder`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/binder/BookIdBinder.java[tags=include]
+----
+<1> The binder must implement the `IdentifierBinder` interface.
+<2> Implement the `bind` method.
+<3> Call `context.bridge(...)` to define the identifier bridge to use.
+<4> Pass the expected type of property values.
+<5> Pass the identifier bridge instance.
+<6> The identifier bridge must still be implemented.
++
+Here the bridge class is nested in the binder class,
+because it is more convenient,
+but you are obviously free to implement it as you wish:
+as a lambda expression, in a separate Java file...
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/binder/Book.java[tags=include;!getters-setters]
+----
+<1> Map the property to the document identifier.
+<2> Instruct Hibernate Search to use our custom identifier binder.
+Note the use of `identifierBinder` instead of `identifierBridge`.
+It is also possible to reference the binder by its name, in the case of a CDI/Spring bean.
+====
+
+[[binding-identifierbridge-parameters]]
+== [[mapper-orm-bridge-identifierbridge-parameters]] [[_passing_parameters]] Passing parameters
+
+There are two ways to pass parameters to identifier bridges:
+
+* One is (mostly) limited to string parameters, but is trivial to implement.
+* The other can allow any type of parameters, but requires you to declare your own annotations.
+
+[[binding-identifierbridge-parameters-string]]
+=== [[mapper-orm-bridge-identifierbridge-parameters-string]] Simple, string parameters
+
+You can pass string parameters to the `@IdentifierBinderRef` annotation and then use them later in the binder:
+
+.Passing parameters to an `IdentifierBridge` using the `@IdentifierBinderRef` annotation
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/annotation/OffsetIdentifierBridge.java[tags=include]
+----
+<1> Implement a bridge that indexes the identifier as is,
+but adds a configurable offset,
+For example, with an offset of 1 and database identifiers starting at 0, index identifiers will start at 1.
+<2> The bridge accepts one parameter in its constructors:
+the offset to apply to identifiers.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/string/OffsetIdentifierBinder.java[tags=include]
+----
+<1> Use the binding context to get the parameter value.
++
+The `param` method will throw an exception if the parameter has not been defined.
+Alternatively, use `paramOptional` to get an `java.util.Optional` that will be empty if the parameter has not been defined.
+<2> Pass the parameter value as an argument to the bridge constructor.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/string/Book.java[tags=include;!getters-setters]
+----
+<1> Define the binder to use on the identifier,
+setting the parameter.
+====
+
+[[binding-identifierbridge-parameters-custom-annotation]]
+=== [[mapper-orm-bridge-identifierbridge-parameters-custom-annotation]] Parameters with custom annotations
+
+You can pass parameters of any type to the bridge by defining
+a <<mapping-custom-annotations,custom annotation>> with attributes:
+
+.Passing parameters to an `IdentifierBridge` using a custom annotation
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/annotation/OffsetIdentifierBridge.java[tags=include]
+----
+<1> Implement a bridge that index the identifier as is,
+but adds a configurable offset,
+For example, with an offset of 1 and database identifiers starting at 0, index identifiers will start at 1.
+<2> The bridge accepts one parameter in its constructors:
+the offset to apply to identifiers.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/annotation/OffsetDocumentId.java[tags=include]
+----
+<1> Define an annotation with `RUNTIME` retention.
+*Any other retention policy will cause the annotation to be ignored by Hibernate Search*.
+<2> Since we're defining an identifier bridge, allow the annotation
+to target either methods (getters) or fields.
+<3> Mark this annotation as a property mapping,
+and instruct Hibernate Search to apply the given processor whenever it finds this annotation.
+It is also possible to reference the processor by its CDI/Spring bean name.
+<4> Optionally, mark the annotation as documented,
+so that it is included in the javadoc of your entities.
+<5> Define custom attributes to configure the value bridge.
+Here we define an offset that the bridge should add to entity identifiers.
+<6> Here the processor class is nested in the annotation class,
+because it is more convenient,
+but you are obviously free to implement it in a separate Java file.
+<7> The processor must implement the `PropertyMappingAnnotationProcessor` interface,
+setting its generic type argument to the type of the corresponding annotation.
+<8> In the `process` method, instantiate the bridge
+and pass the annotation attribute as constructor argument.
+<9> Declare that this property is to be used to generate the document identifier.
+<10> Instruct Hibernate Search to use our bridge to convert between the property and the document identifiers.
+Alternatively, we could pass an identifier binder instead,
+using the `identifierBinder()` method.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/param/annotation/Book.java[tags=include;!getters-setters]
+----
+<1> Apply the bridge using its custom annotation,
+setting the parameter.
+====
+
+[[binding-identifierbridge-access-orm]]
+== [[mapper-orm-bridge-identifierbridge-access-orm]] Accessing the ORM session or session factory from the bridge
+
+include::../components/_mapper-orm-only-note.adoc[]
+
+Contexts passed to the bridge methods can be used to retrieve the Hibernate ORM session or session factory.
+
+.Retrieving the ORM session or session factory from an `IdentifierBridge`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/ormcontext/MyDataIdentifierBridge.java[tags=include]
+----
+<1> Apply an extension to the context to access content specific to Hibernate ORM.
+<2> Retrieve the `SessionFactory` from the extended context.
+The `Session` is not available here.
+<3> Apply an extension to the context to access content specific to Hibernate ORM.
+<4> Retrieve the `Session` from the extended context.
+====
+
+[[binding-identifierbridge-injecting-beans]]
+== [[mapper-orm-bridge-identifierbridge-injecting-beans]] [[_injecting_beans_into_the_bridge_or_binder]] Injecting beans into the bridge or binder
+
+With <<configuration-bean-frameworks,compatible frameworks>>,
+Hibernate Search supports injection of beans into both the `IdentifierBridge` and the `IdentifierBinder`.
+
+NOTE: This only applies to beans instantiated
+through Hibernate Search's <<configuration-bean-resolution,bean resolution>>.
+As a rule of thumb, if you need to call `new MyBridge()` explicitly at some point,
+the bridge won't get auto-magically injected.
+
+The context passed to the identifier binder's `bind` method
+also exposes a `beanResolver()` method to access the bean resolver and instantiate beans explicitly.
+
+See <<configuration-bean-injection>> for more details.
+
+[[binding-identifierbridge-programmatic]]
+== [[mapper-orm-bridge-identifierbridge-programmatic]] Programmatic mapping
+
+You can apply an identifier bridge through the <<mapping-programmatic,programmatic mapping>> too.
+Just pass an instance of the bridge.
+
+.Applying an `IdentifierBridge` with `.identifierBridge(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/simple/IdentifierBridgeSimpleIT.java[tags=programmatic]
+----
+====
+
+Similarly, you can pass a binder instance:
+
+.Applying an `IdentifierBinder` with `.identifierBinder(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/binding/identifierbridge/binder/IdentifierBinderIT.java[tags=programmatic]
+----
+====
+
+[[binding-identifierbridge-incubating]]
+== [[mapper-orm-bridge-identifierbridge-incubating]] Incubating features
+
+include::../components/_incubating-warning.adoc[]
+
+The context passed to the identifier binder's `bind` method
+exposes a `bridgedElement()` method that gives access to metadata about the value being bound,
+in particular its type.
+
+See the javadoc for more information.

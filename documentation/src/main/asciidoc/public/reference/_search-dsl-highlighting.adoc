@@ -1,0 +1,487 @@
+[[search-dsl-highlighting]]
+= Highlight DSL
+
+include::../components/_incubating-warning.adoc[]
+
+[[search-dsl-highlighting-basics]]
+== Basics
+
+Highlighting is a projection that returns fragments from full-text fields of matched documents that caused a query match.
+Specific terms that caused the match are "highlighted" with a pair of opening and closing tags.
+It can help a user to quickly identify the information they were searching for on a results page.
+
+Highlight projections are only available for <<mapping-directfieldmapping-annotations-fulltextfield,full-text fields>>
+with an attribute configuration that allows it:
+
+[[search-dsl-highlighting-configuring-fields-for-highlighting]]
+.Configuring fields for highlighting
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/Book.java[tags=basics]
+----
+<1> A regular full-text field.
+Such field can allow highlight projections if the <<backend-elasticsearch,Elasticsearch backend>> is used.
+See the definition of the <<mapping-directfieldmapping-highlightable-default, default highlightable>> for any details.
+<2> A full-text field that explicitly allows for plain and unified highlighters to be applied to it.
+<3> A full-text field that explicitly allows any highlighter types to be applied to it.
+See the definition of the <<mapping-directfieldmapping-highlightable-any, `ANY` highlightable>> for further details.
+<4> A full-text field that implicitly allows any highlighter types to be applied to it.
+Allowing projection and setting the term vector storage strategy to `WITH_POSITIONS_OFFSETS`
+implies that any highlighter type can be used to create a highlight projection with both <<backend-lucene,Lucene>>
+or <<backend-elasticsearch, Elasticsearch>> backends.
+<5> A generic text field -- such field will not allow highlight projections.
+====
+
+[[search-dsl-highlighting-using-highlight-projection]]
+.Using a highlight projection
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=basics]
+----
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
+<2> Start building the query as usual.
+<3> Mention that the expected result of the query is the highlights on the "title" field.
+An exception will be thrown if the field is not a <<mapping-directfieldmapping-annotations-fulltextfield,full-text field>>
+with <<mapping-directfieldmapping-highlightable,highlighting enabled>> or if it does not exist.
+<4> The predicate from the where clause will be used to determine which documents to include in the results
+and highlight the text from the "title" field.
++
+Note that to get a nonempty list for a highlight projection,
+the field we apply such projection to should be a part of a predicate.
+If there's no match within the field we want to highlight, be it because the document was added to the results because
+of some other predicate condition, or because the highlighted field wasn't a part of a predicate at all, an empty list will be returned by default.
+See <<search-dsl-highlighting-highlighter-options-no-match-size,no match size configuration>> option for more details on how this can be adjusted.
+<5> Fetch the results, which will have highlighted fragments.
+
+Note that the result of applying a highlight projection is always a list of `String`.
+
+As an example, the result may look like:
+[source, JSON]
+----
+[
+    ["The Boscombe Valley <em>Mystery</em>"], <1>
+    [
+      "A Caribbean <em>Mystery</em>",
+      "Miss Marple: A Caribbean <em>Mystery</em> by Agatha Christie"
+    ], <2>
+    ["A <em>Mystery</em> of <em>Mysteries</em>: The Death and Life of Edgar Allan Poe"] <3>
+]
+----
+<1> First hit.
+<2> Second hit with multiple highlighted snippets.
+<3> Third hit.
+====
+
+Highlight projections, just like <<search-dsl-projection-field,field projections>>, can also be used in a combination with
+other projection types as well as with other highlight projections:
+
+[[search-dsl-highlighting-using-highlight-projection-composite]]
+.Using a composite highlight projection
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=composite]
+----
+<1> Start building the query as usual.
+<2> Add an <<search-dsl-projection-id,id projection>>.
+<3> Add a <<search-dsl-projection-field,regular field projection>> on a "title" field.
+<4> Add a <<search-dsl-projection-highlight,highlight projection>> on a "description" field.
+<5> Provide a predicate to filter documents and to use to highlight the results.
+<6> Fetch the results.
+====
+
+A highlighter behavior can be configured. See various available <<search-dsl-highlighting-highlighter-options,configuration options>>.
+A highlighter definition is provided after a where clause of a query:
+
+[[search-dsl-highlighting-highlighter-confguring-default-highlighter-simple]]
+.Configuring a default highlighter
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=very-basic-config]
+----
+<1> Specify a predicate that would look for matches in both `title` and `description` fields.
+<2> Specify the details of the default highlighter. Setting the no match size to a positive value to let the highlighter know
+that we want to get some text back even if there will be nothing to highlight in a particular field.
+<3> Fetch the results.
+====
+
+[[search-dsl-highlighting-highlighter-type]]
+== Highlighter type
+
+Before a highlighter can be configured, you need to pick its type.
+Picking the highlighter type is the first step in a highlighter definition:
+
+.Specifying the plain highlighter type
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=various-highlighter-types-plain]
+----
+<1> Starting the definition of a plain highlighter.
+====
+.Specifying the unified highlighter type
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=various-highlighter-types-unified]
+----
+<1> Starting the definition of a unified highlighter.
+====
+.Specifying the fast vector highlighter type
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=various-highlighter-types-fvh]
+----
+<1> Starting the definition of a fast vector highlighter.
+====
+
+There are three options to choose from when it comes to the highlighter type:
+
+[[search-dsl-highlighting-highlighter-type-plain]]
+Plain::
+The plain highlighter can be useful for simple queries targeting a single field on a small number of documents.
+This highlighter uses a standard Lucene highlighter. It reads the string value of a highlighted field,
+then creates a small in-memory index from it and applies query logic to perform the highlighting.
+[[search-dsl-highlighting-highlighter-type-unified]]
+Unified::
+The unified highlighter is used by default and does not necessarily rely on re-analyzing the text, as it can
+get the offsets either from postings or from term vectors.
++
+This highlighter uses a break iterator (breaks the text into sentences by default) to break the text into later scored passages.
+It better supports more complex queries. Since it can work with prebuilt data, it performs better in case of a larger amount
+of documents compared to the plain highlighter.
+[[search-dsl-highlighting-highlighter-type-fast-vector]]
+Fast vector::
+The fast vector highlighter, in addition to using a break iterator similar to the unified highlighter, it can use the boundary characters
+to control the highlighted snippet.
++
+This is the only highlighter that can assign different weights to highlighted fragments, allowing it to show
+a fragment score differences by wrapping it with a different tag.
+For more on tags, see <<search-dsl-highlighting-highlighter-options-tags,the corresponding section>>.
++
+The fast vector highlighter is also the one which can highlight entire matched phrases.
+Using <<search-dsl-predicate-phrase, phrase predicates>> with other highlighter types will lead to each word in a phrase
+being highlighted separately.
+
+[[search-dsl-highlighting-highlighter-named-highlighters]]
+== Named highlighters
+
+Sometimes we might want to apply different highlighters to various fields.
+We have already seen that a <<search-dsl-highlighting-highlighter-confguring-default-highlighter-simple, highlighter can be configured>>.
+The highlighter from that example is called the default highlighter. Search queries also allow to configure named highlighters.
+A named highlighter has the same configuration capabilities as the default one.
+It overrides the options set by the default highlighter if such was configured.
+If a default highlighter was configured for a query then every named highlighter configured on the same query
+must be of the same type as the default one. Mixing various highlighter types within the same query is only allowed when no default highlighter
+was configured.
+
+When a highlight projection has a named highlighter passed to an optional `highlighter(..)` call chained as a part of
+the <<search-dsl-projection-highlight,highlight projection definition>>, then that particular highlighter will be applied
+to a field projection. Named highlighters can be reused withing a query,
+i.e. the same name of a named highlighter can be passed to multiple highlight projections.
+
+.Configuring both default and named highlighters
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=basic-config]
+----
+<1> Add the highlight projection on a "title" field. This projection uses the default highlighter.
+<2> Add the highlight projection on a "description" field and specify the name of the named highlighter.
+<3> Specify the details of the default highlighter.
+<4> Specify the details of the named highlighter. Note that the name matches the name passed to the configuration of the "description"
+highlight projection.
+<5> Fetch the results.
+====
+
+[NOTE]
+====
+The name of a named highlighter cannot be `null` or an empty string. An exception will be thrown if such values are used.
+====
+
+[[search-dsl-highlighting-highlighter-options]]
+== [[search-dsl-highlighting-highlighter-options-tags]] Tags
+
+By default, the highlighted text is wrapped with a pair of `<em>`/`</em>` tags. A custom pair of tags can be provided to change this behaviour.
+Usually, tags are a pair of HTML tags, but they can be a pair of any character sequences.
+
+.Setting custom tags
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=basic-tags]
+----
+<1> Passing a pair of open/close tags that will be used to highlight the text.
+====
+
+The fast vector highlighter, which can handle multiple tags, has a few additional methods that accept a collection of tags.
+
+.Setting multiple custom tags
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=fvh-tags]
+----
+<1> Passing a collection of open tags and a single closing tag that will be used to highlight the text.
+It can be helpful when configuring a tag schema that differs only in an attribute of an opening tag.
+<2> Passing a pair of collections containing open/close tags that will be used to highlight the text.
+====
+
+Additionally, a fast vector highlighter has the option to enable a tag schema and set it to `HighlighterTagSchema.STYLED`
+to use a predefined set of tags.
+
+.Setting a styled tags schema
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=fvh-schema]
+----
+<1> Passing a styled tags schema that will be used to highlight the text.
+====
+
+Using a styled tags schema is just a shortcut to defining tags as:
+
+.Setting tags as if the styled tags schema is used
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=fvh-schema-alternative]
+----
+<1> Passing the same collection of tags used when a styled schema is applied.
+====
+
+[NOTE]
+====
+Calling different tags configuration methods (`tag(..)`/`tags(..)`/`tagSchema(..`) or the same one multiple times
+within the same highlighter definition will *not* combine them.
+Tags set by the last call will be applied.
+====
+
+[[search-dsl-highlighting-highlighter-options-encoder]]
+== Encoder
+Encoding can be applied to the highlighted snippets when highlighting the fields that store HTML. Applying an
+HTML encoder to a highlighter will encode the text for inclusion into an HTML document:
+it will replace HTML meta-characters such as `<` with their entity equivalent such as `&amp;lt;`;
+however it will not escape the highlighting tags.
+By default, a `HighlighterEncoder.DEFAULT` encoder is used, which keeps the text as is.
+
+.Setting the HTML encoder
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=basic-encoder]
+----
+<1> Configuring the HTML encoder.
+====
+
+[[search-dsl-highlighting-highlighter-options-no-match-size]]
+== No match size
+In case of more complex queries or when highlighting is performed for multiple fields, it might lead to a situation
+where the query matched a document, but a particular highlighted field did not contribute to that match.
+This will lead to an empty list of highlights for that particular document and that field.
+No match size option allows you to still get some text returned even if the field didn't contribute to the document match,
+and there's nothing to be highlighted in it.
+
+The number set by this property defines the number of characters to be included starting at the beginning of a field.
+Depending on the highlighter type, the amount of text returned might not precisely match the configured value since
+highlighters usually try not to break the text in the middle of a word/sentence, depending on their configuration.
+By default, this option is set to `0` and text will only be returned if there's something to highlight.
+
+.Setting the no match size
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=no-match-size]
+----
+<1> We are looking for matches in the title.
+<2> In case a word can also be found in the description, we'd want it to be highlighted.
+<3> Setting the no match size to `100` to still get at least `100` first characters of a description even if the match for
+a word we are searching for is not found.
+====
+
+[NOTE]
+====
+The unified highlighter from the <<backend-lucene,Lucene backend>> has a limited support for this option.
+It cannot limit the amount of the returned text, and works more like a boolean flag to enable/disable the
+feature. If a highlighter of this type has the option not set or set to `0` then no text is returned when
+there was no match found. Otherwise, if the option for a highlighter of this type was set to a positive integer, all
+text is returned, no matter the actual value.
+====
+
+[[search-dsl-highlighting-highlighter-options-fragment-size]]
+== Fragment size and number of fragments
+The fragment size sets the amount of text included in each highlighted fragment, by default `100` characters.
+
+[NOTE]
+====
+This is not a "hard" limit, since highlighters usually try not to break the fragment in the middle of a word. Additionally,
+other features such as <<search-dsl-highlighting-highlighter-options-boundary-scanner,boundary scanning>>
+may lead to more text before and after the fragment being included as well.
+====
+
+A number of fragments configuration sets the maximum number of strings included in the resulting highlighted list.
+By default, the number of fragments is limited to `5`.
+
+A combination of these options can be helpful when highlighting large text fields.
+
+.Setting the fragment size and the number of fragments
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=fragment-size]
+----
+<1> Configuring the fragment size.
+<2> Configuring the maximum number of fragments to be returned.
+====
+
+[NOTE]
+====
+These options are supported by all highlighter types on the Elasticsearch backend.
+As for the Lucene backend -- the number of fragments is also supported by all highlighter types,
+while only plain and fast-vector highlighters support fragment size.
+====
+
+[[search-dsl-highlighting-highlighter-options-order]]
+== Order
+By default, highlighted fragments are returned in the order of occurrence in the text.
+By enabling the order by score option most relevant fragments will be returned at the top of the list.
+
+.Setting the fragment size and number of fragments
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=basic-order]
+----
+<1> A query that would boost the match of one of the searched words.
+<2> Configuring the order by the score to be enabled.
+====
+
+[[search-dsl-highlighting-highlighter-options-fragmenter]]
+== Fragmenter
+By default, the plain highlighter breaks up text into same-sized fragments but tries to avoid breaking up a phrase to be highlighted.
+This is the behaviour of the `HighlighterFragmenter.SPAN` fragmenter. Alternatively, fragmenter can be set to `HighlighterFragmenter.SIMPLE`
+that simply breaks up the text into same-sized fragments.
+
+.Setting the fragmenter
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=basic-fragmenter]
+----
+<1> Configuring the simple fragmenter.
+====
+
+[NOTE]
+====
+This option is supported only by the plain highlighter.
+====
+
+[[search-dsl-highlighting-highlighter-options-boundary-scanner]]
+== Boundary scanner
+
+Unified and fast vector highlighters use boundary scanners to create highlighted fragments:
+they try to expand highlighted fragments by scanning text before and after those fragments for word/sentence boundaries.
+
+An optional locale parameter can be supplied to specify how to search
+for sentence and word boundaries. A sentence boundary scanner is a default option for the unified highlighter.
+
+There are two ways to supply boundary scanner configuration to a highlighter.
+
+.Setting the boundary scanner with DSL
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=scanner-dsl]
+----
+<1> Start the definition of a boundary scanner.
+<2> Pick a boundary scanner type -- a word scanner in this case.
+<3> Set an optional locale.
+<4> End the definition of a boundary scanner.
+<5> Set any other options.
+====
+
+.Setting the boundary scanner using lambda
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=scanner-lambda]
+----
+<1> Pass a lambda configurer to set up a boundary scanner.
+<2> Set any other options
+====
+
+Alternatively, a fast vector highlighter can use a character boundary scanner which relies on two other configurations --
+boundary characters and boundary max scan. When a character boundary scanner is used after a highlighted fragment is formed
+with highlighted text centred, the highlighter checks for the first occurrence of any configured boundary characters to the left and right
+of a currently created fragment. This lookup happens only for a maximum number of characters configured by the boundary max scan option.
+If no boundary characters are found, no additional text will be included besides the already highlighted phrase
+with surrounding text based on a fragment size option set for a highlighter.
+
+The default list of boundary characters includes `.,!? \t\n`.
+The default boundary max scan is equal to `20` characters.
+
+Character boundary scanner is a default option for the fast vector highlighters.
+
+.Setting the character boundary scanner
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=scanner-char]
+----
+Assuming that we have a text that contains multiple paragraphs separated with a new line (`\n`), we want to
+get the entire paragraph containing the highlighted phrase. To do so, boundary characters will be set to `\n`, and
+the max scan option will be based on the number of characters in paragraphs.
+
+<1> Start the definition of a boundary scanner.
+<2> Pick a boundary scanner type -- a character scanner.
+<3> Set a string containing boundary characters. The overloaded methods can accept a `String` or a `Character` array.
+<4> Set the max scan option.
+<5> End the definition of a boundary scanner.
+<6> Set any other options.
+====
+
+[NOTE]
+====
+This option is supported by the unified and fast vector highlighter types.
+====
+
+[[search-dsl-highlighting-highlighter-options-phrase-limit]]
+== Phrase limit
+Phrase limit allows specifying the maximum number of matching phrases in a document for highlighting.
+The highlighter will be going through the text and as soon as it reaches the maximum number of highlighted phrases it'll stop leaving any further occurrences as not highlighted.
+
+[NOTE]
+====
+This limit is different from the <<search-dsl-highlighting-highlighter-options-fragment-size,maximum number of fragments>>:
+
+1. Fragments are the strings returned by the highlight projections, while phrases are the sequences of highlighted (matching) terms in each fragment.
+A fragment may include multiple highlighted phrases, and a given phrase may appear in multiple fragments.
+2. The phrase limit is about limiting the highlighting of occurrences of matched phrases, be it multiple occurrences of the same phrase or a mix of different phrases.
+For example, if we were to search for `fox` and `dog` occurrences in the sentence
+`The quick brown fox jumps over the lazy dog` and set the phrase limit to `1`, then we'll have only `fox` being highlighted
+since it was the first match in the text and the phrase limit was reached.
+
+====
+
+By default, this phrase limit is equal to `256`.
+
+This option can be helpful if a field contains many matches and has a lot of text overall, but we are not interested in
+highlighting every occurrence.
+
+.Setting the phrase limit
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/highlighting/HighlightingDslIT.java[tags=phrase-limit]
+----
+<1> Configuring the phrase limit.
+====
+
+[NOTE]
+====
+This option is supported only by the fast vector highlighter type.
+====
