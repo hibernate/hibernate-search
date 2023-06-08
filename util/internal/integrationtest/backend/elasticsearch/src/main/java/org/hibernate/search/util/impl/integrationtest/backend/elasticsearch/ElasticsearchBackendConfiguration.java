@@ -8,29 +8,14 @@ package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 
-import org.junit.rules.TestRule;
-
 public class ElasticsearchBackendConfiguration extends BackendConfiguration {
-
-	protected final TestElasticsearchClient testElasticsearchClient = new TestElasticsearchClient();
 
 	@Override
 	public String toString() {
 		return "elasticsearch";
-	}
-
-	@Override
-	public Optional<TestRule> testRule() {
-		return Optional.of( testElasticsearchClient );
-	}
-
-	public TestElasticsearchClient testElasticsearchClient() {
-		return testElasticsearchClient;
 	}
 
 	@Override
