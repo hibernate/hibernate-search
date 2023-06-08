@@ -17,6 +17,8 @@ include::_preface.adoc[]
 
 include::_compatibility.adoc[]
 
+include::_getting-started.adoc[]
+
 include::_migrating.adoc[]
 
 include::_concepts.adoc[]
