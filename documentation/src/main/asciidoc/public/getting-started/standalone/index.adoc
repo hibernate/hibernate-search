@@ -1,7 +1,7 @@
 [[mapper-pojo-standalone-getting-started]]
 = Getting started with the Standalone POJO Mapper
 
-include::../../components/incubating-warning.adoc[]
+include::../../components/_incubating-warning.adoc[]
 
 This section will guide you through the initial steps required
 to index and query your entities using Hibernate Search,

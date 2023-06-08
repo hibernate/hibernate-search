@@ -569,4 +569,4 @@ for example `bean:myRestClient`.
 IMPORTANT: If Hibernate Search uses a provided client, it won't create its own client,
 and thus all other client configuration properties will be ignored.
 
-include::configuration-properties-aggregated.adoc[]
+include::_configuration-properties-aggregated.adoc[]

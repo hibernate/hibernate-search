@@ -36,7 +36,7 @@ public class ConfigurationPropertyProcessor implements AutoCloseable {
 		this.javadocFolderName = javadocFolderName;
 		this.target = target;
 		this.output = output;
-		this.fileName = artifact;
+		this.fileName = artifact.startsWith( "_" ) ? artifact : "_" + artifact;
 
 		this.propertyCollector = new ConfigurationPropertyCollector( javadocsBaseLink, locateJavaDocFolder(), artifact,
 				moduleName

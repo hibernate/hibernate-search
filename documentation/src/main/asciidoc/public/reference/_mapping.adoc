@@ -1,0 +1,30 @@
+[[mapping]]
+= [[mapper-orm-mapping]] [[search-mapping]] Mapping entities to indexes
+
+:leveloffset: +1
+
+include::_mapping-configuration.adoc[]
+
+include::_mapping-entityindexmapping.adoc[]
+
+include::_mapping-identifiermapping.adoc[]
+
+include::_mapping-directfieldmapping.adoc[]
+
+include::_mapping-indexedembedded.adoc[]
+
+include::_mapping-containerextractor.adoc[]
+
+include::_mapping-geopoint.adoc[]
+
+include::_mapping-alternatives.adoc[]
+
+include::_mapping-reindexing.adoc[]
+
+include::_mapping-changes.adoc[]
+
+include::_mapping-custom-annotations.adoc[]
+
+include::_mapping-inspect.adoc[]
+
+:leveloffset: -1

@@ -1,0 +1,82 @@
+[[search-dsl-paths]]
+= Field paths
+
+[[search-dsl-paths-absolute]]
+== Absolute field paths
+
+By default, field paths passed to the Search DSL are interpreted as absolute,
+i.e. relative to the index root.
+
+The components of the paths are separated by a dot (`.`).
+
+[NOTE]
+====
+The following examples use the <<search-dsl-predicate,predicate DSL>>,
+but all information in this section applies to other search DSLs as well:
+<<search-dsl-sort,sort DSL>>, <<search-dsl-projection,projection DSL>>, <<search-dsl-aggregation,aggregation DSL>>, ...
+====
+
+.Targeting a field using absolute paths
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/paths/FieldPathsIT.java[tags=root]
+----
+<1> Fields declared at the root of the index can simply be referenced by their name.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/paths/FieldPathsIT.java[tags=nested_implicit]
+----
+<1> Fields declared in object fields (created by <<mapping-indexedembedded,`@IndexedEmbedded`>>, for example)
+must be referenced by their absolute path: the absolute path of the object field, followed by a dot,
+followed by the name of the targeted field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/paths/FieldPathsIT.java[tags=nested_explicit]
+----
+<1> Even within a `nested` predicate, fields referenced in inner predicates must be referenced by their absolute path.
+====
+
+The only exception is <<binding-named-predicate,named predicates>> registered on object fields:
+the factory used to build those predicates interprets field paths as relative to that object field **by default**.
+
+[[search-dsl-paths-relative]]
+== Relative field paths
+
+include::../components/_incubating-warning.adoc[]
+
+In some cases, one may want to pass relative paths instead.
+This can be useful when calling reusable methods that can apply the same predicate
+on different object fields that have same structure (same subfields).
+By calling the `withRoot(String)` method on a factory,
+you can create a new factory which interprets paths as relative to the object field passed as argument to the method.
+
+.Targeting a field using relative paths
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/paths/FieldPathsIT.java[tags=withRoot]
+----
+<1> Call a reusable method to apply a predicate to the name of the book's writers.
+<2> Pass to that method a factory whose root will be the object field `writers`.
+<3> Call a reusable method to apply a predicate to the name of the book's artists.
+<4> Pass to that method a factory whose root will be the object field `artists`.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/paths/FieldPathsIT.java[tags=withRoot_method]
+----
+<1> When manipulating factories created with `withRoot`, paths are interpreted as relative.
+Here `firstName` will be understood as either `writers.firstName` or `artists.firstName`,
+depending on the factory that was passed to this method.
+====
+
+[TIP]
+====
+When building native constructs (for example <<search-dsl-predicate-extensions-lucene-from-lucene-query,Lucene Queries>>),
+you will need to deal with absolute paths, even if the factory accepts relative paths.
+
+To convert a relative path to an absolute path, use the factory's `toAbsolutePath(String)` method.
+====

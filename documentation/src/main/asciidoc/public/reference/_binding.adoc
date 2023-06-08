@@ -1,0 +1,30 @@
+[[binding]]
+= [[mapper-orm-bridge]] [[search-mapping-bridge]] Binding and bridges
+
+:leveloffset: +1
+
+include::_binding-basics.adoc[]
+
+include::_binding-valuebridge.adoc[]
+
+include::_binding-propertybridge.adoc[]
+
+include::_binding-typebridge.adoc[]
+
+include::_binding-identifierbridge.adoc[]
+
+include::_binding-routingbridge.adoc[]
+
+include::_binding-bridgeelement-dependencies.adoc[]
+
+include::_binding-index-field-dsl.adoc[]
+
+include::_binding-index-field-type-dsl.adoc[]
+
+include::_binding-named-predicate.adoc[]
+
+include::_binding-bridge-resolver.adoc[]
+
+include::_binding-projection.adoc[]
+
+:leveloffset: -1

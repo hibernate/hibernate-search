@@ -11,54 +11,54 @@
 
 :leveloffset: +1
 
-include::preface.adoc[]
+include::_preface.adoc[]
 
 :numbered:
 
-include::compatibility.adoc[]
+include::_compatibility.adoc[]
 
-include::migrating.adoc[]
+include::_migrating.adoc[]
 
-include::concepts.adoc[]
+include::_concepts.adoc[]
 
-include::architecture.adoc[]
+include::_architecture.adoc[]
 
-include::mapper-orm.adoc[]
+include::_mapper-orm.adoc[]
 
-include::mapper-pojo-standalone.adoc[]
+include::_mapper-pojo-standalone.adoc[]
 
-include::configuration.adoc[]
+include::_configuration.adoc[]
 
-include::entrypoints.adoc[]
+include::_entrypoints.adoc[]
 
-include::mapping.adoc[]
+include::_mapping.adoc[]
 
-include::mapping-projection.adoc[]
+include::_mapping-projection.adoc[]
 
-include::binding.adoc[]
+include::_binding.adoc[]
 
-include::schema.adoc[]
+include::_schema.adoc[]
 
-include::indexing.adoc[]
+include::_indexing.adoc[]
 
-include::search-dsl.adoc[]
+include::_search-dsl.adoc[]
 
-include::backend-lucene.adoc[]
+include::_backend-lucene.adoc[]
 
-include::backend-elasticsearch.adoc[]
+include::_backend-elasticsearch.adoc[]
 
-include::coordination.adoc[]
+include::_coordination.adoc[]
 
-include::integrations.adoc[]
+include::_integrations.adoc[]
 
-include::limitations.adoc[]
+include::_limitations.adoc[]
 
-include::troubleshooting.adoc[]
+include::_troubleshooting.adoc[]
 
-include::further-reading.adoc[]
+include::_further-reading.adoc[]
 
-include::credits.adoc[]
+include::_credits.adoc[]
 
-include::configuration-properties-aggregated.adoc[]
+include::_configuration-properties-aggregated.adoc[]
 
 :leveloffset: -1

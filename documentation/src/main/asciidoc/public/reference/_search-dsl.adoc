@@ -1,0 +1,29 @@
+[[search-dsl]]
+= [[search-query-querydsl]] Searching
+
+Beyond simply indexing, Hibernate Search also exposes high-level APIs to search these indexes
+without having to resort to native APIs.
+
+One key feature of these search APIs is the ability to use indexes to perform the search,
+but to return entities loaded *from the database*,
+effectively offering a new type of query for Hibernate ORM entities.
+
+:leveloffset: +1
+
+include::_search-dsl-query.adoc[]
+
+include::_search-dsl-predicate.adoc[]
+
+include::_search-dsl-sort.adoc[]
+
+include::_search-dsl-projection.adoc[]
+
+include::_search-dsl-highlighting.adoc[]
+
+include::_search-dsl-aggregation.adoc[]
+
+include::_search-dsl-type-compatibility.adoc[]
+
+include::_search-dsl-paths.adoc[]
+
+:leveloffset: -1
