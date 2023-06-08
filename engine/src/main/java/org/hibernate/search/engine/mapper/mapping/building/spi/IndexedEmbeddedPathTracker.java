@@ -27,8 +27,6 @@ public final class IndexedEmbeddedPathTracker {
 	// Use a LinkedHashSet, since the set will be exposed through a getter and may be iterated on
 	private final Map<String, Boolean> encounteredFieldPaths = new LinkedHashMap<>();
 
-	private final Map<String, Boolean> childEncounteredFieldPaths = new LinkedHashMap<>();
-
 	public IndexedEmbeddedPathTracker(IndexedEmbeddedDefinition definition) {
 		this.definition = definition;
 	}
@@ -49,14 +47,14 @@ public final class IndexedEmbeddedPathTracker {
 		Set<String> uselessExcludePaths = new LinkedHashSet<>();
 		for ( String path : definition.excludePaths() ) {
 			if (
-				// since it's exclude we should always get a FALSE value from this map for such key.
+				// Since it's exclude we should always get a FALSE value from this map for such key.
 				// Hence, we only want to check for fields that we never encountered i.e. some typos in property names or just some "pointless" text :)
+				//
+				// Alternatively, if a property was "explicitly" excluded by a child, which would make adding it to excludes
+				// on this level redundant (or in other words such that references a "missing" property) we will not get
+				// such path marked at all since we stop the recursion early in the filter.
 					!encounteredFieldPaths.containsKey( path )
-							// OR the field was also "explicitly" excluded by a child, which would be redundant...
-							// If it wasn't encountered then it is already covered by a containsKey check above.
-							|| !childEncounteredFieldPaths.getOrDefault( path, Boolean.TRUE )
 			) {
-				// An "excludePaths" filter that does not result in exclusion is useless
 				uselessExcludePaths.add( path );
 			}
 		}
@@ -67,13 +65,9 @@ public final class IndexedEmbeddedPathTracker {
 		return encounteredFieldPaths.keySet();
 	}
 
-	public void markAsEncountered(String relativePath, boolean includedByThis, boolean includedByChild) {
+	public void markAsEncountered(String relativePath, boolean includedByThis) {
 		encounteredFieldPaths.merge(
 				relativePath, includedByThis,
-				(included1, included2) -> included1 || included2
-		);
-		childEncounteredFieldPaths.merge(
-				relativePath, includedByChild,
 				(included1, included2) -> included1 || included2
 		);
 	}
