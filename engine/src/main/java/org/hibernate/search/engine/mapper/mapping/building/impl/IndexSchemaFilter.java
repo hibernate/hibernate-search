@@ -108,7 +108,7 @@ class IndexSchemaFilter {
 	/**
 	 * @param relativeDepth The number of indexed-embeddeds between this filter and the end of the path.
 	 * @param relativePath The path relative to this filter.
-	 * @param markAsEncountered Whether the path should be marked as encountered
+	 * @param markIncludedAsEncountered Whether the included path should be marked as encountered
 	 * ({@code true}), or not ({@code false}).
 	 * Useful when processing "theoretical" paths, such as the includePaths of a child filter, in particular.
 	 * @param includedByChild Whether a child filter included this path.
@@ -118,7 +118,7 @@ class IndexSchemaFilter {
 	 * @return {@code true} if the path is included, {@code false} otherwise.
 	 */
 	private boolean isPathIncludedInternal(int relativeDepth, String relativePath,
-			boolean markAsEncountered, boolean includedByChild) {
+			boolean markIncludedAsEncountered, boolean includedByChild) {
 		boolean includedByThis = ( depthFilter.isEveryPathIncludedAtDepth( relativeDepth )
 				|| pathFilter.isExplicitlyIncluded( relativePath ) )
 				&& !pathFilter.isExplicitlyExcluded( relativePath );
@@ -136,7 +136,7 @@ class IndexSchemaFilter {
 			includedByParent = parent.isPathIncludedInternal(
 					relativeDepth + 1,
 					definition.relativePrefix() + relativePath,
-					markAsEncountered,
+					markIncludedAsEncountered,
 					// need to include a results from the previous step as it may be that we have an include at the current level
 					// but it was excluded at some ancestor level, and we want to pass it up to the parent.
 					includedByThis && includedByChild
@@ -145,7 +145,12 @@ class IndexSchemaFilter {
 
 		boolean included = includedByParent && includedByThis;
 
-		if ( markAsEncountered && pathTracker != null ) {
+		// when we are checking if any path is included we want to make sure we record the paths we've checked, but they are excluded:
+		// - if we end up excluding the entire object because *none* of the "includePaths" are actually included
+		// we want to record the path so that the exclude filter will know it wasn't useless,
+		// - if we end up including the object because some of the "includePaths" are actually included we'll mark those
+		// paths later when we'll be considering adding them.
+		if ( ( markIncludedAsEncountered || !included ) && pathTracker != null ) {
 			pathTracker.markAsEncountered(
 					relativePath, includedByThis, includedByChild
 			);
