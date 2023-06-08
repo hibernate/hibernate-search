@@ -1,9 +1,21 @@
 :reference-documentation-location: ../../reference/index.adoc
 
+:doctype: book
+:revdate: {docdate}
+:sectanchors:
+:anchor:
+:toc: left
+:toclevels: 4
+:docinfodir: {docinfodir}
+:docinfo: shared,private
+:title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
+
 [[mapper-orm-getting-started]]
 = [[getting-started]] Getting started with the Hibernate ORM integration
 
-This section will guide you through the initial steps required
+:numbered:
+
+This guide will walk you through the initial steps required
 to index and query your Hibernate ORM entities using Hibernate Search.
 
 If your entities are **not** defined in Hibernate ORM, see xref:../standalone/index.adoc#mapper-pojo-standalone-getting-started[this other guide] instead.

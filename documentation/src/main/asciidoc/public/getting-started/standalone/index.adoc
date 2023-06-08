@@ -1,11 +1,23 @@
 :reference-documentation-location: ../../reference/index.adoc
 
+:doctype: book
+:revdate: {docdate}
+:sectanchors:
+:anchor:
+:toc: left
+:toclevels: 4
+:docinfodir: {docinfodir}
+:docinfo: shared,private
+:title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
+
 [[mapper-pojo-standalone-getting-started]]
 = Getting started with the Standalone POJO Mapper
 
+:numbered:
+
 include::../../components/_incubating-warning.adoc[]
 
-This section will guide you through the initial steps required
+This guide will walk you through the initial steps required
 to index and query your entities using Hibernate Search,
 when your entities are not defined in Hibernate ORM.
 
