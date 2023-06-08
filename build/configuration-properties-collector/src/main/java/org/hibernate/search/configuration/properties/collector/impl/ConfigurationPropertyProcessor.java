@@ -79,7 +79,7 @@ public class ConfigurationPropertyProcessor implements AutoCloseable {
 		if ( propertyCollector.hasProperties() ) {
 			if ( propertyCollector.hasProperties( API_FILTER ) ) {
 				writeProperties(
-						fileName + ".asciidoc",
+						fileName + ".adoc",
 						new AsciiDocWriter(
 								API_FILTER
 						)
@@ -87,7 +87,7 @@ public class ConfigurationPropertyProcessor implements AutoCloseable {
 			}
 			if ( propertyCollector.hasProperties( SPI_FILTER ) ) {
 				writeProperties(
-						fileName + "-spi.asciidoc",
+						fileName + "-spi.adoc",
 						new AsciiDocWriter(
 								SPI_FILTER
 						)

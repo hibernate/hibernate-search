@@ -1,0 +1,18 @@
+[[indexing]]
+= [[mapper-orm-indexing]] Indexing entities
+
+:leveloffset: +1
+
+include::indexing-automatic.adoc[]
+
+include::indexing-plan.adoc[]
+
+include::indexing-massindexer.adoc[]
+
+include::indexing-workspace.adoc[]
+
+include::mapper-orm-indexing-manual.adoc[]
+
+include::mapper-orm-indexing-jsr352.adoc[]
+
+:leveloffset: -1

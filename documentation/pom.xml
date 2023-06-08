@@ -253,7 +253,7 @@
                         </goals>
                         <configuration>
                             <backend>html5</backend>
-                            <sourceDocumentName>reference/index.asciidoc</sourceDocumentName>
+                            <sourceDocumentName>reference/index.adoc</sourceDocumentName>
                             <outputDirectory>${asciidoctor.base-output-dir}/reference/html_single</outputDirectory>
                             <attributes>
                                 <imagesdir>images</imagesdir>
@@ -272,7 +272,7 @@
                         </goals>
                         <configuration>
                             <backend>html5</backend>
-                            <sourceDocumentName>internals/index.asciidoc</sourceDocumentName>
+                            <sourceDocumentName>internals/index.adoc</sourceDocumentName>
                             <outputDirectory>${asciidoctor.base-output-dir}/internals/html_single</outputDirectory>
                             <attributes>
                                 <imagesdir>images</imagesdir>
@@ -291,7 +291,7 @@
                         </goals>
                         <configuration>
                             <backend>html5</backend>
-                            <sourceDocumentName>migration/index.asciidoc</sourceDocumentName>
+                            <sourceDocumentName>migration/index.adoc</sourceDocumentName>
                             <outputDirectory>${asciidoctor.base-output-dir}/migration/html_single</outputDirectory>
                             <attributes>
                                 <imagesdir>images</imagesdir>
@@ -392,7 +392,7 @@
                                 </goals>
                                 <configuration>
                                     <backend>pdf</backend>
-                                    <sourceDocumentName>reference/index.asciidoc</sourceDocumentName>
+                                    <sourceDocumentName>reference/index.adoc</sourceDocumentName>
                                     <outputDirectory>${asciidoctor.base-output-dir}/reference/pdf</outputDirectory>
                                     <outputFile>hibernate_search_reference.pdf</outputFile>
                                     <attributes>
@@ -414,7 +414,7 @@
                                 </goals>
                                 <configuration>
                                     <backend>pdf</backend>
-                                    <sourceDocumentName>internals/index.asciidoc</sourceDocumentName>
+                                    <sourceDocumentName>internals/index.adoc</sourceDocumentName>
                                     <outputDirectory>${asciidoctor.base-output-dir}/internals/pdf</outputDirectory>
                                     <outputFile>hibernate_search_internals.pdf</outputFile>
                                     <attributes>
@@ -436,7 +436,7 @@
                                 </goals>
                                 <configuration>
                                     <backend>pdf</backend>
-                                    <sourceDocumentName>migration/index.asciidoc</sourceDocumentName>
+                                    <sourceDocumentName>migration/index.adoc</sourceDocumentName>
                                     <outputDirectory>${asciidoctor.base-output-dir}/migration/pdf</outputDirectory>
                                     <outputFile>hibernate_search_migration.pdf</outputFile>
                                     <attributes>

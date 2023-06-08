@@ -105,7 +105,7 @@ have not been kept up-to-date, and might need a refresh.
 * Check that the CI job for the branch you want to release is green.
 * Check there are no outstanding issues in JIRA.
 * **If it's a `.CR` or `.Final` release**:
-  * Check that the [migration guide](documentation/src/main/asciidoc/migration/index.asciidoc) is up to date.
+  * Check that the [migration guide](documentation/src/main/asciidoc/migration/index.adoc) is up to date.
     In particular, check the git history for API/SPI changes
     and document them in the migration guide.
 * If you **added a new Maven module** that should be included in the distribution,

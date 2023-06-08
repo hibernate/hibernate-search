@@ -1,0 +1,1522 @@
+[[search-dsl-projection]]
+= [[projections]] Projection DSL
+
+[[search-dsl-projection-concepts]]
+== Basics
+
+For some use cases, you only need the query to return a small subset of the data contained in your domain object.
+In these cases, returning managed entities and extracting data from these entities may be overkill:
+extracting the data from the index itself would avoid the database round-trip.
+
+Projections do just that: they allow the query to return something more precise than just "the matching entities".
+Projections can be configured when building the search query:
+
+.Using projections to extract data from the index
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=entryPoint-lambdas]
+----
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
+<2> Start building the query as usual.
+<3> Mention that the expected result of the query is a projection on field "title", of type String.
+If that type is not appropriate or if the field does not exist, an exception will be thrown.
+<4> Fetch the results, which will have the expected type.
+====
+
+Alternatively, if you don't want to use lambdas:
+
+.Using projections to extract data from the index -- object-based syntax
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=entryPoint-objects]
+----
+====
+
+include::../components/field-projection-important.adoc[]
+
+While `field` projections are certainly the most common,
+they are not the only type of projection.
+Other projections allow
+<<search-dsl-projection-composite,composing custom beans containing extracted data>>,
+getting references to the <<search-dsl-projection-documentReference,extracted documents>>
+or the <<search-dsl-projection-reference,corresponding entities>>,
+or getting information related to the search query itself
+(<<search-dsl-projection-score,score>>, ...).
+
+[[search-dsl-projection-mapped]]
+== Projecting to a custom (annotated) type
+
+For more complex projections, it is possible to <<mapping-projection,define a custom (annotated) record or class>>
+and have Hibernate Search infer the corresponding projections from the custom type's constructor parameters.
+
+include::../components/custom-projection-type-important.adoc[]
+
+.Using a custom record type to project data from the index
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookProjection.java[tags=include]
+----
+<1> Annotate the record type with `@ProjectionConstructor`,
+either at the type level (if there's only one constructor)
+or at the constructor level (if there are <<mapping-projection-multiple-constructors,multiple constructors>>).
+<2> To project on the entity identifier, annotate the relevant constructor parameter with <<search-dsl-projection-id-mapping,`@IdProjection`>>.
++
+Most projections have a corresponding annotation that can be used on constructor parameters.
+<3> To project on a value field, add a constructor parameter named after that field and with the same type as that field.
+See <<mapping-projection-inner-inference>> for more information on how constructor parameters should be defined.
++
+Alternatively, the field projection can be configured explicitly with <<search-dsl-projection-field-mapping,`@FieldProjection`>>.
+<4> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
+Multivalued projections <<mapping-projection-inner-inference-type,must be modeled as a `List<...>`>> or supertype.
++
+Alternatively, the object projection can be configured explicitly with <<search-dsl-projection-object-mapping,`@ObjectProjection`>>.
+<5> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=entryPoint-mapped-record]
+----
+<1> Pass the custom projection type to `.select(...)`.
+Hibernate Search will <<mapping-projection-inner-inference,infer the inner projections>>
+from the custom type's constructor parameters.
+<2> Each hit will be an instance of the custom projection type,
+populated with data retrieved from the index.
+====
+
+include::../components/custom-projection-type-nonrecord-tip.adoc[]
+
+NOTE: For more information about mapping custom projection types, see <<mapping-projection>>.
+
+Beside `.select(Class<?>)`, some projections also allow using custom projection types;
+see <<search-dsl-projection-composite-as-mapped,the `composite` projection>>
+and <<search-dsl-projection-object-as-mapped,the `object` projection>>.
+For more information about  mapping projection types, see <<mapping-projection>>.
+
+[[search-dsl-projection-documentReference]]
+== `documentReference`: return references to matched documents
+
+The `documentReference` projection returns a reference to the matched document as a `DocumentReference` object.
+
+[[search-dsl-projection-documentReference-syntax]]
+=== Syntax
+
+.Returning references to matched documents
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=documentReference]
+----
+====
+
+NOTE: Since it's a reference to the _document_, not the entity,
+`DocumentReference` only exposes low-level concepts such as the type name and the document identifier (a `String`).
+Use the <<search-dsl-projection-reference,`entityReference`>> projection to get a reference to the entity.
+
+[[search-dsl-projection-documentReference-mapping]]
+=== `@DocumentReferenceProjection` in projections to custom types
+
+To achieve a `documentReference` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+use the `@DocumentReferenceProjection` annotation:
+
+.Returning references to matched documents within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookDocRefAndTitleProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the document reference with `@DocumentReferenceProjection`.
+<3> The type of the constructor parameter must be assignable from `DocumentReference`.
+<4> You can of course also declare other parameters with different projections;
+in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-document-reference]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested document reference and field.
+====
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `DocumentReferenceProjectionBinder.create()`.
+
+.Programmatic mapping of a `documentReference` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-document-reference-projection]
+----
+====
+
+[[search-dsl-projection-reference]]
+== `entityReference`: return references to matched entities
+
+The `entityReference` projection returns a reference to the matched entity as an `EntityReference` object.
+
+[[search-dsl-projection-reference-syntax]]
+=== Syntax
+
+.Returning references to matched entities
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=reference]
+----
+====
+
+NOTE: The entity does not get loaded as part of the projection.
+If you want the actual entity instance, use the <<search-dsl-projection-entity,`entity` projection>>
+
+[[search-dsl-projection-reference-mapping]]
+=== `@EntityReferenceProjection` in projections to custom types
+
+To achieve an `entityReference` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+use the `@EntityReferenceProjection` annotation:
+
+.Returning references to matched entities within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookEntityRefAndTitleProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the entity reference with `@EntityReferenceProjection`.
+<3> The type of the constructor parameter must be assignable from `EntityReference`.
+<4> You can of course also declare other parameters with different projections;
+in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-entity-reference]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested entity reference and field.
+====
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `EntityReferenceProjectionBinder.create()`.
+
+.Programmatic mapping of an `entityReference` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-entity-reference-projection]
+----
+====
+
+[[search-dsl-projection-id]]
+== [[_id_return_identifiers_of_matched_entities]] `id`: return identifiers of matched entities
+
+The `id` projection returns the identifier of the matched entity.
+
+[[search-dsl-projection-id-syntax]]
+=== Syntax
+
+.Returning ids to matched entities, providing the identity type.
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=id-int]
+----
+====
+
+If the provided identifier type does not match the type of identifiers for targeted entity types,
+an exception will be thrown. See also <<search-dsl-projected-value-type>>. 
+
+You can omit the "identifier type" argument, but then you will get projections of type `Object`:
+
+.Returning ids to matched entities, without providing the identity type.
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=id-object]
+----
+====
+
+[[search-dsl-projection-id-mapping]]
+=== `@IdProjection` in projections to custom types
+
+To achieve an `id` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+use the `@IdProjection` annotation:
+
+.Returning ids to matched entities within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookIdAndTitleProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the entity identifier with `@IdProjection`.
+<3> The type of the constructor parameter must be assignable from
+the type of the target entity's identifier.
+<4> You can of course also declare other parameters with different projections;
+in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-id]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested identifier and field.
+====
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `IdProjectionBinder.create()`.
+
+.Programmatic mapping of an `id` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-id-projection]
+----
+====
+
+[[search-dsl-projection-entity]]
+== `entity`: return matched entities
+
+The `entity` projection returns the entity corresponding to the document that matched.
+
+How the entity is loaded exactly depends on your mapper and configuration:
+
+* With the <<mapper-orm,Hibernate ORM integration>>, returned objects are managed entities loaded by Hibernate ORM from the database.
+You can use them as you would use any entity returned from traditional Hibernate ORM queries.
+* With the <<mapper-pojo-standalone,Standalone POJO Mapper>>,
+entities are loaded from an external datastore if <<mapper-pojo-standalone-search-query-loading,configured>>,
+or (failing that) are projected from the index if the entity type declares a <<mapping-projection,projection constructor>>.
+If neither loading configuration nor projection constructor are found,
+the `entity` projection will simply fail.
+
+[[search-dsl-projection-entity-syntax]]
+=== Syntax
+
+.Returning matched entities loaded from the database
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=entity]
+----
+====
+
+NOTE: If an entity cannot be loaded from the external datastore/database
+(e.g. it was deleted there, and the index wasn't updated yet),
+the hit will be omitted and won't appear in the returned `List` at all.
+The total hit count, however, will not take this omission into account.
+
+[[search-dsl-projection-entity-requested-type]]
+=== Requesting a specific entity type
+
+In some (rare) cases, the code creating the projection
+may have to work with a `SearchProjectionFactory<?, ?>`,
+i.e. a factory that carries no information regarding the type of loaded entities.
+
+In those cases, it's possible to request a specific type of entities:
+Hibernate Search will check when the projection is created that
+the requested type matches the type of loaded entities.
+
+.Requesting a specific entity type when for the `entity` projection
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=entity-requested-type]
+----
+====
+
+[[search-dsl-projection-entity-mapping]]
+=== `@EntityProjection` in projections to custom types
+
+To achieve a `entity` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+use the `@EntityProjection` annotation:
+
+.Returning matched entities loaded from the database within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookEntityAndTitleProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the entity with `@EntityProjection`.
+<3> The type of the constructor parameter must be assignable from the searched entity type --
+*all* of them in the case of <<search-dsl-query-targeting-multiple,queries targeting multiple indexes>>.
+<4> You can of course also declare other parameters with different projections;
+in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-entity]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested entity and field.
+====
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `EntityProjectionBinder.create()`.
+
+.Programmatic mapping of an `entity` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-entity-projection]
+----
+====
+
+[[search-dsl-projection-field]]
+== `field`: return field values from matched documents
+
+The `field` projection returns the value of a given field for the matched document.
+
+[[search-dsl-projection-field-prerequisites]]
+include::../components/field-projection-important.adoc[]
+
+[[search-dsl-projection-field-syntax]]
+=== Syntax
+
+By default, the `field` projection returns a single value per document,
+so the code below will be enough for a single-valued field:
+
+.Returning field values from matched documents
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=field]
+----
+====
+
+NOTE: Hibernate Search will throw an exception when building the query if you do this on a multivalued field.
+To project on multivalued fields, see <<search-dsl-projection-field-multivalued>>.
+
+You can omit the "field type" argument, but then you will get projections of type `Object`:
+
+.Returning field values from matched documents, without specifying the field type
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=field-noType]
+----
+====
+
+[[search-dsl-projection-field-multivalued]]
+=== Multivalued fields
+
+To return multiple values, and thus allow projection on multivalued fields, use `.multi()`.
+This will change the return type of the projection to `List<T>` where `T` is what the single-valued projection
+would have returned.
+
+.Returning field values from matched documents, for multivalued fields
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=field-multiValued]
+----
+====
+
+[[search-dsl-projection-field-skipping-conversion]]
+=== Skipping conversion
+
+By default, the values returned by the `field` projection have the same type as
+the entity property corresponding to the target field.
+
+For example, if an entity property if of an enum type,
+<<mapping-directfieldmapping-supported-types,the corresponding field may be of type `String`>>;
+the values returned by the `field` projection will be of the enum type regardless.
+
+This should generally be what you want,
+but if you ever need to bypass conversion and have unconverted values returned to you instead
+(of type `String` in the example above),
+you can do it this way:
+
+.Returning field values from matched documents, without converting the field value
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=field-noProjectionConverter]
+----
+====
+
+See <<search-dsl-projected-value-type>> for more information.
+
+[[search-dsl-projection-field-mapping]]
+=== `@FieldProjection` in projections to custom types
+
+To achieve a `field` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+you can rely on the default <<mapping-projection-inner-inference,inferred projection>>:
+when no annotations are present on a constructor parameter,
+it will be inferred to a field projection to the field with the same name as the constructor parameter
+(or an <<search-dsl-projection-object,object projection>>,
+see <<mapping-projection-inner-inference-type,here for details>>).
+
+To force a field projection,
+or to customize the field projection further (for example to set the field path explicitly),
+use the `@FieldProjection` annotation on the constructor parameter:
+
+.Returning field values from matched documents within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookTitleAndAuthorNamesProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the field value with `@FieldProjection`.
+<3> For single-valued projections,
+the type of the constructor parameter must be assignable from the type of the projected field.
+<4> Annotation attributes allow customization.
++
+Here we're using a path that contains a dot,
+which we can't possibly include in the name of the Java constructor parameter.
+<5> For multi-valued projections,
+the type of the constructor parameter must be assignable from `List<T>`,
+where `T` is the type of the projected field or a supertype.
+See <<mapping-projection-inner-inference-type>> for more information.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-field]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested fields.
+====
+
+The annotation exposes the following attributes:
+
+`path`::
+The path to the projected field.
++
+If not set, it is inferred from the constructor parameter name.
++
+[WARNING]
+====
+Field path inference will <<mapping-projection-inner-inference-fieldpath,fail if constructor parameter names are not included in the Java bytecode>>.
+====
+`convert`::
+How to <<search-dsl-projection-field-skipping-conversion,convert>> values retrieved from the index.
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `FieldProjectionBinder.create()`.
+
+.Programmatic mapping of a `field` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-field-projection]
+----
+====
+
+[[search-dsl-projection-score]]
+== `score`: return the score of matched documents
+
+The `score` projection returns the <<search-dsl-predicate-common-score,score>> of the matched document.
+
+[[search-dsl-projection-score-syntax]]
+=== Syntax
+
+.Returning the score of matched documents
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=score]
+----
+====
+
+[WARNING]
+====
+Two scores can only be reliably compared if they were computed during the very same query execution.
+Trying to compare scores from two separate query executions will only lead to confusing results,
+in particular if the predicates are different or
+if the content of the index changed enough to alter the frequency of some terms significantly.
+
+On a related note, exposing scores to end users is generally not an easy task.
+See https://cwiki.apache.org/confluence/display/LUCENE/ScoresAsPercentages[this article] for some insight
+into what's wrong with displaying the score as a percentage, specifically.
+====
+
+[[search-dsl-projection-score-mapping]]
+=== `@ScoreProjection` in projections to custom types
+
+To achieve a `score` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+use the `@ScoreProjection` annotation:
+
+.Returning the score of matched documents within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookScoreAndTitleProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the score with `@ScoreProjection`.
+<3> The type of the constructor parameter must be assignable from `float`.
+<4> You can of course also declare other parameters with different projections;
+in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-score]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested score and field.
+====
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `ScoreProjectionBinder.create()`.
+
+.Programmatic mapping of a `score` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-score-projection]
+----
+====
+
+[[search-dsl-projection-distance]]
+== `distance`: return the distance to a point
+
+The `distance` projection returns the distance between a given point
+and the geo-point value of a given field for the matched document.
+
+[[search-dsl-projection-distance-prerequisites]]
+include::../components/field-projection-important.adoc[]
+
+[[search-dsl-projection-distance-syntax]]
+=== Syntax
+
+By default, the `distance` projection returns a single value per document,
+so the code below will be enough for a single-valued field:
+
+.Returning the distance to a point
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=distance]
+----
+====
+
+NOTE: Hibernate Search will throw an exception when building the query if you do this on a multivalued field.
+To project on multivalued fields, see <<search-dsl-projection-distance-multivalued>>.
+
+The returned distance is in meters by default, but you can pick a different unit:
+
+.Returning the distance to a point with a given distance unit
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=distance-unit]
+----
+====
+
+[[search-dsl-projection-distance-multivalued]]
+=== Multivalued fields
+
+To return multiple values, and thus allow projection on multivalued fields, use `.multi()`.
+This will change the return type of the projection to `List<Double>`.
+
+.Returning the distance to a point, for multivalued fields
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=distance-multiValued]
+----
+====
+
+[[search-dsl-projection-distance-mapping]]
+=== In projections to custom types
+
+There is no built-in annotation to use the `distance` projection
+inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>
+https://hibernate.atlassian.net/browse/HSEARCH-4807[at the moment].
+
+You can <<binding-projection-parameters-custom-annotation,create your own annotation>> if you need one,
+backed by a <<binding-projection,custom projection binder>>,
+but the center of the distance projection won't be able to change from query to query,
+which limits its usefulness drastically at the moment.
+
+[[search-dsl-projection-composite]]
+== `composite`: combine projections
+
+[[search-dsl-projection-composite-basics]]
+=== Basics
+
+The `composite` projection applies multiple projections and combines their results,
+either as a `List<?>` or as a single object generated using a custom transformer.
+
+To preserve type-safety, you can provide a custom transformer.
+The transformer can be a `Function`, a `BiFunction`,
+or a `org.hibernate.search.util.common.function.TriFunction`,
+depending on the number of inner projections.
+It will receive values returned by inner projections and return an object combining these values.
+
+.Returning custom objects created from multiple projected values with `.composite().from(...).as(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=composite-customObject]
+----
+<1> Call `.composite()`.
+<2> Define the first inner projection as a projection on the `title` field.
+<3> Define the second inner projection as a projection on the `genre` field.
+<4> Define the result of the composite projection as the result of calling the constructor of a custom object, `MyPair`.
+The constructor of `MyPair` will be called for each matched document,
+with the value of the `title` field as its first argument,
+and the value of the `genre` field as its second argument.
+<5> Each hit will be an instance of `MyPair`.
+Thus, the list of hits will be an instance of `List<MyPair>`.
+====
+
+[[search-dsl-projection-composite-more-inners]]
+=== Composing more than 3 inner projections
+
+[TIP]
+====
+For complex projections, consider <<search-dsl-projection-composite-as-mapped,projecting to a custom (annotated) type>>.
+====
+
+If you pass more than 3 projections as arguments to `from(...)`,
+then the transform function will have to take a `List<?>` as an argument,
+and will be set using `asList(...)` instead of `as(..,)`:
+
+.Returning custom objects created from multiple projected values with `.composite().from(...).asList(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=composite-customObject-asList]
+----
+<1> Call `.composite()`.
+<2> Define the first inner projection as a projection on the `title` field.
+<3> Define the second inner projection as a projection on the `genre` field.
+<4> Define the third inner projection as a projection on the `pageCount` field.
+<5> Define the fourth inner projection as a projection on the `description` field.
+<6> Define the result of the object projection as the result of calling a lambda.
+The lambda will take elements of the list (the results of projections defined above, in order),
+cast them, and pass them to the constructor of a custom class, `MyTuple4`.
+<7> Each hit will be an instance of `MyTuple4`.
+Thus, the list of hits will be an instance of `List<MyTuple4>`.
+====
+
+[[search-dsl-projection-composite-as-list]]
+=== Projecting to a `List<?>` or `Object[]`
+
+If you don't mind receiving the result of inner projections as a `List<?>`,
+you can do without the transformer by calling `asList()`:
+
+.Returning a `List` of projected values with `.composite().add(...).asList()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=composite-list]
+----
+<1> Call `.composite()`.
+<2> Define the first inner projection as a projection on the `title` field.
+<3> Define the second inner projection as a projection on the `genre` field.
+<4> Define the result of the projection as a list,
+meaning the hits will be `List` instances with the value of the `title` field of the matched document at index `0`,
+and the value of the `genre` field of the matched document at index `1`.
+<5> Each hit will be an instance of `List<?>`:
+a list containing the result of the inner projections, in the given order.
+Thus, the list of hits will be an instance of `List<List<?>>`.
+====
+
+Similarly, to get the result of inner projections as an array (`Object[]`),
+you can do without the transformer by calling `asArray()`:
+
+.Returning an array of projected values with `.composite(...).add(...).asArray()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=composite-array]
+----
+<1> Call `.composite()`.
+<2> Define the first inner projection as a projection on the `title` field.
+<3> Define the second inner projection as a projection on the `genre` field.
+<4> Define the result of the projection as an array,
+meaning the hits will be `Object[]` instances with the value of the `title` field of the matched document at index `0`,
+and the value of the `genre` field of the matched document at index `1`.
+<5> Each hit will be an instance of `Object[]`:
+a array of objects containing the result of the inner projections, in the given order.
+Thus, the list of hits will be an instance of `List<Object[]>`.
+====
+
+Alternatively, to get the result as a `List<?>`,
+you can use the shorter variant of `.composite(...)` that directly takes projections as arguments:
+
+.Returning a `List` of projected values with `.composite(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=composite-list-singlestep]
+----
+<1> Call `.composite(...)`.
+<2> Define the first projection to combine as a projection on the `title` field.
+<3> Define the second projection to combine as a projection on the `genre` field.
+<4> Each hit will be an instance of `List<?>`:
+a list containing the result of the inner projections, in the given order.
+Thus, the list of hits will be an instance of `List<List<?>>`.
+====
+
+[[search-dsl-projection-composite-as-mapped]]
+=== Projecting to a custom (annotated) type
+
+For more complex composite projections, it is possible to define a custom (annotated) record or class
+and have Hibernate Search infer the corresponding inner projections from the custom type's constructor parameters.
+This is similar to the <<search-dsl-projection-mapped,projection to a custom (annotated) type through `.select(...)`>>.
+
+include::../components/custom-projection-type-important.adoc[]
+
+.Using a custom record type to project data from the index
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookProjection.java[tags=include]
+----
+<1> Annotate the record type with `@ProjectionConstructor`,
+either at the type level (if there's only one constructor)
+or at the constructor level (if there are <<mapping-projection-multiple-constructors,multiple constructors>>).
+<2> To project on the entity identifier, annotate the relevant constructor parameter with <<search-dsl-projection-id-mapping,`@IdProjection`>>.
++
+Most projections have a corresponding annotation that can be used on constructor parameters.
+<3> To project on a value field, add a constructor parameter named after that field and with the same type as that field.
+See <<mapping-projection-inner-inference>> for more information on how constructor parameters should be defined.
++
+Alternatively, the field projection can be configured explicitly with <<search-dsl-projection-field-mapping,`@FieldProjection`>>.
+<4> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
+Multivalued projections <<mapping-projection-inner-inference-type,must be modeled as a `List<...>`>> or supertype.
++
+Alternatively, the object projection can be configured explicitly with <<search-dsl-projection-object-mapping,`@ObjectProjection`>>.
+<5> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=composite-mapped-record]
+----
+<1> Call `.composite()`.
+<2> Define the result of the projection as a custom (annotated) type.
+Hibernate Search will <<mapping-projection-inner-inference,infer the inner projections>>
+from the custom type's constructor parameters.
+<3> Each hit will be an instance of the custom projection type,
+populated with data retrieved from the index.
+====
+
+include::../components/custom-projection-type-nonrecord-tip.adoc[]
+
+NOTE: For more information about mapping custom projection types, see <<mapping-projection>>.
+
+[[search-dsl-projection-composite-mapping]]
+=== `@CompositeProjection` in projections to custom types
+
+To achieve a `composite` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+use the `@CompositeProjection` annotation on the constructor parameter:
+
+.Returning custom objects created from multiple projections within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookMiscInfoAndTitleProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the composite projection with `@CompositeProjection`.
+<3> The type of the constructor parameter must have a projection constructor itself.
+See <<mapping-projection-inner-inference-type>> for more information.
+<4> You can of course also declare other parameters with different projections;
+in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-composite]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested composite projection.
+====
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `CompositeProjectionBinder.create()`.
+
+.Programmatic mapping of a `composite` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-composite-projection]
+----
+====
+
+[[search-dsl-projection-composite-deprecated-variants]]
+=== Deprecated variants
+
+include::../components/deprecated-warning.adoc[]
+
+A few `.composite(...)` methods accepting both a function and a list of projections
+are available on `SearchProjectionFactory`, but they are deprecated.
+
+.Deprecated variant of `composite`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=composite-customObject-singlestep]
+----
+<1> Call `.composite(...)`.
+<2> Define the transformer as the constructor of a custom object, `MyPair`.
+<3> Define the first projection to combine as a projection on the `title` field,
+meaning the constructor of `MyPair` will be called for each matched document
+with the value of the `title` field as its first argument.
+<4> Define the second projection to combine as a projection on the `genre` field,
+meaning the constructor of `MyPair` will be called for each matched document
+with the value of the `genre` field as its second argument.
+<5> Each hit will be an instance of `MyPair`.
+Thus, the list of hits will be an instance of `List<MyPair>`.
+====
+
+[[search-dsl-projection-object]]
+== `object`: return one value per object in an object field
+
+The `object` projection yields one projected value for each object in a given object field,
+the value being generated by applying multiple inner projections and combining their results
+either as a `List<?>` or as a single object generated using a custom transformer.
+
+[NOTE]
+====
+The `object` projection may seem very similar to the <<search-dsl-projection-composite,`composite` projection>>,
+and its definition via the Search DSL certainly is indeed similar.
+
+However, there are two key differences:
+
+1. The `object` projection will yield `null` when projecting on a single-valued object field
+   if the object was null when indexing.
+2. The `object` projection will yield multiple values when projecting on a multivalued object field
+   if there were multiple objects when indexing.
+====
+
+[WARNING]
+====
+With the <<backend-lucene,Lucene backend>>, the object projection has a few limitations:
+
+1. It is only available for single-valued object fields regardless of their <<mapping-indexedembedded-structure,structure>>,
+or multi-valued object fields with a
+<<mapping-indexedembedded-structure-nested,`NESTED` structure>>.
+2. It will never yield `null` objects for multi-valued object fields.
+The Lucene backend does not index `null` objects,
+and thus cannot find them when searching.
+
+These limitations do not apply to the <<backend-elasticsearch,Elasticsearch backend>>.
+====
+
+[[search-dsl-projection-object-syntax]]
+=== Syntax
+
+To preserve type-safety, you can provide a custom transformer.
+The transformer can be a `Function`, a `BiFunction`,
+or a `org.hibernate.search.util.common.function.TriFunction`,
+depending on the number of inner projections.
+It will receive values returned by inner projections and return an object combining these values.
+
+.Returning custom objects created from an object field with `.object(...).from(...).as(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=object-customObject]
+----
+<1> Call `.object( "authors" )`.
+<2> Define the first inner projection as a projection on the `firstName` field of `authors`.
+<3> Define the second inner projection as a projection on the `lastName` field of `authors`.
+<4> Define the result of the object projection as the result of calling the constructor of a custom object, `MyAuthorName`.
+The constructor of `MyAuthorName` will be called for each object in the `authors` object field,
+with the value of the `authors.firstName` field as its first argument,
+and the value of the `authors.lastName` field as its second argument.
+<5> Define the projection as multivalued,
+meaning it will yield values of type `List<MyAuthorName>`:
+one `MyAuthorName` per object in the `authors` object field.
+<6> Each hit will be an instance of `List<MyAuthorName>`.
+Thus, the list of hits will be an instance of `List<List<MyAuthorName>>`.
+====
+
+[[search-dsl-projection-object-more-inners]]
+=== Composing more than 3 inner projections
+
+[TIP]
+====
+For complex projections, consider <<search-dsl-projection-object-as-mapped,projecting to a custom (annotated) type>>.
+====
+
+If you pass more than 3 projections as arguments,
+then the transform function will have to take a `List<?>` as an argument,
+and will be set using `asList(...)` instead of `as(..,)`:
+
+.Returning custom objects created from an object field with `.object(...).from(...).asList(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=object-customObject-asList]
+----
+<1> Call `.object( "authors" )`.
+<2> Define the first inner projection as a projection on the `firstName` field of `authors`.
+<3> Define the second inner projection as a projection on the `lastName` field of `authors`.
+<4> Define the third inner projection as a projection on the `birthDate` field of `authors`.
+<5> Define the fourth inner projection as a <<search-dsl-projection-distance,distance projection>>
+on the `placeOfBirth` field with the given center and unit.
+<6> Define the result of the object projection as the result of calling a lambda.
+The lambda will take elements of the list (the results of projections defined above, in order),
+cast them, and pass them to the constructor of a custom class, `MyAuthorNameAndBirthDateAndPlaceOfBirthDistance`.
+<7> Define the projection as multivalued,
+meaning it will yield values of type `List<MyAuthorNameAndBirthDateAndPlaceOfBirthDistance>`:
+one `MyAuthorNameAndBirthDateAndPlaceOfBirthDistance` per object in the `authors` object field.
+instead of just `MyAuthorNameAndBirthDateAndPlaceOfBirthDistance`.
+<8> Each hit will be an instance of `List<MyAuthorNameAndBirthDateAndPlaceOfBirthDistance>`.
+Thus, the list of hits will be an instance of `List<List<MyAuthorNameAndBirthDateAndPlaceOfBirthDistance>>`.
+====
+
+Similarly, `asArray(...)` can be used to get passed an `Object[]` argument instead of `List<?>`.
+
+.Returning custom objects created from an object field with `.object(...).from(...).asArray(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=object-customObject-asArray]
+----
+<1> Call `.object( "authors" )`.
+<2> Define the first inner projection as a projection on the `firstName` field of `authors`.
+<3> Define the second inner projection as a projection on the `lastName` field of `authors`.
+<4> Define the third inner projection as a projection on the `birthDate` field of `authors`.
+<5> Define the fourth inner projection as a <<search-dsl-projection-distance,distance projection>>
+on the `placeOfBirth` field with the given center and unit.
+<6> Define the result of the object projection as the result of calling a lambda.
+The lambda will take elements of the array (the results of projections defined above, in order),
+cast them, and pass them to the constructor of a custom class, `MyAuthorNameAndBirthDateAndPlaceOfBirthDistance`.
+<7> Define the projection as multivalued,
+meaning it will yield values of type `List<MyAuthorNameAndBirthDateAndPlaceOfBirthDistance>`:
+one `MyAuthorNameAndBirthDateAndPlaceOfBirthDistance` per object in the `authors` object field.
+instead of just `MyAuthorNameAndBirthDateAndPlaceOfBirthDistance`.
+<8> Each hit will be an instance of `List<MyAuthorNameAndBirthDateAndPlaceOfBirthDistance>`.
+Thus, the list of hits will be an instance of `List<List<MyAuthorNameAndBirthDateAndPlaceOfBirthDistance>>`.
+====
+
+[[search-dsl-projection-object-as-list]]
+=== Projecting to a `List<?>` or `Object[]`
+
+If you don't mind receiving the result of inner projections as a `List<?>`,
+you can do without the transformer by calling `asList()`:
+
+.Returning a `List` of projected values with `.object(...).add(...).asList()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=object-list]
+----
+<1> Call `.object( "authors" )`.
+<2> Define the first inner projection as a projection on the `firstName` field of `authors`.
+<3> Define the second inner projection as a projection on the `lastName` field of `authors`.
+<4> Define the result of the projection as a list,
+meaning the hits will be `List` instances with at index `0` the value of the `firstName` field of `authors` ,
+and at index `1` the value of the `lastName` field of `authors`.
+<5> Define the projection as multivalued,
+meaning it will yield values of type `List<List<?>>`:
+one `List<?>` per object in the `authors` object field.
+<6> Each hit will be an instance of `List<List<?>>`:
+a list containing one list per author, which in turns contains the result of the inner projections, in the given order.
+Thus, the list of hits will be an instance of `List<List<List<?>>>`.
+====
+
+Similarly, to get the result of inner projections as an array (`Object[]`),
+you can do without the transformer by calling `asArray()`:
+
+.Returning an array of projected values with `.object(...).add(...).asArray()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=object-array]
+----
+<1> Call `.object( "authors" )`.
+<2> Define the first inner projection as a projection on the `firstName` field of `authors`.
+<3> Define the second inner projection as a projection on the `lastName` field of `authors`.
+<4> Define the result of the projection as an array,
+meaning the hits will be `Object[]` instances with at index `0` the value of the `firstName` field of `authors` ,
+and at index `1` the value of the `lastName` field of `authors`.
+<5> Define the projection as multivalued,
+meaning it will yield values of type `List<Object[]>`:
+one `Object[]` per object in the `authors` object field.
+<6> Each hit will be an instance of `List<Object[]>`:
+a list containing one array per author, which in turns contains the result of the inner projections, in the given order.
+Thus, the list of hits will be an instance of `List<List<Object[]>>`.
+====
+
+[[search-dsl-projection-object-as-mapped]]
+=== Projecting to a custom (annotated) type
+
+For more complex object projections, it is possible to define a custom (annotated) record or class
+and have Hibernate Search infer the corresponding inner projections from the custom type's constructor parameters.
+This is similar to the <<search-dsl-projection-mapped,projection to a custom (annotated) type through `.select(...)`>>.
+
+include::../components/custom-projection-type-important.adoc[]
+
+.Using a custom record type to project data created from an object field
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyAuthorProjection.java[tags=include]
+----
+<1> Annotate the record type with `@ProjectionConstructor`,
+either at the type level (if there's only one constructor)
+or at the constructor level (if there are <<mapping-projection-multiple-constructors,multiple constructors>>).
+<2> To project on a value field, add a constructor parameter named after that field and with the same type as that field.
+See <<mapping-projection-inner-inference>> for more information on how constructor parameters should be defined.
++
+Alternatively, the field projection can be configured explicitly with <<search-dsl-projection-field-mapping,`@FieldProjection`>>.
++
+Most projections have a corresponding annotation that can be used on constructor parameters.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=object-mapped-record]
+----
+<1> Call `.object( "authors" )`.
+<2> Define the result of the projection as a custom (annotated) type.
+Hibernate Search will <<mapping-projection-inner-inference,infer the inner projections>>
+from the custom type's constructor parameters.
+<3> Each hit will be an instance of the custom projection type,
+populated with data retrieved from the index.
+====
+
+include::../components/custom-projection-type-nonrecord-tip.adoc[]
+
+NOTE: For more information about mapping custom projection types, see <<mapping-projection>>.
+
+[[search-dsl-projection-object-mapping]]
+=== `@ObjectProjection` in projections to custom types
+
+To achieve an `object` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+you can rely on the default <<mapping-projection-inner-inference,inferred projection>>:
+when no annotations are present on a constructor parameter,
+it will be inferred to an object projection to the field with the same name as the constructor parameter
+(or a <<search-dsl-projection-field,field projection>>,
+see <<mapping-projection-inner-inference-type,here for details>>).
+
+To force an object projection,
+or to customize the object projection further (for example to set the field path explicitly),
+use the `@ObjectProjection` annotation on the constructor parameter:
+
+.Returning custom objects created from an object field within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookTitleAndAuthorsProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the objects with `@ObjectProjection`.
+<3> For multi-valued projections,
+the type of the constructor parameter must be assignable from `List<T>`,
+where `T` is a type that has a projection constructor itself.
+See <<mapping-projection-inner-inference-type>> for more information.
+<4> Annotation attributes allow customization.
++
+Here we're using a path that is different from the name of the Java constructor parameter.
+<5> For single-valued projections,
+the type of the constructor parameter must have a projection constructor itself.
+See <<mapping-projection-inner-inference-type>> for more information.
+<6> You can of course also declare other parameters with different projections;
+in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-object]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested objects.
+====
+
+The annotation exposes the following attributes:
+
+`path`::
+The path to the projected field.
++
+If not set, it is inferred from the constructor parameter name.
++
+[WARNING]
+====
+Field path inference will <<mapping-projection-inner-inference-fieldpath,fail if constructor parameter names are not included in the Java bytecode>>.
+====
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `ObjectProjectionBinder.create()`.
+
+.Programmatic mapping of an `object` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-object-projection]
+----
+====
+
+[[search-dsl-projection-constant]]
+== `constant`: return a provided constant
+
+The `constant` projection returns the same value for every single document,
+the value being provided when defining the projection.
+
+This is only useful in some edge cases where one wants to include some broader context in the representation of every single hit.
+In this case, the `constant` value will most likely be used together with
+a <<search-dsl-projection-composite,`composite` projection>>
+or an <<search-dsl-projection-object,`object` projection>>.
+
+[[search-dsl-projection-constant-syntax]]
+=== Syntax
+
+.Returning a constant value for every single matched document
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=constant-incomposite]
+----
+====
+
+[[search-dsl-projection-constant-mapping]]
+=== In projections to custom types
+
+There is no built-in annotation to use the `constant` projection
+inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>.
+
+You can <<binding-projection-parameters-custom-annotation,create your own annotation>> if you need one,
+backed by a <<binding-projection,custom projection binder>>.
+
+[[search-dsl-projection-highlight]]
+== `highlight`: return highlighted field values from matched documents
+
+The `highlight` projection returns fragments from full-text fields of matched documents that caused a query match.
+
+[IMPORTANT]
+====
+In order to use highlight projections of a given field,
+you need to provide the list of <<mapping-directfieldmapping-highlightable,highlighters supported by the field>> in the mapping.
+
+The <<mapping-directfieldmapping-highlightable,highlightable>> default may already enable the support of highlighting
+in some cases. For more details see <<mapping-directfieldmapping-highlightable-default, how the `DEFAULT` highlightable value behaves>>.
+====
+
+
+[[search-dsl-projection-highlight-syntax]]
+=== Syntax
+
+The `highlight` projection always returns a list of string values per highlighted field, no matter if the field is
+a single or a multivalued one:
+
+.Returning highlights for matched documents
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlight]
+----
+As an example, the result may look like:
+[source, JSON]
+----
+[
+    ["The Automatic <em>Detective</em>"], <1>
+    ["Dirk Gently's Holistic <em>Detective</em> Agency"], <2>
+    [
+      "The Paris <em>Detective</em>",
+      "<em>Detective</em> Luc Moncrief series"
+    ], <3>
+]
+----
+<1> First hit.
+<2> Second hit.
+<3> Third hit with multiple highlighted snippets.
+====
+
+[[search-dsl-projection-highlight-multivalued]]
+=== Multivalued fields
+
+Each value of a multivalued field is being highlighted. See <<search-dsl-highlighting-highlighter-options, how highlighter can be configured>>
+to adjust the returned results' behaviour and structure.
+
+[IMPORTANT]
+====
+At the moment, highlighting a field within a <<mapping-indexedembedded-structure-nested,nested object>> is https://hibernate.atlassian.net/browse/HSEARCH-4841[not supported] and attempting to do so will lead to an exception.
+Highlighting a field within a <<mapping-indexedembedded-structure-flattened,flattened object>> will work correctly.
+
+Placing a highlight projection inside an <<search-dsl-projection-object,object projection>> is not supported.
+====
+
+.Returning highlights for flattened objects from matched documents
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlight-multiValued]
+----
+====
+
+[[search-dsl-projection-highlight-options]]
+=== Highlighting options
+
+A highlighter can be fine-tuned through its options to change the highlighted output.
+
+.Configuring the default highlighter
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlighter-default]
+----
+<1> Building the highlight query as usual.
+<2> Configure the default highlighter. Change the highlighting tag option.
+====
+
+Additionally, if multiple fields are highlighted, and they need different highlighter options then a named highlighter
+can be used to override the default one.
+
+.Configuring default and named highlighters
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=highlighter-named]
+----
+<1> Specifying the name of a named highlighter to be applied to the `description` field highlight projection.
+<2> Configure the default highlighter.
+<3> Configure the named highlighter.
+====
+
+See <<search-dsl-highlighting>> for more information on highlighter configuration.
+
+[[search-dsl-projection-highlight-mapping]]
+=== `@HighlightProjection` in projections to custom types
+
+To achieve a `highlight` projection inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>,
+use the `@HighlightProjection` annotation on the constructor parameter:
+
+.Returning highlights for matched documents within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookTitleAndHighlightedDescriptionProjection.java[tags=include]
+----
+<1> Annotate the record type with <<mapping-projection-basics,`@ProjectionConstructor`>>.
+<2> Annotate the parameter that should receive the highlights value with `@HighlightProjection`.
+<3> The type of the constructor parameter must be assignable from `List<String>`.
+<4> You can of course also declare other parameters with different projections;
+in this example an <<mapping-projection-inner-inference,inferred projection>> to the `title` field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=projection-constructor-highlight]
+----
+<1> Pass the custom projection type to `.select(...)`.
+<2> Each hit will be an instance of the custom projection type,
+populated with the requested highlights and field.
+====
+
+The annotation exposes the following attributes:
+
+`path`::
+The path to the highlighted field.
++
+If not set, it is inferred from the constructor parameter name.
++
+[WARNING]
+====
+Field path inference will <<mapping-projection-inner-inference-fieldpath,fail if constructor parameter names are not included in the Java bytecode>>.
+====
+`highlighter`::
+The name of a highlighter configured in the query;
+useful to <<search-dsl-projection-highlight-options,apply different options>> to each highlight projection.
++
+If not set, the projection will use the default highlighter as configured in the query.
+
+For <<mapping-projection-programmatic,programmatic mapping>>, use `HighlightProjectionBinder.create()`.
+
+.Programmatic mapping of a `highlight` projection within a projection constructor
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-highlight-projection]
+----
+====
+
+[[search-dsl-projection-extensions]]
+== Backend-specific extensions
+
+By calling `.extension(...)` while building a query,
+it is possible to access backend-specific projections.
+
+[NOTE]
+====
+As their name suggests, backend-specific projections are not portable from one backend technology to the other.
+====
+
+[[search-dsl-projection-extensions-lucene-document]]
+=== Lucene: `document`
+
+The `.document()` projection returns the matched document as a native Lucene `Document`.
+
+include::../components/lucene-api-warning.adoc[]
+
+[[search-dsl-projection-extensions-lucene-document-syntax]]
+==== Syntax
+
+.Returning the matched document as a native `org.apache.lucene.document.Document`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/LuceneProjectionDslIT.java[tags=lucene-document]
+----
+====
+
+[NOTE]
+====
+The returned document is similar to the one that was indexed.
+
+For example, if a value was transformed by the `toIndexedValue` method
+of a <<binding-valuebridge,value bridge>> upon indexing,
+this transformed value (after encoding) will be the value included in the document:
+Hibernate Search will not convert it back using `ValueBridge#fromIndexedValue`.
+
+However, there are some differences between the returned document and the one that was indexed:
+
+* Only stored fields are present.
+* Even stored fields may not have the same `FieldType` as they originally had.
+* The document structure flattened,
+i.e. even fields from <<mapping-indexedembedded-structure-nested,nested documents>>
+are all added to same returned document.
+* <<binding-index-field-dsl-dynamic,Dynamic fields>> may be missing.
+
+If you want a projection that retrieves the value as it was in your entity upon indexing,
+use a <<search-dsl-projection-field,`field` projection>>.
+====
+
+[[search-dsl-projection-extensions-lucene-document-mapping]]
+==== In projections to custom types
+
+There is no built-in annotation to use the `document` projection
+inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>.
+
+You can <<binding-projection-parameters-custom-annotation,create your own annotation>> if you need one,
+backed by a <<binding-projection,custom projection binder>>.
+
+[[search-dsl-projection-extensions-lucene-explanation]]
+=== Lucene: `explanation`
+
+The `.explanation()` projection returns an <<troubleshooting-faq-search-score,explanation>>
+of the match as a native Lucene `Explanation`.
+
+include::../components/explanation-warning.adoc[]
+
+include::../components/lucene-api-warning.adoc[]
+
+[[search-dsl-projection-extensions-lucene-explanation-syntax]]
+==== Syntax
+
+.Returning the score explanation as a native `org.apache.lucene.search.Explanation`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/LuceneProjectionDslIT.java[tags=lucene-explanation]
+----
+====
+
+[[search-dsl-projection-extensions-lucene-explanation-mapping]]
+==== In projections to custom types
+
+There is no built-in annotation to use the `explanation` projection
+inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>.
+
+You can <<binding-projection-parameters-custom-annotation,create your own annotation>> if you need one,
+backed by a <<binding-projection,custom projection binder>>.
+
+[[search-dsl-projection-extensions-elasticsearch-source]]
+=== Elasticsearch: `source`
+
+The `.source()` projection returns the JSON of the document as it was indexed in Elasticsearch,
+as a `JsonObject`.
+
+include::../components/elasticsearch-json-warning.adoc[]
+
+[[search-dsl-projection-extensions-elasticsearch-source-syntax]]
+==== Syntax
+
+.Returning the matched document source as a `JsonObject`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ElasticsearchProjectionDslIT.java[tags=elasticsearch-source]
+----
+====
+
+[NOTE]
+====
+The source is returned exactly as it appears in the response from Elasticsearch.
+In particular, Hibernate Search will not apply any kind of the conversions
+described in <<search-dsl-projected-value-type>>.
+
+For example, if a value was transformed by the `toIndexedValue` method
+of a <<binding-valuebridge,value bridge>> upon indexing,
+this transformed value will be the value included in the source:
+Hibernate Search will not convert it back using `ValueBridge#fromIndexedValue`.
+
+If you want a projection that retrieves the value as it was in your entity upon indexing,
+use a <<search-dsl-projection-field,`field` projection>>.
+====
+
+[[search-dsl-projection-extensions-elasticsearch-source-mapping]]
+==== In projections to custom types
+
+There is no built-in annotation to use the `source` projection
+inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>.
+
+You can <<binding-projection-parameters-custom-annotation,create your own annotation>> if you need one,
+backed by a <<binding-projection,custom projection binder>>.
+
+[[search-dsl-projection-extensions-elasticsearch-explanation]]
+=== Elasticsearch: `explanation`
+
+The `.explanation()` projection returns an <<troubleshooting-faq-search-score,explanation>>
+of the match as a `JsonObject`.
+
+include::../components/explanation-warning.adoc[]
+
+include::../components/elasticsearch-json-warning.adoc[]
+
+[[search-dsl-projection-extensions-elasticsearch-explanation-syntax]]
+==== Syntax
+
+.Returning the score explanation as a `JsonObject`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ElasticsearchProjectionDslIT.java[tags=elasticsearch-explanation]
+----
+====
+
+[[search-dsl-projection-extensions-elasticsearch-explanation-mapping]]
+==== In projections to custom types
+
+There is no built-in annotation to use the `explanation` projection
+inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>.
+
+You can <<binding-projection-parameters-custom-annotation,create your own annotation>> if you need one,
+backed by a <<binding-projection,custom projection binder>>.
+
+[[search-dsl-projection-extensions-elasticsearch-jsonHit]]
+=== Elasticsearch: `jsonHit`
+
+The `.jsonHit()` projection returns the exact JSON returned by Elasticsearch for the hit, as a `JsonObject`.
+
+[NOTE]
+====
+This is particularly useful when <<search-dsl-query-elasticsearch-json,customizing the request's JSON>>
+to ask for additional data within each hit.
+====
+
+include::../components/elasticsearch-json-warning.adoc[]
+
+[[search-dsl-projection-extensions-elasticsearch-jsonHit-syntax]]
+==== Syntax
+
+.Returning the Elasticsearch hit as a `JsonObject`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ElasticsearchProjectionDslIT.java[tags=elasticsearch-jsonHit]
+----
+====
+
+[[search-dsl-projection-extensions-elasticsearch-jsonHit-mapping]]
+==== In projections to custom types
+
+There is no built-in annotation to use the `jsonHit` projection
+inside a <<search-dsl-projection-mapped,projection to an annotated custom type>>.
+
+You can <<binding-projection-parameters-custom-annotation,create your own annotation>> if you need one,
+backed by a <<binding-projection,custom projection binder>>.
