@@ -102,7 +102,7 @@ class IndexSchemaFilter {
 	}
 
 	public boolean isPathIncluded(String relativePath) {
-		return isPathIncludedInternal( 0, relativePath, true, true );
+		return isPathIncludedInternal( 0, relativePath, true );
 	}
 
 	/**
@@ -111,14 +111,10 @@ class IndexSchemaFilter {
 	 * @param markIncludedAsEncountered Whether the included path should be marked as encountered
 	 * ({@code true}), or not ({@code false}).
 	 * Useful when processing "theoretical" paths, such as the includePaths of a child filter, in particular.
-	 * @param includedByChild Whether a child filter included this path.
-	 * Useful when marking a path as encountered: if it is included by this filter,
-	 * but not by any children, the corresponding includePaths is not effective,
-	 * and thus we should consider the path as excluded for the purpose of detecting ineffective includePaths.
 	 * @return {@code true} if the path is included, {@code false} otherwise.
 	 */
 	private boolean isPathIncludedInternal(int relativeDepth, String relativePath,
-			boolean markIncludedAsEncountered, boolean includedByChild) {
+			boolean markIncludedAsEncountered) {
 		boolean includedByThis = ( depthFilter.isEveryPathIncludedAtDepth( relativeDepth )
 				|| pathFilter.isExplicitlyIncluded( relativePath ) )
 				&& !pathFilter.isExplicitlyExcluded( relativePath );
@@ -128,18 +124,12 @@ class IndexSchemaFilter {
 		 * The parent can filter out paths that are considered as included by a child,
 		 * by reducing the includeDepth in particular,
 		 * but it cannot include paths that are filtered out by a child.
-		 *
-		 * Note: If we only go into recursion when `includedByThis == true` path tracking of parent nodes will not record
-		 * the route.
 		 */
 		if ( includedByThis && parent != null ) {
 			includedByParent = parent.isPathIncludedInternal(
 					relativeDepth + 1,
 					definition.relativePrefix() + relativePath,
-					markIncludedAsEncountered,
-					// need to include a results from the previous step as it may be that we have an include at the current level
-					// but it was excluded at some ancestor level, and we want to pass it up to the parent.
-					includedByThis && includedByChild
+					markIncludedAsEncountered
 			);
 		}
 
@@ -151,9 +141,7 @@ class IndexSchemaFilter {
 		// - if we end up including the object because some of the "includePaths" are actually included we'll mark those
 		// paths later when we'll be considering adding them.
 		if ( ( markIncludedAsEncountered || !included ) && pathTracker != null ) {
-			pathTracker.markAsEncountered(
-					relativePath, includedByThis, includedByChild
-			);
+			pathTracker.markAsEncountered( relativePath, includedByThis );
 		}
 
 		return included;
@@ -180,7 +168,7 @@ class IndexSchemaFilter {
 				continue;
 			}
 			String pathWithoutPrefix = path.substring( prefixLength );
-			if ( filter.isPathIncludedInternal( 0, pathWithoutPrefix, false, true ) ) {
+			if ( filter.isPathIncludedInternal( 0, pathWithoutPrefix, false ) ) {
 				return true;
 			}
 		}
