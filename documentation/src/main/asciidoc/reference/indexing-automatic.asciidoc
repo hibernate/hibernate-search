@@ -83,15 +83,6 @@ When processing Hibernate ORM entity change events, it is also aware of which pr
 Thanks to that knowledge, it is able to detect which entity changes are actually relevant to indexing,
 and to skip reindexing when a property is modified, but does not affect the indexed document.
 
-You can control this "dirty checking" by setting
-the <<configuration-property-types,boolean property>> `hibernate.search.automatic_indexing.enable_dirty_check`:
-
-* by default, or when set to `true`,
-Hibernate Search will consider whether modified properties are relevant
-before triggering reindexing.
-* when set to `false`, Hibernate Search will trigger reindexing upon any change,
-regardless of the entity properties that changed.
-
 [[indexing-automatic-synchronization]]
 == Synchronization with the indexes
 
