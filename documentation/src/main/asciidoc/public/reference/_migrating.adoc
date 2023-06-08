@@ -14,7 +14,7 @@ be aware that just bumping the version number will not be enough.
 In particular, the group IDs changed from `org.hibernate` to `org.hibernate.search`,
 most of the artifact IDs changed to reflect the new mapper/backend design,
 and the Lucene integration now requires an explicit dependency instead of being available by default.
-Read <<mapper-orm-getting-started-dependencies>> for more information.
+Read xref:../getting-started/orm/index.adoc#mapper-orm-getting-started-dependencies[Dependencies] for more information.
 
 Additionally, be aware that a lot of APIs have changed, some only because of a package change,
 others because of more fundamental changes

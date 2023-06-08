@@ -80,7 +80,7 @@ _and_ it covers the specifics of Quarkus.
 === [[gettingstarted-framework-spring-boot]] [[_spring_boot]] Spring Boot
 
 Hibernate Search can easily be integrated into a link:{springBootUrl}[Spring Boot] application.
-Just read about Spring Boot's specifics below, then follow the <<mapper-orm-getting-started,getting started guide>>.
+Just read about Spring Boot's specifics below, then follow the xref:../getting-started/orm/index.adoc#mapper-orm-getting-started[getting started guide].
 
 [[compatibility-framework-spring-boot-configuration-properties]]
 ==== [[gettingstarted-framework-spring-boot-configuration-properties]] [[_configuration_properties]] Configuration properties
@@ -184,4 +184,4 @@ the configuration of one won't affect the other.
 If your framework of choice is not mentioned in the previous sections, don't worry:
 Hibernate Search works just fine with plenty of other frameworks.
 
-Just follow the <<mapper-orm-getting-started,getting started guide>> to try it out.
+Just follow the xref:../getting-started/orm/index.adoc#mapper-orm-getting-started[getting started guide] to try it out.
