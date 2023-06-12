@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.metamodel.MappingMetamodel;
-import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContext;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityIdEntityLoadingStrategy;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityLoadingStrategy;
@@ -32,7 +32,7 @@ abstract class AbstractHibernateOrmTypeContext<E>
 
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final String jpaEntityName;
-	private final EntityPersister entityPersister;
+	private final EntityMappingType entityMappingType;
 	private final boolean documentIdIsEntityId;
 	private final HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy;
 	private final PojoPathFilter dirtyFilter;
@@ -45,22 +45,21 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		this.typeIdentifier = builder.typeIdentifier;
 		this.jpaEntityName = builder.jpaEntityName;
 		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
-		this.entityPersister = metamodel.getEntityDescriptor( builder.hibernateOrmEntityName );
+		this.entityMappingType = metamodel.getEntityDescriptor( builder.hibernateOrmEntityName );
 		this.ascendingSuperTypes = builder.ascendingSuperTypes;
 		if ( builder.documentIdSourcePropertyName != null ) {
-			if ( builder.documentIdSourcePropertyName.equals( entityPersister().getIdentifierPropertyName() ) ) {
+			if ( builder.documentIdSourcePropertyName.equals( entityMappingType().getIdentifierMapping().getAttributeName() ) ) {
 				documentIdIsEntityId = true;
 				loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E, ?>) HibernateOrmEntityIdEntityLoadingStrategy
-						.create( sessionFactory, entityPersister() );
+						.create( sessionFactory, entityMappingType() );
 			}
 			else {
 				// The entity ID is not the property used to generate the document ID
 				// We need to use a criteria query to load entities from the document IDs
 				documentIdIsEntityId = false;
 				loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E,
-						?>) HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.create( sessionFactory, entityPersister(),
-								builder.documentIdSourcePropertyName, builder.documentIdSourcePropertyHandle
-						);
+						?>) HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.create( sessionFactory, entityMappingType,
+								builder.documentIdSourcePropertyName, builder.documentIdSourcePropertyHandle );
 			}
 		}
 		else {
@@ -88,12 +87,12 @@ abstract class AbstractHibernateOrmTypeContext<E>
 	}
 
 	public String hibernateOrmEntityName() {
-		return entityPersister.getEntityName();
+		return entityMappingType.getEntityName();
 	}
 
 	@Override
-	public EntityPersister entityPersister() {
-		return entityPersister;
+	public EntityMappingType entityMappingType() {
+		return entityMappingType;
 	}
 
 	@Override
