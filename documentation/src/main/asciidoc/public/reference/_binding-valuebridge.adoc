@@ -38,7 +38,7 @@ A single value bridge cannot populate more than one index field.
 A value bridge is expected to be applied to "atomic" data, such as a `LocalDate`;
 if it is applied to an entity, for example, extracting data from its properties,
 Hibernate Search will not be aware of which properties are used
-and will not be able to automatically trigger reindexing when these properties change.
+and will not be able to <<listener-triggered-indexing,detect that reindexing is required>> when these properties change.
 
 Below is an example of a custom value bridge that converts
 a custom `ISBN` type to its string representation to index it:

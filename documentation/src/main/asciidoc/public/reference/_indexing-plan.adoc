@@ -1,8 +1,8 @@
 [[indexing-plan]]
 = [[mapper-orm-indexing-manual-indexingplan-writes]] [[_deleting_instances_from_the_index]] [[_adding_instances_to_the_index]] Explicitly indexing on entity change events
 
-When <<indexing-automatic,automatic indexing>> is <<mapping-annotations,disabled>>
-or simply not supported (e.g. <<mapper-pojo-standalone-indexing-automatic,with the Standalone POJO Mapper>>),
+When <<listener-triggered-indexing,listener-triggered indexing>> is <<mapping-annotations,disabled>>
+or simply not supported (e.g. <<mapper-pojo-standalone-indexing-listener-triggered,with the Standalone POJO Mapper>>),
 the indexes will start empty and stay that way
 until explicit indexing commands are sent to Hibernate Search.
 
@@ -122,7 +122,7 @@ indexing happens in background threads and is always asynchronous.
 When a transaction is committed (<<mapper-orm,Hibernate ORM integration>>)
 or the `SearchSession` is closed (<<mapper-pojo-standalone,Standalone POJO Mapper>>),
 <<coordination-none,with default coordination settings>>,
-the execution of the indexing plan (<<indexing-automatic,automatic>> or otherwise)
+the execution of the indexing plan (<<listener-triggered-indexing,listener-triggered>> or otherwise)
 can block the application thread
 until indexing reaches a certain level of completion.
 
@@ -204,7 +204,7 @@ The built-in strategies can be retrieved by calling:
 * `IndexingPlanSynchronizationStrategy.readSync()`
 * or `IndexingPlanSynchronizationStrategy.sync()`
 
-.Overriding the automatic indexing synchronization strategy
+.Overriding the indexing plan synchronization strategy
 ====
 [source, JAVA, indent=0]
 ----

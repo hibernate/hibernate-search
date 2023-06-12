@@ -9,6 +9,6 @@ and a summary of the differences between each architecture,
 see <<architecture-examples>>.
 
 For a summary of the differences between coordination strategies
-specifically in the context of automatic indexing,
-see <<indexing-automatic-concepts>>.
+specifically in the context of listener-triggered indexing,
+see <<listener-triggered-indexing-concepts>>.
 ====

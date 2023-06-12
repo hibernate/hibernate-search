@@ -474,7 +474,7 @@ The `simple` layout is a bit more complex than it could be, but it follows the b
 
 Using aliases has a significant advantage over directly targeting the index:
 it makes full reindexing on a live application possible without downtime,
-which is useful in particular when <<indexing-automatic,automatic indexing>> is disabled
+which is useful in particular when <<listener-triggered-indexing,listener-triggered indexing>> is disabled
 (<<indexing-automatic-configuration,completely>> or <<mapping-reindexing-reindexonupdate,partially>>)
 and you need to fully reindex periodically (for example on a daily basis).
 

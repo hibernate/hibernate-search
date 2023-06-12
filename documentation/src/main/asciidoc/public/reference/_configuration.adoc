@@ -398,7 +398,7 @@ and <<architecture-hsearch-components-backend,backends>>.
 
 Hibernate Search generally propagates exceptions occurring in background threads to the user thread,
 but in some cases, such as Lucene segment merging failures,
-or <<indexing-plan-synchronization-failures,some failures during automatic indexing>>,
+or <<indexing-plan-synchronization-failures,some indexing plan synchronization failures>>,
 the exception in background threads cannot be propagated.
 By default, when that happens, the failure is logged at the `ERROR` level.
 

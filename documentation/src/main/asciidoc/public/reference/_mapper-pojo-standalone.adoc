@@ -20,7 +20,7 @@ beyond the fact they are represented as POJOs,
 it can be more complex to use than the <<mapper-orm,Hibernate ORM integration>>.
 In particular:
 
-* This mapper <<mapper-pojo-standalone-indexing-automatic,does not provide automatic indexing>>:
+* This mapper <<mapper-pojo-standalone-indexing-listener-triggered,cannot detect entity changes on its own>>:
 all indexing <<mapper-pojo-standalone-indexing-plan,must be explicit>>.
 * Loading of entities as hits in the result of a <<search-dsl-query,search query>>
 must be <<mapper-pojo-standalone-search-query-loading,implemented on a case-by-case basis>>.
@@ -133,11 +133,11 @@ for its mapping:
 [[mapper-pojo-standalone-indexing]]
 == Indexing
 
-[[mapper-pojo-standalone-indexing-automatic]]
-=== Automatic indexing
+[[mapper-pojo-standalone-indexing-listener-triggered]]
+=== [[mapper-pojo-standalone-indexing-automatic]] Listener-triggered indexing
 
 The Standalone POJO Mapper does not provide "implicit" indexing
-similar to the <<indexing-automatic,automatic indexing>> in the <<mapper-orm,Hibernate ORM integration>>.
+similar to the <<listener-triggered-indexing,listener-triggered indexing>> in the <<mapper-orm,Hibernate ORM integration>>.
 
 Instead, you must index explicitly with an <<mapper-pojo-standalone-indexing-plan,indexing plan>>.
 

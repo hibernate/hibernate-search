@@ -66,14 +66,14 @@ The goal of _mapping_, in Hibernate search, is to resolve these mismatches
 by defining how to transform one or more entities into a document,
 and how to resolve a search hit back into the original entity.
 This is the main added value of Hibernate Search,
-the basis for everything else from automatic indexing to the various search DSLs.
+the basis for everything else from <<architecture-hsearch-indexing,indexing>> to the various search DSLs.
 
 Mapping is usually configured using annotations in the entity model,
 but this can also be achieved using a programmatic API.
 To learn more about how to configure mapping, see <<mapping>>.
 
 To learn how to index the resulting documents, see <<indexing>>
-(hint: for the <<mapper-orm,Hibernate ORM integration>>, it's automatic).
+(hint: for the <<mapper-orm,Hibernate ORM integration>>, it's <<listener-triggered-indexing,automatic>>).
 
 To learn how to search with an API
 that takes advantage of the mapping to be closer to the entity model,
@@ -201,7 +201,7 @@ but they are a trade-off that improves performance.
 
 Different factors influence when refreshes and commit happen:
 
-* <<indexing-automatic,Automatic indexing>> and <<indexing-plan,indexing plans>> will, by default,
+* <<listener-triggered-indexing,Listener-triggered indexing>> and <<indexing-plan,explicit indexing>> will, by default,
 require that a commit of the index writer is performed after each set of changes,
 meaning the changes are safe after the Hibernate ORM transaction commit returns (for the <<mapper-orm,Hibernate ORM integration>>)
 or the ``SearchSession``'s `close()` method returns (for the <<mapper-pojo-standalone,Standalone POJO Mapper>>).

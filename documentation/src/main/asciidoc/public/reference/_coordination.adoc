@@ -44,7 +44,7 @@ See the following subsections for details about available strategies.
 The default strategy is the simplest and does not involve any additional infrastructure
 for communication between application nodes.
 
-All <<indexing-automatic,automatic indexing>> operations
+All <<architecture-hsearch-indexing,explicit or listener-triggered indexing>> operations
 are executed directly in application threads,
 which gives this strategy the unique ability to provide <<indexing-plan-synchronization,synchronous indexing>>,
 at the cost of a few limitations:
@@ -58,7 +58,7 @@ include::../components/_coordination-comparison-note.adoc[]
 === How indexing works without coordination
 
 [[coordination-none-indexing-detected-changes]]
-Changes have to occur in the ORM session in order to be detected for <<indexing-automatic,automatic indexing>>::
+Changes have to occur in the ORM session in order to trigger <<listener-triggered-indexing,indexing listeners>>::
 See <<indexing-automatic-concepts-changes-in-session>> for more details.
 [[coordination-none-indexing-association-consistency]]
 Associations must be updated on both sides::
@@ -154,7 +154,7 @@ include::../components/_incubating-warning.adoc[]
 The `outbox-polling` strategy implements coordination through
 <<coordination-outbox-polling-schema,additional tables>> in the application database.
 
-<<indexing-automatic,Automatic indexing>> is implemented
+<<architecture-hsearch-indexing,Explicit and listener-triggered indexing>> are implemented
 by pushing events to an outbox table within the same transaction as the entity changes,
 and polling this outbox table from background processors which perform indexing.
 
@@ -195,7 +195,7 @@ include::../components/_coordination-comparison-note.adoc[]
 === [[coordination-database-polling-indexing]] How indexing works with `outbox-polling` coordination
 
 [[coordination-outbox-polling-indexing-detected-changes]]
-Changes have to occur in the ORM session in order to be detected for <<indexing-automatic,automatic indexing>>::
+Changes have to occur in the ORM session in order to trigger <<listener-triggered-indexing,indexing listeners>>::
 See <<indexing-automatic-concepts-changes-in-session>> for more details.
 [[coordination-outbox-polling-indexing-association-consistency]]
 Associations must be updated on both sides::

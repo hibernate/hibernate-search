@@ -209,7 +209,7 @@ Here, the `Author` class defines a single indexed field, `name`.
 Thus adding `@IndexedEmbedded` to the `authors` property of `Book`
 will add a single field named `authors.name` to the `Book` index.
 This field will be populated automatically based on the content of the `authors` property,
-and the books will be re-indexed automatically whenever the `name` property of their author changes.
+and the books will be re-indexed whenever Hibernate Search xref:{reference-documentation-location}#architecture-hsearch-indexing[detects that the `name` property of their author changes].
 See xref:{reference-documentation-location}#mapping-indexedembedded[Mapping associated elements with `@IndexedEmbedded`] for more information.
 <7> Entities that are only `@IndexedEmbedded` in other entities,
 but do not require to be searchable by themselves, do not need to be annotated with `@Indexed`.
