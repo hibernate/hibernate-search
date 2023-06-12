@@ -26,16 +26,14 @@ class CriteriaTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E
 
 	public static <E> CriteriaTypeQueryFactory<E, ?> create(EntityDomainType<E> type,
 			String uniquePropertyName) {
-		return new CriteriaTypeQueryFactory<>( type, uniquePropertyName,
-				type.getSingularAttribute( uniquePropertyName ) );
+		return new CriteriaTypeQueryFactory<>( type, type.getSingularAttribute( uniquePropertyName ) );
 	}
 
 	private final EntityDomainType<E> type;
 	private final SingularAttribute<? super E, I> uniqueProperty;
 
-	private CriteriaTypeQueryFactory(EntityDomainType<E> type,
-			String uniquePropertyName, SingularAttribute<? super E, I> uniqueProperty) {
-		super( uniquePropertyName );
+	private CriteriaTypeQueryFactory(EntityDomainType<E> type, SingularAttribute<? super E, I> uniqueProperty) {
+		super( uniqueProperty.getJavaType(), uniqueProperty.getName() );
 		this.type = type;
 		this.uniqueProperty = uniqueProperty;
 	}
