@@ -18,8 +18,12 @@ class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> 
 
 	private final EntityMappingType entityMappingType;
 
+	@SuppressWarnings("unchecked") // Can't do better here: EntityMappingType has no generics
 	HqlTypeQueryFactory(EntityMappingType entityMappingType, String uniquePropertyName) {
-		super( uniquePropertyName );
+		super( uniquePropertyName.equals( entityMappingType.getIdentifierMapping().getAttributeName() )
+				? (Class<I>) entityMappingType.getIdentifierMapping().getJavaType().getJavaTypeClass()
+				: (Class<I>) entityMappingType.findAttributeMapping( uniquePropertyName ).getJavaType().getJavaTypeClass(),
+				uniquePropertyName );
 		this.entityMappingType = entityMappingType;
 	}
 
@@ -32,14 +36,12 @@ class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> 
 				"e", includedTypesFilter );
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
 			Set<? extends Class<? extends E>> includedTypesFilter) {
 		return createQueryWithTypesFilter( session,
 				"select e. " + uniquePropertyName + " from " + entityMappingType.getEntityName() + " e",
-				(Class<I>) entityMappingType.getIdentifierMapping().getJavaType().getJavaTypeClass(),
-				"e", includedTypesFilter );
+				uniquePropertyType, "e", includedTypesFilter );
 	}
 
 	@SuppressWarnings("unchecked")
