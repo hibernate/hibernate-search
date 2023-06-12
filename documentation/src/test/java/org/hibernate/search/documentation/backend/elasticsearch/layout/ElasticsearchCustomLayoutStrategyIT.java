@@ -40,7 +40,7 @@ public class ElasticsearchCustomLayoutStrategyIT {
 	public void smoke() {
 		URLEncodedString primaryIndexName = encodeName( Book.NAME + "-20171106-191900-000000000" );
 		elasticsearchClient.index( primaryIndexName, null, null )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withBackendProperty(

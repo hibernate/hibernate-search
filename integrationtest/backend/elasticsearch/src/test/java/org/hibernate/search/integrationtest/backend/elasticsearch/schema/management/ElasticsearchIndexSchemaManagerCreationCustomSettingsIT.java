@@ -55,7 +55,7 @@ public class ElasticsearchIndexSchemaManagerCreationCustomSettingsIT {
 	@Test
 	public void success_mergeWithNoOverlapping() {
 		elasticsearchClient.index( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		// merge the default analysis configurer with the custom settings,
 		// there are no overlapping of their definitions
@@ -121,7 +121,7 @@ public class ElasticsearchIndexSchemaManagerCreationCustomSettingsIT {
 	@Test
 	public void success_mergeWithOverlapping() {
 		elasticsearchClient.index( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		// merge the default analysis configurer with the custom settings,
 		// there are some overlapping of their definitions
@@ -174,7 +174,7 @@ public class ElasticsearchIndexSchemaManagerCreationCustomSettingsIT {
 	@Test
 	public void success_onlyCustomSettings() {
 		elasticsearchClient.index( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		// use an empty analysis configurer,
 		// so that we have only the custom settings definitions
@@ -212,7 +212,7 @@ public class ElasticsearchIndexSchemaManagerCreationCustomSettingsIT {
 	@Test
 	public void maxResultWindow() {
 		elasticsearchClient.index( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		// use an empty analysis configurer,
 		// so that we have only the custom settings definitions

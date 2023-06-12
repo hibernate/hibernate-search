@@ -58,7 +58,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		);
 
 		elasticSearchClient.index( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		setupAndCreateIndex( index );
 
@@ -82,7 +82,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		);
 
 		elasticSearchClient.index( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		setupAndCreateIndex( index );
 
@@ -104,7 +104,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		);
 
 		elasticSearchClient.index( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		setupAndCreateIndex( index );
 
@@ -127,7 +127,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		);
 
 		elasticSearchClient.index( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		setupAndCreateIndex( index );
 
@@ -150,7 +150,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		);
 
 		elasticSearchClient.index( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		setupAndCreateIndex( index );
 
