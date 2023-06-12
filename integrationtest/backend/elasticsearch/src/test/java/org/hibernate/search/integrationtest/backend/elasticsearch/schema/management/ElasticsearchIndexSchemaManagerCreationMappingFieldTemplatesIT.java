@@ -63,7 +63,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 		} );
 
 		elasticSearchClient.index( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		setupAndCreateIndex( index );
 
@@ -109,7 +109,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 		} );
 
 		elasticSearchClient.index( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		setupAndCreateIndex( index );
 
@@ -157,7 +157,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 		} );
 
 		elasticSearchClient.index( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		setupAndCreateIndex( index, Optional.of( "no-overlapping.json" ) );
 
@@ -220,7 +220,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 		} );
 
 		elasticSearchClient.index( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		setupAndCreateIndex( index, Optional.of( "no-overlapping-with-templates.json" ) );
 
@@ -284,7 +284,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 		} );
 
 		elasticSearchClient.index( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		setupAndCreateIndex( index, Optional.of( "no-overlapping.json" ) );
 

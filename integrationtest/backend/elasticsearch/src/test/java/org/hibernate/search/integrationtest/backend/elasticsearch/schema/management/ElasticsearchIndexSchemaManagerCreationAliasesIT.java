@@ -64,7 +64,7 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 	@Test
 	public void success_defaultLayoutStrategy() {
 		elasticsearchClient.index( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		setupAndCreateIndex( null );
 
@@ -80,7 +80,7 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 	@Test
 	public void success_noAliasLayoutStrategy() {
 		elasticsearchClient.indexNoAlias( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		setupAndCreateIndex( "no-alias" );
 
@@ -94,7 +94,7 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 	@Test
 	public void success_customLayoutStrategy() {
 		elasticsearchClient.index( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		setupAndCreateIndex( new StubSingleIndexLayoutStrategy( "custom-write", "custom-read" ) );
 

@@ -66,7 +66,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 	private ScheduledExecutorService timeoutExecutorService;
 	private ElasticsearchClientImplementor client;
 
-	private final List<URLEncodedString> createdIndicesNames = new ArrayList<>();
+	private final List<URLEncodedString> indexesToCleanUp = new ArrayList<>();
 
 	public ElasticsearchTestDialect getDialect() {
 		return dialect;
@@ -98,6 +98,11 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 			this.primaryIndexName = primaryIndexName;
 			this.writeAlias = writeAlias;
 			this.readAlias = readAlias;
+
+			// Always delete indexes manipulated through test client after the test;
+			// leaving indexes on the cluster could cause problems
+			// with Amazon OpenSearch Serverless in particular.
+			TestElasticsearchClient.this.registerIndexForCleanup( primaryIndexName );
 		}
 
 		public boolean exists() {
@@ -122,11 +127,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 
 		public IndexClient ensureDoesNotExist() {
 			TestElasticsearchClient.this.ensureIndexDoesNotExist( primaryIndexName );
-			return this;
-		}
-
-		public IndexClient registerForCleanup() {
-			TestElasticsearchClient.this.registerIndexForCleanup( primaryIndexName );
 			return this;
 		}
 
@@ -335,7 +335,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 	}
 
 	private void registerIndexForCleanup(URLEncodedString indexName) {
-		createdIndicesNames.add( indexName );
+		indexesToCleanUp.add( indexName );
 	}
 
 	private boolean exists(final URLEncodedString indexName) {
@@ -509,8 +509,8 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 	}
 
 	private void close(Closer<IOException> closer) {
-		closer.pushAll( this::tryDeleteESIndex, createdIndicesNames );
-		createdIndicesNames.clear();
+		closer.pushAll( this::tryDeleteESIndex, indexesToCleanUp );
+		indexesToCleanUp.clear();
 		closer.push( this::tryCloseClient, client );
 		client = null;
 		closer.push( ThreadPoolProviderImpl::close, threadPoolProvider );

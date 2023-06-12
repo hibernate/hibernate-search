@@ -105,7 +105,7 @@ public class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 	@TestForIssue(jiraKey = "HSEARCH-2789")
 	public void doesNotExist() throws Exception {
 		elasticSearchClient.index( index.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		setupAndCreateIndexIfMissingOnly();
 

@@ -57,7 +57,7 @@ public class ElasticsearchIndexSchemaManagerCreationAnalyzerIT {
 	@Test
 	public void success_simple() {
 		elasticSearchClient.index( mainIndex.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
@@ -121,9 +121,9 @@ public class ElasticsearchIndexSchemaManagerCreationAnalyzerIT {
 	@Test
 	public void success_multiIndex() {
 		elasticSearchClient.index( mainIndex.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 		elasticSearchClient.index( otherIndex.name() )
-				.ensureDoesNotExist().registerForCleanup();
+				.ensureDoesNotExist();
 
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
