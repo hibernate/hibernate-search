@@ -20,11 +20,11 @@ import org.hibernate.StatelessSession;
 import org.hibernate.StatelessSessionBuilder;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.metamodel.MappingMetamodel;
-import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.metamodel.mapping.EmbeddableMappingType;
+import org.hibernate.metamodel.mapping.EntityIdentifierMapping;
+import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.IndexScope;
 import org.hibernate.search.util.common.impl.StringHelper;
-import org.hibernate.type.ComponentType;
-import org.hibernate.type.Type;
 
 /**
  * Internal utility class for persistence usage.
@@ -104,20 +104,19 @@ public final class PersistenceUtil {
 	}
 
 	private static <T> EntityTypeDescriptor createDescriptor(MappingMetamodel metamodel, Class<T> type) {
-		EntityPersister entityPersister = metamodel.findEntityDescriptor( type );
-		IdOrder idOrder = createIdOrder( entityPersister );
+		EntityMappingType entityMappingType = metamodel.findEntityDescriptor( type );
+		IdOrder idOrder = createIdOrder( entityMappingType );
 		return new EntityTypeDescriptor( type, idOrder );
 	}
 
-	private static IdOrder createIdOrder(EntityPersister entityPersister) {
-		final String identifierPropertyName = entityPersister.getIdentifierPropertyName();
-		final Type identifierType = entityPersister.getIdentifierType();
-		if ( identifierType instanceof ComponentType ) {
-			final ComponentType componentType = (ComponentType) identifierType;
-			return new CompositeIdOrder( identifierPropertyName, componentType );
+	private static IdOrder createIdOrder(EntityMappingType entityMappingType) {
+		EntityIdentifierMapping identifierMapping = entityMappingType.getIdentifierMapping();
+		if ( identifierMapping.getPartMappingType() instanceof EmbeddableMappingType ) {
+			return new CompositeIdOrder( identifierMapping,
+					(EmbeddableMappingType) identifierMapping.getPartMappingType() );
 		}
 		else {
-			return new SingularIdOrder( identifierPropertyName );
+			return new SingularIdOrder( identifierMapping.getAttributeName() );
 		}
 	}
 

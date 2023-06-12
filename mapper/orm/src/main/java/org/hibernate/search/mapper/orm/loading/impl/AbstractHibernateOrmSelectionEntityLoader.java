@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.hibernate.QueryTimeoutException;
 import org.hibernate.exception.LockTimeoutException;
-import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchQueryHints;
@@ -19,14 +19,14 @@ import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelectionEntityLoader<E> {
 	protected static final String IDS_PARAMETER_NAME = "ids";
 
-	protected final EntityPersister entityPersister;
+	protected final EntityMappingType entityMappingType;
 	protected final LoadingSessionContext sessionContext;
 	protected final MutableEntityLoadingOptions loadingOptions;
 	protected final TypeQueryFactory<E, ?> queryFactory;
 
-	public AbstractHibernateOrmSelectionEntityLoader(EntityPersister entityPersister, TypeQueryFactory<E, ?> queryFactory,
+	public AbstractHibernateOrmSelectionEntityLoader(EntityMappingType entityMappingType, TypeQueryFactory<E, ?> queryFactory,
 			LoadingSessionContext sessionContext, MutableEntityLoadingOptions loadingOptions) {
-		this.entityPersister = entityPersister;
+		this.entityMappingType = entityMappingType;
 		this.sessionContext = sessionContext;
 		this.loadingOptions = loadingOptions;
 		this.queryFactory = queryFactory;
@@ -58,7 +58,7 @@ abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelec
 			query.setHint( HibernateOrmSearchQueryHints.JAVAX_TIMEOUT, Math.toIntExact( timeout ) );
 		}
 
-		EntityGraphHint<?> entityGraphHint = loadingOptions.entityGraphHintOrNullForType( entityPersister );
+		EntityGraphHint<?> entityGraphHint = loadingOptions.entityGraphHintOrNullForType( entityMappingType );
 		if ( entityGraphHint != null ) {
 			query.applyGraph( entityGraphHint.graph, entityGraphHint.semantic );
 		}

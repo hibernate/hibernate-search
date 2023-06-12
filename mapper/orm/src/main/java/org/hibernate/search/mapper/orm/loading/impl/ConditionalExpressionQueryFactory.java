@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.loading.impl;
 import java.util.Set;
 
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
 
@@ -23,21 +23,21 @@ public abstract class ConditionalExpressionQueryFactory<E, I> implements TypeQue
 	}
 
 	@Override
-	public Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityPersister persister,
+	public Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityMappingType entityMappingType,
 			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression) {
 		return createQueryWithConditionalExpression( session,
-				"select count(e) from " + persister.getEntityName() + " e",
+				"select count(e) from " + entityMappingType.getEntityName() + " e",
 				Long.class, "e", includedTypesFilter, conditionalExpression
 		);
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // Can't do better here: EntityPersister has no generics
-	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityPersister persister,
+	@SuppressWarnings("unchecked") // Can't do better here: EntityMappingType has no generics
+	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityMappingType entityMappingType,
 			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression) {
 		return createQueryWithConditionalExpression( session,
-				"select e. " + uniquePropertyName + " from " + persister.getEntityName() + " e",
-				(Class<I>) persister.getIdentifierType().getReturnedClass(), "e",
+				"select e. " + uniquePropertyName + " from " + entityMappingType.getEntityName() + " e",
+				(Class<I>) entityMappingType.getIdentifierMapping().getJavaType().getJavaTypeClass(), "e",
 				includedTypesFilter, conditionalExpression
 		);
 	}
