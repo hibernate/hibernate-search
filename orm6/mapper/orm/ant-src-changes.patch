@@ -34,49 +34,86 @@ index 289a060c28..60e392d528 100644
  				.build();
  		// Orchestrate bootstrap and shutdown
 diff --git a/main/java/org/hibernate/search/mapper/orm/common/impl/HibernateOrmUtils.java b/main/java/org/hibernate/search/mapper/orm/common/impl/HibernateOrmUtils.java
-index d6ed099098..e3fee26f2c 100644
+index d6ed099098..d9db0bab3d 100644
 --- a/main/java/org/hibernate/search/mapper/orm/common/impl/HibernateOrmUtils.java
 +++ b/main/java/org/hibernate/search/mapper/orm/common/impl/HibernateOrmUtils.java
-@@ -21,7 +21,8 @@
+@@ -16,14 +16,14 @@
+ import jakarta.persistence.EntityManager;
+ import jakarta.persistence.EntityManagerFactory;
+ 
+-import org.hibernate.AssertionFailure;
+ import org.hibernate.Session;
  import org.hibernate.engine.spi.SessionFactoryImplementor;
  import org.hibernate.engine.spi.SessionImplementor;
  import org.hibernate.mapping.Property;
 -import org.hibernate.metamodel.spi.MetamodelImplementor;
+-import org.hibernate.persister.entity.EntityPersister;
 +import org.hibernate.metamodel.MappingMetamodel;
 +import org.hibernate.metamodel.mapping.EntityMappingType;
- import org.hibernate.persister.entity.EntityPersister;
  import org.hibernate.search.mapper.orm.logging.impl.Log;
++import org.hibernate.search.util.common.AssertionFailure;
  import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
-@@ -77,13 +78,12 @@ public static EntityPersister toRootEntityType(SessionFactoryImplementor session
- 		 * where A and C are entity types and B is a mapped superclass.
- 		 * So we need to exclude non-entity types, and for that we need the Hibernate ORM metamodel.
- 		 */
--		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
-+		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
- 		String rootEntityName = entityType.getRootEntityName();
--		return metamodel.entityPersister( rootEntityName );
-+		return metamodel.getEntityDescriptor( rootEntityName );
+ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+ import org.hibernate.service.Service;
+@@ -65,25 +65,11 @@ public static SessionImplementor toSessionImplementor(EntityManager entityManage
+ 		}
  	}
  
+-	private static boolean isSuperTypeOf(EntityPersister type1, EntityPersister type2) {
+-		return type1.isSubclassEntityName( type2.getEntityName() );
++	private static boolean isSuperTypeOf(EntityMappingType type1, EntityMappingType type2) {
++		return type1.getSubclassEntityNames().contains( type2.getEntityName() );
+ 	}
+ 
+-	public static EntityPersister toRootEntityType(SessionFactoryImplementor sessionFactory,
+-			EntityPersister entityType) {
+-		/*
+-		 * We need to rely on Hibernate ORM's SPIs: this is complex stuff.
+-		 * For example there may be class hierarchies such as A > B > C
+-		 * where A and C are entity types and B is a mapped superclass.
+-		 * So we need to exclude non-entity types, and for that we need the Hibernate ORM metamodel.
+-		 */
+-		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
+-		String rootEntityName = entityType.getRootEntityName();
+-		return metamodel.entityPersister( rootEntityName );
+-	}
+-
 -	public static EntityPersister toMostSpecificCommonEntitySuperType(MetamodelImplementor metamodel,
 -			EntityPersister type1, EntityPersister type2) {
-+	public static EntityPersister toMostSpecificCommonEntitySuperType(EntityPersister type1, EntityPersister type2) {
++	public static EntityMappingType toMostSpecificCommonEntitySuperType(EntityMappingType type1, EntityMappingType type2) {
  		/*
  		 * We need to rely on Hibernate ORM's SPIs: this is complex stuff.
  		 * For example there may be class hierarchies such as A > B > C
-@@ -93,9 +93,8 @@ public static EntityPersister toMostSpecificCommonEntitySuperType(MetamodelImple
+@@ -91,35 +77,32 @@ public static EntityPersister toMostSpecificCommonEntitySuperType(MetamodelImple
+ 		 * So even if we know the two types have a common superclass,
+ 		 * we need to skip non-entity superclasses, and for that we need the Hibernate ORM metamodel.
  		 */
- 		EntityPersister superTypeCandidate = type1;
+-		EntityPersister superTypeCandidate = type1;
++		EntityMappingType superTypeCandidate = type1;
  		while ( superTypeCandidate != null && !isSuperTypeOf( superTypeCandidate, type2 ) ) {
 -			String superSuperTypeEntityName = superTypeCandidate.getEntityMetamodel().getSuperclass();
 -			superTypeCandidate = superSuperTypeEntityName == null ? null
 -					: metamodel.entityPersister( superSuperTypeEntityName ).getEntityPersister();
-+			EntityMappingType superSuperType = superTypeCandidate.getSuperMappingType();
-+			superTypeCandidate = superSuperType == null ? null : superSuperType.getEntityPersister();
++			superTypeCandidate = superTypeCandidate.getSuperMappingType();
  		}
  		if ( superTypeCandidate == null ) {
  			throw new AssertionFailure(
-@@ -116,10 +115,10 @@ public static boolean targetsAllConcreteSubTypes(SessionFactoryImplementor sessi
+ 					"Cannot find a common entity supertype for " + type1.getEntityName()
+ 							+ " and " + type2.getEntityName() + "."
+-							+ " There is a bug in Hibernate Search, please report it."
+ 			);
+ 		}
+ 		return superTypeCandidate;
+ 	}
+ 
+ 	public static boolean targetsAllConcreteSubTypes(SessionFactoryImplementor sessionFactory,
+-			EntityPersister parentType, Collection<?> targetConcreteSubTypes) {
+-		@SuppressWarnings("unchecked")
+-		Set<String> subClassEntityNames = parentType.getEntityMetamodel().getSubclassEntityNames();
++			EntityMappingType parentType, Collection<?> targetConcreteSubTypes) {
++		Set<String> subClassEntityNames = parentType.getSubclassEntityNames();
+ 		// Quick check to return true immediately if all subtypes are concrete
+ 		if ( subClassEntityNames.size() == targetConcreteSubTypes.size() ) {
  			return true;
  		}
  
@@ -85,44 +122,314 @@ index d6ed099098..e3fee26f2c 100644
  		int concreteSubTypesCount = 0;
  		for ( String subClassEntityName : subClassEntityNames ) {
 -			if ( !metamodel.entityPersister( subClassEntityName ).getEntityMetamodel().isAbstract() ) {
-+			if ( !metamodel.getEntityDescriptor( subClassEntityName ).isAbstract() ) {
++			EntityMappingType subclassType = metamodel.getEntityDescriptor( subClassEntityName );
++			if ( !subclassType.isAbstract() ) {
  				++concreteSubTypesCount;
  			}
  		}
+@@ -131,7 +114,7 @@ public static <T extends Service> T getServiceOrFail(ServiceRegistry serviceRegi
+ 			Class<T> serviceClass) {
+ 		T service = serviceRegistry.getService( serviceClass );
+ 		if ( service == null ) {
+-			throw new org.hibernate.search.util.common.AssertionFailure( "A required service was missing. Missing service: " + serviceClass );
++			throw new AssertionFailure( "A required service was missing. Missing service: " + serviceClass );
+ 		}
+ 		return service;
+ 	}
 diff --git a/main/java/org/hibernate/search/mapper/orm/event/impl/HibernateSearchEventListener.java b/main/java/org/hibernate/search/mapper/orm/event/impl/HibernateSearchEventListener.java
-index 87538e160e..2b0f3c7ee5 100644
+index b50b14e757..7303b724e7 100644
 --- a/main/java/org/hibernate/search/mapper/orm/event/impl/HibernateSearchEventListener.java
 +++ b/main/java/org/hibernate/search/mapper/orm/event/impl/HibernateSearchEventListener.java
-@@ -344,7 +344,7 @@ private void processCollectionEvent(AbstractCollectionEvent event) {
+@@ -35,11 +35,13 @@
+ import org.hibernate.event.spi.PostInsertEventListener;
+ import org.hibernate.event.spi.PostUpdateEvent;
+ import org.hibernate.event.spi.PostUpdateEventListener;
++import org.hibernate.metamodel.mapping.EntityMappingType;
+ import org.hibernate.persister.entity.EntityPersister;
+ import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
+ import org.hibernate.search.mapper.orm.logging.impl.Log;
+ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
+ import org.hibernate.search.mapper.pojo.work.spi.PojoTypeIndexingPlan;
++import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
+ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+ 
+ /**
+@@ -289,8 +291,8 @@ private PojoIndexingPlan getCurrentIndexingPlanIfExisting(SessionImplementor ses
+ 		return contextProvider.currentIndexingPlanIfExisting( sessionImplementor );
+ 	}
+ 
+-	private HibernateOrmListenerTypeContext getTypeContextOrNull(EntityPersister entityPersister) {
+-		String entityName = entityPersister.getEntityName();
++	private HibernateOrmListenerTypeContext getTypeContextOrNull(EntityMappingType entityMappingType) {
++		String entityName = entityMappingType.getEntityName();
+ 		return contextProvider.typeContextProvider().byHibernateOrmEntityName().getOrNull( entityName );
+ 	}
+ 
+@@ -362,8 +364,8 @@ private void processCollectionEvent(AbstractCollectionEvent event) {
+ 	 * Required since Hibernate ORM 4.3
  	 */
  	@Override
- 	@SuppressWarnings("deprecation") // Deprecated but abstract, so we have to implement it...
+-	@SuppressWarnings("deprecation") // Deprecated but abstract, so we have to implement it...
 -	public boolean requiresPostCommitHanding(EntityPersister persister) {
++	@SuppressForbiddenApis(reason = "We are forced to implement this method and it requires accepting an EntityPersister")
 +	public boolean requiresPostCommitHandling(EntityPersister persister) {
  		// TODO Tests seem to pass using _false_ but we might be able to take
  		// advantage of this new hook?
  		return false;
+diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/AbstractHibernateOrmLoadingStrategy.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/AbstractHibernateOrmLoadingStrategy.java
+index a17a46c893..45316ede5d 100644
+--- a/main/java/org/hibernate/search/mapper/orm/loading/impl/AbstractHibernateOrmLoadingStrategy.java
++++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/AbstractHibernateOrmLoadingStrategy.java
+@@ -13,7 +13,7 @@
+ import java.util.Set;
+ 
+ import org.hibernate.engine.spi.SessionFactoryImplementor;
+-import org.hibernate.persister.entity.EntityPersister;
++import org.hibernate.metamodel.mapping.EntityMappingType;
+ import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
+ import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
+ import org.hibernate.search.util.common.AssertionFailure;
+@@ -22,13 +22,13 @@
+ 		implements HibernateOrmEntityLoadingStrategy<E, I> {
+ 
+ 	private final SessionFactoryImplementor sessionFactory;
+-	private final EntityPersister rootEntityPersister;
++	private final EntityMappingType rootEntityMappingType;
+ 	private final TypeQueryFactory<E, I> queryFactory;
+ 
+ 	AbstractHibernateOrmLoadingStrategy(SessionFactoryImplementor sessionFactory,
+-			EntityPersister rootEntityPersister, TypeQueryFactory<E, I> queryFactory) {
++			EntityMappingType rootEntityMappingType, TypeQueryFactory<E, I> queryFactory) {
+ 		this.sessionFactory = sessionFactory;
+-		this.rootEntityPersister = rootEntityPersister;
++		this.rootEntityMappingType = rootEntityMappingType;
+ 		this.queryFactory = queryFactory;
+ 	}
+ 
+@@ -36,7 +36,7 @@
+ 	public HibernateOrmQueryLoader<E, I> createQueryLoader(
+ 			List<LoadingTypeContext<? extends E>> typeContexts, Optional<ConditionalExpression> conditionalExpression) {
+ 		Set<Class<? extends E>> includedTypesFilter;
+-		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, rootEntityPersister, typeContexts ) ) {
++		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, rootEntityMappingType, typeContexts ) ) {
+ 			// All concrete types are included, no need to filter by type.
+ 			includedTypesFilter = Collections.emptySet();
+ 		}
+@@ -52,9 +52,9 @@ public HibernateOrmQueryLoader<E, I> createQueryLoader(
+ 				throw new AssertionFailure( "conditional expression is always defined on a single type" );
+ 			}
+ 
+-			EntityPersister entityPersister = typeContexts.get( 0 ).entityPersister();
++			EntityMappingType entityMappingType = typeContexts.get( 0 ).entityMappingType();
+ 			return new HibernateOrmQueryLoader<>(
+-					queryFactory, entityPersister, includedTypesFilter, conditionalExpression.get() );
++					queryFactory, entityMappingType, includedTypesFilter, conditionalExpression.get() );
+ 		}
+ 		return new HibernateOrmQueryLoader<>( queryFactory, includedTypesFilter );
+ 	}
+diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/AbstractHibernateOrmSelectionEntityLoader.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/AbstractHibernateOrmSelectionEntityLoader.java
+index 4fa0ba9e1b..1dabd67a96 100644
+--- a/main/java/org/hibernate/search/mapper/orm/loading/impl/AbstractHibernateOrmSelectionEntityLoader.java
++++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/AbstractHibernateOrmSelectionEntityLoader.java
+@@ -10,7 +10,7 @@
+ 
+ import org.hibernate.QueryTimeoutException;
+ import org.hibernate.exception.LockTimeoutException;
+-import org.hibernate.persister.entity.EntityPersister;
++import org.hibernate.metamodel.mapping.EntityMappingType;
+ import org.hibernate.query.Query;
+ import org.hibernate.search.engine.common.timing.Deadline;
+ import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchQueryHints;
+@@ -19,14 +19,14 @@
+ abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelectionEntityLoader<E> {
+ 	protected static final String IDS_PARAMETER_NAME = "ids";
+ 
+-	protected final EntityPersister entityPersister;
++	protected final EntityMappingType entityMappingType;
+ 	protected final LoadingSessionContext sessionContext;
+ 	protected final MutableEntityLoadingOptions loadingOptions;
+ 	protected final TypeQueryFactory<E, ?> queryFactory;
+ 
+-	public AbstractHibernateOrmSelectionEntityLoader(EntityPersister entityPersister, TypeQueryFactory<E, ?> queryFactory,
++	public AbstractHibernateOrmSelectionEntityLoader(EntityMappingType entityMappingType, TypeQueryFactory<E, ?> queryFactory,
+ 			LoadingSessionContext sessionContext, MutableEntityLoadingOptions loadingOptions) {
+-		this.entityPersister = entityPersister;
++		this.entityMappingType = entityMappingType;
+ 		this.sessionContext = sessionContext;
+ 		this.loadingOptions = loadingOptions;
+ 		this.queryFactory = queryFactory;
+@@ -58,7 +58,7 @@ final Query<E> createQuery(int fetchSize, Long timeout) {
+ 			query.setHint( HibernateOrmSearchQueryHints.JAVAX_TIMEOUT, Math.toIntExact( timeout ) );
+ 		}
+ 
+-		EntityGraphHint<?> entityGraphHint = loadingOptions.entityGraphHintOrNullForType( entityPersister );
++		EntityGraphHint<?> entityGraphHint = loadingOptions.entityGraphHintOrNullForType( entityMappingType );
+ 		if ( entityGraphHint != null ) {
+ 			query.applyGraph( entityGraphHint.graph, entityGraphHint.semantic );
+ 		}
+diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/ConditionalExpressionQueryFactory.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/ConditionalExpressionQueryFactory.java
+index 81fa041778..f9c69279ad 100644
+--- a/main/java/org/hibernate/search/mapper/orm/loading/impl/ConditionalExpressionQueryFactory.java
++++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/ConditionalExpressionQueryFactory.java
+@@ -9,7 +9,7 @@
+ import java.util.Set;
+ 
+ import org.hibernate.engine.spi.SharedSessionContractImplementor;
+-import org.hibernate.persister.entity.EntityPersister;
++import org.hibernate.metamodel.mapping.EntityMappingType;
+ import org.hibernate.query.Query;
+ import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
+ 
+@@ -23,21 +23,21 @@ public ConditionalExpressionQueryFactory(String uniquePropertyName) {
+ 	}
+ 
+ 	@Override
+-	public Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityPersister persister,
++	public Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityMappingType entityMappingType,
+ 			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression) {
+ 		return createQueryWithConditionalExpression( session,
+-				"select count(e) from " + persister.getEntityName() + " e",
++				"select count(e) from " + entityMappingType.getEntityName() + " e",
+ 				Long.class, "e", includedTypesFilter, conditionalExpression
+ 		);
+ 	}
+ 
+ 	@Override
+-	@SuppressWarnings("unchecked") // Can't do better here: EntityPersister has no generics
+-	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityPersister persister,
++	@SuppressWarnings("unchecked") // Can't do better here: EntityMappingType has no generics
++	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityMappingType entityMappingType,
+ 			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression) {
+ 		return createQueryWithConditionalExpression( session,
+-				"select e. " + uniquePropertyName + " from " + persister.getEntityName() + " e",
+-				(Class<I>) persister.getIdentifierType().getReturnedClass(), "e",
++				"select e. " + uniquePropertyName + " from " + entityMappingType.getEntityName() + " e",
++				(Class<I>) entityMappingType.getIdentifierMapping().getJavaType().getJavaTypeClass(), "e",
+ 				includedTypesFilter, conditionalExpression
+ 		);
+ 	}
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmEntityIdEntityLoadingStrategy.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmEntityIdEntityLoadingStrategy.java
-index 21503d08be..45b9fc0a50 100644
+index 21503d08be..af34072fdf 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmEntityIdEntityLoadingStrategy.java
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmEntityIdEntityLoadingStrategy.java
-@@ -12,7 +12,6 @@
+@@ -12,8 +12,7 @@
  import org.hibernate.AssertionFailure;
  import org.hibernate.engine.spi.SessionFactoryImplementor;
  import org.hibernate.engine.spi.SessionImplementor;
 -import org.hibernate.metamodel.spi.MetamodelImplementor;
- import org.hibernate.persister.entity.EntityPersister;
+-import org.hibernate.persister.entity.EntityPersister;
++import org.hibernate.metamodel.mapping.EntityMappingType;
  import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
  import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-@@ -149,7 +148,6 @@ private PojoSelectionEntityLoader<?> doCreate(EntityPersister entityPersister,
+ import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
+@@ -22,20 +21,20 @@
+ 		extends AbstractHibernateOrmLoadingStrategy<E, I> {
  
- 	private static EntityPersister toMostSpecificCommonEntitySuperType(SessionImplementor session,
- 			Iterable<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
+ 	public static HibernateOrmEntityLoadingStrategy<?, ?> create(SessionFactoryImplementor sessionFactory,
+-			EntityPersister entityPersister) {
+-		EntityPersister rootEntityPersister = HibernateOrmUtils.toRootEntityType( sessionFactory, entityPersister );
+-		TypeQueryFactory<?, ?> queryFactory = TypeQueryFactory.create( sessionFactory, rootEntityPersister,
+-				entityPersister.getIdentifierPropertyName() );
+-		return new HibernateOrmEntityIdEntityLoadingStrategy<>( sessionFactory, rootEntityPersister, queryFactory );
++			EntityMappingType entityMappingType) {
++		EntityMappingType rootEntityMappingType = entityMappingType.getRootEntityDescriptor();
++		TypeQueryFactory<?, ?> queryFactory = TypeQueryFactory.create( sessionFactory, rootEntityMappingType,
++				entityMappingType.getIdentifierMapping().getAttributeName() );
++		return new HibernateOrmEntityIdEntityLoadingStrategy<>( sessionFactory, rootEntityMappingType, queryFactory );
+ 	}
+ 
+-	private final EntityPersister rootEntityPersister;
++	private final EntityMappingType rootEntityMappingType;
+ 	private final TypeQueryFactory<E, I> queryFactory;
+ 
+ 	HibernateOrmEntityIdEntityLoadingStrategy(SessionFactoryImplementor sessionFactory,
+-			EntityPersister rootEntityPersister, TypeQueryFactory<E, I> queryFactory) {
+-		super( sessionFactory, rootEntityPersister, queryFactory );
+-		this.rootEntityPersister = rootEntityPersister;
++			EntityMappingType rootEntityMappingType, TypeQueryFactory<E, I> queryFactory) {
++		super( sessionFactory, rootEntityMappingType, queryFactory );
++		this.rootEntityMappingType = rootEntityMappingType;
+ 		this.queryFactory = queryFactory;
+ 	}
+ 
+@@ -47,12 +46,12 @@ public boolean equals(Object obj) {
+ 		HibernateOrmEntityIdEntityLoadingStrategy<?, ?> other = (HibernateOrmEntityIdEntityLoadingStrategy<?, ?>) obj;
+ 		// If the root entity type is different,
+ 		// the factories work in separate ID spaces and should be used separately.
+-		return rootEntityPersister.equals( other.rootEntityPersister );
++		return rootEntityMappingType.equals( other.rootEntityMappingType );
+ 	}
+ 
+ 	@Override
+ 	public int hashCode() {
+-		return rootEntityPersister.hashCode();
++		return rootEntityMappingType.hashCode();
+ 	}
+ 
+ 	@Override
+@@ -68,13 +67,12 @@ public <E2> PojoSelectionEntityLoader<E2> createLoader(Set<LoadingTypeContext<?
+ 			 * in particular runtime checks handling edge cases.
+ 			 */
+ 			@SuppressWarnings("unchecked")
+-			PojoSelectionEntityLoader<E2> result = (PojoSelectionEntityLoader<E2>) doCreate( targetEntityTypeContext.entityPersister(), sessionContext,
++			PojoSelectionEntityLoader<E2> result = (PojoSelectionEntityLoader<E2>) doCreate( targetEntityTypeContext.entityMappingType(), sessionContext,
+ 					cacheLookupStrategy, loadingOptions );
+ 			return result;
+ 		}
+ 
+-		EntityPersister commonSuperType =
+-				toMostSpecificCommonEntitySuperType( sessionContext.session(), targetEntityTypeContexts );
++		EntityMappingType commonSuperType = toMostSpecificCommonEntitySuperType( targetEntityTypeContexts );
+ 		if ( commonSuperType == null ) {
+ 			throw invalidTypesException( targetEntityTypeContexts );
+ 		}
+@@ -97,12 +95,11 @@ public <E2> PojoSelectionEntityLoader<E2> createLoader(Set<LoadingTypeContext<?
+ 		return result;
+ 	}
+ 
+-	@SuppressWarnings("unchecked") // Can't do better here: EntityPersister has no generics
+-	private PojoSelectionEntityLoader<?> doCreate(EntityPersister entityPersister,
++	private PojoSelectionEntityLoader<?> doCreate(EntityMappingType entityMappingType,
+ 			LoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
+ 			MutableEntityLoadingOptions loadingOptions) {
+-		if ( !rootEntityPersister.getMappedClass().isAssignableFrom( entityPersister.getMappedClass() ) ) {
+-			throw invalidTypeException( entityPersister );
++		if ( !rootEntityMappingType.getJavaType().getJavaTypeClass().isAssignableFrom( entityMappingType.getJavaType().getJavaTypeClass() ) ) {
++			throw invalidTypeException( entityMappingType );
+ 		}
+ 
+ 		SessionImplementor session = sessionContext.session();
+@@ -134,40 +131,38 @@ private PojoSelectionEntityLoader<?> doCreate(EntityPersister entityPersister,
+ 				// to avoid a WrongClassException when the type of an entity changes,
+ 				// because that exception cannot be recovered from.
+ 				cacheLookupStrategyImplementor =
+-						PersistenceContextThenSecondLevelCacheLookupStrategy.create( rootEntityPersister, session );
++						PersistenceContextThenSecondLevelCacheLookupStrategy.create( rootEntityMappingType, session );
+ 				break;
+ 			default:
+ 				throw new AssertionFailure( "Unexpected cache lookup strategy: " + cacheLookupStrategy );
+ 		}
+ 
+-		// We must pass rootEntityPersister here, to avoid getting a WrongClassException when loading from the cache,
+-		// even if we know we actually want instances from the most specific entity persister,
++		// We must pass rootEntityMappingType here, to avoid getting a WrongClassException when loading from the cache,
++		// even if we know we actually want instances from the most specific entity type,
+ 		// because that exception cannot be recovered from.
+-		return new HibernateOrmSelectionEntityByIdLoader<>( rootEntityPersister, queryFactory, sessionContext,
++		return new HibernateOrmSelectionEntityByIdLoader<>( rootEntityMappingType, queryFactory, sessionContext,
+ 				persistenceContextLookup, cacheLookupStrategyImplementor, loadingOptions );
+ 	}
+ 
+-	private static EntityPersister toMostSpecificCommonEntitySuperType(SessionImplementor session,
+-			Iterable<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
 -		MetamodelImplementor metamodel = session.getSessionFactory().getMetamodel();
- 		EntityPersister result = null;
+-		EntityPersister result = null;
++	private static EntityMappingType toMostSpecificCommonEntitySuperType(Iterable<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
++		EntityMappingType result = null;
  		for ( LoadingTypeContext<?> targetTypeContext : targetEntityTypeContexts ) {
- 			EntityPersister type = targetTypeContext.entityPersister();
-@@ -157,7 +155,7 @@ private static EntityPersister toMostSpecificCommonEntitySuperType(SessionImplem
+-			EntityPersister type = targetTypeContext.entityPersister();
++			EntityMappingType type = targetTypeContext.entityMappingType();
+ 			if ( result == null ) {
  				result = type;
  			}
  			else {
@@ -131,6 +438,34 @@ index 21503d08be..45b9fc0a50 100644
  			}
  		}
  		return result;
+ 	}
+ 
+-	private AssertionFailure invalidTypeException(EntityPersister otherEntityPersister) {
++	private AssertionFailure invalidTypeException(EntityMappingType otherEntityMappingType) {
+ 		throw new AssertionFailure(
+ 				"The targeted entity type is not a subclass of the expected root entity type."
+-				+ " Expected root entity name: " + rootEntityPersister.getEntityName()
+-				+ " Targeted entity name: " + otherEntityPersister.getEntityName()
++				+ " Expected root entity name: " + rootEntityMappingType.getEntityName()
++				+ " Targeted entity name: " + otherEntityMappingType.getEntityName()
+ 		);
+ 	}
+ 
+@@ -175,11 +170,11 @@ private AssertionFailure invalidTypesException(
+ 			Set<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
+ 		return new AssertionFailure(
+ 				"Some types among the targeted entity types are not subclasses of the expected root entity type."
+-				+ " Expected entity name: " + rootEntityPersister.getEntityName()
++				+ " Expected entity name: " + rootEntityMappingType.getEntityName()
+ 				+ " Targeted entity names: "
+ 				+ targetEntityTypeContexts.stream()
+-						.map( LoadingTypeContext::entityPersister )
+-						.map( EntityPersister::getEntityName )
++						.map( LoadingTypeContext::entityMappingType )
++						.map( EntityMappingType::getEntityName )
+ 						.collect( Collectors.toList() )
+ 		);
+ 	}
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java
 index 61cf2863dc..033ccecf9e 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java
@@ -154,11 +489,188 @@ index 61cf2863dc..033ccecf9e 100644
  			destinationList.add( id );
  			++totalLoaded;
  		}
+diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.java
+index 2609fecae4..e181f61d20 100644
+--- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.java
++++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.java
+@@ -12,7 +12,7 @@
+ import java.util.stream.Collectors;
+ 
+ import org.hibernate.engine.spi.SessionFactoryImplementor;
+-import org.hibernate.persister.entity.EntityPersister;
++import org.hibernate.metamodel.mapping.EntityMappingType;
+ import org.hibernate.search.mapper.orm.logging.impl.Log;
+ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+ import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
+@@ -26,30 +26,30 @@
+ 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+ 
+ 	public static <I> HibernateOrmEntityLoadingStrategy<?, ?> create(SessionFactoryImplementor sessionFactory,
+-			EntityPersister entityPersister,
++			EntityMappingType entityMappingType,
+ 			String documentIdSourcePropertyName, ValueReadHandle<I> documentIdSourceHandle) {
+ 		// By contract, the documentIdSourceHandle and the documentIdSourcePropertyName refer to the same property,
+ 		// whose type is I.
+ 		@SuppressWarnings("unchecked")
+ 		TypeQueryFactory<?, I> queryFactory = (TypeQueryFactory<?, I>) TypeQueryFactory.create( sessionFactory,
+-				entityPersister, documentIdSourcePropertyName );
++				entityMappingType, documentIdSourcePropertyName );
+ 		return new HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<>( sessionFactory,
+-				entityPersister, queryFactory,
++				entityMappingType, queryFactory,
+ 				documentIdSourcePropertyName, documentIdSourceHandle );
+ 	}
+ 
+-	private final EntityPersister entityPersister;
++	private final EntityMappingType entityMappingType;
+ 	private final TypeQueryFactory<E, I> queryFactory;
+ 	private final String documentIdSourcePropertyName;
+ 	private final ValueReadHandle<?> documentIdSourceHandle;
+ 
+ 	private HibernateOrmNonEntityIdPropertyEntityLoadingStrategy(SessionFactoryImplementor sessionFactory,
+-			EntityPersister entityPersister,
++			EntityMappingType entityMappingType,
+ 			TypeQueryFactory<E, I> queryFactory,
+ 			String documentIdSourcePropertyName,
+ 			ValueReadHandle<I> documentIdSourceHandle) {
+-		super( sessionFactory, entityPersister, queryFactory );
+-		this.entityPersister = entityPersister;
++		super( sessionFactory, entityMappingType, queryFactory );
++		this.entityMappingType = entityMappingType;
+ 		this.queryFactory = queryFactory;
+ 		this.documentIdSourcePropertyName = documentIdSourcePropertyName;
+ 		this.documentIdSourceHandle = documentIdSourceHandle;
+@@ -64,14 +64,14 @@ public boolean equals(Object obj) {
+ 				(HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<?, ?>) obj;
+ 		// If the entity type is different,
+ 		// the factories work in separate ID spaces and should be used separately.
+-		return entityPersister.equals( other.entityPersister )
++		return entityMappingType.equals( other.entityMappingType )
+ 				&& documentIdSourcePropertyName.equals( other.documentIdSourcePropertyName )
+ 				&& documentIdSourceHandle.equals( other.documentIdSourceHandle );
+ 	}
+ 
+ 	@Override
+ 	public int hashCode() {
+-		return Objects.hash( entityPersister, documentIdSourcePropertyName, documentIdSourceHandle );
++		return Objects.hash( entityMappingType, documentIdSourcePropertyName, documentIdSourceHandle );
+ 	}
+ 
+ 	@Override
+@@ -89,17 +89,17 @@ private <E2> PojoSelectionEntityLoader<E2> doCreate(LoadingTypeContext<?> target
+ 			LoadingSessionContext sessionContext,
+ 			EntityLoadingCacheLookupStrategy cacheLookupStrategy,
+ 			MutableEntityLoadingOptions loadingOptions) {
+-		if ( !entityPersister.equals( targetEntityTypeContext.entityPersister() ) ) {
+-			throw invalidTypeException( targetEntityTypeContext.entityPersister() );
++		if ( !entityMappingType.equals( targetEntityTypeContext.entityMappingType() ) ) {
++			throw invalidTypeException( targetEntityTypeContext.entityMappingType() );
+ 		}
+ 
+ 		/*
+-		 * We checked just above that "entityPersister" is equal to "targetEntityTypeContext.entityPersister()",
++		 * We checked just above that "entityMappingType" is equal to "targetEntityTypeContext.entityMappingType()",
+ 		 * so this loader will actually return entities of type E2.
+ 		 */
+ 		@SuppressWarnings("unchecked")
+ 		PojoSelectionEntityLoader<E2> result = new HibernateOrmSelectionEntityByNonIdPropertyLoader<>(
+-				entityPersister, (LoadingTypeContext<E2>) targetEntityTypeContext,
++				entityMappingType, (LoadingTypeContext<E2>) targetEntityTypeContext,
+ 				(TypeQueryFactory<E2, ?>) queryFactory,
+ 				documentIdSourcePropertyName, documentIdSourceHandle,
+ 				sessionContext, loadingOptions
+@@ -121,22 +121,22 @@ private <E2> PojoSelectionEntityLoader<E2> doCreate(LoadingTypeContext<?> target
+ 		return result;
+ 	}
+ 
+-	private AssertionFailure invalidTypeException(EntityPersister otherEntityPersister) {
++	private AssertionFailure invalidTypeException(EntityMappingType otherEntityMappingType) {
+ 		throw new AssertionFailure(
+ 				"Attempt to use a criteria-based entity loader with an unexpected target entity type."
+-						+ " Expected entity name: " + entityPersister.getEntityName()
+-						+ " Targeted entity name: " + otherEntityPersister
++						+ " Expected entity name: " + entityMappingType.getEntityName()
++						+ " Targeted entity name: " + otherEntityMappingType.getEntityName()
+ 		);
+ 	}
+ 
+ 	private AssertionFailure multipleTypesException(Set<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
+ 		return new AssertionFailure(
+ 				"Attempt to use a criteria-based entity loader with multiple target entity types."
+-						+ " Expected entity name: " + entityPersister.getEntityName()
++						+ " Expected entity name: " + entityMappingType.getEntityName()
+ 						+ " Targeted entity names: "
+ 						+ targetEntityTypeContexts.stream()
+-						.map( LoadingTypeContext::entityPersister )
+-						.map( EntityPersister::getEntityName )
++						.map( LoadingTypeContext::entityMappingType )
++						.map( EntityMappingType::getEntityName )
+ 						.collect( Collectors.toList() )
+ 		);
+ 	}
+diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmQueryLoader.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmQueryLoader.java
+index 7614f471ce..529986fd50 100644
+--- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmQueryLoader.java
++++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmQueryLoader.java
+@@ -11,30 +11,30 @@
+ import org.hibernate.MultiIdentifierLoadAccess;
+ import org.hibernate.engine.spi.SessionImplementor;
+ import org.hibernate.engine.spi.SharedSessionContractImplementor;
+-import org.hibernate.persister.entity.EntityPersister;
++import org.hibernate.metamodel.mapping.EntityMappingType;
+ import org.hibernate.query.Query;
+ import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
+ 
+ public class HibernateOrmQueryLoader<E, I> {
+ 	private final TypeQueryFactory<E, I> queryFactory;
+ 	private final Set<Class<? extends E>> includedTypesFilter;
+-	private final EntityPersister persister;
++	private final EntityMappingType entityMappingType;
+ 	private final ConditionalExpression conditionalExpression;
+ 
+ 	public HibernateOrmQueryLoader(TypeQueryFactory<E, I> queryFactory,
+ 			Set<Class<? extends E>> includedTypesFilter) {
+ 		this.queryFactory = queryFactory;
+ 		this.includedTypesFilter = includedTypesFilter;
+-		this.persister = null;
++		this.entityMappingType = null;
+ 		this.conditionalExpression = null;
+ 	}
+ 
+ 	public HibernateOrmQueryLoader(TypeQueryFactory<E, I> queryFactory,
+-			EntityPersister persister, Set<Class<? extends E>> includedTypesFilter,
++			EntityMappingType entityMappingType, Set<Class<? extends E>> includedTypesFilter,
+ 			ConditionalExpression conditionalExpression) {
+ 		this.queryFactory = queryFactory;
+ 		this.includedTypesFilter = includedTypesFilter;
+-		this.persister = persister;
++		this.entityMappingType = entityMappingType;
+ 		this.conditionalExpression = conditionalExpression;
+ 	}
+ 
+@@ -42,7 +42,7 @@ public Query<Long> createCountQuery(SharedSessionContractImplementor session) {
+ 		return ( conditionalExpression == null ) ?
+ 				queryFactory.createQueryForCount( session, includedTypesFilter ) :
+ 				queryFactory.createQueryForCount(
+-						session, persister, includedTypesFilter, conditionalExpression
++						session, entityMappingType, includedTypesFilter, conditionalExpression
+ 				);
+ 	}
+ 
+@@ -50,7 +50,7 @@ public Query<I> createIdentifiersQuery(SharedSessionContractImplementor session)
+ 		return ( conditionalExpression == null ) ?
+ 				queryFactory.createQueryForIdentifierListing( session, includedTypesFilter ) :
+ 				queryFactory.createQueryForIdentifierListing(
+-						session, persister, includedTypesFilter, conditionalExpression
++						session, entityMappingType, includedTypesFilter, conditionalExpression
+ 				);
+ 	}
+ 
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmSelectionEntityByIdLoader.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmSelectionEntityByIdLoader.java
-index 8220212f46..ea908f7bd3 100644
+index 8220212f46..3c20b4003b 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmSelectionEntityByIdLoader.java
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmSelectionEntityByIdLoader.java
-@@ -6,7 +6,6 @@
+@@ -6,13 +6,13 @@
   */
  package org.hibernate.search.mapper.orm.loading.impl;
  
@@ -166,19 +678,196 @@ index 8220212f46..ea908f7bd3 100644
  import java.util.ArrayList;
  import java.util.List;
  
-@@ -87,7 +86,7 @@ protected List<E> doLoadEntities(List<?> allIds, Long timeout) {
+ import org.hibernate.engine.spi.EntityKey;
+-import org.hibernate.persister.entity.EntityPersister;
++import org.hibernate.metamodel.mapping.EntityMappingType;
+ import org.hibernate.query.Query;
++import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
+ 
+ /**
+  * An entity loader for indexed entities whose document ID is the entity ID.
+@@ -24,12 +24,12 @@
+ 	private final PersistenceContextLookupStrategy persistenceContextLookup;
+ 	private final EntityLoadingCacheLookupStrategyImplementor cacheLookupStrategyImplementor;
+ 
+-	HibernateOrmSelectionEntityByIdLoader(EntityPersister rootEntityPersister,
++	HibernateOrmSelectionEntityByIdLoader(EntityMappingType rootEntityMappingType,
+ 			TypeQueryFactory<E, ?> queryFactory, LoadingSessionContext sessionContext,
+ 			PersistenceContextLookupStrategy persistenceContextLookup,
+ 			EntityLoadingCacheLookupStrategyImplementor cacheLookupStrategyImplementor,
+ 			MutableEntityLoadingOptions loadingOptions) {
+-		super( rootEntityPersister, queryFactory, sessionContext, loadingOptions );
++		super( rootEntityMappingType, queryFactory, sessionContext, loadingOptions );
+ 		this.persistenceContextLookup = persistenceContextLookup;
+ 		this.cacheLookupStrategyImplementor = cacheLookupStrategyImplementor;
+ 	}
+@@ -84,11 +84,12 @@ protected List<E> doLoadEntities(List<?> allIds, Long timeout) {
+ 		return loadedEntities;
+ 	}
+ 
++	@SuppressForbiddenApis(reason = "generateEntityKey requires passing an EntityPersister")
  	private EntityKey[] toEntityKeys(List<?> ids) {
  		EntityKey[] entityKeys = new EntityKey[ids.size()];
  		for ( int i = 0; i < ids.size(); i++ ) {
 -			Serializable id = (Serializable) ids.get( i );
+-			EntityKey entityKey = sessionContext.session().generateEntityKey( id, entityPersister );
 +			Object id = ids.get( i );
- 			EntityKey entityKey = sessionContext.session().generateEntityKey( id, entityPersister );
++			EntityKey entityKey = sessionContext.session().generateEntityKey( id, entityMappingType.getEntityPersister() );
  			entityKeys[i] = ( entityKey );
  		}
+ 		return entityKeys;
+diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmSelectionEntityByNonIdPropertyLoader.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmSelectionEntityByNonIdPropertyLoader.java
+index 11409cad25..58b36111c5 100644
+--- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmSelectionEntityByNonIdPropertyLoader.java
++++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmSelectionEntityByNonIdPropertyLoader.java
+@@ -12,7 +12,7 @@
+ import java.util.Map;
+ 
+ import org.hibernate.Hibernate;
+-import org.hibernate.persister.entity.EntityPersister;
++import org.hibernate.metamodel.mapping.EntityMappingType;
+ import org.hibernate.query.Query;
+ import org.hibernate.search.mapper.orm.logging.impl.Log;
+ import org.hibernate.search.util.common.impl.CollectionHelper;
+@@ -33,14 +33,14 @@
+ 	private final String documentIdSourcePropertyName;
+ 	private final ValueReadHandle<?> documentIdSourceHandle;
+ 
+-	HibernateOrmSelectionEntityByNonIdPropertyLoader(EntityPersister entityPersister,
++	HibernateOrmSelectionEntityByNonIdPropertyLoader(EntityMappingType entityMappingType,
+ 			LoadingTypeContext<E> targetEntityTypeContext,
+ 			TypeQueryFactory<E, ?> queryFactory,
+ 			String documentIdSourcePropertyName,
+ 			ValueReadHandle<?> documentIdSourceHandle,
+ 			LoadingSessionContext sessionContext,
+ 			MutableEntityLoadingOptions loadingOptions) {
+-		super( entityPersister, queryFactory, sessionContext, loadingOptions );
++		super( entityMappingType, queryFactory, sessionContext, loadingOptions );
+ 		this.targetEntityTypeContext = targetEntityTypeContext;
+ 		this.documentIdSourcePropertyName = documentIdSourcePropertyName;
+ 		this.documentIdSourceHandle = documentIdSourceHandle;
+diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HqlTypeQueryFactory.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HqlTypeQueryFactory.java
+index a43ff3c025..7c16971e73 100644
+--- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HqlTypeQueryFactory.java
++++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/HqlTypeQueryFactory.java
+@@ -11,23 +11,23 @@
+ import org.hibernate.MultiIdentifierLoadAccess;
+ import org.hibernate.engine.spi.SessionImplementor;
+ import org.hibernate.engine.spi.SharedSessionContractImplementor;
+-import org.hibernate.persister.entity.EntityPersister;
++import org.hibernate.metamodel.mapping.EntityMappingType;
+ import org.hibernate.query.Query;
+ 
+ class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> {
+ 
+-	private final EntityPersister entityPersister;
++	private final EntityMappingType entityMappingType;
+ 
+-	HqlTypeQueryFactory(EntityPersister entityPersister, String uniquePropertyName) {
++	HqlTypeQueryFactory(EntityMappingType entityMappingType, String uniquePropertyName) {
+ 		super( uniquePropertyName );
+-		this.entityPersister = entityPersister;
++		this.entityMappingType = entityMappingType;
+ 	}
+ 
+ 	@Override
+ 	public Query<Long> createQueryForCount(SharedSessionContractImplementor session,
+ 			Set<? extends Class<? extends E>> includedTypesFilter) {
+ 		return createQueryWithTypesFilter( session,
+-				"select count(e) from " + entityPersister.getEntityName() + " e",
++				"select count(e) from " + entityMappingType.getEntityName() + " e",
+ 				Long.class,
+ 				"e", includedTypesFilter );
+ 	}
+@@ -37,8 +37,8 @@ public Query<Long> createQueryForCount(SharedSessionContractImplementor session,
+ 	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
+ 			Set<? extends Class<? extends E>> includedTypesFilter) {
+ 		return createQueryWithTypesFilter( session,
+-				"select e. " + uniquePropertyName + " from " + entityPersister.getEntityName() + " e",
+-				(Class<I>) entityPersister.getIdentifierType().getReturnedClass(),
++				"select e. " + uniquePropertyName + " from " + entityMappingType.getEntityName() + " e",
++				(Class<I>) entityMappingType.getIdentifierMapping().getJavaType().getJavaTypeClass(),
+ 				"e", includedTypesFilter );
+ 	}
+ 
+@@ -46,21 +46,20 @@ public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor
+ 	@Override
+ 	public Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName) {
+ 		return session.createQuery(
+-				"select e from " + entityPersister.getEntityName()
++				"select e from " + entityMappingType.getEntityName()
+ 						+ " e where " + uniquePropertyName + " in (:" + parameterName + ")",
+-				(Class<E>) entityPersister.getMappedClass()
++				(Class<E>) entityMappingType.getMappedJavaType().getJavaTypeClass()
+ 		);
+ 	}
+ 
+ 	@Override
+-	@SuppressWarnings("unchecked") // Can't do better here: the underlying method has no generics
+ 	public MultiIdentifierLoadAccess<E> createMultiIdentifierLoadAccess(SessionImplementor session) {
+-		return session.byMultipleIds( entityPersister.getEntityName() );
++		return session.byMultipleIds( entityMappingType.getEntityName() );
+ 	}
+ 
+ 	@Override
+ 	public boolean uniquePropertyIsTheEntityId() {
+-		return uniquePropertyName.equals( entityPersister.getIdentifierPropertyName() );
++		return uniquePropertyName.equals( entityMappingType.getIdentifierMapping().getAttributeName() );
+ 	}
+ 
+ 	private <T> Query<T> createQueryWithTypesFilter(SharedSessionContractImplementor session,
+diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/LoadingTypeContext.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/LoadingTypeContext.java
+index 4fd6258ed4..eaac4243ea 100644
+--- a/main/java/org/hibernate/search/mapper/orm/loading/impl/LoadingTypeContext.java
++++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/LoadingTypeContext.java
+@@ -8,7 +8,7 @@
+ 
+ import java.util.List;
+ 
+-import org.hibernate.persister.entity.EntityPersister;
++import org.hibernate.metamodel.mapping.EntityMappingType;
+ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+ 
+ public interface LoadingTypeContext<E> {
+@@ -21,9 +21,9 @@
+ 	PojoRawTypeIdentifier<E> typeIdentifier();
+ 
+ 	/**
+-	 * @return The entity persister, giving access to a representation of the entity type in the Hibernate ORM metamodel.
++	 * @return The entity mapping type, giving access to a representation of the entity type in the Hibernate ORM metamodel.
+ 	 */
+-	EntityPersister entityPersister();
++	EntityMappingType entityMappingType();
+ 
+ 	HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy();
+ 
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/MutableEntityLoadingOptions.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/MutableEntityLoadingOptions.java
-index a8669bf79d..776c86fc0e 100644
+index a8669bf79d..838d51df7b 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/MutableEntityLoadingOptions.java
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/MutableEntityLoadingOptions.java
+@@ -9,7 +9,7 @@
+ import java.util.ArrayList;
+ import java.util.List;
+ 
+-import org.hibernate.persister.entity.EntityPersister;
++import org.hibernate.metamodel.mapping.EntityMappingType;
+ import org.hibernate.search.util.common.impl.Contracts;
+ 
+ public class MutableEntityLoadingOptions {
+@@ -30,11 +30,11 @@ public void fetchSize(int fetchSize) {
+ 		this.fetchSize = fetchSize;
+ 	}
+ 
+-	public EntityGraphHint<?> entityGraphHintOrNullForType(EntityPersister entityPersister) {
++	public EntityGraphHint<?> entityGraphHintOrNullForType(EntityMappingType entityMappingType) {
+ 		if ( entityGraphHints == null ) {
+ 			return null;
+ 		}
+-		String hibernateOrmEntityName = entityPersister.getEntityName();
++		String hibernateOrmEntityName = entityMappingType.getEntityName();
+ 		for ( EntityGraphHint<?> entityGraphHint : entityGraphHints ) {
+ 			if ( entityGraphHint.graph.appliesTo( hibernateOrmEntityName ) ) {
+ 				return entityGraphHint;
 @@ -50,6 +50,9 @@ public void entityGraphHint(EntityGraphHint<?> entityGraphHint, boolean replaceE
  		else if ( replaceExisting ) {
  			entityGraphHints.clear();
@@ -189,11 +878,57 @@ index a8669bf79d..776c86fc0e 100644
  		this.entityGraphHints.add( entityGraphHint );
  	}
  }
+diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/PersistenceContextThenSecondLevelCacheLookupStrategy.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/PersistenceContextThenSecondLevelCacheLookupStrategy.java
+index 59da8faa46..6d46612308 100644
+--- a/main/java/org/hibernate/search/mapper/orm/loading/impl/PersistenceContextThenSecondLevelCacheLookupStrategy.java
++++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/PersistenceContextThenSecondLevelCacheLookupStrategy.java
+@@ -12,8 +12,10 @@
+ import org.hibernate.cache.spi.access.EntityDataAccess;
+ import org.hibernate.engine.spi.EntityKey;
+ import org.hibernate.engine.spi.SessionImplementor;
++import org.hibernate.metamodel.mapping.EntityMappingType;
+ import org.hibernate.persister.entity.EntityPersister;
+ import org.hibernate.search.mapper.orm.logging.impl.Log;
++import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
+ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+ 
+ /**
+@@ -24,24 +26,26 @@
+  *
+  * @author Emmanuel Bernard
+  */
++@SuppressForbiddenApis(reason = "EntityPersister is needed to retrieve/use EntityDataAccess")
+ class PersistenceContextThenSecondLevelCacheLookupStrategy
+ 		implements EntityLoadingCacheLookupStrategyImplementor {
+ 
+ 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+ 
+-	static EntityLoadingCacheLookupStrategyImplementor create(EntityPersister commonEntitySuperTypePersister,
++	static EntityLoadingCacheLookupStrategyImplementor create(EntityMappingType entityMappingType,
+ 			SessionImplementor session) {
+ 		EntityLoadingCacheLookupStrategyImplementor persistenceContextLookupStrategy =
+ 				PersistenceContextLookupStrategy.create( session );
+-		EntityDataAccess cacheAccess = commonEntitySuperTypePersister.getCacheAccessStrategy();
++		EntityPersister entityPersister = entityMappingType.getEntityPersister();
++		EntityDataAccess cacheAccess = entityPersister.getCacheAccessStrategy();
+ 		if ( cacheAccess == null ) {
+ 			// No second-level cache
+-			log.skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader( commonEntitySuperTypePersister.getEntityName() );
++			log.skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader( entityPersister.getEntityName() );
+ 			return persistenceContextLookupStrategy;
+ 		}
+ 		return new PersistenceContextThenSecondLevelCacheLookupStrategy(
+ 				persistenceContextLookupStrategy,
+-				commonEntitySuperTypePersister,
++				entityPersister,
+ 				cacheAccess,
+ 				session
+ 		);
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/TypeQueryFactory.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/TypeQueryFactory.java
-index 82c86985ab..3abdf72591 100644
+index 82c86985ab..1d289634b7 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/TypeQueryFactory.java
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/TypeQueryFactory.java
-@@ -6,6 +6,7 @@
+@@ -6,32 +6,33 @@
   */
  package org.hibernate.search.mapper.orm.loading.impl;
  
@@ -201,29 +936,54 @@ index 82c86985ab..3abdf72591 100644
  import java.util.Set;
  
  import org.hibernate.MultiIdentifierLoadAccess;
-@@ -13,7 +14,7 @@
+ import org.hibernate.engine.spi.SessionFactoryImplementor;
  import org.hibernate.engine.spi.SessionImplementor;
  import org.hibernate.engine.spi.SharedSessionContractImplementor;
++import org.hibernate.metamodel.mapping.EntityMappingType;
  import org.hibernate.metamodel.model.domain.EntityDomainType;
 -import org.hibernate.metamodel.spi.MetamodelImplementor;
+-import org.hibernate.persister.entity.EntityPersister;
 +import org.hibernate.metamodel.model.domain.JpaMetamodel;
- import org.hibernate.persister.entity.EntityPersister;
  import org.hibernate.query.Query;
  import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
-@@ -22,9 +23,9 @@
  
- 	static TypeQueryFactory<?, ?> create(SessionFactoryImplementor sessionFactory, EntityPersister entityPersister,
+ public interface TypeQueryFactory<E, I> {
+ 
+-	static TypeQueryFactory<?, ?> create(SessionFactoryImplementor sessionFactory, EntityPersister entityPersister,
++	static TypeQueryFactory<?, ?> create(SessionFactoryImplementor sessionFactory, EntityMappingType entityMappingType,
  			String uniquePropertyName) {
 -		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
-+		JpaMetamodel metamodel = sessionFactory.getJpaMetamodel();
- 		EntityDomainType<?> typeOrNull = metamodel.entity( entityPersister.getEntityName() );
+-		EntityDomainType<?> typeOrNull = metamodel.entity( entityPersister.getEntityName() );
 -		if ( typeOrNull != null ) {
-+		if ( typeOrNull != null && !( entityPersister.getMappedClass().equals( Map.class ) ) ) {
++		JpaMetamodel metamodel = sessionFactory.getJpaMetamodel();
++		EntityDomainType<?> typeOrNull = metamodel.entity( entityMappingType.getEntityName() );
++		if ( typeOrNull != null && !( entityMappingType.getMappedJavaType().getJavaTypeClass().equals( Map.class ) ) ) {
  			return CriteriaTypeQueryFactory.create( typeOrNull, uniquePropertyName );
  		}
  		else {
+ 			// Most likely this is a dynamic-map entity; they don't have a representation in the JPA metamodel
+ 			// and can't be queried using the Criteria API.
+ 			// Use HQL queries instead, even if it feels a bit dirty.
+-			return new HqlTypeQueryFactory<>( entityPersister, uniquePropertyName );
++			return new HqlTypeQueryFactory<>( entityMappingType, uniquePropertyName );
+ 		}
+ 	}
+ 
+@@ -41,10 +42,10 @@ Query<Long> createQueryForCount(SharedSessionContractImplementor session,
+ 	Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
+ 			Set<? extends Class<? extends E>> includedTypesFilter);
+ 
+-	Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityPersister persister,
++	Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityMappingType entityMappingType,
+ 			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression);
+ 
+-	Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityPersister persister,
++	Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityMappingType entityMappingType,
+ 			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression);
+ 
+ 	Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName);
 diff --git a/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java b/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
-index ba51476ada..9341b77f8a 100644
+index 1e89c5be92..16050b2496 100644
 --- a/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
 +++ b/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
 @@ -251,14 +251,10 @@ SearchException foundMultipleEntitiesForDocumentId(String entityName, String doc
@@ -242,29 +1002,75 @@ index ba51476ada..9341b77f8a 100644
  			+ " If you want to define the size of batches for entity loading, set loading options when defining the query instead,"
  			+ " for example with .loading(o -> o.fetchSize(50))."
 diff --git a/main/java/org/hibernate/search/mapper/orm/mapping/impl/AbstractHibernateOrmTypeContext.java b/main/java/org/hibernate/search/mapper/orm/mapping/impl/AbstractHibernateOrmTypeContext.java
-index c27a8cf81b..32a4796285 100644
+index c27a8cf81b..ca84b4c6d1 100644
 --- a/main/java/org/hibernate/search/mapper/orm/mapping/impl/AbstractHibernateOrmTypeContext.java
 +++ b/main/java/org/hibernate/search/mapper/orm/mapping/impl/AbstractHibernateOrmTypeContext.java
-@@ -10,7 +10,7 @@
+@@ -10,8 +10,8 @@
  import java.util.stream.Collectors;
  
  import org.hibernate.engine.spi.SessionFactoryImplementor;
 -import org.hibernate.metamodel.spi.MetamodelImplementor;
+-import org.hibernate.persister.entity.EntityPersister;
 +import org.hibernate.metamodel.MappingMetamodel;
- import org.hibernate.persister.entity.EntityPersister;
++import org.hibernate.metamodel.mapping.EntityMappingType;
  import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContext;
  import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityIdEntityLoadingStrategy;
-@@ -43,8 +43,8 @@
+ import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityLoadingStrategy;
+@@ -31,7 +31,7 @@
+ 
+ 	private final PojoRawTypeIdentifier<E> typeIdentifier;
+ 	private final String jpaEntityName;
+-	private final EntityPersister entityPersister;
++	private final EntityMappingType entityMappingType;
+ 	private final boolean documentIdIsEntityId;
+ 	private final HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy;
+ 	private final PojoPathFilter dirtyFilter;
+@@ -43,23 +43,22 @@
  	AbstractHibernateOrmTypeContext(AbstractBuilder<E> builder, SessionFactoryImplementor sessionFactory) {
  		this.typeIdentifier = builder.typeIdentifier;
  		this.jpaEntityName = builder.jpaEntityName;
 -		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
 -		this.entityPersister = metamodel.entityPersister( builder.hibernateOrmEntityName );
 +		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
-+		this.entityPersister = metamodel.getEntityDescriptor( builder.hibernateOrmEntityName );
++		this.entityMappingType = metamodel.getEntityDescriptor( builder.hibernateOrmEntityName );
  		this.ascendingSuperTypes = builder.ascendingSuperTypes;
  		if ( builder.documentIdSourcePropertyName != null ) {
- 			if ( builder.documentIdSourcePropertyName.equals( entityPersister().getIdentifierPropertyName() ) ) {
+-			if ( builder.documentIdSourcePropertyName.equals( entityPersister().getIdentifierPropertyName() ) ) {
++			if ( builder.documentIdSourcePropertyName.equals( entityMappingType().getIdentifierMapping().getAttributeName() ) ) {
+ 				documentIdIsEntityId = true;
+ 				loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E, ?>)
+-						HibernateOrmEntityIdEntityLoadingStrategy.create( sessionFactory, entityPersister() );
++						HibernateOrmEntityIdEntityLoadingStrategy.create( sessionFactory, entityMappingType() );
+ 			}
+ 			else {
+ 				// The entity ID is not the property used to generate the document ID
+ 				// We need to use a criteria query to load entities from the document IDs
+ 				documentIdIsEntityId = false;
+ 				loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E, ?>)
+-						HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.create( sessionFactory, entityPersister(),
+-								builder.documentIdSourcePropertyName, builder.documentIdSourcePropertyHandle
+-						);
++						HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.create( sessionFactory, entityMappingType,
++								builder.documentIdSourcePropertyName, builder.documentIdSourcePropertyHandle );
+ 			}
+ 		}
+ 		else {
+@@ -87,12 +86,12 @@ public String jpaEntityName() {
+ 	}
+ 
+ 	public String hibernateOrmEntityName() {
+-		return entityPersister.getEntityName();
++		return entityMappingType.getEntityName();
+ 	}
+ 
+ 	@Override
+-	public EntityPersister entityPersister() {
+-		return entityPersister;
++	public EntityMappingType entityMappingType() {
++		return entityMappingType;
+ 	}
+ 
+ 	@Override
 diff --git a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingConfigurationContributor.java b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingConfigurationContributor.java
 index 661f94b149..bdd369055b 100644
 --- a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingConfigurationContributor.java
@@ -292,7 +1098,7 @@ index 661f94b149..bdd369055b 100644
  						new ErrorCollectingPojoTypeMetadataContributor()
  								// Ensure Hibernate ORM metadata about properties is translated into Hibernate Search metadata
 diff --git a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingInitiator.java b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingInitiator.java
-index 9228a9bd7c..77fdfa0616 100644
+index a71c7e8dfb..5ca84b0040 100644
 --- a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingInitiator.java
 +++ b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingInitiator.java
 @@ -8,10 +8,9 @@
