@@ -1,0 +1,11 @@
+:doctype: book
+:revdate: {docdate}
+:sectanchors:
+:anchor:
+:toc: left
+:toclevels: 4
+:docinfodir: {docinfodir}
+:docinfo: shared,private
+:title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
+
+include::../reference/_getting-started.adoc[]

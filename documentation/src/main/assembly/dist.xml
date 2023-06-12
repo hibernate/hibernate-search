@@ -55,6 +55,19 @@
             <outputDirectory>getting-started/standalone/en-US/html_single/images/</outputDirectory>
         </fileSet>
 
+        <fileSet>
+            <directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
+            <outputDirectory>getting-started/en-US/html_single/css/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
+            <outputDirectory>getting-started/en-US/html_single/script/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
+            <outputDirectory>getting-started/en-US/html_single/images/</outputDirectory>
+        </fileSet>
+
         <!-- Internal documentation -->
         <fileSet>
             <directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
@@ -97,6 +110,10 @@
         <file>
             <source>${asciidoctor.base-output-dir}/html/public/getting-started/standalone/index.html</source>
             <outputDirectory>getting-started/standalone/en-US/html_single/</outputDirectory>
+        </file>
+        <file>
+            <source>${asciidoctor.base-output-dir}/html/public/getting-started/index.html</source>
+            <outputDirectory>getting-started/en-US/html_single/</outputDirectory>
         </file>
 
         <file>
