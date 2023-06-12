@@ -35,6 +35,7 @@ updates:
       - dependency-name: org.asciidoctor:asciidoctorj-pdf
       # We strictly align these dependencies on the version used in Hibernate ORM.
       - dependency-name: "org.jboss:jandex"
+      - dependency-name: "io.smallrye:jandex"
       - dependency-name: "javax.persistence:javax.persistence-api"
       - dependency-name: "javax.enterprise:cdi-api"
       - dependency-name: "jakarta.persistence:jakarta.persistence-api"
