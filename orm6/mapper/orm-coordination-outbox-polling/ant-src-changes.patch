@@ -71,7 +71,7 @@ index f42125b5a8..ded12df777 100644
  	}
  }
 diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxEventLoader.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxEventLoader.java
-index abe8ee8ef4..aa23bdb841 100644
+index cba677480e..47293d4b22 100644
 --- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxEventLoader.java
 +++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxEventLoader.java
 @@ -49,7 +49,7 @@ final class OutboxEventLoader implements ToStringTreeAppendable {
