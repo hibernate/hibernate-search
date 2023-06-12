@@ -43,7 +43,7 @@ public class SearchIndexingPlanNonEntityIdDocumentIdIT {
 	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectAnySchema( IndexedEntity.INDEX_NAME );
 
-		setupContext.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false )
+		setupContext.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
 				.withAnnotatedTypes( IndexedEntity.class );
 	}
 

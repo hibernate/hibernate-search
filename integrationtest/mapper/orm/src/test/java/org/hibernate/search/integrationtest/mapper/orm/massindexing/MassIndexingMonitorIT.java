@@ -115,7 +115,7 @@ public class MassIndexingMonitorIT {
 		backendMock.expectAnySchema( Book.INDEX );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
-				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, false )
+				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, false )
 				.withPropertyRadical( EngineSettings.BACKGROUND_FAILURE_HANDLER, failureHandler )
 				.setup( Book.class );
 

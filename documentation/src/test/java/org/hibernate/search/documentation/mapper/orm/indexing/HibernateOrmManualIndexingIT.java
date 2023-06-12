@@ -311,7 +311,7 @@ public class HibernateOrmManualIndexingIT {
 
 	private EntityManagerFactory setup(boolean automaticIndexingEnabled) {
 		return setupHelper.start()
-				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, automaticIndexingEnabled )
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, automaticIndexingEnabled )
 				.setup( Book.class, Author.class );
 	}
 

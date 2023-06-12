@@ -45,7 +45,7 @@ public class MassIndexingPrimitiveIdIT {
 		backendMock.expectAnySchema( EntityWithPrimitiveId.INDEX );
 
 		sessionFactory = ormSetupHelper.start()
-				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, false )
+				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, false )
 				.setup( EntityWithPrimitiveId.class );
 
 		backendMock.verifyExpectationsMet();

@@ -52,7 +52,7 @@ public class MassIndexingManualSchemaManagementIT {
 	@Before
 	public void before() {
 		entityManagerFactory = setupHelper.start()
-				.withProperty( "hibernate.search.automatic_indexing.enabled", false )
+				.withProperty( "hibernate.search.indexing.listeners.enabled", false )
 				.withProperty( "hibernate.search.schema_management.strategy", "none" )
 				.setup( Book.class );
 

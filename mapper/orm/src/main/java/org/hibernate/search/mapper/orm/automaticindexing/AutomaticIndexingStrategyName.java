@@ -17,7 +17,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * Strategy for automatic indexing in Hibernate Search.
  *
- * @deprecated Use {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#AUTOMATIC_INDEXING_ENABLED} instead.
+ * @deprecated Use {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#INDEXING_LISTENERS_ENABLED} instead.
  */
 @Deprecated
 public enum AutomaticIndexingStrategyName {
@@ -27,7 +27,7 @@ public enum AutomaticIndexingStrategyName {
 	 * indexing will only happen when explicitly requested through APIs
 	 * such as {@link SearchSession#indexingPlan()}.
 	 *
-	 * @deprecated Use {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#AUTOMATIC_INDEXING_ENABLED} instead.
+	 * @deprecated Use {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#INDEXING_LISTENERS_ENABLED} instead.
 	 */
 	@Deprecated
 	NONE("none"),
@@ -36,7 +36,7 @@ public enum AutomaticIndexingStrategyName {
 	 * Indexing is triggered automatically when entities are modified in the Hibernate ORM session:
 	 * entity insertion, update etc.
 	 *
-	 * @deprecated Use {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#AUTOMATIC_INDEXING_ENABLED} instead.
+	 * @deprecated Use {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#INDEXING_LISTENERS_ENABLED} instead.
 	 */
 	@Deprecated
 	SESSION("session");

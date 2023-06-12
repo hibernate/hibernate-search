@@ -43,7 +43,7 @@ public class HibernateOrmMassIndexerMultiTenancyIT {
 	@Before
 	public void setup() {
 		this.sessionFactory = setupHelper.start()
-				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false )
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
 				.tenants( TENANT_1_ID, TENANT_2_ID, TENANT_3_ID )
 				.withProperty( HibernateOrmMapperSettings.MULTI_TENANCY_TENANT_IDS,
 						String.join( ",", TENANT_1_ID, TENANT_2_ID, TENANT_3_ID ) )

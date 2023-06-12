@@ -14,13 +14,13 @@ import javax.persistence.Entity;
  * This class is stateful: it queues operations internally to apply them at a later time.
  * <p>
  * When {@link #process()} is called,
- * or when {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#AUTOMATIC_INDEXING_ENABLED automatic indexing is enabled}
+ * or when {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#INDEXING_LISTENERS_ENABLED indexing listeners are enabled}
  * and a Hibernate ORM Session {@code flush()} happens,
  * the entities will be processed and index documents will be built
  * and stored in an internal buffer.
  * <p>
  * When {@link #execute()} is called,
- * or when {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#AUTOMATIC_INDEXING_ENABLED automatic indexing is enabled}
+ * or when {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#INDEXING_LISTENERS_ENABLED indexing listeners are enabled}
  * and a Hibernate ORM transaction is committed or a Hibernate ORM Session {@code flush()} happens outside of any transaction,
  * the operations will be actually sent to the index.
  * <p>
@@ -107,7 +107,7 @@ public interface SearchIndexingPlan {
 	 * or the automatic write on transaction commit will perform the extraction as necessary.
 	 * <p>
 	 * However, calling this method can be useful before a session is cleared
-	 * if {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#AUTOMATIC_INDEXING_ENABLED automatic indexing is disabled}:
+	 * if {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#INDEXING_LISTENERS_ENABLED indexing listeners} are disabled:
 	 * it will make sure the data lost when clearing the session will no longer be necessary for indexing.
 	 * <p>
 	 * Caution: calling this method repeatedly without a call to {@link #execute()}

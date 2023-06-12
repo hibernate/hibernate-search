@@ -56,7 +56,7 @@ public class MassIndexingCachingIT {
 	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 
-		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, "false" )
+		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, "false" )
 				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ALL.name() )
 				.withProperty( AvailableSettings.GENERATE_STATISTICS, "true" )
 				.withProperty( AvailableSettings.USE_SECOND_LEVEL_CACHE, "true" )

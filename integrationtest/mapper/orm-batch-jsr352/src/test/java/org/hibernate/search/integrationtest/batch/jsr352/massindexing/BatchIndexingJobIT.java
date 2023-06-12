@@ -83,7 +83,7 @@ public class BatchIndexingJobIT {
 	@ReusableOrmSetupHolder.Setup
 	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
 		setupContext.withAnnotatedTypes( Company.class, Person.class, WhoAmI.class, CompanyGroup.class )
-				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false );
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false );
 
 		dataClearConfig.clearOrder( CompanyGroup.class, Company.class );
 	}

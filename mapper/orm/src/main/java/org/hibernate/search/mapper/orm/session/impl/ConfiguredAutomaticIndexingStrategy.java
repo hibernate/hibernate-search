@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.session.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 import java.util.function.Function;
 import javax.transaction.Synchronization;
 
@@ -35,10 +36,15 @@ public final class ConfiguredAutomaticIndexingStrategy {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ConfigurationProperty<Boolean> AUTOMATIC_INDEXING_ENABLED =
+	@SuppressWarnings("deprecation")
+	private static final OptionalConfigurationProperty<Boolean> AUTOMATIC_INDEXING_ENABLED =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED )
 					.asBoolean()
-					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_ENABLED )
+					.build();
+
+	private static final OptionalConfigurationProperty<Boolean> INDEXING_LISTENERS_ENABLED =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED )
+					.asBoolean()
 					.build();
 
 	@SuppressWarnings("deprecation")
@@ -94,10 +100,30 @@ public final class ConfiguredAutomaticIndexingStrategy {
 		resolveDefaultSyncStrategyHolder( startContext );
 
 		defaultSynchronizationStrategy = configure( defaultSynchronizationStrategyHolder.get() );
-		if ( AUTOMATIC_INDEXING_ENABLED.get( configurationSource )
+
+		Optional<Boolean> automaticIndexingEnabledOptional = AUTOMATIC_INDEXING_ENABLED.get( configurationSource );
+		Optional<Boolean> indexingListenersEnabledOptional = INDEXING_LISTENERS_ENABLED.get( configurationSource );
+		if ( automaticIndexingEnabledOptional.isPresent() ) {
+			if ( indexingListenersEnabledOptional.isPresent() ) {
+				throw log.bothNewAndOldConfigurationPropertiesForIndexingListenersAreUsed(
+						AUTOMATIC_INDEXING_ENABLED.resolveOrRaw( configurationSource ),
+						INDEXING_LISTENERS_ENABLED.resolveOrRaw( configurationSource )
+				);
+			}
+			log.deprecatedPropertyUsedInsteadOfNew(
+					AUTOMATIC_INDEXING_ENABLED.resolveOrRaw( configurationSource ),
+					INDEXING_LISTENERS_ENABLED.resolveOrRaw( configurationSource )
+			);
+		}
+
+
+		if ( automaticIndexingEnabledOptional.orElse( indexingListenersEnabledOptional.orElse(
+				HibernateOrmMapperSettings.Defaults.INDEXING_LISTENERS_ENABLED ) )
 				&& AUTOMATIC_INDEXING_ENABLED_LEGACY_STRATEGY.getAndMap( configurationSource, enabled -> {
-					log.automaticIndexingStrategyIsDeprecated( AUTOMATIC_INDEXING_ENABLED_LEGACY_STRATEGY.resolveOrRaw( configurationSource ),
-							AUTOMATIC_INDEXING_ENABLED.resolveOrRaw( configurationSource ) );
+					log.deprecatedPropertyUsedInsteadOfNew(
+							AUTOMATIC_INDEXING_ENABLED_LEGACY_STRATEGY.resolveOrRaw( configurationSource ),
+							INDEXING_LISTENERS_ENABLED.resolveOrRaw( configurationSource )
+					);
 					return enabled;
 				} )
 				.orElse( true ) ) {

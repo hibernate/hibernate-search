@@ -72,7 +72,7 @@ public class EntityReaderComponentIT {
 	@ReusableOrmSetupHolder.Setup
 	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		setupContext.withAnnotatedTypes( Company.class )
-				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false );
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false );
 	}
 
 	@Before

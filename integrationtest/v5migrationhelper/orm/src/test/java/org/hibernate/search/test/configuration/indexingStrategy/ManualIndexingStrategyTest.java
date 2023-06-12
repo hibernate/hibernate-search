@@ -44,7 +44,7 @@ public class ManualIndexingStrategyTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		cfg.put( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false );
+		cfg.put( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false );
 	}
 
 	private void indexTestEntity() {

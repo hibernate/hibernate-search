@@ -62,7 +62,7 @@ or if you update it regularly by reindexing,
 either using the  <<indexing-massindexer,`MassIndexer`>>
 or <<mapper-orm-indexing-manual,manually>>.
 You can disable automatic indexing by setting the configuration property
-`hibernate.search.automatic_indexing.enabled` to `false`.
+`hibernate.search.indexing.listeners.enabled` to `false`.
 
 [[indexing-automatic-concepts-changes-in-session]]
 == [[mapper-orm-indexing-automatic-concepts-changes-in-session]] In-session entity change detection and limitations

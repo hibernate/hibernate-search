@@ -49,7 +49,10 @@ public final class HibernateOrmMapperSettings {
 	 * or a string that can be parsed into a Boolean value.
 	 * <p>
 	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_ENABLED}.
+	 *
+	 * @deprecated Use {@link #INDEXING_LISTENERS_ENABLED} instead.
 	 */
+	@Deprecated
 	public static final String AUTOMATIC_INDEXING_ENABLED = PREFIX + Radicals.AUTOMATIC_INDEXING_ENABLED;
 
 	/**
@@ -59,7 +62,7 @@ public final class HibernateOrmMapperSettings {
 	 * <p>
 	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_STRATEGY}.
 	 *
-	 * @deprecated Use {@link #AUTOMATIC_INDEXING_ENABLED} instead (caution: it expects a boolean value).
+	 * @deprecated Use {@link #INDEXING_LISTENERS_ENABLED} instead (caution: it expects a boolean value).
 	 */
 	@Deprecated
 	public static final String AUTOMATIC_INDEXING_STRATEGY = PREFIX + Radicals.AUTOMATIC_INDEXING_STRATEGY;
@@ -214,6 +217,16 @@ public final class HibernateOrmMapperSettings {
 	public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY = PREFIX + Radicals.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY;
 
 	/**
+	 * Whether Hibernate ORM listeners that detect entity changes and automatically trigger indexing operations are enabled.
+	 * <p>
+	 * Expects a Boolean value such as {@code true} or {@code false},
+	 * or a string that can be parsed into a Boolean value.
+	 * <p>
+	 * Defaults to {@link Defaults#INDEXING_LISTENERS_ENABLED}.
+	 */
+	public static final String INDEXING_LISTENERS_ENABLED = PREFIX + Radicals.INDEXING_LISTENERS_ENABLED;
+
+	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
 	 */
 	public static final class Radicals {
@@ -222,8 +235,14 @@ public final class HibernateOrmMapperSettings {
 		}
 
 		public static final String ENABLED = "enabled";
+		@Deprecated
 		public static final String AUTOMATIC_INDEXING = "automatic_indexing";
+		@Deprecated
 		public static final String AUTOMATIC_INDEXING_PREFIX = AUTOMATIC_INDEXING + ".";
+		/**
+		 * @deprecated Use {@link #INDEXING_LISTENERS_ENABLED} instead.
+		 */
+		@Deprecated
 		public static final String AUTOMATIC_INDEXING_ENABLED = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.ENABLED;
 		/**
 		 * @deprecated Use {@link #AUTOMATIC_INDEXING_ENABLED} instead (caution: it expects a boolean value).
@@ -253,27 +272,32 @@ public final class HibernateOrmMapperSettings {
 		public static final String MULTI_TENANCY = "multi_tenancy";
 		public static final String MULTI_TENANCY_PREFIX = MULTI_TENANCY + ".";
 		public static final String MULTI_TENANCY_TENANT_IDS = MULTI_TENANCY_PREFIX + MultiTenancyRadicals.TENANT_IDS;
-		public static final String INDEXING_PLAN_PREFIX = "indexing.plan.";
-		public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY = INDEXING_PLAN_PREFIX + IndexingPlanRadicals.SYNCHRONIZATION_STRATEGY;
-
+		public static final String INDEXING_PREFIX = "indexing.";
+		public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY = INDEXING_PREFIX + IndexingRadicals.PLAN_SYNCHRONIZATION_STRATEGY;
+		public static final String INDEXING_LISTENERS_ENABLED = INDEXING_PREFIX + IndexingRadicals.LISTENERS_ENABLED;
 	}
 
 	/**
 	 * Configuration property keys without the {@link #PREFIX prefix} + {@link Radicals#AUTOMATIC_INDEXING_PREFIX}.
 	 */
+	@Deprecated
 	public static final class AutomaticIndexingRadicals {
 
 		private AutomaticIndexingRadicals() {
 		}
 
+		/**
+		 * @deprecated Use {@link IndexingRadicals#LISTENERS_ENABLED} instead.
+		 */
+		@Deprecated
 		public static final String ENABLED = "enabled";
 		/**
-		 * @deprecated Use {@link #ENABLED} instead (caution: it expects a boolean value).
+		 * @deprecated Use {@link IndexingRadicals#LISTENERS_ENABLED} instead (caution: it expects a boolean value).
 		 */
 		@Deprecated
 		public static final String STRATEGY = "strategy";
 		/**
-		 * @deprecated Use {@link IndexingPlanRadicals#SYNCHRONIZATION_STRATEGY} instead.
+		 * @deprecated Use {@link IndexingRadicals#PLAN_SYNCHRONIZATION_STRATEGY} instead.
 		 */
 		@Deprecated
 		public static final String SYNCHRONIZATION_STRATEGY = "synchronization.strategy";
@@ -286,14 +310,17 @@ public final class HibernateOrmMapperSettings {
 	}
 
 	/**
-	 * Configuration property keys without the {@link #PREFIX prefix} + {@link Radicals#INDEXING_PLAN_PREFIX}.
+	 * Configuration property keys without the {@link #PREFIX prefix} + {@link Radicals#INDEXING_PREFIX}.
 	 */
-	public static final class IndexingPlanRadicals {
+	public static final class IndexingRadicals {
 
-		private IndexingPlanRadicals() {
+		private IndexingRadicals() {
 		}
 
-		public static final String SYNCHRONIZATION_STRATEGY = "synchronization.strategy";
+		public static final String PLAN_PREFIX = "plan.";
+		public static final String PLAN_SYNCHRONIZATION_STRATEGY = PLAN_PREFIX + "synchronization.strategy";
+		public static final String LISTENERS_PREFIX = "listeners.";
+		public static final String LISTENERS_ENABLED = LISTENERS_PREFIX + "enabled";
 	}
 
 	/**
@@ -358,6 +385,7 @@ public final class HibernateOrmMapperSettings {
 				BeanReference.of( CoordinationStrategy.class, NoCoordinationStrategy.NAME );
 		public static final BeanReference<IndexingPlanSynchronizationStrategy> INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
 				BeanReference.of( IndexingPlanSynchronizationStrategy.class, "write-sync" );
+		public static final boolean INDEXING_LISTENERS_ENABLED = true;
 
 	}
 
