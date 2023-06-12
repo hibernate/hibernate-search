@@ -268,10 +268,10 @@ index 4fa0ba9e1b..1dabd67a96 100644
  			query.applyGraph( entityGraphHint.graph, entityGraphHint.semantic );
  		}
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/ConditionalExpressionQueryFactory.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/ConditionalExpressionQueryFactory.java
-index 81fa041778..f9c69279ad 100644
+index 81fa041778..ec2dc3cfa2 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/ConditionalExpressionQueryFactory.java
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/ConditionalExpressionQueryFactory.java
-@@ -9,7 +9,7 @@
+@@ -9,35 +9,36 @@
  import java.util.Set;
  
  import org.hibernate.engine.spi.SharedSessionContractImplementor;
@@ -280,7 +280,16 @@ index 81fa041778..f9c69279ad 100644
  import org.hibernate.query.Query;
  import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
  
-@@ -23,21 +23,21 @@ public ConditionalExpressionQueryFactory(String uniquePropertyName) {
+ public abstract class ConditionalExpressionQueryFactory<E, I> implements TypeQueryFactory<E, I> {
+ 
+ 	private static final String TYPES_PARAM_NAME = "HIBERNATE_SEARCH_INCLUDED_TYPES_FILTER";
++	protected final Class<I> uniquePropertyType;
+ 	protected final String uniquePropertyName;
+ 
+-	public ConditionalExpressionQueryFactory(String uniquePropertyName) {
++	public ConditionalExpressionQueryFactory(Class<I> uniquePropertyType, String uniquePropertyName) {
++		this.uniquePropertyType = uniquePropertyType;
+ 		this.uniquePropertyName = uniquePropertyName;
  	}
  
  	@Override
@@ -297,16 +306,39 @@ index 81fa041778..f9c69279ad 100644
  	@Override
 -	@SuppressWarnings("unchecked") // Can't do better here: EntityPersister has no generics
 -	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityPersister persister,
-+	@SuppressWarnings("unchecked") // Can't do better here: EntityMappingType has no generics
 +	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityMappingType entityMappingType,
  			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression) {
  		return createQueryWithConditionalExpression( session,
 -				"select e. " + uniquePropertyName + " from " + persister.getEntityName() + " e",
 -				(Class<I>) persister.getIdentifierType().getReturnedClass(), "e",
 +				"select e. " + uniquePropertyName + " from " + entityMappingType.getEntityName() + " e",
-+				(Class<I>) entityMappingType.getIdentifierMapping().getJavaType().getJavaTypeClass(), "e",
++				uniquePropertyType, "e",
  				includedTypesFilter, conditionalExpression
  		);
+ 	}
+diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/CriteriaTypeQueryFactory.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/CriteriaTypeQueryFactory.java
+index 62d20f6fe7..96944aa51e 100644
+--- a/main/java/org/hibernate/search/mapper/orm/loading/impl/CriteriaTypeQueryFactory.java
++++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/CriteriaTypeQueryFactory.java
+@@ -25,16 +25,14 @@
+ 
+ 	public static <E> CriteriaTypeQueryFactory<E, ?> create(EntityDomainType<E> type,
+ 			String uniquePropertyName) {
+-		return new CriteriaTypeQueryFactory<>( type, uniquePropertyName,
+-				type.getSingularAttribute( uniquePropertyName ) );
++		return new CriteriaTypeQueryFactory<>( type, type.getSingularAttribute( uniquePropertyName ) );
+ 	}
+ 
+ 	private final EntityDomainType<E> type;
+ 	private final SingularAttribute<? super E, I> uniqueProperty;
+ 
+-	private CriteriaTypeQueryFactory(EntityDomainType<E> type,
+-			String uniquePropertyName, SingularAttribute<? super E, I> uniqueProperty) {
+-		super( uniquePropertyName );
++	private CriteriaTypeQueryFactory(EntityDomainType<E> type, SingularAttribute<? super E, I> uniqueProperty) {
++		super( uniqueProperty.getJavaType(), uniqueProperty.getName() );
+ 		this.type = type;
+ 		this.uniqueProperty = uniqueProperty;
  	}
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmEntityIdEntityLoadingStrategy.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmEntityIdEntityLoadingStrategy.java
 index 21503d08be..af34072fdf 100644
@@ -747,10 +779,10 @@ index 11409cad25..58b36111c5 100644
  		this.documentIdSourcePropertyName = documentIdSourcePropertyName;
  		this.documentIdSourceHandle = documentIdSourceHandle;
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HqlTypeQueryFactory.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HqlTypeQueryFactory.java
-index a43ff3c025..7c16971e73 100644
+index a43ff3c025..abebc0d505 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HqlTypeQueryFactory.java
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/HqlTypeQueryFactory.java
-@@ -11,23 +11,23 @@
+@@ -11,56 +11,57 @@
  import org.hibernate.MultiIdentifierLoadAccess;
  import org.hibernate.engine.spi.SessionImplementor;
  import org.hibernate.engine.spi.SharedSessionContractImplementor;
@@ -764,9 +796,14 @@ index a43ff3c025..7c16971e73 100644
 +	private final EntityMappingType entityMappingType;
  
 -	HqlTypeQueryFactory(EntityPersister entityPersister, String uniquePropertyName) {
-+	HqlTypeQueryFactory(EntityMappingType entityMappingType, String uniquePropertyName) {
- 		super( uniquePropertyName );
+-		super( uniquePropertyName );
 -		this.entityPersister = entityPersister;
++	@SuppressWarnings("unchecked") // Can't do better here: EntityMappingType has no generics
++	HqlTypeQueryFactory(EntityMappingType entityMappingType, String uniquePropertyName) {
++		super( uniquePropertyName.equals( entityMappingType.getIdentifierMapping().getAttributeName() )
++				? (Class<I>) entityMappingType.getIdentifierMapping().getJavaType().getJavaTypeClass()
++				: (Class<I>) entityMappingType.findAttributeMapping( uniquePropertyName ).getJavaType().getJavaTypeClass(),
++				uniquePropertyName );
 +		this.entityMappingType = entityMappingType;
  	}
  
@@ -779,18 +816,20 @@ index a43ff3c025..7c16971e73 100644
  				Long.class,
  				"e", includedTypesFilter );
  	}
-@@ -37,8 +37,8 @@ public Query<Long> createQueryForCount(SharedSessionContractImplementor session,
+ 
+-	@SuppressWarnings("unchecked")
+ 	@Override
  	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
  			Set<? extends Class<? extends E>> includedTypesFilter) {
  		return createQueryWithTypesFilter( session,
 -				"select e. " + uniquePropertyName + " from " + entityPersister.getEntityName() + " e",
 -				(Class<I>) entityPersister.getIdentifierType().getReturnedClass(),
+-				"e", includedTypesFilter );
 +				"select e. " + uniquePropertyName + " from " + entityMappingType.getEntityName() + " e",
-+				(Class<I>) entityMappingType.getIdentifierMapping().getJavaType().getJavaTypeClass(),
- 				"e", includedTypesFilter );
++				uniquePropertyType, "e", includedTypesFilter );
  	}
  
-@@ -46,21 +46,20 @@ public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor
+ 	@SuppressWarnings("unchecked")
  	@Override
  	public Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName) {
  		return session.createQuery(
