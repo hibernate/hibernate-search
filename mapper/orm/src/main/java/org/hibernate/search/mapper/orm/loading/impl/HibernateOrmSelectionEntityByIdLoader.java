@@ -10,8 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.engine.spi.EntityKey;
-import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.query.Query;
+import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 
 /**
  * An entity loader for indexed entities whose document ID is the entity ID.
@@ -23,12 +24,12 @@ class HibernateOrmSelectionEntityByIdLoader<E> extends AbstractHibernateOrmSelec
 	private final PersistenceContextLookupStrategy persistenceContextLookup;
 	private final EntityLoadingCacheLookupStrategyImplementor cacheLookupStrategyImplementor;
 
-	HibernateOrmSelectionEntityByIdLoader(EntityPersister rootEntityPersister,
+	HibernateOrmSelectionEntityByIdLoader(EntityMappingType rootEntityMappingType,
 			TypeQueryFactory<E, ?> queryFactory, LoadingSessionContext sessionContext,
 			PersistenceContextLookupStrategy persistenceContextLookup,
 			EntityLoadingCacheLookupStrategyImplementor cacheLookupStrategyImplementor,
 			MutableEntityLoadingOptions loadingOptions) {
-		super( rootEntityPersister, queryFactory, sessionContext, loadingOptions );
+		super( rootEntityMappingType, queryFactory, sessionContext, loadingOptions );
 		this.persistenceContextLookup = persistenceContextLookup;
 		this.cacheLookupStrategyImplementor = cacheLookupStrategyImplementor;
 	}
@@ -83,11 +84,12 @@ class HibernateOrmSelectionEntityByIdLoader<E> extends AbstractHibernateOrmSelec
 		return loadedEntities;
 	}
 
+	@SuppressForbiddenApis(reason = "generateEntityKey requires passing an EntityPersister")
 	private EntityKey[] toEntityKeys(List<?> ids) {
 		EntityKey[] entityKeys = new EntityKey[ids.size()];
 		for ( int i = 0; i < ids.size(); i++ ) {
 			Object id = ids.get( i );
-			EntityKey entityKey = sessionContext.session().generateEntityKey( id, entityPersister );
+			EntityKey entityKey = sessionContext.session().generateEntityKey( id, entityMappingType.getEntityPersister() );
 			entityKeys[i] = ( entityKey );
 		}
 		return entityKeys;

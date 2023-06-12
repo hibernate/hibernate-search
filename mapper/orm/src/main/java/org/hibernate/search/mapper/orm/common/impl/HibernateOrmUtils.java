@@ -17,15 +17,14 @@ import java.util.Set;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
-import org.hibernate.AssertionFailure;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.mapping.Property;
 import org.hibernate.metamodel.MappingMetamodel;
 import org.hibernate.metamodel.mapping.EntityMappingType;
-import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.service.Service;
@@ -67,24 +66,11 @@ public final class HibernateOrmUtils {
 		}
 	}
 
-	private static boolean isSuperTypeOf(EntityPersister type1, EntityPersister type2) {
-		return type1.isSubclassEntityName( type2.getEntityName() );
+	private static boolean isSuperTypeOf(EntityMappingType type1, EntityMappingType type2) {
+		return type1.getSubclassEntityNames().contains( type2.getEntityName() );
 	}
 
-	public static EntityPersister toRootEntityType(SessionFactoryImplementor sessionFactory,
-			EntityPersister entityType) {
-		/*
-		 * We need to rely on Hibernate ORM's SPIs: this is complex stuff.
-		 * For example there may be class hierarchies such as A > B > C
-		 * where A and C are entity types and B is a mapped superclass.
-		 * So we need to exclude non-entity types, and for that we need the Hibernate ORM metamodel.
-		 */
-		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
-		String rootEntityName = entityType.getRootEntityName();
-		return metamodel.getEntityDescriptor( rootEntityName );
-	}
-
-	public static EntityPersister toMostSpecificCommonEntitySuperType(EntityPersister type1, EntityPersister type2) {
+	public static EntityMappingType toMostSpecificCommonEntitySuperType(EntityMappingType type1, EntityMappingType type2) {
 		/*
 		 * We need to rely on Hibernate ORM's SPIs: this is complex stuff.
 		 * For example there may be class hierarchies such as A > B > C
@@ -92,26 +78,22 @@ public final class HibernateOrmUtils {
 		 * So even if we know the two types have a common superclass,
 		 * we need to skip non-entity superclasses, and for that we need the Hibernate ORM metamodel.
 		 */
-		EntityPersister superTypeCandidate = type1;
+		EntityMappingType superTypeCandidate = type1;
 		while ( superTypeCandidate != null && !isSuperTypeOf( superTypeCandidate, type2 ) ) {
-			EntityMappingType superSuperType = superTypeCandidate.getSuperMappingType();
-			superTypeCandidate = superSuperType == null
-					? null : superSuperType.getEntityPersister();
+			superTypeCandidate = superTypeCandidate.getSuperMappingType();
 		}
 		if ( superTypeCandidate == null ) {
 			throw new AssertionFailure(
 					"Cannot find a common entity supertype for " + type1.getEntityName()
 							+ " and " + type2.getEntityName() + "."
-							+ " There is a bug in Hibernate Search, please report it."
 			);
 		}
 		return superTypeCandidate;
 	}
 
 	public static boolean targetsAllConcreteSubTypes(SessionFactoryImplementor sessionFactory,
-			EntityPersister parentType, Collection<?> targetConcreteSubTypes) {
-		@SuppressWarnings("unchecked")
-		Set<String> subClassEntityNames = parentType.getEntityMetamodel().getSubclassEntityNames();
+			EntityMappingType parentType, Collection<?> targetConcreteSubTypes) {
+		Set<String> subClassEntityNames = parentType.getSubclassEntityNames();
 		// Quick check to return true immediately if all subtypes are concrete
 		if ( subClassEntityNames.size() == targetConcreteSubTypes.size() ) {
 			return true;
@@ -120,7 +102,8 @@ public final class HibernateOrmUtils {
 		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
 		int concreteSubTypesCount = 0;
 		for ( String subClassEntityName : subClassEntityNames ) {
-			if ( !metamodel.getEntityDescriptor( subClassEntityName ).isAbstract() ) {
+			EntityMappingType subclassType = metamodel.getEntityDescriptor( subClassEntityName );
+			if ( !subclassType.isAbstract() ) {
 				++concreteSubTypesCount;
 			}
 		}
@@ -132,7 +115,7 @@ public final class HibernateOrmUtils {
 			Class<T> serviceClass) {
 		T service = serviceRegistry.getService( serviceClass );
 		if ( service == null ) {
-			throw new org.hibernate.search.util.common.AssertionFailure(
+			throw new AssertionFailure(
 					"A required service was missing. Missing service: " + serviceClass );
 		}
 		return service;

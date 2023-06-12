@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -22,13 +22,13 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 		implements HibernateOrmEntityLoadingStrategy<E, I> {
 
 	private final SessionFactoryImplementor sessionFactory;
-	private final EntityPersister rootEntityPersister;
+	private final EntityMappingType rootEntityMappingType;
 	private final TypeQueryFactory<E, I> queryFactory;
 
 	AbstractHibernateOrmLoadingStrategy(SessionFactoryImplementor sessionFactory,
-			EntityPersister rootEntityPersister, TypeQueryFactory<E, I> queryFactory) {
+			EntityMappingType rootEntityMappingType, TypeQueryFactory<E, I> queryFactory) {
 		this.sessionFactory = sessionFactory;
-		this.rootEntityPersister = rootEntityPersister;
+		this.rootEntityMappingType = rootEntityMappingType;
 		this.queryFactory = queryFactory;
 	}
 
@@ -36,7 +36,7 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 	public HibernateOrmQueryLoader<E, I> createQueryLoader(
 			List<LoadingTypeContext<? extends E>> typeContexts, Optional<ConditionalExpression> conditionalExpression) {
 		Set<Class<? extends E>> includedTypesFilter;
-		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, rootEntityPersister, typeContexts ) ) {
+		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, rootEntityMappingType, typeContexts ) ) {
 			// All concrete types are included, no need to filter by type.
 			includedTypesFilter = Collections.emptySet();
 		}
@@ -52,9 +52,9 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 				throw new AssertionFailure( "conditional expression is always defined on a single type" );
 			}
 
-			EntityPersister entityPersister = typeContexts.get( 0 ).entityPersister();
+			EntityMappingType entityMappingType = typeContexts.get( 0 ).entityMappingType();
 			return new HibernateOrmQueryLoader<>(
-					queryFactory, entityPersister, includedTypesFilter, conditionalExpression.get() );
+					queryFactory, entityMappingType, includedTypesFilter, conditionalExpression.get() );
 		}
 		return new HibernateOrmQueryLoader<>( queryFactory, includedTypesFilter );
 	}
