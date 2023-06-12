@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.util.List;
 
-import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface LoadingTypeContext<E> {
@@ -21,9 +21,9 @@ public interface LoadingTypeContext<E> {
 	PojoRawTypeIdentifier<E> typeIdentifier();
 
 	/**
-	 * @return The entity persister, giving access to a representation of the entity type in the Hibernate ORM metamodel.
+	 * @return The entity mapping type, giving access to a representation of the entity type in the Hibernate ORM metamodel.
 	 */
-	EntityPersister entityPersister();
+	EntityMappingType entityMappingType();
 
 	HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy();
 

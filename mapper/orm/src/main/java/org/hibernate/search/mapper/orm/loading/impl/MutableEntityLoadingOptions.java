@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.loading.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.search.util.common.impl.Contracts;
 
 public class MutableEntityLoadingOptions {
@@ -30,11 +30,11 @@ public class MutableEntityLoadingOptions {
 		this.fetchSize = fetchSize;
 	}
 
-	public EntityGraphHint<?> entityGraphHintOrNullForType(EntityPersister entityPersister) {
+	public EntityGraphHint<?> entityGraphHintOrNullForType(EntityMappingType entityMappingType) {
 		if ( entityGraphHints == null ) {
 			return null;
 		}
-		String hibernateOrmEntityName = entityPersister.getEntityName();
+		String hibernateOrmEntityName = entityMappingType.getEntityName();
 		for ( EntityGraphHint<?> entityGraphHint : entityGraphHints ) {
 			if ( entityGraphHint.graph.appliesTo( hibernateOrmEntityName ) ) {
 				return entityGraphHint;
