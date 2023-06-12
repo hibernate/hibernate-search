@@ -61,7 +61,7 @@ public class RestartChunkIT {
 	@ReusableOrmSetupHolder.Setup
 	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		setupContext.withAnnotatedTypes( SimulatedFailureCompany.class )
-				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false );
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false );
 	}
 
 	@Before

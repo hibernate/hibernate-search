@@ -57,7 +57,7 @@ public class MassIndexingMonitorIT {
 	@Before
 	public void before() {
 		entityManagerFactory = setupHelper.start()
-				.withProperty( "hibernate.search.automatic_indexing.enabled", false )
+				.withProperty( "hibernate.search.indexing.listeners.enabled", false )
 				.setup( Book.class );
 
 		prepareBooks( entityManagerFactory, NUMBER_OF_BOOKS );

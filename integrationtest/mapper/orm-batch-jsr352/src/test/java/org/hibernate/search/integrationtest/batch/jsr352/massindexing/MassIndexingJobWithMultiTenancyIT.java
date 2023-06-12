@@ -58,7 +58,7 @@ public class MassIndexingJobWithMultiTenancyIT {
 	@ReusableOrmSetupHolder.Setup
 	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		setupContext.withAnnotatedTypes( Company.class )
-				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false )
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
 				.withBackendProperty( "multi_tenancy.strategy", "discriminator" )
 				.tenants( TARGET_TENANT_ID, UNUSED_TENANT_ID );
 	}

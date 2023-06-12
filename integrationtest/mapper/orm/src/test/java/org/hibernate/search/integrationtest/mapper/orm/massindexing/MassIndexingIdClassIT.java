@@ -50,7 +50,7 @@ public class MassIndexingIdClassIT {
 	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectAnySchema( IdClassEntity.INDEX );
 
-		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, false )
+		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, false )
 				.withAnnotatedTypes( IdClassEntity.class );
 	}
 

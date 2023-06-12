@@ -227,7 +227,7 @@ public class DynamicMapBaseIT {
 		);
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withConfiguration( builder -> builder.addHbmFromClassPath( hbmPath ) )
-				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false )
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
 				.withProperty(
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {

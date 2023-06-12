@@ -86,7 +86,7 @@ public class MassIndexingBaseIT {
 	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
 		backendMock.expectAnySchema( Book.INDEX );
 
-		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, false )
+		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, false )
 				.withAnnotatedTypes( Book.class );
 
 		if ( TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ) {

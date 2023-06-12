@@ -46,7 +46,7 @@ public class HibernateOrmMassIndexerIT {
 	@Before
 	public void setup() {
 		this.entityManagerFactory = setupHelper.start()
-				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false )
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
 				.setup( Book.class, Author.class );
 		initData( entityManagerFactory, HibernateOrmMassIndexerIT::newAuthor );
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {

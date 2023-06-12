@@ -790,7 +790,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		backendMock.expectAnySchema( Book.NAME );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
-				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, false )
+				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, false )
 				.withPropertyRadical( EngineSettings.Radicals.BACKGROUND_FAILURE_HANDLER, getBackgroundFailureHandlerReference() )
 				.withPropertyRadical( EngineSpiSettings.Radicals.THREAD_PROVIDER, threadSpy.getThreadProvider() )
 				.withConfiguration( configuration )

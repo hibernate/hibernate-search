@@ -237,7 +237,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET + 53, value = "Configuration property '%1$s' is deprecated; use '%2$s' instead.")
-	void automaticIndexingStrategyIsDeprecated(String resolveOrRaw, String resolveOrRaw1);
+	void deprecatedPropertyUsedInsteadOfNew(String resolveOrRaw, String resolveOrRaw1);
 
 	@Message(id = ID_OFFSET + 54, value = "Cannot determine the set of all possible tenant identifiers."
 			+ " You must provide this information by setting configuration property '%1$s'"
@@ -332,4 +332,8 @@ public interface Log extends BasicLogger {
 			+ "There will be no alternative provided to replace it. "
 			+ "A dirty check will always be performed when considering triggering the reindexing.")
 	void automaticIndexingEnableDirtyCheckIsDeprecated(String deprecatedProperty);
+
+	@Message(id = ID_OFFSET + 126,
+			value = "Both '%1$s' and '%2$s' are configured. Use only '%2$s' to enable indexing listeners. ")
+	SearchException bothNewAndOldConfigurationPropertiesForIndexingListenersAreUsed(String key1, String key2);
 }

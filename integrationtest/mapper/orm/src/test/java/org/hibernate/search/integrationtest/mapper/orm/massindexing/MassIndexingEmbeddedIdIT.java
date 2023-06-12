@@ -65,7 +65,7 @@ public class MassIndexingEmbeddedIdIT {
 		backendMock.expectAnySchema( Book.INDEX );
 
 		sessionFactory = ormSetupHelper.start()
-				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, false )
+				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, false )
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();

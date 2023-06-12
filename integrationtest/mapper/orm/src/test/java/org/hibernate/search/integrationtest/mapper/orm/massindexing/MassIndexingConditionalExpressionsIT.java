@@ -71,7 +71,7 @@ public class MassIndexingConditionalExpressionsIT {
 		backendMock.expectAnySchema( H3_A_Indexed.NAME );
 		backendMock.expectAnySchema( H3_B_Indexed.NAME );
 
-		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, false )
+		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, false )
 				.withAnnotatedTypes(
 						H0_Indexed.class,
 						H1_Root_NotIndexed.class, H1_A_NotIndexed.class, H1_B_Indexed.class,

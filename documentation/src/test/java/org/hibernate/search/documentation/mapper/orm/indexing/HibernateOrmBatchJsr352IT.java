@@ -44,7 +44,7 @@ public class HibernateOrmBatchJsr352IT {
 	@Before
 	public void setup() {
 		this.entityManagerFactory = setupHelper.start()
-				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false )
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
 				.setup( Book.class, Author.class );
 		initData( entityManagerFactory, HibernateOrmBatchJsr352IT::newAuthor );
 	}

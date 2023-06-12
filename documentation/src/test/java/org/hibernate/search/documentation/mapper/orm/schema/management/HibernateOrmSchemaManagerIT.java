@@ -52,7 +52,7 @@ public class HibernateOrmSchemaManagerIT {
 		this.entityManagerFactory = setupHelper.start()
 				.withProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
 						SchemaManagementStrategyName.NONE )
-				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false )
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
 				.setup( Book.class, Author.class );
 		initData();
 	}
