@@ -12,8 +12,10 @@ import org.hibernate.ObjectNotFoundException;
 import org.hibernate.cache.spi.access.EntityDataAccess;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -24,25 +26,27 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard
  */
+@SuppressForbiddenApis(reason = "EntityPersister is needed to retrieve/use EntityDataAccess")
 class PersistenceContextThenSecondLevelCacheLookupStrategy
 		implements EntityLoadingCacheLookupStrategyImplementor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	static EntityLoadingCacheLookupStrategyImplementor create(EntityPersister commonEntitySuperTypePersister,
+	static EntityLoadingCacheLookupStrategyImplementor create(EntityMappingType entityMappingType,
 			SessionImplementor session) {
 		EntityLoadingCacheLookupStrategyImplementor persistenceContextLookupStrategy =
 				PersistenceContextLookupStrategy.create( session );
-		EntityDataAccess cacheAccess = commonEntitySuperTypePersister.getCacheAccessStrategy();
+		EntityPersister entityPersister = entityMappingType.getEntityPersister();
+		EntityDataAccess cacheAccess = entityPersister.getCacheAccessStrategy();
 		if ( cacheAccess == null ) {
 			// No second-level cache
 			log.skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader(
-					commonEntitySuperTypePersister.getEntityName() );
+					entityPersister.getEntityName() );
 			return persistenceContextLookupStrategy;
 		}
 		return new PersistenceContextThenSecondLevelCacheLookupStrategy(
 				persistenceContextLookupStrategy,
-				commonEntitySuperTypePersister,
+				entityPersister,
 				cacheAccess,
 				session
 		);

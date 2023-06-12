@@ -63,6 +63,7 @@ java.time.ZonedDateTime#parse(java.lang.CharSequence, java.time.format.DateTimeF
 @defaultMessage Avoid using Hibernate ORM internals
 org.hibernate.internal.**
 org.hibernate.**.internal.**
+org.hibernate.persister.** @ Prefer EntityMappingType to the implicitly internal EntityPersister and related classes; see https://hibernate.zulipchat.com/#narrow/stream/132094-hibernate-orm-dev/topic/persister.20and.20internal
 
 ################################################################################################################
 @defaultMessage Favor EntityManager methods over their Session equivalent
