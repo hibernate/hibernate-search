@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
@@ -26,30 +26,30 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static <I> HibernateOrmEntityLoadingStrategy<?, ?> create(SessionFactoryImplementor sessionFactory,
-			EntityPersister entityPersister,
+			EntityMappingType entityMappingType,
 			String documentIdSourcePropertyName, ValueReadHandle<I> documentIdSourceHandle) {
 		// By contract, the documentIdSourceHandle and the documentIdSourcePropertyName refer to the same property,
 		// whose type is I.
 		@SuppressWarnings("unchecked")
 		TypeQueryFactory<?, I> queryFactory = (TypeQueryFactory<?, I>) TypeQueryFactory.create( sessionFactory,
-				entityPersister, documentIdSourcePropertyName );
+				entityMappingType, documentIdSourcePropertyName );
 		return new HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<>( sessionFactory,
-				entityPersister, queryFactory,
+				entityMappingType, queryFactory,
 				documentIdSourcePropertyName, documentIdSourceHandle );
 	}
 
-	private final EntityPersister entityPersister;
+	private final EntityMappingType entityMappingType;
 	private final TypeQueryFactory<E, I> queryFactory;
 	private final String documentIdSourcePropertyName;
 	private final ValueReadHandle<?> documentIdSourceHandle;
 
 	private HibernateOrmNonEntityIdPropertyEntityLoadingStrategy(SessionFactoryImplementor sessionFactory,
-			EntityPersister entityPersister,
+			EntityMappingType entityMappingType,
 			TypeQueryFactory<E, I> queryFactory,
 			String documentIdSourcePropertyName,
 			ValueReadHandle<I> documentIdSourceHandle) {
-		super( sessionFactory, entityPersister, queryFactory );
-		this.entityPersister = entityPersister;
+		super( sessionFactory, entityMappingType, queryFactory );
+		this.entityMappingType = entityMappingType;
 		this.queryFactory = queryFactory;
 		this.documentIdSourcePropertyName = documentIdSourcePropertyName;
 		this.documentIdSourceHandle = documentIdSourceHandle;
@@ -64,14 +64,14 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 				(HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<?, ?>) obj;
 		// If the entity type is different,
 		// the factories work in separate ID spaces and should be used separately.
-		return entityPersister.equals( other.entityPersister )
+		return entityMappingType.equals( other.entityMappingType )
 				&& documentIdSourcePropertyName.equals( other.documentIdSourcePropertyName )
 				&& documentIdSourceHandle.equals( other.documentIdSourceHandle );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( entityPersister, documentIdSourcePropertyName, documentIdSourceHandle );
+		return Objects.hash( entityMappingType, documentIdSourcePropertyName, documentIdSourceHandle );
 	}
 
 	@Override
@@ -89,17 +89,17 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 			LoadingSessionContext sessionContext,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions) {
-		if ( !entityPersister.equals( targetEntityTypeContext.entityPersister() ) ) {
-			throw invalidTypeException( targetEntityTypeContext.entityPersister() );
+		if ( !entityMappingType.equals( targetEntityTypeContext.entityMappingType() ) ) {
+			throw invalidTypeException( targetEntityTypeContext.entityMappingType() );
 		}
 
 		/*
-		 * We checked just above that "entityPersister" is equal to "targetEntityTypeContext.entityPersister()",
+		 * We checked just above that "entityMappingType" is equal to "targetEntityTypeContext.entityMappingType()",
 		 * so this loader will actually return entities of type E2.
 		 */
 		@SuppressWarnings("unchecked")
 		PojoSelectionEntityLoader<E2> result = new HibernateOrmSelectionEntityByNonIdPropertyLoader<>(
-				entityPersister, (LoadingTypeContext<E2>) targetEntityTypeContext,
+				entityMappingType, (LoadingTypeContext<E2>) targetEntityTypeContext,
 				(TypeQueryFactory<E2, ?>) queryFactory,
 				documentIdSourcePropertyName, documentIdSourceHandle,
 				sessionContext, loadingOptions
@@ -121,22 +121,22 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 		return result;
 	}
 
-	private AssertionFailure invalidTypeException(EntityPersister otherEntityPersister) {
+	private AssertionFailure invalidTypeException(EntityMappingType otherEntityMappingType) {
 		throw new AssertionFailure(
 				"Attempt to use a criteria-based entity loader with an unexpected target entity type."
-						+ " Expected entity name: " + entityPersister.getEntityName()
-						+ " Targeted entity name: " + otherEntityPersister
+						+ " Expected entity name: " + entityMappingType.getEntityName()
+						+ " Targeted entity name: " + otherEntityMappingType.getEntityName()
 		);
 	}
 
 	private AssertionFailure multipleTypesException(Set<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
 		return new AssertionFailure(
 				"Attempt to use a criteria-based entity loader with multiple target entity types."
-						+ " Expected entity name: " + entityPersister.getEntityName()
+						+ " Expected entity name: " + entityMappingType.getEntityName()
 						+ " Targeted entity names: "
 						+ targetEntityTypeContexts.stream()
-								.map( LoadingTypeContext::entityPersister )
-								.map( EntityPersister::getEntityName )
+								.map( LoadingTypeContext::entityMappingType )
+								.map( EntityMappingType::getEntityName )
 								.collect( Collectors.toList() )
 		);
 	}

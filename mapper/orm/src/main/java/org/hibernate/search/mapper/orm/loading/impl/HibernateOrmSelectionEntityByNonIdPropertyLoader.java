@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Hibernate;
-import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.impl.CollectionHelper;
@@ -33,14 +33,14 @@ class HibernateOrmSelectionEntityByNonIdPropertyLoader<E> extends AbstractHibern
 	private final String documentIdSourcePropertyName;
 	private final ValueReadHandle<?> documentIdSourceHandle;
 
-	HibernateOrmSelectionEntityByNonIdPropertyLoader(EntityPersister entityPersister,
+	HibernateOrmSelectionEntityByNonIdPropertyLoader(EntityMappingType entityMappingType,
 			LoadingTypeContext<E> targetEntityTypeContext,
 			TypeQueryFactory<E, ?> queryFactory,
 			String documentIdSourcePropertyName,
 			ValueReadHandle<?> documentIdSourceHandle,
 			LoadingSessionContext sessionContext,
 			MutableEntityLoadingOptions loadingOptions) {
-		super( entityPersister, queryFactory, sessionContext, loadingOptions );
+		super( entityMappingType, queryFactory, sessionContext, loadingOptions );
 		this.targetEntityTypeContext = targetEntityTypeContext;
 		this.documentIdSourcePropertyName = documentIdSourcePropertyName;
 		this.documentIdSourceHandle = documentIdSourceHandle;

@@ -35,11 +35,13 @@ import org.hibernate.event.spi.PostInsertEvent;
 import org.hibernate.event.spi.PostInsertEventListener;
 import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.event.spi.PostUpdateEventListener;
+import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoTypeIndexingPlan;
+import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -290,8 +292,8 @@ public final class HibernateSearchEventListener
 		return contextProvider.currentIndexingPlanIfExisting( sessionImplementor );
 	}
 
-	private HibernateOrmListenerTypeContext getTypeContextOrNull(EntityPersister entityPersister) {
-		String entityName = entityPersister.getEntityName();
+	private HibernateOrmListenerTypeContext getTypeContextOrNull(EntityMappingType entityMappingType) {
+		String entityName = entityMappingType.getEntityName();
 		return contextProvider.typeContextProvider().byHibernateOrmEntityName().getOrNull( entityName );
 	}
 
@@ -363,7 +365,7 @@ public final class HibernateSearchEventListener
 	 * Required since Hibernate ORM 4.3
 	 */
 	@Override
-	@SuppressWarnings("deprecation") // Deprecated but abstract, so we have to implement it...
+	@SuppressForbiddenApis(reason = "We are forced to implement this method and it requires accepting an EntityPersister")
 	public boolean requiresPostCommitHandling(EntityPersister persister) {
 		// TODO Tests seem to pass using _false_ but we might be able to take
 		// advantage of this new hook?
