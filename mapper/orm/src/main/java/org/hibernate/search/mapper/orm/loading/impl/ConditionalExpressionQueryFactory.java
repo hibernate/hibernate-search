@@ -16,9 +16,11 @@ import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
 public abstract class ConditionalExpressionQueryFactory<E, I> implements TypeQueryFactory<E, I> {
 
 	private static final String TYPES_PARAM_NAME = "HIBERNATE_SEARCH_INCLUDED_TYPES_FILTER";
+	protected final Class<I> uniquePropertyType;
 	protected final String uniquePropertyName;
 
-	public ConditionalExpressionQueryFactory(String uniquePropertyName) {
+	public ConditionalExpressionQueryFactory(Class<I> uniquePropertyType, String uniquePropertyName) {
+		this.uniquePropertyType = uniquePropertyType;
 		this.uniquePropertyName = uniquePropertyName;
 	}
 
@@ -32,12 +34,11 @@ public abstract class ConditionalExpressionQueryFactory<E, I> implements TypeQue
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // Can't do better here: EntityMappingType has no generics
 	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityMappingType entityMappingType,
 			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression) {
 		return createQueryWithConditionalExpression( session,
 				"select e. " + uniquePropertyName + " from " + entityMappingType.getEntityName() + " e",
-				(Class<I>) entityMappingType.getIdentifierMapping().getJavaType().getJavaTypeClass(), "e",
+				uniquePropertyType, "e",
 				includedTypesFilter, conditionalExpression
 		);
 	}
