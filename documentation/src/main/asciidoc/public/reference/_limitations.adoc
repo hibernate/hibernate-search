@@ -2,7 +2,8 @@
 = [[elasticsearch-limitations]] Known issues and limitations
 
 [[limitations-parallel-embedded-update]]
-== Without coordination, in rare cases, automatic indexing involving `@IndexedEmbedded` may lead to out-of sync indexes
+== Without coordination, in rare cases, indexing involving `@IndexedEmbedded` may lead to out-of sync indexes
+// TODO: we might what to better explain "indexing" in the title ^ which is talking about architecture-hsearch-indexing
 
 [[limitations-parallel-embedded-update-description]]
 === Description
@@ -58,13 +59,13 @@ so it can only be addressed completely by configuring <<coordination,coordinatio
 There are no other solutions currently on the roadmap.
 
 [[limitations-backend-indexing-error]]
-== Without coordination, backend errors during automatic indexing may lead to out-of sync indexes
+== Without coordination, backend errors during indexing may lead to out-of sync indexes
 
 [[limitations-backend-indexing-error-description]]
 === Description
 
 With the default settings (<<coordination-none,no coordination>>),
-<<indexing-automatic,automatic indexing>>
+<<architecture-hsearch-indexing,indexing>>
 will actually apply index changes in the backend *just after* the transaction commit,
 without any kind of transaction log for the index changes.
 
@@ -101,7 +102,7 @@ but they will never solve the problem completely,
 and they are not currently on the roadmap.
 
 [[limitations-changes-in-session]]
-== Automatic indexing only considers changes applied directly to entity instances in Hibernate ORM sessions
+== Listener-triggered indexing only considers changes applied directly to entity instances in Hibernate ORM sessions
 
 [[limitations-changes-in-session-description]]
 === Description
@@ -131,7 +132,7 @@ This is tracked as https://hibernate.atlassian.net/browse/HSEARCH-3513[HSEARCH-3
 but is long-term goal.
 
 [[limitations-changes-asymmetric-association-updates]]
-== [[mapper-orm-indexing-automatic-concepts-session-consistency]] Automatic indexing ignores asymmetric association updates
+== [[mapper-orm-indexing-automatic-concepts-session-consistency]] Listener-triggered indexing ignores asymmetric association updates
 
 [[limitations-changes-asymmetric-association-updates-description]]
 === Description
@@ -191,12 +192,12 @@ This is tracked as https://hibernate.atlassian.net/browse/HSEARCH-3513[HSEARCH-3
 but is long-term goal.
 
 [[limitations-indexing-plan-serialization]]
-== Automatic indexing is not compatible with `Session` serialization
+== Listener-triggered indexing is not compatible with `Session` serialization
 
 [[limitations-indexing-plan-serialization-description]]
 === Description
 
-When <<indexing-automatic,automatic indexing>> is enabled,
+When <<listener-triggered-indexing,listener-triggered indexing>> is enabled,
 Hibernate Search collects entity change events
 to build an "indexing plan" inside the ORM `EntityManager`/`Session`.
 The indexing plan holds information relative to which entities need to be re-indexed,

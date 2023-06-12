@@ -905,16 +905,15 @@ are pushed to the index itself,
 so that a crash or power loss will no longer result in data loss.
 
 Some operations are critical and are always committed before they are considered complete.
-This is the case for changes triggered by <<indexing-automatic,automatic indexing>>
+This is the case for changes triggered by <<listener-triggered-indexing,listener-triggered indexing>>
 (unless <<indexing-plan-synchronization,configured otherwise>>),
 and also for large-scale operations such as a <<indexing-workspace,purge>>.
 When such an operation is encountered, a commit will be performed immediately,
 guaranteeing that the operation is only considered complete after all changes are safely stored on disk.
 
-Other operations, however, are not expected to be committed immediately.
-This is the case for changes contributed by the <<indexing-massindexer,mass indexer>>,
-or by automatic indexing when using the
-<<indexing-plan-synchronization,`async` synchronization strategy>>.
+However, other operations, like changes contributed by the <<indexing-massindexer,mass indexer>>
+or when <<architecture-hsearch-indexing,indexing>> is using the <<indexing-plan-synchronization,`async` synchronization strategy>>,
+are not expected to be committed immediately.
 
 Performance-wise, committing may be an expensive operation,
 which is why Hibernate Search tries not to commit too often.
@@ -942,8 +941,8 @@ The default for this property is `1000`.
 ====
 Setting the commit interval to 0 will force Hibernate Search to commit after every batch of changes,
 which may result in a much lower throughput,
-both for <<indexing-automatic,automatic indexing>>
-and <<indexing-massindexer,mass indexing>>.
+in particular for <<architecture-hsearch-indexing,explicit or listener-triggered indexing>>
+but even more so for <<indexing-massindexer,mass indexing>>.
 ====
 
 [NOTE]
@@ -953,7 +952,7 @@ which may cancel out the potential performance gains from setting a higher commi
 
 By default, the commit interval may only improve throughput
 of the <<indexing-massindexer,mass indexer>>.
-If you want changes triggered by <<indexing-automatic,automatic indexing>>
+If you want changes triggered <<architecture-hsearch-indexing,explicitly or by listeners>>
 to benefit from it too, you will need to select a non-default
 <<indexing-plan-synchronization,synchronization strategy>>,
 so as not to require a commit after each change.
@@ -1100,7 +1099,7 @@ larger values provide better search performance if the index does not change oft
 With smaller values, merging happens more often and thus uses more resources,
 but the total number of segments will be lower on average, increasing read performance.
 Thus, larger values (`> 10`) are best for <<indexing-massindexer,mass indexing>>,
-and smaller values (`< 10`) are best for <<indexing-automatic,automatic indexing>>.
+and smaller values (`< 10`) are best for <<architecture-hsearch-indexing,explicit or listener-triggered indexing>>.
 
 The value must not be lower than `2`.
 

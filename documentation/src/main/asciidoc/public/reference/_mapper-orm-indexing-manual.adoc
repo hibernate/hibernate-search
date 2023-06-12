@@ -6,13 +6,13 @@ include::../components/_mapper-orm-only-note.adoc[]
 [[mapper-orm-indexing-manual-basics]]
 == [[search-batchindex]] Basics
 
-While <<indexing-automatic,automatic indexing>> and
+While <<listener-triggered-indexing,listener-triggered indexing>> and
 the <<indexing-massindexer,`MassIndexer`>>
 or <<mapper-orm-indexing-jsr352,the mass indexing job>>
 should take care of most needs,
 it is sometimes necessary to control indexing manually,
 for example to reindex just a few entity instances
-that were affected by changes to the database that automatic indexing cannot detect,
+that were affected by changes to the database that listener-triggered indexing cannot detect,
 such as JPQL/SQL `insert`, `update` or `delete` queries.
 
 To address these use cases, Hibernate Search exposes several APIs
@@ -29,7 +29,7 @@ A fairly common use case when manipulating large datasets with JPA
 is the link:{hibernateDocUrl}#batch-session-batch-insert[periodic "flush-clear" pattern],
 where a loop reads or writes entities for every iteration
 and flushes then clears the session every `n` iterations.
-This patterns allows processing a large number of entities
+This pattern allows processing a large number of entities
 while keeping the memory footprint reasonably low.
 
 Below is an example of this pattern to persist a large number of entities
@@ -89,8 +89,8 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 <2> Begin the transaction at the beginning of each iteration of the outer loop.
 <3> Only handle a limited number of elements per transaction.
 <4> For every iteration of the loop, instantiate a new entity and persist it.
-Note we're relying on automatic indexing to index the entity,
-but this would work just as well if automatic indexing was disabled,
+Note we're relying on listener-triggered indexing to index the entity,
+but this would work just as well if listener-triggered indexing was disabled,
 only requiring an extra call to index the entity.
 See <<indexing-plan>>.
 <5> Commit the transaction at the end of each iteration of the outer loop.
@@ -144,8 +144,8 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 <1> Get the `SearchSession`.
 <2> Get the search session's indexing plan.
 <3> For every iteration of the loop, instantiate a new entity and persist it.
-Note we're relying on automatic indexing to index the entity,
-but this would work just as well if automatic indexing was disabled,
+Note we're relying on listener-triggered indexing to index the entity,
+but this would work just as well if listener-triggered indexing was disabled,
 only requiring an extra call to index the entity.
 See <<indexing-plan>>.
 <4> After a `flush()`/`clear()`, call `indexingPlan.execute()`.

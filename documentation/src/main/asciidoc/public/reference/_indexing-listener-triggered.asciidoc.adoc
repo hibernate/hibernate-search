@@ -1,5 +1,5 @@
-[[indexing-automatic]]
-= [[mapper-orm-indexing-automatic]] [[_automatic_indexing]] Automatic indexing within Hibernate ORM
+[[listener-triggered-indexing]]
+= [[indexing-automatic]] [[mapper-orm-indexing-automatic]] [[_automatic_indexing]] Listener-triggered indexing
 
 include::../components/_mapper-orm-only-note.adoc[]
 
@@ -8,18 +8,18 @@ if that entity is <<mapping-entityindexmapping,mapped to an index>>,
 Hibernate Search updates the relevant index.
 
 Exactly how and when the index update happens depends on the <<coordination,coordination strategy>>;
-see <<indexing-automatic-concepts>> for more information.
+see <<listener-triggered-indexing-concepts>> for more information.
 
-[[indexing-automatic-concepts]]
-== [[mapper-orm-indexing-automatic-concepts]] Overview
+[[listener-triggered-indexing-concepts]]
+== [[indexing-automatic-concepts]][[mapper-orm-indexing-automatic-concepts]] Overview
 
-Below is a summary of how automatic indexing works depending
+Below is a summary of how listener-triggered indexing works depending
 on the configured <<coordination,coordination strategy>>.
 
 Follow the links for more details.
 
 [cols="h,2*^",options="header"]
-.Comparison of automatic indexing depending on the coordination strategy
+.Comparison of listener-triggered indexing depending on the coordination strategy
 |===
 |Coordination strategy
 |<<coordination-none,No coordination>> (default)
@@ -57,11 +57,11 @@ Follow the links for more details.
 [[indexing-automatic-configuration]]
 == [[mapper-orm-indexing-automatic-configuration]] Configuration
 
-Automatic indexing may be unnecessary if your index is read-only
+Listener-triggered indexing may be unnecessary if your index is read-only
 or if you update it regularly by reindexing,
 either using the  <<indexing-massindexer,`MassIndexer`>>
 or <<mapper-orm-indexing-manual,manually>>.
-You can disable automatic indexing by setting the configuration property
+You can disable listener-triggered indexing by setting the configuration property
 `hibernate.search.indexing.listeners.enabled` to `false`.
 
 [[indexing-automatic-concepts-changes-in-session]]
@@ -86,7 +86,7 @@ and to skip reindexing when a property is modified, but does not affect the inde
 [[indexing-automatic-synchronization]]
 == Synchronization with the indexes
 
-Automatic indexing is affected by the synchronization strategy in use in the `SearchSession`.
+Listener-triggered indexing is affected by the synchronization strategy in use in the `SearchSession`.
 
 See <<indexing-plan-synchronization,this section>> for more information.
 
@@ -95,7 +95,7 @@ See <<indexing-plan-synchronization,this section>> for more information.
 
 include::../components/_incubating-warning.adoc[]
 
-In some scenarios, it might be helpful to pause the indexing programmatically, for example,
+In some scenarios, it might be helpful to pause the <<architecture-hsearch-indexing,explicit and listener-triggered indexing>> programmatically, for example,
 when importing larger amounts of data. Hibernate Search allows configuring application-wide
 and session-level filters to manage which types are tracked for changes and indexed.
 

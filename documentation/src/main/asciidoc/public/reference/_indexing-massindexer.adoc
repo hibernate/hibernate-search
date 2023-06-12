@@ -4,13 +4,13 @@
 [[indexing-massindexer-basics]]
 == [[mapper-orm-indexing-massindexer-basics]] Basics
 
-There are cases where automatic indexing is not enough,
+There are cases where <<architecture-hsearch-indexing,listener-triggered or explicit indexing>> is not enough,
 because pre-existing data has to be indexed:
 
 * when restoring a database backup;
 * when indexes had to be wiped,
 for example because the Hibernate Search <<mapping,mapping>> or some core settings changed;
-* when entities cannot be indexed as they change (e.g. with <<indexing-automatic,automatic indexing>>) for performance reasons,
+* when entities cannot be indexed as they change (e.g. with <<listener-triggered-indexing,listener-triggered indexing>>) for performance reasons,
 and periodic reindexing (every night, ...) is preferred.
 
 To address these situations, Hibernate Search provides the `MassIndexer`:
@@ -244,7 +244,7 @@ will attempt to preload everything in memory.
 |[[mapper-orm-indexing-massindexer-parameters-drop-and-create-schema]]Drops the indexes and their schema (if they exist) and re-creates them before indexing.
 
 Indexes will be unavailable for a short time during the dropping and re-creation,
-so this should only be used when failures of concurrent operations on the indexes (automatic indexing, ...)
+so this should only be used when failures of concurrent operations on the indexes (<<listener-triggered-indexing,listener-triggered indexing>>, ...)
 are acceptable.
 
 This should be used when the existing schema is known to be obsolete,

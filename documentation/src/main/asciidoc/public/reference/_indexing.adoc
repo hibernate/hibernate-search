@@ -3,7 +3,7 @@
 
 :leveloffset: +1
 
-include::_indexing-automatic.adoc[]
+include::_indexing-listener-triggered.asciidoc.adoc[]
 
 include::_indexing-plan.adoc[]
 

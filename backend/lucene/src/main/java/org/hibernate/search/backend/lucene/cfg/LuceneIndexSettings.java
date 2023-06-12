@@ -108,7 +108,7 @@ public final class LuceneIndexSettings {
 	 * </ul>
 	 * <p>
 	 * Note that individual write operations may trigger a forced commit
-	 * (for example with the {@code write-sync} and {@code sync} automatic indexing synchronization strategies in the ORM mapper),
+	 * (for example with the {@code write-sync} and {@code sync} indexing plan synchronization strategies in the ORM mapper),
 	 * in which case you will only benefit from a non-zero commit interval during intensive indexing (mass indexer, ...).
 	 * <p>
 	 * Note that committing is <strong>not</strong> necessary to make changes visible to search queries:
@@ -136,7 +136,7 @@ public final class LuceneIndexSettings {
 	 * </ul>
 	 * <p>
 	 * Note that individual write operations may trigger a forced refresh
-	 * (for example with the {@code read-sync} and {@code sync} automatic indexing synchronization strategies in the ORM mapper),
+	 * (for example with the {@code read-sync} and {@code sync} indexing plan synchronization strategies in the ORM mapper),
 	 * in which case you will only benefit from a non-zero refresh interval during intensive indexing (mass indexer, ...).
 	 * <p>
 	 * Expects a positive Integer value in milliseconds, such as {@code 1000},

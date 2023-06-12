@@ -51,8 +51,9 @@ However, such complex mappings are unlikely since they are generally not support
 [NOTE]
 ====
 It is possible to implement and use custom container extractors,
-but at the moment these extractors will not be handled correctly for automatic reindexing,
-so the corresponding property must <<mapping-reindexing-reindexonupdate,have automatic reindexing disabled>>.
+but at the moment Hibernate Search will not detect that the changes to the data inside such container
+must trigger the reindexing of a containing element.
+Hence, the corresponding property must <<mapping-reindexing-reindexonupdate,disable reindexing on change>>.
 
 See https://hibernate.atlassian.net/browse/HSEARCH-3688[HSEARCH-3688] for more information.
 ====

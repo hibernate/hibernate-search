@@ -19,7 +19,7 @@ either through annotations or a programmatic API.
 * [**On-demand mass indexing**](https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#mapper-orm-indexing-massindexer)
 of all entities in the database,
 to initialize the indexes with pre-existing data.
-* [**On-the-fly automatic indexing**](https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#mapper-orm-indexing-automatic)
+* [**On-the-fly listener-triggered indexing**](https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#listener-triggered-indexing)
 of entities modified through a Hibernate ORM session,
 to always keep the indexes up-to-date.
 * [**A Search DSL**](https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#search-dsl)
@@ -89,7 +89,7 @@ MassIndexer indexer = searchSession.massIndexer( Book.class );
 indexer.startAndWait();
 ```
 
-Automatic indexing does not require any change to code based on JPA or Hibernate ORM:
+Listener-triggered indexing does not require any change to code based on JPA or Hibernate ORM:
 
 ```java
 Author author = new Author();
