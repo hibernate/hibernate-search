@@ -8,7 +8,7 @@
 :docinfo: shared,private
 :title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
 
-:relfileprefix: ../../../just-to-be-removed/
+:relfileprefix: ../../
 :relfilesuffix: /../en-US/html_single/index.html
 
 include::../reference/_getting-started.adoc[]

@@ -10,7 +10,7 @@
 :docinfo: shared,private
 :title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
 
-:relfileprefix: ../../../just-to-be-removed/
+:relfileprefix: ../../
 :relfilesuffix: /../en-US/html_single/index.html
 
 [[mapper-pojo-standalone-getting-started]]
@@ -24,7 +24,16 @@ This guide will walk you through the initial steps required
 to index and query your entities using Hibernate Search,
 when your entities are not defined in Hibernate ORM.
 
+// Note as relfile -prefix/-suffix are just prepended/appended to the string created based on the file location we reference to
+// in some cases we need to get rid of some of the leading/trailing `..` in those strings. That is when we use `just-to-be-removed`.
+// E.g. href="../../../getting-started/just-to-be-removed/../orm/index/../en-US/html_single/......"
+// here the `..` before `/orm/index` need to be consumed by something -- by `just-to-be-removed`.
+ifdef::backend-pdf[:relfileprefix: {hibernateSearchDocUrl}../../../getting-started/just-to-be-removed/]
+
 If your entities **are** defined in Hibernate ORM, see xref:../orm/index.adoc#mapper-orm-getting-started[this other guide] instead.
+
+// we reset the prefix to point to the doc url as all following xrefs will point to the reference doc:
+ifdef::backend-pdf[:relfileprefix: {hibernateSearchDocUrl}../]
 
 [[mapper-pojo-standalone-getting-started-assumptions]]
 == Assumptions
@@ -262,10 +271,22 @@ However, if you use Hibernate Search to index data from another datastore,
 this datastore may already contain data when you add the Hibernate Search integration.
 That data is unknown to Hibernate Search, and thus has to be indexed through a batch process.
 
+// Note as relfile -prefix/-suffix are just prepended/appended to the string created based on the file location we reference to
+// in some cases we need to get rid of some of the leading/trailing `..` in those strings. That is when we use `just-to-be-removed`.
+// E.g. href="../../../just-to-be-removed/../getting-started/orm/index/../en-US/html_single/......"
+// here the `..` before `/getting-started/orm` need to be consumed by something -- by `just-to-be-removed`.
+//
+// Here we need to reset the prefix to point to the getting started guide,
+// and right after we set it back to point to the reference doc
+ifdef::backend-pdf[:relfileprefix: {hibernateSearchDocUrl}../../../getting-started/just-to-be-removed/]
+
 This is possible thanks to the mass indexer API,
 but a little more involved than
 with the xref:../orm/index.adoc#mapper-orm-getting-started-initialization-indexing[Hibernate ORM mapper],
 because a way to load entities from the other datastore needs to be plugged in.
+
+// we reset the prefix to point to the doc url as all following xrefs will point to the reference doc:
+ifdef::backend-pdf[:relfileprefix: {hibernateSearchDocUrl}../]
 
 Due to this (relative) complexity, we won't cover it in this guide,
 but if you want to know more,
