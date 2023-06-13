@@ -10,7 +10,7 @@
 :docinfo: shared,private
 :title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
 
-:relfileprefix: ../../../just-to-be-removed/
+:relfileprefix: ../../
 :relfilesuffix: /../en-US/html_single/index.html
 
 [[mapper-orm-getting-started]]
@@ -21,7 +21,16 @@
 This guide will walk you through the initial steps required
 to index and query your Hibernate ORM entities using Hibernate Search.
 
+// Note as relfile -prefix/-suffix are just prepended/appended to the string created based on the file location we reference to
+// in some cases we need to get rid of some of the leading/trailing `..` in those strings. That is when we use `just-to-be-removed`.
+// E.g. href="../../../getting-started/just-to-be-removed/../orm/index/../en-US/html_single/......"
+// here the `..` before `/orm/index` need to be consumed by something -- by `just-to-be-removed`.
+ifdef::backend-pdf[:relfileprefix: {hibernateSearchDocUrl}../../../getting-started/just-to-be-removed/]
+
 If your entities are **not** defined in Hibernate ORM, see xref:../standalone/index.adoc#mapper-pojo-standalone-getting-started[this other guide] instead.
+
+// we reset the prefix to point to the doc url as all following xrefs will point to the reference doc:
+ifdef::backend-pdf[:relfileprefix: {hibernateSearchDocUrl}../]
 
 [[mapper-orm-getting-started-assumptions]]
 == [[gettingstarted-architecture]] Assumptions
