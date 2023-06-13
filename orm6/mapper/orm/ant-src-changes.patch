@@ -498,6 +498,32 @@ index 21503d08be..af34072fdf 100644
  						.collect( Collectors.toList() )
  		);
  	}
+diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassEntityLoader.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassEntityLoader.java
+index 75076930e8..ae3b4aed76 100644
+--- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassEntityLoader.java
++++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassEntityLoader.java
+@@ -6,7 +6,6 @@
+  */
+ package org.hibernate.search.mapper.orm.loading.impl;
+ 
+-import java.io.Serializable;
+ import java.util.List;
+ 
+ import org.hibernate.FlushMode;
+@@ -57,12 +56,11 @@ public void load(List<I> identifiers) throws InterruptedException {
+ 		transactionHelper.commit( session );
+ 	}
+ 
+-	@SuppressWarnings("unchecked") // We can assume identifiers are serializable
+ 	private List<E> multiLoad(List<I> identifiers) {
+ 		return typeQueryLoader.createMultiIdentifierLoadAccess( session )
+ 				.with( options.cacheMode() )
+ 				.with( LockOptions.NONE )
+-				.multiLoad( (List<Serializable>) identifiers );
++				.multiLoad( identifiers );
+ 	}
+ 
+ 	private List<E> queryByIds(List<I> identifiers) {
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java
 index 61cf2863dc..033ccecf9e 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java
