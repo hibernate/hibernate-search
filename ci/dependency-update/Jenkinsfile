@@ -38,10 +38,16 @@ Map settings() {
 			]
 		case 'lucene9':
 			return [
-					updateProperties: ['version.org.apache.lucene']
-					// In this case we'll rebuild and test everything. Since we have some JDK 11 changes as well as
-					// some driver updates. These changes spans across multiple modules and we would either need to
-					// closely monitor which ones are affected and add them to the build, or ... build everything.
+					updateProperties: ['version.org.apache.lucene'],
+					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
+					// Need to rebuild these module in order to get upgrade changes built and used in tests.
+					// No need to rebuild modules on which these ones depend since those should stay unchanged.
+					// * hibernate-search-backend-lucene -- build the backend itself
+					// * hibernate-search-integrationtest-backend-tck -- rebuild TCK to address some changes in supported features
+					// * hibernate-search-util-internal-integrationtest-backend-lucene -- utils depend on Lucene so we want to rebuild them since they are modified too
+					// * hibernate-search-util-internal-test-common -- changes due to jdk 11 upgrade
+					// * hibernate-search-util-internal-integrationtest-jbatch-runtime -jakarta/-orm6 -- because of the new driver additional properties are needed to be configured
+					additionalMavenArgs: '-pl :hibernate-search-backend-lucene,:hibernate-search-integrationtest-backend-tck,:hibernate-search-util-internal-integrationtest-backend-lucene,:hibernate-search-util-internal-test-common,:hibernate-search-util-internal-integrationtest-jbatch-runtime,:hibernate-search-util-internal-integrationtest-jbatch-runtime-jakarta,:hibernate-search-util-internal-integrationtest-jbatch-runtime-orm6'
 			]
 		default:
 			return [:]
