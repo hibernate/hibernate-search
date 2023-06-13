@@ -178,6 +178,9 @@ stage('Configure') {
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '21', testCompilerTool: 'OpenJDK 21 Latest',
 							testLauncherArgs: '--enable-preview',
+							condition: TestCondition.AFTER_MERGE),
+					new JdkBuildEnvironment(version: '22', testCompilerTool: 'OpenJDK 22 Latest',
+							testLauncherArgs: '--enable-preview',
 							condition: TestCondition.AFTER_MERGE)
 			],
 			compiler: [
