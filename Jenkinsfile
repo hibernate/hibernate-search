@@ -170,9 +170,6 @@ stage('Configure') {
 					// We want to enable preview features when testing newer builds of OpenJDK:
 					// even if we don't use these features, just enabling them can cause side effects
 					// and it's useful to test that.
-					new JdkBuildEnvironment(version: '19', testCompilerTool: 'OpenJDK 19 Latest',
-							testLauncherArgs: '--enable-preview',
-							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '20', testCompilerTool: 'OpenJDK 20 Latest',
 							testLauncherArgs: '--enable-preview',
 							condition: TestCondition.AFTER_MERGE),
