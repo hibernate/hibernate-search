@@ -2635,6 +2635,7 @@ public class IndexedEmbeddedBaseIT {
 		class Included {
 			@KeywordField
 			String includedString;
+			@SuppressWarnings("deprecation")
 			@IndexedEmbedded(prefix = "foo.bar.")
 			Included excludedIncluded;
 
