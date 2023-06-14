@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -30,7 +31,10 @@ import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.common.tree.spi.TreeFilterPathTracker;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.mapper.model.spi.MappingElement;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -45,12 +49,12 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
 public class TreeNestingContextTest {
-	private static final BiFunction<MappableTypeModel, String, SearchException> CYCLIC_RECURSION_EXCEPTION_FACTORY =
-			(definingTypeModel, cyclicRecursionPath) -> new SearchException(
-					cyclicRecursionMessage( definingTypeModel, cyclicRecursionPath ) );
+	private static final BiFunction<MappingElement, String, SearchException> CYCLIC_RECURSION_EXCEPTION_FACTORY =
+			(mappingElement, cyclicRecursionPath) -> new SearchException(
+					cyclicRecursionMessage( mappingElement, cyclicRecursionPath ) );
 
-	private static String cyclicRecursionMessage(MappableTypeModel definingTypeModel, String cyclicRecursionPath) {
-		return "Cyclic recursion! Root = " + definingTypeModel.name() + ", path = " + cyclicRecursionPath;
+	private static String cyclicRecursionMessage(MappingElement mappingElement, String cyclicRecursionPath) {
+		return "Cyclic recursion! Root = " + mappingElement.toString() + ", path = " + cyclicRecursionPath;
 	}
 
 	@Rule
@@ -129,25 +133,29 @@ public class TreeNestingContextTest {
 	public void nestComposed_noFilter_detectCycle_direct() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
+		String relativePrefix = "level1.prefix1_";
+
 		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
-				"level1", rootContext, typeModel1Mock, "level1.prefix1_",
+				"level1", rootContext, typeModel1Mock, relativePrefix,
 				null, null, null
 		);
 		checkFooBarIncluded( "prefix1_", level1Context );
 
+		MappingElement level1MappingElement = new StubMappingElement( typeModel1Mock, relativePrefix );
 		assertThatThrownBy( () -> {
 				TreeFilterDefinition level1Definition = new TreeFilterDefinition(
 						null, null, null
 				);
 				level1Context.nestComposed(
-						typeModel1Mock, "level1.prefix1_", level1Definition,
+						level1MappingElement,
+						relativePrefix, level1Definition,
 						new TreeFilterPathTracker( level1Definition ),
 						nestedContextBuilderMock, CYCLIC_RECURSION_EXCEPTION_FACTORY
 				);
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( cyclicRecursionMessage(
-						typeModel1Mock, "level1.prefix1_level1.prefix1_" ) );
+						level1MappingElement, "level1.prefix1_level1.prefix1_" ) );
 		verifyNoOtherInteractionsAndReset();
 	}
 
@@ -155,8 +163,9 @@ public class TreeNestingContextTest {
 	public void nestComposed_noFilter_detectCycle_indirect() {
 		TreeNestingContext rootContext = TreeNestingContext.root();
 
+		String level1RelativePrefix = "level1.prefix1_";
 		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
-				"level1", rootContext, typeModel1Mock, "level1.prefix1_",
+				"level1", rootContext, typeModel1Mock, level1RelativePrefix,
 				null, null, null
 		);
 
@@ -165,19 +174,20 @@ public class TreeNestingContextTest {
 				null, null, null
 		);
 
+		MappingElement level1MappingElement = new StubMappingElement( typeModel1Mock, level1RelativePrefix );
 		assertThatThrownBy( () -> {
-			TreeFilterDefinition level2Definition = new TreeFilterDefinition(
+			TreeFilterDefinition level1Definition = new TreeFilterDefinition(
 					null, null, null
 			);
 			level2Context.nestComposed(
-					typeModel1Mock, "level1.prefix1_",
-					level2Definition, new TreeFilterPathTracker( level2Definition ),
+					level1MappingElement, level1RelativePrefix,
+					level1Definition, new TreeFilterPathTracker( level1Definition ),
 					nestedContextBuilderMock, CYCLIC_RECURSION_EXCEPTION_FACTORY
 			);
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( cyclicRecursionMessage(
-						typeModel1Mock, "level1.prefix1_level2.prefix2_level1.prefix1_" ) );
+						level1MappingElement, "level1.prefix1_level2.prefix2_level1.prefix1_" ) );
 		verifyNoOtherInteractionsAndReset();
 	}
 
@@ -197,9 +207,10 @@ public class TreeNestingContextTest {
 		TreeFilterDefinition definition = new TreeFilterDefinition(
 				null, null, null
 		);
+		String relativePrefix = "level1.level2.level3.prefix1_";
 		actualReturn = rootContext.nestComposed(
-				typeModel1Mock, "level1.level2.level3.prefix1_",
-				definition, new TreeFilterPathTracker( definition ),
+				new StubMappingElement( typeModel1Mock, relativePrefix ),
+				relativePrefix, definition, new TreeFilterPathTracker( definition ),
 				nestedContextBuilderMock, CYCLIC_RECURSION_EXCEPTION_FACTORY
 		);
 		InOrder inOrder = inOrder( nestedContextBuilderMock );
@@ -1410,7 +1421,8 @@ public class TreeNestingContextTest {
 		Object expectedReturn = new Object();
 		when( nestedContextBuilderMock.build( any() ) ).thenReturn( expectedReturn );
 		Optional<Object> actualReturn = context.nestComposed(
-				definingTypeModel, relativePrefix, definition,
+				new StubMappingElement( definingTypeModel, relativePrefix ),
+				relativePrefix, definition,
 				pathTracker, nestedContextBuilderMock,
 				CYCLIC_RECURSION_EXCEPTION_FACTORY
 		);
@@ -1436,8 +1448,8 @@ public class TreeNestingContextTest {
 	private void checkSimpleComposedFilterExcluded(TreeNestingContext context,
 			MappableTypeModel definingTypeModel, String relativePrefix, TreeFilterDefinition definition,
 			TreeFilterPathTracker pathTracker) {
-		Optional<Object> actualReturn = context.nestComposed( definingTypeModel, relativePrefix,
-				definition, pathTracker, nestedContextBuilderMock, CYCLIC_RECURSION_EXCEPTION_FACTORY );
+		Optional<Object> actualReturn = context.nestComposed( new StubMappingElement( definingTypeModel, relativePrefix ),
+				relativePrefix, definition, pathTracker, nestedContextBuilderMock, CYCLIC_RECURSION_EXCEPTION_FACTORY );
 		verifyNoOtherInteractionsAndReset();
 		assertNotNull( "Expected .nestComposed() to return a non-null result", actualReturn );
 		assertFalse( "Expected the composed filter to be excluded from " + context, actualReturn.isPresent() );
@@ -1496,5 +1508,43 @@ public class TreeNestingContextTest {
 	private void verifyNoOtherInteractionsAndReset() {
 		verifyNoMoreInteractions( leafFactoryMock, compositeFactoryMock, unfilteredFactoryMock, nestedContextBuilderMock );
 		reset( leafFactoryMock, compositeFactoryMock, unfilteredFactoryMock, nestedContextBuilderMock );
+	}
+
+	private static final class StubMappingElement implements MappingElement {
+		private final MappableTypeModel definingType;
+		private final String relativePrefix;
+
+		private StubMappingElement(MappableTypeModel definingType, String relativePrefix) {
+			this.definingType = definingType;
+			this.relativePrefix = relativePrefix;
+		}
+
+		@Override
+		public String toString() {
+			return "indexed-embedded with prefix '" + relativePrefix + "'";
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+			if ( o == null || getClass() != o.getClass() ) {
+				return false;
+			}
+			StubMappingElement that = (StubMappingElement) o;
+			return Objects.equals( definingType, that.definingType ) && Objects.equals(
+					relativePrefix, that.relativePrefix );
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash( definingType, relativePrefix );
+		}
+
+		@Override
+		public EventContext eventContext() {
+			return EventContexts.fromType( definingType );
+		}
 	}
 }

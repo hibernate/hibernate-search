@@ -17,7 +17,6 @@ import java.util.Set;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
@@ -33,6 +32,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataCon
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathCastedTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathOriginalTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
@@ -87,20 +87,24 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 	}
 
 	@Override
-	public void indexedEmbedded(PojoRawTypeModel<?> definingTypeModel, String relativePrefix,
+	public void indexedEmbedded(PojoRawTypeIdentifier<?> definingType, String relativePrefix,
 			ObjectStructure structure,
 			TreeFilterDefinition filterDefinition, boolean includeEmbeddedObjectId,
 			Class<?> targetType) {
+		String propertyName = modelPath.getParent().getPropertyModel().name();
 		String defaultedRelativePrefix = relativePrefix;
 		if ( defaultedRelativePrefix == null ) {
-			defaultedRelativePrefix = modelPath.getParent().getPropertyModel().name() + ".";
+			defaultedRelativePrefix = propertyName + ".";
 		}
 
-		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition( definingTypeModel,
-				defaultedRelativePrefix, structure, filterDefinition );
-
 		Optional<IndexedEmbeddedBindingContext> nestedBindingContextOptional =
-				bindingContext.addIndexedEmbeddedIfIncluded( definition, multiValuedFromContainerExtractor );
+				bindingContext.addIndexedEmbeddedIfIncluded(
+						new PojoIndexedEmbeddedMappingElement( definingType, propertyName,
+								// Don't use the defaulted prefix here: this is included in error messages.
+								relativePrefix ),
+						defaultedRelativePrefix, structure,
+						filterDefinition,
+						multiValuedFromContainerExtractor );
 		if ( !nestedBindingContextOptional.isPresent() ) {
 			return;
 		}

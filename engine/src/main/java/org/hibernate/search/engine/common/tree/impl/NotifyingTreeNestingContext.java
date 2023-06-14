@@ -10,11 +10,11 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
+import org.hibernate.search.engine.common.tree.spi.TreeContributionListener;
 import org.hibernate.search.engine.common.tree.spi.TreeFilterPathTracker;
 import org.hibernate.search.engine.common.tree.spi.TreeNestingContext;
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
-import org.hibernate.search.engine.common.tree.spi.TreeContributionListener;
-import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 import org.hibernate.search.util.common.SearchException;
 
 public final class NotifyingTreeNestingContext implements TreeNestingContext {
@@ -68,10 +68,10 @@ public final class NotifyingTreeNestingContext implements TreeNestingContext {
 	}
 
 	@Override
-	public <T> Optional<T> nestComposed(MappableTypeModel definingTypeModel, String relativePrefix,
+	public <T> Optional<T> nestComposed(MappingElement mappingElement, String relativePrefix,
 			TreeFilterDefinition definition, TreeFilterPathTracker pathTracker, NestedContextBuilder<T> contextBuilder,
-			BiFunction<MappableTypeModel, String, SearchException> cyclicRecursionExceptionFactory) {
-		Optional<T> result = delegate.nestComposed( definingTypeModel, relativePrefix, definition, pathTracker,
+			BiFunction<MappingElement, String, SearchException> cyclicRecursionExceptionFactory) {
+		Optional<T> result = delegate.nestComposed( mappingElement, relativePrefix, definition, pathTracker,
 				contextBuilder, cyclicRecursionExceptionFactory );
 		if ( result.isPresent() ) {
 			listener.onNodeContributed();

@@ -19,8 +19,7 @@ import java.util.Set;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanNotFoundException;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingException;
-import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
-import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
@@ -205,11 +204,12 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 44, value = "Invalid type '%1$s': missing constructor. The type must expose a public constructor with a single parameter of type Map.")
 	SearchException noPublicMapArgConstructor(@FormatWith(ClassFormatter.class) Class<?> classToLoad);
 
-	@Message(id = ID_OFFSET + 46, value = "Cyclic @IndexedEmbedded recursion starting from type '%1$s'."
-			+ " Path starting from that type and ending with a cycle: '%2$s'."
+	@Message(id = ID_OFFSET + 46, value = "Cyclic recursion starting from '%1$s' on %2$s."
+			+ " Index field path starting from that location and ending with a cycle: '%3$s'."
 			+ " A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly."
 			+ " To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ...")
-	SearchException indexedEmbeddedCyclicRecursion(@FormatWith(MappableTypeModelFormatter.class) MappableTypeModel parentTypeModel,
+	SearchException indexedEmbeddedCyclicRecursion(MappingElement indexedEmbedded,
+			@FormatWith(EventContextNoPrefixFormatter.class) EventContext indexedEmbeddedLocation,
 			String cyclicRecursionPath);
 
 	@Message(id = ID_OFFSET + 47,

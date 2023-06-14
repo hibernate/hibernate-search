@@ -19,7 +19,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
@@ -27,7 +26,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleF
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubTypeModel;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingElement;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.BeforeClass;
@@ -266,13 +265,12 @@ public class DocumentElementStaticFieldNameIT<F> {
 			nestedObject = new FirstLevelObjectBinding( nestedObjectField );
 
 			// Simulate an embedded context which excludes every subfield
-			IndexedEmbeddedDefinition indexedEmbeddedDefinition = new IndexedEmbeddedDefinition(
-					new StubTypeModel( "embedded" ),
-					"excludingObject.", ObjectStructure.FLATTENED,
-					new TreeFilterDefinition( null, Collections.singleton( "pathThatDoesNotMatchAnything" ), Collections.emptySet() )
-			);
+			TreeFilterDefinition filterDefinition =
+					new TreeFilterDefinition( null,
+							Collections.singleton( "pathThatDoesNotMatchAnything" ), Collections.emptySet() );
 			IndexedEmbeddedBindingContext excludingEmbeddedContext =
-					ctx.addIndexedEmbeddedIfIncluded( indexedEmbeddedDefinition, true ).get();
+					ctx.addIndexedEmbeddedIfIncluded( new StubMappingElement(),
+							"excludingObject.", ObjectStructure.FLATTENED, filterDefinition, true ).get();
 			excludingObject = new FirstLevelObjectBinding(
 					excludingEmbeddedContext.schemaElement(),
 					excludingEmbeddedContext.parentIndexObjectReferences().iterator().next()

@@ -13,7 +13,7 @@ import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.common.tree.spi.TreeFilterPathTracker;
 import org.hibernate.search.engine.common.tree.spi.TreeNestingContext;
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
-import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 import org.hibernate.search.util.common.SearchException;
 
 
@@ -75,11 +75,11 @@ public final class ConfiguredTreeNestingContext implements TreeNestingContext {
 	}
 
 	@Override
-	public <T> Optional<T> nestComposed(MappableTypeModel definingTypeModel,
+	public <T> Optional<T> nestComposed(MappingElement mappingElement,
 			String relativePrefix, TreeFilterDefinition definition,
 			TreeFilterPathTracker pathTracker, NestedContextBuilder<T> contextBuilder,
-			BiFunction<MappableTypeModel, String, SearchException> cyclicRecursionExceptionFactory) {
-		TreeFilter composedFilter = filter.compose( definingTypeModel, relativePrefix, definition, pathTracker,
+			BiFunction<MappingElement, String, SearchException> cyclicRecursionExceptionFactory) {
+		TreeFilter composedFilter = filter.compose( mappingElement, relativePrefix, definition, pathTracker,
 				cyclicRecursionExceptionFactory );
 
 		if ( !composedFilter.isEveryPathExcluded() ) {

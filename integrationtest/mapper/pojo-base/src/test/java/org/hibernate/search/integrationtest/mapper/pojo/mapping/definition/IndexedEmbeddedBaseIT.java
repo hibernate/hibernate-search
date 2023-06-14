@@ -713,8 +713,9 @@ public class IndexedEmbeddedBaseIT {
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( entityClass.getName() )
+						.pathContext( ".level1" )
 						.failure(
-								"An @IndexedEmbedded defines " + attribute + " filters that do not match anything",
+								"@IndexedEmbedded(...) defines " + attribute + " filters that do not match anything",
 								"Non-matching " + attribute + " filters:",
 								CollectionHelper.asLinkedHashSet( "nonMatchingPath" ).toString(),
 								"Encountered field paths:",
@@ -1783,8 +1784,8 @@ public class IndexedEmbeddedBaseIT {
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( Model.EntityA.class.getName() )
 						.pathContext( ".b<no value extractors>.a<no value extractors>.b" )
-						.failure( "Cyclic @IndexedEmbedded recursion starting from type '" + Model.EntityA.class.getName() + "'",
-								"Path starting from that type and ending with a cycle: 'b.a.b.'",
+						.failure( "Cyclic recursion starting from '@IndexedEmbedded(...)' on type '" + Model.EntityA.class.getName() + "', path '.b'",
+								"Index field path starting from that location and ending with a cycle: 'b.a.b.'",
 								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ..." )
 				);
@@ -1819,8 +1820,8 @@ public class IndexedEmbeddedBaseIT {
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( Model.EntityA.class.getName() )
 						.pathContext( ".b<no value extractors>.c<no value extractors>.b<no value extractors>.c" )
-						.failure( "Cyclic @IndexedEmbedded recursion starting from type '" + Model.EntityB.class.getName() + "'",
-								"Path starting from that type and ending with a cycle: 'c.b.c.'",
+						.failure( "Cyclic recursion starting from '@IndexedEmbedded(...)' on type '" + Model.EntityB.class.getName() + "', path '.c'",
+								"Index field path starting from that location and ending with a cycle: 'c.b.c.'",
 								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ..." )
 				);
@@ -1891,8 +1892,9 @@ public class IndexedEmbeddedBaseIT {
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( Model.IndexedEntity.class.getName() )
+						.pathContext( ".included" )
 						.failure(
-								"An @IndexedEmbedded defines includePaths filters that do not match anything.",
+								"@IndexedEmbedded(...) defines includePaths filters that do not match anything.",
 								"Non-matching includePaths filters: [subIncluded.subSubIncluded.subSubIncludedString].",
 								"Encountered field paths: [includedString, subIncluded, subIncluded.subIncludedString]. Check the filters for typos, or remove them if they are not useful."
 						)
@@ -2334,8 +2336,9 @@ public class IndexedEmbeddedBaseIT {
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( Model.IndexedEntity.class.getName() )
+						.pathContext( ".included" )
 						.failure(
-								"An @IndexedEmbedded defines excludePaths filters that do not match anything",
+								"@IndexedEmbedded(...) defines excludePaths filters that do not match anything",
 								"Non-matching excludePaths filters: [subIncluded.subSubIncluded.subSubIncludedString].",
 								"Encountered field paths: [includedString, subIncluded, subIncluded.subIncludedString, subIncluded.subSubIncluded, subIncluded.subSubIncluded.subSubOtherIncludedString].",
 								"Check the filters for typos, or remove them if they are not useful."
@@ -2587,8 +2590,9 @@ public class IndexedEmbeddedBaseIT {
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( Model.IndexedEntity.class.getName() )
+						.pathContext( ".included" )
 						.failure(
-								"An @IndexedEmbedded defines excludePaths filters that do not match anything",
+								"@IndexedEmbedded(...) defines excludePaths filters that do not match anything",
 								"Non-matching excludePaths filters: [subIncluded.subIncludedStringA].",
 								"Encountered field paths: [includedString, subIncluded, subIncluded.subIncludedStringB, subIncluded.subIncludedStringC].",
 								"Check the filters for typos, or remove them if they are not useful."

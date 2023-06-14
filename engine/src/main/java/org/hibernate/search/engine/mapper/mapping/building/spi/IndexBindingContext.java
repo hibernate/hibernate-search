@@ -9,8 +9,11 @@ package org.hibernate.search.engine.mapper.mapping.building.spi;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
+import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.common.tree.spi.TreeContributionListener;
+import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 
 /**
  * The binding context associated to a specific node in the entity tree.
@@ -50,11 +53,18 @@ public interface IndexBindingContext {
 	IndexSchemaElement schemaElement(TreeContributionListener listener);
 
 	/**
-	 * @param definition The indexed-embedded definition.
+	 * @param mappingElement A unique representation of this indexed-embedded; if the same indexed-embedded is applied in multiple places,
+	 * this method must be called with mapping elements that are equal according to {@link MappingElement#equals(Object)}/{@link MappingElement#hashCode()}.
+	 * @param relativePrefix The prefix to apply to all index fields created in the context of the indexed-embedded.
+	 * @param structure The structure of all object fields created as part of the {@code relativePrefix}.
+	 * @param filter The filter definition (included paths, ...).
 	 * @param multiValued Whether the property with an indexed-embedded is to be considered as multi-valued
 	 * (i.e. multiple indexed-embedded objects may be processed for a single "embedding" object).
 	 * @return A new indexed-embedded binding context, or {@code Optional.empty()}.
 	 */
-	Optional<IndexedEmbeddedBindingContext> addIndexedEmbeddedIfIncluded(IndexedEmbeddedDefinition definition,
+	Optional<IndexedEmbeddedBindingContext> addIndexedEmbeddedIfIncluded(MappingElement mappingElement,
+			String relativePrefix,
+			ObjectStructure structure,
+			TreeFilterDefinition filter,
 			boolean multiValued);
 }

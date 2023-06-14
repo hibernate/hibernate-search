@@ -10,7 +10,7 @@ import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.common.tree.spi.TreeFilterPathTracker;
-import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 import org.hibernate.search.util.common.SearchException;
 
 /**
@@ -29,7 +29,7 @@ import org.hibernate.search.util.common.SearchException;
  *     <li>When a field is added by a bridge, the filter decides whether to include this field or not
  *     through its {@link #isPathIncluded(String)} method</li>
  *     <li>When a nested filter (e.g. {@code @IndexedEmbedded}) is requested, a new filter is created through the
- *     {@link #compose(MappableTypeModel, String, TreeFilterDefinition, TreeFilterPathTracker, BiFunction)}  method,
+ *     {@link #compose(MappingElement, String, TreeFilterDefinition, TreeFilterPathTracker, BiFunction)}  method,
  *     which may return an empty optional,
  *     meaning that the nested filter {@link #isEveryPathExcluded() excludes every path}.</li>
  * </ul>
@@ -59,7 +59,7 @@ import org.hibernate.search.util.common.SearchException;
  * plus some added restrictions depending on the properties of the nested filter.
  * <p>
  * For more information about how filters are composed, see
- * {@link #compose(MappableTypeModel, String, TreeFilterDefinition, TreeFilterPathTracker, BiFunction)}.
+ * {@link #compose(MappingElement, String, TreeFilterDefinition, TreeFilterPathTracker, BiFunction)}.
  *
  */
 public class TreeFilter {
@@ -76,7 +76,7 @@ public class TreeFilter {
 	}
 
 	private final TreeFilter parent;
-	private final MappableTypeModel definingTypeModel;
+	private final MappingElement mappingElement;
 	private final String relativePrefix;
 	private final TreeFilterDefinition definition;
 	private final TreeFilterPathTracker pathTracker;
@@ -86,11 +86,11 @@ public class TreeFilter {
 	private final PathFilter pathFilter;
 
 	private TreeFilter(TreeFilter parent,
-			MappableTypeModel definingTypeModel, String relativePrefix,
+			MappingElement mappingElement, String relativePrefix,
 			TreeFilterDefinition definition, TreeFilterPathTracker pathTracker,
 			DepthFilter depthFilter, PathFilter pathFilter) {
 		this.parent = parent;
-		this.definingTypeModel = definingTypeModel;
+		this.mappingElement = mappingElement;
 		this.relativePrefix = relativePrefix;
 		this.definition = definition;
 		this.pathTracker = pathTracker;
@@ -200,13 +200,17 @@ public class TreeFilter {
 				&& ( parent == null || parent.isEveryPathIncludedAtDepth( depth + 1 ) );
 	}
 
-	private String getPathFromSameFilterSinceNoCompositionLimits(MappableTypeModel definingTypeModel,
+	private String getPathFromSameFilterSinceNoCompositionLimits(MappingElement mappingElement,
 			String relativePrefix, TreeFilterDefinition definition) {
 		if ( hasCompositionLimits() ) {
 			return null;
 		}
 		else if ( parent != null ) {
-			if ( this.definingTypeModel.equals( definingTypeModel )
+			if ( this.mappingElement.equals( mappingElement )
+					// Technically we shouldn't have to check these,
+					// but we'll check just to be safe, and to avoid regressions.
+					// We can consider dropping these checks in the next major,
+					// where behavior changes are more acceptable.
 					&& this.relativePrefix.equals( relativePrefix )
 					&& this.definition.equals( definition ) ) {
 				// Same filter as the one passed as a parameter
@@ -214,7 +218,7 @@ public class TreeFilter {
 			}
 			else {
 				String path = parent.getPathFromSameFilterSinceNoCompositionLimits(
-						definingTypeModel, relativePrefix, definition );
+						mappingElement, relativePrefix, definition );
 				return path == null ? null : path + this.relativePrefix;
 			}
 		}
@@ -228,14 +232,14 @@ public class TreeFilter {
 		}
 	}
 
-	public TreeFilter compose(MappableTypeModel definingTypeModel, String relativePrefix,
+	public TreeFilter compose(MappingElement mappingElement, String relativePrefix,
 			TreeFilterDefinition definition, TreeFilterPathTracker pathTracker,
-			BiFunction<MappableTypeModel, String, SearchException> cyclicRecursionExceptionFactory) {
+			BiFunction<MappingElement, String, SearchException> cyclicRecursionExceptionFactory) {
 		String cyclicRecursionPath = getPathFromSameFilterSinceNoCompositionLimits(
-				definingTypeModel, relativePrefix, definition );
+				mappingElement, relativePrefix, definition );
 		if ( cyclicRecursionPath != null ) {
 			cyclicRecursionPath += relativePrefix;
-			throw cyclicRecursionExceptionFactory.apply( definingTypeModel, cyclicRecursionPath );
+			throw cyclicRecursionExceptionFactory.apply( mappingElement, cyclicRecursionPath );
 		}
 
 		// The new depth filter according to the given includeDepth
@@ -245,7 +249,7 @@ public class TreeFilter {
 		PathFilter newPathFilter = PathFilter.of( definition.includePaths(), definition.excludePaths() );
 
 		return new TreeFilter(
-				this, definingTypeModel, relativePrefix, definition, pathTracker,
+				this, mappingElement, relativePrefix, definition, pathTracker,
 				newDepthFilter, newPathFilter
 		);
 	}

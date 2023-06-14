@@ -151,7 +151,7 @@ class InitialPropertyMappingStep
 	@Override
 	public PropertyMappingIndexedEmbeddedStep indexedEmbedded(String relativeFieldName) {
 		PropertyMappingIndexedEmbeddedStepImpl child = new PropertyMappingIndexedEmbeddedStepImpl(
-				this, parent.getTypeModel(), relativeFieldName
+				this, parent.getTypeModel().typeIdentifier(), relativeFieldName
 		);
 		children.add( child );
 		return child;
