@@ -52,7 +52,7 @@ public interface CoordinationStrategyStartContext {
 
 	/**
 	 * @return The mapping, providing all information and operations necessary
-	 * for background processing of automatic indexing events.
+	 * for background processing of indexing events.
 	 */
 	AutomaticIndexingMappingContext mapping();
 

@@ -15,7 +15,7 @@ public interface PojoMassIndexerAgent {
 	}
 
 	/**
-	 * Starts requesting from other agents that could possibly perform indexing (e.g. automatic indexing)
+	 * Starts requesting from other agents that could possibly perform indexing (e.g. indexing plans)
 	 * that they suspend themselves.
 	 * <p>
 	 * Other agents can be considered suspended when the returned future completes successfully;

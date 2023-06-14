@@ -70,9 +70,9 @@ public interface SearchWorkspace {
 	 * Only to be used by experts fully aware of the implications.
 	 * <p>
 	 * Note that some operations may still be waiting in a queue when {@link #flush()} is called,
-	 * in particular operations queued as part of automatic indexing before a transaction
+	 * in particular operations queued as part of processing an indexing plan before a transaction
 	 * is committed.
-	 * These operations will not be applied immediately just because  a call to {@link #flush()} is issued:
+	 * These operations will not be applied immediately just because a call to {@link #flush()} is issued:
 	 * the "flush" here is a very low-level operation handled by the backend.
 	 */
 	void flush();
@@ -95,8 +95,8 @@ public interface SearchWorkspace {
 	 * Only to be used by experts fully aware of the implications.
 	 * <p>
 	 * Note that some operations may still be waiting in a queue when {@link #refresh()} is called,
-	 * in particular operations queued as part of automatic indexing before a transaction is committed.
-	 * These operations will not be applied immediately just because  a call to {@link #refresh()} is issued:
+	 * in particular operations queued as part of processing an indexing plan before a transaction is committed.
+	 * These operations will not be applied immediately just because a call to {@link #refresh()} is issued:
 	 * the "refresh" here is a very low-level operation handled by the backend.
 	 */
 	void refresh();

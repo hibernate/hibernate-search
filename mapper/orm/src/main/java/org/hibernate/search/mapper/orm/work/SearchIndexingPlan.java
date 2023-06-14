@@ -27,7 +27,7 @@ import javax.persistence.Entity;
  * Note that {@link #execute()} will implicitly trigger processing of documents that weren't processed yet,
  * if any, so calling {@link #process()} is not necessary if you call {@link #execute()} just next.
  * <p>
- * {@link #process()} and {@link #execute()} are mostly useful when automatic indexing is disabled,
+ * {@link #process()} and {@link #execute()} are mostly useful when listener-triggered indexing is disabled,
  * to control the indexing process explicitly.
  */
 public interface SearchIndexingPlan {

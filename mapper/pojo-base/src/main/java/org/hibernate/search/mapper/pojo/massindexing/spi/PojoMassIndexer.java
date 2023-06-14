@@ -66,7 +66,7 @@ public interface PojoMassIndexer {
 	 * Drops the indexes and their schema (if they exist) and re-creates them before indexing.
 	 * <p>
 	 * Indexes will be unavailable for a short time during the dropping and re-creation,
-	 * so this should only be used when failures of concurrent operations on the indexes (automatic indexing, ...)
+	 * so this should only be used when failures of concurrent operations on the indexes (indexing caused by entity changes, ...)
 	 * are acceptable.
 	 * <p>
 	 * This should be used when the existing schema is known to be obsolete, for example when the Hibernate Search mapping

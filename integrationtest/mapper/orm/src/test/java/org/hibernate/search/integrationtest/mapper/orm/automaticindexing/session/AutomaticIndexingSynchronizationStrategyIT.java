@@ -274,7 +274,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				Level.ERROR,
 				CoreMatchers.sameInstance( indexingWorkException ),
 				"Failing operation:",
-				"Automatic indexing of entities",
+				"Background indexing of entities",
 				"Entities that could not be indexed correctly:",
 				IndexedEntity.NAME + "#" + ENTITY_1_ID + " " + IndexedEntity.NAME + "#" + ENTITY_2_ID
 		);
@@ -605,7 +605,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				.extracting( Throwable::getCause ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
 						.isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
-								"Unable to index documents for automatic indexing after transaction completion: ",
+								"Unable to index documents for indexing after transaction completion: ",
 								"Indexing failure: " + indexingWorkException.getMessage(),
 								"The following entities may not have been updated correctly in the index: [" + entityReferences + "]"
 						)

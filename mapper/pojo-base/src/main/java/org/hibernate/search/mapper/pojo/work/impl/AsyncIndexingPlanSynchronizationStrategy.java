@@ -44,13 +44,13 @@ public final class AsyncIndexingPlanSynchronizationStrategy implements IndexingP
 							if ( throwable != null ) {
 								EntityIndexingFailureContext.Builder contextBuilder = EntityIndexingFailureContext.builder();
 								contextBuilder.throwable( throwable );
-								contextBuilder.failingOperation( log.automaticIndexing() );
+								contextBuilder.failingOperation( log.backgroundIndexing() );
 								failureHandler.handle( contextBuilder.build() );
 							}
 							else if ( result != null && result.throwable().isPresent() ) {
 								EntityIndexingFailureContext.Builder contextBuilder = EntityIndexingFailureContext.builder();
 								contextBuilder.throwable( result.throwable().get() );
-								contextBuilder.failingOperation( log.automaticIndexing() );
+								contextBuilder.failingOperation( log.backgroundIndexing() );
 								for ( EntityReference entityReference : result.failingEntities() ) {
 									contextBuilder.failingEntityReference( entityReference );
 								}

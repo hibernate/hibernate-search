@@ -52,7 +52,7 @@ public enum EntityLoadingCacheLookupStrategy {
 		return ParseUtils.parseDiscreteValues(
 				EntityLoadingCacheLookupStrategy.values(),
 				EntityLoadingCacheLookupStrategy::externalRepresentation,
-				log::invalidAutomaticIndexingSynchronizationStrategyName,
+				log::invalidEntityLoadingCacheLookupStrategyName,
 				value
 		);
 	}
