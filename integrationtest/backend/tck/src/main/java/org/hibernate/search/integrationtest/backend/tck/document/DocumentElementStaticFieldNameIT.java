@@ -17,6 +17,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
@@ -268,7 +269,7 @@ public class DocumentElementStaticFieldNameIT<F> {
 			IndexedEmbeddedDefinition indexedEmbeddedDefinition = new IndexedEmbeddedDefinition(
 					new StubTypeModel( "embedded" ),
 					"excludingObject.", ObjectStructure.FLATTENED,
-					null, Collections.singleton( "pathThatDoesNotMatchAnything" ), Collections.emptySet()
+					new TreeFilterDefinition( null, Collections.singleton( "pathThatDoesNotMatchAnything" ), Collections.emptySet() )
 			);
 			IndexedEmbeddedBindingContext excludingEmbeddedContext =
 					ctx.addIndexedEmbeddedIfIncluded( indexedEmbeddedDefinition, true ).get();

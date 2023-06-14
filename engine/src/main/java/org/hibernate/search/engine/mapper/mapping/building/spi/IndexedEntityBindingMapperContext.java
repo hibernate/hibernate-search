@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
+import org.hibernate.search.engine.common.tree.spi.TreeFilterPathTracker;
+
 public interface IndexedEntityBindingMapperContext {
 
 	/**
@@ -22,6 +24,6 @@ public interface IndexedEntityBindingMapperContext {
 	 * @param definition An indexed embedded definition.
 	 * @return The path tracker for that definition.
 	 */
-	IndexedEmbeddedPathTracker getOrCreatePathTracker(IndexedEmbeddedDefinition definition);
+	TreeFilterPathTracker getOrCreatePathTracker(IndexedEmbeddedDefinition definition);
 
 }

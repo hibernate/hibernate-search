@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
 import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.mapper.mapping.building.spi.BackendsInfo;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
+import org.hibernate.search.engine.common.tree.spi.TreeFilterPathTracker;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerFactory;
@@ -37,7 +37,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 	private final TenancyMode tenancyMode;
 
 	private final Map<StubTypeModel, MappedIndexManagerBuilder> indexManagerBuilders = new HashMap<>();
-	private final Map<IndexedEmbeddedDefinition, IndexedEmbeddedPathTracker> pathTrackers = new HashMap<>();
+	private final Map<IndexedEmbeddedDefinition, TreeFilterPathTracker> pathTrackers = new HashMap<>();
 
 	StubMapper(MappingBuildContext buildContext,
 			TypeMetadataContributorProvider<StubMappedIndex> contributorProvider,
@@ -137,8 +137,8 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 	}
 
 	@Override
-	public IndexedEmbeddedPathTracker getOrCreatePathTracker(IndexedEmbeddedDefinition definition) {
-		return pathTrackers.computeIfAbsent( definition, IndexedEmbeddedPathTracker::new );
+	public TreeFilterPathTracker getOrCreatePathTracker(IndexedEmbeddedDefinition definition) {
+		return pathTrackers.computeIfAbsent( definition, d -> new TreeFilterPathTracker( d.filter() ) );
 	}
 
 	@Override

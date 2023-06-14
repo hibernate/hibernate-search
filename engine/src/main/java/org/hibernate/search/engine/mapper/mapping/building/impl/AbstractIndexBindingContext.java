@@ -6,36 +6,48 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaElementImpl;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNestingContext;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFieldBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexCompositeNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
+import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
+import org.hibernate.search.engine.common.tree.spi.TreeContributionListener;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
+import org.hibernate.search.engine.common.tree.spi.TreeFilterPathTracker;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
+import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 abstract class AbstractIndexBindingContext<B extends IndexCompositeNodeBuilder> implements IndexBindingContext {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private final BiFunction<MappableTypeModel, String, SearchException> CYCLIC_RECURSION_EXCEPTION_FACTORY =
+			log::indexedEmbeddedCyclicRecursion;
 
 	private final IndexedEntityBindingMapperContext mapperContext;
 	private final IndexRootBuilder indexRootBuilder;
 	final B indexSchemaObjectNodeBuilder;
-	final ConfiguredIndexSchemaNestingContext nestingContext;
+	final TreeNestingContext nestingContext;
 
 	AbstractIndexBindingContext(IndexedEntityBindingMapperContext mapperContext,
 			IndexRootBuilder indexRootBuilder,
-			B indexSchemaObjectNodeBuilder, ConfiguredIndexSchemaNestingContext nestingContext) {
+			B indexSchemaObjectNodeBuilder, TreeNestingContext nestingContext) {
 		this.mapperContext = mapperContext;
 		this.indexRootBuilder = indexRootBuilder;
 		this.indexSchemaObjectNodeBuilder = indexSchemaObjectNodeBuilder;
@@ -68,11 +80,11 @@ abstract class AbstractIndexBindingContext<B extends IndexCompositeNodeBuilder> 
 	}
 
 	@Override
-	public IndexSchemaElement schemaElement(IndexSchemaContributionListener listener) {
+	public IndexSchemaElement schemaElement(TreeContributionListener listener) {
 		return new IndexSchemaElementImpl<>(
 				createTypeFactory(),
 				indexSchemaObjectNodeBuilder,
-				new NotifyingNestingContext( nestingContext, listener ),
+				TreeNestingContext.notifying( nestingContext, listener ),
 				isParentMultivaluedAndWithoutObjectField()
 		);
 	}
@@ -80,16 +92,16 @@ abstract class AbstractIndexBindingContext<B extends IndexCompositeNodeBuilder> 
 	@Override
 	public Optional<IndexedEmbeddedBindingContext> addIndexedEmbeddedIfIncluded(IndexedEmbeddedDefinition definition,
 			boolean multiValued) {
-		IndexedEmbeddedPathTracker pathTracker = mapperContext.getOrCreatePathTracker( definition );
-		return nestingContext.addIndexedEmbeddedIfIncluded(
-				definition,
-				pathTracker,
+		TreeFilterPathTracker pathTracker = mapperContext.getOrCreatePathTracker( definition );
+		return nestingContext.nestComposed( definition.definingTypeModel(), definition.relativePrefix(),
+				definition.filter(), pathTracker,
 				new NestedContextBuilderImpl(
 						mapperContext,
 						indexRootBuilder, indexSchemaObjectNodeBuilder,
 						definition,
 						isParentMultivaluedAndWithoutObjectField() || multiValued
-				)
+				),
+				CYCLIC_RECURSION_EXCEPTION_FACTORY
 		);
 	}
 
@@ -102,7 +114,7 @@ abstract class AbstractIndexBindingContext<B extends IndexCompositeNodeBuilder> 
 	abstract boolean isParentMultivaluedAndWithoutObjectField();
 
 	private static class NestedContextBuilderImpl
-			implements ConfiguredIndexSchemaNestingContext.NestedContextBuilder<IndexedEmbeddedBindingContext> {
+			implements TreeNestingContext.NestedContextBuilder<IndexedEmbeddedBindingContext> {
 
 		private final IndexedEntityBindingMapperContext mapperContext;
 		private final IndexRootBuilder indexRootBuilder;
@@ -126,7 +138,7 @@ abstract class AbstractIndexBindingContext<B extends IndexCompositeNodeBuilder> 
 		@Override
 		public void appendObject(String objectName) {
 			IndexObjectFieldBuilder nextNodeBuilder =
-					currentNodeBuilder.addObjectField( objectName, IndexFieldInclusion.INCLUDED,
+					currentNodeBuilder.addObjectField( objectName, TreeNodeInclusion.INCLUDED,
 							definition.structure()
 					);
 			if ( multiValued ) {
@@ -139,7 +151,7 @@ abstract class AbstractIndexBindingContext<B extends IndexCompositeNodeBuilder> 
 		}
 
 		@Override
-		public IndexedEmbeddedBindingContext build(ConfiguredIndexSchemaNestingContext nestingContext) {
+		public IndexedEmbeddedBindingContext build(TreeNestingContext nestingContext) {
 			return new IndexedEmbeddedBindingContextImpl(
 					mapperContext,
 					indexRootBuilder,

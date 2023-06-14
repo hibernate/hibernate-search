@@ -11,7 +11,7 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexCompositeNodeType;
 import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexObjectField;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 
 public final class ElasticsearchIndexObjectField
@@ -25,7 +25,7 @@ public final class ElasticsearchIndexObjectField
 		implements ElasticsearchIndexCompositeNode, ElasticsearchIndexField {
 
 	public ElasticsearchIndexObjectField(ElasticsearchIndexCompositeNode parent, String relativeFieldName,
-			ElasticsearchIndexCompositeNodeType type, IndexFieldInclusion inclusion, boolean multiValued,
+			ElasticsearchIndexCompositeNodeType type, TreeNodeInclusion inclusion, boolean multiValued,
 			Map<String, ElasticsearchIndexField> notYetInitializedStaticChildren) {
 		super( parent, relativeFieldName, type, inclusion, multiValued, notYetInitializedStaticChildren );
 	}

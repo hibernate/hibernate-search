@@ -23,12 +23,12 @@ import static org.mockito.Mockito.when;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 
-import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaNestingContext;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
+import org.hibernate.search.engine.common.tree.spi.TreeNestingContext;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
+import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
+import org.hibernate.search.engine.common.tree.spi.TreeFilterPathTracker;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -44,7 +44,14 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
-public class ConfiguredIndexSchemaManagerNestingContextTest {
+public class TreeNestingContextTest {
+	private static final BiFunction<MappableTypeModel, String, SearchException> CYCLIC_RECURSION_EXCEPTION_FACTORY =
+			(definingTypeModel, cyclicRecursionPath) -> new SearchException(
+					cyclicRecursionMessage( definingTypeModel, cyclicRecursionPath ) );
+
+	private static String cyclicRecursionMessage(MappableTypeModel definingTypeModel, String cyclicRecursionPath) {
+		return "Cyclic recursion! Root = " + definingTypeModel.name() + ", path = " + cyclicRecursionPath;
+	}
 
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
@@ -62,16 +69,16 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	private MappableTypeModel typeModel4Mock;
 
 	@Mock
-	private IndexSchemaNestingContext.LeafFactory<Object> leafFactoryMock;
+	private TreeNestingContext.LeafFactory<Object> leafFactoryMock;
 
 	@Mock
-	private IndexSchemaNestingContext.CompositeFactory<Object> compositeFactoryMock;
+	private TreeNestingContext.CompositeFactory<Object> compositeFactoryMock;
 
 	@Mock
-	private IndexSchemaNestingContext.UnfilteredFactory<Object> unfilteredFactoryMock;
+	private TreeNestingContext.UnfilteredFactory<Object> unfilteredFactoryMock;
 
 	@Mock
-	private ConfiguredIndexSchemaNestingContext.NestedContextBuilder<Object> nestedContextBuilderMock;
+	private TreeNestingContext.NestedContextBuilder<Object> nestedContextBuilderMock;
 
 	@Before
 	public void setup() {
@@ -83,35 +90,35 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 	@Test
 	public void noFilter() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		checkFooBarIncluded( "", rootContext );
 
-		IndexSchemaNestingContext level1Context =
+		TreeNestingContext level1Context =
 				checkCompositeIncluded( "level1", rootContext, "level1" );
 
 		checkFooBarIncluded( "", level1Context );
 	}
 
 	@Test
-	public void indexedEmbedded_noFilter() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_noFilter() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
-		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.prefix1_",
 				null, null, null
 		);
 		checkFooBarIncluded( "prefix1_", level1Context );
 
-		// Check non-IndexedEmbedded nesting
+		// Check simple nesting (no filter composition)
 
-		IndexSchemaNestingContext level2NonIndexedEmbeddedContext =
+		TreeNestingContext level2NonComposedContext =
 				checkCompositeIncluded( "prefix1_level2", level1Context, "level2" );
-		checkFooBarIncluded( "", level2NonIndexedEmbeddedContext );
+		checkFooBarIncluded( "", level2NonComposedContext );
 
-		// Check IndexedEmbedded composition
+		// Check nesting with filter composition
 
-		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level2Context = checkSimpleComposedFilterIncluded(
 				"prefix1_level2", level1Context, typeModel2Mock, "level2.prefix2_",
 				null, null, null
 		);
@@ -119,69 +126,67 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	}
 
 	@Test
-	public void indexedEmbedded_noFilter_detectCycle_direct() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_noFilter_detectCycle_direct() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
-		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.prefix1_",
 				null, null, null
 		);
 		checkFooBarIncluded( "prefix1_", level1Context );
 
 		assertThatThrownBy( () -> {
-				IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
-						typeModel1Mock, "level1.prefix1_", ObjectStructure.DEFAULT,
+				TreeFilterDefinition level1Definition = new TreeFilterDefinition(
 						null, null, null
 				);
-				level1Context.addIndexedEmbeddedIfIncluded(
-						level1Definition, new IndexedEmbeddedPathTracker( level1Definition ),
-						nestedContextBuilderMock
+				level1Context.nestComposed(
+						typeModel1Mock, "level1.prefix1_", level1Definition,
+						new TreeFilterPathTracker( level1Definition ),
+						nestedContextBuilderMock, CYCLIC_RECURSION_EXCEPTION_FACTORY
 				);
 		} )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Cyclic @IndexedEmbedded recursion starting from type '" + typeModel1Mock.toString() + "'",
-						"Path starting from that type and ending with a cycle: 'level1.prefix1_level1.prefix1_'"
-				);
+				.hasMessageContainingAll( cyclicRecursionMessage(
+						typeModel1Mock, "level1.prefix1_level1.prefix1_" ) );
 		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
-	public void indexedEmbedded_noFilter_detectCycle_indirect() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_noFilter_detectCycle_indirect() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
-		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.prefix1_",
 				null, null, null
 		);
 
-		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level2Context = checkSimpleComposedFilterIncluded(
 				"prefix1_level2", level1Context, typeModel1Mock, "level2.prefix2_",
 				null, null, null
 		);
 
 		assertThatThrownBy( () -> {
-			IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
-					typeModel1Mock, "level1.prefix1_", ObjectStructure.DEFAULT,
+			TreeFilterDefinition level2Definition = new TreeFilterDefinition(
 					null, null, null
 			);
-			level2Context.addIndexedEmbeddedIfIncluded(
-					level2Definition, new IndexedEmbeddedPathTracker( level2Definition ),
-					nestedContextBuilderMock
+			level2Context.nestComposed(
+					typeModel1Mock, "level1.prefix1_",
+					level2Definition, new TreeFilterPathTracker( level2Definition ),
+					nestedContextBuilderMock, CYCLIC_RECURSION_EXCEPTION_FACTORY
 			);
 		} )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Cyclic @IndexedEmbedded recursion starting from type '" + typeModel1Mock.toString() + "'",
-						"Path starting from that type and ending with a cycle: 'level1.prefix1_level2.prefix2_level1.prefix1_'"
-				);
+				.hasMessageContainingAll( cyclicRecursionMessage(
+						typeModel1Mock, "level1.prefix1_level2.prefix2_level1.prefix1_" ) );
 		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
-	public void indexedEmbedded_noFilter_multiLevelInOneIndexedEmbedded() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_noFilter_multiLevelPrefix() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
-		ArgumentCaptor<ConfiguredIndexSchemaNestingContext> nestedContextCapture =
-				ArgumentCaptor.forClass( ConfiguredIndexSchemaNestingContext.class );
+		ArgumentCaptor<TreeNestingContext> nestedContextCapture =
+				ArgumentCaptor.forClass( TreeNestingContext.class );
 
 		Object expectedReturn;
 		Optional<Object> actualReturn;
@@ -189,13 +194,13 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		expectedReturn = new Object();
 		when( nestedContextBuilderMock.build( any() ) )
 				.thenReturn( expectedReturn );
-		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition(
-				typeModel1Mock, "level1.level2.level3.prefix1_", ObjectStructure.DEFAULT,
+		TreeFilterDefinition definition = new TreeFilterDefinition(
 				null, null, null
 		);
-		actualReturn = rootContext.addIndexedEmbeddedIfIncluded(
-				definition, new IndexedEmbeddedPathTracker( definition ),
-				nestedContextBuilderMock
+		actualReturn = rootContext.nestComposed(
+				typeModel1Mock, "level1.level2.level3.prefix1_",
+				definition, new TreeFilterPathTracker( definition ),
+				nestedContextBuilderMock, CYCLIC_RECURSION_EXCEPTION_FACTORY
 		);
 		InOrder inOrder = inOrder( nestedContextBuilderMock );
 		inOrder.verify( nestedContextBuilderMock ).appendObject( "level1" );
@@ -207,27 +212,27 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		assertTrue( actualReturn.isPresent() );
 		assertSame( expectedReturn, actualReturn.get() );
 
-		ConfiguredIndexSchemaNestingContext level3Context = nestedContextCapture.getValue();
+		TreeNestingContext level3Context = nestedContextCapture.getValue();
 
 		checkFooBarIncluded( "prefix1_", level3Context );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2552")
-	public void indexedEmbedded_includePaths() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_includePaths() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
 
 		includePaths.add( "level2.level3" );
 		includePaths.add( "level2.prefix2_level3" );
 
-		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.",
 				null, includePaths, null
 		);
 		checkFooBarExcluded( "", level1Context );
-		checkFooBarIndexedEmbeddedExcluded( level1Context, typeModel2Mock );
+		checkFooBarComposedFilterExcluded( level1Context, typeModel2Mock );
 		checkLeafExcluded( "level3", level1Context, "level3" );
 		checkCompositeExcluded( "level3", level1Context, "level3" );
 		checkLeafIncluded( "level2", level1Context, "level2" );
@@ -235,26 +240,26 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		checkLeafIncluded( "level2.level3", level1Context, "level2.level3" );
 		checkCompositeIncluded( "level2.level3", level1Context, "level2.level3" );
 
-		// Check non-IndexedEmbedded nesting
+		// Check simple nesting (no filter composition)
 
-		IndexSchemaNestingContext level2NonIndexedEmbeddedContext =
+		TreeNestingContext level2NonComposedContext =
 				checkCompositeIncluded( "level2", level1Context, "level2" );
-		checkFooBarExcluded( "", level2NonIndexedEmbeddedContext );
-		checkLeafIncluded( "level3", level2NonIndexedEmbeddedContext, "level3" );
-		checkLeafIncluded( "prefix2_level3", level2NonIndexedEmbeddedContext, "prefix2_level3" );
-		checkCompositeIncluded( "level3", level2NonIndexedEmbeddedContext, "level3" );
-		checkCompositeIncluded( "prefix2_level3", level2NonIndexedEmbeddedContext, "prefix2_level3" );
-		checkLeafExcluded( "level3.foo", level2NonIndexedEmbeddedContext, "level3.foo" );
-		checkCompositeExcluded( "level3.foo", level2NonIndexedEmbeddedContext, "level3.foo" );
+		checkFooBarExcluded( "", level2NonComposedContext );
+		checkLeafIncluded( "level3", level2NonComposedContext, "level3" );
+		checkLeafIncluded( "prefix2_level3", level2NonComposedContext, "prefix2_level3" );
+		checkCompositeIncluded( "level3", level2NonComposedContext, "level3" );
+		checkCompositeIncluded( "prefix2_level3", level2NonComposedContext, "prefix2_level3" );
+		checkLeafExcluded( "level3.foo", level2NonComposedContext, "level3.foo" );
+		checkCompositeExcluded( "level3.foo", level2NonComposedContext, "level3.foo" );
 
-		// Check IndexedEmbedded composition without a prefix
+		// Check nesting with filter composition without a prefix
 
-		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level2Context = checkSimpleComposedFilterIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.",
 				null, null, null
 		);
 		checkFooBarExcluded( "", level2Context );
-		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
+		checkFooBarComposedFilterExcluded( level2Context, typeModel3Mock );
 		checkLeafIncluded( "level3", level2Context, "level3" );
 		checkLeafIncluded( "prefix2_level3", level2Context, "prefix2_level3" );
 		checkCompositeIncluded( "level3", level2Context, "level3" );
@@ -262,14 +267,14 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		checkLeafExcluded( "level3.foo", level2Context, "level3.foo" );
 		checkCompositeExcluded( "level3.foo", level2Context, "level3.foo" );
 
-		// Check IndexedEmbedded composition with a prefix
+		// Check nesting with filter composition with a prefix
 
-		level2Context = checkSimpleIndexedEmbeddedIncluded(
+		level2Context = checkSimpleComposedFilterIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.prefix2_",
 				null, null, null
 		);
 		checkFooBarExcluded( "prefix2_", level2Context );
-		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
+		checkFooBarComposedFilterExcluded( level2Context, typeModel3Mock );
 		checkLeafIncluded( "prefix2_level3", level2Context, "level3" );
 		checkCompositeIncluded( "prefix2_level3", level2Context, "level3" );
 		checkLeafExcluded( "prefix2_prefix2_level3", level2Context, "prefix2_level3" );
@@ -277,17 +282,17 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		checkLeafExcluded( "prefix2_level3.foo", level2Context, "level3.foo" );
 		checkCompositeExcluded( "prefix2_level3.foo", level2Context, "level3.foo" );
 
-		// Check IndexedEmbedded composition with path filter composition
+		// Check nesting with filter composition with path filter composition
 
 		includePaths.clear();
 		includePaths.add( "prefix2_level3" );
 
-		level2Context = checkSimpleIndexedEmbeddedIncluded(
+		level2Context = checkSimpleComposedFilterIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.",
 				null, includePaths, null
 		);
 		checkFooBarExcluded( "", level2Context );
-		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
+		checkFooBarComposedFilterExcluded( level2Context, typeModel3Mock );
 		checkLeafIncluded( "prefix2_level3", level2Context, "prefix2_level3" );
 		checkCompositeIncluded( "prefix2_level3", level2Context, "prefix2_level3" );
 		checkLeafExcluded( "prefix2_level3.foo", level2Context, "prefix2_level3.foo" );
@@ -299,25 +304,23 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3136")
-	public void indexedEmbedded_includePaths_tracking() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_includePaths_tracking() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
 		includePaths.add( "included" );
 		includePaths.add( "notEncountered" );
-		includePaths.add( "level2NonIndexedEmbedded" );
-		includePaths.add( "level2NonIndexedEmbedded.included" );
-		includePaths.add( "level2NonIndexedEmbedded.notEncountered" );
-		includePaths.add( "level2IndexedEmbedded.included" );
-		includePaths.add( "level2IndexedEmbedded.notEncountered" );
-		includePaths.add( "level2IndexedEmbedded.excludedBecauseOfLevel2" );
-		IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
-				typeModel1Mock, "level1.", ObjectStructure.DEFAULT, null, includePaths, null
-		);
-		IndexedEmbeddedPathTracker level1PathTracker = new IndexedEmbeddedPathTracker( level1Definition );
-		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+		includePaths.add( "level2NonComposed" );
+		includePaths.add( "level2NonComposed.included" );
+		includePaths.add( "level2NonComposed.notEncountered" );
+		includePaths.add( "level2Composed.included" );
+		includePaths.add( "level2Composed.notEncountered" );
+		includePaths.add( "level2Composed.excludedBecauseOfLevel2" );
+		TreeFilterDefinition level1Definition = new TreeFilterDefinition( null, includePaths, null );
+		TreeFilterPathTracker level1PathTracker = new TreeFilterPathTracker( level1Definition );
+		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
 				"level1", rootContext,
-				level1Definition, level1PathTracker
+				typeModel1Mock, "level1.", level1Definition, level1PathTracker
 		);
 		// Initially no path was encountered so all includePaths are useless
 		assertThat( level1PathTracker.encounteredFieldPaths() )
@@ -328,12 +331,12 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 				.containsOnly(
 						"included",
 						"notEncountered",
-						"level2NonIndexedEmbedded",
-						"level2NonIndexedEmbedded.included",
-						"level2NonIndexedEmbedded.notEncountered",
-						"level2IndexedEmbedded.included",
-						"level2IndexedEmbedded.notEncountered",
-						"level2IndexedEmbedded.excludedBecauseOfLevel2"
+						"level2NonComposed",
+						"level2NonComposed.included",
+						"level2NonComposed.notEncountered",
+						"level2Composed.included",
+						"level2Composed.notEncountered",
+						"level2Composed.excludedBecauseOfLevel2"
 				);
 
 		// Encounter "included" and "excludedBecauseOfLevel1"
@@ -350,72 +353,69 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 				.containsOnly(
 						// "included" removed
 						"notEncountered",
-						"level2NonIndexedEmbedded",
-						"level2NonIndexedEmbedded.included",
-						"level2NonIndexedEmbedded.notEncountered",
-						"level2IndexedEmbedded.included",
-						"level2IndexedEmbedded.notEncountered",
-						"level2IndexedEmbedded.excludedBecauseOfLevel2"
+						"level2NonComposed",
+						"level2NonComposed.included",
+						"level2NonComposed.notEncountered",
+						"level2Composed.included",
+						"level2Composed.notEncountered",
+						"level2Composed.excludedBecauseOfLevel2"
 				);
 
-		// Check non-IndexedEmbedded nesting
-		IndexSchemaNestingContext level2NonIndexedEmbeddedContext =
-				checkCompositeIncluded( "level2NonIndexedEmbedded", level1Context, "level2NonIndexedEmbedded" );
+		// Check simple nesting (no filter composition)
+		TreeNestingContext level2NonComposedContext =
+				checkCompositeIncluded( "level2NonComposed", level1Context, "level2NonComposed" );
 		assertThat( level1PathTracker.encounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"excludedBecauseOfLevel1",
-						"level2NonIndexedEmbedded" // Added
+						"level2NonComposed" // Added
 				);
 		// We have no exclude paths so it should be empty all the time:
 		assertThat( level1PathTracker.uselessExcludePaths() ).isEmpty();
 		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
-						// "level2NonIndexedEmbedded" removed
-						"level2NonIndexedEmbedded.included",
-						"level2NonIndexedEmbedded.notEncountered",
-						"level2IndexedEmbedded.included",
-						"level2IndexedEmbedded.notEncountered",
-						"level2IndexedEmbedded.excludedBecauseOfLevel2"
+						// "level2NonComposed" removed
+						"level2NonComposed.included",
+						"level2NonComposed.notEncountered",
+						"level2Composed.included",
+						"level2Composed.notEncountered",
+						"level2Composed.excludedBecauseOfLevel2"
 				);
 
-		// Encounter "level2NonIndexedEmbedded.included" and "level2NonIndexedEmbedded.excludedBecauseOfLevel1"
-		checkLeafIncluded( "included", level2NonIndexedEmbeddedContext, "included" );
-		checkLeafExcluded( "excludedBecauseOfLevel1", level2NonIndexedEmbeddedContext, "excludedBecauseOfLevel1" );
+		// Encounter "level2NonComposed.included" and "level2NonComposed.excludedBecauseOfLevel1"
+		checkLeafIncluded( "included", level2NonComposedContext, "included" );
+		checkLeafExcluded( "excludedBecauseOfLevel1", level2NonComposedContext, "excludedBecauseOfLevel1" );
 		assertThat( level1PathTracker.encounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"excludedBecauseOfLevel1",
-						"level2NonIndexedEmbedded",
-						"level2NonIndexedEmbedded.included", // Added
-						"level2NonIndexedEmbedded.excludedBecauseOfLevel1" // Added
+						"level2NonComposed",
+						"level2NonComposed.included", // Added
+						"level2NonComposed.excludedBecauseOfLevel1" // Added
 				);
 		// We have no exclude paths so it should be empty all the time:
 		assertThat( level1PathTracker.uselessExcludePaths() ).isEmpty();
 		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
-						// "level2NonIndexedEmbedded.included" removed
-						"level2NonIndexedEmbedded.notEncountered",
-						"level2IndexedEmbedded.included",
-						"level2IndexedEmbedded.notEncountered",
-						"level2IndexedEmbedded.excludedBecauseOfLevel2"
+						// "level2NonComposed.included" removed
+						"level2NonComposed.notEncountered",
+						"level2Composed.included",
+						"level2Composed.notEncountered",
+						"level2Composed.excludedBecauseOfLevel2"
 				);
 
-		// Check IndexedEmbedded nesting
+		// Check composition
 		includePaths.clear();
 		includePaths.add( "included" );
 		includePaths.add( "notEncountered" );
 		includePaths.add( "excludedBecauseOfLevel1" );
-		IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
-				typeModel2Mock, "level2IndexedEmbedded.", ObjectStructure.DEFAULT,
-				null, includePaths, null
-		);
-		IndexedEmbeddedPathTracker level2PathTracker = new IndexedEmbeddedPathTracker( level2Definition );
-		ConfiguredIndexSchemaNestingContext level2IndexedEmbeddedContext = checkSimpleIndexedEmbeddedIncluded(
-				"level2IndexedEmbedded", level1Context,
-				level2Definition, level2PathTracker
+		TreeFilterDefinition level2Definition = new TreeFilterDefinition( null, includePaths, null );
+		TreeFilterPathTracker level2PathTracker = new TreeFilterPathTracker( level2Definition );
+		TreeNestingContext level2ComposedContext = checkSimpleComposedFilterIncluded(
+				"level2Composed", level1Context,
+				typeModel2Mock, "level2Composed.", level2Definition, level2PathTracker
 		);
 		assertThat( level2PathTracker.encounteredFieldPaths() )
 				.isEmpty();
@@ -423,10 +423,10 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 				.containsOnly(
 						"included",
 						"excludedBecauseOfLevel1",
-						"level2NonIndexedEmbedded",
-						"level2NonIndexedEmbedded.included",
-						"level2NonIndexedEmbedded.excludedBecauseOfLevel1",
-						"level2IndexedEmbedded" // Added
+						"level2NonComposed",
+						"level2NonComposed.included",
+						"level2NonComposed.excludedBecauseOfLevel1",
+						"level2Composed" // Added
 				);
 		assertThat( level2PathTracker.uselessIncludePaths() )
 				.containsOnly(
@@ -440,15 +440,15 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 				.containsOnly(
 						// No change expected
 						"notEncountered",
-						"level2NonIndexedEmbedded.notEncountered",
-						"level2IndexedEmbedded.included",
-						"level2IndexedEmbedded.notEncountered",
-						"level2IndexedEmbedded.excludedBecauseOfLevel2"
+						"level2NonComposed.notEncountered",
+						"level2Composed.included",
+						"level2Composed.notEncountered",
+						"level2Composed.excludedBecauseOfLevel2"
 				);
 
-		// Encounter "level2IndexedEmbedded.included" and "level2IndexedEmbedded.excludedBecauseOfLevel1"
-		checkLeafIncluded( "included", level2IndexedEmbeddedContext, "included" );
-		checkLeafExcluded( "excludedBecauseOfLevel1", level2IndexedEmbeddedContext, "excludedBecauseOfLevel1" );
+		// Encounter "level2Composed.included" and "level2Composed.excludedBecauseOfLevel1"
+		checkLeafIncluded( "included", level2ComposedContext, "included" );
+		checkLeafExcluded( "excludedBecauseOfLevel1", level2ComposedContext, "excludedBecauseOfLevel1" );
 		assertThat( level2PathTracker.encounteredFieldPaths() )
 				.containsOnly(
 						"included", // Added
@@ -458,12 +458,12 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 				.containsOnly(
 						"included",
 						"excludedBecauseOfLevel1",
-						"level2NonIndexedEmbedded",
-						"level2NonIndexedEmbedded.included",
-						"level2NonIndexedEmbedded.excludedBecauseOfLevel1",
-						"level2IndexedEmbedded",
-						"level2IndexedEmbedded.included", // Added
-						"level2IndexedEmbedded.excludedBecauseOfLevel1" // Added
+						"level2NonComposed",
+						"level2NonComposed.included",
+						"level2NonComposed.excludedBecauseOfLevel1",
+						"level2Composed",
+						"level2Composed.included", // Added
+						"level2Composed.excludedBecauseOfLevel1" // Added
 				);
 		assertThat( level2PathTracker.uselessIncludePaths() )
 				.containsOnly(
@@ -476,14 +476,14 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
-						"level2NonIndexedEmbedded.notEncountered",
-						// "level2IndexedEmbedded.included" removed
-						"level2IndexedEmbedded.notEncountered",
-						"level2IndexedEmbedded.excludedBecauseOfLevel2"
+						"level2NonComposed.notEncountered",
+						// "level2Composed.included" removed
+						"level2Composed.notEncountered",
+						"level2Composed.excludedBecauseOfLevel2"
 				);
 
-		// Encounter "level2IndexedEmbedded.excludedBecauseOfLevel2"
-		checkLeafExcluded( "excludedBecauseOfLevel2", level2IndexedEmbeddedContext, "excludedBecauseOfLevel2" );
+		// Encounter "level2Composed.excludedBecauseOfLevel2"
+		checkLeafExcluded( "excludedBecauseOfLevel2", level2ComposedContext, "excludedBecauseOfLevel2" );
 		assertThat( level2PathTracker.encounteredFieldPaths() )
 				.containsOnly(
 						"included",
@@ -494,13 +494,13 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 				.containsOnly(
 						"included",
 						"excludedBecauseOfLevel1",
-						"level2NonIndexedEmbedded",
-						"level2NonIndexedEmbedded.included",
-						"level2NonIndexedEmbedded.excludedBecauseOfLevel1",
-						"level2IndexedEmbedded",
-						"level2IndexedEmbedded.included",
-						"level2IndexedEmbedded.excludedBecauseOfLevel1"
-						//"level2IndexedEmbedded.excludedBecauseOfLevel2" // should not be added since it is excluded at lvl2, hence it wasn't encountered at lvl1.
+						"level2NonComposed",
+						"level2NonComposed.included",
+						"level2NonComposed.excludedBecauseOfLevel1",
+						"level2Composed",
+						"level2Composed.included",
+						"level2Composed.excludedBecauseOfLevel1"
+						//"level2Composed.excludedBecauseOfLevel2" // should not be added since it is excluded at lvl2, hence it wasn't encountered at lvl1.
 				);
 		assertThat( level2PathTracker.uselessIncludePaths() )
 				.containsOnly(
@@ -512,10 +512,10 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
-						"level2NonIndexedEmbedded.notEncountered",
-						"level2IndexedEmbedded.notEncountered",
+						"level2NonComposed.notEncountered",
+						"level2Composed.notEncountered",
 						// No change expected: "excludedBecauseOfLevel2" was excluded in the end, so it really is useless
-						"level2IndexedEmbedded.excludedBecauseOfLevel2"
+						"level2Composed.excludedBecauseOfLevel2"
 				);
 	}
 
@@ -540,7 +540,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	 * 	public static class Level2 {
 	 * 		String exclude;
 	 * 		String include;
-	 * 		String excludedInLevel1Embedded;
+	 * 		String excludedInLevel1Filter;
 	 * 		@IndexedEmbedded
 	 * 		Level3 level3;
 	 * 		Level3 level3NotAnnotated;
@@ -553,8 +553,8 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	 */
 
 	@Test
-	public void indexedEmbedded_excludePaths_tracking() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_excludePaths_tracking() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> excludePaths = new HashSet<>();
 		excludePaths.add( "exclude" );
@@ -564,13 +564,11 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		excludePaths.add( "level2.level3.exclude" );
 		excludePaths.add( "level2.level3.notEncountered" );
 
-		IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
-				typeModel1Mock, "level1.", ObjectStructure.DEFAULT, null, null, excludePaths
-		);
-		IndexedEmbeddedPathTracker level1PathTracker = new IndexedEmbeddedPathTracker( level1Definition );
-		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeFilterDefinition level1Definition = new TreeFilterDefinition( null, null, excludePaths );
+		TreeFilterPathTracker level1PathTracker = new TreeFilterPathTracker( level1Definition );
+		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
 				"level1", rootContext,
-				level1Definition, level1PathTracker
+				typeModel1Mock, "level1.", level1Definition, level1PathTracker
 		);
 		// Initially no path was encountered so all excludePaths are useless and there's no include paths so no useless included paths as a result
 		assertThat( level1PathTracker.encounteredFieldPaths() ).isEmpty();
@@ -598,14 +596,12 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 						"level2.level3.notEncountered"
 				);
 
-		IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
-				typeModel2Mock, "level2.", ObjectStructure.DEFAULT,
-				null, null, asSet( "excludedInLevel1Embedded", "notEncountered" )
-		);
-		IndexedEmbeddedPathTracker level2PathTracker = new IndexedEmbeddedPathTracker( level2Definition );
-		ConfiguredIndexSchemaNestingContext level2IndexedEmbeddedContext = checkSimpleIndexedEmbeddedIncluded(
+		TreeFilterDefinition level2Definition = new TreeFilterDefinition(
+				null, null, asSet( "excludedInLevel1Filter", "notEncountered" ) );
+		TreeFilterPathTracker level2PathTracker = new TreeFilterPathTracker( level2Definition );
+		TreeNestingContext level2ComposedContext = checkSimpleComposedFilterIncluded(
 				"level2", level1Context,
-				level2Definition, level2PathTracker
+				typeModel2Mock, "level2.", level2Definition, level2PathTracker
 		);
 		assertThat( level2PathTracker.encounteredFieldPaths() ).isEmpty();
 		assertThat( level1PathTracker.encounteredFieldPaths() )
@@ -618,19 +614,19 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		assertThat( level2PathTracker.uselessExcludePaths() )
 				.containsOnly(
 						"notEncountered",
-						"excludedInLevel1Embedded"
+						"excludedInLevel1Filter"
 				);
 
 		// go through level2 properties:
-		checkLeafIncluded( "include", level2IndexedEmbeddedContext, "include" );
-		checkLeafExcluded( "exclude", level2IndexedEmbeddedContext, "exclude" );
-		checkLeafExcluded( "excludedInLevel1Embedded", level2IndexedEmbeddedContext, "excludedInLevel1Embedded" );
+		checkLeafIncluded( "include", level2ComposedContext, "include" );
+		checkLeafExcluded( "exclude", level2ComposedContext, "exclude" );
+		checkLeafExcluded( "excludedInLevel1Filter", level2ComposedContext, "excludedInLevel1Filter" );
 
 		assertThat( level2PathTracker.encounteredFieldPaths() )
 				.containsOnly(
 						"include", // Added
 						"exclude", // Added
-						"excludedInLevel1Embedded" // Added
+						"excludedInLevel1Filter" // Added
 				);
 		assertThat( level1PathTracker.encounteredFieldPaths() )
 				.containsOnly(
@@ -639,13 +635,13 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 						"level2",
 						"level2.include", // Added
 						"level2.exclude" // Added
-						// "level2.excludedInLevel1Embedded" // Should not be added since it was excluded at lvl2 tracking.
+						// "level2.excludedInLevel1Filter" // Should not be added since it was excluded at lvl2 tracking.
 				);
 		assertThat( level2PathTracker.uselessIncludePaths() ).isEmpty();
 		assertThat( level2PathTracker.uselessExcludePaths() )
 				.containsOnly(
 						"notEncountered"
-						// "excludedInLevel1Embedded" // Removed
+						// "excludedInLevel1Filter" // Removed
 				);
 		assertThat( level1PathTracker.uselessIncludePaths() ).isEmpty();
 		assertThat( level1PathTracker.uselessExcludePaths() )
@@ -659,20 +655,17 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 				);
 
 
-		IndexedEmbeddedDefinition level3Definition = new IndexedEmbeddedDefinition(
-				typeModel3Mock, "level3.", ObjectStructure.DEFAULT,
-				null, null, asSet( "notEncountered" )
-		);
-		IndexedEmbeddedPathTracker level3PathTracker = new IndexedEmbeddedPathTracker( level3Definition );
-		ConfiguredIndexSchemaNestingContext level3IndexedEmbeddedContext = checkSimpleIndexedEmbeddedIncluded(
-				"level3", level2IndexedEmbeddedContext,
-				level3Definition, level3PathTracker
+		TreeFilterDefinition level3Definition = new TreeFilterDefinition( null, null, asSet( "notEncountered" ) );
+		TreeFilterPathTracker level3PathTracker = new TreeFilterPathTracker( level3Definition );
+		TreeNestingContext level3ComposedContext = checkSimpleComposedFilterIncluded(
+				"level3", level2ComposedContext,
+				typeModel3Mock, "level3.", level3Definition, level3PathTracker
 		);
 		assertThat( level3PathTracker.encounteredFieldPaths() ).isEmpty();
 		assertThat( level2PathTracker.encounteredFieldPaths() ).containsOnly(
 				"include",
 				"exclude",
-				"excludedInLevel1Embedded",
+				"excludedInLevel1Filter",
 				"level3" // Added
 		);
 		assertThat( level1PathTracker.encounteredFieldPaths() )
@@ -698,8 +691,8 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 						"level2.level3.notEncountered"
 				);
 
-		checkLeafIncluded( "include", level3IndexedEmbeddedContext, "include" );
-		checkLeafExcluded( "exclude", level3IndexedEmbeddedContext, "exclude" );
+		checkLeafIncluded( "include", level3ComposedContext, "include" );
+		checkLeafExcluded( "exclude", level3ComposedContext, "exclude" );
 
 		assertThat( level3PathTracker.encounteredFieldPaths() ).containsOnly(
 				"include", // Added
@@ -708,7 +701,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		assertThat( level2PathTracker.encounteredFieldPaths() ).containsOnly(
 				"include",
 				"exclude",
-				"excludedInLevel1Embedded",
+				"excludedInLevel1Filter",
 				"level3",
 				"level3.include", // Added
 				"level3.exclude" // Added
@@ -760,7 +753,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	 * 	public static class Level2 {
 	 * 		String exclude;
 	 * 		String include;
-	 * 		String excludedInLevel1Embedded;
+	 * 		String excludedInLevel1Filter;
 	 * 		@IndexedEmbedded
 	 * 		Level3 level3;
 	 * 		Level3 level3NotAnnotated;
@@ -773,19 +766,17 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	 */
 
 	@Test
-	public void indexedEmbedded_excludePaths_depth1_exclude_level2() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_excludePaths_depth1_excludeLevel2() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> excludePaths = new HashSet<>();
 		excludePaths.add( "level2.exclude" );
 
-		IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
-				typeModel1Mock, "level1.", ObjectStructure.DEFAULT, 1, null, excludePaths
-		);
-		IndexedEmbeddedPathTracker level1PathTracker = new IndexedEmbeddedPathTracker( level1Definition );
-		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeFilterDefinition level1Definition = new TreeFilterDefinition( 1, null, excludePaths );
+		TreeFilterPathTracker level1PathTracker = new TreeFilterPathTracker( level1Definition );
+		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
 				"level1", rootContext,
-				level1Definition, level1PathTracker
+				typeModel1Mock, "level1.", level1Definition, level1PathTracker
 		);
 		// Initially no path was encountered so all excludePaths are useless and there's no include paths so no useless included paths as a result
 		assertThat( level1PathTracker.encounteredFieldPaths() ).isEmpty();
@@ -804,14 +795,11 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 						"level2.exclude" // so far it is useless
 				);
 
-		IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
-				typeModel2Mock, "level2.", ObjectStructure.DEFAULT,
-				null, null, null
-		);
-		IndexedEmbeddedPathTracker level2PathTracker = new IndexedEmbeddedPathTracker( level2Definition );
-		checkSimpleIndexedEmbeddedExcluded(
+		TreeFilterDefinition level2Definition = TreeFilterDefinition.includeAll();
+		TreeFilterPathTracker level2PathTracker = new TreeFilterPathTracker( level2Definition );
+		checkSimpleComposedFilterExcluded(
 				level1Context,
-				level2Definition, level2PathTracker
+				typeModel2Mock, "level2.", level2Definition, level2PathTracker
 		);
 
 		assertThat( level1PathTracker.uselessExcludePaths() )
@@ -843,7 +831,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	 * 	public static class Level2 {
 	 * 		String exclude;
 	 * 		String include;
-	 * 		String excludedInLevel1Embedded;
+	 * 		String excludedInLevel1Filter;
 	 * 		@IndexedEmbedded
 	 * 		Level3 level3;
 	 * 		Level3 level3NotAnnotated;
@@ -856,19 +844,17 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	 */
 
 	@Test
-	public void indexedEmbedded_excludePaths_same_field_different_levels() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_excludePaths_sameFieldDifferentLevels() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> excludePaths = new HashSet<>();
 		excludePaths.add( "level2.exclude" );
 
-		IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
-				typeModel1Mock, "level1.", ObjectStructure.DEFAULT, null, null, excludePaths
-		);
-		IndexedEmbeddedPathTracker level1PathTracker = new IndexedEmbeddedPathTracker( level1Definition );
-		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeFilterDefinition level1Definition = new TreeFilterDefinition( null, null, excludePaths );
+		TreeFilterPathTracker level1PathTracker = new TreeFilterPathTracker( level1Definition );
+		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
 				"level1", rootContext,
-				level1Definition, level1PathTracker
+				typeModel1Mock, "level1.", level1Definition, level1PathTracker
 		);
 		// Initially no path was encountered so all excludePaths are useless and there's no include paths so no useless included paths as a result
 		assertThat( level1PathTracker.encounteredFieldPaths() ).isEmpty();
@@ -887,14 +873,11 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 						"level2.exclude" // so far it is useless
 				);
 
-		IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
-				typeModel2Mock, "level2.", ObjectStructure.DEFAULT,
-				null, null, asSet( "exclude" )
-		);
-		IndexedEmbeddedPathTracker level2PathTracker = new IndexedEmbeddedPathTracker( level2Definition );
-		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeFilterDefinition level2Definition = new TreeFilterDefinition( null, null, asSet( "exclude" ) );
+		TreeFilterPathTracker level2PathTracker = new TreeFilterPathTracker( level2Definition );
+		TreeNestingContext level2Context = checkSimpleComposedFilterIncluded(
 				"level2", level1Context,
-				level2Definition, level2PathTracker
+				typeModel2Mock, "level2.", level2Definition, level2PathTracker
 		);
 
 		checkLeafExcluded( "exclude", level2Context, "exclude" );
@@ -909,17 +892,17 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2194")
-	public void indexedEmbedded_noFilterThenIncludePaths() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_noFilterThenIncludePaths() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
-		// First level of @IndexedEmbedded: no filter
-		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+		// First level of composition: no filter
+		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
 				"professionnelGC", rootContext, typeModel1Mock, "professionnelGC.",
 				null, null, null
 		);
 
-		// Second level of @IndexedEmbedded: includePaths filter
-		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
+		// Second level of composition: includePaths filter
+		TreeNestingContext level2Context = checkSimpleComposedFilterIncluded(
 				"groupe", level1Context, typeModel1Mock, "groupe.",
 				null, asSet( "raisonSociale" ), null
 		);
@@ -929,145 +912,145 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	}
 
 	@Test
-	public void indexedEmbedded_depth0() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_depth0() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
-		// Depth == 0 => only include fields and nested indexed-embeddeds if they are explicitly included.
+		// Depth == 0 => only include paths if they are explicitly included.
 		// There is little use for this without includePaths, but we test it as an edge case
 
-		checkSimpleIndexedEmbeddedExcluded(
+		checkSimpleComposedFilterExcluded(
 				rootContext, typeModel1Mock,
 				"level1.", 0, null, null
 		);
 	}
 
 	@Test
-	public void indexedEmbedded_depth1() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_depth1() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		// Depth == 1 => implicitly include all fields at the first level,
 		// unless a field is explicitly excluded,
-		// but only include nested indexed-embeddeds and their fields if they are explicitly included.
+		// but only include nested paths in composed filters if they are explicitly included.
 		// (which they won't, because we don't use includePaths/excludePaths here).
 
-		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
 				"level1", rootContext, typeModel1Mock,
 				"level1.", 1, null, null
 		);
 		checkFooBarIncluded( "", level1Context );
-		checkFooBarIndexedEmbeddedExcluded( level1Context, typeModel2Mock );
+		checkFooBarComposedFilterExcluded( level1Context, typeModel2Mock );
 
-		// Check non-IndexedEmbedded nesting
+		// Check simple nesting (no filter composition)
 
-		IndexSchemaNestingContext level2NonIndexedEmbeddedContext =
+		TreeNestingContext level2NonComposedContext =
 				checkCompositeIncluded( "level2", level1Context, "level2" );
-		checkFooBarIncluded( "", level2NonIndexedEmbeddedContext );
+		checkFooBarIncluded( "", level2NonComposedContext );
 
-		IndexSchemaNestingContext level3NonIndexedEmbeddedContext =
-				checkCompositeIncluded( "level3", level2NonIndexedEmbeddedContext, "level3" );
-		checkFooBarIncluded( "", level3NonIndexedEmbeddedContext );
+		TreeNestingContext level3NonComposedContext =
+				checkCompositeIncluded( "level3", level2NonComposedContext, "level3" );
+		checkFooBarIncluded( "", level3NonComposedContext );
 	}
 
 	@Test
-	public void indexedEmbedded_depth3_overridden() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_depth3_overridden() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
-		// Depth == 3 => allow three levels of IndexedEmbedded composition, including level1,
-		// and allow unlimited non-IndexedEmbedded nesting from any of those three levels
+		// Depth == 3 => allow three levels of nesting with filter composition, including level1,
+		// and allow unlimited nesting without filter composition from any of those three levels
 
-		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
 				"level1", rootContext, typeModel1Mock,
 				"level1.", 3, null, null
 		);
 		checkFooBarIncluded( "", level1Context );
 
-		// Check non-IndexedEmbedded nesting
+		// Check simple nesting (no filter composition)
 
-		IndexSchemaNestingContext level2NonIndexedEmbeddedContext =
+		TreeNestingContext level2NonComposedContext =
 				checkCompositeIncluded( "level2", level1Context, "level2" );
-		checkFooBarIncluded( "", level2NonIndexedEmbeddedContext );
+		checkFooBarIncluded( "", level2NonComposedContext );
 
-		IndexSchemaNestingContext level3NonIndexedEmbeddedContext =
-				checkCompositeIncluded( "level3", level2NonIndexedEmbeddedContext, "level3" );
-		checkFooBarIncluded( "", level3NonIndexedEmbeddedContext );
+		TreeNestingContext level3NonComposedContext =
+				checkCompositeIncluded( "level3", level2NonComposedContext, "level3" );
+		checkFooBarIncluded( "", level3NonComposedContext );
 
-		IndexSchemaNestingContext level4NonIndexedEmbeddedContext =
-				checkCompositeIncluded( "level4", level3NonIndexedEmbeddedContext, "level4" );
-		checkFooBarIncluded( "", level4NonIndexedEmbeddedContext );
+		TreeNestingContext level4NonComposedContext =
+				checkCompositeIncluded( "level4", level3NonComposedContext, "level4" );
+		checkFooBarIncluded( "", level4NonComposedContext );
 
-		// Check IndexedEmbedded composition
+		// Check nesting with filter composition
 
-		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level2Context = checkSimpleComposedFilterIncluded(
 				"level2", level1Context, typeModel2Mock,
 				"level2.", null, null, null
 		);
 		checkFooBarIncluded( "", level2Context );
-		level3NonIndexedEmbeddedContext =
+		level3NonComposedContext =
 				checkCompositeIncluded( "level3", level2Context, "level3" );
-		checkFooBarIncluded( "", level3NonIndexedEmbeddedContext );
-		level4NonIndexedEmbeddedContext =
-				checkCompositeIncluded( "level4", level3NonIndexedEmbeddedContext, "level4" );
-		checkFooBarIncluded( "", level4NonIndexedEmbeddedContext );
+		checkFooBarIncluded( "", level3NonComposedContext );
+		level4NonComposedContext =
+				checkCompositeIncluded( "level4", level3NonComposedContext, "level4" );
+		checkFooBarIncluded( "", level4NonComposedContext );
 
-		ConfiguredIndexSchemaNestingContext level3Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level3Context = checkSimpleComposedFilterIncluded(
 				"level3", level2Context, typeModel3Mock,
 				"level3.", null, null, null
 		);
 		checkFooBarIncluded( "", level3Context );
-		level4NonIndexedEmbeddedContext =
+		level4NonComposedContext =
 				checkCompositeIncluded( "level4", level3Context, "level4" );
-		checkFooBarIncluded( "", level4NonIndexedEmbeddedContext );
+		checkFooBarIncluded( "", level4NonComposedContext );
 
-		checkSimpleIndexedEmbeddedExcluded(
+		checkSimpleComposedFilterExcluded(
 				level3Context, typeModel4Mock,
 				"level4.", null, null, null
 		);
 
-		// Check IndexedEmbedded composition with a depth override
+		// Check nesting with filter composition with a depth override
 
-		level2Context = checkSimpleIndexedEmbeddedIncluded(
+		level2Context = checkSimpleComposedFilterIncluded(
 				"level2", level1Context, typeModel2Mock,
 				"level2.", 1, null, null
 		);
 		checkFooBarIncluded( "", level2Context );
 
-		checkSimpleIndexedEmbeddedExcluded(
+		checkSimpleComposedFilterExcluded(
 				level2Context, typeModel3Mock,
 				"level3.", null, null, null
 		);
 	}
 
 	@Test
-	public void indexedEmbedded_includePaths_depth1() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_includePaths_depth1() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
 
 		includePaths.add( "level2.level3" );
 		includePaths.add( "level2.prefix2_level3" );
 
-		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.",
 				1, includePaths, null
 		);
 		checkFooBarIncluded( "", level1Context );
-		checkFooBarIndexedEmbeddedExcluded( level1Context, typeModel2Mock );
+		checkFooBarComposedFilterExcluded( level1Context, typeModel2Mock );
 		checkLeafIncluded( "level2", level1Context, "level2" );
 
-		// Check non-IndexedEmbedded nesting
+		// Check simple nesting (no filter composition)
 
-		IndexSchemaNestingContext level2NonIndexedEmbeddedContext =
+		TreeNestingContext level2NonComposedContext =
 				checkCompositeIncluded( "level2", level1Context, "level2" );
-		checkFooBarIncluded( "", level2NonIndexedEmbeddedContext );
+		checkFooBarIncluded( "", level2NonComposedContext );
 
-		// Check IndexedEmbedded composition without a prefix
+		// Check nesting with filter composition without a prefix
 
-		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level2Context = checkSimpleComposedFilterIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.",
 				null, null, null
 		);
 		checkFooBarExcluded( "", level2Context );
-		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
+		checkFooBarComposedFilterExcluded( level2Context, typeModel3Mock );
 		checkLeafIncluded( "level3", level2Context, "level3" );
 		checkLeafIncluded( "prefix2_level3", level2Context, "prefix2_level3" );
 		checkCompositeIncluded( "level3", level2Context, "level3" );
@@ -1075,14 +1058,14 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		checkLeafExcluded( "level3.foo", level2Context, "level3.foo" );
 		checkCompositeExcluded( "level3.foo", level2Context, "level3.foo" );
 
-		// Check IndexedEmbedded composition with a prefix
+		// Check nesting with filter composition with a prefix
 
-		level2Context = checkSimpleIndexedEmbeddedIncluded(
+		level2Context = checkSimpleComposedFilterIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.prefix2_",
 				null, null, null
 		);
 		checkFooBarExcluded( "prefix2_", level2Context );
-		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
+		checkFooBarComposedFilterExcluded( level2Context, typeModel3Mock );
 		checkLeafIncluded( "prefix2_level3", level2Context, "level3" );
 		checkCompositeIncluded( "prefix2_level3", level2Context, "level3" );
 		checkLeafExcluded( "prefix2_prefix2_level3", level2Context, "prefix2_level3" );
@@ -1090,17 +1073,17 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		checkLeafExcluded( "prefix2_level3.foo", level2Context, "level3.foo" );
 		checkCompositeExcluded( "prefix2_level3.foo", level2Context, "level3.foo" );
 
-		// Check IndexedEmbedded composition with path filter composition
+		// Check nesting with filter composition with path filter composition
 
 		includePaths.clear();
 		includePaths.add( "level3" );
 
-		level2Context = checkSimpleIndexedEmbeddedIncluded(
+		level2Context = checkSimpleComposedFilterIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.",
 				null, includePaths, null
 		);
 		checkFooBarExcluded( "", level2Context );
-		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
+		checkFooBarComposedFilterExcluded( level2Context, typeModel3Mock );
 		checkLeafIncluded( "level3", level2Context, "level3" );
 		checkCompositeIncluded( "level3", level2Context, "level3" );
 		checkLeafExcluded( "level3.foo", level2Context, "level3.foo" );
@@ -1112,8 +1095,8 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3136")
-	public void indexedEmbedded_includePaths_depth1_tracking() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_includePaths_depth1_tracking() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
 
@@ -1121,12 +1104,11 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		includePaths.add( "notEncountered" );
 		includePaths.add( "level2.level3.included" );
 		includePaths.add( "level2.level3.notEncountered" );
-		IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
-				typeModel1Mock, "level1.", ObjectStructure.DEFAULT, 1, includePaths, null
-		);
-		IndexedEmbeddedPathTracker level1PathTracker = new IndexedEmbeddedPathTracker( level1Definition );
-		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeFilterDefinition level1Definition = new TreeFilterDefinition( 1, includePaths, null );
+		TreeFilterPathTracker level1PathTracker = new TreeFilterPathTracker( level1Definition );
+		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
 				"level1", rootContext,
+				typeModel1Mock, "level1.",
 				level1Definition, level1PathTracker
 		);
 		// Initially no path was encountered so all includePaths are useless
@@ -1156,21 +1138,18 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 						"level2.level3.notEncountered"
 				);
 
-		// Encounter a nested indexedEmbedded
-		IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
-				typeModel2Mock, "level2.", ObjectStructure.DEFAULT, null, null, null
+		// Encounter a nested filter
+		TreeFilterDefinition level2Definition = TreeFilterDefinition.includeAll();
+		TreeFilterPathTracker level2PathTracker = new TreeFilterPathTracker( level2Definition );
+		TreeNestingContext level2Context = checkSimpleComposedFilterIncluded(
+				"level2", level1Context,
+				typeModel2Mock, "level2.", level2Definition, level2PathTracker
 		);
-		IndexedEmbeddedPathTracker level2PathTracker = new IndexedEmbeddedPathTracker( level2Definition );
-		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
-				"level2", level1Context, level2Definition, level2PathTracker
-		);
-		IndexedEmbeddedDefinition level3Definition = new IndexedEmbeddedDefinition(
-				typeModel2Mock, "level3.", ObjectStructure.DEFAULT, null, null, null
-		);
-		IndexedEmbeddedPathTracker level3PathTracker = new IndexedEmbeddedPathTracker( level3Definition );
-		ConfiguredIndexSchemaNestingContext level3Context = checkSimpleIndexedEmbeddedIncluded(
-				"level3", level2Context, level3Definition, level3PathTracker
-
+		TreeFilterDefinition level3Definition = TreeFilterDefinition.includeAll();
+		TreeFilterPathTracker level3PathTracker = new TreeFilterPathTracker( level3Definition );
+		TreeNestingContext level3Context = checkSimpleComposedFilterIncluded(
+				"level3", level2Context,
+				typeModel2Mock, "level3.", level3Definition, level3PathTracker
 		);
 		assertThat( level3PathTracker.uselessIncludePaths() )
 				.isEmpty();
@@ -1212,29 +1191,29 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	}
 
 	@Test
-	public void indexedEmbedded_includePaths_embedding_includePaths() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_includePaths_nestComposed_includePaths() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
 
 		includePaths.add( "level2.level3" );
-		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.",
 				null, includePaths, null
 		);
 		checkFooBarExcluded( "", level1Context );
-		checkFooBarIndexedEmbeddedExcluded( level1Context, typeModel2Mock );
+		checkFooBarComposedFilterExcluded( level1Context, typeModel2Mock );
 		checkLeafIncluded( "level2", level1Context, "level2" );
 
 		includePaths.clear();
 		includePaths.add( "level3" );
 		includePaths.add( "level3-alt.level4" );
-		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level2Context = checkSimpleComposedFilterIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.",
 				null, includePaths, null
 		);
 		checkFooBarExcluded( "", level2Context );
-		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
+		checkFooBarComposedFilterExcluded( level2Context, typeModel3Mock );
 		checkLeafIncluded( "level3", level2Context, "level3" );
 		checkLeafExcluded( "level3-alt", level2Context, "level3-alt" );
 		checkCompositeExcluded( "level3-alt", level2Context, "level3-alt" );
@@ -1242,44 +1221,44 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		// Also test a level 2 that has completely incompatible includePaths
 		includePaths.clear();
 		includePaths.add( "level3-alt.level4" );
-		checkSimpleIndexedEmbeddedExcluded(
+		checkSimpleComposedFilterExcluded(
 				level1Context, typeModel2Mock, "level2.",
 				null, includePaths, null
 		);
 
-		IndexSchemaNestingContext level3Context =
+		TreeNestingContext level3Context =
 				checkCompositeIncluded( "level3", level2Context, "level3" );
 		checkFooBarExcluded( "", level3Context );
 	}
 
 	@Test
-	public void indexedEmbedded_includePaths_embedding_depth1AndIncludePaths() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_includePaths_nestComposed_depth1AndIncludePaths() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
 
 		includePaths.add( "level2.level3" );
-		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.",
 				null, includePaths, null
 		);
 		checkFooBarExcluded( "", level1Context );
-		checkFooBarIndexedEmbeddedExcluded( level1Context, typeModel2Mock );
+		checkFooBarComposedFilterExcluded( level1Context, typeModel2Mock );
 		checkLeafIncluded( "level2", level1Context, "level2" );
 
 		includePaths.clear();
 		includePaths.add( "level3-alt.level4" );
-		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level2Context = checkSimpleComposedFilterIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.",
 				1, includePaths, null
 		);
 		checkFooBarExcluded( "", level2Context );
-		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
+		checkFooBarComposedFilterExcluded( level2Context, typeModel3Mock );
 		checkLeafIncluded( "level3", level2Context, "level3" );
 		checkLeafExcluded( "level3-alt", level2Context, "level3-alt" );
 		checkCompositeExcluded( "level3-alt", level2Context, "level3-alt" );
 
-		IndexSchemaNestingContext level3Context =
+		TreeNestingContext level3Context =
 				checkCompositeIncluded( "level3", level2Context, "level3" );
 		checkFooBarExcluded( "", level3Context );
 
@@ -1287,74 +1266,74 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3684")
-	public void indexedEmbedded_includePaths_embedding_depth2AndIncludePaths() {
-		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+	public void nestComposed_includePaths_nestComposed_depth2AndIncludePaths() {
+		TreeNestingContext rootContext = TreeNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
 
 		includePaths.add( "text" );
 		includePaths.add( "nested.nested.text" );
-		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level1Context = checkSimpleComposedFilterIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.",
 				2, includePaths, null
 		);
 
 		// Same includePaths as above
-		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level2Context = checkSimpleComposedFilterIncluded(
 				"nested", level1Context, typeModel2Mock, "nested.",
 				2, includePaths, null
 		);
 		checkFooBarIncluded( "", level2Context );
-		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
+		checkFooBarComposedFilterExcluded( level2Context, typeModel3Mock );
 		checkLeafIncluded( "text", level2Context, "text" );
 		checkCompositeIncluded( "nested", level2Context, "nested" );
 
-		// Also check embedding a third level of @IndexedEmbedded
+		// Also check composing a third level
 		// Same includePaths as above
-		ConfiguredIndexSchemaNestingContext level3Context = checkSimpleIndexedEmbeddedIncluded(
+		TreeNestingContext level3Context = checkSimpleComposedFilterIncluded(
 				"nested", level2Context, typeModel3Mock, "nested.",
 				2, includePaths, null
 		);
 		checkFooBarExcluded( "", level3Context );
-		checkFooBarIndexedEmbeddedExcluded( level3Context, typeModel3Mock );
+		checkFooBarComposedFilterExcluded( level3Context, typeModel3Mock );
 		checkLeafIncluded( "text", level3Context, "text" );
 		checkCompositeExcluded( "nested", level3Context, "nested" );
 
 		// A fourth level should be completely excluded
 		// Same includePaths as above
-		checkSimpleIndexedEmbeddedExcluded(
+		checkSimpleComposedFilterExcluded(
 				level3Context, typeModel4Mock, "nested.",
 				2, includePaths, null
 		);
 	}
 
-	private void checkLeafIncluded(String expectedPrefixedName, IndexSchemaNestingContext context,
+	private void checkLeafIncluded(String expectedPrefixedName, TreeNestingContext context,
 			String relativeFieldName) {
 		Object expectedReturn = new Object();
-		when( leafFactoryMock.create( expectedPrefixedName, IndexFieldInclusion.INCLUDED ) )
+		when( leafFactoryMock.create( expectedPrefixedName, TreeNodeInclusion.INCLUDED ) )
 				.thenReturn( expectedReturn );
 		Object actualReturn = context.nest( relativeFieldName, leafFactoryMock );
 		verifyNoOtherInteractionsAndReset();
 		assertSame( expectedReturn, actualReturn );
 	}
 
-	private void checkLeafExcluded(String expectedPrefixedName, IndexSchemaNestingContext context,
+	private void checkLeafExcluded(String expectedPrefixedName, TreeNestingContext context,
 			String relativeFieldName) {
 		Object expectedReturn = new Object();
-		when( leafFactoryMock.create( expectedPrefixedName, IndexFieldInclusion.EXCLUDED ) )
+		when( leafFactoryMock.create( expectedPrefixedName, TreeNodeInclusion.EXCLUDED ) )
 				.thenReturn( expectedReturn );
 		Object actualReturn = context.nest( relativeFieldName, leafFactoryMock );
 		verifyNoOtherInteractionsAndReset();
 		assertSame( expectedReturn, actualReturn );
 	}
 
-	private IndexSchemaNestingContext checkCompositeIncluded(String expectedPrefixedName,
-			IndexSchemaNestingContext context, String relativeFieldName) {
-		ArgumentCaptor<IndexSchemaNestingContext> nestedContextCapture =
-				ArgumentCaptor.forClass( ConfiguredIndexSchemaNestingContext.class );
+	private TreeNestingContext checkCompositeIncluded(String expectedPrefixedName,
+			TreeNestingContext context, String relativeFieldName) {
+		ArgumentCaptor<TreeNestingContext> nestedContextCapture =
+				ArgumentCaptor.forClass( TreeNestingContext.class );
 		Object expectedReturn = new Object();
 		when( compositeFactoryMock.create(
-				eq( expectedPrefixedName ), eq( IndexFieldInclusion.INCLUDED ),
+				eq( expectedPrefixedName ), eq( TreeNodeInclusion.INCLUDED ),
 				nestedContextCapture.capture()
 		) )
 				.thenReturn( expectedReturn );
@@ -1368,18 +1347,18 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		return nestedContextCapture.getValue();
 	}
 
-	private void checkCompositeExcluded(String expectedPrefixedName, IndexSchemaNestingContext context,
+	private void checkCompositeExcluded(String expectedPrefixedName, TreeNestingContext context,
 			String relativeFieldName) {
 		checkCompositeExcluded( expectedPrefixedName, context, relativeFieldName, true );
 	}
 
-	private void checkCompositeExcluded(String expectedPrefixedName, IndexSchemaNestingContext context,
+	private void checkCompositeExcluded(String expectedPrefixedName, TreeNestingContext context,
 			String relativeFieldName, boolean recurse) {
-		ArgumentCaptor<IndexSchemaNestingContext> nestedContextCapture =
-				ArgumentCaptor.forClass( IndexSchemaNestingContext.class );
+		ArgumentCaptor<TreeNestingContext> nestedContextCapture =
+				ArgumentCaptor.forClass( TreeNestingContext.class );
 		Object expectedReturn = new Object();
 		when( compositeFactoryMock.create(
-				eq( expectedPrefixedName ), eq( IndexFieldInclusion.EXCLUDED ),
+				eq( expectedPrefixedName ), eq( TreeNodeInclusion.EXCLUDED ),
 				nestedContextCapture.capture()
 		) )
 				.thenReturn( expectedReturn );
@@ -1394,49 +1373,49 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		}
 	}
 
-	private void checkDynamicIncluded(String expectedPrefix, IndexSchemaNestingContext context) {
+	private void checkDynamicIncluded(String expectedPrefix, TreeNestingContext context) {
 		Object expectedReturn = new Object();
-		when( unfilteredFactoryMock.create( IndexFieldInclusion.INCLUDED, expectedPrefix ) )
+		when( unfilteredFactoryMock.create( TreeNodeInclusion.INCLUDED, expectedPrefix ) )
 				.thenReturn( expectedReturn );
 		Object actualReturn = context.nestUnfiltered( unfilteredFactoryMock );
 		verifyNoOtherInteractionsAndReset();
 		assertSame( expectedReturn, actualReturn );
 	}
 
-	private void checkDynamicExcluded(String expectedPrefix, IndexSchemaNestingContext context) {
+	private void checkDynamicExcluded(String expectedPrefix, TreeNestingContext context) {
 		Object expectedReturn = new Object();
-		when( unfilteredFactoryMock.create( IndexFieldInclusion.EXCLUDED, expectedPrefix ) )
+		when( unfilteredFactoryMock.create( TreeNodeInclusion.EXCLUDED, expectedPrefix ) )
 				.thenReturn( expectedReturn );
 		Object actualReturn = context.nestUnfiltered( unfilteredFactoryMock );
 		verifyNoOtherInteractionsAndReset();
 		assertSame( expectedReturn, actualReturn );
 	}
 
-	private ConfiguredIndexSchemaNestingContext checkSimpleIndexedEmbeddedIncluded(String expectedObjectName,
-			ConfiguredIndexSchemaNestingContext context, MappableTypeModel typeModel,
-			String relativePrefix, Integer depth, Set<String> includePaths, Set<String> excludePaths) {
-		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition(
-				typeModel, relativePrefix, ObjectStructure.DEFAULT,
-				depth, includePaths, excludePaths
-		);
-		return checkSimpleIndexedEmbeddedIncluded(
-				expectedObjectName, context, definition, new IndexedEmbeddedPathTracker( definition )
-		);
+	private TreeNestingContext checkSimpleComposedFilterIncluded(String expectedObjectName,
+			TreeNestingContext context,
+			MappableTypeModel typeModel, String relativePrefix,
+			Integer depth, Set<String> includePaths, Set<String> excludePaths) {
+		TreeFilterDefinition definition = new TreeFilterDefinition( depth, includePaths, excludePaths );
+		return checkSimpleComposedFilterIncluded( expectedObjectName, context,
+				typeModel, relativePrefix, definition,
+				new TreeFilterPathTracker( definition ) );
 	}
 
-	private ConfiguredIndexSchemaNestingContext checkSimpleIndexedEmbeddedIncluded(String expectedObjectName,
-			ConfiguredIndexSchemaNestingContext context,
-			IndexedEmbeddedDefinition definition,
-			IndexedEmbeddedPathTracker pathTracker) {
-		ArgumentCaptor<ConfiguredIndexSchemaNestingContext> nestedContextCapture =
-				ArgumentCaptor.forClass( ConfiguredIndexSchemaNestingContext.class );
+	private TreeNestingContext checkSimpleComposedFilterIncluded(String expectedObjectName,
+			TreeNestingContext context,
+			MappableTypeModel definingTypeModel, String relativePrefix, TreeFilterDefinition definition,
+			TreeFilterPathTracker pathTracker) {
+		ArgumentCaptor<TreeNestingContext> nestedContextCapture =
+				ArgumentCaptor.forClass( TreeNestingContext.class );
 		Object expectedReturn = new Object();
 		when( nestedContextBuilderMock.build( any() ) ).thenReturn( expectedReturn );
-		Optional<Object> actualReturn = context.addIndexedEmbeddedIfIncluded(
-				definition, pathTracker, nestedContextBuilderMock
+		Optional<Object> actualReturn = context.nestComposed(
+				definingTypeModel, relativePrefix, definition,
+				pathTracker, nestedContextBuilderMock,
+				CYCLIC_RECURSION_EXCEPTION_FACTORY
 		);
-		assertNotNull( "Expected addIndexedEmbeddedIfIncluded to return a non-null result", actualReturn );
-		assertTrue( "Expected the indexedEmbedded to be included in " + context, actualReturn.isPresent() );
+		assertNotNull( "Expected .nestComposed() to return a non-null result", actualReturn );
+		assertTrue( "Expected the composed filter to be included in " + context, actualReturn.isPresent() );
 		InOrder inOrder = inOrder( nestedContextBuilderMock );
 		inOrder.verify( nestedContextBuilderMock ).appendObject( expectedObjectName );
 		inOrder.verify( nestedContextBuilderMock ).build( nestedContextCapture.capture() );
@@ -1446,28 +1425,25 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		return nestedContextCapture.getValue();
 	}
 
-	private void checkSimpleIndexedEmbeddedExcluded(ConfiguredIndexSchemaNestingContext context, MappableTypeModel typeModel,
-			String relativePrefix, Integer depth, Set<String> includePaths, Set<String> excludePaths) {
-		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition(
-				typeModel, relativePrefix, ObjectStructure.DEFAULT,
-				depth, includePaths, excludePaths
-		);
-		checkSimpleIndexedEmbeddedExcluded(
-				context, definition, new IndexedEmbeddedPathTracker( definition )
-		);
+	private void checkSimpleComposedFilterExcluded(TreeNestingContext context,
+			MappableTypeModel typeModel, String relativePrefix,
+			Integer depth, Set<String> includePaths, Set<String> excludePaths) {
+		TreeFilterDefinition definition = new TreeFilterDefinition( depth, includePaths, excludePaths );
+		checkSimpleComposedFilterExcluded( context, typeModel, relativePrefix, definition,
+				new TreeFilterPathTracker( definition ) );
 	}
 
-	private void checkSimpleIndexedEmbeddedExcluded(ConfiguredIndexSchemaNestingContext context,
-			IndexedEmbeddedDefinition definition, IndexedEmbeddedPathTracker pathTracker) {
-		Optional<Object> actualReturn = context.addIndexedEmbeddedIfIncluded(
-				definition, pathTracker, nestedContextBuilderMock
-		);
+	private void checkSimpleComposedFilterExcluded(TreeNestingContext context,
+			MappableTypeModel definingTypeModel, String relativePrefix, TreeFilterDefinition definition,
+			TreeFilterPathTracker pathTracker) {
+		Optional<Object> actualReturn = context.nestComposed( definingTypeModel, relativePrefix,
+				definition, pathTracker, nestedContextBuilderMock, CYCLIC_RECURSION_EXCEPTION_FACTORY );
 		verifyNoOtherInteractionsAndReset();
-		assertNotNull( "Expected addIndexedEmbeddedIfIncluded to return a non-null result", actualReturn );
-		assertFalse( "Expected the indexedEmbedded to be excluded from " + context, actualReturn.isPresent() );
+		assertNotNull( "Expected .nestComposed() to return a non-null result", actualReturn );
+		assertFalse( "Expected the composed filter to be excluded from " + context, actualReturn.isPresent() );
 	}
 
-	private void checkFooBarIncluded(String expectedPrefix, IndexSchemaNestingContext context) {
+	private void checkFooBarIncluded(String expectedPrefix, TreeNestingContext context) {
 		checkLeafIncluded( expectedPrefix + "foo", context, "foo" );
 		checkLeafIncluded( expectedPrefix + "bar", context, "bar" );
 		checkCompositeIncluded( expectedPrefix + "foo", context, "foo" );
@@ -1481,11 +1457,11 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		checkDynamicIncluded( expectedPrefix, context );
 	}
 
-	private void checkFooBarExcluded(String expectedPrefix, IndexSchemaNestingContext context) {
+	private void checkFooBarExcluded(String expectedPrefix, TreeNestingContext context) {
 		checkFooBarExcluded( expectedPrefix, context, true );
 	}
 
-	private void checkFooBarExcluded(String expectedPrefix, IndexSchemaNestingContext context, boolean recurse) {
+	private void checkFooBarExcluded(String expectedPrefix, TreeNestingContext context, boolean recurse) {
 		checkLeafExcluded( expectedPrefix + "foo", context, "foo" );
 		checkLeafExcluded( expectedPrefix + "bar", context, "bar" );
 		checkCompositeExcluded( expectedPrefix + "foo", context, "foo", recurse );
@@ -1496,23 +1472,23 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		checkCompositeExcluded( expectedPrefix + "foo.bar", context, "foo.bar", recurse );
 	}
 
-	private void checkFooBarIndexedEmbeddedExcluded(ConfiguredIndexSchemaNestingContext context, MappableTypeModel typeModel) {
-		checkSimpleIndexedEmbeddedExcluded(
+	private void checkFooBarComposedFilterExcluded(TreeNestingContext context, MappableTypeModel typeModel) {
+		checkSimpleComposedFilterExcluded(
 				context, typeModel, "foo.", null, null, null
 		);
-		checkSimpleIndexedEmbeddedExcluded(
+		checkSimpleComposedFilterExcluded(
 				context, typeModel, "prefix1_", null, null, null
 		);
-		checkSimpleIndexedEmbeddedExcluded(
+		checkSimpleComposedFilterExcluded(
 				context, typeModel, "foo.prefix1_", null, null, null
 		);
-		checkSimpleIndexedEmbeddedExcluded(
+		checkSimpleComposedFilterExcluded(
 				context, typeModel, "foo.bar.prefix1_", null, null, null
 		);
 		Set<String> includePaths = new HashSet<>();
 		includePaths.add( "foo" );
 		includePaths.add( "bar" );
-		checkSimpleIndexedEmbeddedExcluded(
+		checkSimpleComposedFilterExcluded(
 				context, typeModel, "foo", 3, includePaths, null
 		);
 	}

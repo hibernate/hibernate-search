@@ -10,7 +10,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObject
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexCompositeNodeType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 class LuceneIndexObjectFieldTemplateBuilder
@@ -21,7 +21,7 @@ class LuceneIndexObjectFieldTemplateBuilder
 	private final LuceneIndexCompositeNodeType.Builder typeBuilder;
 
 	LuceneIndexObjectFieldTemplateBuilder(AbstractLuceneIndexCompositeNodeBuilder parent,
-			String templateName, IndexFieldInclusion inclusion, ObjectStructure structure, String prefix) {
+			String templateName, TreeNodeInclusion inclusion, ObjectStructure structure, String prefix) {
 		super( parent, templateName, inclusion, prefix );
 		this.typeBuilder = new LuceneIndexCompositeNodeType.Builder( structure );
 	}

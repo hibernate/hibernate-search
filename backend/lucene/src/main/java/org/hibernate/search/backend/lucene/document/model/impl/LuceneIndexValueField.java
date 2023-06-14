@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexValueField;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -34,7 +34,7 @@ public final class LuceneIndexValueField<F>
 	private final boolean dynamic;
 
 	public LuceneIndexValueField(LuceneIndexCompositeNode parent, String relativeFieldName,
-			LuceneIndexValueFieldType<F> type, IndexFieldInclusion inclusion, boolean multiValued,
+			LuceneIndexValueFieldType<F> type, TreeNodeInclusion inclusion, boolean multiValued,
 			boolean dynamic) {
 		super( parent, relativeFieldName, type, inclusion, multiValued );
 		this.dynamic = dynamic;

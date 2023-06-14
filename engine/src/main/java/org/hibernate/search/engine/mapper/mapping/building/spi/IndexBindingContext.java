@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
+import org.hibernate.search.engine.common.tree.spi.TreeContributionListener;
 
 /**
  * The binding context associated to a specific node in the entity tree.
@@ -46,7 +47,7 @@ public interface IndexBindingContext {
 	 * @return The element in the index schema that this context points to,
 	 * with a wrapper that ensures the given listener will be called when operations are executed on the schema element.
 	 */
-	IndexSchemaElement schemaElement(IndexSchemaContributionListener listener);
+	IndexSchemaElement schemaElement(TreeContributionListener listener);
 
 	/**
 	 * @param definition The indexed-embedded definition.

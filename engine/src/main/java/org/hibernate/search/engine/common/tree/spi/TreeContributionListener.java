@@ -4,13 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.mapper.mapping.building.spi;
+package org.hibernate.search.engine.common.tree.spi;
 
-public interface IndexSchemaContributionListener {
+public interface TreeContributionListener {
 
 	/**
-	 * Called at least once if something was contributed to the schema.
+	 * Called at least once if a node was contributed to the tree.
 	 */
-	void onSchemaContributed();
+	void onNodeContributed();
 
 }

@@ -7,9 +7,9 @@
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -20,6 +20,6 @@ public interface PojoIndexMappingCollectorValueNode extends PojoMappingCollector
 			String relativeFieldName, FieldModelContributor fieldModelContributor);
 
 	void indexedEmbedded(PojoRawTypeModel<?> definingTypeModel, String relativePrefix, ObjectStructure structure,
-			Integer includeDepth, Set<String> includePaths, Set<String> excludePaths, boolean includeEmbeddedObjectId, Class<?> targetType);
+			TreeFilterDefinition filterDefinition, boolean includeEmbeddedObjectId, Class<?> targetType);
 
 }

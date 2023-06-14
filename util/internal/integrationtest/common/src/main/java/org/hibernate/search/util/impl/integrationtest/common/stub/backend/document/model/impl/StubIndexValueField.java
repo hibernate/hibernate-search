@@ -7,7 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexValueField;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
@@ -27,7 +27,7 @@ public final class StubIndexValueField<F>
 	private final StubIndexSchemaDataNode schemaData;
 
 	public StubIndexValueField(StubIndexCompositeNode parent, String relativeFieldName,
-			StubIndexValueFieldType<F> type, IndexFieldInclusion inclusion, boolean multiValued,
+			StubIndexValueFieldType<F> type, TreeNodeInclusion inclusion, boolean multiValued,
 			StubIndexSchemaDataNode schemaData) {
 		super( parent, relativeFieldName, type, inclusion, multiValued );
 		this.schemaData = schemaData;

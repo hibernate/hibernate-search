@@ -22,7 +22,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.backend.document.spi.NoOpDocumentElement;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -128,7 +128,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 		ElasticsearchIndexCompositeNode expectedParentNode = node.parent();
 		checkTreeConsistency( expectedParentNode );
 
-		if ( IndexFieldInclusion.EXCLUDED.equals( node.inclusion() ) ) {
+		if ( TreeNodeInclusion.EXCLUDED.equals( node.inclusion() ) ) {
 			return;
 		}
 
@@ -158,7 +158,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 		ElasticsearchIndexCompositeNode expectedParentNode = node.parent();
 		checkTreeConsistency( expectedParentNode );
 
-		if ( IndexFieldInclusion.EXCLUDED.equals( node.inclusion() ) ) {
+		if ( TreeNodeInclusion.EXCLUDED.equals( node.inclusion() ) ) {
 			return NoOpDocumentElement.get();
 		}
 

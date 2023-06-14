@@ -7,15 +7,15 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 
 public class StubIndexFieldReference<F> implements IndexFieldReference<F> {
 
 	private final String absolutePath;
 	private final String relativeFieldName;
-	private final IndexFieldInclusion inclusion;
+	private final TreeNodeInclusion inclusion;
 
-	public StubIndexFieldReference(String absolutePath, String relativeFieldName, IndexFieldInclusion inclusion) {
+	public StubIndexFieldReference(String absolutePath, String relativeFieldName, TreeNodeInclusion inclusion) {
 		this.absolutePath = absolutePath;
 		this.relativeFieldName = relativeFieldName;
 		this.inclusion = inclusion;
@@ -26,7 +26,7 @@ public class StubIndexFieldReference<F> implements IndexFieldReference<F> {
 		return getClass().getSimpleName() + "[" + absolutePath + "]";
 	}
 
-	public IndexFieldInclusion getInclusion() {
+	public TreeNodeInclusion getInclusion() {
 		return inclusion;
 	}
 

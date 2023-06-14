@@ -4,30 +4,29 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.mapper.mapping.building.impl;
+package org.hibernate.search.engine.common.tree.impl;
 
 import java.util.Optional;
+import java.util.function.BiFunction;
 
-import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaNestingContext;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
+import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
+import org.hibernate.search.engine.common.tree.spi.TreeFilterPathTracker;
+import org.hibernate.search.engine.common.tree.spi.TreeNestingContext;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
+import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.util.common.SearchException;
 
 
-class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
+public final class ConfiguredTreeNestingContext implements TreeNestingContext {
 
-	private static final ConfiguredIndexSchemaNestingContext ROOT =
-			new ConfiguredIndexSchemaNestingContext( IndexSchemaFilter.root(), "", "" );
+	public static final ConfiguredTreeNestingContext ROOT =
+			new ConfiguredTreeNestingContext( TreeFilter.root(), "", "" );
 
-	public static ConfiguredIndexSchemaNestingContext root() {
-		return ROOT;
-	}
-
-	private final IndexSchemaFilter filter;
+	private final TreeFilter filter;
 	private final String prefixFromFilter;
 	private final String unconsumedPrefix;
 
-	private ConfiguredIndexSchemaNestingContext(IndexSchemaFilter filter, String prefixFromFilter,
+	private ConfiguredTreeNestingContext(TreeFilter filter, String prefixFromFilter,
 			String unconsumedPrefix) {
 		this.filter = filter;
 		this.prefixFromFilter = prefixFromFilter;
@@ -51,7 +50,7 @@ class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 		String prefixedRelativeName = unconsumedPrefix + relativeName;
 		boolean included = filter.isPathIncluded( nameRelativeToFilter );
 		return factory.create( prefixedRelativeName,
-				included ? IndexFieldInclusion.INCLUDED : IndexFieldInclusion.EXCLUDED );
+				included ? TreeNodeInclusion.INCLUDED : TreeNodeInclusion.EXCLUDED );
 	}
 
 	@Override
@@ -60,29 +59,31 @@ class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 		String prefixedRelativeName = unconsumedPrefix + relativeName;
 		boolean included = filter.isPathIncluded( nameRelativeToFilter );
 		if ( included ) {
-			ConfiguredIndexSchemaNestingContext nestedFilter =
-					new ConfiguredIndexSchemaNestingContext( filter, nameRelativeToFilter + ".", "" );
-			return factory.create( prefixedRelativeName, IndexFieldInclusion.INCLUDED, nestedFilter );
+			ConfiguredTreeNestingContext nestedFilter =
+					new ConfiguredTreeNestingContext( filter, nameRelativeToFilter + ".", "" );
+			return factory.create( prefixedRelativeName, TreeNodeInclusion.INCLUDED, nestedFilter );
 		}
 		else {
-			return factory.create( prefixedRelativeName, IndexFieldInclusion.EXCLUDED,
-					IndexSchemaNestingContext.excludeAll() );
+			return factory.create( prefixedRelativeName, TreeNodeInclusion.EXCLUDED,
+					TreeNestingContext.excludeAll() );
 		}
 	}
 
 	@Override
 	public <T> T nestUnfiltered(UnfilteredFactory<T> factory) {
-		return factory.create( IndexFieldInclusion.INCLUDED, unconsumedPrefix );
+		return factory.create( TreeNodeInclusion.INCLUDED, unconsumedPrefix );
 	}
 
-	public <T> Optional<T> addIndexedEmbeddedIfIncluded(
-			IndexedEmbeddedDefinition definition,
-			IndexedEmbeddedPathTracker pathTracker,
-			NestedContextBuilder<T> contextBuilder) {
-		IndexSchemaFilter composedFilter = filter.compose( definition, pathTracker );
+	@Override
+	public <T> Optional<T> nestComposed(MappableTypeModel definingTypeModel,
+			String relativePrefix, TreeFilterDefinition definition,
+			TreeFilterPathTracker pathTracker, NestedContextBuilder<T> contextBuilder,
+			BiFunction<MappableTypeModel, String, SearchException> cyclicRecursionExceptionFactory) {
+		TreeFilter composedFilter = filter.compose( definingTypeModel, relativePrefix, definition, pathTracker,
+				cyclicRecursionExceptionFactory );
 
 		if ( !composedFilter.isEveryPathExcluded() ) {
-			String prefixToParse = unconsumedPrefix + definition.relativePrefix();
+			String prefixToParse = unconsumedPrefix + relativePrefix;
 			int afterPreviousDotIndex = 0;
 			int nextDotIndex = prefixToParse.indexOf( '.', afterPreviousDotIndex );
 			while ( nextDotIndex >= 0 ) {
@@ -102,20 +103,12 @@ class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 			}
 			String composedUnconsumedPrefix = prefixToParse.substring( afterPreviousDotIndex );
 
-			ConfiguredIndexSchemaNestingContext nestedContext =
-					new ConfiguredIndexSchemaNestingContext( composedFilter, "", composedUnconsumedPrefix );
+			ConfiguredTreeNestingContext nestedContext =
+					new ConfiguredTreeNestingContext( composedFilter, "", composedUnconsumedPrefix );
 			return Optional.of( contextBuilder.build( nestedContext ) );
 		}
 		else {
 			return Optional.empty();
 		}
-	}
-
-	public interface NestedContextBuilder<T> {
-
-		void appendObject(String objectName);
-
-		T build(ConfiguredIndexSchemaNestingContext nestingContext);
-
 	}
 }

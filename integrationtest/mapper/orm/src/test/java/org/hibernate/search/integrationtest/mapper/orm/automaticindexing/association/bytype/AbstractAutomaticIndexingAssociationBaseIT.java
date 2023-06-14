@@ -3677,7 +3677,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 	}
 
 	@Test
-	public void indirectValueUpdate_indexedEmbedded_singleValue_indexed() {
+	public void indirectValueUpdate_compose_singleValue_indexed() {
 		PropertyAccessor<TContaining, TContained> containingAssociation = _containing().containedIndexedEmbedded();
 		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbedded();
 		PropertyAccessor<TContained, String> field = _contained().indexedField();
@@ -3748,7 +3748,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4137")
-	public void directValueUpdate_nonIndexed_then_indirectValueUpdate_indexedEmbedded_singleValue_indexed() {
+	public void directValueUpdate_nonIndexed_then_indirectValueUpdate_compose_singleValue_indexed() {
 		PropertyAccessor<TContaining, TContained> containingAssociation = _containing().containedIndexedEmbedded();
 		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbedded();
 		PropertyAccessor<TContaining, String> nonIndexedField = _containing().nonIndexedField();
@@ -3808,7 +3808,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
-	public void indirectValueUpdate_indexedEmbedded_singleValue_nonIndexed() {
+	public void indirectValueUpdate_compose_singleValue_nonIndexed() {
 		PropertyAccessor<TContaining, TContained> containingAssociation = _containing().containedIndexedEmbedded();
 		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbedded();
 		PropertyAccessor<TContained, String> field = _contained().nonIndexedField();
@@ -3851,7 +3851,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 	}
 
 	@Test
-	public void indirectValueUpdate_indexedEmbedded_elementCollectionValue_indexed() {
+	public void indirectValueUpdate_compose_elementCollectionValue_indexed() {
 		PropertyAccessor<TContaining, TContained> containingAssociation = _containing().containedIndexedEmbedded();
 		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbedded();
 		MultiValuedPropertyAccessor<TContained, String, List<String>> field = _contained().indexedElementCollectionField();
@@ -3958,7 +3958,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
-	public void indirectValueReplace_indexedEmbedded_elementCollectionValue_indexed() {
+	public void indirectValueReplace_compose_elementCollectionValue_indexed() {
 		PropertyAccessor<TContaining, TContained> containingAssociation = _containing().containedIndexedEmbedded();
 		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbedded();
 		MultiValuedPropertyAccessor<TContained, String, List<String>> field = _contained().indexedElementCollectionField();
@@ -4046,7 +4046,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
-	public void indirectValueUpdate_indexedEmbedded_elementCollectionValue_nonIndexed() {
+	public void indirectValueUpdate_compose_elementCollectionValue_nonIndexed() {
 		PropertyAccessor<TContaining, TContained> containingAssociation = _containing().containedIndexedEmbedded();
 		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbedded();
 		MultiValuedPropertyAccessor<TContained, String, List<String>> field = _contained().nonIndexedElementCollectionField();
@@ -4107,7 +4107,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
-	public void indirectValueReplace_indexedEmbedded_elementCollectionValue_nonIndexed() {
+	public void indirectValueReplace_compose_elementCollectionValue_nonIndexed() {
 		PropertyAccessor<TContaining, TContained> containingAssociation = _containing().containedIndexedEmbedded();
 		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbedded();
 		MultiValuedPropertyAccessor<TContained, String, List<String>> field = _contained().nonIndexedElementCollectionField();
@@ -4160,7 +4160,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 	}
 
 	@Test
-	public void indirectValueUpdate_indexedEmbedded_containedDerivedValue_indexed() {
+	public void indirectValueUpdate_compose_containedDerivedValue_indexed() {
 		PropertyAccessor<TContaining, TContained> containingAssociation = _containing().containedIndexedEmbedded();
 		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbedded();
 		PropertyAccessor<TContained, String> field1 = _contained().fieldUsedInContainedDerivedField1();

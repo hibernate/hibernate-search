@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -32,14 +32,14 @@ class LuceneIndexValueFieldBuilder<F>
 	private final AbstractLuceneIndexCompositeNodeBuilder parent;
 	private final String relativeFieldName;
 	private final String absoluteFieldPath;
-	private final IndexFieldInclusion inclusion;
+	private final TreeNodeInclusion inclusion;
 	private final LuceneIndexValueFieldType<F> type;
 	private boolean multiValued = false;
 
 	private LuceneIndexFieldReference<F> reference;
 
 	LuceneIndexValueFieldBuilder(AbstractLuceneIndexCompositeNodeBuilder parent,
-			String relativeFieldName, IndexFieldInclusion inclusion, LuceneIndexValueFieldType<F> type) {
+			String relativeFieldName, TreeNodeInclusion inclusion, LuceneIndexValueFieldType<F> type) {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
 		this.absoluteFieldPath = FieldPaths.compose( parent.getAbsolutePath(), relativeFieldName );

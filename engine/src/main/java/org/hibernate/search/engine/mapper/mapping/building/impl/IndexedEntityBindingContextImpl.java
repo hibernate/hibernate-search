@@ -9,6 +9,7 @@ package org.hibernate.search.engine.mapper.mapping.building.impl;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.common.tree.spi.TreeNestingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
 
@@ -17,7 +18,7 @@ public class IndexedEntityBindingContextImpl extends AbstractIndexBindingContext
 
 	public IndexedEntityBindingContextImpl(IndexedEntityBindingMapperContext mapperContext,
 			IndexRootBuilder indexRootBuilder) {
-		super( mapperContext, indexRootBuilder, indexRootBuilder, ConfiguredIndexSchemaNestingContext.root() );
+		super( mapperContext, indexRootBuilder, indexRootBuilder, TreeNestingContext.root() );
 	}
 
 	@Override
