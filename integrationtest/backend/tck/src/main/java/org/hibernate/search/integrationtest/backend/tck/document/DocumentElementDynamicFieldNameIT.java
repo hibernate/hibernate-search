@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -265,7 +266,7 @@ public class DocumentElementDynamicFieldNameIT<F> {
 			IndexedEmbeddedDefinition indexedEmbeddedDefinition = new IndexedEmbeddedDefinition(
 					new StubTypeModel( "embedded" ),
 					"excludingObject.", ObjectStructure.FLATTENED,
-					null, Collections.singleton( "pathThatDoesNotMatchAnything" ), Collections.emptySet()
+					new TreeFilterDefinition( null, Collections.singleton( "pathThatDoesNotMatchAnything" ), Collections.emptySet() )
 			);
 			// Ignore the result, we'll just reference "excludingObject" by its name
 			ctx.addIndexedEmbeddedIfIncluded( indexedEmbeddedDefinition, true ).get();

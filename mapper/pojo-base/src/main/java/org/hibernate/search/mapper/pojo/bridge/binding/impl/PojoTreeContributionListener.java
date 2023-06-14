@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
+import org.hibernate.search.engine.common.tree.spi.TreeContributionListener;
 
-class PojoIndexSchemaContributionListener implements IndexSchemaContributionListener {
+class PojoTreeContributionListener implements TreeContributionListener {
 	private boolean schemaContributed = false;
 
 	@Override
-	public void onSchemaContributed() {
+	public void onNodeContributed() {
 		schemaContributed = true;
 	}
 

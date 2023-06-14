@@ -7,9 +7,9 @@
 package org.hibernate.search.mapper.pojo.identity.impl;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
@@ -41,7 +41,7 @@ class IdentityMappingCollectorValueNode extends AbstractIdentityMappingCollector
 	@Override
 	public void indexedEmbedded(PojoRawTypeModel<?> definingTypeModel, String relativePrefix,
 			ObjectStructure structure,
-			Integer includeDepth, Set<String> includePaths, Set<String> excludePaths, boolean includeEmbeddedObjectId,
+			TreeFilterDefinition filterDefinition, boolean includeEmbeddedObjectId,
 			Class<?> targetType) {
 		// No-op, we're just collecting the identity mapping.
 	}

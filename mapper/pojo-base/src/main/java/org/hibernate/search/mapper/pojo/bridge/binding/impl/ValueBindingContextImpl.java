@@ -50,7 +50,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 	private final PojoModelValue<V> bridgedElement;
 
 	private final IndexFieldTypeFactory indexFieldTypeFactory;
-	private final PojoIndexSchemaContributionListener listener;
+	private final PojoTreeContributionListener listener;
 	private final IndexSchemaElement schemaElement;
 	private final String relativeFieldName;
 	private final FieldModelContributor contributor;
@@ -71,7 +71,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 		this.bridgedElement = new PojoModelValueElement<>( introspector, valueTypeModel );
 
 		this.indexFieldTypeFactory = indexBindingContext.createTypeFactory( defaultsProvider );
-		this.listener = new PojoIndexSchemaContributionListener();
+		this.listener = new PojoTreeContributionListener();
 		this.schemaElement = indexBindingContext.schemaElement( listener );
 		this.relativeFieldName = relativeFieldName;
 		this.contributor = contributor;

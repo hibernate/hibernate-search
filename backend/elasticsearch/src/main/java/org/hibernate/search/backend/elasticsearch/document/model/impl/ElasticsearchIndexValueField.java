@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexValueField;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -32,7 +32,7 @@ public final class ElasticsearchIndexValueField<F>
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public ElasticsearchIndexValueField(ElasticsearchIndexCompositeNode parent, String relativeFieldName,
-			ElasticsearchIndexValueFieldType<F> type, IndexFieldInclusion inclusion, boolean multiValued) {
+			ElasticsearchIndexValueFieldType<F> type, TreeNodeInclusion inclusion, boolean multiValued) {
 		super( parent, relativeFieldName, type, inclusion, multiValued );
 	}
 

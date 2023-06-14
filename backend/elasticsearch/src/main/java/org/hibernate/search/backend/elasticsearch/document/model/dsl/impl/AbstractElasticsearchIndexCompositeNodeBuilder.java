@@ -25,7 +25,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTe
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFieldBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexCompositeNodeBuilder;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
@@ -58,7 +58,7 @@ public abstract class AbstractElasticsearchIndexCompositeNodeBuilder implements 
 
 	@Override
 	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> addField(
-			String relativeFieldName, IndexFieldInclusion inclusion, IndexFieldType<F> indexFieldType) {
+			String relativeFieldName, TreeNodeInclusion inclusion, IndexFieldType<F> indexFieldType) {
 		ElasticsearchIndexValueFieldType<F> fieldType = (ElasticsearchIndexValueFieldType<F>) indexFieldType;
 		ElasticsearchIndexValueFieldBuilder<F> childBuilder = new ElasticsearchIndexValueFieldBuilder<>(
 				this, relativeFieldName, inclusion, fieldType
@@ -68,7 +68,7 @@ public abstract class AbstractElasticsearchIndexCompositeNodeBuilder implements 
 	}
 
 	@Override
-	public IndexObjectFieldBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
+	public IndexObjectFieldBuilder addObjectField(String relativeFieldName, TreeNodeInclusion inclusion,
 			ObjectStructure structure) {
 		ElasticsearchIndexObjectFieldBuilder objectFieldBuilder =
 				new ElasticsearchIndexObjectFieldBuilder( this, relativeFieldName, inclusion, structure );
@@ -77,12 +77,12 @@ public abstract class AbstractElasticsearchIndexCompositeNodeBuilder implements 
 	}
 
 	@Override
-	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String name, IndexFieldInclusion inclusion,
+	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String name, TreeNodeInclusion inclusion,
 			PredicateDefinition definition) {
 		ElasticsearchIndexNamedPredicateOptions options = new ElasticsearchIndexNamedPredicateOptions(
 			inclusion, definition );
 		putNamedPredicate( name, options );
-		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+		if ( TreeNodeInclusion.INCLUDED.equals( inclusion ) ) {
 			typeBuilder.queryElementFactory( PredicateTypeKeys.named( name ),
 					new ElasticsearchNamedPredicate.Factory( options.definition, name ) );
 		}
@@ -91,7 +91,7 @@ public abstract class AbstractElasticsearchIndexCompositeNodeBuilder implements 
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> addFieldTemplate(String templateName,
-			IndexFieldInclusion inclusion, IndexFieldType<?> indexFieldType, String prefix) {
+			TreeNodeInclusion inclusion, IndexFieldType<?> indexFieldType, String prefix) {
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
 		ElasticsearchIndexValueFieldType<?> fieldType = (ElasticsearchIndexValueFieldType<?>) indexFieldType;
 		ElasticsearchIndexValueFieldTemplateBuilder templateBuilder = new ElasticsearchIndexValueFieldTemplateBuilder(
@@ -103,13 +103,13 @@ public abstract class AbstractElasticsearchIndexCompositeNodeBuilder implements 
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName,
-			ObjectStructure structure, String prefix, IndexFieldInclusion inclusion) {
+			ObjectStructure structure, String prefix, TreeNodeInclusion inclusion) {
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
 		ElasticsearchIndexObjectFieldTemplateBuilder templateBuilder =
 				new ElasticsearchIndexObjectFieldTemplateBuilder(
 						this, prefixedTemplateName, inclusion, structure, prefix
 				);
-		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+		if ( TreeNodeInclusion.INCLUDED.equals( inclusion ) ) {
 			putTemplate( prefixedTemplateName, templateBuilder );
 		}
 		return templateBuilder;

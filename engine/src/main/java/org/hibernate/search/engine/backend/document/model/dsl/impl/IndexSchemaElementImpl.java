@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFie
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexCompositeNodeBuilder;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
+import org.hibernate.search.engine.common.tree.spi.TreeNestingContext;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.StringHelper;
@@ -32,11 +33,11 @@ public class IndexSchemaElementImpl<B extends IndexCompositeNodeBuilder> impleme
 
 	private final IndexFieldTypeFactory typeFactory;
 	final B objectNodeBuilder;
-	private final IndexSchemaNestingContext nestingContext;
+	private final TreeNestingContext nestingContext;
 	private final boolean directChildrenAreMultiValuedByDefault;
 
 	public IndexSchemaElementImpl(IndexFieldTypeFactory typeFactory,
-			B objectNodeBuilder, IndexSchemaNestingContext nestingContext,
+			B objectNodeBuilder, TreeNestingContext nestingContext,
 			boolean directChildrenAreMultiValuedByDefault) {
 		this.typeFactory = typeFactory;
 		this.objectNodeBuilder = objectNodeBuilder;

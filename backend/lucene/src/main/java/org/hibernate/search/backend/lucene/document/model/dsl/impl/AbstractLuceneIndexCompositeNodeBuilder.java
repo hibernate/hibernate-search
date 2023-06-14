@@ -24,7 +24,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPr
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFieldBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexCompositeNodeBuilder;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
@@ -57,7 +57,7 @@ abstract class AbstractLuceneIndexCompositeNodeBuilder
 
 	@Override
 	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> addField(
-			String relativeFieldName, IndexFieldInclusion inclusion, IndexFieldType<F> indexFieldType) {
+			String relativeFieldName, TreeNodeInclusion inclusion, IndexFieldType<F> indexFieldType) {
 		LuceneIndexValueFieldType<F> luceneIndexFieldType = (LuceneIndexValueFieldType<F>) indexFieldType;
 		LuceneIndexValueFieldBuilder<F> childBuilder = new LuceneIndexValueFieldBuilder<>(
 				this, relativeFieldName, inclusion, luceneIndexFieldType
@@ -67,7 +67,7 @@ abstract class AbstractLuceneIndexCompositeNodeBuilder
 	}
 
 	@Override
-	public IndexObjectFieldBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
+	public IndexObjectFieldBuilder addObjectField(String relativeFieldName, TreeNodeInclusion inclusion,
 			ObjectStructure structure) {
 		LuceneIndexObjectFieldBuilder objectFieldBuilder =
 				new LuceneIndexObjectFieldBuilder( this, relativeFieldName, inclusion, structure );
@@ -77,11 +77,11 @@ abstract class AbstractLuceneIndexCompositeNodeBuilder
 
 	@Override
 	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String name,
-			IndexFieldInclusion inclusion, PredicateDefinition definition) {
+			TreeNodeInclusion inclusion, PredicateDefinition definition) {
 		LuceneIndexNamedPredicateOptions options = new LuceneIndexNamedPredicateOptions(
 				inclusion, definition );
 		putNamedPredicate( name, options );
-		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+		if ( TreeNodeInclusion.INCLUDED.equals( inclusion ) ) {
 			typeBuilder.queryElementFactory( PredicateTypeKeys.named( name ),
 					new LuceneNamedPredicate.Factory( options.definition, name ) );
 		}
@@ -90,7 +90,7 @@ abstract class AbstractLuceneIndexCompositeNodeBuilder
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> addFieldTemplate(String templateName,
-			IndexFieldInclusion inclusion, IndexFieldType<?> indexFieldType, String prefix) {
+			TreeNodeInclusion inclusion, IndexFieldType<?> indexFieldType, String prefix) {
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
 		LuceneIndexValueFieldType<?> elasticsearchIndexFieldType = (LuceneIndexValueFieldType<?>) indexFieldType;
 		LuceneIndexValueFieldTemplateBuilder templateBuilder = new LuceneIndexValueFieldTemplateBuilder(
@@ -102,7 +102,7 @@ abstract class AbstractLuceneIndexCompositeNodeBuilder
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName,
-			ObjectStructure structure, String prefix, IndexFieldInclusion inclusion) {
+			ObjectStructure structure, String prefix, TreeNodeInclusion inclusion) {
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
 		LuceneIndexObjectFieldTemplateBuilder templateBuilder =
 				new LuceneIndexObjectFieldTemplateBuilder(

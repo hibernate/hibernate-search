@@ -4,9 +4,9 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.mapper.mapping.building.impl;
+package org.hibernate.search.engine.common.tree.impl;
 
-class DepthFilter {
+public final class DepthFilter {
 
 	private static final DepthFilter UNCONSTRAINED = new DepthFilter( null );
 

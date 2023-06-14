@@ -41,7 +41,7 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 	private final PojoModelPropertyRootElement<P> bridgedElement;
 	private final PojoPropertyIndexingDependencyConfigurationContextImpl<P> dependencyContext;
 	private final IndexFieldTypeFactory indexFieldTypeFactory;
-	private final PojoIndexSchemaContributionListener listener;
+	private final PojoTreeContributionListener listener;
 	private final IndexSchemaElement indexSchemaElement;
 
 	private PartialBinding<P> partialBinding;
@@ -59,7 +59,7 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 		this.bridgedElement = bridgedElement;
 		this.dependencyContext = dependencyContext;
 		this.indexFieldTypeFactory = indexBindingContext.createTypeFactory();
-		this.listener = new PojoIndexSchemaContributionListener();
+		this.listener = new PojoTreeContributionListener();
 		this.indexSchemaElement = indexBindingContext.schemaElement( listener );
 	}
 

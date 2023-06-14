@@ -4,46 +4,49 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.mapper.mapping.building.impl;
+package org.hibernate.search.engine.common.tree.impl;
 
-import java.lang.invoke.MethodHandles;
+import java.util.function.BiFunction;
 
-import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
+import org.hibernate.search.engine.common.tree.spi.TreeFilterPathTracker;
+import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.util.common.SearchException;
 
 /**
- * A schema filter, responsible for deciding which parts of a mapping will actually make it to the index schema.
+ * A tree filter, responsible for deciding which parts of a (potentially cyclic) graph will be retained as a tree,
+ * e.g. in an index schema.
  * <p>
- * A schema filter is created at the root of a Pojo mapping (it accepts everything),
- * and also each time index embedding ({@code @IndexedEmbedded}) is used.
- *
- * <h3 id="filter-usage">Filter usage</h3>
+ * A tree filter that accepts everything is created at the root of tree-like mapping structures (e.g. a Pojo mapping).
+ * Then, each time specific nesting features (e.g. index embedding with {@code @IndexedEmbedded}) are used,
+ * another filter is created with the constraints defined through that feature
+ * (e.g. {@code @IndexedEmbedded(includePaths = ...)}).
  * <p>
- * A schema filter is asked to provide advice about whether or not to trim down the schema in two cases:
+ * <h3 id="filter-usage">Filter usage in index schemas</h3>
+ * <p>
+ * A tree filter is asked to provide advice about whether to trim down the index schema in two cases:
  * <ul>
  *     <li>When a field is added by a bridge, the filter decides whether to include this field or not
  *     through its {@link #isPathIncluded(String)} method</li>
- *     <li>When a nested {@code @IndexedEmbedded} is requested, a new filter is created through the
- *     {@link #compose(IndexedEmbeddedDefinition, IndexedEmbeddedPathTracker)} method, which may return a filter
- *     that {@link #isEveryPathExcluded() excludes every path}, meaning the {@code @IndexedEmbedded} will
- *     be ignored</li>
+ *     <li>When a nested filter (e.g. {@code @IndexedEmbedded}) is requested, a new filter is created through the
+ *     {@link #compose(MappableTypeModel, String, TreeFilterDefinition, TreeFilterPathTracker, BiFunction)}  method,
+ *     which may return an empty optional,
+ *     meaning that the nested filter {@link #isEveryPathExcluded() excludes every path}.</li>
  * </ul>
  *
  * <h3 id="filter-properties">Filter properties</h3>
  * <p>
- * A filter decides whether to include a path or not according to its two main properties:
+ * A tree filter decides whether to include a path or not according to its two main properties:
  * <ul>
  *     <li>the {@link #depthFilter depth filter}</li>
  *     <li>the {@link #pathFilter path filter}</li>
  * </ul>
  * <p>
  * The path filter, as its name suggests, define which paths
- * should be accepted by this filter.
+ * should be explicitly included or excluded by this filter.
  * <p>
  * The depth filter defines
- * how paths that are not included by the path filter should be treated:
+ * how paths that are not explicitly included or excluded by the path filter should be treated:
  * <ul>
  *     <li>as long as the remaining depth is unlimited (null) or strictly positive, paths are included by default</li>
  *     <li>as soon as the remaining depth is zero or negative, paths are excluded by default</li>
@@ -51,39 +54,44 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * <h3 id="filter-composition">Filter composition</h3>
  * <p>
- * Composed filters are created whenever a nested {@code @IndexedEmbedded} is encountered.
+ * Composed filters are created whenever a nested filter (e.g. {@code @IndexedEmbedded}) is encountered.
  * A composed filter will always enforce the restrictions of its parent filter,
- * plus some added restrictions depending on the properties of the nested {@code IndexedEmbedded}.
+ * plus some added restrictions depending on the properties of the nested filter.
  * <p>
  * For more information about how filters are composed, see
- * {@link #compose(IndexedEmbeddedDefinition, IndexedEmbeddedPathTracker)}.
+ * {@link #compose(MappableTypeModel, String, TreeFilterDefinition, TreeFilterPathTracker, BiFunction)}.
  *
  */
-class IndexSchemaFilter {
+public class TreeFilter {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private static final IndexSchemaFilter ROOT = new IndexSchemaFilter(
+	private static final TreeFilter ROOT = new TreeFilter(
 			null, null, null,
+			TreeFilterDefinition.includeAll(),
+			null,
 			DepthFilter.unconstrained(), PathFilter.unconstrained()
 	);
 
-	public static IndexSchemaFilter root() {
+	public static TreeFilter root() {
 		return ROOT;
 	}
 
-	private final IndexSchemaFilter parent;
-	private final IndexedEmbeddedDefinition definition;
-	private final IndexedEmbeddedPathTracker pathTracker;
+	private final TreeFilter parent;
+	private final MappableTypeModel definingTypeModel;
+	private final String relativePrefix;
+	private final TreeFilterDefinition definition;
+	private final TreeFilterPathTracker pathTracker;
 
 	private final DepthFilter depthFilter;
 
 	private final PathFilter pathFilter;
 
-	private IndexSchemaFilter(IndexSchemaFilter parent,
-			IndexedEmbeddedDefinition definition, IndexedEmbeddedPathTracker pathTracker,
+	private TreeFilter(TreeFilter parent,
+			MappableTypeModel definingTypeModel, String relativePrefix,
+			TreeFilterDefinition definition, TreeFilterPathTracker pathTracker,
 			DepthFilter depthFilter, PathFilter pathFilter) {
 		this.parent = parent;
+		this.definingTypeModel = definingTypeModel;
+		this.relativePrefix = relativePrefix;
 		this.definition = definition;
 		this.pathTracker = pathTracker;
 		this.depthFilter = depthFilter;
@@ -106,7 +114,7 @@ class IndexSchemaFilter {
 	}
 
 	/**
-	 * @param relativeDepth The number of indexed-embeddeds between this filter and the end of the path.
+	 * @param relativeDepth The number of filters between this filter and the end of the path.
 	 * @param relativePath The path relative to this filter.
 	 * @param markIncludedAsEncountered Whether the included path should be marked as encountered
 	 * ({@code true}), or not ({@code false}).
@@ -128,7 +136,7 @@ class IndexSchemaFilter {
 		if ( includedByThis && parent != null ) {
 			includedByParent = parent.isPathIncludedInternal(
 					relativeDepth + 1,
-					definition.relativePrefix() + relativePath,
+					relativePrefix + relativePath,
 					markIncludedAsEncountered
 			);
 		}
@@ -147,12 +155,12 @@ class IndexSchemaFilter {
 		return included;
 	}
 
-	boolean isEveryPathExcluded() {
+	public boolean isEveryPathExcluded() {
 		return !isEveryPathIncludedAtDepth( 0 )
 				&& !isAnyPathExplicitlyIncluded( "", this );
 	}
 
-	private boolean isAnyPathExplicitlyIncluded(String prefixToRemove, IndexSchemaFilter filter) {
+	private boolean isAnyPathExplicitlyIncluded(String prefixToRemove, TreeFilter filter) {
 		if ( definition == null ) {
 			// Root: return early to avoid annoying null checks
 			return false;
@@ -183,7 +191,7 @@ class IndexSchemaFilter {
 		 * even though they are not explicitly included by the child
 		 */
 		return parent != null
-				&& parent.isAnyPathExplicitlyIncluded( definition.relativePrefix() + prefixToRemove, filter );
+				&& parent.isAnyPathExplicitlyIncluded( this.relativePrefix + prefixToRemove, filter );
 	}
 
 	private boolean isEveryPathIncludedAtDepth(int depth) {
@@ -192,35 +200,42 @@ class IndexSchemaFilter {
 				&& ( parent == null || parent.isEveryPathIncludedAtDepth( depth + 1 ) );
 	}
 
-	private String getPathFromSameIndexedEmbeddedSinceNoCompositionLimits(IndexedEmbeddedDefinition definition) {
+	private String getPathFromSameFilterSinceNoCompositionLimits(MappableTypeModel definingTypeModel,
+			String relativePrefix, TreeFilterDefinition definition) {
 		if ( hasCompositionLimits() ) {
 			return null;
 		}
 		else if ( parent != null ) {
-			if ( this.definition.equals( definition ) ) {
-				// Same IndexedEmbedded as the one passed as a parameter
-				return this.definition.relativePrefix();
+			if ( this.definingTypeModel.equals( definingTypeModel )
+					&& this.relativePrefix.equals( relativePrefix )
+					&& this.definition.equals( definition ) ) {
+				// Same filter as the one passed as a parameter
+				return this.relativePrefix;
 			}
 			else {
-				String path = parent.getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( definition );
-				return path == null ? null : path + this.definition.relativePrefix();
+				String path = parent.getPathFromSameFilterSinceNoCompositionLimits(
+						definingTypeModel, relativePrefix, definition );
+				return path == null ? null : path + this.relativePrefix;
 			}
 		}
 		else {
 			/*
-			 * No recursion limits, no parent: this is the root.
-			 * I we reach this point, it means there was no recursion limit at all,
-			 * but we did not encounter the IndexedEmbedded we were looking for.
+			 * No composition limits, no parent: this is the root.
+			 * I we reach this point, it means there was no composition limit at all,
+			 * but we did not encounter the filter we were looking for.
 			 */
 			return null;
 		}
 	}
 
-	public IndexSchemaFilter compose(IndexedEmbeddedDefinition definition, IndexedEmbeddedPathTracker pathTracker) {
-		String cyclicRecursionPath = getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( definition );
+	public TreeFilter compose(MappableTypeModel definingTypeModel, String relativePrefix,
+			TreeFilterDefinition definition, TreeFilterPathTracker pathTracker,
+			BiFunction<MappableTypeModel, String, SearchException> cyclicRecursionExceptionFactory) {
+		String cyclicRecursionPath = getPathFromSameFilterSinceNoCompositionLimits(
+				definingTypeModel, relativePrefix, definition );
 		if ( cyclicRecursionPath != null ) {
-			cyclicRecursionPath += definition.relativePrefix();
-			throw log.indexedEmbeddedCyclicRecursion( cyclicRecursionPath, definition.definingTypeModel() );
+			cyclicRecursionPath += relativePrefix;
+			throw cyclicRecursionExceptionFactory.apply( definingTypeModel, cyclicRecursionPath );
 		}
 
 		// The new depth filter according to the given includeDepth
@@ -229,8 +244,8 @@ class IndexSchemaFilter {
 		// The new path filter according to the given includedPaths
 		PathFilter newPathFilter = PathFilter.of( definition.includePaths(), definition.excludePaths() );
 
-		return new IndexSchemaFilter(
-				this, definition, pathTracker,
+		return new TreeFilter(
+				this, definingTypeModel, relativePrefix, definition, pathTracker,
 				newDepthFilter, newPathFilter
 		);
 	}

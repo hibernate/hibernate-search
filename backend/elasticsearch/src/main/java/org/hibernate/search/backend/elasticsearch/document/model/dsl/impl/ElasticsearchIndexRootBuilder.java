@@ -35,7 +35,7 @@ import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexV
 import org.hibernate.search.engine.backend.document.model.dsl.spi.ImplicitFieldCollector;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.ImplicitFieldContributor;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.backend.document.model.spi.IndexIdentifier;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
@@ -189,7 +189,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 				staticFields.put(
 						fieldName,
 						new ElasticsearchIndexValueField<>(
-								rootNode, fieldName, fieldType, IndexFieldInclusion.INCLUDED, false )
+								rootNode, fieldName, fieldType, TreeNodeInclusion.INCLUDED, false )
 				);
 			}
 		};

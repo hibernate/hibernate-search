@@ -12,7 +12,7 @@ import java.util.function.BiConsumer;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFieldBuilder;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubIndexObjectFieldReference;
@@ -26,7 +26,7 @@ class StubIndexObjectFieldBuilder extends AbstractStubIndexCompositeNodeBuilder
 		implements IndexObjectFieldBuilder, StubIndexFieldBuilder {
 
 	private final AbstractStubIndexCompositeNodeBuilder parent;
-	private final IndexFieldInclusion inclusion;
+	private final TreeNodeInclusion inclusion;
 	private final StubIndexCompositeNodeType type;
 
 	private boolean multiValued;
@@ -34,7 +34,7 @@ class StubIndexObjectFieldBuilder extends AbstractStubIndexCompositeNodeBuilder
 	private IndexObjectFieldReference reference;
 
 	StubIndexObjectFieldBuilder(AbstractStubIndexCompositeNodeBuilder parent,
-			StubIndexSchemaDataNode.Builder schemaNodeBuilder, IndexFieldInclusion inclusion,
+			StubIndexSchemaDataNode.Builder schemaNodeBuilder, TreeNodeInclusion inclusion,
 			StubIndexCompositeNodeType type) {
 		super( schemaNodeBuilder );
 		this.parent = parent;

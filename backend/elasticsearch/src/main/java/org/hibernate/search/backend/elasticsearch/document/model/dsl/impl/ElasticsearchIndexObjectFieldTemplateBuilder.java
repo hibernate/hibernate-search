@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Na
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexCompositeNodeType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 class ElasticsearchIndexObjectFieldTemplateBuilder
@@ -26,7 +26,7 @@ class ElasticsearchIndexObjectFieldTemplateBuilder
 	protected final ElasticsearchIndexCompositeNodeType.Builder typeBuilder;
 
 	ElasticsearchIndexObjectFieldTemplateBuilder(AbstractElasticsearchIndexCompositeNodeBuilder parent,
-			String templateName, IndexFieldInclusion inclusion, ObjectStructure structure, String prefix) {
+			String templateName, TreeNodeInclusion inclusion, ObjectStructure structure, String prefix) {
 		super( parent, templateName, inclusion, prefix );
 		this.typeBuilder = new ElasticsearchIndexCompositeNodeType.Builder( structure );
 	}
@@ -38,7 +38,7 @@ class ElasticsearchIndexObjectFieldTemplateBuilder
 
 	@Override
 	protected void doContribute(ElasticsearchIndexNodeCollector collector,
-			ElasticsearchIndexCompositeNode parentNode, IndexFieldInclusion inclusion,
+			ElasticsearchIndexCompositeNode parentNode, TreeNodeInclusion inclusion,
 			SimpleGlobPattern absolutePathGlob, boolean multiValued) {
 		ElasticsearchIndexCompositeNodeType type = typeBuilder.build();
 		ElasticsearchIndexObjectFieldTemplate fieldTemplate = new ElasticsearchIndexObjectFieldTemplate(
@@ -48,7 +48,7 @@ class ElasticsearchIndexObjectFieldTemplateBuilder
 
 		collector.collect( fieldTemplate );
 
-		if ( IndexFieldInclusion.INCLUDED.equals( fieldTemplate.inclusion() ) ) {
+		if ( TreeNodeInclusion.INCLUDED.equals( fieldTemplate.inclusion() ) ) {
 			DynamicTemplate dynamicTemplate = new DynamicTemplate();
 			dynamicTemplate.setMatchMappingType( DataMatchingTypes.OBJECT );
 			dynamicTemplate.setPathMatch( absolutePathGlob.toPatternString() );

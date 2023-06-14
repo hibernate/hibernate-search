@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
@@ -27,7 +27,7 @@ public interface IndexCompositeNodeBuilder extends IndexSchemaBuildContext {
 	 * @return A DSL step where the field can be defined in more details.
 	 */
 	<F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> addField(String relativeFieldName,
-			IndexFieldInclusion inclusion, IndexFieldType<F> indexFieldType);
+			TreeNodeInclusion inclusion, IndexFieldType<F> indexFieldType);
 
 	/**
 	 * Create a new named predicate and add it to the current builder.
@@ -38,7 +38,7 @@ public interface IndexCompositeNodeBuilder extends IndexSchemaBuildContext {
 	 * @return A DSL step where the named predicate can be defined in more details.
 	 */
 	IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String relativeNamedPredicateName,
-			IndexFieldInclusion inclusion, PredicateDefinition definition);
+			TreeNodeInclusion inclusion, PredicateDefinition definition);
 
 	/**
 	 * Create a new object field and add it to the current builder.
@@ -48,7 +48,7 @@ public interface IndexCompositeNodeBuilder extends IndexSchemaBuildContext {
 	 * @param structure The structure of the new object field
 	 * @return A builder for the new object field
 	 */
-	IndexObjectFieldBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
+	IndexObjectFieldBuilder addObjectField(String relativeFieldName, TreeNodeInclusion inclusion,
 			ObjectStructure structure);
 
 	/**
@@ -61,7 +61,7 @@ public interface IndexCompositeNodeBuilder extends IndexSchemaBuildContext {
 	 * and to field paths passed to {@link org.hibernate.search.engine.backend.document.DocumentElement#addValue(String, Object)}.
 	 * @return A DSL step where the field template can be defined in more details.
 	 */
-	IndexSchemaFieldTemplateOptionsStep<?> addFieldTemplate(String templateName, IndexFieldInclusion inclusion,
+	IndexSchemaFieldTemplateOptionsStep<?> addFieldTemplate(String templateName, TreeNodeInclusion inclusion,
 			IndexFieldType<?> indexFieldType,
 			String prefix);
 
@@ -76,6 +76,6 @@ public interface IndexCompositeNodeBuilder extends IndexSchemaBuildContext {
 	 * @return A DSL step where the field template can be defined in more details.
 	 */
 	IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName, ObjectStructure structure,
-			String prefix, IndexFieldInclusion inclusion);
+			String prefix, TreeNodeInclusion inclusion);
 
 }

@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorPropertyNode;
@@ -66,7 +67,8 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 			actualPrefix = prefix;
 		}
 		collector.value( extractorPath ).indexedEmbedded(
-				definingTypeModel, actualPrefix, structure, includeDepth, includePaths, excludePaths,
+				definingTypeModel, actualPrefix, structure,
+				new TreeFilterDefinition( includeDepth, includePaths, excludePaths ),
 				includeEmbeddedObjectId, targetType
 		);
 	}

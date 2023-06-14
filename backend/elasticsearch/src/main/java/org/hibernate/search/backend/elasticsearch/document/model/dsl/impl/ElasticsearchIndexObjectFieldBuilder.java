@@ -22,7 +22,7 @@ import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexC
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFieldBuilder;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -35,14 +35,14 @@ class ElasticsearchIndexObjectFieldBuilder extends AbstractElasticsearchIndexCom
 	private final AbstractElasticsearchIndexCompositeNodeBuilder parent;
 	private final String absoluteFieldPath;
 	private final String relativeFieldName;
-	private final IndexFieldInclusion inclusion;
+	private final TreeNodeInclusion inclusion;
 
 	private boolean multiValued = false;
 
 	private ElasticsearchIndexObjectFieldReference reference;
 
 	ElasticsearchIndexObjectFieldBuilder(AbstractElasticsearchIndexCompositeNodeBuilder parent,
-			String relativeFieldName, IndexFieldInclusion inclusion, ObjectStructure structure) {
+			String relativeFieldName, TreeNodeInclusion inclusion, ObjectStructure structure) {
 		super( new ElasticsearchIndexCompositeNodeType.Builder( structure ) );
 		this.parent = parent;
 		String parentAbsolutePath = parent.getAbsolutePath();
@@ -95,7 +95,7 @@ class ElasticsearchIndexObjectFieldBuilder extends AbstractElasticsearchIndexCom
 
 		PropertyMapping mapping = fieldNode.type().createMapping( dynamicType );
 
-		if ( IndexFieldInclusion.INCLUDED.equals( fieldNode.inclusion() ) ) {
+		if ( TreeNodeInclusion.INCLUDED.equals( fieldNode.inclusion() ) ) {
 			parentMapping.addProperty( relativeFieldName, mapping );
 		}
 

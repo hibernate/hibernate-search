@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.engine.backend.types.spi.AbstractIndexCompositeNodeType;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
@@ -89,8 +90,8 @@ public abstract class AbstractIndexRoot<
 	}
 
 	@Override
-	public final IndexFieldInclusion inclusion() {
-		return IndexFieldInclusion.INCLUDED;
+	public final TreeNodeInclusion inclusion() {
+		return TreeNodeInclusion.INCLUDED;
 	}
 
 	@Override

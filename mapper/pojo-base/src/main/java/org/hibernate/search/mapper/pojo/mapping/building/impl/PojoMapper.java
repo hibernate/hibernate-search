@@ -18,7 +18,7 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.BackendsInfo;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
+import org.hibernate.search.engine.common.tree.spi.TreeFilterPathTracker;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerFactory;
@@ -98,7 +98,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	private final Map<PojoRawTypeModel<?>,PojoIndexedTypeManagerBuilder<?>> indexedTypeManagerBuilders =
 			new LinkedHashMap<>();
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<IndexedEmbeddedDefinition, IndexedEmbeddedPathTracker> pathTrackers = new LinkedHashMap<>();
+	private final Map<IndexedEmbeddedDefinition, TreeFilterPathTracker> pathTrackers = new LinkedHashMap<>();
 	private PojoSearchQueryElementRegistry searchQueryElementRegistry;
 
 	private boolean closed = false;
@@ -365,13 +365,13 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	}
 
 	@Override
-	public IndexedEmbeddedPathTracker getOrCreatePathTracker(IndexedEmbeddedDefinition definition) {
-		return pathTrackers.computeIfAbsent( definition, IndexedEmbeddedPathTracker::new );
+	public TreeFilterPathTracker getOrCreatePathTracker(IndexedEmbeddedDefinition definition) {
+		return pathTrackers.computeIfAbsent( definition, d -> new TreeFilterPathTracker( d.filter() ) );
 	}
 
 	private void checkPathTrackers() {
-		for ( Map.Entry<IndexedEmbeddedDefinition, IndexedEmbeddedPathTracker> entry : pathTrackers.entrySet() ) {
-			IndexedEmbeddedPathTracker pathTracker = entry.getValue();
+		for ( Map.Entry<IndexedEmbeddedDefinition, TreeFilterPathTracker> entry : pathTrackers.entrySet() ) {
+			TreeFilterPathTracker pathTracker = entry.getValue();
 			Set<String> uselessIncludePaths = pathTracker.uselessIncludePaths();
 			if ( !uselessIncludePaths.isEmpty() ) {
 				Set<String> encounteredFieldPaths = pathTracker.encounteredFieldPaths();

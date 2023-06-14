@@ -10,7 +10,7 @@ import java.util.function.BiConsumer;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubIndexFieldReference;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexCompositeNode;
@@ -23,14 +23,14 @@ class StubIndexValueFieldBuilder<F>
 		StubIndexFieldBuilder {
 
 	private final StubIndexSchemaDataNode.Builder schemaDataNodeBuilder;
-	private final IndexFieldInclusion inclusion;
+	private final TreeNodeInclusion inclusion;
 	private final StubIndexValueFieldType<F> type;
 
 	private boolean multiValued;
 
 	private IndexFieldReference<F> reference;
 
-	StubIndexValueFieldBuilder(StubIndexSchemaDataNode.Builder schemaDataNodeBuilder, IndexFieldInclusion inclusion,
+	StubIndexValueFieldBuilder(StubIndexSchemaDataNode.Builder schemaDataNodeBuilder, TreeNodeInclusion inclusion,
 			StubIndexValueFieldType<F> type) {
 		this.schemaDataNodeBuilder = schemaDataNodeBuilder;
 		this.inclusion = inclusion;

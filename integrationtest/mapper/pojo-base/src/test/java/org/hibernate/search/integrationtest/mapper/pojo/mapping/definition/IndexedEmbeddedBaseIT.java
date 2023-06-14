@@ -2623,7 +2623,7 @@ public class IndexedEmbeddedBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".included" )
 						.failure(
-								"'includePaths' and 'excludePaths' cannot be used together in an @IndexedEmbedded",
+								"'includePaths' and 'excludePaths' cannot be used together in the same filter",
 								"Use either `includePaths` or `excludePaths` leaving the other one empty.",
 								"Included paths are: '[includedString]', excluded paths are: '[excludedString]'."
 						)

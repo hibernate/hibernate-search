@@ -4,13 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.mapper.mapping.building.impl;
+package org.hibernate.search.engine.common.tree.impl;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-abstract class PathFilter {
+public abstract class PathFilter {
 
 	static PathFilter unconstrained() {
 		return Unconstrained.INSTANCE;

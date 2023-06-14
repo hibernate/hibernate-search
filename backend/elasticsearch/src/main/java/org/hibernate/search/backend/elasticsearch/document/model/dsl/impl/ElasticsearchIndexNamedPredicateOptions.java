@@ -7,15 +7,15 @@
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
 
 public class ElasticsearchIndexNamedPredicateOptions implements IndexSchemaNamedPredicateOptionsStep {
 
-	public final IndexFieldInclusion inclusion;
+	public final TreeNodeInclusion inclusion;
 	public final PredicateDefinition definition;
 
-	ElasticsearchIndexNamedPredicateOptions(IndexFieldInclusion inclusion, PredicateDefinition definition) {
+	ElasticsearchIndexNamedPredicateOptions(TreeNodeInclusion inclusion, PredicateDefinition definition) {
 		this.inclusion = inclusion;
 		this.definition = definition;
 	}

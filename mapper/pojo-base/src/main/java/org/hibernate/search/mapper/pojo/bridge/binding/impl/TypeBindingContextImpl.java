@@ -41,7 +41,7 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 	private final PojoModelTypeRootElement<T> bridgedElement;
 	private final PojoTypeIndexingDependencyConfigurationContextImpl<T> dependencyContext;
 	private final IndexFieldTypeFactory indexFieldTypeFactory;
-	private final PojoIndexSchemaContributionListener listener;
+	private final PojoTreeContributionListener listener;
 	private final IndexSchemaElement indexSchemaElement;
 
 	private PartialBinding<T> partialBinding;
@@ -59,7 +59,7 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 		this.bridgedElement = bridgedElement;
 		this.dependencyContext = dependencyContext;
 		this.indexFieldTypeFactory = indexBindingContext.createTypeFactory();
-		this.listener = new PojoIndexSchemaContributionListener();
+		this.listener = new PojoTreeContributionListener();
 		this.indexSchemaElement = indexBindingContext.schemaElement( listener );
 	}
 

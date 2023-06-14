@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
@@ -88,17 +89,15 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 	@Override
 	public void indexedEmbedded(PojoRawTypeModel<?> definingTypeModel, String relativePrefix,
 			ObjectStructure structure,
-			Integer includeDepth, Set<String> includePaths, Set<String> excludePaths, boolean includeEmbeddedObjectId,
+			TreeFilterDefinition filterDefinition, boolean includeEmbeddedObjectId,
 			Class<?> targetType) {
 		String defaultedRelativePrefix = relativePrefix;
 		if ( defaultedRelativePrefix == null ) {
 			defaultedRelativePrefix = modelPath.getParent().getPropertyModel().name() + ".";
 		}
 
-		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition(
-				definingTypeModel, defaultedRelativePrefix, structure,
-				includeDepth, includePaths, excludePaths
-		);
+		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition( definingTypeModel,
+				defaultedRelativePrefix, structure, filterDefinition );
 
 		Optional<IndexedEmbeddedBindingContext> nestedBindingContextOptional =
 				bindingContext.addIndexedEmbeddedIfIncluded( definition, multiValuedFromContainerExtractor );
