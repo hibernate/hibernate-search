@@ -215,6 +215,10 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		catch (RuntimeException e) {
 			searchQueryElementRegistryBuilder.closeOnFailure();
 		}
+
+		if ( !failureCollector.hasFailure() ) {
+			mappingHelper.checkPathTrackers();
+		}
 	}
 
 	private <E> void mapIndexedType(PojoRawTypeModel<E> indexedEntityType,

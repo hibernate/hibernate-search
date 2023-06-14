@@ -1124,7 +1124,7 @@ populated with the requested objects.
 The annotation exposes the following attributes:
 
 `path`::
-The path to the projected field.
+[[search-dsl-projection-object-mapping-path]] The path to the projected field.
 +
 If not set, it is inferred from the constructor parameter name.
 +
@@ -1132,6 +1132,12 @@ If not set, it is inferred from the constructor parameter name.
 ====
 Field path inference will <<mapping-projection-inner-inference-fieldpath,fail if constructor parameter names are not included in the Java bytecode>>.
 ====
+`includePaths`::
+See <<search-dsl-projection-object-mapping-filters>>.
+`excludePaths`::
+See <<search-dsl-projection-object-mapping-filters>>.
+`includeDepth`::
+See <<search-dsl-projection-object-mapping-filters>>.
 
 For <<mapping-projection-programmatic,programmatic mapping>>, use `ObjectProjectionBinder.create()`.
 
@@ -1140,6 +1146,190 @@ For <<mapping-projection-programmatic,programmatic mapping>>, use `ObjectProject
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=programmatic-object-projection]
+----
+====
+
+[[search-dsl-projection-object-mapping-filters]]
+=== `@ObjectProjection` filters to exclude nested projections and break `@ObjectProjection` cycles
+
+By default, <<search-dsl-projection-object-mapping,`@ObjectProjection`>>
+and <<mapping-projection-inner-inference,inferred object projections>> will include
+every projection encountered in the projection constructor of the projected type, recursively.
+
+This will work just fine for simpler use cases, but may lead to problems for more complex models:
+
+* If the projection constructor of the projected type declares many nested projections,
+only some of which are actually useful to the "surrounding" type,
+the extra projections will decrease search performance needlessly.
+* If there is a cycle of `@ObjectProjection`
+(e.g. `A` includes a nested object projection `b` of type `B`, which includes a nested projection `a` of type `A`)
+the root projection type will end up with an infinite amount of fields
+(`a.b.someField`, `a.b.a.b.someField`, `a.b.a.b.a.b.someField`, ...),
+which Hibernate Search will detect and reject with an exception.
+
+To address these problems, it is possible to apply filters
+to only include those nested projections that are actually useful.
+Projections on excluded fields, at runtime, will have their value set to `null`,
+or an empty list for multivalued projections.
+
+Available filtering attributes on `@ObjectProjection` are:
+
+`includePaths`::
+The paths of nested index field to be included,
+i.e. for which the corresponding nested projections will actually be retrieved from the index.
++
+Provided paths must be relative to the projected object field,
+i.e. they must not include its <<search-dsl-projection-object-mapping-path,path>>.
++
+This takes precedence over `includeDepth` (see below).
++
+Cannot be used in combination with `excludePaths` in the same `@ObjectProjection`.
+`excludePaths`::
+The paths of index fields from the indexed-embedded element that must *not* be embedded.
++
+Provided paths must be relative to the projected object field,
+i.e. they must not include its <<search-dsl-projection-object-mapping-path,path>>.
++
+This takes precedence over `includeDepth` (see below).
++
+Cannot be used in combination with `includePaths` in the same `@ObjectProjection`.
+`includeDepth`::
+The number of levels of indexed-embedded that will have all their fields included by default.
++
+`includeDepth` is the number of levels of object projections that
+will have all their nested field/object projections
+included by default and actually be retrieved from the index.
++
+Up to and including that depth, object projections
+will be included along with their nested (non-object) field projections,
+even if these fields are not included explicitly through `includePaths`,
+unless these fields are excluded explicitly through `excludePaths`:
++
+* `includeDepth=0` means fields of this object projection are *not* included,
+nor is any field of nested indexed-embedded elements,
+unless these fields are included explicitly through `includePaths`.
+* `includeDepth=1` means fields of this object projection *are* included,
+unless these fields are excluded explicitly through `excludePaths`,
+but *not* fields of nested object projections (`@ObjectProjection` within this `@ObjectProjection`),
+unless these fields are included explicitly through `includePaths`.
+* `includeDepth=2` means fields of this object projection
+and fields of immediately nested object projections (`@ObjectProjection` within this `@ObjectProjection`) *are* included,
+unless these fields are explicitly excluded through `excludePaths`,
+but *not* fields of nested object projections beyond that
+(`@ObjectProjection` within an `@ObjectProjection` within this `@ObjectProjection`),
+unless these fields are included explicitly through `includePaths`.
+* And so on.
+
++
+The default value depends on the value of the `includePaths` attribute:
+
+* if `includePaths` is empty, `includeDepth` defaults to infinity (include all fields at every level).
+* if `includePaths` is *not* empty, `includeDepth` defaults to `0`
+(only include fields included explicitly).
+
+[NOTE]
+.Mixing `includePaths` and `excludePaths` at different nesting levels
+====
+In general, it is possible to use `includePaths` and `excludePaths` at different levels of nested `@ObjectProjection`.
+When doing so, keep in mind that the filter at each level can only reference reachable paths,
+i.e. a filter cannot reference a path that was excluded by a nested `@ObjectProjection` (implicitly or explicitly).
+====
+
+Below are three examples: one leveraging `includePaths` only,
+one leveraging `excludePaths`, and one leveraging `includePaths` and `includeDepth`.
+
+All three examples are based on the following mapped entity
+that rely on <<mapping-indexedembedded,@IndexedEmbedded>>
+and the <<mapping-indexedembedded-filtering,very similar filters>> it provides:
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/filters/Human.java[tags=include;!getters-setters]
+----
+
+[[search-dsl-projection-object-mapping-filters-example-includepaths]]
+.Filtering nested projections with `includePaths`
+====
+This projection will include the following fields:
+
+* `name`
+* `nickname`
+* `parents.name`: explicitly included because `includePaths` on `parents` includes `name`.
+* `parents.nickname`: explicitly included because `includePaths` on `parents` includes `nickname`.
+* `parents.parents.name`: explicitly included because `includePaths` on `parents` includes `parents.name`.
+
+The following fields in particular are excluded:
+
+* `parents.parents.nickname`: *not* implicitly included because `includeDepth` is not set and defaults to `0`,
+and *not* explicitly included either because `includePaths` on `parents` does not include `parents.nickname`.
+* `parents.parents.parents.name`: *not* implicitly included because `includeDepth` is not set and defaults to `0`,
+and *not* explicitly included either because `includePaths` on `parents` does not include `parents.parents.name`.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/filters/includepaths/HumanProjection.java[tags=include]
+----
+====
+
+[[search-dsl-projection-object-mapping-filters-example-excludepaths]]
+.Filtering nested projections with `excludePaths`
+====
+This projection will include the same fields as in
+<<search-dsl-projection-object-mapping-filters-example-includepaths,the `includePaths` example>>,
+but through using the `excludePaths` instead.
+
+This projection will include the following fields:
+
+* `name`
+* `nickname`
+* `parents.name`: implicitly included because `includeDepth` on `parents` defaults to infinity.
+* `parents.nickname`: implicitly included because `includeDepth` on `parents` defaults to infinity.
+* `parents.parents.name`: implicitly included because `includeDepth` on `parents` defaults to infinity.
+
+The following fields in particular are excluded:
+
+* `parents.parents.nickname`: *not* included because `excludePaths` explicitly excludes `parents.nickname`.
+* `parents.parents.parents`/`parents.parents.parents.<any-field>`: *not* included because `excludePaths` explicitly excludes `parents.parents` stopping any further traversing.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/filters/excludepaths/HumanProjection.java[tags=include]
+----
+====
+
+[[search-dsl-projection-object-mapping-filters-example-includepathsanddepth]]
+.Filtering nested projections with `includePaths` and `includeDepth`
+====
+This projection will include the following fields:
+
+* `name`
+* `surname`
+* `parents.name`: implicitly at depth `0` because `includeDepth > 0`
+(so `parents.*` is included implicitly).
+* `parents.nickname`: implicitly included at depth `0` because `includeDepth > 0`
+(so `parents.*` is included implicitly).
+* `parents.parents.name`: implicitly included at depth `1` because `includeDepth > 1`
+(so `parents.parents.*` is included implicitly).
+* `parents.parents.nickname`: implicitly included at depth `1` because `includeDepth > 1`
+(so `parents.parents.*` is included implicitly).
+* `parents.parents.parents.name`: *not* implicitly included at depth `2` because `includeDepth = 2`
+(so `parents.parents.parents` is included implicitly,
+but subfields can only be included explicitly)
+but explicitly included because `includePaths` on `parents` includes `parents.parents.name`.
+
+The following fields in particular are excluded:
+
+* `parents.parents.parents.nickname`: *not* implicitly included at depth `2` because `includeDepth = 2`
+(so `parents.parents.parents` is included implicitly, but subfields must be included explicitly)
+and *not* explicitly included either because `includePaths` on `parents` does not include `parents.parents.nickname`.
+* `parents.parents.parents.parents.name`: *not* implicitly included at depth `3` because `includeDepth = 2`
+(so `parents.parents.parents` is included implicitly,
+but `parents.parents.parents.parents` and subfields can only be included explicitly)
+and *not* explicitly included either because `includePaths` on `parents` does not include `parents.parents.parents.name`.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/filters/includepathsanddepth/HumanProjection.java[tags=include]
 ----
 ====
 

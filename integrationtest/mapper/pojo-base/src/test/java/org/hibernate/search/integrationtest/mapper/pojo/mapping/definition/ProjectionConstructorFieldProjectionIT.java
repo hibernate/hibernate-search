@@ -22,6 +22,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextFi
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectProjection;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.util.common.SearchException;
@@ -311,6 +312,148 @@ public class ProjectionConstructorFieldProjectionIT extends AbstractProjectionCo
 						new MyProjection( "result1", new MyInnerProjection( "result1_1" ) ),
 						new MyProjection( "result2", new MyInnerProjection( null ) ),
 						new MyProjection( "result3", null )
+				)
+		);
+	}
+
+	@Test
+	public void inObjectField_filteredOut() {
+		class Contained {
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String text;
+			@GenericField
+			public Integer integer;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String text;
+			@IndexedEmbedded
+			public Contained contained;
+		}
+		class MyInnerProjection {
+			public final String text;
+			public final Integer integer;
+			@ProjectionConstructor
+			public MyInnerProjection(@FieldProjection String text, @FieldProjection Integer integer) {
+				this.text = text;
+				this.integer = integer;
+			}
+		}
+		class MyProjection {
+			public final String text;
+			public final MyInnerProjection contained;
+			@ProjectionConstructor
+			public MyProjection(@FieldProjection String text,
+					@ObjectProjection(includePaths = {"text"} ) MyInnerProjection contained) {
+				this.text = text;
+				this.contained = contained;
+			}
+		}
+
+		backendMock.expectAnySchema( INDEX_NAME );
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedTypes( MyProjection.class, MyInnerProjection.class )
+				.setup( IndexedEntity.class );
+
+		testSuccessfulRootProjection(
+				mapping, IndexedEntity.class, MyProjection.class,
+				Arrays.asList(
+						Arrays.asList( "result1", Arrays.asList( "result1_1", null ) ),
+						Arrays.asList( "result2", null )
+				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "text", String.class ),
+								f.object( "contained" )
+										.from(
+												dummyProjectionForEnclosingClassInstance( f ),
+												f.field( "contained.text", String.class ),
+												// "contained.integer" got filtered out due to @ObjectProjection filters
+												f.constant( null )
+										)
+										.asList()
+						)
+						.asList(),
+				Arrays.asList(
+						new MyProjection( "result1", new MyInnerProjection( "result1_1", null ) ),
+						new MyProjection( "result2", null )
+				)
+		);
+	}
+
+	@Test
+	public void inObjectField_multiValued_filteredOut() {
+		class Contained {
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String text;
+			@GenericField
+			public List<Integer> integer;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String text;
+			@IndexedEmbedded
+			public Contained contained;
+		}
+		class MyInnerProjection {
+			public final String text;
+			public final List<Integer> integer;
+			@ProjectionConstructor
+			public MyInnerProjection(@FieldProjection String text, @FieldProjection List<Integer> integer) {
+				this.text = text;
+				this.integer = integer;
+			}
+		}
+		class MyProjection {
+			public final String text;
+			public final MyInnerProjection contained;
+			@ProjectionConstructor
+			public MyProjection(@FieldProjection String text,
+					@ObjectProjection(includePaths = {"text"} ) MyInnerProjection contained) {
+				this.text = text;
+				this.contained = contained;
+			}
+		}
+
+		backendMock.expectAnySchema( INDEX_NAME );
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedTypes( MyProjection.class, MyInnerProjection.class )
+				.setup( IndexedEntity.class );
+
+		testSuccessfulRootProjection(
+				mapping, IndexedEntity.class, MyProjection.class,
+				Arrays.asList(
+						Arrays.asList( "result1", Arrays.asList( "result1_1", null ) ),
+						Arrays.asList( "result2", null )
+				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "text", String.class ),
+								f.object( "contained" )
+										.from(
+												dummyProjectionForEnclosingClassInstance( f ),
+												f.field( "contained.text", String.class ),
+												// "contained.integer" got filtered out due to @ObjectProjection filters
+												f.constant( Collections.emptyList() )
+										)
+										.asList()
+						)
+						.asList(),
+				Arrays.asList(
+						new MyProjection( "result1", new MyInnerProjection( "result1_1", Collections.emptyList() ) ),
+						new MyProjection( "result2", null )
 				)
 		);
 	}

@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -27,8 +23,6 @@ public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProces
 
 		String cleanedUpName = context.toNullIfDefault( annotation.name(), "" );
 
-		Integer cleanedUpIncludeDepth = context.toNullIfDefault( annotation.includeDepth(), -1 );
-
 		String[] includePathsArray = annotation.includePaths();
 		String[] excludePathsArray = annotation.excludePaths();
 
@@ -42,22 +36,11 @@ public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProces
 				.extractors( extractorPath )
 				.prefix( cleanedUpPrefix )
 				.structure( structure )
-				.includeDepth( cleanedUpIncludeDepth )
-				.includePaths( cleanUpPaths( includePathsArray ) )
-				.excludePaths( cleanUpPaths( excludePathsArray ) )
+				.includeDepth( context.toNullIfDefault( annotation.includeDepth(), -1 ) )
+				.includePaths( MappingAnnotationProcessorUtils.cleanUpPaths( includePathsArray ) )
+				.excludePaths( MappingAnnotationProcessorUtils.cleanUpPaths( excludePathsArray ) )
 				.includeEmbeddedObjectId( annotation.includeEmbeddedObjectId() )
 				.targetType( cleanedUpTargetType );
 	}
 
-	private Set<String> cleanUpPaths(String[] pathsArray) {
-		Set<String> paths;
-		if ( pathsArray.length > 0 ) {
-			paths = new HashSet<>();
-			Collections.addAll( paths, pathsArray );
-		}
-		else {
-			paths = Collections.emptySet();
-		}
-		return paths;
-	}
 }

@@ -9,7 +9,9 @@ package org.hibernate.search.mapper.pojo.search.definition.binding.builtin;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
+import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectProjection;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingMultiContext;
@@ -67,8 +69,27 @@ public final class ObjectProjectionBinder implements ProjectionBinder {
 
 	private final String fieldPathOrNull;
 
+	private TreeFilterDefinition filter = TreeFilterDefinition.includeAll();
+
 	private ObjectProjectionBinder(String fieldPathOrNull) {
 		this.fieldPathOrNull = fieldPathOrNull;
+	}
+
+	@Override
+	public String toString() {
+		return "ObjectProjectionBinder(...)";
+	}
+
+	/**
+	 * @param filter The filter to apply to determine which nested index field projections should be included in the projection.
+	 * @return {@code this}, for method chaining.
+	 * @see ObjectProjection#includePaths()
+	 * @see ObjectProjection#excludePaths()
+	 * @see ObjectProjection#includeDepth()
+	 */
+	public ObjectProjectionBinder filter(TreeFilterDefinition filter) {
+		this.filter = filter;
+		return this;
 	}
 
 	@Override
@@ -86,13 +107,13 @@ public final class ObjectProjectionBinder implements ProjectionBinder {
 
 	private <T> void bind(ProjectionBindingContext context, String fieldPath, Class<T> constructorParameterType) {
 		context.definition( constructorParameterType,
-				context.createObjectDefinition( fieldPath, constructorParameterType ) );
+				context.createObjectDefinition( fieldPath, constructorParameterType, filter ) );
 	}
 
 	private <T> void bind(ProjectionBindingContext context, ProjectionBindingMultiContext multi,
 			String fieldPath, Class<T> containerElementType) {
 		multi.definition( containerElementType,
-				context.createObjectDefinitionMulti( fieldPath, containerElementType ) );
+				context.createObjectDefinitionMulti( fieldPath, containerElementType, filter ) );
 	}
 
 	private String fieldPathOrFail(ProjectionBindingContext context) {

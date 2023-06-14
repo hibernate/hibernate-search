@@ -35,7 +35,9 @@ import org.junit.Test;
 public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionConstructorIT {
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock )
+			// We don't care about reindexing here and don't want to configure association inverse sides
+			.disableAssociationReindexing();
 
 	@Test
 	public void noArg() {
@@ -228,6 +230,114 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 	}
 
 	@Test
+	public void nonMatchingIncludePaths() {
+		class Contained {
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String text;
+			@GenericField
+			public Integer integer;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String text;
+			@IndexedEmbedded
+			public Contained contained;
+		}
+		class MyInnerProjection {
+			public final String text;
+			@ProjectionConstructor
+			public MyInnerProjection(String text) {
+				this.text = text;
+			}
+		}
+		class MyProjection {
+			public final String text;
+			public final MyInnerProjection contained;
+			@ProjectionConstructor
+			public MyProjection(String text,
+					@ObjectProjection(includePaths = "doesNotExist") MyInnerProjection contained) {
+				this.text = text;
+				this.contained = contained;
+			}
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withAnnotatedTypes( MyProjection.class, MyInnerProjection.class )
+				.setup( IndexedEntity.class, Contained.class ) )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( MyProjection.class.getName() )
+						.projectionConstructorContext()
+						.methodParameterContext( 2, "contained" )
+						.failure(
+								"ObjectProjectionBinder(...) defines includePaths filters that do not match anything",
+								"Non-matching includePaths filters: [doesNotExist].",
+								"Encountered field paths: [text].",
+								"Check the filters for typos, or remove them if they are not useful."
+						)
+				);
+	}
+
+	@Test
+	public void nonMatchingExcludePaths() {
+		class Contained {
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String text;
+			@GenericField
+			public Integer integer;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String text;
+			@IndexedEmbedded
+			public Contained contained;
+		}
+		class MyInnerProjection {
+			public final String text;
+			@ProjectionConstructor
+			public MyInnerProjection(String text) {
+				this.text = text;
+			}
+		}
+		class MyProjection {
+			public final String text;
+			public final MyInnerProjection contained;
+			@ProjectionConstructor
+			public MyProjection(String text,
+					@ObjectProjection(excludePaths = "doesNotExist") MyInnerProjection contained) {
+				this.text = text;
+				this.contained = contained;
+			}
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withAnnotatedTypes( MyProjection.class, MyInnerProjection.class )
+				.setup( IndexedEntity.class, Contained.class ) )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( MyProjection.class.getName() )
+						.projectionConstructorContext()
+						.methodParameterContext( 2, "contained" )
+						.failure(
+								"ObjectProjectionBinder(...) defines excludePaths filters that do not match anything",
+								"Non-matching excludePaths filters: [doesNotExist].",
+								"Encountered field paths: [text].",
+								"Check the filters for typos, or remove them if they are not useful."
+						)
+				);
+	}
+
+	@Test
 	public void inObjectField() {
 		class ContainedLevel2 {
 			@DocumentId
@@ -323,6 +433,184 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 						new MyProjection( "result4", new MyInnerProjectionLevel1( "result4_1",
 								new MyInnerProjectionLevel2( null ) ) ),
 						new MyProjection( "result5", new MyInnerProjectionLevel1( "result5_1", null ) )
+				)
+		);
+	}
+
+	@Test
+	public void inObjectField_filteredOut() {
+		class ContainedLevel2 {
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String text;
+			@GenericField
+			public Integer integer;
+		}
+		class ContainedLevel1 {
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String text;
+			@GenericField
+			public Integer integer;
+			@IndexedEmbedded
+			public ContainedLevel2 contained;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String text;
+			@IndexedEmbedded
+			public ContainedLevel1 contained;
+		}
+		class MyInnerProjectionLevel2 {
+			public final String text;
+			@ProjectionConstructor
+			public MyInnerProjectionLevel2(String text) {
+				this.text = text;
+			}
+		}
+		class MyInnerProjectionLevel1 {
+			public final String text;
+			public final MyInnerProjectionLevel2 contained;
+			@ProjectionConstructor
+			public MyInnerProjectionLevel1(String text,
+					@ObjectProjection MyInnerProjectionLevel2 contained) {
+				this.text = text;
+				this.contained = contained;
+			}
+		}
+		class MyProjection {
+			public final String text;
+			public final MyInnerProjectionLevel1 contained;
+			@ProjectionConstructor
+			public MyProjection(String text,
+					@ObjectProjection(includeDepth = 1) MyInnerProjectionLevel1 contained) {
+				this.text = text;
+				this.contained = contained;
+			}
+		}
+
+		backendMock.expectAnySchema( INDEX_NAME );
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedTypes( MyProjection.class, MyInnerProjectionLevel1.class, MyInnerProjectionLevel2.class )
+				.setup( IndexedEntity.class );
+
+		testSuccessfulRootProjection(
+				mapping, IndexedEntity.class, MyProjection.class,
+				Arrays.asList(
+						Arrays.asList( "result1", Arrays.asList( "result1_1" ) ),
+						Arrays.asList( "result2", null )
+				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "text", String.class ),
+								f.object( "contained" )
+										.from(
+												dummyProjectionForEnclosingClassInstance( f ),
+												f.field( "contained.text", String.class ),
+												// "contained.contained" got filtered out due to @ObjectProjection filters
+												f.constant( null )
+										)
+										.asList()
+						)
+						.asList(),
+				Arrays.asList(
+						new MyProjection( "result1", new MyInnerProjectionLevel1( "result1_1", null ) ),
+						new MyProjection( "result2", null )
+				)
+		);
+	}
+
+	@Test
+	public void inObjectField_multiValued_filteredOut() {
+		class ContainedLevel2 {
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String text;
+			@GenericField
+			public Integer integer;
+		}
+		class ContainedLevel1 {
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String text;
+			@GenericField
+			public Integer integer;
+			@IndexedEmbedded
+			public List<ContainedLevel2> contained;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String text;
+			@IndexedEmbedded
+			public ContainedLevel1 contained;
+		}
+		class MyInnerProjectionLevel2 {
+			public final String text;
+			@ProjectionConstructor
+			public MyInnerProjectionLevel2(String text) {
+				this.text = text;
+			}
+		}
+		class MyInnerProjectionLevel1 {
+			public final String text;
+			public final List<MyInnerProjectionLevel2> contained;
+			@ProjectionConstructor
+			public MyInnerProjectionLevel1(String text,
+					@ObjectProjection List<MyInnerProjectionLevel2> contained) {
+				this.text = text;
+				this.contained = contained;
+			}
+		}
+		class MyProjection {
+			public final String text;
+			public final MyInnerProjectionLevel1 contained;
+			@ProjectionConstructor
+			public MyProjection(String text,
+					@ObjectProjection(includeDepth = 1) MyInnerProjectionLevel1 contained) {
+				this.text = text;
+				this.contained = contained;
+			}
+		}
+
+		backendMock.expectAnySchema( INDEX_NAME );
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedTypes( MyProjection.class, MyInnerProjectionLevel1.class, MyInnerProjectionLevel2.class )
+				.setup( IndexedEntity.class );
+
+		testSuccessfulRootProjection(
+				mapping, IndexedEntity.class, MyProjection.class,
+				Arrays.asList(
+						Arrays.asList( "result1", Arrays.asList( "result1_1" ) ),
+						Arrays.asList( "result2", null )
+				),
+				f -> f.composite()
+						.from(
+								dummyProjectionForEnclosingClassInstance( f ),
+								f.field( "text", String.class ),
+								f.object( "contained" )
+										.from(
+												dummyProjectionForEnclosingClassInstance( f ),
+												f.field( "contained.text", String.class ),
+												// "contained.contained" got filtered out due to @ObjectProjection filters
+												f.constant( Collections.emptyList() )
+										)
+										.asList()
+						)
+						.asList(),
+				Arrays.asList(
+						new MyProjection( "result1", new MyInnerProjectionLevel1( "result1_1", Collections.emptyList() ) ),
+						new MyProjection( "result2", null )
 				)
 		);
 	}

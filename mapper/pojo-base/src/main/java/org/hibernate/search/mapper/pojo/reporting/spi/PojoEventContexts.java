@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.reporting.spi;
 
+import static org.hibernate.search.engine.reporting.spi.EventContexts.singleton;
+
 import java.lang.annotation.Annotation;
 
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
@@ -22,6 +24,8 @@ public final class PojoEventContexts {
 
 	private static final PojoEventContextMessages MESSAGES = PojoEventContextMessages.INSTANCE;
 
+	private static final EventContext PROJECTION_CONSTRUCTOR = singleton( MESSAGES::projectionConstructor );
+
 	private PojoEventContexts() {
 	}
 
@@ -31,6 +35,10 @@ public final class PojoEventContexts {
 
 	public static EventContext fromType(PojoRawTypeIdentifier<?> typeIdentifier) {
 		return EventContexts.fromType( typeIdentifier );
+	}
+
+	public static EventContext projectionConstructor() {
+		return PROJECTION_CONSTRUCTOR;
 	}
 
 	public static EventContext fromConstructor(PojoConstructorModel<?> constructor) {

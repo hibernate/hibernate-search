@@ -157,7 +157,9 @@ include::{sourcedirJava17}/org/hibernate/search/documentation/mapper/orm/binding
 <1> Call `createObjectDefinition(...)` to create a definition to delegate to.
 <2> Pass the <<search-dsl-projection-object-syntax,name of the object field to project on>>.
 <3> Pass the <<search-dsl-projection-object-as-mapped,projected type>>.
-<4> Call `definition(...)` and pass the definition created just above.
+<4> Pass the filter for nested projections; here we're not filtering at all.
+This controls the same feature as <<search-dsl-projection-object-mapping-filters,`includePaths`/`excludePaths`/`includeDepths` in `@ObjectProjection`>>.
+<5> Call `definition(...)` and pass the definition created just above.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----

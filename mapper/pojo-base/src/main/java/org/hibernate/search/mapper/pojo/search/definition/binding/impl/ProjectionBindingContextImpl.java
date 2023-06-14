@@ -10,11 +10,18 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
+import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
+import org.hibernate.search.engine.common.tree.spi.TreeNestingContext;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.CompositeProjectionDefinition;
+import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.ObjectProjectionDefinition;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
@@ -25,24 +32,34 @@ import org.hibernate.search.mapper.pojo.model.PojoModelConstructorParameter;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelConstructorParameterRootElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelValueElement;
+import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingMultiContext;
+import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.FieldProjectionBinder;
+import org.hibernate.search.mapper.pojo.search.definition.binding.builtin.ObjectProjectionBinder;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.AbstractCloser;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private static final BiFunction<MappingElement, String, SearchException> CYCLIC_RECURSION_EXCEPTION_FACTORY =
+			(mappingElement, cyclicRecursionPath) -> log.objectProjectionCyclicRecursion( mappingElement,
+					mappingElement.eventContext(), cyclicRecursionPath );
+
 	private final PojoMappingHelper mappingHelper;
-	private final ProjectionConstructorParameterBinder<P> parameterBinder;
+	final ProjectionConstructorParameterBinder<P> parameterBinder;
 	private final Map<String, Object> params;
 	private final PojoTypeModel<?> parameterTypeModel;
 	private final PojoModelConstructorParameterRootElement<P> parameterRootElement;
 
+	private MappingElement mappingElement;
 	private PartialBinding<P> partialBinding;
 
 	public ProjectionBindingContextImpl(ProjectionConstructorParameterBinder<P> parameterBinder,
@@ -113,48 +130,107 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 
 	@Override
 	public <T> BeanHolder<? extends ProjectionDefinition<T>> createObjectDefinition(String fieldPath,
-			Class<T> projectedType) {
-		CompositeProjectionDefinition<T> composite = createCompositeProjectionDefinition( projectedType );
-		try {
-			return BeanHolder.ofCloseable( new ObjectProjectionDefinition.SingleValued<>( fieldPath, composite ) );
-		}
-		catch (RuntimeException e) {
-			new SuppressingCloser( e )
-					.push( composite );
-			throw e;
-		}
+			Class<T> projectedType, TreeFilterDefinition filter) {
+		Contracts.assertNotNull( fieldPath, "fieldPath" );
+		Contracts.assertNotNull( projectedType, "projectedType" );
+		Contracts.assertNotNull( filter, "filter" );
+		Optional<BeanHolder<? extends ProjectionDefinition<T>>> objectProjection = nestObjectProjection(
+				fieldPath, filter,
+				nestingContext -> {
+					CompositeProjectionDefinition<T> composite =
+							createCompositeProjectionDefinition( projectedType, nestingContext );
+					try {
+						return BeanHolder.ofCloseable( new ObjectProjectionDefinition.SingleValued<>(
+								fieldPath, composite ) );
+					}
+					catch (RuntimeException e) {
+						new SuppressingCloser( e )
+								.push( composite );
+						throw e;
+					}
+				}
+		);
+		return objectProjection.orElse( ConstantProjectionDefinition.nullValue() );
 	}
 
 	@Override
 	public <T> BeanHolder<? extends ProjectionDefinition<List<T>>> createObjectDefinitionMulti(String fieldPath,
-			Class<T> projectedType) {
-		CompositeProjectionDefinition<T> composite = createCompositeProjectionDefinition( projectedType );
-		try {
-			return BeanHolder.ofCloseable( new ObjectProjectionDefinition.MultiValued<>( fieldPath, composite ) );
-		}
-		catch (RuntimeException e) {
-			new SuppressingCloser( e )
-					.push( composite );
-			throw e;
-		}
+			Class<T> projectedType, TreeFilterDefinition filter) {
+		Contracts.assertNotNull( fieldPath, "fieldPath" );
+		Contracts.assertNotNull( projectedType, "projectedType" );
+		Contracts.assertNotNull( filter, "filter" );
+		Optional<BeanHolder<? extends ProjectionDefinition<List<T>>>> objectProjection = nestObjectProjection(
+				fieldPath, filter,
+				nestingContext -> {
+					CompositeProjectionDefinition<T> composite =
+							createCompositeProjectionDefinition( projectedType, nestingContext );
+					try {
+						return BeanHolder.ofCloseable( new ObjectProjectionDefinition.MultiValued<>(
+								fieldPath, composite ) );
+					}
+					catch (RuntimeException e) {
+						new SuppressingCloser( e )
+								.push( composite );
+						throw e;
+					}
+				}
+		);
+		return objectProjection.orElse( ConstantProjectionDefinition.emptyList() );
+	}
+
+	private <T> Optional<T> nestObjectProjection(String fieldPath, TreeFilterDefinition filter,
+			Function<TreeNestingContext, T> contextBuilder) {
+		return parameterBinder.parent.nestingContext.nestComposed(
+				mappingElement,
+				fieldPath + ".", filter,
+				mappingHelper.getOrCreatePathTracker( mappingElement, filter ),
+				new TreeNestingContext.NestedContextBuilder<T>() {
+					@Override
+					public void appendObject(String objectName) {
+						// Ignore
+					}
+
+					@Override
+					public T build(TreeNestingContext nestingContext) {
+						return contextBuilder.apply( nestingContext );
+					}
+				},
+				CYCLIC_RECURSION_EXCEPTION_FACTORY
+		);
 	}
 
 	@Override
 	public <T> BeanHolder<? extends ProjectionDefinition<T>> createCompositeDefinition(Class<T> projectedType) {
-		return BeanHolder.ofCloseable( createCompositeProjectionDefinition( projectedType ) );
+		return BeanHolder.ofCloseable( createCompositeProjectionDefinition( projectedType,
+				parameterBinder.parent.nestingContext ) );
 	}
 
-	private <T> CompositeProjectionDefinition<T> createCompositeProjectionDefinition(Class<T> projectedType) {
-		CompositeProjectionDefinition<T> composite = parameterBinder.createConstructorProjectionDefinitionOrNull(
+	private <T> CompositeProjectionDefinition<T> createCompositeProjectionDefinition(Class<T> projectedType, TreeNestingContext nestingContext) {
+		PojoConstructorModel<T> projectionConstructor = parameterBinder.findProjectionConstructorOrNull(
 				mappingHelper.introspector().typeModel( projectedType ) );
-		if ( composite == null ) {
+		if ( projectionConstructor == null ) {
 			throw log.invalidObjectClassForProjection( projectedType );
 		}
-		return composite;
+		return new ProjectionConstructorBinder<>( mappingHelper, projectionConstructor, this, nestingContext )
+				.bind();
+	}
+
+	@Override
+	public boolean isIncluded(String fieldPath) {
+		return parameterBinder.parent.nestingContext.nest( fieldPath,
+				// Ideally, for consistency, we'd expose an API relying on lambdas, like nest(...) does,
+				// but I must admit that's not exactly obvious to work with.
+				// Also the only reason that (rather convoluted) lambda-based SPI exists
+				// is because of @IndexedEmbedded.prefix, which may alters the name of nested fields...
+				// but we don't have an equivalent for @IndexedEmbedded.prefix in the case of @ObjectProjection.
+				// So we'll just use a more traditional API that simply returns a boolean.
+				(prefixedRelativeName, inclusion) -> TreeNodeInclusion.INCLUDED.equals( inclusion ) );
 	}
 
 	public BeanHolder<? extends ProjectionDefinition<? extends P>> applyBinder(ProjectionBinder binder) {
 		try {
+			this.mappingElement = new PojoConstructorParameterProjectionMappingElement( parameterBinder.parent.constructor,
+					parameterBinder.parameter, binder );
 			// This call should set the partial binding
 			binder.bind( this );
 			if ( partialBinding == null ) {
@@ -171,6 +247,7 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		}
 		finally {
 			partialBinding = null;
+			this.mappingElement = null;
 		}
 	}
 
@@ -185,6 +262,31 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 				(BeanHolder<? extends ProjectionDefinition<? extends P>>) definitionHolder;
 
 		this.partialBinding = new PartialBinding<>( castDefinitionHolder );
+	}
+
+	public BeanHolder<? extends ProjectionDefinition<?>> applyDefaultProjection() {
+		Optional<? extends ProjectionBindingContextImpl<?>.MultiContextImpl<?>> multi = multi();
+		PojoConstructorModel<?> constructorModelOrNull;
+		if ( multi.isPresent() ) {
+			constructorModelOrNull = parameterBinder.findProjectionConstructorOrNull(
+					multi.get().parameterContainerElementTypeModel.rawType() );
+		}
+		else {
+			constructorModelOrNull = parameterBinder.findProjectionConstructorOrNull(
+					parameterTypeModel.rawType() );
+		}
+		Optional<String> paramName = parameterRootElement.name();
+		if ( !paramName.isPresent() ) {
+			throw log.missingParameterNameForInferredProjection();
+		}
+		// We reuse projection binders instead of return projection definitions directly
+		// so that we take advantage of their handling of nesting filters.
+		if ( constructorModelOrNull != null ) {
+			return applyBinder( ObjectProjectionBinder.create( paramName.get() ) );
+		}
+		else {
+			return applyBinder( FieldProjectionBinder.create( paramName.get() ) );
+		}
 	}
 
 	private static class PartialBinding<P> {
