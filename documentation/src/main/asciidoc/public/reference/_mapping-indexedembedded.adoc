@@ -287,12 +287,18 @@ and for which all fields of the indexed-embedded element will be included,
 even if these fields are not included explicitly through `includePaths`,
 unless these fields are excluded explicitly through `excludePaths`:
 +
- * `includeDepth=0` means that fields of the indexed-embedded element are *not* included,
+ * `includeDepth=0` means that fields of this indexed-embedded element are *not* included,
 nor is any field of nested indexed-embedded elements,
 unless these fields are included explicitly through `includePaths`.
- * `includeDepth=1` means that fields of the indexed-embedded element *are* included,
+ * `includeDepth=1` means that fields of this indexed-embedded element *are* included,
 unless these fields are excluded explicitly through `excludePaths`,
-but *not* fields of nested indexed-embedded elements,
+but *not* fields of nested indexed-embedded elements (`@IndexedEmbedded` within this `@IndexedEmbedded`),
+unless these fields are included explicitly through `includePaths`.
+* `includeDepth=2` means that fields of this indexed-embedded element
+and fields of the immediately nested indexed-embedded (`@IndexedEmbedded` within this `@IndexedEmbedded`) elements *are* included,
+unless these fields are explicitly excluded through `excludePaths`,
+but *not* fields of nested indexed-embedded elements beyond that
+(`@IndexedEmbedded` within an `@IndexedEmbedded` within this `@IndexedEmbedded`),
 unless these fields are included explicitly through `includePaths`.
  * And so on.
 +

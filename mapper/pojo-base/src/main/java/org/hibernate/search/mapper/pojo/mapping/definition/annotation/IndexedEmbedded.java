@@ -163,16 +163,22 @@ public @interface IndexedEmbedded {
 	 * even if these fields are not included explicitly through {@code includePaths},
 	 * unless these fields are excluded explicitly through {@code excludePaths}:
 	 * <ul>
-	 * <li>{@code includeDepth=0} means fields of the indexed-embedded element are <strong>not</strong> included,
+	 * <li>{@code includeDepth=0} means fields of this indexed-embedded element are <strong>not</strong> included,
 	 * nor is any field of nested indexed-embedded elements,
 	 * unless these fields are included explicitly through {@link #includePaths()}.
-	 * <li>{@code includeDepth=1} means fields of the indexed-embedded element <strong>are</strong> included,
+	 * <li>{@code includeDepth=1} means fields of this indexed-embedded element <strong>are</strong> included,
 	 * unless these fields are explicitly excluded through {@code excludePaths},
-	 * but <strong>not</strong> fields of nested indexed-embedded elements,
+	 * but <strong>not</strong> fields of nested indexed-embedded elements ({@code @IndexedEmbedded} within this {@code @IndexedEmbedded}),
+	 * unless these fields are included explicitly through {@link #includePaths()}.
+	 * <li>{@code includeDepth=2} means fields of this indexed-embedded element <strong>are</strong> included,
+	 * and so are fields of the immediately nested indexed-embedded elements ({@code @IndexedEmbedded} within this {@code @IndexedEmbedded}),
+	 * unless these fields are explicitly excluded through {@code excludePaths},
+	 * but <strong>not</strong> fields of nested indexed-embedded elements beyond that
+	 * ({@code @IndexedEmbedded} within an {@code @IndexedEmbedded} within this {@code @IndexedEmbedded}),
 	 * unless these fields are included explicitly through {@link #includePaths()}.
 	 * <li>And so on.
 	 * </ul>
-	 * The default value depends on the value of {@link #includePaths()}/{@link #excludePaths()} attributes:
+	 * The default value depends on the value of {@link #includePaths()} attributes:
 	 * <ul>
 	 * <li>if {@link #includePaths()} is empty, the default is {@code Integer.MAX_VALUE} (include all fields at every level)</li>
 	 * <li>if {@link #includePaths()} is <strong>not</strong> empty, the default is {@code 0} (only include fields included explicitly).</li>
