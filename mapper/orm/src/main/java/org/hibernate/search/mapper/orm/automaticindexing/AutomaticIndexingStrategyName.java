@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
- * Strategy for automatic indexing in Hibernate Search.
+ * Strategy for listener-triggered indexing in Hibernate Search.
  *
  * @deprecated Use {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#INDEXING_LISTENERS_ENABLED} instead.
  */
@@ -23,7 +23,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public enum AutomaticIndexingStrategyName {
 
 	/**
-	 * No automatic indexing is performed:
+	 * No listener-triggered indexing is performed:
 	 * indexing will only happen when explicitly requested through APIs
 	 * such as {@link SearchSession#indexingPlan()}.
 	 *

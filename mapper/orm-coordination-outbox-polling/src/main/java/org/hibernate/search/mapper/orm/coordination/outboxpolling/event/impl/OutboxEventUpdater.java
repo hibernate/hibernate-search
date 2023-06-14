@@ -86,7 +86,7 @@ public class OutboxEventUpdater {
 				Instant processAfter = ( retryAfter > 0 ) ? Instant.now().plusSeconds( retryAfter ) : Instant.now();
 				event.setProcessAfter( processAfter );
 
-				log.automaticIndexingRetry(
+				log.backgroundIndexingRetry(
 						event.getId(), event.getEntityName(), event.getEntityId(), attempts, processAfter
 				);
 			}

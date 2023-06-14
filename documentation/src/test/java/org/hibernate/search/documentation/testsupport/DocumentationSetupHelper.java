@@ -138,7 +138,7 @@ public final class DocumentationSetupHelper
 			// Real backend => ensure we clean up everything before and after the tests
 			withProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
 					SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP );
-			// Override the automatic indexing synchronization strategy according to our needs for testing
+			// Override the indexing plan synchronization strategy according to our needs for testing
 			withProperty( HibernateOrmMapperSettings.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY,
 					IndexingPlanSynchronizationStrategyNames.SYNC );
 			// Set up default mapping if necessary

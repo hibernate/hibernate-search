@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 
 /**
  * Given a property, defines how a dependency of the indexing process to this property
- * should affect automatic indexing.
+ * should affect its reindexing.
  * <p>
  * This annotation is generally not needed, as the default behavior is to consider all properties
  * that are actually used in the indexing process as dependencies that trigger reindexing when they are updated.

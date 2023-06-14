@@ -49,9 +49,9 @@ public interface Log extends BasicLogger {
 	SearchException maxRetryExhausted(int retries);
 
 	@LogMessage(level = WARN)
-	@Message(id = ID_OFFSET + 4, value = "Automatic indexing failed for event #%1$s on entity of type '%2$s' with ID '%3$s'."
+	@Message(id = ID_OFFSET + 4, value = "Background indexing failed for event #%1$s on entity of type '%2$s' with ID '%3$s'."
 			+ " Attempts so far: %4$d. The event will be reprocessed after the moment: %5$s.")
-	void automaticIndexingRetry(UUID eventId, String entityName, String entityId, int attempts, Instant processAfter);
+	void backgroundIndexingRetry(UUID eventId, String entityName, String entityId, int attempts, Instant processAfter);
 
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 5, value = "Starting outbox event processor '%1$s': %2$s")

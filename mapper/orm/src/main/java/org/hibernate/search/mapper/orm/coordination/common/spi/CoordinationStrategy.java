@@ -43,7 +43,7 @@ public interface CoordinationStrategy {
 
 	/**
 	 * Creates a {@link PojoMassIndexerAgent},
-	 * able to exert control over other agents that could perform indexing concurrently (e.g. automatic indexing).
+	 * able to exert control over other agents that could perform indexing concurrently (e.g. background processing of entity change events with outbox-polling coordination strategy).
 	 *
 	 * @param context A context with information about the mass indexing that is about to start.
 	 * @return An agent.

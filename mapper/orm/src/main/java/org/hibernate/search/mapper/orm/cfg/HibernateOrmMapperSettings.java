@@ -42,7 +42,7 @@ public final class HibernateOrmMapperSettings {
 	public static final String ENABLED = PREFIX + Radicals.ENABLED;
 
 	/**
-	 * Whether automatic indexing is enabled, i.e. whether changes to entities in a Hibernate ORM session
+	 * Whether listener-triggered indexing is enabled, i.e. whether changes to entities in a Hibernate ORM session
 	 * are detected automatically and lead to reindexing.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
@@ -56,7 +56,7 @@ public final class HibernateOrmMapperSettings {
 	public static final String AUTOMATIC_INDEXING_ENABLED = PREFIX + Radicals.AUTOMATIC_INDEXING_ENABLED;
 
 	/**
-	 * How to enable or disable automatic indexing.
+	 * How to enable or disable listener-triggered indexing.
 	 * <p>
 	 * Expects a {@link org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName} value, or a String representation of such value.
 	 * <p>

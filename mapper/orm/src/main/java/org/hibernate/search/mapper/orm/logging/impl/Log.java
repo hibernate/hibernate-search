@@ -131,8 +131,8 @@ public interface Log extends BasicLogger {
 	SearchException hibernateSessionIsClosed(@Cause IllegalStateException cause);
 
 	@Message(id = ID_OFFSET + 18,
-			value = "Invalid automatic indexing synchronization strategy name: '%1$s'. Valid names are: %2$s.")
-	SearchException invalidAutomaticIndexingSynchronizationStrategyName(String invalidRepresentation,
+			value = "Invalid entity loading cache lookup strategy name: '%1$s'. Valid names are: %2$s.")
+	SearchException invalidEntityLoadingCacheLookupStrategyName(String invalidRepresentation,
 			List<String> validRepresentations);
 
 	@LogMessage(level = DEBUG)
@@ -156,10 +156,10 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 22, value = "Indexing failure: %1$s.\nThe following entities may not have been updated correctly in the index: %2$s.")
 	SearchException indexingFailure(String causeMessage, List<?> failingEntities, @Cause Throwable cause);
 
-	@Message(id = ID_OFFSET + 23, value = "Unable to process entities for automatic indexing before transaction completion: %1$s")
+	@Message(id = ID_OFFSET + 23, value = "Unable to process entities for indexing before transaction completion: %1$s")
 	SearchException synchronizationBeforeTransactionFailure(String causeMessage, @Cause Throwable cause);
 
-	@Message(id = ID_OFFSET + 24, value = "Unable to index documents for automatic indexing after transaction completion: %1$s")
+	@Message(id = ID_OFFSET + 24, value = "Unable to index documents for indexing after transaction completion: %1$s")
 	SearchException synchronizationAfterTransactionFailure(String causeMessage, @Cause Throwable cause);
 
 	@Message(id = ID_OFFSET + 25, value = "Unable to handle transaction: %1$s")
@@ -231,8 +231,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 41, value = "No such bean in bean container '%1$s'.")
 	BeanNotFoundException beanNotFoundInBeanContainer(BeanContainer beanContainer);
 
-	@Message(id = ID_OFFSET + 42, value = "Cannot customize the synchronization strategy: "
-			+ " the selected automatic indexing strategy always processes events asynchronously, through a queue.")
+	@Message(id = ID_OFFSET + 42, value = "Cannot customize the indexing plan synchronization strategy: "
+			+ " the selected coordination strategy always processes events asynchronously, through a queue.")
 	SearchException cannotConfigureSynchronizationStrategyWithIndexingEventQueue();
 
 	@LogMessage(level = WARN)

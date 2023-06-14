@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.automaticindexing;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 
 /**
- * Defines the impact that an update to a value in an entity will have on automatic indexing.
+ * Defines the impact that an update to a value in an entity will have on reindexing of this entity and containing entities.
  * <p>
  * A "value" here means either an entity property or something extracted from that property
  * using a {@link ContainerExtractor}.

@@ -195,7 +195,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 
 	@Override
 	public PojoMassIndexerAgent createMassIndexerAgent(PojoMassIndexerAgentCreateContext context) {
-		// No coordination: we don't prevent automatic indexing from continuing while mass indexing.
+		// No coordination: so we don't need to prevent outbox-polling event processing (since it's not supported) when doing mass-indexing.
 		return PojoMassIndexerAgent.noOp();
 	}
 

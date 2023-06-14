@@ -32,7 +32,7 @@ public class NoCoordinationStrategy implements CoordinationStrategy {
 
 	@Override
 	public PojoMassIndexerAgent createMassIndexerAgent(PojoMassIndexerAgentCreateContext context) {
-		// No coordination: we don't prevent automatic indexing from continuing while mass indexing.
+		// No coordination: we don't prevent background indexing from continuing while mass indexing.
 		return PojoMassIndexerAgent.noOp();
 	}
 

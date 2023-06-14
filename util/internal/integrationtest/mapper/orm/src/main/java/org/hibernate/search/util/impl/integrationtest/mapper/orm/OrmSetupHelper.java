@@ -149,7 +149,7 @@ public final class OrmSetupHelper
 			withProperties( DEFAULT_PROPERTIES );
 			// Override the schema management strategy according to our needs for testing
 			withProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY, schemaManagementStrategyName );
-			// Set the automatic indexing strategy according to the expectations
+			// Set the coordination strategy according to the expectations
 			withProperty( "hibernate.search.coordination.strategy", coordinationStrategyExpectations.strategyName );
 			// Ensure we don't build Jandex indexes needlessly:
 			// discovery based on Jandex ought to be tested in real projects that don't use this setup helper.

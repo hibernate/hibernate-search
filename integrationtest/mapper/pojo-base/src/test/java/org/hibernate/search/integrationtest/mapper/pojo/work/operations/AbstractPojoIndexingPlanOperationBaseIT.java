@@ -385,7 +385,7 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 							Level.ERROR,
 							ExceptionMatcherBuilder.isException( exception )
 									.build(),
-							"Automatic indexing of entities",
+							"Background indexing of entities",
 							"Entities that could not be indexed correctly:"
 					)
 					.once();

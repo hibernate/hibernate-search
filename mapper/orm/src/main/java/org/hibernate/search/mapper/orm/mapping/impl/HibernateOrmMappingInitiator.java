@@ -137,7 +137,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		coordinationStrategyHolder = coordinationStrategyConfiguration.strategyHolder();
 		configuredAutomaticIndexingStrategy = coordinationStrategyConfiguration.createAutomaticIndexingStrategy();
 
-		// If the automatic indexing strategy uses an event queue,
+		// If the underlying coordination strategy uses an event queue,
 		// it will need to send events relative to contained entities,
 		// and thus contained entities need to have an identity mapping.
 		containedEntityIdentityMappingRequired( configuredAutomaticIndexingStrategy.usesAsyncProcessing() );

@@ -31,7 +31,7 @@ public class ManualIndexingStrategyTest extends SearchTestBase {
 	public void testMultipleEntitiesPerIndex() throws Exception {
 		indexTestEntity();
 		assertEquals(
-				"Due to manual indexing being enabled no automatic indexing should have occurred",
+				"Due to manual indexing being enabled no listener-triggered indexing should have occurred",
 				0,
 				getNumberOfDocumentsInIndex( "TestEntity" )
 		);
