@@ -17,9 +17,6 @@ import java.util.Set;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.BackendsInfo;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
-import org.hibernate.search.engine.common.tree.spi.TreeFilterPathTracker;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
@@ -70,8 +67,7 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper<MPBS>,
-		IndexedEntityBindingMapperContext {
+public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper<MPBS> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -97,8 +93,6 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<PojoRawTypeModel<?>,PojoIndexedTypeManagerBuilder<?>> indexedTypeManagerBuilders =
 			new LinkedHashMap<>();
-	// Use a LinkedHashMap for deterministic iteration
-	private final Map<IndexedEmbeddedDefinition, TreeFilterPathTracker> pathTrackers = new LinkedHashMap<>();
 	private PojoSearchQueryElementRegistry searchQueryElementRegistry;
 
 	private boolean closed = false;
@@ -207,7 +201,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		}
 
 		if ( !failureCollector.hasFailure() ) {
-			checkPathTrackers();
+			mappingHelper.checkPathTrackers();
 		}
 
 		PojoSearchQueryElementRegistryBuilder searchQueryElementRegistryBuilder =
@@ -232,7 +226,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		String entityName = entityTypeMetadata.getEntityName();
 		String indexName = indexedTypeMetadata.indexName().orElse( entityName );
 
-		MappedIndexManagerBuilder indexManagerBuilder = indexManagerFactory.createMappedIndexManager( this,
+		MappedIndexManagerBuilder indexManagerBuilder = indexManagerFactory.createMappedIndexManager( mappingHelper,
 				delegate, indexedTypeMetadata.backendName(), indexName, entityName );
 
 		Optional<RoutingBinder> routingBinderOptional = indexedTypeMetadata.routingBinder();
@@ -361,35 +355,6 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 					.push( PojoMapperDelegate::closeOnFailure, delegate )
 					.push( mappingDelegate );
 			throw e;
-		}
-	}
-
-	@Override
-	public TreeFilterPathTracker getOrCreatePathTracker(IndexedEmbeddedDefinition definition) {
-		return pathTrackers.computeIfAbsent( definition, d -> new TreeFilterPathTracker( d.filter() ) );
-	}
-
-	private void checkPathTrackers() {
-		for ( Map.Entry<IndexedEmbeddedDefinition, TreeFilterPathTracker> entry : pathTrackers.entrySet() ) {
-			TreeFilterPathTracker pathTracker = entry.getValue();
-			Set<String> uselessIncludePaths = pathTracker.uselessIncludePaths();
-			if ( !uselessIncludePaths.isEmpty() ) {
-				Set<String> encounteredFieldPaths = pathTracker.encounteredFieldPaths();
-				failureCollector.add( log.uselessIncludePathFilters(
-						uselessIncludePaths, encounteredFieldPaths,
-						EventContexts.fromType( entry.getKey().definingTypeModel() )
-				) );
-			}
-
-			Set<String> uselessExcludePaths = pathTracker.uselessExcludePaths();
-			// this would mean that we have a path in excludes that is unavailable
-			if ( !uselessExcludePaths.isEmpty() ) {
-				Set<String> encounteredFieldPaths = pathTracker.encounteredFieldPaths();
-				failureCollector.add( log.uselessExcludePathFilters(
-						uselessExcludePaths, encounteredFieldPaths,
-						EventContexts.fromType( entry.getKey().definingTypeModel() )
-				) );
-			}
 		}
 	}
 

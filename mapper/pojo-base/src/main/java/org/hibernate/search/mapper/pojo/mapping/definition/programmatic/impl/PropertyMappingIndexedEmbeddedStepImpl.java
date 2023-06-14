@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCol
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingIndexedEmbeddedStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.annotation.Search5DeprecatedAPI;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -30,7 +30,7 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoRawTypeModel<?> definingTypeModel;
+	private final PojoRawTypeIdentifier<?> definingType;
 
 	private final String relativeFieldName;
 
@@ -47,10 +47,10 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 
 	private ContainerExtractorPath extractorPath = ContainerExtractorPath.defaultExtractors();
 
-	PropertyMappingIndexedEmbeddedStepImpl(PropertyMappingStep parent, PojoRawTypeModel<?> definingTypeModel,
+	PropertyMappingIndexedEmbeddedStepImpl(PropertyMappingStep parent, PojoRawTypeIdentifier<?> definingType,
 			String relativeFieldName) {
 		super( parent );
-		this.definingTypeModel = definingTypeModel;
+		this.definingType = definingType;
 		if ( relativeFieldName != null && relativeFieldName.contains( FieldPaths.PATH_SEPARATOR_STRING ) ) {
 			throw log.invalidFieldNameDotNotAllowed( relativeFieldName );
 		}
@@ -67,7 +67,7 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 			actualPrefix = prefix;
 		}
 		collector.value( extractorPath ).indexedEmbedded(
-				definingTypeModel, actualPrefix, structure,
+				definingType, actualPrefix, structure,
 				new TreeFilterDefinition( includeDepth, includePaths, excludePaths ),
 				includeEmbeddedObjectId, targetType
 		);

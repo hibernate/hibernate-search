@@ -14,7 +14,7 @@ import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.common.tree.impl.ConfiguredTreeNestingContext;
 import org.hibernate.search.engine.common.tree.impl.ExcludeAllTreeNestingContext;
 import org.hibernate.search.engine.common.tree.impl.NotifyingTreeNestingContext;
-import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 import org.hibernate.search.util.common.SearchException;
 
 public interface TreeNestingContext {
@@ -73,7 +73,9 @@ public interface TreeNestingContext {
 	 * <p>
 	 * If the resulting context excludes everything, this method returns {@link Optional#empty()}.
 	 *
-	 * @param definingTypeModel The model representing the type on which the filter was defined.
+	 * @param mappingElement A unique representation of the mapping element defining the filter;
+	 * if the same mapping is applied in multiple places,
+	 * this method must be called with mapping elements that are equal according to {@link MappingElement#equals(Object)}/{@link MappingElement#hashCode()}.
 	 * @param relativePrefix The prefix to prepend to the relative path of all nodes nested in the resulting context.
 	 * @param definition The filter definition (included paths, ...).
 	 * @param pathTracker The path tracker, for detection of useless filters.
@@ -83,10 +85,10 @@ public interface TreeNestingContext {
 	 * @param <T> The type of the created context.
 	 * @return The created context.
 	 */
-	<T> Optional<T> nestComposed(MappableTypeModel definingTypeModel, String relativePrefix,
+	<T> Optional<T> nestComposed(MappingElement mappingElement, String relativePrefix,
 			TreeFilterDefinition definition,
 			TreeFilterPathTracker pathTracker, NestedContextBuilder<T> contextBuilder,
-			BiFunction<MappableTypeModel, String, SearchException> cyclicRecursionExceptionFactory);
+			BiFunction<MappingElement, String, SearchException> cyclicRecursionExceptionFactory);
 
 	static TreeNestingContext root() {
 		return ConfiguredTreeNestingContext.ROOT;

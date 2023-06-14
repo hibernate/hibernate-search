@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.logging.impl;
 
+import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 import org.hibernate.search.mapper.pojo.model.path.spi.ProjectionConstructorPath;
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
@@ -134,12 +135,13 @@ public interface Log extends BasicLogger {
 	SearchException missingIdentifierMapping(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 216,
-			value = "An @IndexedEmbedded defines includePaths filters that do not match anything."
-					+ " Non-matching includePaths filters: %1$s."
-					+ " Encountered field paths: %2$s."
+			value = "%1$s defines includePaths filters that do not match anything."
+					+ " Non-matching includePaths filters: %2$s."
+					+ " Encountered field paths: %3$s."
 					+ " Check the filters for typos, or remove them if they are not useful."
 	)
-	SearchException uselessIncludePathFilters(Set<String> nonMatchingIncludePaths, Set<String> encounteredFieldPaths,
+	SearchException uselessIncludePathFilters(MappingElement mappingElement,
+			Set<String> nonMatchingIncludePaths, Set<String> encounteredFieldPaths,
 			@Param EventContext eventContext);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 221,
@@ -871,12 +873,13 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<?> rawClass);
 
 	@Message(id = ID_OFFSET + 142,
-			value = "An @IndexedEmbedded defines excludePaths filters that do not match anything."
-					+ " Non-matching excludePaths filters: %1$s."
-					+ " Encountered field paths: %2$s."
+			value = "%1$s defines excludePaths filters that do not match anything."
+					+ " Non-matching excludePaths filters: %2$s."
+					+ " Encountered field paths: %3$s."
 					+ " Check the filters for typos, or remove them if they are not useful."
 	)
-	SearchException uselessExcludePathFilters(Set<String> nonMatchingExcludePaths, Set<String> encounteredFieldPaths,
+	SearchException uselessExcludePathFilters(MappingElement mappingElement,
+			Set<String> nonMatchingExcludePaths, Set<String> encounteredFieldPaths,
 			@Param EventContext eventContext);
 
 }
