@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
 import org.hibernate.search.mapper.pojo.standalone.cfg.spi.StandalonePojoMapperSpiSettings;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
@@ -69,11 +70,18 @@ public final class StandalonePojoMappingSetupHelper
 	private final MethodHandles.Lookup lookup;
 	private final SchemaManagementStrategyName schemaManagementStrategyName;
 
+	private ReindexOnUpdate defaultReindexOnUpdate;
+
 	private StandalonePojoMappingSetupHelper(MethodHandles.Lookup lookup, BackendSetupStrategy backendSetupStrategy,
 			SchemaManagementStrategyName schemaManagementStrategyName) {
 		super( backendSetupStrategy );
 		this.lookup = lookup;
 		this.schemaManagementStrategyName = schemaManagementStrategyName;
+	}
+
+	public StandalonePojoMappingSetupHelper disableAssociationReindexing() {
+		this.defaultReindexOnUpdate = ReindexOnUpdate.SHALLOW;
+		return this;
 	}
 
 	@Override
@@ -102,6 +110,9 @@ public final class StandalonePojoMappingSetupHelper
 			// Ensure we don't build Jandex indexes needlessly:
 			// discovery based on Jandex ought to be tested in real projects that don't use this setup helper.
 			withConfiguration( builder -> builder.annotationMapping().buildMissingDiscoveredJandexIndexes( false ) );
+			if ( defaultReindexOnUpdate != null ) {
+				withConfiguration( builder -> builder.defaultReindexOnUpdate( defaultReindexOnUpdate ) );
+			}
 		}
 
 		@Override

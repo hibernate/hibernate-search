@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.engine.search.projection.definition.spi;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinitionContext;
@@ -16,12 +19,20 @@ import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 @Incubating
 public final class ConstantProjectionDefinition<T> extends AbstractProjectionDefinition<T> {
 	@SuppressWarnings("rawtypes")
-	public static final BeanHolder<? extends ConstantProjectionDefinition> NULL_VALUE_INSTANCE =
+	private static final BeanHolder<? extends ConstantProjectionDefinition> NULL_VALUE_INSTANCE =
 			BeanHolder.of( new ConstantProjectionDefinition<Void>( null ) );
+	@SuppressWarnings("rawtypes")
+	private static final BeanHolder<? extends ConstantProjectionDefinition> EMPTY_LIST_INSTANCE =
+			BeanHolder.of( new ConstantProjectionDefinition<List>( Collections.emptyList() ) );
 
 	@SuppressWarnings("unchecked") // NULL_VALUE_INSTANCE works for any T
 	public static <T> BeanHolder<ConstantProjectionDefinition<T>> nullValue() {
 		return (BeanHolder<ConstantProjectionDefinition<T>>) NULL_VALUE_INSTANCE;
+	}
+
+	@SuppressWarnings("unchecked") // EMPTY_LIST_INSTANCE works for any T
+	public static <T> BeanHolder<ConstantProjectionDefinition<List<T>>> emptyList() {
+		return (BeanHolder<ConstantProjectionDefinition<List<T>>>) EMPTY_LIST_INSTANCE;
 	}
 
 	private final T value;

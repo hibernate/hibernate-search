@@ -10,12 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectProjection;
 import org.hibernate.search.mapper.pojo.model.PojoModelConstructorParameter;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -95,19 +97,26 @@ public interface ProjectionBindingContext {
 	/**
 	 * @param fieldPath The (relative) path to an object field in the indexed document.
 	 * @param projectedType A type expected to have a corresponding projection mapping
-	 * (e.g. using {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor})
+	 * (e.g. using {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor}).
+	 * @param filter The filter to apply to determine which nested index field projections should be included in the projection.
+	 * See {@link ObjectProjection#includePaths()}, {@link ObjectProjection#excludePaths()},
+	 * {@link ObjectProjection#includeDepth()}, ...
 	 * @return A single-valued object projection definition for the given type.
 	 * @throws SearchException If mapping the given type to a projection definition fails.
 	 * @see org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory#object(String)
 	 * @see org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep#as(Class)
 	 */
 	@Incubating
-	<T> BeanHolder<? extends ProjectionDefinition<T>> createObjectDefinition(String fieldPath, Class<T> projectedType);
+	<T> BeanHolder<? extends ProjectionDefinition<T>> createObjectDefinition(String fieldPath, Class<T> projectedType,
+			TreeFilterDefinition filter);
 
 	/**
 	 * @param fieldPath The (relative) path to an object field in the indexed document.
 	 * @param projectedType A type expected to have a corresponding projection mapping
-	 * (e.g. using {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor})
+	 * (e.g. using {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor}).
+	 * @param filter The filter to apply to determine which nested index field projections should be included in the projection.
+	 * See {@link ObjectProjection#includePaths()}, {@link ObjectProjection#excludePaths()},
+	 * {@link ObjectProjection#includeDepth()}, ...
 	 * @return A multi-valued object projection definition for the given type.
 	 * @throws SearchException If mapping the given type to a projection definition fails.
 	 * @see org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory#object(String)
@@ -115,7 +124,7 @@ public interface ProjectionBindingContext {
 	 */
 	@Incubating
 	<T> BeanHolder<? extends ProjectionDefinition<List<T>>> createObjectDefinitionMulti(String fieldPath,
-			Class<T> projectedType);
+			Class<T> projectedType, TreeFilterDefinition filter);
 
 	/**
 	 * @param projectedType A type expected to have a corresponding projection mapping
@@ -127,5 +136,17 @@ public interface ProjectionBindingContext {
 	 */
 	@Incubating
 	<T> BeanHolder<? extends ProjectionDefinition<T>> createCompositeDefinition(Class<T> projectedType);
+
+	/**
+	 * @param fieldPath The (relative) path to an object field in the indexed document.
+	 * @return {@code true} if the field with the given path is included according to surrounding
+	 * {@link TreeFilterDefinition filters}
+	 * (see {@link ObjectProjection#includePaths()}, {@link ObjectProjection#excludePaths()},
+	 * {@link ObjectProjection#includeDepth()}, ...).
+	 * {@code false} otherwise.
+	 * Projections on excluded fields should be replaced with a constant projection
+	 * returning {@code null} or an empty list, as appropriate.
+	 */
+	boolean isIncluded(String fieldPath);
 
 }

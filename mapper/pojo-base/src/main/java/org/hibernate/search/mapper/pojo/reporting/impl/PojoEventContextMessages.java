@@ -31,6 +31,9 @@ public interface PojoEventContextMessages {
 	@Message(value = "constructor with parameter types %1$s")
 	String constructor(@FormatWith(CommaSeparatedClassesFormatter.class) Class<?>[] parameterTypes);
 
+	@Message(value = "projection constructor")
+	String projectionConstructor();
+
 	@Message(value = "parameter at index %1$s (%2$s)")
 	String methodParameter(int index, String name);
 

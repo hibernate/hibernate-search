@@ -142,6 +142,8 @@ Constructor parameters can be annotated with explicit projection annotations suc
 For projections that would normally be <<mapping-projection-inner-inference,inferred automatically>>,
 this allows further customization, for example in a <<search-dsl-projection-field-mapping,field projection>>
 to set the target field path explicitly or to disable value conversion.
+Alternatively, in an <<search-dsl-projection-object-mapping,object projection>>,
+this also allows <<search-dsl-projection-object-mapping-filters,breaking cycles of nested object projections>>.
 
 For other projections such as <<search-dsl-projection-id-mapping,identifier projection>>,
 this is actually the only way to use them in a projection constructor,

@@ -46,6 +46,7 @@ import org.hibernate.search.util.common.data.impl.LinkedNode;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormatter;
 import org.hibernate.search.util.common.logging.impl.EventContextFormatter;
+import org.hibernate.search.util.common.logging.impl.EventContextNoPrefixFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.SimpleNameClassFormatter;
 import org.hibernate.search.util.common.logging.impl.ToStringTreeMultilineFormatter;
@@ -712,7 +713,7 @@ public interface Log extends BasicLogger {
 					+ " Either make sure this class was compiled with the '-parameters' compiler flag,"
 					+ " or set the path explicitly with '@FieldProjection(path = ...)'"
 					+ " or '@ObjectProjection(path = ...)'.")
-	SearchException missingParameterNameForProjectionConstructor();
+	SearchException missingParameterNameForInferredProjection();
 
 	@Message(id = ID_OFFSET + 115,
 			value = "Invalid parameter type for projection constructor: %1$s."
@@ -733,9 +734,13 @@ public interface Log extends BasicLogger {
 	void constructorProjection(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
 			@FormatWith(ToStringTreeMultilineFormatter.class) PojoConstructorProjectionDefinition<?> projectionDefinition);
 
-	@Message(id = ID_OFFSET + 118,
-			value = "Infinite object projection recursion:\n%1$s")
-	SearchException infiniteRecursionForProjectionConstructor(ProjectionConstructorPath path);
+	@Message(id = ID_OFFSET + 118, value = "Cyclic recursion starting from '%1$s' on %2$s."
+			+ " Index field path starting from that location and ending with a cycle: '%3$s'."
+			+ " A projection constructor cannot declare an unrestricted @ObjectProjection to itself, even indirectly."
+			+ " To break the cycle, you should consider adding filters to your @ObjectProjection: includePaths, includeDepth, excludePaths, ...")
+	SearchException objectProjectionCyclicRecursion(MappingElement objectProjection,
+			@FormatWith(EventContextNoPrefixFormatter.class) EventContext objectProjectionLocation,
+			String cyclicRecursionIndexFieldPath);
 
 	@Message(id = ID_OFFSET + 119,
 			value = "Exception while retrieving the Jandex index for code source location '%1$s': %2$s")

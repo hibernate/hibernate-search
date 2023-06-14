@@ -13,7 +13,6 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.definition.ProjectionDefinition;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
@@ -26,10 +25,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoMethodParameterModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
-import org.hibernate.search.engine.search.projection.definition.spi.FieldProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.ConstantProjectionDefinition;
-import org.hibernate.search.engine.search.projection.definition.spi.ObjectProjectionDefinition;
-import org.hibernate.search.mapper.pojo.search.definition.impl.PojoConstructorProjectionDefinition;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -100,13 +96,7 @@ class ProjectionConstructorParameterBinder<P> implements EventContextProvider {
 		else {
 			ProjectionBindingContextImpl<?> bindingContext =
 					new ProjectionBindingContextImpl<>( this, Collections.emptyMap() );
-			Optional<? extends ProjectionBindingContextImpl<?>.MultiContextImpl<?>> multi = bindingContext.multi();
-			if ( multi.isPresent() ) {
-				return defaultInnerProjection( multi.get().parameterContainerElementTypeModel.rawType(), true );
-			}
-			else {
-				return defaultInnerProjection( parameter.typeModel().rawType(), false );
-			}
+			return bindingContext.applyDefaultProjection();
 		}
 	}
 
@@ -124,33 +114,8 @@ class ProjectionConstructorParameterBinder<P> implements EventContextProvider {
 		}
 	}
 
-	@SuppressWarnings("resource") // ECJ (Eclipse compiler) incorrectly complains about a resource leak
-	private BeanHolder<? extends ProjectionDefinition<?>> defaultInnerProjection(PojoRawTypeModel<?> elementType, boolean multi) {
-		PojoConstructorProjectionDefinition<?> definition = createConstructorProjectionDefinitionOrNull( elementType );
-		if ( definition != null ) {
-			return BeanHolder.ofCloseable( multi
-					? new ObjectProjectionDefinition.MultiValued<>( paramNameOrFail(), definition )
-					: new ObjectProjectionDefinition.SingleValued<>( paramNameOrFail(), definition ) );
-		}
-		else {
-			// No projection constructor for this type; assume it's a projection on a value field
-			return BeanHolder.of( multi
-					? new FieldProjectionDefinition.MultiValued<>( paramNameOrFail(), elementType.typeIdentifier().javaClass(), ValueConvert.YES )
-					: new FieldProjectionDefinition.SingleValued<>( paramNameOrFail(), elementType.typeIdentifier().javaClass(), ValueConvert.YES ) );
-		}
-	}
-
-	private String paramNameOrFail() {
-		Optional<String> paramName = parameter.name();
-		if ( !paramName.isPresent() ) {
-			throw log.missingParameterNameForProjectionConstructor();
-		}
-		return paramName.get();
-	}
-
-	<T> PojoConstructorProjectionDefinition<T> createConstructorProjectionDefinitionOrNull(
-			PojoRawTypeModel<T> projectedType) {
-		PojoConstructorProjectionDefinition<T> result = null;
+	<T> PojoConstructorModel<T> findProjectionConstructorOrNull(PojoRawTypeModel<T> projectedType) {
+		PojoSearchMappingConstructorNode result = null;
 		for ( PojoTypeMetadataContributor contributor : mappingHelper.contributorProvider()
 				// Constructor mapping is not inherited
 				.getIgnoringInheritance( projectedType ) ) {
@@ -160,13 +125,11 @@ class ProjectionConstructorParameterBinder<P> implements EventContextProvider {
 						throw log.multipleProjectionConstructorsForType(
 								projectedType.typeIdentifier().javaClass() );
 					}
-					PojoConstructorModel<T> constructor = projectedType.constructor(
-							constructorMapping.parametersJavaTypes() );
-					result = new ProjectionConstructorBinder<>( mappingHelper, constructor, this )
-							.bind();
+					result = constructorMapping;
 				}
 			}
 		}
-		return result;
+		return result == null ? null : projectedType.constructor( result.parametersJavaTypes() );
 	}
+
 }
