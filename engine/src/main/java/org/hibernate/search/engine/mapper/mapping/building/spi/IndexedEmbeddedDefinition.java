@@ -52,19 +52,14 @@ public final class IndexedEmbeddedDefinition {
 					excludePaths
 			);
 		}
-		if ( includeDepth == null && !( this.includePaths.isEmpty() && this.excludePaths.isEmpty() ) ) {
+		if ( includeDepth == null && !this.includePaths.isEmpty() ) {
 			/*
-			 * If no max depth was provided and
-			 * a)  included paths were provided,
+			 * If no max depth was provided and included paths were provided,
 			 * the remaining composition depth is implicitly set to 0,
 			 * meaning no composition is allowed and paths are excluded unless
 			 * explicitly listed in "includePaths".
-			 * b)  excluded paths were provided,
-			 * the remaining composition depth is implicitly set to Integer.MAX_VALUE,
-			 * meaning no composition is allowed and paths are included unless
-			 * explicitly listed in "excludePaths".
 			 */
-			this.includeDepth = this.includePaths.isEmpty() ? Integer.MAX_VALUE : 0;
+			this.includeDepth = 0;
 		}
 		else {
 			this.includeDepth = includeDepth;
