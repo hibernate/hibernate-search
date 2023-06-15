@@ -1674,7 +1674,7 @@ public class IndexedEmbeddedBaseIT {
 	}
 
 	@Test
-	public void cycleBrokenByExcludePaths() {
+	public void cycle_brokenByExcludePaths() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
@@ -1760,6 +1760,101 @@ public class IndexedEmbeddedBaseIT {
 	}
 
 	@Test
+	public void cycle_brokenByExcludePaths_deeply() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class EntityA {
+				@DocumentId
+				Integer id;
+				@KeywordField
+				String aString;
+
+				@IndexedEmbedded
+				@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW) // just to not bother with inverse sides
+				EntityB b;
+
+				public EntityA(Integer id, String aString, EntityB b) {
+					this.id = id;
+					this.aString = aString;
+					this.b = b;
+				}
+			}
+
+			class EntityB {
+				Integer id;
+
+				@KeywordField
+				String bString;
+				@IndexedEmbedded(excludePaths = "b.a.b.a")
+				EntityA a;
+
+				public EntityB(Integer id, String bString, EntityA a) {
+					this.id = id;
+					this.bString = bString;
+					this.a = a;
+				}
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "aString", String.class )
+				.objectField( "b", b2 -> b2
+						.field( "bString", String.class )
+						.objectField( "a", b3 -> b3
+								.field( "aString", String.class )
+								.objectField( "b", b4 -> b4
+										.field( "bString", String.class )
+										.objectField( "a", b5 -> b5
+												.field( "aString", String.class )
+												.objectField( "b", b6 -> b6
+														.field( "bString", String.class )
+												)
+										)
+								)
+						)
+				)
+		);
+
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.setup();
+
+		backendMock.verifyExpectationsMet();
+
+		Model model = new Model();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> model.new EntityA( id, "a",
+						model.new EntityB( 1, "b",
+								model.new EntityA( 2, "aa",
+										model.new EntityB( 3, "bb",
+												model.new EntityA( 4, "aaa",
+														model.new EntityB( 5, "bbb",
+																model.new EntityA( 6, "aaaa",
+																		model.new EntityB( 7, "bbbb",
+																				null
+												) ) ) ) ) ) ) ),
+				document -> document.field( "aString", "a" )
+						.objectField( "b", b2 -> b2
+								.field( "bString", "b" )
+								.objectField( "a", b3 -> b3
+										.field( "aString", "aa" )
+										.objectField( "b", b4 -> b4
+												.field( "bString", "bb" )
+												.objectField( "a", b5 -> b5
+														.field( "aString", "aaa" )
+														.objectField( "b", b6 -> b6
+																.field( "bString", "bbb" )
+														)
+												)
+										)
+								)
+						)
+		);
+	}
+
+	@Test
 	public void cycle() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
@@ -1825,6 +1920,40 @@ public class IndexedEmbeddedBaseIT {
 								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ..." )
 				);
 	}
+
+	@Test
+	public void cycle_irrelevantExcludePaths() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class EntityA {
+				@DocumentId
+				Integer id;
+				@IndexedEmbedded(excludePaths = "bString")
+				EntityB b;
+			}
+			class EntityB {
+				Integer id;
+				@GenericField
+				String bString;
+				@IndexedEmbedded
+				EntityA a;
+			}
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.setup() )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( Model.EntityA.class.getName() )
+						.pathContext( ".b<no value extractors>.a<no value extractors>.b" )
+						.failure( "Cyclic @IndexedEmbedded recursion starting from type '" + Model.EntityA.class.getName() + "'",
+								"Path starting from that type and ending with a cycle: 'b.a.b.'",
+								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
+								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ..." )
+				);
+	}
+
 
 	/*
 	 * We are trying to include something that is not reachable
