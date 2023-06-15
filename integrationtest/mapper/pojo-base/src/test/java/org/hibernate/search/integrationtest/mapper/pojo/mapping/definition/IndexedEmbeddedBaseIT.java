@@ -1847,6 +1847,92 @@ public class IndexedEmbeddedBaseIT {
 	}
 
 	@Test
+	public void cycle_brokenByExcludePathsWithPrefixNoDot() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class EntityA {
+				@DocumentId
+				Integer id;
+				@KeywordField
+				String aString;
+
+				@IndexedEmbedded(prefix = "prefixForB")
+				@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW) // just to not bother with inverse sides
+				EntityB b;
+
+				public EntityA(Integer id, String aString, EntityB b) {
+					this.id = id;
+					this.aString = aString;
+					this.b = b;
+				}
+			}
+
+			class EntityB {
+				Integer id;
+
+				@KeywordField
+				String bString;
+				@IndexedEmbedded(prefix = "prefixForA", excludePaths = {"prefixForBprefixForA"})
+				EntityA a;
+
+				public EntityB(Integer id, String bString, EntityA a) {
+					this.id = id;
+					this.bString = bString;
+					this.a = a;
+				}
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "aString", String.class )
+				.objectField( "prefixForB", b2 -> b2
+						.field( "bString", String.class )
+						.objectField( "prefixForA", b3 -> b3
+								.field( "aString", String.class )
+								.objectField( "prefixForB", b4 -> b4
+										.field( "bString", String.class )
+								)
+						)
+				)
+		);
+
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.setup();
+
+		backendMock.verifyExpectationsMet();
+
+		Model model = new Model();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> model.new EntityA(
+						id, "a",
+						model.new EntityB(
+								1, "b",
+								model.new EntityA( 2, "aa",
+										model.new EntityB( 3, "bb",
+												model.new EntityA( 4, "aaa",
+														model.new EntityB( 5, "bbb", model.new EntityA( 6, "aaaa", null ) )
+												)
+										)
+								)
+						)
+				),
+				document -> document.field( "aString", "a" )
+						.objectField( "prefixForB", b2 -> b2
+								.field( "bString", "b" )
+								.objectField( "prefixForA", b3 -> b3
+										.field( "aString", "aa" )
+										.objectField( "prefixForB", b4 -> b4
+												.field( "bString", "bb" )
+										)
+								)
+						)
+		);
+	}
+
+	@Test
 	public void cycle_brokenByExcludePaths_deeply() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
