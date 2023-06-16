@@ -1855,6 +1855,85 @@ public class IndexedEmbeddedBaseIT {
 	}
 
 	@Test
+	public void cycle_brokenByExcludePaths_deeply_nonRoot() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class EntityA {
+				@DocumentId
+				Integer id;
+				@KeywordField
+				String aString;
+				@IndexedEmbedded(excludePaths = "c.b.c.b")
+				EntityB b;
+				public EntityA(Integer id, String aString, EntityB b) {
+					this.id = id;
+					this.aString = aString;
+					this.b = b;
+				}
+			}
+			class EntityB {
+				Integer id;
+				@KeywordField
+				String bString;
+				@IndexedEmbedded
+				EntityC c;
+				public EntityB(Integer id, String bString, EntityC c) {
+					this.id = id;
+					this.bString = bString;
+					this.c = c;
+				}
+			}
+			class EntityC {
+				Integer id;
+				@GenericField
+				String cString;
+				@IndexedEmbedded
+				EntityB b;
+				public EntityC(Integer id, String cString, EntityB b) {
+					this.id = id;
+					this.cString = cString;
+					this.b = b;
+				}
+			}
+		}
+
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.setup();
+
+		backendMock.verifyExpectationsMet();
+
+		Model model = new Model();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> model.new EntityA( id, "a",
+						model.new EntityB( 1, "b",
+								model.new EntityC( 2, "c",
+										model.new EntityB( 3, "bb",
+												model.new EntityC( 4, "cc",
+														model.new EntityB( 5, "bbb",
+																model.new EntityC( 6, "ccc",
+																		model.new EntityB( 7, "bbbb",
+																				null
+																		) ) ) ) ) ) ) ),
+				document -> document.field( "aString", "a" )
+						.objectField( "b", b2 -> b2
+								.field( "bString", "b" )
+								.objectField( "c", b3 -> b3
+										.field( "cString", "c" )
+										.objectField( "b", b4 -> b4
+												.field( "bString", "bb" )
+												.objectField( "c", b5 -> b5
+														.field( "cString", "cc" )
+												)
+										)
+								)
+						)
+		);
+	}
+
+	@Test
 	public void cycle() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
@@ -1949,6 +2028,44 @@ public class IndexedEmbeddedBaseIT {
 						.pathContext( ".b<no value extractors>.a<no value extractors>.b" )
 						.failure( "Cyclic @IndexedEmbedded recursion starting from type '" + Model.EntityA.class.getName() + "'",
 								"Path starting from that type and ending with a cycle: 'b.a.b.'",
+								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
+								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ..." )
+				);
+	}
+
+	@Test
+	public void cycle_nonRoot_irrelevantExcludePaths() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class EntityA {
+				@DocumentId
+				Integer id;
+				@IndexedEmbedded(excludePaths = "c.b.c.b.c.cString")
+				EntityB b;
+			}
+			class EntityB {
+				Integer id;
+				@IndexedEmbedded
+				EntityC c;
+			}
+			class EntityC {
+				Integer id;
+				@GenericField
+				String cString;
+				@IndexedEmbedded
+				EntityB b;
+			}
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.setup() )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( Model.EntityA.class.getName() )
+						.pathContext( ".b<no value extractors>.c<no value extractors>.b<no value extractors>.c" )
+						.failure( "Cyclic @IndexedEmbedded recursion starting from type '" + Model.EntityB.class.getName() + "'",
+								"Path starting from that type and ending with a cycle: 'c.b.c.'",
 								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ..." )
 				);
