@@ -253,7 +253,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		PojoIndexedTypeManagerBuilder<E> builder = new PojoIndexedTypeManagerBuilder<>( entityName, indexedEntityType,
 				mappingHelper, indexManagerBuilder,
 				delegate.createIndexedTypeExtendedMappingCollector( indexedEntityType, entityName ),
-				providedIdentifierBridge, routingBridge, mappingHelper.beanResolver() );
+				providedIdentifierBridge, routingBridge );
 
 		// Put the builder in the map before anything else, so it will be closed on error
 		indexedTypeManagerBuilders.put( indexedEntityType, builder );
@@ -416,8 +416,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 					reindexingResolver.associationInverseSideResolver().dirtyContainingAssociationFilter() );
 
 			PojoRootIdentityMappingCollector<T> identityMappingCollector = new PojoRootIdentityMappingCollector<>(
-					entityType, mappingHelper, Optional.empty(), providedIdentifierBridge,
-					mappingHelper.beanResolver()
+					entityType, mappingHelper, Optional.empty(), providedIdentifierBridge
 			);
 			collectIndexMapping( entityType, identityMappingCollector.toMappingCollectorRootNode() );
 			IdentifierMappingImplementor<?, T> identifierMapping = identityMappingCollector

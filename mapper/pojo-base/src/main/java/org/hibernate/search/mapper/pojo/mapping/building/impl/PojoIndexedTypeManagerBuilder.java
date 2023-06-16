@@ -12,7 +12,6 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoImplicitReindexingResolverBuildingHelper;
@@ -61,8 +60,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 			MappedIndexManagerBuilder indexManagerBuilder,
 			PojoIndexedTypeExtendedMappingCollector extendedMappingCollector,
 			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge,
-			BoundRoutingBridge<E> routingBridge,
-			BeanResolver beanResolver) {
+			BoundRoutingBridge<E> routingBridge) {
 		this.entityName = entityName;
 		this.typeModel = typeModel;
 		this.indexManagerBuilder = indexManagerBuilder;
@@ -71,8 +69,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 				typeModel,
 				mappingHelper,
 				Optional.of( indexManagerBuilder.rootBindingContext() ),
-				providedIdentifierBridge,
-				beanResolver
+				providedIdentifierBridge
 		);
 		this.routingBridge = routingBridge;
 		this.processorBuilder = new PojoIndexingProcessorOriginalTypeNodeBuilder<>(
