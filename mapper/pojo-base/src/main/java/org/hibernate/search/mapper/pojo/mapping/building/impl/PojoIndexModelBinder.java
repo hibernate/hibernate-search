@@ -107,7 +107,13 @@ public final class PojoIndexModelBinder {
 			BoundPojoModelPathPropertyNode<?, I> modelPath,
 			IdentifierBinder binder, Map<String, Object> params) {
 		PojoTypeModel<I> identifierTypeModel = modelPath.valueWithoutExtractors().getTypeModel();
+		return bindIdentifier( indexedEntityBindingContext, identifierTypeModel, binder, params );
+	}
 
+	public <I> BoundIdentifierBridge<I> bindIdentifier(
+			Optional<IndexedEntityBindingContext> indexedEntityBindingContext,
+			PojoTypeModel<I> identifierTypeModel,
+			IdentifierBinder binder, Map<String, Object> params) {
 		IdentifierBinder defaultedBinder = binder;
 		if ( binder == null ) {
 			defaultedBinder = bridgeResolver.resolveIdentifierBinderForType( identifierTypeModel );

@@ -12,10 +12,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
@@ -36,7 +36,6 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 	private final Optional<IndexedEntityBindingContext> bindingContext;
 
 	private final BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge;
-	private final BeanResolver beanResolver;
 
 	private IdentifierMappingImplementor<?, E> identifierMapping;
 	private PojoPropertyModel<?> documentIdSourceProperty;
@@ -44,13 +43,11 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 	public PojoRootIdentityMappingCollector(PojoRawTypeModel<E> typeModel,
 			PojoMappingHelper mappingHelper,
 			Optional<IndexedEntityBindingContext> bindingContext,
-			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge,
-			BeanResolver beanResolver) {
+			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge) {
 		this.typeModel = typeModel;
 		this.mappingHelper = mappingHelper;
 		this.bindingContext = bindingContext;
 		this.providedIdentifierBridge = providedIdentifierBridge;
-		this.beanResolver = beanResolver;
 	}
 
 	public void closeOnFailure() {
@@ -97,8 +94,11 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 
 		// Assume a provided ID if requested
 		if ( providedIdentifierBridge != null ) {
-			identifierMapping = ProvidedIdentifierMapping.get( beanResolver.resolve( providedIdentifierBridge ) );
-			documentIdSourceProperty = null;
+			BoundIdentifierBridge<Object> boundIdentifierBridge = mappingHelper.indexModelBinder()
+					.bindIdentifier( bindingContext, mappingHelper.introspector().typeModel( Object.class ),
+							new BeanBinder( providedIdentifierBridge ),
+							Collections.emptyMap() );
+			identifierMapping = ProvidedIdentifierMapping.get( boundIdentifierBridge.getBridgeHolder() );
 			return;
 		}
 
