@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.engine.common.tree.impl;
 
-import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
 
@@ -207,57 +209,126 @@ public class TreeFilter {
 		if ( hasCompositionLimits() ) {
 			return null;
 		}
-		else if ( parent != null ) {
-			if ( this.mappingElement.equals( mappingElement )
-					// Technically we shouldn't have to check these,
-					// but we'll check just to be safe, and to avoid regressions.
-					// We can consider dropping these checks in the next major,
-					// where behavior changes are more acceptable.
-					&& this.relativePrefix.equals( relativePrefix )
-					&& this.definition.equals( definition ) ) {
-				// Same filter as the one passed as a parameter
-				return this.relativePrefix;
-			}
-			else {
-				String path = parent.getPathFromSameFilterSinceNoCompositionLimits(
-						mappingElement, relativePrefix, definition );
-
-				if ( path == null ) {
-					return null;
-				}
-
-				String pathToCheck = pathLeadingToCurrentNode();
-				if ( isPotentiallyExcludedPath( pathToCheck ) ) {
-					return null;
-				}
-
-				return path + this.relativePrefix;
-			}
-		}
-		else {
-			/*
-			 * No composition limits, no parent: this is the root.
-			 * If we reach this point, it means there was no composition limit at all,
-			 * but we did not encounter the filter we were looking for.
-			 */
+		if ( this.definition == null ) {
+			// we are at root
 			return null;
 		}
+
+		String cycle = findCycleDifferently( mappingElement, relativePrefix, definition );
+
+		return cycle;
 	}
 
-	private String pathLeadingToCurrentNode() {
-		TreeFilter localParent = parent;
+	/*
+	 * The idea is to find the longest cycle so far possible.
+	 * Then we'll check if that cycle is broken by some parent exclude. If not,
+	 * then we are giving it a last chance and are checking if any node in the cycle itself can break the cycle permutation at some point.
+	 *
+	 * If we found something that breaks the cycle we are going to return `null`.
+	 *
+	 * If nothing breaks the cycle -- we are going to return the "shortest" cycle found to be reported to the user.
+	 */
+	private String findCycleDifferently(MappingElement mappingElement, String relativePrefix, TreeFilterDefinition definitionToBeAdded) {
+		// we will use these lists for step 2, see below:
+		List<String> paths = new ArrayList<>();
+		List<TreeFilter> nodes = new ArrayList<>();
+
+		String shortestCycle = null;
+		String longestCycle = null;
+		TreeFilter longestCycleNode = null;
+		TreeFilter localParent = this;
 		StringBuilder path = new StringBuilder();
 		while ( localParent != null && localParent.definition != null ) {
+
 			path.insert( 0, localParent.relativePrefix );
+			paths.add( 0, path.toString() );
+			nodes.add( 0, localParent );
+
+			if ( localParent.isSame( mappingElement, relativePrefix, definitionToBeAdded ) ) {
+				longestCycle = path.toString();
+				longestCycleNode = localParent;
+				if ( shortestCycle == null ) {
+					// set the first found cycle and keep it so till the end of the loop
+					shortestCycle = path.toString();
+				}
+			}
+
 			localParent = localParent.parent;
 		}
-		// we won't need the last dot if it's there:
-		return path.lastIndexOf( "." ) == path.length() - 1 ? path.substring( 0, path.length() - 1 ) : path.toString();
+
+		if ( longestCycle == null ) {
+			return null;
+		}
+
+		// We found the longest cycle now let's see if it is included in any path:
+		// 1. First let's check if any node before the one that caused a cycle is going to break that cycle.
+		// To check the node where we've encountered the longest cycle we will first check the node itself, and then
+		// go to its parents till the root prepending the corresponding relative node path.
+		if ( isPotentiallyExcludedPath(
+				// when we check the node we don't need the node's relative path at the beginning of the path we are checking:
+				longestCycle.substring( longestCycleNode.relativePrefix.length() ),
+				longestCycleNode
+		) ) {
+			return null;
+		}
+
+		// 2. maybe there's a node following the one causing the cycle that would break it at some point.
+		// If so we want to go one node at a time, and only check the "new nodes" i.e. if we encounter a same node for the second time
+		// it means even if that node at the current step may break the cycle - we've already checked it before and it didn't
+		// in the previous steps, meaning that if that node breaks a cycle, it wouldn't be the one we are currently in:
+		Set<TreeFilter> encounteredNodesSoFar = new HashSet<>();
+		// we don't want to start from the beginning but from the next node from the one at which we've found the longest cycle:
+		for ( int index = paths.indexOf( longestCycle ); index < nodes.size(); index++ ) {
+			TreeFilter node = nodes.get( index );
+			// so we know that we are in the cycle, and we know what the cycle looks like, if the current node can break a cycle
+			// it would mean that if we make a cycle permutation that starts with the "current node ^" and this same node can
+			// potentially break the cycle -- then we are ok to break it:
+
+			if ( encounteredNodesSoFar.add( node )
+					&& isPotentiallyExcludedPath(
+					removeDot( pathPermutation( longestCycle, paths.get( index ), node.relativePrefix ) ),
+					node.definition.excludePaths()
+			) ) {
+				return null;
+			}
+		}
+
+		// 3. we haven't found an exclude that would break the cycle - so we return the shortest cycle
+		return shortestCycle;
 	}
 
-	private boolean isPotentiallyExcludedPath(String path) {
-		return ( this.definition != null && isPotentiallyExcludedPath( path, this.definition.excludePaths() ) )
-				|| ( parent != null && parent.isPotentiallyExcludedPath( path ) );
+	private boolean isSame(MappingElement mappingElement, String relativePrefix, TreeFilterDefinition definitionToBeAdded) {
+		return this.mappingElement.equals( mappingElement )
+				// Technically we shouldn't have to check these,
+				// but we'll check just to be safe, and to avoid regressions.
+				// We can consider dropping these checks in the next major,
+				// where behavior changes are more acceptable.
+				&& this.relativePrefix.equals( relativePrefix )
+				&& this.definition.equals( definition );
+	}
+
+	private String pathPermutation(String cycle, String path, String currentNodeRelativePath) {
+		// `a.b.c. + a.` -- cycle
+		// let's assume we are at `b.`
+		// first we want to get `b.c.a.`
+		// then we want to drop the current node (`b.`) from the beginning of the permuted path, since our filter wouldn't start with the node itself,
+		// but with the following node:
+		return ( cycle.substring( path.length() ) + cycle.substring( 0, path.length() ) ) // <-- making a permutation
+				.substring( currentNodeRelativePath.length() ); // <-- dropping the current node
+
+
+	}
+
+	private String removeDot(String string) {
+		return string != null && string.endsWith( "." ) ? string.substring( 0, string.length() - 1 ) : string;
+	}
+
+	private boolean isPotentiallyExcludedPath(String path, TreeFilter node) {
+		return node.definition != null && (
+				isPotentiallyExcludedPath( removeDot( path ), node.definition.excludePaths() )
+						|| ( node.parent != null && isPotentiallyExcludedPath(
+						node.relativePrefix + path, node.parent
+				) ) );
 	}
 
 	private boolean isPotentiallyExcludedPath(String path, Set<String> excludePaths) {
@@ -267,10 +338,12 @@ public class TreeFilter {
 				// we want to check that we are not "cutting" a part of a property.
 				// for example if we have a path causing a problem as `node1.node2` but our filter is defined as `node1.node2WithSomeSuffix`
 				// we want to say that `node1.node2` is not excluded:
-				if ( remainingPath.isEmpty() || remainingPath.startsWith( "." ) ) {
+				if ( path.isEmpty() || remainingPath.isEmpty() || remainingPath.startsWith( "." ) ) {
 					return true;
 				}
 			}
+			// If we'd wanted to make things work for prefixes without dots in the end, we'd need to modify the above ^ conditions.
+			// since there we are checking that the remainingPath starts with a dot, when in case of prefixes-with-no-dots - there won't be a dot....
 		}
 
 		return false;
