@@ -2070,6 +2070,22 @@ public class IndexedEmbeddedBaseIT {
 			}
 		}
 
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "aString", String.class )
+				.objectField( "b", b2 -> b2
+						.field( "bString", String.class )
+						.objectField( "c", b3 -> b3
+								.field( "cString", String.class )
+								.objectField( "b", b4 -> b4
+										.field( "bString", String.class )
+										.objectField( "c", b5 -> b5
+												.field( "cString", String.class )
+										)
+								)
+						)
+				)
+		);
+
 		SearchMapping mapping = setupHelper.start()
 				.withAnnotatedEntityTypes( Model.EntityA.class )
 				.setup();
@@ -2099,6 +2115,107 @@ public class IndexedEmbeddedBaseIT {
 												.field( "bString", "bb" )
 												.objectField( "c", b5 -> b5
 														.field( "cString", "cc" )
+												)
+										)
+								)
+						)
+		);
+	}
+
+	@Test
+	public void cycle_brokenByExcludePathsSomewhereMidCycle_deeply_nonRoot() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class EntityA {
+				@DocumentId
+				Integer id;
+				@KeywordField
+				String aString;
+				@IndexedEmbedded
+				EntityB b;
+				public EntityA(Integer id, String aString, EntityB b) {
+					this.id = id;
+					this.aString = aString;
+					this.b = b;
+				}
+			}
+			class EntityB {
+				Integer id;
+				@KeywordField
+				String bString;
+				@IndexedEmbedded
+				EntityC c;
+				public EntityB(Integer id, String bString, EntityC c) {
+					this.id = id;
+					this.bString = bString;
+					this.c = c;
+				}
+			}
+			class EntityC {
+				Integer id;
+				@GenericField
+				String cString;
+				@IndexedEmbedded(excludePaths = "c.b.c")
+				EntityB b;
+				public EntityC(Integer id, String cString, EntityB b) {
+					this.id = id;
+					this.cString = cString;
+					this.b = b;
+				}
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "aString", String.class )
+				.objectField( "b", b2 -> b2
+						.field( "bString", String.class )
+						.objectField( "c", b3 -> b3
+								.field( "cString", String.class )
+								.objectField( "b", b4 -> b4
+										.field( "bString", String.class )
+										.objectField( "c", b5 -> b5
+												.field( "cString", String.class )
+												.objectField( "b", b6 -> b6
+														.field( "bString", String.class )
+												)
+										)
+								)
+						)
+				)
+		);
+
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.setup();
+
+		backendMock.verifyExpectationsMet();
+
+		Model model = new Model();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> model.new EntityA( id, "a",
+						model.new EntityB( 1, "b",
+								model.new EntityC( 2, "c",
+										model.new EntityB( 3, "bb",
+												model.new EntityC( 4, "cc",
+														model.new EntityB( 5, "bbb",
+																model.new EntityC( 6, "ccc",
+																		model.new EntityB( 7, "bbbb",
+																				null
+																		) ) ) ) ) ) ) ),
+				document -> document.field( "aString", "a" )
+						.objectField( "b", b2 -> b2
+								.field( "bString", "b" )
+								.objectField( "c", b3 -> b3
+										.field( "cString", "c" )
+										.objectField( "b", b4 -> b4
+												.field( "bString", "bb" )
+												.objectField( "c", b5 -> b5
+														.field( "cString", "cc" )
+														.objectField( "b", b6 -> b6
+																.field( "bString", "bbb" )
+														)
 												)
 										)
 								)
@@ -2236,7 +2353,7 @@ public class IndexedEmbeddedBaseIT {
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( Model.EntityA.class.getName() )
-						.pathContext( ".b<no value extractors>.c<no value extractors>.b<no value extractors>.c" )
+						.pathContext( ".b<no value extractors>.c<no value extractors>.b<no value extractors>.c<no value extractors>.b<no value extractors>.c<no value extractors>.b<no value extractors>.c" )
 						.failure( "Cyclic @IndexedEmbedded recursion starting from type '" + Model.EntityB.class.getName() + "'",
 								"Path starting from that type and ending with a cycle: 'c.b.c.'",
 								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
@@ -2244,6 +2361,93 @@ public class IndexedEmbeddedBaseIT {
 				);
 	}
 
+	@Test
+	public void cycle_selfReferenceBreaksEventuallyWithExclude() {
+		@Indexed(index = INDEX_NAME)
+		class EntityA {
+			@DocumentId
+			Integer id;
+			@KeywordField
+			String string;
+			@IndexedEmbedded(excludePaths = "a.a.a")
+			@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
+			EntityA a;
+			public EntityA(Integer id, String string, EntityA a) {
+				this.id = id;
+				this.string = string;
+				this.a = a;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "string", String.class )
+				.objectField( "a", b2 -> b2
+						.field( "string", String.class )
+						.objectField( "a", b3 -> b3
+								.field( "string", String.class )
+								.objectField( "a", b4 -> b4
+										.field( "string", String.class )
+								)
+						)
+				)
+		);
+
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( EntityA.class )
+				.setup();
+
+		backendMock.verifyExpectationsMet();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> new EntityA( id, "a",
+						new EntityA( 1, "aa",
+								new EntityA( 2, "aaa",
+										new EntityA( 3, "aaaa",
+												new EntityA( 4, "aaaaa",
+														new EntityA( 5, "aaaaa",
+																new EntityA( 6, "aaaaaa",
+																		new EntityA( 7, "aaaaaaa",
+																				null
+																		) ) ) ) ) ) ) ),
+				document -> document.field( "string", "a" )
+						.objectField( "a", b2 -> b2
+								.field( "string", "aa" )
+								.objectField( "a", b3 -> b3
+										.field( "string", "aaa" )
+										.objectField( "a", b4 -> b4
+												.field( "string", "aaaa" )
+										)
+								)
+						)
+		);
+	}
+
+	@Test
+	public void cycle_selfReferenceWontBreak_excludeSomePropertyNotInCycle() {
+		@Indexed(index = INDEX_NAME)
+		class EntityA {
+			@DocumentId
+			Integer id;
+			@KeywordField
+			String aString;
+			@IndexedEmbedded(excludePaths = "a.a.aString")
+			EntityA a;
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withAnnotatedEntityTypes( EntityA.class )
+				.setup() )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( EntityA.class.getName() )
+						.pathContext( ".a<no value extractors>.a<no value extractors>.a<no value extractors>.a<no value extractors>.a" )
+						.failure( "Cyclic @IndexedEmbedded recursion starting from type '" + EntityA.class.getName() + "'",
+								"Path starting from that type and ending with a cycle: 'a.a.'",
+								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
+								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ..." )
+				);
+	}
 
 	/*
 	 * We are trying to include something that is not reachable
