@@ -28,7 +28,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -227,7 +226,6 @@ public class IndexedEmbeddedCycleIT {
 	}
 
 	@Test
-	@Ignore("Ignoring this test since we are not detecting paths without dots 'correctly' in the cycle breaking...")
 	public void cycle_brokenByExcludePathsWithPrefixNoDot() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
