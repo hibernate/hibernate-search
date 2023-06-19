@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.engine.common.tree.impl;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
@@ -218,112 +214,109 @@ public class TreeFilter {
 	}
 
 	/*
-	 * The idea is to find the longest cycle so far possible.
-	 * Then we'll check if that cycle is broken by some parent exclude. If not,
-	 * then we are giving it a last chance and are checking if any node in the cycle itself can break the cycle permutation at some point.
+	 * The idea is to find the farthest cycle, i.e. the cycle closest to the root.
+	 * There is a chance that the cycle may repeat a few times if there are exclude paths that may break the cycle at some point.
+	 * Let's assume we have a cycle where we are trying to add next `a.` relative path with the same mapping element and filter definition
+	 * as the already added ones before:
+	 * a.b.c.a.b.c.a.b.c.a.b.c. + a.
+	 * 1   ^ 2     3     4        5
 	 *
-	 * If we found something that breaks the cycle we are going to return `null`.
+	 * - we'll be looking for a relative path `a.` with index `1` and that would define our "farthest cycle".
+	 * - we want to know the filter representing the relative path `c.` (marked with `^`) that is right before the `a.` with index `2` as well as the
+	 * path (and prefix) leading to it from `5` -- "a.b.c.a.b.c.a.b.c."
+	 * that will be the filter and the path we'll pass to the "isPotentiallyExcludedPathAndPrefix" check.
+	 * These will be our corresponding `previousCycleFilter` and `pathAndPrefixFromPreviousCycleFilter`
 	 *
-	 * If nothing breaks the cycle -- we are going to return the "shortest" cycle found to be reported to the user.
+	 * Doing so will go through any potential exclude filters defined on indexed-embedded only once; going from that relative path `c.` (^)
+	 * and through its parents will cover the filters from the cycle itself as well as any filters out of the cycle that are in the path leading to the cycle.
+	 *
+	 * In case we don't have a repeating cycle yet - we'll be starting from the "current filter"
+	 * ( previousCycleFilter == this, pathAndPrefixFromPreviousCycleFilter == this.relativePrefix )
 	 */
 	private String findCycle(MappingElement mappingElement, String relativePrefix, TreeFilterDefinition definitionToBeAdded) {
-		// we will use these lists for step 2, see below:
-		List<String> paths = new ArrayList<>();
-		List<TreeFilter> nodes = new ArrayList<>();
-
-		String shortestCycle = null;
-		String longestCycle = null;
-		TreeFilter longestCycleNode = null;
-		TreeFilter localParent = this;
+		String closestCyclePathAndPrefix = null;
+		String pathAndPrefixFromCurrentCycleFilter = null;
+		String pathAndPrefixFromPreviousCycleFilter = relativePrefix;
+		TreeFilter currentFilter = this;
+		TreeFilter currentCycleFilter = null;
+		TreeFilter previousCycleFilter = this;
 		StringBuilder path = new StringBuilder();
-		while ( localParent != null && localParent.definition != null ) {
+		while ( currentFilter != null && currentFilter.definition != null ) {
 
-			path.insert( 0, localParent.relativePrefix );
-			paths.add( 0, path.toString() );
-			nodes.add( 0, localParent );
+			path.insert( 0, currentFilter.relativePrefix );
 
-			if ( localParent.isSame( mappingElement, relativePrefix, definitionToBeAdded ) ) {
-				longestCycle = path.toString();
-				longestCycleNode = localParent;
-				if ( shortestCycle == null ) {
-					// set the first found cycle and keep it so till the end of the loop
-					shortestCycle = path.toString();
+			if ( currentFilter.isSame( mappingElement, relativePrefix, definitionToBeAdded ) ) {
+				if ( currentCycleFilter != null ) {
+					previousCycleFilter = currentCycleFilter.parent;
+					pathAndPrefixFromPreviousCycleFilter = pathAndPrefixFromCurrentCycleFilter;
+				}
+
+				pathAndPrefixFromCurrentCycleFilter = path.toString();
+				currentCycleFilter = currentFilter;
+
+				if ( closestCyclePathAndPrefix == null ) {
+					// Set the first found cycle and keep it unchanged till the end of the loop. We'll report it to the user.
+					closestCyclePathAndPrefix = pathAndPrefixFromCurrentCycleFilter;
 				}
 			}
 
-			localParent = localParent.parent;
+			currentFilter = currentFilter.parent;
 		}
 
-		if ( longestCycle == null ) {
+		if ( pathAndPrefixFromCurrentCycleFilter == null ) {
 			return null;
 		}
 
-		// We found the longest cycle now let's see if it is included in any path:
-		// 1. First let's check if any node before the one that caused a cycle is going to break that cycle.
-		// To check the node where we've encountered the longest cycle we will first check the node itself, and then
-		// go to its parents till the root prepending the corresponding relative node path.
-		if ( isPotentiallyExcludedPath(
-				// when we check the node we don't need the node's relative path at the beginning of the path we are checking:
-				longestCycle.substring( longestCycleNode.relativePrefix.length() ),
-				longestCycleNode
-		) ) {
+		// We have a cycle and the path doesn't contain dots, i.e. we are building a cycle from prefixes without dots.
+		// Which means that this cycle will never be terminated by an exclude path. So it is "safe to just fail" at this point
+		if ( !closestCyclePathAndPrefix.contains( "." ) ) {
+			return closestCyclePathAndPrefix;
+		}
+
+		// If we reached this point -- we've found a cycle that might be broken by an exclude path,
+		// and we need to check if any exclude paths will do so:
+		if ( previousCycleFilter.isPotentiallyExcludedPathAndPrefix( pathAndPrefixFromPreviousCycleFilter ) ) {
 			return null;
 		}
 
-		// 2. maybe there's a node following the one causing the cycle that would break it at some point.
-		// If so we want to go one node at a time, and only check the "new nodes" i.e. if we encounter a same node for the second time
-		// it means even if that node at the current step may break the cycle - we've already checked it before and it didn't
-		// in the previous steps, meaning that if that node breaks a cycle, it wouldn't be the one we are currently in:
-		Set<TreeFilter> encounteredNodesSoFar = new HashSet<>();
-		// we don't want to start from the beginning but from the next node from the one at which we've found the longest cycle:
-		for ( int index = paths.indexOf( longestCycle ); index < nodes.size(); index++ ) {
-			TreeFilter node = nodes.get( index );
-			// so we know that we are in the cycle, and we know what the cycle looks like, if the current node can break a cycle
-			// it would mean that if we make a cycle permutation that starts with the "current node ^" and this same node can
-			// potentially break the cycle -- then we are ok to break it:
+		// We haven't found an exclude that would break the cycle - so we return the closest cycle
+		return closestCyclePathAndPrefix;
+	}
 
-			if ( encounteredNodesSoFar.add( node )
-					&& node.pathFilter.isPotentiallyExcluded(
-					removeDot( pathPermutation( longestCycle, paths.get( index ), node.relativePrefix ) )
-			) ) {
-				return null;
+	private boolean isPotentiallyExcludedPathAndPrefix(String pathAndPrefix) {
+		if ( parent == null ) {
+			// The root node doesn't exclude any path.
+			return false;
+		}
+
+		// Only "pure" paths can be excluded, paths with trailing prefixes cannot.
+		// See @IndexedEmbedded.excludePaths: those are expected to be "pure" paths, without any trailing prefix.
+		int lastDotIndex = pathAndPrefix.lastIndexOf( '.' );
+		if ( lastDotIndex > 0 ) {
+			// "pathAndPrefix" starts with an actual path, which could possibly be excluded.
+			String pathWithoutTrailingPrefix = pathAndPrefix.substring( 0, lastDotIndex );
+			if ( pathFilter.isPotentiallyExcluded( pathWithoutTrailingPrefix ) ) {
+				return true;
 			}
 		}
+		// else: "pathAndPrefix" is really just a prefix without a path, it cannot possibly be excluded by this filter.
+		// However, the prefix of a parent filter may still start with an actual path which may be excluded,
+		// so we'll proceed.
 
-		// 3. we haven't found an exclude that would break the cycle - so we return the shortest cycle
-		return shortestCycle;
+		// If this filter cannot exclude the given "path and prefix", maybe a parent can.
+		// We're not the root, so there's necessarily a parent.
+		return parent.isPotentiallyExcludedPathAndPrefix( relativePrefix + pathAndPrefix );
 	}
 
 	private boolean isSame(MappingElement mappingElement, String relativePrefix, TreeFilterDefinition definition) {
-		return this.mappingElement.equals( mappingElement )
+		return this.mappingElement != null // no need to check the root filter any further
+				&& this.mappingElement.equals( mappingElement )
 				// Technically we shouldn't have to check these,
 				// but we'll check just to be safe, and to avoid regressions.
 				// We can consider dropping these checks in the next major,
 				// where behavior changes are more acceptable.
 				&& this.relativePrefix.equals( relativePrefix )
 				&& this.definition.equals( definition );
-	}
-
-	private String pathPermutation(String cycle, String path, String currentNodeRelativePath) {
-		// `a.b.c. + a.` -- cycle
-		// let's assume we are at `b.`
-		// first we want to get `b.c.a.`
-		// then we want to drop the current node (`b.`) from the beginning of the permuted path, since our filter wouldn't start with the node itself,
-		// but with the following node:
-		return ( cycle.substring( path.length() ) + cycle.substring( 0, path.length() ) ) // <-- making a permutation
-				.substring( currentNodeRelativePath.length() ); // <-- dropping the current node
-	}
-
-	private String removeDot(String string) {
-		return string != null && string.endsWith( "." ) ? string.substring( 0, string.length() - 1 ) : string;
-	}
-
-	private boolean isPotentiallyExcludedPath(String path, TreeFilter node) {
-		return node.definition != null && (
-				node.pathFilter.isPotentiallyExcluded( removeDot( path ) )
-						|| ( node.parent != null && isPotentiallyExcludedPath(
-						node.relativePrefix + path, node.parent
-				) ) );
 	}
 
 	public TreeFilter compose(MappingElement mappingElement, String relativePrefix,

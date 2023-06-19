@@ -107,22 +107,18 @@ public abstract class PathFilter {
 		}
 
 		@Override
-		boolean isPotentiallyExcluded(String path) {
+		boolean isPotentiallyExcluded(String pathToTest) {
 			for ( String excludePath : paths ) {
-				if ( excludePath.startsWith( path ) ) {
-					String remainingPath = excludePath.substring( path.length() );
-					// we want to check that we are not "cutting" a part of a property.
-					// for example if we have a path causing a problem as `node1.node2` but our filter is defined as `node1.node2WithSomeSuffix`
-					// we want to say that `node1.node2` is not excluded:
-					// If `path` is empty it means that we have a cycle of a single indexed-embedded as `a.a.`
-					// In such case we allow it to continue and at least try to add one self element so that we don't need to pass that relative path here
-					// and see if the filter maybe starts with it ...
-					if ( path.isEmpty() || remainingPath.isEmpty() || remainingPath.startsWith( "." ) ) {
-						return true;
-					}
+				if (
+						// Exact match -- great! it means we will definitely exclude our path-to-test.
+						excludePath.equals( pathToTest )
+								// Otherwise, make sure that we have an exclude path that starts with our path-to-test
+								|| excludePath.startsWith( pathToTest )
+								// and make sure that our matched path actually is a path of complete object names,
+								// i.e. in excludePath, there is some other object name following our path-to-test:
+								&& excludePath.startsWith( ".", pathToTest.length() ) ) {
+					return true;
 				}
-				// If we'd wanted to make things work for prefixes without dots in the end, we'd need to modify the above ^ conditions.
-				// since there we are checking that the remainingPath starts with a dot, when in case of prefixes-with-no-dots - there won't be a dot....
 			}
 
 			return false;
