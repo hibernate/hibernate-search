@@ -98,11 +98,6 @@ public abstract class PathFilter {
 
 		@Override
 		boolean isExplicitlyExcluded(String relativePath) {
-			for ( String path : paths ) {
-				if ( relativePath.startsWith( path ) ) {
-					return true;
-				}
-			}
 			return paths.contains( relativePath );
 		}
 
