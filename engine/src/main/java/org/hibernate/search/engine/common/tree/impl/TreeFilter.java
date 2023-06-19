@@ -214,9 +214,7 @@ public class TreeFilter {
 			return null;
 		}
 
-		String cycle = findCycleDifferently( mappingElement, relativePrefix, definition );
-
-		return cycle;
+		return findCycle( mappingElement, relativePrefix, definition );
 	}
 
 	/*
@@ -228,7 +226,7 @@ public class TreeFilter {
 	 *
 	 * If nothing breaks the cycle -- we are going to return the "shortest" cycle found to be reported to the user.
 	 */
-	private String findCycleDifferently(MappingElement mappingElement, String relativePrefix, TreeFilterDefinition definitionToBeAdded) {
+	private String findCycle(MappingElement mappingElement, String relativePrefix, TreeFilterDefinition definitionToBeAdded) {
 		// we will use these lists for step 2, see below:
 		List<String> paths = new ArrayList<>();
 		List<TreeFilter> nodes = new ArrayList<>();
@@ -285,9 +283,8 @@ public class TreeFilter {
 			// potentially break the cycle -- then we are ok to break it:
 
 			if ( encounteredNodesSoFar.add( node )
-					&& isPotentiallyExcludedPath(
-					removeDot( pathPermutation( longestCycle, paths.get( index ), node.relativePrefix ) ),
-					node.definition.excludePaths()
+					&& node.pathFilter.isPotentiallyExcluded(
+					removeDot( pathPermutation( longestCycle, paths.get( index ), node.relativePrefix ) )
 			) ) {
 				return null;
 			}
@@ -297,7 +294,7 @@ public class TreeFilter {
 		return shortestCycle;
 	}
 
-	private boolean isSame(MappingElement mappingElement, String relativePrefix, TreeFilterDefinition definitionToBeAdded) {
+	private boolean isSame(MappingElement mappingElement, String relativePrefix, TreeFilterDefinition definition) {
 		return this.mappingElement.equals( mappingElement )
 				// Technically we shouldn't have to check these,
 				// but we'll check just to be safe, and to avoid regressions.
@@ -315,8 +312,6 @@ public class TreeFilter {
 		// but with the following node:
 		return ( cycle.substring( path.length() ) + cycle.substring( 0, path.length() ) ) // <-- making a permutation
 				.substring( currentNodeRelativePath.length() ); // <-- dropping the current node
-
-
 	}
 
 	private String removeDot(String string) {
@@ -325,28 +320,10 @@ public class TreeFilter {
 
 	private boolean isPotentiallyExcludedPath(String path, TreeFilter node) {
 		return node.definition != null && (
-				isPotentiallyExcludedPath( removeDot( path ), node.definition.excludePaths() )
+				node.pathFilter.isPotentiallyExcluded( removeDot( path ) )
 						|| ( node.parent != null && isPotentiallyExcludedPath(
 						node.relativePrefix + path, node.parent
 				) ) );
-	}
-
-	private boolean isPotentiallyExcludedPath(String path, Set<String> excludePaths) {
-		for ( String excludePath : excludePaths ) {
-			if ( excludePath.startsWith( path ) ) {
-				String remainingPath = excludePath.substring( path.length() );
-				// we want to check that we are not "cutting" a part of a property.
-				// for example if we have a path causing a problem as `node1.node2` but our filter is defined as `node1.node2WithSomeSuffix`
-				// we want to say that `node1.node2` is not excluded:
-				if ( path.isEmpty() || remainingPath.isEmpty() || remainingPath.startsWith( "." ) ) {
-					return true;
-				}
-			}
-			// If we'd wanted to make things work for prefixes without dots in the end, we'd need to modify the above ^ conditions.
-			// since there we are checking that the remainingPath starts with a dot, when in case of prefixes-with-no-dots - there won't be a dot....
-		}
-
-		return false;
 	}
 
 	public TreeFilter compose(MappingElement mappingElement, String relativePrefix,
