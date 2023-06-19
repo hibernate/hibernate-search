@@ -25,6 +25,7 @@ import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.AnnotationMappingSmokeIT;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.ProgrammaticMappingSmokeIT;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubBridge;
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge;
@@ -41,6 +42,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
@@ -2534,6 +2536,166 @@ public class IndexedEmbeddedBaseIT {
 				document -> document.field( "indexedEntityString", "a" )
 						.objectField( "included", b2 -> b2
 								.field( "includedString", "b" ) )
+		);
+	}
+
+	@Test
+	public void excludes() {
+		class Included {
+			@KeywordField
+			String a;
+			@KeywordField
+			String aa;
+			@KeywordField
+			String aaa;
+
+			public Included(String includedString) {
+				this.a = includedString;
+				this.aa = includedString;
+				this.aaa = includedString;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@KeywordField
+			String indexedEntityString;
+			@IndexedEmbedded(excludePaths = "a")
+			Included included;
+
+			public IndexedEntity(Integer id, String indexedEntityString, Included included) {
+				this.id = id;
+				this.indexedEntityString = indexedEntityString;
+				this.included = included;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "indexedEntityString", String.class )
+				.objectField( "included", b2 -> b2
+						.field( "aa", String.class )
+						.field( "aaa", String.class ))
+		);
+
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.setup();
+
+		backendMock.verifyExpectationsMet();
+
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> new IndexedEntity(
+						id, "a",
+						new Included( "b" )
+				),
+				document -> document.field( "indexedEntityString", "a" )
+						.objectField( "included", b2 -> b2
+								.field( "aa", "b" )
+								.field( "aaa", "b" ) )
+		);
+	}
+
+	@Test
+	public void excludePathsWithPrefixWithoutDot() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				Integer id;
+
+				@IndexedEmbedded(prefix = "prefixA", excludePaths = "prefixBprefixCcString1")
+				@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW) // just to not bother with inverse sides
+				EntityA a;
+
+				public IndexedEntity(Integer id, EntityA a) {
+					this.id = id;
+					this.a = a;
+				}
+			}
+			class EntityA {
+				@DocumentId
+				Integer id;
+				@KeywordField
+				String aString;
+
+				@IndexedEmbedded(prefix = "prefixB", excludePaths = "prefixCcString2")
+				@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW) // just to not bother with inverse sides
+				EntityB b;
+
+				public EntityA(Integer id, String aString, EntityB b) {
+					this.id = id;
+					this.aString = aString;
+					this.b = b;
+				}
+			}
+
+			class EntityB {
+				Integer id;
+
+				@KeywordField
+				String bString;
+				@IndexedEmbedded(prefix = "prefixC", excludePaths = "cString3")
+				EntityC c;
+
+				public EntityB(Integer id, String bString, EntityC c) {
+					this.id = id;
+					this.bString = bString;
+					this.c = c;
+				}
+			}
+
+			class EntityC {
+				Integer id;
+				@KeywordField
+				String cString1;
+				@KeywordField
+				String cString2;
+				@KeywordField
+				String cString3;
+				@KeywordField
+				String cString4;
+
+				public EntityC(Integer id, String cString1, String cString2, String cString3, String cString4) {
+					this.id = id;
+					this.cString1 = cString1;
+					this.cString2 = cString2;
+					this.cString3 = cString3;
+					this.cString4 = cString4;
+				}
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "prefixAaString", String.class )
+				.field( "prefixAprefixBbString", String.class )
+				.field( "prefixAprefixBprefixCcString4", String.class ) );
+
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.setup();
+
+		backendMock.verifyExpectationsMet();
+
+		Model model = new Model();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> model.new IndexedEntity(
+						id,
+						model.new EntityA(
+								1, "a",
+								model.new EntityB(
+										2, "b",
+										model.new EntityC( 3, "c1", "c2", "c3", "c4" )
+								)
+						)
+				),
+				document -> document.field( "prefixAaString", "a" )
+						.field( "prefixAprefixBbString", "b" )
+						.field( "prefixAprefixBprefixCcString4", "c4" )
 		);
 	}
 
