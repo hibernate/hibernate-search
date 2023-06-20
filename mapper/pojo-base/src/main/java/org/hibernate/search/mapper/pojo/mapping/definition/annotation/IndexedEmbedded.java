@@ -135,10 +135,11 @@ public @interface IndexedEmbedded {
 	 * @return The paths of index fields to include explicitly.
 	 * Provided paths must be relative to the indexed-embedded element,
 	 * i.e. they must not include the {@link #name()}.
+	 * Paths <b>must</b> lead to a field and <b>cannot</b> end with some {@link #prefix() prefix used to construct a field name}.
 	 */
 	String[] includePaths() default {};
 
-	@Incubating
+
 	/**
 	 * The paths of index fields from the indexed-embedded element that should not be embedded.
 	 * <p>
@@ -152,7 +153,9 @@ public @interface IndexedEmbedded {
 	 * @return The paths of index fields to exclude explicitly.
 	 * Provided paths must be relative to the indexed-embedded element,
 	 * i.e. they must not include the {@link #name()}.
+	 * Paths <b>must</b> lead to a field and <b>cannot</b> end with some {@link #prefix() prefix used to construct a field name}.
 	 */
+	@Incubating
 	String[] excludePaths() default {};
 
 	/**

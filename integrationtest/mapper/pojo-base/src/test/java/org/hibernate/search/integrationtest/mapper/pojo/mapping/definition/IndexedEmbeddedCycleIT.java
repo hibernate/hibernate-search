@@ -226,7 +226,7 @@ public class IndexedEmbeddedCycleIT {
 	}
 
 	@Test
-	public void cycle_brokenByExcludePathsWithPrefixNoDot() {
+	public void cycle_brokenByExcludePathsWithPrefixWithMultipleDotsAndEndingWithDot() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class EntityA {
@@ -235,7 +235,7 @@ public class IndexedEmbeddedCycleIT {
 				@KeywordField
 				String aString;
 
-				@IndexedEmbedded(prefix = "prefixForB")
+				@IndexedEmbedded(prefix = "prefixB1.prefixB2.")
 				@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW) // just to not bother with inverse sides
 				EntityB b;
 
@@ -251,7 +251,7 @@ public class IndexedEmbeddedCycleIT {
 
 				@KeywordField
 				String bString;
-				@IndexedEmbedded(prefix = "prefixForA", excludePaths = { "prefixForBprefixForA" })
+				@IndexedEmbedded(prefix = "prefixA1.prefixA2.prefixA3.", excludePaths = { "prefixB1.prefixB2.prefixA1.prefixA2.prefixA3" })
 				EntityA a;
 
 				public EntityB(Integer id, String bString, EntityA a) {
@@ -264,16 +264,23 @@ public class IndexedEmbeddedCycleIT {
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "aString", String.class )
-				.objectField( "prefixForB", b2 -> b2
-						.field( "bString", String.class )
-						.objectField( "prefixForA", b3 -> b3
-								.field( "aString", String.class )
-								.objectField( "prefixForB", b4 -> b4
-										.field( "bString", String.class )
+				.objectField( "prefixB1", b2 -> b2
+						.objectField( "prefixB2", b3 -> b3
+								.field( "bString", String.class )
+								.objectField( "prefixA1", b4 -> b4
+										.objectField( "prefixA2", b5 -> b5
+												.objectField( "prefixA3", b6 -> b6
+														.field( "aString", String.class )
+														.objectField( "prefixB1", b7 -> b7
+																.objectField( "prefixB2", b8 -> b8
+																		.field( "bString", String.class )
+																		.objectField( "prefixA1", b9 -> b9
+																				.objectField( "prefixA2", b10 -> { }
+																				) ) ) ) )
+
+										)
 								)
-						)
-				)
-		);
+						) ) );
 
 		SearchMapping mapping = setupHelper.start()
 				.withAnnotatedEntityTypes( Model.EntityA.class )
@@ -300,16 +307,74 @@ public class IndexedEmbeddedCycleIT {
 						)
 				),
 				document -> document.field( "aString", "a" )
-						.objectField( "prefixForB", b2 -> b2
-								.field( "bString", "b" )
-								.objectField( "prefixForA", b3 -> b3
-										.field( "aString", "aa" )
-										.objectField( "prefixForB", b4 -> b4
-												.field( "bString", "bb" )
+						.objectField( "prefixB1", b2 -> b2
+								.objectField( "prefixB2", b3 -> b3
+										.field( "bString", "b" )
+										.objectField( "prefixA1", b4 -> b4
+												.objectField( "prefixA2", b5 -> b5
+														.objectField( "prefixA3", b6 -> b6
+																.field( "aString", "aa" )
+																.objectField( "prefixB1", b7 -> b7
+																		.objectField( "prefixB2", b8 -> b8
+																				.field( "bString", "bb" )
+																		) ) )
+
+												)
 										)
-								)
-						)
+								) )
 		);
+	}
+
+	@Test
+	public void cycle_cannotBeBrokenByExcludePathsWithPrefixNoDot() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class EntityA {
+				@DocumentId
+				Integer id;
+				@KeywordField
+				String aString;
+
+				@IndexedEmbedded(prefix = "prefixForB")
+				EntityB b;
+
+				public EntityA(Integer id, String aString, EntityB b) {
+					this.id = id;
+					this.aString = aString;
+					this.b = b;
+				}
+			}
+
+			class EntityB {
+				Integer id;
+
+				@KeywordField
+				String bString;
+				@IndexedEmbedded(prefix = "prefixForA", excludePaths = { "prefixForBprefixForA" })
+				EntityA a;
+
+				public EntityB(Integer id, String bString, EntityA a) {
+					this.id = id;
+					this.bString = bString;
+					this.a = a;
+				}
+			}
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.setup() )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( Model.EntityA.class.getName() )
+						.pathContext( ".b<no value extractors>.a<no value extractors>.b" )
+						.failure(
+								"Cyclic recursion starting from '@IndexedEmbedded(prefix = \"prefixForB\", ...)' on type '" + Model.EntityA.class.getName() + "', path '.b'",
+								"Index field path starting from that location and ending with a cycle: 'prefixForBprefixForAprefixForB'",
+								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
+								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ..."
+						)
+				);
 	}
 
 	@Test

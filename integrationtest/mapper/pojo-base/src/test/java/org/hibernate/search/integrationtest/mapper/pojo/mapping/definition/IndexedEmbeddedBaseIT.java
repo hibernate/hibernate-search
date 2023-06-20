@@ -2575,7 +2575,7 @@ public class IndexedEmbeddedBaseIT {
 				.field( "indexedEntityString", String.class )
 				.objectField( "included", b2 -> b2
 						.field( "aa", String.class )
-						.field( "aaa", String.class ))
+						.field( "aaa", String.class ) )
 		);
 
 		SearchMapping mapping = setupHelper.start()
@@ -2697,6 +2697,204 @@ public class IndexedEmbeddedBaseIT {
 						.field( "prefixAprefixBbString", "b" )
 						.field( "prefixAprefixBprefixCcString4", "c4" )
 		);
+	}
+
+	@Test
+	public void excludePathsWithPrefixWithAndWithoutDot() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				Integer id;
+
+				@IndexedEmbedded(prefix = "obj.prefixA", excludePaths = {
+						"prefixBprefixCcString1",
+						"prefixBprefixD2dString",
+						"prefixOtherD1", // excludes entire object as this would point to a `prefixOtherD1.prefixD1_` and will be excluded because of the "prefixOtherD1" object
+						"prefixOtherD2.prefixD2_dString" // as this only excludes a field a `prefixOtherD2` object is expected to be created.
+				})
+				EntityA a;
+
+				public IndexedEntity(Integer id, EntityA a) {
+					this.id = id;
+					this.a = a;
+				}
+			}
+			class EntityA {
+				Integer id;
+				@KeywordField
+				String aString;
+
+				@IndexedEmbedded(prefix = "prefixB", excludePaths = "prefixCcString2")
+				EntityB b;
+
+
+				@IndexedEmbedded(prefix = "prefixOtherD1.prefixD1_")
+				EntityD d2;
+
+				@IndexedEmbedded(prefix = "prefixOtherD2.prefixD2_")
+				EntityD d3;
+
+				public EntityA(Integer id, String aString, EntityB b) {
+					this.id = id;
+					this.aString = aString;
+					this.b = b;
+				}
+			}
+
+			class EntityB {
+				Integer id;
+
+				@KeywordField
+				String bString;
+				@IndexedEmbedded(prefix = "prefixC", excludePaths = "cString3")
+				EntityC c;
+				@IndexedEmbedded(prefix = "prefixD2")
+				EntityD d;
+
+				public EntityB(Integer id, String bString, EntityC c) {
+					this.id = id;
+					this.bString = bString;
+					this.c = c;
+				}
+			}
+
+			class EntityC {
+				Integer id;
+				@KeywordField
+				String cString1;
+				@KeywordField
+				String cString2;
+				@KeywordField
+				String cString3;
+				@KeywordField
+				String cString4;
+
+				public EntityC(Integer id, String cString1, String cString2, String cString3, String cString4) {
+					this.id = id;
+					this.cString1 = cString1;
+					this.cString2 = cString2;
+					this.cString3 = cString3;
+					this.cString4 = cString4;
+				}
+			}
+
+			class EntityD {
+				Integer id;
+				@KeywordField
+				String dString;
+
+				public EntityD(Integer id, String dString) {
+					this.id = id;
+					this.dString = dString;
+				}
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "obj", b1 -> b1
+						.field( "prefixAaString", String.class )
+						.field( "prefixAprefixBbString", String.class )
+						.field( "prefixAprefixBprefixCcString4", String.class )
+						.objectField( "prefixAprefixOtherD2", b2 -> { } ) ) );
+
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( Model.IndexedEntity.class )
+				.setup();
+
+		backendMock.verifyExpectationsMet();
+
+		Model model = new Model();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> model.new IndexedEntity(
+						id,
+						model.new EntityA(
+								1, "a",
+								model.new EntityB(
+										2, "b",
+										model.new EntityC( 3, "c1", "c2", "c3", "c4" )
+								)
+						)
+				),
+				document -> document.objectField( "obj", b1 -> b1
+						.field( "prefixAaString", "a" )
+						.field( "prefixAprefixBbString", "b" )
+						.field( "prefixAprefixBprefixCcString4", "c4" )
+				)
+		);
+	}
+
+	/*
+	 * Only full object paths are allowed in include/exclude paths. we cannot add something that ends with a prefix.
+	 */
+	@Test
+	public void excludePathsByUnterminatedPrefixIsNotAllowed() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class EntityA {
+				@DocumentId
+				Integer id;
+				@KeywordField
+				String aString;
+
+				@IndexedEmbedded(excludePaths = "prefixC") // cannot exclude by a prefix that is simply a part of a property name
+				EntityB b;
+
+				public EntityA(Integer id, String aString, EntityB b) {
+					this.id = id;
+					this.aString = aString;
+					this.b = b;
+				}
+			}
+
+			class EntityB {
+				Integer id;
+
+				@KeywordField
+				String bString;
+				@IndexedEmbedded(prefix = "prefixC")
+				EntityC c;
+
+				public EntityB(Integer id, String bString, EntityC c) {
+					this.id = id;
+					this.bString = bString;
+					this.c = c;
+				}
+			}
+
+			class EntityC {
+				Integer id;
+				@KeywordField
+				String cString1;
+				@KeywordField
+				String cString2;
+				@KeywordField
+				String cString3;
+				@KeywordField
+				String cString4;
+
+				public EntityC(Integer id, String cString1, String cString2, String cString3, String cString4) {
+					this.id = id;
+					this.cString1 = cString1;
+					this.cString2 = cString2;
+					this.cString3 = cString3;
+					this.cString4 = cString4;
+				}
+			}
+		}
+
+		assertThatThrownBy(
+				() -> setupHelper.start().setup( Model.EntityA.class )
+		).isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.failure(
+								"@IndexedEmbedded(...) defines excludePaths filters that do not match anything",
+								"Non-matching excludePaths filters: [prefixC].",
+								"Encountered field paths: [bString, prefixCcString1, prefixCcString2, prefixCcString3, prefixCcString4]."
+						) );
+
 	}
 
 	private <E> void doTestEmbeddedRuntime(SearchMapping mapping,
