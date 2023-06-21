@@ -22,13 +22,12 @@ import org.hibernate.LockOptions;
 import org.hibernate.ScrollMode;
 import org.hibernate.TypeMismatchException;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
 import org.hibernate.graph.spi.RootGraphImplementor;
 import org.hibernate.query.IllegalQueryOperationException;
-import org.hibernate.query.internal.QueryOptionsImpl;
 import org.hibernate.query.spi.AbstractQuery;
+import org.hibernate.query.spi.MutableQueryOptions;
 import org.hibernate.query.spi.ParameterMetadataImplementor;
 import org.hibernate.query.spi.QueryImplementor;
 import org.hibernate.query.spi.QueryParameterBinding;
@@ -73,8 +72,6 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 
 	private final HSQuery hSearchQuery;
 
-	private final SessionImplementor sessionImplementor;
-	private final QueryOptionsImpl queryOptions = new QueryOptionsImpl();
 	//initialized at 0 since we don't expect to use hints at this stage
 	private final Map<String, Object> hints = new HashMap<String, Object>( 0 );
 
@@ -100,7 +97,6 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 			V5MigrationSearchSession<SearchLoadingOptionsStep> searchSession,
 			Class<?>... entities) {
 		super( sessionImplementor );
-		this.sessionImplementor = sessionImplementor;
 		this.searchSession = searchSession;
 		this.hSearchQuery = searchIntegrator.createHSQuery( luceneQuery, searchSession,
 				loadingOptionsContributor, entities );
@@ -124,7 +120,6 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 
 	@Override
 	protected ScrollableResultsImplementor doScroll(ScrollMode scrollMode) {
-		extractQueryOptions();
 		SearchScroll<?> scroll = hSearchQuery.scroll( fetchSize != null ? fetchSize : 100 );
 		Integer maxResults = hSearchQuery.maxResults();
 		return new HibernateOrmSearchScrollableResultsAdapter<>( scroll,
@@ -159,15 +154,16 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 	}
 
 	private void extractQueryOptions() {
-		Integer limit = getQueryOptions().getLimit().getMaxRows();
+		MutableQueryOptions queryOptions = getQueryOptions();
+		Integer limit = queryOptions.getLimit().getMaxRows();
 		hSearchQuery.maxResults( limit );
-		Integer offset = getQueryOptions().getLimit().getFirstRow();
+		Integer offset = queryOptions.getLimit().getFirstRow();
 		hSearchQuery.firstResult( offset == null ? 0 : offset );
-		Integer queryFetchSize = getQueryOptions().getFetchSize();
+		Integer queryFetchSize = queryOptions.getFetchSize();
 		if ( queryFetchSize != null ) {
 			fetchSize = queryFetchSize;
 		}
-		Integer queryTimeout = getQueryOptions().getTimeout();
+		Integer queryTimeout = queryOptions.getTimeout();
 		if ( queryTimeout != null ) {
 			hSearchQuery.failAfter( queryTimeout, TimeUnit.SECONDS );
 		}
@@ -391,7 +387,7 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 
 	@Override
 	protected int doExecuteUpdate() {
-		throw new UnsupportedOperationException( "executeUpdate is not supported in Hibernate Search queries" );
+		throw new UnsupportedOperationException( "executeUpdate() is not supported in Hibernate Search queries" );
 	}
 
 	@Override
@@ -445,16 +441,6 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 	@Override
 	public String getQueryString() {
 		return hSearchQuery.getQueryString();
-	}
-
-	@Override
-	public QueryOptionsImpl getQueryOptions() {
-		return queryOptions;
-	}
-
-	@Override
-	public SharedSessionContractImplementor getSession() {
-		return sessionImplementor;
 	}
 
 	@Override
