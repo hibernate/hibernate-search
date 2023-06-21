@@ -25,16 +25,19 @@ import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.spi.AnnotationScanning;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.spi.BuiltinAnnotations;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.util.common.jar.spi.JandexBehavior;
 import org.hibernate.search.util.common.jar.impl.JandexUtils;
 import org.hibernate.search.util.common.jar.impl.JarUtils;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 
+import org.jboss.jandex.AnnotationInstance;
+import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.Index;
 import org.jboss.jandex.IndexView;
@@ -119,18 +122,14 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 		}
 
 		if ( discoverAnnotatedTypesFromRootMappingAnnotations ) {
-			IndexView jandexIndex = buildJandexIndex();
-			if ( jandexIndex != null ) {
-				Set<DotName> rootMappingAnnotatedTypes = AnnotationScanning.scanForRootMappingAnnotatedTypes(
-						jandexIndex );
-
-				ClassResolver classResolver = buildContext.classResolver();
-				for ( DotName rootMappingAnnotatedType : rootMappingAnnotatedTypes ) {
-					Class<?> annotatedClass = classResolver.classForName( rootMappingAnnotatedType.toString() );
-					introspector.typeModel( annotatedClass ).ascendingSuperTypes()
-							.forEach( typesToProcess::add );
+			JandexBehavior.doWithJandex( () -> {
+				IndexView jandexIndex = buildJandexIndex();
+				if ( jandexIndex == null ) {
+					return;
 				}
-			}
+				discoverAnnotatedTypesFromRootMappingAnnotation( typesToProcess, jandexIndex,
+						buildContext.classResolver() );
+			} );
 		}
 
 		Set<PojoRawTypeModel<?>> alreadyContributedTypes = new HashSet<>();
@@ -155,6 +154,27 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 			PojoAnnotationTypeMetadataDiscoverer discoverer =
 					new PojoAnnotationTypeMetadataDiscoverer( contributorFactory, alreadyContributedTypes );
 			collector.collectDiscoverer( discoverer );
+		}
+	}
+
+	private void discoverAnnotatedTypesFromRootMappingAnnotation(Set<PojoRawTypeModel<?>> annotatedTypes,
+			IndexView jandexIndex, ClassResolver classResolver) {
+		Set<DotName> rootMappingAnnotations = new HashSet<>( BuiltinAnnotations.ROOT_MAPPING_ANNOTATIONS );
+		rootMappingAnnotations.addAll(
+				JandexUtils.findAnnotatedAnnotationsAndContaining( jandexIndex, BuiltinAnnotations.ROOT_MAPPING ) );
+
+		Set<DotName> rootMappingAnnotatedTypes = new HashSet<>();
+		for ( DotName annotationName : rootMappingAnnotations ) {
+			for ( AnnotationInstance annotation : jandexIndex.getAnnotations( annotationName ) ) {
+				ClassInfo annotatedClassInfo = JandexUtils.extractDeclaringClass( annotation.target() );
+				rootMappingAnnotatedTypes.add( annotatedClassInfo.name() );
+			}
+		}
+
+		for ( DotName rootMappingAnnotatedType : rootMappingAnnotatedTypes ) {
+			Class<?> annotatedClass = classResolver.classForName( rootMappingAnnotatedType.toString() );
+			introspector.typeModel( annotatedClass ).ascendingSuperTypes()
+					.forEach( annotatedTypes::add );
 		}
 	}
 
