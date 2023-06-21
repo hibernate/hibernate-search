@@ -67,7 +67,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 						"'myField': {"
 								+ "  'type': 'date',"
 								+ "  'format': '"
-								+ elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
+								+ elasticSearchClient.getDialect().getLocalDateDefaultMappingFormat() + "',"
 								+ "  'doc_values': false"
 								+ "}"
 				),

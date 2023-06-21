@@ -11,7 +11,6 @@ import java.util.Set;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.util.common.impl.CollectionHelper;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -82,9 +81,7 @@ public class ElasticsearchIndexMetadataTestUtils {
 			result = new Gson().fromJson( "{" + otherAttributes + "}", JsonObject.class );
 		}
 
-		if ( ElasticsearchTestDialect.get().supportsIsWriteIndex() ) {
-			result.addProperty( "is_write_index", isWriteIndex );
-		}
+		result.addProperty( "is_write_index", isWriteIndex );
 
 		return result;
 	}

@@ -58,7 +58,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 										+ "  'index': true,"
 										+ "  'doc_values': false,"
 										+ "  'format': '"
-										+ elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats()
+										+ elasticSearchClient.getDialect().getLocalDateDefaultMappingFormat()
 										+ "',"
 										+ "  'ignore_malformed': true" // Ignored during migration
 										+ "},"
@@ -77,7 +77,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 								+ "  'type': 'date',"
 								+ "  'doc_values': false,"
 								+ "  'format': '"
-								+ elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
+								+ elasticSearchClient.getDialect().getLocalDateDefaultMappingFormat() + "',"
 								+ "  'ignore_malformed': true" // Assert it was not removed
 								+ "},"
 								+ "'NOTmyField': {" // Assert it was not removed
@@ -275,7 +275,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 								+ "  'type': 'date',"
 								+ "  'doc_values': false,"
 								+ "  'format': '"
-								+ elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "'"
+								+ elasticSearchClient.getDialect().getLocalDateDefaultMappingFormat() + "'"
 								+ "},"
 								+ "'NOTmyField': {" // Assert it was not removed
 								+ "  'type': 'date'"
@@ -299,7 +299,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 										+ "  'type': 'date',"
 										+ "  'index': false," // Invalid
 										+ "  'format': '"
-										+ elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "'"
+										+ elasticSearchClient.getDialect().getLocalDateDefaultMappingFormat() + "'"
 										+ "}"
 						)
 				);

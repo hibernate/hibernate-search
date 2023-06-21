@@ -10,11 +10,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingAndCommaForInitialization;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.hasValidationFailureReport;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
-import static org.junit.Assume.assumeFalse;
 
 import java.util.EnumSet;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
@@ -26,7 +23,6 @@ import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
@@ -300,7 +296,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				root -> root.field( "myField", f -> f.asLocalDate() ).toReference()
 		);
 
-		List<String> allFormats = elasticSearchClient.getDialect().getAllLocalDateDefaultMappingFormats();
+		String allFormats = elasticSearchClient.getDialect().getLocalDateDefaultMappingFormat();
 
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
@@ -319,7 +315,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 						.failure( "The output format (the first element) is invalid." )
 						.failure(
 								"Invalid formats",
-								"missing elements are '" + allFormats + "'"
+								"missing elements are '[" + allFormats + "]'"
 						) );
 	}
 
@@ -329,7 +325,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				root -> root.field( "myField", f -> f.asLocalDate() ).toReference()
 		);
 
-		String allFormats = elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats();
+		String allFormats = elasticSearchClient.getDialect().getLocalDateDefaultMappingFormat();
 
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
@@ -345,48 +341,12 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 	}
 
 	@Test
-	public void attribute_format_incomplete() {
-		StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
-				root -> root.field( "myField", f -> f.asLocalDate() ).toReference()
-		);
-
-		String firstFormat = elasticSearchClient.getDialect().getFirstLocalDateDefaultMappingFormat();
-		List<String> nextFormats = elasticSearchClient.getDialect().getAllLocalDateDefaultMappingFormats()
-				.stream().skip( 1 ).collect( Collectors.toList() );
-		assumeFalse(
-				"Skipping this test as we don't have a type with multiple default formats in "
-						+ ElasticsearchTestDialect.getActualVersion(),
-				nextFormats.isEmpty()
-		);
-
-		elasticSearchClient.index( index.name() ).deleteAndCreate();
-		elasticSearchClient.index( index.name() ).type().putMapping(
-				simpleMappingForInitialization(
-						"'myField': {"
-								+ "  'type': 'date',"
-								+ "  'format': '" + firstFormat + "'"
-								+ "}"
-				)
-		);
-
-		assertThatThrownBy( () -> setupAndValidate( index ) )
-				.isInstanceOf( Exception.class )
-				.satisfies( hasValidationFailureReport()
-						.indexFieldContext( "myField" )
-						.mappingAttributeContext( "format" )
-						.failure(
-								"Invalid formats",
-								"missing elements are '" + nextFormats + "'"
-						) );
-	}
-
-	@Test
 	public void attribute_format_exceeding() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
 				root -> root.field( "myField", f -> f.asLocalDate() ).toReference()
 		);
 
-		String allFormats = elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats();
+		String allFormats = elasticSearchClient.getDialect().getLocalDateDefaultMappingFormat();
 
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
@@ -432,7 +392,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 						.mappingAttributeContext( "format" )
 						.failure(
 								"The output format (the first element) is invalid. Expected '"
-										+ elasticSearchClient.getDialect().getFirstLocalDateDefaultMappingFormat()
+										+ elasticSearchClient.getDialect().getLocalDateDefaultMappingFormat()
 										+ "', actual is 'epoch_millis'"
 						) );
 	}
