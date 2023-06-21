@@ -20,31 +20,21 @@ public class IndexWork extends AbstractSingleDocumentIndexingWork
 	public static class Builder
 			extends AbstractSingleDocumentIndexingWork.AbstractBuilder<Builder> {
 		private final URLEncodedString indexName;
-		private final URLEncodedString typeName;
 		private final String routingKey;
 		private final JsonObject document;
 
-		public static Builder forElasticsearch67AndBelow(String entityTypeName, Object entityIdentifier,
-				URLEncodedString elasticsearchIndexName, URLEncodedString typeName,
-				String documentIdentifier, String routingKey,
-				JsonObject document) {
-			return new Builder( entityTypeName, entityIdentifier,
-					elasticsearchIndexName, typeName, documentIdentifier, routingKey, document );
-		}
-
-		public static Builder forElasticsearch7AndAbove(String entityTypeName, Object entityIdentifier,
+		public static Builder create(String entityTypeName, Object entityIdentifier,
 				URLEncodedString elasticsearchIndexName, String documentIdentifier, String routingKey,
 				JsonObject document) {
 			return new Builder( entityTypeName, entityIdentifier,
-					elasticsearchIndexName, null, documentIdentifier, routingKey, document );
+					elasticsearchIndexName, documentIdentifier, routingKey, document );
 		}
 
 		private Builder(String entityTypeName, Object entityIdentifier, URLEncodedString elasticsearchIndexName,
-				URLEncodedString typeName, String documentIdentifier, String routingKey, JsonObject document) {
+				String documentIdentifier, String routingKey, JsonObject document) {
 			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE, entityTypeName, entityIdentifier,
 					documentIdentifier );
 			this.indexName = elasticsearchIndexName;
-			this.typeName = typeName;
 			this.routingKey = routingKey;
 			this.document = document;
 		}
@@ -53,10 +43,6 @@ public class IndexWork extends AbstractSingleDocumentIndexingWork
 		protected JsonObject buildBulkableActionMetadata() {
 			JsonObject index = new JsonObject();
 			index.addProperty( "_index", indexName.original );
-			if ( typeName != null ) { // ES6.x and below only
-				index.addProperty( "_type", typeName.original );
-			}
-
 			index.addProperty( "_id", documentIdentifier );
 
 			if ( routingKey != null ) {

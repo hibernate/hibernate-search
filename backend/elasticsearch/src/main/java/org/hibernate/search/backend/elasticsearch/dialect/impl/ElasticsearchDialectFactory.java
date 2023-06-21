@@ -10,16 +10,9 @@ import java.lang.invoke.MethodHandles;
 import java.util.OptionalInt;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
-import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch56ModelDialect;
-import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch6ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch7ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch8ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
-import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch56ProtocolDialect;
-import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch60ProtocolDialect;
-import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch63ProtocolDialect;
-import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch64ProtocolDialect;
-import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch67ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch70ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch80ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch81ProtocolDialect;
@@ -49,14 +42,8 @@ public class ElasticsearchDialectFactory {
 	private ElasticsearchModelDialect createModelDialectElastic(ElasticsearchVersion version) {
 		int major = version.major();
 
-		if ( major < 5 ) {
+		if ( major < 7 ) {
 			throw log.unsupportedElasticsearchVersion( version );
-		}
-		else if ( major == 5 ) {
-			return createModelDialectElasticV5( version );
-		}
-		else if ( major == 6 ) {
-			return new Elasticsearch6ModelDialect();
 		}
 		else if ( major == 7 ) {
 			return new Elasticsearch7ModelDialect();
@@ -64,18 +51,6 @@ public class ElasticsearchDialectFactory {
 		else {
 			return new Elasticsearch8ModelDialect();
 		}
-	}
-
-	private ElasticsearchModelDialect createModelDialectElasticV5(ElasticsearchVersion version) {
-		OptionalInt minorOptional = version.minor();
-		if ( !minorOptional.isPresent() ) {
-			throw log.ambiguousElasticsearchVersion( version );
-		}
-		int minor = minorOptional.getAsInt();
-		if ( minor < 6 ) {
-			throw log.unsupportedElasticsearchVersion( version );
-		}
-		return new Elasticsearch56ModelDialect();
 	}
 
 	private ElasticsearchModelDialect createModelDialectOpenSearch(ElasticsearchVersion version) {
@@ -109,14 +84,8 @@ public class ElasticsearchDialectFactory {
 		}
 		int minor = minorOptional.getAsInt();
 
-		if ( major < 5 ) {
+		if ( major < 7 ) {
 			throw log.unsupportedElasticsearchVersion( version );
-		}
-		else if ( major == 5 ) {
-			return createProtocolDialectElasticV5( version, minor );
-		}
-		else if ( major == 6 ) {
-			return createProtocolDialectElasticV6( version, minor );
 		}
 		else if ( major == 7 ) {
 			return createProtocolDialectElasticV7( version, minor );
@@ -128,34 +97,6 @@ public class ElasticsearchDialectFactory {
 			log.unknownElasticsearchVersion( version );
 			return new Elasticsearch81ProtocolDialect();
 		}
-	}
-
-	private ElasticsearchProtocolDialect createProtocolDialectElasticV5(ElasticsearchVersion version, int minor) {
-		if ( minor < 6 ) {
-			throw log.unsupportedElasticsearchVersion( version );
-		}
-		// Either the latest supported version, or a newer/unknown one
-		if ( minor != 6 ) {
-			log.unknownElasticsearchVersion( version );
-		}
-		return new Elasticsearch56ProtocolDialect();
-	}
-
-	private ElasticsearchProtocolDialect createProtocolDialectElasticV6(ElasticsearchVersion version, int minor) {
-		if ( minor < 3 ) {
-			return new Elasticsearch60ProtocolDialect();
-		}
-		if ( minor < 4 ) {
-			return new Elasticsearch63ProtocolDialect();
-		}
-		if ( minor < 7 ) {
-			return new Elasticsearch64ProtocolDialect();
-		}
-		// Either the latest supported version, or a newer/unknown one
-		if ( minor > 8 ) {
-			log.unknownElasticsearchVersion( version );
-		}
-		return new Elasticsearch67ProtocolDialect();
 	}
 
 	private ElasticsearchProtocolDialect createProtocolDialectElasticV7(ElasticsearchVersion version, int minor) {

@@ -394,12 +394,6 @@ public interface Log extends BasicLogger {
 			+ " the Elasticsearch backend will always normalize arguments before attempting matches on normalized fields.")
 	SearchException skipAnalysisOnNormalizedField(String absoluteFieldPath, @Param EventContext context);
 
-	@Message(id = ID_OFFSET + 61,
-			value = "Ambiguous Elasticsearch version: '%s'."
-					+ " This version matches multiple dialects."
-					+ " Please use a more precise version to remove the ambiguity.")
-	SearchException ambiguousElasticsearchVersion(ElasticsearchVersion version);
-
 	@Message(id = ID_OFFSET + 62,
 			value = "Invalid index field type: both null token '%2$s' ('indexNullAs')"
 					+ " and analyzer '%1$s' are assigned to this type."

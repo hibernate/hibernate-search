@@ -56,22 +56,7 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 	public static class Builder<R>
 			extends AbstractBuilder<Builder<R>> {
 
-		public static <T> Builder<T> forElasticsearch62AndBelow(JsonObject payload,
-				ElasticsearchSearchResultExtractor<T> resultExtractor) {
-			// No "track_total_hits": this parameter does not exist in ES6 and below, and total hits are always tracked
-			// No "allow_partial_search_results": this parameter does not exist in ES6 and below, and total hits are always tracked
-			// See https://github.com/elastic/elasticsearch/pull/27906
-			return new Builder<>( payload, resultExtractor, null, false );
-		}
-
-		public static <T> Builder<T> forElasticsearch63to68(JsonObject payload,
-				ElasticsearchSearchResultExtractor<T> resultExtractor) {
-			// No "track_total_hits": this parameter does not exist in ES6 and below, and total hits are always tracked
-			return new Builder<>( payload, resultExtractor, null, false );
-		}
-
-		public static <T> Builder<T> forElasticsearch7AndAbove(JsonObject payload,
-				ElasticsearchSearchResultExtractor<T> resultExtractor) {
+		public static <T> Builder<T> create(JsonObject payload, ElasticsearchSearchResultExtractor<T> resultExtractor) {
 			return new Builder<>( payload, resultExtractor, true, false );
 		}
 
