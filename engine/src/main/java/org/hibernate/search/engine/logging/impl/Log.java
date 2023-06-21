@@ -533,7 +533,7 @@ public interface Log extends BasicLogger {
 	SearchException unableToResolveField(String absolutePath, String causeMessage, @Cause SearchException e,
 			@Param EventContext context);
 
-	@LogMessage(level = Logger.Level.WARN)
+	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 116,
 			value = "Ignoring ServiceConfigurationError caught while trying to instantiate service '%s'.")
 	void ignoringServiceConfigurationError(Class<?> serviceContract, @Cause ServiceConfigurationError error);
