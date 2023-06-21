@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
-import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect.isActualVersion;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEqualsIgnoringUnknownFields;
-import static org.junit.Assume.assumeFalse;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -53,13 +51,6 @@ public class ElasticsearchIndexSchemaManagerExporterIT {
 
 	@Test
 	public void export() throws IOException {
-		assumeFalse(
-				"Older versions of Elasticsearch would not match the mappings",
-				isActualVersion(
-						esVersion -> esVersion.isLessThan( "7.0" ),
-						osVersion -> false
-				)
-		);
 		Path directory = temporaryFolder.newFolder().toPath();
 		String testIndexName = "test";
 		mainIndex.schemaManager().exportExpectedSchema( new IndexSchemaCollector() {
