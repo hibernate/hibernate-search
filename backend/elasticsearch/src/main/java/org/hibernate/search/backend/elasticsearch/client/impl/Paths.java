@@ -32,12 +32,6 @@ public final class Paths {
 	public static final URLEncodedString _BULK = URLEncodedString.fromString( "_bulk" );
 	public static final URLEncodedString _DOC = URLEncodedString.fromString( "_doc" );
 	public static final URLEncodedString _ALIASES = URLEncodedString.fromString( "_aliases" );
-
-	/**
-	 * @deprecated Only useful in Elasticsearch 6 and below.
-	 */
-	@Deprecated
-	public static final URLEncodedString DOC = URLEncodedString.fromString( "doc" );
 	public static final URLEncodedString SCROLL = URLEncodedString.fromString( "scroll" );
 	public static final URLEncodedString HEALTH = URLEncodedString.fromString( "health" );
 
