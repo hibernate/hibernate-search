@@ -372,10 +372,6 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 				TckConfiguration.get().getBackendFeatures()
 						.supportsFieldSortWhenFieldMissingInSomeTargetIndexes( fieldTypeDescriptor.getJavaType() )
 		);
-		assumeTrue(
-				"This backend doesn't support field sorts on a nested field that is missing from some of the target indexes.",
-				TckConfiguration.get().getBackendFeatures().supportsFieldSortWhenNestedFieldMissingInSomeTargetIndexes()
-		);
 
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
 

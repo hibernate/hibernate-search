@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues.CENTER_POINT;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.function.Function;
 
@@ -21,7 +20,6 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -74,11 +72,6 @@ public class DistanceSortDynamicFieldIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4531")
 	public void neverPopulated() {
-		assumeTrue(
-				"This backend doesn't support distance sorts on a field that is missing from some of the target indexes.",
-				TckConfiguration.get().getBackendFeatures().supportsDistanceSortWhenFieldMissingInSomeTargetIndexes()
-		);
-
 		String neverPopulatedFieldPath = neverPopulatedFieldPath();
 		String mainFieldPath = mainFieldPath();
 
