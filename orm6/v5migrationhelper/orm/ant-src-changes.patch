@@ -109,7 +109,7 @@ index 9f6bfae665..6c5728910f 100644
  	public FullTextSession openSession() {
  		return Search.getFullTextSession( builder.openSession() );
 diff --git a/main/java/org/hibernate/search/query/hibernate/impl/FullTextQueryImpl.java b/main/java/org/hibernate/search/query/hibernate/impl/FullTextQueryImpl.java
-index c6481cc62e..6ea158d8ae 100644
+index c6481cc62e..d373252b01 100644
 --- a/main/java/org/hibernate/search/query/hibernate/impl/FullTextQueryImpl.java
 +++ b/main/java/org/hibernate/search/query/hibernate/impl/FullTextQueryImpl.java
 @@ -7,21 +7,13 @@
@@ -135,11 +135,8 @@ index c6481cc62e..6ea158d8ae 100644
  
  import org.hibernate.HibernateException;
  import org.hibernate.LockMode;
-@@ -29,14 +21,18 @@
- import org.hibernate.ScrollMode;
- import org.hibernate.TypeMismatchException;
+@@ -31,12 +23,15 @@
  import org.hibernate.engine.spi.SessionImplementor;
-+import org.hibernate.engine.spi.SharedSessionContractImplementor;
  import org.hibernate.graph.GraphSemantic;
  import org.hibernate.graph.RootGraph;
 -import org.hibernate.hql.internal.QueryExecutionRequestException;
@@ -148,8 +145,8 @@ index c6481cc62e..6ea158d8ae 100644
 -import org.hibernate.query.internal.ParameterMetadataImpl;
 +import org.hibernate.graph.spi.RootGraphImplementor;
 +import org.hibernate.query.IllegalQueryOperationException;
-+import org.hibernate.query.internal.QueryOptionsImpl;
 +import org.hibernate.query.spi.AbstractQuery;
++import org.hibernate.query.spi.MutableQueryOptions;
 +import org.hibernate.query.spi.ParameterMetadataImplementor;
  import org.hibernate.query.spi.QueryImplementor;
 +import org.hibernate.query.spi.QueryParameterBinding;
@@ -158,7 +155,7 @@ index c6481cc62e..6ea158d8ae 100644
  import org.hibernate.query.spi.ScrollableResultsImplementor;
  import org.hibernate.search.FullTextQuery;
  import org.hibernate.search.engine.search.query.SearchScroll;
-@@ -45,7 +41,6 @@
+@@ -45,7 +40,6 @@
  import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
  import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchQueryHints;
  import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter;
@@ -166,7 +163,7 @@ index c6481cc62e..6ea158d8ae 100644
  import org.hibernate.search.query.DatabaseRetrievalMethod;
  import org.hibernate.search.query.ObjectLookupMethod;
  import org.hibernate.search.query.engine.spi.FacetManager;
-@@ -55,8 +50,11 @@
+@@ -55,8 +49,11 @@
  import org.hibernate.search.spatial.impl.Point;
  import org.hibernate.search.util.common.SearchTimeoutException;
  import org.hibernate.transform.ResultTransformer;
@@ -179,7 +176,7 @@ index c6481cc62e..6ea158d8ae 100644
  import org.apache.lucene.search.Explanation;
  import org.apache.lucene.search.Query;
  import org.apache.lucene.search.Sort;
-@@ -68,14 +66,14 @@
+@@ -68,14 +65,12 @@
   * @author Hardy Ferentschik
   */
  @SuppressWarnings("rawtypes") // We extend the raw version of AbstractProducedQuery on purpose, see HSEARCH-2564
@@ -192,12 +189,10 @@ index c6481cc62e..6ea158d8ae 100644
  
 -	private Integer firstResult;
 -	private Integer maxResults;
-+	private final SessionImplementor sessionImplementor;
-+	private final QueryOptionsImpl queryOptions = new QueryOptionsImpl();
  	//initialized at 0 since we don't expect to use hints at this stage
  	private final Map<String, Object> hints = new HashMap<String, Object>( 0 );
  
-@@ -96,11 +94,12 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
+@@ -96,11 +91,11 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
  
  	private ResultTransformer resultTransformer;
  
@@ -208,11 +203,10 @@ index c6481cc62e..6ea158d8ae 100644
  			Class<?> ... entities) {
 -		super( session, new ParameterMetadataImpl( null, null ) );
 +		super( sessionImplementor );
-+		this.sessionImplementor = sessionImplementor;
  		this.searchSession = searchSession;
  		this.hSearchQuery = searchIntegrator.createHSQuery( luceneQuery, searchSession,
  				loadingOptionsContributor, entities );
-@@ -118,54 +117,61 @@ public List getResultList() {
+@@ -118,54 +113,61 @@ public List getResultList() {
  	}
  
  	@Override
@@ -227,7 +221,6 @@ index c6481cc62e..6ea158d8ae 100644
 -		SearchScroll<?> scroll = hSearchQuery.scroll(
 -				fetchSize != null ? fetchSize : 100 );
 +	protected ScrollableResultsImplementor doScroll(ScrollMode scrollMode) {
-+		extractQueryOptions();
 +		SearchScroll<?> scroll = hSearchQuery.scroll( fetchSize != null ? fetchSize : 100 );
 +		Integer maxResults = hSearchQuery.maxResults();
  		return new HibernateOrmSearchScrollableResultsAdapter<>( scroll,
@@ -281,15 +274,16 @@ index c6481cc62e..6ea158d8ae 100644
 +	}
 +
 +	private void extractQueryOptions() {
-+		Integer limit = getQueryOptions().getLimit().getMaxRows();
++		MutableQueryOptions queryOptions = getQueryOptions();
++		Integer limit = queryOptions.getLimit().getMaxRows();
 +		hSearchQuery.maxResults( limit );
-+		Integer offset = getQueryOptions().getLimit().getFirstRow();
++		Integer offset = queryOptions.getLimit().getFirstRow();
 +		hSearchQuery.firstResult( offset == null ? 0 : offset );
-+		Integer queryFetchSize = getQueryOptions().getFetchSize();
++		Integer queryFetchSize = queryOptions.getFetchSize();
 +		if ( queryFetchSize != null ) {
 +			fetchSize = queryFetchSize;
 +		}
-+		Integer queryTimeout = getQueryOptions().getTimeout();
++		Integer queryTimeout = queryOptions.getTimeout();
 +		if ( queryTimeout != null ) {
 +			hSearchQuery.failAfter( queryTimeout, TimeUnit.SECONDS );
 +		}
@@ -298,7 +292,7 @@ index c6481cc62e..6ea158d8ae 100644
  	@Override
  	public Explanation explain(Object entityId) {
  		return hSearchQuery.explain( entityId );
-@@ -179,8 +185,14 @@ public int getResultSize() {
+@@ -179,8 +181,14 @@ public int getResultSize() {
  		catch (SearchTimeoutException e) {
  			throw new QueryTimeoutException( e );
  		}
@@ -314,7 +308,7 @@ index c6481cc62e..6ea158d8ae 100644
  		}
  	}
  
-@@ -189,11 +201,16 @@ public int doGetResultSize() {
+@@ -189,11 +197,16 @@ public int doGetResultSize() {
  	}
  
  	@Override
@@ -333,7 +327,7 @@ index c6481cc62e..6ea158d8ae 100644
  	@Override
  	public FullTextQueryImpl setProjection(String... fields) {
  		hSearchQuery.projection( fields );
-@@ -214,44 +231,16 @@ public FullTextQueryImpl setSpatialParameters(double latitude, double longitude,
+@@ -214,44 +227,16 @@ public FullTextQueryImpl setSpatialParameters(double latitude, double longitude,
  
  	@Override
  	public FullTextQuery setMaxResults(int maxResults) {
@@ -380,7 +374,7 @@ index c6481cc62e..6ea158d8ae 100644
  	@Override
  	@SuppressWarnings("deprecation")
  	public FullTextQuery setHint(String hintName, Object value) {
-@@ -266,14 +255,11 @@ public FullTextQuery setHint(String hintName, Object value) {
+@@ -266,14 +251,11 @@ public FullTextQuery setHint(String hintName, Object value) {
  				break;
  			case HibernateOrmSearchQueryHints.JAVAX_FETCHGRAPH:
  			case HibernateOrmSearchQueryHints.JAKARTA_FETCHGRAPH:
@@ -396,7 +390,7 @@ index c6481cc62e..6ea158d8ae 100644
  				break;
  		}
  		return this;
-@@ -284,99 +270,40 @@ public Map<String, Object> getHints() {
+@@ -284,99 +266,40 @@ public Map<String, Object> getHints() {
  		return hints;
  	}
  
@@ -514,7 +508,7 @@ index c6481cc62e..6ea158d8ae 100644
  		throw parametersNoSupported();
  	}
  
-@@ -391,12 +318,7 @@ public FullTextQueryImpl setFlushMode(FlushModeType flushModeType) {
+@@ -391,12 +314,7 @@ public FullTextQueryImpl setFlushMode(FlushModeType flushModeType) {
  
  	@Override
  	public FullTextQueryImpl setFetchSize(int fetchSize) {
@@ -528,7 +522,7 @@ index c6481cc62e..6ea158d8ae 100644
  	}
  
  	@Override
-@@ -434,7 +356,12 @@ public Object unwrap(Class type) {
+@@ -434,7 +352,12 @@ public Object unwrap(Class type) {
  		if ( type == org.apache.lucene.search.Query.class ) {
  			return hSearchQuery.getLuceneQuery();
  		}
@@ -542,32 +536,33 @@ index c6481cc62e..6ea158d8ae 100644
  	}
  
  	@Override
-@@ -457,7 +384,12 @@ private UnsupportedOperationException lockOptionsNotSupported() {
+@@ -457,8 +380,13 @@ private UnsupportedOperationException lockOptionsNotSupported() {
  	}
  
  	@Override
 -	public int executeUpdate() {
+-		throw new UnsupportedOperationException( "executeUpdate is not supported in Hibernate Search queries" );
 +	public int executeUpdate() throws HibernateException {
 +		return doExecuteUpdate();
 +	}
 +
 +	@Override
 +	protected int doExecuteUpdate() {
- 		throw new UnsupportedOperationException( "executeUpdate is not supported in Hibernate Search queries" );
- 	}
- 
-@@ -515,32 +447,13 @@ public String getQueryString() {
++		throw new UnsupportedOperationException( "executeUpdate() is not supported in Hibernate Search queries" );
  	}
  
  	@Override
+@@ -514,47 +442,18 @@ public String getQueryString() {
+ 		return hSearchQuery.getQueryString();
+ 	}
+ 
+-	@Override
 -	protected boolean isNativeQuery() {
 -		return false;
-+	public QueryOptionsImpl getQueryOptions() {
-+		return queryOptions;
- 	}
- 
+-	}
+-
 -	@Deprecated
- 	@Override
+-	@Override
 -	public Type[] getReturnTypes() {
 -		throw new UnsupportedOperationException( "getReturnTypes() is not implemented in Hibernate Search queries" );
 -	}
@@ -588,12 +583,11 @@ index c6481cc62e..6ea158d8ae 100644
 -	@Override
 -	public FullTextQueryImpl setEntity(String name, Object val) {
 -		throw new UnsupportedOperationException( "setEntity(String,Object) is not implemented in Hibernate Search queries" );
-+	public SharedSessionContractImplementor getSession() {
-+		return sessionImplementor;
- 	}
- 
+-	}
+-
  	@Override
-@@ -549,12 +462,12 @@ public String toString() {
+ 	public String toString() {
+ 		return "FullTextQueryImpl(" + getQueryString() + ")";
  	}
  
  	private static final class Search5ScrollHitExtractor
@@ -608,7 +602,7 @@ index c6481cc62e..6ea158d8ae 100644
  			if ( hit instanceof Object[] ) {
  				return (Object[]) hit;
  			}
-@@ -562,19 +475,6 @@ public Object[] toArray(Object hit) {
+@@ -562,19 +461,6 @@ public Object[] toArray(Object hit) {
  				return new Object[] { hit };
  			}
  		}
@@ -628,7 +622,7 @@ index c6481cc62e..6ea158d8ae 100644
  	}
  
  	private static int hintValueToInteger(Object value) {
-@@ -586,7 +486,7 @@ private static int hintValueToInteger(Object value) {
+@@ -586,7 +472,7 @@ private static int hintValueToInteger(Object value) {
  		}
  	}
  
