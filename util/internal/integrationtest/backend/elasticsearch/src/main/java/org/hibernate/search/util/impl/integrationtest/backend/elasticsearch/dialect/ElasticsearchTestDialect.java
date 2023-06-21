@@ -6,16 +6,10 @@
  */
 package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
-import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 
 public class ElasticsearchTestDialect {
@@ -25,6 +19,7 @@ public class ElasticsearchTestDialect {
 	);
 
 	private static final ElasticsearchTestDialect INSTANCE = new ElasticsearchTestDialect();
+	private static final String LOCAL_DATE_DEFAULT_FORMAT = "uuuu-MM-dd";
 
 	public static ElasticsearchTestDialect get() {
 		return INSTANCE;
@@ -34,57 +29,8 @@ public class ElasticsearchTestDialect {
 		return ACTUAL_VERSION;
 	}
 
-	public boolean isEmptyMappingPossible() {
-		return isActualVersion(
-				esVersion -> esVersion.isAtMost( "6.8" ),
-				osVersion -> false
-		);
-	}
-
-	@SuppressWarnings("deprecation")
-	public Optional<URLEncodedString> getTypeNameForMappingAndBulkApi() {
-		if ( isActualVersion(
-				esVersion -> esVersion.isAtMost( "6.8" ),
-				osVersion -> false
-		) ) {
-			return Optional.of( Paths.DOC );
-		}
-		return Optional.empty();
-	}
-
-	public Boolean getIncludeTypeNameParameterForMappingApi() {
-		if ( isActualVersion(
-				esVersion -> esVersion.isBetween( "6.7", "6.8" ),
-				osVersion -> false
-		) ) {
-			return Boolean.TRUE;
-		}
-		return null;
-	}
-
-	public List<String> getAllLocalDateDefaultMappingFormats() {
-		if ( isActualVersion(
-				esVersion -> esVersion.isAtMost( "6.8" ),
-				osVersion -> false
-		) ) {
-			return Arrays.asList( "yyyy-MM-dd", "yyyyyyyyy-MM-dd" );
-		}
-		return Collections.singletonList( "uuuu-MM-dd" );
-	}
-
-	public boolean supportsIsWriteIndex() {
-		return isActualVersion(
-				esVersion -> !esVersion.isLessThan( "6.4.0" ),
-				osVersion -> true
-		);
-	}
-
-	public String getFirstLocalDateDefaultMappingFormat() {
-		return getAllLocalDateDefaultMappingFormats().get( 0 );
-	}
-
-	public String getConcatenatedLocalDateDefaultMappingFormats() {
-		return String.join( "||", getAllLocalDateDefaultMappingFormats() );
+	public String getLocalDateDefaultMappingFormat() {
+		return LOCAL_DATE_DEFAULT_FORMAT;
 	}
 
 	public static boolean isActualVersion(

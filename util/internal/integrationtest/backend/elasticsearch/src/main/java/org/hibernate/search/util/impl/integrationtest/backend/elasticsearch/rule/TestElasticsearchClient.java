@@ -20,7 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
@@ -264,11 +263,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 
 		builder.body( payload );
 
-		Boolean includeTypeName = dialect.getIncludeTypeNameParameterForMappingApi();
-		if ( includeTypeName != null ) {
-			builder.param( "include_type_name", includeTypeName );
-		}
-
 		doDeleteAndCreateIndex(
 				primaryIndexName,
 				builder.build()
@@ -368,13 +362,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 	private void putMapping(URLEncodedString indexName, JsonObject mappingJsonObject) {
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
 				.pathComponent( indexName ).pathComponent( Paths._MAPPING );
-		dialect.getTypeNameForMappingAndBulkApi().ifPresent( builder::pathComponent );
 		builder.body( mappingJsonObject );
-
-		Boolean includeTypeName = dialect.getIncludeTypeNameParameterForMappingApi();
-		if ( includeTypeName != null ) {
-			builder.param( "include_type_name", includeTypeName );
-		}
 
 		performRequest( builder.build() );
 	}
@@ -383,12 +371,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.get()
 				.pathComponent( indexName ).pathComponent( Paths._MAPPING );
-		dialect.getTypeNameForMappingAndBulkApi().ifPresent( builder::pathComponent );
-
-		Boolean includeTypeName = dialect.getIncludeTypeNameParameterForMappingApi();
-		if ( includeTypeName != null ) {
-			builder.param( "include_type_name", includeTypeName );
-		}
 
 		/*
 		 * Elasticsearch 5.5+ triggers a 404 error when mappings are missing,
@@ -405,17 +387,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		if ( mappings == null ) {
 			return new JsonObject().toString();
 		}
-		Optional<URLEncodedString> typeName = dialect.getTypeNameForMappingAndBulkApi();
-		if ( typeName.isPresent() ) {
-			JsonElement mapping = mappings.getAsJsonObject().get( typeName.get().original );
-			if ( mapping == null ) {
-				return new JsonObject().toString();
-			}
-			return mapping.toString();
-		}
-		else {
-			return mappings.toString();
-		}
+		return mappings.toString();
 	}
 
 	private void putIndexSettingsDynamic(URLEncodedString indexName, JsonObject settingsJsonObject) {

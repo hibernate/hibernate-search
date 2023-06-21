@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingAndCommaForInitialization;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.hasValidationFailureReport;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.EnumSet;
 
@@ -22,7 +21,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportChecker;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
@@ -74,7 +72,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 								+ "  'type': 'date',"
 								+ "  'index': true,"
 								+ "  'format': '"
-								+ elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
+								+ elasticSearchClient.getDialect().getLocalDateDefaultMappingFormat() + "',"
 								+ "  'ignore_malformed': true" // Ignored during validation
 								+ "},"
 								+ "'NOTmyField': {" // Ignored during validation
@@ -141,28 +139,6 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 		);
 
 		setupAndValidate( index );
-	}
-
-	@Test
-	public void mapping_missing() {
-		assumeTrue(
-				"Skipping this test as there is always a mapping (be it empty) in "
-						+ ElasticsearchTestDialect.getActualVersion(),
-				elasticSearchClient.getDialect().isEmptyMappingPossible()
-		);
-
-		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
-			root.field( "myField", f -> f.asLocalDate() )
-					.toReference();
-		} );
-
-		elasticSearchClient.index( index.name() ).deleteAndCreate();
-
-		setupAndValidateExpectingFailure(
-				index,
-				hasValidationFailureReport()
-						.failure( "Missing type mapping" )
-		);
 	}
 
 	@Test
@@ -337,7 +313,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 								+ "    'myField': {"
 								+ "      'type': 'date',"
 								+ "      'format': '"
-								+ elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
+								+ elasticSearchClient.getDialect().getLocalDateDefaultMappingFormat() + "',"
 								+ "      'index': false"
 								+ "    }"
 								+ "  }"

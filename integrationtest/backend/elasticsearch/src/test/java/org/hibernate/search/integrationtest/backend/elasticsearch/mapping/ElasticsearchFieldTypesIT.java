@@ -75,18 +75,8 @@ public class ElasticsearchFieldTypesIT {
 		JsonObject mappings = new JsonObject();
 		payload.add( "mappings", mappings );
 
-		JsonObject mapping = dialect.getTypeNameForMappingAndBulkApi()
-				// ES6 and below: the mapping has its own object node, child of "mappings"
-				.map( name -> {
-					JsonObject doc = new JsonObject();
-					mappings.add( name.original, doc );
-					return doc;
-				} )
-				// ES7 and below: the mapping is the "mappings" node
-				.orElse( mappings );
-
 		JsonObject properties = new JsonObject();
-		mapping.add( "properties", properties );
+		mappings.add( "properties", properties );
 
 		properties.add( "keyword", type( "keyword" ) );
 		properties.add( "text", type( "text" ) );
