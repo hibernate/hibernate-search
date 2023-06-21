@@ -208,18 +208,6 @@ stage('Configure') {
 			esLocal: [
 					// --------------------------------------------
 					// Elasticsearch distribution from Elastic
-					new EsLocalBuildEnvironment(version: '5.6.16', condition: TestCondition.AFTER_MERGE),
-					// ES 6.2, 6.3.0, 6.3.1 and 6.3.2 and below have a bug that prevents double-nested
-					// sorts from working: https://github.com/elastic/elasticsearch/issues/32130
-					new EsLocalBuildEnvironment(version: '6.2.4', condition: TestCondition.ON_DEMAND),
-					// ES 6.3 has a bug that prevents IndexingIT from passing.
-					// See https://github.com/elastic/elasticsearch/issues/32395
-					new EsLocalBuildEnvironment(version: '6.3.2', condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(version: '6.6.2', condition: TestCondition.AFTER_MERGE),
-					// Not testing 6.7 to make the build quicker.
-					// The only difference with 6.8+ is a bug in field sorts that is already present in earlier versions.
-					new EsLocalBuildEnvironment(version: '6.7.2', condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(version: '6.8.22', condition: TestCondition.AFTER_MERGE),
 					// Not testing 7.0/7.1/7.2 to make the build quicker.
 					// The only difference with 7.3+ is they have a bug in their BigInteger support.
 					new EsLocalBuildEnvironment(version: '7.2.1', condition: TestCondition.ON_DEMAND),
@@ -273,18 +261,6 @@ stage('Configure') {
 			esAws: [
 					// --------------------------------------------
 					// AWS Elasticsearch service (OpenDistro)
-					new EsAwsBuildEnvironment(version: '5.6', condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '6.0', condition: TestCondition.ON_DEMAND),
-					// ES 6.2, 6.3.0, 6.3.1 and 6.3.2 and below have a bug that prevents double-nested
-					// sorts from working: https://github.com/elastic/elasticsearch/issues/32130
-					new EsAwsBuildEnvironment(version: '6.2', condition: TestCondition.ON_DEMAND),
-					// ES 6.3 has a bug that prevents IndexingIT from passing.
-					// See https://github.com/elastic/elasticsearch/issues/32395
-					new EsAwsBuildEnvironment(version: '6.3', condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '6.4', condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '6.5', condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '6.7', condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '6.8', condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '7.1', condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '7.4', condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '7.7', condition: TestCondition.ON_DEMAND),
