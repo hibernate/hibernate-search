@@ -22,28 +22,20 @@ public class DeleteWork extends AbstractSingleDocumentIndexingWork {
 	public static class Builder
 			extends AbstractSingleDocumentIndexingWork.AbstractBuilder<Builder> {
 		private final URLEncodedString indexName;
-		private final URLEncodedString typeName;
 		private final String routingKey;
 
-		public static Builder forElasticsearch67AndBelow(String entityTypeName, Object entityIdentifier,
-				URLEncodedString elasticsearchIndexName, URLEncodedString typeName,
-				String documentIdentifier, String routingKey) {
-			return new Builder( entityTypeName, entityIdentifier,
-					elasticsearchIndexName, typeName, documentIdentifier, routingKey );
-		}
-
-		public static Builder forElasticsearch7AndAbove(String entityTypeName, Object entityIdentifier,
+		public static Builder create(String entityTypeName, Object entityIdentifier,
 				URLEncodedString elasticsearchIndexName, String documentIdentifier, String routingKey) {
 			return new Builder( entityTypeName, entityIdentifier,
-					elasticsearchIndexName, null, documentIdentifier, routingKey );
+					elasticsearchIndexName, documentIdentifier, routingKey
+			);
 		}
 
 		private Builder(String entityTypeName, Object entityIdentifier,
 				URLEncodedString elasticsearchIndexName,
-				URLEncodedString typeName, String documentIdentifier, String routingKey) {
+				String documentIdentifier, String routingKey) {
 			super( SUCCESS_ASSESSOR, entityTypeName, entityIdentifier, documentIdentifier );
 			this.indexName = elasticsearchIndexName;
-			this.typeName = typeName;
 			this.routingKey = routingKey;
 		}
 
@@ -51,10 +43,6 @@ public class DeleteWork extends AbstractSingleDocumentIndexingWork {
 		protected JsonObject buildBulkableActionMetadata() {
 			JsonObject delete = new JsonObject();
 			delete.addProperty( "_index", indexName.original );
-			if ( typeName != null ) { // ES6.x and below only
-				delete.addProperty( "_type", typeName.original );
-			}
-
 			delete.addProperty( "_id", documentIdentifier );
 
 			if ( routingKey != null ) {

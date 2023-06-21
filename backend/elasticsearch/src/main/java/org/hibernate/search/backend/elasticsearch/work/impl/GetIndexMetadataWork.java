@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -27,20 +26,11 @@ import org.hibernate.search.util.common.AssertionFailure;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 
 public class GetIndexMetadataWork extends AbstractNonBulkableWork<List<ExistingIndexMetadata>> {
 
-	private static final TypeToken<Map<String, RootTypeMapping>> STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN =
-			new TypeToken<Map<String, RootTypeMapping>>() {
-				// Create a new class to capture generic parameters
-			};
-
-	private final URLEncodedString typeName;
-
 	private GetIndexMetadataWork(Builder builder) {
 		super( builder );
-		this.typeName = builder.typeName;
 	}
 
 	@Override
@@ -101,45 +91,23 @@ public class GetIndexMetadataWork extends AbstractNonBulkableWork<List<ExistingI
 
 		if ( mappings != null ) {
 			GsonProvider gsonProvider = context.getGsonProvider();
-			if ( typeName != null ) {
-				// ES6 and below
-				Type mapType = STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN.getType();
-				Map<String, RootTypeMapping> mappingsMap = gsonProvider.getGson().fromJson( mappings, mapType );
-				return mappingsMap.get( typeName.original );
-			}
-			else {
-				// ES7 and above
-				return gsonProvider.getGson().fromJson( mappings, RootTypeMapping.class );
-			}
+			return gsonProvider.getGson().fromJson( mappings, RootTypeMapping.class );
 		}
 		else {
 			return null;
 		}
 	}
 
-	public static class Builder
-			extends AbstractBuilder<Builder> {
+	public static class Builder extends AbstractBuilder<Builder> {
 
 		private final Set<URLEncodedString> indexNames = new LinkedHashSet<>();
-		private final URLEncodedString typeName;
-		private final Boolean includeTypeName;
 
-		public static Builder forElasticsearch66AndBelow(URLEncodedString typeName) {
-			return new Builder( typeName, null );
+		public static Builder create() {
+			return new Builder();
 		}
 
-		public static Builder forElasticsearch67(URLEncodedString typeName) {
-			return new Builder( typeName, true );
-		}
-
-		public static Builder forElasticsearch7AndAbove() {
-			return new Builder( null, null );
-		}
-
-		private Builder(URLEncodedString typeName, Boolean includeTypeName) {
+		private Builder() {
 			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
-			this.typeName = typeName;
-			this.includeTypeName = includeTypeName;
 		}
 
 		public Builder index(URLEncodedString indexName) {
@@ -158,10 +126,6 @@ public class GetIndexMetadataWork extends AbstractNonBulkableWork<List<ExistingI
 			// if the given index name does not match anything, but actually it has no effect.
 			// Leaving it anyway in case they fix it someday.
 			builder.param( "allow_no_indices", true );
-			// ES6.7 and later 6.x only
-			if ( includeTypeName != null ) {
-				builder.param( "include_type_name", includeTypeName );
-			}
 			return builder.build();
 		}
 

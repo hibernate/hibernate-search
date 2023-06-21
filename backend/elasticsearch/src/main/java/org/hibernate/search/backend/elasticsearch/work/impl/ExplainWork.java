@@ -48,26 +48,18 @@ public class ExplainWork extends AbstractNonBulkableWork<ExplainResult> {
 	public static class Builder
 			extends AbstractBuilder<Builder> {
 		private final URLEncodedString indexName;
-		private final URLEncodedString typeName;
 		private final URLEncodedString id;
 		private final JsonObject payload;
 
 		private Set<String> routingKeys;
 
-		public static Builder forElasticsearch67AndBelow(URLEncodedString indexName, URLEncodedString typeName,
-				URLEncodedString id, JsonObject payload) {
-			return new Builder( indexName, typeName, id, payload );
+		public static Builder create(URLEncodedString indexName, URLEncodedString id, JsonObject payload) {
+			return new Builder( indexName, id, payload );
 		}
 
-		public static Builder forElasticsearch7AndAbove(URLEncodedString indexName,
-				URLEncodedString id, JsonObject payload) {
-			return new Builder( indexName, null, id, payload );
-		}
-
-		private Builder(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, JsonObject payload) {
+		private Builder(URLEncodedString indexName, URLEncodedString id, JsonObject payload) {
 			super( SUCCESS_ASSESSOR );
 			this.indexName = indexName;
-			this.typeName = typeName;
 			this.id = id;
 			this.payload = payload;
 		}
@@ -81,17 +73,10 @@ public class ExplainWork extends AbstractNonBulkableWork<ExplainResult> {
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.get()
-							.pathComponent( indexName );
-			if ( typeName != null ) { // ES6.x and below only
-				builder.pathComponent( typeName )
-						.pathComponent( id )
-						.pathComponent( Paths._EXPLAIN );
-			}
-			else { // ES7.x and above
-				builder.pathComponent( Paths._EXPLAIN )
-						.pathComponent( id );
-			}
-			builder.body( payload );
+							.pathComponent( indexName )
+							.pathComponent( Paths._EXPLAIN )
+							.pathComponent( id )
+							.body( payload );
 
 			if ( !routingKeys.isEmpty() ) {
 				builder.multiValuedParam( "routing", routingKeys );

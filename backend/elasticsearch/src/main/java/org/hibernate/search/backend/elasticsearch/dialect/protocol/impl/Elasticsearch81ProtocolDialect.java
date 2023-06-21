@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.dialect.protocol.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.Elasticsearch64IndexMetadataSyntax;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.Elasticsearch7IndexMetadataSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.ElasticsearchIndexMetadataSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.Elasticsearch81SearchSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
@@ -23,7 +23,7 @@ public class Elasticsearch81ProtocolDialect implements ElasticsearchProtocolDial
 
 	@Override
 	public ElasticsearchIndexMetadataSyntax createIndexMetadataSyntax() {
-		return new Elasticsearch64IndexMetadataSyntax();
+		return new Elasticsearch7IndexMetadataSyntax();
 	}
 
 	@Override

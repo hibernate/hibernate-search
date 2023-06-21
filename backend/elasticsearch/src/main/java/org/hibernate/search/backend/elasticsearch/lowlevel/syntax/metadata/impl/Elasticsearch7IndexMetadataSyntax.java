@@ -9,9 +9,9 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 
 /**
- * The index metadata syntax for ES6.4 and later.
+ * The index metadata syntax for ES7 and later.
  */
-public class Elasticsearch64IndexMetadataSyntax implements ElasticsearchIndexMetadataSyntax {
+public class Elasticsearch7IndexMetadataSyntax implements ElasticsearchIndexMetadataSyntax {
 
 	@Override
 	public IndexAliasDefinition createWriteAliasDefinition() {
