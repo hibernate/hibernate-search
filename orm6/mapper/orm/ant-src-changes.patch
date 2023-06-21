@@ -1462,7 +1462,7 @@ index 1e581dd9de..189f713827 100644
  					|| isWholePath && isAssociation( containedValueClass ) ) {
  				String stringRepresentationAsProperty = propertyNode.toPropertyString();
 diff --git a/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java b/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
-index c8ca89a1e0..c83cd836d2 100644
+index c8ca89a1e0..266aee8ae2 100644
 --- a/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
 +++ b/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
 @@ -7,52 +7,50 @@
@@ -1491,17 +1491,17 @@ index c8ca89a1e0..c83cd836d2 100644
  import org.hibernate.ScrollMode;
 -import org.hibernate.TypeMismatchException;
  import org.hibernate.engine.spi.SessionImplementor;
-+import org.hibernate.engine.spi.SharedSessionContractImplementor;
  import org.hibernate.graph.GraphSemantic;
  import org.hibernate.graph.RootGraph;
 -import org.hibernate.query.QueryParameter;
 -import org.hibernate.query.internal.AbstractProducedQuery;
 -import org.hibernate.query.internal.ParameterMetadataImpl;
++import org.hibernate.graph.spi.AppliedGraph;
 +import org.hibernate.graph.spi.RootGraphImplementor;
 +import org.hibernate.query.ResultListTransformer;
 +import org.hibernate.query.TupleTransformer;
-+import org.hibernate.query.internal.QueryOptionsImpl;
 +import org.hibernate.query.spi.AbstractQuery;
++import org.hibernate.query.spi.MutableQueryOptions;
 +import org.hibernate.query.spi.ParameterMetadataImplementor;
 +import org.hibernate.query.spi.QueryImplementor;
 +import org.hibernate.query.spi.QueryParameterBinding;
@@ -1537,7 +1537,7 @@ index c8ca89a1e0..c83cd836d2 100644
  
  	public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query) {
  		return query.extension( HibernateOrmSearchQueryAdapterExtension.get() );
-@@ -61,15 +59,16 @@ public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query)
+@@ -61,14 +59,12 @@ public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query)
  	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
  
  	private final SearchQueryImplementor<R> delegate;
@@ -1545,20 +1545,16 @@ index c8ca89a1e0..c83cd836d2 100644
  
 -	private Integer firstResult;
 -	private Integer maxResults;
-+	private final SessionImplementor sessionImplementor;
 +	private final MutableEntityLoadingOptions loadingOptions;
-+	private final QueryOptionsImpl queryOptions = new QueryOptionsImpl();
  
  	HibernateOrmSearchQueryAdapter(SearchQueryImplementor<R> delegate, SessionImplementor sessionImplementor,
  			MutableEntityLoadingOptions loadingOptions) {
 -		super( sessionImplementor, new ParameterMetadataImpl( null, null ) );
 +		super( sessionImplementor );
  		this.delegate = delegate;
-+		this.sessionImplementor = sessionImplementor;
  		this.loadingOptions = loadingOptions;
  	}
- 
-@@ -84,83 +83,26 @@ public String toString() {
+@@ -84,83 +80,26 @@ public String toString() {
  
  	@Override
  	@SuppressWarnings("unchecked")
@@ -1649,19 +1645,7 @@ index c8ca89a1e0..c83cd836d2 100644
  	}
  
  	@Override
-@@ -168,6 +110,11 @@ public String getQueryString() {
- 		return delegate.queryString();
- 	}
- 
-+	@Override
-+	public QueryOptionsImpl getQueryOptions() {
-+		return queryOptions;
-+	}
-+
- 	@Override
- 	public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value) {
- 		switch ( hintName ) {
-@@ -180,14 +127,12 @@ public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value)
+@@ -180,14 +119,12 @@ public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value)
  				break;
  			case HibernateOrmSearchQueryHints.JAVAX_FETCHGRAPH:
  			case HibernateOrmSearchQueryHints.JAKARTA_FETCHGRAPH:
@@ -1678,7 +1662,7 @@ index c8ca89a1e0..c83cd836d2 100644
  				break;
  		}
  		return this;
-@@ -200,148 +145,109 @@ public HibernateOrmSearchQueryAdapter<R> setTimeout(int timeout) {
+@@ -200,148 +137,107 @@ public HibernateOrmSearchQueryAdapter<R> setTimeout(int timeout) {
  	}
  
  	@Override
@@ -1703,19 +1687,15 @@ index c8ca89a1e0..c83cd836d2 100644
  			throw log.canOnlyUseScrollWithScrollModeForwardsOnly( scrollMode );
  		}
  
-+		extractQueryOptions();
-+
  		int chunkSize = loadingOptions.fetchSize();
  		return new HibernateOrmSearchScrollableResultsAdapter<>( delegate.scroll( chunkSize ), getMaxResults(),
 -				ScrollHitExtractor.singleObject() );
-+				Function.identity() );
- 	}
- 
- 	@Override
+-	}
+-
+-	@Override
 -	protected boolean isNativeQuery() {
 -		return false;
-+	public SharedSessionContractImplementor getSession() {
-+		return sessionImplementor;
++				Function.identity() );
  	}
  
  	@Override
@@ -1735,17 +1715,22 @@ index c8ca89a1e0..c83cd836d2 100644
 +	}
 +
 +	private void extractQueryOptions() {
-+		Integer queryFetchSize = getQueryOptions().getFetchSize();
++		MutableQueryOptions queryOptions = getQueryOptions();
++		Integer queryFetchSize = queryOptions.getFetchSize();
 +		if ( queryFetchSize != null ) {
 +			loadingOptions.fetchSize( queryFetchSize );
 +		}
-+		Integer queryTimeout = getQueryOptions().getTimeout();
++		Integer queryTimeout = queryOptions.getTimeout();
 +		if ( queryTimeout != null ) {
 +			delegate.failAfter( queryTimeout, TimeUnit.SECONDS );
 +		}
 +		EntityGraphHint<?> entityGraphHint = null;
-+		if ( queryOptions.getGraph() != null ) {
-+			entityGraphHint = new EntityGraphHint<>( queryOptions.getGraph(), queryOptions.getSemantic() );
++		if ( hasAppliedGraph( queryOptions ) ) {
++			AppliedGraph appliedGraph = queryOptions.getAppliedGraph();
++			RootGraph<?> graph = appliedGraph.getGraph();
++			if ( graph != null ) {
++				entityGraphHint = new EntityGraphHint<>( graph, appliedGraph.getSemantic() );
++			}
 +		}
 +		loadingOptions.entityGraphHint( entityGraphHint, true );
  	}
@@ -1880,7 +1865,7 @@ index c8ca89a1e0..c83cd836d2 100644
  		throw parametersNoSupported();
  	}
  
-@@ -350,18 +256,16 @@ private UnsupportedOperationException parametersNoSupported() {
+@@ -350,18 +246,16 @@ private UnsupportedOperationException parametersNoSupported() {
  	}
  
  	@Override
@@ -1904,21 +1889,23 @@ index c8ca89a1e0..c83cd836d2 100644
  		return new UnsupportedOperationException( "Result transformers are not supported in Hibernate Search queries" );
  	}
  
-@@ -391,7 +295,12 @@ private UnsupportedOperationException lockOptionsNotSupported() {
+@@ -391,8 +285,13 @@ private UnsupportedOperationException lockOptionsNotSupported() {
  	}
  
  	@Override
 -	public int executeUpdate() {
+-		throw new UnsupportedOperationException( "executeUpdate is not supported in Hibernate Search queries" );
 +	public int executeUpdate() throws HibernateException {
 +		return doExecuteUpdate();
 +	}
 +
 +	@Override
 +	protected int doExecuteUpdate() {
- 		throw new UnsupportedOperationException( "executeUpdate is not supported in Hibernate Search queries" );
++		throw new UnsupportedOperationException( "executeUpdate() is not supported in Hibernate Search queries" );
  	}
  
-@@ -400,30 +309,6 @@ public HibernateOrmSearchQueryAdapter<R> setLockMode(String alias, LockMode lock
+ 	@Override
+@@ -400,30 +299,6 @@ public HibernateOrmSearchQueryAdapter<R> setLockMode(String alias, LockMode lock
  		throw lockOptionsNotSupported();
  	}
  
@@ -1949,7 +1936,7 @@ index c8ca89a1e0..c83cd836d2 100644
  	private static long hintValueToLong(Object value) {
  		if ( value instanceof Number ) {
  			return ( (Number) value ).longValue();
-@@ -442,8 +327,4 @@ private static int hintValueToInteger(Object value) {
+@@ -442,8 +317,4 @@ private static int hintValueToInteger(Object value) {
  		}
  	}
  
