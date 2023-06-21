@@ -99,7 +99,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 	public void brokenCycle_includePaths() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
-			static class Level1 {
+			class Level1 {
 				@DocumentId
 				public Integer id;
 				@FullTextField
@@ -169,7 +169,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 	public void brokenCycle_excludePaths() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
-			static class Level1 {
+			class Level1 {
 				@DocumentId
 				public Integer id;
 				@FullTextField
@@ -239,7 +239,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 	public void brokenCycle_includeDepth() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
-			static class Level1 {
+			class Level1 {
 				@DocumentId
 				public Integer id;
 				@FullTextField
