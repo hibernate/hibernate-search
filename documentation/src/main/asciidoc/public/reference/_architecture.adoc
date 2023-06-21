@@ -40,33 +40,28 @@ notifying the mapper when it's done.
 +
 See <<indexing-massindexer>> for details.
 [[architecture-hsearch-indexing]]Explicit and listener-triggered indexing::
-Both concepts, explicit and listener-triggered indexing, rely on indexing plans (`SearchIndexingPlan`).
-The difference between the two is in who should build these indexing plans or in other words --
-who should inform them of any changes that are expected to be reflected in the index.
+Explicit and listener-triggered indexing rely on indexing plans (`SearchIndexingPlan`)
+to index specific entities as a result of limited changes.
 +
-A search indexing plan can not only check if the changes applied to an entity require reindexing of that entity,
-but it also can detect if those changes must trigger any operations on other indexes that are dependent on the entity being added to the plan.
+With <<manual-index-changes,explicit indexing>>,
+the caller explicitly passes information about changes on entities to an <<indexing-plan,indexing plan>>;
+with <<listener-triggered-indexing,listener-triggered indexing>>,
+entity changes are detected transparently by <<mapper-orm,the Hibernate ORM integration>>
+(with <<listener-triggered-indexing-possible-limitations,a few exceptions>>)
+and added to the indexing plan automatically.
 +
-Explicit indexing refers to a scenario when indexing operations are manually added to a search indexing plan (`SearchIndexingPlan`) by a user.
-It is available for both <<mapper-orm>> and <<mapper-pojo-standalone>>.
+NOTE: Listener-triggered indexing only makes sense in the context of <<mapper-orm,the Hibernate ORM integration>>;
+there is <<mapper-pojo-standalone-indexing-listener-triggered,no such feature available for the Standalone POJO Mapper>>.
 +
-See <<indexing-plan>> for more details on the search indexing plan.
+In both cases, the <<indexing-plan,indexing plan>> will deduce from those changes
+whether entities need to be reindexed, be it the changed entity itself
+or <<mapping-indexedembedded,other entities that embed the changed entity in their index>>.
 +
-Listener-triggered indexing is a way of detecting entity changes without a user explicitly telling Hibernate Search about them.
-It is possible to do so with the <<mapper-orm,Hibernate ORM integration>> where change entity events are reported to
-Hibernate Search, which can then construct the search indexing plan on its own.
-This allows to keep indexes in sync with a database when the <<mapper-orm,Hibernate ORM integration>> is used and entity changes
-are made through Hibernate ORM means. See <<listener-triggered-indexing-possible-limitations,possible limitations>> of listener-triggered indexing.
-+
-When an entity changes, the mapper detects the change and stores the information in an indexing plan.
-Upon transaction commit, these changes are processed (either in the same thread or in a background process,
+Upon transaction commit, changes in the indexing plan are processed (either in the same thread or in a background process,
 depending on the <<coordination,coordination strategy>>),
 and documents are generated, then sent to the backend for indexing.
 The backend puts the documents in an internal queue, and will index documents in batches, in background processes,
 notifying the mapper when it's done.
-+
-NOTE: Listener-triggered indexing only makes sense in the context of <<mapper-orm>> and
-there is <<mapper-pojo-standalone-indexing-listener-triggered,no similar option available for the Standalone POJO Mapper>>.
 +
 See <<listener-triggered-indexing>> for details.
 Searching::
