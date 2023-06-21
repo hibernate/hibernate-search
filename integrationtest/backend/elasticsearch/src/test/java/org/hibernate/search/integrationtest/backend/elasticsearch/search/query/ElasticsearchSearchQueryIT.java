@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.search.query;
 
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultReadAlias;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.encodeName;
-import static org.junit.Assume.assumeTrue;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.impl.ElasticsearchBackendImplSettings;
@@ -22,7 +21,6 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.StubSingleIndexLayoutStrategy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -167,11 +165,6 @@ public class ElasticsearchSearchQueryIT {
 
 	@Test
 	public void trackTotalHits_fetch() {
-		assumeTrue(
-				"Run only if the Elasticsearch version supports `track_total_hits` parameter",
-				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForSearch()
-		);
-
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<?> query = scope.query()
@@ -193,11 +186,6 @@ public class ElasticsearchSearchQueryIT {
 
 	@Test
 	public void trackTotalHits_fetchHits() {
-		assumeTrue(
-				"Run only if the Elasticsearch version supports `track_total_hits` parameter",
-				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForSearch()
-		);
-
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<?> query = scope.query()

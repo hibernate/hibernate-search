@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,12 +15,10 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.BigDecimalFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.BooleanFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
@@ -109,7 +106,6 @@ public class RangePredicateSpecificsIT<F> {
 
 	@Test
 	public void greaterThan() {
-		assumeStrictGreaterThanSupported();
 		int docOrdinal = 1;
 		assertThatQuery( index.query()
 				.where( f -> f.range().field( defaultDslConverterFieldPath() )
@@ -119,7 +115,6 @@ public class RangePredicateSpecificsIT<F> {
 
 	@Test
 	public void greaterThan_withDslConverter_valueConvertDefault() {
-		assumeStrictGreaterThanSupported();
 		int docOrdinal = 1;
 		assertThatQuery( index.query()
 				.where( f -> f.range().field( customDslConverterFieldPath() )
@@ -129,7 +124,6 @@ public class RangePredicateSpecificsIT<F> {
 
 	@Test
 	public void greaterThan_withDslConverter_valueConvertNo() {
-		assumeStrictGreaterThanSupported();
 		int docOrdinal = 1;
 		assertThatQuery( index.query()
 				.where( f -> f.range().field( customDslConverterFieldPath() )
@@ -306,15 +300,6 @@ public class RangePredicateSpecificsIT<F> {
 
 	private int docCount() {
 		return dataSet.values.size();
-	}
-
-	private void assumeStrictGreaterThanSupported() {
-		assumeTrue(
-				"This backend doesn't support strict 'greater than' predicates on BigDecimal fields",
-				BigDecimalFieldTypeDescriptor.INSTANCE.equals( dataSet.fieldType )
-						&& !TckConfiguration.get().getBackendFeatures()
-								.worksFineWithStrictAboveRangedQueriesOnDecimalScaledField()
-		);
 	}
 
 	private static class IndexBinding {

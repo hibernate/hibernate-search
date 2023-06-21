@@ -23,7 +23,6 @@ import java.util.Set;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 
 public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedDateTime> {
 
@@ -40,20 +39,6 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 		}
 
 		ZonedDateTime indexedAtUTC = indexed.withZoneSameInstant( ZoneOffset.UTC );
-
-		/*
-		 * When formatting a ZonedDateTime's docvalues,
-		 * ES 7 and above will return something like "2018-02-01T10:15:30.000000000Z[Z]".
-		 * while ES 6 and below will return something like "2018-02-01T10:15:30.000+00:00[UTC]".
-		 * Strangely, these strings are not equivalent: when parsing them with format "uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ'['VV']'",
-		 * the first one will result in a ZonedDateTime whose offset is "+00:00" and zone is that same offset,
-		 * while the second one will result in a ZonedDateTime whose offset is "+00:00" and zone is "UTC".
-		 * This does not matter much in practice, but we need to know where we stand when testing,
-		 * because those two ZonedDateTimes are not equal.
-		 */
-		if ( TckConfiguration.get().getBackendFeatures().zonedDateTimeDocValueHasUTCZoneId() ) {
-			return ZonedDateTime.ofLocal( indexedAtUTC.toLocalDateTime(), ZoneId.of( "UTC" ), ZoneOffset.UTC );
-		}
 
 		return indexedAtUTC;
 	}

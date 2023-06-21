@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
-import static org.junit.Assume.assumeTrue;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -33,7 +32,6 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -96,11 +94,6 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void resultTotal_totalHitCountThreshold() {
-		assumeTrue(
-				"This backend doesn't take totalHitsThreshold() into account.",
-				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForSearch()
-		);
-
 		initData( 5000 );
 
 		SearchResult<DocumentReference> fetch = matchAllWithConditionSortedByScoreQuery()

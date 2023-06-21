@@ -153,11 +153,6 @@ public class DistanceSortTypeCheckingAndConversionIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4173")
 	public void multiIndex_withMissingFieldIndex() {
-		assumeTrue(
-				"This backend doesn't support distance sorts on a field that is missing from some of the target indexes.",
-				TckConfiguration.get().getBackendFeatures().supportsDistanceSortWhenFieldMissingInSomeTargetIndexes()
-		);
-
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
 
 		SearchQuery<DocumentReference> query;
