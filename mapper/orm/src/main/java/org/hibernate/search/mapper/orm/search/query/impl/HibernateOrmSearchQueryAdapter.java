@@ -18,14 +18,14 @@ import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
 import org.hibernate.ScrollMode;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
+import org.hibernate.graph.spi.AppliedGraph;
 import org.hibernate.graph.spi.RootGraphImplementor;
 import org.hibernate.query.ResultListTransformer;
 import org.hibernate.query.TupleTransformer;
-import org.hibernate.query.internal.QueryOptionsImpl;
 import org.hibernate.query.spi.AbstractQuery;
+import org.hibernate.query.spi.MutableQueryOptions;
 import org.hibernate.query.spi.ParameterMetadataImplementor;
 import org.hibernate.query.spi.QueryImplementor;
 import org.hibernate.query.spi.QueryParameterBinding;
@@ -61,15 +61,12 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 
 	private final SearchQueryImplementor<R> delegate;
 
-	private final SessionImplementor sessionImplementor;
 	private final MutableEntityLoadingOptions loadingOptions;
-	private final QueryOptionsImpl queryOptions = new QueryOptionsImpl();
 
 	HibernateOrmSearchQueryAdapter(SearchQueryImplementor<R> delegate, SessionImplementor sessionImplementor,
 			MutableEntityLoadingOptions loadingOptions) {
 		super( sessionImplementor );
 		this.delegate = delegate;
-		this.sessionImplementor = sessionImplementor;
 		this.loadingOptions = loadingOptions;
 	}
 
@@ -109,11 +106,6 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 	@Override
 	public String getQueryString() {
 		return delegate.queryString();
-	}
-
-	@Override
-	public QueryOptionsImpl getQueryOptions() {
-		return queryOptions;
 	}
 
 	@Override
@@ -163,16 +155,9 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 			throw log.canOnlyUseScrollWithScrollModeForwardsOnly( scrollMode );
 		}
 
-		extractQueryOptions();
-
 		int chunkSize = loadingOptions.fetchSize();
 		return new HibernateOrmSearchScrollableResultsAdapter<>( delegate.scroll( chunkSize ), getMaxResults(),
 				Function.identity() );
-	}
-
-	@Override
-	public SharedSessionContractImplementor getSession() {
-		return sessionImplementor;
 	}
 
 	@Override
@@ -191,17 +176,22 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 	}
 
 	private void extractQueryOptions() {
-		Integer queryFetchSize = getQueryOptions().getFetchSize();
+		MutableQueryOptions queryOptions = getQueryOptions();
+		Integer queryFetchSize = queryOptions.getFetchSize();
 		if ( queryFetchSize != null ) {
 			loadingOptions.fetchSize( queryFetchSize );
 		}
-		Integer queryTimeout = getQueryOptions().getTimeout();
+		Integer queryTimeout = queryOptions.getTimeout();
 		if ( queryTimeout != null ) {
 			delegate.failAfter( queryTimeout, TimeUnit.SECONDS );
 		}
 		EntityGraphHint<?> entityGraphHint = null;
-		if ( queryOptions.getGraph() != null ) {
-			entityGraphHint = new EntityGraphHint<>( queryOptions.getGraph(), queryOptions.getSemantic() );
+		if ( hasAppliedGraph( queryOptions ) ) {
+			AppliedGraph appliedGraph = queryOptions.getAppliedGraph();
+			RootGraph<?> graph = appliedGraph.getGraph();
+			if ( graph != null ) {
+				entityGraphHint = new EntityGraphHint<>( graph, appliedGraph.getSemantic() );
+			}
 		}
 		loadingOptions.entityGraphHint( entityGraphHint, true );
 	}
@@ -302,7 +292,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
 
 	@Override
 	protected int doExecuteUpdate() {
-		throw new UnsupportedOperationException( "executeUpdate is not supported in Hibernate Search queries" );
+		throw new UnsupportedOperationException( "executeUpdate() is not supported in Hibernate Search queries" );
 	}
 
 	@Override
