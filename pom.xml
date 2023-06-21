@@ -255,7 +255,7 @@
         <version.org.slf4j>1.7.36</version.org.slf4j>
 
         <!-- >>> ORM -->
-        <version.org.hibernate>5.6.14.Final</version.org.hibernate>
+        <version.org.hibernate>5.6.15.Final</version.org.hibernate>
         <javadoc.org.hibernate.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/javadocs/</javadoc.org.hibernate.url>
         <documentation.org.hibernate.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.url>
         <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM.
