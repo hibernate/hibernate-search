@@ -191,6 +191,16 @@
             <property name="message" value="Nobody should be using StringBuffer anymore" />
         </module>
 
+        <!-- Loggers should follow conventions and best practices -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="(?&lt;!\bstatic final) Log \w+ =" />
+            <property name="message" value="Loggers must be static final" />
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\bLog (?!log |\w+Log |INSTANCE )\w+ =" />
+            <property name="message" value="Loggers must be named exactly `log` (or in some specific cases `INSTANCE` or `&lt;something&gt;Log`)" />
+        </module>
+
         <!--  Avoid some import statements -->
         <module name="IllegalImport">
             <property name="illegalPkgs" value="java.awt, sun, org.slf4j"/>
