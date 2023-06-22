@@ -42,7 +42,7 @@ import com.google.gson.JsonObject;
  */
 class ElasticsearchSearchQueryRequestContext implements ProjectionRequestRootContext, AggregationRequestContext {
 
-	private Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchSearchIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;

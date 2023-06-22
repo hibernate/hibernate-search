@@ -18,16 +18,16 @@ import org.apache.lucene.util.InfoStream;
  */
 public class LoggerInfoStream extends InfoStream {
 
-	private final Log logger = LoggerFactory.make( Log.class, LuceneLogCategories.INFOSTREAM_LOGGER_CATEGORY );
+	private static final Log log = LoggerFactory.make( Log.class, LuceneLogCategories.INFOSTREAM_LOGGER_CATEGORY );
 
 	@Override
 	public void message(String component, String message) {
-		logger.logInfoStreamMessage( component, message );
+		log.logInfoStreamMessage( component, message );
 	}
 
 	@Override
 	public boolean isEnabled(String component) {
-		return logger.isTraceEnabled();
+		return log.isTraceEnabled();
 	}
 
 	@Override

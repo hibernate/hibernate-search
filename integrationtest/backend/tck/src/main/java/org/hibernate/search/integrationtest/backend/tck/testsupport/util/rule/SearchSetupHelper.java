@@ -51,7 +51,7 @@ import org.junit.runners.model.Statement;
 
 public class SearchSetupHelper implements TestRule {
 
-	private final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final TestConfigurationProvider configurationProvider;
 	private final TckBackendSetupStrategy<?> setupStrategy;
