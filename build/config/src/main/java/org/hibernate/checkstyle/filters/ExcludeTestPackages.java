@@ -25,6 +25,7 @@ import com.puppycrawl.tools.checkstyle.api.Filter;
 public class ExcludeTestPackages implements Filter {
 
 	private static final String UNIT_TESTS_SUB_PATH = File.separator + "src" + File.separator + "test" + File.separator + "java";
+	private static final String COPIED_SOURCES_TESTS_SUB_PATH = File.separator + "copied-sources" + File.separator + "test" + File.separator + "java";
 	private static final String INTEGRATION_TESTS_SUB_PATH = File.separator + "integrationtest" + File.separator;
 	private static final String MESSAGE_DISABLE_KEYWORD = "[not required for tests]";
 
@@ -38,7 +39,9 @@ public class ExcludeTestPackages implements Filter {
 	}
 
 	private boolean isTestFile(String fileName) {
-		return fileName.contains( UNIT_TESTS_SUB_PATH ) || fileName.contains( INTEGRATION_TESTS_SUB_PATH );
+		return fileName.contains( UNIT_TESTS_SUB_PATH )
+				|| fileName.contains( COPIED_SOURCES_TESTS_SUB_PATH )
+				|| fileName.contains( INTEGRATION_TESTS_SUB_PATH );
 	}
 
 	private boolean acceptTestfileEvent(AuditEvent aEvent) {
