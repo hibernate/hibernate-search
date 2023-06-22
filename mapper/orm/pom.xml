@@ -66,6 +66,20 @@
             <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
             <version>${version.io.smallrye.jandex}</version>
         </dependency>
+        <!-- Solve dependency convergence issues through exclusions for transitive-only dependencies -->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
+            <version>${version.jakarta.xml.bind}</version>
+            <exclusions>
+                <!-- Also imported by jakarta.xml.bind-api -->
+                <exclusion>
+                    <groupId>jakarta.activation</groupId>
+                    <artifactId>jakarta.activation-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
