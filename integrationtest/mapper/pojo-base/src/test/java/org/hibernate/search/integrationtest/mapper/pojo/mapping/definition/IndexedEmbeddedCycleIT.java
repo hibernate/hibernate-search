@@ -35,7 +35,7 @@ import org.junit.Test;
  * Test various cases of the {@code @IndexedEmbedded} leading to potential cycles, which are either broken by some
  * attribute of an {@code @IndexedEmbedded} or lead to an exception letting the user know that there's a cycle.
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "deprecation"}) // deprecated IndexedEmbedded#prefix
 public class IndexedEmbeddedCycleIT {
 
 	private static final String INDEX_NAME = "IndexName";

@@ -72,7 +72,7 @@ import org.junit.Test;
  * Does not test uses of container value extractors (for now). Some of them are tested in
  * {@link AnnotationMappingSmokeIT} and {@link ProgrammaticMappingSmokeIT}.
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "deprecation"}) // deprecated IndexedEmbedded#prefix
 public class IndexedEmbeddedBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
