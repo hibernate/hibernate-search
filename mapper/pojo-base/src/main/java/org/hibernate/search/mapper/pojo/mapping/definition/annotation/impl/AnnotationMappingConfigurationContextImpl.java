@@ -99,7 +99,7 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 	}
 
 	@Override
-	public AnnotationMappingConfigurationContext add(IndexView jandexIndex) {
+	public AnnotationMappingConfigurationContext addJandexIndex(IndexView jandexIndex) {
 		explicitJandexIndexes.add( jandexIndex );
 		return this;
 	}

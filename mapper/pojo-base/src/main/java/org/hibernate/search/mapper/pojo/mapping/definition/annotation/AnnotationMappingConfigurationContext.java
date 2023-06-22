@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.RootMapping;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 import org.jboss.jandex.IndexView;
 
@@ -30,7 +31,7 @@ public interface AnnotationMappingConfigurationContext {
 	 * @return {@code this}, for method chaining.
 	 * @see RootMapping
 	 * @see ProjectionConstructor
-	 * @see #add(IndexView)
+	 * @see #addJandexIndex(IndexView)
 	 * @see #discoverJandexIndexesFromAddedTypes(boolean)
 	 */
 	AnnotationMappingConfigurationContext discoverAnnotatedTypesFromRootMappingAnnotations(boolean enabled);
@@ -40,7 +41,7 @@ public interface AnnotationMappingConfigurationContext {
 	 * from types added through {@link #add(Class)} or {@link #add(Set)}.
 	 * {@code false} if that discovery should be disabled.
 	 * @return {@code this}, for method chaining.
-	 * @see #add(IndexView)
+	 * @see #addJandexIndex(IndexView)
 	 * @see #buildMissingDiscoveredJandexIndexes(boolean)
 	 */
 	AnnotationMappingConfigurationContext discoverJandexIndexesFromAddedTypes(boolean enabled);
@@ -51,7 +52,7 @@ public interface AnnotationMappingConfigurationContext {
 	 * {@code false} if Hibernate Search should ignore JARs without a Jandex index.
 	 * @return {@code this}, for method chaining.
 	 * @see #discoverJandexIndexesFromAddedTypes(boolean)
-	 * @see #add(IndexView)
+	 * @see #addJandexIndex(IndexView)
 	 */
 	AnnotationMappingConfigurationContext buildMissingDiscoveredJandexIndexes(boolean enabled);
 
@@ -82,6 +83,7 @@ public interface AnnotationMappingConfigurationContext {
 	 * @see #discoverAnnotatedTypesFromRootMappingAnnotations(boolean)
 	 * @see #discoverJandexIndexesFromAddedTypes(boolean)
 	 */
-	AnnotationMappingConfigurationContext add(IndexView jandexIndex);
+	@Incubating
+	AnnotationMappingConfigurationContext addJandexIndex(IndexView jandexIndex);
 
 }

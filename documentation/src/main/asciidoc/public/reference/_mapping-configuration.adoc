@@ -62,7 +62,7 @@ From that context, either:
 * call `annotationMappingContext.add( MyType.class )` to explicitly tell Hibernate Search
 to process annotation on `MyType`, and to discover other types annotated with
 <<mapping-classpath-scanning-basics,root mapping annotations>> in the JAR containing `MyType`.
-* OR (advanced usage) call `annotationMappingContext.add( <an IndexView instance> )` to explicitly tell Hibernate Search
+* OR (advanced usage, incubating) call `annotationMappingContext.addJandexIndex( <an IndexView instance> )` to explicitly tell Hibernate Search
 to look for types annotated with
 <<mapping-classpath-scanning-basics,root mapping annotations>> in the given Jandex index.
 

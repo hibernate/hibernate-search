@@ -94,7 +94,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 
 		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
 		if ( jandexIndex != null ) {
-			annotationMapping().add( jandexIndex );
+			annotationMapping().addJandexIndex( jandexIndex );
 		}
 		this.introspector = introspector;
 
