@@ -33,7 +33,7 @@ import org.junit.Test;
 
 public class HibernateOrmMassIndexerIT {
 
-	private static final Log logger = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	static final int NUMBER_OF_BOOKS = 1000;
 	static final int INIT_DATA_TRANSACTION_SIZE = 500;
@@ -126,10 +126,10 @@ public class HibernateOrmMassIndexerIT {
 			searchSession.massIndexer() // <1>
 					.start() // <2>
 					.thenRun( () -> { // <3>
-						logger.info( "Mass indexing succeeded!" );
+						log.info( "Mass indexing succeeded!" );
 					} )
 					.exceptionally( throwable -> {
-						logger.error( "Mass indexing failed!", throwable );
+						log.error( "Mass indexing failed!", throwable );
 						return null;
 					} );
 			// end::async[]
