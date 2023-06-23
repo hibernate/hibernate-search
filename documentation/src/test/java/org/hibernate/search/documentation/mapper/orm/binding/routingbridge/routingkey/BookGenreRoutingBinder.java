@@ -33,15 +33,15 @@ public class BookGenreRoutingBinder implements RoutingBinder { // <1>
 
 	public static class Bridge implements RoutingBridge<Book> { // <1>
 		@Override
-		public void route(DocumentRoutes routes, Object entityIdentifier, Book indexedEntity, // <2>
-				RoutingBridgeRouteContext context) {
+		public void route(DocumentRoutes routes, Object entityIdentifier, // <2>
+				Book indexedEntity, RoutingBridgeRouteContext context) {
 			String routingKey = indexedEntity.getGenre().name(); // <3>
 			routes.addRoute().routingKey( routingKey ); // <4>
 		}
 
 		@Override
-		public void previousRoutes(DocumentRoutes routes, Object entityIdentifier, Book indexedEntity, // <5>
-				RoutingBridgeRouteContext context) {
+		public void previousRoutes(DocumentRoutes routes, Object entityIdentifier, // <5>
+				Book indexedEntity, RoutingBridgeRouteContext context) {
 			for ( Genre possiblePreviousGenre : Genre.values() ) {
 				String routingKey = possiblePreviousGenre.name();
 				routes.addRoute().routingKey( routingKey ); // <6>

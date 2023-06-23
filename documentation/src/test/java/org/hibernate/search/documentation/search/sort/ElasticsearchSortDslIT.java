@@ -55,8 +55,8 @@ public class ElasticsearchSortDslIT {
 					// end::elasticsearch-fromJson-jsonObject[]
 					new Gson().fromJson(
 							"{"
-									+ "\"title_sort\": \"asc\""
-							+ "}",
+									+ "    \"title_sort\": \"asc\""
+									+ "}",
 							JsonObject.class
 					)
 					// tag::elasticsearch-fromJson-jsonObject[]
@@ -78,7 +78,7 @@ public class ElasticsearchSortDslIT {
 					.extension( ElasticsearchExtension.get() )
 					.where( f -> f.matchAll() )
 					.sort( f -> f.fromJson( "{"
-									+ "\"title_sort\": \"asc\""
+							+ "     \"title_sort\": \"asc\""
 							+ "}" ) )
 					.fetchHits( 20 );
 			// end::elasticsearch-fromJson-string[]

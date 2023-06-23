@@ -173,12 +173,11 @@ public class PredicateDslIT {
 			// tag::and[]
 			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.and(
-									f.match().field( "title" )
-											.matching( "robot" ), // <1>
-									f.match().field( "description" )
-											.matching( "crime" ) // <2>
-							)
-					)
+							f.match().field( "title" )
+									.matching( "robot" ), // <1>
+							f.match().field( "description" )
+									.matching( "crime" ) // <2>
+					) )
 					.fetchHits( 20 ); // <3>
 			// end::and[]
 			assertThat( hits )
@@ -246,12 +245,11 @@ public class PredicateDslIT {
 			// tag::or[]
 			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.or(
-									f.match().field( "title" )
-											.matching( "robot" ), // <1>
-									f.match().field( "description" )
-											.matching( "investigation" ) // <2>
-							)
-					)
+							f.match().field( "title" )
+									.matching( "robot" ), // <1>
+							f.match().field( "description" )
+									.matching( "investigation" ) // <2>
+					) )
 					.fetchHits( 20 ); // <3>
 			// end::or[]
 			assertThat( hits )

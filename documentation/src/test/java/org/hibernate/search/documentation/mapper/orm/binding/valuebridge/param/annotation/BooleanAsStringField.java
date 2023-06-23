@@ -20,6 +20,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
+// @formatter:off
 //tag::include[]
 @Retention(RetentionPolicy.RUNTIME) // <1>
 @Target({ ElementType.METHOD, ElementType.FIELD }) // <2>
@@ -53,10 +54,15 @@ public @interface BooleanAsStringField {
 			BooleanAsStringBridge bridge = new BooleanAsStringBridge( // <10>
 					annotation.trueAsString(), annotation.falseAsString()
 			);
-			mapping.genericField( annotation.name().isEmpty() ? null : annotation.name() ) // <11>
+			mapping.genericField( // <11>
+						annotation.name().isEmpty() ? null : annotation.name()
+					)
 					.valueBridge( bridge ) // <12>
-					.extractors( context.toContainerExtractorPath( annotation.extraction() ) ); // <13>
+					.extractors( // <13>
+							context.toContainerExtractorPath( annotation.extraction() )
+					);
 		}
 	}
 }
 //end::include[]
+// @formatter:on

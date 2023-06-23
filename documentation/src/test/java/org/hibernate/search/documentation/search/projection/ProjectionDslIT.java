@@ -396,6 +396,7 @@ public class ProjectionDslIT {
 		} );
 
 		withinSearchSession( searchSession -> {
+			// @formatter:off
 			// tag::composite-customObject-asList[]
 			List<MyTuple4<String, Genre, Integer, String>> hits = searchSession.search( Book.class )
 					.select( f -> f.composite() // <1>
@@ -409,6 +410,7 @@ public class ProjectionDslIT {
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <7>
 			// end::composite-customObject-asList[]
+			// @formatter:on
 			Session session = searchSession.toOrmSession();
 			assertThat( hits ).containsExactlyInAnyOrder(
 					new MyTuple4<>(
@@ -612,6 +614,7 @@ public class ProjectionDslIT {
 		} );
 
 		withinSearchSession( searchSession -> {
+			// @formatter:off
 			// tag::object-customObject-asList[]
 			GeoPoint center = GeoPoint.of( 53.970000, 32.150000 );
 			List<List<MyAuthorNameAndBirthDateAndPlaceOfBirthDistance>> hits = searchSession
@@ -630,6 +633,7 @@ public class ProjectionDslIT {
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <8>
 			// end::object-customObject-asList[]
+			// @formatter:on
 			Session session = searchSession.toOrmSession();
 			assertThat( hits )
 					.usingRecursiveFieldByFieldElementComparator( RecursiveComparisonConfiguration.builder()
@@ -672,6 +676,7 @@ public class ProjectionDslIT {
 		} );
 
 		withinSearchSession( searchSession -> {
+			// @formatter:off
 			// tag::object-customObject-asArray[]
 			GeoPoint center = GeoPoint.of( 53.970000, 32.150000 );
 			List<List<MyAuthorNameAndBirthDateAndPlaceOfBirthDistance>> hits = searchSession
@@ -690,6 +695,7 @@ public class ProjectionDslIT {
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <8>
 			// end::object-customObject-asArray[]
+			// @formatter:on
 			Session session = searchSession.toOrmSession();
 			assertThat( hits )
 					.usingRecursiveFieldByFieldElementComparator( RecursiveComparisonConfiguration.builder()
@@ -890,7 +896,10 @@ public class ProjectionDslIT {
 					).asList() )
 					.where( f -> f.match().field( "title" ).matching( "detective" ) )
 					.highlighter( f -> f.unified().tag( "<b>", "</b>" ) ) // <2>
-					.highlighter( "description-highlighter", f -> f.unified().tag( "<span>", "</span>" ) ) // <3>
+					.highlighter(
+							"description-highlighter",
+							f -> f.unified().tag( "<span>", "</span>" )
+					) // <3>
 					.fetchHits( 20 );
 			// end::highlighter-named[]
 			Session session = searchSession.toOrmSession();

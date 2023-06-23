@@ -32,7 +32,8 @@ public @interface InvoiceLineItemsSummaryBinding {
 	class Processor // <6>
 			implements PropertyMappingAnnotationProcessor<InvoiceLineItemsSummaryBinding> { // <7>
 		@Override
-		public void process(PropertyMappingStep mapping, InvoiceLineItemsSummaryBinding annotation,
+		public void process(PropertyMappingStep mapping,
+				InvoiceLineItemsSummaryBinding annotation,
 				PropertyMappingAnnotationProcessorContext context) {
 			InvoiceLineItemsSummaryBinder binder = new InvoiceLineItemsSummaryBinder(); // <8>
 			if ( !annotation.fieldName().isEmpty() ) { // <9>

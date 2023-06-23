@@ -49,7 +49,10 @@ public class FullNameBinder implements TypeBinder { // <1>
 		}
 
 		@Override
-		public void write(DocumentElement target, Author author, TypeBridgeWriteContext context) { // <4>
+		public void write(
+				DocumentElement target,
+				Author author,
+				TypeBridgeWriteContext context) { // <4>
 			String fullName = author.getLastName() + " " + author.getFirstName(); // <5>
 			target.addValue( this.fullNameField, fullName ); // <6>
 		}

@@ -34,8 +34,8 @@ public class BookStatusRoutingBinder implements RoutingBinder { // <1>
 	public static class Bridge // <1>
 			implements RoutingBridge<Book> { // <2>
 		@Override
-		public void route(DocumentRoutes routes, Object entityIdentifier, Book indexedEntity, // <3>
-				RoutingBridgeRouteContext context) {
+		public void route(DocumentRoutes routes, Object entityIdentifier, // <3>
+				Book indexedEntity, RoutingBridgeRouteContext context) {
 			switch ( indexedEntity.getStatus() ) { // <4>
 				case PUBLISHED:
 					routes.addRoute(); // <5>
@@ -47,8 +47,8 @@ public class BookStatusRoutingBinder implements RoutingBinder { // <1>
 		}
 
 		@Override
-		public void previousRoutes(DocumentRoutes routes, Object entityIdentifier, Book indexedEntity, // <7>
-				RoutingBridgeRouteContext context) {
+		public void previousRoutes(DocumentRoutes routes, Object entityIdentifier, // <7>
+				Book indexedEntity, RoutingBridgeRouteContext context) {
 			routes.addRoute(); // <8>
 		}
 	}

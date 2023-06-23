@@ -34,6 +34,7 @@ public class ValueBridgeBinderIT {
 		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
 				BackendConfigurations.simple(),
 				mapping -> {
+				// @formatter:off
 					//tag::programmatic[]
 					TypeMappingStep bookMapping = mapping.type( Book.class );
 					bookMapping.indexed();
@@ -42,6 +43,7 @@ public class ValueBridgeBinderIT {
 									.valueBinder( new ISBNValueBinder() )
 									.sortable( Sortable.YES );
 					//end::programmatic[]
+					// @formatter:on
 				} );
 	}
 

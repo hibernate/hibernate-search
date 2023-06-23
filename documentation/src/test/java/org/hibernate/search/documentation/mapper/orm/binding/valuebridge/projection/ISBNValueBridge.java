@@ -20,8 +20,8 @@ public class ISBNValueBridge implements ValueBridge<ISBN, String> {
 	}
 
 	@Override
-	public ISBN fromIndexedValue(String value, ValueBridgeFromIndexedValueContext context) { // <1>
-		return value == null ? null : ISBN.parse( value );
+	public ISBN fromIndexedValue(String value, ValueBridgeFromIndexedValueContext context) {
+		return value == null ? null : ISBN.parse( value ); // <1>
 	}
 }
 //end::include[]

@@ -11,15 +11,15 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 
 //tag::include[]
-public class ISBNValueBridge implements ValueBridge<ISBN, String> { // <1>
+public class ISBNValueBridge implements ValueBridge<ISBN, String> {
 
 	@Override
-	public String toIndexedValue(ISBN value, ValueBridgeToIndexedValueContext context) { // <2>
+	public String toIndexedValue(ISBN value, ValueBridgeToIndexedValueContext context) {
 		return value == null ? null : value.getStringValue();
 	}
 
 	@Override
-	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
+	public boolean isCompatibleWith(ValueBridge<?, ?> other) { // <1>
 		return getClass().equals( other.getClass() );
 	}
 }

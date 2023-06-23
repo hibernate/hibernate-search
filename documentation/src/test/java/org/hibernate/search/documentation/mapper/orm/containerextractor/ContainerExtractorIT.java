@@ -37,6 +37,7 @@ public class ContainerExtractorIT {
 				mapping -> {
 					TypeMappingStep bookMapping = mapping.type( Book.class );
 					bookMapping.indexed();
+				// @formatter:off
 					//tag::programmatic-extractor[]
 					bookMapping.property( "priceByFormat" )
 							.genericField( "availableFormats" )
@@ -48,6 +49,7 @@ public class ContainerExtractorIT {
 									.valueBridge( new MyCollectionSizeBridge() )
 									.noExtractors();
 					//end::programmatic-noExtractors[]
+					// @formatter:on
 				} );
 	}
 

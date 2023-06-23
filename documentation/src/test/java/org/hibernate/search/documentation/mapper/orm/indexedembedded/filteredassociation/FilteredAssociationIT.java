@@ -33,6 +33,7 @@ public class FilteredAssociationIT {
 		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
 				BackendConfigurations.simple(),
 				mapping -> {
+				// @formatter:off
 					//tag::programmatic[]
 					TypeMappingStep bookMapping = mapping.type( Book.class );
 					bookMapping.indexed();
@@ -47,6 +48,7 @@ public class FilteredAssociationIT {
 					bookEditionMapping.property( "label" )
 							.fullTextField().analyzer( "english" );
 					//end::programmatic[]
+					// @formatter:on
 				} );
 	}
 

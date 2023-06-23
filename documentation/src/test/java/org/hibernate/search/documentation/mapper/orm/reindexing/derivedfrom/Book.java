@@ -69,9 +69,9 @@ public class Book {
 
 	@Transient // <2>
 	@FullTextField(analyzer = "name") // <3>
-	@IndexingDependency(derivedFrom = @ObjectPath( // <4>
+	@IndexingDependency(derivedFrom = @ObjectPath({ // <4>
 			@PropertyValue(propertyName = "authors")
-	))
+	}))
 	public String getMainAuthor() {
 		return authors.isEmpty() ? null : authors.get( 0 );
 	}

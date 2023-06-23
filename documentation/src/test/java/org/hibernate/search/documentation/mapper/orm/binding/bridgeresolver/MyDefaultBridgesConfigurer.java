@@ -43,9 +43,12 @@ public class MyDefaultBridgesConfigurer implements HibernateOrmSearchMappingConf
 					}
 
 					private <T> void doBind(ValueBindingContext<?> context, Class<T> enumType) {
-						BeanHolder<EnumLabelService> serviceHolder =
-								context.beanResolver().resolve( EnumLabelService.class, BeanRetrieval.ANY ); // <3>
-						context.bridge( enumType, new EnumLabelBridge<>( enumType, serviceHolder ) ); // <4>
+						BeanHolder<EnumLabelService> serviceHolder = context.beanResolver()
+								.resolve( EnumLabelService.class, BeanRetrieval.ANY ); // <3>
+						context.bridge(
+								enumType,
+								new EnumLabelBridge<>( enumType, serviceHolder )
+						); // <4>
 					}
 				} );
 		//end::advanced[]

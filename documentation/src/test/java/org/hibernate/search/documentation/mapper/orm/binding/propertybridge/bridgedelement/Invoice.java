@@ -30,7 +30,9 @@ public class Invoice {
 
 	@ElementCollection
 	@OrderColumn
-	@PropertyBinding(binder = @PropertyBinderRef(type = InvoiceLineItemsSummaryBinder.class)) // <1>
+	@PropertyBinding(binder = @PropertyBinderRef( // <1>
+			type = InvoiceLineItemsSummaryBinder.class
+	))
 	private List<InvoiceLineItem> lineItems = new ArrayList<>();
 
 	// Getters and setters

@@ -18,6 +18,7 @@ import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 public class LuceneClassesAnalysisConfigurer implements LuceneAnalysisConfigurer {
 	@Override
 	public void configure(LuceneAnalysisConfigurationContext context) {
+		// @formatter:off
 		// tag::include[]
 		context.analyzer( "english" ).custom()
 				.tokenizer( StandardTokenizerFactory.class )
@@ -31,5 +32,6 @@ public class LuceneClassesAnalysisConfigurer implements LuceneAnalysisConfigurer
 				.tokenFilter( LowerCaseFilterFactory.class )
 				.tokenFilter( ASCIIFoldingFilterFactory.class );
 		// end::include[]
+		// @formatter:on
 	}
 }

@@ -27,8 +27,8 @@ public class ISBNValueBinder implements ValueBinder { // <1>
 
 	private static class ISBNValueBridge implements ValueBridge<ISBN, String> {
 		@Override
-		public String toIndexedValue(ISBN value, ValueBridgeToIndexedValueContext context) { // <9>
-			return value == null ? null : value.getStringValue();
+		public String toIndexedValue(ISBN value, ValueBridgeToIndexedValueContext context) {
+			return value == null ? null : value.getStringValue(); // <9>
 		}
 	}
 }

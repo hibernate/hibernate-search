@@ -329,6 +329,7 @@ public class AggregationDslIT {
 		} );
 
 		withinSearchSession( searchSession -> {
+			// @formatter:off
 			// tag::range-noConverter[]
 			AggregationKey<Map<Range<Instant>, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
 			SearchResult<Book> result = searchSession.search( Book.class )
@@ -350,6 +351,7 @@ public class AggregationDslIT {
 					.fetch( 20 );
 			Map<Range<Instant>, Long> countsByPrice = result.aggregation( countsByPriceKey );
 			// end::range-noConverter[]
+			// @formatter:on
 			assertThat( countsByPrice )
 					.containsExactly(
 							entry(

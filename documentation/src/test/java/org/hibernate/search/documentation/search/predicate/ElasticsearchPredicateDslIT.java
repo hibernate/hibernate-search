@@ -55,10 +55,10 @@ public class ElasticsearchPredicateDslIT {
 					// end::elasticsearch-fromJson-jsonObject[]
 					new Gson().fromJson(
 							"{"
-									+ "\"regexp\": {"
-											+ "\"description\": \"neighbor|neighbour\""
-									+ "}"
-							+ "}",
+									+ "    \"regexp\": {"
+									+ "        \"description\": \"neighbor|neighbour\""
+									+ "    }"
+									+ "}",
 							JsonObject.class
 					)
 					// tag::elasticsearch-fromJson-jsonObject[]
@@ -78,9 +78,9 @@ public class ElasticsearchPredicateDslIT {
 			List<Book> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() ) // <1>
 					.where( f -> f.fromJson( "{" // <2>
-									+ "\"regexp\": {"
-											+ "\"description\": \"neighbor|neighbour\""
-									+ "}"
+							+ "    \"regexp\": {"
+							+ "        \"description\": \"neighbor|neighbour\""
+							+ "    }"
 							+ "}" ) )
 					.fetchHits( 20 );
 			// end::elasticsearch-fromJson-string[]

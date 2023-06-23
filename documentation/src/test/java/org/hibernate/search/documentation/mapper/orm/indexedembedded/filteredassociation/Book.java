@@ -72,9 +72,9 @@ public class Book {
 
 	@Transient // <2>
 	@IndexedEmbedded // <3>
-	@AssociationInverseSide(inversePath = @ObjectPath( // <4>
+	@AssociationInverseSide(inversePath = @ObjectPath({ // <4>
 			@PropertyValue(propertyName = "book")
-	))
+	}))
 	@IndexingDependency(derivedFrom = @ObjectPath({ // <5>
 			@PropertyValue(propertyName = "editions"),
 			@PropertyValue(propertyName = "status")
