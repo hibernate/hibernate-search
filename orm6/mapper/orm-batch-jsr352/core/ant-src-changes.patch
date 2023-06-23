@@ -1,5 +1,5 @@
 diff --git a/main/java/org/hibernate/search/batch/jsr352/core/context/jpa/impl/ActiveSessionFactoryRegistryUpdater.java b/main/java/org/hibernate/search/batch/jsr352/core/context/jpa/impl/ActiveSessionFactoryRegistryUpdater.java
-index 48a8ba8734..a49cd707ca 100644
+index 35980675a0..a49cd707ca 100644
 --- a/main/java/org/hibernate/search/batch/jsr352/core/context/jpa/impl/ActiveSessionFactoryRegistryUpdater.java
 +++ b/main/java/org/hibernate/search/batch/jsr352/core/context/jpa/impl/ActiveSessionFactoryRegistryUpdater.java
 @@ -7,6 +7,7 @@
@@ -10,21 +10,22 @@ index 48a8ba8734..a49cd707ca 100644
  import org.hibernate.engine.spi.SessionFactoryImplementor;
  import org.hibernate.integrator.spi.Integrator;
  import org.hibernate.service.spi.SessionFactoryServiceRegistry;
-@@ -17,7 +18,8 @@
+@@ -17,8 +18,8 @@
  public class ActiveSessionFactoryRegistryUpdater implements Integrator {
  
  	@Override
--	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
+-	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory,
+-			SessionFactoryServiceRegistry serviceRegistry) {
 +	public void integrate(Metadata metadata, BootstrapContext bootstrapContext,
 +			SessionFactoryImplementor sessionFactory) {
  		ActiveSessionFactoryRegistry.getInstance().register( sessionFactory );
  	}
  
 diff --git a/main/java/org/hibernate/search/batch/jsr352/core/massindexing/step/impl/HibernateSearchPartitionMapper.java b/main/java/org/hibernate/search/batch/jsr352/core/massindexing/step/impl/HibernateSearchPartitionMapper.java
-index c8763c2b4a..2d975eab7e 100644
+index b70edc5152..21262a2c77 100644
 --- a/main/java/org/hibernate/search/batch/jsr352/core/massindexing/step/impl/HibernateSearchPartitionMapper.java
 +++ b/main/java/org/hibernate/search/batch/jsr352/core/massindexing/step/impl/HibernateSearchPartitionMapper.java
-@@ -236,7 +236,7 @@ private List<PartitionBound> buildPartitionUnitsFrom(EntityManagerFactory emf, S
+@@ -239,7 +239,7 @@ private List<PartitionBound> buildPartitionUnitsFrom(EntityManagerFactory emf, S
  			query.setMaxResults( maxResults );
  		}
  
@@ -33,7 +34,7 @@ index c8763c2b4a..2d975eab7e 100644
  			/*
  			 * The scroll results are originally positioned *before* the first element,
  			 * so we need to scroll rowsPerPartition + 1 positions to advanced to the
-@@ -248,7 +248,7 @@ private List<PartitionBound> buildPartitionUnitsFrom(EntityManagerFactory emf, S
+@@ -251,7 +251,7 @@ private List<PartitionBound> buildPartitionUnitsFrom(EntityManagerFactory emf, S
  
  			while ( scroll.scroll( rowsPerPartition ) ) {
  				lowerID = upperID;
@@ -43,10 +44,10 @@ index c8763c2b4a..2d975eab7e 100644
  			}
  
 diff --git a/main/java/org/hibernate/search/batch/jsr352/core/massindexing/step/spi/EntityReader.java b/main/java/org/hibernate/search/batch/jsr352/core/massindexing/step/spi/EntityReader.java
-index 6daddd7182..47a1fe9fcd 100644
+index 9d1db50953..237341e6a5 100644
 --- a/main/java/org/hibernate/search/batch/jsr352/core/massindexing/step/spi/EntityReader.java
 +++ b/main/java/org/hibernate/search/batch/jsr352/core/massindexing/step/spi/EntityReader.java
-@@ -400,7 +400,7 @@ else if ( lowerBound != null ) {
+@@ -402,7 +402,7 @@ else if ( lowerBound != null ) {
  
  	private interface FetchingStrategy {
  
@@ -55,7 +56,7 @@ index 6daddd7182..47a1fe9fcd 100644
  
  	}
  
-@@ -411,11 +411,11 @@ private static class ChunkState implements AutoCloseable {
+@@ -413,11 +413,11 @@ private static class ChunkState implements AutoCloseable {
  		private final int clearInterval;
  
  		private Session session;
@@ -69,7 +70,7 @@ index 6daddd7182..47a1fe9fcd 100644
  
  		public ChunkState(
  				EntityManagerFactory emf, String tenantId, FetchingStrategy fetchingStrategy, int clearInterval,
-@@ -446,7 +446,7 @@ else if ( processedEntityCount % clearInterval == 0 ) {
+@@ -448,7 +448,7 @@ else if ( processedEntityCount % clearInterval == 0 ) {
  			if ( !scroll.next() ) {
  				return null;
  			}
@@ -78,7 +79,7 @@ index 6daddd7182..47a1fe9fcd 100644
  			lastProcessedEntityId = session.getIdentifier( entity );
  			++processedEntityCount;
  			return entity;
-@@ -462,13 +462,13 @@ public Serializable end() {
+@@ -464,13 +464,13 @@ public Serializable end() {
  			if ( lastCheckpointInfo != null ) {
  				processedEntityCountInPartition += lastCheckpointInfo.getProcessedEntityCount();
  			}
@@ -95,7 +96,7 @@ index 6daddd7182..47a1fe9fcd 100644
  		}
  
 diff --git a/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/CompositeIdOrder.java b/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/CompositeIdOrder.java
-index a56e45f9d9..be2e90b34d 100644
+index 34524445c8..7a1b35c4b0 100644
 --- a/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/CompositeIdOrder.java
 +++ b/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/CompositeIdOrder.java
 @@ -7,10 +7,7 @@
@@ -107,9 +108,9 @@ index a56e45f9d9..be2e90b34d 100644
  import java.util.List;
 -import java.util.ListIterator;
  import java.util.function.BiFunction;
+ 
  import jakarta.persistence.EmbeddedId;
- import jakarta.persistence.IdClass;
-@@ -20,7 +17,8 @@
+@@ -21,7 +18,8 @@
  import jakarta.persistence.criteria.Predicate;
  import jakarta.persistence.criteria.Root;
  
@@ -119,7 +120,7 @@ index a56e45f9d9..be2e90b34d 100644
  
  /**
   * Order over multiple ID attributes.
-@@ -48,32 +46,12 @@
+@@ -49,32 +47,12 @@
   */
  public class CompositeIdOrder implements IdOrder {
  
@@ -157,7 +158,7 @@ index a56e45f9d9..be2e90b34d 100644
  	}
  
  	@Override
-@@ -106,54 +84,51 @@ public Predicate idLesser(CriteriaBuilder builder, Root<?> root, Object idObj) {
+@@ -107,54 +85,51 @@ public Predicate idLesser(CriteriaBuilder builder, Root<?> root, Object idObj) {
  
  	@Override
  	public void addAscOrder(CriteriaBuilder builder, CriteriaQuery<?> criteria, Root<?> root) {
@@ -242,10 +243,10 @@ index a56e45f9d9..be2e90b34d 100644
 -	}
  }
 diff --git a/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/PersistenceUtil.java b/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/PersistenceUtil.java
-index d20b3cc57f..7c20dc07c2 100644
+index 2faf9f6a2e..51639b2963 100644
 --- a/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/PersistenceUtil.java
 +++ b/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/PersistenceUtil.java
-@@ -18,12 +18,12 @@
+@@ -19,12 +19,12 @@
  import org.hibernate.StatelessSession;
  import org.hibernate.StatelessSessionBuilder;
  import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -262,7 +263,7 @@ index d20b3cc57f..7c20dc07c2 100644
  
  /**
   * Internal utility class for persistence usage.
-@@ -95,28 +95,27 @@ public static IndexScope getIndexScope(String hql) {
+@@ -96,28 +96,27 @@ public static IndexScope getIndexScope(String hql) {
  	public static List<EntityTypeDescriptor> createDescriptors(EntityManagerFactory entityManagerFactory, Set<Class<?>> types) {
  		SessionFactoryImplementor sessionFactory = entityManagerFactory.unwrap( SessionFactoryImplementor.class );
  		List<EntityTypeDescriptor> result = new ArrayList<>( types.size() );

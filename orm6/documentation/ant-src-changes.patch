@@ -1,8 +1,8 @@
 diff --git a/test/java/org/hibernate/search/documentation/search/query/QueryDslIT.java b/test/java/org/hibernate/search/documentation/search/query/QueryDslIT.java
-index 6185209396..b7736775f3 100644
+index edece3f095..f079b92756 100644
 --- a/test/java/org/hibernate/search/documentation/search/query/QueryDslIT.java
 +++ b/test/java/org/hibernate/search/documentation/search/query/QueryDslIT.java
-@@ -61,7 +61,7 @@ public class QueryDslIT {
+@@ -62,7 +62,7 @@ public class QueryDslIT {
  	@Before
  	public void setup() {
  		entityManagerFactory = setupHelper.start()

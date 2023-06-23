@@ -1,51 +1,51 @@
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/cdi/CdiBeanResolutionIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/cdi/CdiBeanResolutionIT.java
-index 0001e76925..77a0379aa5 100644
+index 2e6cb3ec25..404958a8dc 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/cdi/CdiBeanResolutionIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/cdi/CdiBeanResolutionIT.java
-@@ -137,7 +137,7 @@ private <T> void doTest(ExpectedScope expectedScope, CounterKeys counterKeys, Be
- 		int expectedInstances = ExpectedScope.SINGLETON.equals( expectedScope ) ? 1 : 2;
+@@ -139,7 +139,7 @@ private <T> void doTest(ExpectedScope expectedScope, CounterKeys counterKeys, Be
  
- 		try ( @SuppressWarnings("unused") SessionFactory sessionFactory = ormSetupHelper.start()
+ 		try ( @SuppressWarnings("unused")
+ 		SessionFactory sessionFactory = ormSetupHelper.start()
 -				.withProperty( AvailableSettings.CDI_BEAN_MANAGER, cdiContainer.getBeanManager() )
 +				.withProperty( AvailableSettings.JAKARTA_CDI_BEAN_MANAGER, cdiContainer.getBeanManager() )
  				.setup( IndexedEntity.class ) ) {
  			backendMock.verifyExpectationsMet();
  
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/cdi/CdiExtendedBeanManagerBootstrapShutdownIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/cdi/CdiExtendedBeanManagerBootstrapShutdownIT.java
-index ec37ac7ec7..e7179fb776 100644
+index 3fec78524f..4f964fdf2f 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/cdi/CdiExtendedBeanManagerBootstrapShutdownIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/cdi/CdiExtendedBeanManagerBootstrapShutdownIT.java
-@@ -80,7 +80,7 @@ public void successfulBoot() {
- 		} );
+@@ -82,7 +82,7 @@ public void successfulBoot() {
  
- 		try ( @SuppressWarnings("unused") SessionFactory sessionFactory = ormSetupHelper.start()
+ 		try ( @SuppressWarnings("unused")
+ 		SessionFactory sessionFactory = ormSetupHelper.start()
 -				.withProperty( AvailableSettings.CDI_BEAN_MANAGER, extendedBeanManager )
 +				.withProperty( AvailableSettings.JAKARTA_CDI_BEAN_MANAGER, extendedBeanManager )
  				.setup( IndexedEntity.class ) ) {
  			// Hibernate Search should not have booted yet.
  			backendMock.verifyExpectationsMet();
-@@ -135,7 +135,7 @@ public void failedBoot() {
- 		} );
+@@ -138,7 +138,7 @@ public void failedBoot() {
  
- 		try ( @SuppressWarnings("unused") SessionFactory sessionFactory = ormSetupHelper.start()
+ 		try ( @SuppressWarnings("unused")
+ 		SessionFactory sessionFactory = ormSetupHelper.start()
 -				.withProperty( AvailableSettings.CDI_BEAN_MANAGER, extendedBeanManager )
 +				.withProperty( AvailableSettings.JAKARTA_CDI_BEAN_MANAGER, extendedBeanManager )
  				.setup( IndexedEntity.class ) ) {
  			// Hibernate Search should not have booted yet.
  			backendMock.verifyExpectationsMet();
-@@ -189,7 +189,7 @@ public void cancelledBoot() {
- 		} );
+@@ -193,7 +193,7 @@ public void cancelledBoot() {
  
- 		try ( @SuppressWarnings("unused") SessionFactory sessionFactory = ormSetupHelper.start()
+ 		try ( @SuppressWarnings("unused")
+ 		SessionFactory sessionFactory = ormSetupHelper.start()
 -				.withProperty( AvailableSettings.CDI_BEAN_MANAGER, extendedBeanManager )
 +				.withProperty( AvailableSettings.JAKARTA_CDI_BEAN_MANAGER, extendedBeanManager )
  				.setup( IndexedEntity.class ) ) {
  			// Hibernate Search should not have booted yet.
  			backendMock.verifyExpectationsMet();
-@@ -230,7 +230,7 @@ public void failedShutdown() {
- 		} );
+@@ -235,7 +235,7 @@ public void failedShutdown() {
  
- 		try ( @SuppressWarnings("unused") SessionFactory sessionFactory = ormSetupHelper.start()
+ 		try ( @SuppressWarnings("unused")
+ 		SessionFactory sessionFactory = ormSetupHelper.start()
 -				.withProperty( AvailableSettings.CDI_BEAN_MANAGER, extendedBeanManager )
 +				.withProperty( AvailableSettings.JAKARTA_CDI_BEAN_MANAGER, extendedBeanManager )
  				.setup( IndexedEntity.class ) ) {

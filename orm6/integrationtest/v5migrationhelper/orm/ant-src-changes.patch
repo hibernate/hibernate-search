@@ -1,18 +1,18 @@
 diff --git a/test/java/org/hibernate/search/test/configuration/LobTest.java b/test/java/org/hibernate/search/test/configuration/LobTest.java
-index fc90c71105..eb45ab96a2 100644
+index 1820470ca3..6eec8d5d83 100644
 --- a/test/java/org/hibernate/search/test/configuration/LobTest.java
 +++ b/test/java/org/hibernate/search/test/configuration/LobTest.java
 @@ -17,8 +17,7 @@
+ 
  import org.hibernate.Session;
  import org.hibernate.Transaction;
- 
 -import org.hibernate.dialect.Sybase11Dialect;
 -import org.hibernate.dialect.SybaseASE15Dialect;
 +import org.hibernate.dialect.SybaseDialect;
  import org.hibernate.search.FullTextQuery;
  import org.hibernate.search.FullTextSession;
  import org.hibernate.search.Search;
-@@ -41,7 +40,7 @@
+@@ -43,7 +42,7 @@
  public class LobTest extends SearchTestBase {
  
  	@Test
@@ -22,19 +22,19 @@ index fc90c71105..eb45ab96a2 100644
  	public void testCreateIndexSearchEntityWithLobField() {
  		// create and index
 diff --git a/test/java/org/hibernate/search/test/envers/SearchAndEnversIntegrationTest.java b/test/java/org/hibernate/search/test/envers/SearchAndEnversIntegrationTest.java
-index 7b56a4138d..fabd083ba0 100644
+index 3c55a59d0c..1c1c483475 100644
 --- a/test/java/org/hibernate/search/test/envers/SearchAndEnversIntegrationTest.java
 +++ b/test/java/org/hibernate/search/test/envers/SearchAndEnversIntegrationTest.java
 @@ -12,7 +12,7 @@
- import org.apache.lucene.search.Query;
- import org.apache.lucene.search.TermQuery;
+ import java.util.List;
+ 
  import org.hibernate.Transaction;
 -import org.hibernate.dialect.PostgreSQL81Dialect;
 +import org.hibernate.dialect.PostgreSQLDialect;
  import org.hibernate.envers.AuditReader;
  import org.hibernate.envers.AuditReaderFactory;
  import org.hibernate.envers.query.AuditEntity;
-@@ -36,7 +36,7 @@
+@@ -38,7 +38,7 @@
   *
   * @author Davide Di Somma <davide.disomma@gmail.com>
   */
@@ -44,10 +44,10 @@ index 7b56a4138d..fabd083ba0 100644
  public class SearchAndEnversIntegrationTest extends SearchTestBase {
  
 diff --git a/test/java/org/hibernate/search/test/query/LuceneQueryTest.java b/test/java/org/hibernate/search/test/query/LuceneQueryTest.java
-index 94e8526ff0..0ef022a044 100644
+index 004545c638..d4c4910561 100644
 --- a/test/java/org/hibernate/search/test/query/LuceneQueryTest.java
 +++ b/test/java/org/hibernate/search/test/query/LuceneQueryTest.java
-@@ -236,7 +236,7 @@ public void testDefaultFetchSize() throws Exception {
+@@ -237,7 +237,7 @@ public void testDefaultFetchSize() throws Exception {
  
  		ScrollableResults projections = hibQuery.scroll();
  		projections.beforeFirst();
@@ -56,7 +56,7 @@ index 94e8526ff0..0ef022a044 100644
  		assertNull( projection );
  
  		projections.next();
-@@ -262,7 +262,7 @@ public void testFetchSizeLargerThanHits() throws Exception {
+@@ -263,7 +263,7 @@ public void testFetchSizeLargerThanHits() throws Exception {
  		ScrollableResults results = hibQuery.scroll();
  		results.beforeFirst();
  		results.next();
@@ -65,7 +65,7 @@ index 94e8526ff0..0ef022a044 100644
  		assertEquals( "incorrect entityInfo returned", 1000, result[0] );
  
  		tx.commit();
-@@ -285,14 +285,14 @@ public void testFetchSizeDefaultMax() throws Exception {
+@@ -286,14 +286,14 @@ public void testFetchSizeDefaultMax() throws Exception {
  		ScrollableResults results = hibQuery.scroll();
  		results.beforeFirst();
  		results.next();
@@ -83,7 +83,7 @@ index 94e8526ff0..0ef022a044 100644
  		assertEquals( "incorrect entityInfo returned", 1004, result[0] );
  
  		tx.commit();
-@@ -316,19 +316,19 @@ public void testFetchSizeNonDefaultMax() throws Exception {
+@@ -317,19 +317,19 @@ public void testFetchSizeNonDefaultMax() throws Exception {
  		ScrollableResults results = hibQuery.scroll();
  		results.beforeFirst();
  		results.next();
@@ -107,7 +107,7 @@ index 94e8526ff0..0ef022a044 100644
  		assertNull( result );
  
  		results.close();
-@@ -337,12 +337,12 @@ public void testFetchSizeNonDefaultMax() throws Exception {
+@@ -338,12 +338,12 @@ public void testFetchSizeNonDefaultMax() throws Exception {
  
  		results.beforeFirst();
  		results.next();
@@ -122,7 +122,7 @@ index 94e8526ff0..0ef022a044 100644
  		assertNull( result );
  
  		tx.commit();
-@@ -363,7 +363,7 @@ public void testFetchSizeNonDefaultMaxNoHits() throws Exception {
+@@ -364,7 +364,7 @@ public void testFetchSizeNonDefaultMaxNoHits() throws Exception {
  
  		ScrollableResults results = hibQuery.scroll();
  		results.beforeFirst();
@@ -131,7 +131,7 @@ index 94e8526ff0..0ef022a044 100644
  		assertNull( "non-null entity infos returned", result );
  
  		tx.commit();
-@@ -426,11 +426,11 @@ public void testCurrent() throws Exception {
+@@ -427,11 +427,11 @@ public void testCurrent() throws Exception {
  
  		results = hibQuery.scroll();
  		results.scroll( 4 );
@@ -145,7 +145,7 @@ index 94e8526ff0..0ef022a044 100644
  		assertEquals( 1004, result[0] );
  
  		tx.commit();
-@@ -586,7 +586,7 @@ public void testScrollEmptyHits() throws Exception {
+@@ -587,7 +587,7 @@ public void testScrollEmptyHits() throws Exception {
  		ScrollableResults projections = hibQuery.scroll();
  		projections.beforeFirst();
  		projections.next();
@@ -154,7 +154,7 @@ index 94e8526ff0..0ef022a044 100644
  		assertNull( projection );
  
  		hibQuery = fullTextSession.createFullTextQuery( query, Employee.class ).setMaxResults( 20 );
-@@ -594,7 +594,7 @@ public void testScrollEmptyHits() throws Exception {
+@@ -595,7 +595,7 @@ public void testScrollEmptyHits() throws Exception {
  		projections = hibQuery.scroll();
  		projections.beforeFirst();
  		projections.next();
@@ -164,10 +164,10 @@ index 94e8526ff0..0ef022a044 100644
  
  		tx.commit();
 diff --git a/test/java/org/hibernate/search/test/query/ProjectionQueryTest.java b/test/java/org/hibernate/search/test/query/ProjectionQueryTest.java
-index 7396d0df06..878e59509f 100644
+index 7cebc52a54..938872ca52 100644
 --- a/test/java/org/hibernate/search/test/query/ProjectionQueryTest.java
 +++ b/test/java/org/hibernate/search/test/query/ProjectionQueryTest.java
-@@ -153,17 +153,17 @@ public void testProjectionWithScroll() throws Exception {
+@@ -154,17 +154,17 @@ public void testProjectionWithScroll() throws Exception {
  
  		projections.beforeFirst();
  		projections.next();
@@ -188,7 +188,7 @@ index 7396d0df06..878e59509f 100644
  		assertNull( projection );
  
  		projections.close();
-@@ -171,11 +171,11 @@ public void testProjectionWithScroll() throws Exception {
+@@ -172,11 +172,11 @@ public void testProjectionWithScroll() throws Exception {
  		projections = hibQuery.scroll();
  
  		projections.first();
@@ -203,10 +203,10 @@ index 7396d0df06..878e59509f 100644
  
  		//cleanup
 diff --git a/test/java/org/hibernate/search/test/query/ScrollableResultsTest.java b/test/java/org/hibernate/search/test/query/ScrollableResultsTest.java
-index 5f67f7d4e7..cb9495f675 100644
+index 5121cd9c48..3244879d99 100644
 --- a/test/java/org/hibernate/search/test/query/ScrollableResultsTest.java
 +++ b/test/java/org/hibernate/search/test/query/ScrollableResultsTest.java
-@@ -83,7 +83,7 @@ public void testScrollingForward() {
+@@ -84,7 +84,7 @@ public void testScrollingForward() {
  			position++;
  			int bookId = position;
  			assertEquals( position, scrollableResults.getRowNumber() );
@@ -215,7 +215,7 @@ index 5f67f7d4e7..cb9495f675 100644
  			assertEquals( bookId, book.getId().intValue() );
  			assertEquals( "book about the number " + bookId, book.getSummary() );
  			assertTrue( sess.contains( book ) );
-@@ -111,7 +111,7 @@ public void testResultsAreManaged() {
+@@ -112,7 +112,7 @@ public void testResultsAreManaged() {
  		int position = -1;
  		while ( scrollableResults.next() ) {
  			position++;
@@ -224,7 +224,7 @@ index 5f67f7d4e7..cb9495f675 100644
  			assertTrue( sess.contains( book ) );
  			// evict some entities:
  			if ( position % 3 == 0 ) {
-@@ -158,7 +158,7 @@ public void testScrollProjectionAndManaged() {
+@@ -159,7 +159,7 @@ public void testScrollProjectionAndManaged() {
  		int position = scrollableResults.getRowNumber();
  		while ( scrollableResults.next() ) {
  			position++;
@@ -234,10 +234,10 @@ index 5f67f7d4e7..cb9495f675 100644
  			assertEquals( position, objs[1] );
  			assertTrue( objs[2] instanceof Employee );
 diff --git a/test/java/org/hibernate/search/test/session/MassIndexUsingManualFlushTest.java b/test/java/org/hibernate/search/test/session/MassIndexUsingManualFlushTest.java
-index 3e45d55cd1..e9ba5a3272 100644
+index 05199ca806..58c43d0d4f 100644
 --- a/test/java/org/hibernate/search/test/session/MassIndexUsingManualFlushTest.java
 +++ b/test/java/org/hibernate/search/test/session/MassIndexUsingManualFlushTest.java
-@@ -60,7 +60,7 @@ public void execute(Connection connection) throws SQLException {
+@@ -61,7 +61,7 @@ public void execute(Connection connection) throws SQLException {
  		int index = 0;
  		while ( results.next() ) {
  			index++;

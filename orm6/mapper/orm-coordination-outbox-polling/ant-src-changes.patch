@@ -1,5 +1,5 @@
 diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cfg/HibernateOrmMapperOutboxPollingSettings.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cfg/HibernateOrmMapperOutboxPollingSettings.java
-index 5907efddcb..ba176dec75 100644
+index d2f487d040..6c5681f0ee 100644
 --- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cfg/HibernateOrmMapperOutboxPollingSettings.java
 +++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cfg/HibernateOrmMapperOutboxPollingSettings.java
 @@ -8,9 +8,9 @@
@@ -13,7 +13,7 @@ index 5907efddcb..ba176dec75 100644
  import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
  import org.hibernate.search.util.common.annotation.Incubating;
  
-@@ -399,14 +399,15 @@ private HibernateOrmMapperOutboxPollingSettings() {
+@@ -401,14 +401,15 @@ private HibernateOrmMapperOutboxPollingSettings() {
  			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_TABLE;
  
  	/**
@@ -31,7 +31,7 @@ index 5907efddcb..ba176dec75 100644
  	 * @see CustomVersionOneStrategy
  	 * @see StandardRandomStrategy
  	 */
-@@ -458,14 +459,14 @@ private HibernateOrmMapperOutboxPollingSettings() {
+@@ -460,14 +461,14 @@ private HibernateOrmMapperOutboxPollingSettings() {
  			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_AGENT_TABLE;
  
  	/**
@@ -49,7 +49,7 @@ index 5907efddcb..ba176dec75 100644
  	 * @see StandardRandomStrategy
  	 */
 diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java
-index f42125b5a8..ded12df777 100644
+index 248a41acc8..9eaa45dd23 100644
 --- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java
 +++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java
 @@ -39,6 +39,8 @@
@@ -61,7 +61,7 @@ index f42125b5a8..ded12df777 100644
  	public static final String CLASS_NAME = Agent.class.getName();
  
  	// Setting both the JPA entity name and the native entity name to the FQCN so that:
-@@ -175,7 +177,7 @@ public Collection<MappingDocument> produceMappings(ConfigurationPropertySource p
+@@ -180,7 +182,7 @@ public Collection<MappingDocument> produceMappings(ConfigurationPropertySource p
  
  		JaxbHbmHibernateMapping root = (JaxbHbmHibernateMapping) binding.getRoot();
  
@@ -71,10 +71,10 @@ index f42125b5a8..ded12df777 100644
  	}
  }
 diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxEventLoader.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxEventLoader.java
-index cba677480e..47293d4b22 100644
+index 0156888955..35f52d1217 100644
 --- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxEventLoader.java
 +++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxEventLoader.java
-@@ -49,7 +49,7 @@ final class OutboxEventLoader implements ToStringTreeAppendable {
+@@ -50,7 +50,7 @@ final class OutboxEventLoader implements ToStringTreeAppendable {
  		// so we can afford to just skip events that are already locked,
  		// and process them later when they are no longer locked.
  		if ( dialect.supportsSkipLocked() ) {
@@ -84,12 +84,12 @@ index cba677480e..47293d4b22 100644
  		// If SKIP_LOCKED is not supported, we just do basic locking and hope for the best
  		// (in particular we hope for transaction deadlocks to be detected by the database and result in a failure,
 diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java
-index ea4ccc5e6e..5f7479025e 100644
+index 12807b781d..95897ef188 100644
 --- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java
 +++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java
 @@ -30,6 +30,7 @@
- import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.UuidDataTypeUtils;
  import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.UuidGenerationStrategy;
+ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.UuidDataTypeUtils;
  import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.spi.HibernateOrmMapperOutboxPollingSpiSettings;
 +import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer;
  import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
@@ -113,7 +113,7 @@ index ea4ccc5e6e..5f7479025e 100644
  			"        <property name=\"status\" index=\"status\" nullable=\"false\">\n" +
  			"            <type name=\"org.hibernate.type.EnumType\">\n" +
  			"                <param name=\"enumClass\">" + OutboxEvent.Status.class.getName() + "</param>\n" +
-@@ -162,7 +165,7 @@ public Collection<MappingDocument> produceMappings(ConfigurationPropertySource p
+@@ -168,7 +171,7 @@ public Collection<MappingDocument> produceMappings(ConfigurationPropertySource p
  		);
  
  		log.outboxEventGeneratedEntityMapping( entityDefinition );
@@ -122,7 +122,7 @@ index ea4ccc5e6e..5f7479025e 100644
  
  		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( entityDefinition.getBytes() );
  		BufferedInputStream bufferedInputStream = new BufferedInputStream( byteArrayInputStream );
-@@ -170,7 +173,7 @@ public Collection<MappingDocument> produceMappings(ConfigurationPropertySource p
+@@ -176,7 +179,7 @@ public Collection<MappingDocument> produceMappings(ConfigurationPropertySource p
  
  		JaxbHbmHibernateMapping root = (JaxbHbmHibernateMapping) binding.getRoot();
  
@@ -132,7 +132,7 @@ index ea4ccc5e6e..5f7479025e 100644
  	}
  }
 diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/mapping/impl/OutboxPollingSearchMappingImpl.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/mapping/impl/OutboxPollingSearchMappingImpl.java
-index 8af4b57c48..b350b8eb45 100644
+index ca88ad4c5c..5155d3f5ba 100644
 --- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/mapping/impl/OutboxPollingSearchMappingImpl.java
 +++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/mapping/impl/OutboxPollingSearchMappingImpl.java
 @@ -14,6 +14,7 @@
@@ -143,7 +143,7 @@ index 8af4b57c48..b350b8eb45 100644
  import org.hibernate.query.Query;
  import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
  import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyStartContext;
-@@ -76,7 +77,7 @@ public int reprocessAbortedEvents() {
+@@ -78,7 +79,7 @@ public int reprocessAbortedEvents() {
  
  		try ( Session session = sessionFactory.openSession() ) {
  			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
@@ -152,7 +152,7 @@ index 8af4b57c48..b350b8eb45 100644
  				query.setParameter( "status", OutboxEvent.Status.ABORTED );
  				query.setParameter( "newStatus", OutboxEvent.Status.PENDING );
  				return query.executeUpdate();
-@@ -90,7 +91,7 @@ public int reprocessAbortedEvents(String tenantId) {
+@@ -92,7 +93,7 @@ public int reprocessAbortedEvents(String tenantId) {
  
  		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
  			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
@@ -161,7 +161,7 @@ index 8af4b57c48..b350b8eb45 100644
  				query.setParameter( "status", OutboxEvent.Status.ABORTED );
  				query.setParameter( "newStatus", OutboxEvent.Status.PENDING );
  				return query.executeUpdate();
-@@ -104,7 +105,7 @@ public int clearAllAbortedEvents() {
+@@ -106,7 +107,7 @@ public int clearAllAbortedEvents() {
  
  		try ( Session session = sessionFactory.openSession() ) {
  			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
@@ -170,7 +170,7 @@ index 8af4b57c48..b350b8eb45 100644
  				query.setParameter( "status", OutboxEvent.Status.ABORTED );
  				return query.executeUpdate();
  			} );
-@@ -117,7 +118,7 @@ public int clearAllAbortedEvents(String tenantId) {
+@@ -119,7 +120,7 @@ public int clearAllAbortedEvents(String tenantId) {
  
  		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
  			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
