@@ -80,7 +80,7 @@ public abstract class AbstractElasticsearchIndexCompositeNodeBuilder implements 
 	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String name, TreeNodeInclusion inclusion,
 			PredicateDefinition definition) {
 		ElasticsearchIndexNamedPredicateOptions options = new ElasticsearchIndexNamedPredicateOptions(
-			inclusion, definition );
+				inclusion, definition );
 		putNamedPredicate( name, options );
 		if ( TreeNodeInclusion.INCLUDED.equals( inclusion ) ) {
 			typeBuilder.queryElementFactory( PredicateTypeKeys.named( name ),

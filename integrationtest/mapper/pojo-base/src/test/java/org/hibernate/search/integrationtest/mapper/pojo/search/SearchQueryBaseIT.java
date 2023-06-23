@@ -75,7 +75,7 @@ public class SearchQueryBaseIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( Book.NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.of(
 							3L,
 							reference( Book.NAME, "1" ),
@@ -102,7 +102,7 @@ public class SearchQueryBaseIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( Book.NAME, Author.NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.of(
 							2L,
 							reference( Book.NAME, "1" ),
@@ -240,7 +240,7 @@ public class SearchQueryBaseIT {
 
 		@Override
 		public boolean equals(Object obj) {
-			if ( !(obj instanceof Book_Author) ) {
+			if ( !( obj instanceof Book_Author ) ) {
 				return false;
 			}
 			Book_Author other = (Book_Author) obj;
@@ -272,7 +272,7 @@ public class SearchQueryBaseIT {
 
 		@Override
 		public boolean equals(Object obj) {
-			if ( !(obj instanceof Book_Author_Score) ) {
+			if ( !( obj instanceof Book_Author_Score ) ) {
 				return false;
 			}
 			Book_Author_Score other = (Book_Author_Score) obj;

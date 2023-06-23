@@ -15,11 +15,10 @@ import org.apache.lucene.analysis.Analyzer;
 
 public class LuceneMultiIndexSearchIndexValueFieldContext<F>
 		extends AbstractMultiIndexSearchIndexValueFieldContext<
-						LuceneSearchIndexValueFieldContext<F>,
-						LuceneSearchIndexScope<?>,
-						LuceneSearchIndexValueFieldTypeContext<F>,
-						F
-				>
+				LuceneSearchIndexValueFieldContext<F>,
+				LuceneSearchIndexScope<?>,
+				LuceneSearchIndexValueFieldTypeContext<F>,
+				F>
 		implements LuceneSearchIndexValueFieldContext<F>, LuceneSearchIndexValueFieldTypeContext<F> {
 
 	public LuceneMultiIndexSearchIndexValueFieldContext(LuceneSearchIndexScope<?> scope, String absolutePath,

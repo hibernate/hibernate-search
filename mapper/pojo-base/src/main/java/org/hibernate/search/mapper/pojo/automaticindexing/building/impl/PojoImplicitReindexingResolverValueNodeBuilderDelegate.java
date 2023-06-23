@@ -29,8 +29,8 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 
 	private PojoImplicitReindexingResolverOriginalTypeNodeBuilder<V> typeNodeBuilder;
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<PojoRawTypeModel<?>, PojoImplicitReindexingResolverCastedTypeNodeBuilder<V, ?>>
-			castedTypeNodeBuilders = new LinkedHashMap<>();
+	private final Map<PojoRawTypeModel<?>, PojoImplicitReindexingResolverCastedTypeNodeBuilder<V, ?>> castedTypeNodeBuilders =
+			new LinkedHashMap<>();
 
 	private boolean frozen = false;
 
@@ -70,9 +70,9 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 			 */
 			throw new AssertionFailure(
 					"Error while building the automatic reindexing resolver at path " + modelPath
-					+ ": attempt to convert a reindexing resolver builder to an incorrect type; "
-					+ " got " + targetTypeModel + ", but a subtype of " + valueRawTypeModel
-					+ " was expected."
+							+ ": attempt to convert a reindexing resolver builder to an incorrect type; "
+							+ " got " + targetTypeModel + ", but a subtype of " + valueRawTypeModel
+							+ " was expected."
 			);
 		}
 	}
@@ -145,8 +145,8 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 	@SuppressWarnings("unchecked") // We know builders have this exact type, by construction
 	private <U> PojoImplicitReindexingResolverCastedTypeNodeBuilder<V, ? extends U> getOrCreateCastedTypeNodeBuilder(
 			PojoRawTypeModel<U> targetTypeModel) {
-		return (PojoImplicitReindexingResolverCastedTypeNodeBuilder<V, ? extends U>)
-				castedTypeNodeBuilders.computeIfAbsent( targetTypeModel, this::createCastedTypeNodeBuilder );
+		return (PojoImplicitReindexingResolverCastedTypeNodeBuilder<V, ? extends U>) castedTypeNodeBuilders
+				.computeIfAbsent( targetTypeModel, this::createCastedTypeNodeBuilder );
 	}
 
 	private <U> PojoImplicitReindexingResolverCastedTypeNodeBuilder<V, ? extends U> createCastedTypeNodeBuilder(

@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.standalone.loading.dsl.SelectionLoadingO
 
 public interface StandalonePojoSelectionLoadingContextBuilder
 		extends PojoSelectionLoadingContextBuilder<SelectionLoadingOptionsStep>,
-				PojoMassIndexingContextBuilder<SelectionLoadingOptionsStep> {
+		PojoMassIndexingContextBuilder<SelectionLoadingOptionsStep> {
 
 	@Override
 	StandalonePojoLoadingContext build();

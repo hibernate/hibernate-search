@@ -96,7 +96,7 @@ public abstract class SearchTestBase implements TestResourceManager, TestConfigu
 	}
 
 	@Override
-	public void configure(Map<String,Object> settings) {
+	public void configure(Map<String, Object> settings) {
 		//Empty by default
 	}
 

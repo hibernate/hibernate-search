@@ -57,7 +57,8 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	private final Map<IndexFieldKey, CallBehavior<Void>> indexFieldAddBehaviors = new ConcurrentHashMap<>();
 
-	private final List<ParameterizedCallBehavior<BackendBuildContext, Void>> createBackendBehaviors = Collections.synchronizedList( new ArrayList<>() );
+	private final List<ParameterizedCallBehavior<BackendBuildContext, Void>> createBackendBehaviors =
+			Collections.synchronizedList( new ArrayList<>() );
 
 	private final List<CallBehavior<Void>> stopBackendBehaviors = Collections.synchronizedList( new ArrayList<>() );
 
@@ -415,9 +416,8 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 				new NextScrollWorkCall<>( indexNames, work, projectionContext, loadingContext, rootProjection,
 						deadline ),
 				(call1, call2) -> call1.verify( call2 ),
-				noExpectationsBehavior( () ->
-						new SimpleSearchScrollResult<>( SimpleSearchResultTotal.exact( 0L ),
-								false, Collections.emptyList(), Duration.ZERO, false ) )
+				noExpectationsBehavior( () -> new SimpleSearchScrollResult<>( SimpleSearchResultTotal.exact( 0L ),
+						false, Collections.emptyList(), Duration.ZERO, false ) )
 		);
 	}
 
@@ -450,7 +450,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 		@Override
 		public boolean equals(Object obj) {
-			if ( ! (obj instanceof IndexFieldKey ) ) {
+			if ( !( obj instanceof IndexFieldKey ) ) {
 				return false;
 			}
 			IndexFieldKey other = (IndexFieldKey) obj;

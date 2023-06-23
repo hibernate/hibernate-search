@@ -30,7 +30,8 @@ public class ConcurrentData {
 		this.data = data;
 	}
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	@DocumentId
 	public Long getId() {
 		return id;

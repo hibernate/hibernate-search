@@ -65,7 +65,8 @@ public class HibernateSearchMultiReader extends MultiReader {
 	private final List<DirectoryReader> directoryReaders;
 	private final IndexReaderMetadataResolver metadataResolver;
 
-	HibernateSearchMultiReader(List<DirectoryReader> directoryReaders, IndexReaderMetadataResolver metadataResolver) throws IOException {
+	HibernateSearchMultiReader(List<DirectoryReader> directoryReaders, IndexReaderMetadataResolver metadataResolver)
+			throws IOException {
 		// If this flag isn't set to true, the MultiReader will increase the usage counter!
 		super( toReaderArray( directoryReaders ), true );
 		this.directoryReaders = directoryReaders;

@@ -27,7 +27,7 @@ import org.junit.experimental.categories.Category;
  * Test behavior when performing faceting requests on an index with no value for the targeted faceted field
  * (either because there is no document, or because no document has a value for this field).
  */
-@TestForIssue( jiraKey = "HSEARCH-2955" )
+@TestForIssue(jiraKey = "HSEARCH-2955")
 @Category(PortedToSearch6.class)
 public class NoIndexedValueFacetingTest {
 

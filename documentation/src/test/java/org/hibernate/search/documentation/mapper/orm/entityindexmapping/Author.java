@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 @Entity
 @Indexed(index = "AuthorIndex")
 public class Author {
-// end::indexed-explicitindexname[]
+	// end::indexed-explicitindexname[]
 
 	@Id
 	@GeneratedValue

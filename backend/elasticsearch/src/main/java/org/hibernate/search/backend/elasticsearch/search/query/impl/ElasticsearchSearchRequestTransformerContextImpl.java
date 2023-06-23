@@ -86,7 +86,8 @@ final class ElasticsearchSearchRequestTransformerContextImpl
 		builder.wholeEncodedPath( path );
 
 		Map<String, String> parameters = potentiallyTransformedParametersMap != null
-				? potentiallyTransformedParametersMap : originalRequest.parameters();
+				? potentiallyTransformedParametersMap
+				: originalRequest.parameters();
 		parameters.forEach( builder::param );
 
 		JsonObject body = potentiallyTransformedBody != null ? potentiallyTransformedBody : originalBody;

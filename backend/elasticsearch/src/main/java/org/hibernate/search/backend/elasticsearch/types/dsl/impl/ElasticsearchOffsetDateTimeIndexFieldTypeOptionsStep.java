@@ -14,7 +14,8 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 
 class ElasticsearchOffsetDateTimeIndexFieldTypeOptionsStep
 		extends
-		AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<ElasticsearchOffsetDateTimeIndexFieldTypeOptionsStep, OffsetDateTime> {
+		AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<ElasticsearchOffsetDateTimeIndexFieldTypeOptionsStep,
+				OffsetDateTime> {
 
 	ElasticsearchOffsetDateTimeIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, OffsetDateTime.class );

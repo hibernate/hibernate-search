@@ -41,9 +41,9 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 
 	@Override
 	public <F> ExpectationsAlternative<
-					SupportedSingleFieldAggregationExpectations<F>,
-					UnsupportedSingleFieldAggregationExpectations
-			> getSingleFieldAggregationExpectations(FieldTypeDescriptor<F> typeDescriptor) {
+			SupportedSingleFieldAggregationExpectations<F>,
+			UnsupportedSingleFieldAggregationExpectations> getSingleFieldAggregationExpectations(
+					FieldTypeDescriptor<F> typeDescriptor) {
 		if ( String.class.equals( typeDescriptor.getJavaType() )
 				|| GeoPoint.class.equals( typeDescriptor.getJavaType() )
 				|| Boolean.class.equals( typeDescriptor.getJavaType() ) ) {

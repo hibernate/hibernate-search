@@ -65,6 +65,6 @@ public class Author {
 	public void setBirthDate(LocalDate birthDate) {
 		this.birthDate = birthDate;
 	}
-// end::getters-setters[]
+	// end::getters-setters[]
 }
 // end::include[]

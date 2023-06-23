@@ -22,7 +22,7 @@ public final class SimpleQueryStringPredicateFieldStepImpl
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldMoreStep<?, ?> fields(String ... fieldPaths) {
+	public SimpleQueryStringPredicateFieldMoreStep<?, ?> fields(String... fieldPaths) {
 		return new SimpleQueryStringPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
 	}
 }

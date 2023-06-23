@@ -47,12 +47,13 @@ public class NonStandardFieldIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void defaultAttributes() {
 		@Indexed(index = INDEX_NAME)
-		class IndexedEntity	{
+		class IndexedEntity {
 			@DocumentId
 			Integer id;
 			@NonStandardField(valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
@@ -69,7 +70,7 @@ public class NonStandardFieldIT {
 	@Test
 	public void name() {
 		@Indexed(index = INDEX_NAME)
-		class IndexedEntity	{
+		class IndexedEntity {
 			@DocumentId
 			Integer id;
 			@NonStandardField(name = "explicitName",
@@ -87,10 +88,11 @@ public class NonStandardFieldIT {
 	@Test
 	public void name_invalid_dot() {
 		@Indexed(index = INDEX_NAME)
-		class IndexedEntity	{
+		class IndexedEntity {
 			@DocumentId
 			Integer id;
-			@NonStandardField(name = "invalid.withdot", valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
+			@NonStandardField(name = "invalid.withdot",
+					valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
 			WrappedValue value;
 		}
 

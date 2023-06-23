@@ -30,6 +30,7 @@ import org.junit.Test;
 public class OperationSubmitterExecutorTest {
 
 	private SimpleScheduledExecutor executor;
+
 	@Before
 	public void setUp() throws Exception {
 		this.executor = new SimpleScheduledExecutor() {
@@ -77,7 +78,7 @@ public class OperationSubmitterExecutorTest {
 
 		CompletableFuture<Boolean> future = CompletableFuture.supplyAsync( () -> {
 			try {
-				OperationSubmitter.blocking().submitToExecutor( executor, () -> { }, r -> { }, (e, t) -> { } );
+				OperationSubmitter.blocking().submitToExecutor( executor, () -> {}, r -> {}, (e, t) -> {} );
 			}
 			catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
@@ -100,7 +101,7 @@ public class OperationSubmitterExecutorTest {
 	@Test
 	public void nonBlockingOperationSubmitterThrowsException() {
 		// rejecting submitter would just fail with exception all the time as our executor is blocking
-		assertThatThrownBy( () -> OperationSubmitter.rejecting().submitToExecutor( executor, () -> { }, r -> { }, (e, t) -> { } ) )
+		assertThatThrownBy( () -> OperationSubmitter.rejecting().submitToExecutor( executor, () -> {}, r -> {}, (e, t) -> {} ) )
 				.isInstanceOf( RejectedExecutionException.class );
 	}
 
@@ -140,7 +141,7 @@ public class OperationSubmitterExecutorTest {
 					}
 				},
 				() -> { check.set( true ); }, r -> { fail( "shouldn't happen." ); },
-				(e, t) -> { }
+				(e, t) -> {}
 		);
 
 		await().untilAsserted( () -> assertThat( check ).isTrue() );
@@ -154,7 +155,7 @@ public class OperationSubmitterExecutorTest {
 		// we won't submit to the queue but just make sure that work got offloaded
 		AtomicBoolean worked = new AtomicBoolean( false );
 		OperationSubmitter.offloading( Runnable::run )
-				.submitToExecutor( executor, () -> {}, r -> {worked.set( true );}, (e, t) -> {} );
+				.submitToExecutor( executor, () -> {}, r -> { worked.set( true ); }, (e, t) -> {} );
 
 		await().untilAsserted( () -> assertThat( worked ).isTrue() );
 	}
@@ -165,7 +166,9 @@ public class OperationSubmitterExecutorTest {
 		executor.submit( blockingTask );
 
 		AtomicBoolean worked = new AtomicBoolean( false );
-		OperationSubmitter.offloading( Runnable::run ).submitToExecutor( executor, () -> { }, r -> { throw new IllegalStateException( "fail" ); },
+		OperationSubmitter.offloading( Runnable::run ).submitToExecutor( executor, () -> {}, r -> {
+			throw new IllegalStateException( "fail" );
+		},
 				(e, t) -> {
 					assertThat( t )
 							.isInstanceOf( IllegalStateException.class )
@@ -182,7 +185,9 @@ public class OperationSubmitterExecutorTest {
 		executor.submit( blockingTask );
 
 		AtomicBoolean worked = new AtomicBoolean( false );
-		OperationSubmitter.offloading( CompletableFuture::runAsync ).submitToExecutor( executor, () -> { throw new IllegalStateException( "fail" ); },
+		OperationSubmitter.offloading( CompletableFuture::runAsync ).submitToExecutor( executor, () -> {
+			throw new IllegalStateException( "fail" );
+		},
 				Runnable::run,
 				(e, t) -> {
 					assertThat( t )
@@ -196,6 +201,7 @@ public class OperationSubmitterExecutorTest {
 
 	private static class BlockingTask implements Runnable {
 		AtomicBoolean working = new AtomicBoolean( true );
+
 		@Override
 		public void run() {
 			while ( working.get() ) {

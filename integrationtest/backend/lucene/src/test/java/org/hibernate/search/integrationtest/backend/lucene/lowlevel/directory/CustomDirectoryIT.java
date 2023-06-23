@@ -101,6 +101,7 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 					.contains( CONFIGURATION_PROPERTY_EXPECTED_VALUE );
 			return new DirectoryHolder() {
 				Directory directory;
+
 				@Override
 				public void start() {
 					StaticCounters.get().increment( DIRECTORY_HOLDER_START_COUNTER_KEY );

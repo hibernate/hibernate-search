@@ -28,7 +28,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
  */
 public final class BeanDelegatingBinder
 		implements TypeBinder, PropertyBinder, RoutingBinder,
-				MarkerBinder, IdentifierBinder, ValueBinder {
+		MarkerBinder, IdentifierBinder, ValueBinder {
 
 	private final BeanReference<?> delegateReference;
 

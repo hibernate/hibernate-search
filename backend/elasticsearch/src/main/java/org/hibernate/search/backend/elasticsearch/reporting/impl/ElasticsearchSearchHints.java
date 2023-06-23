@@ -18,9 +18,11 @@ public interface ElasticsearchSearchHints extends BackendSearchHints {
 
 	ElasticsearchSearchHints INSTANCE = Messages.getBundle( ElasticsearchSearchHints.class );
 
-	@Message(value = "A JSON hit projection represents a root hit object and adding it as a part of the nested object projection might produce misleading results.")
+	@Message(
+			value = "A JSON hit projection represents a root hit object and adding it as a part of the nested object projection might produce misleading results.")
 	String jsonHitProjectionNestingNotSupportedHint();
 
-	@Message(value = "A source projection represents a root source object and adding it as a part of the nested object projection might produce misleading results.")
+	@Message(
+			value = "A source projection represents a root source object and adding it as a part of the nested object projection might produce misleading results.")
 	String sourceProjectionNestingNotSupportedHint();
 }

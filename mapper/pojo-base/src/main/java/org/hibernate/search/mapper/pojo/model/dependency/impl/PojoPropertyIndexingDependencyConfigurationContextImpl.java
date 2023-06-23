@@ -51,7 +51,8 @@ public class PojoPropertyIndexingDependencyConfigurationContextImpl<P> extends A
 	}
 
 	@Override
-	public PojoOtherEntityIndexingDependencyConfigurationContext fromOtherEntity(ContainerExtractorPath extractorPathFromBridgedProperty,
+	public PojoOtherEntityIndexingDependencyConfigurationContext fromOtherEntity(
+			ContainerExtractorPath extractorPathFromBridgedProperty,
 			Class<?> otherEntityType,
 			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedPropertyExtractedType) {
 		return valueDependencyContexts.computeIfAbsent( extractorPathFromBridgedProperty, ValueDependencyContext::new )
@@ -96,7 +97,8 @@ public class PojoPropertyIndexingDependencyConfigurationContextImpl<P> extends A
 	private class ValueDependencyContext {
 		private final BoundPojoModelPathOriginalTypeNode<?> valueTypePath;
 		private final List<PojoModelPathValueNode> usedPaths = new ArrayList<>();
-		private final List<PojoOtherEntityIndexingDependencyConfigurationContextImpl<?>> otherEntityDependencyContexts = new ArrayList<>();
+		private final List<PojoOtherEntityIndexingDependencyConfigurationContextImpl<?>> otherEntityDependencyContexts =
+				new ArrayList<>();
 
 		private ValueDependencyContext(ContainerExtractorPath extractorPathFromBridgedProperty) {
 			BoundPojoModelPathValueNode<?, ?, ?> valuePath =
@@ -115,7 +117,8 @@ public class PojoPropertyIndexingDependencyConfigurationContextImpl<P> extends A
 						PojoIndexingDependencyCollectorNode.walker()
 				);
 			}
-			for ( PojoOtherEntityIndexingDependencyConfigurationContextImpl<?> otherEntityDependencyContext : otherEntityDependencyContexts ) {
+			for ( PojoOtherEntityIndexingDependencyConfigurationContextImpl<
+					?> otherEntityDependencyContext : otherEntityDependencyContexts ) {
 				otherEntityDependencyContext.contributeDependencies( dependencyCollectorTypeNode );
 			}
 		}

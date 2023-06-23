@@ -15,11 +15,13 @@ import com.google.gson.JsonElement;
 
 public class UnexpectedJsonElementTypeException extends AssertionFailure {
 
-	public UnexpectedJsonElementTypeException(JsonAccessor<?> accessor, JsonElementType<?> expectedType, JsonElement actualElement) {
+	public UnexpectedJsonElementTypeException(JsonAccessor<?> accessor, JsonElementType<?> expectedType,
+			JsonElement actualElement) {
 		this( String.valueOf( accessor ), expectedType, actualElement );
 	}
 
-	public UnexpectedJsonElementTypeException(JsonAccessor<?> accessor, List<? extends JsonElementType<?>> expectedTypes, JsonElement actualElement) {
+	public UnexpectedJsonElementTypeException(JsonAccessor<?> accessor, List<? extends JsonElementType<?>> expectedTypes,
+			JsonElement actualElement) {
 		this( String.valueOf( accessor ), expectedTypes, actualElement );
 	}
 
@@ -27,7 +29,8 @@ public class UnexpectedJsonElementTypeException extends AssertionFailure {
 		this( path, Collections.singletonList( expectedType ), actualElement );
 	}
 
-	public UnexpectedJsonElementTypeException(String path, List<? extends JsonElementType<?>> expectedTypes, JsonElement actualElement) {
+	public UnexpectedJsonElementTypeException(String path, List<? extends JsonElementType<?>> expectedTypes,
+			JsonElement actualElement) {
 		super( "Unexpected type at '" + path + "'. Expected one of " + expectedTypes + ", got '" + actualElement + "'" );
 	}
 

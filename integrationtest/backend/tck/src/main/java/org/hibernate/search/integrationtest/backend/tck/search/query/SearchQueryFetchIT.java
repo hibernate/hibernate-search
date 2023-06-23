@@ -439,7 +439,7 @@ public class SearchQueryFetchIT {
 					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) )
 					.toReference();
 			integer = root.field( "integer", f -> f.asInteger()
-							.projectable( Projectable.YES ).sortable( Sortable.YES ) )
+					.projectable( Projectable.YES ).sortable( Sortable.YES ) )
 					.toReference();
 		}
 	}

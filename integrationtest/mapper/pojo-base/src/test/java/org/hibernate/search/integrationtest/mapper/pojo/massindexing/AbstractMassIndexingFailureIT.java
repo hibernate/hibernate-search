@@ -72,8 +72,8 @@ public abstract class AbstractMassIndexingFailureIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public final StandalonePojoMappingSetupHelper setupHelper
-			= StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public final StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Rule
 	public ThreadSpy threadSpy = new ThreadSpy();
@@ -85,7 +85,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = {"HSEARCH-4218", "HSEARCH-4236"})
+	@TestForIssue(jiraKey = { "HSEARCH-4218", "HSEARCH-4236" })
 	public void identifierLoading() {
 		String exceptionMessage = "ID loading error";
 
@@ -684,8 +684,8 @@ public abstract class AbstractMassIndexingFailureIT {
 										.as( "Mass indexing threads" )
 										.isNotEmpty()
 										.allSatisfy( t -> assertThat( t )
-										.extracting( Thread::getState )
-										.isEqualTo( Thread.State.TERMINATED )
+												.extracting( Thread::getState )
+												.isEqualTo( Thread.State.TERMINATED )
 										)
 						);
 						break;
@@ -885,10 +885,11 @@ public abstract class AbstractMassIndexingFailureIT {
 
 		SearchMapping mapping = setupHelper.start()
 				.expectCustomBeans()
-				.withPropertyRadical( EngineSettings.Radicals.BACKGROUND_FAILURE_HANDLER, getBackgroundFailureHandlerReference() )
+				.withPropertyRadical( EngineSettings.Radicals.BACKGROUND_FAILURE_HANDLER,
+						getBackgroundFailureHandlerReference() )
 				.withPropertyRadical( EngineSpiSettings.Radicals.THREAD_PROVIDER, threadSpy.getThreadProvider() )
 				.withConfiguration( b -> {
-					b.addEntityType( Book.class, c -> c .massLoadingStrategy( loadingStrategy ) );
+					b.addEntityType( Book.class, c -> c.massLoadingStrategy( loadingStrategy ) );
 				} )
 				.setup( Book.class );
 

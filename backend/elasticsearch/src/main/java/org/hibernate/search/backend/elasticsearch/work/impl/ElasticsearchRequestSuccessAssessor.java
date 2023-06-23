@@ -28,7 +28,8 @@ public class ElasticsearchRequestSuccessAssessor {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<Integer> BULK_ITEM_STATUS_CODE = JsonAccessor.root().property( "status" ).asInteger();
-	private static final JsonAccessor<String> ERROR_TYPE = JsonAccessor.root().property( "error" ).property( "type" ).asString();
+	private static final JsonAccessor<String> ERROR_TYPE =
+			JsonAccessor.root().property( "error" ).property( "type" ).asString();
 
 	private static final int TIME_OUT_HTTP_STATUS_CODE = 408;
 
@@ -42,14 +43,14 @@ public class ElasticsearchRequestSuccessAssessor {
 		private final Set<Integer> ignoredErrorStatuses = new HashSet<>();
 		private final Set<String> ignoredErrorTypes = new HashSet<>();
 
-		public Builder ignoreErrorStatuses(int ... ignoredErrorStatuses) {
+		public Builder ignoreErrorStatuses(int... ignoredErrorStatuses) {
 			for ( int ignoredErrorStatus : ignoredErrorStatuses ) {
 				this.ignoredErrorStatuses.add( ignoredErrorStatus );
 			}
 			return this;
 		}
 
-		public Builder ignoreErrorTypes(String ... ignoredErrorTypes) {
+		public Builder ignoreErrorTypes(String... ignoredErrorTypes) {
 			Collections.addAll( this.ignoredErrorTypes, ignoredErrorTypes );
 			return this;
 		}
@@ -95,7 +96,8 @@ public class ElasticsearchRequestSuccessAssessor {
 	 */
 	public void checkSuccess(JsonObject bulkResponseItem) {
 		// Result items have the following format: { "actionName" : { "status" : 201, ... } }
-		JsonObject responseBody = bulkResponseItem == null ? null : bulkResponseItem.entrySet().iterator().next().getValue().getAsJsonObject();
+		JsonObject responseBody =
+				bulkResponseItem == null ? null : bulkResponseItem.entrySet().iterator().next().getValue().getAsJsonObject();
 		Optional<Integer> statusCode = BULK_ITEM_STATUS_CODE.get( responseBody );
 		checkSuccess( statusCode, responseBody );
 	}
@@ -114,7 +116,7 @@ public class ElasticsearchRequestSuccessAssessor {
 	private boolean isSuccess(Optional<Integer> statusCode, JsonObject responseBody) {
 		return statusCode.map(
 				c -> ElasticsearchClientUtils.isSuccessCode( c ) || ignoredErrorStatuses.contains( c )
-				)
+		)
 				.orElse( false )
 				|| ERROR_TYPE.get( responseBody ).map( ignoredErrorTypes::contains ).orElse( false );
 	}

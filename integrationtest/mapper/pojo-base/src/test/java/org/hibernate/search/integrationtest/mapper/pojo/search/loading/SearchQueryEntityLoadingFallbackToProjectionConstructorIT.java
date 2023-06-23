@@ -82,8 +82,10 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 
 			assertThatThrownBy( () -> session.search( IndexedEntity.class ).where( f -> f.matchAll() ).fetchAllHits() )
 					.hasMessageContainingAll(
-							"Cannot project on entity type '" + ENTITY_NAME + "': this type cannot be loaded from an external datasource,"
-									+ " and the documents from the index cannot be projected to its Java class '" + IndexedEntity.class.getName() + "'",
+							"Cannot project on entity type '" + ENTITY_NAME
+									+ "': this type cannot be loaded from an external datasource,"
+									+ " and the documents from the index cannot be projected to its Java class '"
+									+ IndexedEntity.class.getName() + "'",
 							"To enable loading of entity instances from an external source, provide a SelectionLoadingStrategy"
 									+ " when registering the entity type to the mapping builder",
 							"To enable projections turning taking index data into entity instances,"
@@ -269,8 +271,9 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 
 		PersistenceTypeKey<Model.IndexedEntityWithLoadingStrategy, Integer> entityWithLoadingStrategyTypeKey =
 				new PersistenceTypeKey<>( Model.IndexedEntityWithLoadingStrategy.class, Integer.class );
-		PersistenceTypeKey<Model.IndexedEntityWithProjectionConstructorChild, Integer> entityWithProjectionConstructorChildTypeKey =
-				new PersistenceTypeKey<>( Model.IndexedEntityWithProjectionConstructorChild.class, Integer.class );
+		PersistenceTypeKey<Model.IndexedEntityWithProjectionConstructorChild,
+				Integer> entityWithProjectionConstructorChildTypeKey =
+						new PersistenceTypeKey<>( Model.IndexedEntityWithProjectionConstructorChild.class, Integer.class );
 
 		backendMock.expectAnySchema( Model.IndexedEntityWithLoadingStrategy.NAME );
 		backendMock.expectAnySchema( Model.IndexedEntityWithLoadingStrategyChild.NAME );
@@ -353,8 +356,8 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 			);
 
 			assertThat( session.search( Arrays.asList( Model.IndexedEntityWithLoadingStrategy.class,
-							Model.IndexedEntityWithProjectionConstructor.class
-					) )
+					Model.IndexedEntityWithProjectionConstructor.class
+			) )
 					.where( f -> f.matchAll() )
 					.fetchAllHits() )
 					.usingRecursiveComparison()

@@ -160,7 +160,8 @@ public class DocumentElementFieldReferenceIT<F> {
 			flattenedSecondLevelObject = excludingObject.addObject( index.binding().excludingObject.flattenedObject.self );
 			setNullValue( index.binding().excludingObject.flattenedObject, flattenedSecondLevelObject );
 
-			DocumentElement nestedSecondLevelObject = excludingObject.addObject( index.binding().excludingObject.nestedObject.self );
+			DocumentElement nestedSecondLevelObject =
+					excludingObject.addObject( index.binding().excludingObject.nestedObject.self );
 			setNullValue( index.binding().excludingObject.nestedObject, nestedSecondLevelObject );
 			nestedSecondLevelObject = excludingObject.addObject( index.binding().excludingObject.nestedObject.self );
 			setNullValue( index.binding().excludingObject.nestedObject, nestedSecondLevelObject );
@@ -276,8 +277,9 @@ public class DocumentElementFieldReferenceIT<F> {
 		FirstLevelObjectBinding(IndexSchemaElement objectField, IndexObjectFieldReference objectFieldReference) {
 			super( objectField );
 			self = objectFieldReference;
-			IndexSchemaObjectField flattenedObjectField = objectField.objectField( "flattenedObject", ObjectStructure.FLATTENED )
-					.multiValued();
+			IndexSchemaObjectField flattenedObjectField =
+					objectField.objectField( "flattenedObject", ObjectStructure.FLATTENED )
+							.multiValued();
 			flattenedObject = new SecondLevelObjectBinding( flattenedObjectField );
 			IndexSchemaObjectField nestedObjectField = objectField.objectField( "nestedObject", ObjectStructure.NESTED )
 					.multiValued();

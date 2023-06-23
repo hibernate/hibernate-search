@@ -14,9 +14,11 @@ import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.spi.SearchQueryImplementor;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmSelectionLoadingContext;
 
-final class HibernateOrmSearchQueryAdapterExtension<H> implements
+final class HibernateOrmSearchQueryAdapterExtension<H>
+		implements
 		SearchQueryExtension<HibernateOrmSearchQueryAdapter<H>, H> {
-	private static final HibernateOrmSearchQueryAdapterExtension<Object> INSTANCE = new HibernateOrmSearchQueryAdapterExtension<>();
+	private static final HibernateOrmSearchQueryAdapterExtension<Object> INSTANCE =
+			new HibernateOrmSearchQueryAdapterExtension<>();
 
 	@SuppressWarnings("unchecked") // The instance works for any H
 	static <H> HibernateOrmSearchQueryAdapterExtension<H> get() {
@@ -24,7 +26,8 @@ final class HibernateOrmSearchQueryAdapterExtension<H> implements
 	}
 
 	@Override
-	public Optional<HibernateOrmSearchQueryAdapter<H>> extendOptional(SearchQuery<H> original, SearchLoadingContext<?> loadingContext) {
+	public Optional<HibernateOrmSearchQueryAdapter<H>> extendOptional(SearchQuery<H> original,
+			SearchLoadingContext<?> loadingContext) {
 		Object unwrapped = loadingContext.unwrap();
 		if ( unwrapped instanceof HibernateOrmSelectionLoadingContext ) {
 			HibernateOrmSelectionLoadingContext castedLoadingContext = (HibernateOrmSelectionLoadingContext) unwrapped;

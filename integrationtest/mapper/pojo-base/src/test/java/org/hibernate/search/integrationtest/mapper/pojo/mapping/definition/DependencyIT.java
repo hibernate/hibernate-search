@@ -37,7 +37,8 @@ public class DependencyIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void associationInverseSide_error_missingInversePath() {
@@ -45,7 +46,8 @@ public class DependencyIT {
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
-			@AssociationInverseSide(inversePath = @ObjectPath({}))
+
+			@AssociationInverseSide(inversePath = @ObjectPath({ }))
 			public IndexedEntity getOther() {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
@@ -74,10 +76,11 @@ public class DependencyIT {
 			String source1;
 			String source2;
 			String unused;
+
 			@GenericField
 			@IndexingDependency(derivedFrom = {
 					@ObjectPath(@PropertyValue(propertyName = "source1")),
-					@ObjectPath(@PropertyValue(propertyName = "source2"))})
+					@ObjectPath(@PropertyValue(propertyName = "source2")) })
 			public String getDerived() {
 				return source1 + " " + source2;
 			}
@@ -133,6 +136,7 @@ public class DependencyIT {
 		abstract class AbstractIndexedEntity {
 			@DocumentId
 			Integer id;
+
 			@GenericField
 			public abstract String getDerived();
 		}
@@ -142,11 +146,12 @@ public class DependencyIT {
 			String source2;
 			String source3;
 			String source4;
+
 			@Override
 			@IndexingDependency(derivedFrom = {
 					@ObjectPath(@PropertyValue(propertyName = "source1")),
 					@ObjectPath(@PropertyValue(propertyName = "source2")),
-					@ObjectPath(@PropertyValue(propertyName = "source4"))})
+					@ObjectPath(@PropertyValue(propertyName = "source4")) })
 			public String getDerived() {
 				return source1 + " " + source2 + " " + source4;
 			}
@@ -157,11 +162,12 @@ public class DependencyIT {
 			String source2;
 			String source3;
 			String source5;
+
 			@Override
 			@IndexingDependency(derivedFrom = {
 					@ObjectPath(@PropertyValue(propertyName = "source1")),
 					@ObjectPath(@PropertyValue(propertyName = "source3")),
-					@ObjectPath(@PropertyValue(propertyName = "source5"))})
+					@ObjectPath(@PropertyValue(propertyName = "source5")) })
 			public String getDerived() {
 				return source1 + " " + source3 + " " + source5;
 			}
@@ -461,8 +467,8 @@ public class DependencyIT {
 			class ContainedEntity1<T extends OtherContainedSuperClass> extends AbstractContainedEntity<T> {
 				@Override
 				@IndexingDependency(derivedFrom = {
-						@ObjectPath({@PropertyValue(propertyName = "contained"), @PropertyValue(propertyName = "source1")}),
-						@ObjectPath({@PropertyValue(propertyName = "contained"), @PropertyValue(propertyName = "source2")})
+						@ObjectPath({ @PropertyValue(propertyName = "contained"), @PropertyValue(propertyName = "source1") }),
+						@ObjectPath({ @PropertyValue(propertyName = "contained"), @PropertyValue(propertyName = "source2") })
 				})
 				public String getDerived() {
 					return contained.source1 + " " + contained.source2;
@@ -472,8 +478,8 @@ public class DependencyIT {
 			class ContainedEntity2<T extends OtherContainedSuperClass> extends AbstractContainedEntity<T> {
 				@Override
 				@IndexingDependency(derivedFrom = {
-						@ObjectPath({@PropertyValue(propertyName = "contained"), @PropertyValue(propertyName = "source1")}),
-						@ObjectPath({@PropertyValue(propertyName = "contained"), @PropertyValue(propertyName = "source3")})
+						@ObjectPath({ @PropertyValue(propertyName = "contained"), @PropertyValue(propertyName = "source1") }),
+						@ObjectPath({ @PropertyValue(propertyName = "contained"), @PropertyValue(propertyName = "source3") })
 				})
 				public String getDerived() {
 					return contained.source1 + " " + contained.source3;
@@ -590,8 +596,9 @@ public class DependencyIT {
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
+
 			@GenericField
-			@IndexingDependency(derivedFrom = @ObjectPath({}))
+			@IndexingDependency(derivedFrom = @ObjectPath({ }))
 			public String getDerived() {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
@@ -616,6 +623,7 @@ public class DependencyIT {
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
+
 			@GenericField
 			@IndexingDependency(derivedFrom = @ObjectPath(@PropertyValue(propertyName = "invalidPath")))
 			public String getDerived() {
@@ -641,6 +649,7 @@ public class DependencyIT {
 				@DocumentId
 				Integer id;
 				B b;
+
 				@GenericField
 				@IndexingDependency(derivedFrom = @ObjectPath({
 						@PropertyValue(propertyName = "b"),
@@ -650,8 +659,10 @@ public class DependencyIT {
 					throw new UnsupportedOperationException( "Should not be called" );
 				}
 			}
+
 			class B {
 				C c;
+
 				@GenericField
 				@IndexingDependency(derivedFrom = @ObjectPath({
 						@PropertyValue(propertyName = "c"),
@@ -661,8 +672,10 @@ public class DependencyIT {
 					throw new UnsupportedOperationException( "Should not be called" );
 				}
 			}
+
 			class C {
 				A a;
+
 				@GenericField
 				@IndexingDependency(derivedFrom = @ObjectPath({
 						@PropertyValue(propertyName = "a"),
@@ -684,11 +697,15 @@ public class DependencyIT {
 						.typeContext( DerivedFromCycle.A.class.getName() )
 						.pathContext( ".derivedA<no value extractors>" )
 						.multilineFailure( "Unable to resolve dependencies of a derived property:"
-										+ " there is a cyclic dependency starting from type '" + DerivedFromCycle.A.class.getName() + "'",
+								+ " there is a cyclic dependency starting from type '" + DerivedFromCycle.A.class.getName()
+								+ "'",
 								"Derivation chain starting from that type and ending with a cycle:\n"
-										+ "- " + DerivedFromCycle.A.class.getName() + "#.b<default value extractors>.derivedB<default value extractors>\n"
-										+ "- " + DerivedFromCycle.B.class.getName() + "#.c<default value extractors>.derivedC<default value extractors>\n"
-										+ "- " + DerivedFromCycle.C.class.getName() + "#.a<default value extractors>.derivedA<default value extractors>\n",
+										+ "- " + DerivedFromCycle.A.class.getName()
+										+ "#.b<default value extractors>.derivedB<default value extractors>\n"
+										+ "- " + DerivedFromCycle.B.class.getName()
+										+ "#.c<default value extractors>.derivedC<default value extractors>\n"
+										+ "- " + DerivedFromCycle.C.class.getName()
+										+ "#.a<default value extractors>.derivedA<default value extractors>\n",
 								"A derived property cannot be marked as derived from itself",
 								"you should consider disabling automatic reindexing"
 						) );
@@ -703,6 +720,7 @@ public class DependencyIT {
 				@DocumentId
 				Integer id;
 				A a;
+
 				@GenericField
 				@IndexingDependency(derivedFrom = @ObjectPath({
 						@PropertyValue(propertyName = "a"),
@@ -712,8 +730,10 @@ public class DependencyIT {
 					throw new UnsupportedOperationException( "Should not be called" );
 				}
 			}
+
 			class A {
 				B b;
+
 				@GenericField
 				@IndexingDependency(derivedFrom = @ObjectPath({
 						@PropertyValue(propertyName = "b"),
@@ -723,8 +743,10 @@ public class DependencyIT {
 					throw new UnsupportedOperationException( "Should not be called" );
 				}
 			}
+
 			class B {
 				C c;
+
 				@GenericField
 				@IndexingDependency(derivedFrom = @ObjectPath({
 						@PropertyValue(propertyName = "c"),
@@ -734,8 +756,10 @@ public class DependencyIT {
 					throw new UnsupportedOperationException( "Should not be called" );
 				}
 			}
+
 			class C {
 				A a;
+
 				@GenericField
 				@IndexingDependency(derivedFrom = @ObjectPath({
 						@PropertyValue(propertyName = "a"),
@@ -757,11 +781,15 @@ public class DependencyIT {
 						.typeContext( DerivedFromCycle.Zero.class.getName() )
 						.pathContext( ".derivedZero<no value extractors>" )
 						.multilineFailure( "Unable to resolve dependencies of a derived property:"
-										+ " there is a cyclic dependency starting from type '" + DerivedFromCycle.A.class.getName() + "'",
+								+ " there is a cyclic dependency starting from type '" + DerivedFromCycle.A.class.getName()
+								+ "'",
 								"Derivation chain starting from that type and ending with a cycle:\n"
-										+ "- " + DerivedFromCycle.A.class.getName() + "#.b<default value extractors>.derivedB<default value extractors>\n"
-										+ "- " + DerivedFromCycle.B.class.getName() + "#.c<default value extractors>.derivedC<default value extractors>\n"
-										+ "- " + DerivedFromCycle.C.class.getName() + "#.a<default value extractors>.derivedA<default value extractors>\n",
+										+ "- " + DerivedFromCycle.A.class.getName()
+										+ "#.b<default value extractors>.derivedB<default value extractors>\n"
+										+ "- " + DerivedFromCycle.B.class.getName()
+										+ "#.c<default value extractors>.derivedC<default value extractors>\n"
+										+ "- " + DerivedFromCycle.C.class.getName()
+										+ "#.a<default value extractors>.derivedA<default value extractors>\n",
 								"A derived property cannot be marked as derived from itself",
 								"you should consider disabling automatic reindexing"
 						)
@@ -778,6 +806,7 @@ public class DependencyIT {
 				@DocumentId
 				Integer id;
 				B b;
+
 				@GenericField
 				@IndexingDependency(derivedFrom = @ObjectPath({
 						@PropertyValue(propertyName = "b"),
@@ -788,11 +817,14 @@ public class DependencyIT {
 					throw new UnsupportedOperationException( "Should not be called" );
 				}
 			}
+
 			class B {
 				C c;
 			}
+
 			class C {
 				A a;
+
 				// Important: this property must have the same name as the property in A
 				public String getDerivedA() {
 					throw new UnsupportedOperationException( "Should not be called" );
@@ -823,10 +855,12 @@ public class DependencyIT {
 				@IndexedEmbedded
 				Embedded embedded;
 			}
+
 			class Embedded {
 				@IndexedEmbedded
 				B b;
 			}
+
 			class B {
 				A a;
 				@GenericField
@@ -843,7 +877,8 @@ public class DependencyIT {
 						.typeContext( CannotInvertAssociation.A.class.getName() )
 						.pathContext( ".embedded<no value extractors>.b<no value extractors>.text<no value extractors>" )
 						.failure(
-								"Unable to find the inverse side of the association on type '" + CannotInvertAssociation.A.class.getName() + "'"
+								"Unable to find the inverse side of the association on type '"
+										+ CannotInvertAssociation.A.class.getName() + "'"
 										+ " at path '.embedded<no value extractors>.b<no value extractors>'",
 								" Hibernate Search needs this information in order to reindex '"
 										+ CannotInvertAssociation.A.class.getName() + "' when '"
@@ -869,6 +904,7 @@ public class DependencyIT {
 				@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "invalidPath")))
 				B b;
 			}
+
 			class B {
 				A a;
 				@GenericField
@@ -883,11 +919,11 @@ public class DependencyIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Unable to apply path '.invalidPath<default value extractors>'"
-						+ " to type '" + CannotApplyInvertAssociationPath.B.class.getName() + "'"
+								+ " to type '" + CannotApplyInvertAssociationPath.B.class.getName() + "'"
 				)
 				.hasMessageContaining(
 						"This path was resolved as the inverse side of the association '.b<no value extractors>'"
-						+ " on type '" + CannotApplyInvertAssociationPath.A.class.getName() + "'"
+								+ " on type '" + CannotApplyInvertAssociationPath.A.class.getName() + "'"
 				)
 				.hasMessageContaining(
 						"Hibernate Search needs to apply this path in order to reindex '"
@@ -909,6 +945,7 @@ public class DependencyIT {
 				@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "a")))
 				B b;
 			}
+
 			class B {
 				String a;
 				@GenericField
@@ -923,11 +960,11 @@ public class DependencyIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Unable to apply path '.a<default value extractors>'"
-						+ " to type '" + CannotApplyInvertAssociationPath.B.class.getName() + "'"
+								+ " to type '" + CannotApplyInvertAssociationPath.B.class.getName() + "'"
 				)
 				.hasMessageContaining(
 						"This path was resolved as the inverse side of the association '.b<no value extractors>'"
-						+ " on type '" + CannotApplyInvertAssociationPath.A.class.getName() + "'"
+								+ " on type '" + CannotApplyInvertAssociationPath.A.class.getName() + "'"
 				)
 				.hasMessageContaining(
 						"Hibernate Search needs to apply this path in order to reindex '"
@@ -936,8 +973,8 @@ public class DependencyIT {
 				)
 				.hasMessageContaining(
 						"The inverse association targets type '" + String.class.getName()
-						+ "', but a supertype or subtype of '" + CannotApplyInvertAssociationPath.A.class.getName()
-						+ "' was expected"
+								+ "', but a supertype or subtype of '" + CannotApplyInvertAssociationPath.A.class.getName()
+								+ "' was expected"
 				);
 	}
 

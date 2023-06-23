@@ -85,13 +85,16 @@ public class ProductShootingBrief {
 	@Transient
 	@Field(analyzer = @Analyzer(definition = AnalysisNames.ANALYZER_STANDARD))
 	@IndexingDependency(derivedFrom = {
-			@ObjectPath({@PropertyValue(propertyName = "articles"),
-					@PropertyValue(propertyName = "productReferenceCodeWithColorCollection")}),
-			@ObjectPath({@PropertyValue(propertyName = "models"),
-					@PropertyValue(propertyName = "productReferenceCodeCollection")}),
-			@ObjectPath({@PropertyValue(propertyName = "models"),
+			@ObjectPath({
 					@PropertyValue(propertyName = "articles"),
-					@PropertyValue(propertyName = "productReferenceCodeWithColorCollection")})
+					@PropertyValue(propertyName = "productReferenceCodeWithColorCollection") }),
+			@ObjectPath({
+					@PropertyValue(propertyName = "models"),
+					@PropertyValue(propertyName = "productReferenceCodeCollection") }),
+			@ObjectPath({
+					@PropertyValue(propertyName = "models"),
+					@PropertyValue(propertyName = "articles"),
+					@PropertyValue(propertyName = "productReferenceCodeWithColorCollection") })
 	})
 	public Collection<String> getReferenceCodeCollection() {
 		Collection<String> referenceCodes = new ArrayList<String>();

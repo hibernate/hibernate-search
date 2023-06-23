@@ -127,7 +127,7 @@ public class IndexIndexerLargeDocumentsIT {
 		int returnedSize = 10_000;
 		int length = GREAT_EXPECTATIONS.length();
 
-		int start = (id * returnedSize) % length;
+		int start = ( id * returnedSize ) % length;
 		int end = start + returnedSize;
 		if ( end > length ) {
 			end = length;

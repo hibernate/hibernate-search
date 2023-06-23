@@ -134,8 +134,8 @@ public class HibernateOrmSchemaManagerIT {
 			// end::schema-export[]
 
 			assertThat( Files.list( targetDirectory.resolve( "backend" )
-							.resolve( "indexes" )
-							.resolve( Book.class.getSimpleName() ) )
+					.resolve( "indexes" )
+					.resolve( Book.class.getSimpleName() ) )
 					.map( f -> f.getFileName().toString() )
 					.collect( Collectors.toSet() ) )
 					.containsAnyOf(
@@ -145,8 +145,8 @@ public class HibernateOrmSchemaManagerIT {
 					);
 
 			assertThat( Files.list( targetDirectory.resolve( "backend" )
-							.resolve( "indexes" )
-							.resolve( Author.class.getSimpleName() ) )
+					.resolve( "indexes" )
+					.resolve( Author.class.getSimpleName() ) )
 					.map( f -> f.getFileName().toString() )
 					.collect( Collectors.toSet() ) )
 					.containsAnyOf(

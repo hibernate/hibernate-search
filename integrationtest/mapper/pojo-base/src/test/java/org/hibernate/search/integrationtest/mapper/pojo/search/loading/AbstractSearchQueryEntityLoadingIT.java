@@ -89,7 +89,7 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 			List<DocumentReference> hitDocumentReferences) {
 		backendMock.expectSearchObjects(
 				targetIndexes,
-				b -> { },
+				b -> {},
 				StubSearchWorkBehavior.of(
 						hitDocumentReferences.size(),
 						hitDocumentReferences

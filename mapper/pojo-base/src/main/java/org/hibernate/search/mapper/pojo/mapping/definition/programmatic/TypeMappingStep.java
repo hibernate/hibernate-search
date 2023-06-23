@@ -68,7 +68,7 @@ public interface TypeMappingStep {
 	 * @throws org.hibernate.search.util.common.SearchException If this type does not declare a constructor
 	 * with the given types.
 	 */
-	ConstructorMappingStep constructor(Class<?> ... parameterTypes);
+	ConstructorMappingStep constructor(Class<?>... parameterTypes);
 
 	/**
 	 * Starts the definition of the mapping of a specific property.

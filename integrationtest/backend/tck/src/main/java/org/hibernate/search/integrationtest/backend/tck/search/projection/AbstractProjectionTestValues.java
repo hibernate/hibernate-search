@@ -32,7 +32,7 @@ public abstract class AbstractProjectionTestValues<F, P> {
 
 	public abstract P projectedValue(int ordinal);
 
-	public List<P> projectedValues(int ... ordinals) {
+	public List<P> projectedValues(int... ordinals) {
 		return IntStream.of( ordinals ).mapToObj( this::projectedValue )
 				.collect( Collectors.toList() );
 	}

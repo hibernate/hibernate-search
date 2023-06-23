@@ -24,13 +24,12 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 
 public abstract class AbstractDelegatingSearchQuerySelectStep<R, E, LOS>
 		implements SearchQuerySelectStep<
-						SearchQueryOptionsStep<?, E, LOS, ?, ?>,
-						R,
-						E,
-						LOS,
-						SearchProjectionFactory<R, E>,
-						SearchPredicateFactory
-				> {
+				SearchQueryOptionsStep<?, E, LOS, ?, ?>,
+				R,
+				E,
+				LOS,
+				SearchProjectionFactory<R, E>,
+				SearchPredicateFactory> {
 
 	private final SearchQuerySelectStep<?, R, E, LOS, ?, ?> delegate;
 
@@ -78,7 +77,8 @@ public abstract class AbstractDelegatingSearchQuerySelectStep<R, E, LOS>
 
 	@Override
 	public SearchQueryOptionsStep<?, E, LOS, ?, ?> where(
-			BiConsumer<? super SearchPredicateFactory, ? super SimpleBooleanPredicateClausesCollector<?>> predicateContributor) {
+			BiConsumer<? super SearchPredicateFactory,
+					? super SimpleBooleanPredicateClausesCollector<?>> predicateContributor) {
 		return delegate.where( predicateContributor );
 	}
 

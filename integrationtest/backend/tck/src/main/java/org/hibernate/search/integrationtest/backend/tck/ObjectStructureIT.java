@@ -73,8 +73,8 @@ public class ObjectStructureIT {
 
 	@Test
 	public void index_error_invalidFieldForDocumentElement_flattened() {
-		assertThatThrownBy( () -> index.index( "willNotWork", document ->
-				document.addValue( index.binding().flattenedObject.string, "willNotWork" ) ) )
+		assertThatThrownBy( () -> index.index( "willNotWork",
+				document -> document.addValue( index.binding().flattenedObject.string, "willNotWork" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Invalid field reference for this document element",
@@ -84,8 +84,8 @@ public class ObjectStructureIT {
 
 	@Test
 	public void index_error_invalidFieldForDocumentElement_nested() {
-		assertThatThrownBy( () -> index.index( "willNotWork", document ->
-				document.addValue( index.binding().nestedObject.string, "willNotWork" ) ) )
+		assertThatThrownBy( () -> index.index( "willNotWork",
+				document -> document.addValue( index.binding().nestedObject.string, "willNotWork" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Invalid field reference for this document element",
@@ -162,8 +162,7 @@ public class ObjectStructureIT {
 	public void search_error_nonNestedField() {
 		StubMappingScope scope = index.createScope();
 
-		assertThatThrownBy( () ->
-			scope.predicate().nested( "flattenedObject" )
+		assertThatThrownBy( () -> scope.predicate().nested( "flattenedObject" )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Cannot use 'predicate:nested' on field 'flattenedObject'",
@@ -175,8 +174,7 @@ public class ObjectStructureIT {
 	public void search_error_nonObjectField() {
 		StubMappingScope scope = index.createScope();
 
-		assertThatThrownBy( () ->
-				scope.predicate().nested( "flattenedObject.string" )
+		assertThatThrownBy( () -> scope.predicate().nested( "flattenedObject.string" )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Cannot use 'predicate:nested' on field 'flattenedObject.string'",
@@ -187,8 +185,7 @@ public class ObjectStructureIT {
 	public void search_error_missingField() {
 		StubMappingScope scope = index.createScope();
 
-		assertThatThrownBy( () ->
-				scope.predicate().nested( "doesNotExist" )
+		assertThatThrownBy( () -> scope.predicate().nested( "doesNotExist" )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unknown field", "'doesNotExist'" );
@@ -235,8 +232,8 @@ public class ObjectStructureIT {
 					 * but this content is spread over several objects, meaning it will only match
 					 * if a flattened structure is used.
 					 */
-					for ( ObjectMapping objectMapping :
-							Arrays.asList( index.binding().flattenedObject, index.binding().nestedObject ) ) {
+					for ( ObjectMapping objectMapping : Arrays.asList( index.binding().flattenedObject,
+							index.binding().nestedObject ) ) {
 						DocumentElement object = document.addObject( objectMapping.self );
 						object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
 
@@ -262,8 +259,8 @@ public class ObjectStructureIT {
 					 * For first-level nesting tests, it's because of the integer field.
 					 * For second-level nesting tests, it's because there is no nested object matching condition 1.
 					 */
-					for ( ObjectMapping objectMapping :
-							Arrays.asList( index.binding().flattenedObject, index.binding().nestedObject ) ) {
+					for ( ObjectMapping objectMapping : Arrays.asList( index.binding().flattenedObject,
+							index.binding().nestedObject ) ) {
 						DocumentElement object = document.addObject( objectMapping.self );
 						object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
 
@@ -282,7 +279,7 @@ public class ObjectStructureIT {
 						object.addValue( objectMapping.localDate, MATCHING_LOCAL_DATE );
 					}
 				} )
-				.add( "empty", document -> { } )
+				.add( "empty", document -> {} )
 				.join();
 	}
 

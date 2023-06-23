@@ -106,7 +106,8 @@ public abstract class AbstractConfiguredExtraPropertiesJsonAdapterFactory implem
 			}
 			rawType = rawType.getSuperclass();
 		}
-		throw new AssertionFailure( "Missing or inaccessible field annotated with " + SerializeExtraProperties.class + " on type " + type );
+		throw new AssertionFailure(
+				"Missing or inaccessible field annotated with " + SerializeExtraProperties.class + " on type " + type );
 	}
 
 	@SuppressWarnings("unchecked")

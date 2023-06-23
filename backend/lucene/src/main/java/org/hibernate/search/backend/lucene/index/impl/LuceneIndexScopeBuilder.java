@@ -35,7 +35,7 @@ class LuceneIndexScopeBuilder implements IndexScopeBuilder {
 	}
 
 	void add(IndexManagerBackendContext backendContext, LuceneIndexManagerImpl indexManager) {
-		if ( ! this.backendContext.equals( backendContext ) ) {
+		if ( !this.backendContext.equals( backendContext ) ) {
 			throw log.cannotMixLuceneScopeWithOtherBackend(
 					this, indexManager, backendContext.getEventContext()
 			);

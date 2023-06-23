@@ -12,7 +12,7 @@ import com.google.gson.JsonObject;
 
 public interface ElasticsearchSearchQuery<H>
 		extends ExtendedSearchQuery<H, ElasticsearchSearchResult<H>, ElasticsearchSearchScroll<H>>,
-				ElasticsearchSearchFetchable<H> {
+		ElasticsearchSearchFetchable<H> {
 
 	/**
 	 * Explain score computation of this query for the document with the given id.

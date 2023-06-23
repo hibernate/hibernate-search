@@ -49,23 +49,23 @@ public class AnalysisCustomIT {
 		/**
 		 * No-op normalizer.
 		 */
-		NORMALIZER_NOOP("normalizer_noop"),
+		NORMALIZER_NOOP( "normalizer_noop" ),
 		/**
 		 * Normalizer with a lowercase token filter.
 		 */
-		NORMALIZER_LOWERCASE("normalizer_lowercase"),
+		NORMALIZER_LOWERCASE( "normalizer_lowercase" ),
 		/**
 		 * Normalizer with a pattern-replacing char filter replacing "\s+" with ",".
 		 */
-		NORMALIZER_PATTERN_REPLACING("normalizer_pattern_replacing"),
+		NORMALIZER_PATTERN_REPLACING( "normalizer_pattern_replacing" ),
 		/**
 		 * No-op analyzer.
 		 */
-		ANALYZER_NOOP("analyzer_noop"),
+		ANALYZER_NOOP( "analyzer_noop" ),
 		/**
 		 * Analyzer with a tokenizer on whitespaces and a lowercase token filter.
 		 */
-		ANALYZER_WHITESPACE_LOWERCASE("analyzer_lowercase"),
+		ANALYZER_WHITESPACE_LOWERCASE( "analyzer_lowercase" ),
 		/**
 		 * Analyzer with:
 		 * <ul>
@@ -74,8 +74,7 @@ public class AnalysisCustomIT {
 		 *     <li>A stopword token filter removing the stopword "stopword"</li>
 		 * </ul>
 		 */
-		ANALYZER_PATTERNS_STOPWORD("analyzer_patterns_stopword")
-		;
+		ANALYZER_PATTERNS_STOPWORD( "analyzer_patterns_stopword" );
 
 		public final String name;
 
@@ -85,7 +84,8 @@ public class AnalysisCustomIT {
 	}
 
 	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper( TckBackendHelper::createAnalysisCustomBackendSetupStrategy );
+	public final SearchSetupHelper setupHelper =
+			new SearchSetupHelper( TckBackendHelper::createAnalysisCustomBackendSetupStrategy );
 
 	private SimpleMappedIndex<IndexBinding> index;
 

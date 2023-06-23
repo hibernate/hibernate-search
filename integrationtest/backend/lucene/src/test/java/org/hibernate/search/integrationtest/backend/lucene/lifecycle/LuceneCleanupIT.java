@@ -106,7 +106,7 @@ public class LuceneCleanupIT {
 				.fetchAll();
 	}
 
-	private void doStore(int ... ids) {
+	private void doStore(int... ids) {
 		IndexIndexingPlan plan = index.createIndexingPlan(
 				// Let the commit/refresh intervals do their job
 				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE

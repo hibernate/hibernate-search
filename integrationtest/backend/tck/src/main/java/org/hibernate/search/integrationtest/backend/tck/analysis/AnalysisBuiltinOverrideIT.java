@@ -37,7 +37,8 @@ import org.junit.Test;
 public class AnalysisBuiltinOverrideIT {
 
 	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper( TckBackendHelper::createAnalysisBuiltinOverridesBackendSetupStrategy );
+	public final SearchSetupHelper setupHelper =
+			new SearchSetupHelper( TckBackendHelper::createAnalysisBuiltinOverridesBackendSetupStrategy );
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

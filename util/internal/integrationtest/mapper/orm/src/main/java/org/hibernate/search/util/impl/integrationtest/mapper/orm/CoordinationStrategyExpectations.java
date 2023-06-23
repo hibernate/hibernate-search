@@ -19,7 +19,8 @@ public final class CoordinationStrategyExpectations {
 	public static CoordinationStrategyExpectations outboxPolling() {
 		return new CoordinationStrategyExpectations( "outbox-polling", false,
 				BackendIndexingWorkExpectations.async( ".*Outbox event processor.*",
-						StubDocumentWork.Type.ADD_OR_UPDATE ), true );
+						StubDocumentWork.Type.ADD_OR_UPDATE ),
+				true );
 	}
 
 	public static CoordinationStrategyExpectations outboxPollingAndMassIndexing() {
@@ -27,7 +28,8 @@ public final class CoordinationStrategyExpectations {
 				BackendIndexingWorkExpectations.async( ".*Outbox event processor.*|Hibernate Search - Mass indexing.*",
 						// We expect the test to take into account that event processors always
 						// issue "add-or-update" works, never "add" work; but the mass indexer does.
-						StubDocumentWork.Type.ADD ), true );
+						StubDocumentWork.Type.ADD ),
+				true );
 	}
 
 	final String strategyName;

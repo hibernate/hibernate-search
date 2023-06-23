@@ -86,9 +86,9 @@ public class MatchIdPredicateConverterIT {
 
 	private static void initData() {
 		index.bulkIndexer()
-				.add( DOCUMENT_1, document -> { } )
-				.add( DOCUMENT_2, document -> { } )
-				.add( DOCUMENT_3, document -> { } )
+				.add( DOCUMENT_1, document -> {} )
+				.add( DOCUMENT_2, document -> {} )
+				.add( DOCUMENT_3, document -> {} )
 				.join();
 	}
 }

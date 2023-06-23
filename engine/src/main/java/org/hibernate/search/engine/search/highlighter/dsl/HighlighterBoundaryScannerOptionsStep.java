@@ -13,7 +13,9 @@ import java.util.Locale;
  * The step in a highlighter definition where the boundary scanner options can be set.
  * Refer to your particular backend documentation for more detailed information on the exposed settings.
  */
-public interface HighlighterBoundaryScannerOptionsStep<T extends HighlighterBoundaryScannerOptionsStep<?, ?>, N extends HighlighterOptionsStep<?>>
+public interface HighlighterBoundaryScannerOptionsStep<
+		T extends HighlighterBoundaryScannerOptionsStep<?, ?>,
+		N extends HighlighterOptionsStep<?>>
 		extends HighlighterBoundaryScannerFinalStep<N> {
 
 	/**

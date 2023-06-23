@@ -24,7 +24,7 @@ public final class PojoMappingConfigurationContextImpl implements PojoMappingCon
 
 	@Override
 	public Optional<PojoTypeModel<?>> extractedValueType(PojoTypeModel<?> sourceType,
-				ContainerExtractorPath extractorPath) {
+			ContainerExtractorPath extractorPath) {
 		return extractorBinder.tryBindPath( sourceType, extractorPath )
 				.map( BoundContainerExtractorPath::getExtractedType );
 	}

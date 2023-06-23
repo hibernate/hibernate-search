@@ -155,7 +155,8 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 	}
 
 	@Override
-	protected void assertMassIndexerLoadingOperationFailureHandling(Class<? extends Throwable> exceptionType, String exceptionMessage,
+	protected void assertMassIndexerLoadingOperationFailureHandling(Class<? extends Throwable> exceptionType,
+			String exceptionMessage,
 			String failingOperationAsString,
 			int failureFloodingThreshold, Class<? extends Throwable> closingExceptionType,
 			String closingExceptionMessage, String closingFailingOperationAsString) {

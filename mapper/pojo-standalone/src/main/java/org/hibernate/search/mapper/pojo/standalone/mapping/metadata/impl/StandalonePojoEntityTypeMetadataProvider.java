@@ -27,7 +27,8 @@ public class StandalonePojoEntityTypeMetadataProvider {
 
 	private final Map<PojoRawTypeModel<?>, StandalonePojoEntityTypeMetadata<?>> entityTypeMetadata;
 
-	private StandalonePojoEntityTypeMetadataProvider(Map<PojoRawTypeModel<?>, StandalonePojoEntityTypeMetadata<?>> entityTypeMetadata) {
+	private StandalonePojoEntityTypeMetadataProvider(
+			Map<PojoRawTypeModel<?>, StandalonePojoEntityTypeMetadata<?>> entityTypeMetadata) {
 		this.entityTypeMetadata = entityTypeMetadata;
 	}
 
@@ -55,7 +56,7 @@ public class StandalonePojoEntityTypeMetadataProvider {
 		public <E> void addEntityType(Class<E> clazz, String entityName, EntityConfigurer<E> configurerOrNull) {
 			PojoRawTypeModel<E> type = introspector.typeModel( clazz );
 			entityDefinitionByType.merge( type, new EntityDefinition<>( type, entityName, configurerOrNull ),
-							EntityDefinition::mergeWith );
+					EntityDefinition::mergeWith );
 			PojoRawTypeModel<?> previousType = entityTypeByName.putIfAbsent( entityName, type );
 			if ( previousType != null && !previousType.equals( type ) ) {
 				throw log.multipleEntityTypesWithSameName( entityName, previousType, type );

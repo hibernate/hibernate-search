@@ -30,8 +30,8 @@ import org.apache.lucene.search.Query;
 
 public interface LuceneSearchQueryIndexScope<S extends LuceneSearchQueryIndexScope<?>>
 		extends SearchQueryIndexScope<S>, LuceneSearchIndexScope<S>,
-				LuceneSearchPredicateIndexScope<S>, LuceneSearchSortIndexScope<S>,
-				LuceneSearchProjectionIndexScope<S>, LuceneSearchAggregationIndexScope<S> {
+		LuceneSearchPredicateIndexScope<S>, LuceneSearchSortIndexScope<S>,
+		LuceneSearchProjectionIndexScope<S>, LuceneSearchAggregationIndexScope<S> {
 
 	@Override
 	<P> LuceneSearchQueryBuilder<P> select(BackendSessionContext sessionContext,

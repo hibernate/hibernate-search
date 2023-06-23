@@ -91,8 +91,8 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 		persistThatManyEntities( entityCount );
 
 		testLoadingThatManyEntities(
-				session -> { }, // No particular session setup
-				o -> { }, // No particular loading option
+				session -> {}, // No particular session setup
+				o -> {}, // No particular loading option
 				entityCount,
 				// Only one entity type means only one statement should be executed, even if there are multiple hits
 				c -> c.assertStatementExecutionCount().isEqualTo( 1 )
@@ -106,8 +106,8 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 		persistThatManyEntities( entityCount );
 
 		testLoadingThatManyEntities(
-				session -> { }, // No particular session setup
-				o -> { }, // No particular loading option
+				session -> {}, // No particular session setup
+				o -> {}, // No particular loading option
 				entityCount,
 				// Only one entity type means only one statement should be executed, even if there are multiple hits
 				c -> c.assertStatementExecutionCount().isEqualTo( 1 ),
@@ -123,7 +123,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 
 		assertThatThrownBy( () -> testLoadingThatManyEntities(
 				session -> TimeoutLoadingListener.registerTimingOutLoadingListener( session ),
-				o -> { }, // No particular loading option
+				o -> {}, // No particular loading option
 				entityCount,
 				// Only one entity type means only one statement should be executed, even if there are multiple hits
 				c -> c.assertStatementExecutionCount().isEqualTo( 1 ),
@@ -145,8 +145,8 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 		persistThatManyEntities( 2 );
 
 		testLoading(
-				session -> { }, // No particular session setup
-				o -> { }, // No particular loading option
+				session -> {}, // No particular session setup
+				o -> {}, // No particular loading option
 				c -> c
 						.doc( model.getIndexName(), mapping.getDocumentIdForEntityId( 0 ) )
 						.doc( model.getIndexName(), mapping.getDocumentIdForEntityId( 1 ) )
@@ -186,7 +186,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 					 */
 					proxyReference.set( proxy );
 				},
-				o -> { }, // No particular loading option
+				o -> {}, // No particular loading option
 				entityCount,
 				// Only one entity type means only one statement should be executed, even if there are multiple hits
 				c -> c.assertStatementExecutionCount().isEqualTo( 1 )

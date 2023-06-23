@@ -44,15 +44,25 @@ public class DelegatingSearchSession implements SearchSession {
 
 	@Override
 	@SuppressWarnings("deprecation")
-	public <T> SearchQuerySelectStep<?, org.hibernate.search.mapper.orm.common.EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
-			Collection<? extends Class<? extends T>> types) {
+	public <T> SearchQuerySelectStep<?,
+			org.hibernate.search.mapper.orm.common.EntityReference,
+			T,
+			SearchLoadingOptionsStep,
+			?,
+			?> search(
+					Collection<? extends Class<? extends T>> types) {
 		return getDelegate().search( types );
 	}
 
 	@Override
 	@SuppressWarnings("deprecation")
-	public <T> SearchQuerySelectStep<?, org.hibernate.search.mapper.orm.common.EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
-			SearchScope<T> scope) {
+	public <T> SearchQuerySelectStep<?,
+			org.hibernate.search.mapper.orm.common.EntityReference,
+			T,
+			SearchLoadingOptionsStep,
+			?,
+			?> search(
+					SearchScope<T> scope) {
 		return getDelegate().search( scope );
 	}
 
@@ -98,7 +108,8 @@ public class DelegatingSearchSession implements SearchSession {
 
 	@Override
 	@SuppressWarnings("deprecation")
-	public void automaticIndexingSynchronizationStrategy(org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
+	public void automaticIndexingSynchronizationStrategy(
+			org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		getDelegate().automaticIndexingSynchronizationStrategy( synchronizationStrategy );
 	}
 

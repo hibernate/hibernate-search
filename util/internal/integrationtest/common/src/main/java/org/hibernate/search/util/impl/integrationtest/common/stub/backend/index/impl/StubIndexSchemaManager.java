@@ -27,32 +27,37 @@ public class StubIndexSchemaManager implements IndexSchemaManager {
 
 	@Override
 	public CompletableFuture<?> createIfMissing(OperationSubmitter operationSubmitter) {
-		StubSchemaManagementWork work = StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.CREATE_IF_MISSING ).build();
+		StubSchemaManagementWork work =
+				StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.CREATE_IF_MISSING ).build();
 		return behavior.executeSchemaManagementWork( indexName, work, null );
 	}
 
 	@Override
 	public CompletableFuture<?> createOrValidate(ContextualFailureCollector failureCollector,
 			OperationSubmitter operationSubmitter) {
-		StubSchemaManagementWork work = StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.CREATE_OR_VALIDATE ).build();
+		StubSchemaManagementWork work =
+				StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.CREATE_OR_VALIDATE ).build();
 		return behavior.executeSchemaManagementWork( indexName, work, failureCollector );
 	}
 
 	@Override
 	public CompletableFuture<?> createOrUpdate(OperationSubmitter operationSubmitter) {
-		StubSchemaManagementWork work = StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.CREATE_OR_UPDATE ).build();
+		StubSchemaManagementWork work =
+				StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.CREATE_OR_UPDATE ).build();
 		return behavior.executeSchemaManagementWork( indexName, work, null );
 	}
 
 	@Override
 	public CompletableFuture<?> dropIfExisting(OperationSubmitter operationSubmitter) {
-		StubSchemaManagementWork work = StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.DROP_IF_EXISTING ).build();
+		StubSchemaManagementWork work =
+				StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.DROP_IF_EXISTING ).build();
 		return behavior.executeSchemaManagementWork( indexName, work, null );
 	}
 
 	@Override
 	public CompletableFuture<?> dropAndCreate(OperationSubmitter operationSubmitter) {
-		StubSchemaManagementWork work = StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.DROP_AND_CREATE ).build();
+		StubSchemaManagementWork work =
+				StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.DROP_AND_CREATE ).build();
 		return behavior.executeSchemaManagementWork( indexName, work, null );
 	}
 

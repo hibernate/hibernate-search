@@ -28,10 +28,10 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
  */
 public final class SessionBasedBridgeOperationContext
 		implements IdentifierBridgeFromDocumentIdentifierContext,
-				RoutingBridgeRouteContext,
-				TypeBridgeWriteContext,
-				PropertyBridgeWriteContext,
-				ValueBridgeFromIndexedValueContext {
+		RoutingBridgeRouteContext,
+		TypeBridgeWriteContext,
+		PropertyBridgeWriteContext,
+		ValueBridgeFromIndexedValueContext {
 
 	private final BridgeSessionContext sessionContext;
 

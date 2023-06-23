@@ -91,7 +91,8 @@ public class ArrayBridgeTest extends SearchTestBase {
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
-		assertEquals( "Wrong result returned looking for a null in a collection", withNullEntry.getName(), results.get( 0 ).getName() );
+		assertEquals( "Wrong result returned looking for a null in a collection", withNullEntry.getName(),
+				results.get( 0 ).getName() );
 	}
 
 	@Test
@@ -101,7 +102,8 @@ public class ArrayBridgeTest extends SearchTestBase {
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
-		assertEquals( "Wrong result returned looking for a null in a collection of numeric", withNullEntry.getName(), results.get( 0 ).getName() );
+		assertEquals( "Wrong result returned looking for a null in a collection of numeric", withNullEntry.getName(),
+				results.get( 0 ).getName() );
 	}
 
 	@Test

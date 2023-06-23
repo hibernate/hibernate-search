@@ -67,7 +67,8 @@ public final class Poller {
 				assertionError = e;
 				++nbOfFailedAttempts;
 			}
-		} while ( System.nanoTime() < deadline );
+		}
+		while ( System.nanoTime() < deadline );
 
 		long timeSpentNanos = System.nanoTime() - initialNanoTime;
 		throw newAssertionPollingError( assertionError, nbOfFailedAttempts, timeSpentNanos );
@@ -87,11 +88,12 @@ public final class Poller {
 		void run() throws E;
 	}
 
-	private AssertionError newAssertionPollingError(AssertionError lastAssertionError, int nbOfFailedAttempts, long timeSpentNanos) {
+	private AssertionError newAssertionPollingError(AssertionError lastAssertionError, int nbOfFailedAttempts,
+			long timeSpentNanos) {
 		AssertionError error = new AssertionError(
 				"Assertion failed even after " + nbOfFailedAttempts + " attempts in " + timeSpentNanos + "ns : "
-				+ lastAssertionError.getMessage()
-				);
+						+ lastAssertionError.getMessage()
+		);
 		error.initCause( lastAssertionError );
 		return error;
 	}

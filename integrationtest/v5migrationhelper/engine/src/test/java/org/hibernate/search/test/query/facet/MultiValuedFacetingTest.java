@@ -84,7 +84,8 @@ public class MultiValuedFacetingTest {
 
 		HSQuery hsQuery = helper.hsQuery( new MatchAllDocsQuery(), StringCollectionFacetEntity.class );
 
-		QueryBuilder builder = sfHolder.getSearchFactory().buildQueryBuilder().forEntity( StringCollectionFacetEntity.class ).get();
+		QueryBuilder builder =
+				sfHolder.getSearchFactory().buildQueryBuilder().forEntity( StringCollectionFacetEntity.class ).get();
 		FacetingRequest facetReq = builder.facet()
 				.name( "someFacet" )
 				.onField( "facet" )
@@ -169,7 +170,8 @@ public class MultiValuedFacetingTest {
 
 		HSQuery hsQuery = helper.hsQuery( new MatchAllDocsQuery(), NumberCollectionFacetEntity.class );
 
-		QueryBuilder builder = sfHolder.getSearchFactory().buildQueryBuilder().forEntity( NumberCollectionFacetEntity.class ).get();
+		QueryBuilder builder =
+				sfHolder.getSearchFactory().buildQueryBuilder().forEntity( NumberCollectionFacetEntity.class ).get();
 		FacetingRequest facetReq = builder.facet()
 				.name( "someFacet" )
 				.onField( "facet" )
@@ -231,7 +233,7 @@ public class MultiValuedFacetingTest {
 		@org.hibernate.search.annotations.Facet
 		private String[] facet;
 
-		private StringArrayFacetEntity(Long id, String ... facet) {
+		private StringArrayFacetEntity(Long id, String... facet) {
 			super();
 			this.id = id;
 			this.facet = facet;
@@ -247,7 +249,7 @@ public class MultiValuedFacetingTest {
 		@org.hibernate.search.annotations.Facet
 		private Collection<String> facet;
 
-		private StringCollectionFacetEntity(Long id, String ... facet) {
+		private StringCollectionFacetEntity(Long id, String... facet) {
 			super();
 			this.id = id;
 			this.facet = Arrays.asList( facet );
@@ -263,7 +265,7 @@ public class MultiValuedFacetingTest {
 		@org.hibernate.search.annotations.Facet
 		private Map<Integer, String> facet;
 
-		private StringMapFacetEntity(Long id, String ... facet) {
+		private StringMapFacetEntity(Long id, String... facet) {
 			super();
 			this.id = id;
 			this.facet = new TreeMap<>();
@@ -284,7 +286,7 @@ public class MultiValuedFacetingTest {
 		@org.hibernate.search.annotations.Facet
 		private int[] facet;
 
-		private NumberArrayFacetEntity(Long id, int ... facet) {
+		private NumberArrayFacetEntity(Long id, int... facet) {
 			super();
 			this.id = id;
 			this.facet = facet;
@@ -300,7 +302,7 @@ public class MultiValuedFacetingTest {
 		@org.hibernate.search.annotations.Facet
 		private Collection<Float> facet;
 
-		private NumberCollectionFacetEntity(Long id, Float ... facet) {
+		private NumberCollectionFacetEntity(Long id, Float... facet) {
 			super();
 			this.id = id;
 			this.facet = Arrays.asList( facet );
@@ -316,7 +318,7 @@ public class MultiValuedFacetingTest {
 		@org.hibernate.search.annotations.Facet
 		private Map<Integer, Float> facet;
 
-		private NumberMapFacetEntity(Long id, Float ... facet) {
+		private NumberMapFacetEntity(Long id, Float... facet) {
 			super();
 			this.id = id;
 			this.facet = new TreeMap<>();

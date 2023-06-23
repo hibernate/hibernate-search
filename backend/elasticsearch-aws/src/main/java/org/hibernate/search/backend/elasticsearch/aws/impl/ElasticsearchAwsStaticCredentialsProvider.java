@@ -34,6 +34,7 @@ public class ElasticsearchAwsStaticCredentialsProvider implements ElasticsearchA
 			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.CREDENTIALS_SECRET_ACCESS_KEY )
 					.asString()
 					.build();
+
 	@Override
 	public AwsCredentialsProvider create(ConfigurationPropertySource propertySource) {
 		String accessKey = CREDENTIALS_ACCESS_KEY_ID.getOrThrow( propertySource,

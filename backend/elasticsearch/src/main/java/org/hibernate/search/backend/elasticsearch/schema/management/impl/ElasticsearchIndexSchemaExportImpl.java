@@ -49,9 +49,9 @@ public class ElasticsearchIndexSchemaExportImpl implements ElasticsearchIndexSch
 			queryParams.addProperty( entry.getKey(), entry.getValue() );
 		}
 		List<JsonObject> parts = request.bodyParts();
-		JsonElement body = parts.size() == 1 ?
-				parts.get( 0 ) :
-				parts.stream().collect( JsonArray::new, JsonArray::add, JsonArray::addAll );
+		JsonElement body = parts.size() == 1
+				? parts.get( 0 )
+				: parts.stream().collect( JsonArray::new, JsonArray::add, JsonArray::addAll );
 
 		write( targetDirectory, "create-index.json", body );
 		write( targetDirectory, "create-index-query-params.json", queryParams );

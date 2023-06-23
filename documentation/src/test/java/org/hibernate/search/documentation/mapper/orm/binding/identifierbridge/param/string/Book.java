@@ -47,6 +47,6 @@ public class Book {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-// end::getters-setters[]
+	// end::getters-setters[]
 }
 // end::include[]

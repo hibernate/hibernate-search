@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerEx
  * and to one or more target value(s) in that property using a {@link ContainerExtraction}.
  */
 @Documented
-@Target({}) // Only used as a component in other annotations
+@Target({ }) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PropertyValue {
 

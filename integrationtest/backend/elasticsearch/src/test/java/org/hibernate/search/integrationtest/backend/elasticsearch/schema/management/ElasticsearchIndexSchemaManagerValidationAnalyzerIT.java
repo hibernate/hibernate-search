@@ -80,12 +80,12 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						+ " 'tokenizer': {"
 						+ "   'custom-edgeNGram': {"
 						+ "     'type': 'edge_ngram',"
-									/*
-									 * Strangely enough, even if you send properly typed numbers
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of numbers...
-									 * Testing both a properly typed number and a number as string here.
-									 */
+						/*
+						 * Strangely enough, even if you send properly typed numbers
+						 * to Elasticsearch, when you ask for the current settings it
+						 * will spit back strings instead of numbers...
+						 * Testing both a properly typed number and a number as string here.
+						 */
 						+ "     'min_gram': 1,"
 						+ "     'max_gram': '10'"
 						+ "   }"
@@ -93,10 +93,10 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						+ " 'filter': {"
 						+ "   'custom-keep-types': {"
 						+ "     'type': 'keep_types',"
-									/*
-									 * The order doesn't matter with this array.
-									 * Here we test that validation ignores order.
-									 */
+						/*
+						 * The order doesn't matter with this array.
+						 * Here we test that validation ignores order.
+						 */
 						+ "     'types': ['<DOUBLE>', '<NUM>']"
 						+ "   },"
 						+ "   'custom-word-delimiter': {"
@@ -104,8 +104,8 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						+ "     'generate_word_parts': false"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		putMapping();
 
@@ -144,8 +144,8 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						+ "     'generate_word_parts': false"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		putMapping();
 
@@ -193,8 +193,8 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						+ "     'generate_word_parts': false"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		putMapping();
 
@@ -245,8 +245,8 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						+ "     'generate_word_parts': false"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		putMapping();
 
@@ -297,8 +297,8 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						+ "     'generate_word_parts': false"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		putMapping();
 
@@ -334,8 +334,8 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						+ "     'generate_word_parts': false"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		putMapping();
 
@@ -371,8 +371,8 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						+ "     'generate_word_parts': false"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		putMapping();
 
@@ -405,8 +405,8 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						+ "     'max_gram': 10"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		putMapping();
 
@@ -456,8 +456,8 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						+ "     'generate_word_parts': false"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		putMapping();
 
@@ -507,8 +507,8 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						+ "     'generate_word_parts': false"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		putMapping();
 
@@ -539,7 +539,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						+ "     'type': 'pattern_replace',"
 						+ "     'pattern': '[^0-9]',"
 						+ "     'replacement': '0'"
-									// Missing "tags"
+						// Missing "tags"
 						+ "   }"
 						+ " },"
 						+ " 'tokenizer': {"
@@ -559,8 +559,8 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						+ "     'generate_word_parts': false"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		putMapping();
 
@@ -612,8 +612,8 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						+ "     'generate_number_parts': false"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		putMapping();
 

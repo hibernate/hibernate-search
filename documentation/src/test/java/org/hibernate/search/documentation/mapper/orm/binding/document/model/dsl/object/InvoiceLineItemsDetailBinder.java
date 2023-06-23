@@ -39,7 +39,7 @@ public class InvoiceLineItemsDetailBinder implements PropertyBinder {
 						"lineItems", // <2>
 						ObjectStructure.NESTED // <3>
 				)
-				.multiValued(); // <4>
+						.multiValued(); // <4>
 
 		context.bridge( List.class, new Bridge(
 				lineItemsField.toReference(), // <5>

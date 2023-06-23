@@ -52,7 +52,8 @@ enum ElasticsearchIndexSchemaManagerValidationOperation {
 				} ) );
 	}
 
-	protected abstract CompletableFuture<?> apply(IndexSchemaManager schemaManager, ContextualFailureCollector failureCollector);
+	protected abstract CompletableFuture<?> apply(IndexSchemaManager schemaManager,
+			ContextualFailureCollector failureCollector);
 
 	public static EnumSet<ElasticsearchIndexSchemaManagerValidationOperation> all() {
 		return EnumSet.allOf( ElasticsearchIndexSchemaManagerValidationOperation.class );

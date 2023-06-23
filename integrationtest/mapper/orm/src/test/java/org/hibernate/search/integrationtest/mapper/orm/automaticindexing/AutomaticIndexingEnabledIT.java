@@ -187,7 +187,8 @@ public class AutomaticIndexingEnabledIT {
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Both 'hibernate.search.automatic_indexing.enabled' and 'hibernate.search.indexing.listeners.enabled' are configured." +
+						"Both 'hibernate.search.automatic_indexing.enabled' and 'hibernate.search.indexing.listeners.enabled' are configured."
+								+
 								" Use only 'hibernate.search.indexing.listeners.enabled' to enable indexing listeners." );
 	}
 

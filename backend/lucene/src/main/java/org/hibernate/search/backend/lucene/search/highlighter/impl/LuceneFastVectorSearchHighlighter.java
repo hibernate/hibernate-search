@@ -90,7 +90,8 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 	public <A> Values<A> createValues(String parentDocumentPath, String nestedDocumentPath,
 			String absoluteFieldPath, Analyzer analyzer, ProjectionExtractContext context,
 			ProjectionAccumulator<String, ?, A, List<String>> accumulator) {
-		return new FastVectorHighlighterValues<>( parentDocumentPath, nestedDocumentPath, absoluteFieldPath, context, accumulator );
+		return new FastVectorHighlighterValues<>( parentDocumentPath, nestedDocumentPath, absoluteFieldPath, context,
+				accumulator );
 	}
 
 	@Override
@@ -118,8 +119,9 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 			this.highlighter.setPhraseLimit( LuceneFastVectorSearchHighlighter.this.phraseLimit );
 			this.query = context.collectorExecutionContext().originalQuery();
 			this.fragListBuilder =
-					LuceneFastVectorSearchHighlighter.this.numberOfFragments == 0 ? new SingleFragListBuilder() :
-							new SimpleFragListBuilder();
+					LuceneFastVectorSearchHighlighter.this.numberOfFragments == 0
+							? new SingleFragListBuilder()
+							: new SimpleFragListBuilder();
 
 			this.preTags = LuceneFastVectorSearchHighlighter.this.preTags.toArray(
 					new String[LuceneFastVectorSearchHighlighter.this.preTags.size()] );
@@ -194,8 +196,10 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 						leafReaderContext.reader(), doc, field, fieldFragList, 1, preTags, postTags,
 						LuceneFastVectorSearchHighlighter.this.encoder
 				);
-				return fragment == null || fragment.length == 0 ? Collections.emptyList() : Collections.singletonList(
-						fragment[0] );
+				return fragment == null || fragment.length == 0
+						? Collections.emptyList()
+						: Collections.singletonList(
+								fragment[0] );
 			}
 			return Collections.emptyList();
 		}
@@ -213,7 +217,8 @@ class LuceneFastVectorSearchHighlighter extends LuceneAbstractSearchHighlighter 
 			List<FieldFragList.WeightedFragInfo> result = new ArrayList<>();
 
 			for ( Field field : fields ) {
-				result.add( new FieldFragList.WeightedFragInfo( 0, field.stringValue().length(), Collections.emptyList(), 0.0f ) );
+				result.add(
+						new FieldFragList.WeightedFragInfo( 0, field.stringValue().length(), Collections.emptyList(), 0.0f ) );
 			}
 
 			return result;

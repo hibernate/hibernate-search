@@ -58,13 +58,12 @@ import org.apache.lucene.search.Query;
 
 public final class LuceneSearchIndexScopeImpl
 		extends AbstractSearchIndexScope<
-						LuceneSearchIndexScopeImpl,
-						LuceneIndexModel,
-						LuceneSearchIndexNodeContext,
-						LuceneSearchIndexCompositeNodeContext
-				>
+				LuceneSearchIndexScopeImpl,
+				LuceneIndexModel,
+				LuceneSearchIndexNodeContext,
+				LuceneSearchIndexCompositeNodeContext>
 		implements LuceneSearchIndexScope<LuceneSearchIndexScopeImpl>,
-				LuceneSearchQueryIndexScope<LuceneSearchIndexScopeImpl> {
+		LuceneSearchQueryIndexScope<LuceneSearchIndexScopeImpl> {
 
 	// Backend context
 	private final SearchBackendContext backendContext;

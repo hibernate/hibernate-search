@@ -32,7 +32,7 @@ public final class Retry implements TestRule {
 	 * @return A rule that will retry failing tests 3 times, taking care to reset the given other {@link TestRule}s
 	 * between each new attempt.
 	 */
-	public static Retry withOtherRules(TestRule otherRule1, TestRule ... otherRules) {
+	public static Retry withOtherRules(TestRule otherRule1, TestRule... otherRules) {
 		List<TestRule> otherRulesList = new ArrayList<>();
 		otherRulesList.add( otherRule1 );
 		Collections.addAll( otherRulesList, otherRules );

@@ -149,8 +149,8 @@ public abstract class AbstractPojoIndexingDependencyCollectorDirectValueNode<P, 
 				// Use a LinkedHashMap for deterministic iteration
 				result = new LinkedHashMap<>();
 
-				for ( PojoRawTypeModel<?> concreteEntityType :
-						buildingHelper.getConcreteEntitySubTypesForEntitySuperType( originalSideRawEntityType ) ) {
+				for ( PojoRawTypeModel<?> concreteEntityType : buildingHelper
+						.getConcreteEntitySubTypesForEntitySuperType( originalSideRawEntityType ) ) {
 					BoundPojoModelPathValueNode<?, ?, ?> modelPathFromConcreteEntitySubType =
 							applyProcessingPathToSubType( concreteEntityType, modelPathFromLastEntityNode );
 					PojoModelPathValueNode inverseAssociationPath = buildingHelper.pathInverter()

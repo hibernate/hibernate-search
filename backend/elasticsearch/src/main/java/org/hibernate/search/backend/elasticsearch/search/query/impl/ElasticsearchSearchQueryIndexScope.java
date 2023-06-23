@@ -21,8 +21,8 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 
 public interface ElasticsearchSearchQueryIndexScope<S extends ElasticsearchSearchQueryIndexScope<?>>
 		extends SearchQueryIndexScope<S>,
-				ElasticsearchSearchPredicateIndexScope<S>, ElasticsearchSearchSortIndexScope<S>,
-				ElasticsearchSearchProjectionIndexScope<S>, ElasticsearchSearchAggregationIndexScope<S> {
+		ElasticsearchSearchPredicateIndexScope<S>, ElasticsearchSearchSortIndexScope<S>,
+		ElasticsearchSearchProjectionIndexScope<S>, ElasticsearchSearchAggregationIndexScope<S> {
 
 	@Override
 	<P> ElasticsearchSearchQueryBuilder<P> select(BackendSessionContext sessionContext,

@@ -53,7 +53,8 @@ public class HibernateOrmExtensionTest {
 				new IdentifierBridgeToDocumentIdentifierContextImpl( mappingContext );
 		assertThat( toDocumentContext.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
 
-		IdentifierBridgeFromDocumentIdentifierContext fromDocumentContext = new SessionBasedBridgeOperationContext( sessionContext );
+		IdentifierBridgeFromDocumentIdentifierContext fromDocumentContext =
+				new SessionBasedBridgeOperationContext( sessionContext );
 		assertThat( fromDocumentContext.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
 	}
 

@@ -69,7 +69,7 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	@Override
 	public Query createRangeQuery(String absoluteFieldPath, Double lowerLimit, Double upperLimit) {
 		return DoublePoint.newRangeQuery(
-			absoluteFieldPath, lowerLimit, upperLimit
+				absoluteFieldPath, lowerLimit, upperLimit
 		);
 	}
 
@@ -85,7 +85,8 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 
 	@Override
 	public Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-			NestedDocsProvider nestedDocsProvider) throws IOException {
+			NestedDocsProvider nestedDocsProvider)
+			throws IOException {
 		// As we don't need to apply any operation to terms except sometimes a sort,
 		// we can simply rely on raw, long values, whose order is the same as their corresponding double value.
 		// Values are ultimately converted back to the Double equivalent by calling sortedDocValueToTerm.
@@ -98,7 +99,8 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	@Override
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			Collection<? extends Range<? extends Double>> ranges,
-			NestedDocsProvider nestedDocsProvider) throws IOException {
+			NestedDocsProvider nestedDocsProvider)
+			throws IOException {
 		// As we don't need to apply any operation to terms except sometimes a sort,
 		// we can simply rely on raw, long values, whose order is the same as their corresponding double value.
 		// Values are ultimately converted back to the Double equivalent by calling sortedDocValueToTerm.

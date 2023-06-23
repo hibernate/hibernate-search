@@ -125,7 +125,8 @@ public class JBeretEntityManagerFactoryRegistry implements EntityManagerFactoryR
 
 		switch ( namespace ) {
 			case CDI_NAMESPACE_NAME:
-				Instance<EntityManagerFactory> instance = entityManagerFactoryInstance.select( new NamedQualifier( reference ) );
+				Instance<EntityManagerFactory> instance =
+						entityManagerFactoryInstance.select( new NamedQualifier( reference ) );
 				if ( instance.isUnsatisfied() ) {
 					throw log.noAvailableEntityManagerFactoryInCDI( reference );
 				}

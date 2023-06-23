@@ -16,11 +16,10 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * @param <N> The type of the next step.
  */
 public interface SpatialWithinPredicateFieldMoreStep<
-				S extends SpatialWithinPredicateFieldMoreStep<?, N>,
-				N extends SpatialWithinPredicateOptionsStep<?>
-		>
+		S extends SpatialWithinPredicateFieldMoreStep<?, N>,
+		N extends SpatialWithinPredicateOptionsStep<?>>
 		extends SpatialWithinPredicateAreaStep<N>,
-				MultiFieldPredicateFieldBoostStep<S> {
+		MultiFieldPredicateFieldBoostStep<S> {
 
 	/**
 	 * Target the given field in the "within" predicate,
@@ -50,6 +49,6 @@ public interface SpatialWithinPredicateFieldMoreStep<
 	 *
 	 * @see SpatialWithinPredicateFieldStep#fields(String...)
 	 */
-	S fields(String ... fieldPaths);
+	S fields(String... fieldPaths);
 
 }

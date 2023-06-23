@@ -27,7 +27,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(MarkerBinding.List.class)
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = MarkerBindingProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = MarkerBindingProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface MarkerBinding {
 
 	/**

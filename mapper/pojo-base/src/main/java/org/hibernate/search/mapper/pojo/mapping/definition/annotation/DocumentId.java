@@ -27,7 +27,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Documented
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = DocumentIdProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = DocumentIdProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface DocumentId {
 
 	/**

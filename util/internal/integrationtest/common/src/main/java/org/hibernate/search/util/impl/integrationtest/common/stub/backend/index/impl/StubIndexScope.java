@@ -44,7 +44,8 @@ public class StubIndexScope implements IndexScope {
 
 		void add(StubBackend backend, StubIndexModel model) {
 			if ( !this.backend.equals( backend ) ) {
-				throw new IllegalStateException( "Attempt to build a scope spanning two distinct backends; this is not possible." );
+				throw new IllegalStateException(
+						"Attempt to build a scope spanning two distinct backends; this is not possible." );
 			}
 			indexModels.add( model );
 		}

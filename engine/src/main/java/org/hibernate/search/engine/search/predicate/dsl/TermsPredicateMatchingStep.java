@@ -28,7 +28,7 @@ public interface TermsPredicateMatchingStep<N extends TermsPredicateOptionsStep<
 	 * See {@link ValueConvert#YES} for more information.
 	 * @return The next step.
 	 */
-	default N matchingAny(Object firstTerm, Object ... otherTerms) {
+	default N matchingAny(Object firstTerm, Object... otherTerms) {
 		return matchingAny( CollectionHelper.asList( firstTerm, otherTerms ) );
 	}
 
@@ -68,7 +68,7 @@ public interface TermsPredicateMatchingStep<N extends TermsPredicateOptionsStep<
 	 * See {@link ValueConvert#YES} for more information.
 	 * @return The next step.
 	 */
-	default N matchingAll(Object firstTerm, Object ... otherTerms) {
+	default N matchingAll(Object firstTerm, Object... otherTerms) {
 		return matchingAll( CollectionHelper.asList( firstTerm, otherTerms ) );
 	}
 

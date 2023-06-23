@@ -17,29 +17,30 @@ class AnalyzerDefinitionValidator extends AnalysisDefinitionValidator<AnalyzerDe
 		super(
 				new AnalysisParameterEquivalenceRegistry.Builder()
 						.type( "keep_types" )
-								.param( "types" ).unorderedArray()
-								.end()
+						.param( "types" ).unorderedArray()
+						.end()
 						.build()
 		);
 	}
 
 	@Override
-	public void validate(ValidationErrorCollector errorCollector, AnalyzerDefinition expectedDefinition, AnalyzerDefinition actualDefinition) {
+	public void validate(ValidationErrorCollector errorCollector, AnalyzerDefinition expectedDefinition,
+			AnalyzerDefinition actualDefinition) {
 		super.validate( errorCollector, expectedDefinition, actualDefinition );
 
-		if ( ! Objects.equals( expectedDefinition.getCharFilters(), actualDefinition.getCharFilters() ) ) {
+		if ( !Objects.equals( expectedDefinition.getCharFilters(), actualDefinition.getCharFilters() ) ) {
 			errorCollector.addError( ElasticsearchValidationMessages.INSTANCE.invalidAnalyzerCharFilters(
 					expectedDefinition.getCharFilters(), actualDefinition.getCharFilters()
 			) );
 		}
 
-		if ( ! Objects.equals( expectedDefinition.getTokenizer(), actualDefinition.getTokenizer() ) ) {
+		if ( !Objects.equals( expectedDefinition.getTokenizer(), actualDefinition.getTokenizer() ) ) {
 			errorCollector.addError( ElasticsearchValidationMessages.INSTANCE.invalidAnalyzerTokenizer(
 					expectedDefinition.getTokenizer(), actualDefinition.getTokenizer()
 			) );
 		}
 
-		if ( ! Objects.equals( expectedDefinition.getTokenFilters(), actualDefinition.getTokenFilters() ) ) {
+		if ( !Objects.equals( expectedDefinition.getTokenFilters(), actualDefinition.getTokenFilters() ) ) {
 			errorCollector.addError( ElasticsearchValidationMessages.INSTANCE.invalidAnalyzerTokenFilters(
 					expectedDefinition.getTokenFilters(), actualDefinition.getTokenFilters()
 			) );

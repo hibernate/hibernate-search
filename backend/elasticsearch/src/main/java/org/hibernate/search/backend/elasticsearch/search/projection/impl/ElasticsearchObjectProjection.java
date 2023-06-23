@@ -47,7 +47,8 @@ public class ElasticsearchObjectProjection<E, V, P>
 		this.absoluteFieldPath = builder.objectField.absolutePath();
 		this.absoluteFieldPathComponents = builder.objectField.absolutePathComponents();
 		this.requiredContextAbsoluteFieldPath = accumulatorProvider.isSingleValued()
-				? builder.objectField.closestMultiValuedParentAbsolutePath() : null;
+				? builder.objectField.closestMultiValuedParentAbsolutePath()
+				: null;
 		this.inners = inners;
 		this.compositor = compositor;
 		this.accumulatorProvider = accumulatorProvider;
@@ -165,7 +166,7 @@ public class ElasticsearchObjectProjection<E, V, P>
 						objectField.eventContext() );
 			}
 			ElasticsearchSearchProjection<?>[] typedInners =
-					new ElasticsearchSearchProjection<?>[ inners.length ];
+					new ElasticsearchSearchProjection<?>[inners.length];
 			for ( int i = 0; i < inners.length; i++ ) {
 				typedInners[i] = ElasticsearchSearchProjection.from( scope, inners[i] );
 			}

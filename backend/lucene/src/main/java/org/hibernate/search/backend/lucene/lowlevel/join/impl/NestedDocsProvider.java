@@ -70,7 +70,8 @@ public class NestedDocsProvider {
 	}
 
 	public ChildDocIds childDocs(Weight childDocsWeight, LeafReaderContext context,
-			DocIdSetIterator childFilter) throws IOException {
+			DocIdSetIterator childFilter)
+			throws IOException {
 		BitSet parentDocs = parentFilter.getBitSet( context );
 		if ( parentDocs == null ) {
 			return null;

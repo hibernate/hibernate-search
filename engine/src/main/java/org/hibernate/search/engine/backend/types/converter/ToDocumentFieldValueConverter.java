@@ -25,7 +25,8 @@ public interface ToDocumentFieldValueConverter<V, F> extends ToDocumentValueConv
 
 	@Override
 	default boolean isCompatibleWith(ToDocumentValueConverter<?, ?> other) {
-		return other instanceof ToDocumentFieldValueConverter && isCompatibleWith( (ToDocumentFieldValueConverter<?, ?>) other );
+		return other instanceof ToDocumentFieldValueConverter
+				&& isCompatibleWith( (ToDocumentFieldValueConverter<?, ?>) other );
 	}
 
 	/**

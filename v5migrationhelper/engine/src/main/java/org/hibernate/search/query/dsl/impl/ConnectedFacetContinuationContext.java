@@ -33,4 +33,3 @@ public class ConnectedFacetContinuationContext implements FacetContinuationConte
 	}
 }
 
-

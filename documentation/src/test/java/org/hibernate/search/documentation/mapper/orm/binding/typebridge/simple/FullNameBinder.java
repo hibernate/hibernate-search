@@ -29,7 +29,7 @@ public class FullNameBinder implements TypeBinder { // <1>
 		context.bridge( // <6>
 				Author.class, // <7>
 				new Bridge( // <8>
-					fullNameField // <9>
+						fullNameField // <9>
 				)
 		);
 	}

@@ -73,7 +73,8 @@ public class ToStringTest extends JPATestCase {
 	}
 
 	private void assertToStringContainsLuceneQueryInformation(String fullTextQueryToString) {
-		assertThat( "Unexpected toString implementation. The string should contain a string representation of the internal query.",
+		assertThat(
+				"Unexpected toString implementation. The string should contain a string representation of the internal query.",
 				fullTextQueryToString, CoreMatchers.containsString( luceneQuery.toString() ) );
 	}
 

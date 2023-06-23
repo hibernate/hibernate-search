@@ -42,7 +42,7 @@ public interface BeanHolder<T> extends AutoCloseable {
 	 * @return A bean holder that wraps the current bean holder, and ensures the dependencies are also
 	 * closed when its {@link #close()} method is called.
 	 */
-	default BeanHolder<T> withDependencyAutoClosing(BeanHolder<?> ... dependencies) {
+	default BeanHolder<T> withDependencyAutoClosing(BeanHolder<?>... dependencies) {
 		return new DependencyClosingBeanHolder<>( this, Arrays.asList( dependencies ) );
 	}
 

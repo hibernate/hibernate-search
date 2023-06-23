@@ -130,7 +130,9 @@ public class SuppressingCloserTest {
 
 		new SuppressingCloser( mainException )
 				.push( AutoCloseable::close, supplier, Supplier::get )
-				.push( ignored -> { throw exception2; }, new Object() );
+				.push( ignored -> {
+					throw exception2;
+				}, new Object() );
 
 		assertThat( mainException )
 				.hasSuppressedException( exception1 )
@@ -146,7 +148,9 @@ public class SuppressingCloserTest {
 
 		new SuppressingCloser( mainException )
 				.push( ignored -> { throw exception1; }, new Object() )
-				.push( ignored -> { throw exception2; }, new Object() )
+				.push( ignored -> {
+					throw exception2;
+				}, new Object() )
 				.push( ignored -> { throw exception3; }, new Object() );
 
 		assertThat( mainException )
@@ -169,7 +173,9 @@ public class SuppressingCloserTest {
 		new SuppressingCloser( mainException )
 				.push( ignored -> fail( "Should not be called" ), supplier1, Supplier::get )
 				.push( ignored -> fail( "Should not be called" ), supplier2, Supplier::get )
-				.push( ignored -> { throw exception3; }, supplier3, Supplier::get );
+				.push( ignored -> {
+					throw exception3;
+				}, supplier3, Supplier::get );
 
 		assertThat( mainException )
 				.hasSuppressedException( exception1 )
@@ -187,7 +193,9 @@ public class SuppressingCloserTest {
 		new SuppressingCloser( mainException )
 				.push( () -> { /* Do not fail */ } )
 				.push( ignored -> { throw exception1; }, new Object() )
-				.push( ignored -> { throw exception2; }, new Object() )
+				.push( ignored -> {
+					throw exception2;
+				}, new Object() )
 				.push( () -> { /* Do not fail */ } )
 				.push( () -> { /* Do not fail */ } )
 				.push( ignored -> { throw exception3; }, new Object() )
@@ -239,7 +247,9 @@ public class SuppressingCloserTest {
 		List<Closeable> closeables = Arrays.asList(
 				() -> { throw exception1; },
 				() -> { throw exception2; },
-				() -> { throw exception3; },
+				() -> {
+					throw exception3;
+				},
 				() -> { throw exception4; }
 		);
 
@@ -262,7 +272,9 @@ public class SuppressingCloserTest {
 		RuntimeException exception4 = new UnsupportedOperationException();
 		List<Supplier<Closeable>> closeableSuppliers = Arrays.asList(
 				() -> () -> { throw exception1; },
-				() -> () -> { throw exception2; },
+				() -> () -> {
+					throw exception2;
+				},
 				() -> () -> { throw exception3; },
 				() -> () -> { throw exception4; }
 		);

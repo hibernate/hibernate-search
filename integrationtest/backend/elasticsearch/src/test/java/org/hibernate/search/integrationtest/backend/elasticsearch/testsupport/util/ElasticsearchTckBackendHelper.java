@@ -105,20 +105,23 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 	public PredicateFinalStep createSlowPredicate(SearchPredicateFactory f) {
 		return f.extension( ElasticsearchExtension.get() )
 				.fromJson( "{\"script\": {"
-								+ "  \"script\": \""
-								+ "  long end = System.nanoTime() + 10000000L;"
-								+ "  while ( System.nanoTime() < end ) {"
-										// We can't use Thread.sleep, so let's do something slow.
-										// Note that (0L, 100000000L) takes forever to execute on AWS ES Service,
-										// so we'll stick to a shorter range.
-										+ "LongStream.range( 0L, 1000000L ).sum();"
-								+ "}"
+						+ "  \"script\": \""
+						+ "  long end = System.nanoTime() + 10000000L;"
+						+ "  while ( System.nanoTime() < end ) {"
+						// We can't use Thread.sleep, so let's do something slow.
+						// Note that (0L, 100000000L) takes forever to execute on AWS ES Service,
+						// so we'll stick to a shorter range.
+						+ "LongStream.range( 0L, 1000000L ).sum();"
+						+ "}"
 						+ "\""
-				+ "} }" );
+						+ "} }" );
 	}
 
 	@Override
-	public <R, E, LOS> SearchQueryDslExtension<? extends SearchQuerySelectStep<?, R, E, LOS, ?, ?>, R, E, LOS> queryDslExtension() {
+	public <
+			R,
+			E,
+			LOS> SearchQueryDslExtension<? extends SearchQuerySelectStep<?, R, E, LOS, ?, ?>, R, E, LOS> queryDslExtension() {
 		return ElasticsearchExtension.get();
 	}
 }

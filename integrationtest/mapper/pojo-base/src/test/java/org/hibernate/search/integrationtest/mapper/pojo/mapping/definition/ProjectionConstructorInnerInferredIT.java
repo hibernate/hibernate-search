@@ -34,7 +34,8 @@ import org.junit.Test;
 public class ProjectionConstructorInnerInferredIT extends AbstractProjectionConstructorIT {
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void value() {
@@ -50,6 +51,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 		class MyProjection {
 			public final String text;
 			public final Integer integer;
+
 			@ProjectionConstructor
 			public MyProjection(String text, Integer integer) {
 				this.text = text;
@@ -96,6 +98,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 		class MyProjection {
 			public final List<String> text;
 			public final List<Integer> integer;
+
 			@ProjectionConstructor
 			public MyProjection(List<String> text, List<Integer> integer) {
 				this.text = text;
@@ -146,6 +149,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 		class MyProjection {
 			public final Collection<String> text;
 			public final Collection<Integer> integer;
+
 			@ProjectionConstructor
 			public MyProjection(Collection<String> text, Collection<Integer> integer) {
 				this.text = text;
@@ -196,6 +200,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 		class MyProjection {
 			public final Iterable<String> text;
 			public final Iterable<Integer> integer;
+
 			@ProjectionConstructor
 			public MyProjection(Iterable<String> text, Iterable<Integer> integer) {
 				this.text = text;
@@ -246,6 +251,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 		class MyProjection {
 			public final Set<String> text;
 			public final List<Integer> integer;
+
 			@ProjectionConstructor
 			public MyProjection(Set<String> text, List<Integer> integer) {
 				this.text = text;
@@ -290,6 +296,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 		class MyInnerProjection {
 			public final String text;
 			public final Integer integer;
+
 			@ProjectionConstructor
 			public MyInnerProjection(String text, Integer integer) {
 				this.text = text;
@@ -299,6 +306,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 		class MyProjection {
 			public final String text;
 			public final MyInnerProjection contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text, MyInnerProjection contained) {
 				this.text = text;
@@ -363,6 +371,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 		class MyInnerProjection {
 			public final String text;
 			public final Integer integer;
+
 			@ProjectionConstructor
 			public MyInnerProjection(String text, Integer integer) {
 				this.text = text;
@@ -372,6 +381,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 		class MyProjection {
 			public final String text;
 			public final MyInnerProjection contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text, MyInnerProjection contained) {
 				this.text = text;
@@ -436,6 +446,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 		class MyInnerProjection {
 			public final String text;
 			public final Integer integer;
+
 			@ProjectionConstructor
 			public MyInnerProjection(String text, Integer integer) {
 				this.text = text;
@@ -445,6 +456,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 		class MyProjection {
 			public final String text;
 			public final List<MyInnerProjection> contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text, List<MyInnerProjection> contained) {
 				this.text = text;
@@ -524,6 +536,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 		class MyInnerProjection {
 			public final String text;
 			public final Integer integer;
+
 			@ProjectionConstructor
 			public MyInnerProjection(String text, Integer integer) {
 				this.text = text;
@@ -533,6 +546,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 		class MyProjection {
 			public final String text;
 			public final Collection<MyInnerProjection> contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text, Collection<MyInnerProjection> contained) {
 				this.text = text;
@@ -612,6 +626,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 		class MyInnerProjection {
 			public final String text;
 			public final Integer integer;
+
 			@ProjectionConstructor
 			public MyInnerProjection(String text, Integer integer) {
 				this.text = text;
@@ -621,6 +636,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 		class MyProjection {
 			public final String text;
 			public final Iterable<MyInnerProjection> contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text, Iterable<MyInnerProjection> contained) {
 				this.text = text;
@@ -700,6 +716,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 		class MyInnerProjection {
 			public final String text;
 			public final Integer integer;
+
 			@ProjectionConstructor
 			public MyInnerProjection(String text, Integer integer) {
 				this.text = text;
@@ -709,6 +726,7 @@ public class ProjectionConstructorInnerInferredIT extends AbstractProjectionCons
 		class MyProjection {
 			public final String text;
 			public final Set<MyInnerProjection> contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text, Set<MyInnerProjection> contained) {
 				this.text = text;

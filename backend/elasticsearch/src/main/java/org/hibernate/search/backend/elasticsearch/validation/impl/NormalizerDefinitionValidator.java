@@ -21,15 +21,16 @@ class NormalizerDefinitionValidator extends AnalysisDefinitionValidator<Normaliz
 	}
 
 	@Override
-	public void validate(ValidationErrorCollector errorCollector, NormalizerDefinition expectedDefinition, NormalizerDefinition actualDefinition) {
+	public void validate(ValidationErrorCollector errorCollector, NormalizerDefinition expectedDefinition,
+			NormalizerDefinition actualDefinition) {
 		super.validate( errorCollector, expectedDefinition, actualDefinition );
 
-		if ( ! Objects.equals( expectedDefinition.getCharFilters(), actualDefinition.getCharFilters() ) ) {
+		if ( !Objects.equals( expectedDefinition.getCharFilters(), actualDefinition.getCharFilters() ) ) {
 			errorCollector.addError( ElasticsearchValidationMessages.INSTANCE.invalidAnalyzerCharFilters(
 					expectedDefinition.getCharFilters(), actualDefinition.getCharFilters() ) );
 		}
 
-		if ( ! Objects.equals( expectedDefinition.getTokenFilters(), actualDefinition.getTokenFilters() ) ) {
+		if ( !Objects.equals( expectedDefinition.getTokenFilters(), actualDefinition.getTokenFilters() ) ) {
 			errorCollector.addError( ElasticsearchValidationMessages.INSTANCE.invalidAnalyzerTokenFilters(
 					expectedDefinition.getTokenFilters(), actualDefinition.getTokenFilters() ) );
 		}

@@ -337,12 +337,11 @@ public class SearchProjectionIT {
 		SearchQuery<List<?>> query;
 
 		query = scope.query()
-				.select( f ->
-						f.composite(
-								f.field( mainIndex.binding().string1Field.relativeFieldName, String.class ),
-								f.documentReference(),
-								f.field( mainIndex.binding().string2Field.relativeFieldName, String.class )
-						)
+				.select( f -> f.composite(
+						f.field( mainIndex.binding().string1Field.relativeFieldName, String.class ),
+						f.documentReference(),
+						f.field( mainIndex.binding().string2Field.relativeFieldName, String.class )
+				)
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
@@ -381,14 +380,13 @@ public class SearchProjectionIT {
 		SearchQuery<List<?>> query;
 
 		query = scope.query()
-				.select( f ->
-						f.composite(
-								f.field( mainIndex.binding().string1Field.relativeFieldName, String.class ),
-								f.documentReference(),
-								f.field( "nested." + mainIndex.binding().nestedField.relativeFieldName, String.class ),
-								f.field( "nested.nested." + mainIndex.binding().nestedNestedField.relativeFieldName, String.class ),
-								f.field( "nested.flattened." + mainIndex.binding().flattenedField.relativeFieldName, String.class )
-						)
+				.select( f -> f.composite(
+						f.field( mainIndex.binding().string1Field.relativeFieldName, String.class ),
+						f.documentReference(),
+						f.field( "nested." + mainIndex.binding().nestedField.relativeFieldName, String.class ),
+						f.field( "nested.nested." + mainIndex.binding().nestedNestedField.relativeFieldName, String.class ),
+						f.field( "nested.flattened." + mainIndex.binding().flattenedField.relativeFieldName, String.class )
+				)
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
@@ -479,11 +477,10 @@ public class SearchProjectionIT {
 
 		// reuse the same projection instance on a different scope,
 		// targeting a different index
-		assertThatThrownBy( () ->
-				otherIndex.createScope().query()
-						.select( projection )
-						.where( f -> f.matchAll() )
-						.toQuery() )
+		assertThatThrownBy( () -> otherIndex.createScope().query()
+				.select( projection )
+				.where( f -> f.matchAll() )
+				.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Invalid search projection",
 						"You must build the projection from a scope targeting indexes ", otherIndex.name(),
@@ -491,11 +488,10 @@ public class SearchProjectionIT {
 
 		// reuse the same projection instance on a different scope,
 		// targeting different indexes
-		assertThatThrownBy( () ->
-				mainIndex.createScope( otherIndex ).query()
-						.select( projection )
-						.where( f -> f.matchAll() )
-						.toQuery() )
+		assertThatThrownBy( () -> mainIndex.createScope( otherIndex ).query()
+				.select( projection )
+				.where( f -> f.matchAll() )
+				.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Invalid search projection",
 						"You must build the projection from a scope targeting indexes ",
@@ -660,7 +656,7 @@ public class SearchProjectionIT {
 					DocumentElement flattedDocument = nestedDocument.addObject( mainIndex.binding().flattenedObject );
 					mainIndex.binding().flattenedField.document3Value.write( flattedDocument );
 				} )
-				.add( EMPTY, document -> { } )
+				.add( EMPTY, document -> {} )
 				.join();
 	}
 

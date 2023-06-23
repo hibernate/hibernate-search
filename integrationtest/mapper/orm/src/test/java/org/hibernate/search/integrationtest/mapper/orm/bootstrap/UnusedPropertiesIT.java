@@ -88,7 +88,7 @@ public class UnusedPropertiesIT {
 		 * Check that the "configuration property tracking strategy" property is considered used.
 		 * This is a corner case worth testing, since the property may legitimately be accessed before
 		 * we start tracking property usage.
- 		 */
+		 */
 		logged.expectMessage( "some properties in the given configuration are not used" )
 				.never();
 		logged.expectMessage( "Configuration property tracking is disabled" )

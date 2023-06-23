@@ -147,9 +147,7 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 
 		// for double imprecision we risk to cross the bounds
 		// TODO HSEARCH-3583 Fix the precision issue in Elasticsearch and remove this hack
-		return ( longValue > 0 ) ?
-				bigDecimal.subtract( BigDecimal.TEN ) :
-				bigDecimal.add( BigDecimal.TEN );
+		return ( longValue > 0 ) ? bigDecimal.subtract( BigDecimal.TEN ) : bigDecimal.add( BigDecimal.TEN );
 	}
 
 	private BigDecimal nextUp(BigDecimal originalValue) {

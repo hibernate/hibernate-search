@@ -515,20 +515,20 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 				.add( DOCUMENT_1, document -> initDocument( mainIndex.binding(), document, 1 ) )
 				.add( DOCUMENT_2, document -> initDocument( mainIndex.binding(), document, 2 ) )
 				.add( DOCUMENT_3, document -> initDocument( mainIndex.binding(), document, 3 ) )
-				.add( EMPTY, document -> { } );
+				.add( EMPTY, document -> {} );
 		BulkIndexer compatibleIndexer = compatibleIndex.bulkIndexer()
 				.add( COMPATIBLE_INDEX_DOCUMENT_1, document -> {
 					compatibleIndex.binding().fieldModels
-								.forEach( f -> addFieldValue( document, f, 1 ) );
+							.forEach( f -> addFieldValue( document, f, 1 ) );
 					compatibleIndex.binding().fieldWithConverterModels
 							.forEach( f -> addFieldValue( document, f, 1 ) );
 				} );
 		BulkIndexer rawFieldCompatibleIndexer = rawFieldCompatibleIndex.bulkIndexer()
 				.add( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1,
 						document -> rawFieldCompatibleIndex.binding().fieldWithConverterModels
-							.forEach( f -> addFieldValue( document, f, 1 ) ) );
+								.forEach( f -> addFieldValue( document, f, 1 ) ) );
 		BulkIndexer missingFieldIndexer = missingFieldIndex.bulkIndexer()
-				.add( MISSING_FIELD_INDEX_DOCUMENT_1, document -> { } );
+				.add( MISSING_FIELD_INDEX_DOCUMENT_1, document -> {} );
 		mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer, missingFieldIndexer );
 	}
 
@@ -599,10 +599,10 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 					} );
 			fieldWithConverterModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
 					"converted_", (fieldType, c) -> {
-							c.projectable( Projectable.YES )
+						c.projectable( Projectable.YES )
 								.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
 								.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() );
-							addIrrelevantOptions( fieldType, c );
+						addIrrelevantOptions( fieldType, c );
 					} );
 		}
 
@@ -664,8 +664,8 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 		}
 
 		private static void mapFieldsWithIncompatibleType(IndexSchemaElement parent) {
-			supportedFieldTypes.forEach( typeDescriptor ->
-					SimpleFieldModel.mapper( FieldTypeDescriptor.getIncompatible( typeDescriptor ) )
+			supportedFieldTypes.forEach(
+					typeDescriptor -> SimpleFieldModel.mapper( FieldTypeDescriptor.getIncompatible( typeDescriptor ) )
 							.map( parent, "" + typeDescriptor.getUniqueName(), c -> c.projectable( Projectable.YES ) )
 			);
 		}

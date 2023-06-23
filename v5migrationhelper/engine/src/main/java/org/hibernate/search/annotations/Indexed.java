@@ -21,11 +21,12 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  * @deprecated Use Hibernate Search 6's {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed}
  * instead.
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( ElementType.TYPE )
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
 @Documented
 @Deprecated
-@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = IndexedAnnotationProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = IndexedAnnotationProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface Indexed {
 	/**
 	 * @return The filename of the index. Default to empty string

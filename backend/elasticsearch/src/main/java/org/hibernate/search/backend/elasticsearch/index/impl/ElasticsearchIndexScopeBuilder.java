@@ -37,7 +37,7 @@ class ElasticsearchIndexScopeBuilder implements IndexScopeBuilder {
 	}
 
 	void add(IndexManagerBackendContext backendContext, ElasticsearchIndexManagerImpl indexManager) {
-		if ( ! this.backendContext.equals( backendContext ) ) {
+		if ( !this.backendContext.equals( backendContext ) ) {
 			throw log.cannotMixElasticsearchScopeWithOtherBackend(
 					this, indexManager, backendContext.getEventContext()
 			);

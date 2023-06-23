@@ -65,12 +65,14 @@ public class ExistsPredicateBaseIT {
 
 		final BulkIndexer typeCheckingMainIndexer = TypeCheckingNoConversionIT.index.bulkIndexer();
 		final BulkIndexer typeCheckingCompatibleIndexer = TypeCheckingNoConversionIT.compatibleIndex.bulkIndexer();
-		final BulkIndexer typeCheckingRawFieldCompatibleIndexer = TypeCheckingNoConversionIT.rawFieldCompatibleIndex.bulkIndexer();
+		final BulkIndexer typeCheckingRawFieldCompatibleIndexer =
+				TypeCheckingNoConversionIT.rawFieldCompatibleIndex.bulkIndexer();
 		final BulkIndexer typeCheckingMissingFieldIndexer = TypeCheckingNoConversionIT.missingFieldIndex.bulkIndexer();
-		TypeCheckingNoConversionIT.dataSets.forEach( d -> d.contribute( TypeCheckingNoConversionIT.index, typeCheckingMainIndexer,
-				TypeCheckingNoConversionIT.compatibleIndex, typeCheckingCompatibleIndexer,
-				TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
-				TypeCheckingNoConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer ) );
+		TypeCheckingNoConversionIT.dataSets
+				.forEach( d -> d.contribute( TypeCheckingNoConversionIT.index, typeCheckingMainIndexer,
+						TypeCheckingNoConversionIT.compatibleIndex, typeCheckingCompatibleIndexer,
+						TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
+						TypeCheckingNoConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer ) );
 
 		final BulkIndexer scaleCheckingMainIndexer = ScaleCheckingIT.index.bulkIndexer();
 		final BulkIndexer scaleCheckingCompatibleIndexer = ScaleCheckingIT.compatibleIndex.bulkIndexer();
@@ -214,8 +216,7 @@ public class ExistsPredicateBaseIT {
 				scoreIndexer.add( docId( 1 ), routingKey, document -> {
 					document.addValue( binding.field1.get( fieldType ).reference, values.value() );
 				} );
-				scoreIndexer.add( docId( 2 ), routingKey, document -> {
-				} );
+				scoreIndexer.add( docId( 2 ), routingKey, document -> {} );
 			}
 		}
 	}
@@ -334,7 +335,8 @@ public class ExistsPredicateBaseIT {
 
 	@Nested
 	@RunWith(Parameterized.class)
-	public static class TypeCheckingNoConversionIT<F> extends AbstractPredicateTypeCheckingNoConversionIT<ExistsPredicateTestValues<F>> {
+	public static class TypeCheckingNoConversionIT<F>
+			extends AbstractPredicateTypeCheckingNoConversionIT<ExistsPredicateTestValues<F>> {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Object[]> parameters = new ArrayList<>();
 		static {

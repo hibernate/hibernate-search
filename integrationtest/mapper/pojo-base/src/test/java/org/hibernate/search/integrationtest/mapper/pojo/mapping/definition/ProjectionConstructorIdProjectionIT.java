@@ -26,7 +26,8 @@ import org.junit.Test;
 public class ProjectionConstructorIdProjectionIT extends AbstractProjectionConstructorIT {
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void noArg() {
@@ -41,6 +42,7 @@ public class ProjectionConstructorIdProjectionIT extends AbstractProjectionConst
 		}
 		class MyProjection {
 			public final Integer identifier;
+
 			@ProjectionConstructor
 			public MyProjection(@IdProjection Integer identifier) {
 				this.identifier = identifier;
@@ -82,6 +84,7 @@ public class ProjectionConstructorIdProjectionIT extends AbstractProjectionConst
 		}
 		class MyProjection {
 			public final Object id;
+
 			@ProjectionConstructor
 			public MyProjection(@IdProjection Object id) {
 				this.id = id;
@@ -123,6 +126,7 @@ public class ProjectionConstructorIdProjectionIT extends AbstractProjectionConst
 		}
 		class MyProjection {
 			public final int id;
+
 			@ProjectionConstructor
 			public MyProjection(@IdProjection int id) {
 				this.id = id;

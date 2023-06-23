@@ -40,7 +40,8 @@ class BeforeCommitIndexingPlanSynchronization implements Synchronization {
 
 	@Override
 	public void beforeCompletion() {
-		log.tracef( "Processing Transaction's afterCompletion() phase for %s. Executing indexing plan.", transactionIdentifier );
+		log.tracef( "Processing Transaction's afterCompletion() phase for %s. Executing indexing plan.",
+				transactionIdentifier );
 		synchronizationStrategy.executeAndSynchronize( indexingPlan );
 	}
 

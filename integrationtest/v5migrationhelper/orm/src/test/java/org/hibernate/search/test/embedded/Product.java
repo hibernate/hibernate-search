@@ -32,7 +32,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDe
 @Indexed
 public class Product {
 
-	@Id @GeneratedValue @DocumentId
+	@Id
+	@GeneratedValue
+	@DocumentId
 	private Integer id;
 
 	@Field

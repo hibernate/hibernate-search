@@ -72,8 +72,7 @@ public class StandalonePojoEntryPointsIT {
 	public void mappingContainsExpectedEntities() {
 		assertThat( theSearchMapping.allIndexedEntities() )
 				.extracting( SearchIndexedEntity::name )
-				.contains( "Book", "Associate", "Manager" )
-		;
+				.contains( "Book", "Associate", "Manager" );
 	}
 
 	@Test
@@ -141,7 +140,8 @@ public class StandalonePojoEntryPointsIT {
 		SearchMapping searchMapping = theSearchMapping;
 		try ( SearchSession searchSession = searchMapping.createSession() ) {
 			SearchScope<Book> bookScope = searchSession.scope( Book.class );
-			SearchScope<Person> associateAndManagerScope = searchSession.scope( Arrays.asList( Associate.class, Manager.class ) );
+			SearchScope<Person> associateAndManagerScope =
+					searchSession.scope( Arrays.asList( Associate.class, Manager.class ) );
 			SearchScope<Person> personScope = searchSession.scope( Person.class );
 			SearchScope<Object> allScope = searchSession.scope( Object.class );
 			// end::searchScope-fromSearchSession[]

@@ -28,9 +28,8 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 
 abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
-				S extends AbstractLuceneTemporalIndexFieldTypeOptionsStep<S, F>,
-				F extends TemporalAccessor
-		>
+		S extends AbstractLuceneTemporalIndexFieldTypeOptionsStep<S, F>,
+		F extends TemporalAccessor>
 		extends AbstractLuceneStandardIndexFieldTypeOptionsStep<S, F> {
 
 	private Sortable sortable = Sortable.DEFAULT;
@@ -65,7 +64,8 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 			builder.queryElementFactory( PredicateTypeKeys.RANGE, new LuceneNumericRangePredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.TERMS, new LuceneNumericTermsPredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS,
-					DocValues.ENABLED.equals( docValues ) ? new LuceneExistsPredicate.DocValuesBasedFactory<>()
+					DocValues.ENABLED.equals( docValues )
+							? new LuceneExistsPredicate.DocValuesBasedFactory<>()
 							: new LuceneExistsPredicate.DefaultFactory<>() );
 		}
 

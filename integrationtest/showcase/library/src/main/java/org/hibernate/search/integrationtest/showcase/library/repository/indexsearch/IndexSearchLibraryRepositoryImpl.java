@@ -107,12 +107,12 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 					}
 					// Nested query + must loop
 					if ( libraryServices != null && !libraryServices.isEmpty() ) {
-							for ( LibraryServiceOption service : libraryServices ) {
-								root.add( f.match()
-										.field( "services" )
-										.matching( service )
-								);
-							}
+						for ( LibraryServiceOption service : libraryServices ) {
+							root.add( f.match()
+									.field( "services" )
+									.matching( service )
+							);
+						}
 					}
 				} )
 				.aggregation( aggByCollectionSizekey, f -> f.range()

@@ -181,7 +181,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 		return fieldContext.toReference();
 	}
 
-	@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
+	@SuppressWarnings("unchecked") // We ensure this cast is safe through reflection
 	private <F> IndexFieldTypeOptionsStep<?, F> inferFieldType(ValueBridge<?, F> bridge) {
 		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
 		Type typeArgument = bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 1 )

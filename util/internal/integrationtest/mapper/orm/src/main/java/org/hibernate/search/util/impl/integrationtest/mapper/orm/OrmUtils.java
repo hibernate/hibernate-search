@@ -36,14 +36,16 @@ public final class OrmUtils {
 		return new NativePersistenceRunner( sessionFactory, tenantId );
 	}
 
-	public static <E extends Throwable> void runInTransaction(Session session, ThrowingConsumer<Transaction, E> action) throws E {
+	public static <E extends Throwable> void runInTransaction(Session session, ThrowingConsumer<Transaction, E> action)
+			throws E {
 		applyInTransaction( session, tx -> {
 			action.accept( tx );
 			return null;
 		} );
 	}
 
-	public static <R, E extends Throwable> R applyInTransaction(Session session, ThrowingFunction<Transaction, R, E> action) throws E {
+	public static <R, E extends Throwable> R applyInTransaction(Session session, ThrowingFunction<Transaction, R, E> action)
+			throws E {
 		Transaction tx = null;
 		try {
 			tx = session.beginTransaction();
@@ -78,7 +80,9 @@ public final class OrmUtils {
 		}
 	}
 
-	public static <R, E extends Throwable> R applyInJPATransaction(EntityManager entityManager, ThrowingFunction<EntityTransaction, R, E> action) throws E {
+	public static <R, E extends Throwable> R applyInJPATransaction(EntityManager entityManager,
+			ThrowingFunction<EntityTransaction, R, E> action)
+			throws E {
 		EntityTransaction tx = null;
 		try {
 			tx = entityManager.getTransaction();

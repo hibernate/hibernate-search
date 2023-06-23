@@ -53,10 +53,10 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 			// in a multi-index search, it may not exist for all indexes.
 			// Use ".size() != 0" to check whether this field has a value. ".value != null" won't work on ES7+
 			" if (doc.containsKey(params.fieldPath) && doc[params.fieldPath].size() != 0) {" +
-				" return doc[params.fieldPath].arcDistance(params.lat, params.lon);" +
-			" } else {" +
-				" return null;" +
-			" }";
+					" return doc[params.fieldPath].arcDistance(params.lat, params.lon);" +
+					" } else {" +
+					" return null;" +
+					" }";
 
 	private final String absoluteFieldPath;
 	private final boolean singleValuedInRoot;
@@ -149,7 +149,8 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 	}
 
 	private Double extractDistanceFromScriptField(JsonObject hit) {
-		Optional<JsonElement> projectedFieldElement = FIELDS_ACCESSOR.property( scriptFieldName ).asArray().element( 0 ).get( hit );
+		Optional<JsonElement> projectedFieldElement =
+				FIELDS_ACCESSOR.property( scriptFieldName ).asArray().element( 0 ).get( hit );
 		if ( !projectedFieldElement.isPresent() || projectedFieldElement.get().isJsonNull() ) {
 			return null;
 		}

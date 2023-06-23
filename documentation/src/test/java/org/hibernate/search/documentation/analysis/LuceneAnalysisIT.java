@@ -42,8 +42,8 @@ public class LuceneAnalysisIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> context.programmaticMapping()
 								.type( IndexedEntity.class )
-										.property( "text" )
-												.fullTextField( "standard" ).analyzer( "my-standard" )
+								.property( "text" )
+								.fullTextField( "standard" ).analyzer( "my-standard" )
 				)
 				.setup( IndexedEntity.class );
 

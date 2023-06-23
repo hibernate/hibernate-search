@@ -22,7 +22,7 @@ import org.hibernate.search.util.common.impl.Contracts;
 
 class WildcardPredicateFieldMoreStepImpl
 		implements WildcardPredicateFieldMoreStep<WildcardPredicateFieldMoreStepImpl, WildcardPredicateOptionsStep<?>>,
-				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
+		AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
 
 	private final CommonState commonState;
 

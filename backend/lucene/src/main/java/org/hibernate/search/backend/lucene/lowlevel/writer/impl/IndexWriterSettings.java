@@ -66,7 +66,7 @@ public final class IndexWriterSettings implements Serializable {
 
 		registerSetting( Extractor.fromBoolean( IO_WRITER_INFOSTREAM,
 				enabled -> Boolean.TRUE.equals( enabled ) ? new LoggerInfoStream() : null,
-				IndexWriterConfig::setInfoStream, (logByteSizeMergePolicy, integer) -> { } ) );
+				IndexWriterConfig::setInfoStream, (logByteSizeMergePolicy, integer) -> {} ) );
 
 		registerIntegerMergePolicySetting( IO_MERGE_MAX_DOCS, LogByteSizeMergePolicy::setMaxMergeDocs );
 		registerIntegerMergePolicySetting( IO_MERGE_FACTOR, LogByteSizeMergePolicy::setMergeFactor );
@@ -79,19 +79,19 @@ public final class IndexWriterSettings implements Serializable {
 	private static void registerIntegerWriterSetting(String propertyKey,
 			BiConsumer<IndexWriterConfig, Integer> writerSettingApplier) {
 		EXTRACTORS.add( Extractor.fromInteger( propertyKey, Function.identity(),
-				writerSettingApplier, (logByteSizeMergePolicy, integer) -> { } ) );
+				writerSettingApplier, (logByteSizeMergePolicy, integer) -> {} ) );
 	}
 
 	private static void registerIntegerMergePolicySetting(String propertyKey,
 			BiConsumer<LogByteSizeMergePolicy, Integer> mergePolicySettingApplier) {
 		EXTRACTORS.add( Extractor.fromInteger( propertyKey, Function.identity(),
-				(writer, integer) -> { }, mergePolicySettingApplier ) );
+				(writer, integer) -> {}, mergePolicySettingApplier ) );
 	}
 
 	private static void registerBooleanMergePolicySetting(String propertyKey,
 			BiConsumer<LogByteSizeMergePolicy, Boolean> mergePolicySettingApplier) {
 		EXTRACTORS.add( Extractor.fromBoolean( propertyKey, Function.identity(),
-				(writer, integer) -> { }, mergePolicySettingApplier ) );
+				(writer, integer) -> {}, mergePolicySettingApplier ) );
 	}
 
 	private static void registerSetting(Extractor<?, ?> extractor) {

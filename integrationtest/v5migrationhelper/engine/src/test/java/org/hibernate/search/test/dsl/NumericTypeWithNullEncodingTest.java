@@ -45,11 +45,11 @@ public class NumericTypeWithNullEncodingTest {
 	@Test
 	public void verifyExplicitRangeQuery() {
 		Query query = getQueryBuilder()
-					.range()
-						.onField( "nullableAge" )
-						.from( 1 ).excludeLimit()
-						.to( 3 ).excludeLimit()
-						.createQuery();
+				.range()
+				.onField( "nullableAge" )
+				.from( 1 ).excludeLimit()
+				.to( 3 ).excludeLimit()
+				.createQuery();
 
 		assertProjection( query, "title" ).matchesExactlySingleProjections( "title-two" );
 	}
@@ -57,10 +57,10 @@ public class NumericTypeWithNullEncodingTest {
 	@Test
 	public void verifyExplicitKeywordQuery() {
 		Query query = getQueryBuilder()
-					.keyword()
-					.onField( "nullableAge" )
-					.matching( 2 )
-					.createQuery();
+				.keyword()
+				.onField( "nullableAge" )
+				.matching( 2 )
+				.createQuery();
 
 		assertProjection( query, "title" ).matchesExactlySingleProjections( "title-two" );
 	}

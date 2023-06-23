@@ -123,7 +123,7 @@ public class ElasticsearchContentLengthIT {
 					postRequestedFor( urlPathLike( "/myIndex/myType" ) )
 							.withoutHeader( "Transfer-Encoding" )
 							.withHeader( "Content-length", equalTo( String.valueOf( BODY_PART_BYTE_SIZE ) ) )
-					);
+			);
 		}
 	}
 
@@ -140,7 +140,7 @@ public class ElasticsearchContentLengthIT {
 					postRequestedFor( urlPathLike( "/myIndex/myType" ) )
 							.withoutHeader( "Transfer-Encoding" )
 							.withHeader( "Content-length", equalTo( String.valueOf( bodyPartCount * BODY_PART_BYTE_SIZE ) ) )
-					);
+			);
 		}
 	}
 
@@ -194,7 +194,7 @@ public class ElasticsearchContentLengthIT {
 					postRequestedFor( urlPathLike( "/myIndex/myType" ) )
 							.withoutHeader( "Transfer-Encoding" )
 							.withHeader( "Content-length", equalTo( String.valueOf( bodyPartCount * BODY_PART_BYTE_SIZE ) ) )
-					);
+			);
 		}
 	}
 
@@ -226,7 +226,8 @@ public class ElasticsearchContentLengthIT {
 		return client.submit( buildRequest( ElasticsearchRequest.post(), path, bodyParts ) ).join();
 	}
 
-	private ElasticsearchRequest buildRequest(ElasticsearchRequest.Builder builder, String path, Collection<JsonObject> bodyParts) {
+	private ElasticsearchRequest buildRequest(ElasticsearchRequest.Builder builder, String path,
+			Collection<JsonObject> bodyParts) {
 		for ( String pathComponent : path.split( "/" ) ) {
 			if ( !pathComponent.isEmpty() ) {
 				URLEncodedString fromString = URLEncodedString.fromString( pathComponent );

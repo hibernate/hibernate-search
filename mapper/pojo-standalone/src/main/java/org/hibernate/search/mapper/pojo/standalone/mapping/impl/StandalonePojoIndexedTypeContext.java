@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSe
 
 class StandalonePojoIndexedTypeContext<E> extends AbstractStandalonePojoTypeContext<E>
 		implements ProjectionMappedTypeContext,
-				StandalonePojoScopeIndexedTypeContext<E>, StandalonePojoSessionIndexedTypeContext<E> {
+		StandalonePojoScopeIndexedTypeContext<E>, StandalonePojoSessionIndexedTypeContext<E> {
 
 	private final MappedIndexManager indexManager;
 

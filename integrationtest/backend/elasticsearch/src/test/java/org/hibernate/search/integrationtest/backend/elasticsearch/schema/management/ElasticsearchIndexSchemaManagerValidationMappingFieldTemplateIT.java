@@ -91,9 +91,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		setupAndValidate( index );
@@ -121,9 +121,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
@@ -163,9 +163,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
@@ -201,9 +201,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
@@ -236,9 +236,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
@@ -268,9 +268,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
@@ -299,9 +299,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
@@ -328,9 +328,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
@@ -357,9 +357,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
@@ -387,9 +387,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
@@ -417,9 +417,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
@@ -447,9 +447,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
@@ -476,9 +476,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )

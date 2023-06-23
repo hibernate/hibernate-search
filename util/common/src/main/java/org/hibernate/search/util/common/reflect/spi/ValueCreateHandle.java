@@ -16,7 +16,7 @@ import java.util.function.Function;
  */
 public interface ValueCreateHandle<T> extends Function<Object[], T> {
 
-	T create(Object ... arguments);
+	T create(Object... arguments);
 
 	@Override
 	default T apply(Object[] objects) {

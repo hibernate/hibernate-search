@@ -16,11 +16,10 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.
 
 public final class StubIndexRoot
 		extends AbstractIndexRoot<
-						StubIndexRoot,
-						StubSearchIndexScope,
-						StubIndexCompositeNodeType,
-						StubIndexField
-				>
+				StubIndexRoot,
+				StubSearchIndexScope,
+				StubIndexCompositeNodeType,
+				StubIndexField>
 		implements StubIndexCompositeNode {
 
 	private final StubIndexSchemaDataNode schemaData;

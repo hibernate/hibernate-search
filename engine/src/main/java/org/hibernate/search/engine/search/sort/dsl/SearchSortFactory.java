@@ -86,7 +86,8 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "distance" sort can be defined in more details.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	default DistanceSortOptionsStep<?, ? extends SearchPredicateFactory> distance(String fieldPath, double latitude, double longitude) {
+	default DistanceSortOptionsStep<?, ? extends SearchPredicateFactory> distance(String fieldPath, double latitude,
+			double longitude) {
 		return distance( fieldPath, GeoPoint.of( latitude, longitude ) );
 	}
 

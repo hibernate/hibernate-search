@@ -106,7 +106,7 @@ public abstract class AbstractCloser<S, E extends Exception> {
 	 * @return {@code this}, for method chaining.
 	 */
 	@SafeVarargs
-	public final <T> S pushAll(ClosingOperator<T, ? extends E> operator, T ... objectsToClose) {
+	public final <T> S pushAll(ClosingOperator<T, ? extends E> operator, T... objectsToClose) {
 		for ( T objectToClose : objectsToClose ) {
 			push( operator, objectToClose );
 		}

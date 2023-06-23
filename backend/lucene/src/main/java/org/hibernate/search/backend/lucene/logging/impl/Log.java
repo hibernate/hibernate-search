@@ -104,7 +104,8 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 75,
 			value = "Missing value for configuration property '%1$s': using LATEST (currently '%2$s'). %3$s")
-	void recommendConfiguringLuceneVersion(String key, Version latest, @FormatWith(EventContextFormatter.class) EventContext context);
+	void recommendConfiguringLuceneVersion(String key, Version latest,
+			@FormatWith(EventContextFormatter.class) EventContext context);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 114,
 			value = "Resource does not exist in classpath: '%1$s'")
@@ -124,19 +125,19 @@ public interface Log extends BasicLogger {
 	void lockingFailureDuringInitialization(String directoryDescription, @Param EventContext context, @Cause Exception e);
 
 	@LogMessage(level = TRACE)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 226, value = "%s: %s" )
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 226, value = "%s: %s")
 	void logInfoStreamMessage(String componentName, String message);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 228,
-			value = "Unable to parse '%1$ss' into a Lucene version: %2$s" )
+			value = "Unable to parse '%1$ss' into a Lucene version: %2$s")
 	SearchException illegalLuceneVersionFormat(String property, String luceneErrorMessage, @Cause Exception e);
 
 	@LogMessage(level = TRACE)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 274, value = "Executing Lucene query: %s" )
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 274, value = "Executing Lucene query: %s")
 	void executingLuceneQuery(Query luceneQuery);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 284,
-			value = "Unable to open index readers: %1$s" )
+			value = "Unable to open index readers: %1$s")
 	SearchException unableToOpenIndexReaders(String causeMessage, @Param EventContext context, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 329,
@@ -200,7 +201,8 @@ public interface Log extends BasicLogger {
 	SearchException unableToInitializeIndexDirectory(String causeMessage,
 			@Param EventContext context, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET + 16, value = "Unable to index entity of type '%2$s' with identifier '%3$s' and tenant identifier '%1$s': %4$s")
+	@Message(id = ID_OFFSET + 16,
+			value = "Unable to index entity of type '%2$s' with identifier '%3$s' and tenant identifier '%1$s': %4$s")
 	SearchException unableToIndexEntry(String tenantId, String entityTypeName, Object entityIdentifier,
 			String causeMessage, @Param EventContext context, @Cause Exception cause);
 
@@ -341,7 +343,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 75,
 			value = "Invalid use of explain(Object id) on a query targeting multiple types."
-					+ " Use explain(String typeName, Object id) and pass one of %1$s as the type name." )
+					+ " Use explain(String typeName, Object id) and pass one of %1$s as the type name.")
 	SearchException explainRequiresTypeName(Set<String> targetedTypeNames);
 
 	@Message(id = ID_OFFSET + 76,
@@ -374,13 +376,14 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 82,
 			value = "Invalid index field type: decimal scale '%1$s' is positive."
-						+ " The decimal scale of BigInteger fields must be zero or negative.")
+					+ " The decimal scale of BigInteger fields must be zero or negative.")
 	SearchException invalidDecimalScale(Integer decimalScale, @Param EventContext eventContext);
 
 	@Message(id = ID_OFFSET + 84,
 			value = "Invalid search predicate: '%1$s'. You must build the predicate from a scope targeting indexes %3$s,"
 					+ " but the given predicate was built from a scope targeting indexes %2$s.")
-	SearchException predicateDefinedOnDifferentIndexes(SearchPredicate predicate, Set<String> predicateIndexes, Set<String> scopeIndexes);
+	SearchException predicateDefinedOnDifferentIndexes(SearchPredicate predicate, Set<String> predicateIndexes,
+			Set<String> scopeIndexes);
 
 	@Message(id = ID_OFFSET + 85,
 			value = "Invalid search sort: '%1$s'. You must build the sort from a scope targeting indexes %3$s,"
@@ -390,7 +393,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 86,
 			value = "Invalid search projection: '%1$s'. You must build the projection from a scope targeting indexes %3$s,"
 					+ " but the given projection was built from a scope targeting indexes %2$s.")
-	SearchException projectionDefinedOnDifferentIndexes(SearchProjection<?> predicate, Set<String> predicateIndexes, Set<String> scopeIndexes);
+	SearchException projectionDefinedOnDifferentIndexes(SearchProjection<?> predicate, Set<String> predicateIndexes,
+			Set<String> scopeIndexes);
 
 	@Message(id = ID_OFFSET + 87,
 			value = "Invalid filesystem access strategy name: '%1$s'. Valid names are: %2$s.")
@@ -440,8 +444,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 104,
 			value = "Invalid index field type: search analyzer '%1$s' is assigned to this type,"
-				+ " but the indexing analyzer is missing."
-				+ " Assign an indexing analyzer and a search analyzer, or remove the search analyzer.")
+					+ " but the indexing analyzer is missing."
+					+ " Assign an indexing analyzer and a search analyzer, or remove the search analyzer.")
 	SearchException searchAnalyzerWithoutAnalyzer(String searchAnalyzer, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 108,
@@ -628,7 +632,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 156, value = "Nonblocking operation submitter is not supported.")
 	SearchException nonblockingOperationSubmitterNotSupported();
 
-	@Message(id = ID_OFFSET + 157, value = "Unable to export the schema for '%1$s' index: %2$s" )
+	@Message(id = ID_OFFSET + 157, value = "Unable to export the schema for '%1$s' index: %2$s")
 	SearchException unableToExportSchema(String indexName, String message, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 158,
@@ -638,12 +642,14 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 159,
 			value = "Invalid highlighter: '%1$s'. You must build the highlighter from a scope targeting indexes %3$s,"
 					+ " but the given highlighter was built from a scope targeting indexes %2$s.")
-	SearchException queryHighlighterDefinedOnDifferentIndexes(SearchHighlighter highlighter, Set<String> indexNames, Set<String> hibernateSearchIndexNames);
+	SearchException queryHighlighterDefinedOnDifferentIndexes(SearchHighlighter highlighter, Set<String> indexNames,
+			Set<String> hibernateSearchIndexNames);
 
 	@Message(id = ID_OFFSET + 160,
 			value = "Overriding a '%2$s' highlighter with a '%1$s' is not supported. " +
 					"Overriding highlighters should be of the same type as the global is if the global highlighter was configured.")
-	SearchException cannotMixDifferentHighlighterTypesAtOverrideLevel(SearchHighlighterType override, SearchHighlighterType parent);
+	SearchException cannotMixDifferentHighlighterTypesAtOverrideLevel(SearchHighlighterType override,
+			SearchHighlighterType parent);
 
 	@Message(id = ID_OFFSET + 161,
 			value = "Cannot find a highlighter with name '%1$s'." +

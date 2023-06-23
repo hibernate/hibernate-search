@@ -145,7 +145,8 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 
 		@Override
 		public List<String> highlight(int doc) throws IOException {
-			List<TextFragment> highlights = highlighter.highlightField( fieldsIn, query, leafReaderContext.docBase + doc, maxPassagesIn );
+			List<TextFragment> highlights =
+					highlighter.highlightField( fieldsIn, query, leafReaderContext.docBase + doc, maxPassagesIn );
 			if ( highlights == null ) {
 				return Collections.emptyList();
 			}
@@ -168,10 +169,12 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 			super( indexSearcher, indexAnalyzer );
 		}
 
-		@SuppressWarnings( "unchecked" )
-		public List<TextFragment> highlightField(String[] fieldIn, Query query, int doc, int[] maxPassagesIn) throws IOException {
+		@SuppressWarnings("unchecked")
+		public List<TextFragment> highlightField(String[] fieldIn, Query query, int doc, int[] maxPassagesIn)
+				throws IOException {
 			assert fieldIn.length == 1;
-			return (List<TextFragment>) highlightFieldsAsObjects( fieldIn, query, new int[] { doc }, maxPassagesIn ).get( fieldIn[0] )[0];
+			return (List<TextFragment>) highlightFieldsAsObjects( fieldIn, query, new int[] { doc }, maxPassagesIn )
+					.get( fieldIn[0] )[0];
 		}
 	}
 
@@ -243,6 +246,7 @@ class LuceneUnifiedSearchHighlighter extends LuceneAbstractSearchHighlighter {
 
 		private final String highlightedText;
 		private final float score;
+
 		public TextFragment(String highlightedText, float score) {
 			this.highlightedText = highlightedText;
 			this.score = score;

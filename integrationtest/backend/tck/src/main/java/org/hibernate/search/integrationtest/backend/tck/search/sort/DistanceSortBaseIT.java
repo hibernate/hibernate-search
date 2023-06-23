@@ -134,7 +134,8 @@ public class DistanceSortBaseIT {
 		dataSet = dataSetForAsc;
 		query = simpleQuery( dataSet, b -> b.distance( fieldPath, CENTER_POINT ) );
 		assertThatQuery( query )
-				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id,
+						dataSet.emptyDoc1Id );
 
 		dataSet = dataSetForAsc;
 		query = simpleQuery(
@@ -142,7 +143,8 @@ public class DistanceSortBaseIT {
 				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
 		);
 		assertThatQuery( query )
-				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id,
+						dataSet.emptyDoc1Id );
 
 		dataSet = dataSetForAsc;
 		query = simpleQuery(
@@ -151,7 +153,8 @@ public class DistanceSortBaseIT {
 						.asc()
 		);
 		assertThatQuery( query )
-				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id,
+						dataSet.emptyDoc1Id );
 
 		dataSet = dataSetForDesc;
 		query = simpleQuery(
@@ -159,7 +162,8 @@ public class DistanceSortBaseIT {
 				b -> b.distance( fieldPath, CENTER_POINT ).desc()
 		);
 		assertThatQuery( query )
-				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id,
+						dataSet.doc1Id );
 
 		dataSet = dataSetForDesc;
 		query = simpleQuery(
@@ -168,7 +172,8 @@ public class DistanceSortBaseIT {
 						.desc()
 		);
 		assertThatQuery( query )
-				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id,
+						dataSet.doc1Id );
 	}
 
 	@Test
@@ -187,7 +192,8 @@ public class DistanceSortBaseIT {
 						.asc().missing().last()
 		);
 		assertThatQuery( query )
-				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id,
+						dataSet.emptyDoc1Id );
 
 		if ( !TckConfiguration.get().getBackendFeatures().geoDistanceSortingSupportsConfigurableMissingValues() ) {
 			assertThatThrownBy( () -> simpleQuery(
@@ -207,7 +213,8 @@ public class DistanceSortBaseIT {
 							.desc().missing().last()
 			);
 			assertThatQuery( query )
-					.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id, dataSet.emptyDoc1Id );
+					.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id,
+							dataSet.emptyDoc1Id );
 		}
 
 		// Explicit order with missing().lowest()
@@ -238,7 +245,8 @@ public class DistanceSortBaseIT {
 							.asc().missing().lowest()
 			);
 			assertThatQuery( query )
-					.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id );
+					.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc1Id, dataSet.doc2Id,
+							dataSet.doc3Id );
 
 			dataSet = dataSetForDesc;
 			query = simpleQuery(
@@ -247,7 +255,8 @@ public class DistanceSortBaseIT {
 							.desc().missing().lowest()
 			);
 			assertThatQuery( query )
-					.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id, dataSet.emptyDoc1Id );
+					.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id,
+							dataSet.emptyDoc1Id );
 		}
 
 		// Explicit order with missing().first()
@@ -258,7 +267,8 @@ public class DistanceSortBaseIT {
 						.desc().missing().first()
 		);
 		assertThatQuery( query )
-				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id,
+						dataSet.doc1Id );
 
 		if ( !TckConfiguration.get().getBackendFeatures().geoDistanceSortingSupportsConfigurableMissingValues() ) {
 			// explicit .asc()
@@ -289,7 +299,8 @@ public class DistanceSortBaseIT {
 							.asc().missing().first()
 			);
 			assertThatQuery( query )
-					.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id );
+					.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc1Id, dataSet.doc2Id,
+							dataSet.doc3Id );
 		}
 
 		// Explicit order with missing().highest()
@@ -300,7 +311,8 @@ public class DistanceSortBaseIT {
 						.desc().missing().highest()
 		);
 		assertThatQuery( query )
-				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id,
+						dataSet.doc1Id );
 
 		dataSet = dataSetForAsc;
 		query = simpleQuery(
@@ -309,7 +321,8 @@ public class DistanceSortBaseIT {
 						.asc().missing().highest()
 		);
 		assertThatQuery( query )
-				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id,
+						dataSet.emptyDoc1Id );
 
 		// Explicit order with missing().use( ... )
 		if ( !TckConfiguration.get().getBackendFeatures().geoDistanceSortingSupportsConfigurableMissingValues() ) {
@@ -333,7 +346,8 @@ public class DistanceSortBaseIT {
 						.asc().missing().use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) )
 		);
 		assertThatQuery( query )
-				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id );
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc1Id, dataSet.doc2Id,
+						dataSet.doc3Id );
 
 		dataSet = dataSetForAsc;
 		query = simpleQuery(
@@ -342,7 +356,8 @@ public class DistanceSortBaseIT {
 						.asc().missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) )
 		);
 		assertThatQuery( query )
-				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.emptyDoc1Id, dataSet.doc2Id, dataSet.doc3Id );
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.emptyDoc1Id, dataSet.doc2Id,
+						dataSet.doc3Id );
 
 		dataSet = dataSetForAsc;
 		query = simpleQuery(
@@ -351,7 +366,8 @@ public class DistanceSortBaseIT {
 						.asc().missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ) )
 		);
 		assertThatQuery( query )
-				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.emptyDoc1Id, dataSet.doc3Id );
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.emptyDoc1Id,
+						dataSet.doc3Id );
 
 		dataSet = dataSetForAsc;
 		query = simpleQuery(
@@ -360,7 +376,8 @@ public class DistanceSortBaseIT {
 						.asc().missing().use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ) )
 		);
 		assertThatQuery( query )
-				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id,
+						dataSet.emptyDoc1Id );
 	}
 
 	@Test
@@ -415,9 +432,10 @@ public class DistanceSortBaseIT {
 		assertThatQuery( index.query()
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
-				.sort( ( (Function<SearchSortFactory, DistanceSortOptionsStep<?, ?>>)
-						f -> f.withRoot( parentObjectBinding.absolutePath )
-								.distance( parentObjectBinding.getRelativeFieldName( fieldStructure, fieldType ), CENTER_POINT ) )
+				.sort( ( (Function<SearchSortFactory,
+						DistanceSortOptionsStep<?, ?>>) f -> f.withRoot( parentObjectBinding.absolutePath )
+								.distance( parentObjectBinding.getRelativeFieldName( fieldStructure, fieldType ),
+										CENTER_POINT ) )
 						.andThen( this::applySortMode )
 						// Don't call this.applyFilter: we need to use the relative name of the discriminator field.
 						.andThen( optionsStep -> {

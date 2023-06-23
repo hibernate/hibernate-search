@@ -43,7 +43,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Documented
 @Deprecated
 @Repeatable(Fields.class)
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = FieldAnnotationProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = FieldAnnotationProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface Field {
 
 	/**

@@ -236,7 +236,8 @@ public class SearchMappingIT {
 				.hasMessageContainingAll(
 						"No index manager with name 'invalid'",
 						"Check that at least one entity is configured to target that index",
-						"The following indexes can be retrieved by name: [" + Person.INDEX_NAME + ", " + Pet.JPA_ENTITY_NAME + "]"
+						"The following indexes can be retrieved by name: [" + Person.INDEX_NAME + ", " + Pet.JPA_ENTITY_NAME
+								+ "]"
 				);
 	}
 
@@ -296,6 +297,7 @@ public class SearchMappingIT {
 		public Integer getId() {
 			return id;
 		}
+
 		public String getName() {
 			return name;
 		}
@@ -319,9 +321,11 @@ public class SearchMappingIT {
 		public Integer getId() {
 			return id;
 		}
+
 		public String getNickname() {
 			return nickname;
 		}
+
 		public List<Toy> getToys() {
 			return toys;
 		}
@@ -344,9 +348,11 @@ public class SearchMappingIT {
 		public Integer getId() {
 			return id;
 		}
+
 		public String getName() {
 			return name;
 		}
+
 		public Pet getOwner() {
 			return owner;
 		}

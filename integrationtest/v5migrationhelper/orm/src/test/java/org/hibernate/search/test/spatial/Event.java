@@ -65,7 +65,7 @@ public class Event {
 		};
 	}
 
-	public Event( Integer id, String name, double latitude, double longitude, Date date ) {
+	public Event(Integer id, String name, double latitude, double longitude, Date date) {
 		this.id = id;
 		this.name = name;
 		this.latitude = latitude;

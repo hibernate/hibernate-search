@@ -150,7 +150,7 @@ public class ToHibernateOrmQueryIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.of(
 							6L,
 							reference( IndexedEntity.NAME, "1" ),
@@ -175,7 +175,7 @@ public class ToHibernateOrmQueryIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.of(
 							1L,
 							reference( IndexedEntity.NAME, "1" )
@@ -188,7 +188,7 @@ public class ToHibernateOrmQueryIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.empty()
 			);
 			result = query.uniqueResult();
@@ -197,7 +197,7 @@ public class ToHibernateOrmQueryIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.of(
 							2L,
 							reference( IndexedEntity.NAME, "1" ),
@@ -210,7 +210,7 @@ public class ToHibernateOrmQueryIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.of(
 							2L,
 							reference( IndexedEntity.NAME, "1" ),
@@ -449,7 +449,7 @@ public class ToHibernateOrmQueryIT {
 			query.setHint( "javax.persistence.loadgraph", session.getEntityGraph( IndexedEntity.GRAPH_EAGER ) );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.NAME ), b -> { },
+					Arrays.asList( IndexedEntity.NAME ), b -> {},
 					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
 			);
 

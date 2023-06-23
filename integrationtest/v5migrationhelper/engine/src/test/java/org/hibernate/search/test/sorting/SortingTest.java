@@ -135,7 +135,7 @@ public class SortingTest {
 				new Person( 0, 3, "Three", new CuddlyToy( "Hippo" ) ),
 				new Person( 1, 10, "Ten", new CuddlyToy( "Giraffe" ) ),
 				new Person( 2, 9, "Nine", new CuddlyToy( "Gorilla" ) ),
-				new Person( 3, 5, "Five" , new CuddlyToy( "Alligator" ) )
+				new Person( 3, 5, "Five", new CuddlyToy( "Alligator" ) )
 		);
 
 		Sort sortAsString = builder().sort().byField( "favoriteCuddlyToy.type" ).createSort();
@@ -235,8 +235,8 @@ public class SortingTest {
 				@org.hibernate.search.annotations.SortableField(forField = "ageForNullChecks")
 		})
 		@Fields({
-			@Field(name = "ageForIntSorting", store = Store.YES, analyze = Analyze.NO),
-			@Field(name = "ageForNullChecks", store = Store.YES, analyze = Analyze.NO, indexNullAs = "-1")
+				@Field(name = "ageForIntSorting", store = Store.YES, analyze = Analyze.NO),
+				@Field(name = "ageForNullChecks", store = Store.YES, analyze = Analyze.NO, indexNullAs = "-1")
 		})
 		final Integer age;
 		@Field(name = "ageForStringSorting", store = Store.YES, analyze = Analyze.NO)
@@ -249,7 +249,8 @@ public class SortingTest {
 		})
 		@Fields({
 				@Field(name = "name", store = Store.YES, analyze = Analyze.NO, indexNullAs = "_null_"),
-				@Field(name = "collatedName", store = Store.YES, normalizer = @Normalizer(definition = COLLATING_NORMALIZER_NAME))
+				@Field(name = "collatedName", store = Store.YES,
+						normalizer = @Normalizer(definition = COLLATING_NORMALIZER_NAME))
 		})
 		final String name;
 

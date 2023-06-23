@@ -142,10 +142,12 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 	private static final class ChainedFieldAcceptor implements FieldAcceptor {
 		final FieldAcceptor next;
 		final String acceptedFieldName;
+
 		ChainedFieldAcceptor(FieldAcceptor next, String acceptedFieldName) {
 			this.next = next;
 			this.acceptedFieldName = acceptedFieldName;
 		}
+
 		@Override
 		public Status acceptField(final String fieldName) {
 			if ( acceptedFieldName.equals( fieldName ) ) {

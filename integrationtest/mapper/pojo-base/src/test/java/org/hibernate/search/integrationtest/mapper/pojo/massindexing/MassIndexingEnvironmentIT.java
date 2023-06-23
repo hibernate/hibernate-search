@@ -41,8 +41,8 @@ public class MassIndexingEnvironmentIT {
 	public final BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public final StandalonePojoMappingSetupHelper setupHelper
-			= StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public final StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private SearchMapping mapping;
 
@@ -89,10 +89,9 @@ public class MassIndexingEnvironmentIT {
 					} );
 
 			backendMock.expectWorks(
-							Entity.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
-					)
-					.add( "1", b -> {
-					} );
+					Entity.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+			)
+					.add( "1", b -> {} );
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:

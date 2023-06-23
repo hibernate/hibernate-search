@@ -30,7 +30,8 @@ public class InvalidPrefixCase {
 	public int id;
 
 	@ManyToOne
-	@IndexedEmbedded(includePaths = { "b.c.indexed", // valid
+	@IndexedEmbedded(includePaths = {
+			"b.c.indexed", // valid
 			"a.b.c.indexed" // invalid, prefix of a. is not necessary, as path is relative to a
 	})
 	public A a;

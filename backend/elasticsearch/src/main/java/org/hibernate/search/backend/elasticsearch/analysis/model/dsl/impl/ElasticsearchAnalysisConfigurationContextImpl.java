@@ -48,7 +48,7 @@ public class ElasticsearchAnalysisConfigurationContextImpl
 	public ElasticsearchNormalizerTypeStep normalizer(String name) {
 		return () -> {
 			ElasticsearchNormalizerComponentsStep context =
-				new ElasticsearchNormalizerComponentsStep( name );
+					new ElasticsearchNormalizerComponentsStep( name );
 			children.add( context );
 			return context;
 		};

@@ -83,7 +83,7 @@ public class SessionTest extends SearchTestBase {
 	}
 
 	@Override
-	public void configure(Map<String,Object> cfg) {
+	public void configure(Map<String, Object> cfg) {
 		// for this test we explicitly set the auto commit mode since we are not explicitly starting a transaction
 		// which could be a problem in some databases.
 		cfg.put( "hibernate.connection.autocommit", "true" );

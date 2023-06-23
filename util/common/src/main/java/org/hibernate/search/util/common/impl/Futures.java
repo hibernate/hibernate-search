@@ -131,7 +131,8 @@ public final class Futures {
 	 * @param delegate The composition function to delegate to.
 	 * @return The new, delegating composition function .
 	 */
-	public static <T, R> Function<T, CompletionStage<R>> safeComposer(Function<? super T, ? extends CompletionStage<R>> delegate) {
+	public static <T, R> Function<T, CompletionStage<R>> safeComposer(
+			Function<? super T, ? extends CompletionStage<R>> delegate) {
 		return result -> {
 			try {
 				return delegate.apply( result );
@@ -155,7 +156,8 @@ public final class Futures {
 	 * @return A completable future that will be complete once {@code self} finished executing and
 	 * {@code action} and its resulting future finished executing.
 	 */
-	public static <T> CompletableFuture<T> whenCompleteExecute(CompletableFuture<?> self, Supplier<? extends CompletionStage<T>> action) {
+	public static <T> CompletableFuture<T> whenCompleteExecute(CompletableFuture<?> self,
+			Supplier<? extends CompletionStage<T>> action) {
 		return self.handle( handler( (result, throwable) -> throwable ) )
 				.thenCompose( throwable -> {
 					CompletionStage<T> stage;

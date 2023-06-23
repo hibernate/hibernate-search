@@ -61,7 +61,9 @@ public abstract class AbstractFacet implements Facet {
 		if ( facetingName != null ? !facetingName.equals( that.facetingName ) : that.facetingName != null ) {
 			return false;
 		}
-		if ( absoluteFieldPath != null ? !absoluteFieldPath.equals( that.absoluteFieldPath ) : that.absoluteFieldPath != null ) {
+		if ( absoluteFieldPath != null
+				? !absoluteFieldPath.equals( that.absoluteFieldPath )
+				: that.absoluteFieldPath != null ) {
 			return false;
 		}
 		if ( value != null ? !value.equals( that.value ) : that.value != null ) {
@@ -91,5 +93,4 @@ public abstract class AbstractFacet implements Facet {
 		return sb.toString();
 	}
 }
-
 

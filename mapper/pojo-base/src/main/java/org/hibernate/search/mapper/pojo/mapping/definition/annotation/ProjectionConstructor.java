@@ -33,7 +33,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Target({ ElementType.CONSTRUCTOR, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @RootMapping
-@ConstructorMapping(processor = @ConstructorMappingAnnotationProcessorRef(type = ProjectionConstructorProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
-@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = ProjectionConstructorProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@ConstructorMapping(processor = @ConstructorMappingAnnotationProcessorRef(type = ProjectionConstructorProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
+@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = ProjectionConstructorProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface ProjectionConstructor {
 }

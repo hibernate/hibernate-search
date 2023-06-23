@@ -47,7 +47,8 @@ public class LuceneNormalizeWildcardExpressionsIT {
 	private static final String PATTERN_1_AND_2 = PATTERN_1 + " " + PATTERN_2;
 
 	private static final String TEXT_MATCHING_PATTERN_1 = "Localization in English is a must-have.";
-	private static final String TEXT_MATCHING_PATTERN_2 = "Internationalization allows to adapt the application to multiple locales.";
+	private static final String TEXT_MATCHING_PATTERN_2 =
+			"Internationalization allows to adapt the application to multiple locales.";
 	private static final String TEXT_MATCHING_PATTERN_3 = "A had to call the landlord.";
 	private static final String TEXT_MATCHING_PATTERN_2_AND_3 = "I had some interaction with that lad.";
 
@@ -111,7 +112,9 @@ public class LuceneNormalizeWildcardExpressionsIT {
 		final IndexFieldReference<String> analyzed;
 
 		IndexBinding(IndexSchemaElement root) {
-			analyzed = root.field( "analyzed", c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) )
+			analyzed = root
+					.field( "analyzed",
+							c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) )
 					.toReference();
 		}
 	}

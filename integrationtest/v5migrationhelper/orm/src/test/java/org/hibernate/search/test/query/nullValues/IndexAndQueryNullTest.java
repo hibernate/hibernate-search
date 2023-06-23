@@ -103,7 +103,8 @@ public class IndexAndQueryNullTest extends SearchTestBase {
 		fullTextSession.close();
 	}
 
-	private void searchKeywordWithExpectedNumberOfResults(FullTextSession fullTextSession, String fieldName, String termValue, int expectedNumberOfResults)
+	private void searchKeywordWithExpectedNumberOfResults(FullTextSession fullTextSession, String fieldName, String termValue,
+			int expectedNumberOfResults)
 			throws Exception {
 		TermQuery query = new TermQuery( new Term( fieldName, termValue ) );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Value.class );

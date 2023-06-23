@@ -172,64 +172,64 @@ public class BytecodeEnhancementIT {
 							.field( "primitiveDouble", 42.0d )
 							.field( "transientText", "initialValue" )
 					);
-			} );
+		} );
 
-			AtomicReference<IndexedEntity> entityFromTransaction = new AtomicReference<>();
+		AtomicReference<IndexedEntity> entityFromTransaction = new AtomicReference<>();
 
-			with( sessionFactory ).runInTransaction( session -> {
-				IndexedEntity entity = session.getReference( IndexedEntity.class, 1 );
-				entityFromTransaction.set( entity );
+		with( sessionFactory ).runInTransaction( session -> {
+			IndexedEntity entity = session.getReference( IndexedEntity.class, 1 );
+			entityFromTransaction.set( entity );
 
-				assertOnlyLoadedPropertiesAre( entity, "id" );
-				// Because of HHH-10480, lazy loading through bytecode enhancement doesn't work on embeddables
-				assertOnlyLoadedPropertiesAre( entity.containedEmbeddable, "text" );
+			assertOnlyLoadedPropertiesAre( entity, "id" );
+			// Because of HHH-10480, lazy loading through bytecode enhancement doesn't work on embeddables
+			assertOnlyLoadedPropertiesAre( entity.containedEmbeddable, "text" );
 
-				// Trigger reindexing
-				entity.text1 = "updatedValue";
+			// Trigger reindexing
+			entity.text1 = "updatedValue";
 
-				assertOnlyLoadedPropertiesAre( entity, "id", "text1" );
-				// Because of HHH-10480, lazy loading through bytecode enhancement doesn't work on embeddables
-				assertOnlyLoadedPropertiesAre( entity.containedEmbeddable, "text" );
+			assertOnlyLoadedPropertiesAre( entity, "id", "text1" );
+			// Because of HHH-10480, lazy loading through bytecode enhancement doesn't work on embeddables
+			assertOnlyLoadedPropertiesAre( entity.containedEmbeddable, "text" );
 
-				// Expect all properties to be correctly loaded, even though we're using bytecode enhancement
-				backendMock.expectWorks( IndexedEntity.INDEX )
-						.addOrUpdate( "1", b -> b
-								.field( "mappedSuperClassText", "initialValue" )
-								.field( "entitySuperClassText", "initialValue" )
-								.field( "id", 1 )
-								.objectField( "containedEntityList", b2 -> b2
-										.field( "text", "initialValue1" )
-								)
-								.objectField( "containedEntityList", b2 -> b2
-										.field( "text", "initialValue2" )
-								)
-								.objectField( "containedEmbeddable", b2 -> b2
-										.field( "text", "initialValue" )
-								)
-								.field( "text1", "updatedValue" )
-								.field( "text2", "initialValue" )
-								.field( "primitiveInteger", 42 )
-								.field( "primitiveLong", 42L )
-								.field( "primitiveBoolean", true )
-								.field( "primitiveFloat", 42.0f )
-								.field( "primitiveDouble", 42.0d )
-								.field( "transientText", null )
-						);
+			// Expect all properties to be correctly loaded, even though we're using bytecode enhancement
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.addOrUpdate( "1", b -> b
+							.field( "mappedSuperClassText", "initialValue" )
+							.field( "entitySuperClassText", "initialValue" )
+							.field( "id", 1 )
+							.objectField( "containedEntityList", b2 -> b2
+									.field( "text", "initialValue1" )
+							)
+							.objectField( "containedEntityList", b2 -> b2
+									.field( "text", "initialValue2" )
+							)
+							.objectField( "containedEmbeddable", b2 -> b2
+									.field( "text", "initialValue" )
+							)
+							.field( "text1", "updatedValue" )
+							.field( "text2", "initialValue" )
+							.field( "primitiveInteger", 42 )
+							.field( "primitiveLong", 42L )
+							.field( "primitiveBoolean", true )
+							.field( "primitiveFloat", 42.0f )
+							.field( "primitiveDouble", 42.0d )
+							.field( "transientText", null )
+					);
 		} );
 
 		assertPropertiesAreNotLoaded( entityFromTransaction.get(), "notIndexedText" );
 	}
 
-	private static void assertOnlyLoadedPropertiesAre(IndexedEntity entity, String ... expectedLoadedProperties) {
+	private static void assertOnlyLoadedPropertiesAre(IndexedEntity entity, String... expectedLoadedProperties) {
 		assertOnlyLoadedPropertiesAre( entity, IndexedEntity.LAZY_PROPERTY_NAMES, expectedLoadedProperties );
 	}
 
-	private static void assertOnlyLoadedPropertiesAre(ContainedEmbeddable embeddable, String ... expectedLoadedProperties) {
+	private static void assertOnlyLoadedPropertiesAre(ContainedEmbeddable embeddable, String... expectedLoadedProperties) {
 		assertOnlyLoadedPropertiesAre( embeddable, ContainedEmbeddable.LAZY_PROPERTY_NAMES, expectedLoadedProperties );
 	}
 
 	private static void assertOnlyLoadedPropertiesAre(Object object, String[] allProperties,
-			String ... expectedLoadedProperties) {
+			String... expectedLoadedProperties) {
 		Set<String> expectedNotLoadedPropertyNames = new HashSet<>();
 		Set<String> expectedLoadedPropertyNames = CollectionHelper.asImmutableSet( expectedLoadedProperties );
 		Collections.addAll( expectedNotLoadedPropertyNames, allProperties );

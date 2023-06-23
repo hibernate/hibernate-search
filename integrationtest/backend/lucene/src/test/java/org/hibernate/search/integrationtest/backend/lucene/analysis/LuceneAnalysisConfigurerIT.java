@@ -161,6 +161,7 @@ public class LuceneAnalysisConfigurerIT {
 
 	public static class FailingConfigurer implements LuceneAnalysisConfigurer {
 		private static final String FAILURE_MESSAGE = "Simulated failure for " + FailingConfigurer.class.getName();
+
 		@Override
 		public void configure(LuceneAnalysisConfigurationContext context) {
 			throw new SimulatedFailure( FAILURE_MESSAGE );
@@ -195,9 +196,9 @@ public class LuceneAnalysisConfigurerIT {
 		public void configure(LuceneAnalysisConfigurationContext context) {
 			context.analyzer( "analyzerName" ).custom()
 					.tokenizer( WhitespaceTokenizerFactory.class )
-							.param( "parameterName", "value1" )
-							.param( "anotherParameterName", "someValue" )
-							.param( "parameterName", "value2" );
+					.param( "parameterName", "value1" )
+					.param( "anotherParameterName", "someValue" )
+					.param( "parameterName", "value2" );
 		}
 	}
 

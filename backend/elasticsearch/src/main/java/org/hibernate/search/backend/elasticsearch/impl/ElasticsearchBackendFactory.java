@@ -177,11 +177,11 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					}
 					return optionalName;
 				} ).orElseGet( () -> {
-			// set dynamic default
-			return ( buildContext.multiTenancyEnabled() ) ?
-					MultiTenancyStrategyName.DISCRIMINATOR :
-					MultiTenancyStrategyName.NONE;
-		} );
+					// set dynamic default
+					return ( buildContext.multiTenancyEnabled() )
+							? MultiTenancyStrategyName.DISCRIMINATOR
+							: MultiTenancyStrategyName.NONE;
+				} );
 
 		switch ( multiTenancyStrategy ) {
 			case NONE:

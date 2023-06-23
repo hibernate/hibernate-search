@@ -14,10 +14,10 @@ import org.hibernate.search.annotations.Store;
  */
 class Country {
 
-	@Field( store = Store.YES )
+	@Field(store = Store.YES)
 	private double idh;
 
-	@Field( store = Store.YES )
+	@Field(store = Store.YES)
 	private String name;
 
 	public Country(String name, double idh) {

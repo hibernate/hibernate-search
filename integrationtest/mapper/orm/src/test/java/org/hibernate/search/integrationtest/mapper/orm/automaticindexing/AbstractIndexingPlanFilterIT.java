@@ -56,15 +56,14 @@ public abstract class AbstractIndexingPlanFilterIT {
 	protected static final String DYNAMIC_NOT_INDEXED_SUBTYPE_B_B = "DynamicNotIndexedSubTypeB_B";
 
 
-
 	@ReusableOrmSetupHolder.Setup
 	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
-						.field( "indexedField", String.class )
-						.objectField(
-								"containedIndexedEmbedded", b2 -> b2.field( "indexedField", String.class ).multiValued( true )
-						)
+				.field( "indexedField", String.class )
+				.objectField(
+						"containedIndexedEmbedded", b2 -> b2.field( "indexedField", String.class ).multiValued( true )
 				)
+		)
 				.expectSchema( OtherIndexedEntity.INDEX, b -> b
 						.field( "indexedField", String.class )
 						.objectField(
@@ -111,7 +110,7 @@ public abstract class AbstractIndexingPlanFilterIT {
 						}
 				);
 		backendMock.expectSchema( DYNAMIC_BASE_TYPE_A, b -> b
-						.field( "propertyOfA", String.class ) )
+				.field( "propertyOfA", String.class ) )
 				.expectSchema( DYNAMIC_SUBTYPE_B, b -> b
 						.field( "propertyOfA", String.class )
 						.field( "propertyOfB", Integer.class ) )

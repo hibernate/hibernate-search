@@ -38,7 +38,8 @@ abstract class AbstractStubIndexCompositeNodeBuilder implements IndexCompositeNo
 	@Override
 	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> addField(String relativeFieldName,
 			TreeNodeInclusion inclusion, IndexFieldType<F> indexFieldType) {
-		StubIndexSchemaDataNode.Builder childSchemaNodeBuilder = StubIndexSchemaDataNode.field( schemaDataNodeBuilder, relativeFieldName );
+		StubIndexSchemaDataNode.Builder childSchemaNodeBuilder =
+				StubIndexSchemaDataNode.field( schemaDataNodeBuilder, relativeFieldName );
 		StubIndexValueFieldType<F> stubType = (StubIndexValueFieldType<F>) indexFieldType;
 		stubType.apply( childSchemaNodeBuilder );
 		if ( TreeNodeInclusion.INCLUDED.equals( inclusion ) ) {

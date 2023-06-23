@@ -60,7 +60,8 @@ public class ElasticsearchFieldProjection<F, V, P> extends AbstractElasticsearch
 		this.absoluteFieldPath = field.absolutePath();
 		this.absoluteFieldPathComponents = field.absolutePathComponents();
 		this.requiredContextAbsoluteFieldPath = accumulatorProvider.isSingleValued()
-				? field.closestMultiValuedParentAbsolutePath() : null;
+				? field.closestMultiValuedParentAbsolutePath()
+				: null;
 		this.decodeFunction = decodeFunction;
 		this.converter = converter;
 		this.accumulatorProvider = accumulatorProvider;

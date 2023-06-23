@@ -102,10 +102,12 @@ public class ProductModel {
 
 	@Field
 	@IndexingDependency(derivedFrom = {
-			@ObjectPath({@PropertyValue(propertyName = "mainReferenceCode"),
-					@PropertyValue(propertyName = "rawValue")}),
-			@ObjectPath({@PropertyValue(propertyName = "additionalReferenceCodes"),
-					@PropertyValue(propertyName = "rawValue")})
+			@ObjectPath({
+					@PropertyValue(propertyName = "mainReferenceCode"),
+					@PropertyValue(propertyName = "rawValue") }),
+			@ObjectPath({
+					@PropertyValue(propertyName = "additionalReferenceCodes"),
+					@PropertyValue(propertyName = "rawValue") })
 	})
 	public Collection<String> getProductReferenceCodeCollection() {
 		Collection<String> productReferenceCodeCollection = new ArrayList<String>();

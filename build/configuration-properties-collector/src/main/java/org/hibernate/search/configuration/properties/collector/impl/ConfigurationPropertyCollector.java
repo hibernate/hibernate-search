@@ -163,9 +163,7 @@ public class ConfigurationPropertyCollector {
 
 	private ConfigurationProperty.Type extractType(String className, String constant) {
 		String packageName = packagePrefix( className );
-		return SPI_PATTERN.matcher( packageName ).matches() ?
-				ConfigurationProperty.Type.SPI :
-				ConfigurationProperty.Type.API;
+		return SPI_PATTERN.matcher( packageName ).matches() ? ConfigurationProperty.Type.SPI : ConfigurationProperty.Type.API;
 	}
 
 	private String extractJavadoc(Document javadoc, String className, String constant) {

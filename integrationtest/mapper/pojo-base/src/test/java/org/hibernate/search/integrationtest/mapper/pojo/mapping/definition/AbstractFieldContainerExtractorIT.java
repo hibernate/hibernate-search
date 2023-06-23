@@ -54,7 +54,8 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private final TestModelProvider testModelProvider;
 
@@ -385,7 +386,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 
 	@SafeVarargs
 	final <E, P, F> void doTest(Supplier<StandalonePojoMappingSetupHelper.SetupContext> startSetup,
-				TestModel<E, P> testModel, Class<F> indexedFieldType, boolean multiValued,
+			TestModel<E, P> testModel, Class<F> indexedFieldType, boolean multiValued,
 			P propertyValue, F firstIndexedFieldValues, F... otherIndexedFieldValues) {
 		// Schema
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -421,7 +422,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 			session.indexingPlan().add( entity1 );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.add( "2", b -> { } );
+					.add( "2", b -> {} );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -447,7 +448,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 			session.indexingPlan().add( entity1 );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.add( "1", b -> { } );
+					.add( "1", b -> {} );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -462,6 +463,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 
 	public static class PrefixedStringBridge implements ValueBridge<String, String> {
 		public static final String PREFIX = "Prefix - ";
+
 		@Override
 		public String toIndexedValue(String value,
 				ValueBridgeToIndexedValueContext context) {
@@ -471,27 +473,49 @@ public abstract class AbstractFieldContainerExtractorIT {
 
 	interface TestModelProvider {
 		TestModel<?, String[]> objectArray();
+
 		TestModel<?, char[]> charArray();
+
 		TestModel<?, boolean[]> booleanArray();
+
 		TestModel<?, byte[]> byteArray();
+
 		TestModel<?, short[]> shortArray();
+
 		TestModel<?, int[]> intArray();
+
 		TestModel<?, long[]> longArray();
+
 		TestModel<?, float[]> floatArray();
+
 		TestModel<?, double[]> doubleArray();
+
 		TestModel<?, Iterable<String>> iterable();
+
 		TestModel<?, Collection<String>> collection();
+
 		TestModel<?, List<String>> list();
+
 		TestModel<?, Set<String>> set();
+
 		TestModel<?, SortedSet<String>> sortedSet();
+
 		TestModel<?, Map<String, String>> mapValues();
+
 		TestModel<?, SortedMap<String, String>> sortedMapValues();
+
 		TestModel<?, Map<String, List<String>>> mapListValues();
+
 		TestModel<?, Optional<String>> optional();
+
 		TestModel<?, OptionalDouble> optionalDouble();
+
 		TestModel<?, OptionalInt> optionalInt();
+
 		TestModel<?, OptionalLong> optionalLong();
+
 		TestModel<?, List<String>> list_explicitPrefixedStringBridge();
+
 		TestModel<?, List<MyEnum>> list_implicitEnumBridge();
 	}
 

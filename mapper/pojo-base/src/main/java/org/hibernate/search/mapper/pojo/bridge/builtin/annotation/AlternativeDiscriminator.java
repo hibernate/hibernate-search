@@ -24,9 +24,10 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * @see AlternativeBinder
  */
 @Incubating
-@Target( { ElementType.FIELD, ElementType.METHOD })
+@Target({ ElementType.FIELD, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = AlternativeDiscriminatorProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = AlternativeDiscriminatorProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface AlternativeDiscriminator {
 
 	/**

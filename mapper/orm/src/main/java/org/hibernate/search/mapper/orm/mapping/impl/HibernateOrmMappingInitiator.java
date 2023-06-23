@@ -57,11 +57,12 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 					.withDefault( HibernateOrmMapperSettings.Defaults.MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES )
 					.build();
 
-	private static final OptionalConfigurationProperty<List<BeanReference<? extends HibernateOrmSearchMappingConfigurer>>> MAPPING_CONFIGURER =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.MAPPING_CONFIGURER )
-					.asBeanReference( HibernateOrmSearchMappingConfigurer.class )
-					.multivalued()
-					.build();
+	private static final OptionalConfigurationProperty<
+			List<BeanReference<? extends HibernateOrmSearchMappingConfigurer>>> MAPPING_CONFIGURER =
+					ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.MAPPING_CONFIGURER )
+							.asBeanReference( HibernateOrmSearchMappingConfigurer.class )
+							.multivalued()
+							.build();
 
 	public static HibernateOrmMappingInitiator create(Metadata metadata, IndexView jandexIndex,
 			ReflectionManager reflectionManager,
@@ -108,7 +109,8 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		MultiTenancyStrategy multiTenancyStrategy =
 				MultiTenancyStrategy.determineMultiTenancyStrategy( ormConfigurationService.getSettings() );
 
-		tenancyMode( MultiTenancyStrategy.NONE.equals( multiTenancyStrategy ) ? TenancyMode.SINGLE_TENANCY
+		tenancyMode( MultiTenancyStrategy.NONE.equals( multiTenancyStrategy )
+				? TenancyMode.SINGLE_TENANCY
 				: TenancyMode.MULTI_TENANCY );
 
 		this.preIntegrationService = preIntegrationService;
@@ -148,7 +150,8 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 			annotationMapping()
 					.discoverAnnotatedTypesFromRootMappingAnnotations( true )
 					.discoverJandexIndexesFromAddedTypes( true )
-					.buildMissingDiscoveredJandexIndexes( MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES.get( propertySource ) )
+					.buildMissingDiscoveredJandexIndexes(
+							MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES.get( propertySource ) )
 					.discoverAnnotationsFromReferencedTypes( true );
 
 			AnnotationMappingConfigurationContext annotationMapping = annotationMapping();

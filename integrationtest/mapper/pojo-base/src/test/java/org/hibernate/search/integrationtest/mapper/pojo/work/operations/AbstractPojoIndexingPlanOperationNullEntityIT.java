@@ -81,7 +81,8 @@ public abstract class AbstractPojoIndexingPlanOperationNullEntityIT extends Abst
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
 
-			expectIndexedEntityLoadingIfRelevant( Collections.singletonList( 42 ), Collections.singletonList( IndexedEntity.of( 1 ) ) );
+			expectIndexedEntityLoadingIfRelevant( Collections.singletonList( 42 ),
+					Collections.singletonList( IndexedEntity.of( 1 ) ) );
 			expectOperation( futureFromBackend,
 					worksBeforeInSamePlan -> {
 						if ( !isAdd() ) {
@@ -97,8 +98,10 @@ public abstract class AbstractPojoIndexingPlanOperationNullEntityIT extends Abst
 								MyRoutingBridge.previousValues = Arrays.asList( "1", "foo", "3" );
 								worksBeforeInSamePlan
 										// "1" is ignored as it's the current value
-										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "foo" ) ) )
-										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "3" ) ) );
+										.delete( b -> addWorkInfo( b, tenantId, "42",
+												MyRoutingBridge.toRoutingKey( tenantId, 42, "foo" ) ) )
+										.delete( b -> addWorkInfo( b, tenantId, "42",
+												MyRoutingBridge.toRoutingKey( tenantId, 42, "3" ) ) );
 							}
 							// else: if implicit routing is disabled,
 							// since we don't provide any previous routes, we don't expect additional deletes.
@@ -119,7 +122,8 @@ public abstract class AbstractPojoIndexingPlanOperationNullEntityIT extends Abst
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
 
-			expectIndexedEntityLoadingIfRelevant( Collections.singletonList( 42 ), Collections.singletonList( IndexedEntity.of( 1 ) ) );
+			expectIndexedEntityLoadingIfRelevant( Collections.singletonList( 42 ),
+					Collections.singletonList( IndexedEntity.of( 1 ) ) );
 			expectOperation(
 					futureFromBackend,
 					worksBeforeInSamePlan -> {
@@ -139,8 +143,10 @@ public abstract class AbstractPojoIndexingPlanOperationNullEntityIT extends Abst
 								MyRoutingBridge.previousValues = Arrays.asList( "1", "foo", "3" );
 								worksBeforeInSamePlan
 										// "1" is ignored as it's the current value
-										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "foo" ) ) )
-										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "3" ) ) );
+										.delete( b -> addWorkInfo( b, tenantId, "42",
+												MyRoutingBridge.toRoutingKey( tenantId, 42, "foo" ) ) )
+										.delete( b -> addWorkInfo( b, tenantId, "42",
+												MyRoutingBridge.toRoutingKey( tenantId, 42, "3" ) ) );
 							}
 						}
 					},
@@ -202,14 +208,14 @@ public abstract class AbstractPojoIndexingPlanOperationNullEntityIT extends Abst
 			expectOperation(
 					futureFromBackend,
 					worksBeforeInSamePlan -> {
-							if ( !isAdd() ) {
-								// For operations other than add, expect a delete for every previous route distinct from the current one.
-								worksBeforeInSamePlan
-										.delete( b -> addWorkInfo( b, tenantId, "1",
-												MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) )
-										.delete( b -> addWorkInfo( b, tenantId, "1",
-												MyRoutingBridge.toRoutingKey( tenantId, 1, "3" ) ) );
-							}
+						if ( !isAdd() ) {
+							// For operations other than add, expect a delete for every previous route distinct from the current one.
+							worksBeforeInSamePlan
+									.delete( b -> addWorkInfo( b, tenantId, "1",
+											MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) )
+									.delete( b -> addWorkInfo( b, tenantId, "1",
+											MyRoutingBridge.toRoutingKey( tenantId, 1, "3" ) ) );
+						}
 					},
 					// And only then, expect the actual operation.
 					1, null, "1"

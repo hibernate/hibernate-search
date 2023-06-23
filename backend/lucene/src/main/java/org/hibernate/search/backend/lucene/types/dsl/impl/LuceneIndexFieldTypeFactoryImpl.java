@@ -47,7 +47,8 @@ public class LuceneIndexFieldTypeFactoryImpl
 	private final IndexFieldTypeDefaultsProvider typeDefaultsProvider;
 
 	public LuceneIndexFieldTypeFactoryImpl(EventContext eventContext,
-			BackendMapperContext backendMapperContext, LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexFieldTypeDefaultsProvider typeDefaultsProvider) {
+			BackendMapperContext backendMapperContext, LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
+			IndexFieldTypeDefaultsProvider typeDefaultsProvider) {
 		this.eventContext = eventContext;
 		this.backendMapperContext = backendMapperContext;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;

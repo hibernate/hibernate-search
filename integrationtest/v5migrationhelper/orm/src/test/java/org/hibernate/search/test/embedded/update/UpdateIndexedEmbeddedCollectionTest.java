@@ -146,26 +146,52 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestBase {
 		public Driver() {
 		}
 
-		@Id @GeneratedValue @DocumentId
-		public Long getId() { return id; }
-		public void setId(Long id) { this.id = id; }
+		@Id
+		@GeneratedValue
+		@DocumentId
+		public Long getId() {
+			return id;
+		}
+
+		public void setId(Long id) {
+			this.id = id;
+		}
+
 		private Long id;
 
 		@Field
-		public String getFirstName() { return firstName; }
-		public void setFirstName(String firstName) { this.firstName = firstName; }
+		public String getFirstName() {
+			return firstName;
+		}
+
+		public void setFirstName(String firstName) {
+			this.firstName = firstName;
+		}
+
 		private String firstName;
 
 		@Field
-		public String getLastName() { return lastName; }
-		public void setLastName(String lastName) { this.lastName = lastName; }
+		public String getLastName() {
+			return lastName;
+		}
+
+		public void setLastName(String lastName) {
+			this.lastName = lastName;
+		}
+
 		private String lastName;
 
 		@IndexedEmbedded(includeEmbeddedObjectId = true)
 		@OneToOne(cascade = CascadeType.ALL)
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
-		public Truck getTruck() { return truck; }
-		public void setTruck(Truck truck) { this.truck = truck; }
+		public Truck getTruck() {
+			return truck;
+		}
+
+		public void setTruck(Truck truck) {
+			this.truck = truck;
+		}
+
 		private Truck truck;
 	}
 
@@ -183,19 +209,38 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestBase {
 
 		@Id
 		@GeneratedValue
-		public Long getId() { return id; }
-		public void setId(Long id) { this.id = id; }
+		public Long getId() {
+			return id;
+		}
+
+		public void setId(Long id) {
+			this.id = id;
+		}
+
 		private Long id;
 
 		@Field
-		public String getNumberPlate() { return numberPlate; }
-		public void setNumberPlate(String numberPlate) { this.numberPlate = numberPlate; }
+		public String getNumberPlate() {
+			return numberPlate;
+		}
+
+		public void setNumberPlate(String numberPlate) {
+			this.numberPlate = numberPlate;
+		}
+
 		private String numberPlate;
 
-		@IndexedEmbedded @OneToMany(cascade = CascadeType.ALL)
+		@IndexedEmbedded
+		@OneToMany(cascade = CascadeType.ALL)
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
-		public Set<Item> getItems() { return items; }
-		public void setItems(Set<Item> items) { this.items = items; }
+		public Set<Item> getItems() {
+			return items;
+		}
+
+		public void setItems(Set<Item> items) {
+			this.items = items;
+		}
+
 		private Set<Item> items;
 	}
 
@@ -211,19 +256,39 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestBase {
 		public Item() {
 		}
 
-		@Id @GeneratedValue @DocumentId
-		public Long getId() { return id; }
-		public void setId(Long id) { this.id = id; }
+		@Id
+		@GeneratedValue
+		@DocumentId
+		public Long getId() {
+			return id;
+		}
+
+		public void setId(Long id) {
+			this.id = id;
+		}
+
 		private Long id;
 
 		@Field
-		public String getDescription() { return description; }
-		public void setDescription(String description) { this.description = description; }
+		public String getDescription() {
+			return description;
+		}
+
+		public void setDescription(String description) {
+			this.description = description;
+		}
+
 		private String description;
 
 		@Field
-		public Integer getQuantity() { return quantity; }
-		public void setQuantity(Integer quantity) { this.quantity = quantity; }
+		public Integer getQuantity() {
+			return quantity;
+		}
+
+		public void setQuantity(Integer quantity) {
+			this.quantity = quantity;
+		}
+
 		private Integer quantity;
 	}
 

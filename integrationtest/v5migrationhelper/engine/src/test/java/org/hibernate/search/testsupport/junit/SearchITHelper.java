@@ -72,7 +72,7 @@ public class SearchITHelper {
 		add().push( entries ).execute();
 	}
 
-	public void add(Object ... entries) {
+	public void add(Object... entries) {
 		add().push( entries ).execute();
 	}
 
@@ -88,7 +88,7 @@ public class SearchITHelper {
 		index().push( entries ).execute();
 	}
 
-	public void index(Object ... entries) {
+	public void index(Object... entries) {
 		index().push( entries ).execute();
 	}
 
@@ -104,7 +104,7 @@ public class SearchITHelper {
 		delete().push( type, ids ).execute();
 	}
 
-	public void delete(Class<?> type, Serializable ... ids) {
+	public void delete(Class<?> type, Serializable... ids) {
 		delete().push( type, ids ).execute();
 	}
 
@@ -116,11 +116,11 @@ public class SearchITHelper {
 		return new V5MigrationStandalonePojoSearchSessionAdapter( sfHolder.getMapping().createSession() );
 	}
 
-	public HSQuery hsQuery(Class<?> ... classes) {
+	public HSQuery hsQuery(Class<?>... classes) {
 		return hsQuery( new MatchAllDocsQuery(), classes );
 	}
 
-	public HSQuery hsQuery(Query query, Class<?> ... classes) {
+	public HSQuery hsQuery(Query query, Class<?>... classes) {
 		return sfHolder.getSearchFactory().createHSQuery( query, session(), null, classes );
 	}
 
@@ -231,7 +231,7 @@ public class SearchITHelper {
 			return push( StreamSupport.stream( entries.spliterator(), false ) );
 		}
 
-		public EntityInstanceWorkContext push(Object ... entries) {
+		public EntityInstanceWorkContext push(Object... entries) {
 			return push( Arrays.stream( entries ) );
 		}
 
@@ -290,7 +290,7 @@ public class SearchITHelper {
 			this.executor = executor;
 		}
 
-		public EntityTypeWorkContext push(Class<?> type, Serializable ... ids) {
+		public EntityTypeWorkContext push(Class<?> type, Serializable... ids) {
 			return push( type, Arrays.stream( ids ) );
 		}
 
@@ -348,7 +348,7 @@ public class SearchITHelper {
 		}
 
 		@SafeVarargs
-		public final AssertHSQueryContext matchesExactlyIds(Serializable ... expectedIds) {
+		public final AssertHSQueryContext matchesExactlyIds(Serializable... expectedIds) {
 			Object[] objectArray = Arrays.stream( expectedIds ).toArray();
 			asResultIds().containsExactly( objectArray );
 			return this;
@@ -361,7 +361,7 @@ public class SearchITHelper {
 		}
 
 		@SafeVarargs
-		public final AssertHSQueryContext matchesUnorderedIds(Serializable ... expectedIds) {
+		public final AssertHSQueryContext matchesUnorderedIds(Serializable... expectedIds) {
 			Object[] objectArray = Arrays.stream( expectedIds ).toArray();
 			asResultIds().containsExactlyInAnyOrder( objectArray );
 			return this;
@@ -374,7 +374,7 @@ public class SearchITHelper {
 		}
 
 		@SafeVarargs
-		public final AssertHSQueryContext matchesExactlyProjections(Object[] ... expectedProjections) {
+		public final AssertHSQueryContext matchesExactlyProjections(Object[]... expectedProjections) {
 			Object[] objectArray = Arrays.stream( expectedProjections )
 					.map( Arrays::asList ) // Take advantage of List.equals
 					.toArray();
@@ -383,7 +383,7 @@ public class SearchITHelper {
 		}
 
 		@SafeVarargs
-		public final <T> AssertHSQueryContext matchesExactlySingleProjections(T ... expectedSingleElementProjections) {
+		public final <T> AssertHSQueryContext matchesExactlySingleProjections(T... expectedSingleElementProjections) {
 			Object[] objectArray = Arrays.stream( expectedSingleElementProjections )
 					.map( p -> Arrays.asList( p ) ) // Take advantage of List.equals
 					.toArray();
@@ -392,7 +392,7 @@ public class SearchITHelper {
 		}
 
 		@SafeVarargs
-		public final AssertHSQueryContext matchesUnorderedProjections(Object[] ... expectedProjections) {
+		public final AssertHSQueryContext matchesUnorderedProjections(Object[]... expectedProjections) {
 			Object[] objectArray = Arrays.stream( expectedProjections )
 					.map( Arrays::asList ) // Take advantage of List.equals
 					.toArray();
@@ -401,7 +401,7 @@ public class SearchITHelper {
 		}
 
 		@SafeVarargs
-		public final <T> AssertHSQueryContext matchesUnorderedSingleProjections(T ... expectedSingleElementProjections) {
+		public final <T> AssertHSQueryContext matchesUnorderedSingleProjections(T... expectedSingleElementProjections) {
 			Object[] objectArray = Arrays.stream( expectedSingleElementProjections )
 					.map( p -> Arrays.asList( p ) ) // Take advantage of List.equals
 					.toArray();
@@ -473,14 +473,16 @@ public class SearchITHelper {
 				Facet facet = it.next();
 				if ( Objects.equals( value, facet.getValue() ) ) {
 					assertThat( facet.getCount() )
-							.as( "Count for faceting request '" + facetingRequestName + "', facet '" + value + "' on query " + queryContext )
+							.as( "Count for faceting request '" + facetingRequestName + "', facet '" + value + "' on query "
+									+ queryContext )
 							.isEqualTo( count );
 					it.remove();
 					found = true;
 				}
 			}
 			if ( !found ) {
-				fail( "Could not find facet '" + value + "' for faceting request '" + facetingRequestName + "' on query " + queryContext );
+				fail( "Could not find facet '" + value + "' for faceting request '" + facetingRequestName + "' on query "
+						+ queryContext );
 			}
 			return this;
 		}
@@ -501,14 +503,14 @@ public class SearchITHelper {
 	public class AssertBuildingHSQueryContext extends AssertHSQueryContext {
 		private final Query luceneQuery;
 		private Class<?>[] classes;
-		private Consumer<HSQuery> before = q -> { };
+		private Consumer<HSQuery> before = q -> {};
 
 		private AssertBuildingHSQueryContext(Query luceneQuery) {
 			super();
 			this.luceneQuery = luceneQuery;
 		}
 
-		public AssertBuildingHSQueryContext from(Class<?> ... classes) {
+		public AssertBuildingHSQueryContext from(Class<?>... classes) {
 			this.classes = classes;
 			return this;
 		}
@@ -518,7 +520,7 @@ public class SearchITHelper {
 			return this;
 		}
 
-		public AssertBuildingHSQueryContext projecting(String ... projections) {
+		public AssertBuildingHSQueryContext projecting(String... projections) {
 			before = before.andThen( q -> q.projection( projections ) );
 			return this;
 		}

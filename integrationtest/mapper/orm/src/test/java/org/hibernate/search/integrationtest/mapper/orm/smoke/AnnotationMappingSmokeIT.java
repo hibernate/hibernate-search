@@ -268,7 +268,7 @@ public class AnnotationMappingSmokeIT {
 											)
 									)
 							)
-							.objectField( "myEmbeddedList", b2 -> { } )
+							.objectField( "myEmbeddedList", b2 -> {} )
 							.objectField( "embeddedMap", b2 -> b2
 									.objectField( "myEmbedded", b3 -> b3
 											.field( "myLocalDateField", entity3.getEmbedded().getLocalDate() )
@@ -298,8 +298,8 @@ public class AnnotationMappingSmokeIT {
 		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			SearchQuery<ParentIndexedEntity> query = searchSession.search(
-							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
-					)
+					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
+			)
 					.selectEntity()
 					.where( f -> f.matchAll() )
 					.toQuery();

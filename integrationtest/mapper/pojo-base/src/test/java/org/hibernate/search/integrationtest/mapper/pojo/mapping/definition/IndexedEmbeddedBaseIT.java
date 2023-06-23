@@ -72,7 +72,7 @@ import org.junit.Test;
  * Does not test uses of container value extractors (for now). Some of them are tested in
  * {@link AnnotationMappingSmokeIT} and {@link ProgrammaticMappingSmokeIT}.
  */
-@SuppressWarnings({"unused", "deprecation"}) // deprecated IndexedEmbedded#prefix
+@SuppressWarnings({ "unused", "deprecation" }) // deprecated IndexedEmbedded#prefix
 public class IndexedEmbeddedBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
@@ -81,7 +81,8 @@ public class IndexedEmbeddedBaseIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Rule
 	public StaticCounters counters = new StaticCounters();
@@ -104,6 +105,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, String level1Value, String level2Value) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -151,6 +153,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(name = "explicitName")
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, String value) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -175,7 +178,7 @@ public class IndexedEmbeddedBaseIT {
 				document -> document
 						.objectField( "explicitName", b2 -> b2
 								.field( "level1Property", "level1Value" )
-				)
+						)
 		);
 	}
 
@@ -191,6 +194,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(name = "invalid.withdot")
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, String value) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -222,6 +226,7 @@ public class IndexedEmbeddedBaseIT {
 			@SuppressWarnings("deprecation")
 			@IndexedEmbedded(name = "somename", prefix = "someprefix.")
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, String value) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -255,14 +260,17 @@ public class IndexedEmbeddedBaseIT {
 			public String getForDefault() {
 				return forDefault;
 			}
+
 			@GenericField
 			public String getFlat() {
 				return flat;
 			}
+
 			@GenericField
 			public String getNest() {
 				return nest;
 			}
+
 			@GenericField
 			public String getCommon() {
 				return common;
@@ -272,17 +280,18 @@ public class IndexedEmbeddedBaseIT {
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
-			@IndexedEmbedded(name = "default", includePaths = {"default", "common"})
-			@IndexedEmbedded(name = "flat", includePaths = {"flat", "common"},
+			@IndexedEmbedded(name = "default", includePaths = { "default", "common" })
+			@IndexedEmbedded(name = "flat", includePaths = { "flat", "common" },
 					structure = ObjectStructure.FLATTENED)
-			@IndexedEmbedded(name = "nest", includePaths = {"nest", "common"},
+			@IndexedEmbedded(name = "nest", includePaths = { "nest", "common" },
 					structure = ObjectStructure.NESTED)
-			@IndexedEmbedded(name = "default_but_exclude", excludePaths = {"flat", "nest"})
-			@IndexedEmbedded(name = "flat_but_exclude", excludePaths = {"default", "nest"},
+			@IndexedEmbedded(name = "default_but_exclude", excludePaths = { "flat", "nest" })
+			@IndexedEmbedded(name = "flat_but_exclude", excludePaths = { "default", "nest" },
 					structure = ObjectStructure.FLATTENED)
-			@IndexedEmbedded(name = "nest_but_exclude", excludePaths = {"default", "flat"},
+			@IndexedEmbedded(name = "nest_but_exclude", excludePaths = { "default", "flat" },
 					structure = ObjectStructure.NESTED)
 			Embedded embedded;
+
 			public IndexedEntity(int id, String value) {
 				this.id = id;
 				this.embedded = new Embedded();
@@ -294,35 +303,35 @@ public class IndexedEmbeddedBaseIT {
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> {
-				b.objectField( "default", b2 -> {
-					b2.field( "default", String.class );
-					b2.field( "common", String.class );
-				} );
-				b.objectField( "flat", b2 -> {
-					b2.objectStructure( ObjectStructure.FLATTENED );
-					b2.field( "flat", String.class );
-					b2.field( "common", String.class );
-				} );
-				b.objectField( "nest", b2 -> {
-					b2.objectStructure( ObjectStructure.NESTED );
-					b2.field( "nest", String.class );
-					b2.field( "common", String.class );
-				} );
-				b.objectField( "default_but_exclude", b2 -> {
-					b2.field( "default", String.class );
-					b2.field( "common", String.class );
-				} );
-				b.objectField( "flat_but_exclude", b2 -> {
-					b2.objectStructure( ObjectStructure.FLATTENED );
-					b2.field( "flat", String.class );
-					b2.field( "common", String.class );
-				} );
-				b.objectField( "nest_but_exclude", b2 -> {
-					b2.objectStructure( ObjectStructure.NESTED );
-					b2.field( "nest", String.class );
-					b2.field( "common", String.class );
-				} );
-			}
+			b.objectField( "default", b2 -> {
+				b2.field( "default", String.class );
+				b2.field( "common", String.class );
+			} );
+			b.objectField( "flat", b2 -> {
+				b2.objectStructure( ObjectStructure.FLATTENED );
+				b2.field( "flat", String.class );
+				b2.field( "common", String.class );
+			} );
+			b.objectField( "nest", b2 -> {
+				b2.objectStructure( ObjectStructure.NESTED );
+				b2.field( "nest", String.class );
+				b2.field( "common", String.class );
+			} );
+			b.objectField( "default_but_exclude", b2 -> {
+				b2.field( "default", String.class );
+				b2.field( "common", String.class );
+			} );
+			b.objectField( "flat_but_exclude", b2 -> {
+				b2.objectStructure( ObjectStructure.FLATTENED );
+				b2.field( "flat", String.class );
+				b2.field( "common", String.class );
+			} );
+			b.objectField( "nest_but_exclude", b2 -> {
+				b2.objectStructure( ObjectStructure.NESTED );
+				b2.field( "nest", String.class );
+				b2.field( "common", String.class );
+			} );
+		}
 		);
 		SearchMapping mapping = setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
@@ -402,6 +411,7 @@ public class IndexedEmbeddedBaseIT {
 	public void prefix_multiValued() {
 		class IndexedEmbeddedLevel2 {
 			String level2Property;
+
 			@GenericField
 			public String getLevel2Property() {
 				return level2Property;
@@ -412,20 +422,24 @@ public class IndexedEmbeddedBaseIT {
 			IndexedEmbeddedLevel2 level2OneDotInPrefix = new IndexedEmbeddedLevel2();
 			IndexedEmbeddedLevel2 level2TwoDotsInPrefix = new IndexedEmbeddedLevel2();
 			String level1Property;
+
 			@GenericField
 			public String getLevel1Property() {
 				return level1Property;
 			}
+
 			@SuppressWarnings("deprecation")
 			@IndexedEmbedded(prefix = "level2NoDotInPrefix_")
 			public IndexedEmbeddedLevel2 getLevel2NoDotInPrefix() {
 				return level2NoDotInPrefix;
 			}
+
 			@SuppressWarnings("deprecation")
 			@IndexedEmbedded(prefix = "level2OneDotInPrefix.")
 			public IndexedEmbeddedLevel2 getLevel2OneDotInPrefix() {
 				return level2OneDotInPrefix;
 			}
+
 			@SuppressWarnings("deprecation")
 			@IndexedEmbedded(prefix = "level2TwoDotsInPrefix.level3.")
 			public IndexedEmbeddedLevel2 getLevel2TwoDotsInPrefix() {
@@ -523,6 +537,7 @@ public class IndexedEmbeddedBaseIT {
 			@SuppressWarnings("deprecation")
 			@IndexedEmbedded(prefix = "customPrefix_")
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, String level1Property) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -557,10 +572,12 @@ public class IndexedEmbeddedBaseIT {
 		class IndexedEmbeddedLevel1 {
 			String ignoredProperty;
 			String includedProperty;
+
 			@GenericField
 			public String getIgnoredProperty() {
 				return ignoredProperty;
 			}
+
 			@GenericField
 			public String getIncludedProperty() {
 				return includedProperty;
@@ -572,6 +589,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(includePaths = "includedProperty")
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, String ignoredProperty, String includedProperty) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -596,10 +614,12 @@ public class IndexedEmbeddedBaseIT {
 		class IndexedEmbeddedLevel1 {
 			String ignoredProperty;
 			String includedProperty;
+
 			@GenericField
 			public String getIgnoredProperty() {
 				return ignoredProperty;
 			}
+
 			@GenericField
 			public String getIncludedProperty() {
 				return includedProperty;
@@ -611,6 +631,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(excludePaths = "ignoredProperty")
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, String ignoredProperty, String includedProperty) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -662,8 +683,9 @@ public class IndexedEmbeddedBaseIT {
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
-			@IndexedEmbedded(includePaths = {"includedProperty", "nonMatchingPath"})
+			@IndexedEmbedded(includePaths = { "includedProperty", "nonMatchingPath" })
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, String ignoredProperty, String includedProperty) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -692,6 +714,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(excludePaths = { "includedProperty", "nonMatchingPath" })
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, String ignoredProperty, String includedProperty) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -733,6 +756,7 @@ public class IndexedEmbeddedBaseIT {
 	public void includeDepth() {
 		class IndexedEmbeddedLevel2 {
 			String level2Property;
+
 			@GenericField
 			public String getLevel2Property() {
 				return level2Property;
@@ -741,10 +765,12 @@ public class IndexedEmbeddedBaseIT {
 		class IndexedEmbeddedLevel1 {
 			String level1Property;
 			IndexedEmbeddedLevel2 level2;
+
 			@GenericField
 			public String getLevel1Property() {
 				return level1Property;
 			}
+
 			@IndexedEmbedded
 			public IndexedEmbeddedLevel2 getLevel2() {
 				return level2;
@@ -756,6 +782,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(includeDepth = 1)
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, String level1Value, String level2Value) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -795,6 +822,7 @@ public class IndexedEmbeddedBaseIT {
 		class IndexedEmbeddedLevel1 {
 			@GenericField
 			String level1Property;
+
 			public String getLevel1Property() {
 				return level1Property;
 			}
@@ -805,6 +833,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(structure = ObjectStructure.NESTED)
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, String level1Value) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -856,10 +885,12 @@ public class IndexedEmbeddedBaseIT {
 
 		class IndexedEmbeddedLevel1 {
 			String level1Property;
+
 			public Double getLongitude() {
 				StaticCounters.get().increment( getLongitudeKey );
 				return null;
 			}
+
 			public Double getLatitude() {
 				StaticCounters.get().increment( getLatitudeKey );
 				return null;
@@ -868,6 +899,7 @@ public class IndexedEmbeddedBaseIT {
 		class IndexedEntity {
 			Integer id;
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, String level1Property) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -943,15 +975,18 @@ public class IndexedEmbeddedBaseIT {
 	public void targetType() {
 		abstract class IndexedEmbeddedLevel1 {
 			public abstract String getLevel1Property();
+
 			public abstract void setLevel1Property(String level1Property);
 		}
 		class IndexedEmbeddedLevel1Impl extends IndexedEmbeddedLevel1 {
 			String level1Property;
+
 			@Override
 			@GenericField
 			public String getLevel1Property() {
 				return level1Property;
 			}
+
 			@Override
 			public void setLevel1Property(String level1Property) {
 				this.level1Property = level1Property;
@@ -963,6 +998,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(includeDepth = 1, targetType = IndexedEmbeddedLevel1Impl.class)
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, String level1Value) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1Impl();
@@ -995,15 +1031,18 @@ public class IndexedEmbeddedBaseIT {
 	public void targetType_castException() {
 		abstract class IndexedEmbeddedLevel1 {
 			public abstract String getLevel1Property();
+
 			public abstract void setLevel1Property(String level1Property);
 		}
 		class IndexedEmbeddedLevel1Impl extends IndexedEmbeddedLevel1 {
 			String level1Property;
+
 			@Override
 			@GenericField
 			public String getLevel1Property() {
 				return level1Property;
 			}
+
 			@Override
 			public void setLevel1Property(String level1Property) {
 				this.level1Property = level1Property;
@@ -1011,11 +1050,13 @@ public class IndexedEmbeddedBaseIT {
 		}
 		class InvalidTypeImpl extends IndexedEmbeddedLevel1 {
 			String level1Property;
+
 			@Override
 			@GenericField
 			public String getLevel1Property() {
 				return level1Property;
 			}
+
 			@Override
 			public void setLevel1Property(String level1Property) {
 				this.level1Property = level1Property;
@@ -1027,6 +1068,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(includeDepth = 1, targetType = IndexedEmbeddedLevel1Impl.class)
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, String level1Value) {
 				this.id = id;
 				// The actual instance has a type that cannot be cast to IndexedEmbeddedLevel1Impl
@@ -1063,15 +1105,18 @@ public class IndexedEmbeddedBaseIT {
 	public void targetType_preserveGenericTypeContext() {
 		abstract class IndexedEmbeddedLevel1<T> {
 			public abstract T getLevel1Property();
+
 			public abstract void setLevel1Property(T level1Property);
 		}
 		class IndexedEmbeddedLevel1Impl<T> extends IndexedEmbeddedLevel1<T> {
 			T level1Property;
+
 			@Override
 			@GenericField
 			public T getLevel1Property() {
 				return level1Property;
 			}
+
 			@Override
 			public void setLevel1Property(T level1Property) {
 				this.level1Property = level1Property;
@@ -1083,6 +1128,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(includeDepth = 1, targetType = IndexedEmbeddedLevel1Impl.class)
 			IndexedEmbeddedLevel1<String> level1;
+
 			public IndexedEntity(int id, String level1Value) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1Impl<>();
@@ -1125,6 +1171,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(includeEmbeddedObjectId = true)
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, String level1Id) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -1164,6 +1211,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(includeEmbeddedObjectId = true)
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, String level1Id) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -1206,6 +1254,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(includeEmbeddedObjectId = true)
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, String level1Id) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -1243,6 +1292,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(includeEmbeddedObjectId = true)
 			List<IndexedEmbeddedLevel1> level1;
+
 			public IndexedEntity(int id, String level1Id1, String level1Id2) {
 				this.id = id;
 				this.level1 = Arrays.asList( new IndexedEmbeddedLevel1(), new IndexedEmbeddedLevel1() );
@@ -1289,6 +1339,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(includeEmbeddedObjectId = true)
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, Long level1Id) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -1332,6 +1383,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(includeEmbeddedObjectId = true)
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, Long level1Id) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -1376,6 +1428,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(includeEmbeddedObjectId = true)
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, Long level1Id) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -1445,6 +1498,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(includeEmbeddedObjectId = true)
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, Long level1Id) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -1483,6 +1537,7 @@ public class IndexedEmbeddedBaseIT {
 		class IndexedEntity {
 			Integer id;
 			IndexedEmbeddedLevel1 level1;
+
 			public IndexedEntity(int id, Long level1Id) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
@@ -1587,6 +1642,7 @@ public class IndexedEmbeddedBaseIT {
 			Integer id;
 			@IndexedEmbedded(includeEmbeddedObjectId = true, targetType = IndexedEmbeddedLevel1.class)
 			Object level1;
+
 			public IndexedEntity(int id, String level1Id) {
 				this.id = id;
 				IndexedEmbeddedLevel1 level1 = new IndexedEmbeddedLevel1();
@@ -1910,7 +1966,8 @@ public class IndexedEmbeddedBaseIT {
 			SubIncluded included;
 
 			@IndexedEmbedded(excludePaths = {
-					"included.included.included.string2", "included.included.included.string3"
+					"included.included.included.string2",
+					"included.included.included.string3"
 			})
 			SubIncluded includedWithoutLastNode;
 
@@ -1977,9 +2034,9 @@ public class IndexedEmbeddedBaseIT {
 						id, "a",
 						new Included(
 								"b", new SubIncluded( "c", new SubSubIncluded(
-								"d",
-								new SubSubSubIncluded( "e", new SubSubSubSubIncluded( "f", "g", "h" ) )
-						) ) )
+										"d",
+										new SubSubSubIncluded( "e", new SubSubSubSubIncluded( "f", "g", "h" ) )
+								) ) )
 				),
 				document -> document.field( "string", "a" )
 						.objectField( "included", b2 -> b2
@@ -2517,7 +2574,7 @@ public class IndexedEmbeddedBaseIT {
 						.field( "includedString", String.class )
 						// TODO: if we don't want this foo to hang around here -- we can have a objectNameList in ConfiguredIndexSchemaNestingContext
 						// that we will only trough and add objects to context if  while loop wasn't stopped by returning an empty optional
-						.objectField( "foo", b3 -> { } ) )
+						.objectField( "foo", b3 -> {} ) )
 		);
 
 		SearchMapping mapping = setupHelper.start()
@@ -2615,6 +2672,7 @@ public class IndexedEmbeddedBaseIT {
 					this.a = a;
 				}
 			}
+
 			class EntityA {
 				@DocumentId
 				Integer id;
@@ -2720,6 +2778,7 @@ public class IndexedEmbeddedBaseIT {
 					this.a = a;
 				}
 			}
+
 			class EntityA {
 				Integer id;
 				@KeywordField
@@ -2796,7 +2855,7 @@ public class IndexedEmbeddedBaseIT {
 						.field( "prefixAaString", String.class )
 						.field( "prefixAprefixBbString", String.class )
 						.field( "prefixAprefixBprefixCcString4", String.class )
-						.objectField( "prefixAprefixOtherD2", b2 -> { } ) ) );
+						.objectField( "prefixAprefixOtherD2", b2 -> {} ) ) );
 
 		SearchMapping mapping = setupHelper.start()
 				.withAnnotatedEntityTypes( Model.IndexedEntity.class )

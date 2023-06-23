@@ -25,7 +25,7 @@ public abstract class BackendConfiguration {
 
 	// Uncomment one of the following lines to set the backend type when running tests from the IDE
 	public static final String IDE_BACKEND_TYPE = "lucene";
-//	public static final String IDE_BACKEND_TYPE = "elasticsearch";
+	//	public static final String IDE_BACKEND_TYPE = "elasticsearch";
 
 	public static final String BACKEND_TYPE;
 	public static final boolean IS_IDE;

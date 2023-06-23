@@ -101,7 +101,7 @@ public class LoadingStrategyInheritanceIT {
 		backendMock.verifyExpectationsMet();
 
 		try ( SearchSession session = mapping.createSession() ) {
-			backendMock.expectSearchObjects( Arrays.asList( rootEntityName, derivedEntityName ), c -> { },
+			backendMock.expectSearchObjects( Arrays.asList( rootEntityName, derivedEntityName ), c -> {},
 					StubSearchWorkBehavior.of( 2, reference( rootEntityName, "1" ),
 							reference( derivedEntityName, "2" ) ) );
 			assertThat( session.search( Object.class ).where( f -> f.matchAll() ).fetchAllHits() )
@@ -155,7 +155,7 @@ public class LoadingStrategyInheritanceIT {
 		backendMock.verifyExpectationsMet();
 
 		try ( SearchSession session = mapping.createSession() ) {
-			backendMock.expectSearchObjects( Arrays.asList( rootEntityName, derivedEntityName ), c -> { },
+			backendMock.expectSearchObjects( Arrays.asList( rootEntityName, derivedEntityName ), c -> {},
 					StubSearchWorkBehavior.of( 2, reference( rootEntityName, "1" ),
 							reference( derivedEntityName, "2" ) ) );
 			assertThat( session.search( Object.class ).where( f -> f.matchAll() ).fetchAllHits() )

@@ -102,7 +102,7 @@ public class EventContexts {
 		} );
 	}
 
-	public static EventContext fromIndexNames(String ... indexNames) {
+	public static EventContext fromIndexNames(String... indexNames) {
 		return fromIndexNames( CollectionHelper.asLinkedHashSet( indexNames ) );
 	}
 

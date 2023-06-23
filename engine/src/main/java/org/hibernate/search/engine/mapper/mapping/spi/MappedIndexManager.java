@@ -41,7 +41,8 @@ public interface MappedIndexManager {
 	 * @deprecated Use {@link #createWorkspace(BackendMappingContext, Set)} instead.
 	 */
 	@Deprecated
-	IndexWorkspace createWorkspace(org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext sessionContext);
+	IndexWorkspace createWorkspace(
+			org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext sessionContext);
 
 	IndexWorkspace createWorkspace(BackendMappingContext mappingContext, Set<String> tenantId);
 

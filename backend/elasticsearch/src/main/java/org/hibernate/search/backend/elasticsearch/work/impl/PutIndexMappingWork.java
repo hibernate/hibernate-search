@@ -75,7 +75,7 @@ public class PutIndexMappingWork extends AbstractNonBulkableWork<Void> {
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.put()
-					.pathComponent( indexName );
+							.pathComponent( indexName );
 			// ES6.6 and below only
 			if ( typeName != null ) {
 				builder.pathComponent( typeName );

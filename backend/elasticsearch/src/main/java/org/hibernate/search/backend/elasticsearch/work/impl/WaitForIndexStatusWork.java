@@ -41,11 +41,11 @@ public class WaitForIndexStatusWork extends AbstractNonBulkableWork<Void> {
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.get()
-					.pathComponent( Paths._CLUSTER )
-					.pathComponent( Paths.HEALTH )
-					.pathComponent( indexName )
-					.param( "wait_for_status", requiredStatus.externalRepresentation() )
-					.param( "timeout", requiredStatusTimeoutInMs + "ms" );
+							.pathComponent( Paths._CLUSTER )
+							.pathComponent( Paths.HEALTH )
+							.pathComponent( indexName )
+							.param( "wait_for_status", requiredStatus.externalRepresentation() )
+							.param( "timeout", requiredStatusTimeoutInMs + "ms" );
 
 			builder.deadline( StaticDeadline.ofMilliseconds( requiredStatusTimeoutInMs ) );
 

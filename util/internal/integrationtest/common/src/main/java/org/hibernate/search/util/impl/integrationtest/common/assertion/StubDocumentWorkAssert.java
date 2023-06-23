@@ -20,7 +20,8 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 
 public class StubDocumentWorkAssert {
 
-	public static final StubTreeNodeDiffer<StubDocumentNode> DEFAULT_DOCUMENT_DIFFER = StubTreeNodeDiffer.<StubDocumentNode>builder().build();
+	public static final StubTreeNodeDiffer<StubDocumentNode> DEFAULT_DOCUMENT_DIFFER =
+			StubTreeNodeDiffer.<StubDocumentNode>builder().build();
 
 	public static StubDocumentWorkAssert assertThatDocumentWork(StubDocumentWork work) {
 		return new StubDocumentWorkAssert( work );

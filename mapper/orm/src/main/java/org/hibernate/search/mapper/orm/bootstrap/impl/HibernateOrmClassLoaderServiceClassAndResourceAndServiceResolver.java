@@ -78,7 +78,7 @@ final class HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver
 		Iterable<T> servicesFromLocalClassLoader = internalServiceResolver.loadJavaServices( serviceContract );
 
 		//LinkedHashMap to maintain order; elements from Hibernate ORM first.
-		Map<String,T> combined = new LinkedHashMap<>();
+		Map<String, T> combined = new LinkedHashMap<>();
 
 		addAllServices( servicesFromORMCLassLoader, combined );
 		addAllServices( servicesFromLocalClassLoader, combined );
@@ -86,7 +86,7 @@ final class HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver
 		return combined.values();
 	}
 
-	private <T> void addAllServices(Iterable<T> services, Map<String,T> combined ) {
+	private <T> void addAllServices(Iterable<T> services, Map<String, T> combined) {
 		for ( T service : services ) {
 			combined.put( service.getClass().getName(), service );
 		}

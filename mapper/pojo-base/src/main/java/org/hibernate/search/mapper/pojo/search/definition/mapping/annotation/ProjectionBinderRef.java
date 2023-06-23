@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBind
  * References can use either a name, a type, or both.
  */
 @Documented
-@Target({}) // Only used as a component in other annotations
+@Target({ }) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ProjectionBinderRef {
 
@@ -51,7 +51,7 @@ public @interface ProjectionBinderRef {
 	 * @see ProjectionBindingContext#param(String)
 	 * @see ProjectionBindingContext#paramOptional(String)
 	 */
-	Param[] params() default {};
+	Param[] params() default { };
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.

@@ -52,7 +52,7 @@ public class BulkWork extends AbstractNonBulkableWork<BulkResult> {
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.post()
-					.pathComponent( Paths._BULK );
+							.pathComponent( Paths._BULK );
 			switch ( refreshStrategy ) {
 				case FORCE:
 					builder.param( "refresh", true );

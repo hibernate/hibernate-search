@@ -243,7 +243,8 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	 */
 	@Override
 	public Iterator<R> iterate() {
-		throw new UnsupportedOperationException( "iterate() is not implemented in Hibernate Search queries. Use scroll() instead." );
+		throw new UnsupportedOperationException(
+				"iterate() is not implemented in Hibernate Search queries. Use scroll() instead." );
 	}
 
 	@Override
@@ -257,7 +258,8 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	}
 
 	@Override
-	public HibernateOrmSearchQueryAdapter<R> setParameter(Parameter<Calendar> calendarParameter, Calendar calendar, TemporalType temporalType) {
+	public HibernateOrmSearchQueryAdapter<R> setParameter(Parameter<Calendar> calendarParameter, Calendar calendar,
+			TemporalType temporalType) {
 		throw parametersNoSupported();
 	}
 

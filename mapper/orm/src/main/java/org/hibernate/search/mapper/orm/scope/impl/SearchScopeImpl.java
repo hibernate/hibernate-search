@@ -39,18 +39,28 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	private final HibernateOrmScopeMappingContext mappingContext;
 	private final TenancyConfiguration tenancyConfiguration;
-	private final PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate;
+	private final PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference,
+			E,
+			HibernateOrmScopeIndexedTypeContext<? extends E>> delegate;
 
 	public SearchScopeImpl(HibernateOrmScopeMappingContext mappingContext,
 			TenancyConfiguration tenancyConfiguration,
-			PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate) {
+			PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference,
+					E,
+					HibernateOrmScopeIndexedTypeContext<? extends E>> delegate) {
 		this.mappingContext = mappingContext;
 		this.tenancyConfiguration = tenancyConfiguration;
 		this.delegate = delegate;
 	}
 
-	public SearchQuerySelectStep<?, org.hibernate.search.mapper.orm.common.EntityReference, E, SearchLoadingOptionsStep, ?, ?> search(
-			HibernateOrmScopeSessionContext sessionContext, HibernateOrmSelectionLoadingContext.Builder loadingContextBuilder) {
+	public SearchQuerySelectStep<?,
+			org.hibernate.search.mapper.orm.common.EntityReference,
+			E,
+			SearchLoadingOptionsStep,
+			?,
+			?> search(
+					HibernateOrmScopeSessionContext sessionContext,
+					HibernateOrmSelectionLoadingContext.Builder loadingContextBuilder) {
 		return delegate.search( sessionContext, loadingContextBuilder );
 	}
 

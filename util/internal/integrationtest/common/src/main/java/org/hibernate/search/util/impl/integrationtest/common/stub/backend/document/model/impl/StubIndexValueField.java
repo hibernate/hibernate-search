@@ -16,12 +16,11 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.
 
 public final class StubIndexValueField<F>
 		extends AbstractIndexValueField<
-						StubIndexValueField<F>,
-						StubSearchIndexScope,
-						StubIndexValueFieldType<F>,
-						StubIndexCompositeNode,
-						F
-				>
+				StubIndexValueField<F>,
+				StubSearchIndexScope,
+				StubIndexValueFieldType<F>,
+				StubIndexCompositeNode,
+				F>
 		implements StubIndexField, StubSearchIndexValueFieldContext<F> {
 
 	private final StubIndexSchemaDataNode schemaData;

@@ -95,7 +95,8 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 			@Override
 			protected List<ZonedDateTime> createSingle() {
 				List<ZonedDateTime> values = new ArrayList<>();
-				for ( LocalDateTime localDateTime : LocalDateTimeFieldTypeDescriptor.INSTANCE.getIndexableValues().getSingle() ) {
+				for ( LocalDateTime localDateTime : LocalDateTimeFieldTypeDescriptor.INSTANCE.getIndexableValues()
+						.getSingle() ) {
 					for ( ZoneId zoneId : createIndexableZoneIdList() ) {
 						values.add( localDateTime.atZone( zoneId ) );
 					}

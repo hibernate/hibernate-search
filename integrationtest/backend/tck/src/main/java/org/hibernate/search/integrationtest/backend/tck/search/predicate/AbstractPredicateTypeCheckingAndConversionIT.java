@@ -113,7 +113,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 	@Test
 	public void defaultDslConverter_valueConvertYes_invalidType() {
 		SearchPredicateFactory f = index.createScope().predicate();
-		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path(),invalidTypeParam(),
+		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path(), invalidTypeParam(),
 				ValueConvert.YES ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
@@ -440,7 +440,8 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		private final SimpleFieldModelsByType customDslConverterField0;
 		private final SimpleFieldModelsByType customDslConverterField1;
 
-		public RawFieldCompatibleIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+		public RawFieldCompatibleIndexBinding(IndexSchemaElement root,
+				Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
 			defaultDslConverterField0 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "defaultDslConverterField0_",
 					c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() ) );
 			customDslConverterField0 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "customDslConverterField0_" );
@@ -450,17 +451,14 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	public static final class IncompatibleIndexBinding {
 		public IncompatibleIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
-			fieldTypes.forEach( fieldType ->
-					SimpleFieldModel.mapper( FieldTypeDescriptor.getIncompatible( fieldType ) )
-							.map( root, "defaultDslConverterField0_" + fieldType.getUniqueName() )
+			fieldTypes.forEach( fieldType -> SimpleFieldModel.mapper( FieldTypeDescriptor.getIncompatible( fieldType ) )
+					.map( root, "defaultDslConverterField0_" + fieldType.getUniqueName() )
 			);
-			fieldTypes.forEach( fieldType ->
-					SimpleFieldModel.mapper( FieldTypeDescriptor.getIncompatible( fieldType ) )
-							.map( root, "customDslConverterField0_" + fieldType.getUniqueName() )
+			fieldTypes.forEach( fieldType -> SimpleFieldModel.mapper( FieldTypeDescriptor.getIncompatible( fieldType ) )
+					.map( root, "customDslConverterField0_" + fieldType.getUniqueName() )
 			);
-			fieldTypes.forEach( fieldType ->
-					SimpleFieldModel.mapper( FieldTypeDescriptor.getIncompatible( fieldType ) )
-							.map( root, "customDslConverterField1_" + fieldType.getUniqueName() )
+			fieldTypes.forEach( fieldType -> SimpleFieldModel.mapper( FieldTypeDescriptor.getIncompatible( fieldType ) )
+					.map( root, "customDslConverterField1_" + fieldType.getUniqueName() )
 			);
 		}
 	}
@@ -480,7 +478,8 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 		public void contribute(SimpleMappedIndex<IndexBinding> mainIndex, BulkIndexer mainIndexer,
 				SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex, BulkIndexer compatibleIndexer,
-				SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex, BulkIndexer rawFieldCompatibleIndexer,
+				SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+				BulkIndexer rawFieldCompatibleIndexer,
 				SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex, BulkIndexer missingFieldIndexer) {
 			mainIndexer.add( docId( 0 ), routingKey,
 					document -> initDocument( mainIndex, document, values.fieldValue( 0 ) ) );
@@ -494,7 +493,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 					document -> initRawFieldCompatibleDocument( rawFieldCompatibleIndex, document, values.fieldValue( 0 ) ) );
 			rawFieldCompatibleIndexer.add( docId( 1 ), routingKey,
 					document -> initRawFieldCompatibleDocument( rawFieldCompatibleIndex, document, values.fieldValue( 1 ) ) );
-			missingFieldIndexer.add( docId( MISSING_FIELD_INDEX_DOC_ORDINAL ), routingKey, document -> { } );
+			missingFieldIndexer.add( docId( MISSING_FIELD_INDEX_DOC_ORDINAL ), routingKey, document -> {} );
 		}
 
 		private void initDocument(SimpleMappedIndex<IndexBinding> index, DocumentElement document,

@@ -13,6 +13,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.
 
 public interface StubIndexCompositeNode
 		extends IndexCompositeNode<StubSearchIndexScope, StubIndexCompositeNodeType, StubIndexField>,
-				StubIndexNode, StubSearchIndexCompositeNodeContext {
+		StubIndexNode, StubSearchIndexCompositeNodeContext {
 
 }

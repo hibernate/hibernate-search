@@ -64,7 +64,7 @@ public class HibernateOrmMassIndexerIT {
 				SearchSession searchSession = /* ... */ // <1>
 						// end::simple[]
 						Search.session( entityManager );
-						// tag::simple[]
+				// tag::simple[]
 				searchSession.massIndexer() // <2>
 						.startAndWait(); // <3>
 				// end::simple[]
@@ -200,7 +200,7 @@ public class HibernateOrmMassIndexerIT {
 				.isEqualTo( expectedCount );
 	}
 
-	static void initData( EntityManagerFactory entityManagerFactory, Function<Integer, Author> authorInit ) {
+	static void initData(EntityManagerFactory entityManagerFactory, Function<Integer, Author> authorInit) {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				int i = 0;

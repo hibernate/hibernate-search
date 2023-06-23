@@ -17,14 +17,14 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchSearchAggregationFactoryImpl
 		extends AbstractSearchAggregationFactory<
-						ElasticsearchSearchAggregationFactory,
-						ElasticsearchSearchAggregationIndexScope<?>,
-						ElasticsearchSearchPredicateFactory
-				>
+				ElasticsearchSearchAggregationFactory,
+				ElasticsearchSearchAggregationIndexScope<?>,
+				ElasticsearchSearchPredicateFactory>
 		implements ElasticsearchSearchAggregationFactory {
 
 	public ElasticsearchSearchAggregationFactoryImpl(
-			SearchAggregationDslContext<ElasticsearchSearchAggregationIndexScope<?>, ElasticsearchSearchPredicateFactory> dslContext) {
+			SearchAggregationDslContext<ElasticsearchSearchAggregationIndexScope<?>,
+					ElasticsearchSearchPredicateFactory> dslContext) {
 		super( dslContext );
 	}
 

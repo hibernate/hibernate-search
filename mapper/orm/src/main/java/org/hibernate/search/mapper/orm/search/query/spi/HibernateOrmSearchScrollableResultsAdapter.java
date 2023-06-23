@@ -156,10 +156,9 @@ public class HibernateOrmSearchScrollableResultsAdapter<H> implements Scrollable
 	@Override
 	public boolean isLast() {
 		// If we're on the last element, we should have already fetched the last (empty) chunk
-		return !afterLast && (
-				currentIndexInScroll == (maxResults - 1)
-				|| currentChunk != null && !currentChunk.hasHits()
-		);
+		return !afterLast
+				&& ( currentIndexInScroll == ( maxResults - 1 )
+						|| currentChunk != null && !currentChunk.hasHits() );
 	}
 
 	@Override
@@ -346,6 +345,7 @@ public class HibernateOrmSearchScrollableResultsAdapter<H> implements Scrollable
 
 	public interface ScrollHitExtractor<H> {
 		Object[] toArray(H hit);
+
 		Object toElement(H hit, int index);
 
 		@SuppressWarnings({ "unchecked", "rawtypes" }) // The instance works for any H

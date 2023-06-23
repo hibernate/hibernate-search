@@ -50,10 +50,9 @@ class PojoPropertyAdditionalMetadataBuilder implements PojoAdditionalMetadataCol
 
 	@SuppressWarnings("unchecked")
 	private <M> void doAddMarker(M marker) {
-		Class<M> markerType = (Class<M>) (
-				marker instanceof Annotation ? ((Annotation) marker).annotationType()
-						: marker.getClass()
-		);
+		Class<M> markerType = (Class<M>) ( marker instanceof Annotation
+				? ( (Annotation) marker ).annotationType()
+				: marker.getClass() );
 		List<M> list = (List<M>) markers.computeIfAbsent( markerType, ignored -> new ArrayList<M>() );
 		list.add( marker );
 	}

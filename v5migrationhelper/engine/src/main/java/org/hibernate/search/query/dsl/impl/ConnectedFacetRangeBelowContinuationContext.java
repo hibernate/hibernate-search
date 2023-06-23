@@ -51,4 +51,3 @@ public class ConnectedFacetRangeBelowContinuationContext<T> extends ConnectedFac
 	}
 }
 
-

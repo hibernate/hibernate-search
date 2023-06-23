@@ -39,6 +39,7 @@ public class CompanyFacility {
 		this.country = country;
 
 	}
+
 	public int getId() {
 		return id;
 	}

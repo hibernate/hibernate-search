@@ -57,7 +57,8 @@ public class LuceneTckBackendAccessor implements TckBackendAccessor {
 			throw new IllegalStateException(
 					"Unexpected exception while deleting and changing files in index '"
 							+ indexName + "' at path '" + indexPath + "'"
-							+ " to trigger failures in tests.", e
+							+ " to trigger failures in tests.",
+					e
 			);
 		}
 	}

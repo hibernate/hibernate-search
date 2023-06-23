@@ -15,12 +15,11 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldContext;
 
 public abstract class AbstractIndexValueField<
-				S extends AbstractIndexValueField<S, SC, FT, C, F>,
-				SC extends SearchIndexScope<?>,
-				FT extends AbstractIndexValueFieldType<SC, ? super S, F>,
-				C extends IndexCompositeNode<SC, ?, ?>,
-				F
-		>
+		S extends AbstractIndexValueField<S, SC, FT, C, F>,
+		SC extends SearchIndexScope<?>,
+		FT extends AbstractIndexValueFieldType<SC, ? super S, F>,
+		C extends IndexCompositeNode<SC, ?, ?>,
+		F>
 		extends AbstractIndexField<S, SC, FT, C>
 		implements IndexValueField<SC, FT, C>, SearchIndexValueFieldContext<SC> {
 

@@ -34,8 +34,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PojoIndexingPlanImpl
 		implements PojoIndexingPlan, PojoLoadingPlanProvider,
-				PojoReindexingCollector, PojoReindexingAssociationInverseSideCollector,
-				PojoIndexingProcessorRootContext {
+		PojoReindexingCollector, PojoReindexingAssociationInverseSideCollector,
+		PojoIndexingProcessorRootContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -45,8 +45,10 @@ public class PojoIndexingPlanImpl
 	private final PojoIndexingPlanStrategy strategy;
 
 	// Use a LinkedHashMap for deterministic iteration
-	protected final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeIndexingPlan<?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
-	protected final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeIndexingPlan<?, ?>> containedTypeDelegates = new LinkedHashMap<>();
+	protected final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeIndexingPlan<?, ?>> indexedTypeDelegates =
+			new LinkedHashMap<>();
+	protected final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeIndexingPlan<?, ?>> containedTypeDelegates =
+			new LinkedHashMap<>();
 
 	private boolean isProcessing = false;
 	private PojoLoadingPlan<Object> loadingPlan = null;

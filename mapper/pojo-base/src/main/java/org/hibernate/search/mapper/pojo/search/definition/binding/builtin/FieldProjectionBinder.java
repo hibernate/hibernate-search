@@ -92,7 +92,8 @@ public final class FieldProjectionBinder implements ProjectionBinder {
 
 	private <T> void bind(ProjectionBindingContext context, String fieldPath, Class<T> constructorParameterType) {
 		context.definition( constructorParameterType, context.isIncluded( fieldPath )
-				? BeanHolder.of( new FieldProjectionDefinition.SingleValued<>( fieldPath, constructorParameterType, valueConvert ) )
+				? BeanHolder
+						.of( new FieldProjectionDefinition.SingleValued<>( fieldPath, constructorParameterType, valueConvert ) )
 				: ConstantProjectionDefinition.nullValue() );
 	}
 

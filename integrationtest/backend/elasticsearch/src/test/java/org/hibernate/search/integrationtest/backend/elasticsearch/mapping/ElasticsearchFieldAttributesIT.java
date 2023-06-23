@@ -66,7 +66,9 @@ public class ElasticsearchFieldAttributesIT {
 			root.field( "no", f -> f.asString().analyzer( "standard" ).termVector( TermVector.NO ) ).toReference();
 			root.field( "yes", f -> f.asString().analyzer( "standard" ).termVector( TermVector.YES ) ).toReference();
 			root.field( "implicit", f -> f.asString().analyzer( "standard" ) ).toReference();
-			root.field( "moreOptions", f -> f.asString().analyzer( "standard" ).termVector( TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS ) ).toReference();
+			root.field( "moreOptions",
+					f -> f.asString().analyzer( "standard" ).termVector( TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS ) )
+					.toReference();
 		}, properties );
 	}
 

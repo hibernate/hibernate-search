@@ -18,11 +18,10 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public abstract class AbstractIndexRoot<
-				S extends AbstractIndexRoot<S, SC, NT, F>,
-				SC extends SearchIndexScope<?>,
-				NT extends AbstractIndexCompositeNodeType<SC, ? super S>,
-				F extends IndexField<SC, ?>
-		>
+		S extends AbstractIndexRoot<S, SC, NT, F>,
+		SC extends SearchIndexScope<?>,
+		NT extends AbstractIndexCompositeNodeType<SC, ? super S>,
+		F extends IndexField<SC, ?>>
 		extends AbstractIndexNode<S, SC, NT>
 		implements IndexCompositeNode<SC, NT, F> {
 

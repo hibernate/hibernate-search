@@ -104,11 +104,11 @@ public class ObjectProjectionSpecificsIT {
 	public void multiValuedObjectField_singleValuedObjectProjection() {
 		SearchProjectionFactory<?, ?> f = index.createScope().projection();
 		assertThatThrownBy( () -> f.object( "level1" )
-						.from( f.field( "level1.field1" ) )
-						.asList()
-						// A call to .multi() is missing here
-						.toProjection()
-				)
+				.from( f.field( "level1.field1" ) )
+				.asList()
+				// A call to .multi() is missing here
+				.toProjection()
+		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Invalid cardinality for projection on field 'level1'",
@@ -123,7 +123,7 @@ public class ObjectProjectionSpecificsIT {
 				.select( f -> f.object( "level1WithSingleValuedLevel2.level2" )
 						.from( f.field( "level1WithSingleValuedLevel2.level2.field1" ) )
 						.asList()
-						// A call to .multi() is missing here
+				// A call to .multi() is missing here
 				)
 				.where( f -> f.matchAll() )
 				.toQuery() )
@@ -150,8 +150,9 @@ public class ObjectProjectionSpecificsIT {
 			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedLevel1", ObjectStructure.FLATTENED )
 					.multiValued();
 			flattenedLevel1 = new Level1ObjectBinding( flattenedObjectField );
-			IndexSchemaObjectField otherNestedObjectField = root.objectField( "level1WithSingleValuedLevel2", ObjectStructure.NESTED )
-					.multiValued();
+			IndexSchemaObjectField otherNestedObjectField =
+					root.objectField( "level1WithSingleValuedLevel2", ObjectStructure.NESTED )
+							.multiValued();
 			level1WithSingleValuedLevel2 = new Level1ObjectBindingWithSingleValuedLevel2( otherNestedObjectField );
 		}
 	}

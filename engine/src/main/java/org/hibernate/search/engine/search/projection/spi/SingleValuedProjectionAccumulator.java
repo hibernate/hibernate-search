@@ -26,10 +26,12 @@ final class SingleValuedProjectionAccumulator<E, V> implements ProjectionAccumul
 	@SuppressWarnings("rawtypes")
 	static final ProjectionAccumulator.Provider PROVIDER = new ProjectionAccumulator.Provider() {
 		private final SingleValuedProjectionAccumulator instance = new SingleValuedProjectionAccumulator();
+
 		@Override
 		public ProjectionAccumulator get() {
 			return instance;
 		}
+
 		@Override
 		public boolean isSingleValued() {
 			return true;

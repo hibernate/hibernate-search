@@ -253,8 +253,9 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 	}
 
 	private String resolveTermVector() {
-		if ( highlightable != null && ( highlightable.contains( Highlightable.FAST_VECTOR )
-				|| highlightable.contains( Highlightable.ANY ) ) ) {
+		if ( highlightable != null
+				&& ( highlightable.contains( Highlightable.FAST_VECTOR )
+						|| highlightable.contains( Highlightable.ANY ) ) ) {
 			if ( TermVector.DEFAULT.equals( termVector ) ) {
 				return TermVector.WITH_POSITIONS_OFFSETS.name().toLowerCase( Locale.ROOT );
 			}

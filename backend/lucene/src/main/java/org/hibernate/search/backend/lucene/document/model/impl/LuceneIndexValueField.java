@@ -21,12 +21,11 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 public final class LuceneIndexValueField<F>
 		extends AbstractIndexValueField<
-						LuceneIndexValueField<F>,
-						LuceneSearchIndexScope<?>,
-						LuceneIndexValueFieldType<F>,
-						LuceneIndexCompositeNode,
-						F
-				>
+				LuceneIndexValueField<F>,
+				LuceneSearchIndexScope<?>,
+				LuceneIndexValueFieldType<F>,
+				LuceneIndexCompositeNode,
+				F>
 		implements LuceneIndexField, LuceneSearchIndexValueFieldContext<F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

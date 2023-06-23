@@ -32,7 +32,8 @@ public class AnnotationMappingAccessTypeIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private SearchMapping mapping;
 
@@ -65,7 +66,8 @@ public class AnnotationMappingAccessTypeIT {
 			entity1.propertyWithGetterAndFieldDeclaredInParent = "propertyWithGetterAndFieldDeclaredInParent";
 			entity1.propertyWithFieldDeclaredInParent = "propertyWithFieldDeclaredInParent";
 			entity1.propertyWithFieldDeclaredInParentThenGetterInChild = "propertyWithFieldDeclaredInParentThenGetterInChild";
-			entity1.propertyWithGetterAndFieldDeclaredInParentThenOverridden = "propertyWithGetterAndFieldDeclaredInParentThenOverridden";
+			entity1.propertyWithGetterAndFieldDeclaredInParentThenOverridden =
+					"propertyWithGetterAndFieldDeclaredInParentThenOverridden";
 			entity1.propertyWithGetterDeclaredAbstractInParent = "propertyWithGetterDeclaredAbstractInParent";
 			entity1.propertyWithGetterAndField = "propertyWithGetterAndField";
 			entity1.propertyWithFieldOnly = "propertyWithFieldOnly";
@@ -75,14 +77,19 @@ public class AnnotationMappingAccessTypeIT {
 
 			backendMock.expectWorks( IndexedEntity.NAME )
 					.add( "1", b -> b
-							.field( "propertyWithGetterAndFieldDeclaredInParent", entity1.propertyWithGetterAndFieldDeclaredInParent )
+							.field( "propertyWithGetterAndFieldDeclaredInParent",
+									entity1.propertyWithGetterAndFieldDeclaredInParent )
 							.field( "propertyWithFieldDeclaredInParent", entity1.propertyWithFieldDeclaredInParent )
-							.field( "propertyWithFieldDeclaredInParentThenGetterInChild", entity1.propertyWithFieldDeclaredInParentThenGetterInChild )
-							.field( "propertyWithGetterAndFieldDeclaredInParentThenOverridden", entity1.propertyWithGetterAndFieldDeclaredInParentThenOverridden )
-							.field( "propertyWithGetterDeclaredAbstractInParent", entity1.propertyWithGetterDeclaredAbstractInParent )
+							.field( "propertyWithFieldDeclaredInParentThenGetterInChild",
+									entity1.propertyWithFieldDeclaredInParentThenGetterInChild )
+							.field( "propertyWithGetterAndFieldDeclaredInParentThenOverridden",
+									entity1.propertyWithGetterAndFieldDeclaredInParentThenOverridden )
+							.field( "propertyWithGetterDeclaredAbstractInParent",
+									entity1.propertyWithGetterDeclaredAbstractInParent )
 							.field( "propertyWithGetterAndField", entity1.propertyWithGetterAndField )
 							.field( "propertyWithFieldOnly", entity1.propertyWithFieldOnly )
-							.field( "propertyWithGetterAndDifferentlyNamedField", entity1.internalFieldForPropertyWithGetterAndDifferentlyNamedField )
+							.field( "propertyWithGetterAndDifferentlyNamedField",
+									entity1.internalFieldForPropertyWithGetterAndDifferentlyNamedField )
 					);
 		}
 	}

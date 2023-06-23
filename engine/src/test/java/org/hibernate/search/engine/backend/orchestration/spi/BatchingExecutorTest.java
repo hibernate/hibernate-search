@@ -57,7 +57,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
-@SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types
+@SuppressWarnings({ "unchecked", "rawtypes" }) // Raw types are the only way to mock parameterized types
 @RunWith(Parameterized.class)
 public class BatchingExecutorTest {
 
@@ -449,7 +449,7 @@ public class BatchingExecutorTest {
 
 	@Test
 	public void simple_newTasksBlockedAndOffloadedCompletes() throws InterruptedException {
-		AtomicReference<Runnable> offloadAction = new AtomicReference<>( () -> { } );
+		AtomicReference<Runnable> offloadAction = new AtomicReference<>( () -> {} );
 		createAndStartExecutor( 2, true, w -> offloadAction.get().run() );
 
 		assumeFalse(
@@ -547,7 +547,9 @@ public class BatchingExecutorTest {
 	private void createAndStartExecutor(int maxTasksPerBatch, boolean fair) {
 		createAndStartExecutor( maxTasksPerBatch, fair, w -> fail( "Work shouldn't be offloaded." ) );
 	}
-	private void createAndStartExecutor(int maxTasksPerBatch, boolean fair, Consumer<? super BatchedWork<? super StubWorkProcessor>> blockingRetryProducer) {
+
+	private void createAndStartExecutor(int maxTasksPerBatch, boolean fair,
+			Consumer<? super BatchedWork<? super StubWorkProcessor>> blockingRetryProducer) {
 		this.executor = new BatchingExecutor<>(
 				NAME, processorMock, maxTasksPerBatch, fair, failureHandlerMock, blockingRetryProducer
 		);

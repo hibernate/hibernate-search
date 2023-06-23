@@ -28,21 +28,24 @@ import org.apache.lucene.store.Lock;
 
 public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 
-	protected static final String SINGLE_INSTANCE_LOCK_FQN = "org.apache.lucene.store.SingleInstanceLockFactory$SingleInstanceLock";
+	protected static final String SINGLE_INSTANCE_LOCK_FQN =
+			"org.apache.lucene.store.SingleInstanceLockFactory$SingleInstanceLock";
 	protected static final String SIMPLE_FS_LOCK_FQN = "org.apache.lucene.store.SimpleFSLockFactory$SimpleFSLock";
 	protected static final String NATIVE_FS_LOCK_FQN = "org.apache.lucene.store.NativeFSLockFactory$NativeFSLock";
 	protected static final String NO_LOCK_FQN = "org.apache.lucene.store.NoLockFactory$NoLock";
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
-	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testUseOfNativeLockingFactory")
+	@PortedFromSearch5(
+			original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testUseOfNativeLockingFactory")
 	public void lockingStrategy_default() {
 		testValidLockingStrategy( null, getDefaultLockClassName() );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
-	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testUseOfSimpleLockingFactory")
+	@PortedFromSearch5(
+			original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testUseOfSimpleLockingFactory")
 	public void lockingStrategy_simpleFilesystem() {
 		if ( isFSDirectory() ) {
 			testValidLockingStrategy( "simple-filesystem", SIMPLE_FS_LOCK_FQN );
@@ -54,7 +57,8 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
-	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testUseOfNativeLockingFactory")
+	@PortedFromSearch5(
+			original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testUseOfNativeLockingFactory")
 	public void lockingStrategy_nativeFilesystem() {
 		if ( isFSDirectory() ) {
 			testValidLockingStrategy( "native-filesystem", NATIVE_FS_LOCK_FQN );
@@ -66,7 +70,8 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
-	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testUseOfSingleLockingFactory")
+	@PortedFromSearch5(
+			original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testUseOfSingleLockingFactory")
 	public void lockingStrategy_singleInstance() {
 		testValidLockingStrategy( "single-instance", SINGLE_INSTANCE_LOCK_FQN );
 	}
@@ -79,7 +84,8 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
-	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testFailOnNonExistentLockingFactory")
+	@PortedFromSearch5(
+			original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testFailOnNonExistentLockingFactory")
 	public void lockingStrategy_invalid() {
 		assertThatThrownBy( () -> setup( c -> c.withBackendProperty(
 				LuceneIndexSettings.DIRECTORY_LOCKING_STRATEGY,

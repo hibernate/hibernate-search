@@ -39,6 +39,7 @@ public interface HighlighterBoundaryScannerFastVectorHighlighterOptionsStep<T ex
 	 * @return The next step in a highlighter definition.
 	 */
 	HighlighterBoundaryScannerFastVectorHighlighterOptionsStep<T> boundaryChars(String boundaryChars);
+
 	/**
 	 * Specify a set of characters to look for when scanning for boundaries when
 	 * a {@link HighlighterBoundaryScannerTypeFastVectorHighlighterStep#chars() characters boundary scanner} is used.

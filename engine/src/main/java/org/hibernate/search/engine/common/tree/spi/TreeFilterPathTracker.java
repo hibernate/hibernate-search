@@ -50,12 +50,12 @@ public final class TreeFilterPathTracker {
 		for ( String path : definition.excludePaths() ) {
 			if (
 				// Since it's exclude we should always get a FALSE value from this map for such key.
-				// Hence, we only want to check for fields that we never encountered i.e. some typos in property names or just some "pointless" text :)
-				//
-				// Alternatively, if a property was "explicitly" excluded by a child, which would make adding it to excludes
-				// on this level redundant (or in other words such that references a "missing" property) we will not get
-				// such path marked at all since we stop the recursion early in the filter.
-					!encounteredFieldPaths.containsKey( path )
+			// Hence, we only want to check for fields that we never encountered i.e. some typos in property names or just some "pointless" text :)
+			//
+			// Alternatively, if a property was "explicitly" excluded by a child, which would make adding it to excludes
+			// on this level redundant (or in other words such that references a "missing" property) we will not get
+			// such path marked at all since we stop the recursion early in the filter.
+			!encounteredFieldPaths.containsKey( path )
 			) {
 				uselessExcludePaths.add( path );
 			}

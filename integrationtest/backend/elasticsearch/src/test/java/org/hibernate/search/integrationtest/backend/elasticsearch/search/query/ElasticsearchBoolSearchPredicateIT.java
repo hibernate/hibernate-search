@@ -51,7 +51,10 @@ public class ElasticsearchBoolSearchPredicateIT {
 						"  }" +
 						"}",
 				index.query()
-						.where( f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "fieldName" ).matching( "test" ) ) ) ) ) ) ) ) ).toPredicate() )
+						.where( f.bool()
+								.must( f.not( f.not( f.not( f.not(
+										f.not( f.not( f.not( f.match().field( "fieldName" ).matching( "test" ) ) ) ) ) ) ) ) )
+								.toPredicate() )
 						.toQuery()
 						.queryString()
 		);
@@ -67,7 +70,11 @@ public class ElasticsearchBoolSearchPredicateIT {
 						"  }" +
 						"}",
 				index.query()
-						.where( f.not( f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "fieldName" ).matching( "test" ) ) ) ) ) ) ) ) ) ).toPredicate() )
+						.where( f
+								.not( f.bool()
+										.must( f.not( f.not( f.not( f.not( f.not( f
+												.not( f.not( f.match().field( "fieldName" ).matching( "test" ) ) ) ) ) ) ) ) ) )
+								.toPredicate() )
 						.toQuery()
 						.queryString()
 		);
@@ -218,14 +225,14 @@ public class ElasticsearchBoolSearchPredicateIT {
 		assertJsonEqualsIgnoringUnknownFields(
 				expectedQueryJson,
 				index.query().where( f -> f.bool()
-								.must( f.match().field( "fieldName" ).matching( "test" ) )
-								.must( f.nested( "nested" )
-										.add( f.range().field( "nested.integer" )
-												.between( 5, 10 ) )
-										.add( f.match().field( "nested.text" )
-												.matching( "value" )
-										) )
-						).toQuery()
+						.must( f.match().field( "fieldName" ).matching( "test" ) )
+						.must( f.nested( "nested" )
+								.add( f.range().field( "nested.integer" )
+										.between( 5, 10 ) )
+								.add( f.match().field( "nested.text" )
+										.matching( "value" )
+								) )
+				).toQuery()
 						.queryString()
 		);
 
@@ -233,17 +240,17 @@ public class ElasticsearchBoolSearchPredicateIT {
 		assertJsonEqualsIgnoringUnknownFields(
 				expectedQueryJson,
 				index.query().where( f -> f.bool()
-								.must( f.match().field( "fieldName" ).matching( "test" ) )
-								.must( f.nested( "nested" )
-										.add(
-												f.bool()
-														.must( f.range().field( "nested.integer" )
-																.between( 5, 10 ) )
-														.must( f.match().field( "nested.text" )
-																.matching( "value" )
-														)
-										) )
-						).toQuery()
+						.must( f.match().field( "fieldName" ).matching( "test" ) )
+						.must( f.nested( "nested" )
+								.add(
+										f.bool()
+												.must( f.range().field( "nested.integer" )
+														.between( 5, 10 ) )
+												.must( f.match().field( "nested.text" )
+														.matching( "value" )
+												)
+								) )
+				).toQuery()
 						.queryString()
 		);
 	}
@@ -281,16 +288,16 @@ public class ElasticsearchBoolSearchPredicateIT {
 						"  }" +
 						"}",
 				index.query().where( f -> f.nested( "nested" )
-								.add(
-										f.bool()
-												.must( f.range().field( "nested.integer" )
-														.between( 5, 10 )
-												)
-												.must( f.match().field( "nested.text" )
-														.matching( "value" )
-												)
-								)
-						).toQuery()
+						.add(
+								f.bool()
+										.must( f.range().field( "nested.integer" )
+												.between( 5, 10 )
+										)
+										.must( f.match().field( "nested.text" )
+												.matching( "value" )
+										)
+						)
+				).toQuery()
 						.queryString()
 		);
 
@@ -312,12 +319,12 @@ public class ElasticsearchBoolSearchPredicateIT {
 						"  }" +
 						"}",
 				index.query().where( f -> f.nested( "nested" )
-								.add(
-										f.bool()
-												.must( f.range().field( "nested.integer" )
-														.between( 5, 10 ) )
-								)
-						).toQuery()
+						.add(
+								f.bool()
+										.must( f.range().field( "nested.integer" )
+												.between( 5, 10 ) )
+						)
+				).toQuery()
 						.queryString()
 		);
 	}

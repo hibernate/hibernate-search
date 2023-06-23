@@ -47,8 +47,8 @@ public class PojoIndexingProcessorCastedTypeNodeBuilder<T, U> extends AbstractPo
 	protected PojoIndexingDependencyCollectorTypeNode<U> toType(
 			AbstractPojoIndexingDependencyCollectorDirectValueNode<?, T> valueDependencyCollector) {
 		// By construction, the casted type should be the same as U
-		return (PojoIndexingDependencyCollectorTypeNode<U>)
-				valueDependencyCollector.castedType( getModelPath().getTypeModel().rawType() );
+		return (PojoIndexingDependencyCollectorTypeNode<U>) valueDependencyCollector
+				.castedType( getModelPath().getTypeModel().rawType() );
 	}
 
 	@Override

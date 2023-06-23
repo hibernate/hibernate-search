@@ -79,12 +79,12 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	@Override
 	public boolean sortByFieldValue(TestedFieldStructure fieldStructure, Class<?> fieldType, SortMode sortMode) {
 		if (
-				fieldStructure.isInNested()
-				&& sortMode == SortMode.MAX
-				&& ( Float.class.equals( fieldType )
-						|| Double.class.equals( fieldType )
-						|| BigInteger.class.equals( fieldType )
-						|| BigDecimal.class.equals( fieldType ) )
+			fieldStructure.isInNested()
+					&& sortMode == SortMode.MAX
+					&& ( Float.class.equals( fieldType )
+							|| Double.class.equals( fieldType )
+							|| BigInteger.class.equals( fieldType )
+							|| BigDecimal.class.equals( fieldType ) )
 		) {
 			// For some reason, ES 5.6 seems to evaluate the max to 0 when a nested document
 			// has a field with only negative floating-point values.

@@ -97,7 +97,8 @@ public class LuceneTextPhrasePredicate extends AbstractLuceneLeafSingleFieldPred
 				return new TermQuery( new Term( absoluteFieldPath, phrase ) );
 			}
 
-			Query analyzed = new QueryBuilder( effectiveAnalyzerOrNormalizer ).createPhraseQuery( absoluteFieldPath, phrase, slop );
+			Query analyzed =
+					new QueryBuilder( effectiveAnalyzerOrNormalizer ).createPhraseQuery( absoluteFieldPath, phrase, slop );
 			if ( analyzed == null ) {
 				// Either the value was an empty string
 				// or the analysis removed all tokens (that can happen if the value contained only stopwords, for example)

@@ -136,7 +136,7 @@ class LongMultiValueRangeCounter {
 		int lo = 0;
 		int hi = boundaries.length - 1;
 		while ( true ) {
-			int mid = (lo + hi) >>> 1;
+			int mid = ( lo + hi ) >>> 1;
 			if ( v <= boundaries[mid] ) {
 				if ( mid == 0 ) {
 					return 0;
@@ -196,7 +196,7 @@ class LongMultiValueRangeCounter {
 			return new LongRangeNode( range.start, range.end, null, null );
 		}
 		else {
-			int mid = (start + end) >>> 1;
+			int mid = ( start + end ) >>> 1;
 			LongRangeNode left = split( start, mid, elementaryIntervals );
 			LongRangeNode right = split( mid, end, elementaryIntervals );
 			return new LongRangeNode( left.start, right.end, left, right );

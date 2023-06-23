@@ -40,7 +40,7 @@ public class SystemConfigurationPropertySource implements AllAwareConfigurationP
 		return System.getProperties().entrySet().stream()
 				.filter( e -> {
 					Object key = e.getKey();
-					if ( ! ( key instanceof String ) ) {
+					if ( !( key instanceof String ) ) {
 						return false;
 					}
 					return predicate.test( (String) key, e.getValue() );

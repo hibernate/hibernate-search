@@ -140,16 +140,17 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.apache.lucene.search.Query luceneQuery = builder
 				.spatial()
-					.onField( "location" )
-					.within( 100, Unit.KM )
-						.ofLatitude( centerLatitude )
-						.andLongitude( centerLongitude )
+				.onField( "location" )
+				.within( 100, Unit.KM )
+				.ofLatitude( centerLatitude )
+				.andLongitude( centerLongitude )
 				.createQuery();
 
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
-		hibQuery.setSort( builder.sort().byDistance().onField( "location" ).fromLatitude( centerLatitude ).andLongitude( centerLongitude ).createSort() );
+		hibQuery.setSort( builder.sort().byDistance().onField( "location" ).fromLatitude( centerLatitude )
+				.andLongitude( centerLongitude ).createSort() );
 		List results = hibQuery.list();
 		Object[] firstResult = (Object[]) results.get( 0 );
 		Object[] secondResult = (Object[]) results.get( 1 );
@@ -434,9 +435,9 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.apache.lucene.search.Query luceneQuery = builder
 				.spatial()
-					.within( 50, Unit.KM )
-						.ofLatitude( centerLatitude )
-						.andLongitude( centerLongitude )
+				.within( 50, Unit.KM )
+				.ofLatitude( centerLatitude )
+				.andLongitude( centerLongitude )
 				.createQuery();
 
 
@@ -446,9 +447,9 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.apache.lucene.search.Query luceneQuery2 = builder
 				.spatial()
-					.within( 51, Unit.KM )
-						.ofLatitude( centerLatitude )
-						.andLongitude( centerLongitude )
+				.within( 51, Unit.KM )
+				.ofLatitude( centerLatitude )
+				.andLongitude( centerLongitude )
 				.createQuery();
 
 		org.hibernate.query.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, RangeHotel.class );
@@ -460,9 +461,9 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.apache.lucene.search.Query luceneQuery3 = builder
 				.spatial()
-					.within( 112, Unit.KM )
-						.ofLatitude( endOfTheWorldLatitude )
-						.andLongitude( endOfTheWorldLongitude )
+				.within( 112, Unit.KM )
+				.ofLatitude( endOfTheWorldLatitude )
+				.andLongitude( endOfTheWorldLongitude )
 				.createQuery();
 
 		org.hibernate.query.Query hibQuery3 = fullTextSession.createFullTextQuery( luceneQuery3, RangeHotel.class );
@@ -471,9 +472,9 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.apache.lucene.search.Query luceneQuery4 = builder
 				.spatial()
-					.within( 100000, Unit.KM )
-						.ofLatitude( endOfTheWorldLatitude )
-						.andLongitude( endOfTheWorldLongitude )
+				.within( 100000, Unit.KM )
+				.ofLatitude( endOfTheWorldLatitude )
+				.andLongitude( endOfTheWorldLongitude )
 				.createQuery();
 
 		org.hibernate.query.Query hibQuery4 = fullTextSession.createFullTextQuery( luceneQuery4, RangeHotel.class );
@@ -534,7 +535,8 @@ public class SpatialIndexingTest extends SearchTestBase {
 		double centerLatitude = 37.769645d;
 		double centerLongitude = -122.446428d;
 
-		final QueryBuilder builder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( DoubleIndexedPOI.class ).get();
+		final QueryBuilder builder =
+				fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( DoubleIndexedPOI.class ).get();
 
 		//Tests with FieldBridge
 		org.apache.lucene.search.Query luceneQuery = builder.spatial().onField( "location" )
@@ -543,7 +545,8 @@ public class SpatialIndexingTest extends SearchTestBase {
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, DoubleIndexedPOI.class );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
-		hibQuery.setSort( builder.sort().byDistance().onField( "location" ).fromLatitude( centerLatitude ).andLongitude( centerLongitude ).createSort() );
+		hibQuery.setSort( builder.sort().byDistance().onField( "location" ).fromLatitude( centerLatitude )
+				.andLongitude( centerLongitude ).createSort() );
 		List results = hibQuery.list();
 		assertEquals( 2, results.size() );
 		Object[] firstResult = (Object[]) results.get( 0 );
@@ -558,7 +561,8 @@ public class SpatialIndexingTest extends SearchTestBase {
 		hibQuery = fullTextSession.createFullTextQuery( luceneQuery, DoubleIndexedPOI.class );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, Spatial.COORDINATES_DEFAULT_FIELD );
-		hibQuery.setSort( builder.sort().byDistance().onField( "location" ).fromLatitude( centerLatitude ).andLongitude( centerLongitude ).createSort() );
+		hibQuery.setSort( builder.sort().byDistance().onField( "location" ).fromLatitude( centerLatitude )
+				.andLongitude( centerLongitude ).createSort() );
 		results = hibQuery.list();
 		assertEquals( 2, results.size() );
 		firstResult = (Object[]) results.get( 0 );

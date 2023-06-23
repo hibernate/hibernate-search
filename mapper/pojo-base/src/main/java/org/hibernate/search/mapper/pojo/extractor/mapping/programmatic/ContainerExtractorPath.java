@@ -95,7 +95,7 @@ public class ContainerExtractorPath {
 
 	@Override
 	public boolean equals(Object obj) {
-		if ( ! ( obj instanceof ContainerExtractorPath ) ) {
+		if ( !( obj instanceof ContainerExtractorPath ) ) {
 			return false;
 		}
 		ContainerExtractorPath other = (ContainerExtractorPath) obj;

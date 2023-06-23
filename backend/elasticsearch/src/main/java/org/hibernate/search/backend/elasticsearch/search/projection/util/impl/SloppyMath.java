@@ -91,7 +91,8 @@ public class SloppyMath {
 		index &= ( SIN_COS_TABS_SIZE - 2 ); // index % (SIN_COS_TABS_SIZE-1)
 		double indexCos = cosTab[index];
 		double indexSin = sinTab[index];
-		return indexCos + delta * ( -indexSin + delta * ( -indexCos * ONE_DIV_F2 + delta * ( indexSin * ONE_DIV_F3 + delta * indexCos * ONE_DIV_F4 ) ) );
+		return indexCos + delta * ( -indexSin
+				+ delta * ( -indexCos * ONE_DIV_F2 + delta * ( indexSin * ONE_DIV_F3 + delta * indexCos * ONE_DIV_F4 ) ) );
 	}
 
 	/**
@@ -127,14 +128,16 @@ public class SloppyMath {
 		if ( a <= ASIN_MAX_VALUE_FOR_TABS ) {
 			int index = (int) ( a * ASIN_INDEXER + 0.5 );
 			double delta = a - index * ASIN_DELTA;
-			double result = asinTab[index] + delta * ( asinDer1DivF1Tab[index] + delta * ( asinDer2DivF2Tab[index] + delta * ( asinDer3DivF3Tab[index] + delta * asinDer4DivF4Tab[index] ) ) );
+			double result = asinTab[index] + delta * ( asinDer1DivF1Tab[index] + delta * ( asinDer2DivF2Tab[index]
+					+ delta * ( asinDer3DivF3Tab[index] + delta * asinDer4DivF4Tab[index] ) ) );
 			return negateResult ? -result : result;
 		}
 		else { // value > ASIN_MAX_VALUE_FOR_TABS, or value is NaN
-			// This part is derived from fdlibm.
+				// This part is derived from fdlibm.
 			if ( a < 1.0 ) {
 				double t = ( 1.0 - a ) * 0.5;
-				double p = t * ( ASIN_PS0 + t * ( ASIN_PS1 + t * ( ASIN_PS2 + t * ( ASIN_PS3 + t * ( ASIN_PS4 + t * ASIN_PS5 ) ) ) ) );
+				double p = t * ( ASIN_PS0
+						+ t * ( ASIN_PS1 + t * ( ASIN_PS2 + t * ( ASIN_PS3 + t * ( ASIN_PS4 + t * ASIN_PS5 ) ) ) ) );
 				double q = 1.0 + t * ( ASIN_QS1 + t * ( ASIN_QS2 + t * ( ASIN_QS3 + t * ASIN_QS4 ) ) );
 				double s = Math.sqrt( t );
 				double z = s + s * ( p / q );

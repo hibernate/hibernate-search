@@ -304,10 +304,11 @@ public class SortTest extends SearchTestBase {
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
 		assertThat( result ).extracting( "lastName" )
-			.containsExactly( "Higgins", "Higgins", "Johnson", "Johnson" );
+				.containsExactly( "Higgins", "Higgins", "Johnson", "Johnson" );
 
 		assertThat( result ).extracting( "name" )
-			.containsExactly( "Barny the brick layer", "Bart the brick layer", "Barny the brick layer", "Bill the brick layer" );
+				.containsExactly( "Barny the brick layer", "Bart the brick layer", "Barny the brick layer",
+						"Bill the brick layer" );
 
 		tx.commit();
 	}
@@ -549,11 +550,13 @@ public class SortTest extends SearchTestBase {
 
 		@Override
 		public void copy(int slot, int doc) throws IOException {
-			int v1 = (int) ( currentReaderValuesField1.advanceExact( doc ) ? currentReaderValuesField1.nextValue()
+			int v1 = (int) ( currentReaderValuesField1.advanceExact( doc )
+					? currentReaderValuesField1.nextValue()
 					: Integer.MAX_VALUE );
 			field1Values[slot] = v1;
 
-			int v2 = (int) ( currentReaderValuesField2.advanceExact( doc ) ? currentReaderValuesField2.nextValue()
+			int v2 = (int) ( currentReaderValuesField2.advanceExact( doc )
+					? currentReaderValuesField2.nextValue()
 					: Integer.MAX_VALUE );
 			field2Values[slot] = v2;
 		}

@@ -51,7 +51,7 @@ public class LuceneSimilarityIT {
 				} );
 
 		// Add a document to the index
-		index.index( "1", document -> { } );
+		index.index( "1", document -> {} );
 
 		// Check that writing succeeded
 		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
@@ -76,7 +76,7 @@ public class LuceneSimilarityIT {
 				} );
 
 		// Add a document to the index
-		index.index( "1", document -> { } );
+		index.index( "1", document -> {} );
 
 		// Check that writing succeeded
 		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
@@ -88,7 +88,8 @@ public class LuceneSimilarityIT {
 				.withIndex( index )
 				.withBackendProperty(
 						LuceneBackendSettings.ANALYSIS_CONFIGURER,
-						similarity == null ? null
+						similarity == null
+								? null
 								: (LuceneAnalysisConfigurer) context -> context.similarity( similarity )
 				)
 				.setup();

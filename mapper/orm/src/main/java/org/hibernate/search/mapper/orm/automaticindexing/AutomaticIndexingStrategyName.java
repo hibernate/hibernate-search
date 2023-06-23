@@ -29,7 +29,7 @@ public enum AutomaticIndexingStrategyName {
 	 * @deprecated Use {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#INDEXING_LISTENERS_ENABLED} instead.
 	 */
 	@Deprecated
-	NONE("none"),
+	NONE( "none" ),
 
 	/**
 	 * Indexing is triggered automatically when entities are modified in the Hibernate ORM session:
@@ -38,7 +38,7 @@ public enum AutomaticIndexingStrategyName {
 	 * @deprecated Use {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#INDEXING_LISTENERS_ENABLED} instead.
 	 */
 	@Deprecated
-	SESSION("session");
+	SESSION( "session" );
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

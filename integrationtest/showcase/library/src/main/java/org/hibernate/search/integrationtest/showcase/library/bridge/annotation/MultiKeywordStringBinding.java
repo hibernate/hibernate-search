@@ -30,8 +30,7 @@ public @interface MultiKeywordStringBinding {
 
 	String fieldName();
 
-	String separatorPattern() default
-			org.hibernate.search.integrationtest.showcase.library.bridge.MultiKeywordStringBridge.SEPARATOR_PATTERN_DEFAULT;
+	String separatorPattern() default org.hibernate.search.integrationtest.showcase.library.bridge.MultiKeywordStringBridge.SEPARATOR_PATTERN_DEFAULT;
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.METHOD, ElementType.FIELD })

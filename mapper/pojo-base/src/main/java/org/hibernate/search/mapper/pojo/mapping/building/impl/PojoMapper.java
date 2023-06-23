@@ -91,7 +91,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	private final Set<PojoRawTypeModel<?>> indexedEntityTypes = new LinkedHashSet<>();
 	private final Set<PojoRawTypeModel<?>> initialMappedTypes = new LinkedHashSet<>();
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<PojoRawTypeModel<?>,PojoIndexedTypeManagerBuilder<?>> indexedTypeManagerBuilders =
+	private final Map<PojoRawTypeModel<?>, PojoIndexedTypeManagerBuilder<?>> indexedTypeManagerBuilders =
 			new LinkedHashMap<>();
 	private PojoSearchQueryElementRegistry searchQueryElementRegistry;
 
@@ -279,8 +279,8 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			}
 
 			// Second step: build the indexed type managers and their reindexing resolvers
-			for ( Map.Entry<PojoRawTypeModel<?>, PojoIndexedTypeManagerBuilder<?>> entry
-					: indexedTypeManagerBuilders.entrySet() ) {
+			for ( Map.Entry<PojoRawTypeModel<?>, PojoIndexedTypeManagerBuilder<?>> entry : indexedTypeManagerBuilders
+					.entrySet() ) {
 				PojoRawTypeModel<?> typeModel = entry.getKey();
 				PojoIndexedTypeManagerBuilder<?> pojoIndexedTypeManagerBuilder = entry.getValue();
 				try {

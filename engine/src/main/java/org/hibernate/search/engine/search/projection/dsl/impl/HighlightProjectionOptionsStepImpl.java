@@ -15,7 +15,8 @@ import org.hibernate.search.engine.search.projection.dsl.spi.HighlightProjection
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 
-public class HighlightProjectionOptionsStepImpl implements HighlightProjectionOptionsStep,
+public class HighlightProjectionOptionsStepImpl
+		implements HighlightProjectionOptionsStep,
 		HighlightProjectionFinalStep {
 
 	private final HighlightProjectionBuilder highlight;

@@ -14,7 +14,9 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateCl
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 public final class SimpleBooleanPredicateClausesStepImpl
-		extends AbstractSimpleBooleanPredicateClausesStep<SimpleBooleanPredicateClausesStepImpl, SimpleBooleanPredicateClausesCollector<?>>
+		extends
+		AbstractSimpleBooleanPredicateClausesStep<SimpleBooleanPredicateClausesStepImpl,
+				SimpleBooleanPredicateClausesCollector<?>>
 		implements SimpleBooleanPredicateClausesStep<SimpleBooleanPredicateClausesStepImpl> {
 
 	public SimpleBooleanPredicateClausesStepImpl(SimpleBooleanPredicateOperator operator,

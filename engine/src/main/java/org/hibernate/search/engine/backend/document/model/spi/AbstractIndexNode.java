@@ -15,10 +15,9 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public abstract class AbstractIndexNode<
-				S extends AbstractIndexNode<S, SC, ?>,
-				SC extends SearchIndexScope<?>,
-				NT extends SearchIndexNodeTypeContext<SC, ? super S>
-		>
+		S extends AbstractIndexNode<S, SC, ?>,
+		SC extends SearchIndexScope<?>,
+		NT extends SearchIndexNodeTypeContext<SC, ? super S>>
 		implements IndexNode<SC> {
 	protected final NT type;
 

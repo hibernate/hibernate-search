@@ -21,8 +21,8 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 
 public class StubIndexCompositeNodeType
 		extends AbstractIndexCompositeNodeType<
-		StubSearchIndexScope, StubSearchIndexCompositeNodeContext
-		>
+				StubSearchIndexScope,
+				StubSearchIndexCompositeNodeContext>
 		implements StubSearchIndexCompositeNodeTypeContext {
 
 	public final ObjectStructure objectStructure;
@@ -40,8 +40,8 @@ public class StubIndexCompositeNodeType
 
 	public static class Builder
 			extends AbstractIndexCompositeNodeType.Builder<
-			StubSearchIndexScope, StubSearchIndexCompositeNodeContext
-			> {
+					StubSearchIndexScope,
+					StubSearchIndexCompositeNodeContext> {
 		private final ObjectStructure objectStructure;
 
 		public Builder(ObjectStructure objectStructure) {

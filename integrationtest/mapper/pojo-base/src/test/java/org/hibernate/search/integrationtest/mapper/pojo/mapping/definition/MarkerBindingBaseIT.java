@@ -47,8 +47,7 @@ public class MarkerBindingBaseIT {
 
 	@Test
 	public void withParams_annotationMapping() {
-		backendMock.expectSchema( INDEX_NAME, b -> {
-		} );
+		backendMock.expectSchema( INDEX_NAME, b -> {} );
 		setupHelper.start().expectCustomBeans().setup( AnnotatedEntity.class );
 		backendMock.verifyExpectationsMet();
 
@@ -57,8 +56,7 @@ public class MarkerBindingBaseIT {
 
 	@Test
 	public void withParams_programmaticMapping() {
-		backendMock.expectSchema( INDEX_NAME, b -> {
-		} );
+		backendMock.expectSchema( INDEX_NAME, b -> {} );
 		setupHelper.start()
 				.withConfiguration( builder -> {
 					builder.addEntityType( NonAnnotatedEntity.class );

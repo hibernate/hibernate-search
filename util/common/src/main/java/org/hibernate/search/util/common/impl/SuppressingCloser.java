@@ -76,7 +76,7 @@ public final class SuppressingCloser extends AbstractCloser<SuppressingCloser, E
 	 * @param closeables An array of {@link AutoCloseable}s to close.
 	 * @return {@code this}, for method chaining.
 	 */
-	public SuppressingCloser pushAll(AutoCloseable ... closeables) {
+	public SuppressingCloser pushAll(AutoCloseable... closeables) {
 		return pushAll( AutoCloseable::close, closeables );
 	}
 

@@ -100,7 +100,8 @@ public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexin
 			includedInPropertyBridgeSourceAccessor = context.bridgedElement().property( "containedSingle" )
 					.property( "includedInSingleValuedPropertyBridge" )
 					.createAccessor( String.class );
-			IndexSchemaObjectField propertyBridgeObjectField = context.indexSchemaElement().objectField( "singleValuedPropertyBridge" );
+			IndexSchemaObjectField propertyBridgeObjectField =
+					context.indexSchemaElement().objectField( "singleValuedPropertyBridge" );
 			propertyBridgeObjectFieldReference = propertyBridgeObjectField.toReference();
 			includedInPropertyBridgeFieldReference = propertyBridgeObjectField.field(
 					"includedInSingleValuedPropertyBridge", f -> f.asString()

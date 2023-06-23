@@ -69,11 +69,11 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 						+ " 'tokenizer': {"
 						+ "   'custom-edgeNGram': {"
 						+ "     'type': 'edge_ngram',"
-									/*
-									 * Strangely enough, even if you send properly typed numbers
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of numbers...
-									 */
+						/*
+						 * Strangely enough, even if you send properly typed numbers
+						 * to Elasticsearch, when you ask for the current settings it
+						 * will spit back strings instead of numbers...
+						 */
 						+ "     'min_gram': '1',"
 						+ "     'max_gram': '10'"
 						+ "   }"
@@ -88,8 +88,8 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 						+ "     'generate_word_parts': false"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		setupAndUpdateIndex();
 
@@ -114,11 +114,11 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 						+ " 'tokenizer': {"
 						+ "   'custom-edgeNGram': {"
 						+ "     'type': 'edge_ngram',"
-									/*
-									 * Strangely enough, even if you send properly typed numbers
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of numbers...
-									 */
+						/*
+						 * Strangely enough, even if you send properly typed numbers
+						 * to Elasticsearch, when you ask for the current settings it
+						 * will spit back strings instead of numbers...
+						 */
 						+ "     'min_gram': '1',"
 						+ "     'max_gram': '10'"
 						+ "   }"
@@ -130,17 +130,17 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 						+ "   },"
 						+ "   'custom-word-delimiter': {"
 						+ "     'type': 'word_delimiter',"
-									/*
-									 * Strangely enough, even if you send properly typed booleans
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of booleans...
-									 */
+						/*
+						 * Strangely enough, even if you send properly typed booleans
+						 * to Elasticsearch, when you ask for the current settings it
+						 * will spit back strings instead of booleans...
+						 */
 						+ "     'generate_word_parts': 'false'"
 						+ "   }"
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).settings( "index.analysis" ).get()
-				);
+		);
 	}
 
 	@Test
@@ -173,8 +173,8 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 						+ "     'generate_word_parts': false"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		setupAndUpdateIndex();
 
@@ -199,11 +199,11 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 						+ " 'tokenizer': {"
 						+ "   'custom-edgeNGram': {"
 						+ "     'type': 'edge_ngram',"
-									/*
-									 * Strangely enough, even if you send properly typed numbers
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of numbers...
-									 */
+						/*
+						 * Strangely enough, even if you send properly typed numbers
+						 * to Elasticsearch, when you ask for the current settings it
+						 * will spit back strings instead of numbers...
+						 */
 						+ "     'min_gram': '1',"
 						+ "     'max_gram': '10'"
 						+ "   }"
@@ -215,17 +215,17 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 						+ "   },"
 						+ "   'custom-word-delimiter': {"
 						+ "     'type': 'word_delimiter',"
-									/*
-									 * Strangely enough, even if you send properly typed booleans
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of booleans...
-									 */
+						/*
+						 * Strangely enough, even if you send properly typed booleans
+						 * to Elasticsearch, when you ask for the current settings it
+						 * will spit back strings instead of booleans...
+						 */
 						+ "     'generate_word_parts': 'false'"
 						+ "   }"
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).settings( "index.analysis" ).get()
-				);
+		);
 	}
 
 	@Test
@@ -233,11 +233,11 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
-					/*
-					 * We don't add the analyzer here: since a component is missing
-					 * the analyzer can't reference it and thus it must be missing too.
-					 */
-					// missing: 'char_filter'
+						/*
+						 * We don't add the analyzer here: since a component is missing
+						 * the analyzer can't reference it and thus it must be missing too.
+						 */
+						// missing: 'char_filter'
 						+ " 'tokenizer': {"
 						+ "   'custom-edgeNGram': {"
 						+ "     'type': 'edge_ngram',"
@@ -255,8 +255,8 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 						+ "     'generate_word_parts': false"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		setupAndUpdateIndex();
 
@@ -281,11 +281,11 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 						+ " 'tokenizer': {"
 						+ "   'custom-edgeNGram': {"
 						+ "     'type': 'edge_ngram',"
-									/*
-									 * Strangely enough, even if you send properly typed numbers
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of numbers...
-									 */
+						/*
+						 * Strangely enough, even if you send properly typed numbers
+						 * to Elasticsearch, when you ask for the current settings it
+						 * will spit back strings instead of numbers...
+						 */
 						+ "     'min_gram': '1',"
 						+ "     'max_gram': '10'"
 						+ "   }"
@@ -297,17 +297,17 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 						+ "   },"
 						+ "   'custom-word-delimiter': {"
 						+ "     'type': 'word_delimiter',"
-									/*
-									 * Strangely enough, even if you send properly typed booleans
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of booleans...
-									 */
+						/*
+						 * Strangely enough, even if you send properly typed booleans
+						 * to Elasticsearch, when you ask for the current settings it
+						 * will spit back strings instead of booleans...
+						 */
 						+ "     'generate_word_parts': 'false'"
 						+ "   }"
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).settings( "index.analysis" ).get()
-				);
+		);
 	}
 
 	@Test
@@ -347,8 +347,8 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 						+ "     'generate_word_parts': false"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		setupAndUpdateIndex();
 
@@ -373,11 +373,11 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 						+ " 'tokenizer': {"
 						+ "   'custom-edgeNGram': {"
 						+ "     'type': 'edge_ngram',"
-									/*
-									 * Strangely enough, even if you send properly typed numbers
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of numbers...
-									 */
+						/*
+						 * Strangely enough, even if you send properly typed numbers
+						 * to Elasticsearch, when you ask for the current settings it
+						 * will spit back strings instead of numbers...
+						 */
 						+ "     'min_gram': '1',"
 						+ "     'max_gram': '10'"
 						+ "   }"
@@ -389,17 +389,17 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 						+ "   },"
 						+ "   'custom-word-delimiter': {"
 						+ "     'type': 'word_delimiter',"
-									/*
-									 * Strangely enough, even if you send properly typed booleans
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of booleans...
-									 */
+						/*
+						 * Strangely enough, even if you send properly typed booleans
+						 * to Elasticsearch, when you ask for the current settings it
+						 * will spit back strings instead of booleans...
+						 */
 						+ "     'generate_word_parts': 'false'"
 						+ "   }"
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).settings( "index.analysis" ).get()
-				);
+		);
 	}
 
 	@Test
@@ -436,8 +436,8 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 						+ "     'generate_word_parts': false"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		setupAndUpdateIndex();
 
@@ -462,11 +462,11 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 						+ " 'tokenizer': {"
 						+ "   'custom-edgeNGram': {"
 						+ "     'type': 'edge_ngram',"
-									/*
-									 * Strangely enough, even if you send properly typed numbers
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of numbers...
-									 */
+						/*
+						 * Strangely enough, even if you send properly typed numbers
+						 * to Elasticsearch, when you ask for the current settings it
+						 * will spit back strings instead of numbers...
+						 */
 						+ "     'min_gram': '1',"
 						+ "     'max_gram': '10'"
 						+ "   }"
@@ -478,17 +478,17 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 						+ "   },"
 						+ "   'custom-word-delimiter': {"
 						+ "     'type': 'word_delimiter',"
-									/*
-									 * Strangely enough, even if you send properly typed booleans
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of booleans...
-									 */
+						/*
+						 * Strangely enough, even if you send properly typed booleans
+						 * to Elasticsearch, when you ask for the current settings it
+						 * will spit back strings instead of booleans...
+						 */
 						+ "     'generate_word_parts': 'false'"
 						+ "   }"
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).settings( "index.analysis" ).get()
-				);
+		);
 	}
 
 	private void setupAndUpdateIndex() {

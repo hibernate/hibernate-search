@@ -42,7 +42,7 @@ import org.hibernate.search.util.common.spi.ToStringTreeAppender;
  */
 public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 		implements PojoWorkIndexedTypeContext<I, E>, PojoScopeIndexedTypeContext<I, E>,
-				PojoMassIndexingIndexedTypeContext<E> {
+		PojoMassIndexingIndexedTypeContext<E> {
 	private final DocumentRouter<? super E> documentRouter;
 	private final PojoIndexingProcessor<E> processor;
 	private final MappedIndexManager indexManager;

@@ -77,12 +77,14 @@ public class RegexpPredicateBaseIT {
 
 		final BulkIndexer typeCheckingMainIndexer = TypeCheckingNoConversionIT.index.bulkIndexer();
 		final BulkIndexer typeCheckingCompatibleIndexer = TypeCheckingNoConversionIT.compatibleIndex.bulkIndexer();
-		final BulkIndexer typeCheckingRawFieldCompatibleIndexer = TypeCheckingNoConversionIT.rawFieldCompatibleIndex.bulkIndexer();
+		final BulkIndexer typeCheckingRawFieldCompatibleIndexer =
+				TypeCheckingNoConversionIT.rawFieldCompatibleIndex.bulkIndexer();
 		final BulkIndexer typeCheckingMissingFieldIndexer = TypeCheckingNoConversionIT.missingFieldIndex.bulkIndexer();
-		TypeCheckingNoConversionIT.dataSets.forEach( d -> d.contribute( TypeCheckingNoConversionIT.index, typeCheckingMainIndexer,
-				TypeCheckingNoConversionIT.compatibleIndex, typeCheckingCompatibleIndexer,
-				TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
-				TypeCheckingNoConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer ) );
+		TypeCheckingNoConversionIT.dataSets
+				.forEach( d -> d.contribute( TypeCheckingNoConversionIT.index, typeCheckingMainIndexer,
+						TypeCheckingNoConversionIT.compatibleIndex, typeCheckingCompatibleIndexer,
+						TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
+						TypeCheckingNoConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer ) );
 
 		singleFieldIndexer.join(
 				multiFieldIndexer, inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer,

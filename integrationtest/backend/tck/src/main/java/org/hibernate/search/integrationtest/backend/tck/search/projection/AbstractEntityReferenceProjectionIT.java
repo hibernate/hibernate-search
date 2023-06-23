@@ -94,7 +94,8 @@ public abstract class AbstractEntityReferenceProjectionIT {
 									.entityReference( doc1Reference, doc1EntityReference )
 									.entityReference( doc2Reference, doc2EntityReference )
 					);
-					assertThatHits( hitsUsingScroll( referencesQuery ) ).hasHitsAnyOrder( doc1EntityReference, doc2EntityReference );
+					assertThatHits( hitsUsingScroll( referencesQuery ) ).hasHitsAnyOrder( doc1EntityReference,
+							doc2EntityReference );
 					verify( loadingContextMock ).createProjectionHitMapper();
 				} );
 	}
@@ -107,8 +108,8 @@ public abstract class AbstractEntityReferenceProjectionIT {
 
 	public static void initData(BulkIndexer indexer) {
 		indexer
-				.add( DOCUMENT_1_ID, document -> { } )
-				.add( DOCUMENT_2_ID, document -> { } );
+				.add( DOCUMENT_1_ID, document -> {} )
+				.add( DOCUMENT_2_ID, document -> {} );
 	}
 
 }

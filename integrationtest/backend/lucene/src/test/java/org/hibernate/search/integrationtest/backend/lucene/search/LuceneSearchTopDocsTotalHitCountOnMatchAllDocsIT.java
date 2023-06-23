@@ -76,7 +76,7 @@ public class LuceneSearchTopDocsTotalHitCountOnMatchAllDocsIT {
 
 		IndexBinding(IndexSchemaElement root) {
 			text = root.field(
-					"text" ,
+					"text",
 					f -> f.asString()
 							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 			)

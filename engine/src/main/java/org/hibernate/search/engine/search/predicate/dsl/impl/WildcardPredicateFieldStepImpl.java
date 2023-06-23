@@ -22,7 +22,7 @@ public final class WildcardPredicateFieldStepImpl
 	}
 
 	@Override
-	public WildcardPredicateFieldMoreStep<?, ?> fields(String ... fieldPaths) {
+	public WildcardPredicateFieldMoreStep<?, ?> fields(String... fieldPaths) {
 		return new WildcardPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
 	}
 }

@@ -58,9 +58,8 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateIndexScop
 import org.hibernate.search.util.common.impl.Contracts;
 
 public abstract class AbstractSearchPredicateFactory<
-				S extends ExtendedSearchPredicateFactory<S>,
-				SC extends SearchPredicateIndexScope<?>
-		>
+		S extends ExtendedSearchPredicateFactory<S>,
+		SC extends SearchPredicateIndexScope<?>>
 		implements ExtendedSearchPredicateFactory<S> {
 
 	protected final SearchPredicateDslContext<SC> dslContext;

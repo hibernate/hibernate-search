@@ -77,9 +77,9 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 @SuppressWarnings("deprecation")
 public class HibernateOrmMapping extends AbstractPojoMappingImplementor<HibernateOrmMapping>
 		implements SearchMapping, AutoCloseable, HibernateOrmMappingContext,
-				HibernateOrmListenerContextProvider, BatchMappingContext,
-				HibernateOrmScopeMappingContext, HibernateOrmSearchSessionMappingContext,
-				AutomaticIndexingMappingContext, CoordinationStrategyContext {
+		HibernateOrmListenerContextProvider, BatchMappingContext,
+		HibernateOrmScopeMappingContext, HibernateOrmSearchSessionMappingContext,
+		AutomaticIndexingMappingContext, CoordinationStrategyContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -132,7 +132,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	private final int fetchSize;
 
 	private final SchemaManagementListener schemaManagementListener;
-	private volatile ConfiguredSearchIndexingPlanFilter applicationIndexingPlanFilter = ConfiguredSearchIndexingPlanFilter.IncludeAll.INSTANCE;
+	private volatile ConfiguredSearchIndexingPlanFilter applicationIndexingPlanFilter =
+			ConfiguredSearchIndexingPlanFilter.IncludeAll.INSTANCE;
 
 	private TenancyConfiguration tenancyConfiguration;
 
@@ -447,8 +448,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	private Optional<SearchScopeImpl<Object>> createAllScope() {
-		return delegate()
-				.<org.hibernate.search.mapper.orm.common.EntityReference, HibernateOrmScopeIndexedTypeContext<?>>createPojoAllScope(
+		return delegate().<org.hibernate.search.mapper.orm.common.EntityReference,
+				HibernateOrmScopeIndexedTypeContext<?>>createPojoAllScope(
 						this,
 						typeContextContainer::indexedForExactType
 				)
@@ -456,12 +457,14 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	private <T> SearchScopeImpl<T> doCreateScope(Collection<PojoRawTypeIdentifier<? extends T>> typeIdentifiers) {
-		PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference, T, HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
-				delegate().createPojoScope(
-						this,
-						typeIdentifiers,
-						typeContextContainer::indexedForExactType
-				);
+		PojoScopeDelegate<org.hibernate.search.mapper.orm.common.EntityReference,
+				T,
+				HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
+						delegate().createPojoScope(
+								this,
+								typeIdentifiers,
+								typeContextContainer::indexedForExactType
+						);
 
 		// Explicit type parameter is necessary here for ECJ (Eclipse compiler)
 		return new SearchScopeImpl<T>( this, tenancyConfiguration, scopeDelegate );

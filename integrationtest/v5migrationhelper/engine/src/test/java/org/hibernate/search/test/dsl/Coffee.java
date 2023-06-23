@@ -25,48 +25,94 @@ class Coffee {
 	public static final String NAME_SORT = "name_sort";
 
 	@DocumentId
-	public String getId() { return id; }
+	public String getId() {
+		return id;
+	}
+
 	public void setId(String id) {
 		this.id = id;
 	}
+
 	private String id;
 
 	@Field(termVector = TermVector.NO, store = Store.YES)
 	@Field(name = NAME_SORT, analyze = Analyze.NO)
 	@SortableField(forField = NAME_SORT)
-	public String getName() { return name; }
-	public void setName(String name) { this.name = name; }
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	private String name;
 
 	@Field(termVector = TermVector.YES)
-	public String getSummary() { return summary; }
-	public void setSummary(String summary) { this.summary = summary; }
+	public String getSummary() {
+		return summary;
+	}
+
+	public void setSummary(String summary) {
+		this.summary = summary;
+	}
+
 	private String summary;
 
 	@Field(termVector = TermVector.YES)
-	public String getDescription() { return description; }
-	public void setDescription(String description) { this.description = description; }
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 	private String description;
 
 	@Field
-	public int getIntensity() { return intensity; }
-	public void setIntensity(int intensity) { this.intensity = intensity; }
+	public int getIntensity() {
+		return intensity;
+	}
+
+	public void setIntensity(int intensity) {
+		this.intensity = intensity;
+	}
+
 	private int intensity;
 
 	// Not stored nor term vector, i.e. cannot be used for More Like This
 	@Field
-	public String getInternalDescription() { return internalDescription; }
-	public void setInternalDescription(String internalDescription) { this.internalDescription = internalDescription; }
+	public String getInternalDescription() {
+		return internalDescription;
+	}
+
+	public void setInternalDescription(String internalDescription) {
+		this.internalDescription = internalDescription;
+	}
+
 	private String internalDescription;
 
 	@IndexedEmbedded(includeEmbeddedObjectId = true)
-	public CoffeeBrand getBrand() { return brand; }
-	public void setBrand(CoffeeBrand brand) { this.brand = brand; }
+	public CoffeeBrand getBrand() {
+		return brand;
+	}
+
+	public void setBrand(CoffeeBrand brand) {
+		this.brand = brand;
+	}
+
 	private CoffeeBrand brand;
 
 	@IndexedEmbedded(includeEmbeddedObjectId = true)
-	public CoffeeMaker getMaker() { return maker; }
-	public void setMaker(CoffeeMaker maker) { this.maker = maker; }
+	public CoffeeMaker getMaker() {
+		return maker;
+	}
+
+	public void setMaker(CoffeeMaker maker) {
+		this.maker = maker;
+	}
+
 	private CoffeeMaker maker;
 
 	@Override

@@ -49,10 +49,10 @@ public class ElasticsearchNativeTypeIT {
 					.extension( ElasticsearchExtension.get() )
 					.where( f -> f.fromJson(
 							"{\n" +
-							"  \"term\": {\n" +
-							"    \"ipAddress\": \"192.168.0.0/16\"\n" +
-							"  }\n" +
-							"}"
+									"  \"term\": {\n" +
+									"    \"ipAddress\": \"192.168.0.0/16\"\n" +
+									"  }\n" +
+									"}"
 					) )
 					.fetchHits( 20 );
 

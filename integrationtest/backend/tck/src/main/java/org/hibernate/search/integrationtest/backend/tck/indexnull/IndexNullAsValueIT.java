@@ -87,7 +87,7 @@ public class IndexNullAsValueIT {
 								c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name
 								)
 										.indexNullAs( "bla bla bla" ) )
-										.toReference()
+								.toReference()
 				) )
 				.setup()
 		)
@@ -164,7 +164,8 @@ public class IndexNullAsValueIT {
 
 	private static class ByTypeFieldModel<F> {
 		static <F> ByTypeFieldModel<F> mapper(IndexSchemaElement root, FieldTypeDescriptor<F> typeDescriptor) {
-			IndexNullAsMatchPredicateExpectactions<F> expectations = typeDescriptor.getIndexNullAsMatchPredicateExpectations().get();
+			IndexNullAsMatchPredicateExpectactions<F> expectations =
+					typeDescriptor.getIndexNullAsMatchPredicateExpectations().get();
 			F indexNullAsValue = expectations.getIndexNullAsValue();
 
 			return StandardFieldMapper.of(
@@ -178,7 +179,8 @@ public class IndexNullAsValueIT {
 		final ValueModel<F> differentValue;
 		final ValueModel<F> nullValue;
 
-		public ByTypeFieldModel(IndexFieldReference<F> reference, String relativeFieldName, IndexNullAsMatchPredicateExpectactions<F> expectations) {
+		public ByTypeFieldModel(IndexFieldReference<F> reference, String relativeFieldName,
+				IndexNullAsMatchPredicateExpectactions<F> expectations) {
 			this.relativeFieldName = relativeFieldName;
 			this.indexNullAsValue = new ValueModel<>( reference, expectations.getIndexNullAsValue() );
 			this.differentValue = new ValueModel<>( reference, expectations.getDifferentValue() );

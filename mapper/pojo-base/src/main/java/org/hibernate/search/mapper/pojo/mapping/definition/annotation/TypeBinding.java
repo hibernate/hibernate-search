@@ -36,7 +36,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(TypeBinding.List.class)
-@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = TypeBindingProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = TypeBindingProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface TypeBinding {
 
 	/**

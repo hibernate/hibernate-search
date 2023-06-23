@@ -65,7 +65,7 @@ public class ElasticsearchHibernateOrmSchemaManagerIT {
 									.bodyParts(); // <2>
 						}
 					}
-					// end::walking-the-schema-extension[]
+			// end::walking-the-schema-extension[]
 			);
 		} );
 	}

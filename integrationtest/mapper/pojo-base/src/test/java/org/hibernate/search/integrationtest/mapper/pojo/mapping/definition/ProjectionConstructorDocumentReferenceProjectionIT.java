@@ -31,7 +31,8 @@ import org.junit.Test;
 public class ProjectionConstructorDocumentReferenceProjectionIT extends AbstractProjectionConstructorIT {
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void noArg() {
@@ -44,6 +45,7 @@ public class ProjectionConstructorDocumentReferenceProjectionIT extends Abstract
 		}
 		class MyProjection {
 			public final DocumentReference documentReference;
+
 			@ProjectionConstructor
 			public MyProjection(@DocumentReferenceProjection DocumentReference documentReference) {
 				this.documentReference = documentReference;
@@ -85,6 +87,7 @@ public class ProjectionConstructorDocumentReferenceProjectionIT extends Abstract
 		}
 		class MyProjection {
 			public final Object documentReference;
+
 			@ProjectionConstructor
 			public MyProjection(@DocumentReferenceProjection Object documentReference) {
 				this.documentReference = documentReference;
@@ -126,6 +129,7 @@ public class ProjectionConstructorDocumentReferenceProjectionIT extends Abstract
 		}
 		class MyProjection {
 			public final Integer documentReference;
+
 			@ProjectionConstructor
 			public MyProjection(@DocumentReferenceProjection Integer documentReference) {
 				this.documentReference = documentReference;
@@ -140,7 +144,9 @@ public class ProjectionConstructorDocumentReferenceProjectionIT extends Abstract
 						.typeContext( MyProjection.class.getName() )
 						.constructorContext( ProjectionConstructorDocumentReferenceProjectionIT.class, Integer.class )
 						.methodParameterContext( 1, "documentReference" )
-						.failure( "Invalid projection definition for constructor parameter type '" + Integer.class.getName() + "'",
+						.failure(
+								"Invalid projection definition for constructor parameter type '" + Integer.class.getName()
+										+ "'",
 								"This projection results in values of type '" + DocumentReference.class.getName() + "'" )
 				);
 	}

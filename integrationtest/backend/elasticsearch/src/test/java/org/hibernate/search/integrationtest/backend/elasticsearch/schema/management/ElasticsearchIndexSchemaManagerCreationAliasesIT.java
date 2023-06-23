@@ -72,7 +72,7 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 				"{"
 						+ "'" + defaultWriteAlias( index.name() ) + "': " + simpleWriteAliasDefinition() + ", "
 						+ "  '" + defaultReadAlias( index.name() ) + "': " + simpleReadAliasDefinition()
-				+ "}",
+						+ "}",
 				elasticsearchClient.index( index.name() ).aliases().get()
 		);
 	}
@@ -102,7 +102,7 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 				"{"
 						+ "'custom-write': " + simpleWriteAliasDefinition() + ", "
 						+ "  'custom-read': " + simpleReadAliasDefinition()
-				+ "}",
+						+ "}",
 				elasticsearchClient.index( index.name() ).aliases().get()
 		);
 	}

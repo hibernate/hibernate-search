@@ -19,7 +19,8 @@ class ElasticsearchExplanationProjection extends AbstractElasticsearchProjection
 		implements ElasticsearchSearchProjection.Extractor<JsonObject, JsonObject> {
 
 	private static final JsonAccessor<Boolean> REQUEST_EXPLAIN_ACCESSOR = JsonAccessor.root().property( "explain" ).asBoolean();
-	private static final JsonObjectAccessor HIT_EXPLANATION_ACCESSOR = JsonAccessor.root().property( "_explanation" ).asObject();
+	private static final JsonObjectAccessor HIT_EXPLANATION_ACCESSOR =
+			JsonAccessor.root().property( "_explanation" ).asObject();
 
 	ElasticsearchExplanationProjection(ElasticsearchSearchIndexScope<?> scope) {
 		super( scope );

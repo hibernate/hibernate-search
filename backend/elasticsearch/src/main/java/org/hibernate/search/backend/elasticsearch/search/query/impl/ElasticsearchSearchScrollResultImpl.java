@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.query.spi.SimpleSearchScrollResult;
 public class ElasticsearchSearchScrollResultImpl<H> extends SimpleSearchScrollResult<H>
 		implements ElasticsearchSearchScrollResult<H> {
 	public ElasticsearchSearchScrollResultImpl(SearchResultTotal total, boolean hasHits, List<H> hits,
-			Duration took, Boolean timedOut ) {
+			Duration took, Boolean timedOut) {
 		super( total, hasHits, hits, took, timedOut );
 	}
 }

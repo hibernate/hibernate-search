@@ -15,8 +15,9 @@ import org.apache.lucene.search.uhighlight.Passage;
 
 public class LuceneUnifiedSearchHighlighterPassageFormatterWithEncoderTest {
 
-	private LuceneUnifiedSearchHighlighter.PassageFormatterWithEncoder formatter = new LuceneUnifiedSearchHighlighter.PassageFormatterWithEncoder(
-			"<em>", "</em>", new DefaultEncoder() );
+	private LuceneUnifiedSearchHighlighter.PassageFormatterWithEncoder formatter =
+			new LuceneUnifiedSearchHighlighter.PassageFormatterWithEncoder(
+					"<em>", "</em>", new DefaultEncoder() );
 
 	@Test
 	public void simple() {

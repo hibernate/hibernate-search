@@ -25,7 +25,13 @@ public class StringPropertyTypeDescriptor extends PropertyTypeDescriptor<String,
 	protected PropertyValues<String, String> createValues() {
 		PropertyValues.StringBasedBuilder<String> builder = PropertyValues.stringBasedBuilder();
 		for ( String value : new String[] {
-				"", "a", "AaaA", "Some words", "\000", "http://foo", "yop@yopmail.com"
+				"",
+				"a",
+				"AaaA",
+				"Some words",
+				"\000",
+				"http://foo",
+				"yop@yopmail.com"
 		} ) {
 			builder.add( value, value );
 		}

@@ -22,16 +22,15 @@ import org.hibernate.search.engine.search.query.dsl.spi.AbstractExtendedSearchQu
 
 class LuceneSearchQueryOptionsStepImpl<H, LOS>
 		extends AbstractExtendedSearchQueryOptionsStep<
-						LuceneSearchQueryOptionsStep<H, LOS>,
-						H,
-						LuceneSearchResult<H>,
-						LuceneSearchScroll<H>,
-						LOS,
-						LuceneSearchPredicateFactory,
-						LuceneSearchSortFactory,
-						LuceneSearchAggregationFactory,
-						LuceneSearchQueryIndexScope<?>
-				>
+				LuceneSearchQueryOptionsStep<H, LOS>,
+				H,
+				LuceneSearchResult<H>,
+				LuceneSearchScroll<H>,
+				LOS,
+				LuceneSearchPredicateFactory,
+				LuceneSearchSortFactory,
+				LuceneSearchAggregationFactory,
+				LuceneSearchQueryIndexScope<?>>
 		implements LuceneSearchQueryWhereStep<H, LOS>, LuceneSearchQueryOptionsStep<H, LOS> {
 
 	private final LuceneSearchQueryBuilder<H> searchQueryBuilder;

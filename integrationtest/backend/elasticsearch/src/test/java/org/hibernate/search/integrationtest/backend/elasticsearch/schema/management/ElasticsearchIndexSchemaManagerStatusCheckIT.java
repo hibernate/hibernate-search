@@ -89,7 +89,7 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 	@Test
 	public void invalidIndexStatus_usingPreexistingIndex() throws Exception {
 		assumeFalse( "The operation " + operation + " drops the existing index automatically."
-						+ " No point running this test.",
+				+ " No point running this test.",
 				ElasticsearchIndexSchemaManagerOperation.dropping().contains( operation ) );
 
 		// Make sure automatically created indexes will never be green by requiring 5 replicas

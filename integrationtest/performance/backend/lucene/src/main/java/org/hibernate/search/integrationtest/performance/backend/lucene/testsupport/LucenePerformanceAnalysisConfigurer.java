@@ -23,7 +23,7 @@ public class LucenePerformanceAnalysisConfigurer implements LuceneAnalysisConfig
 				.tokenizer( StandardTokenizerFactory.class )
 				.tokenFilter( LowerCaseFilterFactory.class )
 				.tokenFilter( SnowballPorterFilterFactory.class )
-						.param( "language", "English" )
+				.param( "language", "English" )
 				.tokenFilter( ASCIIFoldingFilterFactory.class );
 
 		context.normalizer( Analyzers.NORMALIZER_ENGLISH ).custom()

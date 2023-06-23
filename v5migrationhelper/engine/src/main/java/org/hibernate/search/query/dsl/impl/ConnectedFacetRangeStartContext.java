@@ -27,4 +27,3 @@ public class ConnectedFacetRangeStartContext<T> implements FacetRangeStartContex
 	}
 }
 
-

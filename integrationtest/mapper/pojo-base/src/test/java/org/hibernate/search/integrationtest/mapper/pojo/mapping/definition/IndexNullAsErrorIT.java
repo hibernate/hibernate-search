@@ -27,7 +27,8 @@ import org.junit.runners.Parameterized;
 public class IndexNullAsErrorIT<V, F> {
 
 	private static final String FIELD_NAME = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_FIELD_NAME;
-	private static final String FIELD_INDEXNULLAS_NAME = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_FIELD_INDEXNULLAS_NAME;
+	private static final String FIELD_INDEXNULLAS_NAME =
+			DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_FIELD_INDEXNULLAS_NAME;
 
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[] types() {
@@ -41,7 +42,8 @@ public class IndexNullAsErrorIT<V, F> {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private final DefaultValueBridgeExpectations<V, F> expectations;
 
@@ -55,15 +57,14 @@ public class IndexNullAsErrorIT<V, F> {
 		// Null means "there's no value I can't parse". Useful for the String type.
 		assumeNotNull( unparsableNullAsValue );
 
-		assertThatThrownBy( () ->
-				setupHelper.start().withConfiguration( c -> {
-					c.addEntityType( expectations.getTypeWithValueBridge1() );
-					TypeMappingStep typeMapping = c.programmaticMapping().type( expectations.getTypeWithValueBridge1() );
-					typeMapping.indexed();
-					typeMapping.property( FIELD_NAME ).genericField( FIELD_NAME );
-					typeMapping.property( FIELD_NAME )
-							.genericField( FIELD_INDEXNULLAS_NAME ).indexNullAs( unparsableNullAsValue );
-				} ).setup()
+		assertThatThrownBy( () -> setupHelper.start().withConfiguration( c -> {
+			c.addEntityType( expectations.getTypeWithValueBridge1() );
+			TypeMappingStep typeMapping = c.programmaticMapping().type( expectations.getTypeWithValueBridge1() );
+			typeMapping.indexed();
+			typeMapping.property( FIELD_NAME ).genericField( FIELD_NAME );
+			typeMapping.property( FIELD_NAME )
+					.genericField( FIELD_INDEXNULLAS_NAME ).indexNullAs( unparsableNullAsValue );
+		} ).setup()
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "HSEARCH0005" )

@@ -19,7 +19,8 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNo
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoModelPathBinder;
 
-class PojoOtherEntityIndexingDependencyConfigurationContextImpl<T> implements
+class PojoOtherEntityIndexingDependencyConfigurationContextImpl<T>
+		implements
 		PojoOtherEntityIndexingDependencyConfigurationContext {
 	private final BoundPojoModelPath.Walker bindingPathWalker;
 	private final BoundPojoModelPathTypeNode<T> modelPath;

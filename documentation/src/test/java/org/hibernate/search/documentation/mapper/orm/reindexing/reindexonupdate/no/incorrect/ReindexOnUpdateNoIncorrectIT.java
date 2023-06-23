@@ -36,7 +36,7 @@ public class ReindexOnUpdateNoIncorrectIT {
 	@Test
 	public void missingReindexOnUpdateNo() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
-			for ( int i = 0 ; i < 2000 ; ++i ) {
+			for ( int i = 0; i < 2000; ++i ) {
 				Sensor sensor = new Sensor();
 				sensor.setId( i );
 				sensor.setName( "Sensor " + i );

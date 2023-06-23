@@ -18,9 +18,8 @@ import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 
 public abstract class AbstractIndexCompositeNodeType<
-				SC extends SearchIndexScope<?>,
-				N extends SearchIndexCompositeNodeContext<SC>
-		>
+		SC extends SearchIndexScope<?>,
+		N extends SearchIndexCompositeNodeContext<SC>>
 		implements IndexObjectFieldTypeDescriptor, SearchIndexCompositeNodeTypeContext<SC, N> {
 	private final ObjectStructure objectStructure;
 	private final Map<SearchQueryElementTypeKey<?>, SearchQueryElementFactory<?, ? super SC, ? super N>> queryElementFactories;
@@ -58,12 +57,11 @@ public abstract class AbstractIndexCompositeNodeType<
 	}
 
 	public abstract static class Builder<
-				SC extends SearchIndexScope<?>,
-				N extends SearchIndexCompositeNodeContext<SC>
-			> {
+			SC extends SearchIndexScope<?>,
+			N extends SearchIndexCompositeNodeContext<SC>> {
 		private final ObjectStructure objectStructure;
-		private final Map<SearchQueryElementTypeKey<?>, SearchQueryElementFactory<?, ? super SC, ? super N>>
-				queryElementFactories = new HashMap<>();
+		private final Map<SearchQueryElementTypeKey<?>,
+				SearchQueryElementFactory<?, ? super SC, ? super N>> queryElementFactories = new HashMap<>();
 
 		public Builder(ObjectStructure objectStructure) {
 			this.objectStructure = objectStructure;

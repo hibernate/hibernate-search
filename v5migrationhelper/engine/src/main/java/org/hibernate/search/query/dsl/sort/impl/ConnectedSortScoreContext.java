@@ -20,6 +20,7 @@ public class ConnectedSortScoreContext extends ConnectedSortAdditionalSortFieldC
 	public ConnectedSortScoreContext(QueryBuildingContext queryContext, SortFieldStates states) {
 		super( queryContext, states );
 	}
+
 	@Override
 	public SortScoreContext asc() {
 		getStates().setAsc();

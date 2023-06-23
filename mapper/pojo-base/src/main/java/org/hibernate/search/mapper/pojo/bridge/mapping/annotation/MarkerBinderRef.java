@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.pojo.common.annotation.Param;
  * References can use either a name, a type, or both.
  */
 @Documented
-@Target({}) // Only used as a component in other annotations
+@Target({ }) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MarkerBinderRef {
 
@@ -45,7 +45,7 @@ public @interface MarkerBinderRef {
 	/**
 	 * @return Params that will be passed to the {@link MarkerBinder}.
 	 */
-	Param[] params() default {};
+	Param[] params() default { };
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.

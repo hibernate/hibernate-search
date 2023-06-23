@@ -10,7 +10,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorIdentifier;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoConstructorProjectionDefinitionMessages;
 
 public final class ProjectionConstructorPath {
-	private static final PojoConstructorProjectionDefinitionMessages MESSAGES = PojoConstructorProjectionDefinitionMessages.INSTANCE;
+	private static final PojoConstructorProjectionDefinitionMessages MESSAGES =
+			PojoConstructorProjectionDefinitionMessages.INSTANCE;
 
 	private final PojoConstructorIdentifier constructor;
 	private final ProjectionConstructorPath child;
@@ -33,8 +34,9 @@ public final class ProjectionConstructorPath {
 
 	@Override
 	public String toString() {
-		return child == null ? constructor.toString() :
-				child + "\n\t\u2937 for parameter #" + childPosition + " in " + constructor.toHighlightedString(
+		return child == null
+				? constructor.toString()
+				: child + "\n\t\u2937 for parameter #" + childPosition + " in " + constructor.toHighlightedString(
 						childPosition );
 	}
 }

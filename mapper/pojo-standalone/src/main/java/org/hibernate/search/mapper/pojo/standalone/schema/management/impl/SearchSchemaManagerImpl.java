@@ -68,7 +68,8 @@ public class SearchSchemaManagerImpl implements SearchSchemaManager {
 		delegate.exportExpectedSchema( targetDirectory );
 	}
 
-	private void doOperation(TriFunction<PojoScopeSchemaManager, FailureCollector, OperationSubmitter, CompletableFuture<?>> operation) {
+	private void doOperation(
+			TriFunction<PojoScopeSchemaManager, FailureCollector, OperationSubmitter, CompletableFuture<?>> operation) {
 		RootFailureCollector failureCollector = new RootFailureCollector(
 				StandalonePojoEventContextMessages.INSTANCE.schemaManagement()
 		);

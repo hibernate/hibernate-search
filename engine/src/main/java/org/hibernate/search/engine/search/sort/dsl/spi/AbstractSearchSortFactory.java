@@ -28,10 +28,9 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortIndexScope;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 public abstract class AbstractSearchSortFactory<
-				S extends ExtendedSearchSortFactory<S, PDF>,
-				SC extends SearchSortIndexScope<?>,
-				PDF extends SearchPredicateFactory
-		>
+		S extends ExtendedSearchSortFactory<S, PDF>,
+		SC extends SearchSortIndexScope<?>,
+		PDF extends SearchPredicateFactory>
 		implements ExtendedSearchSortFactory<S, PDF> {
 
 	protected final SearchSortDslContext<SC, PDF> dslContext;

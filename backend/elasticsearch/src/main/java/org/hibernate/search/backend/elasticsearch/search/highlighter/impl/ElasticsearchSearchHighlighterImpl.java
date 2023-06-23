@@ -37,17 +37,20 @@ public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHi
 	private static final JsonObjectAccessor REQUEST_HIGHLIGHT_ACCESSOR = JsonAccessor.root().property( "highlight" ).asObject();
 	private static final JsonAccessor<String> TYPE = JsonAccessor.root().property( "type" ).asString();
 	private static final JsonAccessor<String> BOUNDARY_CHARS = JsonAccessor.root().property( "boundary_chars" ).asString();
-	private static final JsonAccessor<Integer> BOUNDARY_MAX_SCAN = JsonAccessor.root().property( "boundary_max_scan" ).asInteger();
+	private static final JsonAccessor<Integer> BOUNDARY_MAX_SCAN =
+			JsonAccessor.root().property( "boundary_max_scan" ).asInteger();
 	private static final JsonAccessor<String> ENCODER = JsonAccessor.root().property( "encoder" ).asString();
 	private static final JsonAccessor<Integer> FRAGMENT_SIZE = JsonAccessor.root().property( "fragment_size" ).asInteger();
 	private static final JsonAccessor<Integer> NO_MATCH_SIZE = JsonAccessor.root().property( "no_match_size" ).asInteger();
-	private static final JsonAccessor<Integer> NUMBER_OF_FRAGMENTS = JsonAccessor.root().property( "number_of_fragments" ).asInteger();
+	private static final JsonAccessor<Integer> NUMBER_OF_FRAGMENTS =
+			JsonAccessor.root().property( "number_of_fragments" ).asInteger();
 	private static final JsonAccessor<String> ORDER = JsonAccessor.root().property( "order" ).asString();
 	private static final JsonAccessor<String> TAGS_SCHEMA = JsonAccessor.root().property( "tags_schema" ).asString();
 	private static final JsonArrayAccessor PRE_TAGS = JsonAccessor.root().property( "pre_tags" ).asArray();
 	private static final JsonArrayAccessor POST_TAGS = JsonAccessor.root().property( "post_tags" ).asArray();
 	private static final JsonAccessor<String> BOUNDARY_SCANNER = JsonAccessor.root().property( "boundary_scanner" ).asString();
-	private static final JsonAccessor<String> BOUNDARY_SCANNER_LOCALE = JsonAccessor.root().property( "boundary_scanner_locale" ).asString();
+	private static final JsonAccessor<String> BOUNDARY_SCANNER_LOCALE =
+			JsonAccessor.root().property( "boundary_scanner_locale" ).asString();
 	private static final JsonAccessor<String> FRAGMENTER = JsonAccessor.root().property( "fragmenter" ).asString();
 	private static final JsonAccessor<Integer> PHRASE_LIMIT = JsonAccessor.root().property( "phrase_limit" ).asInteger();
 
@@ -186,6 +189,7 @@ public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHi
 			accessor.set( object, array );
 		}
 	}
+
 	private static String convertHighlighterType(SearchHighlighterType type) {
 		if ( type == null ) {
 			return null;
@@ -204,7 +208,7 @@ public class ElasticsearchSearchHighlighterImpl implements ElasticsearchSearchHi
 
 	private static String convertBoundaryScannerType(BoundaryScannerType type) {
 		switch ( type ) {
-			case DEFAULT :
+			case DEFAULT:
 				return null;
 			case CHARS:
 				return "chars";

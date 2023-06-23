@@ -30,7 +30,8 @@ public final class RuntimeHelper {
 			try {
 				CALLER_CLASS_WALKER = new StackWalkerCallerClassWalker( stackWalkerClass );
 			}
-			catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | RuntimeException e) {
+			catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException |
+					RuntimeException e) {
 				throw new IllegalStateException( "Unable to initialize ClassWalker based on java.lang.StackWaker", e );
 			}
 		}

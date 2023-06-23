@@ -27,7 +27,8 @@ class ElasticsearchBigDecimalIndexFieldTypeOptionsStep
 
 	private Integer decimalScale = null;
 
-	ElasticsearchBigDecimalIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext, IndexFieldTypeDefaultsProvider defaultsProvider) {
+	ElasticsearchBigDecimalIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,
+			IndexFieldTypeDefaultsProvider defaultsProvider) {
 		super( buildContext, BigDecimal.class, DataTypes.SCALED_FLOAT );
 		this.defaultsProvider = defaultsProvider;
 	}

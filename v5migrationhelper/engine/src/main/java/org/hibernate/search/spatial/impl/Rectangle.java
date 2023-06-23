@@ -56,11 +56,12 @@ public final class Rectangle {
 				Math.toRadians(
 						minimumLatitude
 				)
-		) ) || ( radius > 2 * Math.PI * GeometricConstants.EARTH_MEAN_RADIUS_KM * Math.cos(
-				Math.toRadians(
-						maximumLatitude
-				)
-		) ) ) {
+		) )
+				|| ( radius > 2 * Math.PI * GeometricConstants.EARTH_MEAN_RADIUS_KM * Math.cos(
+						Math.toRadians(
+								maximumLatitude
+						)
+				) ) ) {
 			maximumLongitude = GeometricConstants.LONGITUDE_DEGREE_MAX;
 			minimumLongitude = GeometricConstants.LONGITUDE_DEGREE_MIN;
 		}

@@ -44,6 +44,7 @@ public class Comment implements IComment {
 	public Integer getId() {
 		return id;
 	}
+
 	@Override
 	public void setId(Integer id) {
 		this.id = id;
@@ -70,6 +71,7 @@ public class Comment implements IComment {
 	public String getContent() {
 		return name;
 	}
+
 	@Override
 	public void setContent(String name) {
 		this.name = name;
@@ -81,6 +83,7 @@ public class Comment implements IComment {
 	public IComment getRootComment() {
 		return root;
 	}
+
 	@Override
 	public void setRootComment(IComment root) {
 		this.root = root;

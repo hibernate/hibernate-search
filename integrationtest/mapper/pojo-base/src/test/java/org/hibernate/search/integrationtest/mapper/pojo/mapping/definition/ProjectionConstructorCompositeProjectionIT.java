@@ -32,7 +32,8 @@ import org.junit.Test;
 public class ProjectionConstructorCompositeProjectionIT extends AbstractProjectionConstructorIT {
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void noArg() {
@@ -50,6 +51,7 @@ public class ProjectionConstructorCompositeProjectionIT extends AbstractProjecti
 		class MyInnerProjection {
 			public final String text2;
 			public final Integer integer;
+
 			@ProjectionConstructor
 			public MyInnerProjection(String text2, Integer integer) {
 				this.text2 = text2;
@@ -59,6 +61,7 @@ public class ProjectionConstructorCompositeProjectionIT extends AbstractProjecti
 		class MyProjection {
 			public final String text;
 			public final MyInnerProjection composite;
+
 			@ProjectionConstructor
 			public MyProjection(String text, @CompositeProjection MyInnerProjection composite) {
 				this.text = text;
@@ -111,10 +114,12 @@ public class ProjectionConstructorCompositeProjectionIT extends AbstractProjecti
 		class MyNonProjection {
 			public final String text2;
 			public final Integer integer;
+
 			public MyNonProjection() {
 				this.text2 = "foo";
 				this.integer = 42;
 			}
+
 			public MyNonProjection(String text2, Integer integer) {
 				this.text2 = text2;
 				this.integer = integer;
@@ -122,6 +127,7 @@ public class ProjectionConstructorCompositeProjectionIT extends AbstractProjecti
 		}
 		class MyProjection {
 			public final MyNonProjection composite;
+
 			@ProjectionConstructor
 			public MyProjection(@CompositeProjection MyNonProjection composite) {
 				this.composite = composite;
@@ -166,6 +172,7 @@ public class ProjectionConstructorCompositeProjectionIT extends AbstractProjecti
 		class MyInnerProjectionLevel2 {
 			public final String text2;
 			public final Integer integer;
+
 			@ProjectionConstructor
 			public MyInnerProjectionLevel2(String text2, Integer integer) {
 				this.text2 = text2;
@@ -175,6 +182,7 @@ public class ProjectionConstructorCompositeProjectionIT extends AbstractProjecti
 		class MyInnerProjectionLevel1 {
 			public final String text;
 			public final MyInnerProjectionLevel2 composite;
+
 			@ProjectionConstructor
 			public MyInnerProjectionLevel1(String text, @CompositeProjection MyInnerProjectionLevel2 composite) {
 				this.text = text;
@@ -184,6 +192,7 @@ public class ProjectionConstructorCompositeProjectionIT extends AbstractProjecti
 		class MyProjection {
 			public final String text;
 			public final MyInnerProjectionLevel1 contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text, MyInnerProjectionLevel1 contained) {
 				this.text = text;
@@ -248,6 +257,7 @@ public class ProjectionConstructorCompositeProjectionIT extends AbstractProjecti
 		class MyInnerProjection {
 			public final String text2;
 			public final Integer integer;
+
 			@ProjectionConstructor
 			public MyInnerProjection(String text2, Integer integer) {
 				this.text2 = text2;
@@ -257,6 +267,7 @@ public class ProjectionConstructorCompositeProjectionIT extends AbstractProjecti
 		class MyProjection {
 			public final String text;
 			public final List<MyInnerProjection> composite;
+
 			@ProjectionConstructor
 			public MyProjection(String text, @CompositeProjection List<MyInnerProjection> composite) {
 				this.text = text;

@@ -22,7 +22,7 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortIndexScope;
 
 public interface SearchQueryIndexScope<S extends SearchQueryIndexScope<?>>
 		extends SearchIndexScope<S>, SearchPredicateIndexScope<S>, SearchSortIndexScope<S>,
-				SearchProjectionIndexScope<S>, SearchAggregationIndexScope<S> {
+		SearchProjectionIndexScope<S>, SearchAggregationIndexScope<S> {
 
 	<P> SearchQueryBuilder<P> select(BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection);

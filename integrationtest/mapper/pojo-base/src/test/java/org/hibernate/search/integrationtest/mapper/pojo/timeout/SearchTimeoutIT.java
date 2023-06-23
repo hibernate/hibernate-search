@@ -37,7 +37,8 @@ public class SearchTimeoutIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private SearchMapping mapping;
 
@@ -54,8 +55,8 @@ public class SearchTimeoutIT {
 			SearchQuery<EntityReference> query = session.search( IndexedEntity.class )
 					.selectEntityReference()
 					.where( f -> f.matchAll() )
-						// define a timeout
-						.truncateAfter( 5L, TimeUnit.SECONDS )
+					// define a timeout
+					.truncateAfter( 5L, TimeUnit.SECONDS )
 					.toQuery();
 
 			backendMock.expectSearchReferences( Collections.singletonList( INDEX_NAME ),

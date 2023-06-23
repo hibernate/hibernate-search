@@ -23,13 +23,15 @@ public class ConnectedSimpleQueryStringMatchingContext implements SimpleQueryStr
 
 	private boolean withAndAsDefaultOperator = false;
 
-	public ConnectedSimpleQueryStringMatchingContext(String field, QueryCustomizer queryCustomizer, QueryBuildingContext queryContext) {
+	public ConnectedSimpleQueryStringMatchingContext(String field, QueryCustomizer queryCustomizer,
+			QueryBuildingContext queryContext) {
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
 		this.fieldsContext = new FieldsContext( new String[] { field }, queryContext );
 	}
 
-	public ConnectedSimpleQueryStringMatchingContext(String[] fields, QueryCustomizer queryCustomizer, QueryBuildingContext queryContext) {
+	public ConnectedSimpleQueryStringMatchingContext(String[] fields, QueryCustomizer queryCustomizer,
+			QueryBuildingContext queryContext) {
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
 		this.fieldsContext = new FieldsContext( fields, queryContext );

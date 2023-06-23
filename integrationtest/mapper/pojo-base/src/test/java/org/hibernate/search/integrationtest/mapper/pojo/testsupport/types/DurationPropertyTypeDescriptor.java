@@ -104,6 +104,7 @@ public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Durat
 		Duration id;
 
 	}
+
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
 	public static class TypeWithIdentifierBridge2 {
 		@DocumentId

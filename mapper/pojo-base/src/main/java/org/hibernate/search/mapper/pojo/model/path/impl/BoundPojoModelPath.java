@@ -78,11 +78,12 @@ public abstract class BoundPojoModelPath {
 		appendSelfPath( builder );
 	}
 
-	public static class Walker implements PojoModelPathWalker<
-			Void, BoundPojoModelPathTypeNode<?>,
-			BoundPojoModelPathPropertyNode<?, ?>,
-			BoundPojoModelPathValueNode<?, ?, ?>
-			> {
+	public static class Walker
+			implements PojoModelPathWalker<
+					Void,
+					BoundPojoModelPathTypeNode<?>,
+					BoundPojoModelPathPropertyNode<?, ?>,
+					BoundPojoModelPathValueNode<?, ?, ?>> {
 
 		private final ContainerExtractorBinder containerExtractorBinder;
 

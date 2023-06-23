@@ -15,7 +15,7 @@ public interface PojoWorkTypeContextProvider {
 
 	<E> PojoWorkIndexedTypeContext<?, E> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
-	KeyValueProvider<String, ? extends PojoWorkTypeContext<?,?>> byEntityName();
+	KeyValueProvider<String, ? extends PojoWorkTypeContext<?, ?>> byEntityName();
 
 	KeyValueProvider<String, PojoRawTypeIdentifier<?>> typeIdentifierByEntityName();
 

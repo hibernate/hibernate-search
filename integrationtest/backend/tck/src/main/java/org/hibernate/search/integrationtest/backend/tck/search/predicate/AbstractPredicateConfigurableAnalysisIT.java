@@ -32,7 +32,8 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 	public void analyzerOverride() {
 		String whitespaceAnalyzedField = index.binding().whitespaceAnalyzedField.relativeFieldName;
 		String whitespaceLowercaseAnalyzedField = index.binding().whitespaceLowercaseAnalyzedField.relativeFieldName;
-		String whitespaceLowercaseSearchAnalyzedField = index.binding().whitespaceLowercaseSearchAnalyzedField.relativeFieldName;
+		String whitespaceLowercaseSearchAnalyzedField =
+				index.binding().whitespaceLowercaseSearchAnalyzedField.relativeFieldName;
 
 		// Terms are never lower-cased, neither at write nor at query time.
 		assertThatQuery( index.query()
@@ -126,7 +127,7 @@ public abstract class AbstractPredicateConfigurableAnalysisIT extends AbstractPr
 	}
 
 	@Test
-	@TestForIssue( jiraKey = { "HSEARCH-2534", "HSEARCH-3042" } )
+	@TestForIssue(jiraKey = { "HSEARCH-2534", "HSEARCH-3042" })
 	public void analyzerOverride_queryOnlyAnalyzer() {
 		String absoluteFieldPath = index.binding().whitespaceLowercaseAnalyzedField.relativeFieldName;
 		String ngramFieldPath = index.binding().ngramSearchAnalyzedField.relativeFieldName;

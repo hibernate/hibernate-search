@@ -78,13 +78,12 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = {"HSEARCH-4218", "HSEARCH-4236"})
+	@TestForIssue(jiraKey = { "HSEARCH-4218", "HSEARCH-4236" })
 	public void identifierLoading() {
-		SessionFactory sessionFactory = setup( builder ->
-				builder.setProperty(
-						AvailableSettings.AUTO_SESSION_EVENTS_LISTENER,
-						JdbcStatementFailureOnIdLoadingThreadListener.class.getName()
-				)
+		SessionFactory sessionFactory = setup( builder -> builder.setProperty(
+				AvailableSettings.AUTO_SESSION_EVENTS_LISTENER,
+				JdbcStatementFailureOnIdLoadingThreadListener.class.getName()
+		)
 		);
 
 		String exceptionMessage = JdbcStatementFailureOnIdLoadingThreadListener.MESSAGE;
@@ -125,11 +124,10 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	public void entityLoading(Optional<Integer> failureFloodingThreshold) {
-		SessionFactory sessionFactory = setup( builder ->
-				builder.setProperty(
-						AvailableSettings.AUTO_SESSION_EVENTS_LISTENER,
-						JdbcStatementFailureOnEntityLoadingThreadListener.class.getName()
-				)
+		SessionFactory sessionFactory = setup( builder -> builder.setProperty(
+				AvailableSettings.AUTO_SESSION_EVENTS_LISTENER,
+				JdbcStatementFailureOnEntityLoadingThreadListener.class.getName()
+		)
 		);
 
 		// We need more than 1000 batches in order to reproduce HSEARCH-4236.
@@ -632,7 +630,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	private void doMassIndexingWithFailure(MassIndexer massIndexer,
 			ThreadExpectation threadExpectation,
 			Consumer<Throwable> thrownExpectation,
-			Runnable ... expectationSetters) {
+			Runnable... expectationSetters) {
 		doMassIndexingWithFailure(
 				massIndexer,
 				threadExpectation,
@@ -646,7 +644,7 @@ public abstract class AbstractMassIndexingFailureIT {
 			ThreadExpectation threadExpectation,
 			Consumer<Throwable> thrownExpectation,
 			ExecutionExpectation book2GetIdExpectation, ExecutionExpectation book2GetTitleExpectation,
-			Runnable ... expectationSetters) {
+			Runnable... expectationSetters) {
 		Book.failOnBook2GetId.set( ExecutionExpectation.FAIL.equals( book2GetIdExpectation ) );
 		Book.failOnBook2GetTitle.set( ExecutionExpectation.FAIL.equals( book2GetTitleExpectation ) );
 		try {
@@ -782,7 +780,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	private SessionFactory setup() {
-		return setup( ignored -> { } );
+		return setup( ignored -> {} );
 	}
 
 	private SessionFactory setup(Consumer<SimpleSessionFactoryBuilder> configuration) {
@@ -792,7 +790,8 @@ public abstract class AbstractMassIndexingFailureIT {
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, false )
-				.withPropertyRadical( EngineSettings.Radicals.BACKGROUND_FAILURE_HANDLER, getBackgroundFailureHandlerReference() )
+				.withPropertyRadical( EngineSettings.Radicals.BACKGROUND_FAILURE_HANDLER,
+						getBackgroundFailureHandlerReference() )
 				.withPropertyRadical( EngineSpiSettings.Radicals.THREAD_PROVIDER, threadSpy.getThreadProvider() )
 				.withConfiguration( configuration )
 				.setup( Book.class );

@@ -62,11 +62,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  * @author Nicolas Helleringer
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.METHOD, ElementType.FIELD, ElementType.TYPE })
+@Target({ ElementType.METHOD, ElementType.FIELD, ElementType.TYPE })
 @Documented
 @Repeatable(GeoPointBinding.List.class)
-@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = GeoPointBindingProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = GeoPointBindingProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = GeoPointBindingProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = GeoPointBindingProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface GeoPointBinding {
 
 	/**
@@ -97,8 +99,8 @@ public @interface GeoPointBinding {
 	 */
 	String markerSet() default "";
 
-	@Retention( RetentionPolicy.RUNTIME )
-	@Target( { ElementType.METHOD, ElementType.FIELD, ElementType.TYPE } )
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ ElementType.METHOD, ElementType.FIELD, ElementType.TYPE })
 	@Documented
 	@interface List {
 

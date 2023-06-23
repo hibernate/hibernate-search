@@ -68,22 +68,26 @@ public final class LuceneAnalysisComponentFactory {
 	}
 
 	public TokenizerFactory createTokenizerFactory(Class<? extends TokenizerFactory> factoryClass,
-			Map<String, String> parameters) throws IOException {
+			Map<String, String> parameters)
+			throws IOException {
 		return createAnalysisComponent( TokenizerFactory.class, factoryClass, parameters );
 	}
 
 	public CharFilterFactory createCharFilterFactory(Class<? extends CharFilterFactory> factoryClass,
-			Map<String, String> parameters) throws IOException {
+			Map<String, String> parameters)
+			throws IOException {
 		return createAnalysisComponent( CharFilterFactory.class, factoryClass, parameters );
 	}
 
 	public TokenFilterFactory createTokenFilterFactory(Class<? extends TokenFilterFactory> factoryClass,
-			Map<String, String> parameters) throws IOException {
+			Map<String, String> parameters)
+			throws IOException {
 		return createAnalysisComponent( TokenFilterFactory.class, factoryClass, parameters );
 	}
 
 	private <T> T createAnalysisComponent(Class<T> expectedFactoryClass,
-			Class<? extends T> factoryClass, Map<String, String> parameters) throws IOException {
+			Class<? extends T> factoryClass, Map<String, String> parameters)
+			throws IOException {
 		try {
 			final Map<String, String> tokenMapsOfParameters = getMapOfParameters( parameters, luceneMatchVersion );
 			T tokenizerFactory = ClassLoaderHelper.instanceFromClass(

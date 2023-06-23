@@ -25,7 +25,7 @@ class JsonElementValidator implements Validator<JsonElement> {
 	@Override
 	public void validate(ValidationErrorCollector theErrorCollector, JsonElement expected, JsonElement actual) {
 		JsonElementEquivalence parameterEquivalence = equivalenceProvider.get( theErrorCollector.getCurrentName() );
-		if ( ! parameterEquivalence.isEquivalent( expected, actual ) ) {
+		if ( !parameterEquivalence.isEquivalent( expected, actual ) ) {
 			theErrorCollector.addError(
 					ElasticsearchValidationMessages.INSTANCE.invalidValue( expected, actual )
 			);

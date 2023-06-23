@@ -70,7 +70,8 @@ public interface Log extends BasicLogger {
 	void version(String versionString);
 
 	@LogMessage(level = WARN)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 36, value = "Unable to guess the transaction status: not starting a JTA transaction.")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 36,
+			value = "Unable to guess the transaction status: not starting a JTA transaction.")
 	void cannotGuessTransactionStatus(@Cause Exception e);
 
 	@LogMessage(level = WARN)
@@ -153,7 +154,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 21, value = "Unable to access Hibernate ORM session factory: %1$s")
 	SearchException hibernateSessionFactoryAccessError(String causeMessage, @Cause IllegalStateException cause);
 
-	@Message(id = ID_OFFSET + 22, value = "Indexing failure: %1$s.\nThe following entities may not have been updated correctly in the index: %2$s.")
+	@Message(id = ID_OFFSET + 22,
+			value = "Indexing failure: %1$s.\nThe following entities may not have been updated correctly in the index: %2$s.")
 	SearchException indexingFailure(String causeMessage, List<?> failingEntities, @Cause Throwable cause);
 
 	@Message(id = ID_OFFSET + 23, value = "Unable to process entities for indexing before transaction completion: %1$s")
@@ -248,7 +250,7 @@ public interface Log extends BasicLogger {
 			+ " was not listed in the configuration provided on startup."
 			+ " To target this tenant, you must provide the tenant identifier through configuration property '%3$s',"
 			+ " which should be set to a comma-separated string containing all possible tenant identifiers."
-			+ " Currently configured tenant identifiers: %2$s." )
+			+ " Currently configured tenant identifiers: %2$s.")
 	SearchException invalidTenantId(String tenantId, Set<String> allTenantIds, String tenantIdsConfigurationPropertyKey);
 
 	// NOTE: This is used in -orm6 modules
@@ -259,10 +261,11 @@ public interface Log extends BasicLogger {
 
 	// NOTE: This is used in -orm6 modules
 	@SuppressWarnings("unused")
-	@Message(id = ID_OFFSET + 57, value = "Cannot set the fetch size of Hibernate Search ScrollableResults after having created them."
-			+ " If you want to define the size of batches for entity loading, set loading options when defining the query instead,"
-			+ " for example with .loading(o -> o.fetchSize(50))."
-			+ " See the reference documentation for more information.")
+	@Message(id = ID_OFFSET + 57,
+			value = "Cannot set the fetch size of Hibernate Search ScrollableResults after having created them."
+					+ " If you want to define the size of batches for entity loading, set loading options when defining the query instead,"
+					+ " for example with .loading(o -> o.fetchSize(50))."
+					+ " See the reference documentation for more information.")
 	SearchException cannotSetFetchSize();
 
 	@Message(id = ID_OFFSET + 58, value = "No matching entity type for type identifier '%1$s'."
@@ -311,7 +314,8 @@ public interface Log extends BasicLogger {
 					+ " The exception is being ignored to preserve backwards compatibility with earlier versions of Hibernate Search."
 					+ " Failure: %3$s"
 					+ " %2$s") // Context
-	void failedToResolveStateRepresentation(String path, @FormatWith(EventContextFormatter.class) EventContext context, String causeMessage,
+	void failedToResolveStateRepresentation(String path, @FormatWith(EventContextFormatter.class) EventContext context,
+			String causeMessage,
 			@Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 122,
@@ -322,8 +326,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 123, value = "Configuration property '%1$s' is deprecated; use '%2$s' instead.")
 	void automaticIndexingSynchronizationStrategyIsDeprecated(String deprecatedProperty, String newProperty);
 
-	@Message(id = ID_OFFSET + 124, value = "Unable to apply the given filter at the session level with the outbox polling coordination strategy. " +
-			"With this coordination strategy, applying a session-level indexing plan filter is only allowed if it excludes all types.")
+	@Message(id = ID_OFFSET + 124,
+			value = "Unable to apply the given filter at the session level with the outbox polling coordination strategy. " +
+					"With this coordination strategy, applying a session-level indexing plan filter is only allowed if it excludes all types.")
 	SearchException cannotApplySessionFilterWhenAsyncProcessingIsUsed();
 
 	@LogMessage(level = WARN)

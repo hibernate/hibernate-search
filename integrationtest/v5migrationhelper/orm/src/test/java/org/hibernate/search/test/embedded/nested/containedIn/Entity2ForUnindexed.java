@@ -29,7 +29,7 @@ public class Entity2ForUnindexed {
 	 */
 	@Id
 	@GeneratedValue
-	@Column(name = "universalid")// "uid" is a keyword in Oracle
+	@Column(name = "universalid") // "uid" is a keyword in Oracle
 	private long uid;
 
 	/**

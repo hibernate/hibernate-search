@@ -28,7 +28,8 @@ public class PojoRoutingIndexingDependencyConfigurationContextImpl<T>
 
 	private final BoundPojoModelPathTypeNode<T> modelPath;
 	private final List<BoundPojoModelPathValueNode<?, ?, ?>> usedPaths = new ArrayList<>();
-	private final List<PojoOtherEntityIndexingDependencyConfigurationContextImpl<?>> otherEntityDependencyContexts = new ArrayList<>();
+	private final List<PojoOtherEntityIndexingDependencyConfigurationContextImpl<?>> otherEntityDependencyContexts =
+			new ArrayList<>();
 
 	public PojoRoutingIndexingDependencyConfigurationContextImpl(PojoBootstrapIntrospector introspector,
 			ContainerExtractorBinder containerExtractorBinder,
@@ -60,7 +61,8 @@ public class PojoRoutingIndexingDependencyConfigurationContextImpl<T>
 					PojoIndexingDependencyCollectorNode.walker()
 			);
 		}
-		for ( PojoOtherEntityIndexingDependencyConfigurationContextImpl<?> otherEntityDependencyContext : otherEntityDependencyContexts ) {
+		for ( PojoOtherEntityIndexingDependencyConfigurationContextImpl<
+				?> otherEntityDependencyContext : otherEntityDependencyContexts ) {
 			otherEntityDependencyContext.contributeDependencies( dependencyCollector );
 		}
 	}

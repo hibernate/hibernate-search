@@ -87,7 +87,8 @@ public abstract class AbstractPredicateSimpleAnalysisIT {
 				.fetchAll() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Inconsistent configuration for field '" + absoluteFieldPath + "' in a search query across multiple indexes",
+						"Inconsistent configuration for field '" + absoluteFieldPath
+								+ "' in a search query across multiple indexes",
 						"Attribute 'searchAnalyzer", "' differs:", " vs. "
 				)
 				.satisfies( FailureReportUtils.hasContext(

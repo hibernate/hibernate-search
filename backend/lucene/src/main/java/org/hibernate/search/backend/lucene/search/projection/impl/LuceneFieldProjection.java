@@ -60,7 +60,8 @@ public class LuceneFieldProjection<F, V, P> extends AbstractLuceneProjection<P> 
 		this.absoluteFieldPath = field.absolutePath();
 		this.nestedDocumentPath = field.nestedDocumentPath();
 		this.requiredContextAbsoluteFieldPath = accumulatorProvider.isSingleValued()
-				? field.closestMultiValuedParentAbsolutePath() : null;
+				? field.closestMultiValuedParentAbsolutePath()
+				: null;
 		this.decodeFunction = decodeFunction;
 		this.converter = converter;
 		this.accumulatorProvider = accumulatorProvider;

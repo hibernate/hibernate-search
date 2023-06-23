@@ -108,6 +108,7 @@ public class SearchMappingNoDefaultBackendIT {
 		public Integer getId() {
 			return id;
 		}
+
 		public String getName() {
 			return name;
 		}
@@ -142,9 +143,11 @@ public class SearchMappingNoDefaultBackendIT {
 		public Integer getId() {
 			return id;
 		}
+
 		public String getName() {
 			return name;
 		}
+
 		public Pet getOwner() {
 			return owner;
 		}

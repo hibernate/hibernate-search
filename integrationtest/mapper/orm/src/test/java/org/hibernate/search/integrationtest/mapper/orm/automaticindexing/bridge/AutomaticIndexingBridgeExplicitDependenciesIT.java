@@ -105,7 +105,8 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 			context.dependencies()
 					.use( "containedSingle.includedInSingleValuedPropertyBridge" );
 
-			IndexSchemaObjectField propertyBridgeObjectField = context.indexSchemaElement().objectField( "singleValuedPropertyBridge" );
+			IndexSchemaObjectField propertyBridgeObjectField =
+					context.indexSchemaElement().objectField( "singleValuedPropertyBridge" );
 			propertyBridgeObjectFieldReference = propertyBridgeObjectField.toReference();
 			includedInPropertyBridgeFieldReference = propertyBridgeObjectField.field(
 					"includedInSingleValuedPropertyBridge", f -> f.asString()
@@ -143,7 +144,8 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 			context.dependencies()
 					.use( "containedSingle.includedInMultiValuedPropertyBridge" );
 
-			IndexSchemaObjectField propertyBridgeObjectField = context.indexSchemaElement().objectField( "multiValuedPropertyBridge" );
+			IndexSchemaObjectField propertyBridgeObjectField =
+					context.indexSchemaElement().objectField( "multiValuedPropertyBridge" );
 			propertyBridgeObjectFieldReference = propertyBridgeObjectField.toReference();
 			includedInPropertyBridgeFieldReference = propertyBridgeObjectField.field(
 					"includedInMultiValuedPropertyBridge", f -> f.asString()
@@ -152,7 +154,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		}
 
 		@Override
-		@SuppressWarnings({"unchecked", "rawtypes"})
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public void write(DocumentElement target, List bridgedElement, PropertyBridgeWriteContext context) {
 			List<ContainingEntity> castedBridgedElement = (List<ContainingEntity>) bridgedElement;
 

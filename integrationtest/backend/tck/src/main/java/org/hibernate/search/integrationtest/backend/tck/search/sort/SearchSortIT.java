@@ -226,11 +226,10 @@ public class SearchSortIT {
 
 		// reuse the same sort instance on a different scope,
 		// targeting a different index
-		assertThatThrownBy( () ->
-				otherIndex.createScope().query()
-						.where( f -> f.matchAll() )
-						.sort( sort )
-						.toQuery() )
+		assertThatThrownBy( () -> otherIndex.createScope().query()
+				.where( f -> f.matchAll() )
+				.sort( sort )
+				.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Invalid search sort",
 						"You must build the sort from a scope targeting indexes ", otherIndex.name(),
@@ -238,11 +237,10 @@ public class SearchSortIT {
 
 		// reuse the same sort instance on a different scope,
 		// targeting different indexes
-		assertThatThrownBy( () ->
-				mainIndex.createScope( otherIndex ).query()
-						.where( f -> f.matchAll() )
-						.sort( sort )
-						.toQuery() )
+		assertThatThrownBy( () -> mainIndex.createScope( otherIndex ).query()
+				.where( f -> f.matchAll() )
+				.sort( sort )
+				.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Invalid search sort",
 						"You must build the sort from a scope targeting indexes ",
@@ -275,29 +273,29 @@ public class SearchSortIT {
 		// Conditional extensions with orElse - two, both supported
 		query = simpleQuery( b -> b
 				.extension()
-						.ifSupported(
-								new SupportedExtension(),
-								c -> c.extendedSort( "string" ).missing().last()
-						)
-						.ifSupported(
-								new SupportedExtension(),
-								ignored -> fail( "This should not be called" )
-						)
-						.orElseFail()
+				.ifSupported(
+						new SupportedExtension(),
+						c -> c.extendedSort( "string" ).missing().last()
+				)
+				.ifSupported(
+						new SupportedExtension(),
+						ignored -> fail( "This should not be called" )
+				)
+				.orElseFail()
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
 				.extension()
-						.ifSupported(
-								new SupportedExtension(),
-								c -> c.extendedSort( "string" ).desc().missing().last()
-						)
-						.ifSupported(
-								new SupportedExtension(),
-								ignored -> fail( "This should not be called" )
-						)
-						.orElseFail()
+				.ifSupported(
+						new SupportedExtension(),
+						c -> c.extendedSort( "string" ).desc().missing().last()
+				)
+				.ifSupported(
+						new SupportedExtension(),
+						ignored -> fail( "This should not be called" )
+				)
+				.orElseFail()
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
@@ -305,29 +303,29 @@ public class SearchSortIT {
 		// Conditional extensions with orElse - two, second supported
 		query = simpleQuery( b -> b
 				.extension()
-						.ifSupported(
-								new UnSupportedExtension(),
-								ignored -> fail( "This should not be called" )
-						)
-						.ifSupported(
-								new SupportedExtension(),
-								c -> c.extendedSort( "string" ).missing().last()
-						)
-						.orElse( ignored -> fail( "This should not be called" ) )
+				.ifSupported(
+						new UnSupportedExtension(),
+						ignored -> fail( "This should not be called" )
+				)
+				.ifSupported(
+						new SupportedExtension(),
+						c -> c.extendedSort( "string" ).missing().last()
+				)
+				.orElse( ignored -> fail( "This should not be called" ) )
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
 				.extension()
-						.ifSupported(
-								new UnSupportedExtension(),
-								ignored -> fail( "This should not be called" )
-						)
-						.ifSupported(
-								new SupportedExtension(),
-								c -> c.extendedSort( "string" ).desc().missing().last()
-						)
-						.orElse( ignored -> fail( "This should not be called" ) )
+				.ifSupported(
+						new UnSupportedExtension(),
+						ignored -> fail( "This should not be called" )
+				)
+				.ifSupported(
+						new SupportedExtension(),
+						c -> c.extendedSort( "string" ).desc().missing().last()
+				)
+				.orElse( ignored -> fail( "This should not be called" ) )
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
@@ -335,33 +333,33 @@ public class SearchSortIT {
 		// Conditional extensions with orElse - two, both unsupported
 		query = simpleQuery( b -> b
 				.extension()
-						.ifSupported(
-								new UnSupportedExtension(),
-								ignored -> fail( "This should not be called" )
-						)
-						.ifSupported(
-								new UnSupportedExtension(),
-								ignored -> fail( "This should not be called" )
-						)
-						.orElse(
-								c -> c.field( "string" ).missing().last()
-						)
+				.ifSupported(
+						new UnSupportedExtension(),
+						ignored -> fail( "This should not be called" )
+				)
+				.ifSupported(
+						new UnSupportedExtension(),
+						ignored -> fail( "This should not be called" )
+				)
+				.orElse(
+						c -> c.field( "string" ).missing().last()
+				)
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
 				.extension()
-						.ifSupported(
-								new UnSupportedExtension(),
-								ignored -> fail( "This should not be called" )
-						)
-						.ifSupported(
-								new UnSupportedExtension(),
-								ignored -> fail( "This should not be called" )
-						)
-						.orElse(
-								c -> c.field( "string" ).desc().missing().last()
-						)
+				.ifSupported(
+						new UnSupportedExtension(),
+						ignored -> fail( "This should not be called" )
+				)
+				.ifSupported(
+						new UnSupportedExtension(),
+						ignored -> fail( "This should not be called" )
+				)
+				.orElse(
+						c -> c.field( "string" ).desc().missing().last()
+				)
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
@@ -399,7 +397,7 @@ public class SearchSortIT {
 
 	private void initData() {
 		mainIndex.bulkIndexer()
-		// Important: do not index the documents in the expected order after sorts
+				// Important: do not index the documents in the expected order after sorts
 				.add( SECOND_ID, document -> {
 					document.addValue( mainIndex.binding().string, "george" );
 					document.addValue( mainIndex.binding().string_analyzed_forScore, "Hooray Hooray" );
@@ -418,7 +416,7 @@ public class SearchSortIT {
 					document.addValue( mainIndex.binding().string_analyzed_forScore_reversed, "Hooray Hooray Hooray" );
 					document.addValue( mainIndex.binding().unsortable, "zach" );
 				} )
-				.add( EMPTY_ID, document -> { } )
+				.add( EMPTY_ID, document -> {} )
 				.join();
 	}
 
@@ -433,13 +431,13 @@ public class SearchSortIT {
 			string = root.field( "string", f -> f.asString().sortable( Sortable.YES ) )
 					.toReference();
 			string_analyzed_forScore = root.field(
-					"string_analyzed_forScore" ,
+					"string_analyzed_forScore",
 					f -> f.asString()
 							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 			)
 					.toReference();
 			string_analyzed_forScore_reversed = root.field(
-					"string_analyzed_forScore_reversed" ,
+					"string_analyzed_forScore_reversed",
 					f -> f.asString()
 							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 			)

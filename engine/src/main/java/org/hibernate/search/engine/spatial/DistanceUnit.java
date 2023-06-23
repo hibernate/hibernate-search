@@ -13,15 +13,15 @@ import org.hibernate.search.util.common.impl.Contracts;
  */
 public enum DistanceUnit {
 
-	METERS(1),
+	METERS( 1 ),
 
-	KILOMETERS(1000),
+	KILOMETERS( 1000 ),
 
-	MILES(1_609.344),
+	MILES( 1_609.344 ),
 
-	YARDS(0.9144),
+	YARDS( 0.9144 ),
 
-	NAUTICAL_MILES(1_852);
+	NAUTICAL_MILES( 1_852 );
 
 	private final double toMeters;
 

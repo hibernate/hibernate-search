@@ -24,7 +24,7 @@ import org.hibernate.search.util.common.impl.Contracts;
 
 class TermsPredicateFieldMoreStepImpl
 		implements TermsPredicateFieldMoreStep<TermsPredicateFieldMoreStepImpl, TermsPredicateOptionsStep<?>>,
-				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
+		AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
 
 	private final CommonState commonState;
 

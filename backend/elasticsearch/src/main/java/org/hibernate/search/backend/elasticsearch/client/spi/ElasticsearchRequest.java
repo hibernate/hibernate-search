@@ -50,8 +50,10 @@ public final class ElasticsearchRequest {
 	private ElasticsearchRequest(Builder builder) {
 		this.method = builder.method;
 		this.path = builder.pathBuilder.toString();
-		this.parameters = builder.parameters == null ? Collections.emptyMap() : Collections.unmodifiableMap( builder.parameters );
-		this.bodyParts = builder.bodyParts == null ? Collections.emptyList() : Collections.unmodifiableList( builder.bodyParts );
+		this.parameters =
+				builder.parameters == null ? Collections.emptyMap() : Collections.unmodifiableMap( builder.parameters );
+		this.bodyParts =
+				builder.bodyParts == null ? Collections.emptyList() : Collections.unmodifiableList( builder.bodyParts );
 		this.deadline = builder.deadline;
 	}
 

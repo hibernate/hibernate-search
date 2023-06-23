@@ -15,7 +15,8 @@ public final class PojoModelPathBinder {
 		// Only static methods
 	}
 
-	public static <T, P, V> V bind(T rootNode, PojoModelPathValueNode unboundModelPath, PojoModelPathWalker<Void, T, P, V> walker) {
+	public static <T, P, V> V bind(T rootNode, PojoModelPathValueNode unboundModelPath,
+			PojoModelPathWalker<Void, T, P, V> walker) {
 		return bind( null, rootNode, unboundModelPath, walker );
 	}
 

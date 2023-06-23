@@ -37,7 +37,7 @@ public class ConcurrentRunner {
 	private final TaskFactory factory;
 	private final int repetitions;
 	private final CountDownLatch finalizingTaskEndLatch = new CountDownLatch( 1 );
-	private Runnable finalizingTask = () -> { };
+	private Runnable finalizingTask = () -> {};
 
 	private Long timeoutValue;
 	private TimeUnit timeoutUnit;
@@ -101,14 +101,14 @@ public class ConcurrentRunner {
 		// When all other tasks finished executing, execute the finalizing task
 		executor.execute( new WrapRunnable(
 				mainTasksEndLatch, finalizingTaskEndLatch, "'finalizing task'", finalizingTask
-				) );
+		) );
 		executor.shutdown();
 		startLatch.countDown();
 
 		boolean timedOut = false;
 		try {
 			if ( timeoutValue != null ) {
-				if ( ! finalizingTaskEndLatch.await( timeoutValue, timeoutUnit ) ) {
+				if ( !finalizingTaskEndLatch.await( timeoutValue, timeoutUnit ) ) {
 					executor.shutdownNow();
 					timedOut = true;
 				}
@@ -126,7 +126,8 @@ public class ConcurrentRunner {
 		AssertionError reportedError = null;
 
 		if ( timedOut ) {
-			reportedError = new AssertionError( "The thread pool didn't finish executing after " + timeoutValue + " " + timeoutUnit );
+			reportedError =
+					new AssertionError( "The thread pool didn't finish executing after " + timeoutValue + " " + timeoutUnit );
 			// Go on and also add errors (if any) as suppressed exceptions
 		}
 

@@ -122,7 +122,8 @@ public class BeanResolverImplRetrievalClassTest {
 		doReturn( BeanManagerType2.class ).when( classResolverMock ).classForName( BeanManagerType2.class.getName() );
 		when( beanManagerBeanProviderMock.forType( BeanManagerType2.class ) )
 				.thenReturn( type2BeanHolder );
-		assertThat( beanResolver.resolve( BeanReference.of( Object.class, BeanManagerType2.class.getName(), BeanRetrieval.CLASS ) ) )
+		assertThat( beanResolver
+				.resolve( BeanReference.of( Object.class, BeanManagerType2.class.getName(), BeanRetrieval.CLASS ) ) )
 				.isSameAs( type2BeanHolder );
 		verifyNoOtherInteractionsAndReset();
 
@@ -170,7 +171,8 @@ public class BeanResolverImplRetrievalClassTest {
 		doReturn( ReflectionType2.class ).when( classResolverMock ).classForName( ReflectionType2.class.getName() );
 		when( beanManagerBeanProviderMock.forType( ReflectionType2.class ) )
 				.thenThrow( beanManagerNotFoundException );
-		assertThat( beanResolver.resolve( BeanReference.of( Object.class, ReflectionType2.class.getName(), BeanRetrieval.CLASS ) ) )
+		assertThat(
+				beanResolver.resolve( BeanReference.of( Object.class, ReflectionType2.class.getName(), BeanRetrieval.CLASS ) ) )
 				.extracting( BeanHolder::get ).isInstanceOf( ReflectionType2.class );
 		verifyNoOtherInteractionsAndReset();
 
@@ -223,7 +225,7 @@ public class BeanResolverImplRetrievalClassTest {
 		assertThatThrownBy( () -> beanResolver.resolve( InvalidType.class, "someName", BeanRetrieval.CLASS ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unable to resolve bean reference to type '" + InvalidType.class.getName()
-								+ "' and name 'someName'",
+						+ "' and name 'someName'",
 						classNotFoundException.getMessage() );
 		verifyNoOtherInteractionsAndReset();
 
@@ -234,7 +236,7 @@ public class BeanResolverImplRetrievalClassTest {
 		assertThatThrownBy( () -> beanResolver.resolve( Object.class, InvalidType.class.getName(), BeanRetrieval.CLASS ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unable to resolve bean reference to type '" + Object.class.getName()
-								+ "' and name '" + InvalidType.class.getName() + "'",
+						+ "' and name '" + InvalidType.class.getName() + "'",
 						beanManagerNotFoundException.getMessage(),
 						"missing constructor" )
 				.hasCause( beanManagerNotFoundException );

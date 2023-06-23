@@ -37,7 +37,8 @@ class ActualBackendSetupStrategy implements BackendSetupStrategy {
 
 	@Override
 	public String toString() {
-		return namedBackendConfigurations.isEmpty() ? defaultBackendConfiguration.toString()
+		return namedBackendConfigurations.isEmpty()
+				? defaultBackendConfiguration.toString()
 				: allConfigurations.toString();
 	}
 

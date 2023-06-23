@@ -79,7 +79,7 @@ public class SyncBackendLongWorkListStressTest extends SearchTestBase {
 	}
 
 	@Override
-	public void configure(Map<String,Object> cfg) {
+	public void configure(Map<String, Object> cfg) {
 		// The index content must survive the SessionFactory close/recreate
 		cfg.put( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY, SchemaManagementStrategyName.CREATE );
 

@@ -34,12 +34,13 @@ public abstract class AbstractSpringITConfig {
 
 	@Bean
 	public HibernatePropertiesCustomizer backendMockPropertiesCustomizer(@Autowired BackendMock backendMock) {
-		return hibernateProperties ->
-				hibernateProperties.put( "hibernate.search.backend.type", backendMock.factory( mappingHandlePromise ) );
+		return hibernateProperties -> hibernateProperties.put( "hibernate.search.backend.type",
+				backendMock.factory( mappingHandlePromise ) );
 	}
 
 	@EventListener(ApplicationReadyEvent.class)
 	public void initBackendMappingHandle(ApplicationReadyEvent event) {
-		mappingHandlePromise.complete( new HibernateOrmMappingHandle( event.getApplicationContext().getBean( SessionFactory.class ) ) );
+		mappingHandlePromise
+				.complete( new HibernateOrmMappingHandle( event.getApplicationContext().getBean( SessionFactory.class ) ) );
 	}
 }

@@ -15,7 +15,6 @@ package org.hibernate.search.engine.search.common.spi;
  */
 public interface SearchIndexNodeTypeContext<SC extends SearchIndexScope<?>, N> {
 
-	<T> SearchQueryElementFactory<? extends T, ? super SC, ? super N>
-			queryElementFactory(SearchQueryElementTypeKey<T> key);
+	<T> SearchQueryElementFactory<? extends T, ? super SC, ? super N> queryElementFactory(SearchQueryElementTypeKey<T> key);
 
 }

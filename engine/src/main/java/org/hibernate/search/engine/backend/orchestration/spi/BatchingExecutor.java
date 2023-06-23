@@ -148,7 +148,8 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor, W extends Ba
 	/**
 	 * Takes a batch of works from the queue and submits them to the processor.
 	 */
-	private static final class BatchWorker<P extends BatchedWorkProcessor, W extends BatchedWork<? super P>> implements SingletonTask.Worker {
+	private static final class BatchWorker<P extends BatchedWorkProcessor, W extends BatchedWork<? super P>>
+			implements SingletonTask.Worker {
 		private final CompletableFuture<?> completedFuture = CompletableFuture.completedFuture( null );
 
 		private final String name;

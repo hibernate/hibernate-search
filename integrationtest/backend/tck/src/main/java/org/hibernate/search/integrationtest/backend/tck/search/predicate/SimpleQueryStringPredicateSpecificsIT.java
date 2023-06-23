@@ -76,6 +76,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 		dataSet.contribute( indexer );
 		indexer.join();
 	}
+
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.SimpleQueryStringDSLTest.testSimpleQueryString")
@@ -418,7 +419,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = {"HSEARCH-3612", "HSEARCH-3845"})
+	@TestForIssue(jiraKey = { "HSEARCH-3612", "HSEARCH-3845" })
 	public void prefix_normalizePrefixTerm() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
@@ -539,9 +540,9 @@ public class SimpleQueryStringPredicateSpecificsIT {
 
 		public void contribute(BulkIndexer indexer) {
 			indexer.add( DOCUMENT_1, document -> {
-						document.addValue( index.binding().nonAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
-						document.addValue( index.binding().analyzedStringField1.reference, TEXT_TERM_1_AND_TERM_2 );
-					} )
+				document.addValue( index.binding().nonAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
+				document.addValue( index.binding().analyzedStringField1.reference, TEXT_TERM_1_AND_TERM_2 );
+			} )
 					.add( DOCUMENT_2, document -> {
 						document.addValue( index.binding().nonAnalyzedField.reference, TERM_1 );
 						document.addValue( index.binding().analyzedStringField1.reference, TEXT_TERM_1_AND_TERM_3 );
@@ -554,9 +555,10 @@ public class SimpleQueryStringPredicateSpecificsIT {
 						document.addValue( index.binding().analyzedStringField1.reference, TEXT_TERM_4_IN_PHRASE_SLOP_2 );
 					} )
 					.add( DOCUMENT_5, document -> {
-						document.addValue( index.binding().analyzedStringField1.reference, TEXT_TERM_1_EDIT_DISTANCE_1_OR_TERM_6 );
+						document.addValue( index.binding().analyzedStringField1.reference,
+								TEXT_TERM_1_EDIT_DISTANCE_1_OR_TERM_6 );
 					} )
-					.add( EMPTY, document -> { } );
+					.add( EMPTY, document -> {} );
 		}
 	}
 }

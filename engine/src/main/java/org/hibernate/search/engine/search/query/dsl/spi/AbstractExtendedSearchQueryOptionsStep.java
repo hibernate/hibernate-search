@@ -18,16 +18,15 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 
 public abstract class AbstractExtendedSearchQueryOptionsStep<
-				S extends SearchQueryOptionsStep<S, H, LOS, SF, AF>,
-				H,
-				R extends SearchResult<H>,
-				SCR extends SearchScroll<H>,
-				LOS,
-				PDF extends SearchPredicateFactory,
-				SF extends SearchSortFactory,
-				AF extends SearchAggregationFactory,
-				SC extends SearchQueryIndexScope<?>
-		>
+		S extends SearchQueryOptionsStep<S, H, LOS, SF, AF>,
+		H,
+		R extends SearchResult<H>,
+		SCR extends SearchScroll<H>,
+		LOS,
+		PDF extends SearchPredicateFactory,
+		SF extends SearchSortFactory,
+		AF extends SearchAggregationFactory,
+		SC extends SearchQueryIndexScope<?>>
 		extends AbstractSearchQueryOptionsStep<S, H, LOS, PDF, SF, AF, SC> {
 
 	public AbstractExtendedSearchQueryOptionsStep(SC scope,

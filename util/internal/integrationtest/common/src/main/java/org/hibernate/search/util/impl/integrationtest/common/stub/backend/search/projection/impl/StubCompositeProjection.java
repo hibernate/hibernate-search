@@ -100,7 +100,7 @@ class StubCompositeProjection<E, V, A, P> extends StubSearchProjection<P> {
 		public final <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
 				ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
 			StubSearchProjection<?>[] typedInners =
-					new StubSearchProjection<?>[ inners.length ];
+					new StubSearchProjection<?>[inners.length];
 			for ( int i = 0; i < inners.length; i++ ) {
 				typedInners[i] = StubSearchProjection.from( inners[i] );
 			}

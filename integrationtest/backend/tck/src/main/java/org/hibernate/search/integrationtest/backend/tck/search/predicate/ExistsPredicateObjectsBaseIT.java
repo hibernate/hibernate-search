@@ -89,7 +89,8 @@ public class ExistsPredicateObjectsBaseIT {
 						.name( "nesting" );
 
 		private static final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex =
-				SimpleMappedIndex.of( root -> new MissingFieldIndexBinding( root, Collections.singletonList( innerFieldType ) ) )
+				SimpleMappedIndex
+						.of( root -> new MissingFieldIndexBinding( root, Collections.singletonList( innerFieldType ) ) )
 						.name( "nesting_missingField" );
 
 		@Parameterized.Parameters(name = "{0}")
@@ -131,7 +132,8 @@ public class ExistsPredicateObjectsBaseIT {
 			return f.exists().field( targetField( objectFieldBinding ).absolutePath );
 		}
 
-		protected PredicateFinalStep predicateWithRelativePath(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding) {
+		protected PredicateFinalStep predicateWithRelativePath(SearchPredicateFactory f,
+				ObjectFieldBinding objectFieldBinding) {
 			return f.exists().field( targetField( objectFieldBinding ).relativeName );
 		}
 
@@ -157,7 +159,7 @@ public class ExistsPredicateObjectsBaseIT {
 			public void contribute(BulkIndexer mainIndexer, BulkIndexer missingFieldIndexer) {
 				mainIndexer.add( docId( 0 ), routingKey, document -> mainIndex.binding()
 						.initDocument( document, innerFieldType, "irrelevant" ) );
-				mainIndexer.add( docId( 1 ), routingKey, document -> { } );
+				mainIndexer.add( docId( 1 ), routingKey, document -> {} );
 				missingFieldIndexer.add( docId( MISSING_FIELD_INDEX_DOC_ORDINAL ), routingKey,
 						document -> missingFieldIndex.binding().initDocument() );
 			}

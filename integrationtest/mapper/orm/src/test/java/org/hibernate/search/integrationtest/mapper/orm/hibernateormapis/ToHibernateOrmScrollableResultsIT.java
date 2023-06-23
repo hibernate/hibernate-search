@@ -230,7 +230,7 @@ public class ToHibernateOrmScrollableResultsIT {
 		setupHolder.runInTransaction( session -> {
 			int customFetchSize = 10;
 			backendMock.expectScrollObjects( Collections.singletonList( IndexedEntity.NAME ),
-					customFetchSize, b -> { } );
+					customFetchSize, b -> {} );
 			try ( ScrollableResults scroll = Search.toOrmQuery( Search.session( session )
 					.search( IndexedEntity.class )
 					.where( f -> f.matchAll() )
@@ -1082,7 +1082,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	private void expectScrollCreate() {
 		backendMock.expectScrollObjects( Collections.singletonList( IndexedEntity.NAME ),
-				DEFAULT_FETCH_SIZE, b -> { } );
+				DEFAULT_FETCH_SIZE, b -> {} );
 	}
 
 	private void expectScrollNextIfNecessary(int i, int fetchSize, int totalHitCount) {

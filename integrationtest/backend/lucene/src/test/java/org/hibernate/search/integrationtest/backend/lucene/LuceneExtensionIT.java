@@ -174,7 +174,8 @@ public class LuceneExtensionIT {
 
 		// Unsupported extension
 		assertThatThrownBy(
-				() -> query.extension( (SearchQuery<DocumentReference> original, SearchLoadingContext<?> loadingContext) -> Optional.empty() )
+				() -> query.extension(
+						(SearchQuery<DocumentReference> original, SearchLoadingContext<?> loadingContext) -> Optional.empty() )
 		)
 				.isInstanceOf( SearchException.class );
 	}
@@ -349,10 +350,10 @@ public class LuceneExtensionIT {
 		SearchPredicate predicate3 = scope.predicate().extension( LuceneExtension.get() )
 				.fromLuceneQuery( LatLonPoint.newDistanceQuery( "geoPoint", 40, -70, 200_000 ) ).toPredicate();
 		SearchPredicate booleanPredicate = scope.predicate().or(
-						predicate1,
-						predicate2,
-						predicate3
-				).toPredicate();
+				predicate1,
+				predicate2,
+				predicate3
+		).toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( booleanPredicate )
@@ -386,11 +387,11 @@ public class LuceneExtensionIT {
 				.where( f -> f.matchAll() )
 				.sort( f -> f
 						.extension( LuceneExtension.get() )
-								.fromLuceneSortField( new SortedSetSortField( "sort1", false ) )
+						.fromLuceneSortField( new SortedSetSortField( "sort1", false ) )
 						.then().extension( LuceneExtension.get() )
-								.fromLuceneSortField( new SortedSetSortField( "sort2", false ) )
+						.fromLuceneSortField( new SortedSetSortField( "sort2", false ) )
 						.then().extension( LuceneExtension.get() )
-								.fromLuceneSortField( new SortedSetSortField( "sort3", false ) )
+						.fromLuceneSortField( new SortedSetSortField( "sort3", false ) )
 				)
 				.toQuery();
 		assertThatQuery( query ).hasDocRefHitsExactOrder(
@@ -407,7 +408,7 @@ public class LuceneExtensionIT {
 										new SortedSetSortField( "sort3", false ),
 										new SortedSetSortField( "sort2", false ),
 										new SortedSetSortField( "sort1", false )
-									)
+								)
 								)
 						)
 						.orElseFail()
@@ -424,11 +425,11 @@ public class LuceneExtensionIT {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchSort sort1 = scope.sort().extension()
-						.ifSupported(
-								LuceneExtension.get(),
-								c2 -> c2.fromLuceneSortField( new SortedSetSortField( "sort1", false ) )
-						)
-						.orElseFail()
+				.ifSupported(
+						LuceneExtension.get(),
+						c2 -> c2.fromLuceneSortField( new SortedSetSortField( "sort1", false ) )
+				)
+				.orElseFail()
 				.toSort();
 		SearchSort sort2 = scope.sort().extension( LuceneExtension.get() )
 				.fromLuceneSortField( new SortedSetSortField( "sort2", false ) )
@@ -453,7 +454,7 @@ public class LuceneExtensionIT {
 						new SortedSetSortField( "sort3", false ),
 						new SortedSetSortField( "sort2", false ),
 						new SortedSetSortField( "sort1", false )
-					)
+				)
 				)
 				.toSort();
 
@@ -607,7 +608,8 @@ public class LuceneExtensionIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
-				.sort( f -> f.extension( LuceneExtension.get() ).fromLuceneSortField( new SortField( "nativeField", Type.LONG ) ) )
+				.sort( f -> f.extension( LuceneExtension.get() )
+						.fromLuceneSortField( new SortField( "nativeField", Type.LONG ) ) )
 				.toQuery();
 
 		assertThatQuery( query )
@@ -740,11 +742,10 @@ public class LuceneExtensionIT {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
-				.select( f ->
-						f.composite(
-								f.extension( LuceneExtension.get() ).document(),
-								f.field( "string" )
-						)
+				.select( f -> f.composite(
+						f.extension( LuceneExtension.get() ).document(),
+						f.field( "string" )
+				)
 				)
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
@@ -810,11 +811,12 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void nativeField_invalidFieldPath() {
-		assertThatThrownBy( () -> mainIndex.index( FIRST_ID, document ->
-			document.addValue( mainIndex.binding().nativeField_invalidFieldPath, 45 )
-		) )
+		assertThatThrownBy( () -> mainIndex
+				.index( FIRST_ID, document -> document.addValue( mainIndex.binding().nativeField_invalidFieldPath, 45 )
+				) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Invalid field path; expected path 'nativeField_invalidFieldPath', got 'not the expected path'." );
+				.hasMessageContaining(
+						"Invalid field path; expected path 'nativeField_invalidFieldPath', got 'not the expected path'." );
 	}
 
 	@Test
@@ -879,8 +881,8 @@ public class LuceneExtensionIT {
 	public void documentProjectionInsideNested() {
 		assertThatThrownBy( () -> mainIndex.createScope().query()
 				.select( f -> f.object( "nestedObject" ).from(
-								f.extension( LuceneExtension.get() ).document()
-						).asList().multi()
+						f.extension( LuceneExtension.get() ).document()
+				).asList().multi()
 				)
 				.where( f -> f.matchAll() )
 				.toQuery()
@@ -895,8 +897,8 @@ public class LuceneExtensionIT {
 	public void explanationProjectionInsideNested() {
 		assertThatThrownBy( () -> mainIndex.createScope().query()
 				.select( f -> f.object( "nestedObject" ).from(
-								f.extension( LuceneExtension.get() ).explanation()
-						).asList().multi()
+						f.extension( LuceneExtension.get() ).explanation()
+				).asList().multi()
 				)
 				.where( f -> f.matchAll() )
 				.toQuery()
@@ -1088,13 +1090,15 @@ public class LuceneExtensionIT {
 			nativeField = root.field(
 					"nativeField",
 					f -> f.extension( LuceneExtension.get() )
-							.asNative( Integer.class, LuceneExtensionIT::contributeNativeField, LuceneExtensionIT::fromNativeField )
+							.asNative( Integer.class, LuceneExtensionIT::contributeNativeField,
+									LuceneExtensionIT::fromNativeField )
 			)
 					.toReference();
 			nativeField_converted = root.field(
 					"nativeField_converted",
 					f -> f.extension( LuceneExtension.get() )
-							.asNative( Integer.class, LuceneExtensionIT::contributeNativeField, LuceneExtensionIT::fromNativeField )
+							.asNative( Integer.class, LuceneExtensionIT::contributeNativeField,
+									LuceneExtensionIT::fromNativeField )
 							.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() )
 			)
 					.toReference();
@@ -1173,7 +1177,8 @@ public class LuceneExtensionIT {
 		return Integer.parseInt( field.stringValue() );
 	}
 
-	private static void contributeNativeFieldInvalidFieldPath(String absoluteFieldPath, Integer value, Consumer<IndexableField> collector) {
+	private static void contributeNativeFieldInvalidFieldPath(String absoluteFieldPath, Integer value,
+			Consumer<IndexableField> collector) {
 		collector.accept( new StringField( "not the expected path", value.toString(), Store.YES ) );
 	}
 }

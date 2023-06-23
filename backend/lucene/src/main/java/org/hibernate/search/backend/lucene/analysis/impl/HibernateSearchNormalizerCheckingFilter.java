@@ -35,7 +35,8 @@ final class HibernateSearchNormalizerCheckingFilter extends TokenFilter {
 
 	@Override
 	public boolean equals(Object obj) {
-		return obj != null && getClass().equals( obj.getClass() )
+		return obj != null
+				&& getClass().equals( obj.getClass() )
 				&& normalizerName.equals( ( (HibernateSearchNormalizerCheckingFilter) obj ).normalizerName )
 				&& super.equals( obj );
 	}

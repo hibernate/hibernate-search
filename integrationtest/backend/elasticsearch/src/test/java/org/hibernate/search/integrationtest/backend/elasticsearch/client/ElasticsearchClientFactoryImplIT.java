@@ -130,7 +130,8 @@ public class ElasticsearchClientFactoryImplIT {
 	private final WireMockRule wireMockRule1 = new WireMockRule( wireMockConfig().port( 0 )
 			.httpsPort( 0 ) /* Automatic port selection */ );
 
-	private final WireMockRule wireMockRule2 = new WireMockRule( wireMockConfig().port( 0 ).httpsPort( 0 ) /* Automatic port selection */ );
+	private final WireMockRule wireMockRule2 =
+			new WireMockRule( wireMockConfig().port( 0 ).httpsPort( 0 ) /* Automatic port selection */ );
 
 	private final TestConfigurationProvider testConfigurationProvider = new TestConfigurationProvider();
 
@@ -197,8 +198,8 @@ public class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient( properties -> properties.accept(
 				ElasticsearchBackendSettings.CLIENT_CONFIGURER,
-				(ElasticsearchHttpClientConfigurer) context ->
-						context.clientBuilder().addInterceptorFirst( responseInterceptor )
+				(ElasticsearchHttpClientConfigurer) context -> context.clientBuilder()
+						.addInterceptorFirst( responseInterceptor )
 		) ) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
 			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
@@ -374,7 +375,7 @@ public class ElasticsearchClientFactoryImplIT {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn(
 						elasticsearchResponse().withStatus( 500 )
-						.withBody( responseBody )
+								.withBody( responseBody )
 				) );
 
 		try ( ElasticsearchClientImplementor client = createClient() ) {
@@ -391,7 +392,7 @@ public class ElasticsearchClientFactoryImplIT {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn(
 						elasticsearchResponse()
-						.withBody( "'unparseable" )
+								.withBody( "'unparseable" )
 				) );
 
 		assertThatThrownBy( () -> {
@@ -416,7 +417,7 @@ public class ElasticsearchClientFactoryImplIT {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn(
 						elasticsearchResponse()
-						.withFixedDelay( 2000 )
+								.withFixedDelay( 2000 )
 				) );
 
 		assertThatThrownBy( () -> {
@@ -444,7 +445,7 @@ public class ElasticsearchClientFactoryImplIT {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn(
 						elasticsearchResponse()
-						.withFixedDelay( 2000 )
+								.withFixedDelay( 2000 )
 				) );
 
 		assertThatThrownBy( () -> {
@@ -493,7 +494,7 @@ public class ElasticsearchClientFactoryImplIT {
 			// Clog up the client: put many requests in the queue, to be executed asynchronously,
 			// so that we're sure the next request will have to wait in the queue
 			// for more that the configured timeout before it ends up being executed.
-			for ( int i = 0 ; i < 10 ; ++i ) {
+			for ( int i = 0; i < 10; ++i ) {
 				client.submit( buildRequest( ElasticsearchRequest.post(), "/long", payload ) );
 			}
 
@@ -530,12 +531,12 @@ public class ElasticsearchClientFactoryImplIT {
 			// Clog up the client: put many requests in the queue, to be executed asynchronously,
 			// so that we're sure the next request will have to wait in the queue
 			// for more that the configured timeout before it ends up being executed.
-			for ( int i = 0 ; i < 10 ; ++i ) {
+			for ( int i = 0; i < 10; ++i ) {
 				client.submit( buildRequest( ElasticsearchRequest.post(), "/long", payload ) );
 			}
 
 			assertThatThrownBy( () -> {
-					doPost( client, "/myIndex/myType", payload );
+				doPost( client, "/myIndex/myType", payload );
 			} )
 					.isInstanceOf( AssertionFailure.class )
 					.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
@@ -891,7 +892,7 @@ public class ElasticsearchClientFactoryImplIT {
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn(
 						elasticsearchResponse().withStatus( 401 /* Unauthorized */ )
-						.withStatusMessage( statusMessage )
+								.withStatusMessage( statusMessage )
 				) );
 
 		try ( ElasticsearchClientImplementor client = createClient() ) {
@@ -1051,7 +1052,7 @@ public class ElasticsearchClientFactoryImplIT {
 		maxKeepAliveConnection( 10, 2 );
 	}
 
-	public void maxKeepAliveConnection(long time, int connections ) throws InterruptedException {
+	public void maxKeepAliveConnection(long time, int connections) throws InterruptedException {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessage";
 		String responseBody = "{ \"foo\": \"bar\" }";
@@ -1131,7 +1132,7 @@ public class ElasticsearchClientFactoryImplIT {
 	}
 
 	private ElasticsearchClientImplementor createClient() {
-		return createClient( ignored -> { } );
+		return createClient( ignored -> {} );
 	}
 
 	private ElasticsearchClientImplementor createClient(Consumer<BiConsumer<String, Object>> additionalProperties) {
@@ -1197,25 +1198,25 @@ public class ElasticsearchClientFactoryImplIT {
 		return builder.build();
 	}
 
-	private static String httpHostAndPortFor(WireMockRule ... rules) {
+	private static String httpHostAndPortFor(WireMockRule... rules) {
 		return Arrays.stream( rules )
 				.map( rule -> "localhost:" + rule.port() )
 				.collect( Collectors.joining( "," ) );
 	}
 
-	private static String httpsHostAndPortFor(WireMockRule ... rules) {
+	private static String httpsHostAndPortFor(WireMockRule... rules) {
 		return Arrays.stream( rules )
 				.map( rule -> "localhost:" + rule.httpsPort() )
 				.collect( Collectors.joining( "," ) );
 	}
 
-	private static String httpUrisFor(WireMockRule ... rules) {
+	private static String httpUrisFor(WireMockRule... rules) {
 		return Arrays.stream( rules )
 				.map( rule -> "http://localhost:" + rule.port() )
 				.collect( Collectors.joining( "," ) );
 	}
 
-	private static String httpsUrisFor(WireMockRule ... rules) {
+	private static String httpsUrisFor(WireMockRule... rules) {
 		return Arrays.stream( rules )
 				.map( rule -> "https://localhost:" + rule.httpsPort() )
 				.collect( Collectors.joining( "," ) );

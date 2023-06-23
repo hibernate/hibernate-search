@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 public class SyncWorkerTest extends WorkerTestCase {
 
 	@Override
-	public void configure(Map<String,Object> cfg) {
+	public void configure(Map<String, Object> cfg) {
 		cfg.put( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
 				AutomaticIndexingSynchronizationStrategyNames.SYNC );
 	}

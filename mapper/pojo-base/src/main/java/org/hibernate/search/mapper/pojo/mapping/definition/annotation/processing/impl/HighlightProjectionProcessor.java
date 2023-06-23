@@ -20,7 +20,7 @@ public final class HighlightProjectionProcessor
 			MethodParameterMappingAnnotationProcessorContext context) {
 		mapping.projection( HighlightProjectionBinder.create(
 				context.toNullIfDefault( annotation.path(), "" ) )
-						.highlighter( context.toNullIfDefault( annotation.highlighter(), "" ) ) );
+				.highlighter( context.toNullIfDefault( annotation.highlighter(), "" ) ) );
 	}
 
 }

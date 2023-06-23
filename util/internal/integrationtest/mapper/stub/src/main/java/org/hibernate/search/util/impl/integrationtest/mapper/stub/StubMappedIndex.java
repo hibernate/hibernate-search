@@ -36,7 +36,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 public abstract class StubMappedIndex {
 
 	public static StubMappedIndex withoutFields() {
-		return ofAdvancedNonRetrievable( ignored -> { } );
+		return ofAdvancedNonRetrievable( ignored -> {} );
 	}
 
 	public static StubMappedIndex ofNonRetrievable(Consumer<? super IndexSchemaElement> binder) {
@@ -144,7 +144,8 @@ public abstract class StubMappedIndex {
 				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE );
 	}
 
-	public IndexIndexingPlan createIndexingPlan(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+	public IndexIndexingPlan createIndexingPlan(DocumentCommitStrategy commitStrategy,
+			DocumentRefreshStrategy refreshStrategy) {
 		return delegate().createIndexingPlan( mapping.session(),
 				commitStrategy, refreshStrategy );
 	}

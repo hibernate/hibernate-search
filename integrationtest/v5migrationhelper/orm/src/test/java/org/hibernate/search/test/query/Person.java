@@ -15,7 +15,8 @@ import javax.persistence.Id;
  */
 @Entity
 public class Person {
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	private Integer id;
 	private String name;
 

@@ -95,7 +95,8 @@ final class ElasticsearchSchemaMigrator {
 		}
 		else {
 			mappingMigration = settingsMigration
-					.thenCompose( ignored -> doMigrateMapping( indexName, expectedIndexMetadata.getMapping(), operationSubmitter ) );
+					.thenCompose(
+							ignored -> doMigrateMapping( indexName, expectedIndexMetadata.getMapping(), operationSubmitter ) );
 		}
 
 		return mappingMigration.exceptionally( Futures.handler( e -> {

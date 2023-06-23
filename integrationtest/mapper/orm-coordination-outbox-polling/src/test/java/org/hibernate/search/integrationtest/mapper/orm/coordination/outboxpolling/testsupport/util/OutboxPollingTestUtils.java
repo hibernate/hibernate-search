@@ -27,7 +27,8 @@ public class OutboxPollingTestUtils {
 	// Wait for all agents to be registered and member of the same cluster.
 	// Useful in tests checking indexing count for each agent,
 	// because for those tests, starting with a partially-formed cluster could skew the numbers.
-	public static void awaitAllAgentsRunningInOneCluster(PersistenceRunner<Session, Transaction> runner, int expectedAgentCount) {
+	public static void awaitAllAgentsRunningInOneCluster(PersistenceRunner<Session, Transaction> runner,
+			int expectedAgentCount) {
 		await( "Waiting for the formation of a cluster of " + expectedAgentCount + " agents" )
 				.pollDelay( Duration.ZERO )
 				.pollInterval( Duration.ofMillis( 5 ) )
@@ -43,7 +44,8 @@ public class OutboxPollingTestUtils {
 									assertThat( agent.getTotalShardCount() ).isEqualTo( expectedAgentCount );
 								} )
 								.extracting( Agent::getAssignedShardIndex )
-								.containsExactlyInAnyOrder( IntStream.range( 0, expectedAgentCount ).boxed().toArray( Integer[]::new ) );
+								.containsExactlyInAnyOrder(
+										IntStream.range( 0, expectedAgentCount ).boxed().toArray( Integer[]::new ) );
 					} );
 				} );
 	}

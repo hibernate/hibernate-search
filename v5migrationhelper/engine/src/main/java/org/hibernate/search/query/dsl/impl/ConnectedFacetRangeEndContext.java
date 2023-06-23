@@ -52,4 +52,3 @@ public class ConnectedFacetRangeEndContext<T> extends ConnectedFacetParameterCon
 	}
 }
 
-

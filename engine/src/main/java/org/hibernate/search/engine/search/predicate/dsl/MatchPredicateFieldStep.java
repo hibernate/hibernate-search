@@ -44,5 +44,5 @@ public interface MatchPredicateFieldStep<N extends MatchPredicateFieldMoreStep<?
 	 *
 	 * @see #field(String)
 	 */
-	N fields(String ... fieldPaths);
+	N fields(String... fieldPaths);
 }

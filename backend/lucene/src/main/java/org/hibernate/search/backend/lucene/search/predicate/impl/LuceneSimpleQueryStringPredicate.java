@@ -105,7 +105,8 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 					firstFieldState = fieldState;
 				}
 				else {
-					SearchIndexSchemaElementContextHelper.checkNestedDocumentPathCompatibility( firstFieldState.field(), fieldState.field() );
+					SearchIndexSchemaElementContextHelper.checkNestedDocumentPathCompatibility( firstFieldState.field(),
+							fieldState.field() );
 				}
 				fieldStates.put( fieldPath, fieldState );
 			}

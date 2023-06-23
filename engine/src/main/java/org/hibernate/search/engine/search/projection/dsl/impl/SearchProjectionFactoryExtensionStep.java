@@ -14,7 +14,8 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtensionIfSupportedMoreStep;
 
-public final class SearchProjectionFactoryExtensionStep<P, R, E> implements
+public final class SearchProjectionFactoryExtensionStep<P, R, E>
+		implements
 		SearchProjectionFactoryExtensionIfSupportedMoreStep<P, R, E> {
 
 	private final SearchProjectionFactory<R, E> parent;

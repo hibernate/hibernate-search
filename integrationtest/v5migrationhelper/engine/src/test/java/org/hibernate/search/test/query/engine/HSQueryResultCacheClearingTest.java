@@ -75,7 +75,7 @@ public class HSQueryResultCacheClearingTest {
 
 		hsQuery.projection( ProjectionConstants.ID, "field" );
 		helper.assertThatQuery( hsQuery ).matchesExactlyProjections(
-				new Object[][]{
+				new Object[][] {
 						{ 0, "zero" },
 						{ 1, "one" },
 						{ 2, "two" },

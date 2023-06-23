@@ -52,6 +52,7 @@ public class LuceneBackendSpiSettings {
 
 		private Defaults() {
 		}
+
 		public static final BeanReference<? extends LuceneWorkExecutorProvider> BACKEND_WORK_EXECUTOR_PROVIDER =
 				BeanReference.of( LuceneWorkExecutorProvider.class, DEFAULT_BEAN_NAME );
 

@@ -46,17 +46,19 @@ public class HibernateOrmIndexingPlanSynchronizationStrategyAdapter implements I
 					@Override
 					@SuppressWarnings("deprecation") // need to keep OLD API still implemented
 					public void indexingFutureHandler(
-							Consumer<CompletableFuture<org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport>> handler) {
+							Consumer<CompletableFuture<
+									org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport>> handler) {
 						context.indexingFutureHandler( report -> handler.accept(
-								report.thenApply( r ->
-										new org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport() {
+								report.thenApply(
+										r -> new org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport() {
 											@Override
 											public Optional<Throwable> throwable() {
 												return r.throwable();
 											}
 
 											@Override
-											public List<org.hibernate.search.mapper.orm.common.EntityReference> failingEntities() {
+											public List<
+													org.hibernate.search.mapper.orm.common.EntityReference> failingEntities() {
 												return r.failingEntities().stream()
 														.map( org.hibernate.search.mapper.orm.common.EntityReference.class::cast )
 														.collect( Collectors.toList() );

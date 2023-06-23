@@ -67,6 +67,7 @@ public final class ElasticsearchBackendSpiSettings {
 
 		private Defaults() {
 		}
+
 		public static final BeanReference<? extends ElasticsearchWorkExecutorProvider> BACKEND_WORK_EXECUTOR_PROVIDER =
 				BeanReference.of( ElasticsearchWorkExecutorProvider.class, DEFAULT_BEAN_NAME );
 	}

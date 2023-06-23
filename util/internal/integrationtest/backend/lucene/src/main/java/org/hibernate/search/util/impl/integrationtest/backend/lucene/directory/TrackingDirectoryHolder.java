@@ -22,7 +22,8 @@ class TrackingDirectoryHolder implements DirectoryHolder {
 
 	private TrackingDirectory directory;
 
-	public TrackingDirectoryHolder(DirectoryHolder delegate, Supplier<LockFactory> lockFactorySupplier, OpenResourceTracker tracker) {
+	public TrackingDirectoryHolder(DirectoryHolder delegate, Supplier<LockFactory> lockFactorySupplier,
+			OpenResourceTracker tracker) {
 		this.delegate = delegate;
 		this.lockFactorySupplier = lockFactorySupplier;
 		this.tracker = tracker;

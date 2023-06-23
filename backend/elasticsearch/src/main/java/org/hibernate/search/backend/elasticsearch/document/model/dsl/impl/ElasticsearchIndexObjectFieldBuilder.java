@@ -46,7 +46,8 @@ class ElasticsearchIndexObjectFieldBuilder extends AbstractElasticsearchIndexCom
 		super( new ElasticsearchIndexCompositeNodeType.Builder( structure ) );
 		this.parent = parent;
 		String parentAbsolutePath = parent.getAbsolutePath();
-		this.absoluteFieldPath = parentAbsolutePath == null ? relativeFieldName
+		this.absoluteFieldPath = parentAbsolutePath == null
+				? relativeFieldName
 				: FieldPaths.compose( parentAbsolutePath, relativeFieldName );
 		this.relativeFieldName = relativeFieldName;
 		this.inclusion = inclusion;

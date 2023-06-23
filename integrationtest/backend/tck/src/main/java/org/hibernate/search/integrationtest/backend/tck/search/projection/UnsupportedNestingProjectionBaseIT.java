@@ -40,8 +40,8 @@ public class UnsupportedNestingProjectionBaseIT {
 	public void id() {
 		assertThatThrownBy( () -> index.createScope().query()
 				.select( f -> f.object( "nested" ).from(
-								f.id()
-						).asList().multi()
+						f.id()
+				).asList().multi()
 				)
 				.where( f -> f.matchAll() )
 				.toQuery()
@@ -57,8 +57,8 @@ public class UnsupportedNestingProjectionBaseIT {
 	public void entity() {
 		assertThatThrownBy( () -> index.createScope().query()
 				.select( f -> f.object( "nested" ).from(
-								f.entity()
-						).asList().multi()
+						f.entity()
+				).asList().multi()
 				)
 				.where( f -> f.matchAll() )
 				.toQuery()
@@ -74,8 +74,8 @@ public class UnsupportedNestingProjectionBaseIT {
 	public void entityReference() {
 		assertThatThrownBy( () -> index.createScope().query()
 				.select( f -> f.object( "nested" ).from(
-								f.entityReference()
-						).asList().multi()
+						f.entityReference()
+				).asList().multi()
 				)
 				.where( f -> f.matchAll() )
 				.toQuery()
@@ -91,8 +91,8 @@ public class UnsupportedNestingProjectionBaseIT {
 	public void documentReference() {
 		assertThatThrownBy( () -> index.createScope().query()
 				.select( f -> f.object( "nested" ).from(
-								f.documentReference()
-						).asList().multi()
+						f.documentReference()
+				).asList().multi()
 				)
 				.where( f -> f.matchAll() )
 				.toQuery()
@@ -108,8 +108,8 @@ public class UnsupportedNestingProjectionBaseIT {
 	public void score() {
 		assertThatThrownBy( () -> index.createScope().query()
 				.select( f -> f.object( "nested" ).from(
-								f.score()
-						).asList().multi()
+						f.score()
+				).asList().multi()
 				)
 				.where( f -> f.matchAll() )
 				.toQuery()

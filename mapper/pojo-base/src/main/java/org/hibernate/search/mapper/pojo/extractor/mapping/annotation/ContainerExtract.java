@@ -19,6 +19,6 @@ public enum ContainerExtract {
 	/**
 	 * Do not apply any container extractor,
 	 * and throw an exception if {@link ContainerExtraction#value() extractors} are defined explicitly.
- 	 */
+	 */
 	NO
 }

@@ -94,7 +94,8 @@ public final class SerializationUtil {
 	}
 
 	public static CacheMode parseCacheModeParameter(String key, String value, CacheMode defaultValue) {
-		return parseEnumParameter( CacheMode.class, key, value == null ? value : value.toUpperCase( Locale.ROOT ), defaultValue );
+		return parseEnumParameter( CacheMode.class, key, value == null ? value : value.toUpperCase( Locale.ROOT ),
+				defaultValue );
 	}
 
 	private static <T extends Enum<T>> T parseEnumParameter(Class<T> clazz, String key, String value, T defaultValue) {

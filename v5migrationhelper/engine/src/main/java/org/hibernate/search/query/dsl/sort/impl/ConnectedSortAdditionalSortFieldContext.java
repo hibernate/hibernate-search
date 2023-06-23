@@ -19,7 +19,8 @@ import org.apache.lucene.search.SortField;
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public abstract class ConnectedSortAdditionalSortFieldContext extends AbstractConnectedSortContext implements SortAdditionalSortFieldContext {
+public abstract class ConnectedSortAdditionalSortFieldContext extends AbstractConnectedSortContext
+		implements SortAdditionalSortFieldContext {
 
 	public ConnectedSortAdditionalSortFieldContext(QueryBuildingContext queryContext, SortFieldStates states) {
 		super( queryContext, states );

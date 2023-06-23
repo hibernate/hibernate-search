@@ -25,7 +25,8 @@ public final class PersistenceUnitTestUtil {
 	 * using different settings.
 	 */
 	public static String getPersistenceUnitName() {
-		return ( BackendConfiguration.isElasticsearch() ) ? ELASTICSEARCH_PERSISTENCE_UNIT_NAME
+		return ( BackendConfiguration.isElasticsearch() )
+				? ELASTICSEARCH_PERSISTENCE_UNIT_NAME
 				: LUCENE_PERSISTENCE_UNIT_NAME;
 	}
 }

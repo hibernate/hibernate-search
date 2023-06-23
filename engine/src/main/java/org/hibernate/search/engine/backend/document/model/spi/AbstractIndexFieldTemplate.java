@@ -12,11 +12,10 @@ import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 public abstract class AbstractIndexFieldTemplate<
-				M extends AbstractIndexModel<?, ?, F>,
-				F extends IndexField<?, C>,
-				C extends IndexCompositeNode<?, ?, ?>,
-				FT
-		> {
+		M extends AbstractIndexModel<?, ?, F>,
+		F extends IndexField<?, C>,
+		C extends IndexCompositeNode<?, ?, ?>,
+		FT> {
 
 	private final FT type;
 	private final TreeNodeInclusion inclusion;

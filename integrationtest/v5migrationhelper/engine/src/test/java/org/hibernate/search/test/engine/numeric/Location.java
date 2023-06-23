@@ -85,7 +85,7 @@ class Location {
 	}
 
 	public Location(int id, Long counter, double latitude, Double longitude,
-					Integer ranking, String description, Double multiple, Country country, short importance, byte popularity) {
+			Integer ranking, String description, Double multiple, Country country, short importance, byte popularity) {
 		this.id = id;
 		this.counter = counter;
 		this.longitude = longitude;

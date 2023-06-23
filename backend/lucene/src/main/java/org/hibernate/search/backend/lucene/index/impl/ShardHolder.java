@@ -35,7 +35,8 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
 
-class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerContext,
+class ShardHolder
+		implements ReadIndexManagerContext, WorkExecutionIndexManagerContext,
 		SchemaManagementIndexManagerContext {
 
 	private static final SavedState.Key<Map<String, SavedState>> SHARDS_KEY = SavedState.key( "shards" );
@@ -65,7 +66,8 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 		return SavedState.builder().put( SHARDS_KEY, states ).build();
 	}
 
-	private ConfigurationPropertySource toShardPropertySource(ConfigurationPropertySource indexPropertySource, String shardIdOrNull) {
+	private ConfigurationPropertySource toShardPropertySource(ConfigurationPropertySource indexPropertySource,
+			String shardIdOrNull) {
 		return shardIdOrNull != null
 				? indexPropertySource.withMask( LuceneIndexSettings.SHARDS ).withMask( shardIdOrNull )
 						.withFallback( indexPropertySource )

@@ -83,7 +83,8 @@ public final class HibernateOrmMapperSettings {
 	 * @deprecated Use {@link #INDEXING_PLAN_SYNCHRONIZATION_STRATEGY} instead.
 	 */
 	@Deprecated
-	public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = PREFIX + Radicals.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY;
+	public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
+			PREFIX + Radicals.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY;
 
 	/**
 	 * Whether to check if dirty properties are relevant to indexing before actually reindexing an entity.
@@ -149,7 +150,8 @@ public final class HibernateOrmMapperSettings {
 	 * <p>
 	 * Defaults to {@link Defaults#MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES}.
 	 */
-	public static final String MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES = PREFIX + Radicals.MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES;
+	public static final String MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES =
+			PREFIX + Radicals.MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES;
 
 	/**
 	 * A configurer for the Hibernate Search mapping.
@@ -214,7 +216,8 @@ public final class HibernateOrmMapperSettings {
 	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
 	 * which includes a description of the "bean reference" properties and accepted values.
 	 */
-	public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY = PREFIX + Radicals.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY;
+	public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
+			PREFIX + Radicals.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY;
 
 	/**
 	 * Whether Hibernate ORM listeners that detect entity changes and automatically trigger indexing operations are enabled.
@@ -253,17 +256,20 @@ public final class HibernateOrmMapperSettings {
 		 * @deprecated Use {@link  #INDEXING_PLAN_SYNCHRONIZATION_STRATEGY} instead.
 		 */
 		@Deprecated
-		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.SYNCHRONIZATION_STRATEGY;
+		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
+				AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.SYNCHRONIZATION_STRATEGY;
 		/**
 		 * @deprecated This setting will be removed in a future version. There will be no alternative provided to replace it.
 		 * A dirty check will always be performed when considering triggering the reindexing.
 		 */
 		@Deprecated
-		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.ENABLE_DIRTY_CHECK;
+		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK =
+				AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.ENABLE_DIRTY_CHECK;
 		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup.strategy";
 		public static final String QUERY_LOADING_FETCH_SIZE = "query.loading.fetch_size";
 		public static final String MAPPING_PROCESS_ANNOTATIONS = "mapping.process_annotations";
-		public static final String MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES = "mapping.build_missing_discovered_jandex_indexes";
+		public static final String MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES =
+				"mapping.build_missing_discovered_jandex_indexes";
 		public static final String MAPPING_CONFIGURER = "mapping.configurer";
 		public static final String SCHEMA_MANAGEMENT_STRATEGY = "schema_management.strategy";
 		public static final String COORDINATION = "coordination";
@@ -273,7 +279,8 @@ public final class HibernateOrmMapperSettings {
 		public static final String MULTI_TENANCY_PREFIX = MULTI_TENANCY + ".";
 		public static final String MULTI_TENANCY_TENANT_IDS = MULTI_TENANCY_PREFIX + MultiTenancyRadicals.TENANT_IDS;
 		public static final String INDEXING_PREFIX = "indexing.";
-		public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY = INDEXING_PREFIX + IndexingRadicals.PLAN_SYNCHRONIZATION_STRATEGY;
+		public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
+				INDEXING_PREFIX + IndexingRadicals.PLAN_SYNCHRONIZATION_STRATEGY;
 		public static final String INDEXING_LISTENERS_ENABLED = INDEXING_PREFIX + IndexingRadicals.LISTENERS_ENABLED;
 	}
 
@@ -367,8 +374,11 @@ public final class HibernateOrmMapperSettings {
 		 * @deprecated Use {@link #INDEXING_PLAN_SYNCHRONIZATION_STRATEGY} instead.
 		 */
 		@Deprecated
-		public static final BeanReference<org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
-				BeanReference.of( org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy.class, "write-sync" );
+		public static final BeanReference<
+				org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
+						BeanReference.of(
+								org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy.class,
+								"write-sync" );
 		/**
 		 * @deprecated This setting will be removed in a future version. There will be no alternative provided to replace it.
 		 * A dirty check will always be performed when considering triggering the reindexing.
@@ -380,7 +390,8 @@ public final class HibernateOrmMapperSettings {
 		public static final int QUERY_LOADING_FETCH_SIZE = 100;
 		public static final boolean MAPPING_PROCESS_ANNOTATIONS = true;
 		public static final boolean MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES = true;
-		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY = SchemaManagementStrategyName.CREATE_OR_VALIDATE;
+		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY =
+				SchemaManagementStrategyName.CREATE_OR_VALIDATE;
 		public static final BeanReference<CoordinationStrategy> COORDINATION_STRATEGY =
 				BeanReference.of( CoordinationStrategy.class, NoCoordinationStrategy.NAME );
 		public static final BeanReference<IndexingPlanSynchronizationStrategy> INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =

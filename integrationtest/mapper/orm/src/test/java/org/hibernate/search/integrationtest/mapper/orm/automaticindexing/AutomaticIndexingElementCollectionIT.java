@@ -170,7 +170,7 @@ public class AutomaticIndexingElementCollectionIT {
 			session.persist( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.add( "1", b -> { } );
+					.add( "1", b -> {} );
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -211,7 +211,7 @@ public class AutomaticIndexingElementCollectionIT {
 			session.persist( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.add( "1", b -> { } );
+					.add( "1", b -> {} );
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -223,7 +223,7 @@ public class AutomaticIndexingElementCollectionIT {
 
 			// TODO HSEARCH-3204: remove the statement below to not expect any work
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.addOrUpdate( "1", b -> { } );
+					.addOrUpdate( "1", b -> {} );
 		} );
 		backendMock.verifyExpectationsMet();
 	}

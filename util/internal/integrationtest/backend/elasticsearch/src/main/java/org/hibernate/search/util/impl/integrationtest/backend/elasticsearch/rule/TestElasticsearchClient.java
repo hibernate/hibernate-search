@@ -324,7 +324,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		return action;
 	}
 
-	private void updateAliases(JsonObject ... actions) {
+	private void updateAliases(JsonObject... actions) {
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.post()
 				.pathComponent( Paths._ALIASES );
 
@@ -360,7 +360,8 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 				 * the indexes to never reach a green status
 				 */
 				.param( "wait_for_status", IndexStatus.YELLOW.externalRepresentation() )
-				.param( "timeout", ElasticsearchIndexSettings.Defaults.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT + "ms" )
+				.param( "timeout",
+						ElasticsearchIndexSettings.Defaults.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT + "ms" )
 				.build() );
 	}
 
@@ -620,7 +621,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 				+ "\nResponse:\n"
 				+ "========\n"
 				+ new ElasticsearchResponseFormatter( response )
-				);
+		);
 	}
 
 	/*

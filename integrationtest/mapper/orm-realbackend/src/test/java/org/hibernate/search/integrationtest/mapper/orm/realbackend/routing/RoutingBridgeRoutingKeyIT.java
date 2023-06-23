@@ -44,7 +44,8 @@ public class RoutingBridgeRoutingKeyIT {
 	private static final int SHARD_COUNT = 64;
 
 	@Rule
-	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.hashBasedSharding( SHARD_COUNT ) );
+	public OrmSetupHelper setupHelper =
+			OrmSetupHelper.withSingleBackend( BackendConfigurations.hashBasedSharding( SHARD_COUNT ) );
 
 	private EntityManagerFactory entityManagerFactory;
 

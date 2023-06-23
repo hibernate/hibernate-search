@@ -58,17 +58,19 @@ public class LuceneBackendFactory implements BackendFactory {
 					.as( MultiTenancyStrategyName.class, MultiTenancyStrategyName::of )
 					.build();
 
-	private static final OptionalConfigurationProperty<List<BeanReference<? extends LuceneAnalysisConfigurer>>> ANALYSIS_CONFIGURER =
-			ConfigurationProperty.forKey( LuceneBackendSettings.ANALYSIS_CONFIGURER )
-					.asBeanReference( LuceneAnalysisConfigurer.class )
-					.multivalued()
-					.build();
+	private static final OptionalConfigurationProperty<
+			List<BeanReference<? extends LuceneAnalysisConfigurer>>> ANALYSIS_CONFIGURER =
+					ConfigurationProperty.forKey( LuceneBackendSettings.ANALYSIS_CONFIGURER )
+							.asBeanReference( LuceneAnalysisConfigurer.class )
+							.multivalued()
+							.build();
 
-	private static final OptionalConfigurationProperty<List<BeanReference<? extends QueryCachingConfigurer>>> QUERY_CACHING_CONFIGURER =
-			ConfigurationProperty.forKey( LuceneBackendSettings.QUERY_CACHING_CONFIGURER )
-					.asBeanReference( QueryCachingConfigurer.class )
-					.multivalued()
-					.build();
+	private static final OptionalConfigurationProperty<
+			List<BeanReference<? extends QueryCachingConfigurer>>> QUERY_CACHING_CONFIGURER =
+					ConfigurationProperty.forKey( LuceneBackendSettings.QUERY_CACHING_CONFIGURER )
+							.asBeanReference( QueryCachingConfigurer.class )
+							.multivalued()
+							.build();
 
 	@Override
 	public BackendImplementor create(EventContext eventContext, BackendBuildContext buildContext,
@@ -86,8 +88,7 @@ public class LuceneBackendFactory implements BackendFactory {
 					buildContext, propertySource, luceneVersion
 			);
 
-			LuceneQueryCachingContext cachingContext
-					= new LuceneQueryCachingContext( luceneVersion );
+			LuceneQueryCachingContext cachingContext = new LuceneQueryCachingContext( luceneVersion );
 
 			configureQueryCache( buildContext, propertySource, cachingContext );
 
@@ -145,11 +146,11 @@ public class LuceneBackendFactory implements BackendFactory {
 					}
 					return optionalName;
 				} ).orElseGet( () -> {
-			// set dynamic default
-			return ( buildContext.multiTenancyEnabled() ) ?
-					MultiTenancyStrategyName.DISCRIMINATOR :
-					MultiTenancyStrategyName.NONE;
-		} );
+					// set dynamic default
+					return ( buildContext.multiTenancyEnabled() )
+							? MultiTenancyStrategyName.DISCRIMINATOR
+							: MultiTenancyStrategyName.NONE;
+				} );
 
 		switch ( multiTenancyStrategy ) {
 			case NONE:

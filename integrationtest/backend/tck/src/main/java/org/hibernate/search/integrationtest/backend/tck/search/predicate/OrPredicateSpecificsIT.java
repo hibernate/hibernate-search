@@ -96,9 +96,9 @@ public class OrPredicateSpecificsIT {
 
 		assertThatQuery( scope.query()
 				.where( f -> f.or(
-								predicate1,
-								predicate2
-						)
+						predicate1,
+						predicate2
+				)
 				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_3 );
 	}

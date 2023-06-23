@@ -35,7 +35,7 @@ public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
 						(byte) 55,
 						(byte) 70,
 						(byte) 101,
-						(byte) (Byte.MAX_VALUE - 10 )
+						(byte) ( Byte.MAX_VALUE - 10 )
 				);
 			}
 

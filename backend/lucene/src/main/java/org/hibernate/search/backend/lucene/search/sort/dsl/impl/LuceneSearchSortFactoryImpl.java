@@ -18,13 +18,13 @@ import org.apache.lucene.search.SortField;
 
 public class LuceneSearchSortFactoryImpl
 		extends AbstractSearchSortFactory<
-						LuceneSearchSortFactory,
-						LuceneSearchSortIndexScope<?>,
-						LuceneSearchPredicateFactory
-				>
+				LuceneSearchSortFactory,
+				LuceneSearchSortIndexScope<?>,
+				LuceneSearchPredicateFactory>
 		implements LuceneSearchSortFactory {
 
-	public LuceneSearchSortFactoryImpl(SearchSortDslContext<LuceneSearchSortIndexScope<?>, LuceneSearchPredicateFactory> dslContext) {
+	public LuceneSearchSortFactoryImpl(
+			SearchSortDslContext<LuceneSearchSortIndexScope<?>, LuceneSearchPredicateFactory> dslContext) {
 		super( dslContext );
 	}
 

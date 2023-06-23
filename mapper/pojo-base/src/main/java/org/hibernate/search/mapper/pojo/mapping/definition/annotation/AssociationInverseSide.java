@@ -37,7 +37,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(AssociationInverseSide.List.class)
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = AssociationInverseSideProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = AssociationInverseSideProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface AssociationInverseSide {
 
 	/**

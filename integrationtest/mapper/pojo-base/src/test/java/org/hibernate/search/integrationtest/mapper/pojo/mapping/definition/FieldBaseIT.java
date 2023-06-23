@@ -48,7 +48,8 @@ public class FieldBaseIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void valueBridge_default_noMatch() {
@@ -67,7 +68,7 @@ public class FieldBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".myProperty" )
 						.failure( "No default value bridge implementation for type '"
-										+ Object.class.getName() + "'",
+								+ Object.class.getName() + "'",
 								"Use a custom bridge" ) );
 	}
 
@@ -130,7 +131,7 @@ public class FieldBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".myProperty" )
 						.failure( "No default value bridge implementation for type 'java.lang.Enum<"
-										+ EnumForEnumSuperClassTest.class.getName() + ">'",
+								+ EnumForEnumSuperClassTest.class.getName() + ">'",
 								"Use a custom bridge" ) );
 	}
 
@@ -155,7 +156,7 @@ public class FieldBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure( "Invalid bridge for input type '" + Integer.class.getName()
-										+ "': '" + MyStringBridge.TOSTRING + "'",
+								+ "': '" + MyStringBridge.TOSTRING + "'",
 								"This bridge expects an input of type '" + String.class.getName() + "'" ) );
 	}
 
@@ -176,17 +177,19 @@ public class FieldBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".numbers" )
 						.failure( "Invalid bridge for input type '" + Integer.class.getName()
-										+ "': '" + MyStringBridge.TOSTRING + "'",
+								+ "': '" + MyStringBridge.TOSTRING + "'",
 								"This bridge expects an input of type '" + String.class.getName() + "'" ) );
 	}
 
 	public static class MyStringBridge implements ValueBridge<String, String> {
 		private static final String TOSTRING = "<MyStringBridge toString() result>";
+
 		@Override
 		public String toIndexedValue(String value,
 				ValueBridgeToIndexedValueContext context) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
+
 		@Override
 		public String toString() {
 			return TOSTRING;

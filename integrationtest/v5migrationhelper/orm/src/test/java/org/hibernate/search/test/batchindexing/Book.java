@@ -30,7 +30,8 @@ public class Book implements TitleAble {
 
 	private Nation firstPublishedIn;
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	public long getId() {
 		return id;
 	}

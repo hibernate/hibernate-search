@@ -220,8 +220,7 @@ public class NamedPredicateBaseIT {
 			indexer
 					.add( DOCUMENT_1, document -> index.binding().initDocument( document, WORD_1, WORD_2, WORD_3, WORD_4 ) )
 					.add( DOCUMENT_2, document -> index.binding().initDocument( document, WORD_1, WORD_5, WORD_3, WORD_5 ) )
-					.add( EMPTY, document -> {
-					} );
+					.add( EMPTY, document -> {} );
 		}
 	}
 

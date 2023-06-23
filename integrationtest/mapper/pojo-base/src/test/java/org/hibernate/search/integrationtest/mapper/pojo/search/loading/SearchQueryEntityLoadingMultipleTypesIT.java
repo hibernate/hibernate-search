@@ -89,19 +89,23 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 
 					b.addEntityType( Hierarchy3_A__NonAbstract_NonIndexed.class, Hierarchy3_A__NonAbstract_NonIndexed.NAME,
 							c -> c.selectionLoadingStrategy(
-									new StubSelectionLoadingStrategy<>( Hierarchy3_A__NonAbstract_NonIndexed.PERSISTENCE_KEY ) ) );
+									new StubSelectionLoadingStrategy<>(
+											Hierarchy3_A__NonAbstract_NonIndexed.PERSISTENCE_KEY ) ) );
 					b.addEntityType( Hierarchy3_A_B.class, Hierarchy3_A_B.NAME );
 					b.addEntityType( Hierarchy3_A_C.class, Hierarchy3_A_C.NAME );
 
 					b.addEntityType( Hierarchy4_A__NonAbstract_NonIndexed.class, Hierarchy4_A__NonAbstract_NonIndexed.NAME,
 							c -> c.selectionLoadingStrategy(
-									new StubSelectionLoadingStrategy<>( Hierarchy4_A__NonAbstract_NonIndexed.PERSISTENCE_KEY ) ) );
+									new StubSelectionLoadingStrategy<>(
+											Hierarchy4_A__NonAbstract_NonIndexed.PERSISTENCE_KEY ) ) );
 					b.addEntityType( Hierarchy4_A_B__integer1DocumentId.class, Hierarchy4_A_B__integer1DocumentId.NAME,
 							c -> c.selectionLoadingStrategy(
-									new StubSelectionLoadingStrategy<>( Hierarchy4_A_B__integer1DocumentId.PERSISTENCE_KEY ) ) );
+									new StubSelectionLoadingStrategy<>(
+											Hierarchy4_A_B__integer1DocumentId.PERSISTENCE_KEY ) ) );
 					b.addEntityType( Hierarchy4_A_C__integer2DocumentId.class, Hierarchy4_A_C__integer2DocumentId.NAME,
 							c -> c.selectionLoadingStrategy(
-									new StubSelectionLoadingStrategy<>( Hierarchy4_A_C__integer2DocumentId.PERSISTENCE_KEY ) ) );
+									new StubSelectionLoadingStrategy<>(
+											Hierarchy4_A_C__integer2DocumentId.PERSISTENCE_KEY ) ) );
 					b.addEntityType( Hierarchy4_A_D.class, Hierarchy4_A_D.NAME );
 
 					b.addEntityType( Hierarchy5_A__Abstract.class, Hierarchy5_A__Abstract.NAME,
@@ -355,8 +359,8 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 		persist( Hierarchy2_A_C.PERSISTENCE_KEY, 3, new Hierarchy2_A_C( 3 ) );
 
 		persist( Hierarchy3_A__NonAbstract_NonIndexed.PERSISTENCE_KEY, 1, new Hierarchy3_A__NonAbstract_NonIndexed( 1 ) );
-		persist( Hierarchy3_A_B.PERSISTENCE_KEY, 2,new Hierarchy3_A_B( 2 ) );
-		persist( Hierarchy3_A_C.PERSISTENCE_KEY, 3,new Hierarchy3_A_C( 3 ) );
+		persist( Hierarchy3_A_B.PERSISTENCE_KEY, 2, new Hierarchy3_A_B( 2 ) );
+		persist( Hierarchy3_A_C.PERSISTENCE_KEY, 3, new Hierarchy3_A_C( 3 ) );
 
 		persist( Hierarchy4_A__NonAbstract_NonIndexed.PERSISTENCE_KEY, 1, new Hierarchy4_A__NonAbstract_NonIndexed( 1 ) );
 		persist( Hierarchy4_A_B__integer1DocumentId.PERSISTENCE_KEY, 42, new Hierarchy4_A_B__integer1DocumentId( 2, 42 ) );

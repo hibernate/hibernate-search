@@ -18,7 +18,8 @@ public class LuceneNumericFieldComparatorSource<E extends Number> extends Lucene
 	private final LuceneNumericDomain<E> numericDomain;
 	private final MultiValueMode sortMode;
 
-	public LuceneNumericFieldComparatorSource(String nestedDocumentPath, LuceneNumericDomain<E> numericDomain, E missingValue, MultiValueMode sortMode, Query filter) {
+	public LuceneNumericFieldComparatorSource(String nestedDocumentPath, LuceneNumericDomain<E> numericDomain, E missingValue,
+			MultiValueMode sortMode, Query filter) {
 		super( nestedDocumentPath, filter );
 		this.numericDomain = numericDomain;
 		this.missingValue = missingValue;

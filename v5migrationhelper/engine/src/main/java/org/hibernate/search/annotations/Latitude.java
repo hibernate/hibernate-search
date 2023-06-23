@@ -27,10 +27,11 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  * instead. See also the javadoc of {@link Spatial}.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.FIELD, ElementType.METHOD } )
+@Target({ ElementType.FIELD, ElementType.METHOD })
 @Documented
 @Deprecated
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = LatitudeAnnotationProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = LatitudeAnnotationProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface Latitude {
 	/**
 	 * @return the name of the spatial field (defined in @Spatial.name)

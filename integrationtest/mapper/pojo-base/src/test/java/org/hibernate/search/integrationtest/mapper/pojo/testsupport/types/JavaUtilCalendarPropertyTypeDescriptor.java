@@ -69,17 +69,17 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 
 				// Two date/times that could be ambiguous due to a daylight saving time switch
 				.add( calendar(
-								LocalDateTime.parse( "2011-10-30T02:50:00.00" ).atZone( ZoneId.of( "CET" ) )
-										.withEarlierOffsetAtOverlap().toInstant().toEpochMilli(),
-								"CET"
-						),
+						LocalDateTime.parse( "2011-10-30T02:50:00.00" ).atZone( ZoneId.of( "CET" ) )
+								.withEarlierOffsetAtOverlap().toInstant().toEpochMilli(),
+						"CET"
+				),
 						zonedDateTime( "2011-10-30T02:50:00.00", "CET" ).withEarlierOffsetAtOverlap(),
 						"2011-10-30T02:50:00+02:00[CET]" )
 				.add( calendar(
-								LocalDateTime.parse( "2011-10-30T02:50:00.00" ).atZone( ZoneId.of( "CET" ) )
-										.withLaterOffsetAtOverlap().toInstant().toEpochMilli(),
-								"CET"
-						),
+						LocalDateTime.parse( "2011-10-30T02:50:00.00" ).atZone( ZoneId.of( "CET" ) )
+								.withLaterOffsetAtOverlap().toInstant().toEpochMilli(),
+						"CET"
+				),
 						zonedDateTime( "2011-10-30T02:50:00.00", "CET" ).withLaterOffsetAtOverlap(),
 						"2011-10-30T02:50:00+01:00[CET]" )
 				.build();

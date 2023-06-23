@@ -91,7 +91,8 @@ public final class MapperMockUtils {
 		private final List<DocumentReference> referencesToLoad = new ArrayList<>();
 		private final List<E> loadedObjects = new ArrayList<>();
 
-		public HitMappingDefinitionContext<E> entityReference(DocumentReference documentReference, EntityReference transformedReference) {
+		public HitMappingDefinitionContext<E> entityReference(DocumentReference documentReference,
+				EntityReference transformedReference) {
 			referenceMap.computeIfAbsent( documentReference, ignored -> new LinkedHashSet<>() )
 					.add( transformedReference );
 			return this;
@@ -106,6 +107,7 @@ public final class MapperMockUtils {
 
 	private static class StubLoadingKey {
 		private final int ordinal;
+
 		public StubLoadingKey(int ordinal) {
 			this.ordinal = ordinal;
 		}

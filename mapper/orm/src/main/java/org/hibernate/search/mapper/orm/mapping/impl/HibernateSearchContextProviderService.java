@@ -23,7 +23,8 @@ public final class HibernateSearchContextProviderService
 		implements Service, AutoCloseable, Supplier<HibernateOrmMapping> {
 
 	public static HibernateSearchContextProviderService get(SessionFactoryImplementor sessionFactory) {
-		return HibernateOrmUtils.getServiceOrFail( sessionFactory.getServiceRegistry(), HibernateSearchContextProviderService.class );
+		return HibernateOrmUtils.getServiceOrFail( sessionFactory.getServiceRegistry(),
+				HibernateSearchContextProviderService.class );
 	}
 
 	private volatile HibernateOrmMapping mapping;

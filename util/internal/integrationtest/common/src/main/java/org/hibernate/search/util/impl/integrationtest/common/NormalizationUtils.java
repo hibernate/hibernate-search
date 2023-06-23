@@ -91,25 +91,31 @@ public final class NormalizationUtils {
 	}
 
 	public static <K, V> Map.Entry<K, V> normalize(Map.Entry<K, V> original) {
-		return original == null ? null : entry(
-				normalize( original.getKey() ),
-				normalize( original.getValue() )
-		);
+		return original == null
+				? null
+				: entry(
+						normalize( original.getKey() ),
+						normalize( original.getValue() )
+				);
 	}
 
 	public static <T> List<T> normalize(List<T> original) {
-		return original == null ? null : original.stream()
-				.map( NormalizationUtils::normalize )
-				.collect( Collectors.toList() );
+		return original == null
+				? null
+				: original.stream()
+						.map( NormalizationUtils::normalize )
+						.collect( Collectors.toList() );
 	}
 
 	public static <K, V> Map<K, V> normalize(Map<K, V> original) {
-		return original == null ? null : original.entrySet().stream()
-				.map( e -> entry(
-						normalize( e.getKey() ),
-						normalize( e.getValue() )
-				) )
-				.collect( StreamHelper.toMap( Map.Entry::getKey, Map.Entry::getValue, LinkedHashMap::new ) );
+		return original == null
+				? null
+				: original.entrySet().stream()
+						.map( e -> entry(
+								normalize( e.getKey() ),
+								normalize( e.getValue() )
+						) )
+						.collect( StreamHelper.toMap( Map.Entry::getKey, Map.Entry::getValue, LinkedHashMap::new ) );
 	}
 
 	/**

@@ -19,9 +19,11 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 @TestForIssue(jiraKey = "HSEARCH-3997")
-public class AutomaticIndexingFloatArrayIT extends AbstractAutomaticIndexingArrayIT<
-				AutomaticIndexingFloatArrayIT.IndexedEntity, float[], Float
-		> {
+public class AutomaticIndexingFloatArrayIT
+		extends AbstractAutomaticIndexingArrayIT<
+				AutomaticIndexingFloatArrayIT.IndexedEntity,
+				float[],
+				Float> {
 
 	public AutomaticIndexingFloatArrayIT() {
 		super( new FloatArrayModelPrimitives() );

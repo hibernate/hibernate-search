@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.configuration.properties.collector.impl;
 
-
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
@@ -47,7 +46,8 @@ public class AsciiDocWriter implements BiConsumer<Map<String, ConfigurationPrope
 
 		try {
 			for ( Map.Entry<String, Collection<ConfigurationProperty>> entry : groups.entrySet() ) {
-				tryToWriteLine( writer, "[[configuration-properties-aggregated-", entry.getValue().iterator().next().anchorPrefix(), "]]" );
+				tryToWriteLine( writer, "[[configuration-properties-aggregated-",
+						entry.getValue().iterator().next().anchorPrefix(), "]]" );
 				tryToWriteLine( writer, "== ", entry.getKey() );
 				writer.write( '\n' );
 				for ( ConfigurationProperty el : entry.getValue() ) {

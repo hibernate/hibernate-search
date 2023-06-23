@@ -20,9 +20,8 @@ import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 abstract class AbstractLuceneIndexFieldTemplateBuilder<
-				S extends AbstractLuceneIndexFieldTemplateBuilder<S, T>,
-				T extends AbstractLuceneIndexFieldTemplate<?>
-		>
+		S extends AbstractLuceneIndexFieldTemplateBuilder<S, T>,
+		T extends AbstractLuceneIndexFieldTemplate<?>>
 		implements IndexSchemaFieldTemplateOptionsStep<S>,
 		LuceneIndexNodeContributor, IndexSchemaBuildContext {
 

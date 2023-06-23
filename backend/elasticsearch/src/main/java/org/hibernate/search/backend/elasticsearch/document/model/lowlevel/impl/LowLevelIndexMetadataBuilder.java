@@ -30,7 +30,8 @@ public class LowLevelIndexMetadataBuilder {
 	private RootTypeMapping mapping;
 	private RootTypeMapping customMapping;
 
-	public LowLevelIndexMetadataBuilder(GsonProvider gsonProvider, ElasticsearchIndexMetadataSyntax syntax, IndexNames indexNames) {
+	public LowLevelIndexMetadataBuilder(GsonProvider gsonProvider, ElasticsearchIndexMetadataSyntax syntax,
+			IndexNames indexNames) {
 		this.gsonProvider = gsonProvider;
 		this.syntax = syntax;
 		this.indexNames = indexNames;

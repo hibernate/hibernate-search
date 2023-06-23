@@ -27,9 +27,8 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT extends Abstr
 
 		mapping = setupHelper.start()
 				.withConfiguration( b -> {
-					b.addEntityType( BasicIndexedEntity.class, BasicIndexedEntity.NAME, c ->
-							c.selectionLoadingStrategy(
-									new StubSelectionLoadingStrategy<>( BasicIndexedEntity.PERSISTENCE_KEY ) ) );
+					b.addEntityType( BasicIndexedEntity.class, BasicIndexedEntity.NAME, c -> c.selectionLoadingStrategy(
+							new StubSelectionLoadingStrategy<>( BasicIndexedEntity.PERSISTENCE_KEY ) ) );
 				} )
 				.setup();
 

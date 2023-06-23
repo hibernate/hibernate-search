@@ -69,7 +69,8 @@ public class ChildDocIdsTest {
 	public void joinedNextChild() throws IOException {
 		DocIdSetIterator other = docIdSetIterator( 1, 5, 6, 8, 18, 20, 26, 28, 31, 36 );
 		ChildDocIds childDocs = new ChildDocIds( bitSet( 2, 20, 24, 30, 35, 37 ),
-				ConjunctionDISI.intersectIterators( Arrays.asList( docIdSetIterator( 4, 6, 9, 17, 18, 21, 22, 31, 34, 36 ), other ) ) );
+				ConjunctionDISI.intersectIterators(
+						Arrays.asList( docIdSetIterator( 4, 6, 9, 17, 18, 21, 22, 31, 34, 36 ), other ) ) );
 		assertThat( childDocs.advanceExactParent( 2 ) ).isFalse();
 		assertThat( childDocs.nextChild() ).isEqualTo( DocIdSetIterator.NO_MORE_DOCS );
 		assertThat( childDocs.nextChild() ).isEqualTo( DocIdSetIterator.NO_MORE_DOCS );
@@ -96,11 +97,11 @@ public class ChildDocIdsTest {
 		assertThat( childDocs.nextChild() ).isEqualTo( DocIdSetIterator.NO_MORE_DOCS );
 	}
 
-	private static DocIdSetIterator docIdSetIterator(int ... docIds) {
+	private static DocIdSetIterator docIdSetIterator(int... docIds) {
 		return ExplicitDocIdSetIterator.of( docIds, 0, Integer.MAX_VALUE );
 	}
 
-	private static BitSet bitSet(int ... setBits) throws IOException {
+	private static BitSet bitSet(int... setBits) throws IOException {
 		return BitSet.of( docIdSetIterator( setBits ), 1000 );
 	}
 

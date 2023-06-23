@@ -84,7 +84,7 @@ public class ToJpaEntityManagerIT {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HSEARCH-1857" )
+	@TestForIssue(jiraKey = "HSEARCH-1857")
 	public void reuseSearchSessionAfterEntityManagerIsClosed_noMatching() {
 		EntityManager entityManager = setupHolder.entityManagerFactory().createEntityManager();
 		SearchSession searchSession = Search.session( entityManager );

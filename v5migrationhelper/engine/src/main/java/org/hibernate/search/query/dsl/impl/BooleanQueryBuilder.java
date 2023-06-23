@@ -61,7 +61,7 @@ class BooleanQueryBuilder implements MustJunction {
 		if ( lastClause == null ) {
 			return;
 		}
-		if ( ! lastClause.getOccur().equals( Occur.MUST ) ) {
+		if ( !lastClause.getOccur().equals( Occur.MUST ) ) {
 			throw new AssertionFailure( "Cannot negate or disable scoring on class: " + lastClause.getOccur() );
 		}
 		final int lastIndex = clauses.size() - 1;

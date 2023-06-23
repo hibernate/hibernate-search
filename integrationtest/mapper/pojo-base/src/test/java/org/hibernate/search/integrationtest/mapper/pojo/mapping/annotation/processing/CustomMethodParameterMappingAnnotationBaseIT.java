@@ -56,7 +56,8 @@ public class CustomMethodParameterMappingAnnotationBaseIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Rule
 	public StaticCounters counters = new StaticCounters();
@@ -79,6 +80,7 @@ public class CustomMethodParameterMappingAnnotationBaseIT {
 		}
 		class MyProjection {
 			public final String text;
+
 			@ProjectionConstructor
 			public MyProjection(@WorkingAnnotation String text) {
 				this.text = text;
@@ -135,8 +137,7 @@ public class CustomMethodParameterMappingAnnotationBaseIT {
 					MethodParameterMappingAnnotationProcessorContext context) {
 				mapping.projection( bindingContext -> {
 					bindingContext.definition( String.class,
-							(factory, definitionContext) ->
-									factory.field( "myText", String.class ).toProjection() );
+							(factory, definitionContext) -> factory.field( "myText", String.class ).toProjection() );
 				} );
 			}
 		}
@@ -148,6 +149,7 @@ public class CustomMethodParameterMappingAnnotationBaseIT {
 		class IndexedEntity {
 			@DocumentId
 			Long id;
+
 			public IndexedEntity(@AnnotationWithEmptyProcessorRef Long id) {
 				this.id = id;
 			}
@@ -174,6 +176,7 @@ public class CustomMethodParameterMappingAnnotationBaseIT {
 		class IndexedEntity {
 			@DocumentId
 			Long id;
+
 			public IndexedEntity(@AnnotationWithProcessorWithDifferentAnnotationType Long id) {
 				this.id = id;
 			}
@@ -189,18 +192,22 @@ public class CustomMethodParameterMappingAnnotationBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.PARAMETER)
-	@MethodParameterMapping(processor = @MethodParameterMappingAnnotationProcessorRef(type = DifferentAnnotationType.Processor.class))
+	@MethodParameterMapping(
+			processor = @MethodParameterMappingAnnotationProcessorRef(type = DifferentAnnotationType.Processor.class))
 	private @interface AnnotationWithProcessorWithDifferentAnnotationType {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.PARAMETER)
 	private @interface DifferentAnnotationType {
-		class Processor implements MethodParameterMappingAnnotationProcessor<CustomMethodParameterMappingAnnotationBaseIT.DifferentAnnotationType> {
+		class Processor
+				implements MethodParameterMappingAnnotationProcessor<
+						CustomMethodParameterMappingAnnotationBaseIT.DifferentAnnotationType> {
 			public static final String TO_STRING = "DifferentAnnotationType.Processor";
 
 			@Override
-			public void process(MethodParameterMappingStep mapping, CustomMethodParameterMappingAnnotationBaseIT.DifferentAnnotationType annotation,
+			public void process(MethodParameterMappingStep mapping,
+					CustomMethodParameterMappingAnnotationBaseIT.DifferentAnnotationType annotation,
 					MethodParameterMappingAnnotationProcessorContext context) {
 				throw new UnsupportedOperationException( "This should not be called" );
 			}
@@ -222,17 +229,15 @@ public class CustomMethodParameterMappingAnnotationBaseIT {
 		class MyProjection {
 			@ProjectionConstructor
 			public MyProjection(
-					@AnnotatedElementAwareAnnotation @OtherAnnotationForAnnotatedElementAwareAnnotation(name = "nonRepeatable")
-					String paramWithOtherAnnotation,
+					@AnnotatedElementAwareAnnotation @OtherAnnotationForAnnotatedElementAwareAnnotation(
+							name = "nonRepeatable") String paramWithOtherAnnotation,
 					@AnnotatedElementAwareAnnotation @RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation.List({
 							@RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation(name = "explicitRepeatable1"),
 							@RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation(name = "explicitRepeatable2")
-					})
-					String paramWithExplicitRepeatableOtherAnnotation,
-					@AnnotatedElementAwareAnnotation
-					@RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation(name = "implicitRepeatable1")
-					@RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation(name = "implicitRepeatable2")
-					String paramWithImplicitRepeatableOtherAnnotation) {
+					}) String paramWithExplicitRepeatableOtherAnnotation,
+					@AnnotatedElementAwareAnnotation @RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation(
+							name = "implicitRepeatable1") @RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation(
+									name = "implicitRepeatable2") String paramWithImplicitRepeatableOtherAnnotation) {
 			}
 		}
 
@@ -245,22 +250,29 @@ public class CustomMethodParameterMappingAnnotationBaseIT {
 
 		assertThat( counters.get( AnnotatedElementAwareAnnotation.CONSTRUCTOR_PARAMETER_WITH_OTHER_ANNOTATION ) )
 				.isEqualTo( 1 );
-		assertThat( counters.get( AnnotatedElementAwareAnnotation.CONSTRUCTOR_PARAMETER_WITH_EXPLICIT_REPEATABLE_OTHER_ANNOTATION ) )
+		assertThat( counters
+				.get( AnnotatedElementAwareAnnotation.CONSTRUCTOR_PARAMETER_WITH_EXPLICIT_REPEATABLE_OTHER_ANNOTATION ) )
 				.isEqualTo( 1 );
-		assertThat( counters.get( AnnotatedElementAwareAnnotation.CONSTRUCTOR_PARAMETER_WITH_IMPLICIT_REPEATABLE_OTHER_ANNOTATION ) )
+		assertThat( counters
+				.get( AnnotatedElementAwareAnnotation.CONSTRUCTOR_PARAMETER_WITH_IMPLICIT_REPEATABLE_OTHER_ANNOTATION ) )
 				.isEqualTo( 1 );
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.PARAMETER)
-	@MethodParameterMapping(processor = @MethodParameterMappingAnnotationProcessorRef(type = AnnotatedElementAwareAnnotation.Processor.class))
+	@MethodParameterMapping(
+			processor = @MethodParameterMappingAnnotationProcessorRef(type = AnnotatedElementAwareAnnotation.Processor.class))
 	private @interface AnnotatedElementAwareAnnotation {
 		StaticCounters.Key CONSTRUCTOR_PARAMETER_WITH_OTHER_ANNOTATION = StaticCounters.createKey();
 		StaticCounters.Key CONSTRUCTOR_PARAMETER_WITH_EXPLICIT_REPEATABLE_OTHER_ANNOTATION = StaticCounters.createKey();
 		StaticCounters.Key CONSTRUCTOR_PARAMETER_WITH_IMPLICIT_REPEATABLE_OTHER_ANNOTATION = StaticCounters.createKey();
-		class Processor implements MethodParameterMappingAnnotationProcessor<CustomMethodParameterMappingAnnotationBaseIT.AnnotatedElementAwareAnnotation> {
+
+		class Processor
+				implements MethodParameterMappingAnnotationProcessor<
+						CustomMethodParameterMappingAnnotationBaseIT.AnnotatedElementAwareAnnotation> {
 			@Override
-			public void process(MethodParameterMappingStep mapping, CustomMethodParameterMappingAnnotationBaseIT.AnnotatedElementAwareAnnotation annotation,
+			public void process(MethodParameterMappingStep mapping,
+					CustomMethodParameterMappingAnnotationBaseIT.AnnotatedElementAwareAnnotation annotation,
 					MethodParameterMappingAnnotationProcessorContext context) {
 				MappingAnnotatedMethodParameter annotatedElement = context.annotatedElement();
 				if ( annotatedElement.name().get().equals( "paramWithOtherAnnotation" ) ) {
@@ -273,7 +285,8 @@ public class CustomMethodParameterMappingAnnotationBaseIT {
 				}
 				else if ( annotatedElement.name().get().equals( "paramWithExplicitRepeatableOtherAnnotation" ) ) {
 					assertThat( annotatedElement.allAnnotations()
-							.filter( a -> RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation.class.equals( a.annotationType() ) )
+							.filter( a -> RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation.class
+									.equals( a.annotationType() ) )
 							.map( a -> ( (RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation) a ).name() )
 							.toArray() )
 							.containsExactlyInAnyOrder( "explicitRepeatable1", "explicitRepeatable2" );
@@ -281,7 +294,8 @@ public class CustomMethodParameterMappingAnnotationBaseIT {
 				}
 				else if ( annotatedElement.name().get().equals( "paramWithImplicitRepeatableOtherAnnotation" ) ) {
 					assertThat( annotatedElement.allAnnotations()
-							.filter( a -> RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation.class.equals( a.annotationType() ) )
+							.filter( a -> RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation.class
+									.equals( a.annotationType() ) )
 							.map( a -> ( (RepeatableOtherAnnotationForAnnotatedElementAwareAnnotation) a ).name() )
 							.toArray() )
 							.containsExactlyInAnyOrder( "implicitRepeatable1", "implicitRepeatable2" );
@@ -321,6 +335,7 @@ public class CustomMethodParameterMappingAnnotationBaseIT {
 		class IndexedEntityType {
 			@DocumentId
 			Integer id;
+
 			@ProjectionConstructor
 			IndexedEntityType(@EventContextAwareAnnotation String text) {
 			}
@@ -346,14 +361,18 @@ public class CustomMethodParameterMappingAnnotationBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.PARAMETER)
-	@MethodParameterMapping(processor = @MethodParameterMappingAnnotationProcessorRef(type = EventContextAwareAnnotation.Processor.class))
+	@MethodParameterMapping(
+			processor = @MethodParameterMappingAnnotationProcessorRef(type = EventContextAwareAnnotation.Processor.class))
 	private @interface EventContextAwareAnnotation {
 
-		class Processor implements MethodParameterMappingAnnotationProcessor<CustomMethodParameterMappingAnnotationBaseIT.EventContextAwareAnnotation> {
+		class Processor
+				implements MethodParameterMappingAnnotationProcessor<
+						CustomMethodParameterMappingAnnotationBaseIT.EventContextAwareAnnotation> {
 			static EventContext lastProcessedContext = null;
 
 			@Override
-			public void process(MethodParameterMappingStep mapping, CustomMethodParameterMappingAnnotationBaseIT.EventContextAwareAnnotation annotation,
+			public void process(MethodParameterMappingStep mapping,
+					CustomMethodParameterMappingAnnotationBaseIT.EventContextAwareAnnotation annotation,
 					MethodParameterMappingAnnotationProcessorContext context) {
 				lastProcessedContext = context.eventContext();
 			}

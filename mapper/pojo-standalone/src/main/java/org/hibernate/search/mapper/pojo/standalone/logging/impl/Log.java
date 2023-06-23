@@ -26,7 +26,8 @@ import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.ValidIdRange;
 
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
-@ValidIdRange(min = MessageConstants.MAPPER_POJO_STANDALONE_ID_RANGE_MIN, max = MessageConstants.MAPPER_POJO_STANDALONE_ID_RANGE_MAX)
+@ValidIdRange(min = MessageConstants.MAPPER_POJO_STANDALONE_ID_RANGE_MIN,
+		max = MessageConstants.MAPPER_POJO_STANDALONE_ID_RANGE_MAX)
 public interface Log extends BasicLogger {
 
 	int ID_OFFSET = MessageConstants.MAPPER_POJO_STANDALONE_ID_RANGE_MIN;

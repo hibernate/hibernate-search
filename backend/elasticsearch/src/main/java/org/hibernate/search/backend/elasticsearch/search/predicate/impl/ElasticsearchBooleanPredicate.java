@@ -117,7 +117,8 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		}
 	}
 
-	private String formatMinimumShouldMatchConstraints(Map<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints) {
+	private String formatMinimumShouldMatchConstraints(
+			Map<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints) {
 		StringBuilder builder = new StringBuilder();
 		Iterator<Map.Entry<Integer, MinimumShouldMatchConstraint>> iterator =
 				minimumShouldMatchConstraints.entrySet().iterator();
@@ -148,7 +149,8 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 	}
 
 	private boolean isOnlyMustNot() {
-		return mustNotClauses != null && !mustNotClauses.isEmpty()
+		return mustNotClauses != null
+				&& !mustNotClauses.isEmpty()
 				&& ( mustClauses == null || mustClauses.isEmpty() )
 				&& ( shouldClauses == null || shouldClauses.isEmpty() )
 				&& ( filterClauses == null || filterClauses.isEmpty() );
@@ -311,14 +313,16 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 		}
 
 		private boolean hasOnlyOneMustClause() {
-			return mustClauses != null && mustClauses.size() == 1
+			return mustClauses != null
+					&& mustClauses.size() == 1
 					&& ( mustNotClauses == null || mustNotClauses.isEmpty() )
 					&& ( shouldClauses == null || shouldClauses.isEmpty() )
 					&& ( filterClauses == null || filterClauses.isEmpty() );
 		}
 
 		private boolean hasOnlyOneShouldClause() {
-			return shouldClauses != null && shouldClauses.size() == 1
+			return shouldClauses != null
+					&& shouldClauses.size() == 1
 					&& ( mustNotClauses == null || mustNotClauses.isEmpty() )
 					&& ( mustClauses == null || mustClauses.isEmpty() )
 					&& ( filterClauses == null || filterClauses.isEmpty() );

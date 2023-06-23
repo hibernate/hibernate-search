@@ -77,7 +77,8 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 				.build();
 	}
 
-	protected RecursiveComparisonConfiguration.Builder configureRecursiveComparison(RecursiveComparisonConfiguration.Builder builder) {
+	protected RecursiveComparisonConfiguration.Builder configureRecursiveComparison(
+			RecursiveComparisonConfiguration.Builder builder) {
 		return builder;
 	}
 
@@ -492,10 +493,10 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 						hit( LEVEL1_SINGLE_EMPTY_OBJECT_DOCUMENT_ID,
 								TckConfiguration.get().getBackendFeatures()
 										.projectionPreservesEmptySingleValuedObject( dataSet.singleValuedObjectStructure )
-										? new ObjectDto<>(
-												null,
-												Collections.emptyList() )
-										: null
+												? new ObjectDto<>(
+														null,
+														Collections.emptyList() )
+												: null
 						),
 						hit( LEVEL1_NO_OBJECT_DOCUMENT_ID, null ),
 						hit( LEVEL2_SINGLE_OBJECT_DOCUMENT_ID, null ),
@@ -713,17 +714,17 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 	@Test
 	public void fieldOutsideObjectFieldTree() {
 		assertThatThrownBy( () -> mainIndex.query()
-						.select( f -> f.object( level2Path() )
-								.from(
-										// This is incorrect: the inner projection uses fields from "level1",
-										// which won't be present in "level1.level2".
-										singleValuedProjection( f, level1SingleValuedFieldPath() )
-								)
-								.asList()
-								.multi() )
-						.where( f -> f.matchAll() )
-						.routing( dataSet.routingKey )
-						.toQuery() )
+				.select( f -> f.object( level2Path() )
+						.from(
+								// This is incorrect: the inner projection uses fields from "level1",
+								// which won't be present in "level1.level2".
+								singleValuedProjection( f, level1SingleValuedFieldPath() )
+						)
+						.asList()
+						.multi() )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Invalid context for projection on field '" + level1SingleValuedFieldPath() + "'",
@@ -736,25 +737,25 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 	@Test
 	public void singleValuedField_effectivelyMultiValuedInContext() {
 		assertThatThrownBy( () -> mainIndex.query()
-						.select( f -> f.object( level1Path() )
-								.from(
-										singleValuedProjection( f, level1SingleValuedFieldPath() ),
-										multiValuedProjection( f, level1MultiValuedFieldPath() ),
-										f.composite()
-												.from(
-														// This is incorrect: we don't use object( "level1.level2" ),
-														// so this field is multi-valued, because it's collected
-														// for each "level1" object, and "level1.level2" is multi-valued.
-														singleValuedProjection( f, level2SingleValuedFieldPath() ),
-														multiValuedProjection( f, level2MultiValuedFieldPath() )
-												)
-												.asList()
-								)
-								.asList()
-								.multi() )
-						.where( f -> f.matchAll() )
-						.routing( dataSet.routingKey )
-						.toQuery() )
+				.select( f -> f.object( level1Path() )
+						.from(
+								singleValuedProjection( f, level1SingleValuedFieldPath() ),
+								multiValuedProjection( f, level1MultiValuedFieldPath() ),
+								f.composite()
+										.from(
+												// This is incorrect: we don't use object( "level1.level2" ),
+												// so this field is multi-valued, because it's collected
+												// for each "level1" object, and "level1.level2" is multi-valued.
+												singleValuedProjection( f, level2SingleValuedFieldPath() ),
+												multiValuedProjection( f, level2MultiValuedFieldPath() )
+										)
+										.asList()
+						)
+						.asList()
+						.multi() )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Invalid cardinality for projection on field '" + level2SingleValuedFieldPath() + "'",
@@ -762,7 +763,8 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 						"because parent object field '" + level2Path() + "' is multi-valued",
 						"call '.multi()' when you create the projection on field '" + level2SingleValuedFieldPath() + "'",
 						"or wrap that projection in an object projection like this:"
-								+ " 'f.object(\"" + level2Path() + "\").from(<the projection on field " + level2SingleValuedFieldPath() + ">).as(...).multi()'."
+								+ " 'f.object(\"" + level2Path() + "\").from(<the projection on field "
+								+ level2SingleValuedFieldPath() + ">).as(...).multi()'."
 				);
 	}
 
@@ -872,7 +874,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 	}
 
 	@SafeVarargs
-	private static <T> List<T> listMaybeWithNull(T ... values) {
+	private static <T> List<T> listMaybeWithNull(T... values) {
 		List<T> list = new ArrayList<>();
 		Collections.addAll( list, values );
 		if ( !TckConfiguration.get().getBackendFeatures().projectionPreservesNulls() ) {
@@ -929,7 +931,8 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 
 	protected abstract ProjectionFinalStep<P> singleValuedProjection(SearchProjectionFactory<?, ?> f, String absoluteFieldPath);
 
-	protected abstract ProjectionFinalStep<List<P>> multiValuedProjection(SearchProjectionFactory<?, ?> f, String absoluteFieldPath);
+	protected abstract ProjectionFinalStep<List<P>> multiValuedProjection(SearchProjectionFactory<?, ?> f,
+			String absoluteFieldPath);
 
 	public static final class DataSet<F, P, V extends AbstractProjectionTestValues<F, P>>
 			extends AbstractPerFieldTypeProjectionDataSet<F, P, V> {
@@ -971,37 +974,61 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 						document.addNullObject( level1.reference );
 
 						level1Object = document.addObject( level1.reference );
-						level1Object.addValue( level1.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 0 ) );
-						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 1 ) );
-						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 2 ) );
+						level1Object.addValue( level1.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 0 ) );
+						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 1 ) );
+						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 2 ) );
 						level1Object.addNullObject( level2.reference );
 						level2Object = level1Object.addObject( level2.reference );
-						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 3 ) );
-						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 4 ) );
-						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 5 ) );
+						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 3 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 4 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 5 ) );
 						level2Object = level1Object.addObject( level2.reference );
-						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 6 ) );
-						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 7 ) );
-						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 8 ) );
+						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 6 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 7 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 8 ) );
 
 						level1Object = document.addObject( level1.reference );
-						level1Object.addValue( level1.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 9 ) );
-						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 10 ) );
-						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 11 ) );
+						level1Object.addValue( level1.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 9 ) );
+						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 10 ) );
+						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 11 ) );
 						level2Object = level1Object.addObject( level2.reference );
-						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 12 ) );
-						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 13 ) );
-						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 14 ) );
+						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 12 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 13 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 14 ) );
 						level1Object.addNullObject( level2.reference );
 						level2Object = level1Object.addObject( level2.reference );
-						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 15 ) );
-						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 16 ) );
-						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 17 ) );
+						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 15 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 16 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 17 ) );
 
 						singleValuedLevel1Object = document.addObject( singleValuedLevel1.reference );
-						singleValuedLevel1Object.addValue( singleValuedLevel1.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 18 ) );
-						singleValuedLevel1Object.addValue( singleValuedLevel1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 19 ) );
-						singleValuedLevel1Object.addValue( singleValuedLevel1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 20 ) );
+						singleValuedLevel1Object.addValue(
+								singleValuedLevel1.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 18 ) );
+						singleValuedLevel1Object.addValue(
+								singleValuedLevel1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 19 ) );
+						singleValuedLevel1Object.addValue(
+								singleValuedLevel1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 20 ) );
 					} )
 					.add( docId( SINGLE_VALUED_DOCUMENT_ID ), routingKey, document -> {
 						Level1ObjectFieldBinding level1;
@@ -1016,15 +1043,22 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 						singleValuedLevel1 = mainIndex.binding().singleValuedLevel1( singleValuedObjectStructure );
 
 						level1Object = document.addObject( level1.reference );
-						level1Object.addValue( level1.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 0 ) );
-						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 1 ) );
+						level1Object.addValue( level1.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 0 ) );
+						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 1 ) );
 						level2Object = level1Object.addObject( level2.reference );
-						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 2 ) );
-						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 3 ) );
+						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 2 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 3 ) );
 
 						singleValuedLevel1Object = document.addObject( singleValuedLevel1.reference );
-						singleValuedLevel1Object.addValue( singleValuedLevel1.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 4 ) );
-						singleValuedLevel1Object.addValue( singleValuedLevel1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 5 ) );
+						singleValuedLevel1Object.addValue(
+								singleValuedLevel1.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 4 ) );
+						singleValuedLevel1Object.addValue(
+								singleValuedLevel1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 5 ) );
 					} )
 					.add( docId( LEVEL1_SINGLE_OBJECT_DOCUMENT_ID ), routingKey, document -> {
 						Level1ObjectFieldBinding level1;
@@ -1039,22 +1073,37 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 						singleValuedLevel1 = mainIndex.binding().singleValuedLevel1( singleValuedObjectStructure );
 
 						level1Object = document.addObject( level1.reference );
-						level1Object.addValue( level1.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 0 ) );
-						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 1 ) );
-						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 2 ) );
+						level1Object.addValue( level1.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 0 ) );
+						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 1 ) );
+						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 2 ) );
 						level2Object = level1Object.addObject( level2.reference );
-						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 3 ) );
-						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 4 ) );
-						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 5 ) );
+						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 3 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 4 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 5 ) );
 						level2Object = level1Object.addObject( level2.reference );
-						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 6 ) );
-						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 7 ) );
-						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 8 ) );
+						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 6 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 7 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 8 ) );
 
 						singleValuedLevel1Object = document.addObject( singleValuedLevel1.reference );
-						singleValuedLevel1Object.addValue( singleValuedLevel1.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 9 ) );
-						singleValuedLevel1Object.addValue( singleValuedLevel1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 10 ) );
-						singleValuedLevel1Object.addValue( singleValuedLevel1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 11 ) );
+						singleValuedLevel1Object.addValue(
+								singleValuedLevel1.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 9 ) );
+						singleValuedLevel1Object.addValue(
+								singleValuedLevel1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 10 ) );
+						singleValuedLevel1Object.addValue(
+								singleValuedLevel1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 11 ) );
 					} )
 					.add( docId( LEVEL1_SINGLE_EMPTY_OBJECT_DOCUMENT_ID ), routingKey, document -> {
 						Level1ObjectFieldBinding level1;
@@ -1076,8 +1125,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 						document.addNullObject( level1.reference );
 						document.addNullObject( singleValuedLevel1.reference );
 					} )
-					.add( docId( LEVEL1_NO_OBJECT_DOCUMENT_ID ), routingKey, document -> {
-					} )
+					.add( docId( LEVEL1_NO_OBJECT_DOCUMENT_ID ), routingKey, document -> {} )
 					.add( docId( LEVEL2_SINGLE_OBJECT_DOCUMENT_ID ), routingKey, document -> {
 						Level1ObjectFieldBinding level1;
 						ObjectFieldBinding level2;
@@ -1089,15 +1137,21 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 
 						level1Object = document.addObject( level1.reference );
 						level2Object = level1Object.addObject( level2.reference );
-						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 0 ) );
-						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 1 ) );
-						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 2 ) );
+						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 0 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 1 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 2 ) );
 
 						level1Object = document.addObject( level1.reference );
 						level2Object = level1Object.addObject( level2.reference );
-						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 3 ) );
-						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 4 ) );
-						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 5 ) );
+						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 3 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 4 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 5 ) );
 					} )
 					.add( docId( LEVEL2_SINGLE_EMPTY_OBJECT_DOCUMENT_ID ), routingKey, document -> {
 						Level1ObjectFieldBinding level1;
@@ -1122,40 +1176,57 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 
 						document.addObject( level1.reference );
 					} );
-			missingLevel1Indexer.add( docId( MISSING_LEVEL1_DOCUMENT_ID ), routingKey, document -> { } );
-			missingLevel1SingleValuedFieldIndexer.add( docId( MISSING_LEVEL1_SINGLE_VALUED_FIELD_DOCUMENT_ID ), routingKey, document -> {
-				Level1ObjectFieldBindingWithoutSingleValuedField level1;
-				ObjectFieldBinding level2;
-				DocumentElement level1Object;
-				DocumentElement level2Object;
+			missingLevel1Indexer.add( docId( MISSING_LEVEL1_DOCUMENT_ID ), routingKey, document -> {} );
+			missingLevel1SingleValuedFieldIndexer.add( docId( MISSING_LEVEL1_SINGLE_VALUED_FIELD_DOCUMENT_ID ), routingKey,
+					document -> {
+						Level1ObjectFieldBindingWithoutSingleValuedField level1;
+						ObjectFieldBinding level2;
+						DocumentElement level1Object;
+						DocumentElement level2Object;
 
-				level1 = missingLevel1SingleValuedFieldIndex.binding().level1( multiValuedObjectStructure );
-				level2 = level1.level2;
+						level1 = missingLevel1SingleValuedFieldIndex.binding().level1( multiValuedObjectStructure );
+						level2 = level1.level2;
 
-				level1Object = document.addObject( level1.reference );
-				level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 0 ) );
-				level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 1 ) );
-				level2Object = level1Object.addObject( level2.reference );
-				level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 2 ) );
-				level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 3 ) );
-				level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 4 ) );
-				level2Object = level1Object.addObject( level2.reference );
-				level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 5 ) );
-				level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 6 ) );
-				level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 7 ) );
+						level1Object = document.addObject( level1.reference );
+						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 0 ) );
+						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 1 ) );
+						level2Object = level1Object.addObject( level2.reference );
+						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 2 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 3 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 4 ) );
+						level2Object = level1Object.addObject( level2.reference );
+						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 5 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 6 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 7 ) );
 
-				level1Object = document.addObject( level1.reference );
-				level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 8 ) );
-				level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 9 ) );
-				level2Object = level1Object.addObject( level2.reference );
-				level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 10 ) );
-				level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 11 ) );
-				level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 12 ) );
-				level2Object = level1Object.addObject( level2.reference );
-				level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 13 ) );
-				level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 14 ) );
-				level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 15 ) );
-			} );
+						level1Object = document.addObject( level1.reference );
+						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 8 ) );
+						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 9 ) );
+						level2Object = level1Object.addObject( level2.reference );
+						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 10 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 11 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 12 ) );
+						level2Object = level1Object.addObject( level2.reference );
+						level2Object.addValue( level2.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 13 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 14 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 15 ) );
+					} );
 			missingLevel2Indexer.add( docId( MISSING_LEVEL2_DOCUMENT_ID ), routingKey, document -> {
 				ObjectFieldBinding level1;
 				DocumentElement level1Object;
@@ -1172,37 +1243,52 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 				level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 4 ) );
 				level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 5 ) );
 			} );
-			missingLevel2SingleValuedFieldIndexer.add( docId( MISSING_LEVEL2_SINGLE_VALUED_FIELD_DOCUMENT_ID ), routingKey, document -> {
-				Level1ObjectFieldBindingWithoutLevel2SingleValuedField level1;
-				ObjectFieldBindingWithoutSingleValuedField level2;
-				DocumentElement level1Object;
-				DocumentElement level2Object;
+			missingLevel2SingleValuedFieldIndexer.add( docId( MISSING_LEVEL2_SINGLE_VALUED_FIELD_DOCUMENT_ID ), routingKey,
+					document -> {
+						Level1ObjectFieldBindingWithoutLevel2SingleValuedField level1;
+						ObjectFieldBindingWithoutSingleValuedField level2;
+						DocumentElement level1Object;
+						DocumentElement level2Object;
 
-				level1 = missingLevel2SingleValuedFieldIndex.binding().level1( multiValuedObjectStructure );
-				level2 = level1.level2;
+						level1 = missingLevel2SingleValuedFieldIndex.binding().level1( multiValuedObjectStructure );
+						level2 = level1.level2;
 
-				level1Object = document.addObject( level1.reference );
-				level1Object.addValue( level1.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 0 ) );
-				level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 1 ) );
-				level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 2 ) );
-				level2Object = level1Object.addObject( level2.reference );
-				level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 3 ) );
-				level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 4 ) );
-				level2Object = level1Object.addObject( level2.reference );
-				level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 5 ) );
-				level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 6 ) );
+						level1Object = document.addObject( level1.reference );
+						level1Object.addValue( level1.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 0 ) );
+						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 1 ) );
+						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 2 ) );
+						level2Object = level1Object.addObject( level2.reference );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 3 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 4 ) );
+						level2Object = level1Object.addObject( level2.reference );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 5 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 6 ) );
 
-				level1Object = document.addObject( level1.reference );
-				level1Object.addValue( level1.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 7 ) );
-				level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 8 ) );
-				level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 9 ) );
-				level2Object = level1Object.addObject( level2.reference );
-				level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 10 ) );
-				level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 11 ) );
-				level2Object = level1Object.addObject( level2.reference );
-				level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 12 ) );
-				level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference, values.fieldValue( 13 ) );
-			} );
+						level1Object = document.addObject( level1.reference );
+						level1Object.addValue( level1.singleValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 7 ) );
+						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 8 ) );
+						level1Object.addValue( level1.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 9 ) );
+						level2Object = level1Object.addObject( level2.reference );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 10 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 11 ) );
+						level2Object = level1Object.addObject( level2.reference );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 12 ) );
+						level2Object.addValue( level2.multiValuedField.get( values.fieldType ).reference,
+								values.fieldValue( 13 ) );
+					} );
 		}
 	}
 
@@ -1489,7 +1575,8 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 			super( objectField, parentAbsolutePath, relativeFieldName, fieldTypes );
 			IndexSchemaObjectField level2ObjectField = objectField.objectField( "level2", structure )
 					.multiValued();
-			level2 = new ObjectFieldBindingWithoutSingleValuedField( level2ObjectField, this.absolutePath, "level2", fieldTypes );
+			level2 = new ObjectFieldBindingWithoutSingleValuedField( level2ObjectField, this.absolutePath, "level2",
+					fieldTypes );
 		}
 	}
 }

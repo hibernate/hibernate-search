@@ -99,13 +99,11 @@ public class FieldTemplateIT {
 
 		// Index a few documents
 		index.bulkIndexer()
-				.add( EMPTY, document -> { } )
-				.add( DOCUMENT_1, document ->
-						initDocument( document, "foo",
-								"matchedValue", "notMatchedValue1", "notMatchedValue2" ) )
-				.add( DOCUMENT_2, document ->
-						initDocument( document, "foo",
-								"notMatchedValue1", "notMatchedValue1", "matchedValue" ) )
+				.add( EMPTY, document -> {} )
+				.add( DOCUMENT_1, document -> initDocument( document, "foo",
+						"matchedValue", "notMatchedValue1", "notMatchedValue2" ) )
+				.add( DOCUMENT_2, document -> initDocument( document, "foo",
+						"notMatchedValue1", "notMatchedValue1", "matchedValue" ) )
 				.join();
 
 		// Check that documents are indexed and the dynamic field can be searched
@@ -145,13 +143,11 @@ public class FieldTemplateIT {
 
 		// Index a few documents
 		index.bulkIndexer()
-				.add( EMPTY, document -> { } )
-				.add( DOCUMENT_1, document ->
-						initDocument( document, "foo_str",
-								"matchedValue", "notMatchedValue1", "notMatchedValue2" ) )
-				.add( DOCUMENT_2, document ->
-						initDocument( document, "foo_int",
-								42, 52, 56 ) )
+				.add( EMPTY, document -> {} )
+				.add( DOCUMENT_1, document -> initDocument( document, "foo_str",
+						"matchedValue", "notMatchedValue1", "notMatchedValue2" ) )
+				.add( DOCUMENT_2, document -> initDocument( document, "foo_int",
+						42, 52, 56 ) )
 				.join();
 
 		// Check that documents are indexed and the dynamic fields can be searched
@@ -204,13 +200,11 @@ public class FieldTemplateIT {
 
 		// Index a few documents
 		index.bulkIndexer()
-				.add( EMPTY, document -> { } )
-				.add( DOCUMENT_1, document ->
-						initDocument( document, "foo_str_int",
-								"42", "notMatchedValue1", "notMatchedValue2" ) )
-				.add( DOCUMENT_2, document ->
-						initDocument( document, "foo_int",
-								42, 52, 56 ) )
+				.add( EMPTY, document -> {} )
+				.add( DOCUMENT_1, document -> initDocument( document, "foo_str_int",
+						"42", "notMatchedValue1", "notMatchedValue2" ) )
+				.add( DOCUMENT_2, document -> initDocument( document, "foo_int",
+						42, 52, 56 ) )
 				.join();
 
 		// Check that dynamic fields have the correct type
@@ -352,13 +346,16 @@ public class FieldTemplateIT {
 			case IN_NESTED_TWICE:
 				DocumentElement firstLevelNestedObject0 = document.addObject( binding.nestedObject.self );
 				DocumentElement firstLevelNestedObject1 = document.addObject( binding.nestedObject.self );
-				DocumentElement nestedNestedObject0 = firstLevelNestedObject0.addObject( binding.nestedObject.nestedObject.self );
+				DocumentElement nestedNestedObject0 =
+						firstLevelNestedObject0.addObject( binding.nestedObject.nestedObject.self );
 				nestedNestedObject0.addValue( binding.nestedObject.nestedObject.discriminator, "included" );
 				nestedNestedObject0.addValue( fieldName, value1 );
-				DocumentElement nestedNestedObject1 = firstLevelNestedObject0.addObject( binding.nestedObject.nestedObject.self );
+				DocumentElement nestedNestedObject1 =
+						firstLevelNestedObject0.addObject( binding.nestedObject.nestedObject.self );
 				nestedNestedObject1.addValue( binding.nestedObject.nestedObject.discriminator, "excluded" );
 				nestedNestedObject1.addValue( fieldName, excludedValue );
-				DocumentElement nestedNestedObject2 = firstLevelNestedObject1.addObject( binding.nestedObject.nestedObject.self );
+				DocumentElement nestedNestedObject2 =
+						firstLevelNestedObject1.addObject( binding.nestedObject.nestedObject.self );
 				nestedNestedObject2.addValue( binding.nestedObject.nestedObject.discriminator, "included" );
 				nestedNestedObject2.addValue( fieldName, value2 );
 				break;

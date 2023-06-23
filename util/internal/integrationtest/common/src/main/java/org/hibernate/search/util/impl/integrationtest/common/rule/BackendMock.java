@@ -42,7 +42,8 @@ import org.junit.runners.model.Statement;
 
 public class BackendMock implements TestRule {
 
-	private final VerifyingStubBackendBehavior backendBehavior = new VerifyingStubBackendBehavior( this::indexingWorkExpectations );
+	private final VerifyingStubBackendBehavior backendBehavior =
+			new VerifyingStubBackendBehavior( this::indexingWorkExpectations );
 
 	private volatile boolean started = false;
 
@@ -148,7 +149,7 @@ public class BackendMock implements TestRule {
 	}
 
 	public BackendMock expectSchema(String indexName, Consumer<StubIndexSchemaDataNode.Builder> contributor) {
-		return expectSchema( indexName, contributor, ignored -> { } );
+		return expectSchema( indexName, contributor, ignored -> {} );
 	}
 
 	public BackendMock expectSchema(String indexName, Consumer<StubIndexSchemaDataNode.Builder> contributor,
@@ -208,7 +209,7 @@ public class BackendMock implements TestRule {
 
 	public BackendMock expectSearchReferences(Collection<String> indexNames,
 			StubSearchWorkBehavior<DocumentReference> behavior) {
-		return expectSearch( indexNames, b -> { }, behavior );
+		return expectSearch( indexNames, b -> {}, behavior );
 	}
 
 	public BackendMock expectSearchReferences(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
@@ -222,7 +223,7 @@ public class BackendMock implements TestRule {
 	}
 
 	public BackendMock expectSearchObjects(String indexName, StubSearchWorkBehavior<DocumentReference> behavior) {
-		return expectSearch( Collections.singleton( indexName ), ignored -> { }, behavior );
+		return expectSearch( Collections.singleton( indexName ), ignored -> {}, behavior );
 	}
 
 	public BackendMock expectSearchObjects(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
@@ -231,7 +232,7 @@ public class BackendMock implements TestRule {
 	}
 
 	public BackendMock expectSearchProjection(String indexNames, StubSearchWorkBehavior<?> behavior) {
-		return expectSearch( Collections.singleton( indexNames ), ignored -> { }, behavior );
+		return expectSearch( Collections.singleton( indexNames ), ignored -> {}, behavior );
 	}
 
 	public BackendMock expectSearchProjection(String indexNames, Consumer<StubSearchWork.Builder> contributor,
@@ -240,7 +241,7 @@ public class BackendMock implements TestRule {
 	}
 
 	public BackendMock expectSearchProjection(Collection<String> indexNames, StubSearchWorkBehavior<?> behavior) {
-		return expectSearch( indexNames, ignored -> { }, behavior );
+		return expectSearch( indexNames, ignored -> {}, behavior );
 	}
 
 	public BackendMock expectSearchProjection(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,

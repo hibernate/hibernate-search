@@ -156,7 +156,8 @@ public interface PojoPropertyIndexingDependencyConfigurationContext {
 	 * or the given path cannot be applied to the given entity type.
 	 */
 	@Incubating
-	PojoOtherEntityIndexingDependencyConfigurationContext fromOtherEntity(ContainerExtractorPath extractorPathFromBridgedProperty,
+	PojoOtherEntityIndexingDependencyConfigurationContext fromOtherEntity(
+			ContainerExtractorPath extractorPathFromBridgedProperty,
 			Class<?> otherEntityType,
 			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedPropertyExtractedType);
 

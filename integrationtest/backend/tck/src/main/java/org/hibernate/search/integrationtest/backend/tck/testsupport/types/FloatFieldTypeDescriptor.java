@@ -65,7 +65,7 @@ public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 	protected List<Float> createUniquelyMatchableValues() {
 		return Arrays.asList(
 				Float.MIN_VALUE, Float.MAX_VALUE,
-				- Float.MIN_VALUE, - Float.MAX_VALUE,
+				-Float.MIN_VALUE, -Float.MAX_VALUE,
 				// Elasticsearch doesn't support these: it fails when parsing them
 				//Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY, Float.NaN,
 				0.0f,

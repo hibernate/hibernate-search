@@ -36,8 +36,10 @@ public class LuceneIndexWriterSettingsPerShardIT extends AbstractSettingsPerShar
 	public void test() {
 		setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), LuceneIndexSettings.IO_WRITER_MAX_BUFFERED_DOCS, "420" )
-				.withIndexProperty( index.name(), "shards." + shardIds.get( 2 ) + "." + LuceneIndexSettings.IO_WRITER_MAX_BUFFERED_DOCS, "42" )
-				.withIndexProperty( index.name(), "shards." + shardIds.get( 3 ) + "." + LuceneIndexSettings.IO_WRITER_MAX_BUFFERED_DOCS, "4200" )
+				.withIndexProperty( index.name(),
+						"shards." + shardIds.get( 2 ) + "." + LuceneIndexSettings.IO_WRITER_MAX_BUFFERED_DOCS, "42" )
+				.withIndexProperty( index.name(),
+						"shards." + shardIds.get( 3 ) + "." + LuceneIndexSettings.IO_WRITER_MAX_BUFFERED_DOCS, "4200" )
 				.setup();
 
 		LuceneIndexManagerImpl luceneIndexManager = index.unwrapForTests( LuceneIndexManagerImpl.class );

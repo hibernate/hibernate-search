@@ -17,7 +17,8 @@ public final class SystemHelper {
 	public static SystemPropertyRestorer setSystemProperty(String key, String value) {
 		String oldValue = System.getProperty( key );
 		System.setProperty( key, value );
-		return oldValue == null ? () -> System.clearProperty( key )
+		return oldValue == null
+				? () -> System.clearProperty( key )
 				: () -> System.setProperty( key, oldValue );
 	}
 

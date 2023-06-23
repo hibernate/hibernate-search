@@ -13,8 +13,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
 abstract class AbstractPropertyMappingNonFullTextStandardFieldOptionsStep<
-				S extends PropertyMappingNonFullTextFieldOptionsStep<?>
-		>
+		S extends PropertyMappingNonFullTextFieldOptionsStep<?>>
 		extends AbstractPropertyMappingStandardFieldOptionsStep<S>
 		implements PropertyMappingNonFullTextFieldOptionsStep<S> {
 

@@ -155,7 +155,7 @@ public class GenericTypeContextTest {
 	public void genericArgument() {
 		new GenericTypeContextAssert.AssertWithType<Iterable<CustomGenericType<String, Integer>>>() {
 		}
-				.resolveTypeArgumentTo( new TypeCapture<CustomGenericType<String, Integer>>() { },
+				.resolveTypeArgumentTo( new TypeCapture<CustomGenericType<String, Integer>>() {},
 						Iterable.class, 0 )
 				.resolveTypeArgumentToEmpty( Collection.class, 0 )
 				.resolveTypeArgumentToEmpty( List.class, 0 )
@@ -163,7 +163,7 @@ public class GenericTypeContextTest {
 				.resolveTypeArgumentToEmpty( Map.class, 1 )
 				.castTo( Collection.class, actual -> actual
 						.hasRawType( Collection.class )
-						.resolveTypeArgumentTo( new TypeCapture<CustomGenericType<String, Integer>>() { },
+						.resolveTypeArgumentTo( new TypeCapture<CustomGenericType<String, Integer>>() {},
 								Collection.class, 0 )
 						.resolveTypeArgumentToEmpty( List.class, 0 ) );
 	}

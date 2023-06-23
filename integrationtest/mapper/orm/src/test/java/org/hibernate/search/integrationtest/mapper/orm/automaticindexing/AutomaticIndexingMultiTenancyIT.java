@@ -76,7 +76,7 @@ public class AutomaticIndexingMultiTenancyIT {
 
 		static final String NAME = "IndexedEntity";
 
-		static volatile AtomicReference<Runnable> getTextConcurrentOperation = new AtomicReference<>( () -> { } );
+		static volatile AtomicReference<Runnable> getTextConcurrentOperation = new AtomicReference<>( () -> {} );
 
 		private Integer id;
 		private String text;

@@ -91,7 +91,7 @@ public class StrictSecondLCAndPCLookupTest extends SearchTestBase {
 	}
 
 	@Override
-	public void configure(Map<String,Object> cfg) {
+	public void configure(Map<String, Object> cfg) {
 		super.configure( cfg );
 		cfg.put( Environment.USE_SECOND_LEVEL_CACHE, "true" );
 		cfg.put( Environment.CACHE_REGION_FACTORY, CachingRegionFactory.class.getCanonicalName() );

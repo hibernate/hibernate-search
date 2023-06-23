@@ -36,7 +36,8 @@ class PersistenceContextThenSecondLevelCacheLookupStrategy
 		EntityDataAccess cacheAccess = commonEntitySuperTypePersister.getCacheAccessStrategy();
 		if ( cacheAccess == null ) {
 			// No second-level cache
-			log.skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader( commonEntitySuperTypePersister.getEntityName() );
+			log.skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader(
+					commonEntitySuperTypePersister.getEntityName() );
 			return persistenceContextLookupStrategy;
 		}
 		return new PersistenceContextThenSecondLevelCacheLookupStrategy(

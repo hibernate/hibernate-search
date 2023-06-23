@@ -29,7 +29,8 @@ import org.junit.Test;
 public class ProjectionConstructorScoreProjectionIT extends AbstractProjectionConstructorIT {
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void noArg() {
@@ -42,6 +43,7 @@ public class ProjectionConstructorScoreProjectionIT extends AbstractProjectionCo
 		}
 		class MyProjection {
 			public final Float score;
+
 			@ProjectionConstructor
 			public MyProjection(@ScoreProjection Float score) {
 				this.score = score;
@@ -83,6 +85,7 @@ public class ProjectionConstructorScoreProjectionIT extends AbstractProjectionCo
 		}
 		class MyProjection {
 			public final Object score;
+
 			@ProjectionConstructor
 			public MyProjection(@ScoreProjection Object score) {
 				this.score = score;
@@ -124,6 +127,7 @@ public class ProjectionConstructorScoreProjectionIT extends AbstractProjectionCo
 		}
 		class MyProjection {
 			public final float score;
+
 			@ProjectionConstructor
 			public MyProjection(@ScoreProjection float score) {
 				this.score = score;
@@ -165,6 +169,7 @@ public class ProjectionConstructorScoreProjectionIT extends AbstractProjectionCo
 		}
 		class MyProjection {
 			public final Integer score;
+
 			@ProjectionConstructor
 			public MyProjection(@ScoreProjection Integer score) {
 				this.score = score;
@@ -179,7 +184,9 @@ public class ProjectionConstructorScoreProjectionIT extends AbstractProjectionCo
 						.typeContext( MyProjection.class.getName() )
 						.constructorContext( ProjectionConstructorScoreProjectionIT.class, Integer.class )
 						.methodParameterContext( 1, "score" )
-						.failure( "Invalid projection definition for constructor parameter type '" + Integer.class.getName() + "'",
+						.failure(
+								"Invalid projection definition for constructor parameter type '" + Integer.class.getName()
+										+ "'",
 								"This projection results in values of type '" + Float.class.getName() + "'" )
 				);
 	}

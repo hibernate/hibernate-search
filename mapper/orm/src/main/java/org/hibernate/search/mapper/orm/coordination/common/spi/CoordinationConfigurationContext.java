@@ -30,7 +30,8 @@ public interface CoordinationConfigurationContext {
 	 * meaning event can (and should) be sent before the commit,
 	 * which will automatically lead them to be sent on commit (or not sent at all in case of rollback).
 	 */
-	void sendIndexingEventsTo(Function<AutomaticIndexingEventSendingSessionContext, AutomaticIndexingQueueEventSendingPlan> senderFactory,
+	void sendIndexingEventsTo(
+			Function<AutomaticIndexingEventSendingSessionContext, AutomaticIndexingQueueEventSendingPlan> senderFactory,
 			boolean enlistsInTransaction);
 
 	/**

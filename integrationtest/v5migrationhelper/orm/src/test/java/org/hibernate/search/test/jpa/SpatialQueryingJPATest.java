@@ -45,7 +45,8 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		withinEntityManager( factory, em -> {
 			withinTransaction( em, () -> {
 				em.createQuery( "from " + POI.class.getName() ).getResultList().forEach( entity -> em.remove( entity ) );
-				em.createQuery( "from " + DoubleIndexedPOI.class.getName() ).getResultList().forEach( entity -> em.remove( entity ) );
+				em.createQuery( "from " + DoubleIndexedPOI.class.getName() ).getResultList()
+						.forEach( entity -> em.remove( entity ) );
 			} );
 		} );
 	}
@@ -125,7 +126,8 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				final QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
 
 				org.apache.lucene.search.Query luceneQuery = builder.spatial().onField( "location" )
-						.within( LARGE_DISTANCE_KM, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+						.within( LARGE_DISTANCE_KM, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude )
+						.createQuery();
 
 				FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
 				hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
@@ -231,17 +233,17 @@ public class SpatialQueryingJPATest extends JPATestCase {
 			withinTransaction( em, () -> {
 				int cnt = 0;
 				for ( double[] c : new double[][] {
-						{41.04389845, -74.06328534},
-						{40.64383333, -73.75050000},
-						{40.75666667, -73.98650000},
-						{40.69416667, -73.78166667},
-						{40.75802992, -73.98532391},
-						{40.75802992, -73.98532391},
-						{50.77687257, 6.08431213},
-						{50.78361600, 6.07003500},
-						{50.76066667, 6.08866667},
-						{50.77683333, 6.08466667},
-						{50.77650000, 6.08416667},
+						{ 41.04389845, -74.06328534 },
+						{ 40.64383333, -73.75050000 },
+						{ 40.75666667, -73.98650000 },
+						{ 40.69416667, -73.78166667 },
+						{ 40.75802992, -73.98532391 },
+						{ 40.75802992, -73.98532391 },
+						{ 50.77687257, 6.08431213 },
+						{ 50.78361600, 6.07003500 },
+						{ 50.76066667, 6.08866667 },
+						{ 50.77683333, 6.08466667 },
+						{ 50.77650000, 6.08416667 },
 				} ) {
 					em.persist( new POI( cnt, "Test_" + cnt, c[0], c[1], "" ) );
 					++cnt;
@@ -256,8 +258,8 @@ public class SpatialQueryingJPATest extends JPATestCase {
 
 				org.apache.lucene.search.Query luceneQuery = builder.spatial().onField( "location" )
 						.within( 1.8097233616663808, Unit.KM )
-							.ofLatitude( centerLatitude )
-							.andLongitude( centerLongitude )
+						.ofLatitude( centerLatitude )
+						.andLongitude( centerLongitude )
 						.createQuery();
 
 				FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
@@ -272,7 +274,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				List<Object[]> results = hibQuery.getResultList();
 
 				for ( Object[] result : results ) {
-					POI poi = (POI)result[0];
+					POI poi = (POI) result[0];
 					String message = poi.getName() + " (" + poi.getLatitude() + ", " + poi.getLongitude() + ") is not at "
 							+ centerLatitude + ", " + centerLongitude;
 
@@ -335,16 +337,14 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		POI poi2 = new POI( 1, "Distance to 24,32 : unknown, 4361.00km if interpreted as 0,0", null, null, "" );
 
 		withinEntityManager( factory, em -> {
-			withinTransaction( em, () ->
-				em.persist( poi )
+			withinTransaction( em, () -> em.persist( poi )
 			);
 
 			/*
 			 * Create the POI with a missing value in a separate transaction, so that
 			 * the document will be alone in one segment (or so it seems...?)
 			 */
-			withinTransaction( em, () ->
-				em.persist( poi2 )
+			withinTransaction( em, () -> em.persist( poi2 )
 			);
 
 			withinTransaction( em, () -> {
@@ -412,8 +412,9 @@ public class SpatialQueryingJPATest extends JPATestCase {
 
 				final QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
 
-				org.apache.lucene.search.Query luceneQuery = builder.spatial().onField( "location" ).within( 100, Unit.KM ).ofLatitude( centerLatitude )
-						.andLongitude( centerLongitude ).createQuery();
+				org.apache.lucene.search.Query luceneQuery =
+						builder.spatial().onField( "location" ).within( 100, Unit.KM ).ofLatitude( centerLatitude )
+								.andLongitude( centerLongitude ).createQuery();
 
 				FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
 				Sort distanceSort = builder.sort().byDistance().onField( "location" )
@@ -463,7 +464,8 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				double centerLatitude = 24.0d;
 				double centerLongitude = 32.0d;
 
-				final QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( DoubleIndexedPOI.class ).get();
+				final QueryBuilder builder =
+						em.getSearchFactory().buildQueryBuilder().forEntity( DoubleIndexedPOI.class ).get();
 
 				//Tests with FieldBridge
 				org.apache.lucene.search.Query luceneQuery = builder.spatial().onField( "location" )

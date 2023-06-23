@@ -42,7 +42,8 @@ public class IndexWorkspaceIT {
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
-	public SearchSetupHelper multiTenancySetupHelper = new SearchSetupHelper( TckBackendHelper::createMultiTenancyBackendSetupStrategy );
+	public SearchSetupHelper multiTenancySetupHelper =
+			new SearchSetupHelper( TckBackendHelper::createMultiTenancyBackendSetupStrategy );
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

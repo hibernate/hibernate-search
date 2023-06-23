@@ -34,6 +34,7 @@ public abstract class HashTable<T> implements Iterable<T> {
 	public Iterator<T> iterator() {
 		return new Iterator<T>() {
 			int index = 0;
+
 			@Override
 			public boolean hasNext() {
 				return index < buckets.length;

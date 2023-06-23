@@ -53,7 +53,7 @@ public class DSLTest {
 
 	@Rule
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Month.class, Car.class,
-					SportsCar.class, Animal.class, Day.class, Coffee.class );
+			SportsCar.class, Animal.class, Day.class, Coffee.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
@@ -135,12 +135,12 @@ public class DSLTest {
 		//fuzzy search with custom threshold and prefix
 		Query query = monthQb
 				.keyword()
-					.fuzzy()
-						.withEditDistanceUpTo( 1 )
-						.withPrefixLength( 1 )
-					.onField( "mythology" )
-					.matching( "calder" )
-					.createQuery();
+				.fuzzy()
+				.withEditDistanceUpTo( 1 )
+				.withPrefixLength( 1 )
+				.onField( "mythology" )
+				.matching( "calder" )
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).hasResultSize( 1 );
 	}
@@ -168,10 +168,10 @@ public class DSLTest {
 
 		Query query = monthQb
 				.keyword()
-					.wildcard()
-					.onField( "mythology" )
-					.matching( "mon*" )
-					.createQuery();
+				.wildcard()
+				.onField( "mythology" )
+				.matching( "mon*" )
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).hasResultSize( 3 );
 	}
@@ -183,10 +183,10 @@ public class DSLTest {
 
 		Query query = monthQb
 				.keyword()
-					.wildcard()
-					.onFields( "mythology", "history" )
-					.matching( "snowbo*" )
-					.createQuery();
+				.wildcard()
+				.onFields( "mythology", "history" )
+				.matching( "snowbo*" )
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 2, 3 );
 	}
@@ -234,7 +234,7 @@ public class DSLTest {
 		//combined query, January and February both contain whitening but February in a longer text
 		query = monthQb.keyword()
 				.onFields( "mythology", "history" )
-					.boostedTo( 30 )
+				.boostedTo( 30 )
 				.matching( "whitening" ).createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 1, 2 );
@@ -244,7 +244,7 @@ public class DSLTest {
 		query = monthQb.keyword()
 				.onField( "mythology" )
 				.andField( "history" )
-					.boostedTo( 30 )
+				.boostedTo( 30 )
 				.matching( "whitening" )
 				.createQuery();
 
@@ -266,26 +266,26 @@ public class DSLTest {
 		//must not + all
 		query = monthQb
 				.bool()
-					.should( monthQb.all().createQuery() )
-					.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
-						.not()
-					.createQuery();
+				.should( monthQb.all().createQuery() )
+				.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
+				.not()
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 2, 3 );
 
 		//implicit must not + all (not recommended)
 		query = monthQb
 				.bool()
-					.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
-						.not()
-					.createQuery();
+				.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
+				.not()
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 2, 3 );
 
 		//all except (recommended)
 		query = monthQb
 				.all()
-					.except( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
+				.except( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
 				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 2, 3 );
@@ -319,9 +319,9 @@ public class DSLTest {
 		Query query = monthQb
 				.bool()
 				.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
-					.not() //expectation: exclude January
+				.not() //expectation: exclude January
 				.must( monthQb.keyword().onField( "mythology" ).matching( "snowboarding" ).createQuery() )
-					.not() //expectation: exclude February
+				.not() //expectation: exclude February
 				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 3 );
@@ -362,10 +362,10 @@ public class DSLTest {
 		// must not / filter with null clauses
 		query = monthQb
 				.bool()
-					.must( null ).not()
-					.must( null ).disableScoring()
-					.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
-					.createQuery();
+				.must( null ).not()
+				.must( null ).disableScoring()
+				.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
+				.createQuery();
 
 		assertThat( query, CoreMatchers.instanceOf( BoostQuery.class ) );
 
@@ -385,10 +385,10 @@ public class DSLTest {
 
 		Query query = monthQb
 				.range()
-					.onField( "estimatedCreation" )
-					.from( from )
-					.to( to ).excludeLimit()
-					.createQuery();
+				.onField( "estimatedCreation" )
+				.from( from )
+				.to( to ).excludeLimit()
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).hasResultSize( 1 );
 	}
@@ -407,11 +407,11 @@ public class DSLTest {
 
 		Query query = monthQb
 				.range()
-					.onField( "estimatedCreation" )
-					.from( from )
-					.to( to )
-						.excludeLimit()
-					.createQuery();
+				.onField( "estimatedCreation" )
+				.from( from )
+				.to( to )
+				.excludeLimit()
+				.createQuery();
 		helper.assertThatQuery( query ).from( Month.class ).hasResultSize( 1 );
 	}
 
@@ -425,9 +425,9 @@ public class DSLTest {
 
 		Query query = monthQb
 				.range()
-					.onField( "estimatedCreation" )
-					.below( to )
-					.createQuery();
+				.onField( "estimatedCreation" )
+				.below( to )
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 3 );
 
@@ -450,9 +450,9 @@ public class DSLTest {
 
 		Query query = monthQb
 				.range()
-					.onField( "estimatedCreation" )
-					.below( to )
-					.createQuery();
+				.onField( "estimatedCreation" )
+				.below( to )
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 3 );
 	}
@@ -467,9 +467,9 @@ public class DSLTest {
 
 		Query query = monthQb
 				.range()
-					.onField( "estimatedCreation" )
-					.above( to )
-					.createQuery();
+				.onField( "estimatedCreation" )
+				.above( to )
+				.createQuery();
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 2 );
 	}
 
@@ -484,9 +484,9 @@ public class DSLTest {
 
 		Query query = monthQb
 				.range()
-					.onField( "estimatedCreation" )
-					.above( to )
-					.createQuery();
+				.onField( "estimatedCreation" )
+				.above( to )
+				.createQuery();
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 2 );
 	}
 
@@ -497,9 +497,9 @@ public class DSLTest {
 		// test the limits, inclusive
 		Query query = monthQb
 				.range()
-					.onField( "estimatedCreation" )
-					.above( february )
-					.createQuery();
+				.onField( "estimatedCreation" )
+				.above( february )
+				.createQuery();
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 2 );
 	}
 
@@ -510,9 +510,9 @@ public class DSLTest {
 		// test the limits, exclusive
 		Query query = monthQb
 				.range()
-					.onField( "estimatedCreation" )
-					.above( february ).excludeLimit()
-					.createQuery();
+				.onField( "estimatedCreation" )
+				.above( february ).excludeLimit()
+				.createQuery();
 		helper.assertThatQuery( query ).from( Month.class ).matchesNone();
 	}
 
@@ -523,26 +523,26 @@ public class DSLTest {
 
 		Query query = monthQb
 				.phrase()
-					.onField( "mythology" )
-					.sentence( "Month whitening" )
-					.createQuery();
+				.onField( "mythology" )
+				.sentence( "Month whitening" )
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).as( "test slop" ).hasResultSize( 0 );
 
 		query = monthQb
 				.phrase()
-					.withSlop( 3 )
-					.onField( "mythology" )
-					.sentence( "Month whitening" )
-					.createQuery();
+				.withSlop( 3 )
+				.onField( "mythology" )
+				.sentence( "Month whitening" )
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).as( "test slop" ).hasResultSize( 1 );
 
 		query = monthQb
 				.phrase()
-					.onField( "mythology" )
-					.sentence( "whitening" )
-					.createQuery();
+				.onField( "mythology" )
+				.sentence( "whitening" )
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class )
 				.as( "test one term optimization" )
@@ -550,13 +550,13 @@ public class DSLTest {
 
 
 		//Does not work as the NGram filter does not seem to be skipping posiional increment between ngrams.
-//		query = monthQb
-//				.phrase()
-//					.onField( "mythology_ngram" )
-//					.sentence( "snobored" )
-//					.createQuery();
-//
-//		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
+		//		query = monthQb
+		//				.phrase()
+		//					.onField( "mythology_ngram" )
+		//					.sentence( "snobored" )
+		//					.createQuery();
+		//
+		//		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
 	}
 
 	@Test
@@ -568,30 +568,30 @@ public class DSLTest {
 
 		Query query = monthQb
 				.phrase()
-					.onField( "name" )
-					.sentence( "February" )
-					.createQuery();
+				.onField( "name" )
+				.sentence( "February" )
+				.createQuery();
 		helper.assertThatQuery( query ).from( Month.class ).hasResultSize( 1 );
 
 		query = monthQb
 				.phrase()
-					.onField( "name" )
-					.sentence( "february" )
-					.createQuery();
+				.onField( "name" )
+				.sentence( "february" )
+				.createQuery();
 		helper.assertThatQuery( query ).from( Month.class ).hasResultSize( 1 );
 
 		query = monthQb
 				.phrase()
-					.onField( "mythology_normalized" )
-					.sentence( "Month whitening" )
-					.createQuery();
+				.onField( "mythology_normalized" )
+				.sentence( "Month whitening" )
+				.createQuery();
 		helper.assertThatQuery( query ).from( Month.class ).hasResultSize( 0 );
 
 		query = monthQb
 				.phrase()
-					.onField( "mythology_normalized" )
-					.sentence( "month whitening" )
-					.createQuery();
+				.onField( "mythology_normalized" )
+				.sentence( "month whitening" )
+				.createQuery();
 		helper.assertThatQuery( query ).from( Month.class ).hasResultSize( 0 );
 	}
 
@@ -603,9 +603,9 @@ public class DSLTest {
 
 		Query query = monthQb
 				.phrase()
-					.onField( "mythology" )
-					.sentence( testCaseText )
-					.createQuery();
+				.onField( "mythology" )
+				.sentence( testCaseText )
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).as( "test term ordering" ).hasResultSize( 0 );
 	}
@@ -616,9 +616,9 @@ public class DSLTest {
 
 		Query query = monthQb
 				.phrase()
-					.onField( "mythology" )
-					.sentence( "colder and whitening" )
-					.createQuery();
+				.onField( "mythology" )
+				.sentence( "colder and whitening" )
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).hasResultSize( 1 );
 	}
@@ -629,8 +629,7 @@ public class DSLTest {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		// we use mythology_stem here as the default analyzer for Elasticsearch does not include a stopwords filter
-		Query query = monthQb.
-				phrase()
+		Query query = monthQb.phrase()
 				.onField( "mythology_stem" )
 				.sentence( "and" )
 				.createQuery();
@@ -646,60 +645,60 @@ public class DSLTest {
 
 		Query query = monthQb
 				.range()
-					.onField( "raindropInMm" )
-					.from( 0.23d )
-					.to( 0.24d )
-					.createQuery();
+				.onField( "raindropInMm" )
+				.from( 0.23d )
+				.to( 0.24d )
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 1 );
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HSEARCH-1378")
+	@TestForIssue(jiraKey = "HSEARCH-1378")
 	public void testNumericRangeQueryAbove() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		//inclusive
 		Query query = monthQb
 				.range()
-					.onField( "raindropInMm" )
-					.above( 0.231d )
-					.createQuery();
+				.onField( "raindropInMm" )
+				.above( 0.231d )
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesUnorderedIds( 1, 2, 3 );
 
 		//exclusive
 		query = monthQb
 				.range()
-					.onField( "raindropInMm" )
-					.above( 0.231d )
-					.excludeLimit()
-					.createQuery();
+				.onField( "raindropInMm" )
+				.above( 0.231d )
+				.excludeLimit()
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesUnorderedIds( 2, 3 );
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HSEARCH-1378")
+	@TestForIssue(jiraKey = "HSEARCH-1378")
 	public void testNumericRangeQueryBelow() {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		//inclusive
 		Query query = monthQb
 				.range()
-					.onField( "raindropInMm" )
-					.below( 0.435d )
-					.createQuery();
+				.onField( "raindropInMm" )
+				.below( 0.435d )
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesUnorderedIds( 1, 2, 3 );
 
 		//exclusive
 		query = monthQb
 				.range()
-					.onField( "raindropInMm" )
-					.below( 0.435d )
-					.excludeLimit()
-					.createQuery();
+				.onField( "raindropInMm" )
+				.below( 0.435d )
+				.excludeLimit()
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesUnorderedIds( 1 );
 	}
@@ -717,7 +716,7 @@ public class DSLTest {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HSEARCH-703" )
+	@TestForIssue(jiraKey = "HSEARCH-703")
 	public void testPolymorphicQueryForUnindexedSuperTypeReturnsIndexedSubType() {
 		final QueryBuilder builder = helper.queryBuilder( Object.class );
 
@@ -728,7 +727,7 @@ public class DSLTest {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HSEARCH-703" )
+	@TestForIssue(jiraKey = "HSEARCH-703")
 	public void testPolymorphicQueryWithKeywordTermForUnindexedSuperTypeReturnsIndexedSubType() {
 		final QueryBuilder builder = helper.queryBuilder( Car.class );
 
@@ -737,7 +736,7 @@ public class DSLTest {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HSEARCH-703" )
+	@TestForIssue(jiraKey = "HSEARCH-703")
 	public void testObtainingBuilderForUnindexedTypeWithoutIndexedSubTypesCausesException() {
 		try {
 			helper.queryBuilder( Animal.class );

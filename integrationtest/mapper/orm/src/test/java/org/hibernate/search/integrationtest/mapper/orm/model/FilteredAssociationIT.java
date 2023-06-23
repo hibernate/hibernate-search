@@ -48,8 +48,7 @@ public class FilteredAssociationIT {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.objectField( "contained", b2 -> b2
 						.multiValued( true )
-						.field( "text", String.class, b3 -> {
-						} ) ) );
+						.field( "text", String.class, b3 -> {} ) ) );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.setup( IndexedEntity.class, ContainedEntity.class );
@@ -160,7 +159,7 @@ public class FilteredAssociationIT {
 
 		@IndexedEmbedded(name = "contained")
 		@IndexingDependency(derivedFrom = {
-				@ObjectPath({@PropertyValue(propertyName = "contained"), @PropertyValue(propertyName = "status")})
+				@ObjectPath({ @PropertyValue(propertyName = "contained"), @PropertyValue(propertyName = "status") })
 		})
 		@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "containing")))
 		public List<ContainedEntity> getContainedNotDeleted() {

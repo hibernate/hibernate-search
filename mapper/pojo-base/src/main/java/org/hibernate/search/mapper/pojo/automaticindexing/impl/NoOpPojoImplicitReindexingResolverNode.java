@@ -12,7 +12,7 @@ class NoOpPojoImplicitReindexingResolverNode extends PojoImplicitReindexingResol
 
 	private static final NoOpPojoImplicitReindexingResolverNode INSTANCE = new NoOpPojoImplicitReindexingResolverNode();
 
-	@SuppressWarnings( "unchecked" ) // This instance works for any T
+	@SuppressWarnings("unchecked") // This instance works for any T
 	public static <T> PojoImplicitReindexingResolverNode<T> get() {
 		return (PojoImplicitReindexingResolverNode<T>) INSTANCE;
 	}

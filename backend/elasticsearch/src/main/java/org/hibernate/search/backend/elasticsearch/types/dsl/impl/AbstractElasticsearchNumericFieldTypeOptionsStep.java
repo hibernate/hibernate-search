@@ -20,7 +20,9 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 
-abstract class AbstractElasticsearchNumericFieldTypeOptionsStep<S extends AbstractElasticsearchNumericFieldTypeOptionsStep<?, F>, F>
+abstract class AbstractElasticsearchNumericFieldTypeOptionsStep<
+		S extends AbstractElasticsearchNumericFieldTypeOptionsStep<?, F>,
+		F>
 		extends AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S, F> {
 
 	AbstractElasticsearchNumericFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,

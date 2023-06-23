@@ -125,7 +125,7 @@ public class EntityManagerFactoryRetrievalIT {
 						.entityManagerFactoryNamespace( "persistence-unit-name" )
 						.entityManagerFactoryReference( getPersistenceUnitName() )
 						.build()
-				);
+		);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 
@@ -146,7 +146,7 @@ public class EntityManagerFactoryRetrievalIT {
 						.entityManagerFactoryNamespace( "session-factory-name" )
 						.entityManagerFactoryReference( SESSION_FACTORY_NAME )
 						.build()
-				);
+		);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 

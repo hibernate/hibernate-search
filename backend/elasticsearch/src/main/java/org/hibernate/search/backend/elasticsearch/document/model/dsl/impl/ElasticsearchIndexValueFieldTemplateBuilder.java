@@ -16,8 +16,8 @@ import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 class ElasticsearchIndexValueFieldTemplateBuilder
 		extends AbstractElasticsearchIndexFieldTemplateBuilder<
-						ElasticsearchIndexValueFieldTemplateBuilder, ElasticsearchIndexValueFieldTemplate
-				> {
+				ElasticsearchIndexValueFieldTemplateBuilder,
+				ElasticsearchIndexValueFieldTemplate> {
 
 	private final ElasticsearchIndexValueFieldType<?> type;
 

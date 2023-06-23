@@ -130,21 +130,17 @@ public class ToStringTreeBuilder implements ToStringTreeAppender {
 
 		// Add a new line
 		if (
-				// ... except for the very first element at the root
-				!( first && structureTypeStack.isEmpty() )
+			// ... except for the very first element at the root
+		!( first && structureTypeStack.isEmpty() )
 				// ... or for entries containing a squeezed structure
 				&& !shouldSqueeze( containedStructureType, entryType, structureTypeStack.peek() )
 				// ... or for structures without a name nor a start delimiter
-				&& !(
-						StructureType.UNNAMED_ENTRY.equals( entryType )
+				&& !( StructureType.UNNAMED_ENTRY.equals( entryType )
 						&& StructureType.OBJECT.equals( containedStructureType )
-						&& StringHelper.isEmpty( style.startObject )
-				)
-				&& !(
-						StructureType.UNNAMED_ENTRY.equals( entryType )
+						&& StringHelper.isEmpty( style.startObject ) )
+				&& !( StructureType.UNNAMED_ENTRY.equals( entryType )
 						&& StructureType.LIST.equals( containedStructureType )
-						&& StringHelper.isEmpty( style.startList )
-				)
+						&& StringHelper.isEmpty( style.startList ) )
 		) {
 			appendNewline();
 			appendIndentIfNecessary();
@@ -234,8 +230,8 @@ public class ToStringTreeBuilder implements ToStringTreeAppender {
 			case LIST:
 				// Display a bullet point if:
 				if (
-						// We are adding an element directly to the list
-						child == null
+					// We are adding an element directly to the list
+				child == null
 						// OR we are adding the first element to a squeezed element in the list
 						|| shouldSqueeze( grandChild, child, current ) && !hasParent && first
 				) {

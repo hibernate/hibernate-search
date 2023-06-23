@@ -49,7 +49,7 @@ class DynamicTemplateValidator implements Validator<DynamicTemplate> {
 					errorCollector, expected.getMapping(), actual.getMapping()
 			);
 		}
-			finally {
+		finally {
 			errorCollector.pop();
 		}
 	}

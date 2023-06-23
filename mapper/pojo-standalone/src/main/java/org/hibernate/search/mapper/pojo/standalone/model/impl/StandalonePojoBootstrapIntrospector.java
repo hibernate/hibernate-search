@@ -34,7 +34,8 @@ import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 /**
  * A very simple introspector for Pojo mapping in standalone mode (without Hibernate ORM).
  */
-public class StandalonePojoBootstrapIntrospector extends AbstractPojoHCAnnBootstrapIntrospector implements PojoBootstrapIntrospector {
+public class StandalonePojoBootstrapIntrospector extends AbstractPojoHCAnnBootstrapIntrospector
+		implements PojoBootstrapIntrospector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

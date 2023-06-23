@@ -69,8 +69,8 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 						+ "     'articles': ['l', 'd']"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		setupAndUpdateIndex();
 
@@ -94,9 +94,9 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 						+ "     'articles': ['l', 'd']"
 						+ "   }"
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).settings( "index.analysis" ).get()
-				);
+		);
 	}
 
 	@Test
@@ -116,8 +116,8 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 						+ "     'articles': ['l', 'd']"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		setupAndUpdateIndex();
 
@@ -142,9 +142,9 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 						+ "     'articles': ['l', 'd']"
 						+ "   }"
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).settings( "index.analysis" ).get()
-				);
+		);
 	}
 
 	@Test
@@ -152,19 +152,19 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
-					/*
-					 * We don't add the analyzer here: since a component is missing
-					 * the analyzer can't reference it and thus it must be missing too.
-					 */
-					// missing: 'char_filter'
+						/*
+						 * We don't add the analyzer here: since a component is missing
+						 * the analyzer can't reference it and thus it must be missing too.
+						 */
+						// missing: 'char_filter'
 						+ " 'filter': {"
 						+ "   'custom-elision': {"
 						+ "     'type': 'elision',"
 						+ "     'articles': ['l', 'd']"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		setupAndUpdateIndex();
 
@@ -189,9 +189,9 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 						+ "     'articles': ['l', 'd']"
 						+ "   }"
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).settings( "index.analysis" ).get()
-				);
+		);
 	}
 
 	@Test
@@ -221,8 +221,8 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 						+ "     'articles': ['l', 'd']"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		setupAndUpdateIndex();
 
@@ -251,9 +251,9 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 						+ "     'articles': ['l', 'd']"
 						+ "   }"
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).settings( "index.analysis" ).get()
-				);
+		);
 	}
 
 	@Test
@@ -279,8 +279,8 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 						+ "     'articles': ['l', 'd']"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		setupAndUpdateIndex();
 
@@ -305,9 +305,9 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 						+ "     'articles': ['l', 'd']"
 						+ "   }"
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).settings( "index.analysis" ).get()
-				);
+		);
 	}
 
 	private void setupAndUpdateIndex() {

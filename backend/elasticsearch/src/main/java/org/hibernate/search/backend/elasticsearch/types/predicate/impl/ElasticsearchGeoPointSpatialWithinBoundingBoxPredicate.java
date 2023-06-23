@@ -68,7 +68,8 @@ public class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicate extends Abst
 		}
 
 		@Override
-		public Builder create(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
+		public Builder create(ElasticsearchSearchIndexScope<?> scope,
+				ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
 			return new Builder( codec, scope, field );
 		}
 	}

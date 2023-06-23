@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 @Table(name = "\"user\"")
 @Indexed(backend = "backend2")
 public class User {
-// end::indexed-explicitbackend[]
+	// end::indexed-explicitbackend[]
 
 	@Id
 	@GeneratedValue

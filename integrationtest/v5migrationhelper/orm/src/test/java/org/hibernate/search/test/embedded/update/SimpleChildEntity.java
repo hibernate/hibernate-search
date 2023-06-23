@@ -38,7 +38,8 @@ public class SimpleChildEntity {
 
 	@Field(analyze = Analyze.NO)
 	@IndexingDependency(derivedFrom = @ObjectPath({
-			@PropertyValue(propertyName = "parent"), @PropertyValue(propertyName = "name")
+			@PropertyValue(propertyName = "parent"),
+			@PropertyValue(propertyName = "name")
 	}))
 	public String getParentName() {
 		return parent.getName();

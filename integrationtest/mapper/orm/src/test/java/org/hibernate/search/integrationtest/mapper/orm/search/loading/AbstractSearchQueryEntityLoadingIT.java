@@ -120,7 +120,8 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 		} );
 	}
 
-	protected <T> List<T> getHits(List<String> targetIndexes, SearchQuery<T> query, List<DocumentReference> hitDocumentReferences,
+	protected <T> List<T> getHits(List<String> targetIndexes, SearchQuery<T> query,
+			List<DocumentReference> hitDocumentReferences,
 			Integer timeout, TimeUnit timeUnit) {
 		backendMock().expectSearchObjects(
 				targetIndexes,

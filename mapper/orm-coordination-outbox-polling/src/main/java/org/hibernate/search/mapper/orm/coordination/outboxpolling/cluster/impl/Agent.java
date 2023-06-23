@@ -119,7 +119,8 @@ public class Agent {
 
 	@Transient
 	public ShardAssignmentDescriptor getShardAssignment() {
-		return ( totalShardCount == null || assignedShardIndex == null ) ? null
+		return ( totalShardCount == null || assignedShardIndex == null )
+				? null
 				: new ShardAssignmentDescriptor( totalShardCount, assignedShardIndex );
 	}
 }

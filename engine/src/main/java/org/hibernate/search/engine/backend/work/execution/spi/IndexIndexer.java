@@ -28,7 +28,8 @@ public interface IndexIndexer {
 	 * @return A {@link CompletableFuture} that completes once the document is added.
 	 */
 	CompletableFuture<?> add(DocumentReferenceProvider referenceProvider, DocumentContributor documentContributor,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, OperationSubmitter operationSubmitter);
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter);
 
 	/**
 	 * Update a document in the index, or add it if it's absent from the index.
@@ -41,7 +42,8 @@ public interface IndexIndexer {
 	 * @return A {@link CompletableFuture} that completes once the document is updated.
 	 */
 	CompletableFuture<?> addOrUpdate(DocumentReferenceProvider referenceProvider, DocumentContributor documentContributor,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, OperationSubmitter operationSubmitter);
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter);
 
 	/**
 	 * Delete a document from the index.
@@ -53,6 +55,7 @@ public interface IndexIndexer {
 	 * @return A {@link CompletableFuture} that completes once the document is deleted.
 	 */
 	CompletableFuture<?> delete(DocumentReferenceProvider referenceProvider,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, OperationSubmitter operationSubmitter);
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter);
 
 }

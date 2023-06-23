@@ -48,8 +48,9 @@ final class SimpleMultiValuedPropertyAccessor<R, V, C>
 		}
 		V first = iterator.next();
 		if ( iterator.hasNext() ) {
-			throw new IllegalArgumentException( "get() can only be used if the container is empty or contains a single value, but the container currently contains: "
-					+ container );
+			throw new IllegalArgumentException(
+					"get() can only be used if the container is empty or contains a single value, but the container currently contains: "
+							+ container );
 		}
 		return first;
 	}

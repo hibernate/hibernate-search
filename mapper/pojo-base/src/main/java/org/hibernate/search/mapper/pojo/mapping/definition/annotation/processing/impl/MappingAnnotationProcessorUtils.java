@@ -66,7 +66,7 @@ public final class MappingAnnotationProcessorUtils {
 				}
 			default:
 				throw new AssertionFailure(
-					"Unexpected " + ContainerExtract.class.getSimpleName() + " value: " + extract
+						"Unexpected " + ContainerExtract.class.getSimpleName() + " value: " + extract
 				);
 		}
 	}

@@ -35,7 +35,7 @@ import org.junit.Test;
  * Test various cases of the {@code @IndexedEmbedded} leading to potential cycles, which are either broken by some
  * attribute of an {@code @IndexedEmbedded} or lead to an exception letting the user know that there's a cycle.
  */
-@SuppressWarnings({"unused", "deprecation"}) // deprecated IndexedEmbedded#prefix
+@SuppressWarnings({ "unused", "deprecation" }) // deprecated IndexedEmbedded#prefix
 public class IndexedEmbeddedCycleIT {
 
 	private static final String INDEX_NAME = "IndexName";
@@ -251,7 +251,8 @@ public class IndexedEmbeddedCycleIT {
 
 				@KeywordField
 				String bString;
-				@IndexedEmbedded(prefix = "prefixA1.prefixA2.prefixA3.", excludePaths = { "prefixB1.prefixB2.prefixA1.prefixA2.prefixA3" })
+				@IndexedEmbedded(prefix = "prefixA1.prefixA2.prefixA3.",
+						excludePaths = { "prefixB1.prefixB2.prefixA1.prefixA2.prefixA3" })
 				EntityA a;
 
 				public EntityB(Integer id, String bString, EntityA a) {
@@ -275,7 +276,7 @@ public class IndexedEmbeddedCycleIT {
 																.objectField( "prefixB2", b8 -> b8
 																		.field( "bString", String.class )
 																		.objectField( "prefixA1", b9 -> b9
-																				.objectField( "prefixA2", b10 -> { }
+																				.objectField( "prefixA2", b10 -> {}
 																				) ) ) ) )
 
 										)
@@ -369,7 +370,8 @@ public class IndexedEmbeddedCycleIT {
 						.typeContext( Model.EntityA.class.getName() )
 						.pathContext( ".b<no value extractors>.a<no value extractors>.b" )
 						.failure(
-								"Cyclic recursion starting from '@IndexedEmbedded(prefix = \"prefixForB\", ...)' on type '" + Model.EntityA.class.getName() + "', path '.b'",
+								"Cyclic recursion starting from '@IndexedEmbedded(prefix = \"prefixForB\", ...)' on type '"
+										+ Model.EntityA.class.getName() + "', path '.b'",
 								"Index field path starting from that location and ending with a cycle: 'prefixForBprefixForAprefixForB'",
 								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ..."
@@ -725,7 +727,8 @@ public class IndexedEmbeddedCycleIT {
 						.typeContext( Model.EntityA.class.getName() )
 						.pathContext( ".b<no value extractors>.a<no value extractors>.b" )
 						.failure(
-								"Cyclic recursion starting from '@IndexedEmbedded(...)' on type '" + Model.EntityA.class.getName() + "', path '.b'",
+								"Cyclic recursion starting from '@IndexedEmbedded(...)' on type '"
+										+ Model.EntityA.class.getName() + "', path '.b'",
 								"Index field path starting from that location and ending with a cycle: 'b.a.b.'",
 								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ..."
@@ -765,7 +768,8 @@ public class IndexedEmbeddedCycleIT {
 						.typeContext( Model.EntityA.class.getName() )
 						.pathContext( ".b<no value extractors>.c<no value extractors>.b<no value extractors>.c" )
 						.failure(
-								"Cyclic recursion starting from '@IndexedEmbedded(...)' on type '" + Model.EntityB.class.getName() + "', path '.c'.",
+								"Cyclic recursion starting from '@IndexedEmbedded(...)' on type '"
+										+ Model.EntityB.class.getName() + "', path '.c'.",
 								"Index field path starting from that location and ending with a cycle: 'c.b.c.'",
 								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ..."
@@ -801,7 +805,8 @@ public class IndexedEmbeddedCycleIT {
 						.typeContext( Model.EntityA.class.getName() )
 						.pathContext( ".b<no value extractors>.a<no value extractors>.b" )
 						.failure(
-								"Cyclic recursion starting from '@IndexedEmbedded(...)' on type '" + Model.EntityA.class.getName() + "', path '.b'.",
+								"Cyclic recursion starting from '@IndexedEmbedded(...)' on type '"
+										+ Model.EntityA.class.getName() + "', path '.b'.",
 								"Index field path starting from that location and ending with a cycle: 'b.a.b.'",
 								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ..."
@@ -844,7 +849,8 @@ public class IndexedEmbeddedCycleIT {
 						.pathContext(
 								".b<no value extractors>.c<no value extractors>.b<no value extractors>.c<no value extractors>.b<no value extractors>.c<no value extractors>.b<no value extractors>.c" )
 						.failure(
-								"Cyclic recursion starting from '@IndexedEmbedded(...)' on type '" + Model.EntityB.class.getName() + "', path '.c'.",
+								"Cyclic recursion starting from '@IndexedEmbedded(...)' on type '"
+										+ Model.EntityB.class.getName() + "', path '.c'.",
 								"Index field path starting from that location and ending with a cycle: 'c.b.c.'",
 								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ..."
@@ -943,7 +949,8 @@ public class IndexedEmbeddedCycleIT {
 						.pathContext(
 								".a<no value extractors>.a<no value extractors>.a<no value extractors>.a<no value extractors>.a" )
 						.failure(
-								"Cyclic recursion starting from '@IndexedEmbedded(...)' on type '" + EntityA.class.getName() + "', path '.a'",
+								"Cyclic recursion starting from '@IndexedEmbedded(...)' on type '" + EntityA.class.getName()
+										+ "', path '.a'",
 								"Index field path starting from that location and ending with a cycle: 'a.a.'",
 								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, excludePaths, ..."

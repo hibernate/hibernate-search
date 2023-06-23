@@ -21,7 +21,7 @@ public final class TermsPredicateFieldStepImpl implements TermsPredicateFieldSte
 	}
 
 	@Override
-	public TermsPredicateFieldMoreStep<?, ?> fields(String ... fieldPaths) {
+	public TermsPredicateFieldMoreStep<?, ?> fields(String... fieldPaths) {
 		return new TermsPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
 	}
 }

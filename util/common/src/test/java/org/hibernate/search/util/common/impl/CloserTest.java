@@ -212,9 +212,11 @@ public class CloserTest {
 		List<Closeable> closeables = Arrays.asList(
 				() -> { throw exception1; },
 				() -> { throw exception2; },
-				() -> { throw exception3; },
+				() -> {
+					throw exception3;
+				},
 				() -> { throw exception4; }
-				);
+		);
 
 		assertThatThrownBy( () -> {
 			try ( Closer<IOException> closer = new Closer<>() ) {
@@ -245,10 +247,12 @@ public class CloserTest {
 		RuntimeException exception4 = new UnsupportedOperationException();
 		List<Supplier<Closeable>> closeableSuppliers = Arrays.asList(
 				() -> () -> { throw exception1; },
-				() -> () -> { throw exception2; },
+				() -> () -> {
+					throw exception2;
+				},
 				() -> () -> { throw exception3; },
 				() -> () -> { throw exception4; }
-				);
+		);
 
 		assertThatThrownBy( () -> {
 			try ( Closer<IOException> closer = new Closer<>() ) {

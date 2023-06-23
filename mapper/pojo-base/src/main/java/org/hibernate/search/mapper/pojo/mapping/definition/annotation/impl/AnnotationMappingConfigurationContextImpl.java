@@ -42,7 +42,8 @@ import org.jboss.jandex.DotName;
 import org.jboss.jandex.Index;
 import org.jboss.jandex.IndexView;
 
-public class AnnotationMappingConfigurationContextImpl implements AnnotationMappingConfigurationContext,
+public class AnnotationMappingConfigurationContextImpl
+		implements AnnotationMappingConfigurationContext,
 		PojoMappingConfigurationContributor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

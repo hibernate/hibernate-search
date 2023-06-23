@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 @Entity
 @Indexed
 public class Book {
-// end::indexed-default[]
+	// end::indexed-default[]
 
 	@Id
 	@GeneratedValue

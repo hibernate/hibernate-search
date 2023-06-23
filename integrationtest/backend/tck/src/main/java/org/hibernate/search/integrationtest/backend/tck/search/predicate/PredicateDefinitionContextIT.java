@@ -44,7 +44,7 @@ public class PredicateDefinitionContextIT {
 		setupHelper.start().withIndex( index ).setup();
 
 		BulkIndexer indexer = index.bulkIndexer();
-		indexer.add( DOCUMENT_1, document -> { } );
+		indexer.add( DOCUMENT_1, document -> {} );
 		indexer.join();
 	}
 

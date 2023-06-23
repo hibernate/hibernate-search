@@ -43,10 +43,10 @@ public class AnalysisIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> context.programmaticMapping()
 								.type( IndexedEntity.class )
-										.property( "text" )
-												.fullTextField( "english" ).analyzer( "english" )
-												.fullTextField( "french" ).analyzer( "french" )
-												.keywordField( "lowercase" ).normalizer( "lowercase" )
+								.property( "text" )
+								.fullTextField( "english" ).analyzer( "english" )
+								.fullTextField( "french" ).analyzer( "french" )
+								.keywordField( "lowercase" ).normalizer( "lowercase" )
 				)
 				.setup( IndexedEntity.class );
 

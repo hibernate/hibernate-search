@@ -61,7 +61,8 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 
 	private static final Charset CHARSET = StandardCharsets.UTF_8;
 
-	private static final BasicHeader CONTENT_TYPE = new BasicHeader( HTTP.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString() );
+	private static final BasicHeader CONTENT_TYPE =
+			new BasicHeader( HTTP.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString() );
 
 	/**
 	 * The size of byte buffer pages in {@link ProgressiveCharBufferWriter}

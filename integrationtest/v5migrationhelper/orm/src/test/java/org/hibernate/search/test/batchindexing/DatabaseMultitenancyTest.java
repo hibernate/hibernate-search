@@ -44,9 +44,9 @@ import org.apache.lucene.search.Query;
  * @since 5.2
  */
 @RequiresDialect(
-	comment = "The connection provider for this test ignores configuration and requires H2",
-	strictMatching = true,
-	value = org.hibernate.dialect.H2Dialect.class
+		comment = "The connection provider for this test ignores configuration and requires H2",
+		strictMatching = true,
+		value = org.hibernate.dialect.H2Dialect.class
 )
 public class DatabaseMultitenancyTest extends SearchTestBase {
 

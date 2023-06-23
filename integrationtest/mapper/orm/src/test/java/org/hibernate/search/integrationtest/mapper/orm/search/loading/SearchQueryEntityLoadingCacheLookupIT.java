@@ -98,7 +98,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 		backendMock.expectAnySchema( model.getIndexName() );
 
 		setupContext.withProperty( HibernateOrmMapperSettings.QUERY_LOADING_CACHE_LOOKUP_STRATEGY,
-						defaultCacheLookupStrategy )
+				defaultCacheLookupStrategy )
 				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ALL.name() )
 				.withConfiguration( c -> mapping.configure( c, model ) );
 	}
@@ -289,7 +289,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 		);
 	}
 
-	@SuppressWarnings({"unchecked", "deprecation"})
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	private void testLoadingCacheLookup(EntityLoadingCacheLookupStrategy overriddenLookupStrategy,
 			int entityCount,
 			List<Integer> entitiesToPutInSecondLevelCache,

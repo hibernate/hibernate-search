@@ -52,7 +52,7 @@ public class SearchQueryTimeoutIT {
 		setupHelper.start().withIndex( index ).setup();
 
 		index.bulkIndexer()
-				.add( DOCUMENT_COUNT, i -> StubMapperUtils.documentProvider( String.valueOf( i ), document -> { } ) )
+				.add( DOCUMENT_COUNT, i -> StubMapperUtils.documentProvider( String.valueOf( i ), document -> {} ) )
 				.join();
 	}
 

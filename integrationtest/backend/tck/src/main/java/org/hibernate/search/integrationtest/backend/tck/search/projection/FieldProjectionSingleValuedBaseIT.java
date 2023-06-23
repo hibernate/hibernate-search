@@ -71,9 +71,9 @@ public class FieldProjectionSingleValuedBaseIT<F> {
 			root -> SingleFieldIndexBinding.createWithSingleValuedNestedFields(
 					root,
 					supportedFieldTypes,
-					TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault() ?
-							NO_ADDITIONAL_CONFIGURATION :
-							c -> c.projectable( Projectable.YES )
+					TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+							? NO_ADDITIONAL_CONFIGURATION
+							: c -> c.projectable( Projectable.YES )
 			);
 
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> index = SimpleMappedIndex.of( bindingFactory );
@@ -174,11 +174,10 @@ public class FieldProjectionSingleValuedBaseIT<F> {
 		String fieldPath = getFieldPath();
 
 		assertThatQuery( scope.query()
-				.select( f ->
-						f.composite(
-								f.field( fieldPath, fieldType.getJavaType() ),
-								f.field( fieldPath, fieldType.getJavaType() )
-						)
+				.select( f -> f.composite(
+						f.field( fieldPath, fieldType.getJavaType() ),
+						f.field( fieldPath, fieldType.getJavaType() )
+				)
 				)
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
@@ -201,7 +200,8 @@ public class FieldProjectionSingleValuedBaseIT<F> {
 
 		assertThatQuery( index.query()
 				.select( f -> f.withRoot( parentObjectBinding.absolutePath )
-						.field( parentObjectBinding.getRelativeFieldName( fieldStructure, fieldType ), fieldType.getJavaType() ) )
+						.field( parentObjectBinding.getRelativeFieldName( fieldStructure, fieldType ),
+								fieldType.getJavaType() ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )

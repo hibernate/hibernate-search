@@ -43,7 +43,7 @@ class ElasticsearchIndexSchemaManagerTestUtils {
 	private static String simpleMapping(String metadataMapping, String otherProperties) {
 		StringBuilder builder = new StringBuilder();
 		builder.append( "{"
-						+ "  'dynamic': 'strict',"
+				+ "  'dynamic': 'strict',"
 				+ "'properties': {" );
 		builder.append( metadataMapping );
 		if ( !metadataMapping.isEmpty() && !otherProperties.isEmpty() ) {

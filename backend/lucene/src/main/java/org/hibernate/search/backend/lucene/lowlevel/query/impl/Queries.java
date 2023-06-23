@@ -19,9 +19,11 @@ import org.apache.lucene.search.TermQuery;
 
 public class Queries {
 
-	private static final Query MAIN_DOCUMENT_QUERY = new TermQuery( new Term( MetadataFields.typeFieldName(), MetadataFields.TYPE_MAIN_DOCUMENT ) );
+	private static final Query MAIN_DOCUMENT_QUERY =
+			new TermQuery( new Term( MetadataFields.typeFieldName(), MetadataFields.TYPE_MAIN_DOCUMENT ) );
 
-	private static final Query CHILD_DOCUMENT_QUERY = new TermQuery( new Term( MetadataFields.typeFieldName(), MetadataFields.TYPE_CHILD_DOCUMENT ) );
+	private static final Query CHILD_DOCUMENT_QUERY =
+			new TermQuery( new Term( MetadataFields.typeFieldName(), MetadataFields.TYPE_CHILD_DOCUMENT ) );
 
 	private Queries() {
 	}

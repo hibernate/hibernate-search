@@ -92,8 +92,7 @@ public class SerializationUtilTest {
 	@Test
 	public void deserializeBoolean_fromOthers() throws Exception {
 		for ( String value : new String[] { "", "0", "1", "t", "f" } ) {
-			assertThatThrownBy( () ->
-					SerializationUtil.parseBooleanParameterOptional( "My parameter", value, true ) )
+			assertThatThrownBy( () -> SerializationUtil.parseBooleanParameterOptional( "My parameter", value, true ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Invalid value for job parameter 'My parameter': '" + value + "'." );
 		}

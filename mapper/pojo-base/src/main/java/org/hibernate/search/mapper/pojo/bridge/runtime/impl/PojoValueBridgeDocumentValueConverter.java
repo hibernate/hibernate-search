@@ -68,7 +68,7 @@ public final class PojoValueBridgeDocumentValueConverter<V, F>
 
 	private static final class ContextExtension
 			implements ToDocumentValueConvertContextExtension<ValueBridgeToIndexedValueContext>,
-					FromDocumentValueConvertContextExtension<ValueBridgeFromIndexedValueContext> {
+			FromDocumentValueConvertContextExtension<ValueBridgeFromIndexedValueContext> {
 		private static final ContextExtension INSTANCE = new ContextExtension();
 
 		@Override

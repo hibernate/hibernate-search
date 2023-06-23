@@ -30,7 +30,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 class RangePredicateFieldMoreStepImpl
 		implements RangePredicateFieldMoreStep<RangePredicateFieldMoreStepImpl, RangePredicateOptionsStep<?>>,
-				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
+		AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

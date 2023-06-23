@@ -282,7 +282,8 @@ public abstract class AbstractPredicateInObjectFieldIT {
 
 		ObjectFieldBinding(IndexSchemaObjectField objectField, String parentAbsolutePath, String relativeFieldName,
 				Collection<? extends FieldTypeDescriptor<?>> fieldTypes, int depth) {
-			super( objectField, parentAbsolutePath == null ? relativeFieldName : parentAbsolutePath + "." + relativeFieldName, fieldTypes );
+			super( objectField, parentAbsolutePath == null ? relativeFieldName : parentAbsolutePath + "." + relativeFieldName,
+					fieldTypes );
 			relativeName = relativeFieldName;
 			reference = objectField.toReference();
 			objectField.namedPredicate( StubPredicateDefinition.NAME, new StubPredicateDefinition() );

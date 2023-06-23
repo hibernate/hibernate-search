@@ -49,7 +49,7 @@ public final class PojoRawTypeIdentifier<T> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if ( ! ( obj instanceof PojoRawTypeIdentifier ) ) {
+		if ( !( obj instanceof PojoRawTypeIdentifier ) ) {
 			return false;
 		}
 		PojoRawTypeIdentifier<?> other = (PojoRawTypeIdentifier<?>) obj;

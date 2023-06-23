@@ -71,9 +71,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		setupAndUpdate( index );
@@ -100,9 +100,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForExpectations()
+						+ defaultMetadataMappingForExpectations()
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
@@ -129,9 +129,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		setupAndUpdate( index );
@@ -154,9 +154,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForExpectations()
+						+ defaultMetadataMappingForExpectations()
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
@@ -191,9 +191,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		setupAndUpdate( index );
@@ -216,9 +216,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForExpectations()
+						+ defaultMetadataMappingForExpectations()
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
@@ -249,9 +249,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		setupAndUpdate( index );
@@ -274,9 +274,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForExpectations()
+						+ defaultMetadataMappingForExpectations()
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
@@ -301,9 +301,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		setupAndUpdate( index );
@@ -318,9 +318,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForExpectations()
+						+ defaultMetadataMappingForExpectations()
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
@@ -342,9 +342,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		setupAndUpdate( index );
@@ -360,9 +360,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForExpectations()
+						+ defaultMetadataMappingForExpectations()
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
@@ -385,9 +385,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		setupAndUpdate( index );
@@ -403,9 +403,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForExpectations()
+						+ defaultMetadataMappingForExpectations()
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
@@ -426,9 +426,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		setupAndUpdate( index );
@@ -443,9 +443,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForExpectations()
+						+ defaultMetadataMappingForExpectations()
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
@@ -466,9 +466,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		setupAndUpdate( index );
@@ -484,9 +484,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForExpectations()
+						+ defaultMetadataMappingForExpectations()
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
@@ -508,9 +508,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		setupAndUpdate( index );
@@ -526,9 +526,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForExpectations()
+						+ defaultMetadataMappingForExpectations()
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
@@ -550,9 +550,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		setupAndUpdate( index );
@@ -567,9 +567,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForExpectations()
+						+ defaultMetadataMappingForExpectations()
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
@@ -591,9 +591,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		setupAndUpdate( index );
@@ -608,9 +608,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForExpectations()
+						+ defaultMetadataMappingForExpectations()
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
@@ -631,9 +631,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForInitialization()
+						+ defaultMetadataMappingForInitialization()
 						+ " }"
-				+ "}"
+						+ "}"
 		);
 
 		setupAndUpdate( index );
@@ -648,9 +648,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForExpectations()
+						+ defaultMetadataMappingForExpectations()
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
@@ -673,21 +673,21 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 	private String integerMappingForExpectations() {
 		return "{"
-						+ "  'type': 'integer',"
-						+ "  'doc_values': false"
+				+ "  'type': 'integer',"
+				+ "  'doc_values': false"
 				+ "}";
 	}
 
 	private String textMappingForExpectations() {
 		return "{"
-						+ "  'type': 'text',"
-						+ "  'analyzer': 'default'"
+				+ "  'type': 'text',"
+				+ "  'analyzer': 'default'"
 				+ "}";
 	}
 
 	private String keywordMappingForExpectations() {
 		return "{"
-						+ "  'type': 'keyword'"
+				+ "  'type': 'keyword'"
 				+ "}";
 	}
 }

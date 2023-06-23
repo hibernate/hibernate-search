@@ -30,7 +30,8 @@ public class ProgrammaticMappingGeoPointBindingIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private SearchMapping mapping;
 
@@ -38,7 +39,8 @@ public class ProgrammaticMappingGeoPointBindingIT {
 	public void setup() {
 		backendMock.expectSchema( GeoPointOnTypeEntity.INDEX, b -> b
 				.field( "homeLocation", GeoPoint.class, b2 -> b2.projectable( Projectable.YES ).sortable( Sortable.YES ) )
-				.field( "workLocation", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
+				.field( "workLocation", GeoPoint.class,
+						b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
 		);
 		backendMock.expectSchema( GeoPointOnCoordinatesPropertyEntity.INDEX, b -> b
 				.field( "coord", GeoPoint.class )
@@ -85,14 +87,15 @@ public class ProgrammaticMappingGeoPointBindingIT {
 							mappingDefinition.type( GeoPointOnCoordinatesPropertyEntity.class );
 					geoPointOnCoordinatesPropertyEntityMapping.indexed().index( GeoPointOnCoordinatesPropertyEntity.INDEX );
 					geoPointOnCoordinatesPropertyEntityMapping.property( "id" )
-									.documentId();
+							.documentId();
 					geoPointOnCoordinatesPropertyEntityMapping.property( "coord" )
-									.genericField()
-									.genericField( "location" ).projectable( Projectable.NO );
+							.genericField()
+							.genericField( "location" ).projectable( Projectable.NO );
 
 					TypeMappingStep geoPointOnCustomCoordinatesPropertyEntityMapping =
 							mappingDefinition.type( GeoPointOnCustomCoordinatesPropertyEntity.class );
-					geoPointOnCustomCoordinatesPropertyEntityMapping.indexed().index( GeoPointOnCustomCoordinatesPropertyEntity.INDEX );
+					geoPointOnCustomCoordinatesPropertyEntityMapping.indexed()
+							.index( GeoPointOnCustomCoordinatesPropertyEntity.INDEX );
 					geoPointOnCustomCoordinatesPropertyEntityMapping.property( "id" ).documentId();
 					geoPointOnCustomCoordinatesPropertyEntityMapping.property( "coord" )
 							.binder( GeoPointBinder.create() )

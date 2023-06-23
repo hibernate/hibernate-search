@@ -139,8 +139,10 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 		assumeTestParametersWork();
 
 		DataSet<F> dataSet = dataSetForAsc;
-		LuceneSearchQuery<DocumentReference> segment0Query = matchNonEmptySortedByFieldQuery( dataSet, SEGMENT_0, SortOrder.ASC );
-		LuceneSearchQuery<DocumentReference> segment1Query = matchNonEmptySortedByFieldQuery( dataSet, SEGMENT_1, SortOrder.ASC );
+		LuceneSearchQuery<DocumentReference> segment0Query =
+				matchNonEmptySortedByFieldQuery( dataSet, SEGMENT_0, SortOrder.ASC );
+		LuceneSearchQuery<DocumentReference> segment1Query =
+				matchNonEmptySortedByFieldQuery( dataSet, SEGMENT_1, SortOrder.ASC );
 		LuceneSearchResult<?> segment0Result = segment0Query.fetch( 10 );
 		LuceneSearchResult<?> segment1Result = segment1Query.fetch( 10 );
 		assertThatResult( segment0Result ).fromQuery( segment0Query )
@@ -163,8 +165,10 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 		assumeTestParametersWork();
 
 		DataSet<F> dataSet = dataSetForDesc;
-		LuceneSearchQuery<DocumentReference> segment0Query = matchNonEmptySortedByFieldQuery( dataSet, SEGMENT_0, SortOrder.DESC );
-		LuceneSearchQuery<DocumentReference> segment1Query = matchNonEmptySortedByFieldQuery( dataSet, SEGMENT_1, SortOrder.DESC );
+		LuceneSearchQuery<DocumentReference> segment0Query =
+				matchNonEmptySortedByFieldQuery( dataSet, SEGMENT_0, SortOrder.DESC );
+		LuceneSearchQuery<DocumentReference> segment1Query =
+				matchNonEmptySortedByFieldQuery( dataSet, SEGMENT_1, SortOrder.DESC );
 		LuceneSearchResult<?> segment0Result = segment0Query.fetch( 10 );
 		LuceneSearchResult<?> segment1Result = segment1Query.fetch( 10 );
 		assertThatResult( segment0Result ).fromQuery( segment0Query )
@@ -185,7 +189,8 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 			SortOrder sortOrder) {
 		StubMappingScope scope = index.createScope();
 		return scope.query().extension( LuceneExtension.get() )
-				.where( f -> f.matchAll().except( f.id().matchingAny( Arrays.asList( dataSet.seg0EmptyDocId, dataSet.seg1EmptyDocId ) ) ) )
+				.where( f -> f.matchAll()
+						.except( f.id().matchingAny( Arrays.asList( dataSet.seg0EmptyDocId, dataSet.seg1EmptyDocId ) ) ) )
 				.sort( f -> applyFilter( applySortMode(
 						scope.sort().field( getFieldPath() ).order( sortOrder )
 				) ) )
@@ -213,7 +218,7 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 		}
 	}
 
-	private TopFieldDocs[] retrieveTopDocs(LuceneSearchQuery<?> query, LuceneSearchResult<?> ... results) {
+	private TopFieldDocs[] retrieveTopDocs(LuceneSearchQuery<?> query, LuceneSearchResult<?>... results) {
 		Sort sort = query.luceneSort();
 		TopFieldDocs[] allTopDocs = new TopFieldDocs[results.length];
 		for ( int i = 0; i < results.length; i++ ) {
@@ -237,10 +242,8 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 
 	private boolean isSumWithTemporalField() {
 		return SortMode.SUM.equals( sortMode )
-				&& (
-						Temporal.class.isAssignableFrom( fieldType.getJavaType() )
-						|| MonthDay.class.equals( fieldType.getJavaType() )
-				);
+				&& ( Temporal.class.isAssignableFrom( fieldType.getJavaType() )
+						|| MonthDay.class.equals( fieldType.getJavaType() ) );
 	}
 
 	private boolean isMedianWithNestedField() {

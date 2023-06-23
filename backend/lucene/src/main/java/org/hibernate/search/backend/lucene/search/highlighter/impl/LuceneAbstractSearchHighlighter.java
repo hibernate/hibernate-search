@@ -78,14 +78,13 @@ public abstract class LuceneAbstractSearchHighlighter implements SearchHighlight
 				builder.boundaryChars(), builder.boundaryMaxScan(),
 				builder.fragmentSize(), builder.noMatchSize(), builder.numberOfFragments(), builder.orderByScore(),
 				HighlighterTagSchema.STYLED.equals( builder.tagSchema() ) ? STYLED_SCHEMA_PRE_TAG : builder.preTags(),
-				HighlighterTagSchema.STYLED.equals( builder.tagSchema() ) ? STYLED_SCHEMA_POST_TAGS :
-						builder.postTags(),
-				BoundaryScannerType.DEFAULT.equals( builder.boundaryScannerType() ) ? null :
-						builder.boundaryScannerType(),
+				HighlighterTagSchema.STYLED.equals( builder.tagSchema() ) ? STYLED_SCHEMA_POST_TAGS : builder.postTags(),
+				BoundaryScannerType.DEFAULT.equals( builder.boundaryScannerType() ) ? null : builder.boundaryScannerType(),
 				builder.boundaryScannerLocale(), builder.fragmenterType(),
 				builder.phraseLimit(),
-				builder.encoder() != null ?
-						( HighlighterEncoder.HTML.equals( builder.encoder() ) ? HTML_ENCODER : DEFAULT_ENCODER ) : null
+				builder.encoder() != null
+						? ( HighlighterEncoder.HTML.equals( builder.encoder() ) ? HTML_ENCODER : DEFAULT_ENCODER )
+						: null
 		);
 	}
 

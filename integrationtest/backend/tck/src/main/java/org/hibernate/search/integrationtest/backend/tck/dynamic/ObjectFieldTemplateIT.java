@@ -70,7 +70,7 @@ public class ObjectFieldTemplateIT {
 
 		// Index a few documents
 		index.bulkIndexer()
-				.add( EMPTY, document -> { } )
+				.add( EMPTY, document -> {} )
 				.add( DOCUMENT_MATCHING_FOR_NESTED, document -> {
 					DocumentElement nestedObject = document.addObject( "foo" );
 					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
@@ -118,7 +118,7 @@ public class ObjectFieldTemplateIT {
 
 		// Index a few documents
 		index.bulkIndexer()
-				.add( EMPTY, document -> { } )
+				.add( EMPTY, document -> {} )
 				.add( DOCUMENT_MATCHING_FOR_NESTED, document -> {
 					DocumentElement staticObject = document.addObject( index.binding().staticObject.self );
 
@@ -171,7 +171,7 @@ public class ObjectFieldTemplateIT {
 
 		// Index a few documents
 		index.bulkIndexer()
-				.add( EMPTY, document -> { } )
+				.add( EMPTY, document -> {} )
 				.add( DOCUMENT_MATCHING_FOR_NESTED, document -> {
 					DocumentElement nestedObject = document.addObject( "foo_nested" );
 					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
@@ -240,7 +240,7 @@ public class ObjectFieldTemplateIT {
 
 		// Index a few documents
 		index.bulkIndexer()
-				.add( EMPTY, document -> { } )
+				.add( EMPTY, document -> {} )
 				.add( DOCUMENT_MATCHING_FOR_NESTED, document -> {
 					DocumentElement nestedObject = document.addObject( "foo_nested_object" );
 					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
@@ -307,7 +307,7 @@ public class ObjectFieldTemplateIT {
 
 		// Index a few documents
 		index.bulkIndexer()
-				.add( EMPTY, document -> { } )
+				.add( EMPTY, document -> {} )
 				.add( DOCUMENT_MATCHING_FOR_NESTED, document -> {
 					DocumentElement staticObject = document.addObject( index.binding().staticObject.self );
 
@@ -363,7 +363,7 @@ public class ObjectFieldTemplateIT {
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3273", "HSEARCH-3905" })
 	public void exists_staticObjectField() {
-		Consumer<IndexSchemaElement> rootTemplatesBinder = root -> { };
+		Consumer<IndexSchemaElement> rootTemplatesBinder = root -> {};
 		Consumer<IndexSchemaElement> staticObjectTemplatesBinder = staticObject -> {
 			staticObject.fieldTemplate( "fieldTemplate", f -> f.asString() )
 					.matchingPathGlob( VALUE_FIELD_PATH_GLOB );
@@ -384,7 +384,7 @@ public class ObjectFieldTemplateIT {
 
 		// Index a few documents
 		index.bulkIndexer()
-				.add( EMPTY, document -> { } )
+				.add( EMPTY, document -> {} )
 				.add( documentWhereObjectFieldExistsId, document -> {
 					DocumentElement staticObject = document.addObject( index.binding().staticObject.self );
 
@@ -446,7 +446,7 @@ public class ObjectFieldTemplateIT {
 
 		// Index a few documents
 		index.bulkIndexer()
-				.add( EMPTY, document -> { } )
+				.add( EMPTY, document -> {} )
 				.add( documentWhereObjectFieldExistsId, document -> {
 					DocumentElement nestedObject = document.addObject( "foo_nested" );
 					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
@@ -522,7 +522,7 @@ public class ObjectFieldTemplateIT {
 
 	private StubMapping setup(StubMappingSchemaManagementStrategy schemaManagementStrategy,
 			Consumer<IndexSchemaElement> rootTemplatesBinder) {
-		return setup( schemaManagementStrategy, rootTemplatesBinder, ignored -> { } );
+		return setup( schemaManagementStrategy, rootTemplatesBinder, ignored -> {} );
 	}
 
 	private StubMapping setup(StubMappingSchemaManagementStrategy schemaManagementStrategy,

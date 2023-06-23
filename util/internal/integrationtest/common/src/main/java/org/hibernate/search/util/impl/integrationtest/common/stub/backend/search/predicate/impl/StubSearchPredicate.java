@@ -101,7 +101,8 @@ public class StubSearchPredicate implements SearchPredicate {
 
 	}
 
-	public static class Builder implements MatchAllPredicateBuilder,
+	public static class Builder
+			implements MatchAllPredicateBuilder,
 			MatchNonePredicateBuilder,
 			BooleanPredicateBuilder,
 			MatchIdPredicateBuilder,

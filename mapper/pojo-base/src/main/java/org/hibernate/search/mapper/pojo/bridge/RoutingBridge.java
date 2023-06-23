@@ -43,7 +43,7 @@ public interface RoutingBridge<E> extends AutoCloseable {
 	 * {@link IdentifierBridge#toDocumentIdentifier(Object, org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext)}.
 	 * @param indexedEntity The indexed entity that should be routed by this bridge.
 	 * @param context A context that can be
- 	 * {@link RoutingBridgeRouteContext#extension(RoutingBridgeRouteContextExtension) extended}
+	 * {@link RoutingBridgeRouteContext#extension(RoutingBridgeRouteContextExtension) extended}
 	 * to a more useful type, giving access to such things as a Hibernate ORM Session
 	 * (if using the Hibernate ORM mapper).
 	 */

@@ -155,7 +155,7 @@ public class ToJpaQueryIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.of(
 							6L,
 							reference( IndexedEntity.NAME, "1" ),
@@ -180,7 +180,7 @@ public class ToJpaQueryIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.of(
 							1L,
 							reference( IndexedEntity.NAME, "1" )
@@ -193,7 +193,7 @@ public class ToJpaQueryIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.empty()
 			);
 			assertThatThrownBy( () -> query.getSingleResult() )
@@ -202,7 +202,7 @@ public class ToJpaQueryIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.of(
 							2L,
 							reference( IndexedEntity.NAME, "1" ),
@@ -215,7 +215,7 @@ public class ToJpaQueryIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.of(
 							2L,
 							reference( IndexedEntity.NAME, "1" ),
@@ -380,7 +380,7 @@ public class ToJpaQueryIT {
 			query.setHint( "javax.persistence.loadgraph", entityManager.getEntityGraph( IndexedEntity.GRAPH_EAGER ) );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.NAME ), b -> { },
+					Arrays.asList( IndexedEntity.NAME ), b -> {},
 					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
 			);
 

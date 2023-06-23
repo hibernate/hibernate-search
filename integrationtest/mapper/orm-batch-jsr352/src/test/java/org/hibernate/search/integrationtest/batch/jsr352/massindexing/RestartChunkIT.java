@@ -129,7 +129,8 @@ public class RestartChunkIT {
 
 	private void doTest(String hql, long expectedTotal, long expectedGoogle) throws InterruptedException, IOException {
 		assertEquals( 0, JobTestUtil.nbDocumentsInIndex( emf, SimulatedFailureCompany.class ) );
-		List<SimulatedFailureCompany> google = JobTestUtil.findIndexedResults( emf, SimulatedFailureCompany.class, "name", "Google" );
+		List<SimulatedFailureCompany> google =
+				JobTestUtil.findIndexedResults( emf, SimulatedFailureCompany.class, "name", "Google" );
 		assertEquals( 0, google.size() );
 
 		// start the job

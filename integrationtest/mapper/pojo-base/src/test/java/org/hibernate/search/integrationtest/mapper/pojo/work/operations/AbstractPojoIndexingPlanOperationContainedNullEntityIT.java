@@ -78,7 +78,8 @@ public abstract class AbstractPojoIndexingPlanOperationContainedNullEntityIT ext
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
 
-			expectContainedEntityLoadingIfRelevant( Collections.singletonList( 42 ), Collections.singletonList( ContainedEntity.of( 1 ) ) );
+			expectContainedEntityLoadingIfRelevant( Collections.singletonList( 42 ),
+					Collections.singletonList( ContainedEntity.of( 1 ) ) );
 			if ( !isDelete() ) {
 				// Deletes don't trigger reindexing, so we don't expect anything for those.
 				expectUpdateCausedByContained( futureFromBackend, 1, "1", "contained1" );
@@ -86,8 +87,8 @@ public abstract class AbstractPojoIndexingPlanOperationContainedNullEntityIT ext
 			scenario().addWithoutInstanceTo( indexingPlan, ContainedEntity.class, 42,
 					DocumentRoutesDescriptor.of( DocumentRouteDescriptor.of( "UE-123" ),
 							Arrays.asList( DocumentRouteDescriptor.of( "UE-121" ),
-							DocumentRouteDescriptor.of( "UE-122" ),
-							DocumentRouteDescriptor.of( "UE-123" ) ) ) );
+									DocumentRouteDescriptor.of( "UE-122" ),
+									DocumentRouteDescriptor.of( "UE-123" ) ) ) );
 			// The session will wait for completion of the indexing plan upon closing,
 			// so we need to complete it now.
 			futureFromBackend.complete( null );
@@ -117,7 +118,7 @@ public abstract class AbstractPojoIndexingPlanOperationContainedNullEntityIT ext
 
 	private void assumeImplicitLoading() {
 		assumeTrue( "This test only makes sense when "
-						+ "the operation automatically loads entities",
+				+ "the operation automatically loads entities",
 				!isDelete() );
 	}
 

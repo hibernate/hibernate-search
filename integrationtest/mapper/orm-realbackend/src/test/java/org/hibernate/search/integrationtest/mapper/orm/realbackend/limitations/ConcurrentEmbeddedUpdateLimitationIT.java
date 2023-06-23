@@ -66,10 +66,10 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 						IndexingPlanSynchronizationStrategyNames.SYNC )
 				.skipTestForDialect( SQLServerDialect.class,
 						"The execution could provoke a failure caused by a deadlock on SQLServer, "
-						+ "which will abort our requests and will make the tests fail." )
+								+ "which will abort our requests and will make the tests fail." )
 				.skipTestForDialect( CockroachDB192Dialect.class,
 						"The execution could provoke a 'failed preemptive refresh due to a conflict' on CockroachDB,"
-						+ " which will abort our requests and will make the tests fail." )
+								+ " which will abort our requests and will make the tests fail." )
 				.setup( Book.class, Author.class, BookEdition.class );
 
 		reproducer();

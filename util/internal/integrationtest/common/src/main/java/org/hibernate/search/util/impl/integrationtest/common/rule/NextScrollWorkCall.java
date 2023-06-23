@@ -71,11 +71,11 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 
 		return () -> new SimpleSearchScrollResult<>( SimpleSearchResultTotal.exact( behavior.getTotalHitCount() ),
 				behavior.hasHits(), SearchWorkCall.getResults(
-				actualCall.projectionContext,
-				actualCall.loadingContext.createProjectionHitMapper(),
-				actualCall.rootProjection,
-				behavior.getRawHits(), actualCall.deadline
-		), Duration.ZERO, false );
+						actualCall.projectionContext,
+						actualCall.loadingContext.createProjectionHitMapper(),
+						actualCall.rootProjection,
+						behavior.getRawHits(), actualCall.deadline
+				), Duration.ZERO, false );
 	}
 
 	@Override

@@ -31,7 +31,8 @@ abstract class AbstractPojoIndexingDependencyCollectorValueNode extends PojoInde
 	 * @param dependencyPathFromInverseSideEntityTypeNode The path from the given entity type node
 	 * to the property being used when reindexing.
 	 */
-	abstract void markForReindexing(AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> inverseSideEntityTypeNodeBuilder,
+	abstract void markForReindexing(
+			AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> inverseSideEntityTypeNodeBuilder,
 			BoundPojoModelPathValueNode<?, ?, ?> dependencyPathFromInverseSideEntityTypeNode);
 
 }

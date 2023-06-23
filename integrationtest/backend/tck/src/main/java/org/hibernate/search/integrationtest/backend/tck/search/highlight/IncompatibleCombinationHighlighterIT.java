@@ -34,8 +34,8 @@ public class IncompatibleCombinationHighlighterIT {
 
 			IncompatibleTypeIndexBinding(IndexSchemaElement root) {
 				stringField = root.field( "string", f -> f.asString()
-								.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
-								.highlightable( Arrays.asList( Highlightable.NO, Highlightable.ANY ) ) )
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
+						.highlightable( Arrays.asList( Highlightable.NO, Highlightable.ANY ) ) )
 						.toReference();
 			}
 		}
@@ -58,8 +58,8 @@ public class IncompatibleCombinationHighlighterIT {
 
 			IncompatibleTypeIndexBinding(IndexSchemaElement root) {
 				stringField = root.field( "string", f -> f.asString()
-								.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
-								.highlightable( Collections.singletonList( Highlightable.PLAIN ) ) )
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
+						.highlightable( Collections.singletonList( Highlightable.PLAIN ) ) )
 						.toReference();
 			}
 		}

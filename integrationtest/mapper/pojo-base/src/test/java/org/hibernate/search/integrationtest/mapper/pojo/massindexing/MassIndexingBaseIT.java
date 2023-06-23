@@ -47,8 +47,8 @@ public class MassIndexingBaseIT {
 	public final BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public final StandalonePojoMappingSetupHelper setupHelper
-			= StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public final StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private SearchMapping mapping;
 
@@ -83,16 +83,16 @@ public class MassIndexingBaseIT {
 					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> b
-					.field( "title", TITLE_1 )
-					.field( "author", AUTHOR_1 )
+							.field( "title", TITLE_1 )
+							.field( "author", AUTHOR_1 )
 					)
 					.add( "2", b -> b
-					.field( "title", TITLE_2 )
-					.field( "author", AUTHOR_2 )
+							.field( "title", TITLE_2 )
+							.field( "author", AUTHOR_2 )
 					)
 					.add( "3", b -> b
-					.field( "title", TITLE_3 )
-					.field( "author", AUTHOR_3 )
+							.field( "title", TITLE_3 )
+							.field( "author", AUTHOR_3 )
 					);
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
@@ -129,16 +129,16 @@ public class MassIndexingBaseIT {
 					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> b
-					.field( "title", TITLE_1 )
-					.field( "author", AUTHOR_1 )
+							.field( "title", TITLE_1 )
+							.field( "author", AUTHOR_1 )
 					)
 					.add( "2", b -> b
-					.field( "title", TITLE_2 )
-					.field( "author", AUTHOR_2 )
+							.field( "title", TITLE_2 )
+							.field( "author", AUTHOR_2 )
 					)
 					.add( "3", b -> b
-					.field( "title", TITLE_3 )
-					.field( "author", AUTHOR_3 )
+							.field( "title", TITLE_3 )
+							.field( "author", AUTHOR_3 )
 					);
 
 			backendMock.expectSchemaManagementWorks( Book.INDEX )
@@ -176,16 +176,16 @@ public class MassIndexingBaseIT {
 					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> b
-					.field( "title", TITLE_1 )
-					.field( "author", AUTHOR_1 )
+							.field( "title", TITLE_1 )
+							.field( "author", AUTHOR_1 )
 					)
 					.add( "2", b -> b
-					.field( "title", TITLE_2 )
-					.field( "author", AUTHOR_2 )
+							.field( "title", TITLE_2 )
+							.field( "author", AUTHOR_2 )
 					)
 					.add( "3", b -> b
-					.field( "title", TITLE_3 )
-					.field( "author", AUTHOR_3 )
+							.field( "title", TITLE_3 )
+							.field( "author", AUTHOR_3 )
 					);
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
@@ -222,8 +222,8 @@ public class MassIndexingBaseIT {
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
 			backendMock.expectWorks(
-							Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
-					)
+					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+			)
 					.add( "1", b -> b
 							.field( "title", TITLE_1 )
 							.field( "author", AUTHOR_1 )

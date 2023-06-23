@@ -62,7 +62,8 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private final PropertyTypeDescriptor<I, ?> typeDescriptor;
 	private final DefaultIdentifierBridgeExpectations<I> expectations;
@@ -80,17 +81,19 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	public void setup() {
 		backendMock.expectSchema(
 				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
-				b -> { },
+				b -> {},
 				indexModel -> this.index1Model = indexModel
 		);
 		backendMock.expectSchema(
 				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME,
-				b -> { },
+				b -> {},
 				indexModel -> this.index2Model = indexModel
 		);
 		mapping = setupHelper.start()
-				.withAnnotatedEntityType( expectations.getTypeWithIdentifierBridge1(), DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME )
-				.withAnnotatedEntityType( expectations.getTypeWithIdentifierBridge2(), DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME )
+				.withAnnotatedEntityType( expectations.getTypeWithIdentifierBridge1(),
+						DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME )
+				.withAnnotatedEntityType( expectations.getTypeWithIdentifierBridge2(),
+						DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME )
 				.setup();
 		backendMock.verifyExpectationsMet();
 	}
@@ -104,7 +107,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 				session.indexingPlan().add( entity );
 
 				backendMock.expectWorks( DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME )
-						.add( documentIdentifierIterator.next(), b -> { } );
+						.add( documentIdentifierIterator.next(), b -> {} );
 			}
 		}
 		backendMock.verifyExpectationsMet();
@@ -153,8 +156,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 				backendMock.expectSearchIds(
 						Collections.singletonList(
 								DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME ),
-						b -> {
-						},
+						b -> {},
 						StubSearchWorkBehavior.of(
 								1L,
 								documentIdentifierValue
@@ -236,7 +238,8 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 		assertThatCode( () -> projectionConverter.withConvertedType( Object.class,
 				() -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )
 				.doesNotThrowAnyException();
-		assertThatCode( () -> projectionConverter.withConvertedType( typeDescriptor.getBoxedJavaType(), () -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )
+		assertThatCode( () -> projectionConverter.withConvertedType( typeDescriptor.getBoxedJavaType(),
+				() -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )
 				.doesNotThrowAnyException();
 		assertThatThrownBy( () -> projectionConverter.withConvertedType( IncompatibleType.class,
 				() -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )

@@ -20,7 +20,7 @@ import org.hibernate.search.engine.environment.bean.BeanRetrieval;
  * References can use either a name, a type, or both.
  */
 @Documented
-@Target({}) // Only used as a component in other annotations
+@Target({ }) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MethodParameterMappingAnnotationProcessorRef {
 
@@ -44,7 +44,8 @@ public @interface MethodParameterMappingAnnotationProcessorRef {
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.
 	 */
-	abstract class UndefinedProcessorImplementationType implements
+	abstract class UndefinedProcessorImplementationType
+			implements
 			MethodParameterMappingAnnotationProcessor<Annotation> {
 		private UndefinedProcessorImplementationType() {
 		}

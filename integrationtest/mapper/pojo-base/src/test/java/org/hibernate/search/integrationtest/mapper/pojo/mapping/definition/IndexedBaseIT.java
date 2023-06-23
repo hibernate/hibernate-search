@@ -180,6 +180,7 @@ public class IndexedBaseIT {
 			public Integer getId() {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
+
 			@GenericField
 			public String getText() {
 				throw new UnsupportedOperationException( "Should not be called" );
@@ -213,6 +214,7 @@ public class IndexedBaseIT {
 			public Integer getId() {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
+
 			@GenericField
 			public String getText() {
 				throw new UnsupportedOperationException( "Should not be called" );
@@ -255,6 +257,7 @@ public class IndexedBaseIT {
 			public Integer getId() {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
+
 			@GenericField
 			public String getText() {
 				throw new UnsupportedOperationException( "Should not be called" );
@@ -308,6 +311,7 @@ public class IndexedBaseIT {
 			public Integer getId() {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
+
 			@GenericField
 			public String getText() {
 				throw new UnsupportedOperationException( "Should not be called" );
@@ -338,6 +342,7 @@ public class IndexedBaseIT {
 			public Integer getId() {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
+
 			@GenericField
 			public String getText() {
 				throw new UnsupportedOperationException( "Should not be called" );
@@ -372,6 +377,7 @@ public class IndexedBaseIT {
 			public Integer getId() {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
+
 			@GenericField
 			public String getText() {
 				throw new UnsupportedOperationException( "Should not be called" );
@@ -406,6 +412,7 @@ public class IndexedBaseIT {
 			public Integer getId() {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
+
 			@GenericField
 			public String getText() {
 				throw new UnsupportedOperationException( "Should not be called" );
@@ -466,7 +473,7 @@ public class IndexedBaseIT {
 			Integer id;
 		}
 
-		defaultBackendMock.expectSchema( IndexedEntity.class.getSimpleName(), b -> { } );
+		defaultBackendMock.expectSchema( IndexedEntity.class.getSimpleName(), b -> {} );
 
 		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
 		defaultBackendMock.verifyExpectationsMet();

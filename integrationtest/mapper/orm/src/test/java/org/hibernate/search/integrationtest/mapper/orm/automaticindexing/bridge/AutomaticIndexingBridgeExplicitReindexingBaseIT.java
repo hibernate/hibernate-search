@@ -59,7 +59,7 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 					// TODO HSEARCH-3567 this is currently necessary to handle removals, but it shouldn't be necessary
 					.use( "association1.containedSingle" )
 					.fromOtherEntity( ContainedEntity.class, "containingAsSingle.association1InverseSide" )
-							.use( "includedInTypeBridge" );
+					.use( "includedInTypeBridge" );
 
 			IndexSchemaObjectField typeBridgeObjectField = context.indexSchemaElement().objectField( "typeBridge" );
 			typeBridgeObjectFieldReference = typeBridgeObjectField.toReference();
@@ -109,9 +109,10 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 					// TODO HSEARCH-3567 this is currently necessary to handle removals, but it shouldn't be necessary
 					.use( "containedSingle" )
 					.fromOtherEntity( ContainedEntity.class, "containingAsSingle" )
-							.use( "includedInSingleValuedPropertyBridge" );
+					.use( "includedInSingleValuedPropertyBridge" );
 
-			IndexSchemaObjectField propertyBridgeObjectField = context.indexSchemaElement().objectField( "singleValuedPropertyBridge" );
+			IndexSchemaObjectField propertyBridgeObjectField =
+					context.indexSchemaElement().objectField( "singleValuedPropertyBridge" );
 			propertyBridgeObjectFieldReference = propertyBridgeObjectField.toReference();
 			includedInPropertyBridgeFieldReference = propertyBridgeObjectField.field(
 					"includedInSingleValuedPropertyBridge", f -> f.asString()
@@ -149,7 +150,8 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 					.fromOtherEntity( ContainedEntity.class, "containingAsSingle" )
 					.use( "includedInMultiValuedPropertyBridge" );
 
-			IndexSchemaObjectField propertyBridgeObjectField = context.indexSchemaElement().objectField( "multiValuedPropertyBridge" );
+			IndexSchemaObjectField propertyBridgeObjectField =
+					context.indexSchemaElement().objectField( "multiValuedPropertyBridge" );
 			propertyBridgeObjectFieldReference = propertyBridgeObjectField.toReference();
 			includedInPropertyBridgeFieldReference = propertyBridgeObjectField.field(
 					"includedInMultiValuedPropertyBridge", f -> f.asString()
@@ -158,7 +160,7 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 		}
 
 		@Override
-		@SuppressWarnings({"unchecked", "rawtypes"})
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public void write(DocumentElement target, List bridgedElement, PropertyBridgeWriteContext context) {
 			List<ContainingEntity> castedBridgedElement = (List<ContainingEntity>) bridgedElement;
 

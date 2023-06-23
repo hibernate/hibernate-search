@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
  */
 @Deprecated
 @Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.METHOD, ElementType.FIELD })
+@Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
 @Repeatable(NumericFields.class)
 public @interface NumericField {

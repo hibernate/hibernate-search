@@ -31,9 +31,9 @@ public class SentenceInventor {
 	private final WordDictionary dictionary;
 	private final Locale randomlocale;
 	//array contains repeated object for probability distribution (more chance for a ",")
-	private final char[] sentenceSeparators = new char[] { ',', ',', ',' , ';', ':', ':' };
+	private final char[] sentenceSeparators = new char[] { ',', ',', ',', ';', ':', ':' };
 	//same as above, but favour the "full stop" char as a more likely end for periods.
-	private final char[] periodSeparators = new char[] { '.', '.', '.' , '.', '.', '?', '?', '!' };
+	private final char[] periodSeparators = new char[] { '.', '.', '.', '.', '.', '?', '?', '!' };
 
 	/**
 	 * @param randomSeed the seed to use for random generator
@@ -58,7 +58,7 @@ public class SentenceInventor {
 	 * @return a random character from the ASCII table (text chars only)
 	 */
 	public char randomCharacter() {
-		return (char) (r.nextInt( 26 ) + 65);
+		return (char) ( r.nextInt( 26 ) + 65 );
 	}
 
 	/**
@@ -157,14 +157,14 @@ public class SentenceInventor {
 		periodLengthSentences = ( periodLengthSentences < 1 ) ? 1 : periodLengthSentences;
 		String firstsentence = nextSentence();
 		StringBuilder sb = new StringBuilder()
-			.append( firstsentence.substring( 0,1 ).toUpperCase( randomlocale ) )
-			.append( firstsentence.substring( 1 ) );
+				.append( firstsentence.substring( 0, 1 ).toUpperCase( randomlocale ) )
+				.append( firstsentence.substring( 1 ) );
 		for ( int i = 1; i < periodLengthSentences; i++ ) {
 			int separatorCharIndex = r.nextInt( sentenceSeparators.length );
 			sb
-				.append( sentenceSeparators[separatorCharIndex] )
-				.append( ' ' )
-				.append( nextSentence() );
+					.append( sentenceSeparators[separatorCharIndex] )
+					.append( ' ' )
+					.append( nextSentence() );
 		}
 		int periodSeparatorCharIndex = r.nextInt( periodSeparators.length );
 		sb.append( periodSeparators[periodSeparatorCharIndex] );

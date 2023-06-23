@@ -172,7 +172,8 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 		private CompletableFuture<?>[] indexingFutures;
 
 		public void startIndexingList(PojoMassIndexingSessionContext sessionContext, PojoIndexer indexer,
-				List<?> entities) throws InterruptedException {
+				List<?> entities)
+				throws InterruptedException {
 			this.sessionContext = sessionContext;
 			this.entities = entities;
 			getNotifier().reportEntitiesLoaded( entities.size() );
@@ -223,7 +224,8 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 		}
 
 		private CompletableFuture<?> startIndexing(PojoMassIndexingSessionContext sessionContext,
-				PojoIndexer indexer, Object entity) throws InterruptedException {
+				PojoIndexer indexer, Object entity)
+				throws InterruptedException {
 			// abort if the thread has been interrupted while not in wait(), I/O or similar which themselves would have
 			// raised the InterruptedException
 			if ( Thread.currentThread().isInterrupted() ) {

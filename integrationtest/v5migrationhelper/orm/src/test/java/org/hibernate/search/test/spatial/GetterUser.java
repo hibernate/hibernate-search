@@ -26,7 +26,7 @@ public class GetterUser {
 
 	Double homeLongitude;
 
-	public GetterUser( Integer id, Double homeLatitude, Double homeLongitude) {
+	public GetterUser(Integer id, Double homeLatitude, Double homeLongitude) {
 		this.id = id;
 		this.homeLatitude = homeLatitude;
 		this.homeLongitude = homeLongitude;

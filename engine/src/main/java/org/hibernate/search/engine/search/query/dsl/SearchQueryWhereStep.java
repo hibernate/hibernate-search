@@ -24,11 +24,10 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateCl
  * @param <LOS> The type of the initial step of the loading options definition DSL accessible through {@link SearchQueryOptionsStep#loading(Consumer)}.
  */
 public interface SearchQueryWhereStep<
-				N extends SearchQueryOptionsStep<?, H, LOS, ?, ?>,
-				H,
-				LOS,
-				PDF extends SearchPredicateFactory
-		> {
+		N extends SearchQueryOptionsStep<?, H, LOS, ?, ?>,
+		H,
+		LOS,
+		PDF extends SearchPredicateFactory> {
 
 	/**
 	 * Set the predicate for this query.

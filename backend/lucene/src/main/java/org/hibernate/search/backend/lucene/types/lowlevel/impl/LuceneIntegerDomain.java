@@ -84,7 +84,8 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 
 	@Override
 	public Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-			NestedDocsProvider nestedDocsProvider) throws IOException {
+			NestedDocsProvider nestedDocsProvider)
+			throws IOException {
 		JoiningLongMultiValuesSource source = JoiningLongMultiValuesSource.fromIntField(
 				absoluteFieldPath, nestedDocsProvider
 		);
@@ -97,7 +98,8 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 	@Override
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			Collection<? extends Range<? extends Integer>> ranges,
-			NestedDocsProvider nestedDocsProvider) throws IOException {
+			NestedDocsProvider nestedDocsProvider)
+			throws IOException {
 		JoiningLongMultiValuesSource source = JoiningLongMultiValuesSource.fromIntField(
 				absoluteFieldPath, nestedDocsProvider
 		);

@@ -31,8 +31,8 @@ public class PerThreadIndexPartition {
 		documentIdOffset =
 				// Avoid conflict between initial documents and new documents:
 				indexInitializer.getInitialIndexSize()
-				// Avoid conflict between threads: use a different starting point based on the thread index...
-				+ threadIndex;
+						// Avoid conflict between threads: use a different starting point based on the thread index...
+						+ threadIndex;
 		// ... and then a gap based on the thread count
 		documentIdGap = threadParams.getThreadCount();
 	}

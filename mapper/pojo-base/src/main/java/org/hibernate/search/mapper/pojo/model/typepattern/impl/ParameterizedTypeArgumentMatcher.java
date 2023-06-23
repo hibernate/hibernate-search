@@ -25,7 +25,7 @@ class ParameterizedTypeArgumentMatcher implements ExtractingTypePatternMatcher {
 		StringBuilder builder = new StringBuilder();
 		builder.append( matchedRawType.getName() ).append( "<" );
 		TypeVariable<? extends Class<?>>[] typeParameters = matchedRawType.getTypeParameters();
-		for ( int i = 0; i < typeParameters.length ; ++i ) {
+		for ( int i = 0; i < typeParameters.length; ++i ) {
 			if ( i > 0 ) {
 				builder.append( ", " );
 			}

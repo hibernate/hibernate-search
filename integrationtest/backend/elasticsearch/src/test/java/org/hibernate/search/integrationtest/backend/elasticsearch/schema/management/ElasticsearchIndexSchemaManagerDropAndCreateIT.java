@@ -36,9 +36,8 @@ public class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private final StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
-		root.field( "field", f -> f.asString() )
-				.toReference()
+	private final StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> root.field( "field", f -> f.asString() )
+			.toReference()
 	);
 
 	@Test
@@ -49,10 +48,10 @@ public class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 				simpleMappingForInitialization(
 						"'field': {"
 								+ "  'type': 'text'"
-						+ "},"
-						+ "'NOTmyField': {"
+								+ "},"
+								+ "'NOTmyField': {"
 								+ "  'type': 'date'"
-						+ "}"
+								+ "}"
 				)
 		);
 
@@ -60,10 +59,10 @@ public class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 				simpleMappingForExpectations(
 						"'field': {"
 								+ "  'type': 'text'"
-						+ "},"
-						+ "'NOTmyField': {"
+								+ "},"
+								+ "'NOTmyField': {"
 								+ "  'type': 'date'"
-						+ "}"
+								+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -77,7 +76,7 @@ public class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 						"'field': {"
 								+ "  'type': 'keyword',"
 								+ "  'doc_values': false"
-						+ "}"
+								+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -98,7 +97,7 @@ public class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 						"'field': {"
 								+ "  'type': 'keyword',"
 								+ "  'doc_values': false"
-						+ "}"
+								+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);

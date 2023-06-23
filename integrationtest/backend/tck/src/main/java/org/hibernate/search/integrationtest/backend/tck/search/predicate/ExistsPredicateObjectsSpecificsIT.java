@@ -78,7 +78,8 @@ public class ExistsPredicateObjectsSpecificsIT {
 	private static final SimpleMappedIndex<DifferentFieldsNoInnerNestedIndexBinding> noInnerNestedField =
 			SimpleMappedIndex.of( DifferentFieldsNoInnerNestedIndexBinding::new ).name( "noInnerNestedField" );
 	private static final SimpleMappedIndex<DifferentFieldsDifferentInnerNestedFieldsIndexBinding> differentInnerNestedField =
-			SimpleMappedIndex.of( DifferentFieldsDifferentInnerNestedFieldsIndexBinding::new ).name( "differentInnerNestedField" );
+			SimpleMappedIndex.of( DifferentFieldsDifferentInnerNestedFieldsIndexBinding::new )
+					.name( "differentInnerNestedField" );
 
 
 	@BeforeClass
@@ -273,7 +274,7 @@ public class ExistsPredicateObjectsSpecificsIT {
 
 	private static void initData() {
 		mainIndex.bulkIndexer()
-				.add( DOCUMENT_0, document -> { } )
+				.add( DOCUMENT_0, document -> {} )
 				.add( DOCUMENT_1, document -> {
 					document.addValue( mainIndex.binding().string, ANY_STRING );
 					document.addValue( mainIndex.binding().numeric, ANY_INTEGER );
@@ -449,6 +450,7 @@ public class ExistsPredicateObjectsSpecificsIT {
 		final IndexObjectFieldReference nested;
 		final IndexObjectFieldReference nestedX2;
 		final IndexFieldReference<String> nestedX2String;
+
 		DifferentFieldsDifferentInnerNestedFieldsIndexBinding(IndexSchemaElement root) {
 			IndexSchemaObjectField nestedObject = root.objectField( "nested", ObjectStructure.NESTED );
 			nested = nestedObject.toReference();

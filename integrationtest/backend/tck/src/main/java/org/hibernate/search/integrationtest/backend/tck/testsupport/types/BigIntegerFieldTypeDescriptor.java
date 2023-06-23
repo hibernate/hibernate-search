@@ -67,22 +67,22 @@ public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigIntege
 		return new IndexableValues<BigInteger>() {
 			@Override
 			protected List<BigInteger> createSingle() {
-		return Arrays.asList(
-				BigInteger.valueOf( Long.MIN_VALUE ).multiply( BigInteger.valueOf( 100 ) ),
-				BigInteger.valueOf( Long.MAX_VALUE ).multiply( BigInteger.valueOf( 100 ) ),
-				BigInteger.valueOf( Long.MIN_VALUE ),
-				BigInteger.valueOf( Long.MAX_VALUE ),
-				BigInteger.valueOf( Integer.MIN_VALUE ),
-				BigInteger.valueOf( Integer.MAX_VALUE ),
-				BigInteger.valueOf( -251_484_254 ),
-				BigInteger.valueOf( -42 ),
-				BigInteger.valueOf( -1 ),
-				BigInteger.ZERO,
-				BigInteger.ONE,
-				BigInteger.TEN,
-				new BigInteger( "42" ),
-				BigInteger.valueOf( 151_484_254L )
-		);
+				return Arrays.asList(
+						BigInteger.valueOf( Long.MIN_VALUE ).multiply( BigInteger.valueOf( 100 ) ),
+						BigInteger.valueOf( Long.MAX_VALUE ).multiply( BigInteger.valueOf( 100 ) ),
+						BigInteger.valueOf( Long.MIN_VALUE ),
+						BigInteger.valueOf( Long.MAX_VALUE ),
+						BigInteger.valueOf( Integer.MIN_VALUE ),
+						BigInteger.valueOf( Integer.MAX_VALUE ),
+						BigInteger.valueOf( -251_484_254 ),
+						BigInteger.valueOf( -42 ),
+						BigInteger.valueOf( -1 ),
+						BigInteger.ZERO,
+						BigInteger.ONE,
+						BigInteger.TEN,
+						new BigInteger( "42" ),
+						BigInteger.valueOf( 151_484_254L )
+				);
 			}
 		};
 	}

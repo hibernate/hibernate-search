@@ -45,8 +45,10 @@ public abstract class PojoImplicitReindexingAssociationInverseSideResolverNode<T
 		}
 	}
 
-	private static <T, P> PojoImplicitReindexingAssociationInverseSideResolverNode<Object> bind(ContainerExtractorBinder extractorBinder,
-			BoundPojoModelPathPropertyNode<T, P> path, PojoImplicitReindexingAssociationInverseSideResolverNode<? super P> nested) {
+	private static <T, P> PojoImplicitReindexingAssociationInverseSideResolverNode<Object> bind(
+			ContainerExtractorBinder extractorBinder,
+			BoundPojoModelPathPropertyNode<T, P> path,
+			PojoImplicitReindexingAssociationInverseSideResolverNode<? super P> nested) {
 		try {
 			return bind( extractorBinder, path.getParent(),
 					new PojoImplicitReindexingAssociationInverseSideResolverPropertyNode<>(
@@ -59,7 +61,8 @@ public abstract class PojoImplicitReindexingAssociationInverseSideResolverNode<T
 		}
 	}
 
-	private static <T> PojoImplicitReindexingAssociationInverseSideResolverNode<Object> bind(ContainerExtractorBinder extractorBinder,
+	private static <T> PojoImplicitReindexingAssociationInverseSideResolverNode<Object> bind(
+			ContainerExtractorBinder extractorBinder,
 			BoundPojoModelPathTypeNode<T> path,
 			PojoImplicitReindexingAssociationInverseSideResolverNode<? super T> nested) {
 		try {

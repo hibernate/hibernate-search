@@ -21,7 +21,8 @@ public class ElasticsearchVersion {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final Pattern VERSION_PATTERN = Pattern.compile( "(\\d+)(?:\\.(\\d+)(?:\\.(\\d+)(?:-(\\w+))?)?)?" );
-	private static final Pattern DISTRIBUTION_AND_VERSION_PATTERN = Pattern.compile( "(?:([^\\d]+):)?(" + VERSION_PATTERN.pattern() + ")" );
+	private static final Pattern DISTRIBUTION_AND_VERSION_PATTERN =
+			Pattern.compile( "(?:([^\\d]+):)?(" + VERSION_PATTERN.pattern() + ")" );
 
 	/**
 	 * @param distributionAndVersionString A version string following the format {@code x.y.z-qualifier} or {@code <distribution>:x.y.z-qualifier},
@@ -42,8 +43,9 @@ public class ElasticsearchVersion {
 		}
 		try {
 			String distributionString = matcher.group( 1 );
-			return of( distributionString == null ? ElasticsearchDistributionName.defaultValue()
-							: ElasticsearchDistributionName.of( distributionString ),
+			return of( distributionString == null
+					? ElasticsearchDistributionName.defaultValue()
+					: ElasticsearchDistributionName.of( distributionString ),
 					matcher.group( 2 ) );
 		}
 		catch (RuntimeException e) {
@@ -89,7 +91,8 @@ public class ElasticsearchVersion {
 	private final Integer micro;
 	private final String qualifier;
 
-	private ElasticsearchVersion(ElasticsearchDistributionName distribution, int major, Integer minor, Integer micro, String qualifier) {
+	private ElasticsearchVersion(ElasticsearchDistributionName distribution, int major, Integer minor, Integer micro,
+			String qualifier) {
 		this.distribution = distribution;
 		this.major = major;
 		this.minor = minor;

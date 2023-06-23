@@ -82,7 +82,7 @@ public class SearchIntegrationBuilder implements SearchIntegration.Builder {
 		if ( frozen ) {
 			throw new AssertionFailure(
 					"Attempt to add a mapping initiator"
-					+ " after Hibernate Search has started to build the mappings."
+							+ " after Hibernate Search has started to build the mappings."
 			);
 		}
 
@@ -133,12 +133,13 @@ public class SearchIntegrationBuilder implements SearchIntegration.Builder {
 					engineThreads, timingSource
 			);
 
-			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( beanResolver, propertySource, rootBuildContext );
+			indexManagerBuildingStateHolder =
+					new IndexManagerBuildingStateHolder( beanResolver, propertySource, rootBuildContext );
 
 			// Step #1: collect configuration for all mappings
 			for ( Map.Entry<MappingKey<?, ?>, MappingInitiator<?, ?>> entry : mappingInitiators.entrySet() ) {
 				// We know the key and initiator have compatible types, see how they are put into the map
-				@SuppressWarnings({"rawtypes", "unchecked"})
+				@SuppressWarnings({ "rawtypes", "unchecked" })
 				MappingBuildingState<?, ?> mappingBuildingState = new MappingBuildingState<>(
 						rootBuildContext,
 						(MappingKey) entry.getKey(), entry.getValue()

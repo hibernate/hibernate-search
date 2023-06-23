@@ -54,7 +54,7 @@ public class BackRefPropertyIT {
 	public void test() {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.objectField( "contained", b2 -> b2
-						.field( "text", String.class, b3 -> { } ) ) );
+						.field( "text", String.class, b3 -> {} ) ) );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.setup( IndexedEntity.class, ContainedEntity.class );

@@ -125,7 +125,7 @@ public class AggregationBaseIT {
 				.add( DOCUMENT_3, document -> {
 					document.addValue( index.binding().string, STRING_1 );
 				} )
-				.add( EMPTY, document -> { } )
+				.add( EMPTY, document -> {} )
 				.join();
 	}
 

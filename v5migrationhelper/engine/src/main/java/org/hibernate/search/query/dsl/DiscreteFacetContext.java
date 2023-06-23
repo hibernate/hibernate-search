@@ -14,4 +14,3 @@ package org.hibernate.search.query.dsl;
 public interface DiscreteFacetContext extends FacetParameterContext {
 }
 
-

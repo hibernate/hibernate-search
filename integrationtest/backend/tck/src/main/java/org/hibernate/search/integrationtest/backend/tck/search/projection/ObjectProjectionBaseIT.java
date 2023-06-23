@@ -51,8 +51,10 @@ public class ObjectProjectionBaseIT {
 	}
 
 	private static ObjectStructure requiredObjectStructure(boolean multivalued) {
-		return multivalued && TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForMultiValuedObjectProjection()
-				? ObjectStructure.NESTED : ObjectStructure.DEFAULT;
+		return multivalued
+				&& TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForMultiValuedObjectProjection()
+						? ObjectStructure.NESTED
+						: ObjectStructure.DEFAULT;
 	}
 
 	@Nested
@@ -100,7 +102,8 @@ public class ObjectProjectionBaseIT {
 			private static class ObjectBinding extends AbstractCompositeProjectionFromAsIT.CompositeBinding {
 				public static ObjectBinding create(IndexSchemaElement parent, String relativeName,
 						boolean multiValued) {
-					IndexSchemaObjectField objectField = parent.objectField( relativeName, requiredObjectStructure( multiValued ) );
+					IndexSchemaObjectField objectField =
+							parent.objectField( relativeName, requiredObjectStructure( multiValued ) );
 					if ( multiValued ) {
 						objectField.multiValued();
 					}

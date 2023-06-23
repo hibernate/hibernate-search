@@ -20,6 +20,6 @@ public interface PojoMappingConfigurationContext {
 	 * or {@link Optional#empty()} if the path cannot be applied.
 	 */
 	Optional<PojoTypeModel<?>> extractedValueType(PojoTypeModel<?> sourceType,
-				ContainerExtractorPath extractorPath);
+			ContainerExtractorPath extractorPath);
 
 }

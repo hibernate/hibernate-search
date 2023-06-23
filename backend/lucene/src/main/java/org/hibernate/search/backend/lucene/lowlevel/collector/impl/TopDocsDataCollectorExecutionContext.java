@@ -28,12 +28,14 @@ public class TopDocsDataCollectorExecutionContext extends CollectorExecutionCont
 
 	public TopDocsDataCollectorExecutionContext(IndexReaderMetadataResolver metadataResolver,
 			IndexSearcher indexSearcher, Query executedQuery, Query originalQuery, TopDocs topDocs,
-			StoredFieldsValuesDelegate.Factory storedFieldsValuesDelegateOrNull) throws IOException {
+			StoredFieldsValuesDelegate.Factory storedFieldsValuesDelegateOrNull)
+			throws IOException {
 		super( metadataResolver, indexSearcher, topDocs.scoreDocs.length );
 		this.executedQuery = executedQuery;
 		this.originalQuery = originalQuery;
 		this.topDocs = topDocs;
-		this.storedFieldsValuesDelegate = storedFieldsValuesDelegateOrNull == null ? null
+		this.storedFieldsValuesDelegate = storedFieldsValuesDelegateOrNull == null
+				? null
 				: storedFieldsValuesDelegateOrNull.create( this );
 	}
 

@@ -85,12 +85,12 @@ public class BoxedBytePropertyTypeDescriptor extends PropertyTypeDescriptor<Byte
 
 			@Override
 			public Byte getNullAsValueBridge1() {
-				return (byte)0;
+				return (byte) 0;
 			}
 
 			@Override
 			public Byte getNullAsValueBridge2() {
-				return (byte)-64;
+				return (byte) -64;
 			}
 		};
 	}

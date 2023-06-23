@@ -154,7 +154,7 @@ public interface SearchSession extends AutoCloseable {
 	 * @param types One or more indexed types, or supertypes of all indexed types that will be targeted by the workspace.
 	 * @return A {@link SearchWorkspace}.
 	 */
-	default SearchWorkspace workspace(Class<?> ... types) {
+	default SearchWorkspace workspace(Class<?>... types) {
 		return workspace( Arrays.asList( types ) );
 	}
 

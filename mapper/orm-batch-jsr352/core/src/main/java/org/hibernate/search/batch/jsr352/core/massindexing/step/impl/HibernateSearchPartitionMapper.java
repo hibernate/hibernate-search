@@ -110,14 +110,14 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 	 * Constructor for unit test.
 	 */
 	public HibernateSearchPartitionMapper(
-				String serializedIdFetchSize,
-				String customQueryHql,
-				String serializedMaxThreads,
-				String serializedMaxResultsPerEntity,
-				String serializedRowsPerPartition,
-				String serializedCheckpointInterval,
-				String tenantId,
-				JobContext jobContext) {
+			String serializedIdFetchSize,
+			String customQueryHql,
+			String serializedMaxThreads,
+			String serializedMaxResultsPerEntity,
+			String serializedRowsPerPartition,
+			String serializedCheckpointInterval,
+			String tenantId,
+			JobContext jobContext) {
 		this.serializedIdFetchSize = serializedIdFetchSize;
 		this.customQueryHql = customQueryHql;
 		this.serializedMaxThreads = serializedMaxThreads;
@@ -176,8 +176,10 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 				props[i] = new Properties();
 				props[i].setProperty( MassIndexingPartitionProperties.ENTITY_NAME, bound.getEntityName() );
 				props[i].setProperty( MassIndexingPartitionProperties.PARTITION_ID, String.valueOf( i ) );
-				props[i].setProperty( MassIndexingPartitionProperties.LOWER_BOUND, SerializationUtil.serialize( bound.getLowerBound() ) );
-				props[i].setProperty( MassIndexingPartitionProperties.UPPER_BOUND, SerializationUtil.serialize( bound.getUpperBound() ) );
+				props[i].setProperty( MassIndexingPartitionProperties.LOWER_BOUND,
+						SerializationUtil.serialize( bound.getLowerBound() ) );
+				props[i].setProperty( MassIndexingPartitionProperties.UPPER_BOUND,
+						SerializationUtil.serialize( bound.getUpperBound() ) );
 				props[i].setProperty( MassIndexingPartitionProperties.INDEX_SCOPE, bound.getIndexScope().name() );
 				props[i].setProperty(
 						MassIndexingPartitionProperties.CHECKPOINT_INTERVAL,

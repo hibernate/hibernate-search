@@ -64,7 +64,7 @@ public class LogFailureHandler implements FailureHandler {
 
 		final StringBuilder messageBuilder = formatMessage( (FailureContext) context );
 
-		if ( ! entityReferences.isEmpty() ) {
+		if ( !entityReferences.isEmpty() ) {
 			messageBuilder.append( "Entities that could not be indexed correctly:\n" );
 			for ( EntityReference entityReference : entityReferences ) {
 				messageBuilder.append( entityReference );

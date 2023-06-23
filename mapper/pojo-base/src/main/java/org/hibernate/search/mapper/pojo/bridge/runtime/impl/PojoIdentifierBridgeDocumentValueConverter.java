@@ -68,7 +68,7 @@ public final class PojoIdentifierBridgeDocumentValueConverter<I>
 
 	private static class ContextExtension
 			implements ToDocumentValueConvertContextExtension<IdentifierBridgeToDocumentIdentifierContext>,
-					FromDocumentValueConvertContextExtension<IdentifierBridgeFromDocumentIdentifierContext> {
+			FromDocumentValueConvertContextExtension<IdentifierBridgeFromDocumentIdentifierContext> {
 		private static final ContextExtension INSTANCE = new ContextExtension();
 
 		@Override

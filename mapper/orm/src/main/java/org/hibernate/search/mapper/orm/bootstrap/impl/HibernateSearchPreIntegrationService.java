@@ -202,7 +202,8 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 
 	public CoordinationConfigurationContextImpl coordinationStrategyConfiguration() {
 		if ( coordinationStrategyConfiguration == null ) {
-			coordinationStrategyConfiguration = CoordinationConfigurationContextImpl.configure( propertySource, beanResolver() );
+			coordinationStrategyConfiguration =
+					CoordinationConfigurationContextImpl.configure( propertySource, beanResolver() );
 		}
 		return coordinationStrategyConfiguration;
 	}

@@ -20,7 +20,8 @@ import org.hibernate.search.annotations.Indexed;
 @Entity
 @Indexed
 public class Gangster {
-	@Id @DocumentId
+	@Id
+	@DocumentId
 	private Serializable id;
 	private String name;
 

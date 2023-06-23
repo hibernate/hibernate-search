@@ -58,7 +58,7 @@ public class StartupStubContainerExtractor implements ContainerExtractor<Object,
 		StaticCounters.get().increment( counterKeys.runtimeUse );
 		return new AssertionFailure(
 				"Instances of " + getClass().getSimpleName() + " are not supposed to be used at runtime,"
-				+ " they should only be used to test the startup process."
+						+ " they should only be used to test the startup process."
 		);
 	}
 }

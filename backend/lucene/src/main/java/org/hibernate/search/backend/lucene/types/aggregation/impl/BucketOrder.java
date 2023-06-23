@@ -54,7 +54,8 @@ enum BucketOrder {
 	};
 
 	<F> Comparator<Bucket<F>> toBucketComparator(Comparator<F> termAscendingComparator) {
-		return toBucketComparatorInternal( isTermOrderDescending() ? termAscendingComparator.reversed() : termAscendingComparator );
+		return toBucketComparatorInternal(
+				isTermOrderDescending() ? termAscendingComparator.reversed() : termAscendingComparator );
 	}
 
 	abstract <F> Comparator<Bucket<F>> toBucketComparatorInternal(Comparator<F> termComparator);

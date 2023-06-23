@@ -22,7 +22,7 @@ public class SearchQueryEntityLoadingScrollingIT extends SearchQueryEntityLoadin
 		backendMock.expectScrollObjects(
 				targetIndexes,
 				hitDocumentReferences.size(),
-				b -> { }
+				b -> {}
 		);
 
 		backendMock.expectNextScroll( targetIndexes, StubNextScrollWorkBehavior

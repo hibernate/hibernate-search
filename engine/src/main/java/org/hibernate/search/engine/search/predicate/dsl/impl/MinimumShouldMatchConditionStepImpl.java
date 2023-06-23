@@ -12,7 +12,8 @@ import org.hibernate.search.engine.search.predicate.dsl.MinimumShouldMatchRequir
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.util.common.impl.Contracts;
 
-final class MinimumShouldMatchConditionStepImpl<N> implements MinimumShouldMatchConditionStep<N>,
+final class MinimumShouldMatchConditionStepImpl<N>
+		implements MinimumShouldMatchConditionStep<N>,
 		MinimumShouldMatchRequireStep<N>, MinimumShouldMatchMoreStep<N> {
 
 	private final BooleanPredicateBuilder builder;

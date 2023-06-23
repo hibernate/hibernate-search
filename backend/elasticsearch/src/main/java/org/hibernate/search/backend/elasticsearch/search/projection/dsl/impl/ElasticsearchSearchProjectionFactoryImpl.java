@@ -17,14 +17,14 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchSearchProjectionFactoryImpl<R, E>
 		extends AbstractSearchProjectionFactory<
-						ElasticsearchSearchProjectionFactory<R, E>,
-						ElasticsearchSearchProjectionIndexScope<?>,
-						R,
-						E
-				>
+				ElasticsearchSearchProjectionFactory<R, E>,
+				ElasticsearchSearchProjectionIndexScope<?>,
+				R,
+				E>
 		implements ElasticsearchSearchProjectionFactory<R, E> {
 
-	public ElasticsearchSearchProjectionFactoryImpl(SearchProjectionDslContext<ElasticsearchSearchProjectionIndexScope<?>> dslContext) {
+	public ElasticsearchSearchProjectionFactoryImpl(
+			SearchProjectionDslContext<ElasticsearchSearchProjectionIndexScope<?>> dslContext) {
 		super( dslContext );
 	}
 

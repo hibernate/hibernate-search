@@ -188,9 +188,9 @@ public class SearchMultiIndexIT {
 				.toQuery();
 
 		assertThatQuery( projectionQuery ).hasHitsAnyOrder(
-			ADDITIONAL_FIELD_1_1_1,
-			ADDITIONAL_FIELD_1_1_2,
-			null
+				ADDITIONAL_FIELD_1_1_1,
+				ADDITIONAL_FIELD_1_1_2,
+				null
 		);
 	}
 

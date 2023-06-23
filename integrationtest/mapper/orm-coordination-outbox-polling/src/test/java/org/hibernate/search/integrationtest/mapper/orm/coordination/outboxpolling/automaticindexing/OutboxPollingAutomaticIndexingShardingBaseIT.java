@@ -40,7 +40,7 @@ import org.assertj.core.data.Percentage;
  * (if they were not, we would see missing or duplicate indexing work executions).
  */
 @RunWith(Parameterized.class)
-@TestForIssue(jiraKey = {"HSEARCH-4141", "HSEARCH-4140"})
+@TestForIssue(jiraKey = { "HSEARCH-4141", "HSEARCH-4140" })
 public class OutboxPollingAutomaticIndexingShardingBaseIT {
 
 	@Parameterized.Parameters(name = "static = {0}, totalShardCount = {1}")
@@ -105,8 +105,10 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 				.with( ctx -> {
 					if ( isStatic ) {
 						return ctx
-								.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", totalShardCount )
-								.withProperty( "hibernate.search.coordination.event_processor.shards.assigned", String.valueOf( assignedShardIndex ) );
+								.withProperty( "hibernate.search.coordination.event_processor.shards.total_count",
+										totalShardCount )
+								.withProperty( "hibernate.search.coordination.event_processor.shards.assigned",
+										String.valueOf( assignedShardIndex ) );
 					}
 					else {
 						return ctx;
@@ -225,7 +227,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 			int idStart = i;
 			int idEnd = Math.min( i + batchSize, entityCount );
 			with( sessionFactory ).runInTransaction( session -> {
-				for ( int j = idStart; j < idEnd ; j++ ) {
+				for ( int j = idStart; j < idEnd; j++ ) {
 					IndexedEntity entity = session.getReference( IndexedEntity.class, j );
 					entity.setText( "updated" );
 

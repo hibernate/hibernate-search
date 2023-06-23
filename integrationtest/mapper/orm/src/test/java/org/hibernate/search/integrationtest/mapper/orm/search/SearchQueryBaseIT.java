@@ -167,7 +167,7 @@ public class SearchQueryBaseIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( Book.NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.of(
 							3L,
 							reference( Book.NAME, "1" ),
@@ -198,8 +198,7 @@ public class SearchQueryBaseIT {
 			for ( int i = 0; i < 3; i++ ) {
 				backendMock.expectSearchObjects(
 						Arrays.asList( Book.NAME ),
-						b -> {
-						},
+						b -> {},
 						StubSearchWorkBehavior.of(
 								3L,
 								reference( Book.NAME, "1" ),
@@ -228,7 +227,7 @@ public class SearchQueryBaseIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( Book.NAME, Author.NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.of(
 							2L,
 							reference( Book.NAME, "1" ),
@@ -326,7 +325,7 @@ public class SearchQueryBaseIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( Book.NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.of(
 							3L,
 							reference( Book.NAME, "1" ),
@@ -349,14 +348,14 @@ public class SearchQueryBaseIT {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Object> query = searchSession.search( searchSession.scope(
-							Object.class, Arrays.asList( Book.NAME, Author.NAME )
-					) )
+					Object.class, Arrays.asList( Book.NAME, Author.NAME )
+			) )
 					.where( f -> f.matchAll() )
 					.toQuery();
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( Book.NAME, Author.NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.of(
 							2L,
 							reference( Book.NAME, "1" ),
@@ -427,7 +426,7 @@ public class SearchQueryBaseIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( Book.NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.of(
 							3L,
 							reference( Book.NAME, "1" ),
@@ -628,7 +627,8 @@ public class SearchQueryBaseIT {
 			assertThat( query.fetchAllHits() ).containsExactlyInAnyOrder(
 					new Book_Author_Score( new Book_Author( session.getReference( Book.class, 1 ), AUTHOR_4_3_2_1 ), 4.0F ),
 					new Book_Author_Score( new Book_Author( session.getReference( Book.class, 2 ), AUTHOR_CIDER_HOUSE ), 5.0F ),
-					new Book_Author_Score( new Book_Author( session.getReference( Book.class, 3 ), AUTHOR_AVENUE_OF_MYSTERIES ), 6.0F )
+					new Book_Author_Score( new Book_Author( session.getReference( Book.class, 3 ), AUTHOR_AVENUE_OF_MYSTERIES ),
+							6.0F )
 			);
 		} );
 	}
@@ -746,8 +746,10 @@ public class SearchQueryBaseIT {
 			);
 
 			assertThat( query.fetchAllHits() ).containsExactly(
-					org.hibernate.search.mapper.orm.common.impl.HibernateOrmEntityReference.withName( Book.class, Book.NAME, 1 ),
-					org.hibernate.search.mapper.orm.common.impl.HibernateOrmEntityReference.withName( Book.class, Book.NAME, 2 ),
+					org.hibernate.search.mapper.orm.common.impl.HibernateOrmEntityReference.withName( Book.class, Book.NAME,
+							1 ),
+					org.hibernate.search.mapper.orm.common.impl.HibernateOrmEntityReference.withName( Book.class, Book.NAME,
+							2 ),
 					org.hibernate.search.mapper.orm.common.impl.HibernateOrmEntityReference.withName( Book.class, Book.NAME, 3 )
 			);
 		} );
@@ -865,7 +867,7 @@ public class SearchQueryBaseIT {
 
 		@Override
 		public boolean equals(Object obj) {
-			if ( !(obj instanceof Book_Author) ) {
+			if ( !( obj instanceof Book_Author ) ) {
 				return false;
 			}
 			Book_Author other = (Book_Author) obj;
@@ -897,7 +899,7 @@ public class SearchQueryBaseIT {
 
 		@Override
 		public boolean equals(Object obj) {
-			if ( !(obj instanceof Book_Author_Score) ) {
+			if ( !( obj instanceof Book_Author_Score ) ) {
 				return false;
 			}
 			Book_Author_Score other = (Book_Author_Score) obj;

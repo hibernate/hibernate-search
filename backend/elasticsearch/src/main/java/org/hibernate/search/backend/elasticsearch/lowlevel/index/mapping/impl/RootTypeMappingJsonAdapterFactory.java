@@ -13,7 +13,7 @@ import com.google.gson.reflect.TypeToken;
 public class RootTypeMappingJsonAdapterFactory extends AbstractTypeMappingJsonAdapterFactory {
 
 	private static final TypeToken<List<NamedDynamicTemplate>> DYNAMIC_TEMPLATES_TYPE_TOKEN =
-			new TypeToken<List<NamedDynamicTemplate>>() { };
+			new TypeToken<List<NamedDynamicTemplate>>() {};
 
 	@Override
 	protected <T> void addFields(Builder<T> builder) {

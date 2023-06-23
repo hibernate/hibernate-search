@@ -55,6 +55,6 @@ public class Book {
 	public void setStatus(Status status) {
 		this.status = status;
 	}
-// end::getters-setters[]
+	// end::getters-setters[]
 }
 // end::include[]

@@ -422,9 +422,18 @@ public class EmbeddedTest extends SearchTestBase {
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
-				Tower.class, Address.class, Product.class, Order.class, Author.class, Country.class,
-				State.class, StateCandidate.class, NonIndexedEntity.class,
-				AbstractProduct.class, Book.class, ProductFeature.class
+				Tower.class,
+				Address.class,
+				Product.class,
+				Order.class,
+				Author.class,
+				Country.class,
+				State.class,
+				StateCandidate.class,
+				NonIndexedEntity.class,
+				AbstractProduct.class,
+				Book.class,
+				ProductFeature.class
 		};
 	}
 }

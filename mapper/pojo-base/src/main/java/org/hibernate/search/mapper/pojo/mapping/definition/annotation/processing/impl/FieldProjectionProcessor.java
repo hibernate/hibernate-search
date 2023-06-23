@@ -19,7 +19,7 @@ public final class FieldProjectionProcessor
 	public void process(MethodParameterMappingStep mapping, FieldProjection annotation,
 			MethodParameterMappingAnnotationProcessorContext context) {
 		mapping.projection( FieldProjectionBinder.create( context.toNullIfDefault( annotation.path(), "" ) )
-						.valueConvert( annotation.convert() ) );
+				.valueConvert( annotation.convert() ) );
 	}
 
 }

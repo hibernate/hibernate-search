@@ -36,7 +36,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
-@SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types
+@SuppressWarnings({ "unchecked", "rawtypes" }) // Raw types are the only way to mock parameterized types
 public class ConfigurationPropertyBeanReferenceTest {
 
 	@Rule
@@ -429,7 +429,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 						"The reference is prefixed with 'notABeanRetrieval:', which is not a valid bean retrieval prefix.",
 						"If you want to reference a bean by name, and the name contains a colon, use 'bean:notABeanRetrieval:name'.",
 						"Otherwise, use a valid bean retrieval prefix among the following:"
-							+ " [builtin:, bean:, class:, constructor:, any:]."
+								+ " [builtin:, bean:, class:, constructor:, any:]."
 				);
 		verifyNoOtherSourceInteractionsAndReset();
 

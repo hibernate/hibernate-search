@@ -18,10 +18,12 @@ import org.apache.lucene.search.Query;
 public interface LuceneSearcher<R, ER> {
 
 	R search(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
-			int offset, Integer limit, int totalHitCountThreshold) throws IOException;
+			int offset, Integer limit, int totalHitCountThreshold)
+			throws IOException;
 
 	ER scroll(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
-			int offset, int limit, int totalHitCountThreshold) throws IOException;
+			int offset, int limit, int totalHitCountThreshold)
+			throws IOException;
 
 	int count(IndexSearcher indexSearcher) throws IOException;
 

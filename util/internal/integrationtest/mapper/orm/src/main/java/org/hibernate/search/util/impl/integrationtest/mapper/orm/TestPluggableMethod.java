@@ -67,7 +67,8 @@ class TestPluggableMethod<T> {
 		}
 		catch (IllegalAccessException e) {
 			throw new IllegalStateException(
-					"Method " + method + ", annotated with " + annotationClass.getName() + ", must be accessible from " + lookup + ".",
+					"Method " + method + ", annotated with " + annotationClass.getName() + ", must be accessible from " + lookup
+							+ ".",
 					e
 			);
 		}

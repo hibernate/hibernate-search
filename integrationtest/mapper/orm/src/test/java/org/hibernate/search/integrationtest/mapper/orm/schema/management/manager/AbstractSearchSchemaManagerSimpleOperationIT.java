@@ -46,7 +46,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 		backendMock.expectAnySchema( IndexedEntity1.NAME );
 		backendMock.expectAnySchema( IndexedEntity2.NAME );
 		setupContext.withProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
-						SchemaManagementStrategyName.NONE )
+				SchemaManagementStrategyName.NONE )
 				.withAnnotatedTypes( IndexedEntity1.class, IndexedEntity2.class );
 	}
 

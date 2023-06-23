@@ -80,7 +80,7 @@ public class LuceneIndexWriterCommitIT {
 				DocumentCommitStrategy.NONE, // The commit will happen at some point, but the indexing plan will be considered completed before that
 				DocumentRefreshStrategy.NONE // This is irrelevant
 		);
-		plan.add( referenceProvider( "1" ), document -> { } );
+		plan.add( referenceProvider( "1" ), document -> {} );
 		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// Commit will happen some time after indexing finished
@@ -107,7 +107,7 @@ public class LuceneIndexWriterCommitIT {
 				DocumentCommitStrategy.FORCE, // The commit will happen before the indexing plan is considered completed
 				DocumentRefreshStrategy.NONE // This is irrelevant
 		);
-		plan.add( referenceProvider( "1" ), document -> { } );
+		plan.add( referenceProvider( "1" ), document -> {} );
 		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// Commit should have happened before indexing finished
@@ -129,7 +129,7 @@ public class LuceneIndexWriterCommitIT {
 				DocumentCommitStrategy.NONE, // The commit should not be necessary for changes to be visible
 				DocumentRefreshStrategy.NONE // The refresh should be done regardless of this parameter
 		);
-		plan.add( referenceProvider( "1" ), document -> { } );
+		plan.add( referenceProvider( "1" ), document -> {} );
 		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// Stop Hibernate Search

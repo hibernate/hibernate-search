@@ -13,6 +13,6 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeSessionContext;
 
 public interface HibernateOrmScopeSessionContext
 		extends PojoScopeSessionContext, LoadingSessionContext, HibernateOrmMassIndexingSessionContext,
-				BatchSessionContext {
+		BatchSessionContext {
 
 }

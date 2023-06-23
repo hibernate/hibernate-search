@@ -20,7 +20,7 @@ public interface BackendMappingHints {
 	@Message(value = "")
 	String noEntityProjectionAvailable();
 
-	@Message( "" )
+	@Message("")
 	String missingDecimalScale();
 
 }

@@ -17,9 +17,8 @@ import org.apache.lucene.search.Query;
 
 public class LuceneSearchPredicateFactoryImpl
 		extends AbstractSearchPredicateFactory<
-						LuceneSearchPredicateFactory,
-						LuceneSearchPredicateIndexScope<?>
-				>
+				LuceneSearchPredicateFactory,
+				LuceneSearchPredicateIndexScope<?>>
 		implements LuceneSearchPredicateFactory {
 
 	public LuceneSearchPredicateFactoryImpl(SearchPredicateDslContext<LuceneSearchPredicateIndexScope<?>> dslContext) {

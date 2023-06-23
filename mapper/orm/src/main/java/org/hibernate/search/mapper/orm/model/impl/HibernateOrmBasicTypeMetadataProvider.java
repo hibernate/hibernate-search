@@ -22,7 +22,7 @@ import org.hibernate.mapping.Property;
 import org.hibernate.mapping.Value;
 import org.hibernate.property.access.spi.Getter;
 
-@SuppressWarnings( "unchecked" ) // Hibernate ORM gives us raw types, we must make do.
+@SuppressWarnings("unchecked") // Hibernate ORM gives us raw types, we must make do.
 public class HibernateOrmBasicTypeMetadataProvider {
 
 	public static HibernateOrmBasicTypeMetadataProvider create(Metadata metadata) {

@@ -59,7 +59,7 @@ public class OutboxPollingAutomaticIndexingConcurrencyIT {
 	@Before
 	public void setup() {
 		sessionFactories.add( setup( "create-drop" ) );
-		for ( int i = 1; i < TOTAL_SHARD_COUNT ; i++ ) {
+		for ( int i = 1; i < TOTAL_SHARD_COUNT; i++ ) {
 			// Avoid session factories stepping on each other's feet: use Action.NONE here.
 			sessionFactories.add( setup( "none" ) );
 		}
@@ -93,7 +93,7 @@ public class OutboxPollingAutomaticIndexingConcurrencyIT {
 			int idStart = i;
 			int idEnd = Math.min( i + ENTITY_UPDATE_BATCH_SIZE, ENTITY_COUNT );
 			with( sessionFactory ).runInTransaction( session -> {
-				for ( int j = idStart; j < idEnd ; j++ ) {
+				for ( int j = idStart; j < idEnd; j++ ) {
 					IndexedEntity entity = new IndexedEntity( j, "initial" );
 					session.persist( entity );
 

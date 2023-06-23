@@ -20,10 +20,9 @@ import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
  * @param <F> The indexed field value type.
  */
 public interface SearchIndexValueFieldTypeContext<
-				SC extends SearchIndexScope<?>,
-				N,
-				F
-		>
+		SC extends SearchIndexScope<?>,
+		N,
+		F>
 		extends SearchIndexNodeTypeContext<SC, N> {
 
 	Class<F> valueClass();

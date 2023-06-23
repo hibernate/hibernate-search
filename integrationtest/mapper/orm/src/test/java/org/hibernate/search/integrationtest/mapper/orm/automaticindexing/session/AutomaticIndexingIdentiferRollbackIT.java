@@ -31,7 +31,7 @@ import org.junit.rules.MethodRule;
 /**
  * Test that Hibernate Search manages to delete entities even when {@code hibernate.use_identifier_rollback=true}.
  */
-@TestForIssue(jiraKey = {"HSEARCH-650", "HSEARCH-3985"})
+@TestForIssue(jiraKey = { "HSEARCH-650", "HSEARCH-3985" })
 @PortedFromSearch5(original = "org.hibernate.search.test.engine.UsingIdentifierRollbackTest")
 public class AutomaticIndexingIdentiferRollbackIT {
 
@@ -64,7 +64,7 @@ public class AutomaticIndexingIdentiferRollbackIT {
 			entity1Id.set( entity1.getId() );
 
 			backendMock.expectWorks( EntityWithJpaIdAsDocumentId.NAME )
-					.add( entity1.getId().toString(), b -> { } );
+					.add( entity1.getId().toString(), b -> {} );
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -98,7 +98,7 @@ public class AutomaticIndexingIdentiferRollbackIT {
 			entity1Id.set( entity1.getId() );
 
 			backendMock.expectWorks( EntityWithNonJpaIdAsDocumentId.NAME )
-					.add( "document1", b -> { } );
+					.add( "document1", b -> {} );
 		} );
 		backendMock.verifyExpectationsMet();
 

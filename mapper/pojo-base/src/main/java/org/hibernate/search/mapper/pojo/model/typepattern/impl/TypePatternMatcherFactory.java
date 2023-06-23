@@ -141,7 +141,8 @@ public class TypePatternMatcherFactory {
 				WildcardType wildcardTypeArgument = (WildcardType) typeArgument;
 				Type[] upperBounds = wildcardTypeArgument.getUpperBounds();
 				Type[] lowerBounds = wildcardTypeArgument.getLowerBounds();
-				if ( upperBounds.length > 1 || !Object.class.equals( upperBounds[0] )
+				if ( upperBounds.length > 1
+						|| !Object.class.equals( upperBounds[0] )
 						|| lowerBounds.length > 0 ) {
 					throw new UnsupportedOperationException(
 							"Matching a parameterized type with bounded type arguments is not supported"

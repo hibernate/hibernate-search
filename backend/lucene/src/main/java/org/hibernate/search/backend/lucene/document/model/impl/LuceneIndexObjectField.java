@@ -16,12 +16,11 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementCon
 
 public final class LuceneIndexObjectField
 		extends AbstractIndexObjectField<
-						LuceneIndexObjectField,
-						LuceneSearchIndexScope<?>,
-						LuceneIndexCompositeNodeType,
-						LuceneIndexCompositeNode,
-						LuceneIndexField
-				>
+				LuceneIndexObjectField,
+				LuceneSearchIndexScope<?>,
+				LuceneIndexCompositeNodeType,
+				LuceneIndexCompositeNode,
+				LuceneIndexField>
 		implements LuceneIndexCompositeNode, LuceneIndexField {
 
 	private final boolean dynamic;

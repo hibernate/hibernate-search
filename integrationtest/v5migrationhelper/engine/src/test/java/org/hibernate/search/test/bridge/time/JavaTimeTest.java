@@ -140,7 +140,7 @@ public class JavaTimeTest {
 				221998, Month.FEBRUARY.getValue(), 12,
 				13, 05, 33, 7,
 				ZoneOffset.of( "+01:00" )
-				);
+		);
 
 		Sample sample = new Sample( 1L, "OffsetDateTime example" );
 		sample.offsetDateTime = value;

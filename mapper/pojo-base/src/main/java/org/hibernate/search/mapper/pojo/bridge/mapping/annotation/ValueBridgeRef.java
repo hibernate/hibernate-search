@@ -26,7 +26,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
  * References can use either a name, a type, or both.
  */
 @Documented
-@Target({}) // Only used as a component in other annotations
+@Target({ }) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValueBridgeRef {
 

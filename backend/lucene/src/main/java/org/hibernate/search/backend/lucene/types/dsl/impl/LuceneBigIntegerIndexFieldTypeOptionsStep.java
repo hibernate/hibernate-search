@@ -29,7 +29,8 @@ class LuceneBigIntegerIndexFieldTypeOptionsStep
 
 	private Integer decimalScale = null;
 
-	LuceneBigIntegerIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, IndexFieldTypeDefaultsProvider defaultsProvider) {
+	LuceneBigIntegerIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext,
+			IndexFieldTypeDefaultsProvider defaultsProvider) {
 		super( buildContext, BigInteger.class );
 		this.defaultsProvider = defaultsProvider;
 	}

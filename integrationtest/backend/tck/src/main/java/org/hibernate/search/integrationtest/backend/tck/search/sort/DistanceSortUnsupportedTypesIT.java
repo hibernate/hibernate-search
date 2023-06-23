@@ -45,7 +45,7 @@ public class DistanceSortUnsupportedTypesIT<F> {
 	public static Object[][] parameters() {
 		List<Object[]> parameters = new ArrayList<>();
 		unsupportedTypeDescriptors().forEach( fieldTypeDescriptor -> {
-				parameters.add( new Object[] { fieldTypeDescriptor } );
+			parameters.add( new Object[] { fieldTypeDescriptor } );
 		} );
 		return parameters.toArray( new Object[0][] );
 	}
@@ -92,7 +92,7 @@ public class DistanceSortUnsupportedTypesIT<F> {
 		final SimpleFieldModelsByType fieldModels;
 
 		IndexBinding(IndexSchemaElement root) {
-			fieldModels = SimpleFieldModelsByType.mapAll( unsupportedTypeDescriptors(), root, "", c -> { } );
+			fieldModels = SimpleFieldModelsByType.mapAll( unsupportedTypeDescriptors(), root, "", c -> {} );
 		}
 	}
 

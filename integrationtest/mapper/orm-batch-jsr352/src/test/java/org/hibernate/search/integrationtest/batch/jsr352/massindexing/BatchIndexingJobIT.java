@@ -119,7 +119,8 @@ public class BatchIndexingJobIT {
 	}
 
 	@Test
-	public void simple() throws InterruptedException,
+	public void simple()
+			throws InterruptedException,
 			IOException {
 		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		List<Person> people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
@@ -134,7 +135,7 @@ public class BatchIndexingJobIT {
 						.forEntities( Company.class, Person.class, WhoAmI.class )
 						.checkpointInterval( CHECKPOINT_INTERVAL )
 						.build()
-				);
+		);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 		assertCompletion( executionId );
@@ -151,7 +152,8 @@ public class BatchIndexingJobIT {
 	}
 
 	@Test
-	public void simple_defaultCheckpointInterval() throws InterruptedException,
+	public void simple_defaultCheckpointInterval()
+			throws InterruptedException,
 			IOException {
 		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		List<Person> people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
@@ -183,7 +185,8 @@ public class BatchIndexingJobIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2637")
-	public void indexedEmbeddedCollection() throws InterruptedException,
+	public void indexedEmbeddedCollection()
+			throws InterruptedException,
 			IOException {
 		setupHolder.runInTransaction( em -> {
 			CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
@@ -204,9 +207,12 @@ public class BatchIndexingJobIT {
 			groups.forEach( em::persist );
 		} );
 
-		List<CompanyGroup> groupsContainingGoogle = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Google" );
-		List<CompanyGroup> groupsContainingRedHat = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Red Hat" );
-		List<CompanyGroup> groupsContainingMicrosoft = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Microsoft" );
+		List<CompanyGroup> groupsContainingGoogle =
+				JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Google" );
+		List<CompanyGroup> groupsContainingRedHat =
+				JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Red Hat" );
+		List<CompanyGroup> groupsContainingMicrosoft =
+				JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Microsoft" );
 		assertEquals( 0, groupsContainingGoogle.size() );
 		assertEquals( 0, groupsContainingRedHat.size() );
 		assertEquals( 0, groupsContainingMicrosoft.size() );
@@ -217,7 +223,7 @@ public class BatchIndexingJobIT {
 						.forEntities( CompanyGroup.class )
 						.checkpointInterval( CHECKPOINT_INTERVAL )
 						.build()
-				);
+		);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 		assertCompletion( executionId );
@@ -284,7 +290,8 @@ public class BatchIndexingJobIT {
 	}
 
 	@Test
-	public void hql() throws InterruptedException,
+	public void hql()
+			throws InterruptedException,
 			IOException {
 		// searches before mass index,
 		// expected no results for each search
@@ -299,17 +306,20 @@ public class BatchIndexingJobIT {
 						.checkpointInterval( CHECKPOINT_INTERVAL )
 						.restrictedBy( "select c from Company c where c.name like 'Google%' or c.name like 'Red Hat%'" )
 						.build()
-				);
+		);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 
-		assertEquals( INSTANCES_PER_DATA_TEMPLATE, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" ).size() );
-		assertEquals( INSTANCES_PER_DATA_TEMPLATE, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Red Hat" ).size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE,
+				JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" ).size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE,
+				JobTestUtil.findIndexedResults( emf, Company.class, "name", "Red Hat" ).size() );
 		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Microsoft" ).size() );
 	}
 
 	@Test
-	public void hql_maxResults() throws InterruptedException,
+	public void hql_maxResults()
+			throws InterruptedException,
 			IOException {
 		// searches before mass index,
 		// expected no results for each search
@@ -333,7 +343,8 @@ public class BatchIndexingJobIT {
 	}
 
 	@Test
-	public void partitioned() throws InterruptedException,
+	public void partitioned()
+			throws InterruptedException,
 			IOException {
 		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		List<Person> people = JobTestUtil.findIndexedResults( emf, Person.class, "firstName", "Linus" );
@@ -349,7 +360,7 @@ public class BatchIndexingJobIT {
 						.checkpointInterval( CHECKPOINT_INTERVAL )
 						.rowsPerPartition( INSTANCE_PER_ENTITY_TYPE - 1 )
 						.build()
-				);
+		);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 		assertCompletion( executionId );

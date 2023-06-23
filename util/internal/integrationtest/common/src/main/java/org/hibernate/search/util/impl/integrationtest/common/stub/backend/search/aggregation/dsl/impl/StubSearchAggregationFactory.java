@@ -12,7 +12,8 @@ import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationIndex
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 public class StubSearchAggregationFactory
-		extends AbstractSearchAggregationFactory<StubSearchAggregationFactory, SearchAggregationIndexScope<?>, SearchPredicateFactory> {
+		extends
+		AbstractSearchAggregationFactory<StubSearchAggregationFactory, SearchAggregationIndexScope<?>, SearchPredicateFactory> {
 	public StubSearchAggregationFactory(
 			SearchAggregationDslContext<SearchAggregationIndexScope<?>, SearchPredicateFactory> dslContext) {
 		super( dslContext );

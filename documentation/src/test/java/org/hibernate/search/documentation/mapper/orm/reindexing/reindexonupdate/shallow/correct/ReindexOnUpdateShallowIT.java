@@ -66,7 +66,7 @@ public class ReindexOnUpdateShallowIT {
 			category.setName( "Science-fiction" );
 			entityManager.persist( category );
 
-			for ( int i = 0 ; i < 100 ; ++i ) {
+			for ( int i = 0; i < 100; ++i ) {
 				Book book = new Book();
 				book.setId( i );
 				book.setTitle( "Book " + i );

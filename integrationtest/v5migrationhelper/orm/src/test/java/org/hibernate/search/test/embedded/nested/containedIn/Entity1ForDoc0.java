@@ -33,7 +33,7 @@ public class Entity1ForDoc0 implements Serializable {
 	@Id
 	@Field
 	@GeneratedValue //(generator = "ids_generator1", strategy = GenerationType.SEQUENCE)
-	@Column(name = "universalid")//"uid" is a keywork in Oracle
+	@Column(name = "universalid") //"uid" is a keywork in Oracle
 	private long uid;
 
 	@Version

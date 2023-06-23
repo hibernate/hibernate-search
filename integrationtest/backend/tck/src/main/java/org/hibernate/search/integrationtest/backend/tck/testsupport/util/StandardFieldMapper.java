@@ -21,7 +21,7 @@ public final class StandardFieldMapper<F, M> {
 	public static <F, M> StandardFieldMapper<F, M> of(
 			Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration,
 			BiFunction<IndexFieldReference<F>, String, M> resultFunction) {
-		return of( initialConfiguration, ignored -> { }, resultFunction );
+		return of( initialConfiguration, ignored -> {}, resultFunction );
 	}
 
 	public static <F> StandardFieldMapper<F, IndexFieldReference<F>> of(
@@ -53,11 +53,11 @@ public final class StandardFieldMapper<F, M> {
 	}
 
 	public M map(IndexSchemaElement parent, String name) {
-		return map( parent, name, ignored -> { } );
+		return map( parent, name, ignored -> {} );
 	}
 
 	public M mapMultiValued(IndexSchemaElement parent, String name) {
-		return mapMultiValued( parent, name, ignored -> { } );
+		return mapMultiValued( parent, name, ignored -> {} );
 	}
 
 	@SafeVarargs
@@ -82,7 +82,8 @@ public final class StandardFieldMapper<F, M> {
 						f -> {
 							StandardIndexFieldTypeOptionsStep<?, F> typeContext = initialConfiguration.apply( f );
 							configurationAdjustment.accept( typeContext );
-							for ( Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>> additionalConfiguration : additionalConfigurations ) {
+							for ( Consumer<? super StandardIndexFieldTypeOptionsStep<?,
+									F>> additionalConfiguration : additionalConfigurations ) {
 								additionalConfiguration.accept( typeContext );
 							}
 							return typeContext;

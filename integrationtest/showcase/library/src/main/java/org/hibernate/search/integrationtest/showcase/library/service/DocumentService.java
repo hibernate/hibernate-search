@@ -57,7 +57,8 @@ public class DocumentService {
 		return documentRepo.searchByMedium( terms, medium, offset, limit );
 	}
 
-	public List<Document<?>> searchAroundMe(String terms, String tags, GeoPoint myLocation, Double maxDistanceInKilometers, List<LibraryServiceOption> options,
+	public List<Document<?>> searchAroundMe(String terms, String tags, GeoPoint myLocation, Double maxDistanceInKilometers,
+			List<LibraryServiceOption> options,
 			int offset, int limit) {
 		return documentRepo.searchAroundMe( terms, tags, myLocation, maxDistanceInKilometers, options, offset, limit );
 	}

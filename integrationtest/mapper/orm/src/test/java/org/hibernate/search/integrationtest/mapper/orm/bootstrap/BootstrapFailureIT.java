@@ -38,7 +38,7 @@ public class BootstrapFailureIT {
 	@Test
 	public void propagateException() {
 		assertThatThrownBy( () -> ormSetupHelper.start()
-						.setup( FailingIndexedEntity.class, ContainedEntity.class )
+				.setup( FailingIndexedEntity.class, ContainedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(

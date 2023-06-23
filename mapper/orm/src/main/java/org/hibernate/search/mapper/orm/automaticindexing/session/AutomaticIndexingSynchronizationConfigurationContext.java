@@ -48,7 +48,8 @@ public interface AutomaticIndexingSynchronizationConfigurationContext {
 	 * the report will {@link org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport#throwable() contain a throwable}
 	 * and (if applicable) {@link org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport#failingEntities() a list of failing entities}.
 	 */
-	void indexingFutureHandler(Consumer<CompletableFuture<org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport>> handler);
+	void indexingFutureHandler(
+			Consumer<CompletableFuture<org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport>> handler);
 
 	/**
 	 * @return The failure handler.

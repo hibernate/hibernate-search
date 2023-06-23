@@ -124,9 +124,15 @@ public class SingleFieldAggregationBaseIT<F> {
 
 	@Test
 	@TestForIssue(jiraKey = {
-			"HSEARCH-726", "HSEARCH-900", "HSEARCH-809",
-			"HSEARCH-2376", "HSEARCH-2472", "HSEARCH-2954", "HSEARCH-2535",
-			"HSEARCH-1927", "HSEARCH-1929",
+			"HSEARCH-726",
+			"HSEARCH-900",
+			"HSEARCH-809",
+			"HSEARCH-2376",
+			"HSEARCH-2472",
+			"HSEARCH-2954",
+			"HSEARCH-2535",
+			"HSEARCH-1927",
+			"HSEARCH-1929",
 			"HSEARCH-3881"
 	})
 	@PortedFromSearch5(original = {
@@ -155,8 +161,9 @@ public class SingleFieldAggregationBaseIT<F> {
 		String fieldPath = getFieldPath( mainIndex.binding() );
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchAggregation<A> aggregation = scenario.setup( scope.aggregation(), fieldPath, getFilterOrNull( mainIndex.binding() ) )
-				.toAggregation();
+		SearchAggregation<A> aggregation =
+				scenario.setup( scope.aggregation(), fieldPath, getFilterOrNull( mainIndex.binding() ) )
+						.toAggregation();
 
 		assertThatQuery(
 				mainIndex.createScope().query()
@@ -340,7 +347,7 @@ public class SingleFieldAggregationBaseIT<F> {
 				}
 			}
 			mainIndexer.add(
-					documentProvider( routingKey + "_document_empty", routingKey, document -> { } )
+					documentProvider( routingKey + "_document_empty", routingKey, document -> {} )
 			);
 
 			nullOnlyIndexer.add(

@@ -52,7 +52,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
-public final class HibernateSearchEventListener implements PostDeleteEventListener,
+public final class HibernateSearchEventListener
+		implements PostDeleteEventListener,
 		PostInsertEventListener, PostUpdateEventListener,
 		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener, PostCollectionUpdateEventListener,
 		FlushEventListener, AutoFlushEventListener, ClearEventListener {
@@ -338,8 +339,8 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 				}
 			}
 			else {
-				 // We don't know which collection is being changed,
-				 // so we have to default to reindexing, just in case.
+				// We don't know which collection is being changed,
+				// so we have to default to reindexing, just in case.
 				dirtyPaths = null;
 			}
 		}

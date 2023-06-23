@@ -67,8 +67,7 @@ public class LuceneIndexSchemaManagerCreationOrPreservationIT {
 		assertThat( indexExists() ).isTrue();
 
 		IndexIndexingPlan plan = index.createIndexingPlan();
-		plan.add( referenceProvider( "1" ), document -> {
-		} );
+		plan.add( referenceProvider( "1" ), document -> {} );
 		plan.execute( OperationSubmitter.blocking() ).join();
 
 		assertThat( countDocsOnDisk() ).isEqualTo( 1 );

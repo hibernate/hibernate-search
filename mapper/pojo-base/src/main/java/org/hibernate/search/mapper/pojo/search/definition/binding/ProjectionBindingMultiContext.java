@@ -47,7 +47,8 @@ public interface ProjectionBindingMultiContext {
 	 * to bind to the constructor parameter.
 	 * @param <P> The type of values returned by the projection.
 	 */
-	<P> void definition(Class<P> expectedValueType, BeanHolder<? extends ProjectionDefinition<? extends List<? extends P>>> definitionHolder);
+	<P> void definition(Class<P> expectedValueType,
+			BeanHolder<? extends ProjectionDefinition<? extends List<? extends P>>> definitionHolder);
 
 	/**
 	 * @return An entry point allowing to inspect the constructor parameter being bound to a projection.

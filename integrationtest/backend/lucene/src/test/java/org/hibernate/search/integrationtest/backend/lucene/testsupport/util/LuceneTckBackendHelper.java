@@ -84,7 +84,10 @@ public class LuceneTckBackendHelper implements TckBackendHelper {
 	}
 
 	@Override
-	public <R, E, LOS> SearchQueryDslExtension<? extends SearchQuerySelectStep<?, R, E, LOS, ?, ?>, R, E, LOS> queryDslExtension() {
+	public <
+			R,
+			E,
+			LOS> SearchQueryDslExtension<? extends SearchQuerySelectStep<?, R, E, LOS, ?, ?>, R, E, LOS> queryDslExtension() {
 		return LuceneExtension.get();
 	}
 }

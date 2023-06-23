@@ -180,8 +180,8 @@ public class WebShopTest extends AbstractFacetTest {
 					case cubicCapacityFacetName:
 						// Clearly not a great user experience, but Search 6 returns a Range<T>
 						// which is much easier to work with.
-						Integer min = ((RangeFacet<Integer>) selectedFacet).getMin();
-						Integer max = ((RangeFacet<Integer>) selectedFacet).getMax();
+						Integer min = ( (RangeFacet<Integer>) selectedFacet ).getMin();
+						Integer max = ( (RangeFacet<Integer>) selectedFacet ).getMax();
 						junction.filteredBy( builder.range()
 								.onField( Car.CUBIC_CAPACITY_STRING_FACET_NUMERIC_ENCODING )
 								.from( min ).to( max )

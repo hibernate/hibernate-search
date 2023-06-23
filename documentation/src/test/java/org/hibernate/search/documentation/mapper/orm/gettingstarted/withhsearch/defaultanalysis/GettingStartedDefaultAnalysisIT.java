@@ -79,14 +79,14 @@ public class GettingStartedDefaultAnalysisIT {
 
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			try {
-			// tag::manual-index[]
+				// tag::manual-index[]
 				SearchSession searchSession = Search.session( entityManager ); // <1>
 
 				MassIndexer indexer = searchSession.massIndexer( Book.class ) // <2>
 						.threadsToLoadObjects( 7 ); // <3>
 
 				indexer.startAndWait(); // <4>
-			// end::manual-index[]
+				// end::manual-index[]
 			}
 			catch (InterruptedException e) {
 				throw new RuntimeException( e );
@@ -112,14 +112,14 @@ public class GettingStartedDefaultAnalysisIT {
 
 			List<Book> hits2 =
 					/* ... same DSL calls as above... */
-			// end::searching-objects[]
+					// end::searching-objects[]
 					searchSession.search( scope )
-					.where( scope.predicate().match()
-							.fields( "title", "authors.name" )
-							.matching( "refactoring" )
-							.toPredicate() )
-			// tag::searching-objects[]
-					.fetchHits( 20 ); // <8>
+							.where( scope.predicate().match()
+									.fields( "title", "authors.name" )
+									.matching( "refactoring" )
+									.toPredicate() )
+							// tag::searching-objects[]
+							.fetchHits( 20 ); // <8>
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching-objects[]
 
@@ -146,13 +146,13 @@ public class GettingStartedDefaultAnalysisIT {
 
 			List<Book> hits2 =
 					/* ... same DSL calls as above... */
-			// end::searching-lambdas[]
+					// end::searching-lambdas[]
 					searchSession.search( Book.class )
 							.where( f -> f.match()
 									.fields( "title", "authors.name" )
 									.matching( "refactoring" ) )
-			// tag::searching-lambdas[]
-					.fetchHits( 20 ); // <7>
+							// tag::searching-lambdas[]
+							.fetchHits( 20 ); // <7>
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching-lambdas[]
 

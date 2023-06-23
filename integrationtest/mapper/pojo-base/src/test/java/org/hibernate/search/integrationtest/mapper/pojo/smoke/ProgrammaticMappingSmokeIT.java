@@ -47,7 +47,8 @@ public class ProgrammaticMappingSmokeIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private SearchMapping mapping;
 
@@ -138,15 +139,15 @@ public class ProgrammaticMappingSmokeIT {
 					indexedEntityMapping.indexed().index( IndexedEntity.INDEX );
 					indexedEntityMapping.binder(
 							new CustomTypeBridge.Binder()
-							.objectName( "customBridgeOnClass" )
+									.objectName( "customBridgeOnClass" )
 					);
 					indexedEntityMapping.property( "id" ).documentId();
 					indexedEntityMapping.property( "text" )
 							.genericField( "myTextField" );
 					indexedEntityMapping.property( "embedded" )
 							.indexedEmbedded( "myEmbedded" )
-									.includeDepth( 1 )
-									.includePaths( "customBridgeOnClass.text", "myEmbedded.customBridgeOnClass.text" );
+							.includeDepth( 1 )
+							.includePaths( "customBridgeOnClass.text", "myEmbedded.customBridgeOnClass.text" );
 
 					ProgrammaticMappingConfigurationContext secondMappingDefinition = builder.programmaticMapping();
 
@@ -159,7 +160,7 @@ public class ProgrammaticMappingSmokeIT {
 							)
 							.binder(
 									new CustomPropertyBridge.Binder()
-									.objectName( "customBridgeOnProperty" )
+											.objectName( "customBridgeOnProperty" )
 							);
 
 					TypeMappingStep otherIndexedEntityMapping = secondMappingDefinition.type( OtherIndexedEntity.class );
@@ -170,7 +171,8 @@ public class ProgrammaticMappingSmokeIT {
 							.genericField()
 							.genericField( "numericAsString" ).valueBridge( IntegerAsStringValueBridge.class );
 
-					TypeMappingStep yetAnotherIndexedEntityMapping = secondMappingDefinition.type( YetAnotherIndexedEntity.class );
+					TypeMappingStep yetAnotherIndexedEntityMapping =
+							secondMappingDefinition.type( YetAnotherIndexedEntity.class );
 					yetAnotherIndexedEntityMapping.indexed().index( YetAnotherIndexedEntity.INDEX );
 					yetAnotherIndexedEntityMapping.property( "id" ).documentId();
 					yetAnotherIndexedEntityMapping.property( "numeric" ).genericField();
@@ -184,7 +186,7 @@ public class ProgrammaticMappingSmokeIT {
 									PojoModelPath.ofValue( "embeddingAsList" )
 							)
 							.indexedEmbedded( "myEmbeddedList" )
-									.includePaths( "myEmbedded.customBridgeOnClass.text" );
+							.includePaths( "myEmbedded.customBridgeOnClass.text" );
 					yetAnotherIndexedEntityMapping.property( "embeddedArrayList" )
 							.associationInverseSide(
 									PojoModelPath.ofValue( "embeddingAsArrayList" )
@@ -364,7 +366,7 @@ public class ProgrammaticMappingSmokeIT {
 											)
 									)
 							)
-							.objectField( "myEmbeddedList", b2 -> { } )
+							.objectField( "myEmbeddedList", b2 -> {} )
 							.objectField( "embeddedArrayList", b2 -> b2
 									.objectField( "myEmbedded", b3 -> b3
 											.objectField( "customBridgeOnProperty", b4 -> b4

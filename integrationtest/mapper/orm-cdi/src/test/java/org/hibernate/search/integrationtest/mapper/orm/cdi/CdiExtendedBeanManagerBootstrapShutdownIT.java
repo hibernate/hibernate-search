@@ -80,7 +80,8 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 			}
 		} );
 
-		try ( @SuppressWarnings("unused") SessionFactory sessionFactory = ormSetupHelper.start()
+		try ( @SuppressWarnings("unused")
+		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withProperty( AvailableSettings.CDI_BEAN_MANAGER, extendedBeanManager )
 				.setup( IndexedEntity.class ) ) {
 			// Hibernate Search should not have booted yet.
@@ -135,7 +136,8 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 			}
 		} );
 
-		try ( @SuppressWarnings("unused") SessionFactory sessionFactory = ormSetupHelper.start()
+		try ( @SuppressWarnings("unused")
+		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withProperty( AvailableSettings.CDI_BEAN_MANAGER, extendedBeanManager )
 				.setup( IndexedEntity.class ) ) {
 			// Hibernate Search should not have booted yet.
@@ -189,7 +191,8 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 			}
 		} );
 
-		try ( @SuppressWarnings("unused") SessionFactory sessionFactory = ormSetupHelper.start()
+		try ( @SuppressWarnings("unused")
+		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withProperty( AvailableSettings.CDI_BEAN_MANAGER, extendedBeanManager )
 				.setup( IndexedEntity.class ) ) {
 			// Hibernate Search should not have booted yet.
@@ -230,7 +233,8 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 			throw bootFailedException;
 		} );
 
-		try ( @SuppressWarnings("unused") SessionFactory sessionFactory = ormSetupHelper.start()
+		try ( @SuppressWarnings("unused")
+		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withProperty( AvailableSettings.CDI_BEAN_MANAGER, extendedBeanManager )
 				.setup( IndexedEntity.class ) ) {
 			// Hibernate Search should not have booted yet.

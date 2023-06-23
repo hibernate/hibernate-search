@@ -33,7 +33,11 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHe
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 
 public final class StandalonePojoMappingSetupHelper
-		extends MappingSetupHelper<StandalonePojoMappingSetupHelper.SetupContext, SearchMappingBuilder, StandalonePojoMappingConfigurationContext, CloseableSearchMapping> {
+		extends
+		MappingSetupHelper<StandalonePojoMappingSetupHelper.SetupContext,
+				SearchMappingBuilder,
+				StandalonePojoMappingConfigurationContext,
+				CloseableSearchMapping> {
 
 	/**
 	 * @param lookup A {@link MethodHandles.Lookup} with private access to the test method,
@@ -95,7 +99,11 @@ public final class StandalonePojoMappingSetupHelper
 	}
 
 	public final class SetupContext
-			extends MappingSetupHelper<SetupContext, SearchMappingBuilder, StandalonePojoMappingConfigurationContext, CloseableSearchMapping>.AbstractSetupContext {
+			extends
+			MappingSetupHelper<SetupContext,
+					SearchMappingBuilder,
+					StandalonePojoMappingConfigurationContext,
+					CloseableSearchMapping>.AbstractSetupContext {
 
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> properties = new LinkedHashMap<>();
@@ -138,7 +146,7 @@ public final class StandalonePojoMappingSetupHelper
 			} );
 		}
 
-		public SetupContext withAnnotatedEntityTypes(Class<?> ... annotatedEntityTypes) {
+		public SetupContext withAnnotatedEntityTypes(Class<?>... annotatedEntityTypes) {
 			return withAnnotatedEntityTypes( CollectionHelper.asLinkedHashSet( annotatedEntityTypes ) );
 		}
 
@@ -149,7 +157,7 @@ public final class StandalonePojoMappingSetupHelper
 			} );
 		}
 
-		public SetupContext withAnnotatedTypes(Class<?> ... annotatedTypes) {
+		public SetupContext withAnnotatedTypes(Class<?>... annotatedTypes) {
 			return withAnnotatedTypes( CollectionHelper.asLinkedHashSet( annotatedTypes ) );
 		}
 
@@ -157,7 +165,7 @@ public final class StandalonePojoMappingSetupHelper
 			return withConfiguration( builder -> builder.annotationMapping().add( annotatedTypes ) );
 		}
 
-		public SearchMapping setup(Class<?> ... annotatedEntityTypes) {
+		public SearchMapping setup(Class<?>... annotatedEntityTypes) {
 			return withAnnotatedEntityTypes( annotatedEntityTypes ).setup();
 		}
 
@@ -169,7 +177,8 @@ public final class StandalonePojoMappingSetupHelper
 		}
 
 		@Override
-		protected void consumeBeforeBuildConfigurations(SearchMappingBuilder builder, List<Consumer<StandalonePojoMappingConfigurationContext>> consumers) {
+		protected void consumeBeforeBuildConfigurations(SearchMappingBuilder builder,
+				List<Consumer<StandalonePojoMappingConfigurationContext>> consumers) {
 			List<Object> configurers = consumers.stream()
 					.map( c -> (StandalonePojoMappingConfigurer) c::accept )
 					.collect( Collectors.toList() );

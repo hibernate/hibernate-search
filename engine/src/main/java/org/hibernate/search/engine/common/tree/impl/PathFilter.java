@@ -53,6 +53,7 @@ public abstract class PathFilter {
 	}
 
 	abstract boolean isExplicitlyIncluded(String relativePath);
+
 	abstract boolean isExplicitlyExcluded(String relativePath);
 
 	abstract boolean isPotentiallyExcluded(String path);
@@ -105,10 +106,10 @@ public abstract class PathFilter {
 		boolean isPotentiallyExcluded(String pathToTest) {
 			for ( String excludePath : paths ) {
 				if (
-						// Exact match -- great! it means we will definitely exclude our path-to-test.
-						excludePath.equals( pathToTest )
-								// Otherwise, make sure that we have an exclude path that starts with our path-to-test
-								|| excludePath.startsWith( pathToTest )
+					// Exact match -- great! it means we will definitely exclude our path-to-test.
+				excludePath.equals( pathToTest )
+						// Otherwise, make sure that we have an exclude path that starts with our path-to-test
+						|| excludePath.startsWith( pathToTest )
 								// and make sure that our matched path actually is a path of complete object names,
 								// i.e. in excludePath, there is some other object name following our path-to-test:
 								&& excludePath.startsWith( ".", pathToTest.length() ) ) {
@@ -127,6 +128,7 @@ public abstract class PathFilter {
 
 	private static class Unconstrained extends PathFilter {
 		private static final PathFilter INSTANCE = new Unconstrained();
+
 		private Unconstrained() {
 			super( Collections.emptySet() );
 		}

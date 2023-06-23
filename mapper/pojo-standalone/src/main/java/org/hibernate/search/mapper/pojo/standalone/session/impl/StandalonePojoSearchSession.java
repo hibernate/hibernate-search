@@ -69,8 +69,9 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 		this.loadingOptionsContributor = builder.loadingOptionsContributor;
 		this.synchronizationStrategyHolder = builder.synchronizationStrategyHolder;
 
-		this.indexingPlanSynchronizationStrategy = this.synchronizationStrategyHolder.configureOverriddenSynchronizationStrategy(
-				builder.synchronizationStrategy );
+		this.indexingPlanSynchronizationStrategy =
+				this.synchronizationStrategyHolder.configureOverriddenSynchronizationStrategy(
+						builder.synchronizationStrategy );
 		this.configuredIndexingPlanFilter = ACCEPT_ALL;
 	}
 
@@ -108,8 +109,9 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public void indexingPlanSynchronizationStrategy( IndexingPlanSynchronizationStrategy synchronizationStrategy) {
-		this.indexingPlanSynchronizationStrategy = synchronizationStrategyHolder.configureOverriddenSynchronizationStrategy( synchronizationStrategy );
+	public void indexingPlanSynchronizationStrategy(IndexingPlanSynchronizationStrategy synchronizationStrategy) {
+		this.indexingPlanSynchronizationStrategy =
+				synchronizationStrategyHolder.configureOverriddenSynchronizationStrategy( synchronizationStrategy );
 	}
 
 	@Override
@@ -227,7 +229,8 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 		}
 
 		@Override
-		public SearchSessionBuilder indexingPlanSynchronizationStrategy(IndexingPlanSynchronizationStrategy synchronizationStrategy) {
+		public SearchSessionBuilder indexingPlanSynchronizationStrategy(
+				IndexingPlanSynchronizationStrategy synchronizationStrategy) {
 			this.synchronizationStrategy = synchronizationStrategy;
 			return this;
 		}

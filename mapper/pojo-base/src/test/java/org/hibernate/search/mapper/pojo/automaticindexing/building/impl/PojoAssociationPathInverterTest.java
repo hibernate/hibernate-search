@@ -38,7 +38,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class PojoAssociationPathInverterTest {
 
 	@Rule
@@ -134,19 +134,22 @@ public class PojoAssociationPathInverterTest {
 				mock( PojoTypeAdditionalMetadata.class, "inverseSideEntityTypeAdditionalMetadataMock" );
 		when( typeAdditionalMetadataProviderMock.get( inverseSideEntityTypeMock ) )
 				.thenReturn( inverseSideEntityTypeAdditionalMetadataMock );
-		setupSingletonEmbeddedPropertiesAdditionalMetadataStub( inverseSideEntityTypeAdditionalMetadataMock, inverseSideProperty1Name );
+		setupSingletonEmbeddedPropertiesAdditionalMetadataStub( inverseSideEntityTypeAdditionalMetadataMock,
+				inverseSideProperty1Name );
 
 		PojoTypeAdditionalMetadata inverseSideEmbeddableType1AdditionalMetadataMock =
 				mock( PojoTypeAdditionalMetadata.class, "inverseSideEmbeddableType1AdditionalMetadataMock" );
 		when( typeAdditionalMetadataProviderMock.get( inverseSideEmbeddableType1Mock ) )
 				.thenReturn( inverseSideEmbeddableType1AdditionalMetadataMock );
-		setupSingletonEmbeddedPropertiesAdditionalMetadataStub( inverseSideEmbeddableType1AdditionalMetadataMock, inverseSideProperty2Name );
+		setupSingletonEmbeddedPropertiesAdditionalMetadataStub( inverseSideEmbeddableType1AdditionalMetadataMock,
+				inverseSideProperty2Name );
 
 		PojoTypeAdditionalMetadata inverseSideEmbeddableType2AdditionalMetadataMock =
 				mock( PojoTypeAdditionalMetadata.class, "inverseSideEmbeddableType2AdditionalMetadataMock" );
 		when( typeAdditionalMetadataProviderMock.get( inverseSideEmbeddableType2Mock ) )
 				.thenReturn( inverseSideEmbeddableType2AdditionalMetadataMock );
-		setupSingletonEmbeddedPropertiesAdditionalMetadataStub( inverseSideEmbeddableType2AdditionalMetadataMock, inverseSideProperty3Name );
+		setupSingletonEmbeddedPropertiesAdditionalMetadataStub( inverseSideEmbeddableType2AdditionalMetadataMock,
+				inverseSideProperty3Name );
 
 		// Let's not complicate things any further: assume that none of the paths is the default one
 		when( extractorBinderMock.isDefaultExtractorPath( any(), any() ) )
@@ -188,7 +191,8 @@ public class PojoAssociationPathInverterTest {
 				.thenReturn( (PojoTypeModel) propertyTypeMock );
 	}
 
-	private void setupSingletonEmbeddedPropertiesAdditionalMetadataStub(PojoTypeAdditionalMetadata typeAdditionalMetadata, String propertyName) {
+	private void setupSingletonEmbeddedPropertiesAdditionalMetadataStub(PojoTypeAdditionalMetadata typeAdditionalMetadata,
+			String propertyName) {
 		PojoPropertyAdditionalMetadata propertyAdditionalMetadataMock =
 				mock( PojoPropertyAdditionalMetadata.class, propertyName + "PropertyAdditionalMetadataMock" );
 		PojoValueAdditionalMetadata valueAdditionalMetadataMock =

@@ -13,10 +13,9 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexCompositeNode
 
 public interface ElasticsearchIndexCompositeNode
 		extends IndexCompositeNode<
-						ElasticsearchSearchIndexScope<?>,
-						ElasticsearchIndexCompositeNodeType,
-						ElasticsearchIndexField
-				>,
-				ElasticsearchIndexNode, ElasticsearchSearchIndexCompositeNodeContext {
+				ElasticsearchSearchIndexScope<?>,
+				ElasticsearchIndexCompositeNodeType,
+				ElasticsearchIndexField>,
+		ElasticsearchIndexNode, ElasticsearchSearchIndexCompositeNodeContext {
 
 }

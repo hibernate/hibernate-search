@@ -27,6 +27,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Documented
 @Target({ ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-@MethodParameterMapping(processor = @MethodParameterMappingAnnotationProcessorRef(type = EntityProjectionProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@MethodParameterMapping(processor = @MethodParameterMappingAnnotationProcessorRef(type = EntityProjectionProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface EntityProjection {
 }

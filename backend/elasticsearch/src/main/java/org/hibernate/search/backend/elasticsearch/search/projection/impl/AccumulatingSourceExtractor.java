@@ -51,7 +51,7 @@ abstract class AccumulatingSourceExtractor<E, V, A, P>
 
 		JsonElement child = parent.get( fieldPathComponents[currentPathComponentIndex] );
 
-		if ( currentPathComponentIndex == ( fieldPathComponents.length - 1) ) {
+		if ( currentPathComponentIndex == ( fieldPathComponents.length - 1 ) ) {
 			// We reached the field we want to collect.
 			return collectTargetField( projectionHitMapper, hit, child, context, accumulated );
 		}

@@ -49,7 +49,8 @@ public final class ElasticsearchSimpleQueryStringPredicateBuilderFieldState
 
 	public static class Factory
 			extends
-			AbstractElasticsearchValueFieldSearchQueryElementFactory<ElasticsearchSimpleQueryStringPredicateBuilderFieldState, String> {
+			AbstractElasticsearchValueFieldSearchQueryElementFactory<ElasticsearchSimpleQueryStringPredicateBuilderFieldState,
+					String> {
 		@Override
 		public ElasticsearchSimpleQueryStringPredicateBuilderFieldState create(
 				ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<String> field) {

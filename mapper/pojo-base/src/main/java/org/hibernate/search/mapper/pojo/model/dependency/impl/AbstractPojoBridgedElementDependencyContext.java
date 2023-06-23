@@ -49,7 +49,8 @@ public abstract class AbstractPojoBridgedElementDependencyContext {
 
 	public abstract boolean hasNonRootDependency();
 
-	PojoOtherEntityIndexingDependencyConfigurationContextImpl<?> createOtherEntityDependencyContext(PojoRawTypeModel<?> bridgedType,
+	PojoOtherEntityIndexingDependencyConfigurationContextImpl<?> createOtherEntityDependencyContext(
+			PojoRawTypeModel<?> bridgedType,
 			Class<?> otherEntityClass, PojoModelPathValueNode pathFromOtherEntityTypeToBridgedType) {
 		if ( !typeAdditionalMetadataProvider.get( bridgedType ).isEntity() ) {
 			throw log.cannotDefineOtherEntityDependencyOnNonEntityBridgedType( bridgedType );

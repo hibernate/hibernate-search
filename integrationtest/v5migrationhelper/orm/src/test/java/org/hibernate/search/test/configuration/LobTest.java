@@ -101,4 +101,3 @@ public class LobTest extends SearchTestBase {
 	}
 }
 
-

@@ -15,7 +15,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 
-public class GeoPointBindingProcessor implements TypeMappingAnnotationProcessor<GeoPointBinding>,
+public class GeoPointBindingProcessor
+		implements TypeMappingAnnotationProcessor<GeoPointBinding>,
 		PropertyMappingAnnotationProcessor<GeoPointBinding> {
 	@Override
 	public void process(TypeMappingStep mapping, GeoPointBinding annotation,

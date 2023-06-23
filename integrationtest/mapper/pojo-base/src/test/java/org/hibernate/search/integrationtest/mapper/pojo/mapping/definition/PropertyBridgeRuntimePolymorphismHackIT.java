@@ -51,8 +51,7 @@ public class PropertyBridgeRuntimePolymorphismHackIT {
 
 	@Test
 	public void explicitReindexing_hack_runtimePolymorphism() {
-		backendMock.expectSchema( INDEX_NAME, b ->
-				b.field( "someField", String.class ) );
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "someField", String.class ) );
 
 		SearchMapping mapping = setupHelper.start()
 				.setup( IndexedEntity.class, AbstractContainedEntity.class, ContainedEntity1.class );

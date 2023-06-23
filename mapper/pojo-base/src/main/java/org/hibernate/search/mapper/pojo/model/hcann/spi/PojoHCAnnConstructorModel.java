@@ -44,7 +44,8 @@ public class PojoHCAnnConstructorModel<T> implements PojoConstructorModel<T> {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[" + declaringTypeModel.name() + "(" + CommaSeparatedClassesFormatter.format( parametersJavaTypes() ) + ")" + "]";
+		return getClass().getSimpleName() + "[" + declaringTypeModel.name() + "("
+				+ CommaSeparatedClassesFormatter.format( parametersJavaTypes() ) + ")" + "]";
 	}
 
 	@Override

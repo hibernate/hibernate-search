@@ -53,7 +53,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(IndexingDependency.List.class)
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = IndexingDependencyProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = IndexingDependencyProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface IndexingDependency {
 
 	/**
@@ -72,7 +73,7 @@ public @interface IndexingDependency {
 	 * it allows Hibernate Search to know that whenever these other properties are changed,
 	 * this property may change too and thus should be reindexed.
 	 */
-	ObjectPath[] derivedFrom() default {};
+	ObjectPath[] derivedFrom() default { };
 
 	/**
 	 * @return A definition of container extractors to be applied to the property,

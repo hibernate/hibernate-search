@@ -114,8 +114,8 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 		}
 		else {
 			if ( boundParameterElementExtractorNames.size() > 1
-					|| ! ( BuiltinContainerExtractors.COLLECTION.equals( boundParameterElementExtractorNames.get( 0 ) )
-					|| BuiltinContainerExtractors.ITERABLE.equals( boundParameterElementExtractorNames.get( 0 ) ) )
+					|| !( BuiltinContainerExtractors.COLLECTION.equals( boundParameterElementExtractorNames.get( 0 ) )
+							|| BuiltinContainerExtractors.ITERABLE.equals( boundParameterElementExtractorNames.get( 0 ) ) )
 					|| !mappingHelper.introspector().typeModel( List.class ).isSubTypeOf( parameterTypeModel.rawType() ) ) {
 				throw log.invalidMultiValuedParameterTypeForProjectionConstructor( parameterTypeModel );
 			}
@@ -205,7 +205,8 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 				parameterBinder.parent.nestingContext ) );
 	}
 
-	private <T> CompositeProjectionDefinition<T> createCompositeProjectionDefinition(Class<T> projectedType, TreeNestingContext nestingContext) {
+	private <T> CompositeProjectionDefinition<T> createCompositeProjectionDefinition(Class<T> projectedType,
+			TreeNestingContext nestingContext) {
 		PojoConstructorModel<T> projectionConstructor = parameterBinder.findProjectionConstructorOrNull(
 				mappingHelper.introspector().typeModel( projectedType ) );
 		if ( projectionConstructor == null ) {
@@ -332,7 +333,8 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 			return parameterContainerElementRootElement;
 		}
 
-		private <P2> void checkAndBind(BeanHolder<? extends ProjectionDefinition<? extends List<? extends P2>>> definitionHolder,
+		private <P2> void checkAndBind(
+				BeanHolder<? extends ProjectionDefinition<? extends List<? extends P2>>> definitionHolder,
 				PojoRawTypeModel<P2> expectedValueType) {
 			if ( !expectedValueType.isSubTypeOf( parameterContainerElementTypeModel.rawType() ) ) {
 				throw log.invalidOutputTypeForMultiValuedProjectionDefinition( definitionHolder.get(), parameterTypeModel,

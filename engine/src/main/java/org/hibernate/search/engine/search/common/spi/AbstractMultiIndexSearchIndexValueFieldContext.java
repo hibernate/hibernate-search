@@ -14,11 +14,10 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 
 public abstract class AbstractMultiIndexSearchIndexValueFieldContext<
-				S extends SearchIndexValueFieldContext<SC>,
-				SC extends SearchIndexScope<?>,
-				FT extends SearchIndexValueFieldTypeContext<SC, S, F>,
-				F
-		>
+		S extends SearchIndexValueFieldContext<SC>,
+		SC extends SearchIndexScope<?>,
+		FT extends SearchIndexValueFieldTypeContext<SC, S, F>,
+		F>
 		extends AbstractMultiIndexSearchIndexNodeContext<S, SC, FT>
 		implements SearchIndexValueFieldContext<SC>, SearchIndexValueFieldTypeContext<SC, S, F> {
 	public AbstractMultiIndexSearchIndexValueFieldContext(SC scope, String absolutePath,

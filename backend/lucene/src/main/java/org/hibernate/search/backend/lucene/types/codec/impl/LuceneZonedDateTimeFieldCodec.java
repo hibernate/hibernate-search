@@ -27,10 +27,10 @@ public final class LuceneZonedDateTimeFieldCodec extends AbstractLuceneNumericFi
 			.append( LuceneOffsetDateTimeFieldCodec.FORMATTER )
 			// ZoneRegionId is optional
 			.optionalStart()
-				.appendLiteral( '[' )
-				.parseCaseSensitive()
-				.appendZoneRegionId()
-				.appendLiteral( ']' )
+			.appendLiteral( '[' )
+			.parseCaseSensitive()
+			.appendZoneRegionId()
+			.appendLiteral( ']' )
 			.optionalEnd()
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );

@@ -36,7 +36,8 @@ public class PojoScopeWorkspaceImpl implements PojoScopeWorkspace {
 
 	@Override
 	public CompletableFuture<?> purge(Set<String> routingKeys, OperationSubmitter operationSubmitter) {
-		return doOperationOnTypes( (indexWorkspace, submitter) -> indexWorkspace.purge( routingKeys, submitter ), operationSubmitter );
+		return doOperationOnTypes( (indexWorkspace, submitter) -> indexWorkspace.purge( routingKeys, submitter ),
+				operationSubmitter );
 	}
 
 	@Override
@@ -50,8 +51,9 @@ public class PojoScopeWorkspaceImpl implements PojoScopeWorkspace {
 	}
 
 	private CompletableFuture<?> doOperationOnTypes(
-			BiFunction<IndexWorkspace, OperationSubmitter,
-			CompletableFuture<?>> operation,
+			BiFunction<IndexWorkspace,
+					OperationSubmitter,
+					CompletableFuture<?>> operation,
 			OperationSubmitter operationSubmitter) {
 		CompletableFuture<?>[] futures = new CompletableFuture<?>[delegates.size()];
 		int typeCounter = 0;

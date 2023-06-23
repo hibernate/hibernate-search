@@ -82,19 +82,18 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		for ( PojoRawTypeModel<?> entityType : entityTypes ) {
 			if ( !entityType.isAbstract() ) {
 				entityType.ascendingSuperTypes().forEach(
-						superType ->
-								concreteEntitySubTypesByEntitySuperType.computeIfAbsent(
-										superType,
-										// Use a LinkedHashSet for deterministic iteration
-										ignored -> new LinkedHashSet<>()
-								)
-										.add( entityType )
+						superType -> concreteEntitySubTypesByEntitySuperType.computeIfAbsent(
+								superType,
+								// Use a LinkedHashSet for deterministic iteration
+								ignored -> new LinkedHashSet<>()
+						)
+								.add( entityType )
 				);
 			}
 		}
 		// Make sure every Set is unmodifiable
-		for ( Map.Entry<PojoRawTypeModel<?>, Set<PojoRawTypeModel<?>>> entry
-				: concreteEntitySubTypesByEntitySuperType.entrySet() ) {
+		for ( Map.Entry<PojoRawTypeModel<?>, Set<PojoRawTypeModel<?>>> entry : concreteEntitySubTypesByEntitySuperType
+				.entrySet() ) {
 			entry.setValue( Collections.unmodifiableSet( entry.getValue() ) );
 		}
 	}
@@ -146,7 +145,8 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 
 	public PojoImplicitReindexingAssociationInverseSideResolver createAssociationInverseSideResolver(
 			PojoRawTypeModel<?> typeModel,
-			Map<PojoModelPathValueNode, Map<PojoRawTypeModel<?>, PojoModelPathValueNode>> inversePathByInverseTypeByDirectContainingPath) {
+			Map<PojoModelPathValueNode,
+					Map<PojoRawTypeModel<?>, PojoModelPathValueNode>> inversePathByInverseTypeByDirectContainingPath) {
 		PojoRuntimePathsBuildingHelper pathsBuildingHelper = runtimePathsBuildingHelper( typeModel );
 		List<List<PojoImplicitReindexingAssociationInverseSideResolverNode<Object>>> resolversByOrdinal =
 				createResolversByOrdinal( typeModel, pathsBuildingHelper, inversePathByInverseTypeByDirectContainingPath );
@@ -158,10 +158,12 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 
 	private List<List<PojoImplicitReindexingAssociationInverseSideResolverNode<Object>>> createResolversByOrdinal(
 			PojoRawTypeModel<?> typeModel, PojoRuntimePathsBuildingHelper pathsBuildingHelper,
-			Map<PojoModelPathValueNode, Map<PojoRawTypeModel<?>, PojoModelPathValueNode>> inversePathByInverseTypeByDirectContainingPath) {
+			Map<PojoModelPathValueNode,
+					Map<PojoRawTypeModel<?>, PojoModelPathValueNode>> inversePathByInverseTypeByDirectContainingPath) {
 		List<List<PojoImplicitReindexingAssociationInverseSideResolverNode<Object>>> result = new ArrayList<>();
-		for ( Map.Entry<PojoModelPathValueNode, Map<PojoRawTypeModel<?>, PojoModelPathValueNode>> entry :
-				inversePathByInverseTypeByDirectContainingPath.entrySet() ) {
+		for ( Map.Entry<PojoModelPathValueNode,
+				Map<PojoRawTypeModel<?>, PojoModelPathValueNode>> entry : inversePathByInverseTypeByDirectContainingPath
+						.entrySet() ) {
 			PojoModelPathValueNode path = entry.getKey();
 			Map<PojoRawTypeModel<?>, PojoModelPathValueNode> inversePathByInverseType = entry.getValue();
 			int ordinal;
@@ -171,7 +173,8 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 				// otherwise toPathDefinition() might lack some information and fail.
 				BoundPojoModelPathValueNode<?, ?, ?> boundPath = bindPath( typeModel, path );
 				PojoPathDefinition pathDefinition = pathsBuildingHelper.toPathDefinition( boundPath.toUnboundPath() );
-				Optional<PojoPathEntityStateRepresentation> entityStateRepresentationOptional = pathDefinition.entityStateRepresentation();
+				Optional<PojoPathEntityStateRepresentation> entityStateRepresentationOptional =
+						pathDefinition.entityStateRepresentation();
 				if ( !entityStateRepresentationOptional.isPresent() ) {
 					// Ignore: we don't have metadata to resolve the inverse side of this association from entity state.
 					// This may happen with the Standalone POJO Mapper,
@@ -193,10 +196,12 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 				// TODO HSEARCH-4720 when we can afford breaking changes (in the next major), we should probably throw an exception
 				//  instead of just logging a warning here?
 				// Wrap the failure to append a message "please report this bug"
-				AssertionFailure assertionFailure = e instanceof AssertionFailure ? (AssertionFailure) e
+				AssertionFailure assertionFailure = e instanceof AssertionFailure
+						? (AssertionFailure) e
 						: new AssertionFailure( e.getMessage(), e );
 				log.failedToCreateImplicitReindexingAssociationInverseSideResolverNode(
-						inversePathByInverseType, EventContexts.fromType( typeModel ).append( PojoEventContexts.fromPath( path ) ),
+						inversePathByInverseType,
+						EventContexts.fromType( typeModel ).append( PojoEventContexts.fromPath( path ) ),
 						assertionFailure.getMessage(), assertionFailure );
 				continue;
 			}

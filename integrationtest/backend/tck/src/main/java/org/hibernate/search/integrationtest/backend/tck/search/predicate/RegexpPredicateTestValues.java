@@ -28,7 +28,8 @@ public final class RegexpPredicateTestValues extends AbstractPredicateTestValues
 
 	public String matchingArg(int docOrdinal) {
 		String valueToMatch = fieldValue( docOrdinal );
-		if ( AnalyzedStringFieldTypeDescriptor.INSTANCE.equals( fieldType ) || NormalizedStringFieldTypeDescriptor.INSTANCE.equals( fieldType ) ) {
+		if ( AnalyzedStringFieldTypeDescriptor.INSTANCE.equals( fieldType )
+				|| NormalizedStringFieldTypeDescriptor.INSTANCE.equals( fieldType ) ) {
 			valueToMatch = valueToMatch.toLowerCase( Locale.ROOT );
 		}
 		return valueToMatch;

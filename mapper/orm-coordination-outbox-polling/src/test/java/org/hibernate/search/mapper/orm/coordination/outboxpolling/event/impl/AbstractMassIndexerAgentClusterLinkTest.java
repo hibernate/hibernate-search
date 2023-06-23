@@ -101,7 +101,8 @@ abstract class AbstractMassIndexerAgentClusterLinkTest {
 		repositoryMockHelper.defineSelfPreExisting( self );
 	}
 
-	protected final MassIndexerAgentClusterLinkPulseExpectations.InstructionsStep expect(OutboxPollingMassIndexerAgentClusterLink link) {
+	protected final MassIndexerAgentClusterLinkPulseExpectations.InstructionsStep expect(
+			OutboxPollingMassIndexerAgentClusterLink link) {
 		return MassIndexerAgentClusterLinkPulseExpectations.expect( repositoryMockHelper, link );
 	}
 

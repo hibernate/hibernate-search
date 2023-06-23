@@ -68,7 +68,8 @@ public class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends Abstract
 			extends
 			AbstractElasticsearchValueFieldSearchQueryElementFactory<SpatialWithinPolygonPredicateBuilder, GeoPoint> {
 		@Override
-		public Builder create(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
+		public Builder create(ElasticsearchSearchIndexScope<?> scope,
+				ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
 			return new Builder( scope, field );
 		}
 	}

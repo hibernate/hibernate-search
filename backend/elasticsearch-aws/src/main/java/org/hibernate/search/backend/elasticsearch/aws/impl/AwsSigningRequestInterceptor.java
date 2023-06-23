@@ -101,7 +101,8 @@ class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 		}
 	}
 
-	private SdkHttpFullRequest toAwsRequest(HttpRequest request, HttpContext context, ContentStreamProvider contentStreamProvider) {
+	private SdkHttpFullRequest toAwsRequest(HttpRequest request, HttpContext context,
+			ContentStreamProvider contentStreamProvider) {
 		SdkHttpFullRequest.Builder awsRequestBuilder = SdkHttpFullRequest.builder();
 
 		HttpCoreContext coreContext = HttpCoreContext.adapt( context );

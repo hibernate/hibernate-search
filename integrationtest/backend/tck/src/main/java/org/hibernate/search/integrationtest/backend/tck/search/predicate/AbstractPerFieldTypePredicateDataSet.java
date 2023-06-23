@@ -8,7 +8,8 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 
-public abstract class AbstractPerFieldTypePredicateDataSet<F, V extends AbstractPredicateTestValues<F>> extends AbstractPredicateDataSet {
+public abstract class AbstractPerFieldTypePredicateDataSet<F, V extends AbstractPredicateTestValues<F>>
+		extends AbstractPredicateDataSet {
 
 	protected final FieldTypeDescriptor<F> fieldType;
 	protected final V values;

@@ -116,7 +116,7 @@ public class BoolPredicateSpecificsIT {
 		SearchPredicate predicate = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
 
 		assertThatQuery( scope.query()
-				.where(	f -> f.bool().must( predicate ) ) )
+				.where( f -> f.bool().must( predicate ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
@@ -238,7 +238,7 @@ public class BoolPredicateSpecificsIT {
 		SearchPredicate predicate = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
 
 		assertThatQuery( scope.query()
-				.where(	f -> f.bool().filter( predicate ) ) )
+				.where( f -> f.bool().filter( predicate ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
@@ -275,8 +275,8 @@ public class BoolPredicateSpecificsIT {
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
 						.must( f.bool()
-										.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
-										.should( f.match().field( "field1" ).matching( FIELD1_VALUE3 ) )
+								.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
+								.should( f.match().field( "field1" ).matching( FIELD1_VALUE3 ) )
 						) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_3 );
 
@@ -389,8 +389,8 @@ public class BoolPredicateSpecificsIT {
 	public void lambda() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool( b -> {
-						b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
-						b.should( f.match().field( "field1" ).matching( FIELD1_VALUE2 ) );
+					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
+					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE2 ) );
 				} ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
 	}
@@ -688,7 +688,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HSEARCH-3534" )
+	@TestForIssue(jiraKey = "HSEARCH-3534")
 	public void minimumShouldMatch_default() {
 		// If the should is alone ( not having any sibling must ),
 		// the default minimum should match will be 1.
@@ -720,7 +720,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HSEARCH-3534" )
+	@TestForIssue(jiraKey = "HSEARCH-3534")
 	public void minimumShouldMatch_default_withinFilter_mustSibling() {
 		// We're following here the Lucene's conventions.
 		// If the should has a sibling must, even if the should is inside a filter,

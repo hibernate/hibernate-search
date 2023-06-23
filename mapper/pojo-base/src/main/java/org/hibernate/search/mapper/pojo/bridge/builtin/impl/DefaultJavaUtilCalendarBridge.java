@@ -44,7 +44,8 @@ public final class DefaultJavaUtilCalendarBridge extends AbstractConvertingDeleg
 		// in a different way GregorianCalendar.getInstance does.
 		Calendar calendar = Calendar.getInstance( TimeZone.getTimeZone( value.getZone() ), Locale.getDefault() );
 		if ( calendar instanceof GregorianCalendar ) {
-			calendar.setTimeInMillis( Math.addExact( Math.multiplyExact( value.toEpochSecond(), 1000L ), value.get( ChronoField.MILLI_OF_SECOND ) ) );
+			calendar.setTimeInMillis( Math.addExact( Math.multiplyExact( value.toEpochSecond(), 1000L ),
+					value.get( ChronoField.MILLI_OF_SECOND ) ) );
 		}
 		else {
 			calendar.setTime( Date.from( value.toInstant() ) );

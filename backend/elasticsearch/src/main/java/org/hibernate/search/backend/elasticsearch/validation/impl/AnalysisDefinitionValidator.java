@@ -27,7 +27,7 @@ class AnalysisDefinitionValidator<T extends AnalysisDefinition> implements Valid
 		String actualType = actualDefinition.getType();
 		Object defaultedExpectedType = expectedType == null ? getDefaultType() : expectedType;
 		Object defaultedActualType = actualType == null ? getDefaultType() : actualType;
-		if ( ! Objects.equals( defaultedExpectedType, defaultedActualType ) ) {
+		if ( !Objects.equals( defaultedExpectedType, defaultedActualType ) ) {
 			errorCollector.addError( ElasticsearchValidationMessages.INSTANCE.invalidAnalysisDefinitionType(
 					expectedType, actualType
 			) );

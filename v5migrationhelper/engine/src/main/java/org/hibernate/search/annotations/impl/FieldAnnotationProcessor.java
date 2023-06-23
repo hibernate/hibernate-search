@@ -65,7 +65,8 @@ public class FieldAnnotationProcessor implements PropertyMappingAnnotationProces
 				.get(); // The default extractors can always be applied: worst case, they default to no extractors.
 
 		PropertyMappingStandardFieldOptionsStep<?> optionsStep;
-		if ( String.class.equals( propertyType ) || Enum.class.isAssignableFrom( propertyType )
+		if ( String.class.equals( propertyType )
+				|| Enum.class.isAssignableFrom( propertyType )
 				|| Character.class.equals( propertyType ) ) {
 			if ( Analyze.YES.equals( annotation.analyze() ) ) {
 				optionsStep = mapAnalyzed( mapping, annotation, context );

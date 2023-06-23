@@ -114,7 +114,8 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	}
 
 	ValueReadHandle<?> createValueReadHandle(Class<?> holderClass, Member member,
-			HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata) throws IllegalAccessException {
+			HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata)
+			throws IllegalAccessException {
 		if ( member instanceof Method ) {
 			Method method = (Method) member;
 			setAccessible( method );

@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 
 final class IdentifierBridgeContextToValueBridgeContextAdapterExtension
 		implements ValueBridgeToIndexedValueContextExtension<IdentifierBridgeToDocumentIdentifierContext>,
-				ValueBridgeFromIndexedValueContextExtension<IdentifierBridgeFromDocumentIdentifierContext> {
+		ValueBridgeFromIndexedValueContextExtension<IdentifierBridgeFromDocumentIdentifierContext> {
 	static final IdentifierBridgeContextToValueBridgeContextAdapterExtension INSTANCE =
 			new IdentifierBridgeContextToValueBridgeContextAdapterExtension();
 

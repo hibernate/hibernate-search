@@ -60,12 +60,14 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 					.build();
 
 	private static final OptionalConfigurationProperty<Integer> EVENT_PROCESSOR_SHARDS_TOTAL_COUNT =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_SHARDS_TOTAL_COUNT )
+			ConfigurationProperty
+					.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_SHARDS_TOTAL_COUNT )
 					.asIntegerStrictlyPositive()
 					.build();
 
 	private static final OptionalConfigurationProperty<List<Integer>> EVENT_PROCESSOR_SHARDS_ASSIGNED =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_SHARDS_ASSIGNED )
+			ConfigurationProperty
+					.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_SHARDS_ASSIGNED )
 					.asIntegerPositiveOrZero()
 					.multivalued()
 					.build();
@@ -93,7 +95,8 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 	public void configure(CoordinationConfigurationContext context) {
 		context.mappingProducer( new OutboxPollingOutboxEventAdditionalJaxbMappingProducer() );
 		context.mappingProducer( new OutboxPollingAgentAdditionalJaxbMappingProducer() );
-		context.sendIndexingEventsTo( ctx -> new OutboxPollingOutboxEventSendingPlan( ctx.entityReferenceFactory(), ctx.session() ), true );
+		context.sendIndexingEventsTo(
+				ctx -> new OutboxPollingOutboxEventSendingPlan( ctx.entityReferenceFactory(), ctx.session() ), true );
 	}
 
 	@Override
@@ -141,6 +144,7 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 		outboxPollingSearchMapping = new OutboxPollingSearchMappingImpl( context, tenancyConfiguration );
 		return CompletableFuture.completedFuture( null );
 	}
+
 	@Override
 	public PojoMassIndexerAgent createMassIndexerAgent(PojoMassIndexerAgentCreateContext context) {
 		return tenantDelegate( context.tenantIdentifier() ).massIndexerAgentFactory
@@ -266,7 +270,8 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 			return totalShardCount;
 		}
 
-		private List<ShardAssignmentDescriptor> toStaticShardAssignments(ConfigurationPropertySource configurationPropertySource,
+		private List<ShardAssignmentDescriptor> toStaticShardAssignments(
+				ConfigurationPropertySource configurationPropertySource,
 				int totalShardCount, List<Integer> shardIndices) {
 			// Remove duplicates
 			Set<Integer> uniqueShardIndices = new HashSet<>( shardIndices );

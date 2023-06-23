@@ -89,7 +89,8 @@ class InitialPropertyMappingStep
 
 	@Override
 	public PropertyMappingGenericFieldOptionsStep genericField(String relativeFieldName) {
-		PropertyMappingGenericFieldOptionsStepImpl child = new PropertyMappingGenericFieldOptionsStepImpl( this, relativeFieldName );
+		PropertyMappingGenericFieldOptionsStepImpl child =
+				new PropertyMappingGenericFieldOptionsStepImpl( this, relativeFieldName );
 		children.add( child );
 		return child;
 	}
@@ -101,7 +102,8 @@ class InitialPropertyMappingStep
 
 	@Override
 	public PropertyMappingFullTextFieldOptionsStep fullTextField(String relativeFieldName) {
-		PropertyMappingFullTextFieldOptionsStepImpl child = new PropertyMappingFullTextFieldOptionsStepImpl( this, relativeFieldName );
+		PropertyMappingFullTextFieldOptionsStepImpl child =
+				new PropertyMappingFullTextFieldOptionsStepImpl( this, relativeFieldName );
 		children.add( child );
 		return child;
 	}
@@ -113,7 +115,8 @@ class InitialPropertyMappingStep
 
 	@Override
 	public PropertyMappingKeywordFieldOptionsStep keywordField(String relativeFieldName) {
-		PropertyMappingKeywordFieldOptionsStepImpl child = new PropertyMappingKeywordFieldOptionsStepImpl( this, relativeFieldName );
+		PropertyMappingKeywordFieldOptionsStepImpl child =
+				new PropertyMappingKeywordFieldOptionsStepImpl( this, relativeFieldName );
 		children.add( child );
 		return child;
 	}
@@ -125,7 +128,8 @@ class InitialPropertyMappingStep
 
 	@Override
 	public PropertyMappingScaledNumberFieldOptionsStep scaledNumberField(String relativeFieldName) {
-		PropertyMappingScaledNumberFieldOptionsStepImpl child = new PropertyMappingScaledNumberFieldOptionsStepImpl( this, relativeFieldName );
+		PropertyMappingScaledNumberFieldOptionsStepImpl child =
+				new PropertyMappingScaledNumberFieldOptionsStepImpl( this, relativeFieldName );
 		children.add( child );
 		return child;
 	}

@@ -86,12 +86,14 @@ public class SimpleQueryStringPredicateBaseIT {
 
 		final BulkIndexer typeCheckingMainIndexer = TypeCheckingNoConversionIT.index.bulkIndexer();
 		final BulkIndexer typeCheckingCompatibleIndexer = TypeCheckingNoConversionIT.compatibleIndex.bulkIndexer();
-		final BulkIndexer typeCheckingRawFieldCompatibleIndexer = TypeCheckingNoConversionIT.rawFieldCompatibleIndex.bulkIndexer();
+		final BulkIndexer typeCheckingRawFieldCompatibleIndexer =
+				TypeCheckingNoConversionIT.rawFieldCompatibleIndex.bulkIndexer();
 		final BulkIndexer typeCheckingMissingFieldIndexer = TypeCheckingNoConversionIT.missingFieldIndex.bulkIndexer();
-		TypeCheckingNoConversionIT.dataSets.forEach( d -> d.contribute( TypeCheckingNoConversionIT.index, typeCheckingMainIndexer,
-				TypeCheckingNoConversionIT.compatibleIndex, typeCheckingCompatibleIndexer,
-				TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
-				TypeCheckingNoConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer ) );
+		TypeCheckingNoConversionIT.dataSets
+				.forEach( d -> d.contribute( TypeCheckingNoConversionIT.index, typeCheckingMainIndexer,
+						TypeCheckingNoConversionIT.compatibleIndex, typeCheckingCompatibleIndexer,
+						TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
+						TypeCheckingNoConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer ) );
 
 		singleFieldIndexer.join(
 				multiFieldIndexer, inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer,
@@ -508,7 +510,8 @@ public class SimpleQueryStringPredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
 				int matchingDocOrdinal) {
-			return f.simpleQueryString().field( field0Path ).field( field1Path ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
+			return f.simpleQueryString().field( field0Path ).field( field1Path )
+					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override

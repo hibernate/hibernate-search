@@ -89,7 +89,8 @@ class PojoImplicitReindexingResolverBuilder<T> {
 		Optional<PojoImplicitReindexingResolverNode<T>> containingEntitiesResolverRootOptional =
 				containingEntitiesResolverRootBuilder.build( pathsBuildingHelper, null );
 
-		if ( immutableDirtyPathsAcceptedByFilter.isEmpty() && !containingEntitiesResolverRootOptional.isPresent()
+		if ( immutableDirtyPathsAcceptedByFilter.isEmpty()
+				&& !containingEntitiesResolverRootOptional.isPresent()
 				&& containingAssociationPaths.isEmpty() ) {
 			/*
 			 * If this resolver won't resolve to anything, it is useless and we don't need to build it.
@@ -133,11 +134,12 @@ class PojoImplicitReindexingResolverBuilder<T> {
 		}
 	}
 
-	static class Walker implements PojoModelPathWalker<
-			Void, AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?>,
-			PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?>,
-			PojoImplicitReindexingResolverValueNodeBuilderDelegate<?>
-			> {
+	static class Walker
+			implements PojoModelPathWalker<
+					Void,
+					AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?>,
+					PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?>,
+					PojoImplicitReindexingResolverValueNodeBuilderDelegate<?>> {
 		public static final Walker INSTANCE = new Walker();
 
 		@Override

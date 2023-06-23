@@ -60,8 +60,8 @@ public class ElasticsearchSortDslIT {
 									+ "}",
 							JsonObject.class
 					)
-					// tag::elasticsearch-fromJson-jsonObject[]
-					/* ... */;
+			// tag::elasticsearch-fromJson-jsonObject[]
+			/* ... */;
 			List<Book> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
 					.where( f -> f.matchAll() )

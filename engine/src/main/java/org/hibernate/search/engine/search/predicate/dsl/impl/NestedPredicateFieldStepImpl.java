@@ -20,14 +20,11 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 public final class NestedPredicateFieldStepImpl
 		extends AbstractPredicateFinalStep
 		implements org.hibernate.search.engine.search.predicate.dsl.NestedPredicateFieldStep<
-						org.hibernate.search.engine.search.predicate.dsl.NestedPredicateNestStep<?>
-				>,
-				org.hibernate.search.engine.search.predicate.dsl.NestedPredicateNestStep<
-						org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep<?>
-				>,
-				org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep<
-						org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep<?>
-				> {
+				org.hibernate.search.engine.search.predicate.dsl.NestedPredicateNestStep<?>>,
+		org.hibernate.search.engine.search.predicate.dsl.NestedPredicateNestStep<
+				org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep<?>>,
+		org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep<
+				org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep<?>> {
 
 	private final SearchPredicateFactory factory;
 	private NestedPredicateBuilder builder;
@@ -44,7 +41,8 @@ public final class NestedPredicateFieldStepImpl
 	}
 
 	@Override
-	public org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep<?> nest(SearchPredicate searchPredicate) {
+	public org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep<?> nest(
+			SearchPredicate searchPredicate) {
 		builder.nested( searchPredicate );
 		return this;
 	}

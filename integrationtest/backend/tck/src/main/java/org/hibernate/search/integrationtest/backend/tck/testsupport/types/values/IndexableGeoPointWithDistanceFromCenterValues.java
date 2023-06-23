@@ -17,10 +17,13 @@ public class IndexableGeoPointWithDistanceFromCenterValues extends IndexableValu
 	public static final GeoPoint CENTER_POINT_1 = GeoPoint.of( 46.038673, 3.978563 );
 	public static final GeoPoint CENTER_POINT_2 = GeoPoint.of( 46.038683, 3.964652 );
 
-	public static final IndexableGeoPointWithDistanceFromCenterValues INSTANCE = new IndexableGeoPointWithDistanceFromCenterValues();
+	public static final IndexableGeoPointWithDistanceFromCenterValues INSTANCE =
+			new IndexableGeoPointWithDistanceFromCenterValues();
 
-	private final List<Double> singleDistancesFromCenterPoint1 = Collections.unmodifiableList( createDistancesFromCenterPoint1() );
-	private final List<Double> singleDistancesFromCenterPoint2 = Collections.unmodifiableList( createDistancesFromCenterPoint2() );
+	private final List<Double> singleDistancesFromCenterPoint1 =
+			Collections.unmodifiableList( createDistancesFromCenterPoint1() );
+	private final List<Double> singleDistancesFromCenterPoint2 =
+			Collections.unmodifiableList( createDistancesFromCenterPoint2() );
 	private final List<List<Double>> multiDistancesFromCenterPoint1 = makeMulti( singleDistancesFromCenterPoint1 );
 	private final List<List<Double>> multiDistancesFromCenterPoint2 = makeMulti( singleDistancesFromCenterPoint2 );
 

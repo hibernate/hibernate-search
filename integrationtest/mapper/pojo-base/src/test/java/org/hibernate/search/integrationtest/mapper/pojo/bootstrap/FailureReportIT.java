@@ -31,10 +31,11 @@ public class FailureReportIT {
 			+ " continuing for now to list all problems,"
 			+ " but the process will ultimately be aborted.\n"
 			+ "Context: ";
-	private static final String FAILURE_REPORT_INTRODUCTION = "HSEARCH000520: Hibernate Search encountered failures during bootstrap."
-			+ " Failures:\n"
-			+ "\n"
-			+ "    Standalone POJO mapping: \n";
+	private static final String FAILURE_REPORT_INTRODUCTION =
+			"HSEARCH000520: Hibernate Search encountered failures during bootstrap."
+					+ " Failures:\n"
+					+ "\n"
+					+ "    Standalone POJO mapping: \n";
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();
@@ -43,7 +44,8 @@ public class FailureReportIT {
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	/**
 	 * Test mapping with failures in the same context

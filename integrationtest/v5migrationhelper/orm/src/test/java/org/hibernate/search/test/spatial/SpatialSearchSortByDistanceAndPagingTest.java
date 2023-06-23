@@ -115,8 +115,8 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 		int firstResult = 0;
 		List result;
 
-		while ( (result = distanceSearch( CENTER_LAT, CENTER_LON, distance, firstResult, pageSize, sortByDistance ))
-				!= null && !result.isEmpty() ) {
+		while ( ( result = distanceSearch( CENTER_LAT, CENTER_LON, distance, firstResult, pageSize, sortByDistance ) ) != null
+				&& !result.isEmpty() ) {
 
 			printResults( result );
 
@@ -135,7 +135,8 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 							"%d %f %d%s",
 							idx, entity.getDistance(), entity.getId(),
 							entitiesIdsSet.containsKey( entity.getId() )
-									? " was at index " + entitiesIdsSet.get( entity.getId() ) : ""
+									? " was at index " + entitiesIdsSet.get( entity.getId() )
+									: ""
 					)
 			);
 			if ( !entitiesIdsSet.containsKey( entity.getId() ) ) {

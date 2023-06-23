@@ -74,7 +74,8 @@ public class Address implements Serializable {
 	@IndexedEmbedded
 	private Contact contact;
 
-	public Address(String address1, String address2, String town, String county, String country, String postcode, boolean active, Contact contact) {
+	public Address(String address1, String address2, String town, String county, String country, String postcode,
+			boolean active, Contact contact) {
 		super();
 		this.address1 = address1;
 		this.address2 = address2;
@@ -206,7 +207,7 @@ public class Address implements Serializable {
 		}
 		return equals( this.getContact(), that.getContact() );
 		//		EqualsBuilder equalsBuilder = new EqualsBuilder();
-//		return equalsBuilder.append(new Object[]{this.getAddress1(), this.getAddress2(), this.getCounty(), this.getTown(), this.getPostcode(), this.contact}, new Object[]{address.getAddress1(), address.getAddress2(), address.getCounty(), address.getTown(), address.getPostcode(), address.getContact()}).isEquals();
+		//		return equalsBuilder.append(new Object[]{this.getAddress1(), this.getAddress2(), this.getCounty(), this.getTown(), this.getPostcode(), this.contact}, new Object[]{address.getAddress1(), address.getAddress2(), address.getCounty(), address.getTown(), address.getPostcode(), address.getContact()}).isEquals();
 	}
 
 	private boolean equals(Object o1, Object o2) {
@@ -233,7 +234,7 @@ public class Address implements Serializable {
 		a = a * 23 + hashCode( this.getPostcode() );
 		a = a * 23 + hashCode( this.getContact() );
 		return a;
-//		return new HashCodeBuilder().append(new Object[]{this.getAddress1(), this.getAddress2(), this.getCounty(), this.getTown(), this.getPostcode(), this.getContact()}).hashCode();
+		//		return new HashCodeBuilder().append(new Object[]{this.getAddress1(), this.getAddress2(), this.getCounty(), this.getTown(), this.getPostcode(), this.getContact()}).hashCode();
 	}
 
 	@Override
@@ -244,14 +245,14 @@ public class Address implements Serializable {
 	}
 
 	private void displayAddress(StringBuilder buf, Address address) {
-//		buf.append(Constants.TAB + Constants.TAB + "Address 1: " + address.getAddress1() + Constants.NEW_LINE);
-//		buf.append(Constants.TAB + Constants.TAB +"Address 2: " + address.getAddress2() + Constants.NEW_LINE);
-//		buf.append(Constants.TAB + Constants.TAB +"Town: " + address.getTown() + Constants.NEW_LINE);
-//		buf.append(Constants.TAB + Constants.TAB +"County: " + address.getCounty() + Constants.NEW_LINE);
-//		buf.append(Constants.TAB + Constants.TAB +"Postcode: " + address.getPostcode() + Constants.NEW_LINE);
-//		buf.append(Constants.TAB + Constants.TAB +"Country: " + address.getCountry() + Constants.NEW_LINE);
-//		buf.append(Constants.TAB + Constants.TAB +"Is current: " + (address.isActive()? "Yes" : "No") + Constants.NEW_LINE);
-//		buf.append(Constants.NEW_LINE);
+		//		buf.append(Constants.TAB + Constants.TAB + "Address 1: " + address.getAddress1() + Constants.NEW_LINE);
+		//		buf.append(Constants.TAB + Constants.TAB +"Address 2: " + address.getAddress2() + Constants.NEW_LINE);
+		//		buf.append(Constants.TAB + Constants.TAB +"Town: " + address.getTown() + Constants.NEW_LINE);
+		//		buf.append(Constants.TAB + Constants.TAB +"County: " + address.getCounty() + Constants.NEW_LINE);
+		//		buf.append(Constants.TAB + Constants.TAB +"Postcode: " + address.getPostcode() + Constants.NEW_LINE);
+		//		buf.append(Constants.TAB + Constants.TAB +"Country: " + address.getCountry() + Constants.NEW_LINE);
+		//		buf.append(Constants.TAB + Constants.TAB +"Is current: " + (address.isActive()? "Yes" : "No") + Constants.NEW_LINE);
+		//		buf.append(Constants.NEW_LINE);
 	}
 
 	public boolean isValidPostcode() {

@@ -74,7 +74,7 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 		EntityIndexingFailureContext context = entityFailureContextCapture.getValue();
 		assertSingleEntityFailure( context, entityReference, failingOperationAsString,
 				e -> assertThat( e )
-				.isInstanceOf( SimulatedFailure.class )
+						.isInstanceOf( SimulatedFailure.class )
 						.hasMessage( exceptionMessage ) );
 	}
 
@@ -94,10 +94,10 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 		EntityIndexingFailureContext context = entityFailureContextCapture.getValue();
 		assertSingleEntityFailure( context, entityReference, failingOperationAsString,
 				e -> assertThat( e )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Exception while invoking" )
-				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
-				.isInstanceOf( SimulatedFailure.class )
+						.isInstanceOf( SearchException.class )
+						.hasMessageContaining( "Exception while invoking" )
+						.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+						.isInstanceOf( SimulatedFailure.class )
 						.hasMessageContaining( exceptionMessage ) );
 	}
 
@@ -117,11 +117,11 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 		EntityIndexingFailureContext context = entityFailureContextCapture.getValue();
 		assertSingleEntityFailure( context, entityReference, failingOperationAsString,
 				e -> assertThat( e )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
+						.isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
 								"Exception while building document for entity '" + entityReference + "'",
-						"Exception while invoking",
-						exceptionMessage )
+								"Exception while invoking",
+								exceptionMessage )
 						.hasRootCauseInstanceOf( SimulatedFailure.class ) );
 	}
 
@@ -168,7 +168,7 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 		EntityIndexingFailureContext context = entityFailureContextCapture.getValue();
 		assertSingleEntityFailure( context, null, failingOperationAsString,
 				e -> assertThat( e )
-				.isInstanceOf( exceptionType )
+						.isInstanceOf( exceptionType )
 						.hasMessageContainingAll( exceptionMessage ) );
 
 		verify( failureHandler, times( 1 ) ).handle( genericFailureContextCapture.capture() );
@@ -204,7 +204,7 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 		EntityIndexingFailureContext context = entityFailureContextCapture.getValue();
 		assertSingleEntityFailure( context, entityReference, failingEntityIndexingOperationAsString,
 				e -> assertThat( e )
-				.isInstanceOf( SimulatedFailure.class )
+						.isInstanceOf( SimulatedFailure.class )
 						.hasMessage( failingEntityIndexingExceptionMessage ) );
 
 		FailureContext massIndexerOperationFailureContext = genericFailureContextCapture.getValue();

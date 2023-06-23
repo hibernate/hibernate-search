@@ -29,12 +29,13 @@ public final class ConfigurationPropertyChecker {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ConfigurationProperty<ConfigurationPropertyCheckingStrategyName>
-			CONFIGURATION_PROPERTY_CHECKING_STRATEGY =
-			ConfigurationProperty.forKey( EngineSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY )
-					.as( ConfigurationPropertyCheckingStrategyName.class, ConfigurationPropertyCheckingStrategyName::of )
-					.withDefault( EngineSettings.Defaults.CONFIGURATION_PROPERTY_CHECKING_STRATEGY )
-					.build();
+	private static final ConfigurationProperty<
+			ConfigurationPropertyCheckingStrategyName> CONFIGURATION_PROPERTY_CHECKING_STRATEGY =
+					ConfigurationProperty.forKey( EngineSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY )
+							.as( ConfigurationPropertyCheckingStrategyName.class,
+									ConfigurationPropertyCheckingStrategyName::of )
+							.withDefault( EngineSettings.Defaults.CONFIGURATION_PROPERTY_CHECKING_STRATEGY )
+							.build();
 
 	public static ConfigurationPropertyChecker create() {
 		return new ConfigurationPropertyChecker();

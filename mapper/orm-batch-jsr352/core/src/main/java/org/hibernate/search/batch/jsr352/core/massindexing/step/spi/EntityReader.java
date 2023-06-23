@@ -342,7 +342,8 @@ public class EntityReader extends AbstractItemReader {
 	 * and uses the last returned entity's ID as a checkpoint ID.
 	 */
 	private FetchingStrategy createCriteriaFetchingStrategy(
-			CacheMode cacheMode, int entityFetchSize, Integer maxResults) throws IOException, ClassNotFoundException {
+			CacheMode cacheMode, int entityFetchSize, Integer maxResults)
+			throws IOException, ClassNotFoundException {
 		Class<?> entityType = jobData.getEntityType( entityName );
 		Object upperBound = SerializationUtil.deserialize( serializedUpperBound );
 		Object lowerBound = SerializationUtil.deserialize( serializedLowerBound );
@@ -389,13 +390,13 @@ public class EntityReader extends AbstractItemReader {
 			}
 
 			return query
-				.setReadOnly( true )
-				.setCacheable( false )
-				.setLockMode( LockModeType.NONE )
-				.setCacheMode( cacheMode )
-				.setHibernateFlushMode( FlushMode.MANUAL )
-				.setFetchSize( entityFetchSize )
-				.scroll( ScrollMode.FORWARD_ONLY );
+					.setReadOnly( true )
+					.setCacheable( false )
+					.setLockMode( LockModeType.NONE )
+					.setCacheMode( cacheMode )
+					.setHibernateFlushMode( FlushMode.MANUAL )
+					.setFetchSize( entityFetchSize )
+					.scroll( ScrollMode.FORWARD_ONLY );
 		};
 	}
 

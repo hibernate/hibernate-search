@@ -117,6 +117,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 					public void onSuccess(Response response) {
 						completableFuture.complete( response );
 					}
+
 					@Override
 					public void onFailure(Exception exception) {
 						if ( exception instanceof ResponseException ) {
@@ -132,7 +133,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 						}
 					}
 				}
-				);
+		);
 
 		Deadline deadline = elasticsearchRequest.deadline();
 		if ( deadline == null && !requestTimeoutMs.isPresent() ) {
@@ -140,8 +141,8 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 			return completableFuture;
 		}
 
-		long currentTimeoutValue = deadline == null ?
-				Long.valueOf( requestTimeoutMs.get() ) : deadline.checkRemainingTimeMillis();
+		long currentTimeoutValue =
+				deadline == null ? Long.valueOf( requestTimeoutMs.get() ) : deadline.checkRemainingTimeMillis();
 
 		/*
 		 * TODO HSEARCH-3590 maybe the callback should also cancel the request?

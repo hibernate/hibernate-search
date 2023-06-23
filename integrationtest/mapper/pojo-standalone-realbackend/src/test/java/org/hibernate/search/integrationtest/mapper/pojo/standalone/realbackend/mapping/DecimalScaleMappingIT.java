@@ -28,8 +28,7 @@ public class DecimalScaleMappingIT {
 
 	@Test
 	public void testFailingWithHint() {
-		assertThatThrownBy( () ->
-				setupHelper.start().setup( FailingEntity.class )
+		assertThatThrownBy( () -> setupHelper.start().setup( FailingEntity.class )
 		).isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Hibernate Search encountered failures during bootstrap",

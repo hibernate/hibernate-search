@@ -53,7 +53,8 @@ public class HibernateOrmBootstrapIntrospectorAccessTypeTest
 
 	@Test
 	public void embeddedId_defaultMethodAccess() {
-		HibernateOrmBootstrapIntrospector introspector = createIntrospector( EntityWithEmbeddedIdWithDefaultMethodAccess.class );
+		HibernateOrmBootstrapIntrospector introspector =
+				createIntrospector( EntityWithEmbeddedIdWithDefaultMethodAccess.class );
 		testEmbeddableWithDefaultMethodAccess( introspector );
 	}
 
@@ -199,7 +200,8 @@ public class HibernateOrmBootstrapIntrospectorAccessTypeTest
 		valueReadHandle = nestedEmbeddableTypeModel.property( "propertyWithDefaultFieldAccess" ).handle();
 		assertThat( valueReadHandle.get( nestedEmbeddable ) ).isEqualTo( nestedEmbeddable.propertyWithDefaultFieldAccess );
 		valueReadHandle = nestedEmbeddableTypeModel.property( "propertyWithNonDefaultMethodAccess" ).handle();
-		assertThat( valueReadHandle.get( nestedEmbeddable ) ).isEqualTo( nestedEmbeddable.getPropertyWithNonDefaultMethodAccess() );
+		assertThat( valueReadHandle.get( nestedEmbeddable ) )
+				.isEqualTo( nestedEmbeddable.getPropertyWithNonDefaultMethodAccess() );
 	}
 
 	private void testEmbeddableWithDefaultMethodAccess(HibernateOrmBootstrapIntrospector introspector) {
@@ -224,7 +226,8 @@ public class HibernateOrmBootstrapIntrospectorAccessTypeTest
 		PojoRawTypeModel<NestedEmbeddableWithDefaultMethodAccess> nestedEmbeddableTypeModel =
 				introspector.typeModel( NestedEmbeddableWithDefaultMethodAccess.class );
 		valueReadHandle = nestedEmbeddableTypeModel.property( "propertyWithDefaultMethodAccess" ).handle();
-		assertThat( valueReadHandle.get( nestedEmbeddable ) ).isEqualTo( nestedEmbeddable.getPropertyWithDefaultMethodAccess() );
+		assertThat( valueReadHandle.get( nestedEmbeddable ) )
+				.isEqualTo( nestedEmbeddable.getPropertyWithDefaultMethodAccess() );
 		valueReadHandle = nestedEmbeddableTypeModel.property( "propertyWithNonDefaultFieldAccess" ).handle();
 		assertThat( valueReadHandle.get( nestedEmbeddable ) ).isEqualTo( nestedEmbeddable.propertyWithNonDefaultFieldAccess );
 	}
@@ -270,7 +273,7 @@ public class HibernateOrmBootstrapIntrospectorAccessTypeTest
 	private static class EntityWithDefaultMethodAccess {
 		private String idWithDefaultMethodAccess = "idWithDefaultMethodAccessValue";
 
-		@Access( AccessType.FIELD )
+		@Access(AccessType.FIELD)
 		@Basic
 		protected String propertyWithNonDefaultFieldAccess = "propertyWithNonDefaultFieldAccessValue";
 

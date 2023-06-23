@@ -23,11 +23,12 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
  * @deprecated No longer necessary in Hibernate Search 6.
  * Replace {@link Field} with {@link KeywordField} and pass the normalizer name directly to {@link KeywordField#normalizer()}.
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target({})
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ })
 @Documented
 @Deprecated
 public @interface Normalizer {
 	Class<?> impl() default void.class;
+
 	String definition() default "";
 }

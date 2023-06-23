@@ -36,7 +36,7 @@ public final class JarTestUtils {
 	}
 
 	public static Path toJar(TemporaryFolder temporaryFolder, URL codeSourceLocation) {
-			return toJar( temporaryFolder, toPath( codeSourceLocation ) );
+		return toJar( temporaryFolder, toPath( codeSourceLocation ) );
 	}
 
 	public static Path toJar(TemporaryFolder temporaryFolder, Path jarOrDirectoryPath) {

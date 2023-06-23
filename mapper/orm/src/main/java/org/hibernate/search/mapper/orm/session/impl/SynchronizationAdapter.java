@@ -26,7 +26,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * Also, suppresses any call to {@link Synchronization#afterCompletion(int)} so that
  * it can be executed later, in {@link AfterTransactionCompletionProcess#doAfterTransactionCompletion(boolean, SharedSessionContractImplementor)}.
  */
-class SynchronizationAdapter implements Synchronization,
+class SynchronizationAdapter
+		implements Synchronization,
 		BeforeTransactionCompletionProcess, AfterTransactionCompletionProcess {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -48,7 +49,8 @@ class SynchronizationAdapter implements Synchronization,
 	public void afterCompletion(int status) {
 		log.tracef(
 				"Transaction's afterCompletion is expected to be executed"
-						+ " through the AfterTransactionCompletionProcess interface, ignoring: %s", delegate
+						+ " through the AfterTransactionCompletionProcess interface, ignoring: %s",
+				delegate
 		);
 	}
 
@@ -61,6 +63,7 @@ class SynchronizationAdapter implements Synchronization,
 			throw log.synchronizationBeforeTransactionFailure( e.getMessage(), e );
 		}
 	}
+
 	@Override
 	public void doAfterTransactionCompletion(boolean success, SharedSessionContractImplementor sessionImplementor) {
 		try {

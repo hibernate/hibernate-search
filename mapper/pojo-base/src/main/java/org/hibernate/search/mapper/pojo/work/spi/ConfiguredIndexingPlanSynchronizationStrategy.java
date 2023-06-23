@@ -56,7 +56,8 @@ public class ConfiguredIndexingPlanSynchronizationStrategy {
 
 		private DocumentCommitStrategy documentCommitStrategy = DocumentCommitStrategy.NONE;
 		private DocumentRefreshStrategy documentRefreshStrategy = DocumentRefreshStrategy.NONE;
-		private Consumer<? super CompletableFuture<? extends SearchIndexingPlanExecutionReport>> indexingFutureHandler = future -> { };
+		private Consumer<? super CompletableFuture<? extends SearchIndexingPlanExecutionReport>> indexingFutureHandler =
+				future -> {};
 		private OperationSubmitter operationSubmitter = OperationSubmitter.blocking();
 
 		public Builder(FailureHandler failureHandler) {
@@ -76,7 +77,8 @@ public class ConfiguredIndexingPlanSynchronizationStrategy {
 		}
 
 		@Override
-		public void indexingFutureHandler(Consumer<? super CompletableFuture<? extends SearchIndexingPlanExecutionReport>> handler) {
+		public void indexingFutureHandler(
+				Consumer<? super CompletableFuture<? extends SearchIndexingPlanExecutionReport>> handler) {
 			Contracts.assertNotNull( handler, "handler" );
 			this.indexingFutureHandler = handler;
 		}

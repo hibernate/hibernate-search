@@ -40,7 +40,8 @@ public class StubSearchSort implements SearchSort {
 		}
 	}
 
-	public static class Builder implements ScoreSortBuilder,
+	public static class Builder
+			implements ScoreSortBuilder,
 			FieldSortBuilder, DistanceSortBuilder, CompositeSortBuilder {
 
 		@Override

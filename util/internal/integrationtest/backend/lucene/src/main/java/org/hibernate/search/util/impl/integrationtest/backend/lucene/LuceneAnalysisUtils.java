@@ -19,7 +19,8 @@ public final class LuceneAnalysisUtils {
 	}
 
 	public static List<String> analyze(Analyzer analyzer, String absoluteFieldPath,
-			String inputString) throws IOException {
+			String inputString)
+			throws IOException {
 		final List<String> tokenList = new ArrayList<>();
 		try ( TokenStream stream = analyzer.tokenStream( absoluteFieldPath, inputString ) ) {
 			CharTermAttribute term = stream.addAttribute( CharTermAttribute.class );

@@ -28,7 +28,7 @@ public class UserRange {
 	@Longitude
 	Double homeLongitude;
 
-	public UserRange( Integer id, Double homeLatitude, Double homeLongitude) {
+	public UserRange(Integer id, Double homeLatitude, Double homeLongitude) {
 		this.id = id;
 		this.homeLatitude = homeLatitude;
 		this.homeLongitude = homeLongitude;

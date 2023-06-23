@@ -36,8 +36,8 @@ public class CloseIndexWork extends AbstractNonBulkableWork<Void> {
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.post()
-					.pathComponent( indexName )
-					.pathComponent( Paths._CLOSE );
+							.pathComponent( indexName )
+							.pathComponent( Paths._CLOSE );
 
 			return builder.build();
 		}

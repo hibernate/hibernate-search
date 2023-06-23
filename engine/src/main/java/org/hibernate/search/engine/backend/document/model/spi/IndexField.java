@@ -10,9 +10,8 @@ import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 
 public interface IndexField<
-				SC extends SearchIndexScope<?>,
-				C extends IndexCompositeNode<SC, ?, ?>
-		>
+		SC extends SearchIndexScope<?>,
+		C extends IndexCompositeNode<SC, ?, ?>>
 		extends IndexNode<SC>, IndexFieldDescriptor {
 
 	@Override

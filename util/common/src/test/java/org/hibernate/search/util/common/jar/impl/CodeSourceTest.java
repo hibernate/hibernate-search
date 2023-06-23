@@ -165,7 +165,7 @@ public class CodeSourceTest {
 		} );
 
 		try ( JarFile outerJar = new JarFile( jarPath.toFile() ) ) {
-			@SuppressWarnings( "deprecation" ) // For JDK 20+
+			@SuppressWarnings("deprecation") // For JDK 20+
 			// TODO: HSEARCH-4765 To be replaced with URL#of(URI, URLStreamHandler) when switching to JDK 20+
 			// see https://download.java.net/java/early_access/jdk20/docs/api/java.base/java/net/URL.html#of(java.net.URI,java.net.URLStreamHandler) for deprecation info
 			// cannot simply change to URI as boot specific Handler is required to make things work.

@@ -57,9 +57,9 @@ public class StandalonePojoSelectionLoadingIT {
 						"hibernate.search.mapping.configurer",
 						(StandalonePojoMappingConfigurer) c -> {
 							c.addEntityType( Book.class, context -> // <2>
-									context.selectionLoadingStrategy(
-											new MySelectionLoadingStrategy<>( Book.class )
-									) );
+							context.selectionLoadingStrategy(
+									new MySelectionLoadingStrategy<>( Book.class )
+							) );
 						}
 				)
 				// end::setup[]
@@ -108,8 +108,7 @@ public class StandalonePojoSelectionLoadingIT {
 		// tag::search[]
 		try ( MyDatastoreConnection connection = datastore.connect(); // <3>
 				SearchSession searchSession = searchMapping.createSessionWithOptions() // <4>
-						.loading( o ->
-								o.context( MyDatastoreConnection.class, connection ) ) // <5>
+						.loading( o -> o.context( MyDatastoreConnection.class, connection ) ) // <5>
 						.build() ) { // <6>
 			List<Book> hits = searchSession.search( Book.class ) // <7>
 					.where( f -> f.matchAll() )

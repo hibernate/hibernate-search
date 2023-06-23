@@ -170,9 +170,12 @@ public class JobContextSetupListener extends AbstractJobListener {
 		}
 
 		// A boolean parameter is validated if its deserialization is successful.
-		SerializationUtil.parseBooleanParameterOptional( MERGE_SEGMENTS_ON_FINISH, serializedMergeSegmentsOnFinish, Defaults.MERGE_SEGMENTS_ON_FINISH );
-		SerializationUtil.parseBooleanParameterOptional( MERGE_SEGMENTS_AFTER_PURGE, serializedMergeSegmentsAfterPurge, Defaults.MERGE_SEGMENTS_AFTER_PURGE );
-		SerializationUtil.parseBooleanParameterOptional( PURGE_ALL_ON_START, serializedPurgeAllOnStart, Defaults.PURGE_ALL_ON_START );
+		SerializationUtil.parseBooleanParameterOptional( MERGE_SEGMENTS_ON_FINISH, serializedMergeSegmentsOnFinish,
+				Defaults.MERGE_SEGMENTS_ON_FINISH );
+		SerializationUtil.parseBooleanParameterOptional( MERGE_SEGMENTS_AFTER_PURGE, serializedMergeSegmentsAfterPurge,
+				Defaults.MERGE_SEGMENTS_AFTER_PURGE );
+		SerializationUtil.parseBooleanParameterOptional( PURGE_ALL_ON_START, serializedPurgeAllOnStart,
+				Defaults.PURGE_ALL_ON_START );
 	}
 
 	private void validateQuerying() {

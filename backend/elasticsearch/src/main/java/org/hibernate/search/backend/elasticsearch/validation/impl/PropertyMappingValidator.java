@@ -31,14 +31,16 @@ class PropertyMappingValidator extends AbstractTypeMappingValidator<PropertyMapp
 	}
 
 	@Override
-	public void validate(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping, PropertyMapping actualMapping) {
+	public void validate(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping,
+			PropertyMapping actualMapping) {
 		LeafValidators.EQUAL.validateWithDefault(
 				errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "type",
 				expectedMapping.getType(), actualMapping.getType(), DataTypes.OBJECT
 		);
 
 		List<String> formatDefault = DataTypes.DATE.equals( expectedMapping.getType() )
-				? DEFAULT_DATE_FORMAT : Collections.emptyList();
+				? DEFAULT_DATE_FORMAT
+				: Collections.emptyList();
 		LeafValidators.FORMAT.validateWithDefault(
 				errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "format",
 				expectedMapping.getFormat(), actualMapping.getFormat(), formatDefault
@@ -66,7 +68,8 @@ class PropertyMappingValidator extends AbstractTypeMappingValidator<PropertyMapp
 		super.validate( errorCollector, expectedMapping, actualMapping );
 	}
 
-	private void validateAnalyzerOptions(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping, PropertyMapping actualMapping) {
+	private void validateAnalyzerOptions(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping,
+			PropertyMapping actualMapping) {
 		LeafValidators.EQUAL.validateWithDefault(
 				errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "analyzer",
 				expectedMapping.getAnalyzer(), actualMapping.getAnalyzer(), AnalyzerNames.DEFAULT
@@ -83,7 +86,8 @@ class PropertyMappingValidator extends AbstractTypeMappingValidator<PropertyMapp
 		);
 	}
 
-	private void validateIndexOptions(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping, PropertyMapping actualMapping) {
+	private void validateIndexOptions(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping,
+			PropertyMapping actualMapping) {
 		Boolean expectedIndex = expectedMapping.getIndex();
 		if ( Boolean.TRUE.equals( expectedIndex ) ) { // If we don't need an index, we don't care
 			LeafValidators.EQUAL.validateWithDefault(

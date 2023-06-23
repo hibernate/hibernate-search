@@ -21,7 +21,8 @@ public final class LuceneIndexContentUtils {
 
 	// Reads directly from the index, without going through Hibernate Search
 	public static <T> T readIndex(SearchSetupHelper setupHelper,
-			String indexName, ThrowingExtractor<DirectoryReader, T, IOException> action) throws IOException {
+			String indexName, ThrowingExtractor<DirectoryReader, T, IOException> action)
+			throws IOException {
 		LuceneTckBackendAccessor accessor = (LuceneTckBackendAccessor) setupHelper.getBackendAccessor();
 		try ( Directory directory = accessor.openDirectory( indexName );
 				DirectoryReader reader = DirectoryReader.open( directory ) ) {

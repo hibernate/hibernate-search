@@ -55,7 +55,8 @@ public class AnnotationMappingSmokeIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private SearchMapping mapping;
 
@@ -314,7 +315,7 @@ public class AnnotationMappingSmokeIT {
 											)
 									)
 							)
-							.objectField( "myEmbeddedList", b2 -> { } )
+							.objectField( "myEmbeddedList", b2 -> {} )
 							.objectField( "embeddedArrayList", b2 -> b2
 									.objectField( "myEmbedded", b3 -> b3
 											.objectField( "customBridgeOnProperty", b4 -> b4
@@ -498,7 +499,7 @@ public class AnnotationMappingSmokeIT {
 		@CustomPropertyBinding(objectName = "customBridgeOnProperty")
 		@AssociationInverseSide(
 				inversePath = @ObjectPath(
-						@PropertyValue( propertyName = "embeddingAsSingle")
+					@PropertyValue(propertyName = "embeddingAsSingle")
 				)
 		)
 		public IndexedEntity getEmbedded() {
@@ -644,7 +645,7 @@ public class AnnotationMappingSmokeIT {
 		@IndexedEmbedded(includePaths = "myEmbedded.myTextField")
 		@AssociationInverseSide(
 				inversePath = @ObjectPath(
-						@PropertyValue( propertyName = "embeddingAsIterable")
+					@PropertyValue(propertyName = "embeddingAsIterable")
 				)
 		)
 		public Iterable<IndexedEntity> getEmbeddedIterable() {
@@ -658,7 +659,7 @@ public class AnnotationMappingSmokeIT {
 		@IndexedEmbedded(name = "myEmbeddedList", includePaths = "myEmbedded.customBridgeOnClass.text")
 		@AssociationInverseSide(
 				inversePath = @ObjectPath(
-						@PropertyValue( propertyName = "embeddingAsList")
+					@PropertyValue(propertyName = "embeddingAsList")
 				)
 		)
 		public List<IndexedEntity> getEmbeddedList() {
@@ -672,7 +673,7 @@ public class AnnotationMappingSmokeIT {
 		@IndexedEmbedded(includePaths = "myEmbedded.customBridgeOnProperty.text")
 		@AssociationInverseSide(
 				inversePath = @ObjectPath(
-						@PropertyValue( propertyName = "embeddingAsArrayList")
+					@PropertyValue(propertyName = "embeddingAsArrayList")
 				)
 		)
 		public ArrayList<IndexedEntity> getEmbeddedArrayList() {
@@ -686,7 +687,7 @@ public class AnnotationMappingSmokeIT {
 		@IndexedEmbedded(includePaths = "myEmbedded.myLocalDateField")
 		@AssociationInverseSide(
 				inversePath = @ObjectPath(
-						@PropertyValue( propertyName = "embeddingAsMap")
+					@PropertyValue(propertyName = "embeddingAsMap")
 				)
 		)
 		@GenericField(

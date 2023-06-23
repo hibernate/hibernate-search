@@ -57,7 +57,8 @@ public final class PojoSearchQueryElementRegistryBuilder {
 		}
 	}
 
-	private <T> void processProjectionConstructors(PojoRawTypeModel<T> type, PojoSearchMappingConstructorNode constructorMapping) {
+	private <T> void processProjectionConstructors(PojoRawTypeModel<T> type,
+			PojoSearchMappingConstructorNode constructorMapping) {
 		PojoConstructorModel<T> constructor = type.constructor( constructorMapping.parametersJavaTypes() );
 		try {
 			processProjectionConstructors( type, constructor, constructorMapping );

@@ -295,7 +295,7 @@ public class MassIndexingJobWithCompositeIdIT {
 	 */
 	@Entity(name = "EntityWithIdClass")
 	@Indexed
-	@IdClass( EntityWithIdClass.DatePK.class )
+	@IdClass(EntityWithIdClass.DatePK.class)
 	public static class EntityWithIdClass implements Serializable {
 
 		private static final long serialVersionUID = 1L;

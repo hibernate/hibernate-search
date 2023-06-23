@@ -54,7 +54,7 @@ public class Book {
 	)
 	@AssociationInverseSide( // <3>
 			extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY),
-			inversePath = @ObjectPath( @PropertyValue( propertyName = "book" ) )
+			inversePath = @ObjectPath(@PropertyValue(propertyName = "book"))
 	)
 	private Map<BookEdition, BigDecimal> priceByEdition = new LinkedHashMap<>();
 

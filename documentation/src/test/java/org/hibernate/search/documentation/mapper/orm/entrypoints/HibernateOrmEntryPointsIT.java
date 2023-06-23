@@ -137,7 +137,8 @@ public class HibernateOrmEntryPointsIT {
 					Search.session( theSession );
 			// tag::searchScope-fromSearchSession[]
 			SearchScope<Book> bookScope = searchSession.scope( Book.class ); // <2>
-			SearchScope<Person> associateAndManagerScope = searchSession.scope( Arrays.asList( Associate.class, Manager.class ) ); // <3>
+			SearchScope<Person> associateAndManagerScope =
+					searchSession.scope( Arrays.asList( Associate.class, Manager.class ) ); // <3>
 			SearchScope<Person> personScope = searchSession.scope( Person.class ); // <4>
 			SearchScope<Person> personSubTypesScope = searchSession.scope( Person.class,
 					Arrays.asList( "Manager", "Associate" ) ); // <5>

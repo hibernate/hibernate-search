@@ -53,8 +53,8 @@ public class HighlighterUnifiedIT extends AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
-						f -> f.highlight( "string" )
-				)
+				f -> f.highlight( "string" )
+		)
 				.where( f -> f.match().field( "string" ).matching( "rock" ) )
 				.highlighter( h -> h.unified()
 						.boundaryScanner()
@@ -77,8 +77,8 @@ public class HighlighterUnifiedIT extends AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
-						f -> f.highlight( "string" )
-				)
+				f -> f.highlight( "string" )
+		)
 				.where( f -> f.match().field( "string" ).matching( "rock" ) )
 				.highlighter( h -> h.unified()
 						.boundaryScanner()

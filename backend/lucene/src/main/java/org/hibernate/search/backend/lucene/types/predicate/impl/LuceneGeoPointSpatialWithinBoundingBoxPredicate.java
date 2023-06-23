@@ -52,7 +52,8 @@ public class LuceneGeoPointSpatialWithinBoundingBoxPredicate extends AbstractLuc
 
 		@Override
 		protected Query buildQuery() {
-			return LatLonPoint.newBoxQuery( absoluteFieldPath, boundingBox.bottomRight().latitude(), boundingBox.topLeft().latitude(),
+			return LatLonPoint.newBoxQuery( absoluteFieldPath, boundingBox.bottomRight().latitude(),
+					boundingBox.topLeft().latitude(),
 					boundingBox.topLeft().longitude(), boundingBox.bottomRight().longitude() );
 		}
 	}

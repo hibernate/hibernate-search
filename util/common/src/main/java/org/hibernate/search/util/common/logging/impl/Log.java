@@ -44,7 +44,8 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET_LEGACY_ENGINE = MessageConstants.ENGINE_ID_RANGE_MIN;
 
 	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 17, value = "Work discarded, thread was interrupted while waiting for space to schedule: %1$s")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 17,
+			value = "Work discarded, thread was interrupted while waiting for space to schedule: %1$s")
 	void interruptedWorkError(Runnable r);
 
 	@LogMessage(level = ERROR)
@@ -115,7 +116,8 @@ public interface Log extends BasicLogger {
 	IllegalArgumentException collectionMustNotContainNullElement(String collectionDescription);
 
 	@Message(id = ID_OFFSET + 12, value = "Exception while invoking '%1$s' with arguments %2$s: %3$s")
-	SearchException errorInvokingStaticMember(Member member, String argumentsAsString, @Cause Throwable cause, String causeMessage);
+	SearchException errorInvokingStaticMember(Member member, String argumentsAsString, @Cause Throwable cause,
+			String causeMessage);
 
 	@Message(id = ID_OFFSET + 13, value = "Exception while accessing Jandex index for '%1$s': %2$s")
 	SearchException errorAccessingJandexIndex(URL codeSourceLocation, String message, @Cause Throwable e);
@@ -132,7 +134,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 17, value = "Cannot interpret '%1$s' as a local directory or JAR.")
 	IOException cannotInterpretCodeSourceUrl(URL url);
 
-	@Message(id = ID_OFFSET + 18, value = "Cannot open a ZIP filesystem for code source at '%1$s', because the URI points to content inside a nested JAR.")
+	@Message(id = ID_OFFSET + 18,
+			value = "Cannot open a ZIP filesystem for code source at '%1$s', because the URI points to content inside a nested JAR.")
 	IOException cannotOpenNestedJar(URI uri);
 
 }

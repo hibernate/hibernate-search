@@ -60,11 +60,12 @@ public abstract class PojoIndexingDependencyCollectorNode {
 
 	abstract ReindexOnUpdate reindexOnUpdate();
 
-	static class Walker implements PojoModelPathWalker<
-			Void, PojoIndexingDependencyCollectorTypeNode<?>,
-			PojoIndexingDependencyCollectorPropertyNode<?, ?>,
-			AbstractPojoIndexingDependencyCollectorDirectValueNode<?, ?>
-			> {
+	static class Walker
+			implements PojoModelPathWalker<
+					Void,
+					PojoIndexingDependencyCollectorTypeNode<?>,
+					PojoIndexingDependencyCollectorPropertyNode<?, ?>,
+					AbstractPojoIndexingDependencyCollectorDirectValueNode<?, ?>> {
 		private final LinkedNode<DerivedDependencyWalkingInfo> derivedDependencyPath;
 
 		Walker(LinkedNode<DerivedDependencyWalkingInfo> derivedDependencyPath) {

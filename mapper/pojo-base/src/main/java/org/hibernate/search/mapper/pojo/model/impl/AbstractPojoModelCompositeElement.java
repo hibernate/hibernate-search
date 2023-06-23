@@ -79,7 +79,8 @@ public abstract class AbstractPojoModelCompositeElement<V> implements PojoModelC
 	public PojoModelNestedCompositeElement<?, ?> property(String relativeFieldName) {
 		return properties.computeIfAbsent( relativeFieldName, name -> {
 			BoundPojoModelPathTypeNode<V> modelPathTypeNode = getModelPathTypeNode();
-			PojoPropertyAdditionalMetadata additionalMetadata = getTypeAdditionalMetadata().getPropertyAdditionalMetadata( name );
+			PojoPropertyAdditionalMetadata additionalMetadata =
+					getTypeAdditionalMetadata().getPropertyAdditionalMetadata( name );
 			return new PojoModelNestedCompositeElement<>(
 					this,
 					modelPathTypeNode.property( name ),

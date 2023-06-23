@@ -62,8 +62,8 @@ public class ElasticsearchAggregationDslIT {
 									+ "}",
 							JsonObject.class
 					)
-					// tag::elasticsearch-fromJson-jsonObject[]
-					/* ... */;
+			// tag::elasticsearch-fromJson-jsonObject[]
+			/* ... */;
 			AggregationKey<JsonObject> countsByPriceHistogramKey = AggregationKey.of( "countsByPriceHistogram" );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )

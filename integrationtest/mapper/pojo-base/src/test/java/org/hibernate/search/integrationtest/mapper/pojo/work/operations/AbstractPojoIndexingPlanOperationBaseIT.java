@@ -84,8 +84,10 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 								MyRoutingBridge.previousValues = Arrays.asList( "1", "foo", "3" );
 								worksBeforeInSamePlan
 										// "1" is ignored as it's the current value
-										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "foo" ) ) )
-										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "3" ) ) );
+										.delete( b -> addWorkInfo( b, tenantId, "42",
+												MyRoutingBridge.toRoutingKey( tenantId, 42, "foo" ) ) )
+										.delete( b -> addWorkInfo( b, tenantId, "42",
+												MyRoutingBridge.toRoutingKey( tenantId, 42, "3" ) ) );
 							}
 							// else: if implicit routing is disabled,
 							// since we don't provide any previous routes, we don't expect additional deletes.
@@ -125,8 +127,10 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 								MyRoutingBridge.previousValues = Arrays.asList( "1", "foo", "3" );
 								worksBeforeInSamePlan
 										// "1" is ignored as it's the current value
-										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "foo" ) ) )
-										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "3" ) ) );
+										.delete( b -> addWorkInfo( b, tenantId, "42",
+												MyRoutingBridge.toRoutingKey( tenantId, 42, "foo" ) ) )
+										.delete( b -> addWorkInfo( b, tenantId, "42",
+												MyRoutingBridge.toRoutingKey( tenantId, 42, "3" ) ) );
 							}
 						}
 					},
@@ -173,8 +177,10 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 						// If implicit routing is enabled, previous routes are also taken from the routing bridge.
 						MyRoutingBridge.previousValues = Arrays.asList( "foo", "3" );
 						worksBeforeInSamePlan
-								.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "foo" ) ) )
-								.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "3" ) ) );
+								.delete( b -> addWorkInfo( b, tenantId, "42",
+										MyRoutingBridge.toRoutingKey( tenantId, 42, "foo" ) ) )
+								.delete( b -> addWorkInfo( b, tenantId, "42",
+										MyRoutingBridge.toRoutingKey( tenantId, 42, "3" ) ) );
 					}
 				}, 42, MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ), "1" );
 			}
@@ -248,14 +254,14 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 			expectOperation(
 					futureFromBackend,
 					worksBeforeInSamePlan -> {
-							if ( !isAdd() ) {
-								// For operations other than add, expect a delete for every previous route distinct from the current one.
-								worksBeforeInSamePlan
-										.delete( b -> addWorkInfo( b, tenantId, "1",
-												MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) )
-										.delete( b -> addWorkInfo( b, tenantId, "1",
-												MyRoutingBridge.toRoutingKey( tenantId, 1, "3" ) ) );
-							}
+						if ( !isAdd() ) {
+							// For operations other than add, expect a delete for every previous route distinct from the current one.
+							worksBeforeInSamePlan
+									.delete( b -> addWorkInfo( b, tenantId, "1",
+											MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) )
+									.delete( b -> addWorkInfo( b, tenantId, "1",
+											MyRoutingBridge.toRoutingKey( tenantId, 1, "3" ) ) );
+						}
 					},
 					// And only then, expect the actual operation.
 					1, null, "1"
@@ -378,16 +384,16 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 		assertExceptionalSituation( work, error );
 	}
 
-	private void assertExceptionalSituation(Runnable work, Throwable exception ) {
+	private void assertExceptionalSituation(Runnable work, Throwable exception) {
 		if ( isErrorLoggedOnly() ) {
 			// we are in async case and error will not be thrown, but rather logged so let's check for that:
 			logged.expectEvent(
-							Level.ERROR,
-							ExceptionMatcherBuilder.isException( exception )
-									.build(),
-							"Background indexing of entities",
-							"Entities that could not be indexed correctly:"
-					)
+					Level.ERROR,
+					ExceptionMatcherBuilder.isException( exception )
+							.build(),
+					"Background indexing of entities",
+					"Entities that could not be indexed correctly:"
+			)
 					.once();
 			work.run();
 		}

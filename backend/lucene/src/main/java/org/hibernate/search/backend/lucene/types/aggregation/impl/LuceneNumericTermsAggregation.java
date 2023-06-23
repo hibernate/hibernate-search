@@ -52,7 +52,8 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 
 	@Override
 	FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
-			NestedDocsProvider nestedDocsProvider, int limit) throws IOException {
+			NestedDocsProvider nestedDocsProvider, int limit)
+			throws IOException {
 		Facets facetCounts = numericDomain.createTermsFacetCounts(
 				absoluteFieldPath, facetsCollector, nestedDocsProvider
 		);
@@ -100,7 +101,9 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 
 	public static class Factory<F>
 			extends
-			AbstractLuceneCodecAwareSearchQueryElementFactory<TermsAggregationBuilder.TypeSelector, F, AbstractLuceneNumericFieldCodec<F, ?>> {
+			AbstractLuceneCodecAwareSearchQueryElementFactory<TermsAggregationBuilder.TypeSelector,
+					F,
+					AbstractLuceneNumericFieldCodec<F, ?>> {
 		public Factory(AbstractLuceneNumericFieldCodec<F, ?> codec) {
 			super( codec );
 		}

@@ -120,7 +120,8 @@ public class LuceneFieldAttributesIT {
 					document.addValue( index.binding().norms, TEXT );
 					document.addValue( index.binding().noNorms, TEXT );
 					document.addValue( index.binding().termVector, TEXT );
-					document.addValue( index.binding().moreOptions, "Search 6 groundwork - Add the missing common field type options compared to Search 5" );
+					document.addValue( index.binding().moreOptions,
+							"Search 6 groundwork - Add the missing common field type options compared to Search 5" );
 				} )
 				.join();
 	}
@@ -135,13 +136,15 @@ public class LuceneFieldAttributesIT {
 
 		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "keyword", f -> f.asString().projectable( Projectable.YES ) ).toReference();
-			text = root.field( "text", f -> f.asString().analyzer( ANALYZER_NAME ).projectable( Projectable.YES ) ).toReference();
+			text = root.field( "text", f -> f.asString().analyzer( ANALYZER_NAME ).projectable( Projectable.YES ) )
+					.toReference();
 
 			norms = root.field( "norms", f -> {
 				// extracting a variable to workaround an Eclipse compiler issue
 				StringIndexFieldTypeOptionsStep<?> ctx = f.asString()
 						.analyzer( ANALYZER_NAME ).projectable( Projectable.YES );
-				return ctx.norms( Norms.YES ); }
+				return ctx.norms( Norms.YES );
+			}
 			).toReference();
 
 			noNorms = root.field( "noNorms", f -> {
@@ -155,14 +158,16 @@ public class LuceneFieldAttributesIT {
 				// extracting a variable to workaround an Eclipse compiler issue
 				StringIndexFieldTypeOptionsStep<?> ctx = f.asString()
 						.analyzer( ANALYZER_NAME ).projectable( Projectable.YES );
-				return ctx.termVector( TermVector.YES ); }
+				return ctx.termVector( TermVector.YES );
+			}
 			).toReference();
 
 			moreOptions = root.field( "moreOptions", f -> {
 				// extracting a variable to workaround an Eclipse compiler issue
 				StringIndexFieldTypeOptionsStep<?> ctx = f.asString()
 						.analyzer( ANALYZER_NAME ).projectable( Projectable.YES );
-				return ctx.termVector( TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS ); }
+				return ctx.termVector( TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS );
+			}
 			).toReference();
 		}
 	}

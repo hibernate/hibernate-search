@@ -15,6 +15,6 @@ package org.hibernate.search.engine.search.predicate.dsl;
  */
 public interface SimpleBooleanPredicateClausesStep<S extends SimpleBooleanPredicateClausesStep<?>>
 		extends GenericSimpleBooleanPredicateClausesStep<S, SimpleBooleanPredicateClausesCollector<?>>,
-				SimpleBooleanPredicateOptionsStep<S> {
+		SimpleBooleanPredicateOptionsStep<S> {
 
 }

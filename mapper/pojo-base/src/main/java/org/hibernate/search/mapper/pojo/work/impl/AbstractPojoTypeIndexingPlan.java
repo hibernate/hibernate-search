@@ -60,7 +60,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 
 	@Override
 	public void add(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
-		if ( ! mayRequireLoading && entity == null ) {
+		if ( !mayRequireLoading && entity == null ) {
 			mayRequireLoading = true;
 		}
 		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
@@ -73,7 +73,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 	@Override
 	public void addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity,
 			boolean forceSelfDirty, boolean forceContainingDirty, BitSet dirtyPaths) {
-		if ( ! mayRequireLoading && entity == null ) {
+		if ( !mayRequireLoading && entity == null ) {
 			mayRequireLoading = true;
 		}
 		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
@@ -95,7 +95,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 	@Override
 	public void addOrUpdateOrDelete(Object providedId, DocumentRoutesDescriptor providedRoutes, boolean forceSelfDirty,
 			boolean forceContainingDirty, BitSet dirtyPaths) {
-		if ( ! mayRequireLoading ) {
+		if ( !mayRequireLoading ) {
 			mayRequireLoading = true;
 		}
 		I identifier = toIdentifier( providedId, null );
@@ -122,7 +122,8 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 	void updateBecauseOfContainedAssociation(Object entity, int dirtyAssociationPathOrdinal) {
 		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext().identifierMapping().getIdentifier( null, entitySupplier );
-		BitSet dirtyPaths = typeContext().reindexingResolver().dirtySelfOrContainingFilter().filter( dirtyAssociationPathOrdinal );
+		BitSet dirtyPaths =
+				typeContext().reindexingResolver().dirtySelfOrContainingFilter().filter( dirtyAssociationPathOrdinal );
 		if ( dirtyPaths != null ) {
 			getState( identifier ).addOrUpdate( entitySupplier, dirtyPaths, false, false );
 		}
@@ -192,7 +193,8 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		PojoRawTypeIdentifier<?> typeIdentifier = runtimeIntrospector().detectEntityType( containingEntity );
 		if ( typeIdentifier == null ) {
 			throw new AssertionFailure(
-					"Attempted to detect entity type of object " + containingEntity + " because a contained entity was modified,"
+					"Attempted to detect entity type of object " + containingEntity
+							+ " because a contained entity was modified,"
 							+ " but this object does not seem to be an entity."
 			);
 		}

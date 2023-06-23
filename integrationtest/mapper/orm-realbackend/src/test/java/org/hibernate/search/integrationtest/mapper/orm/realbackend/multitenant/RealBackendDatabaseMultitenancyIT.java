@@ -64,11 +64,10 @@ public class RealBackendDatabaseMultitenancyIT {
 
 	@Test
 	public void multiTenancyStrategy_none() {
-		assertThatThrownBy( () ->
-				setupHelper.start()
-						.withProperty( "hibernate.search.backend.multi_tenancy.strategy", "none" )
-						.tenants( TENANT_ID_1, TENANT_ID_2 )
-						.setup( IndexedEntity.class ) )
+		assertThatThrownBy( () -> setupHelper.start()
+				.withProperty( "hibernate.search.backend.multi_tenancy.strategy", "none" )
+				.tenants( TENANT_ID_1, TENANT_ID_2 )
+				.setup( IndexedEntity.class ) )
 				// This is necessary to correctly rethrow assumption failures (when not using H2)
 				.satisfies( AssertionAndAssumptionViolationFallThrough.get() )
 				.isInstanceOf( SearchException.class )

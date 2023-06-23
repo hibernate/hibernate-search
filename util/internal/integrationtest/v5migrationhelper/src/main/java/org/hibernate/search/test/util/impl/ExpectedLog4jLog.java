@@ -87,6 +87,7 @@ public class ExpectedLog4jLog implements TestRule {
 			public void describeTo(Description description) {
 				description.appendText( "a LoggingEvent with " ).appendValue( level ).appendText( " level or higher" );
 			}
+
 			@Override
 			protected boolean matchesSafely(LogEvent item) {
 				return item.getLevel().isMoreSpecificThan( level );

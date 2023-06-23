@@ -51,10 +51,12 @@ import org.junit.Test;
 public class OutboxPollingCustomEntityMappingIT {
 
 	private static final String CUSTOM_SCHEMA = "CUSTOM_SCHEMA";
-	private static final String ORIGINAL_OUTBOX_EVENT_TABLE_NAME = HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE;
+	private static final String ORIGINAL_OUTBOX_EVENT_TABLE_NAME =
+			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE;
 	private static final String CUSTOM_OUTBOX_EVENT_TABLE_NAME = "CUSTOM_OUTBOX_EVENT";
 
-	private static final String ORIGINAL_AGENT_TABLE_NAME = HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_TABLE;
+	private static final String ORIGINAL_AGENT_TABLE_NAME =
+			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_TABLE;
 	private static final String CUSTOM_AGENT_TABLE_NAME = "CUSTOM_AGENT";
 	private static final String VALID_OUTBOX_EVENT_MAPPING;
 	private static final String VALID_AGENT_EVENT_MAPPING;
@@ -69,8 +71,10 @@ public class OutboxPollingCustomEntityMappingIT {
 				.replace( ORIGINAL_AGENT_TABLE_NAME, CUSTOM_AGENT_TABLE_NAME );
 
 		SQL_KEYS = new String[] {
-				ORIGINAL_OUTBOX_EVENT_TABLE_NAME, CUSTOM_OUTBOX_EVENT_TABLE_NAME,
-				ORIGINAL_AGENT_TABLE_NAME, CUSTOM_AGENT_TABLE_NAME,
+				ORIGINAL_OUTBOX_EVENT_TABLE_NAME,
+				CUSTOM_OUTBOX_EVENT_TABLE_NAME,
+				ORIGINAL_AGENT_TABLE_NAME,
+				CUSTOM_AGENT_TABLE_NAME,
 				CUSTOM_SCHEMA,
 		};
 	}
@@ -89,7 +93,8 @@ public class OutboxPollingCustomEntityMappingIT {
 	@Test
 	public void wrongOutboxEventMapping() {
 		assertThatThrownBy( () -> ormSetupHelper.start()
-				.withProperty( "hibernate.search.coordination.outboxevent.entity.mapping", "<entity-mappings><ciao></ciao></entity-mappings>" )
+				.withProperty( "hibernate.search.coordination.outboxevent.entity.mapping",
+						"<entity-mappings><ciao></ciao></entity-mappings>" )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( MappingException.class )
 				.hasMessageContainingAll( "Unable to perform unmarshalling", "unexpected element" );
@@ -98,7 +103,8 @@ public class OutboxPollingCustomEntityMappingIT {
 	@Test
 	public void wrongAgentMapping() {
 		assertThatThrownBy( () -> ormSetupHelper.start()
-				.withProperty( "hibernate.search.coordination.agent.entity.mapping", "<entity-mappings><ciao></ciao></entity-mappings>" )
+				.withProperty( "hibernate.search.coordination.agent.entity.mapping",
+						"<entity-mappings><ciao></ciao></entity-mappings>" )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( MappingException.class )
 				.hasMessageContainingAll( "Unable to perform unmarshalling", "unexpected element" );
@@ -191,7 +197,8 @@ public class OutboxPollingCustomEntityMappingIT {
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
 		sessionFactory = ormSetupHelper.start()
 				.withProperty( "hibernate.search.coordination.entity.mapping.agent.table", CUSTOM_AGENT_TABLE_NAME )
-				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.table", CUSTOM_OUTBOX_EVENT_TABLE_NAME )
+				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.table",
+						CUSTOM_OUTBOX_EVENT_TABLE_NAME )
 				.withProperty( "hibernate.session_factory.statement_inspector", statementInspector )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -227,7 +234,8 @@ public class OutboxPollingCustomEntityMappingIT {
 				.withProperty( "hibernate.search.coordination.entity.mapping.agent.schema", CUSTOM_SCHEMA )
 				.withProperty( "hibernate.search.coordination.entity.mapping.agent.table", CUSTOM_AGENT_TABLE_NAME )
 				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.schema", CUSTOM_SCHEMA )
-				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.table", CUSTOM_OUTBOX_EVENT_TABLE_NAME )
+				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.table",
+						CUSTOM_OUTBOX_EVENT_TABLE_NAME )
 				.withProperty( "hibernate.session_factory.statement_inspector", statementInspector )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -388,9 +396,9 @@ public class OutboxPollingCustomEntityMappingIT {
 	private void assertAgentUUIDVersion(Session session, int expectedVersion) {
 		assertThat(
 				session.createQuery(
-								"select a from " + OutboxPollingAgentAdditionalJaxbMappingProducer.ENTITY_NAME + " a ",
-								Agent.class
-						)
+						"select a from " + OutboxPollingAgentAdditionalJaxbMappingProducer.ENTITY_NAME + " a ",
+						Agent.class
+				)
 						.getResultList()
 		).hasSizeGreaterThan( 0 )
 				.extracting( Agent::getId )

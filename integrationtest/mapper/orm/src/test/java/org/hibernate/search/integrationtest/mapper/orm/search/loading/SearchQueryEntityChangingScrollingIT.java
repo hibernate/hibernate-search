@@ -74,8 +74,7 @@ public class SearchQueryEntityChangingScrollingIT {
 
 			List<String> targetIndexes = Collections.singletonList( SimpleEntity.NAME );
 
-			backendMock.expectScrollObjects( targetIndexes, 3, b -> {
-			} );
+			backendMock.expectScrollObjects( targetIndexes, 3, b -> {} );
 			for ( int base = 0; base < 12; base += 3 ) {
 				backendMock.expectNextScroll( targetIndexes,
 						StubNextScrollWorkBehavior.of( 12, documentReferences( base, base + 1, base + 2 ) ) );
@@ -87,7 +86,8 @@ public class SearchQueryEntityChangingScrollingIT {
 
 			try ( SearchScroll<SimpleEntity> scroll = query.scroll( 3 ) ) {
 				for ( SearchScrollResult<SimpleEntity> next = scroll.next(); next.hasHits(); next = scroll.next() ) {
-					assertThatHits( next.hits() ).hasHitsAnyOrder( new SimpleEntity( index++ ), new SimpleEntity( index++ ), new SimpleEntity( index++ ) );
+					assertThatHits( next.hits() ).hasHitsAnyOrder( new SimpleEntity( index++ ), new SimpleEntity( index++ ),
+							new SimpleEntity( index++ ) );
 					changeNames( next.hits() );
 
 					assertThat( next.total().hitCount() ).isEqualTo( 12 );

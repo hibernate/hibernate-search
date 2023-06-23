@@ -28,9 +28,11 @@ class LuceneNestedObjectFieldBuilder extends AbstractLuceneObjectFieldBuilder {
 
 		// We own the document content, so we finalize it ourselves.
 		Document document = documentContent.finalizeDocument( multiTenancyStrategy, tenantId, routingKey );
-		document.add( MetadataFields.searchableMetadataField( MetadataFields.typeFieldName(), MetadataFields.TYPE_CHILD_DOCUMENT ) );
+		document.add(
+				MetadataFields.searchableMetadataField( MetadataFields.typeFieldName(), MetadataFields.TYPE_CHILD_DOCUMENT ) );
 		document.add( MetadataFields.searchableMetadataField( MetadataFields.idFieldName(), rootId ) );
-		document.add( MetadataFields.searchableMetadataField( MetadataFields.nestedDocumentPathFieldName(), schemaNode.absolutePath() ) );
+		document.add( MetadataFields.searchableMetadataField( MetadataFields.nestedDocumentPathFieldName(),
+				schemaNode.absolutePath() ) );
 
 		// In the list of documents, a child must appear before its parent,
 		// so we let children contribute their document first.

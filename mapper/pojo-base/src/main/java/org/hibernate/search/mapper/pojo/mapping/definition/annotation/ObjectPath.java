@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
  * representing a property and a way to extra values from that property.
  */
 @Documented
-@Target({}) // Only used as a component in other annotations
+@Target({ }) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ObjectPath {
 

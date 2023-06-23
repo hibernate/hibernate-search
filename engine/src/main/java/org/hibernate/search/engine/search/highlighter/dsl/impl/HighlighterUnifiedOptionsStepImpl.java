@@ -56,7 +56,8 @@ public class HighlighterUnifiedOptionsStepImpl
 		}
 	}
 
-	private class HighlighterBoundaryScannerOptionsStepImpl implements
+	private class HighlighterBoundaryScannerOptionsStepImpl
+			implements
 			HighlighterBoundaryScannerOptionsStep<HighlighterBoundaryScannerOptionsStepImpl, HighlighterUnifiedOptionsStep> {
 
 		@Override

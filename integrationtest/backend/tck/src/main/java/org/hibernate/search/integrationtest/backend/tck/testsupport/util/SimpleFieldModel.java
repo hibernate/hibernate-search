@@ -17,7 +17,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 public class SimpleFieldModel<F> {
 
 	public static <F> StandardFieldMapper<F, SimpleFieldModel<F>> mapper(FieldTypeDescriptor<F> typeDescriptor) {
-		return mapper( typeDescriptor, ignored -> { } );
+		return mapper( typeDescriptor, ignored -> {} );
 	}
 
 	public static <F> StandardFieldMapper<F, SimpleFieldModel<F>> mapper(FieldTypeDescriptor<F> typeDescriptor,

@@ -60,7 +60,7 @@ public final class StreamHelper {
 	}
 
 	private static <T> BinaryOperator<T> throwingMerger() {
-		return (u,v) -> { throw new AssertionFailure( "Unexpected duplicate key: " + u ); };
+		return (u, v) -> { throw new AssertionFailure( "Unexpected duplicate key: " + u ); };
 	}
 
 }

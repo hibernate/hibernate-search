@@ -111,7 +111,8 @@ public class BridgeTest extends SearchTestBase {
 		result = session.createFullTextQuery( query ).setProjection( "uuid" ).list();
 		assertEquals( "UUID works", 1, result.size() );
 
-		query = parser.parse( "char1:[" + String.valueOf( Character.MIN_VALUE ) + " TO " + String.valueOf( Character.MAX_VALUE - 2 ) + "]" );
+		query = parser.parse(
+				"char1:[" + String.valueOf( Character.MIN_VALUE ) + " TO " + String.valueOf( Character.MAX_VALUE - 2 ) + "]" );
 		result = session.createFullTextQuery( query ).setProjection( "char1" ).list();
 		assertEquals( "Null elements should not be stored, CharacterBridge is not working", 0, result.size() );
 

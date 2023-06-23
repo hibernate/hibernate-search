@@ -38,7 +38,8 @@ public class MassIndexerAgentClusterLinkPulseExpectations {
 		this.repoMockingHelper = builder.repoMockingHelper;
 		this.link = builder.link;
 		this.expectedInstructionsExpiration = builder.expectedInstructionsExpiration;
-		this.expectedInstructionsConsiderEventProcessingSuspended = builder.expectedInstructionsConsiderEventProcessingSuspended;
+		this.expectedInstructionsConsiderEventProcessingSuspended =
+				builder.expectedInstructionsConsiderEventProcessingSuspended;
 		this.expectedSelfAgentId = builder.expectedSelfAgentId;
 		this.expectedSelfAgentExpiration = builder.expectedSelfAgentExpiration;
 		this.expectedSelfAgentCurrentState = builder.expectedSelfAgentCurrentState;
@@ -48,7 +49,8 @@ public class MassIndexerAgentClusterLinkPulseExpectations {
 	public String toString() {
 		return "ClusterLinkPulseExpectations{" +
 				", expectedInstructionsExpiration=" + expectedInstructionsExpiration +
-				", expectedInstructionsConsiderEventProcessingSuspended=" + expectedInstructionsConsiderEventProcessingSuspended +
+				", expectedInstructionsConsiderEventProcessingSuspended=" + expectedInstructionsConsiderEventProcessingSuspended
+				+
 				", expectedSelfAgentId=" + expectedSelfAgentId +
 				", expectedSelfAgentExpiration=" + expectedSelfAgentExpiration +
 				", expectedSelfAgentCurrentState=" + expectedSelfAgentCurrentState +

@@ -33,8 +33,8 @@ import org.apache.lucene.search.TermQuery;
 public class LazyM2OContainedInTest extends SearchTestBase {
 
 	@Test
-	@TestForIssue( jiraKey = "HSEARCH-385")
-	@SuppressWarnings( "unchecked" )
+	@TestForIssue(jiraKey = "HSEARCH-385")
+	@SuppressWarnings("unchecked")
 	public void testDocumentsAt0() {
 		FullTextSession fts = Search.getFullTextSession( getSessionFactory().openSession() );
 		Transaction tx = fts.beginTransaction();
@@ -65,7 +65,8 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 		);
 		assertEquals(
 				1,
-				fts.createFullTextQuery( LongPoint.newExactQuery( "entities2.uid", uid2 ), Entity1ForDoc0.class ).getResultSize()
+				fts.createFullTextQuery( LongPoint.newExactQuery( "entities2.uid", uid2 ), Entity1ForDoc0.class )
+						.getResultSize()
 		);
 
 		tx.commit();
@@ -81,8 +82,8 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HSEARCH-386")
-	@SuppressWarnings( "unchecked" )
+	@TestForIssue(jiraKey = "HSEARCH-386")
+	@SuppressWarnings("unchecked")
 	public void testContainedInAndLazy() {
 		FullTextSession fts = Search.getFullTextSession( getSessionFactory().openSession() );
 		Entity1ForUnindexed ent1_0 = new Entity1ForUnindexed();
@@ -133,7 +134,8 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 		fts.clear();
 
 		assertEquals( 0,
-				fts.createFullTextQuery( new TermQuery( new Term( "entity1.uid", String.valueOf( otherId ) ) ), Entity2ForUnindexed.class ).getResultSize() );
+				fts.createFullTextQuery( new TermQuery( new Term( "entity1.uid", String.valueOf( otherId ) ) ),
+						Entity2ForUnindexed.class ).getResultSize() );
 
 		tx = fts.beginTransaction();
 		for ( Entity2ForUnindexed e : listAll( fts, Entity2ForUnindexed.class ) ) {
@@ -148,7 +150,7 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 	}
 
 	@Override
-	public void configure(Map<String,Object> cfg) {
+	public void configure(Map<String, Object> cfg) {
 		cfg.put( AvailableSettings.CACHE_REGION_FACTORY, CachingRegionFactory.class.getName() );
 	}
 

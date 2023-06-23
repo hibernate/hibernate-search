@@ -56,9 +56,9 @@ public class StandalonePojoMassLoadingIT {
 						"hibernate.search.mapping.configurer",
 						(StandalonePojoMappingConfigurer) configurerContext -> {
 							configurerContext.addEntityType( Book.class, context -> // <3>
-									context.massLoadingStrategy(
-											new MyMassLoadingStrategy<>( datastore, Book.class )
-									) );
+							context.massLoadingStrategy(
+									new MyMassLoadingStrategy<>( datastore, Book.class )
+							) );
 						}
 				)
 				// end::setup[]

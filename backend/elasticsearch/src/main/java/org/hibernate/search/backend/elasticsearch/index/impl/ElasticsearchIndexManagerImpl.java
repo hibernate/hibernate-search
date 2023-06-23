@@ -49,7 +49,8 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.JsonObject;
 
-class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
+class ElasticsearchIndexManagerImpl
+		implements IndexManagerImplementor,
 		ElasticsearchIndexManager, WorkExecutionIndexManagerContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

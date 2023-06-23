@@ -34,4 +34,3 @@ public class ConnectedFacetRangeLimitContext<T> implements FacetRangeLimitContex
 
 }
 
-

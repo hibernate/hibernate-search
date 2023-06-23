@@ -43,7 +43,8 @@ public class LuceneTextTermsAggregation<K>
 
 	@Override
 	FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
-			NestedDocsProvider nestedDocsProvider, int limit) throws IOException {
+			NestedDocsProvider nestedDocsProvider, int limit)
+			throws IOException {
 		JoiningTextMultiValuesSource valueSource = JoiningTextMultiValuesSource.fromField(
 				absoluteFieldPath, nestedDocsProvider
 		);

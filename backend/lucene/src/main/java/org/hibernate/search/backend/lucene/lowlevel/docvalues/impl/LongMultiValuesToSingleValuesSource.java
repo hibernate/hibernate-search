@@ -40,7 +40,8 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 	 * @param nested the nested provider
 	 * @return A {@link LongMultiValuesToSingleValuesSource}
 	 */
-	public static LongMultiValuesToSingleValuesSource fromLongField(String field, MultiValueMode mode, NestedDocsProvider nested) {
+	public static LongMultiValuesToSingleValuesSource fromLongField(String field, MultiValueMode mode,
+			NestedDocsProvider nested) {
 		return fromField( field, mode, nested );
 	}
 
@@ -52,7 +53,8 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 	 * @param nested the nested provider
 	 * @return A {@link LongMultiValuesToSingleValuesSource}
 	 */
-	public static LongMultiValuesToSingleValuesSource fromIntField(String field, MultiValueMode mode, NestedDocsProvider nested) {
+	public static LongMultiValuesToSingleValuesSource fromIntField(String field, MultiValueMode mode,
+			NestedDocsProvider nested) {
 		return fromLongField( field, mode, nested );
 	}
 

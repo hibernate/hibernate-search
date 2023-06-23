@@ -72,7 +72,8 @@ public final class StandalonePojoMapperSettings {
 	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
 	 * which includes a description of the "bean reference" properties and accepted values.
 	 */
-	public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY = PREFIX + Radicals.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY;
+	public static final String INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
+			PREFIX + Radicals.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY;
 
 	public static class Radicals {
 
@@ -95,7 +96,8 @@ public final class StandalonePojoMapperSettings {
 		private Defaults() {
 		}
 
-		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY = SchemaManagementStrategyName.CREATE_OR_VALIDATE;
+		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY =
+				SchemaManagementStrategyName.CREATE_OR_VALIDATE;
 		public static final boolean MULTI_TENANCY_ENABLED = false;
 
 		public static final BeanReference<IndexingPlanSynchronizationStrategy> INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =

@@ -214,7 +214,7 @@ public class CoordinatesBridge implements TypeBridge<Object>, PropertyBridge<Obj
 
 	private static class CoordinatesConverter
 			implements ToDocumentValueConverter<Coordinates, GeoPoint>,
-					FromDocumentValueConverter<GeoPoint, Coordinates> {
+			FromDocumentValueConverter<GeoPoint, Coordinates> {
 		static final CoordinatesConverter INSTANCE = new CoordinatesConverter();
 
 		private CoordinatesConverter() {

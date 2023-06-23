@@ -73,7 +73,7 @@ import org.junit.rules.MethodRule;
  *
  * Moving the responsibility of marking objects as "to reindex" to a nested node fixed the issue.
  */
-@TestForIssue( jiraKey = "HSEARCH-3199")
+@TestForIssue(jiraKey = "HSEARCH-3199")
 public class AutomaticIndexingOverReindexingIT {
 
 	@ClassRule
@@ -92,9 +92,9 @@ public class AutomaticIndexingOverReindexingIT {
 		);
 
 		backendMock.expectSchema( Level2Entity.INDEX, b -> b
-					.objectField( "level3", b3 -> b3
-							.field( "property2", String.class )
-					)
+				.objectField( "level3", b3 -> b3
+						.field( "property2", String.class )
+				)
 		);
 
 		setupContext.withAnnotatedTypes(

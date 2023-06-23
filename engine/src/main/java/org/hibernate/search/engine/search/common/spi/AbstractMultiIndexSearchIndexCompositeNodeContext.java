@@ -18,11 +18,10 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractMultiIndexSearchIndexCompositeNodeContext<
-				S extends SearchIndexCompositeNodeContext<SC>,
-				SC extends SearchIndexScope<?>,
-				NT extends SearchIndexCompositeNodeTypeContext<SC, S>,
-				F extends SearchIndexNodeContext<SC>
-		>
+		S extends SearchIndexCompositeNodeContext<SC>,
+		SC extends SearchIndexScope<?>,
+		NT extends SearchIndexCompositeNodeTypeContext<SC, S>,
+		F extends SearchIndexNodeContext<SC>>
 		extends AbstractMultiIndexSearchIndexNodeContext<S, SC, NT>
 		implements SearchIndexCompositeNodeContext<SC>, SearchIndexCompositeNodeTypeContext<SC, S> {
 

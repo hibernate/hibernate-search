@@ -108,7 +108,8 @@ public class ElasticsearchBatchingWorkOrchestrator
 	}
 
 	@Override
-	protected void doSubmit(ElasticsearchBatchedWork<?> work, OperationSubmitter operationSubmitter) throws InterruptedException {
+	protected void doSubmit(ElasticsearchBatchedWork<?> work, OperationSubmitter operationSubmitter)
+			throws InterruptedException {
 		executors.get( work.getQueuingKey() ).submit( work, operationSubmitter );
 	}
 
@@ -133,8 +134,7 @@ public class ElasticsearchBatchingWorkOrchestrator
 		ElasticsearchWorkSequenceBuilder sequenceBuilder = new ElasticsearchDefaultWorkSequenceBuilder( context );
 		ElasticsearchWorkBulker bulker = new ElasticsearchDefaultWorkBulker(
 				sequenceBuilder,
-				(worksToBulk, refreshStrategy) ->
-						link.getWorkFactory().bulk( worksToBulk ).refresh( refreshStrategy ).build(),
+				(worksToBulk, refreshStrategy) -> link.getWorkFactory().bulk( worksToBulk ).refresh( refreshStrategy ).build(),
 				maxBulkSize
 		);
 		return new ElasticsearchBatchedWorkProcessor( sequenceBuilder, bulker );

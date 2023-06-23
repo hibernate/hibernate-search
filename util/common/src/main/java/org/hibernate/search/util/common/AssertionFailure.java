@@ -7,7 +7,6 @@
 package org.hibernate.search.util.common;
 
 
-
 public class AssertionFailure extends RuntimeException {
 
 	public AssertionFailure(String message, Throwable cause) {

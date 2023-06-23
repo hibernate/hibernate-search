@@ -33,7 +33,8 @@ public class DeleteByQueryWork extends AbstractNonBulkableWork<Void> {
 	}
 
 	@Override
-	protected CompletableFuture<?> beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
+	protected CompletableFuture<?> beforeExecute(ElasticsearchWorkExecutionContext executionContext,
+			ElasticsearchRequest request) {
 		/*
 		 * Refresh the index so as to minimize the risk of version conflict
 		 */
@@ -71,12 +72,12 @@ public class DeleteByQueryWork extends AbstractNonBulkableWork<Void> {
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.post()
-					.pathComponent( indexName )
-					/*
-					 * Ignore conflicts: if we wrote to a document concurrently,
-					 * we just want to keep it as is.
-					 */
-					.param( "conflicts", "proceed" );
+							.pathComponent( indexName )
+							/*
+							 * Ignore conflicts: if we wrote to a document concurrently,
+							 * we just want to keep it as is.
+							 */
+							.param( "conflicts", "proceed" );
 
 			if ( !typeNames.isEmpty() ) {
 				builder.multiValuedPathComponent( typeNames );

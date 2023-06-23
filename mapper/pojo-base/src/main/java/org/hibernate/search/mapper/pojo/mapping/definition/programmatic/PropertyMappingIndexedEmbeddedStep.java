@@ -43,7 +43,7 @@ public interface PropertyMappingIndexedEmbeddedStep extends PropertyMappingStep 
 	 * @return {@code this}, for method chaining.
 	 * @see IndexedEmbedded#includePaths()
 	 */
-	default PropertyMappingIndexedEmbeddedStep includePaths(String ... paths) {
+	default PropertyMappingIndexedEmbeddedStep includePaths(String... paths) {
 		return includePaths( Arrays.asList( paths ) );
 	}
 

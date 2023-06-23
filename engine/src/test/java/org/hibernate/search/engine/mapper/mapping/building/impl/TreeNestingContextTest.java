@@ -143,15 +143,15 @@ public class TreeNestingContextTest {
 
 		MappingElement level1MappingElement = new StubMappingElement( typeModel1Mock, relativePrefix );
 		assertThatThrownBy( () -> {
-				TreeFilterDefinition level1Definition = new TreeFilterDefinition(
-						null, null, null
-				);
-				level1Context.nestComposed(
-						level1MappingElement,
-						relativePrefix, level1Definition,
-						new TreeFilterPathTracker( level1Definition ),
-						nestedContextBuilderMock, CYCLIC_RECURSION_EXCEPTION_FACTORY
-				);
+			TreeFilterDefinition level1Definition = new TreeFilterDefinition(
+					null, null, null
+			);
+			level1Context.nestComposed(
+					level1MappingElement,
+					relativePrefix, level1Definition,
+					new TreeFilterPathTracker( level1Definition ),
+					nestedContextBuilderMock, CYCLIC_RECURSION_EXCEPTION_FACTORY
+			);
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( cyclicRecursionMessage(
@@ -480,7 +480,7 @@ public class TreeNestingContextTest {
 				.containsOnly(
 						// "included" removed
 						"notEncountered"
-						// "excludedBecauseOfLevel1" removed
+				// "excludedBecauseOfLevel1" removed
 				);
 		// We have no exclude paths so it should be empty all the time:
 		assertThat( level1PathTracker.uselessExcludePaths() ).isEmpty();
@@ -511,7 +511,7 @@ public class TreeNestingContextTest {
 						"level2Composed",
 						"level2Composed.included",
 						"level2Composed.excludedBecauseOfLevel1"
-						//"level2Composed.excludedBecauseOfLevel2" // should not be added since it is excluded at lvl2, hence it wasn't encountered at lvl1.
+				//"level2Composed.excludedBecauseOfLevel2" // should not be added since it is excluded at lvl2, hence it wasn't encountered at lvl1.
 				);
 		assertThat( level2PathTracker.uselessIncludePaths() )
 				.containsOnly(
@@ -646,13 +646,13 @@ public class TreeNestingContextTest {
 						"level2",
 						"level2.include", // Added
 						"level2.exclude" // Added
-						// "level2.excludedInLevel1Filter" // Should not be added since it was excluded at lvl2 tracking.
+				// "level2.excludedInLevel1Filter" // Should not be added since it was excluded at lvl2 tracking.
 				);
 		assertThat( level2PathTracker.uselessIncludePaths() ).isEmpty();
 		assertThat( level2PathTracker.uselessExcludePaths() )
 				.containsOnly(
 						"notEncountered"
-						// "excludedInLevel1Filter" // Removed
+				// "excludedInLevel1Filter" // Removed
 				);
 		assertThat( level1PathTracker.uselessIncludePaths() ).isEmpty();
 		assertThat( level1PathTracker.uselessExcludePaths() )
@@ -1533,8 +1533,9 @@ public class TreeNestingContextTest {
 				return false;
 			}
 			StubMappingElement that = (StubMappingElement) o;
-			return Objects.equals( definingType, that.definingType ) && Objects.equals(
-					relativePrefix, that.relativePrefix );
+			return Objects.equals( definingType, that.definingType )
+					&& Objects.equals(
+							relativePrefix, that.relativePrefix );
 		}
 
 		@Override

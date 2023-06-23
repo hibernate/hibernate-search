@@ -18,7 +18,9 @@ import org.hibernate.search.util.common.AssertionFailure;
  * @param <S> The "self" type (the actual exposed type of this step).
  * @param <F> The type of field values.
  */
-abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<S extends AbstractLuceneStandardIndexFieldTypeOptionsStep<?, F>, F>
+abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<
+		S extends AbstractLuceneStandardIndexFieldTypeOptionsStep<?, F>,
+		F>
 		extends AbstractLuceneIndexFieldTypeOptionsStep<S, F>
 		implements LuceneStandardIndexFieldTypeOptionsStep<S, F> {
 

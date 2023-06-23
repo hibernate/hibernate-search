@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldContex
  */
 public interface ElasticsearchSearchIndexValueFieldContext<F>
 		extends SearchIndexValueFieldContext<ElasticsearchSearchIndexScope<?>>,
-				ElasticsearchSearchIndexNodeContext {
+		ElasticsearchSearchIndexNodeContext {
 
 	@Override
 	ElasticsearchSearchIndexValueFieldTypeContext<F> type();

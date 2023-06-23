@@ -43,7 +43,8 @@ public class ElasticsearchTestHostConnectionConfiguration {
 		this.awsRegion = System.getProperty( "test.elasticsearch.connection.aws.region" );
 		this.awsCredentialsType = System.getProperty( "test.elasticsearch.connection.aws.credentials.type" );
 		this.awsCredentialsAccessKeyId = System.getProperty( "test.elasticsearch.connection.aws.credentials.access_key_id" );
-		this.awsCredentialsSecretAccessKey = System.getProperty( "test.elasticsearch.connection.aws.credentials.secret_access_key" );
+		this.awsCredentialsSecretAccessKey =
+				System.getProperty( "test.elasticsearch.connection.aws.credentials.secret_access_key" );
 
 		log.infof(
 				"Integration tests will connect to '%s' (AWS signing enabled: '%s')",

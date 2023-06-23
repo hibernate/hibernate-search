@@ -24,7 +24,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Documented
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = IndexedProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@TypeMapping(
+		processor = @TypeMappingAnnotationProcessorRef(type = IndexedProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface Indexed {
 
 	/**

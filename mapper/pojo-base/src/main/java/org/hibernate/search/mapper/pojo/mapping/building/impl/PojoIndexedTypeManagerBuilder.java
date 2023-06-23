@@ -139,7 +139,8 @@ class PojoIndexedTypeManagerBuilder<E> {
 				entityName, typeModel.typeIdentifier(), typeModel.caster(),
 				reindexingResolverBuildingHelper.isSingleConcreteTypeInEntityHierarchy( typeModel ),
 				identifierMapping,
-				routingBridge == null ? NoOpDocumentRouter.INSTANCE
+				routingBridge == null
+						? NoOpDocumentRouter.INSTANCE
 						: new RoutingBridgeDocumentRouter<>( routingBridge.getBridgeHolder() ),
 				reindexingResolverBuildingHelper.runtimePathsBuildingHelper( typeModel ).pathOrdinals(),
 				preBuiltIndexingProcessor,

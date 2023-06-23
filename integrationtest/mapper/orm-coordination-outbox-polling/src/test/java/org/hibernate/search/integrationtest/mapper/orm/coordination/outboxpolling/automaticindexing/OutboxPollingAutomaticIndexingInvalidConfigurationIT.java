@@ -43,7 +43,8 @@ public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 				.withProperty( "hibernate.search.coordination.event_processor.pulse_interval", "-1" ) ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_interval'",
+						.failure(
+								"Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_interval'",
 								"'-1'", "'value' must be strictly positive" ) );
 	}
 
@@ -53,7 +54,8 @@ public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 				.withProperty( "hibernate.search.coordination.event_processor.pulse_interval", "0" ) ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_interval'",
+						.failure(
+								"Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_interval'",
 								"'0'", "'value' must be strictly positive" ) );
 	}
 
@@ -64,7 +66,8 @@ public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 				.withProperty( "hibernate.search.coordination.event_processor.polling_interval", "50" ) ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_interval'",
+						.failure(
+								"Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_interval'",
 								"'40'", "The pulse interval must be greater than or equal to the polling interval",
 								"i.e. in this case at least 50" ) );
 	}
@@ -75,7 +78,8 @@ public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 				.withProperty( "hibernate.search.coordination.event_processor.pulse_expiration", "-1" ) ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_expiration'",
+						.failure(
+								"Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_expiration'",
 								"'-1'", "'value' must be strictly positive" ) );
 	}
 
@@ -85,7 +89,8 @@ public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 				.withProperty( "hibernate.search.coordination.event_processor.pulse_expiration", "0" ) ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_expiration'",
+						.failure(
+								"Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_expiration'",
 								"'0'", "'value' must be strictly positive" ) );
 	}
 
@@ -96,7 +101,8 @@ public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 				.withProperty( "hibernate.search.coordination.event_processor.pulse_interval", "200" ) ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_expiration'",
+						.failure(
+								"Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_expiration'",
 								"'599'",
 								"The pulse expiration must be greater than or equal to 3 times the pulse interval",
 								"i.e. in this case at least 600" ) );

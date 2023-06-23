@@ -22,7 +22,8 @@ public class StubSearchWorkAssert {
 
 	private static final String NEWLINE = "\n\t";
 
-	private final StubTreeNodeDiffer<StubProjectionNode> PROJECTION_DIFFER = StubTreeNodeDiffer.<StubProjectionNode>builder().build();
+	private final StubTreeNodeDiffer<StubProjectionNode> PROJECTION_DIFFER =
+			StubTreeNodeDiffer.<StubProjectionNode>builder().build();
 
 	public static StubSearchWorkAssert assertThatSearchWork(StubSearchWork work) {
 		return new StubSearchWorkAssert( work );
@@ -63,16 +64,20 @@ public class StubSearchWorkAssert {
 		mismatch = checkForMismatch( builder, "routingKeys", expected.getRoutingKeys(), actual.getRoutingKeys() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 
-		mismatch = checkForMismatch( builder, "truncateAfterTimeout", expected.getTruncateAfterTimeout(), actual.getTruncateAfterTimeout() );
+		mismatch = checkForMismatch( builder, "truncateAfterTimeout", expected.getTruncateAfterTimeout(),
+				actual.getTruncateAfterTimeout() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 
-		mismatch = checkForMismatch( builder, "truncateAfterTimeUnit", expected.getTruncateAfterTimeUnit(), actual.getTruncateAfterTimeUnit() );
+		mismatch = checkForMismatch( builder, "truncateAfterTimeUnit", expected.getTruncateAfterTimeUnit(),
+				actual.getTruncateAfterTimeUnit() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 
-		mismatch = checkForMismatch( builder, "failAfterTimeout", expected.getFailAfterTimeout(), actual.getFailAfterTimeout() );
+		mismatch =
+				checkForMismatch( builder, "failAfterTimeout", expected.getFailAfterTimeout(), actual.getFailAfterTimeout() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 
-		mismatch = checkForMismatch( builder, "failAfterTimeUnit", expected.getFailAfterTimeUnit(), actual.getFailAfterTimeUnit() );
+		mismatch = checkForMismatch( builder, "failAfterTimeUnit", expected.getFailAfterTimeUnit(),
+				actual.getFailAfterTimeUnit() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 
 		mismatch = checkForMismatch( builder, "offset", expected.getOffset(), actual.getOffset() );

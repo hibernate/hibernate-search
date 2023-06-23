@@ -26,7 +26,7 @@ public class DistanceSortKey {
 		if ( obj == this ) {
 			return true;
 		}
-		if ( !(obj instanceof DistanceSortKey ) ) {
+		if ( !( obj instanceof DistanceSortKey ) ) {
 			return false;
 		}
 

@@ -187,8 +187,8 @@ public class ObjectLoadingPublicFieldTest extends SearchTestBase {
 
 		fullTextSession.clear();
 		fullTextQuery = fullTextSession.createFullTextQuery(
-						fieldFooQuery, A.class, B.class, C.class
-				)
+				fieldFooQuery, A.class, B.class, C.class
+		)
 				.setProjection( ProjectionConstants.THIS );
 		result = fullTextQuery.list();
 		assertPopulated( result );
@@ -233,13 +233,13 @@ public class ObjectLoadingPublicFieldTest extends SearchTestBase {
 			result = tuple[0];
 		}
 		if ( result instanceof A ) {
-			assertNotNull( ((A) result).id );
+			assertNotNull( ( (A) result ).id );
 		}
 		else if ( result instanceof B ) {
-			assertNotNull( ((B) result).id );
+			assertNotNull( ( (B) result ).id );
 		}
 		else if ( result instanceof C ) {
-			assertNotNull( ((C) result).id );
+			assertNotNull( ( (C) result ).id );
 		}
 		else {
 			throw new AssertionFailure( "Unexpected type for result " + result );

@@ -24,7 +24,7 @@ public interface TestConfiguration {
 	 * but sometimes it can be different type.
 	 * @param settings
 	 */
-	void configure(Map<String,Object> settings);
+	void configure(Map<String, Object> settings);
 
 	/**
 	 * Use this to enable a multi-tenant capable SessionFactory,

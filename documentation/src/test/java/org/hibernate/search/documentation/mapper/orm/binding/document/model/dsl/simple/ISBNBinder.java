@@ -62,6 +62,6 @@ public class ISBNBinder implements PropertyBinder {
 		}
 	}
 	//end::write[]
-//tag::bind[]
+	//tag::bind[]
 }
 //end::bind[]

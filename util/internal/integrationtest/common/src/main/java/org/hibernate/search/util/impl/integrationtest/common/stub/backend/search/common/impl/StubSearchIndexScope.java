@@ -43,11 +43,10 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 
 public class StubSearchIndexScope
 		extends AbstractSearchIndexScope<
-						StubSearchIndexScope,
-						StubIndexModel,
-						StubSearchIndexNodeContext,
-						StubSearchIndexCompositeNodeContext
-				> {
+				StubSearchIndexScope,
+				StubIndexModel,
+				StubSearchIndexNodeContext,
+				StubSearchIndexCompositeNodeContext> {
 	private final StubBackend backend;
 	private final StubSearchPredicateBuilderFactory predicateFactory;
 	private final StubSearchSortBuilderFactory sortFactory;
@@ -55,7 +54,7 @@ public class StubSearchIndexScope
 	private final StubSearchAggregationBuilderFactory aggregationFactory;
 
 	public StubSearchIndexScope(BackendMappingContext mappingContext, StubBackend backend,
-				Set<StubIndexModel> indexModels) {
+			Set<StubIndexModel> indexModels) {
 		super( mappingContext, indexModels );
 		this.backend = backend;
 		this.predicateFactory = new StubSearchPredicateBuilderFactory();

@@ -15,4 +15,3 @@ public interface FacetRangeAboveContext<T> extends FacetTermination, FacetParame
 	FacetRangeAboveContext<T> excludeLimit();
 }
 
-

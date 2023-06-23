@@ -40,13 +40,12 @@ import org.hibernate.search.util.common.SearchException;
  * @param <PDF> The type of factory used to create predicates in {@link #where(Function)}.
  */
 public interface SearchQuerySelectStep<
-				N extends SearchQueryOptionsStep<?, E, LOS, ?, ?>,
-				R,
-				E,
-				LOS,
-				PJF extends SearchProjectionFactory<R, E>,
-				PDF extends SearchPredicateFactory
-		>
+		N extends SearchQueryOptionsStep<?, E, LOS, ?, ?>,
+		R,
+		E,
+		LOS,
+		PJF extends SearchProjectionFactory<R, E>,
+		PDF extends SearchPredicateFactory>
 		extends SearchQueryWhereStep<N, E, LOS, PDF> {
 
 	/**

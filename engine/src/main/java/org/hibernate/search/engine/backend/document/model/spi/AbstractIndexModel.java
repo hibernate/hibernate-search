@@ -27,10 +27,9 @@ import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
 public abstract class AbstractIndexModel<
-				S extends AbstractIndexModel<?, R, F>,
-				R extends IndexCompositeNode<?, ?, ?>,
-				F extends IndexField<?, ?>
-		>
+		S extends AbstractIndexModel<?, R, F>,
+		R extends IndexCompositeNode<?, ?, ?>,
+		F extends IndexField<?, ?>>
 		implements EventContextProvider, IndexDescriptor {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

@@ -36,14 +36,16 @@ import org.jboss.logging.annotations.ValidIdRanges;
 
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({
-		@ValidIdRange(min = MessageConstants.MAPPER_ORM_OUTBOX_POLLING_ID_RANGE_MIN, max = MessageConstants.MAPPER_ORM_OUTBOX_POLLING_ID_RANGE_MAX)
+		@ValidIdRange(min = MessageConstants.MAPPER_ORM_OUTBOX_POLLING_ID_RANGE_MIN,
+				max = MessageConstants.MAPPER_ORM_OUTBOX_POLLING_ID_RANGE_MAX)
 })
 public interface Log extends BasicLogger {
 
 	int ID_OFFSET = MessageConstants.MAPPER_ORM_OUTBOX_POLLING_ID_RANGE_MIN;
 
 	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 1, value = "Generated entity mapping for outbox events used in the outbox-polling coordination strategy: %1$s")
+	@Message(id = ID_OFFSET + 1,
+			value = "Generated entity mapping for outbox events used in the outbox-polling coordination strategy: %1$s")
 	void outboxEventGeneratedEntityMapping(String xmlMappingDefinition);
 
 	@Message(id = ID_OFFSET + 3, value = "Max '%1$s' retries exhausted to process the event. Event will be aborted.")
@@ -56,7 +58,8 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 5, value = "Starting outbox event processor '%1$s': %2$s")
-	void startingOutboxEventProcessor(String name, @FormatWith(ToStringTreeMultilineFormatter.class) ToStringTreeAppendable processor);
+	void startingOutboxEventProcessor(String name,
+			@FormatWith(ToStringTreeMultilineFormatter.class) ToStringTreeAppendable processor);
 
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 6, value = "Stopping outbox event processor '%1$s'")
@@ -92,7 +95,8 @@ public interface Log extends BasicLogger {
 	SearchException unableToDeserializeOutboxEventPayloadWithAvro(String causeMessage, @Cause Throwable cause);
 
 	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 14, value = "Generated entity mapping for agents used in the outbox-polling coordination strategy: %1$s")
+	@Message(id = ID_OFFSET + 14,
+			value = "Generated entity mapping for agents used in the outbox-polling coordination strategy: %1$s")
 	void agentGeneratedEntityMapping(String xmlMappingDefinition);
 
 	@Message(id = ID_OFFSET + 15, value = "The pulse interval must be greater than or equal to the polling interval"
@@ -146,7 +150,8 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 21, value = "Starting outbox mass indexer agent '%1$s': %2$s")
-	void startingOutboxMassIndexerAgent(String name, @FormatWith(ToStringTreeMultilineFormatter.class) ToStringTreeAppendable processor);
+	void startingOutboxMassIndexerAgent(String name,
+			@FormatWith(ToStringTreeMultilineFormatter.class) ToStringTreeAppendable processor);
 
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 22, value = "Stopping outbox mass indexer agent '%1$s'")

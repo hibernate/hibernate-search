@@ -28,7 +28,8 @@ public class PojoTypeIndexingDependencyConfigurationContextImpl<T> extends Abstr
 
 	private final BoundPojoModelPathTypeNode<T> modelPath;
 	private final List<BoundPojoModelPathValueNode<?, ?, ?>> usedPaths = new ArrayList<>();
-	private final List<PojoOtherEntityIndexingDependencyConfigurationContextImpl<?>> otherEntityDependencyContexts = new ArrayList<>();
+	private final List<PojoOtherEntityIndexingDependencyConfigurationContextImpl<?>> otherEntityDependencyContexts =
+			new ArrayList<>();
 
 	public PojoTypeIndexingDependencyConfigurationContextImpl(
 			PojoBootstrapIntrospector introspector,
@@ -56,10 +57,11 @@ public class PojoTypeIndexingDependencyConfigurationContextImpl<T> extends Abstr
 	@Override
 	public PojoOtherEntityIndexingDependencyConfigurationContext fromOtherEntity(Class<?> otherEntityType,
 			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedType) {
-		PojoOtherEntityIndexingDependencyConfigurationContextImpl<?> otherEntityDependencyContext = createOtherEntityDependencyContext(
-				modelPath.getTypeModel().rawType(),
-				otherEntityType, pathFromOtherEntityTypeToBridgedType
-		);
+		PojoOtherEntityIndexingDependencyConfigurationContextImpl<?> otherEntityDependencyContext =
+				createOtherEntityDependencyContext(
+						modelPath.getTypeModel().rawType(),
+						otherEntityType, pathFromOtherEntityTypeToBridgedType
+				);
 
 		// If we get here, the path is valid
 
@@ -76,7 +78,8 @@ public class PojoTypeIndexingDependencyConfigurationContextImpl<T> extends Abstr
 					PojoIndexingDependencyCollectorNode.walker()
 			);
 		}
-		for ( PojoOtherEntityIndexingDependencyConfigurationContextImpl<?> otherEntityDependencyContext : otherEntityDependencyContexts ) {
+		for ( PojoOtherEntityIndexingDependencyConfigurationContextImpl<
+				?> otherEntityDependencyContext : otherEntityDependencyContexts ) {
 			otherEntityDependencyContext.contributeDependencies( dependencyCollector );
 		}
 	}

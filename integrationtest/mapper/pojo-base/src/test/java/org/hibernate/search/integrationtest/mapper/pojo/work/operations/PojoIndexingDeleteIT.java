@@ -20,45 +20,46 @@ import org.junit.runner.RunWith;
 @RunWith(NestedRunner.class)
 public class PojoIndexingDeleteIT {
 
-	private static final PojoIndexingOperationScenario SCENARIO = new PojoIndexingOperationScenario( BackendIndexingOperation.DELETE ) {
-		@Override
-		boolean expectImplicitLoadingOnNullEntity() {
-			return false;
-		}
+	private static final PojoIndexingOperationScenario SCENARIO =
+			new PojoIndexingOperationScenario( BackendIndexingOperation.DELETE ) {
+				@Override
+				boolean expectImplicitLoadingOnNullEntity() {
+					return false;
+				}
 
-		@Override
-		boolean isEntityPresentOnLoading() {
-			return false;
-		}
+				@Override
+				boolean isEntityPresentOnLoading() {
+					return false;
+				}
 
-		@Override
-		boolean expectSkipOnEntityAbsentAfterImplicitLoading() {
-			return false;
-		}
+				@Override
+				boolean expectSkipOnEntityAbsentAfterImplicitLoading() {
+					return false;
+				}
 
-		@Override
-		<T> void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes,
-				T entity) {
-			indexingPlan.delete( providedId, providedRoutes, entity );
-		}
+				@Override
+				<T> void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes,
+						T entity) {
+					indexingPlan.delete( providedId, providedRoutes, entity );
+				}
 
-		@Override
-		<T> void addWithoutInstanceTo(SearchIndexingPlan indexingPlan, Class<T> entityClass, Object providedId,
-				DocumentRoutesDescriptor providedRoutes) {
-			indexingPlan.purge( entityClass, providedId, providedRoutes );
-		}
+				@Override
+				<T> void addWithoutInstanceTo(SearchIndexingPlan indexingPlan, Class<T> entityClass, Object providedId,
+						DocumentRoutesDescriptor providedRoutes) {
+					indexingPlan.purge( entityClass, providedId, providedRoutes );
+				}
 
-		@Override
-		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, DocumentRoutesDescriptor providedRoutes,
-				IndexedEntity entity) {
-			return indexer.delete( providedId, providedRoutes, entity );
-		}
+				@Override
+				CompletionStage<?> execute(SearchIndexer indexer, Object providedId, DocumentRoutesDescriptor providedRoutes,
+						IndexedEntity entity) {
+					return indexer.delete( providedId, providedRoutes, entity );
+				}
 
-		@Override
-		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, DocumentRoutesDescriptor providedRoutes) {
-			return indexer.delete( IndexedEntity.class, providedId, providedRoutes );
-		}
-	};
+				@Override
+				CompletionStage<?> execute(SearchIndexer indexer, Object providedId, DocumentRoutesDescriptor providedRoutes) {
+					return indexer.delete( IndexedEntity.class, providedId, providedRoutes );
+				}
+			};
 
 	@Nested
 	public static class IndexerBaseIT extends AbstractPojoIndexerOperationBaseIT {

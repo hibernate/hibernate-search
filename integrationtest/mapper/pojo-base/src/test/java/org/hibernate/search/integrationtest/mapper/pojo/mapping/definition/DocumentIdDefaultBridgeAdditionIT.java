@@ -40,7 +40,8 @@ public class DocumentIdDefaultBridgeAdditionIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void exactType() {
@@ -103,7 +104,7 @@ public class DocumentIdDefaultBridgeAdditionIT {
 
 	private <T> void doTestSuccess(Consumer<BridgesConfigurationContext> bridgesConfigurer,
 			Class<T> indexedType, Function<String, T> constructor) {
-		backendMock.expectSchema( INDEX_NAME, b -> { } );
+		backendMock.expectSchema( INDEX_NAME, b -> {} );
 		SearchMapping mapping = setupHelper.start()
 				.withConfiguration( builder -> bridgesConfigurer.accept( builder.bridges() ) )
 				.setup( indexedType );
@@ -116,8 +117,8 @@ public class DocumentIdDefaultBridgeAdditionIT {
 			session.indexingPlan().add( entity2 );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.add( "id1", b -> { } )
-					.add( "id2", b -> { } );
+					.add( "id1", b -> {} )
+					.add( "id2", b -> {} );
 		}
 		backendMock.verifyExpectationsMet();
 	}

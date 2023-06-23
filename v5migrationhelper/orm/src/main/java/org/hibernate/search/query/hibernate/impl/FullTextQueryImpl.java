@@ -100,7 +100,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	public FullTextQueryImpl(Query luceneQuery, SessionImplementor session,
 			V5MigrationOrmSearchIntegratorAdapter searchIntegrator,
 			V5MigrationSearchSession<SearchLoadingOptionsStep> searchSession,
-			Class<?> ... entities) {
+			Class<?>... entities) {
 		super( session, new ParameterMetadataImpl( null, null ) );
 		this.searchSession = searchSession;
 		this.hSearchQuery = searchIntegrator.createHSQuery( luceneQuery, searchSession,
@@ -120,7 +120,8 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	@Override
 	public Iterator iterate() {
-		throw new UnsupportedOperationException( "iterate() is not implemented in Hibernate Search queries. Use scroll() instead." );
+		throw new UnsupportedOperationException(
+				"iterate() is not implemented in Hibernate Search queries. Use scroll() instead." );
 	}
 
 	@Override

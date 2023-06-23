@@ -103,7 +103,7 @@ public class FieldProjectionTypeIndependentIT {
 		final ObjectMapping nestedObject;
 
 		IndexBinding(IndexSchemaElement root) {
-			string1Field = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE, c -> { } )
+			string1Field = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE, c -> {} )
 					.map( root, "string1" );
 
 			flattenedObject = new ObjectMapping( root, "flattenedObject", ObjectStructure.FLATTENED );

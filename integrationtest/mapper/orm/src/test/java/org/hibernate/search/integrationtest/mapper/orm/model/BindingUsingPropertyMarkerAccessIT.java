@@ -104,6 +104,7 @@ public class BindingUsingPropertyMarkerAccessIT<TIndexed> {
 
 	private interface ModelPrimitives<T> {
 		Class<T> getModelClass();
+
 		T create(int id, double latitude, double longitude);
 	}
 
@@ -142,21 +143,22 @@ public class BindingUsingPropertyMarkerAccessIT<TIndexed> {
 	@Indexed(index = INDEX_NAME)
 	@GeoPointBinding(fieldName = "location")
 	public static final class ProtectedFieldAccessEntity {
-		static final ModelPrimitives<ProtectedFieldAccessEntity> PRIMITIVES = new ModelPrimitives<ProtectedFieldAccessEntity>() {
-			@Override
-			public Class<ProtectedFieldAccessEntity> getModelClass() {
-				return ProtectedFieldAccessEntity.class;
-			}
+		static final ModelPrimitives<ProtectedFieldAccessEntity> PRIMITIVES =
+				new ModelPrimitives<ProtectedFieldAccessEntity>() {
+					@Override
+					public Class<ProtectedFieldAccessEntity> getModelClass() {
+						return ProtectedFieldAccessEntity.class;
+					}
 
-			@Override
-			public ProtectedFieldAccessEntity create(int id, double latitude, double longitude) {
-				ProtectedFieldAccessEntity entity = new ProtectedFieldAccessEntity();
-				entity.id = id;
-				entity.latitude = latitude;
-				entity.longitude = longitude;
-				return entity;
-			}
-		};
+					@Override
+					public ProtectedFieldAccessEntity create(int id, double latitude, double longitude) {
+						ProtectedFieldAccessEntity entity = new ProtectedFieldAccessEntity();
+						entity.id = id;
+						entity.latitude = latitude;
+						entity.longitude = longitude;
+						return entity;
+					}
+				};
 
 		@Id
 		@DocumentId
@@ -265,21 +267,22 @@ public class BindingUsingPropertyMarkerAccessIT<TIndexed> {
 	@Indexed(index = INDEX_NAME)
 	@GeoPointBinding(fieldName = "location")
 	public static final class ProtectedMethodAccessEntity {
-		static final ModelPrimitives<ProtectedMethodAccessEntity> PRIMITIVES = new ModelPrimitives<ProtectedMethodAccessEntity>() {
-			@Override
-			public Class<ProtectedMethodAccessEntity> getModelClass() {
-				return ProtectedMethodAccessEntity.class;
-			}
+		static final ModelPrimitives<ProtectedMethodAccessEntity> PRIMITIVES =
+				new ModelPrimitives<ProtectedMethodAccessEntity>() {
+					@Override
+					public Class<ProtectedMethodAccessEntity> getModelClass() {
+						return ProtectedMethodAccessEntity.class;
+					}
 
-			@Override
-			public ProtectedMethodAccessEntity create(int id, double latitude, double longitude) {
-				ProtectedMethodAccessEntity entity = new ProtectedMethodAccessEntity();
-				entity.idWithUnpredictableName = id;
-				entity.latitudeWithUnpredictableName = latitude;
-				entity.longitudeWithUnpredictableName = longitude;
-				return entity;
-			}
-		};
+					@Override
+					public ProtectedMethodAccessEntity create(int id, double latitude, double longitude) {
+						ProtectedMethodAccessEntity entity = new ProtectedMethodAccessEntity();
+						entity.idWithUnpredictableName = id;
+						entity.latitudeWithUnpredictableName = latitude;
+						entity.longitudeWithUnpredictableName = longitude;
+						return entity;
+					}
+				};
 
 		/*
 		 * Give unpredictable names to properties, so that we're sure Hibernate Search

@@ -26,7 +26,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextFi
  * @deprecated No longer necessary in Hibernate Search 6.
  * Replace {@link Field} with {@link FullTextField} and pass the analyzer name directly to {@link FullTextField#analyzer()}.
  */
-@Retention( RetentionPolicy.RUNTIME )
+@Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD, ElementType.METHOD })
 @Documented
 @Deprecated

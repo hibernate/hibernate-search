@@ -30,8 +30,8 @@ public class HibernateOrmSearchSessionHolder implements Serializable {
 	}
 
 	public static HibernateOrmSearchSessionHolder get(SessionImplementor session, boolean createIfMissing) {
-		HibernateOrmSearchSessionHolder holder = (HibernateOrmSearchSessionHolder)
-				session.getProperties().get( SESSION_PROPERTY_KEY );
+		HibernateOrmSearchSessionHolder holder =
+				(HibernateOrmSearchSessionHolder) session.getProperties().get( SESSION_PROPERTY_KEY );
 		if ( holder != null ) {
 			return holder;
 		}

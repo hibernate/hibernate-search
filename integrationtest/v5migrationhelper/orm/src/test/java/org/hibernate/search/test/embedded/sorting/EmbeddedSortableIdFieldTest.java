@@ -89,7 +89,7 @@ public class EmbeddedSortableIdFieldTest extends SearchTestBase {
 	}
 
 	@Test
-	@Category( ElasticsearchSupportInProgress.class ) // HSEARCH-2398 Improve field name/type validation when querying the Elasticsearch backend
+	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2398 Improve field name/type validation when querying the Elasticsearch backend
 	public void testSortingOnSortableFieldNotIncludedByIndexEmbeddedException() {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Unknown field 'villain.id_sort'" );

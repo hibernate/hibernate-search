@@ -52,14 +52,17 @@ public class DistanceProjectionBaseIT {
 
 		BulkIndexer compositeForEachMainIndexer = InObjectProjectionIT.mainIndex.bulkIndexer();
 		BulkIndexer compositeForEachMissingLevel1Indexer = InObjectProjectionIT.missingLevel1Index.bulkIndexer();
-		BulkIndexer compositeForEachMissingLevel1SingleValuedFieldIndexer = InObjectProjectionIT.missingLevel1SingleValuedFieldIndex.bulkIndexer();
+		BulkIndexer compositeForEachMissingLevel1SingleValuedFieldIndexer =
+				InObjectProjectionIT.missingLevel1SingleValuedFieldIndex.bulkIndexer();
 		BulkIndexer compositeForEachMissingLevel2Indexer = InObjectProjectionIT.missingLevel2Index.bulkIndexer();
-		BulkIndexer compositeForEachMissingLevel2SingleValuedFieldIndexer = InObjectProjectionIT.missingLevel2SingleValuedFieldIndex.bulkIndexer();
+		BulkIndexer compositeForEachMissingLevel2SingleValuedFieldIndexer =
+				InObjectProjectionIT.missingLevel2SingleValuedFieldIndex.bulkIndexer();
 		InObjectProjectionIT.dataSets.forEach( d -> d.contribute( InObjectProjectionIT.mainIndex, compositeForEachMainIndexer,
 				InObjectProjectionIT.missingLevel1Index, compositeForEachMissingLevel1Indexer,
 				InObjectProjectionIT.missingLevel1SingleValuedFieldIndex, compositeForEachMissingLevel1SingleValuedFieldIndexer,
 				InObjectProjectionIT.missingLevel2Index, compositeForEachMissingLevel2Indexer,
-				InObjectProjectionIT.missingLevel2SingleValuedFieldIndex, compositeForEachMissingLevel2SingleValuedFieldIndexer ) );
+				InObjectProjectionIT.missingLevel2SingleValuedFieldIndex,
+				compositeForEachMissingLevel2SingleValuedFieldIndexer ) );
 
 		compositeForEachMainIndexer.join( compositeForEachMissingLevel1Indexer,
 				compositeForEachMissingLevel1SingleValuedFieldIndexer, compositeForEachMissingLevel2Indexer,
@@ -80,13 +83,15 @@ public class DistanceProjectionBaseIT {
 		private static final List<DataSet<GeoPoint, Double, DistanceProjectionTestValues>> dataSets = new ArrayList<>();
 		private static final List<Object[]> parameters = new ArrayList<>();
 		static {
-			for ( ObjectStructure singleValuedObjectStructure :
-					new ObjectStructure[] { ObjectStructure.FLATTENED, ObjectStructure.NESTED } ) {
+			for ( ObjectStructure singleValuedObjectStructure : new ObjectStructure[] {
+					ObjectStructure.FLATTENED,
+					ObjectStructure.NESTED } ) {
 				ObjectStructure multiValuedObjectStructure =
 						ObjectStructure.NESTED.equals( singleValuedObjectStructure )
-								|| TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForMultiValuedObjectProjection()
-								? ObjectStructure.NESTED
-								: ObjectStructure.FLATTENED;
+								|| TckConfiguration.get().getBackendFeatures()
+										.reliesOnNestedDocumentsForMultiValuedObjectProjection()
+												? ObjectStructure.NESTED
+												: ObjectStructure.FLATTENED;
 				DataSet<GeoPoint, Double, DistanceProjectionTestValues> dataSet = new DataSet<>( testValues(),
 						singleValuedObjectStructure, multiValuedObjectStructure );
 				dataSets.add( dataSet );

@@ -37,7 +37,8 @@ public class ChildDocIds {
 	 */
 	public boolean advanceExactParent(int parentDocId) throws IOException {
 		if ( parentDocId <= currentParentDocId ) {
-			throw new AssertionFailure( "This iterator can only move forward (no advancing to the same doc twice, no going backward)" );
+			throw new AssertionFailure(
+					"This iterator can only move forward (no advancing to the same doc twice, no going backward)" );
 		}
 		currentParentDocId = parentDocId;
 		lastReturnedChildDocId = -1;

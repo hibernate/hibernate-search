@@ -149,7 +149,7 @@ public class ContainerExtractorBinder {
 	 * @throws AssertionFailure if the bound path was empty
 	 */
 	// Checks are performed using reflection when building the resolved path
-	@SuppressWarnings( {"rawtypes", "unchecked"} )
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public <C, V> ContainerExtractorHolder<C, V> create(BoundContainerExtractorPath<C, V> boundPath) {
 		if ( boundPath.getExtractorPath().isEmpty() ) {
 			throw new AssertionFailure(
@@ -195,9 +195,10 @@ public class ContainerExtractorBinder {
 						sourceType,
 						ContainerExtractorPath.defaultExtractors()
 				);
-		return boundDefaultExtractorPathOptional.isPresent() && extractorPath.equals(
-				boundDefaultExtractorPathOptional.get().getExtractorPath()
-		);
+		return boundDefaultExtractorPathOptional.isPresent()
+				&& extractorPath.equals(
+						boundDefaultExtractorPathOptional.get().getExtractorPath()
+				);
 	}
 
 	private void addDefaultExtractor(String extractorName) {
@@ -209,7 +210,7 @@ public class ContainerExtractorBinder {
 		return extractorContributorCache.computeIfAbsent( extractorName, this::createExtractorContributorForName );
 	}
 
-	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
+	@SuppressWarnings("rawtypes") // Checks are implemented using reflection
 	private SingleExtractorContributor createExtractorContributorForName(String extractorName) {
 		Class<? extends ContainerExtractor> extractorClass = containerExtractorRegistry.forName( extractorName ).type();
 		GenericTypeContext typeContext = new GenericTypeContext( extractorClass );
@@ -238,7 +239,7 @@ public class ContainerExtractorBinder {
 
 	}
 
-	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
+	@SuppressWarnings("rawtypes") // Checks are implemented using reflection
 	private static class SingleExtractorContributor implements ExtractorContributor {
 		private final ExtractingTypePatternMatcher typePatternMatcher;
 		private final String extractorName;
@@ -292,7 +293,7 @@ public class ContainerExtractorBinder {
 		}
 	}
 
-	@SuppressWarnings({"rawtypes"}) // Checks are implemented using reflection
+	@SuppressWarnings({ "rawtypes" }) // Checks are implemented using reflection
 	private static class ExtractorResolutionState<C> {
 
 		private final List<String> extractorNames = new ArrayList<>();

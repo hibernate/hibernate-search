@@ -169,7 +169,7 @@ public abstract class DefaultServiceResolver implements ServiceResolver {
 		private <S> Iterator<? extends Supplier<S>> providerIterator(ClassLoader classLoader, Class<S> serviceContract) {
 			try {
 				ServiceLoader<S> delegate = ServiceLoader.load( serviceContract, classLoader );
-				return ((Stream<? extends Supplier<S>>) SERVICE_LOADER_STREAM_METHOD.invoke( delegate )).iterator();
+				return ( (Stream<? extends Supplier<S>>) SERVICE_LOADER_STREAM_METHOD.invoke( delegate ) ).iterator();
 			}
 			catch (RuntimeException | IllegalAccessException | InvocationTargetException e) {
 				throw new AssertionFailure( "Error calling ServiceLoader.stream()", e );
@@ -179,7 +179,8 @@ public abstract class DefaultServiceResolver implements ServiceResolver {
 		/**
 		 * Only adds a supplied provider if its type name is not present in `alreadyUsedProviderTypes`. Ignores it otherwise.
 		 */
-		private <S> void collectServiceIfNotDuplicate(Set<S> services, Set<String> alreadyUsedProviderTypes, Supplier<S> provider) {
+		private <S> void collectServiceIfNotDuplicate(Set<S> services, Set<String> alreadyUsedProviderTypes,
+				Supplier<S> provider) {
 			Class<?> type;
 			try {
 				type = (Class<?>) PROVIDER_TYPE_METHOD.invoke( provider );

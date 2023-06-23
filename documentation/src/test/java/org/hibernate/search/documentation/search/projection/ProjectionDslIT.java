@@ -203,9 +203,9 @@ public class ProjectionDslIT {
 		withinSearchSession( searchSession -> {
 			List<Book> hits = searchSession.search( Book.class )
 					.select( f ->
-							// tag::entity-requested-type[]
-							f.entity( Book.class )
-							// end::entity-requested-type[]
+			// tag::entity-requested-type[]
+			f.entity( Book.class )
+			// end::entity-requested-type[]
 					)
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
@@ -587,31 +587,31 @@ public class ProjectionDslIT {
 			Session session = searchSession.toOrmSession();
 			assertThat( hits ).usingRecursiveFieldByFieldElementComparator()
 					.containsExactlyInAnyOrder(
-					Collections.singletonList(
-							new MyAuthorName(
-									session.getReference( Book.class, BOOK1_ID ).getAuthors().get( 0 ).getFirstName(),
-									session.getReference( Book.class, BOOK1_ID ).getAuthors().get( 0 ).getLastName()
+							Collections.singletonList(
+									new MyAuthorName(
+											session.getReference( Book.class, BOOK1_ID ).getAuthors().get( 0 ).getFirstName(),
+											session.getReference( Book.class, BOOK1_ID ).getAuthors().get( 0 ).getLastName()
+									)
+							),
+							Collections.singletonList(
+									new MyAuthorName(
+											session.getReference( Book.class, BOOK2_ID ).getAuthors().get( 0 ).getFirstName(),
+											session.getReference( Book.class, BOOK2_ID ).getAuthors().get( 0 ).getLastName()
+									)
+							),
+							Collections.singletonList(
+									new MyAuthorName(
+											session.getReference( Book.class, BOOK3_ID ).getAuthors().get( 0 ).getFirstName(),
+											session.getReference( Book.class, BOOK3_ID ).getAuthors().get( 0 ).getLastName()
+									)
+							),
+							Collections.singletonList(
+									new MyAuthorName(
+											session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getFirstName(),
+											session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getLastName()
+									)
 							)
-					),
-					Collections.singletonList(
-							new MyAuthorName(
-									session.getReference( Book.class, BOOK2_ID ).getAuthors().get( 0 ).getFirstName(),
-									session.getReference( Book.class, BOOK2_ID ).getAuthors().get( 0 ).getLastName()
-							)
-					),
-					Collections.singletonList(
-							new MyAuthorName(
-									session.getReference( Book.class, BOOK3_ID ).getAuthors().get( 0 ).getFirstName(),
-									session.getReference( Book.class, BOOK3_ID ).getAuthors().get( 0 ).getLastName()
-							)
-					),
-					Collections.singletonList(
-							new MyAuthorName(
-									session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getFirstName(),
-									session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getLastName()
-							)
-					)
-			);
+					);
 		} );
 
 		withinSearchSession( searchSession -> {
@@ -1017,7 +1017,8 @@ public class ProjectionDslIT {
 				return false;
 			}
 			MyTuple4<?, ?, ?, ?> other = (MyTuple4<?, ?, ?, ?>) obj;
-			return Objects.equals( first, other.first ) && Objects.equals( second, other.second )
+			return Objects.equals( first, other.first )
+					&& Objects.equals( second, other.second )
 					&& Objects.equals( third, other.third ) && Objects.equals( fourth, other.fourth );
 		}
 

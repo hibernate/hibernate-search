@@ -14,7 +14,7 @@ class NoOpPojoIndexingProcessor extends PojoIndexingProcessor<Object> {
 
 	private static final NoOpPojoIndexingProcessor INSTANCE = new NoOpPojoIndexingProcessor();
 
-	@SuppressWarnings( "unchecked" ) // This instance works for any T
+	@SuppressWarnings("unchecked") // This instance works for any T
 	public static <T> PojoIndexingProcessor<T> get() {
 		return (PojoIndexingProcessor<T>) INSTANCE;
 	}

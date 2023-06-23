@@ -70,7 +70,8 @@ public abstract class AbstractNonBulkableWork<R> implements NonBulkableWork<R> {
 				.thenApply( response -> handleResult( executionContext, response ) );
 	}
 
-	protected CompletableFuture<?> beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
+	protected CompletableFuture<?> beforeExecute(ElasticsearchWorkExecutionContext executionContext,
+			ElasticsearchRequest request) {
 		// Do nothing by default
 		return SUCCESSFUL_FUTURE;
 	}

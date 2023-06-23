@@ -72,7 +72,8 @@ public class SingleFieldAggregationInvalidFieldIT<F> {
 	}
 
 	@Test
-	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.FacetUnknownFieldFailureTest.testUnknownFieldNameThrowsException")
+	@PortedFromSearch5(
+			original = "org.hibernate.search.test.query.facet.FacetUnknownFieldFailureTest.testUnknownFieldNameThrowsException")
 	public void unknownField() {
 		String fieldPath = "unknownField";
 

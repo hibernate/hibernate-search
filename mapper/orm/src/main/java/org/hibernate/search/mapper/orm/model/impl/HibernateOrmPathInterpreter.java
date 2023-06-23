@@ -195,7 +195,7 @@ final class HibernateOrmPathInterpreter
 			this.wholePath = wholePath;
 		}
 
-		public void resolvedStringRepresentation(String ... stringRepresentationArray) {
+		public void resolvedStringRepresentation(String... stringRepresentationArray) {
 			found = true;
 			Collections.addAll( stringRepresentations, stringRepresentationArray );
 		}
@@ -329,7 +329,7 @@ final class HibernateOrmPathInterpreter
 		if ( extractorPath.isDefault() ) {
 			throw new AssertionFailure(
 					"Expected a non-default extractor path as per the "
-					+ PojoPathDefinitionProvider.class.getSimpleName() + " contract"
+							+ PojoPathDefinitionProvider.class.getSimpleName() + " contract"
 			);
 		}
 

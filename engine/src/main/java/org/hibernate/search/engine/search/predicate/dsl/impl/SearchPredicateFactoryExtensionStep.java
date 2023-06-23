@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryEx
 
 public final class SearchPredicateFactoryExtensionStep
 		implements SearchPredicateFactoryExtensionIfSupportedStep,
-				SearchPredicateFactoryExtensionIfSupportedMoreStep {
+		SearchPredicateFactoryExtensionIfSupportedMoreStep {
 
 	private final SearchPredicateFactory parent;
 

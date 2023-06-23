@@ -37,9 +37,11 @@ class JPAPersistenceRunner implements PersistenceRunner<EntityManager, EntityTra
 	}
 
 	@Override
-	public <R, E extends Throwable> R applyInTransaction(ThrowingBiFunction<? super EntityManager, ? super EntityTransaction, R, E> action) throws E {
-		return applyNoTransaction( entityManager ->
-				applyInJPATransaction( entityManager, tx -> action.apply( entityManager, tx ) )
+	public <R, E extends Throwable> R applyInTransaction(
+			ThrowingBiFunction<? super EntityManager, ? super EntityTransaction, R, E> action)
+			throws E {
+		return applyNoTransaction(
+				entityManager -> applyInJPATransaction( entityManager, tx -> action.apply( entityManager, tx ) )
 		);
 	}
 }

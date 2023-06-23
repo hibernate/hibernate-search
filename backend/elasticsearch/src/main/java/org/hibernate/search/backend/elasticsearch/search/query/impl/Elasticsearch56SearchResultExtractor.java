@@ -42,8 +42,9 @@ class Elasticsearch56SearchResultExtractor<H> extends Elasticsearch7SearchResult
 	protected SearchResultTotal extractTotal(JsonObject responseBody) {
 		Optional<Long> hitsTotal = HITS_TOTAL_ACCESSOR.get( responseBody );
 
-		return ( hitsTotal.isPresent() ) ? SimpleSearchResultTotal.exact( hitsTotal.get() ) :
-				SimpleSearchResultTotal.lowerBound( 0L );
+		return ( hitsTotal.isPresent() )
+				? SimpleSearchResultTotal.exact( hitsTotal.get() )
+				: SimpleSearchResultTotal.lowerBound( 0L );
 	}
 
 }

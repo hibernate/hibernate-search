@@ -36,7 +36,8 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 
 	@Override
 	protected List<String> numberOfFragmentsResult() {
-		return Arrays.asList( "Lorem <em>ipsum</em> dolor sit amet, consectetur adipiscing elit. Proin nec <em>ipsum</em> ultricies, blandit velit vitae" );
+		return Arrays.asList(
+				"Lorem <em>ipsum</em> dolor sit amet, consectetur adipiscing elit. Proin nec <em>ipsum</em> ultricies, blandit velit vitae" );
 	}
 
 	@Override
@@ -69,8 +70,8 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
-						f -> f.highlight( "string" )
-				)
+				f -> f.highlight( "string" )
+		)
 				.where( f -> f.match().field( "string" ).matching( "rock" ) )
 				.highlighter( h -> h.fastVector()
 						.boundaryScanner()
@@ -81,7 +82,8 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 
 		assertThatHits( highlights.fetchAllHits() )
 				.hasHitsAnyOrder(
-						Arrays.asList( "Scorpions are a German <em>rock</em> band formed in Hanover in 1965 by guitarist Rudolf Schenker. Since the band's",
+						Arrays.asList(
+								"Scorpions are a German <em>rock</em> band formed in Hanover in 1965 by guitarist Rudolf Schenker. Since the band's",
 								"style has ranged from hard <em>rock</em>, heavy metal and glam metal to soft <em>rock</em>." )
 				);
 	}
@@ -91,8 +93,8 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
-						f -> f.highlight( "string" )
-				)
+				f -> f.highlight( "string" )
+		)
 				.where( f -> f.match().field( "string" ).matching( "rock" ) )
 				.highlighter( h -> h.fastVector()
 						.boundaryScanner()
@@ -116,8 +118,8 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
-						f -> f.highlight( "string" )
-				)
+				f -> f.highlight( "string" )
+		)
 				.where( f -> f.match().field( "string" ).matching( "rock" ) )
 				.highlighter( h -> h.fastVector()
 						.boundaryScanner( bs -> bs.word().locale( Locale.ENGLISH ) )
@@ -138,8 +140,8 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
-						f -> f.highlight( "string" )
-				)
+				f -> f.highlight( "string" )
+		)
 				.where( f -> f.match().field( "string" ).matching( "rock" ) )
 				.highlighter( h -> h.fastVector()
 						.boundaryScanner()
@@ -153,7 +155,8 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 						//    "Scorpions are a German <em>rock</em> band formed in Hanover in 1965 by guitarist Rudolf Schenker. ",
 						//    "Since the band's inception, its musical style has ranged from hard <em>rock</em>, heavy metal and glam metal to soft rock. ",
 						//    "Since the band's inception, its musical style has ranged from hard rock, heavy metal and glam metal to soft <em>rock</em>."
-						.fragmentSize( "Scorpions are a German rock band formed in Hanover in 1965 by guitarist Rudolf Schenker".length() )
+						.fragmentSize( "Scorpions are a German rock band formed in Hanover in 1965 by guitarist Rudolf Schenker"
+								.length() )
 				)
 				.toQuery();
 
@@ -171,8 +174,8 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
-						f -> f.highlight( "string" )
-				)
+				f -> f.highlight( "string" )
+		)
 				.where( f -> f.match().field( "string" ).matching( "another" ) )
 				.highlighter( h2 -> h2.fastVector().tagSchema( HighlighterTagSchema.STYLED ) )
 				.toQuery();
@@ -193,8 +196,8 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
-						f -> f.highlight( "string" )
-				)
+				f -> f.highlight( "string" )
+		)
 				.where( f -> f.match().field( "string" ).matching( "another" ) )
 				.highlighter( h2 -> h2.fastVector().tag( "<strong>", "</strong>" ).tagSchema( HighlighterTagSchema.STYLED ) )
 				.toQuery();
@@ -211,8 +214,8 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
-						f -> f.highlight( "string" )
-				)
+				f -> f.highlight( "string" )
+		)
 				.where( f -> f.match().field( "string" ).matching( "another" ) )
 				.highlighter( h2 -> h2.fastVector().tagSchema( HighlighterTagSchema.STYLED ).tag( "<strong>", "</strong>" ) )
 				.toQuery();
@@ -229,8 +232,8 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
-						f -> f.highlight( "string" )
-				)
+				f -> f.highlight( "string" )
+		)
 				.where( f -> f.match().field( "string" ).matching( "useless" ) )
 				.highlighter( h2 -> h2.fastVector()
 						.fragmentSize( 20 )
@@ -250,8 +253,8 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 				);
 
 		highlights = scope.query().select(
-						f -> f.highlight( "string" )
-				)
+				f -> f.highlight( "string" )
+		)
 				.where( f -> f.match().field( "string" ).matching( "useless" ) )
 				.highlighter( h2 -> h2.fastVector()
 						.fragmentSize( 20 )
@@ -278,8 +281,8 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
-						f -> f.highlight( "string" )
-				)
+				f -> f.highlight( "string" )
+		)
 				.where( f -> f.match().field( "string" ).matching( "useless" ) )
 				.highlighter( h2 -> h2.fastVector()
 						.fragmentSize( 20 )
@@ -303,8 +306,8 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
-						f -> f.highlight( "string" )
-				)
+				f -> f.highlight( "string" )
+		)
 				.where( f -> f.match().field( "string" ).matching( "rock" ) )
 				.highlighter( h2 -> h2.fastVector()
 						.phraseLimit( 1 )
@@ -313,7 +316,8 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 
 		assertThatHits( highlights.fetchAllHits() )
 				.hasHitsAnyOrder(
-						Arrays.asList( "Scorpions are a German <em>rock</em> band formed in Hanover in 1965 by guitarist Rudolf Schenker. Since the band's" )
+						Arrays.asList(
+								"Scorpions are a German <em>rock</em> band formed in Hanover in 1965 by guitarist Rudolf Schenker. Since the band's" )
 				);
 	}
 
@@ -322,8 +326,8 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
-						f -> f.highlight( "multiValuedString" )
-				)
+				f -> f.highlight( "multiValuedString" )
+		)
 				.where( f -> f.bool()
 						.must( f.match().field( "multiValuedString" ).matching( "dog" ) )
 						.should( f.match().field( "multiValuedString" ).matching( "string" ).boost( 10.0f ) ) )
@@ -345,8 +349,8 @@ public class HighlighterFastVectorIT extends AbstractHighlighterIT {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
-						f -> f.highlight( "multiValuedString" )
-				)
+				f -> f.highlight( "multiValuedString" )
+		)
 				.where( f -> f.bool()
 						.must( f.match().field( "multiValuedString" ).matching( "dog" ) )
 						.should( f.match().field( "multiValuedString" ).matching( "string" ).boost( 10.0f ) ) )

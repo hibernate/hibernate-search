@@ -110,7 +110,8 @@ public class MassIndexingInterruptionIT {
 				.hasSize( 1 )
 				.allSatisfy( t -> assertThat( t )
 						.asInstanceOf( InstanceOfAssertFactories.THROWABLE )
-						.hasMessageContaining( "Mass indexing received interrupt signal. The index is left in an unknown state!" ) );
+						.hasMessageContaining(
+								"Mass indexing received interrupt signal. The index is left in an unknown state!" ) );
 		// Most JDK methods unset the interrupt flag when they throw an InterruptedException:
 		// the MassIndexer should do the same.
 		assertThat( interruptFlagAfterInterruption ).isFalse();

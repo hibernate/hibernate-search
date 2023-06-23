@@ -152,15 +152,16 @@ public class BeanResolverImplRetrievalBuiltinTest {
 		assertThatThrownBy( () -> beanResolver.resolve( InvalidType.class, "someName", BeanRetrieval.BUILTIN ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unable to resolve bean reference to type '" + InvalidType.class.getName()
-								+ "' and name 'someName'",
+						+ "' and name 'someName'",
 						"No beans defined for type", "in Hibernate Search's internal registry" );
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String) through BeanReference
-		assertThatThrownBy( () -> beanResolver.resolve( BeanReference.of( InvalidType.class, "someName", BeanRetrieval.BUILTIN ) ) )
+		assertThatThrownBy(
+				() -> beanResolver.resolve( BeanReference.of( InvalidType.class, "someName", BeanRetrieval.BUILTIN ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unable to resolve bean reference to type '" + InvalidType.class.getName()
-								+ "' and name 'someName'",
+						+ "' and name 'someName'",
 						"No beans defined for type", "in Hibernate Search's internal registry" );
 		verifyNoOtherInteractionsAndReset();
 

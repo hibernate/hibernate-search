@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * use {@code @ContainerExtraction(extract = ContainerExtract.NO)}
  */
 @Documented
-@Target({}) // Only used as a component in other annotations
+@Target({ }) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ContainerExtraction {
 
@@ -44,6 +44,6 @@ public @interface ContainerExtraction {
 	 * Setting this together with {@code extract = } {@link ContainerExtract#NO} will trigger an exception.
 	 * @see org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors
 	 */
-	String[] value() default {};
+	String[] value() default { };
 
 }

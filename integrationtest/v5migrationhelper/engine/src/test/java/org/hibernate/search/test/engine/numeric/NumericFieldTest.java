@@ -48,16 +48,19 @@ public class NumericFieldTest {
 		assertRangeQuery( "overriddenFieldName", 1, 3 ).as( "Query id " ).hasResultSize( 3 );
 		assertRangeQuery( "latitude", -10d, 10d ).as( "Query by double range" ).hasResultSize( 3 );
 		assertRangeQuery( "importance", (short) 11, (short) 13 ).as( "Query by short range" ).hasResultSize( 3 );
-		assertRangeQuery( "fallbackImportance", Short.valueOf( "11" ), Short.valueOf( "13" ) ).as( "Query by Short range" ).hasResultSize( 3 );
+		assertRangeQuery( "fallbackImportance", Short.valueOf( "11" ), Short.valueOf( "13" ) ).as( "Query by Short range" )
+				.hasResultSize( 3 );
 		assertRangeQuery( "popularity", (byte) 21, (byte) 23 ).as( "Query by byte range" ).hasResultSize( 3 );
-		assertRangeQuery( "fallbackPopularity", Byte.valueOf( "21" ), Byte.valueOf( "23" ) ).as( "Query by Byte range" ).hasResultSize( 3 );
+		assertRangeQuery( "fallbackPopularity", Byte.valueOf( "21" ), Byte.valueOf( "23" ) ).as( "Query by Byte range" )
+				.hasResultSize( 3 );
 		assertRangeQuery( "ranking", 1, 2 ).as( "Query by integer range" ).hasResultSize( 4 );
 		assertRangeQuery( "myCounter", 1L, 3L ).as( "Query by long range" ).hasResultSize( 3 );
 		assertRangeQuery( "strMultiple", 0.7d, 0.9d ).as( "Query by multi-fields" ).hasResultSize( 2 );
 
 		// Range Queries different bounds
 		assertRangeQuery( "overriddenFieldName", 1, 3, true, false ).as( "Query by id excluding upper" ).hasResultSize( 2 );
-		assertRangeQuery( "overriddenFieldName", 1, 3, false, false ).as( "Query by id excluding upper and lower" ).hasResultSize( 1 );
+		assertRangeQuery( "overriddenFieldName", 1, 3, false, false ).as( "Query by id excluding upper and lower" )
+				.hasResultSize( 1 );
 
 		// Range Query for embedded entities
 		assertRangeQuery( "country.idh", 0.9, 1d ).as( "Range Query for indexed embedded" ).hasResultSize( 2 );
@@ -68,8 +71,8 @@ public class NumericFieldTest {
 		// Exact Matching Queries
 		assertExactQuery( "overriddenFieldName", 1 ).as( "Query id exact" ).matchesExactlyIds( 1 );
 		assertExactQuery( "latitude", -10d ).as( "Query double exact" ).matchesExactlyIds( 2 );
-		assertExactQuery( "importance", (short)12 ).as( "Query short exact" ).matchesExactlyIds( 3 );
-		assertExactQuery( "popularity", (byte)22 ).as( "Query byte exact" ).matchesExactlyIds( 3 );
+		assertExactQuery( "importance", (short) 12 ).as( "Query short exact" ).matchesExactlyIds( 3 );
+		assertExactQuery( "popularity", (byte) 22 ).as( "Query byte exact" ).matchesExactlyIds( 3 );
 		assertExactQuery( "longitude", -20d ).as( "Query integer exact" ).matchesExactlyIds( 3 );
 		assertExactQuery( "myCounter", 4L ).as( "Query long exact" ).matchesExactlyIds( 4 );
 		assertExactQuery( "strMultiple", 0.1d ).as( "Query multifield exact" ).matchesExactlyIds( 5 );
@@ -116,7 +119,8 @@ public class NumericFieldTest {
 		return helper.assertThatQuery( query ).from( Location.class );
 	}
 
-	private AssertBuildingHSQueryContext assertRangeQuery(String fieldName, Object from, Object to, boolean includeLower, boolean includeUpper) {
+	private AssertBuildingHSQueryContext assertRangeQuery(String fieldName, Object from, Object to, boolean includeLower,
+			boolean includeUpper) {
 		RangeMatchingContext.FromRangeContext<Object> fromContext = helper.queryBuilder(
 				Location.class ).range().onField( fieldName )
 				.from( from );
@@ -132,15 +136,20 @@ public class NumericFieldTest {
 	}
 
 	private void prepareData() {
-		Location loc1 = new Location( 1, 1L, -20d, -40d, 1, "Random text", 1.5d, countryFor( "England", 0.947 ), (short) 10, (byte) 20 );
+		Location loc1 = new Location( 1, 1L, -20d, -40d, 1, "Random text", 1.5d, countryFor( "England", 0.947 ), (short) 10,
+				(byte) 20 );
 		loc1.addPinPoints( new PinPoint( 1, 4, loc1 ), new PinPoint( 2, 5, loc1 ) );
 
-		Location loc2 = new Location( 2, 2L, -10d, -30d, 1, "Some text", 0.786d, countryFor( "Italy", 0.951 ), (short) 11, (byte) 21 );
+		Location loc2 =
+				new Location( 2, 2L, -10d, -30d, 1, "Some text", 0.786d, countryFor( "Italy", 0.951 ), (short) 11, (byte) 21 );
 		loc2.addPinPoints( new PinPoint( 3, 1, loc2 ), new PinPoint( 4, 2, loc2 ) );
 
-		Location loc3 = new Location( 3, 3L, 0d, -20d, 1, "A text", 0.86d, countryFor( "Brazil", 0.813 ), (short) 12, (byte) 22 );
-		Location loc4 = new Location( 4, 4L, 10d, 0d, 2, "Any text", 0.99d, countryFor( "France", 0.872 ), (short) 13, (byte) 23 );
-		Location loc5 = new Location( 5, 5L, 20d, 20d, 3, "Random text", 0.1d, countryFor( "India", 0.612 ), (short) 14, (byte) 24 );
+		Location loc3 =
+				new Location( 3, 3L, 0d, -20d, 1, "A text", 0.86d, countryFor( "Brazil", 0.813 ), (short) 12, (byte) 22 );
+		Location loc4 =
+				new Location( 4, 4L, 10d, 0d, 2, "Any text", 0.99d, countryFor( "France", 0.872 ), (short) 13, (byte) 23 );
+		Location loc5 =
+				new Location( 5, 5L, 20d, 20d, 3, "Random text", 0.1d, countryFor( "India", 0.612 ), (short) 14, (byte) 24 );
 
 		helper.add( loc1, loc2, loc3, loc4, loc5 );
 

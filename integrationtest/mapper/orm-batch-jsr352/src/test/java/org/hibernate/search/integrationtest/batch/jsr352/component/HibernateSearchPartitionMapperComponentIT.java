@@ -108,7 +108,7 @@ public class HibernateSearchPartitionMapperComponentIT {
 		jobData.setEntityTypeDescriptors( Arrays.asList(
 				JobTestUtil.createSimpleEntityTypeDescriptor( emf, Company.class ),
 				JobTestUtil.createSimpleEntityTypeDescriptor( emf, Person.class )
-				) );
+		) );
 		when( mockedJobContext.getTransientUserData() ).thenReturn( jobData );
 
 		PartitionPlan partitionPlan = partitionMapper.mapPartitions();

@@ -36,7 +36,8 @@ import org.junit.Test;
 public class ProjectionConstructorEntityProjectionIT extends AbstractProjectionConstructorIT {
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	protected final StubLoadingContext loadingContext = new StubLoadingContext();
 
@@ -54,6 +55,7 @@ public class ProjectionConstructorEntityProjectionIT extends AbstractProjectionC
 	public void noArg() {
 		class MyProjection {
 			public final IndexedEntity entity;
+
 			@ProjectionConstructor
 			public MyProjection(@EntityProjection IndexedEntity entity) {
 				this.entity = entity;
@@ -89,6 +91,7 @@ public class ProjectionConstructorEntityProjectionIT extends AbstractProjectionC
 	public void supertype() {
 		class MyProjection {
 			public final Object entity;
+
 			@ProjectionConstructor
 			public MyProjection(@EntityProjection Object entity) {
 				this.entity = entity;
@@ -124,6 +127,7 @@ public class ProjectionConstructorEntityProjectionIT extends AbstractProjectionC
 	public void invalidType() {
 		class MyProjection {
 			public final Integer entity;
+
 			@ProjectionConstructor
 			public MyProjection(@EntityProjection Integer entity) {
 				this.entity = entity;
@@ -149,9 +153,8 @@ public class ProjectionConstructorEntityProjectionIT extends AbstractProjectionC
 	}
 
 	private void addLoadableEntityType(StandalonePojoMappingConfigurationContext context) {
-		context.addEntityType( IndexedEntity.class, IndexedEntity.NAME, c ->
-				c.selectionLoadingStrategy(
-						new StubSelectionLoadingStrategy<>( IndexedEntity.PERSISTENCE_KEY ) ) );
+		context.addEntityType( IndexedEntity.class, IndexedEntity.NAME, c -> c.selectionLoadingStrategy(
+				new StubSelectionLoadingStrategy<>( IndexedEntity.PERSISTENCE_KEY ) ) );
 	}
 
 	@Override

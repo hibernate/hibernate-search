@@ -91,7 +91,8 @@ public class SearchIntegrationImpl implements SearchIntegration {
 		if ( backend == null ) {
 			throw log.unknownNameForBackend( backendName,
 					backends.keySet().stream().filter( Objects::nonNull ).collect( Collectors.toList() ),
-					backends.containsKey( null ) ? log.defaultBackendAvailable()
+					backends.containsKey( null )
+							? log.defaultBackendAvailable()
 							: log.defaultBackendUnavailable() );
 		}
 		return backend.toAPI();

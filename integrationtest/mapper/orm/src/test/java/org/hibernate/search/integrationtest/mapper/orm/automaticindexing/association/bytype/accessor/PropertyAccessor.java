@@ -31,7 +31,8 @@ public interface PropertyAccessor<R, V> {
 		return new ComposedPropertyAccessor<>( this, defaultInstanceSupplier, leaf );
 	}
 
-	default <U, C> MultiValuedPropertyAccessor<R, U, C> andThen(Supplier<V> defaultInstanceSupplier, MultiValuedPropertyAccessor<? super V, U, C> leaf) {
+	default <U, C> MultiValuedPropertyAccessor<R, U, C> andThen(Supplier<V> defaultInstanceSupplier,
+			MultiValuedPropertyAccessor<? super V, U, C> leaf) {
 		return new ComposedMultiValuedPropertyAccessor<>( this, defaultInstanceSupplier, leaf );
 	}
 }

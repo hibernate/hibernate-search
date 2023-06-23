@@ -39,17 +39,17 @@ public class HibernateOrmQueryLoader<E, I> {
 	}
 
 	public Query<Long> createCountQuery(SharedSessionContractImplementor session) {
-		return ( conditionalExpression == null ) ?
-				queryFactory.createQueryForCount( session, includedTypesFilter ) :
-				queryFactory.createQueryForCount(
+		return ( conditionalExpression == null )
+				? queryFactory.createQueryForCount( session, includedTypesFilter )
+				: queryFactory.createQueryForCount(
 						session, persister, includedTypesFilter, conditionalExpression
 				);
 	}
 
 	public Query<I> createIdentifiersQuery(SharedSessionContractImplementor session) {
-		return ( conditionalExpression == null ) ?
-				queryFactory.createQueryForIdentifierListing( session, includedTypesFilter ) :
-				queryFactory.createQueryForIdentifierListing(
+		return ( conditionalExpression == null )
+				? queryFactory.createQueryForIdentifierListing( session, includedTypesFilter )
+				: queryFactory.createQueryForIdentifierListing(
 						session, persister, includedTypesFilter, conditionalExpression
 				);
 	}

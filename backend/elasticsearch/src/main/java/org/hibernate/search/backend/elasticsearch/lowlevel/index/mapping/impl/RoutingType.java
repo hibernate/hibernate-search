@@ -13,7 +13,7 @@ import com.google.gson.annotations.JsonAdapter;
  *
  * See https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-routing-field.html
  */
-@JsonAdapter( RoutingTypeJsonAdapter.class )
+@JsonAdapter(RoutingTypeJsonAdapter.class)
 public enum RoutingType {
 
 	REQUIRED,

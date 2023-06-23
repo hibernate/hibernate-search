@@ -81,7 +81,7 @@ public class ExplainWork extends AbstractNonBulkableWork<ExplainResult> {
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.get()
-					.pathComponent( indexName );
+							.pathComponent( indexName );
 			if ( typeName != null ) { // ES6.x and below only
 				builder.pathComponent( typeName )
 						.pathComponent( id )

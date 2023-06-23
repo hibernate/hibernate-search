@@ -37,7 +37,8 @@ import org.hibernate.search.util.common.annotation.Incubating;
 @Documented
 @Target({ ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-@MethodParameterMapping(processor = @MethodParameterMappingAnnotationProcessorRef(type = ObjectProjectionProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@MethodParameterMapping(processor = @MethodParameterMappingAnnotationProcessorRef(type = ObjectProjectionProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface ObjectProjection {
 
 	/**
@@ -67,7 +68,7 @@ public @interface ObjectProjection {
 	 * Provided paths must be relative to the projected object field,
 	 * i.e. they must not include the {@link #path()}.
 	 */
-	String[] includePaths() default {};
+	String[] includePaths() default { };
 
 	/**
 	 * The paths of nested index field to be excluded,
@@ -91,7 +92,7 @@ public @interface ObjectProjection {
 	 * i.e. they must not include the {@link #path()}.
 	 */
 	@Incubating
-	String[] excludePaths() default {};
+	String[] excludePaths() default { };
 
 	/**
 	 * The number of levels of object projections that will have all their nested field/object projections

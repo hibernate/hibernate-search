@@ -144,7 +144,12 @@ public class NestedEmbeddedTest extends SearchTestBase {
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
-				Product.class, Attribute.class, AttributeValue.class, Person.class, Place.class, Address.class
+				Product.class,
+				Attribute.class,
+				AttributeValue.class,
+				Person.class,
+				Place.class,
+				Address.class
 		};
 	}
 }

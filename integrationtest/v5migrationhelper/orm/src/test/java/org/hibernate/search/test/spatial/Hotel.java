@@ -37,7 +37,7 @@ public class Hotel implements Coordinates {
 	double latitude;
 	double longitude;
 
-	public Hotel( Integer id, String name, double latitude, double longitude, String type ) {
+	public Hotel(Integer id, String name, double latitude, double longitude, String type) {
 		this.id = id;
 		this.name = name;
 		this.latitude = latitude;

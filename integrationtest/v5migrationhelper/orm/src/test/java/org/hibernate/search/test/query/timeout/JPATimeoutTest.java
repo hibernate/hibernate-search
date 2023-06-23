@@ -106,14 +106,14 @@ public class JPATimeoutTest extends JPATestCase {
 
 		//We cannot test intermediate limit, Lucene / hibernate: too unpredictable
 
-//		hibernateQuery = fts.createFullTextQuery( slowQuery, Clock.class );
-//		hibernateQuery.limitFetchingTime( 1000, TimeUnit.NANOSECONDS );
-//		results = hibernateQuery.list();
-//		System.out.println("Result size partial: " + results.size() );
-//		assertTrue("Regular failure when some elements are fetched", 0 < results.size() && results.size() < 500 );
-//		assertTrue( hibernateQuery.hasPartialResults() );
-//
-//		fts.clear();
+		//		hibernateQuery = fts.createFullTextQuery( slowQuery, Clock.class );
+		//		hibernateQuery.limitFetchingTime( 1000, TimeUnit.NANOSECONDS );
+		//		results = hibernateQuery.list();
+		//		System.out.println("Result size partial: " + results.size() );
+		//		assertTrue("Regular failure when some elements are fetched", 0 < results.size() && results.size() < 500 );
+		//		assertTrue( hibernateQuery.hasPartialResults() );
+		//
+		//		fts.clear();
 
 		hibernateQuery = em.createFullTextQuery( slowQuery, Clock.class );
 		hibernateQuery.limitExecutionTimeTo( 30, TimeUnit.SECONDS );

@@ -17,9 +17,11 @@ import javax.persistence.OrderColumn;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class AutomaticIndexingStringArrayIT extends AbstractAutomaticIndexingArrayIT<
-				AutomaticIndexingStringArrayIT.IndexedEntity, String[], String
-		> {
+public class AutomaticIndexingStringArrayIT
+		extends AbstractAutomaticIndexingArrayIT<
+				AutomaticIndexingStringArrayIT.IndexedEntity,
+				String[],
+				String> {
 
 	public AutomaticIndexingStringArrayIT() {
 		super( new StringArrayModelPrimitives() );

@@ -97,12 +97,19 @@ public class NotPredicateSpecificsIT {
 		SearchPredicateFactory f = index.createScope().predicate();
 
 		assertThatQuery( index.query()
-				.where( f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) ) ) ) ) ) ) ) ).toPredicate() ) )
+				.where( f.bool()
+						.must( f.not( f.not( f.not( f
+								.not( f.not( f.not( f.not( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) ) ) ) ) ) ) ) )
+						.toPredicate() ) )
 				.hasTotalHitCount( 2 )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2, DOCUMENT_3 );
 
 		assertThatQuery( index.query()
-				.where( f.not( f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) ) ) ) ) ) ) ) ) ).toPredicate() ) )
+				.where( f
+						.not( f.bool()
+								.must( f.not( f.not( f.not( f.not( f.not(
+										f.not( f.not( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) ) ) ) ) ) ) ) ) )
+						.toPredicate() ) )
 				.hasTotalHitCount( 1 )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}

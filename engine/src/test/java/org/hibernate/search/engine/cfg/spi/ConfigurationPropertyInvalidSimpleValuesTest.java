@@ -33,7 +33,7 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
 @RunWith(Parameterized.class)
-@SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types
+@SuppressWarnings({ "unchecked", "rawtypes" }) // Raw types are the only way to mock parameterized types
 public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 
 	@Parameterized.Parameters(name = "{1}")
@@ -106,8 +106,11 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 			String expectedInvalidValueStringMessagePrefix,
 			String expectedInvalidStringMessage) {
 		return new Object[] {
-				testedMethod, invalidStringValue, validValue,
-				expectedInvalidValueTypeMessagePrefix, expectedInvalidValueStringMessagePrefix,
+				testedMethod,
+				invalidStringValue,
+				validValue,
+				expectedInvalidValueTypeMessagePrefix,
+				expectedInvalidValueStringMessagePrefix,
 				expectedInvalidStringMessage
 		};
 	}

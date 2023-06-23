@@ -49,7 +49,8 @@ public class ProjectionConstructorProjectionBindingIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	protected final ProjectionFinalStep<?> dummyProjectionForEnclosingClassInstance(SearchProjectionFactory<?, ?> f) {
 		return f.constant( null );
@@ -66,8 +67,10 @@ public class ProjectionConstructorProjectionBindingIT {
 		}
 		class MyProjection {
 			public final String text;
+
 			@ProjectionConstructor
-			public MyProjection(@ProjectionBinding(binder = @ProjectionBinderRef(type = WorkingProjectionBinder.class)) String text) {
+			public MyProjection(
+					@ProjectionBinding(binder = @ProjectionBinderRef(type = WorkingProjectionBinder.class)) String text) {
 				this.text = text;
 			}
 		}
@@ -131,6 +134,7 @@ public class ProjectionConstructorProjectionBindingIT {
 		}
 		class MyProjection {
 			public final String text;
+
 			@ProjectionConstructor
 			public MyProjection(@ProjectionBinding(binder = @ProjectionBinderRef) String text) {
 				this.text = text;
@@ -160,9 +164,10 @@ public class ProjectionConstructorProjectionBindingIT {
 		}
 		class MyProjection {
 			public final String text;
+
 			@ProjectionConstructor
 			public MyProjection(@ProjectionBinding(binder = @ProjectionBinderRef(type = ParametricBinder.class,
-							params = @Param(name = "fieldPath", value = "myText"))) String text) {
+					params = @Param(name = "fieldPath", value = "myText"))) String text) {
 				this.text = text;
 			}
 		}
@@ -218,6 +223,7 @@ public class ProjectionConstructorProjectionBindingIT {
 		}
 		class MyProjection {
 			public final String text;
+
 			@ProjectionConstructor
 			public MyProjection(@ProjectionBinding(binder = @ProjectionBinderRef(type = ParametricBinder.class)) String text) {
 				this.text = text;
@@ -248,9 +254,12 @@ public class ProjectionConstructorProjectionBindingIT {
 		}
 		class MyProjection {
 			public final String text;
+
 			@ProjectionConstructor
 			public MyProjection(@ProjectionBinding(binder = @ProjectionBinderRef(type = ParametricBinder.class,
-					params = { @Param(name = "fieldPath", value = "foo"), @Param(name = "fieldPath", value = "foo") })) String text) {
+					params = {
+							@Param(name = "fieldPath", value = "foo"),
+							@Param(name = "fieldPath", value = "foo") })) String text) {
 				this.text = text;
 			}
 		}
@@ -282,6 +291,7 @@ public class ProjectionConstructorProjectionBindingIT {
 		}
 		class MyProjection {
 			public final String text;
+
 			public MyProjection(String text) {
 				this.text = text;
 			}

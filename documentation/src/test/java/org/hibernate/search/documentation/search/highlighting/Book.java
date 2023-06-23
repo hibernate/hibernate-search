@@ -91,6 +91,6 @@ public class Book {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-// tag::basics[]
+	// tag::basics[]
 }
 // end::basics[]

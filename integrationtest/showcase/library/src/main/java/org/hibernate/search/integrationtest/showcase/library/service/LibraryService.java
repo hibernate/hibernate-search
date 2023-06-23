@@ -37,7 +37,8 @@ public class LibraryService {
 	@Autowired
 	private DocumentCopyRepository copyRepo;
 
-	public Library create(int id, String name, int collectionSize, double latitude, double longitude, LibraryServiceOption... services) {
+	public Library create(int id, String name, int collectionSize, double latitude, double longitude,
+			LibraryServiceOption... services) {
 		return libraryRepo.save( new Library( id, name, collectionSize, latitude, longitude, services ) );
 	}
 

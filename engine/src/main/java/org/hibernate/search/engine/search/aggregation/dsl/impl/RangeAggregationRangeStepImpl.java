@@ -23,11 +23,12 @@ import org.hibernate.search.util.common.impl.Contracts;
 
 class RangeAggregationRangeStepImpl<PDF extends SearchPredicateFactory, F>
 		implements RangeAggregationRangeStep<RangeAggregationRangeStepImpl<PDF, F>, PDF, F>,
-				RangeAggregationRangeMoreStep<RangeAggregationRangeStepImpl<PDF, F>, RangeAggregationRangeStepImpl<PDF, F>, PDF, F> {
+		RangeAggregationRangeMoreStep<RangeAggregationRangeStepImpl<PDF, F>, RangeAggregationRangeStepImpl<PDF, F>, PDF, F> {
 	private final RangeAggregationBuilder<F> builder;
 	private final SearchAggregationDslContext<?, ? extends PDF> dslContext;
 
-	RangeAggregationRangeStepImpl(RangeAggregationBuilder<F> builder, SearchAggregationDslContext<?, ? extends PDF> dslContext) {
+	RangeAggregationRangeStepImpl(RangeAggregationBuilder<F> builder,
+			SearchAggregationDslContext<?, ? extends PDF> dslContext) {
 		this.builder = builder;
 		this.dslContext = dslContext;
 	}

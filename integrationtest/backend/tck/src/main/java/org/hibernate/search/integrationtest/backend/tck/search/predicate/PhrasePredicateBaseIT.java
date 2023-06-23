@@ -89,12 +89,14 @@ public class PhrasePredicateBaseIT {
 
 		final BulkIndexer typeCheckingMainIndexer = TypeCheckingNoConversionIT.index.bulkIndexer();
 		final BulkIndexer typeCheckingCompatibleIndexer = TypeCheckingNoConversionIT.compatibleIndex.bulkIndexer();
-		final BulkIndexer typeCheckingRawFieldCompatibleIndexer = TypeCheckingNoConversionIT.rawFieldCompatibleIndex.bulkIndexer();
+		final BulkIndexer typeCheckingRawFieldCompatibleIndexer =
+				TypeCheckingNoConversionIT.rawFieldCompatibleIndex.bulkIndexer();
 		final BulkIndexer typeCheckingMissingFieldIndexer = TypeCheckingNoConversionIT.missingFieldIndex.bulkIndexer();
-		TypeCheckingNoConversionIT.dataSets.forEach( d -> d.contribute( TypeCheckingNoConversionIT.index, typeCheckingMainIndexer,
-				TypeCheckingNoConversionIT.compatibleIndex, typeCheckingCompatibleIndexer,
-				TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
-				TypeCheckingNoConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer ) );
+		TypeCheckingNoConversionIT.dataSets
+				.forEach( d -> d.contribute( TypeCheckingNoConversionIT.index, typeCheckingMainIndexer,
+						TypeCheckingNoConversionIT.compatibleIndex, typeCheckingCompatibleIndexer,
+						TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
+						TypeCheckingNoConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer ) );
 
 		singleFieldIndexer.join(
 				multiFieldIndexer, inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer,
@@ -467,13 +469,13 @@ public class PhrasePredicateBaseIT {
 			SearchPredicateFactory f = index.createScope().predicate();
 
 			assertThatThrownBy( () -> f.phrase().field( fieldPath() )
-							.matching( "foo" ).slop( -1 ) )
+					.matching( "foo" ).slop( -1 ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Invalid slop" )
 					.hasMessageContaining( "must be positive or zero" );
 
 			assertThatThrownBy( () -> f.phrase().field( fieldPath() )
-							.matching( "foo" ).slop( Integer.MIN_VALUE ) )
+					.matching( "foo" ).slop( Integer.MIN_VALUE ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Invalid slop" )
 					.hasMessageContaining( "must be positive or zero" );
@@ -487,7 +489,8 @@ public class PhrasePredicateBaseIT {
 
 	@Nested
 	@RunWith(Parameterized.class)
-	public static class TypeCheckingNoConversionIT extends AbstractPredicateTypeCheckingNoConversionIT<PhrasePredicateTestValues> {
+	public static class TypeCheckingNoConversionIT
+			extends AbstractPredicateTypeCheckingNoConversionIT<PhrasePredicateTestValues> {
 		private static final List<DataSet<String, PhrasePredicateTestValues>> dataSets = new ArrayList<>();
 		private static final List<Object[]> parameters = new ArrayList<>();
 		static {

@@ -61,7 +61,8 @@ public class Elasticsearch6DefaultFieldFormatProvider implements ElasticsearchDe
 		map.put( LocalTime.class, asImmutableList( "HH:mm:ss.SSS", "HH:mm:ss.SSSSSSSSS" ) );
 		map.put( LocalDateTime.class, asImmutableList( "yyyy-MM-dd'T'HH:mm:ss.SSS", "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS" ) );
 		map.put( OffsetTime.class, asImmutableList( "HH:mm:ss.SSSZZ", "HH:mm:ss.SSSSSSSSSZZ" ) );
-		map.put( OffsetDateTime.class, asImmutableList( "yyyy-MM-dd'T'HH:mm:ss.SSSZZ", "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ" ) );
+		map.put( OffsetDateTime.class,
+				asImmutableList( "yyyy-MM-dd'T'HH:mm:ss.SSSZZ", "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ" ) );
 		/*
 		 * ZoneRegionId is optional for ZonedDateTime, but we need the offset to handle ambiguous date/times at DST overlap.
 		 *
@@ -90,8 +91,8 @@ public class Elasticsearch6DefaultFieldFormatProvider implements ElasticsearchDe
 		 * only format patterns in the mapping are different,
 		 * because the different syntax of patterns in ES6 and below (JodaTime syntax instead of java.time syntax)
 		 */
-		for ( Map.Entry<Class<? extends TemporalAccessor>, String> entry :
-				Elasticsearch7DefaultFieldFormatProvider.JAVA_TIME_FORMAT_PATTERN_BY_TYPE.entrySet() ) {
+		for ( Map.Entry<Class<? extends TemporalAccessor>,
+				String> entry : Elasticsearch7DefaultFieldFormatProvider.JAVA_TIME_FORMAT_PATTERN_BY_TYPE.entrySet() ) {
 			Class<? extends TemporalAccessor> type = entry.getKey();
 			String pattern = entry.getValue();
 			dateTimeFormatters.put( type, lenientPattern( pattern ) );
@@ -120,7 +121,8 @@ public class Elasticsearch6DefaultFieldFormatProvider implements ElasticsearchDe
 					// Replace the fraction of seconds pattern with this more lenient format (cannot be expressed as a pattern)
 					.appendFraction( ChronoField.NANO_OF_SECOND, 3, 9, true )
 					// Add the part of the pattern after the fraction of seconds
-					.appendPattern( pattern.substring( fractionOfSecondsIndex + JAVA_TIME_FRACTION_OF_SECONDS_PATTERN.length() ) )
+					.appendPattern(
+							pattern.substring( fractionOfSecondsIndex + JAVA_TIME_FRACTION_OF_SECONDS_PATTERN.length() ) )
 					.toFormatter( Locale.ROOT );
 		}
 	}

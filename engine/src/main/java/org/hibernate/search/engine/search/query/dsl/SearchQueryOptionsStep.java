@@ -40,12 +40,11 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * @param <AF> The type of factory used to create aggregations in {@link #aggregation(AggregationKey, Function)}.
  */
 public interface SearchQueryOptionsStep<
-				S extends SearchQueryOptionsStep<?, H, LOS, SF, AF>,
-				H,
-				LOS,
-				SF extends SearchSortFactory,
-				AF extends SearchAggregationFactory
-		>
+		S extends SearchQueryOptionsStep<?, H, LOS, SF, AF>,
+		H,
+		LOS,
+		SF extends SearchSortFactory,
+		AF extends SearchAggregationFactory>
 		extends SearchQueryFinalStep<H>, SearchFetchable<H> {
 
 	/**
@@ -207,7 +206,8 @@ public interface SearchQueryOptionsStep<
 	 * @see HighlightProjectionOptionsStep#highlighter(String)
 	 */
 	@Incubating
-	S highlighter(String highlighterName, Function<? super SearchHighlighterFactory, ? extends HighlighterFinalStep> highlighterContributor);
+	S highlighter(String highlighterName,
+			Function<? super SearchHighlighterFactory, ? extends HighlighterFinalStep> highlighterContributor);
 
 	/**
 	 * Configure a named highlighter.

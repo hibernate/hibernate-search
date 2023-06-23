@@ -62,9 +62,8 @@ public class OutboxPollingIndexingPlanFilterIT {
 	@Test
 	public void partialSessionFilterFails() {
 		setupHolder.runInTransaction( session -> {
-			assertThatThrownBy( () ->
-					Search.session( session ).indexingPlanFilter(
-							ctx -> ctx.exclude( Entity1A.class ) )
+			assertThatThrownBy( () -> Search.session( session ).indexingPlanFilter(
+					ctx -> ctx.exclude( Entity1A.class ) )
 			).isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
 							"Unable to apply the given filter at the session level with the outbox polling coordination strategy.",
@@ -76,12 +75,11 @@ public class OutboxPollingIndexingPlanFilterIT {
 	@Test
 	public void allTypesMixSessionFilterFails() {
 		setupHolder.runInTransaction( session -> {
-			assertThatThrownBy( () ->
-					Search.session( session ).indexingPlanFilter(
-							ctx -> ctx.exclude( EntityA.class )
-									.exclude( Entity1A.class )
-									.exclude( Entity1B.class )
-									.include( Entity2A.class ) )
+			assertThatThrownBy( () -> Search.session( session ).indexingPlanFilter(
+					ctx -> ctx.exclude( EntityA.class )
+							.exclude( Entity1A.class )
+							.exclude( Entity1B.class )
+							.include( Entity2A.class ) )
 			).isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
 							"Unable to apply the given filter at the session level with the outbox polling coordination strategy.",

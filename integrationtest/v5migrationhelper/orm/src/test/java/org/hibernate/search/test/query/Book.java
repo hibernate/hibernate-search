@@ -89,9 +89,9 @@ public class Book {
 	@DocumentId
 	@Field(store = Store.YES)
 	@Field(
-		name = "id_forIntegerSort",
-		store = Store.NO,
-		index = Index.NO
+			name = "id_forIntegerSort",
+			store = Store.NO,
+			index = Index.NO
 	)
 	@NumericField
 	@SortableField(forField = "id_forIntegerSort")

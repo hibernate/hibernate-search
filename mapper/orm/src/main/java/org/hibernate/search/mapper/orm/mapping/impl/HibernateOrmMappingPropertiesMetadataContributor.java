@@ -48,8 +48,9 @@ public final class HibernateOrmMappingPropertiesMetadataContributor implements P
 	@Override
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
 		for ( Property property : properties ) {
-			collector.property( property.getName(), collectorPropertyNode ->
-					collectMetadataFromHibernateOrmMappingProperty( collectorPropertyNode, property ) );
+			collector.property( property.getName(),
+					collectorPropertyNode -> collectMetadataFromHibernateOrmMappingProperty( collectorPropertyNode,
+							property ) );
 		}
 	}
 

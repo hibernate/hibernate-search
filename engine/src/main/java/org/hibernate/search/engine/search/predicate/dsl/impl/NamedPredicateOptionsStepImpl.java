@@ -17,8 +17,8 @@ import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 
 public class NamedPredicateOptionsStepImpl
-	extends AbstractPredicateFinalStep
-	implements NamedPredicateOptionsStep {
+		extends AbstractPredicateFinalStep
+		implements NamedPredicateOptionsStep {
 
 	private final NamedPredicateBuilder builder;
 
@@ -27,7 +27,8 @@ public class NamedPredicateOptionsStepImpl
 		super( dslContext );
 		SearchIndexScope<?> scope = dslContext.scope();
 		SearchQueryElementTypeKey<NamedPredicateBuilder> key = PredicateTypeKeys.named( predicateName );
-		this.builder = fieldPath == null ? scope.rootQueryElement( key )
+		this.builder = fieldPath == null
+				? scope.rootQueryElement( key )
 				: scope.fieldQueryElement( fieldPath, key );
 		builder.factory( fieldPath == null ? predicateFactory : predicateFactory.withRoot( fieldPath ) );
 	}

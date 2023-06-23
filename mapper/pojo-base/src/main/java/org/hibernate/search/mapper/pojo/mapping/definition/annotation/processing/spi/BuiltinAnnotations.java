@@ -17,7 +17,8 @@ public final class BuiltinAnnotations {
 	private BuiltinAnnotations() {
 	}
 
-	public static final DotName ROOT_MAPPING = DotName.createSimple( "org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.RootMapping" );
+	public static final DotName ROOT_MAPPING =
+			DotName.createSimple( "org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.RootMapping" );
 
 	public static final List<DotName> ROOT_MAPPING_ANNOTATIONS = Collections.unmodifiableList( Arrays.asList(
 			DotName.createSimple( "org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor" )

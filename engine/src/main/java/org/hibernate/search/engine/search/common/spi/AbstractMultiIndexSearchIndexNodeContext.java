@@ -19,10 +19,9 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public abstract class AbstractMultiIndexSearchIndexNodeContext<
-				S extends SearchIndexNodeContext<SC>,
-				SC extends SearchIndexScope<?>,
-				NT extends SearchIndexNodeTypeContext<SC, S>
-		>
+		S extends SearchIndexNodeContext<SC>,
+		SC extends SearchIndexScope<?>,
+		NT extends SearchIndexNodeTypeContext<SC, S>>
 		implements SearchIndexNodeContext<SC>, SearchIndexNodeTypeContext<SC, S> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -102,7 +101,8 @@ public abstract class AbstractMultiIndexSearchIndexNodeContext<
 
 	@Override
 	public final EventContext relativeEventContext() {
-		return absolutePath == null ? EventContexts.indexSchemaRoot()
+		return absolutePath == null
+				? EventContexts.indexSchemaRoot()
 				: EventContexts.fromIndexFieldAbsolutePath( absolutePath );
 	}
 

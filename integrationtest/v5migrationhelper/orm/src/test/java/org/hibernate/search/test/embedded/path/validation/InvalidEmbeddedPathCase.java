@@ -27,7 +27,8 @@ public class InvalidEmbeddedPathCase {
 	public int id;
 
 	@ManyToOne
-	@IndexedEmbedded(includePaths = { "emb.e1", // valid
+	@IndexedEmbedded(includePaths = {
+			"emb.e1", // valid
 			"emb.e3.c.indexed", // valid
 			"emb.e4" // invalid
 	})

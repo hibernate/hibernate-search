@@ -89,12 +89,13 @@ class AgentRepositoryMockingHelper {
 	}
 
 	List<Agent> allAgentsInIdOrder() {
-		return Stream.concat( otherAgents.stream(), selfExists.getAsBoolean() ? Stream.of( selfSupplier.get() ) : Stream.empty() )
+		return Stream
+				.concat( otherAgents.stream(), selfExists.getAsBoolean() ? Stream.of( selfSupplier.get() ) : Stream.empty() )
 				.sorted( Comparator.comparing( Agent::getId ) )
 				.collect( Collectors.toList() );
 	}
 
-	List<Agent> agentsInIdOrder(UUID ... ids) {
+	List<Agent> agentsInIdOrder(UUID... ids) {
 		Set<UUID> idSet = new HashSet<>( Arrays.asList( ids ) );
 		return allAgentsInIdOrder().stream()
 				.filter( agent -> idSet.contains( agent.getId() ) )

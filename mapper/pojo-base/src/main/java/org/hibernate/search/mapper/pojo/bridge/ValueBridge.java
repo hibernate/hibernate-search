@@ -55,7 +55,8 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 	 * @throws RuntimeException If the value cannot be parsed to the raw index field value.
 	 */
 	default F parse(String value) {
-		throw new UnsupportedOperationException( "Bridge " + toString() + " does not support parsing a value from a String. Trying to parse the value: " + value + "." );
+		throw new UnsupportedOperationException( "Bridge " + toString()
+				+ " does not support parsing a value from a String. Trying to parse the value: " + value + "." );
 	}
 
 	/**

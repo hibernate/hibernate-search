@@ -108,7 +108,8 @@ public abstract class JoiningTextMultiValuesSource extends TextMultiValuesSource
 		};
 	}
 
-	private static class FieldTextMultiValuesSource extends
+	private static class FieldTextMultiValuesSource
+			extends
 			JoiningTextMultiValuesSource {
 
 		private final String field;

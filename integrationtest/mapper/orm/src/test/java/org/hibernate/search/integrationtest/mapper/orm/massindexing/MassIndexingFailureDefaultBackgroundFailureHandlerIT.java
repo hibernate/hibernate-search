@@ -125,13 +125,13 @@ public class MassIndexingFailureDefaultBackgroundFailureHandlerIT extends Abstra
 	protected void expectMassIndexerLoadingOperationFailureHandling(Class<? extends Throwable> exceptionType,
 			String exceptionMessage, int count, String failingOperationAsString, String... extraMessages) {
 		logged.expectEvent(
-						Level.ERROR,
-						ExceptionMatcherBuilder.isException( exceptionType )
-								.withMessage( exceptionMessage )
-								.build(),
-						failingOperationAsString,
-						extraMessages
-				)
+				Level.ERROR,
+				ExceptionMatcherBuilder.isException( exceptionType )
+						.withMessage( exceptionMessage )
+						.build(),
+				failingOperationAsString,
+				extraMessages
+		)
 				.times( count );
 	}
 

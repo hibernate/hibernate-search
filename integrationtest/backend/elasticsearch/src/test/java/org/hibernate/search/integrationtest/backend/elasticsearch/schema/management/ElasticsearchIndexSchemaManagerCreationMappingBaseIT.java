@@ -53,9 +53,8 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 
 	@Test
 	public void dateField() {
-		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
-				root.field( "myField", f -> f.asLocalDate() )
-					.toReference()
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> root.field( "myField", f -> f.asLocalDate() )
+				.toReference()
 		);
 
 		elasticSearchClient.index( index.name() )
@@ -67,9 +66,10 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 				ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations(
 						"'myField': {"
 								+ "  'type': 'date',"
-								+ "  'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
+								+ "  'format': '"
+								+ elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
 								+ "  'doc_values': false"
-						+ "}"
+								+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -77,9 +77,8 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 
 	@Test
 	public void booleanField() {
-		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
-				root.field( "myField", f -> f.asBoolean() )
-						.toReference()
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> root.field( "myField", f -> f.asBoolean() )
+				.toReference()
 		);
 
 		elasticSearchClient.index( index.name() )
@@ -92,7 +91,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 						"'myField': {"
 								+ "  'type': 'boolean',"
 								+ "  'doc_values': false"
-						+ "}"
+								+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -100,9 +99,8 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 
 	@Test
 	public void keywordField() {
-		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
-				root.field( "myField", f -> f.asString() )
-						.toReference()
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> root.field( "myField", f -> f.asString() )
+				.toReference()
 		);
 
 		elasticSearchClient.index( index.name() )
@@ -115,7 +113,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 						"'myField': {"
 								+ "  'type': 'keyword',"
 								+ "  'doc_values': false"
-						+ "}"
+								+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -123,8 +121,8 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 
 	@Test
 	public void textField() {
-		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
-				root.field( "myField", f -> f.asString().analyzer( "standard" ) )
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
+				root -> root.field( "myField", f -> f.asString().analyzer( "standard" ) )
 						.toReference()
 		);
 
@@ -138,7 +136,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 						"'myField': {"
 								+ "  'type': 'text',"
 								+ "  'analyzer': 'standard'"
-						+ "}"
+								+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -146,8 +144,8 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 
 	@Test
 	public void textField_noNorms() {
-		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
-				root.field( "myField", f -> f.asString().analyzer( "standard" ).norms( Norms.NO ) )
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
+				root -> root.field( "myField", f -> f.asString().analyzer( "standard" ).norms( Norms.NO ) )
 						.toReference()
 		);
 
@@ -162,7 +160,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 								+ "  'type': 'text',"
 								+ "  'analyzer': 'standard',"
 								+ "  'norms': false"
-						+ "}"
+								+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);

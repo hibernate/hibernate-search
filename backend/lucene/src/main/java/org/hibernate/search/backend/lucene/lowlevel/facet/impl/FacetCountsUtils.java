@@ -19,7 +19,8 @@ public class FacetCountsUtils {
 	private FacetCountsUtils() {
 	}
 
-	public static <T extends Number> LongRange[] createLongRangesForIntegralValues(Collection<? extends Range<? extends T>> ranges) {
+	public static <
+			T extends Number> LongRange[] createLongRangesForIntegralValues(Collection<? extends Range<? extends T>> ranges) {
 		return createLongRanges( ranges, Number::longValue, Long.MIN_VALUE, Long.MAX_VALUE, false );
 	}
 

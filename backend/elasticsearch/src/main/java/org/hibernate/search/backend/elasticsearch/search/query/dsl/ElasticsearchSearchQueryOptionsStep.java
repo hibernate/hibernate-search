@@ -16,13 +16,12 @@ import org.hibernate.search.util.common.annotation.Incubating;
 
 public interface ElasticsearchSearchQueryOptionsStep<H, LOS>
 		extends SearchQueryOptionsStep<
-						ElasticsearchSearchQueryOptionsStep<H, LOS>,
-						H,
-						LOS,
-						ElasticsearchSearchSortFactory,
-						ElasticsearchSearchAggregationFactory
-				>,
-				ElasticsearchSearchFetchable<H> {
+				ElasticsearchSearchQueryOptionsStep<H, LOS>,
+				H,
+				LOS,
+				ElasticsearchSearchSortFactory,
+				ElasticsearchSearchAggregationFactory>,
+		ElasticsearchSearchFetchable<H> {
 
 	/**
 	 * Set the {@link ElasticsearchSearchRequestTransformer} for this search query.

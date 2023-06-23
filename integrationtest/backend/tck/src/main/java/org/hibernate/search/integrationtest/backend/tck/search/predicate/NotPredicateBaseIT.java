@@ -95,7 +95,7 @@ public class NotPredicateBaseIT {
 
 			public void contribute(BulkIndexer scoreIndexer) {
 				for ( Integer ordinal : ordinals ) {
-					scoreIndexer.add( docId( ordinal ), routingKey, document -> { } );
+					scoreIndexer.add( docId( ordinal ), routingKey, document -> {} );
 				}
 			}
 

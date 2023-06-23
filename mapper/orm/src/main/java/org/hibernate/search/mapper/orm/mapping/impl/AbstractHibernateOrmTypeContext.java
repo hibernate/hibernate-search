@@ -27,7 +27,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoTypeContext;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 abstract class AbstractHibernateOrmTypeContext<E>
-		implements PojoTypeContext<E>, HibernateOrmListenerTypeContext, HibernateOrmSessionTypeContext<E>, LoadingTypeContext<E> {
+		implements PojoTypeContext<E>, HibernateOrmListenerTypeContext, HibernateOrmSessionTypeContext<E>,
+		LoadingTypeContext<E> {
 
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final String jpaEntityName;
@@ -49,15 +50,15 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		if ( builder.documentIdSourcePropertyName != null ) {
 			if ( builder.documentIdSourcePropertyName.equals( entityPersister().getIdentifierPropertyName() ) ) {
 				documentIdIsEntityId = true;
-				loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E, ?>)
-						HibernateOrmEntityIdEntityLoadingStrategy.create( sessionFactory, entityPersister() );
+				loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E, ?>) HibernateOrmEntityIdEntityLoadingStrategy
+						.create( sessionFactory, entityPersister() );
 			}
 			else {
 				// The entity ID is not the property used to generate the document ID
 				// We need to use a criteria query to load entities from the document IDs
 				documentIdIsEntityId = false;
-				loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E, ?>)
-						HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.create( sessionFactory, entityPersister(),
+				loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E,
+						?>) HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.create( sessionFactory, entityPersister(),
 								builder.documentIdSourcePropertyName, builder.documentIdSourcePropertyHandle
 						);
 			}

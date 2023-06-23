@@ -14,10 +14,9 @@ import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationD
 
 public class LuceneSearchAggregationFactoryImpl
 		extends AbstractSearchAggregationFactory<
-						LuceneSearchAggregationFactory,
-						LuceneSearchAggregationIndexScope<?>,
-						LuceneSearchPredicateFactory
-				>
+				LuceneSearchAggregationFactory,
+				LuceneSearchAggregationIndexScope<?>,
+				LuceneSearchPredicateFactory>
 		implements LuceneSearchAggregationFactory {
 
 	public LuceneSearchAggregationFactoryImpl(

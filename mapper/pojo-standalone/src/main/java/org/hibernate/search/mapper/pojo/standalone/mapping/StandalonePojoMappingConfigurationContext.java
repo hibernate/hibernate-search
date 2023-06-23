@@ -117,7 +117,8 @@ public interface StandalonePojoMappingConfigurationContext {
 	 * @param entityName The name of the entity.
 	 * @param configurer The configurer, to provide additional information about the entity type.
 	 */
-	<E> StandalonePojoMappingConfigurationContext addEntityType(Class<E> type, String entityName, EntityConfigurer<E> configurer);
+	<E> StandalonePojoMappingConfigurationContext addEntityType(Class<E> type, String entityName,
+			EntityConfigurer<E> configurer);
 
 	/**
 	 * Defines the default depth of automatic reindexing.

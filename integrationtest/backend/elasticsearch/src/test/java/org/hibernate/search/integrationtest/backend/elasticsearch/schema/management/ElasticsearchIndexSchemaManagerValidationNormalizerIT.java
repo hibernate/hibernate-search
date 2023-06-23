@@ -79,8 +79,8 @@ public class ElasticsearchIndexSchemaManagerValidationNormalizerIT {
 						+ "     'articles': ['l', 'd']"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		putMapping();
 
@@ -106,8 +106,8 @@ public class ElasticsearchIndexSchemaManagerValidationNormalizerIT {
 						+ "     'articles': ['l', 'd']"
 						+ "   }"
 						+ " }"
-				+ "}"
-				);
+						+ "}"
+		);
 
 		putMapping();
 

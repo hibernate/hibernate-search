@@ -48,36 +48,44 @@ public final class OutboxPollingEventProcessor implements ToStringTreeAppendable
 	}
 
 	private static final ConfigurationProperty<Integer> POLLING_INTERVAL =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_POLLING_INTERVAL )
+			ConfigurationProperty
+					.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_POLLING_INTERVAL )
 					.asIntegerStrictlyPositive()
-					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_POLLING_INTERVAL )
+					.withDefault(
+							HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_POLLING_INTERVAL )
 					.build();
 
 	private static final ConfigurationProperty<Integer> PULSE_INTERVAL =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_PULSE_INTERVAL )
+			ConfigurationProperty
+					.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_PULSE_INTERVAL )
 					.asIntegerStrictlyPositive()
 					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_PULSE_INTERVAL )
 					.build();
 
 	private static final ConfigurationProperty<Integer> PULSE_EXPIRATION =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_PULSE_EXPIRATION )
+			ConfigurationProperty
+					.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_PULSE_EXPIRATION )
 					.asIntegerStrictlyPositive()
-					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_PULSE_EXPIRATION )
+					.withDefault(
+							HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_PULSE_EXPIRATION )
 					.build();
 
 	private static final ConfigurationProperty<Integer> BATCH_SIZE =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_BATCH_SIZE )
+			ConfigurationProperty
+					.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_BATCH_SIZE )
 					.asIntegerStrictlyPositive()
 					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_BATCH_SIZE )
 					.build();
 
 	private static final OptionalConfigurationProperty<Integer> TRANSACTION_TIMEOUT =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_TRANSACTION_TIMEOUT )
+			ConfigurationProperty
+					.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_TRANSACTION_TIMEOUT )
 					.asIntegerStrictlyPositive()
 					.build();
 
 	private static final ConfigurationProperty<Integer> RETRY_DELAY =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_RETRY_DELAY )
+			ConfigurationProperty
+					.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_RETRY_DELAY )
 					.asIntegerPositiveOrZero()
 					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_RETRY_DELAY )
 					.build();
@@ -135,7 +143,8 @@ public final class OutboxPollingEventProcessor implements ToStringTreeAppendable
 					+ ( shardAssignmentOrNull == null ? "" : " - " + shardAssignmentOrNull.assignedShardIndex );
 			OutboxPollingEventProcessorClusterLink clusterLink = new OutboxPollingEventProcessorClusterLink(
 					agentName, mapping.failureHandler(), clock,
-					new ShardAssignment.Provider( finderProvider ), pollingInterval, pulseInterval, pulseExpiration, shardAssignmentOrNull );
+					new ShardAssignment.Provider( finderProvider ), pollingInterval, pulseInterval, pulseExpiration,
+					shardAssignmentOrNull );
 
 			return new OutboxPollingEventProcessor( agentName, this, scheduledExecutor,
 					agentRepositoryProvider, clusterLink );

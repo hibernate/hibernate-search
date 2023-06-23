@@ -34,7 +34,8 @@ import org.junit.Test;
 public class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConstructorIT {
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void noArg() {
@@ -47,6 +48,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 		}
 		class MyProjection {
 			public final List<String> text;
+
 			@ProjectionConstructor
 			public MyProjection(@HighlightProjection List<String> text) {
 				this.text = text;
@@ -88,6 +90,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 		}
 		class MyProjection {
 			public final List<String> text;
+
 			@ProjectionConstructor
 			public MyProjection(@HighlightProjection(path = "myText") List<String> text) {
 				this.text = text;
@@ -129,6 +132,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 		}
 		class MyProjection {
 			public final List<String> text;
+
 			@ProjectionConstructor
 			public MyProjection(@HighlightProjection(highlighter = "foo") List<String> text) {
 				this.text = text;
@@ -171,6 +175,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 		}
 		class MyProjection {
 			public final List<CharSequence> text;
+
 			@ProjectionConstructor
 			public MyProjection(@HighlightProjection List<CharSequence> text) {
 				this.text = text;
@@ -212,6 +217,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 		}
 		class MyProjection {
 			public final String text;
+
 			@ProjectionConstructor
 			public MyProjection(@HighlightProjection String text) {
 				this.text = text;
@@ -253,6 +259,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 		}
 		class MyInnerProjection {
 			public final List<String> text;
+
 			@ProjectionConstructor
 			public MyInnerProjection(@HighlightProjection List<String> text) {
 				this.text = text;
@@ -261,6 +268,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 		class MyProjection {
 			public final List<String> text;
 			public final MyInnerProjection contained;
+
 			@ProjectionConstructor
 			public MyProjection(@HighlightProjection List<String> text, MyInnerProjection contained) {
 				this.text = text;
@@ -313,6 +321,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 		}
 		class MyProjection {
 			public final Collection<String> text;
+
 			@ProjectionConstructor
 			public MyProjection(@HighlightProjection Collection<String> text) {
 				this.text = text;
@@ -354,6 +363,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 		}
 		class MyProjection {
 			public final Iterable<String> text;
+
 			@ProjectionConstructor
 			public MyProjection(@HighlightProjection Iterable<String> text) {
 				this.text = text;
@@ -395,6 +405,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 		}
 		class MyProjection {
 			public final Set<String> text;
+
 			@ProjectionConstructor
 			public MyProjection(@HighlightProjection Set<String> text) {
 				this.text = text;
@@ -424,6 +435,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 		}
 		class MyProjection {
 			public final List<Integer> text;
+
 			@ProjectionConstructor
 			public MyProjection(@HighlightProjection List<Integer> text) {
 				this.text = text;

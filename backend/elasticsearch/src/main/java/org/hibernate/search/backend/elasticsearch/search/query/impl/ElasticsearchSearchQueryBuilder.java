@@ -180,10 +180,10 @@ public class ElasticsearchSearchQueryBuilder<H>
 			throw log.highlighterNameCannotBeBlank();
 		}
 		if (
-				this.namedHighlighters.put(
-						highlighterName,
-						ElasticsearchSearchHighlighter.from( scope, highlighter )
-				) != null
+			this.namedHighlighters.put(
+					highlighterName,
+					ElasticsearchSearchHighlighter.from( scope, highlighter )
+			) != null
 		) {
 			throw log.highlighterWithTheSameNameCannotBeAdded( highlighterName );
 		}

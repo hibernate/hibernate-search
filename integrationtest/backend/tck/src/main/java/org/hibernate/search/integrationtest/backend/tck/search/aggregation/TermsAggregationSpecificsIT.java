@@ -443,9 +443,8 @@ public class TermsAggregationSpecificsIT<F> {
 	public void minDocumentCount_negative() {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
-		assertThatThrownBy( () ->
-				index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
-						.minDocumentCount( -1 ) )
+		assertThatThrownBy( () -> index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
+				.minDocumentCount( -1 ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'minDocumentCount'" )
 				.hasMessageContaining( "must be positive or zero" );
@@ -474,7 +473,8 @@ public class TermsAggregationSpecificsIT<F> {
 						 */
 						containsInAnyOrder( c -> {
 							F valueWithMostDocuments = dataSet.valuesInDescendingDocumentCountOrder.get( 0 );
-							c.accept( valueWithMostDocuments, (long) dataSet.documentIdPerTerm.get( valueWithMostDocuments ).size() );
+							c.accept( valueWithMostDocuments,
+									(long) dataSet.documentIdPerTerm.get( valueWithMostDocuments ).size() );
 						} )
 				);
 	}
@@ -536,7 +536,8 @@ public class TermsAggregationSpecificsIT<F> {
 						 */
 						containsInAnyOrder( c -> {
 							F valueWithLeastDocuments = dataSet.valuesInAscendingDocumentCountOrder.get( 0 );
-							c.accept( valueWithLeastDocuments, (long) dataSet.documentIdPerTerm.get( valueWithLeastDocuments ).size() );
+							c.accept( valueWithLeastDocuments,
+									(long) dataSet.documentIdPerTerm.get( valueWithLeastDocuments ).size() );
 						} )
 				);
 	}
@@ -545,9 +546,8 @@ public class TermsAggregationSpecificsIT<F> {
 	public void maxTermCount_zero() {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
-		assertThatThrownBy( () ->
-				index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
-						.maxTermCount( 0 ) )
+		assertThatThrownBy( () -> index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
+				.maxTermCount( 0 ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'maxTermCount'" )
 				.hasMessageContaining( "must be strictly positive" );
@@ -557,9 +557,8 @@ public class TermsAggregationSpecificsIT<F> {
 	public void maxTermCount_negative() {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
-		assertThatThrownBy( () ->
-				index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
-						.maxTermCount( -1 ) )
+		assertThatThrownBy( () -> index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
+				.maxTermCount( -1 ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'maxTermCount'" )
 				.hasMessageContaining( "must be strictly positive" );
@@ -697,7 +696,7 @@ public class TermsAggregationSpecificsIT<F> {
 					} );
 				}
 			}
-			indexer.add( name + "_document_empty", name, document -> { } );
+			indexer.add( name + "_document_empty", name, document -> {} );
 			indexer.join();
 		}
 

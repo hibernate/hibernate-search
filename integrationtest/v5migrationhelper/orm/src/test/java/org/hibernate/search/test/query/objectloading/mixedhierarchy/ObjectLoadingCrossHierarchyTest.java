@@ -59,37 +59,37 @@ public class ObjectLoadingCrossHierarchyTest extends SearchTestBase {
 				// uses @Id Long identifier;
 				.should(
 						queryBuilder.keyword()
-							.onField( "name" )
-							.matching( "Southern Florida College of Golf" )
-							.createQuery()
+								.onField( "name" )
+								.matching( "Southern Florida College of Golf" )
+								.createQuery()
 				)
 				// uses @Id Long identifier, via SINGLE_TABLE shared with College
 				.should(
 						queryBuilder.keyword()
-						.onField( "name" )
-						.matching( "St. Lucie Community College" )
-						.createQuery()
+								.onField( "name" )
+								.matching( "St. Lucie Community College" )
+								.createQuery()
 				)
 				// uses @Id Integer id;
 				.should(
 						queryBuilder.keyword()
-							.onField( "name" )
-							.matching( "Wogharts" )
-							.createQuery()
+								.onField( "name" )
+								.matching( "Wogharts" )
+								.createQuery()
 				)
 				// uses @Id Short id; has mapped super-class School, using TABLE_PER_CLASS
 				.should(
 						queryBuilder.keyword()
-							.onField( "name" )
-							.matching( "Homestead Elementary School" )
-							.createQuery()
+								.onField( "name" )
+								.matching( "Homestead Elementary School" )
+								.createQuery()
 				)
 				// uses @Id Long identifier; also has mapped super-class School, using TABLE_PER_CLASS
 				.should(
 						queryBuilder.keyword()
-							.onField( "name" )
-							.matching( "Cutler Bay High School" )
-							.createQuery()
+								.onField( "name" )
+								.matching( "Cutler Bay High School" )
+								.createQuery()
 				)
 				.createQuery();
 
@@ -100,12 +100,12 @@ public class ObjectLoadingCrossHierarchyTest extends SearchTestBase {
 				.extracting( "name" )
 				.describedAs( "Can load results originating from different id spaces, using different id types and names" )
 				.containsExactlyInAnyOrder(
-				"Southern Florida College of Golf",
-				"Wogharts",
-				"St. Lucie Community College",
-				"Homestead Elementary School",
-				"Cutler Bay High School"
-		);
+						"Southern Florida College of Golf",
+						"Wogharts",
+						"St. Lucie Community College",
+						"Homestead Elementary School",
+						"Cutler Bay High School"
+				);
 	}
 
 	private void indexTestData() {

@@ -54,7 +54,7 @@ public class Book {
 	@OrderBy("edition_id asc")
 	@AssociationInverseSide(
 			extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY),
-			inversePath = @ObjectPath( @PropertyValue( propertyName = "book" ) )
+			inversePath = @ObjectPath(@PropertyValue(propertyName = "book"))
 	)
 	private Map<BookEdition, BigDecimal> priceByEdition = new LinkedHashMap<>(); // <2>
 

@@ -21,11 +21,12 @@ import org.hibernate.search.util.common.impl.Closer;
 
 public class BackendThreads {
 
-	private static final ConfigurationProperty<BeanReference<? extends LuceneWorkExecutorProvider>> BACKEND_WORK_EXECUTOR_PROVIDER =
-			ConfigurationProperty.forKey( LuceneBackendSpiSettings.Radicals.BACKEND_WORK_EXECUTOR_PROVIDER )
-					.asBeanReference( LuceneWorkExecutorProvider.class )
-					.withDefault( LuceneBackendSpiSettings.Defaults.BACKEND_WORK_EXECUTOR_PROVIDER )
-					.build();
+	private static final ConfigurationProperty<
+			BeanReference<? extends LuceneWorkExecutorProvider>> BACKEND_WORK_EXECUTOR_PROVIDER =
+					ConfigurationProperty.forKey( LuceneBackendSpiSettings.Radicals.BACKEND_WORK_EXECUTOR_PROVIDER )
+							.asBeanReference( LuceneWorkExecutorProvider.class )
+							.withDefault( LuceneBackendSpiSettings.Defaults.BACKEND_WORK_EXECUTOR_PROVIDER )
+							.build();
 	private final String prefix;
 
 	private ThreadPoolProvider threadPoolProvider;
@@ -35,7 +36,8 @@ public class BackendThreads {
 		this.prefix = prefix;
 	}
 
-	public void onStart(ConfigurationPropertySource propertySource, BeanResolver beanResolver, ThreadPoolProvider threadPoolProvider) {
+	public void onStart(ConfigurationPropertySource propertySource, BeanResolver beanResolver,
+			ThreadPoolProvider threadPoolProvider) {
 		if ( this.writeExecutor != null ) {
 			// Already started
 			return;

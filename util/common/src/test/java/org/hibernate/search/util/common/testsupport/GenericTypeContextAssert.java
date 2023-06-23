@@ -80,7 +80,8 @@ public abstract class GenericTypeContextAssert {
 		try {
 			getTypeContext().resolveTypeArgument( rawSuperClass, typeArgumentIndex );
 			fail( "Expected resolveTypeArgument(" + rawSuperClass + ", " + typeArgumentIndex + ")"
-					+ " for type " + getTypeContext() + " to fail because " + rawSuperClass + " doesn't have any type parameter" );
+					+ " for type " + getTypeContext() + " to fail because " + rawSuperClass
+					+ " doesn't have any type parameter" );
 		}
 		catch (IllegalArgumentException e) {
 			assertThat( e.getMessage() )

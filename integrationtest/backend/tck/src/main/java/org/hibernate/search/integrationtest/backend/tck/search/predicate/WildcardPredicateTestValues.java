@@ -29,7 +29,8 @@ public final class WildcardPredicateTestValues extends AbstractPredicateTestValu
 	public String matchingArg(int docOrdinal) {
 		String valueToMatch = fieldValue( docOrdinal );
 		if ( AnalyzedStringFieldTypeDescriptor.INSTANCE.equals( fieldType )
-				&& !TckConfiguration.get().getBackendFeatures().normalizesStringArgumentToWildcardPredicateForAnalyzedStringField() ) {
+				&& !TckConfiguration.get().getBackendFeatures()
+						.normalizesStringArgumentToWildcardPredicateForAnalyzedStringField() ) {
 			// The backend doesn't normalize missing value replacements automatically, we have to do it ourselves
 			valueToMatch = valueToMatch.toLowerCase( Locale.ROOT );
 		}

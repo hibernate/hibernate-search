@@ -72,7 +72,8 @@ public class Library extends AbstractEntity<Integer> {
 	public Library() {
 	}
 
-	public Library(int id, String name, int collectionSize, double latitude, double longitude, LibraryServiceOption... services) {
+	public Library(int id, String name, int collectionSize, double latitude, double longitude,
+			LibraryServiceOption... services) {
 		this.id = id;
 		this.name = name;
 		this.collectionSize = collectionSize;

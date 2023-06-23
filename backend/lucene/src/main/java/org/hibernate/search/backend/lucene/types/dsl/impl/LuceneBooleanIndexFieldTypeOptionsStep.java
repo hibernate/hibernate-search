@@ -59,7 +59,8 @@ class LuceneBooleanIndexFieldTypeOptionsStep
 			builder.queryElementFactory( PredicateTypeKeys.RANGE, new LuceneNumericRangePredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.TERMS, new LuceneNumericTermsPredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS,
-					DocValues.ENABLED.equals( docValues ) ? new LuceneExistsPredicate.DocValuesBasedFactory<>()
+					DocValues.ENABLED.equals( docValues )
+							? new LuceneExistsPredicate.DocValuesBasedFactory<>()
 							: new LuceneExistsPredicate.DefaultFactory<>() );
 		}
 

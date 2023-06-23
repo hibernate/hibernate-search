@@ -135,19 +135,34 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public <T> SearchQuerySelectStep<?, org.hibernate.search.mapper.orm.common.EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
-			Collection<? extends Class<? extends T>> types) {
+	public <T> SearchQuerySelectStep<?,
+			org.hibernate.search.mapper.orm.common.EntityReference,
+			T,
+			SearchLoadingOptionsStep,
+			?,
+			?> search(
+					Collection<? extends Class<? extends T>> types) {
 		return search( scope( types ) );
 	}
 
 	@Override
-	public <T> SearchQuerySelectStep<?, org.hibernate.search.mapper.orm.common.EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
-			SearchScope<T> scope) {
+	public <T> SearchQuerySelectStep<?,
+			org.hibernate.search.mapper.orm.common.EntityReference,
+			T,
+			SearchLoadingOptionsStep,
+			?,
+			?> search(
+					SearchScope<T> scope) {
 		return search( (SearchScopeImpl<T>) scope );
 	}
 
-	public <T> SearchQuerySelectStep<?, org.hibernate.search.mapper.orm.common.EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
-			SearchScopeImpl<T> scope) {
+	public <T> SearchQuerySelectStep<?,
+			org.hibernate.search.mapper.orm.common.EntityReference,
+			T,
+			SearchLoadingOptionsStep,
+			?,
+			?> search(
+					SearchScopeImpl<T> scope) {
 		return scope.search( this, loadingContextBuilder() );
 	}
 
@@ -201,9 +216,9 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	public void automaticIndexingSynchronizationStrategy(
 			org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		indexingPlanSynchronizationStrategy(
-				synchronizationStrategy instanceof DelegatingAutomaticIndexingSynchronizationStrategy ?
-						( (DelegatingAutomaticIndexingSynchronizationStrategy) synchronizationStrategy ).delegate() :
-						new HibernateOrmIndexingPlanSynchronizationStrategyAdapter( synchronizationStrategy )
+				synchronizationStrategy instanceof DelegatingAutomaticIndexingSynchronizationStrategy
+						? ( (DelegatingAutomaticIndexingSynchronizationStrategy) synchronizationStrategy ).delegate()
+						: new HibernateOrmIndexingPlanSynchronizationStrategyAdapter( synchronizationStrategy )
 		);
 	}
 

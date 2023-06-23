@@ -161,7 +161,8 @@ public class LuceneCollectors {
 	 * @throws IOException If Lucene throws an {@link IOException}.
 	 */
 	public <T> List<T> collectTopDocsData(TopDocsDataCollector.Factory<T> collectorFactory,
-			int startInclusive, int endExclusive) throws IOException {
+			int startInclusive, int endExclusive)
+			throws IOException {
 		List<T> extractedData = new ArrayList<>( endExclusive - startInclusive );
 		try {
 			ScoreDoc[] scoreDocs = topDocs.scoreDocs;

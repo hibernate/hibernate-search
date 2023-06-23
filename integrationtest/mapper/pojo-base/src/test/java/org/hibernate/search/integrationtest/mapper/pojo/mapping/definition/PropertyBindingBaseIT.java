@@ -48,15 +48,15 @@ public class PropertyBindingBaseIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	/**
 	 * Basic test checking that a simple type binding will be applied as expected.
 	 */
 	@Test
 	public void simple() {
-		backendMock.expectSchema( INDEX_NAME, b ->
-				b.field( "myText", String.class )
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "myText", String.class )
 		);
 
 		SearchMapping mapping = setupHelper.start().expectCustomBeans()

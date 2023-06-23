@@ -116,6 +116,7 @@ public class NamedPredicateMultiIndexCompatibilityIT {
 
 	public static class MissingPredicateIndexBinding {
 		private final SimpleFieldModel<String> field;
+
 		public MissingPredicateIndexBinding(IndexSchemaElement root) {
 			field = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE )
 					.map( root, "field" );
@@ -148,6 +149,7 @@ public class NamedPredicateMultiIndexCompatibilityIT {
 
 	private static class TestedPredicateDefinition implements PredicateDefinition {
 		private final String fieldName;
+
 		public TestedPredicateDefinition(
 				String fieldName) {
 			this.fieldName = fieldName;

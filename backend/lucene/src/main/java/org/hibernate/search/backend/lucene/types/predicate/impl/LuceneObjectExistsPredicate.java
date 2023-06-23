@@ -61,7 +61,8 @@ public class LuceneObjectExistsPredicate extends AbstractLuceneSingleFieldPredic
 		return builder.build();
 	}
 
-	public static class Factory extends
+	public static class Factory
+			extends
 			AbstractLuceneCompositeNodeSearchQueryElementFactory<ExistsPredicateBuilder> {
 		public static final Factory INSTANCE = new Factory();
 

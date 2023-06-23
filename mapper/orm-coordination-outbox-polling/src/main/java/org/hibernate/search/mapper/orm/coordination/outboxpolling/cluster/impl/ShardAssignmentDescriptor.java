@@ -12,7 +12,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class ShardAssignmentDescriptor {
-	public static Optional<ShardAssignmentDescriptor> fromClusterMemberList(List<UUID> clusterMembersInShardOrder, UUID selfId) {
+	public static Optional<ShardAssignmentDescriptor> fromClusterMemberList(List<UUID> clusterMembersInShardOrder,
+			UUID selfId) {
 		int totalShardCount = clusterMembersInShardOrder.size();
 		int assignedShard = clusterMembersInShardOrder.indexOf( selfId );
 		if ( assignedShard < 0 ) {

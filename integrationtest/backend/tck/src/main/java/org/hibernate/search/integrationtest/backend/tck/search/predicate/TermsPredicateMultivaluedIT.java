@@ -156,7 +156,7 @@ public class TermsPredicateMultivaluedIT<F> {
 				otherTerms[i - 1] = values.matchingArg( i );
 			}
 		}
-		otherTerms[ values.size() - 1 ] = values.nonMatchingArg( 0 ); // put a non-matching term
+		otherTerms[values.size() - 1] = values.nonMatchingArg( 0 ); // put a non-matching term
 
 		F finalFirstTerm = firstTerm;
 		assertThatQuery( index.query().where( f -> f.terms().field( path ).matchingAll( finalFirstTerm, otherTerms ) ) )

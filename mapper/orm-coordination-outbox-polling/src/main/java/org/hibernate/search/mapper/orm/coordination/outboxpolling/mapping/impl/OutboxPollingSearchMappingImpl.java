@@ -27,8 +27,10 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final String COUNT_EVENTS_WITH_STATUS = "select count(e) from " + ENTITY_NAME + " e where e.status = :status";
-	private static final String UPDATE_EVENTS_WITH_STATUS = "update " + ENTITY_NAME + " e set e.status = :newStatus where e.status = :status";
+	private static final String COUNT_EVENTS_WITH_STATUS =
+			"select count(e) from " + ENTITY_NAME + " e where e.status = :status";
+	private static final String UPDATE_EVENTS_WITH_STATUS =
+			"update " + ENTITY_NAME + " e set e.status = :newStatus where e.status = :status";
 	private static final String DELETE_EVENTS_WITH_STATUS = "delete " + ENTITY_NAME + " e where e.status = :status";
 
 	private final TransactionHelper transactionHelper;

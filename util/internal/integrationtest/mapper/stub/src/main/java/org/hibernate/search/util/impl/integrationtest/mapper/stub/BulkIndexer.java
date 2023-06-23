@@ -81,7 +81,7 @@ public class BulkIndexer {
 		valueContributor.accept( new SingleFieldDocumentBuilder<T>() {
 			@Override
 			public void emptyDocument(String documentId) {
-				add( documentProvider( documentId, document -> { } ) );
+				add( documentProvider( documentId, document -> {} ) );
 			}
 
 			@Override
@@ -103,7 +103,7 @@ public class BulkIndexer {
 		Futures.unwrappedExceptionJoin( end() );
 	}
 
-	public void join(BulkIndexer ... otherIndexers) {
+	public void join(BulkIndexer... otherIndexers) {
 		CompletableFuture<?>[] futures = new CompletableFuture[otherIndexers.length + 1];
 		for ( int i = 0; i < otherIndexers.length; i++ ) {
 			futures[i] = otherIndexers[i].end();

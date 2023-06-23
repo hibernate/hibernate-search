@@ -106,7 +106,8 @@ public final class JobTestUtil {
 		}
 	}
 
-	public static <T> List<T> findIndexedResultsInTenant(EntityManagerFactory emf, Class<T> clazz, String key, String value, String tenantId) {
+	public static <T> List<T> findIndexedResultsInTenant(EntityManagerFactory emf, Class<T> clazz, String key, String value,
+			String tenantId) {
 		SessionFactory sessionFactory = emf.unwrap( SessionFactory.class );
 		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
 			return find( session, clazz, key, value );

@@ -44,8 +44,8 @@ public class PutIndexAliasesWork extends AbstractNonBulkableWork<Void> {
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.post()
-					.pathComponent( Paths._ALIASES )
-					.body( payload );
+							.pathComponent( Paths._ALIASES )
+							.body( payload );
 			return builder.build();
 		}
 

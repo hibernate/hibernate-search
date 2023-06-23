@@ -93,6 +93,7 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 				facetManager.getFacets( ascendingOrderedFacet ).isEmpty()
 		);
 	}
+
 	private FullTextQuery queryHondaNoResultsWithFacet(FacetingRequest request) {
 		Query luceneQuery = queryBuilder( Car.class )
 				.keyword()
@@ -104,6 +105,7 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 		assertEquals( "Wrong number of query matches", 0, query.getResultSize() );
 		return query;
 	}
+
 	@Test
 	public void testSimpleDiscretFacetingQuery() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
@@ -163,6 +165,7 @@ public class NoQueryResultsFacetingTest extends AbstractFacetTest {
 				facetManager.getFacets( ascendingOrderedFacet ).isEmpty()
 		);
 	}
+
 	private FullTextQuery queryHondaWithFacet(FacetingRequest request) {
 		Query luceneQuery = queryBuilder( Car.class )
 				.keyword()

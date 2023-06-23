@@ -40,7 +40,7 @@ public final class MockUtils {
 		} );
 	}
 
-	public static List<?> projectionMatcher(Object ... expected) {
+	public static List<?> projectionMatcher(Object... expected) {
 		return projectionMatcher( Arrays.asList( expected ) );
 	}
 

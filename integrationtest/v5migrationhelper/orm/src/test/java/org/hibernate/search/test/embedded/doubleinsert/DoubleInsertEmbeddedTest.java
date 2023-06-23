@@ -28,7 +28,7 @@ public class DoubleInsertEmbeddedTest extends SearchTestBase {
 	@Test
 	public void testDoubleInsert() throws Exception {
 		PersonalContact contact = createTestData();
-		FullTextSession s = Search.getFullTextSession( openSession( ) );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		s.getTransaction().begin();
 		Term term = new Term( "county", "county" );
 		TermQuery termQuery = new TermQuery( term );
@@ -49,7 +49,7 @@ public class DoubleInsertEmbeddedTest extends SearchTestBase {
 	@Test
 	public void testMultipleUpdatesTriggeredByContainedIn() {
 		PersonalContact contact = createTestData();
-		FullTextSession s = Search.getFullTextSession( openSession( ) );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		s.getTransaction().begin();
 		contact = (PersonalContact) s.load( PersonalContact.class, contact.getId() );
 		contact.setEmail( "spam@hibernate.org" );
@@ -87,7 +87,7 @@ public class DoubleInsertEmbeddedTest extends SearchTestBase {
 		contact.addAddressToContact( address );
 		contact.addPhoneToContact( phone );
 
-		FullTextSession s = Search.getFullTextSession( openSession( ) );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		s.getTransaction().begin();
 		s.save( contact );
 		s.getTransaction().commit();

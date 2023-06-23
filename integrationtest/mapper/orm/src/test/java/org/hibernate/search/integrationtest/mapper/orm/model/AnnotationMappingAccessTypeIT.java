@@ -73,7 +73,7 @@ public class AnnotationMappingAccessTypeIT {
 						.field( "field", String.class )
 				)
 		);
-		backendMock.expectSchema( IndexedEntityWithoutIdSetter.INDEX, b -> { } );
+		backendMock.expectSchema( IndexedEntityWithoutIdSetter.INDEX, b -> {} );
 
 		sessionFactory = ormSetupHelper.start()
 				.setup(
@@ -119,12 +119,16 @@ public class AnnotationMappingAccessTypeIT {
 							.field( "fieldWithNonDefaultMethodAccess", entity1.getFieldWithNonDefaultMethodAccess() )
 							.field( "fieldWithDefaultMethodAccess", entity1.getFieldWithDefaultMethodAccess() )
 							.objectField( "embeddedWithDefaultFieldAccess", b2 -> b2
-									.field( "fieldWithDefaultFieldAccess", embeddableWithDefaultFieldAccess.fieldWithDefaultFieldAccess )
-									.field( "fieldWithNonDefaultMethodAccess", embeddableWithDefaultFieldAccess.getFieldWithNonDefaultMethodAccess() )
+									.field( "fieldWithDefaultFieldAccess",
+											embeddableWithDefaultFieldAccess.fieldWithDefaultFieldAccess )
+									.field( "fieldWithNonDefaultMethodAccess",
+											embeddableWithDefaultFieldAccess.getFieldWithNonDefaultMethodAccess() )
 							)
 							.objectField( "embeddedWithDefaultMethodAccess", b2 -> b2
-									.field( "fieldWithNonDefaultFieldAccess", embeddableWithDefaultMethodAccess.fieldWithNonDefaultFieldAccess )
-									.field( "fieldWithDefaultMethodAccess", embeddableWithDefaultMethodAccess.getFieldWithDefaultMethodAccess() )
+									.field( "fieldWithNonDefaultFieldAccess",
+											embeddableWithDefaultMethodAccess.fieldWithNonDefaultFieldAccess )
+									.field( "fieldWithDefaultMethodAccess",
+											embeddableWithDefaultMethodAccess.getFieldWithDefaultMethodAccess() )
 							)
 							.objectField( "nonManaged", b2 -> b2
 									.field( "field", nonManaged.getField() )
@@ -139,7 +143,7 @@ public class AnnotationMappingAccessTypeIT {
 	}
 
 	@MappedSuperclass
-	@Access( AccessType.FIELD )
+	@Access(AccessType.FIELD)
 	public static class ParentIndexedEntity {
 
 		@Basic
@@ -157,7 +161,7 @@ public class AnnotationMappingAccessTypeIT {
 			methodShouldNotBeCalled();
 		}
 
-		@Access( AccessType.PROPERTY )
+		@Access(AccessType.PROPERTY)
 		@Basic
 		@Column(name = "nonDefaultMethodAccess")
 		@GenericField
@@ -172,7 +176,7 @@ public class AnnotationMappingAccessTypeIT {
 
 	@Entity
 	@Table(name = "indexed")
-	@Access( AccessType.PROPERTY )
+	@Access(AccessType.PROPERTY)
 	@Indexed(index = IndexedEntity.INDEX)
 	public static class IndexedEntity extends ParentIndexedEntity {
 
@@ -180,7 +184,7 @@ public class AnnotationMappingAccessTypeIT {
 
 		private Integer id;
 
-		@Access( AccessType.FIELD )
+		@Access(AccessType.FIELD)
 		@Basic
 		protected String fieldWithNonDefaultFieldAccess;
 
@@ -227,7 +231,8 @@ public class AnnotationMappingAccessTypeIT {
 
 		@AttributeOverrides({
 				@AttributeOverride(name = "fieldWithDefaultFieldAccess", column = @Column(name = "ef_defaultFieldAccess")),
-				@AttributeOverride(name = "fieldWithNonDefaultMethodAccess", column = @Column(name = "ef_nonDefaultMethodAccess"))
+				@AttributeOverride(name = "fieldWithNonDefaultMethodAccess",
+						column = @Column(name = "ef_nonDefaultMethodAccess"))
 		})
 		@IndexedEmbedded
 		public EmbeddableWithDefaultFieldAccess getEmbeddedWithDefaultFieldAccess() {
@@ -273,7 +278,7 @@ public class AnnotationMappingAccessTypeIT {
 	}
 
 	@javax.persistence.Embeddable
-	@Access( AccessType.FIELD )
+	@Access(AccessType.FIELD)
 	public static class EmbeddableWithDefaultFieldAccess {
 		@Basic
 		protected String fieldWithDefaultFieldAccess;
@@ -290,7 +295,7 @@ public class AnnotationMappingAccessTypeIT {
 			methodShouldNotBeCalled();
 		}
 
-		@Access( AccessType.PROPERTY )
+		@Access(AccessType.PROPERTY)
 		@Basic
 		@GenericField
 		public String getFieldWithNonDefaultMethodAccess() {
@@ -303,9 +308,9 @@ public class AnnotationMappingAccessTypeIT {
 	}
 
 	@javax.persistence.Embeddable
-	@Access( AccessType.PROPERTY )
+	@Access(AccessType.PROPERTY)
 	public static class EmbeddableWithDefaultMethodAccess {
-		@Access( AccessType.FIELD )
+		@Access(AccessType.FIELD)
 		@Basic
 		protected String fieldWithNonDefaultFieldAccess;
 

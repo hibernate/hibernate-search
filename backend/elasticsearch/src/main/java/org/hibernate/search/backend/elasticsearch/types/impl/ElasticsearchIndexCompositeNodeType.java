@@ -22,8 +22,8 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 
 public class ElasticsearchIndexCompositeNodeType
 		extends AbstractIndexCompositeNodeType<
-						ElasticsearchSearchIndexScope<?>, ElasticsearchSearchIndexCompositeNodeContext
-				>
+				ElasticsearchSearchIndexScope<?>,
+				ElasticsearchSearchIndexCompositeNodeContext>
 		implements ElasticsearchSearchIndexCompositeNodeTypeContext {
 
 	private ElasticsearchIndexCompositeNodeType(Builder builder) {
@@ -39,8 +39,8 @@ public class ElasticsearchIndexCompositeNodeType
 
 	public static class Builder
 			extends AbstractIndexCompositeNodeType.Builder<
-							ElasticsearchSearchIndexScope<?>, ElasticsearchSearchIndexCompositeNodeContext
-					> {
+					ElasticsearchSearchIndexScope<?>,
+					ElasticsearchSearchIndexCompositeNodeContext> {
 		public Builder(ObjectStructure objectStructure) {
 			super( objectStructure );
 			queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.ObjectFieldFactory() );

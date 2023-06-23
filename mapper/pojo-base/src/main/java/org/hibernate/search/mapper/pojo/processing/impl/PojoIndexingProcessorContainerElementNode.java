@@ -30,8 +30,8 @@ public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexin
 			PojoIndexingProcessor<? super V> nested) {
 		this.extractorHolder = extractorHolder;
 		this.nested = nested;
-		this.extractingDelegate = extractorHolder.wrap( (target, value, sessionContext, extractionContext) ->
-				nested.process( target, value, sessionContext ) );
+		this.extractingDelegate = extractorHolder
+				.wrap( (target, value, sessionContext, extractionContext) -> nested.process( target, value, sessionContext ) );
 	}
 
 	@Override

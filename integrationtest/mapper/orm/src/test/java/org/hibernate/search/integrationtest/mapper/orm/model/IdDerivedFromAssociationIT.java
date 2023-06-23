@@ -75,7 +75,7 @@ public class IdDerivedFromAssociationIT {
 			session.persist( derived );
 
 			backendMock.expectWorks( IndexedBaseForNonIndexedDerived.NAME )
-					.add( String.valueOf( base.getId() ), b -> { } );
+					.add( String.valueOf( base.getId() ), b -> {} );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -97,7 +97,7 @@ public class IdDerivedFromAssociationIT {
 			session.persist( derived );
 
 			backendMock.expectWorks( IndexedDerivedWithDocumentId.NAME )
-					.add( String.valueOf( base.getId() ), b -> { } );
+					.add( String.valueOf( base.getId() ), b -> {} );
 		} );
 		backendMock.verifyExpectationsMet();
 	}

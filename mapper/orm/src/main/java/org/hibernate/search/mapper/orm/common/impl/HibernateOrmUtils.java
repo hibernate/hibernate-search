@@ -95,7 +95,8 @@ public final class HibernateOrmUtils {
 		EntityPersister superTypeCandidate = type1;
 		while ( superTypeCandidate != null && !isSuperTypeOf( superTypeCandidate, type2 ) ) {
 			String superSuperTypeEntityName = superTypeCandidate.getEntityMetamodel().getSuperclass();
-			superTypeCandidate = superSuperTypeEntityName == null ? null
+			superTypeCandidate = superSuperTypeEntityName == null
+					? null
 					: metamodel.entityPersister( superSuperTypeEntityName ).getEntityPersister();
 		}
 		if ( superTypeCandidate == null ) {
@@ -132,7 +133,8 @@ public final class HibernateOrmUtils {
 			Class<T> serviceClass) {
 		T service = serviceRegistry.getService( serviceClass );
 		if ( service == null ) {
-			throw new org.hibernate.search.util.common.AssertionFailure( "A required service was missing. Missing service: " + serviceClass );
+			throw new org.hibernate.search.util.common.AssertionFailure(
+					"A required service was missing. Missing service: " + serviceClass );
 		}
 		return service;
 	}
@@ -143,7 +145,7 @@ public final class HibernateOrmUtils {
 		/*
 		 * First check the service binding, because if it does not exist,
 		 * a call to serviceRegistry.getService would throw an exception.
- 		 */
+		 */
 		ServiceBinding<T> binding = ( (ServiceRegistryImplementor) serviceRegistry )
 				.locateServiceBinding( serviceClass );
 		if ( binding == null ) {

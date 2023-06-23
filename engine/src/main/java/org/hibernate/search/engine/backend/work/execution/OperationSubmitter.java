@@ -42,14 +42,16 @@ public abstract class OperationSubmitter {
 	 * Depending on the implementation might throw {@link RejectedExecutionException} or offload the submit operation to a provided executor.
 	 */
 	public abstract <T> void submitToQueue(BlockingQueue<? super T> queue, T element,
-			Consumer<? super T> blockingRetryProducer, BiConsumer<? super T, Throwable> asyncFailureReporter) throws InterruptedException;
+			Consumer<? super T> blockingRetryProducer, BiConsumer<? super T, Throwable> asyncFailureReporter)
+			throws InterruptedException;
 
 	/**
 	 * Defines how an element will be submitted to the executor.
 	 * Depending on the implementation might throw {@link RejectedExecutionException} or offload the submit operation to an offload executor.
 	 */
 	public abstract <T extends Runnable> void submitToExecutor(SimpleScheduledExecutor executor, T element,
-			Consumer<? super T> blockingRetryProducer, BiConsumer<? super T, Throwable> asyncFailureReporter) throws InterruptedException;
+			Consumer<? super T> blockingRetryProducer, BiConsumer<? super T, Throwable> asyncFailureReporter)
+			throws InterruptedException;
 
 	/**
 	 * When using this submitter, dding a new element will block the thread when the underlying
@@ -141,7 +143,8 @@ public abstract class OperationSubmitter {
 			private final Consumer<? super T> blockingRetryProducer;
 			private final BiConsumer<? super T, Throwable> asyncFailureReporter;
 
-			private RetryAction(T element, Consumer<? super T> blockingRetryProducer, BiConsumer<? super T, Throwable> asyncFailureReporter) {
+			private RetryAction(T element, Consumer<? super T> blockingRetryProducer,
+					BiConsumer<? super T, Throwable> asyncFailureReporter) {
 				this.element = element;
 				this.blockingRetryProducer = blockingRetryProducer;
 				this.asyncFailureReporter = asyncFailureReporter;

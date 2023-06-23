@@ -83,7 +83,8 @@ public class LuceneQueryCacheConfigurerIT {
 	}
 
 	public static class FailingCachePolicyExceptionQueryCacheConfigurer implements QueryCachingConfigurer {
-		private static final String FAILURE_MESSAGE = "Simulated failure for " + FailingCachePolicyExceptionQueryCacheConfigurer.class.getName();
+		private static final String FAILURE_MESSAGE =
+				"Simulated failure for " + FailingCachePolicyExceptionQueryCacheConfigurer.class.getName();
 
 		@Override
 		public void configure(QueryCachingConfigurationContext context) {
@@ -93,8 +94,7 @@ public class LuceneQueryCacheConfigurerIT {
 	}
 
 	private void setup(String queryCacheConfigurer) {
-		setup( queryCacheConfigurer, c -> {
-		} );
+		setup( queryCacheConfigurer, c -> {} );
 	}
 
 	private void setup(String queryCacheConfigurer, Consumer<IndexBindingContext> binder) {

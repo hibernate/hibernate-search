@@ -212,7 +212,8 @@ public class TextMultiValueFacetCounts extends Facets {
 	/**
 	 * Does all the "real work" of tallying up the counts.
 	 */
-	private void count(IndexReader reader, TextMultiValuesSource valuesSource, List<MatchingDocs> matchingDocs) throws IOException {
+	private void count(IndexReader reader, TextMultiValuesSource valuesSource, List<MatchingDocs> matchingDocs)
+			throws IOException {
 		OrdinalMap ordinalMap;
 
 		// TODO: is this right?  really, we need a way to

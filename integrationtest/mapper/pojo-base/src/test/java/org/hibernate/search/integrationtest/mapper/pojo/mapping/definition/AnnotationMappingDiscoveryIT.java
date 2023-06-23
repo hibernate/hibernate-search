@@ -40,7 +40,8 @@ public class AnnotationMappingDiscoveryIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void discoveryEnabled() {
@@ -77,8 +78,8 @@ public class AnnotationMappingDiscoveryIT {
 
 					builder.programmaticMapping()
 							.type( IndexedEntity.class )
-									.property( "nonAnnotationMappedEmbedded" )
-											.indexedEmbedded();
+							.property( "nonAnnotationMappedEmbedded" )
+							.indexedEmbedded();
 
 					mapAlwaysPresentProperty( builder.programmaticMapping() );
 				} )
@@ -116,8 +117,8 @@ public class AnnotationMappingDiscoveryIT {
 
 					builder.programmaticMapping()
 							.type( IndexedEntity.class )
-									.property( "nonAnnotationMappedEmbedded" )
-											.indexedEmbedded();
+							.property( "nonAnnotationMappedEmbedded" )
+							.indexedEmbedded();
 
 					mapAlwaysPresentProperty( builder.programmaticMapping() );
 				} )

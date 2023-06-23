@@ -53,8 +53,9 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	private final Collection<BoundPropertyBridge<P>> boundPropertyBridges = new ArrayList<>();
 	private final PojoIndexingProcessorValueNodeBuilderDelegate<P, P> valueWithoutExtractorBuilderDelegate;
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<ContainerExtractorPath, PojoIndexingProcessorContainerElementNodeBuilder<P, ? super P, ?>>
-			containerElementNodeBuilders = new LinkedHashMap<>();
+	private final Map<ContainerExtractorPath,
+			PojoIndexingProcessorContainerElementNodeBuilder<P, ? super P, ?>> containerElementNodeBuilders =
+					new LinkedHashMap<>();
 
 	PojoIndexingProcessorPropertyNodeBuilder(
 			BoundPojoModelPathPropertyNode<T, P> modelPath,
@@ -164,8 +165,8 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 			PojoIndexingDependencyCollectorTypeNode<T> parentDependencyCollector) {
 		@SuppressWarnings("unchecked") // We know from the property model that this property has type P
 		PojoIndexingDependencyCollectorPropertyNode<T, P> propertyDependencyCollector =
-				(PojoIndexingDependencyCollectorPropertyNode<T, P>)
-						parentDependencyCollector.property( modelPath.getPropertyModel().name() );
+				(PojoIndexingDependencyCollectorPropertyNode<T, P>) parentDependencyCollector
+						.property( modelPath.getPropertyModel().name() );
 
 		Collection<PojoIndexingProcessor<? super P>> nestedNodes = new ArrayList<>();
 		try {

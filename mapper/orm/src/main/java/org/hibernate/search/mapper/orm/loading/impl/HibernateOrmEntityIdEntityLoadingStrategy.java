@@ -68,8 +68,9 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 			 * in particular runtime checks handling edge cases.
 			 */
 			@SuppressWarnings("unchecked")
-			PojoSelectionEntityLoader<E2> result = (PojoSelectionEntityLoader<E2>) doCreate( targetEntityTypeContext.entityPersister(), sessionContext,
-					cacheLookupStrategy, loadingOptions );
+			PojoSelectionEntityLoader<E2> result =
+					(PojoSelectionEntityLoader<E2>) doCreate( targetEntityTypeContext.entityPersister(), sessionContext,
+							cacheLookupStrategy, loadingOptions );
 			return result;
 		}
 
@@ -91,8 +92,9 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 		 * See PojoLoader.castToExactTypeOrNull() and its callers for more information.
 		 */
 		@SuppressWarnings("unchecked")
-		PojoSelectionEntityLoader<E2> result = (PojoSelectionEntityLoader<E2>) doCreate( commonSuperType, sessionContext, cacheLookupStrategy,
-				loadingOptions );
+		PojoSelectionEntityLoader<E2> result =
+				(PojoSelectionEntityLoader<E2>) doCreate( commonSuperType, sessionContext, cacheLookupStrategy,
+						loadingOptions );
 
 		return result;
 	}
@@ -166,8 +168,8 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 	private AssertionFailure invalidTypeException(EntityPersister otherEntityPersister) {
 		throw new AssertionFailure(
 				"The targeted entity type is not a subclass of the expected root entity type."
-				+ " Expected root entity name: " + rootEntityPersister.getEntityName()
-				+ " Targeted entity name: " + otherEntityPersister.getEntityName()
+						+ " Expected root entity name: " + rootEntityPersister.getEntityName()
+						+ " Targeted entity name: " + otherEntityPersister.getEntityName()
 		);
 	}
 
@@ -175,12 +177,12 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 			Set<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
 		return new AssertionFailure(
 				"Some types among the targeted entity types are not subclasses of the expected root entity type."
-				+ " Expected entity name: " + rootEntityPersister.getEntityName()
-				+ " Targeted entity names: "
-				+ targetEntityTypeContexts.stream()
-						.map( LoadingTypeContext::entityPersister )
-						.map( EntityPersister::getEntityName )
-						.collect( Collectors.toList() )
+						+ " Expected entity name: " + rootEntityPersister.getEntityName()
+						+ " Targeted entity names: "
+						+ targetEntityTypeContexts.stream()
+								.map( LoadingTypeContext::entityPersister )
+								.map( EntityPersister::getEntityName )
+								.collect( Collectors.toList() )
 		);
 	}
 

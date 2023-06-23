@@ -126,7 +126,8 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 			RootFailureCollector failureCollector = new RootFailureCollector(
 					PojoEventContextMessages.INSTANCE.schemaManagement()
 			);
-			Futures.unwrappedExceptionGet( scopeSchemaManager.dropAndCreate( failureCollector, OperationSubmitter.blocking() ) );
+			Futures.unwrappedExceptionGet(
+					scopeSchemaManager.dropAndCreate( failureCollector, OperationSubmitter.blocking() ) );
 			failureCollector.checkNoFailure();
 		}
 

@@ -57,7 +57,8 @@ public class KeywordFieldIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void defaultAttributes() {
@@ -80,7 +81,7 @@ public class KeywordFieldIT {
 	@Test
 	public void name() {
 		@Indexed(index = INDEX_NAME)
-		class IndexedEntity	{
+		class IndexedEntity {
 			@DocumentId
 			Integer id;
 			@KeywordField(name = "explicitName")
@@ -97,7 +98,7 @@ public class KeywordFieldIT {
 	@Test
 	public void name_invalid_dot() {
 		@Indexed(index = INDEX_NAME)
-		class IndexedEntity	{
+		class IndexedEntity {
 			@DocumentId
 			Integer id;
 			@KeywordField(name = "invalid.withdot")
@@ -123,6 +124,7 @@ public class KeywordFieldIT {
 			Integer id;
 			@KeywordField(normalizer = NORMALIZER_NAME)
 			String myProperty;
+
 			IndexedEntity(int id, String myProperty) {
 				this.id = id;
 				this.myProperty = myProperty;
@@ -141,7 +143,7 @@ public class KeywordFieldIT {
 	public void norms() {
 
 		@Indexed(index = INDEX_NAME)
-		class IndexedEntity	{
+		class IndexedEntity {
 			@DocumentId
 			Integer id;
 			@KeywordField(norms = Norms.YES)
@@ -168,7 +170,7 @@ public class KeywordFieldIT {
 	public void searchable() {
 
 		@Indexed(index = INDEX_NAME)
-		class IndexedEntity	{
+		class IndexedEntity {
 			@DocumentId
 			Integer id;
 			@KeywordField(searchable = Searchable.YES)
@@ -194,7 +196,7 @@ public class KeywordFieldIT {
 	@Test
 	public void aggregable() {
 		@Indexed(index = INDEX_NAME)
-		class IndexedEntity	{
+		class IndexedEntity {
 			@DocumentId
 			Integer id;
 			@KeywordField(aggregable = Aggregable.YES)
@@ -265,6 +267,7 @@ public class KeywordFieldIT {
 
 			IndexedEntity() {
 			}
+
 			IndexedEntity(Integer id, WrappedValue wrap) {
 				this.id = id;
 				this.wrap = wrap;
@@ -294,6 +297,7 @@ public class KeywordFieldIT {
 
 			IndexedEntity() {
 			}
+
 			IndexedEntity(Integer id, WrappedValue wrap) {
 				this.id = id;
 				this.wrap = wrap;

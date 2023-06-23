@@ -15,8 +15,8 @@ import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 class LuceneIndexObjectFieldTemplateBuilder
 		extends AbstractLuceneIndexFieldTemplateBuilder<
-					LuceneIndexObjectFieldTemplateBuilder, LuceneIndexObjectFieldTemplate
-				> {
+				LuceneIndexObjectFieldTemplateBuilder,
+				LuceneIndexObjectFieldTemplate> {
 
 	private final LuceneIndexCompositeNodeType.Builder typeBuilder;
 

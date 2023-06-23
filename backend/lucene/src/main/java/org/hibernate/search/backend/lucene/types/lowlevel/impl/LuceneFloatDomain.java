@@ -85,7 +85,8 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 
 	@Override
 	public Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-			NestedDocsProvider nestedDocsProvider) throws IOException {
+			NestedDocsProvider nestedDocsProvider)
+			throws IOException {
 		// As we don't need to apply any operation to terms except sometimes a sort,
 		// we can simply rely on raw, int values, whose order is the same as their corresponding float value.
 		// Values are ultimately converted back to the Float equivalent by calling sortedDocValueToTerm.
@@ -98,7 +99,8 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	@Override
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			Collection<? extends Range<? extends Float>> ranges,
-			NestedDocsProvider nestedDocsProvider) throws IOException {
+			NestedDocsProvider nestedDocsProvider)
+			throws IOException {
 		// As we don't need to apply any operation to terms except sometimes a sort,
 		// we can simply rely on raw, int values, whose order is the same as their corresponding float value.
 		// Values are ultimately converted back to the Float equivalent by calling sortedDocValueToTerm.

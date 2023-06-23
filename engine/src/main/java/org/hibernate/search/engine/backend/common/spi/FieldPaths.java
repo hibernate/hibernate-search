@@ -51,7 +51,8 @@ public class FieldPaths {
 		return relativeFieldPathGlob.prependLiteral( absolutePath + PATH_SEPARATOR );
 	}
 
-	public static SimpleGlobPattern absolutize(String absoluteParentPath, String prefix, SimpleGlobPattern relativeFieldPathGlob) {
+	public static SimpleGlobPattern absolutize(String absoluteParentPath, String prefix,
+			SimpleGlobPattern relativeFieldPathGlob) {
 		return compose( absoluteParentPath, prefix( prefix, relativeFieldPathGlob ) );
 	}
 

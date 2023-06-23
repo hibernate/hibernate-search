@@ -38,7 +38,8 @@ abstract class AbstractLuceneNestablePredicate extends AbstractLuceneSearchPredi
 		checkNestableWithin( context.getNestedPath() );
 
 		List<String> nestedPathHierarchy = getNestedPathHierarchy();
-		String expectedNestedPath = nestedPathHierarchy.isEmpty() ? null
+		String expectedNestedPath = nestedPathHierarchy.isEmpty()
+				? null
 				: nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
 
 		if ( Objects.equals( context.getNestedPath(), expectedNestedPath ) ) {
@@ -63,7 +64,8 @@ abstract class AbstractLuceneNestablePredicate extends AbstractLuceneSearchPredi
 				break;
 			}
 
-			String parentNestedDocumentPath = ( i == 0 ) ? null // The parent document is the root document
+			String parentNestedDocumentPath = ( i == 0 )
+					? null // The parent document is the root document
 					: nestedPathHierarchy.get( i - 1 ); // The parent document is a nested document one level higher
 			result = LuceneNestedPredicate.createNestedQuery( parentNestedDocumentPath, path, result );
 		}

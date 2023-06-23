@@ -46,7 +46,7 @@ public class LuceneIndexWriterSettingsIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3776")
 	public void defaults() {
-		setup( properties -> { } );
+		setup( properties -> {} );
 
 		LuceneIndexManagerImpl luceneIndexManager = index.unwrapForTests( LuceneIndexManagerImpl.class );
 		assertThat( luceneIndexManager.getShardsForTests() )
@@ -79,7 +79,8 @@ public class LuceneIndexWriterSettingsIT {
 								.isCloseTo( LogByteSizeMergePolicy.DEFAULT_MAX_MERGE_MB, withPercentage( 1 ) );
 						softly.assertThat( mergePolicy.getMaxMergeMBForForcedMerge() ).as( "getMaxMergeMBForForcedMerge()" )
 								// The default exposed by Lucene is in bytes, so we have to convert it
-								.isCloseTo( LogByteSizeMergePolicy.DEFAULT_MAX_MERGE_MB_FOR_FORCED_MERGE / 1024 / 1024, withPercentage( 1 ) );
+								.isCloseTo( LogByteSizeMergePolicy.DEFAULT_MAX_MERGE_MB_FOR_FORCED_MERGE / 1024 / 1024,
+										withPercentage( 1 ) );
 						softly.assertThat( mergePolicy.getCalibrateSizeByDeletes() ).as( "getCalibrateSizeByDeletes()" )
 								.isTrue();
 					} );
@@ -87,7 +88,7 @@ public class LuceneIndexWriterSettingsIT {
 
 		// Add a document to the index
 		IndexIndexingPlan plan = index.createIndexingPlan();
-		plan.add( referenceProvider( "1" ), document -> { } );
+		plan.add( referenceProvider( "1" ), document -> {} );
 		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// Check that writing succeeded
@@ -97,7 +98,8 @@ public class LuceneIndexWriterSettingsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3776")
-	@PortedFromSearch5(original = "org.hibernate.search.test.configuration.LuceneIndexingParametersTest.testSpecificTypeParametersOverride")
+	@PortedFromSearch5(
+			original = "org.hibernate.search.test.configuration.LuceneIndexingParametersTest.testSpecificTypeParametersOverride")
 	public void custom() {
 		setup( properties -> {
 			properties.accept( LuceneIndexSettings.IO_WRITER_MAX_BUFFERED_DOCS, "420" );
@@ -150,7 +152,7 @@ public class LuceneIndexWriterSettingsIT {
 
 		// Add a document to the index
 		IndexIndexingPlan plan = index.createIndexingPlan();
-		plan.add( referenceProvider( "1" ), document -> { } );
+		plan.add( referenceProvider( "1" ), document -> {} );
 		plan.execute( OperationSubmitter.blocking() ).join();
 
 		// Check that writing succeeded

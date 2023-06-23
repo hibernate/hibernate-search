@@ -17,14 +17,13 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 
 public interface ElasticsearchSearchQuerySelectStep<R, E, LOS>
 		extends SearchQuerySelectStep<
-						ElasticsearchSearchQueryOptionsStep<E, LOS>,
-						R,
-						E,
-						LOS,
-						ElasticsearchSearchProjectionFactory<R, E>,
-						ElasticsearchSearchPredicateFactory
-				>,
-				ElasticsearchSearchQueryWhereStep<E, LOS> {
+				ElasticsearchSearchQueryOptionsStep<E, LOS>,
+				R,
+				E,
+				LOS,
+				ElasticsearchSearchProjectionFactory<R, E>,
+				ElasticsearchSearchPredicateFactory>,
+		ElasticsearchSearchQueryWhereStep<E, LOS> {
 
 	@Override
 	ElasticsearchSearchQueryWhereStep<E, LOS> selectEntity();
@@ -37,7 +36,8 @@ public interface ElasticsearchSearchQuerySelectStep<R, E, LOS>
 
 	@Override
 	<P> ElasticsearchSearchQueryWhereStep<P, LOS> select(
-			Function<? super ElasticsearchSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
+			Function<? super ElasticsearchSearchProjectionFactory<R, E>,
+					? extends ProjectionFinalStep<P>> projectionContributor);
 
 	@Override
 	<P> ElasticsearchSearchQueryWhereStep<P, LOS> select(SearchProjection<P> projection);

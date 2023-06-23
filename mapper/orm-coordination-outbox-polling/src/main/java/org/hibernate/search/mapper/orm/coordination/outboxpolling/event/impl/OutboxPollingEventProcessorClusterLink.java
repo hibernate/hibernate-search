@@ -46,7 +46,8 @@ public final class OutboxPollingEventProcessorClusterLink
 			ShardAssignmentDescriptor staticShardAssignment) {
 		super(
 				new AgentPersister(
-						staticShardAssignment == null ? AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING
+						staticShardAssignment == null
+								? AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING
 								: AgentType.EVENT_PROCESSING_STATIC_SHARDING,
 						agentName, staticShardAssignment
 				),
@@ -106,7 +107,8 @@ public final class OutboxPollingEventProcessorClusterLink
 		}
 
 		Optional<ShardAssignmentDescriptor> shardAssignmentOptional =
-				ShardAssignmentDescriptor.fromClusterMemberList( clusterTarget.descriptor.memberIdsInShardOrder, selfReference().id );
+				ShardAssignmentDescriptor.fromClusterMemberList( clusterTarget.descriptor.memberIdsInShardOrder,
+						selfReference().id );
 		if ( !shardAssignmentOptional.isPresent() ) {
 			log.logf( currentSelf.getState() != AgentState.SUSPENDED ? Logger.Level.INFO : Logger.Level.TRACE,
 					"Agent '%s': this agent is superfluous and will not perform event processing,"
@@ -136,8 +138,8 @@ public final class OutboxPollingEventProcessorClusterLink
 
 		if ( !targetShardAssignment.equals( persistedShardAssignment ) ) {
 			log.infof( "Agent '%s': the persisted shard assignment (%s) does not match the target."
-							+ " Target assignment: %s."
-							+ " Cluster: %s.",
+					+ " Target assignment: %s."
+					+ " Cluster: %s.",
 					selfReference(), persistedShardAssignment, targetShardAssignment,
 					clusterTarget.descriptor );
 			return (now, self, agentPersister) -> {
@@ -252,7 +254,8 @@ public final class OutboxPollingEventProcessorClusterLink
 		Instant expiration = now.plus( pulseInterval );
 		log.tracef( "Agent '%s': instructions are to process events and to retry a pulse in %s, around %s",
 				selfReference(), pulseInterval, expiration );
-		return new OutboxPollingEventProcessingInstructions( clock, expiration, Optional.of( lastShardAssignment.eventFinder ) );
+		return new OutboxPollingEventProcessingInstructions( clock, expiration,
+				Optional.of( lastShardAssignment.eventFinder ) );
 	}
 
 }

@@ -21,6 +21,7 @@ public class ConnectedSortFieldContext extends ConnectedSortAdditionalSortFieldC
 	public ConnectedSortFieldContext(QueryBuildingContext queryContext, SortFieldStates states) {
 		super( queryContext, states );
 	}
+
 	@Override
 	public SortFieldContext asc() {
 		getStates().setAsc();

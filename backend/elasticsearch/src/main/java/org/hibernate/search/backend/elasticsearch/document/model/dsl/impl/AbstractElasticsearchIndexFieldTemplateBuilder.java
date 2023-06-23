@@ -21,9 +21,8 @@ import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 abstract class AbstractElasticsearchIndexFieldTemplateBuilder<
-				S extends AbstractElasticsearchIndexFieldTemplateBuilder<S, T>,
-				T extends AbstractElasticsearchIndexFieldTemplate<?>
-		>
+		S extends AbstractElasticsearchIndexFieldTemplateBuilder<S, T>,
+		T extends AbstractElasticsearchIndexFieldTemplate<?>>
 		implements IndexSchemaFieldTemplateOptionsStep<S>,
 		ElasticsearchIndexNodeContributor, IndexSchemaBuildContext {
 

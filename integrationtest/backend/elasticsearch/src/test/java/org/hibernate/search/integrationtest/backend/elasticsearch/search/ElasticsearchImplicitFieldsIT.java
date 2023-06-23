@@ -57,8 +57,7 @@ public class ElasticsearchImplicitFieldsIT {
 				.toQuery();
 		assertThatQuery( query ).aggregation( countsByEntityKey )
 				.extracting( "mainType" )
-				.isEqualTo( 6L )
-		;
+				.isEqualTo( 6L );
 	}
 
 	@Test
@@ -99,8 +98,7 @@ public class ElasticsearchImplicitFieldsIT {
 				.add( FIFTH_ID, document -> {
 					document.addValue( mainIndex.binding().string, "text 5" );
 				} )
-				.add( EMPTY_ID, document -> {
-				} )
+				.add( EMPTY_ID, document -> {} )
 				.join();
 	}
 

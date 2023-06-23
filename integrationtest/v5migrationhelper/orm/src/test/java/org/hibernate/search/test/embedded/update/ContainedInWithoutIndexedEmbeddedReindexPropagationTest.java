@@ -123,7 +123,8 @@ public class ContainedInWithoutIndexedEmbeddedReindexPropagationTest extends Sea
 	}
 
 	private List<SimpleChildEntity> getSimpleChildEntitiesFromIndex(FullTextSession session, String name) {
-		FullTextQuery q = session.createFullTextQuery( new TermQuery( new Term( "parentName", name ) ), SimpleChildEntity.class );
+		FullTextQuery q =
+				session.createFullTextQuery( new TermQuery( new Term( "parentName", name ) ), SimpleChildEntity.class );
 		@SuppressWarnings("unchecked")
 		List<SimpleChildEntity> results = q.list();
 		return results;
@@ -140,7 +141,12 @@ public class ContainedInWithoutIndexedEmbeddedReindexPropagationTest extends Sea
 
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
-		return new Class[] { SimpleParentEntity.class, SimpleChildEntity.class, ProductArticle.class, ProductModel.class, ProductReferenceCode.class,
+		return new Class[] {
+				SimpleParentEntity.class,
+				SimpleChildEntity.class,
+				ProductArticle.class,
+				ProductModel.class,
+				ProductReferenceCode.class,
 				ProductShootingBrief.class };
 	}
 }

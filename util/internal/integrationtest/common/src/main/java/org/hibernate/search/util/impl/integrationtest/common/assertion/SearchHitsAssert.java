@@ -41,14 +41,14 @@ public class SearchHitsAssert<H> {
 
 	public ListAssert<DocumentReference> asNormalizedDocRefs() {
 		shouldHaveOnlyElementsOfTypeOrNull( asIs(), DocumentReference.class );
-		@SuppressWarnings( "unchecked" ) // We check that at runtime, that's what the assertion is for
+		@SuppressWarnings("unchecked") // We check that at runtime, that's what the assertion is for
 		List<DocumentReference> normalized = normalizeDocRefHits( ( (List<? extends DocumentReference>) actual ) );
 		return assertThat( normalized ).as( description );
 	}
 
 	public ListAssert<List<?>> asNormalizedLists() {
 		shouldHaveOnlyElementsOfTypeOrNull( asIs(), List.class );
-		@SuppressWarnings( "unchecked" ) // We check that at runtime, that's what the assertion is for
+		@SuppressWarnings("unchecked") // We check that at runtime, that's what the assertion is for
 		List<List<?>> normalized = ( (List<? extends List<?>>) actual ).stream()
 				.map( NormalizationUtils::<List<?>>normalize )
 				.collect( Collectors.toList() );

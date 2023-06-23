@@ -85,8 +85,8 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		CompletableFuture<BulkResult> bulkWorkResultFuture =
 				// When the previous work completes *and* the bulk work is available...
 				sequenceContext.tail.thenCombine( workFuture, (ignored, work) -> work )
-				// ... execute the bulk work
-				.thenCompose( sequenceContext::execute );
+						// ... execute the bulk work
+						.thenCompose( sequenceContext::execute );
 
 		sequenceContext.updateTail( bulkWorkResultFuture );
 

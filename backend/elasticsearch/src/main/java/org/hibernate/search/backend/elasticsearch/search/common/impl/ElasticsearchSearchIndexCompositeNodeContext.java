@@ -12,9 +12,8 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexCompositeNodeCon
 
 public interface ElasticsearchSearchIndexCompositeNodeContext
 		extends SearchIndexCompositeNodeContext<
-						ElasticsearchSearchIndexScope<?>
-		>,
-				ElasticsearchSearchIndexNodeContext {
+				ElasticsearchSearchIndexScope<?>>,
+		ElasticsearchSearchIndexNodeContext {
 
 	@Override
 	ElasticsearchSearchIndexCompositeNodeTypeContext type();

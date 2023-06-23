@@ -43,7 +43,7 @@ public class StubDocumentNode extends StubTreeNode<StubDocumentNode> {
 		 * we want to avoid ambiguity on the call site when passing null
 		 * to the other version of this method.
 		 */
-		public Builder field(String relativeFieldName, Object value, Object ... values) {
+		public Builder field(String relativeFieldName, Object value, Object... values) {
 			List<Object> list = new ArrayList<>();
 			list.add( value );
 			Collections.addAll( list, values );

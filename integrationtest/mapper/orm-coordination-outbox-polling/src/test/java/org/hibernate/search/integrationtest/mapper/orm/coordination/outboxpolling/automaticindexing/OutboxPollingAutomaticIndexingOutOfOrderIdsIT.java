@@ -45,9 +45,11 @@ import org.junit.Test;
 
 public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
-	private static final String OUTBOX_EVENT_UPDATE_ID_AND_TIME = "UPDATE HSEARCH_OUTBOX_EVENT SET ID = ?, PROCESSAFTER = ? WHERE ID = ?";
+	private static final String OUTBOX_EVENT_UPDATE_ID_AND_TIME =
+			"UPDATE HSEARCH_OUTBOX_EVENT SET ID = ?, PROCESSAFTER = ? WHERE ID = ?";
 
-	private static final String OUTBOX_EVENT_SELECT_ORDERED_IDS_AND_PROCESS_AFTER_TIME = "SELECT ID, PROCESSAFTER FROM HSEARCH_OUTBOX_EVENT ORDER BY PROCESSAFTER, ID";
+	private static final String OUTBOX_EVENT_SELECT_ORDERED_IDS_AND_PROCESS_AFTER_TIME =
+			"SELECT ID, PROCESSAFTER FROM HSEARCH_OUTBOX_EVENT ORDER BY PROCESSAFTER, ID";
 
 	private final OutboxEventFilter eventFilter = new OutboxEventFilter();
 
@@ -376,7 +378,8 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			if ( javaVersionString != null && !javaVersionString.trim().isEmpty() ) {
 				boolean oldJavaVersion = javaVersionString.startsWith( "1." );
 				assumeTrue(
-						"The H2 actual maximum available precision depends on operating system and JVM and can be 3 (milliseconds) or higher. " +
+						"The H2 actual maximum available precision depends on operating system and JVM and can be 3 (milliseconds) or higher. "
+								+
 								"Higher precision is not available before Java 9.",
 						!( oldJavaVersion && env.getDialect() instanceof H2Dialect )
 				);
@@ -404,7 +407,8 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 	}
 
 	private void updateOutboxTableRow(JdbcCoordinator jdbc, String newId, String rowToUpdateId,
-			java.sql.Timestamp newCreated) throws SQLException {
+			java.sql.Timestamp newCreated)
+			throws SQLException {
 		try ( PreparedStatement ps = jdbc.getStatementPreparer().prepareStatement( OUTBOX_EVENT_UPDATE_ID_AND_TIME ) ) {
 			ps.setString( 1, newId );
 			ps.setTimestamp( 2, newCreated );

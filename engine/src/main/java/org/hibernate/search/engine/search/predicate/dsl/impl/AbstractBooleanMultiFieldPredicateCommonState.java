@@ -33,9 +33,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <F> The type of field set states.
  */
 abstract class AbstractBooleanMultiFieldPredicateCommonState<
-				S extends AbstractBooleanMultiFieldPredicateCommonState<?, ?>,
-				F extends AbstractBooleanMultiFieldPredicateCommonState.FieldSetState
-		>
+		S extends AbstractBooleanMultiFieldPredicateCommonState<?, ?>,
+		F extends AbstractBooleanMultiFieldPredicateCommonState.FieldSetState>
 		extends AbstractPredicateFinalStep {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

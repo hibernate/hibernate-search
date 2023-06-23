@@ -43,7 +43,8 @@ public final class EntityProjectionOptionsStepImpl<E>
 		boolean canUseProjectionFromFirst = true;
 		ProjectionMappedTypeContext first = mappedTypeContexts.get( 0 );
 		for ( ProjectionMappedTypeContext mappedTypeContext : mappedTypeContexts ) {
-			boolean willYieldSameProjectionAsFirst = first.loadingAvailable() ? mappedTypeContext.loadingAvailable()
+			boolean willYieldSameProjectionAsFirst = first.loadingAvailable()
+					? mappedTypeContext.loadingAvailable()
 					: first.javaClass().equals( mappedTypeContext.javaClass() );
 			if ( !willYieldSameProjectionAsFirst ) {
 				canUseProjectionFromFirst = false;

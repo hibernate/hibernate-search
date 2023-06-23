@@ -146,7 +146,7 @@ class LuceneCompositeProjection<E, V, A, P>
 		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
 				ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
 			LuceneSearchProjection<?>[] typedInners =
-					new LuceneSearchProjection<?>[ inners.length ];
+					new LuceneSearchProjection<?>[inners.length];
 			for ( int i = 0; i < inners.length; i++ ) {
 				typedInners[i] = LuceneSearchProjection.from( scope, inners[i] );
 			}

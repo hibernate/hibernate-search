@@ -15,11 +15,10 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementCon
 
 public final class ElasticsearchIndexRoot
 		extends AbstractIndexRoot<
-						ElasticsearchIndexRoot,
-						ElasticsearchSearchIndexScope<?>,
-						ElasticsearchIndexCompositeNodeType,
-						ElasticsearchIndexField
-				>
+				ElasticsearchIndexRoot,
+				ElasticsearchSearchIndexScope<?>,
+				ElasticsearchIndexCompositeNodeType,
+				ElasticsearchIndexField>
 		implements ElasticsearchIndexCompositeNode {
 
 	public ElasticsearchIndexRoot(ElasticsearchIndexCompositeNodeType type,

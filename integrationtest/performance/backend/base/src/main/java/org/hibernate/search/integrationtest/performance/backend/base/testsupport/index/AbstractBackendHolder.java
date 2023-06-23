@@ -85,9 +85,8 @@ public abstract class AbstractBackendHolder {
 					integrationPartialBuildState.finalizer( propertySource, unusedPropertyChecker );
 			mapping = finalizer.finalizeMapping(
 					mappingKey,
-					(context, partialMapping) ->
-							partialMapping.finalizeMapping(
-									StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP )
+					(context, partialMapping) -> partialMapping.finalizeMapping(
+							StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP )
 			);
 			finalizer.finalizeIntegration();
 		}

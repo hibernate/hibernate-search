@@ -56,7 +56,8 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private final PropertyTypeDescriptor<I, ?> typeDescriptor;
 	private final DefaultIdentifierBridgeExpectations<I> expectations;
@@ -73,7 +74,7 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 	public void setup() {
 		backendMock.expectSchema(
 				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
-				b -> { },
+				b -> {},
 				indexModel -> this.indexModel = indexModel
 		);
 		mapping = setupHelper.start()
@@ -93,7 +94,7 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 			session.indexingPlan().add( entity );
 
 			backendMock.expectWorks( DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME )
-					.add( getDocumentIdentifierValue(), b -> { } );
+					.add( getDocumentIdentifierValue(), b -> {} );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -132,7 +133,7 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 		try ( SearchSession session = mapping.createSession() ) {
 			backendMock.expectSearchIds(
 					Collections.singletonList( DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.of(
 							1L,
 							getDocumentIdentifierValue()

@@ -92,21 +92,25 @@ public class IterableBridgeTest extends SearchTestBase {
 	@Test
 	public void testSearchNullEntry() throws Exception {
 		{
-			List<IterableBridgeTestEntity> results = findResults( "nullIndexed", IterableBridgeTestEntity.NULL_LANGUAGE_TOKEN, true );
+			List<IterableBridgeTestEntity> results =
+					findResults( "nullIndexed", IterableBridgeTestEntity.NULL_LANGUAGE_TOKEN, true );
 
 			assertNotNull( "No result found for an indexed collection", results );
 			assertEquals( "Unexpected number of results in a collection", 1, results.size() );
-			assertEquals( "Wrong result returned looking for a null in a collection", withNullEntry.getName(), results.get( 0 ).getName() );
+			assertEquals( "Wrong result returned looking for a null in a collection", withNullEntry.getName(),
+					results.get( 0 ).getName() );
 		}
 	}
 
 	@Test
 	public void testSearchNullNumericEntry() throws Exception {
-		List<IterableBridgeTestEntity> results = findResults( "numericNullIndexed", IterableBridgeTestEntity.NULL_NUMERIC_TOKEN_INT, false );
+		List<IterableBridgeTestEntity> results =
+				findResults( "numericNullIndexed", IterableBridgeTestEntity.NULL_NUMERIC_TOKEN_INT, false );
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
-		assertEquals( "Wrong result returned looking for a null in a collection of numeric", withNullEntry.getName(), results.get( 0 ).getName() );
+		assertEquals( "Wrong result returned looking for a null in a collection of numeric", withNullEntry.getName(),
+				results.get( 0 ).getName() );
 	}
 
 	@Test
@@ -209,7 +213,7 @@ public class IterableBridgeTest extends SearchTestBase {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<IterableBridgeTestEntity> findResults( String fieldName, Object value, boolean checkRawValue) {
+	private List<IterableBridgeTestEntity> findResults(String fieldName, Object value, boolean checkRawValue) {
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
 				.forEntity( IterableBridgeTestEntity.class ).get();
 		TermMatchingContext termMatchingContext = queryBuilder.keyword().onField( fieldName );

@@ -173,8 +173,7 @@ public class ElasticsearchSchemaManagerExporterIT {
 				"{}"
 		);
 
-		assertThatThrownBy( () ->
-				mapping.scope( Object.class ).schemaManager().exportExpectedSchema( directory )
+		assertThatThrownBy( () -> mapping.scope( Object.class ).schemaManager().exportExpectedSchema( directory )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -196,8 +195,7 @@ public class ElasticsearchSchemaManagerExporterIT {
 				"{}"
 		);
 
-		assertThatThrownBy( () ->
-				mapping.scope( Object.class ).schemaManager().exportExpectedSchema( directory )
+		assertThatThrownBy( () -> mapping.scope( Object.class ).schemaManager().exportExpectedSchema( directory )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(

@@ -160,13 +160,13 @@ public class MatchIdPredicateSpecificsIT {
 
 	private static void initData() {
 		BulkIndexer mainIndexer = mainIndex.bulkIndexer()
-				.add( DOCUMENT_1, document -> { } )
-				.add( DOCUMENT_2, document -> { } )
-				.add( DOCUMENT_3, document -> { } );
+				.add( DOCUMENT_1, document -> {} )
+				.add( DOCUMENT_2, document -> {} )
+				.add( DOCUMENT_3, document -> {} );
 		BulkIndexer compatibleIdConverterIndexer = compatibleIdConverterIndex.bulkIndexer()
-				.add( COMPATIBLE_ID_CONVERTER_DOCUMENT_1, document -> { } );
+				.add( COMPATIBLE_ID_CONVERTER_DOCUMENT_1, document -> {} );
 		BulkIndexer incompatibleIdConverterIndexer = incompatibleIdConverterIndex.bulkIndexer()
-				.add( INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1, document -> { } );
+				.add( INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1, document -> {} );
 		mainIndexer.join( compatibleIdConverterIndexer, incompatibleIdConverterIndexer );
 	}
 

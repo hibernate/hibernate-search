@@ -56,7 +56,7 @@ final class StubByMappedTypeProjection<P> extends StubSearchProjection<P> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public P transform(LoadingResult<?> loadingResult, Object extractedData, StubSearchProjectionContext context) {
-		return ((DelegateAndExtractedValue<P>) extractedData).transform( loadingResult, context );
+		return ( (DelegateAndExtractedValue<P>) extractedData ).transform( loadingResult, context );
 	}
 
 	@Override

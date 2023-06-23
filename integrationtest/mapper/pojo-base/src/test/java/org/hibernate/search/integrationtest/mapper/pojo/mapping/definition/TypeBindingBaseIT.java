@@ -56,8 +56,7 @@ public class TypeBindingBaseIT {
 	 */
 	@Test
 	public void simple() {
-		backendMock.expectSchema( INDEX_NAME, b ->
-				b.field( "myText", String.class )
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "myText", String.class )
 		);
 
 		SearchMapping mapping = setupHelper.start().expectCustomBeans()

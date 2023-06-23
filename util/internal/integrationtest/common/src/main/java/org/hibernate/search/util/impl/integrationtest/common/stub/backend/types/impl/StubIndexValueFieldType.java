@@ -31,10 +31,9 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 
 public final class StubIndexValueFieldType<F>
 		extends AbstractIndexValueFieldType<
-						StubSearchIndexScope,
-						StubSearchIndexValueFieldContext<F>,
-						F
-				>
+				StubSearchIndexScope,
+				StubSearchIndexValueFieldContext<F>,
+				F>
 		implements IndexFieldType<F>, StubSearchIndexValueFieldTypeContext<F> {
 
 	private final List<Consumer<StubIndexSchemaDataNode.Builder>> modifiers;
@@ -53,10 +52,9 @@ public final class StubIndexValueFieldType<F>
 
 	public static class Builder<F>
 			extends AbstractIndexValueFieldType.Builder<
-							StubSearchIndexScope,
-							StubSearchIndexValueFieldContext<F>,
-							F
-					> {
+					StubSearchIndexScope,
+					StubSearchIndexValueFieldContext<F>,
+					F> {
 		private final List<Consumer<StubIndexSchemaDataNode.Builder>> modifiers = new ArrayList<>();
 
 		public Builder(Class<F> valueClass) {

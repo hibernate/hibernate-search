@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
  */
 public interface HibernateOrmScopeIndexedTypeContext<E>
 		extends SearchIndexedEntity<E>, LoadingTypeContext<E>,
-				HibernateOrmMassIndexingIndexedTypeContext<E> {
+		HibernateOrmMassIndexingIndexedTypeContext<E> {
 
 	@Override
 	HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy();

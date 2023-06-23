@@ -69,7 +69,7 @@ public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel
 	 * @return The constructor of this type whose parameters have the given {@code parameterTypes}.
 	 * @throws org.hibernate.search.util.common.SearchException If there is no constructor with parameters of the given types.
 	 */
-	PojoConstructorModel<T> constructor(Class<?> ... parameterTypes);
+	PojoConstructorModel<T> constructor(Class<?>... parameterTypes);
 
 	/**
 	 * @return All accessible constructors of this type.

@@ -174,7 +174,7 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 		String fieldPath = getNonSortableFieldPath();
 
 		assertThatThrownBy( () -> {
-				scope.sort().field( fieldPath );
+			scope.sort().field( fieldPath );
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -523,13 +523,14 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 				.add( COMPATIBLE_INDEX_DOCUMENT_1, document -> {
 					CompatibleIndexBinding binding = compatibleIndex.binding();
 					binding.fieldModels.forEach( fieldModel -> addValue( fieldModel, document, DOCUMENT_1_ORDINAL ) );
-					binding.fieldWithDslConverterModels.forEach( fieldModel -> addValue( fieldModel, document, DOCUMENT_1_ORDINAL ) );
+					binding.fieldWithDslConverterModels
+							.forEach( fieldModel -> addValue( fieldModel, document, DOCUMENT_1_ORDINAL ) );
 				} );
 		BulkIndexer rawFieldCompatibleIndexer = rawFieldCompatibleIndex.bulkIndexer()
 				.add( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1,
 						document -> initDocument( rawFieldCompatibleIndex.binding(), document, DOCUMENT_1_ORDINAL ) );
 		BulkIndexer missingFieldIndexer = missingFieldIndex.bulkIndexer()
-				.add( MISSING_FIELD_INDEX_DOCUMENT_1, document -> { } );
+				.add( MISSING_FIELD_INDEX_DOCUMENT_1, document -> {} );
 		mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer, missingFieldIndexer );
 	}
 
@@ -563,7 +564,7 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 		final FirstLevelObjectMapping nested;
 
 		IndexBinding(IndexSchemaElement root) {
-			this( root, ignored -> { } );
+			this( root, ignored -> {} );
 		}
 
 		IndexBinding(IndexSchemaElement root,
@@ -649,8 +650,8 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 		}
 
 		private static void mapFieldsWithIncompatibleType(IndexSchemaElement parent) {
-			supportedFieldTypes.forEach( typeDescriptor ->
-					SimpleFieldModel.mapper( FieldTypeDescriptor.getIncompatible( typeDescriptor ) )
+			supportedFieldTypes.forEach(
+					typeDescriptor -> SimpleFieldModel.mapper( FieldTypeDescriptor.getIncompatible( typeDescriptor ) )
 							.map( parent, "" + typeDescriptor.getUniqueName() )
 			);
 		}

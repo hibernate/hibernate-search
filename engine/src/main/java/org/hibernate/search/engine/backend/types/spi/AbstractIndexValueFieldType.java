@@ -26,10 +26,9 @@ import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.highlighter.spi.SearchHighlighterType;
 
 public abstract class AbstractIndexValueFieldType<
-				SC extends SearchIndexScope<?>,
-				N extends SearchIndexValueFieldContext<SC>,
-				F
-		>
+		SC extends SearchIndexScope<?>,
+		N extends SearchIndexValueFieldContext<SC>,
+		F>
 		implements IndexValueFieldTypeDescriptor, IndexFieldType<F>, SearchIndexValueFieldTypeContext<SC, N, F> {
 	private final Class<F> valueClass;
 	private final DslConverter<F, F> rawDslConverter;
@@ -160,10 +159,9 @@ public abstract class AbstractIndexValueFieldType<
 	}
 
 	public abstract static class Builder<
-					SC extends SearchIndexScope<?>,
-					N extends SearchIndexValueFieldContext<SC>,
-					F
-			> {
+			SC extends SearchIndexScope<?>,
+			N extends SearchIndexValueFieldContext<SC>,
+			F> {
 
 		private final Class<F> valueClass;
 		private final DslConverter<F, F> rawDslConverter;
@@ -178,8 +176,8 @@ public abstract class AbstractIndexValueFieldType<
 		private boolean aggregable;
 		private Set<SearchHighlighterType> allowedHighlighterTypes = Collections.emptySet();
 
-		private final Map<SearchQueryElementTypeKey<?>, SearchQueryElementFactory<?, ? super SC, ? super N>>
-				queryElementFactories = new HashMap<>();
+		private final Map<SearchQueryElementTypeKey<?>,
+				SearchQueryElementFactory<?, ? super SC, ? super N>> queryElementFactories = new HashMap<>();
 
 		private String analyzerName;
 		private String searchAnalyzerName;
@@ -199,7 +197,8 @@ public abstract class AbstractIndexValueFieldType<
 			this.dslConverter = new DslConverter<>( valueType, toIndexConverter );
 		}
 
-		public final <V> void projectionConverter(Class<V> valueType, FromDocumentValueConverter<? super F, V> fromIndexConverter) {
+		public final <V> void projectionConverter(Class<V> valueType,
+				FromDocumentValueConverter<? super F, V> fromIndexConverter) {
 			this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
 		}
 

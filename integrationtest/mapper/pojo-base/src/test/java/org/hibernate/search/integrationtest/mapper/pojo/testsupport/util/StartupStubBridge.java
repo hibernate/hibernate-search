@@ -46,7 +46,7 @@ import org.hibernate.search.util.impl.test.rule.StaticCounters;
  */
 public class StartupStubBridge<T>
 		implements TypeBridge<T>, PropertyBridge<T>, ValueBridge<T, String>,
-				RoutingBridge<T>, IdentifierBridge<T> {
+		RoutingBridge<T>, IdentifierBridge<T> {
 	public static class CounterKeys {
 		public final StaticCounters.Key instance = StaticCounters.createKey();
 		public final StaticCounters.Key runtimeUse = StaticCounters.createKey();
@@ -135,7 +135,7 @@ public class StartupStubBridge<T>
 		StaticCounters.get().increment( counterKeys.runtimeUse );
 		return new AssertionFailure(
 				"Instances of " + getClass().getSimpleName() + " are not supposed to be used at runtime,"
-				+ " they should only be used to test the startup process."
+						+ " they should only be used to test the startup process."
 		);
 	}
 

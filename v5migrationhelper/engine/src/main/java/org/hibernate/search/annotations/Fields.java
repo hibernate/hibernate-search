@@ -28,7 +28,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
  *     <li>{@link GenericField} for non-text fields.</li>
  * </ul>
  */
-@Retention( RetentionPolicy.RUNTIME )
+@Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
 @Deprecated

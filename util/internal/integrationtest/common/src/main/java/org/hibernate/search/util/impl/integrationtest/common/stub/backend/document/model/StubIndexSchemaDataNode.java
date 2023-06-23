@@ -98,8 +98,7 @@ public final class StubIndexSchemaDataNode extends StubTreeNode<StubIndexSchemaD
 		}
 
 		public Builder field(String relativeFieldName, Class<?> valueClass) {
-			return field( relativeFieldName, valueClass, b -> {
-			} );
+			return field( relativeFieldName, valueClass, b -> {} );
 		}
 
 		public Builder field(String relativeFieldName, Class<?> valueClass, Consumer<Builder> contributor) {

@@ -59,7 +59,8 @@ public class LuceneObjectProjection<E, V, P>
 		this.filter = builder.filter;
 		this.nestedDocumentPath = builder.objectField.nestedDocumentPath();
 		this.requiredContextAbsoluteFieldPath = accumulatorProvider.isSingleValued()
-				? builder.objectField.closestMultiValuedParentAbsolutePath() : null;
+				? builder.objectField.closestMultiValuedParentAbsolutePath()
+				: null;
 		this.inners = inners;
 		this.compositor = compositor;
 		this.accumulatorProvider = accumulatorProvider;
@@ -227,7 +228,7 @@ public class LuceneObjectProjection<E, V, P>
 						objectField.eventContext() );
 			}
 			LuceneSearchProjection<?>[] typedInners =
-					new LuceneSearchProjection<?>[ inners.length ];
+					new LuceneSearchProjection<?>[inners.length];
 			for ( int i = 0; i < inners.length; i++ ) {
 				typedInners[i] = LuceneSearchProjection.from( scope, inners[i] );
 			}

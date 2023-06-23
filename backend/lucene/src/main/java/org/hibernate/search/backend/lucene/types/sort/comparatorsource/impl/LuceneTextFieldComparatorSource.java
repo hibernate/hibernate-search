@@ -24,7 +24,8 @@ public class LuceneTextFieldComparatorSource extends LuceneFieldComparatorSource
 	private final Object missingValue;
 	private final MultiValueMode multiValueMode;
 
-	public LuceneTextFieldComparatorSource(String nestedDocumentPath, Object missingValue, MultiValueMode multiValueMode, Query luceneFilter) {
+	public LuceneTextFieldComparatorSource(String nestedDocumentPath, Object missingValue, MultiValueMode multiValueMode,
+			Query luceneFilter) {
 		super( nestedDocumentPath, luceneFilter );
 		this.missingValue = missingValue;
 		this.multiValueMode = multiValueMode;
@@ -44,7 +45,7 @@ public class LuceneTextFieldComparatorSource extends LuceneFieldComparatorSource
 			considerMissingHighest = !reversed;
 		}
 		else { // SortMissingValue.MISSING_FIRST, the default
-			// To appear first, missing values must be considered lowest, or highest if the order is reversed.
+				// To appear first, missing values must be considered lowest, or highest if the order is reversed.
 			considerMissingHighest = reversed;
 		}
 		TextMultiValuesToSingleValuesSource source =

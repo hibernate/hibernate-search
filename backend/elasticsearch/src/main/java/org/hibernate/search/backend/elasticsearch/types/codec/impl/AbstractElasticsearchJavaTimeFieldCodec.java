@@ -15,7 +15,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
-public abstract class AbstractElasticsearchJavaTimeFieldCodec<T extends TemporalAccessor> implements ElasticsearchFieldCodec<T> {
+public abstract class AbstractElasticsearchJavaTimeFieldCodec<T extends TemporalAccessor>
+		implements ElasticsearchFieldCodec<T> {
 
 	protected final DateTimeFormatter formatter;
 

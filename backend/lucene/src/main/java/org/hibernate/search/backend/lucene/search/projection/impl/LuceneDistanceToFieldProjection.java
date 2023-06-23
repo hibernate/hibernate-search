@@ -61,7 +61,8 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 		this.absoluteFieldPath = builder.field.absolutePath();
 		this.nestedDocumentPath = builder.field.nestedDocumentPath();
 		this.requiredContextAbsoluteFieldPath = accumulatorProvider.isSingleValued()
-				? builder.field.closestMultiValuedParentAbsolutePath() : null;
+				? builder.field.closestMultiValuedParentAbsolutePath()
+				: null;
 		this.codec = builder.codec;
 		this.center = builder.center;
 		this.unit = builder.unit;
@@ -185,7 +186,9 @@ public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection
 
 	public static class Factory
 			extends
-			AbstractLuceneCodecAwareSearchQueryElementFactory<DistanceToFieldProjectionBuilder, GeoPoint, LuceneFieldCodec<GeoPoint>> {
+			AbstractLuceneCodecAwareSearchQueryElementFactory<DistanceToFieldProjectionBuilder,
+					GeoPoint,
+					LuceneFieldCodec<GeoPoint>> {
 		public Factory(LuceneFieldCodec<GeoPoint> codec) {
 			super( codec );
 		}

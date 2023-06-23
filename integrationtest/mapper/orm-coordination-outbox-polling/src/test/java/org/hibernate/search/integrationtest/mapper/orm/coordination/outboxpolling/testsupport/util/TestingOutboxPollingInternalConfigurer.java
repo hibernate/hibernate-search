@@ -27,7 +27,8 @@ public class TestingOutboxPollingInternalConfigurer implements OutboxPollingInte
 		return this;
 	}
 
-	public TestingOutboxPollingInternalConfigurer agentDisconnectionSimulator(OutboxAgentDisconnectionSimulator agentDisconnectionSimulator) {
+	public TestingOutboxPollingInternalConfigurer agentDisconnectionSimulator(
+			OutboxAgentDisconnectionSimulator agentDisconnectionSimulator) {
 		this.agentDisconnectionSimulator = agentDisconnectionSimulator;
 		return this;
 	}

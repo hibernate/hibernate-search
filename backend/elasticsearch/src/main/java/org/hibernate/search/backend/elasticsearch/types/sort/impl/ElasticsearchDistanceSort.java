@@ -93,9 +93,9 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 
 		@Override
 		public void missingLowest() {
-			throw SortOrder.DESC.equals( order ) ?
-					log.missingLowestOnDescSortNotSupported( field.eventContext() ) :
-					log.missingLowestOnAscSortNotSupported( field.eventContext() );
+			throw SortOrder.DESC.equals( order )
+					? log.missingLowestOnDescSortNotSupported( field.eventContext() )
+					: log.missingLowestOnAscSortNotSupported( field.eventContext() );
 		}
 
 		@Override

@@ -23,7 +23,8 @@ class TermsAggregationOptionsStepImpl<PDF extends SearchPredicateFactory, F>
 	private final TermsAggregationBuilder<F> builder;
 	private final SearchAggregationDslContext<?, ? extends PDF> dslContext;
 
-	TermsAggregationOptionsStepImpl(TermsAggregationBuilder<F> builder, SearchAggregationDslContext<?, ? extends PDF> dslContext) {
+	TermsAggregationOptionsStepImpl(TermsAggregationBuilder<F> builder,
+			SearchAggregationDslContext<?, ? extends PDF> dslContext) {
 		this.builder = builder;
 		this.dslContext = dslContext;
 	}

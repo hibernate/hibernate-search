@@ -46,7 +46,8 @@ public class ProvidedIdIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private StubIndexModel indexModel;
 
@@ -58,7 +59,7 @@ public class ProvidedIdIT {
 		}
 
 		// Schema
-		backendMock.expectSchema( entityAndIndexName, b -> { },
+		backendMock.expectSchema( entityAndIndexName, b -> {},
 				indexModel -> this.indexModel = indexModel );
 		SearchMapping mapping = withBaseConfiguration()
 				.withAnnotatedEntityType( IndexedEntity.class, entityAndIndexName )
@@ -96,7 +97,7 @@ public class ProvidedIdIT {
 		}
 
 		// Schema
-		backendMock.expectSchema( entityAndIndexName, b -> { } );
+		backendMock.expectSchema( entityAndIndexName, b -> {} );
 		SearchMapping mapping = withBaseConfiguration()
 				.withAnnotatedEntityType( IndexedEntity.class, entityAndIndexName )
 				.setup();
@@ -109,7 +110,7 @@ public class ProvidedIdIT {
 			session.indexingPlan().add( 42, null, entity1 );
 
 			backendMock.expectWorks( entityAndIndexName )
-					.add( "42", b -> { } );
+					.add( "42", b -> {} );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -131,7 +132,7 @@ public class ProvidedIdIT {
 			// Check provided ID bridge is applied when fetching IDs
 			backendMock.expectSearchIds(
 					Collections.singletonList( entityAndIndexName ),
-					b -> { },
+					b -> {},
 					StubSearchWorkBehavior.of(
 							1L,
 							Arrays.asList( "42" )
@@ -171,7 +172,8 @@ public class ProvidedIdIT {
 
 	private StandalonePojoMappingSetupHelper.SetupContext withBaseConfiguration() {
 		return setupHelper.start()
-				.withConfiguration( b -> b.providedIdentifierBridge( BeanReference.ofInstance( new NaiveIdentifierBridge() ) ) );
+				.withConfiguration(
+						b -> b.providedIdentifierBridge( BeanReference.ofInstance( new NaiveIdentifierBridge() ) ) );
 	}
 
 	public static class NaiveIdentifierBridge implements IdentifierBridge<Object> {

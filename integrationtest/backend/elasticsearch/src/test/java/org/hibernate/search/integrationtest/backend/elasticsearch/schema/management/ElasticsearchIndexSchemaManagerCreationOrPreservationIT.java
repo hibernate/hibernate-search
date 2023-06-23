@@ -48,9 +48,8 @@ public class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private final StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
-		root.field( "field", f -> f.asString() )
-				.toReference()
+	private final StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> root.field( "field", f -> f.asString() )
+			.toReference()
 	);
 
 	private final ElasticsearchIndexSchemaManagerOperation operation;
@@ -67,10 +66,10 @@ public class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 				simpleMappingForInitialization(
 						"'field': {"
 								+ "  'type': 'keyword'"
-						+ "},"
-						+ "'NOTmyField': {" // Ignored during validation
+								+ "},"
+								+ "'NOTmyField': {" // Ignored during validation
 								+ "  'type': 'date'"
-						+ "}"
+								+ "}"
 				)
 		);
 
@@ -78,10 +77,10 @@ public class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 				simpleMappingForExpectations(
 						"'field': {"
 								+ "  'type': 'keyword'"
-						+ "},"
-						+ "'NOTmyField': {" // Ignored during validation
+								+ "},"
+								+ "'NOTmyField': {" // Ignored during validation
 								+ "  'type': 'date'"
-						+ "}"
+								+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -93,10 +92,10 @@ public class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 				simpleMappingForExpectations(
 						"'field': {"
 								+ "  'type': 'keyword'"
-						+ "},"
-						+ "'NOTmyField': {" // Ignored during validation
+								+ "},"
+								+ "'NOTmyField': {" // Ignored during validation
 								+ "  'type': 'date'"
-						+ "}"
+								+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);

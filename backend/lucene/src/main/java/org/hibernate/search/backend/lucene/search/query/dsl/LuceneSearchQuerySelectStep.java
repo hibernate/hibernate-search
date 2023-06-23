@@ -17,14 +17,13 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 
 public interface LuceneSearchQuerySelectStep<R, E, LOS>
 		extends SearchQuerySelectStep<
-						LuceneSearchQueryOptionsStep<E, LOS>,
-						R,
-						E,
-						LOS,
-						LuceneSearchProjectionFactory<R, E>,
-						LuceneSearchPredicateFactory
-				>,
-				LuceneSearchQueryWhereStep<E, LOS> {
+				LuceneSearchQueryOptionsStep<E, LOS>,
+				R,
+				E,
+				LOS,
+				LuceneSearchProjectionFactory<R, E>,
+				LuceneSearchPredicateFactory>,
+		LuceneSearchQueryWhereStep<E, LOS> {
 
 	@Override
 	LuceneSearchQueryWhereStep<E, LOS> selectEntity();

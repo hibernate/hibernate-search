@@ -59,7 +59,8 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 		if ( resolvedSearchable ) {
 			builder.searchable( true );
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS,
-					DocValues.ENABLED.equals( docValues ) ? new LuceneExistsPredicate.DocValuesBasedFactory<>()
+					DocValues.ENABLED.equals( docValues )
+							? new LuceneExistsPredicate.DocValuesBasedFactory<>()
 							: new LuceneExistsPredicate.DefaultFactory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE,
 					new LuceneGeoPointSpatialWithinCirclePredicate.Factory() );

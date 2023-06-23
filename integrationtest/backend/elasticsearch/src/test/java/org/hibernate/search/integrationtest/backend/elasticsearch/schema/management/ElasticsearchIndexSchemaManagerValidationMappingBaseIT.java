@@ -73,13 +73,14 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 						"'myField': {"
 								+ "  'type': 'date',"
 								+ "  'index': true,"
-								+ "  'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
+								+ "  'format': '"
+								+ elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
 								+ "  'ignore_malformed': true" // Ignored during validation
-						+ "},"
-						+ "'NOTmyField': {" // Ignored during validation
+								+ "},"
+								+ "'NOTmyField': {" // Ignored during validation
 								+ "  'type': 'date',"
 								+ "  'index': true"
-						+ "}"
+								+ "}"
 				)
 		);
 
@@ -101,11 +102,11 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 						"'myField': {"
 								+ "  'type': 'boolean',"
 								+ "  'index': true"
-						+ "},"
-						+ "'NOTmyField': {" // Ignored during validation
+								+ "},"
+								+ "'NOTmyField': {" // Ignored during validation
 								+ "  'type': 'boolean',"
 								+ "  'index': true"
-						+ "}"
+								+ "}"
 				)
 		);
 
@@ -131,11 +132,11 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 								+ "  'type': 'text',"
 								+ "  'index': true,"
 								+ "  'analyzer': 'default'"
-						+ "},"
-						+ "'NOTmyField': {" // Ignored during validation
+								+ "},"
+								+ "'NOTmyField': {" // Ignored during validation
 								+ "  'type': 'text',"
 								+ "  'index': true"
-						+ "}"
+								+ "}"
 				)
 		);
 
@@ -145,7 +146,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 	@Test
 	public void mapping_missing() {
 		assumeTrue(
-				"Skipping this test as there is always a mapping (be it empty) in " + ElasticsearchTestDialect.getActualVersion(),
+				"Skipping this test as there is always a mapping (be it empty) in "
+						+ ElasticsearchTestDialect.getActualVersion(),
 				elasticSearchClient.getDialect().isEmptyMappingPossible()
 		);
 
@@ -166,16 +168,16 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 	@Test
 	public void attribute_field_notPresent() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
-			root -> root.field( "myField", f -> f.asInteger() ).toReference()
+				root -> root.field( "myField", f -> f.asInteger() ).toReference()
 		);
 
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
-					"'notMyField': {"
-							+ "    'type': 'integer',"
-							+ "    'index': true"
-							+ "  }"
+						"'notMyField': {"
+								+ "    'type': 'integer',"
+								+ "    'index': true"
+								+ "  }"
 				)
 		);
 
@@ -206,12 +208,12 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 								+ "  'type': 'long',"
 								+ "  'index': true,"
 								+ "  'store': true"
-						+ "},"
-						+ "'myTextField': {"
+								+ "},"
+								+ "'myTextField': {"
 								+ "  'type': 'text',"
 								+ "  'index': true,"
 								+ "  'norms': true"
-						+ "}"
+								+ "}"
 				)
 		);
 
@@ -231,11 +233,11 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 						"'float': {"
 								+ "  'type': 'float',"
 								+ "  'null_value': 1.7"
-						+ "},"
-						+ "'double': {"
+								+ "},"
+								+ "'double': {"
 								+ "  'type': 'double',"
 								+ "  'null_value': 1.7"
-						+ "}"
+								+ "}"
 				)
 		);
 
@@ -255,22 +257,22 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 						"'float': {"
 								+ "  'type': 'float',"
 								+ "  'null_value': 1.9"
-						+ "},"
-						+ "'double': {"
+								+ "},"
+								+ "'double': {"
 								+ "  'type': 'double',"
 								+ "  'null_value': 1.9"
-						+ "}"
+								+ "}"
 				)
 		);
 
 		setupAndValidateExpectingFailure( index,
 				hasValidationFailureReport()
 						.indexFieldContext( "double" )
-								.mappingAttributeContext( "null_value" )
-										.failure( "Invalid value. Expected '1.7', actual is '1.9'" )
+						.mappingAttributeContext( "null_value" )
+						.failure( "Invalid value. Expected '1.7', actual is '1.9'" )
 						.indexFieldContext( "float" )
-								.mappingAttributeContext( "null_value" )
-										.failure( "Invalid value. Expected '1.7', actual is '1.9'" )
+						.mappingAttributeContext( "null_value" )
+						.failure( "Invalid value. Expected '1.7', actual is '1.9'" )
 		);
 	}
 
@@ -293,22 +295,22 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 						"'float': {"
 								+ "  'type': 'float',"
 								+ "  'null_value': 1.9"
-						+ "},"
-						+ "'double': {"
+								+ "},"
+								+ "'double': {"
 								+ "  'type': 'double',"
 								+ "  'null_value': 1.9"
-						+ "}"
+								+ "}"
 				)
 		);
 
 		setupAndValidateExpectingFailure( index,
 				hasValidationFailureReport()
 						.indexFieldContext( "double" )
-								.mappingAttributeContext( "null_value" )
-										.failure( "Invalid value. Expected '\"BBB\"', actual is '1.9'" )
+						.mappingAttributeContext( "null_value" )
+						.failure( "Invalid value. Expected '\"BBB\"', actual is '1.9'" )
 						.indexFieldContext( "float" )
-								.mappingAttributeContext( "null_value" )
-										.failure( "Invalid value. Expected '\"AAA\"', actual is '1.9'" )
+						.mappingAttributeContext( "null_value" )
+						.failure( "Invalid value. Expected '\"AAA\"', actual is '1.9'" )
 		);
 	}
 
@@ -334,11 +336,12 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 								+ "  'properties': {"
 								+ "    'myField': {"
 								+ "      'type': 'date',"
-								+ "      'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
+								+ "      'format': '"
+								+ elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
 								+ "      'index': false"
 								+ "    }"
 								+ "  }"
-						+ "}"
+								+ "}"
 				)
 		);
 
@@ -363,12 +366,12 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 				"{"
 						+ "  'dynamic': false,"
 						+ "  'properties': {"
-								+ defaultMetadataMappingAndCommaForInitialization()
+						+ defaultMetadataMappingAndCommaForInitialization()
 						+ "    'myField': {"
 						+ "      'type': 'integer'"
 						+ "    }"
 						+ "  }"
-				+ "}"
+						+ "}"
 		);
 
 		setupAndValidateExpectingFailure(

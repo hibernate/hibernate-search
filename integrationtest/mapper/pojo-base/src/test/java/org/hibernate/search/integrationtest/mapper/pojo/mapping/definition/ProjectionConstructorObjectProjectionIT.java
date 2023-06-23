@@ -35,9 +35,10 @@ import org.junit.Test;
 public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionConstructorIT {
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock )
-			// We don't care about reindexing here and don't want to configure association inverse sides
-			.disableAssociationReindexing();
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock )
+					// We don't care about reindexing here and don't want to configure association inverse sides
+					.disableAssociationReindexing();
 
 	@Test
 	public void noArg() {
@@ -60,6 +61,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		}
 		class MyInnerProjection {
 			public final String text;
+
 			@ProjectionConstructor
 			public MyInnerProjection(String text) {
 				this.text = text;
@@ -68,6 +70,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyProjection {
 			public final String text;
 			public final MyInnerProjection contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text, @ObjectProjection MyInnerProjection contained) {
 				this.text = text;
@@ -128,6 +131,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		}
 		class MyInnerProjection {
 			public final String text;
+
 			@ProjectionConstructor
 			public MyInnerProjection(String text) {
 				this.text = text;
@@ -136,6 +140,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyProjection {
 			public final String text;
 			public final MyInnerProjection contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text,
 					@ObjectProjection(path = "myContained") MyInnerProjection contained) {
@@ -198,10 +203,12 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyNonProjection {
 			public final String text;
 			public final Integer integer;
+
 			public MyNonProjection() {
 				this.text = "foo";
 				this.integer = 42;
 			}
+
 			public MyNonProjection(String text, Integer integer) {
 				this.text = text;
 				this.integer = integer;
@@ -209,6 +216,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		}
 		class MyProjection {
 			public final MyNonProjection contained;
+
 			@ProjectionConstructor
 			public MyProjection(@ObjectProjection MyNonProjection contained) {
 				this.contained = contained;
@@ -250,6 +258,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		}
 		class MyInnerProjection {
 			public final String text;
+
 			@ProjectionConstructor
 			public MyInnerProjection(String text) {
 				this.text = text;
@@ -258,6 +267,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyProjection {
 			public final String text;
 			public final MyInnerProjection contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text,
 					@ObjectProjection(includePaths = "doesNotExist") MyInnerProjection contained) {
@@ -304,6 +314,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		}
 		class MyInnerProjection {
 			public final String text;
+
 			@ProjectionConstructor
 			public MyInnerProjection(String text) {
 				this.text = text;
@@ -312,6 +323,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyProjection {
 			public final String text;
 			public final MyInnerProjection contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text,
 					@ObjectProjection(excludePaths = "doesNotExist") MyInnerProjection contained) {
@@ -368,6 +380,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		}
 		class MyInnerProjectionLevel2 {
 			public final String text;
+
 			@ProjectionConstructor
 			public MyInnerProjectionLevel2(String text) {
 				this.text = text;
@@ -376,6 +389,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyInnerProjectionLevel1 {
 			public final String text;
 			public final MyInnerProjectionLevel2 contained;
+
 			@ProjectionConstructor
 			public MyInnerProjectionLevel1(String text,
 					@ObjectProjection MyInnerProjectionLevel2 contained) {
@@ -386,6 +400,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyProjection {
 			public final String text;
 			public final MyInnerProjectionLevel1 contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text, @ObjectProjection MyInnerProjectionLevel1 contained) {
 				this.text = text;
@@ -468,6 +483,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		}
 		class MyInnerProjectionLevel2 {
 			public final String text;
+
 			@ProjectionConstructor
 			public MyInnerProjectionLevel2(String text) {
 				this.text = text;
@@ -476,6 +492,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyInnerProjectionLevel1 {
 			public final String text;
 			public final MyInnerProjectionLevel2 contained;
+
 			@ProjectionConstructor
 			public MyInnerProjectionLevel1(String text,
 					@ObjectProjection MyInnerProjectionLevel2 contained) {
@@ -486,6 +503,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyProjection {
 			public final String text;
 			public final MyInnerProjectionLevel1 contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text,
 					@ObjectProjection(includeDepth = 1) MyInnerProjectionLevel1 contained) {
@@ -557,6 +575,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		}
 		class MyInnerProjectionLevel2 {
 			public final String text;
+
 			@ProjectionConstructor
 			public MyInnerProjectionLevel2(String text) {
 				this.text = text;
@@ -565,6 +584,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyInnerProjectionLevel1 {
 			public final String text;
 			public final List<MyInnerProjectionLevel2> contained;
+
 			@ProjectionConstructor
 			public MyInnerProjectionLevel1(String text,
 					@ObjectProjection List<MyInnerProjectionLevel2> contained) {
@@ -575,6 +595,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyProjection {
 			public final String text;
 			public final MyInnerProjectionLevel1 contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text,
 					@ObjectProjection(includeDepth = 1) MyInnerProjectionLevel1 contained) {
@@ -637,6 +658,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyInnerProjection {
 			public final String text;
 			public final Integer integer;
+
 			@ProjectionConstructor
 			public MyInnerProjection(String text, Integer integer) {
 				this.text = text;
@@ -646,6 +668,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyProjection {
 			public final String text;
 			public final List<MyInnerProjection> contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text, @ObjectProjection List<MyInnerProjection> contained) {
 				this.text = text;
@@ -725,6 +748,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyInnerProjection {
 			public final String text;
 			public final Integer integer;
+
 			@ProjectionConstructor
 			public MyInnerProjection(String text, Integer integer) {
 				this.text = text;
@@ -734,6 +758,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyProjection {
 			public final String text;
 			public final Collection<MyInnerProjection> contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text, @ObjectProjection Collection<MyInnerProjection> contained) {
 				this.text = text;
@@ -813,6 +838,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyInnerProjection {
 			public final String text;
 			public final Integer integer;
+
 			@ProjectionConstructor
 			public MyInnerProjection(String text, Integer integer) {
 				this.text = text;
@@ -822,6 +848,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyProjection {
 			public final String text;
 			public final Iterable<MyInnerProjection> contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text, @ObjectProjection Iterable<MyInnerProjection> contained) {
 				this.text = text;
@@ -901,6 +928,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyInnerProjection {
 			public final String text;
 			public final Integer integer;
+
 			@ProjectionConstructor
 			public MyInnerProjection(String text, Integer integer) {
 				this.text = text;
@@ -910,6 +938,7 @@ public class ProjectionConstructorObjectProjectionIT extends AbstractProjectionC
 		class MyProjection {
 			public final String text;
 			public final Set<MyInnerProjection> contained;
+
 			@ProjectionConstructor
 			public MyProjection(String text, @ObjectProjection Set<MyInnerProjection> contained) {
 				this.text = text;

@@ -15,7 +15,8 @@ import org.hibernate.search.annotations.Indexed;
 /**
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
-@Entity @Indexed
+@Entity
+@Indexed
 public class IssueEntity {
 
 	@Id

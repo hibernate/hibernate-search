@@ -19,7 +19,7 @@ import javax.inject.Scope;
 /**
  * Scope for job execution, to be mapped to the scopes specific to each JSR-352 implementation.
  */
-@Target({TYPE})
+@Target({ TYPE })
 @Retention(RUNTIME)
 @Documented
 @Scope

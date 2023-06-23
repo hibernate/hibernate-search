@@ -45,4 +45,3 @@ public interface Facet {
 	int getCount();
 }
 
-

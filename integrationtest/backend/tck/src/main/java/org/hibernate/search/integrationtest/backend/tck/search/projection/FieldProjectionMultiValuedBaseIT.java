@@ -70,9 +70,9 @@ public class FieldProjectionMultiValuedBaseIT<F> {
 			root -> SingleFieldIndexBinding.create(
 					root,
 					supportedFieldTypes,
-					TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault() ?
-							NO_ADDITIONAL_CONFIGURATION :
-							c -> c.projectable( Projectable.YES )
+					TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+							? NO_ADDITIONAL_CONFIGURATION
+							: c -> c.projectable( Projectable.YES )
 			);
 
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> index = SimpleMappedIndex.of( bindingFactory );
@@ -147,11 +147,10 @@ public class FieldProjectionMultiValuedBaseIT<F> {
 		String fieldPath = getFieldPath();
 
 		assertThatQuery( scope.query()
-				.select( f ->
-						f.composite(
-								f.field( fieldPath, fieldType.getJavaType() ).multi(),
-								f.field( fieldPath, fieldType.getJavaType() ).multi()
-						)
+				.select( f -> f.composite(
+						f.field( fieldPath, fieldType.getJavaType() ).multi(),
+						f.field( fieldPath, fieldType.getJavaType() ).multi()
+				)
 				)
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )

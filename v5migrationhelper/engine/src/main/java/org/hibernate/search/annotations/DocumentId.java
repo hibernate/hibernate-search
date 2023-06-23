@@ -30,6 +30,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
 @Deprecated
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = DocumentIdAnnotationProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = DocumentIdAnnotationProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface DocumentId {
 }

@@ -35,8 +35,8 @@ public abstract class AggregationDescriptor {
 	}
 
 	public abstract <F> ExpectationsAlternative<
-					SupportedSingleFieldAggregationExpectations<F>,
-					UnsupportedSingleFieldAggregationExpectations
-			> getSingleFieldAggregationExpectations(FieldTypeDescriptor<F> typeDescriptor);
+			SupportedSingleFieldAggregationExpectations<F>,
+			UnsupportedSingleFieldAggregationExpectations> getSingleFieldAggregationExpectations(
+					FieldTypeDescriptor<F> typeDescriptor);
 
 }

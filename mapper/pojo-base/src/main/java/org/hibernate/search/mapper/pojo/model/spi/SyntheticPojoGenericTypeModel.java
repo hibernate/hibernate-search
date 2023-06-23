@@ -24,7 +24,7 @@ public final class SyntheticPojoGenericTypeModel<T> extends AbstractPojoGenericT
 	}
 
 	public static <T> PojoTypeModel<T> genericType(PojoRawTypeModel<? super T> rawTypeModel,
-			PojoTypeModel<?> firstTypeArgument, PojoTypeModel<?> ... otherTypeArguments) {
+			PojoTypeModel<?> firstTypeArgument, PojoTypeModel<?>... otherTypeArguments) {
 		return new SyntheticPojoGenericTypeModel<>( rawTypeModel, null,
 				CollectionHelper.asList( firstTypeArgument, otherTypeArguments ) );
 	}

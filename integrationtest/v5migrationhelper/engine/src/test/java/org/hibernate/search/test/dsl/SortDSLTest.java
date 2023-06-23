@@ -45,8 +45,8 @@ public class SortDSLTest {
 		IndexedEntry entry0 = new IndexedEntry( 0 )
 				.setTextField(
 						"infrequent1 infrequent2 infrequent1"
-						+ " inMultipleDocsWithUniqueScores"
-						+ " inMultipleDocsWithVariousScores inMultipleDocsWithVariousScores"
+								+ " inMultipleDocsWithUniqueScores"
+								+ " inMultipleDocsWithVariousScores inMultipleDocsWithVariousScores"
 				)
 				.setNonUniqueIntgerField( 1 )
 				.setUniqueIntegerField( 3 )
@@ -60,7 +60,7 @@ public class SortDSLTest {
 		IndexedEntry entry1 = new IndexedEntry( 1 )
 				.setTextField(
 						"inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores"
-						+ " inMultipleDocsWithVariousScores"
+								+ " inMultipleDocsWithVariousScores"
 				)
 				.setNonUniqueIntgerField( 2 )
 				.setUniqueIntegerField( 1 )
@@ -80,8 +80,8 @@ public class SortDSLTest {
 		IndexedEntry entry3 = new IndexedEntry( 3 )
 				.setTextField(
 						"infrequent1"
-						+ " inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores"
-						+ " inMultipleDocsWithVariousScores"
+								+ " inMultipleDocsWithUniqueScores inMultipleDocsWithUniqueScores"
+								+ " inMultipleDocsWithVariousScores"
 				)
 				.setNonUniqueIntgerField( 1 )
 				.setUniqueIntegerField( 4 )
@@ -125,14 +125,14 @@ public class SortDSLTest {
 
 		sort = builder().sort()
 				.byScore()
-						.asc()
+				.asc()
 				.createSort();
 		helper.assertThatQuery( query ).from( IndexedEntry.class )
 				.sort( sort ).matchesExactlyIds( 3, 0 );
 
 		sort = builder().sort()
 				.byScore()
-						.desc()
+				.desc()
 				.createSort();
 		helper.assertThatQuery( query ).from( IndexedEntry.class )
 				.sort( sort ).matchesExactlyIds( 0, 3 );
@@ -148,14 +148,14 @@ public class SortDSLTest {
 
 		sort = builder().sort()
 				.byIndexOrder()
-						.asc()
+				.asc()
 				.createSort();
 		// Index order is not deterministic
 		assertQueryAll( sort ).matchesUnorderedIds( 0, 1, 2, 3 );
 
 		sort = builder().sort()
 				.byIndexOrder()
-						.desc()
+				.desc()
 				.createSort();
 		// Index order is not deterministic
 		assertQueryAll( sort ).matchesUnorderedIds( 0, 1, 2, 3 );
@@ -172,13 +172,13 @@ public class SortDSLTest {
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
-						.asc()
+				.asc()
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 1, 0, 3, 2 );
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
-						.desc()
+				.desc()
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 1, 2 );
 	}
@@ -187,21 +187,21 @@ public class SortDSLTest {
 	public void singleField_double_missingValue_use() throws Exception {
 		Sort sort = builder().sort()
 				.byField( "uniqueDoubleField" )
-						.onMissingValue().use( 1.5d )
+				.onMissingValue().use( 1.5d )
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 1, 2, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
-						.asc()
-						.onMissingValue().use( 1.5d )
+				.asc()
+				.onMissingValue().use( 1.5d )
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 1, 2, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
-						.desc()
-						.onMissingValue().use( 1.5d )
+				.desc()
+				.onMissingValue().use( 1.5d )
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 2, 1 );
 	}
@@ -210,21 +210,21 @@ public class SortDSLTest {
 	public void singleField_integer_missingValue_use() throws Exception {
 		Sort sort = builder().sort()
 				.byField( "uniqueIntegerField" )
-						.onMissingValue().use( 2 )
+				.onMissingValue().use( 2 )
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 1, 2, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueIntegerField" )
-						.asc()
-						.onMissingValue().use( 2 )
+				.asc()
+				.onMissingValue().use( 2 )
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 1, 2, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueIntegerField" )
-						.desc()
-						.onMissingValue().use( 2 )
+				.desc()
+				.onMissingValue().use( 2 )
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 2, 1 );
 	}
@@ -233,21 +233,21 @@ public class SortDSLTest {
 	public void singleField_double_missingValue_sortFirst() throws Exception {
 		Sort sort = builder().sort()
 				.byField( "uniqueDoubleField" )
-						.onMissingValue().sortFirst()
+				.onMissingValue().sortFirst()
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
-						.asc()
-						.onMissingValue().sortFirst()
+				.asc()
+				.onMissingValue().sortFirst()
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
-						.desc()
-						.onMissingValue().sortFirst()
+				.desc()
+				.onMissingValue().sortFirst()
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 2, 3, 0, 1 );
 	}
@@ -256,21 +256,21 @@ public class SortDSLTest {
 	public void singleField_integer_missingValue_sortFirst() throws Exception {
 		Sort sort = builder().sort()
 				.byField( "uniqueIntegerField" )
-						.onMissingValue().sortFirst()
+				.onMissingValue().sortFirst()
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueIntegerField" )
-						.asc()
-						.onMissingValue().sortFirst()
+				.asc()
+				.onMissingValue().sortFirst()
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "uniqueIntegerField" )
-						.desc()
-						.onMissingValue().sortFirst()
+				.desc()
+				.onMissingValue().sortFirst()
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 2, 3, 0, 1 );
 	}
@@ -279,21 +279,21 @@ public class SortDSLTest {
 	public void singleField_missingValue_sortLast() throws Exception {
 		Sort sort = builder().sort()
 				.byField( "uniqueDoubleField" )
-						.onMissingValue().sortLast()
+				.onMissingValue().sortLast()
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 1, 0, 3, 2 );
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
-						.asc()
-						.onMissingValue().sortLast()
+				.asc()
+				.onMissingValue().sortLast()
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 1, 0, 3, 2 );
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
-						.desc()
-						.onMissingValue().sortLast()
+				.desc()
+				.onMissingValue().sortLast()
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 1, 2 );
 	}
@@ -309,7 +309,7 @@ public class SortDSLTest {
 		sort = builder().sort()
 				.byField( "nonUniqueIntegerField" )
 				.andByField( "uniqueDoubleField" )
-						.asc()
+				.asc()
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 0, 3, 2, 1 );
 
@@ -325,24 +325,24 @@ public class SortDSLTest {
 	public void distance() throws Exception {
 		Sort sort = builder().sort()
 				.byDistance()
-						.onField( "location" )
-						.fromLatitude( 24 ).andLongitude( 32 )
+				.onField( "location" )
+				.fromLatitude( 24 ).andLongitude( 32 )
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 0, 1, 3, 2 );
 
 		sort = builder().sort()
 				.byDistance()
-						.onField( "location" )
-						.fromLatitude( 24 ).andLongitude( 32 )
-						.asc()
+				.onField( "location" )
+				.fromLatitude( 24 ).andLongitude( 32 )
+				.asc()
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 0, 1, 3, 2 );
 
 		sort = builder().sort()
 				.byDistance()
-						.onField( "location" )
-						.fromLatitude( 24 ).andLongitude( 32 )
-						.desc()
+				.onField( "location" )
+				.fromLatitude( 24 ).andLongitude( 32 )
+				.desc()
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 2, 3, 1, 0 );
 	}
@@ -362,14 +362,14 @@ public class SortDSLTest {
 
 		sort = builder().sort()
 				.byField( "nonUniqueIntegerField" )
-						.asc()
+				.asc()
 				.andByScore()
 				.createSort();
 		assertQuery( query, sort ).matchesExactlyIds( 3, 0, 1 );
 
 		sort = builder().sort()
 				.byField( "nonUniqueIntegerField" )
-						.desc()
+				.desc()
 				.andByScore()
 				.createSort();
 		assertQuery( query, sort ).matchesExactlyIds( 1, 3, 0 );
@@ -390,14 +390,14 @@ public class SortDSLTest {
 
 		sort = builder().sort()
 				.byScore()
-						.asc()
+				.asc()
 				.andByField( "uniqueDoubleField" )
 				.createSort();
 		assertQuery( query, sort ).matchesExactlyIds( 1, 3, 0 );
 
 		sort = builder().sort()
 				.byScore()
-						.desc()
+				.desc()
 				.andByField( "uniqueDoubleField" )
 				.createSort();
 		assertQuery( query, sort ).matchesExactlyIds( 0, 1, 3 );
@@ -415,13 +415,13 @@ public class SortDSLTest {
 
 		sort = builder().sort()
 				.byField( "previous.uniqueDoubleField" )
-						.asc()
+				.asc()
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "previous.uniqueDoubleField" )
-						.desc()
+				.desc()
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 0, 1, 2, 3 );
 	}

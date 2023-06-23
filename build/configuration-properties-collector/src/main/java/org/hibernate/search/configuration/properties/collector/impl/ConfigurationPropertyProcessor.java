@@ -20,10 +20,12 @@ import java.util.function.Predicate;
 
 public class ConfigurationPropertyProcessor implements AutoCloseable {
 
-	private static final Predicate<Map.Entry<String, ConfigurationProperty>> API_FILTER = entry -> ConfigurationProperty.Type.API.equals(
-			entry.getValue().type() );
-	private static final Predicate<Map.Entry<String, ConfigurationProperty>> SPI_FILTER = entry -> ConfigurationProperty.Type.SPI.equals(
-			entry.getValue().type() );
+	private static final Predicate<Map.Entry<String, ConfigurationProperty>> API_FILTER =
+			entry -> ConfigurationProperty.Type.API.equals(
+					entry.getValue().type() );
+	private static final Predicate<Map.Entry<String, ConfigurationProperty>> SPI_FILTER =
+			entry -> ConfigurationProperty.Type.SPI.equals(
+					entry.getValue().type() );
 
 	private final ConfigurationPropertyCollector propertyCollector;
 	private final String fileName;

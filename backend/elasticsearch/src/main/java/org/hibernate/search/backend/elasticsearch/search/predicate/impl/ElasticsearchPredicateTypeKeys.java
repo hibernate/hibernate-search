@@ -18,7 +18,8 @@ public final class ElasticsearchPredicateTypeKeys {
 		return SearchQueryElementTypeKey.of( "predicate", name );
 	}
 
-	public static final SearchQueryElementTypeKey<ElasticsearchSimpleQueryStringPredicateBuilderFieldState> SIMPLE_QUERY_STRING =
-			key( "simple-query-string" );
+	public static final SearchQueryElementTypeKey<
+			ElasticsearchSimpleQueryStringPredicateBuilderFieldState> SIMPLE_QUERY_STRING =
+					key( "simple-query-string" );
 
 }

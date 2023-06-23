@@ -208,7 +208,8 @@ class LuceneStringIndexFieldTypeOptionsStep
 			}
 			else {
 				builder.queryElementFactory( PredicateTypeKeys.EXISTS,
-						DocValues.ENABLED.equals( docValues ) ? new LuceneExistsPredicate.DocValuesBasedFactory<>()
+						DocValues.ENABLED.equals( docValues )
+								? new LuceneExistsPredicate.DocValuesBasedFactory<>()
 								: new LuceneExistsPredicate.DefaultFactory<>() );
 			}
 			builder.queryElementFactory( PredicateTypeKeys.PHRASE, new LuceneTextPhrasePredicate.Factory<>() );
@@ -260,8 +261,9 @@ class LuceneStringIndexFieldTypeOptionsStep
 
 	private ResolvedTermVector resolveTermVector() {
 		TermVector localTermVector = termVector;
-		if ( highlightable != null && ( highlightable.contains( Highlightable.ANY )
-				|| highlightable.contains( Highlightable.FAST_VECTOR ) ) ) {
+		if ( highlightable != null
+				&& ( highlightable.contains( Highlightable.ANY )
+						|| highlightable.contains( Highlightable.FAST_VECTOR ) ) ) {
 			if ( TermVector.DEFAULT.equals( termVector ) ) {
 				localTermVector = TermVector.WITH_POSITIONS_OFFSETS;
 			}
@@ -296,7 +298,8 @@ class LuceneStringIndexFieldTypeOptionsStep
 		}
 	}
 
-	private static FieldType getFieldType(boolean projectable, boolean searchable, boolean analyzed, boolean norms, ResolvedTermVector termVector) {
+	private static FieldType getFieldType(boolean projectable, boolean searchable, boolean analyzed, boolean norms,
+			ResolvedTermVector termVector) {
 		FieldType fieldType = new FieldType();
 
 		if ( !searchable ) {
@@ -344,7 +347,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 			this.payloads = payloads;
 		}
 
-		private void applyTo( FieldType fieldType ) {
+		private void applyTo(FieldType fieldType) {
 			fieldType.setStoreTermVectors( store );
 			fieldType.setStoreTermVectorPositions( positions );
 			fieldType.setStoreTermVectorOffsets( offsets );

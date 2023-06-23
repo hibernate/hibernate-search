@@ -38,7 +38,8 @@ public abstract class AbstractElasticsearchNestablePredicate extends AbstractEla
 		checkNestableWithin( context.getNestedPath() );
 
 		List<String> nestedPathHierarchy = getNestedPathHierarchy();
-		String expectedNestedPath = nestedPathHierarchy.isEmpty() ? null
+		String expectedNestedPath = nestedPathHierarchy.isEmpty()
+				? null
 				: nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
 
 		if ( Objects.equals( context.getNestedPath(), expectedNestedPath ) ) {

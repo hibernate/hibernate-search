@@ -48,7 +48,8 @@ public final class JobContextUtil {
 			String entityTypes) {
 		JobContextData data = (JobContextData) jobContext.getTransientUserData();
 		if ( data == null ) {
-			EntityManagerFactory emf = getEntityManagerFactory( emfRegistry, entityManagerFactoryNamespace, entityManagerFactoryReference );
+			EntityManagerFactory emf =
+					getEntityManagerFactory( emfRegistry, entityManagerFactoryNamespace, entityManagerFactoryReference );
 			data = createData( emf, entityTypes );
 			jobContext.setTransientUserData( data );
 		}

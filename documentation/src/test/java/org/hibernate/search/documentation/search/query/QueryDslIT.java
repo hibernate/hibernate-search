@@ -100,8 +100,8 @@ public class QueryDslIT {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::targeting-multiple[]
 			SearchResult<Person> result = searchSession.search( Arrays.asList( // <1>
-							Manager.class, Associate.class
-					) )
+					Manager.class, Associate.class
+			) )
 					.where( f -> f.match() // <2>
 							.field( "name" )
 							.matching( "james" ) )
@@ -122,11 +122,11 @@ public class QueryDslIT {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::targeting-entityName[]
 			SearchResult<Person> result = searchSession.search( // <1>
-							searchSession.scope( // <2>
-									Person.class,
-									Arrays.asList( "Manager", "Associate" )
-							)
+					searchSession.scope( // <2>
+							Person.class,
+							Arrays.asList( "Manager", "Associate" )
 					)
+			)
 					.where( f -> f.match() // <3>
 							.field( "name" )
 							.matching( "james" ) )

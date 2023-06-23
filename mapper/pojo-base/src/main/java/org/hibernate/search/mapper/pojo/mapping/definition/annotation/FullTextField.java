@@ -48,7 +48,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(FullTextField.List.class)
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = FullTextFieldProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = FullTextFieldProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface FullTextField {
 
 	/**

@@ -69,7 +69,8 @@ public abstract class AbstractPredicateScaleCheckingIT {
 		assertThatThrownBy( () -> predicate( scope.predicate(), bigDecimalFieldPath(), dataSet.bigDecimal0 ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Inconsistent configuration for field '" + bigDecimalFieldPath() + "' in a search query across multiple indexes",
+						"Inconsistent configuration for field '" + bigDecimalFieldPath()
+								+ "' in a search query across multiple indexes",
 						"Inconsistent support for '" + predicateNameInErrorMessage() + "'",
 						"Field codec differs:", "decimalScale=2", " vs. ", "decimalScale=7"
 				)
@@ -80,7 +81,8 @@ public abstract class AbstractPredicateScaleCheckingIT {
 		assertThatThrownBy( () -> predicate( scope.predicate(), bigIntegerFieldPath(), dataSet.bigInteger0 ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Inconsistent configuration for field '" + bigIntegerFieldPath() + "' in a search query across multiple indexes",
+						"Inconsistent configuration for field '" + bigIntegerFieldPath()
+								+ "' in a search query across multiple indexes",
 						"Inconsistent support for '" + predicateNameInErrorMessage() + "'",
 						"Field codec differs:", "decimalScale=-2", " vs. ", "decimalScale=-7"
 				)

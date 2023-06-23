@@ -71,12 +71,14 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  * of {@link org.hibernate.search.spatial.Coordinates} and simply use {@link GenericField} on properties of this type.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.METHOD, ElementType.FIELD, ElementType.TYPE })
+@Target({ ElementType.METHOD, ElementType.FIELD, ElementType.TYPE })
 @Documented
 @Deprecated
 @Repeatable(Spatials.class)
-@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = SpatialAnnotationProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = SpatialAnnotationProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = SpatialAnnotationProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = SpatialAnnotationProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface Spatial {
 	/**
 	 * Prefix used to generate field names for a default {@link Spatial} annotation

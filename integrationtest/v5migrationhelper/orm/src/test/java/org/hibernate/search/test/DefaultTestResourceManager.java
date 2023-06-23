@@ -59,7 +59,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	private Path baseIndexDir;
 	private Session session;
 	private SearchFactory searchFactory;
-	private Map<String,Object> configurationSettings;
+	private Map<String, Object> configurationSettings;
 
 	public DefaultTestResourceManager(TestConfiguration test, V5MigrationHelperOrmSetupHelper setupHelper) {
 		this.test = test;
@@ -94,14 +94,14 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 
 		Class<?>[] annotatedClasses = test.getAnnotatedClasses();
 		if ( annotatedClasses != null ) {
-			setupContext = setupContext.withConfiguration( builder ->
-					builder.addAnnotatedClasses( Arrays.asList( annotatedClasses ) ) );
+			setupContext = setupContext
+					.withConfiguration( builder -> builder.addAnnotatedClasses( Arrays.asList( annotatedClasses ) ) );
 		}
 
 		return setupContext.setup().unwrap( SessionFactoryImplementor.class );
 	}
 
-	private Map<String,Object> getConfigurationSettings() {
+	private Map<String, Object> getConfigurationSettings() {
 		if ( configurationSettings == null ) {
 			configurationSettings = new HashMap<>();
 			test.configure( configurationSettings );

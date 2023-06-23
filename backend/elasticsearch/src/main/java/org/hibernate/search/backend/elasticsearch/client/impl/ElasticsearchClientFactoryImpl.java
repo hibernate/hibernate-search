@@ -48,8 +48,8 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends RestClient>>
-			CLIENT_INSTANCE = ConfigurationProperty.forKey( ElasticsearchBackendSpiSettings.CLIENT_INSTANCE )
+	private static final OptionalConfigurationProperty<BeanReference<? extends RestClient>> CLIENT_INSTANCE =
+			ConfigurationProperty.forKey( ElasticsearchBackendSpiSettings.CLIENT_INSTANCE )
 					.asBeanReference( RestClient.class )
 					.build();
 
@@ -125,10 +125,11 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 					.withDefault( ElasticsearchBackendSettings.Defaults.DISCOVERY_REFRESH_INTERVAL )
 					.build();
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends ElasticsearchHttpClientConfigurer>>
-			CLIENT_CONFIGURER = ConfigurationProperty.forKey( ElasticsearchBackendSettings.CLIENT_CONFIGURER )
-			.asBeanReference( ElasticsearchHttpClientConfigurer.class )
-			.build();
+	private static final OptionalConfigurationProperty<
+			BeanReference<? extends ElasticsearchHttpClientConfigurer>> CLIENT_CONFIGURER =
+					ConfigurationProperty.forKey( ElasticsearchBackendSettings.CLIENT_CONFIGURER )
+							.asBeanReference( ElasticsearchHttpClientConfigurer.class )
+							.build();
 
 	private static final OptionalConfigurationProperty<Long> MAX_KEEP_ALIVE =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MAX_KEEP_ALIVE )
@@ -217,8 +218,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		if ( discoveryEnabled ) {
 			SnifferBuilder builder = Sniffer.builder( client )
 					.setSniffIntervalMillis(
-							DISCOVERY_REFRESH_INTERVAL.get( propertySource )
-							* 1_000 // The configured value is in seconds
+							DISCOVERY_REFRESH_INTERVAL.get( propertySource ) * 1_000 // The configured value is in seconds
 					);
 
 			// https discovery support

@@ -24,7 +24,7 @@ import org.hibernate.search.util.common.impl.Contracts;
 
 class RegexpPredicateFieldMoreStepImpl
 		implements RegexpPredicateFieldMoreStep<RegexpPredicateFieldMoreStepImpl, RegexpPredicateOptionsStep<?>>,
-				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
+		AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
 
 	private final CommonState commonState;
 

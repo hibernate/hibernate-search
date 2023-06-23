@@ -26,7 +26,8 @@ public class MassIndexingEntityFailureContext extends MassIndexingFailureContext
 	private MassIndexingEntityFailureContext(Builder builder) {
 		super( builder );
 		this.failingEntityReferences = builder.failingEntityReferences == null
-				? Collections.emptyList() : Collections.unmodifiableList( builder.failingEntityReferences );
+				? Collections.emptyList()
+				: Collections.unmodifiableList( builder.failingEntityReferences );
 	}
 
 	@Override

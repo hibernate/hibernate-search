@@ -202,11 +202,12 @@ public class DocumentElementMultiValuedIT<F> {
 			DocumentElement level1 = document.addObject( index.binding().singleValuedFlattenedObject.self );
 			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
 		} );
-		expectSingleValuedException( "2", "singleValuedFlattenedObject." + singleValuedFieldModel.relativeFieldName, document -> {
-			DocumentElement level1 = document.addObject( index.binding().singleValuedFlattenedObject.self );
-			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
-			level1.addValue( singleValuedFieldModel.reference, getValue( 1 ) );
-		} );
+		expectSingleValuedException( "2", "singleValuedFlattenedObject." + singleValuedFieldModel.relativeFieldName,
+				document -> {
+					DocumentElement level1 = document.addObject( index.binding().singleValuedFlattenedObject.self );
+					level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
+					level1.addValue( singleValuedFieldModel.reference, getValue( 1 ) );
+				} );
 		expectSuccess( "3", document -> {
 			DocumentElement level1 = document.addObject( index.binding().singleValuedFlattenedObject.self );
 			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
@@ -227,11 +228,12 @@ public class DocumentElementMultiValuedIT<F> {
 			DocumentElement level1 = document.addObject( index.binding().multiValuedFlattenedObject.self );
 			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
 		} );
-		expectSingleValuedException( "2", "multiValuedFlattenedObject." + singleValuedFieldModel.relativeFieldName, document -> {
-			DocumentElement level1 = document.addObject( index.binding().multiValuedFlattenedObject.self );
-			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
-			level1.addValue( singleValuedFieldModel.reference, getValue( 1 ) );
-		} );
+		expectSingleValuedException( "2", "multiValuedFlattenedObject." + singleValuedFieldModel.relativeFieldName,
+				document -> {
+					DocumentElement level1 = document.addObject( index.binding().multiValuedFlattenedObject.self );
+					level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
+					level1.addValue( singleValuedFieldModel.reference, getValue( 1 ) );
+				} );
 		expectSuccess( "3", document -> {
 			DocumentElement level1 = document.addObject( index.binding().multiValuedFlattenedObject.self );
 			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
@@ -298,7 +300,8 @@ public class DocumentElementMultiValuedIT<F> {
 		executeAdd( id, documentContributor );
 	}
 
-	private void expectSingleValuedException(String id, String absoluteFieldPath, Consumer<DocumentElement> documentContributor) {
+	private void expectSingleValuedException(String id, String absoluteFieldPath,
+			Consumer<DocumentElement> documentContributor) {
 		assertThatThrownBy(
 				() -> executeAdd( id, documentContributor ),
 				"Multiple values written to field '" + absoluteFieldPath + "'"
@@ -367,6 +370,7 @@ public class DocumentElementMultiValuedIT<F> {
 
 	private static class FirstLevelObjectBinding extends AbstractObjectBinding {
 		final IndexObjectFieldReference self;
+
 		FirstLevelObjectBinding(IndexSchemaObjectField objectField) {
 			super( objectField );
 			self = objectField.toReference();

@@ -46,5 +46,5 @@ public interface RangePredicateFieldStep<N extends RangePredicateFieldMoreStep<?
 	 *
 	 * @see #field(String)
 	 */
-	N fields(String ... fieldPaths);
+	N fields(String... fieldPaths);
 }

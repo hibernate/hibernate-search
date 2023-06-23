@@ -17,17 +17,17 @@ public enum DynamicMapping {
 	/**
 	 * Add unknown fields to the schema dynamically
 	 */
-	TRUE("true"),
+	TRUE( "true" ),
 
 	/**
 	 * Ignore unknown fields
 	 */
-	FALSE("false"),
+	FALSE( "false" ),
 
 	/**
 	 * Throw an exception on unknown fields
 	 */
-	STRICT("strict");
+	STRICT( "strict" );
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

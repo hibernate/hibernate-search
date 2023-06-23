@@ -87,7 +87,9 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 	public static class Factory<F>
 			extends
-			AbstractLuceneCodecAwareSearchQueryElementFactory<RangeAggregationBuilder.TypeSelector, F, AbstractLuceneNumericFieldCodec<F, ?>> {
+			AbstractLuceneCodecAwareSearchQueryElementFactory<RangeAggregationBuilder.TypeSelector,
+					F,
+					AbstractLuceneNumericFieldCodec<F, ?>> {
 		public Factory(AbstractLuceneNumericFieldCodec<F, ?> codec) {
 			super( codec );
 		}

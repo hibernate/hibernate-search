@@ -54,7 +54,8 @@ public class DocumentIdBaseIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void identifierBridge_default_noMatch() {
@@ -163,21 +164,24 @@ public class DocumentIdBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure( "Invalid bridge for input type '" + Integer.class.getName()
-										+ "': '" + MyStringBridge.TOSTRING + "'",
+								+ "': '" + MyStringBridge.TOSTRING + "'",
 								"This bridge expects an input of type '" + String.class.getName() + "'." ) );
 	}
 
 	public static class MyStringBridge implements IdentifierBridge<String> {
 		private static final String TOSTRING = "<MyStringBridge toString() result>";
+
 		@Override
 		public String fromDocumentIdentifier(String documentIdentifier,
 				IdentifierBridgeFromDocumentIdentifierContext context) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
+
 		@Override
 		public String toDocumentIdentifier(String propertyValue, IdentifierBridgeToDocumentIdentifierContext context) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
+
 		@Override
 		public String toString() {
 			return TOSTRING;
@@ -198,7 +202,7 @@ public class DocumentIdBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure( "Invalid bridge for input type '" + Object.class.getName()
-										+ "': '" + MyNumberBridge.TOSTRING + "'",
+								+ "': '" + MyNumberBridge.TOSTRING + "'",
 								"This bridge expects an input of type '" + Number.class.getName() + "'" ) );
 	}
 
@@ -216,21 +220,24 @@ public class DocumentIdBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure( "Invalid bridge for input type '" + Integer.class.getName()
-										+ "': '" + MyNumberBridge.TOSTRING + "'",
+								+ "': '" + MyNumberBridge.TOSTRING + "'",
 								"This bridge expects an input of type '" + Number.class.getName() + "'." ) );
 	}
 
 	public static class MyNumberBridge implements IdentifierBridge<Number> {
 		private static final String TOSTRING = "<MyNumberBridge toString() result>";
+
 		@Override
 		public Number fromDocumentIdentifier(String documentIdentifier,
 				IdentifierBridgeFromDocumentIdentifierContext context) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
+
 		@Override
 		public String toDocumentIdentifier(Number propertyValue, IdentifierBridgeToDocumentIdentifierContext context) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
+
 		@Override
 		public String toString() {
 			return TOSTRING;

@@ -23,16 +23,15 @@ import org.hibernate.search.engine.search.query.dsl.spi.AbstractExtendedSearchQu
 
 class ElasticsearchSearchQueryOptionsStepImpl<H, LOS>
 		extends AbstractExtendedSearchQueryOptionsStep<
-						ElasticsearchSearchQueryOptionsStep<H, LOS>,
-						H,
-						ElasticsearchSearchResult<H>,
-						ElasticsearchSearchScroll<H>,
-						LOS,
-						ElasticsearchSearchPredicateFactory,
-						ElasticsearchSearchSortFactory,
-						ElasticsearchSearchAggregationFactory,
-						ElasticsearchSearchQueryIndexScope<?>
-				>
+				ElasticsearchSearchQueryOptionsStep<H, LOS>,
+				H,
+				ElasticsearchSearchResult<H>,
+				ElasticsearchSearchScroll<H>,
+				LOS,
+				ElasticsearchSearchPredicateFactory,
+				ElasticsearchSearchSortFactory,
+				ElasticsearchSearchAggregationFactory,
+				ElasticsearchSearchQueryIndexScope<?>>
 		implements ElasticsearchSearchQueryWhereStep<H, LOS>, ElasticsearchSearchQueryOptionsStep<H, LOS> {
 
 	private final ElasticsearchSearchQueryBuilder<H> searchQueryBuilder;

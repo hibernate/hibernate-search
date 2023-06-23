@@ -342,7 +342,8 @@ public class TreeFilter {
 	}
 
 	private boolean hasCompositionLimits() {
-		return depthFilter.hasDepthLimit() || pathFilter.isAnyPathExplicitlyIncluded()
+		return depthFilter.hasDepthLimit()
+				|| pathFilter.isAnyPathExplicitlyIncluded()
 				|| parent != null && parent.hasCompositionLimits();
 	}
 }

@@ -30,7 +30,8 @@ public class PropertyInheritanceIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private SearchMapping mapping;
 
@@ -95,7 +96,7 @@ public class PropertyInheritanceIT {
 		}
 
 		@IndexedEmbedded(includeDepth = 1)
-		@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue( propertyName = "embedding")))
+		@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "embedding")))
 		public abstract ParentIndexedEntity getEmbedded();
 	}
 

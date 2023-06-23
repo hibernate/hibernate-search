@@ -12,11 +12,10 @@ import org.hibernate.search.engine.search.common.spi.AbstractMultiIndexSearchInd
 
 public final class LuceneMultiIndexSearchIndexCompositeNodeContext
 		extends AbstractMultiIndexSearchIndexCompositeNodeContext<
-						LuceneSearchIndexCompositeNodeContext,
-						LuceneSearchIndexScope<?>,
-						LuceneSearchIndexCompositeNodeTypeContext,
-						LuceneSearchIndexNodeContext
-				>
+				LuceneSearchIndexCompositeNodeContext,
+				LuceneSearchIndexScope<?>,
+				LuceneSearchIndexCompositeNodeTypeContext,
+				LuceneSearchIndexNodeContext>
 		implements LuceneSearchIndexCompositeNodeContext, LuceneSearchIndexCompositeNodeTypeContext {
 
 	public LuceneMultiIndexSearchIndexCompositeNodeContext(LuceneSearchIndexScope<?> scope,

@@ -283,7 +283,8 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				)
 				.build();
 
-		ExplainResult explainResult = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work, OperationSubmitter.blocking() ) );
+		ExplainResult explainResult =
+				Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work, OperationSubmitter.blocking() ) );
 		return explainResult.getJsonObject();
 	}
 

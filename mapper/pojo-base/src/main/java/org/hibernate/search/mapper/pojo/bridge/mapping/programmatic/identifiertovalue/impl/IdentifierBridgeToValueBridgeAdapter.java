@@ -25,19 +25,23 @@ final class IdentifierBridgeToValueBridgeAdapter<I> implements ValueBridge<I, St
 
 	@Override
 	public String toIndexedValue(I value, ValueBridgeToIndexedValueContext context) {
-		return value == null ? null : delegate.toDocumentIdentifier( value,
-				context.extension( IdentifierBridgeContextToValueBridgeContextAdapterExtension.INSTANCE ) );
+		return value == null
+				? null
+				: delegate.toDocumentIdentifier( value,
+						context.extension( IdentifierBridgeContextToValueBridgeContextAdapterExtension.INSTANCE ) );
 	}
 
 	@Override
 	public I fromIndexedValue(String value, ValueBridgeFromIndexedValueContext context) {
-		return value == null ? null : delegate.fromDocumentIdentifier( value,
-				context.extension( IdentifierBridgeContextToValueBridgeContextAdapterExtension.INSTANCE ) );
+		return value == null
+				? null
+				: delegate.fromDocumentIdentifier( value,
+						context.extension( IdentifierBridgeContextToValueBridgeContextAdapterExtension.INSTANCE ) );
 	}
 
 	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
-		if ( !(other instanceof IdentifierBridgeToValueBridgeAdapter ) ) {
+		if ( !( other instanceof IdentifierBridgeToValueBridgeAdapter ) ) {
 			return false;
 		}
 		IdentifierBridgeToValueBridgeAdapter<?> castedOther = (IdentifierBridgeToValueBridgeAdapter<?>) other;

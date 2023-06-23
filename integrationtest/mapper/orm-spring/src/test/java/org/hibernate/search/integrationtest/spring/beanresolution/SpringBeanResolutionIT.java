@@ -73,13 +73,14 @@ public class SpringBeanResolutionIT {
 		public HibernatePropertiesCustomizer backendMockPropertiesCustomizer(ApplicationContext applicationContext) {
 			BackendMock backendMock = applicationContext.getEnvironment()
 					.getProperty( "test.backendMock", BackendMock.class );
-			return hibernateProperties ->
-					hibernateProperties.put( "hibernate.search.backend.type", backendMock.factory( mappingHandlePromise ) );
+			return hibernateProperties -> hibernateProperties.put( "hibernate.search.backend.type",
+					backendMock.factory( mappingHandlePromise ) );
 		}
 
 		@EventListener(ApplicationReadyEvent.class)
 		public void initBackendMappingHandle(ApplicationReadyEvent event) {
-			mappingHandlePromise.complete( new HibernateOrmMappingHandle( event.getApplicationContext().getBean( SessionFactory.class ) ) );
+			mappingHandlePromise
+					.complete( new HibernateOrmMappingHandle( event.getApplicationContext().getBean( SessionFactory.class ) ) );
 		}
 	}
 
@@ -142,7 +143,8 @@ public class SpringBeanResolutionIT {
 
 		int expectedInstances = ExpectedScope.SINGLETON.equals( expectedScope ) ? 1 : 2;
 
-		try ( @SuppressWarnings("unused") ConfigurableApplicationContext applicationContext = startApplication() ) {
+		try ( @SuppressWarnings("unused")
+		ConfigurableApplicationContext applicationContext = startApplication() ) {
 			applicationContext.getBean( EntityManagerFactory.class ).getMetamodel();
 			backendMock.verifyExpectationsMet();
 

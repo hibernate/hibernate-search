@@ -35,7 +35,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 	@TestForIssue(jiraKey = "HSEARCH-4287")
 	public void syncDefaultAddWorkType() {
 		backendMock.indexingWorkExpectations( BackendIndexingWorkExpectations.sync() );
-		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> { } );
+		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> {} );
 		assertThatCode( () -> backendMock.backendBehavior().executeDocumentWork(
 				INDEX_NAME,
 				StubDocumentWork.builder( StubDocumentWork.Type.ADD )
@@ -45,7 +45,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 		) )
 				.doesNotThrowAnyException();
 
-		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> { } );
+		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> {} );
 		assertThatCode( () -> backendMock.backendBehavior().executeDocumentWork(
 				INDEX_NAME,
 				StubDocumentWork.builder( StubDocumentWork.Type.ADD_OR_UPDATE )
@@ -61,7 +61,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 	@TestForIssue(jiraKey = "HSEARCH-4287")
 	public void asyncDefaultAddWorkType() {
 		backendMock.indexingWorkExpectations( BackendIndexingWorkExpectations.async( ".*" ) );
-		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> { } );
+		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> {} );
 		assertThatCode( () -> backendMock.backendBehavior().executeDocumentWork(
 				INDEX_NAME,
 				StubDocumentWork.builder( StubDocumentWork.Type.ADD )
@@ -71,7 +71,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 		) )
 				.doesNotThrowAnyException();
 
-		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> { } );
+		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> {} );
 		assertThatCode( () -> backendMock.backendBehavior().executeDocumentWork(
 				INDEX_NAME,
 				StubDocumentWork.builder( StubDocumentWork.Type.ADD_OR_UPDATE )
@@ -88,9 +88,10 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 	public void asyncCustomAddWorkType() {
 		// We tell the backend that all "add" expectations should instead be interpreted as "addOrUpdate",
 		// because the mapper is configured to always issue ADD_OR_UPDATE operations.
-		backendMock.indexingWorkExpectations( BackendIndexingWorkExpectations.async( ".*", StubDocumentWork.Type.ADD_OR_UPDATE ) );
+		backendMock
+				.indexingWorkExpectations( BackendIndexingWorkExpectations.async( ".*", StubDocumentWork.Type.ADD_OR_UPDATE ) );
 		// We expect an "add" operation...
-		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> { } );
+		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> {} );
 		// We trigger an "addOrUpdate" operation...
 		assertThatCode( () -> backendMock.backendBehavior().executeDocumentWork(
 				INDEX_NAME,
@@ -103,7 +104,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 				.doesNotThrowAnyException();
 
 		// We expect an "add" operation...
-		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> { } );
+		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> {} );
 		// We trigger a "delete" operation...
 		assertThatCode( () -> backendMock.backendBehavior().executeDocumentWork(
 				INDEX_NAME,
@@ -121,7 +122,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 	@TestForIssue(jiraKey = "HSEARCH-4133")
 	public void workSubmittedFromExpectedThread() {
 		backendMock.indexingWorkExpectations( BackendIndexingWorkExpectations.async( "matching.*" ) );
-		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> { } );
+		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> {} );
 		assertThatThrownByCodeRunningInThreadWithName( "matchingFoo",
 				() -> {
 					backendMock.backendBehavior().executeDocumentWork( INDEX_NAME,
@@ -137,7 +138,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 	@TestForIssue(jiraKey = "HSEARCH-4133")
 	public void workSubmittedFromUnexpectedThread() {
 		backendMock.indexingWorkExpectations( BackendIndexingWorkExpectations.async( "matching.*" ) );
-		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> { } );
+		backendMock.expectWorks( INDEX_NAME ).executeFollowingWorks().add( b -> {} );
 		assertThatThrownByCodeRunningInThreadWithName( "wrongName",
 				() -> {
 					backendMock.backendBehavior().executeDocumentWork( INDEX_NAME,
@@ -160,7 +161,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 	@TestForIssue(jiraKey = "HSEARCH-4308")
 	public void syncDuplicateIndexingWork() {
 		backendMock.indexingWorkExpectations( BackendIndexingWorkExpectations.sync() );
-		backendMock.expectWorks( INDEX_NAME ).add( b -> { } );
+		backendMock.expectWorks( INDEX_NAME ).add( b -> {} );
 
 		StubDocumentWork indexingWork = StubDocumentWork.builder( StubDocumentWork.Type.ADD )
 				.commit( DocumentCommitStrategy.FORCE )
@@ -185,7 +186,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 	@TestForIssue(jiraKey = "HSEARCH-4308")
 	public void asyncDuplicateIndexingWork() {
 		backendMock.indexingWorkExpectations( BackendIndexingWorkExpectations.async( ".*" ) );
-		backendMock.expectWorks( INDEX_NAME ).add( b -> { } );
+		backendMock.expectWorks( INDEX_NAME ).add( b -> {} );
 
 		StubDocumentWork indexingWork = StubDocumentWork.builder( StubDocumentWork.Type.ADD )
 				.commit( DocumentCommitStrategy.FORCE )
@@ -214,7 +215,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 				.isInstanceOf( AssertionError.class );
 
 		// New matched work
-		backendMock.expectWorks( INDEX_NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE ).add( b -> { } );
+		backendMock.expectWorks( INDEX_NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE ).add( b -> {} );
 		assertThatCode( () -> backendMock.backendBehavior().createDocumentWork( INDEX_NAME, differentIndexingWork ) )
 				.doesNotThrowAnyException();
 		assertThatCode( () -> backendMock.backendBehavior().executeDocumentWork( INDEX_NAME, differentIndexingWork ) )

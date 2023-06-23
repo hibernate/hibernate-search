@@ -69,7 +69,8 @@ public class StoredFieldsValuesDelegate {
 
 	public StoredFieldsValuesDelegate(NestedDocsProvider nestedDocsProvider,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
-			IndexSearcher indexSearcher) throws IOException {
+			IndexSearcher indexSearcher)
+			throws IOException {
 		this.childrenWeight = nestedDocsProvider == null ? null : nestedDocsProvider.childDocsWeight( indexSearcher );
 		this.nestedDocsProvider = nestedDocsProvider;
 		this.storedFieldVisitor = storedFieldVisitor;
@@ -85,7 +86,8 @@ public class StoredFieldsValuesDelegate {
 
 	void context(LeafReaderContext context) throws IOException {
 		this.currentLeafReader = context.reader();
-		this.currentLeafChildDocs = nestedDocsProvider == null ? null
+		this.currentLeafChildDocs = nestedDocsProvider == null
+				? null
 				: nestedDocsProvider.childDocs( childrenWeight, context, null );
 
 		this.currentRootDoc = -1;

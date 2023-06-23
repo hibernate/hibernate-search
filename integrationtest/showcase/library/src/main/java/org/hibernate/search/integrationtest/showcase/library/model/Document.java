@@ -49,7 +49,7 @@ public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity
 	)
 	private String title;
 
-	@GenericField( projectable = Projectable.YES, sortable = Sortable.YES)
+	@GenericField(projectable = Projectable.YES, sortable = Sortable.YES)
 	private String author;
 
 	@Basic
@@ -64,7 +64,7 @@ public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity
 	private String tags;
 
 	@OneToMany(mappedBy = "document", targetEntity = DocumentCopy.class)
-	@IndexedEmbedded(includePaths = {"medium", "library.location", "library.services"}, structure = ObjectStructure.NESTED)
+	@IndexedEmbedded(includePaths = { "medium", "library.location", "library.services" }, structure = ObjectStructure.NESTED)
 	private List<C> copies = new ArrayList<>();
 
 	public Document() {

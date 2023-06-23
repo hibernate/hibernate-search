@@ -103,7 +103,8 @@ public class CallQueue<C extends Call<? super C>> {
 				return behavior.execute();
 			}
 
-			behavior = tryMatchOutOfOrder( lastMatchingCallsOutOfOrder, actualCall, callVerifyFunction, duplicateCallsMatchingErrors );
+			behavior = tryMatchOutOfOrder( lastMatchingCallsOutOfOrder, actualCall, callVerifyFunction,
+					duplicateCallsMatchingErrors );
 			if ( behavior != null ) {
 				return behavior.execute();
 			}

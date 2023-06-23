@@ -21,7 +21,7 @@ import org.junit.Rule;
 public abstract class AbstractSpatialWithinPredicateIT {
 
 	protected static final String OURSON_QUI_BOIT_ID = "ourson qui boit";
-	protected static final GeoPoint OURSON_QUI_BOIT_GEO_POINT = GeoPoint.of( 45.7705687,4.835233 );
+	protected static final GeoPoint OURSON_QUI_BOIT_GEO_POINT = GeoPoint.of( 45.7705687, 4.835233 );
 	protected static final String OURSON_QUI_BOIT_STRING = "L'ourson qui boit";
 
 	protected static final String IMOUTO_ID = "imouto";
@@ -84,7 +84,7 @@ public abstract class AbstractSpatialWithinPredicateIT {
 					document.addValue( mainIndex.binding().geoPoint_with_longName, CHEZ_MARGOTTE_GEO_POINT );
 					document.addValue( mainIndex.binding().projectableUnsortableGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
 				} )
-				.add( EMPTY_ID, document -> { } )
+				.add( EMPTY_ID, document -> {} )
 				.join();
 	}
 

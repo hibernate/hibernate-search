@@ -17,10 +17,9 @@ import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationIndex
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 public abstract class AbstractSearchAggregationFactory<
-				S extends ExtendedSearchAggregationFactory<S, PDF>,
-				SC extends SearchAggregationIndexScope<?>,
-				PDF extends SearchPredicateFactory
-		>
+		S extends ExtendedSearchAggregationFactory<S, PDF>,
+		SC extends SearchAggregationIndexScope<?>,
+		PDF extends SearchPredicateFactory>
 		implements ExtendedSearchAggregationFactory<S, PDF> {
 
 	protected final SearchAggregationDslContext<SC, PDF> dslContext;

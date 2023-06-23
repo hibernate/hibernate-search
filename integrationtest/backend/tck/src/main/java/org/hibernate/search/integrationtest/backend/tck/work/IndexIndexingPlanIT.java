@@ -57,12 +57,14 @@ public class IndexIndexingPlanIT {
 		return new Object[][] {
 				{
 						NO_MULTI_TENANCY_LABEL,
-						(Function<TckBackendHelper, TckBackendSetupStrategy<?>>) TckBackendHelper::createDefaultBackendSetupStrategy,
+						(Function<TckBackendHelper,
+								TckBackendSetupStrategy<?>>) TckBackendHelper::createDefaultBackendSetupStrategy,
 						null
 				},
 				{
 						MULTI_TENANCY_LABEL,
-						(Function<TckBackendHelper, TckBackendSetupStrategy<?>>) TckBackendHelper::createMultiTenancyBackendSetupStrategy,
+						(Function<TckBackendHelper,
+								TckBackendSetupStrategy<?>>) TckBackendHelper::createMultiTenancyBackendSetupStrategy,
 						"tenant_1"
 				}
 		};
@@ -103,9 +105,12 @@ public class IndexIndexingPlanIT {
 		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 
 		// Add
-		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "The Lord of the Rings chap. 1" ) );
-		plan.add( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "The Lord of the Rings chap. 2" ) );
-		plan.add( referenceProvider( "3" ), document -> document.addValue( index.binding().title, "The Lord of the Rings chap. 3" ) );
+		plan.add( referenceProvider( "1" ),
+				document -> document.addValue( index.binding().title, "The Lord of the Rings chap. 1" ) );
+		plan.add( referenceProvider( "2" ),
+				document -> document.addValue( index.binding().title, "The Lord of the Rings chap. 2" ) );
+		plan.add( referenceProvider( "3" ),
+				document -> document.addValue( index.binding().title, "The Lord of the Rings chap. 3" ) );
 		CompletableFuture<?> future = plan.execute( OperationSubmitter.blocking() );
 		Awaitility.await().until( future::isDone );
 		// The operations should succeed.
@@ -117,7 +122,8 @@ public class IndexIndexingPlanIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2", "3" );
 
 		// Update
-		plan.addOrUpdate( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "The Boss of the Rings chap. 2" ) );
+		plan.addOrUpdate( referenceProvider( "2" ),
+				document -> document.addValue( index.binding().title, "The Boss of the Rings chap. 2" ) );
 		future = plan.execute( OperationSubmitter.blocking() );
 		Awaitility.await().until( future::isDone );
 		// The operations should succeed.

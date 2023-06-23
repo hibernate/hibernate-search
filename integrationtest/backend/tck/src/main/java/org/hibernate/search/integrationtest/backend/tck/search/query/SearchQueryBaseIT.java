@@ -244,7 +244,8 @@ public class SearchQueryBaseIT {
 		}
 	}
 
-	private static class SupportedQueryDslExtension<R, E, LOS> implements
+	private static class SupportedQueryDslExtension<R, E, LOS>
+			implements
 			SearchQueryDslExtension<MyExtendedDslContext<E>, R, E, LOS> {
 		@Override
 		public Optional<MyExtendedDslContext<E>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
@@ -258,7 +259,8 @@ public class SearchQueryBaseIT {
 		}
 	}
 
-	private static class UnSupportedQueryDslExtension<R, E, LOS> implements
+	private static class UnSupportedQueryDslExtension<R, E, LOS>
+			implements
 			SearchQueryDslExtension<MyExtendedDslContext<E>, R, E, LOS> {
 		@Override
 		public Optional<MyExtendedDslContext<E>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
@@ -281,9 +283,9 @@ public class SearchQueryBaseIT {
 
 		public SearchQuery<T> extendedFeature(String fieldName, String value1, String value2) {
 			return delegate.where( f -> f.or(
-							f.match().field( fieldName ).matching( value1 ),
-							f.match().field( fieldName ).matching( value2 )
-					) )
+					f.match().field( fieldName ).matching( value1 ),
+					f.match().field( fieldName ).matching( value2 )
+			) )
 					.sort( f -> f.field( fieldName ) )
 					.toQuery();
 		}

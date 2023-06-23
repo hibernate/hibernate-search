@@ -98,7 +98,7 @@ public class LongMultiValueFacetCounts extends Facets {
 			@Override
 			protected boolean lessThan(Entry a, Entry b) {
 				// sort by count descending, breaking ties by value ascending:
-				return a.count < b.count || (a.count == b.count && a.value > b.value);
+				return a.count < b.count || ( a.count == b.count && a.value > b.value );
 			}
 		};
 

@@ -81,7 +81,8 @@ public class PojoIndexingDependencyCollectorMonomorphicDirectValueNode<P, V>
 
 	@Override
 	void doCollectDependency(LinkedNode<DerivedDependencyWalkingInfo> derivedDependencyPath) {
-		ReindexOnUpdate composedReindexOnUpdate = derivedDependencyPath == null ? metadata.reindexOnUpdate
+		ReindexOnUpdate composedReindexOnUpdate = derivedDependencyPath == null
+				? metadata.reindexOnUpdate
 				: derivedDependencyPath.last.value.node.composeReindexOnUpdate( lastEntityNode(), metadata.reindexOnUpdate );
 		if ( ReindexOnUpdate.NO.equals( composedReindexOnUpdate ) ) {
 			// Updates are ignored
@@ -110,7 +111,8 @@ public class PojoIndexingDependencyCollectorMonomorphicDirectValueNode<P, V>
 					checkForDerivedDependencyCycle( derivedDependencyPath, newDerivedDependencyInfo );
 				}
 				LinkedNode<DerivedDependencyWalkingInfo> updatedDerivedDependencyPath =
-						derivedDependencyPath == null ? LinkedNode.of( newDerivedDependencyInfo )
+						derivedDependencyPath == null
+								? LinkedNode.of( newDerivedDependencyInfo )
 								: derivedDependencyPath.withHead( newDerivedDependencyInfo );
 				PojoModelPathBinder.bind(
 						lastTypeNode, path,

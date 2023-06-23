@@ -58,8 +58,9 @@ public final class ConfigurationRules {
 			);
 		}
 		else {
-			return !propertyKey.startsWith( "hibernate.search." ) ? Collections.singletonList( "hibernate.search." ) :
-					Collections.emptyList();
+			return !propertyKey.startsWith( "hibernate.search." )
+					? Collections.singletonList( "hibernate.search." )
+					: Collections.emptyList();
 		}
 	}
 }

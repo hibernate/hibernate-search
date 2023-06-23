@@ -84,7 +84,8 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 						? repositoryMockHelper.selfInitialExpiration()
 						// If self created by this pulse:
 						: NOW.plus( PULSE_EXPIRATION ) )
-				.shardAssignment( selfStaticShardAssignment() != null ? selfStaticShardAssignment()
+				.shardAssignment( selfStaticShardAssignment() != null
+						? selfStaticShardAssignment()
 						: repositoryMockHelper.selfInitialShardAssignment() )
 				.build();
 	}
@@ -104,12 +105,17 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 	}
 
 	protected abstract UUID other1Id();
+
 	protected abstract UUID other2Id();
+
 	protected abstract UUID other3Id();
 
 	protected abstract AgentType other1Type();
+
 	protected abstract AgentType selfType();
+
 	protected abstract AgentType other2Type();
+
 	protected abstract AgentType other3Type();
 
 	protected final boolean isOther1Static() {
@@ -151,7 +157,8 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 
 	protected final ShardAssignmentDescriptor selfStaticShardAssignment() {
 		return AgentType.EVENT_PROCESSING_STATIC_SHARDING.equals( selfType() )
-				? selfShardAssignmentIn4NodeCluster() : null;
+				? selfShardAssignmentIn4NodeCluster()
+				: null;
 	}
 
 	protected final ShardAssignmentDescriptor shardAssignmentIn5NodeCluster() {

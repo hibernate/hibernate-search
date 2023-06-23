@@ -25,7 +25,8 @@ public interface FromDocumentFieldValueConverter<F, V> extends FromDocumentValue
 
 	@Override
 	default boolean isCompatibleWith(FromDocumentValueConverter<?, ?> other) {
-		return other instanceof FromDocumentFieldValueConverter && isCompatibleWith( (FromDocumentFieldValueConverter<?, ?>) other );
+		return other instanceof FromDocumentFieldValueConverter
+				&& isCompatibleWith( (FromDocumentFieldValueConverter<?, ?>) other );
 	}
 
 	/**
@@ -35,7 +36,8 @@ public interface FromDocumentFieldValueConverter<F, V> extends FromDocumentValue
 	 * to a more useful type, giving access to such things as a Hibernate ORM Session (if using the Hibernate ORM mapper).
 	 * @return The converted value.
 	 */
-	V convert(F value, org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext context);
+	V convert(F value,
+			org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext context);
 
 	/**
 	 * @param other Another {@link ToDocumentFieldValueConverter}, never {@code null}.

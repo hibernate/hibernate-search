@@ -57,27 +57,27 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
-				"   'properties':{ " +
-				"     '_entity_type':{ " +
-				"        'type':'keyword', " +
-				"        'index':false " +
-				"     }, " +
-				"     'userField':{ " +
-				"       'type':'keyword', " +
-				"       'index':true, " +
-				"       'norms':true, " +
-				"       'doc_values':true " +
-				"     }, " +
-				"     'userObject':{ " +
-				"       'dynamic':'true', " +
-				"       'type':'object' " +
-				"     } " +
-				"   }, " +
-				"   '_source': { " +
-				"     'enabled': false " +
-				"   }, " +
-				"   'dynamic':'strict' " +
-				" } "
+						"   'properties':{ " +
+						"     '_entity_type':{ " +
+						"        'type':'keyword', " +
+						"        'index':false " +
+						"     }, " +
+						"     'userField':{ " +
+						"       'type':'keyword', " +
+						"       'index':true, " +
+						"       'norms':true, " +
+						"       'doc_values':true " +
+						"     }, " +
+						"     'userObject':{ " +
+						"       'dynamic':'true', " +
+						"       'type':'object' " +
+						"     } " +
+						"   }, " +
+						"   '_source': { " +
+						"     'enabled': false " +
+						"   }, " +
+						"   'dynamic':'strict' " +
+						" } "
 		);
 
 		setupAndValidate( "no-overlapping.json" );
@@ -88,27 +88,27 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
-				"   'properties':{ " +
-				"     '_entity_type':{ " +
-				"        'type':'keyword', " +
-				"        'index':false " +
-				"     }, " +
-				"     'userField':{ " +
-				"       'type':'keyword', " +
-				"       'index':true, " +
-				"       'norms':true, " +
-				"       'doc_values':true " +
-				"     }, " +
-				"     'userObject':{ " +
-				"       'dynamic':'true', " +
-				"       'type':'object' " +
-				"     } " +
-				"   }, " +
-				"   '_source': { " +
-				"     'enabled': true " +
-				"   }, " +
-				"   'dynamic':'strict' " +
-				" } "
+						"   'properties':{ " +
+						"     '_entity_type':{ " +
+						"        'type':'keyword', " +
+						"        'index':false " +
+						"     }, " +
+						"     'userField':{ " +
+						"       'type':'keyword', " +
+						"       'index':true, " +
+						"       'norms':true, " +
+						"       'doc_values':true " +
+						"     }, " +
+						"     'userObject':{ " +
+						"       'dynamic':'true', " +
+						"       'type':'object' " +
+						"     } " +
+						"   }, " +
+						"   '_source': { " +
+						"     'enabled': true " +
+						"   }, " +
+						"   'dynamic':'strict' " +
+						" } "
 		);
 
 		assertThatThrownBy( () -> setupAndValidate( "no-overlapping.json" ) )
@@ -124,24 +124,24 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
-				"   'properties':{ " +
-				"     '_entity_type':{ " +
-				"        'type':'keyword', " +
-				"        'index':false " +
-				"     }, " +
-				"     'userField':{ " +
-				"       'type':'keyword', " +
-				"       'index':true, " +
-				"       'norms':true, " +
-				"       'doc_values':true " +
-				"     }, " +
-				"     'userObject':{ " +
-				"       'dynamic':'true', " +
-				"       'type':'object' " +
-				"     } " +
-				"   }, " +
-				"   'dynamic':'strict' " +
-				" } "
+						"   'properties':{ " +
+						"     '_entity_type':{ " +
+						"        'type':'keyword', " +
+						"        'index':false " +
+						"     }, " +
+						"     'userField':{ " +
+						"       'type':'keyword', " +
+						"       'index':true, " +
+						"       'norms':true, " +
+						"       'doc_values':true " +
+						"     }, " +
+						"     'userObject':{ " +
+						"       'dynamic':'true', " +
+						"       'type':'object' " +
+						"     } " +
+						"   }, " +
+						"   'dynamic':'strict' " +
+						" } "
 		);
 
 		assertThatThrownBy( () -> setupAndValidate( "no-overlapping.json" ) )
@@ -156,26 +156,26 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
-				"   'properties':{ " +
-				"     '_entity_type':{ " +
-				"        'type':'keyword', " +
-				"        'index':false " +
-				"     }, " +
-				"     'userField':{ " +
-				"       'type':'integer', " +
-				"       'index':false, " +
-				"       'doc_values':false " +
-				"     }, " +
-				"     'userObject':{ " +
-				"       'dynamic':'true', " +
-				"       'type':'object' " +
-				"     } " +
-				"   }, " +
-				"   '_source': { " +
-				"     'enabled': false " +
-				"   }, " +
-				"   'dynamic':'strict' " +
-				" } "
+						"   'properties':{ " +
+						"     '_entity_type':{ " +
+						"        'type':'keyword', " +
+						"        'index':false " +
+						"     }, " +
+						"     'userField':{ " +
+						"       'type':'integer', " +
+						"       'index':false, " +
+						"       'doc_values':false " +
+						"     }, " +
+						"     'userObject':{ " +
+						"       'dynamic':'true', " +
+						"       'type':'object' " +
+						"     } " +
+						"   }, " +
+						"   '_source': { " +
+						"     'enabled': false " +
+						"   }, " +
+						"   'dynamic':'strict' " +
+						" } "
 		);
 
 		assertThatThrownBy( () -> setupAndValidate( "no-overlapping.json" ) )
@@ -197,21 +197,21 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
-				"   'properties':{ " +
-				"     '_entity_type':{ " +
-				"        'type':'keyword', " +
-				"        'index':false " +
-				"     }, " +
-				"     'userObject':{ " +
-				"       'dynamic':'true', " +
-				"       'type':'object' " +
-				"     } " +
-				"   }, " +
-				"   '_source': { " +
-				"     'enabled': false " +
-				"   }, " +
-				"   'dynamic':'strict' " +
-				" } "
+						"   'properties':{ " +
+						"     '_entity_type':{ " +
+						"        'type':'keyword', " +
+						"        'index':false " +
+						"     }, " +
+						"     'userObject':{ " +
+						"       'dynamic':'true', " +
+						"       'type':'object' " +
+						"     } " +
+						"   }, " +
+						"   '_source': { " +
+						"     'enabled': false " +
+						"   }, " +
+						"   'dynamic':'strict' " +
+						" } "
 		);
 
 		assertThatThrownBy( () -> setupAndValidate( "no-overlapping.json" ) )

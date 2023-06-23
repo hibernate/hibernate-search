@@ -151,7 +151,8 @@ public final class PojoScopeDelegateImpl<R extends EntityReference, E, C> implem
 
 	@Override
 	@Deprecated
-	public PojoScopeWorkspace workspace(org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext sessionContext) {
+	public PojoScopeWorkspace workspace(
+			org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext sessionContext) {
 		return workspace( sessionContext.tenantIdentifier() );
 	}
 
@@ -172,7 +173,8 @@ public final class PojoScopeDelegateImpl<R extends EntityReference, E, C> implem
 
 	@Override
 	@Deprecated
-	public PojoMassIndexer massIndexer(PojoMassIndexingContext context, org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext detachedSession) {
+	public PojoMassIndexer massIndexer(PojoMassIndexingContext context,
+			org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext detachedSession) {
 		String tenantIdentifier = detachedSession.tenantIdentifier();
 		return massIndexer( context, asSetIgnoreNull( tenantIdentifier ) );
 	}

@@ -73,9 +73,9 @@ public abstract class SearchIndexSchemaElementContextHelper {
 		}
 	};
 
-	public <T, SC extends SearchIndexScope<?>, N extends SearchIndexNodeContext<SC>>
-			T queryElement(SearchQueryElementTypeKey<T> key,
-					SearchQueryElementFactory<? extends T, ? super SC, ? super N> factory, SC scope, N node) {
+	public <T, SC extends SearchIndexScope<?>, N extends SearchIndexNodeContext<SC>> T queryElement(
+			SearchQueryElementTypeKey<T> key,
+			SearchQueryElementFactory<? extends T, ? super SC, ? super N> factory, SC scope, N node) {
 		if ( factory == null ) {
 			throw cannotUseQueryElement( key, node, missingSupportHint( key ), null );
 		}
@@ -87,8 +87,8 @@ public abstract class SearchIndexSchemaElementContextHelper {
 		}
 	}
 
-	public <T, SC extends SearchIndexScope<?>, N extends SearchIndexNodeContext<SC>>
-	SearchException cannotUseQueryElement(SearchQueryElementTypeKey<T> key, N node, String hint,
+	public <T, SC extends SearchIndexScope<?>, N extends SearchIndexNodeContext<SC>> SearchException cannotUseQueryElement(
+			SearchQueryElementTypeKey<T> key, N node, String hint,
 			Exception causeOrNull) {
 		throw log.cannotUseQueryElementForIndexNode( node.relativeEventContext(), key,
 				hint, node.eventContext(), causeOrNull );

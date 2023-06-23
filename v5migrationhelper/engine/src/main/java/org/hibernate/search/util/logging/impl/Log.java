@@ -44,16 +44,19 @@ public interface Log extends BaseHibernateSearchLogger {
 	@Message(id = 201, value = "The edit distance must be either 1 or 2")
 	SearchException incorrectEditDistance();
 
-	@Message(id = 227, value = "A BooleanQuery is not valid without at least one clause. Use at least one of should(Query) or must(Query)." )
+	@Message(id = 227,
+			value = "A BooleanQuery is not valid without at least one clause. Use at least one of should(Query) or must(Query).")
 	SearchException booleanQueryWithoutClauses();
 
-	@Message(id = 237, value = "Cannot create numeric range query for field '%s', since from and to values are null" )
+	@Message(id = 237, value = "Cannot create numeric range query for field '%s', since from and to values are null")
 	SearchException rangeQueryWithNullToAndFromValue(String fieldName);
 
-	@Message(id = 238, value = "Cannot create numeric range query for field '%s', since values are not numeric (Date, int, long, short or double)")
+	@Message(id = 238,
+			value = "Cannot create numeric range query for field '%s', since values are not numeric (Date, int, long, short or double)")
 	SearchException numericRangeQueryWithNonNumericToAndFromValues(String fieldName);
 
-	@Message(id = 269, value = "'%1$s' is not a supported type for a range faceting request parameter. Supported types are: '%2$s'")
+	@Message(id = 269,
+			value = "'%1$s' is not a supported type for a range faceting request parameter. Supported types are: '%2$s'")
 	SearchException unsupportedParameterTypeForRangeFaceting(String facetRangeParameterType, String supportedTypes);
 
 	@Message(id = 270, value = "At least of of the facets ranges in facet request '%1$s' contains neither start nor end value")
@@ -66,10 +69,11 @@ public interface Log extends BaseHibernateSearchLogger {
 	SearchException unexpectedProjectionConstant(String constantName);
 
 	@LogMessage(level = Logger.Level.DEBUG)
-	@Message(id = 336, value = "A file could not be deleted: likely lock contention. Not a problem for index replications as it will be attempted again in the future.")
+	@Message(id = 336,
+			value = "A file could not be deleted: likely lock contention. Not a problem for index replications as it will be attempted again in the future.")
 	void fileDeleteFailureIgnored(@Cause IOException e);
 
-	@Message(id = 342, value = "Field '%1$s' refers to both an analyzer and a normalizer." )
+	@Message(id = 342, value = "Field '%1$s' refers to both an analyzer and a normalizer.")
 	SearchException cannotReferenceAnalyzerAndNormalizer(String relativeFieldPath);
 
 	@Message(id = 352, value = "Multiple conflicting minimumShouldMatch constraints")

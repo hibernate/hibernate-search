@@ -324,8 +324,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 				.add( DOCUMENT_1, document -> initDocument( mainIndex.binding(), document, 1 ) )
 				.add( DOCUMENT_2, document -> initDocument( mainIndex.binding(), document, 2 ) )
 				.add( DOCUMENT_3, document -> initDocument( mainIndex.binding(), document, 3 ) )
-				.add( EMPTY, document -> {
-				} );
+				.add( EMPTY, document -> {} );
 		BulkIndexer compatibleIndexer = compatibleIndex.bulkIndexer()
 				.add( COMPATIBLE_INDEX_DOCUMENT_1, document -> {
 					addFieldValue( document, compatibleIndex.binding().fieldModel, 1 );
@@ -338,8 +337,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 								document, rawFieldCompatibleIndex.binding().fieldWithConverterModel, 1 )
 				);
 		BulkIndexer missingFieldIndexer = missingFieldIndex.bulkIndexer()
-				.add( MISSING_FIELD_INDEX_DOCUMENT_1, document -> {
-				} );
+				.add( MISSING_FIELD_INDEX_DOCUMENT_1, document -> {} );
 		mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer, missingFieldIndexer );
 	}
 

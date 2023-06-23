@@ -34,7 +34,8 @@ public class CollectionInitializeTest extends SearchTestBase {
 			List list = listAll( fullTextSession, LegacyCarPlant.class );
 			assertEquals( 1, list.size() );
 			fullTextSession.createIndexer( LegacyCarPlant.class ).startAndWait();
-			int resultSize = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), LegacyCarPlant.class ).getResultSize();
+			int resultSize =
+					fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), LegacyCarPlant.class ).getResultSize();
 			assertEquals( 1, resultSize );
 		}
 		finally {

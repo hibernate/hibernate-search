@@ -44,7 +44,8 @@ public final class MultiEntityOperationExecutionReport {
 
 	private MultiEntityOperationExecutionReport(Builder builder) {
 		this.failingEntityReferences = builder.failingEntityReferences == null
-				? Collections.emptyList() : Collections.unmodifiableList( builder.failingEntityReferences );
+				? Collections.emptyList()
+				: Collections.unmodifiableList( builder.failingEntityReferences );
 		if ( builder.throwable == null && !failingEntityReferences.isEmpty() ) {
 			this.throwable = new AssertionFailure(
 					"Unknown throwable: missing throwable when reporting the failure."

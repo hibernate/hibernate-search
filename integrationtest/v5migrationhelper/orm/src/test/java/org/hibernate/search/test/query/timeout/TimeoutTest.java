@@ -96,14 +96,14 @@ public class TimeoutTest extends SearchTestBase {
 
 		//We cannot test intermediate limit, Lucene / hibernate: too unpredictable
 
-//		hibernateQuery = fts.createFullTextQuery( query, Clock.class );
-//		hibernateQuery.limitFetchingTime( 1000, TimeUnit.NANOSECONDS );
-//		results = hibernateQuery.list();
-//		System.out.println("Result size partial: " + results.size() );
-//		assertTrue("Regular failure when some elements are fetched", 0 < results.size() && results.size() < 500 );
-//		assertTrue( hibernateQuery.hasPartialResults() );
-//
-//		fts.clear();
+		//		hibernateQuery = fts.createFullTextQuery( query, Clock.class );
+		//		hibernateQuery.limitFetchingTime( 1000, TimeUnit.NANOSECONDS );
+		//		results = hibernateQuery.list();
+		//		System.out.println("Result size partial: " + results.size() );
+		//		assertTrue("Regular failure when some elements are fetched", 0 < results.size() && results.size() < 500 );
+		//		assertTrue( hibernateQuery.hasPartialResults() );
+		//
+		//		fts.clear();
 	}
 
 	@Test
@@ -208,7 +208,7 @@ public class TimeoutTest extends SearchTestBase {
 	}
 
 	@Override
-	public void configure(Map<String,Object> cfg) {
+	public void configure(Map<String, Object> cfg) {
 		cfg.put( "hibernate.jdbc.batch_size", "1000" );
 	}
 

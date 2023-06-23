@@ -29,7 +29,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> {
+class Elasticsearch7SearchResultExtractor<H>
+		implements ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> {
 
 	protected static final JsonObjectAccessor HITS_ACCESSOR =
 			JsonAccessor.root().property( "hits" ).asObject();
@@ -91,11 +92,12 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 			total = SimpleSearchResultTotal.lowerBound( total.hitCountLowerBound() );
 		}
 
-		List<Object> extractedHits = ( total.isHitCountLowerBound() || total.hitCount() > 0 ) ?
-				extractHits( extractContext ) : Collections.emptyList();
+		List<Object> extractedHits = ( total.isHitCountLowerBound() || total.hitCount() > 0 )
+				? extractHits( extractContext )
+				: Collections.emptyList();
 
-		Map<AggregationKey<?>, ?> extractedAggregations = aggregations.isEmpty() ?
-				Collections.emptyMap() : extractAggregations( extractContext, responseBody );
+		Map<AggregationKey<?>, ?> extractedAggregations =
+				aggregations.isEmpty() ? Collections.emptyMap() : extractAggregations( extractContext, responseBody );
 
 		String scrollId = extractScrollId( responseBody );
 

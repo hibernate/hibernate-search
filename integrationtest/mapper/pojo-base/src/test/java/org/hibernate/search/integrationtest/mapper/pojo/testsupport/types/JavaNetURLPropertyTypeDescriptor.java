@@ -160,7 +160,7 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 	// this constructor and we want to test such scenario
 	private static URL urlAsNewUrl(String spec) {
 		try {
-			@SuppressWarnings( "deprecation" )
+			@SuppressWarnings("deprecation")
 			URL url = new URL( spec );
 			return url;
 		}

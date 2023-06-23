@@ -68,7 +68,8 @@ public interface HighlighterFastVectorHighlighterOptionsStep
 	 *
 	 * @return The next step in a highlighter definition exposing boundary scanner specific options.
 	 */
-	HighlighterBoundaryScannerTypeFastVectorHighlighterStep<? extends HighlighterFastVectorHighlighterOptionsStep> boundaryScanner();
+	HighlighterBoundaryScannerTypeFastVectorHighlighterStep<
+			? extends HighlighterFastVectorHighlighterOptionsStep> boundaryScanner();
 
 	/**
 	 * Specify how the text should be broken up into highlighting snippets.

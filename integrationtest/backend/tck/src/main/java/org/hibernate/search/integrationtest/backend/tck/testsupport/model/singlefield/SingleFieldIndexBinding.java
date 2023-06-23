@@ -28,7 +28,7 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 	public static final String DISCRIMINATOR_VALUE_INCLUDED = "included";
 	public static final String DISCRIMINATOR_VALUE_EXCLUDED = "excluded";
 
-	public static final Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> NO_ADDITIONAL_CONFIGURATION = c -> { };
+	public static final Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> NO_ADDITIONAL_CONFIGURATION = c -> {};
 
 	public static SingleFieldIndexBinding create(IndexSchemaElement root,
 			Collection<? extends FieldTypeDescriptor<?>> supportedFieldTypes,

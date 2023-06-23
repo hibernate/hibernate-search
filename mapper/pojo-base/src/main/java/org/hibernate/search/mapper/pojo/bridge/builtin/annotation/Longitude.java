@@ -23,10 +23,11 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  *
  * @author Nicolas Helleringer
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.METHOD, ElementType.FIELD } )
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = LongitudeProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = LongitudeProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface Longitude {
 
 	/**

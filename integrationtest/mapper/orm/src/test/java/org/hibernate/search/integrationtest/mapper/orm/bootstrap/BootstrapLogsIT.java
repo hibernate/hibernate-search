@@ -140,8 +140,7 @@ public class BootstrapLogsIT {
 				return item.getLevel().isMoreSpecificThan( level )
 						// Ignore these, they are warning but are expected (just related to the testing infrastructure)
 						&& !( CONNECTION_POOL_WARNING_PATTERN.matcher( item.getMessage().getFormattedMessage() ).find()
-						|| HBM2DDL_WARNING_PATTERN.matcher( item.getMessage().getFormattedMessage() ).find()
-				);
+								|| HBM2DDL_WARNING_PATTERN.matcher( item.getMessage().getFormattedMessage() ).find() );
 			}
 		};
 	}

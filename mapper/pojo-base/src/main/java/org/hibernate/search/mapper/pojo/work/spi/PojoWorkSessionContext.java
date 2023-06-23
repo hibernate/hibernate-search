@@ -18,7 +18,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  */
 public interface PojoWorkSessionContext
 		extends BackendSessionContext, BridgeSessionContext, PojoIndexingProcessorSessionContext,
-				PojoImplicitReindexingResolverSessionContext {
+		PojoImplicitReindexingResolverSessionContext {
 
 	@Override
 	PojoWorkMappingContext mappingContext();

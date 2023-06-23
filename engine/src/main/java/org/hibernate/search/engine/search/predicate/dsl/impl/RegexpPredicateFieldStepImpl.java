@@ -22,7 +22,7 @@ public final class RegexpPredicateFieldStepImpl
 	}
 
 	@Override
-	public RegexpPredicateFieldMoreStep<?, ?> fields(String ... fieldPaths) {
+	public RegexpPredicateFieldMoreStep<?, ?> fields(String... fieldPaths) {
 		return new RegexpPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
 	}
 }

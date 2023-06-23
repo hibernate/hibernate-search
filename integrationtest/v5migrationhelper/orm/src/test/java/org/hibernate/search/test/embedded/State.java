@@ -51,7 +51,7 @@ public class State {
 		return candidate;
 	}
 
-	public void setCandidate( StateCandidate candidate ) {
+	public void setCandidate(StateCandidate candidate) {
 		this.candidate = candidate;
 	}
 }

@@ -21,10 +21,10 @@ public class ForbiddenBeanProvider implements BeanProvider {
 	@Override
 	public <T> BeanHolder<T> forType(Class<T> typeReference) {
 		return fail( "Bean request for type '%s' was unexpectedly routed to the bean manager."
-						+ " If this test does rely on custom beans, call 'expectCustomBeans()' on the setup helper."
-						+ " If this test doesn't rely on custom beans, there is probably a bug in Hibernate Search:"
-						+ " look for references to built-in beans that"
-						+ " don't use the 'reflection' or 'built-in' provider as they should.",
+				+ " If this test does rely on custom beans, call 'expectCustomBeans()' on the setup helper."
+				+ " If this test doesn't rely on custom beans, there is probably a bug in Hibernate Search:"
+				+ " look for references to built-in beans that"
+				+ " don't use the 'reflection' or 'built-in' provider as they should.",
 				typeReference );
 	}
 

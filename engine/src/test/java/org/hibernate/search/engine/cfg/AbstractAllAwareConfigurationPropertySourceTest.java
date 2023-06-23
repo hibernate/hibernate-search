@@ -47,7 +47,7 @@ public abstract class AbstractAllAwareConfigurationPropertySourceTest {
 
 	@Test
 	public void resolveAll_empty() {
-		AllAwareConfigurationPropertySource propertySource = createPropertySource( b -> { } );
+		AllAwareConfigurationPropertySource propertySource = createPropertySource( b -> {} );
 		assertThat( propertySource.resolveAll( (k, v) -> false ) ).isEmpty();
 	}
 

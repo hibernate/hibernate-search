@@ -103,7 +103,8 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 		CompositeProjectionDefinition<StubEntity> projectionDefinitionStub =
 				// Simulate a projection that instantiates the entity based on field values extracted from the index.
 				// Here we're just retrieving a field containing the ID.
-				(f, initialStep, ctx) -> initialStep.from( f.field( mainIndex.binding().idField.relativeFieldName, String.class ) )
+				(f, initialStep, ctx) -> initialStep
+						.from( f.field( mainIndex.binding().idField.relativeFieldName, String.class ) )
 						.as( id -> new StubEntity( reference( mainIndex.typeName(), id ) ) );
 		when( projectionRegistryMock.compositeOptional( StubEntity.class ) )
 				.thenReturn( Optional.of( projectionDefinitionStub ) );
@@ -120,11 +121,11 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 					IndexBinding binding = mainIndex.binding();
 					SearchQuery<List<?>> query = scope.query( loadingContextMock )
 							.select( f -> f.composite().from(
-											f.object( binding.nested.absolutePath )
-													.from( f.field( binding.nested.fieldPath(), String.class ) )
-													.asList().multi(),
-											f.entity()
-									).asList()
+									f.object( binding.nested.absolutePath )
+											.from( f.field( binding.nested.fieldPath(), String.class ) )
+											.asList().multi(),
+									f.entity()
+							).asList()
 							)
 							.where( f -> f.matchAll() )
 							.toQuery();
@@ -242,7 +243,8 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 							.hasMessageContainingAll(
 									"Invalid type for entity projection on type '" + mainIndex.typeName() + "'",
 									"the entity type's Java class '" + StubEntity.class.getName()
-											+ "' does not extend the requested projection type '" + Integer.class.getName() + "'"
+											+ "' does not extend the requested projection type '" + Integer.class.getName()
+											+ "'"
 							);
 				} );
 	}

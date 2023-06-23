@@ -56,7 +56,7 @@ public final class Point implements Coordinates {
 	 */
 	public static double normalizeLongitude(double longitude) {
 		if ( longitude == ( -GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) {
-			return GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ;
+			return GeometricConstants.LONGITUDE_DEGREE_RANGE / 2;
 		}
 		else {
 			return normalizeLongitudeInclusive( longitude );
@@ -68,10 +68,12 @@ public final class Point implements Coordinates {
 	 * @return longitude normalized in [-180;+180]
 	 */
 	public static double normalizeLongitudeInclusive(double longitude) {
-		if ( (longitude < -( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) || (longitude > ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) ) {
+		if ( ( longitude < -( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) )
+				|| ( longitude > ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) ) {
 			double _longitude;
 			// shift 180 and normalize full circle turn
-			_longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE );
+			_longitude = ( ( longitude
+					+ ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE );
 			// as Java % is not a math modulus we may have negative numbers so the unshift is sign dependant
 			if ( _longitude < 0 ) {
 				_longitude = _longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
@@ -93,7 +95,8 @@ public final class Point implements Coordinates {
 	public static double normalizeLatitude(double latitude) {
 		if ( latitude > GeometricConstants.LATITUDE_DEGREE_MAX || latitude < GeometricConstants.LATITUDE_DEGREE_MIN ) {
 			// shift 90, normalize full circle turn and 'symmetry' on the lat axis with abs
-			double _latitude = Math.abs( ( latitude + ( GeometricConstants.LATITUDE_DEGREE_RANGE / 2 ) ) % ( GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE ) );
+			double _latitude = Math.abs( ( latitude
+					+ ( GeometricConstants.LATITUDE_DEGREE_RANGE / 2 ) ) % ( GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE ) );
 			// Push 2nd and 3rd quadran in 1st and 4th by 'symmetry'
 			if ( _latitude > GeometricConstants.LATITUDE_DEGREE_RANGE ) {
 				_latitude = GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE - _latitude;
@@ -175,7 +178,7 @@ public final class Point implements Coordinates {
 	 * @return the distance between the points
 	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Distance haversine formula</a>
 	 */
-	public double getDistanceTo(final double latitude,final double longitude) {
+	public double getDistanceTo(final double latitude, final double longitude) {
 		double destinationLatitudeRadians = normalizeLatitude( latitude ) * GeometricConstants.TO_RADIANS_RATIO;
 		double destinationLongitudeRadians = normalizeLongitude( longitude ) * GeometricConstants.TO_RADIANS_RATIO;
 		final double dLat = ( destinationLatitudeRadians - getLatitudeRad() ) / 2.0d;
@@ -217,7 +220,7 @@ public final class Point implements Coordinates {
 		if ( obj instanceof Point ) {
 			Point other = (Point) obj;
 			return latitude == other.latitude
-				&& longitude == other.longitude;
+					&& longitude == other.longitude;
 		}
 		return false;
 	}

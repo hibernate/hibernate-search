@@ -120,6 +120,7 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 		}
 	}
 
-	private static final class EntityIdentifierLoadingContextImpl implements MassIndexingEnvironment.EntityIdentifierLoadingContext {
+	private static final class EntityIdentifierLoadingContextImpl
+			implements MassIndexingEnvironment.EntityIdentifierLoadingContext {
 	}
 }

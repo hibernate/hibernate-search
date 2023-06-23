@@ -40,7 +40,8 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 	 * @param nested the nested provider
 	 * @return A {@link DoubleMultiValuesToSingleValuesSource}
 	 */
-	public static DoubleMultiValuesToSingleValuesSource fromDoubleField(String field, MultiValueMode mode, NestedDocsProvider nested) {
+	public static DoubleMultiValuesToSingleValuesSource fromDoubleField(String field, MultiValueMode mode,
+			NestedDocsProvider nested) {
 		return fromField( field, mode, nested, SortedNumericDoubleDocValues::fromDoubleField );
 	}
 
@@ -52,7 +53,8 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 	 * @param nested the nested provider
 	 * @return A {@link DoubleMultiValuesToSingleValuesSource}
 	 */
-	public static DoubleMultiValuesToSingleValuesSource fromFloatField(String field, MultiValueMode mode, NestedDocsProvider nested) {
+	public static DoubleMultiValuesToSingleValuesSource fromFloatField(String field, MultiValueMode mode,
+			NestedDocsProvider nested) {
 		return fromField( field, mode, nested, SortedNumericDoubleDocValues::fromFloatField );
 	}
 

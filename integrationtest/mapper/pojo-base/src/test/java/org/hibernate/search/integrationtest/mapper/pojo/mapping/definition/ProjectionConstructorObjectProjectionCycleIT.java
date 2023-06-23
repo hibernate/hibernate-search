@@ -30,9 +30,10 @@ import org.junit.Test;
 public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionConstructorIT {
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock )
-			// We don't care about reindexing here and don't want to configure association inverse sides
-			.disableAssociationReindexing();
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock )
+					// We don't care about reindexing here and don't want to configure association inverse sides
+					.disableAssociationReindexing();
 
 	@Test
 	public void actualCycle_direct() {
@@ -46,6 +47,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 				@IndexedEmbedded(includeDepth = 10)
 				public Level2 level2;
 			}
+
 			class Level2 {
 				@DocumentId
 				public Integer id;
@@ -54,18 +56,22 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 				@IndexedEmbedded
 				Level1 level1;
 			}
+
 			class ProjectionLevel1 {
 				public final String text;
 				public final ProjectionLevel2 level2;
+
 				@ProjectionConstructor
 				public ProjectionLevel1(String text, ProjectionLevel2 level2) {
 					this.text = text;
 					this.level2 = level2;
 				}
 			}
+
 			class ProjectionLevel2 {
 				public final String text;
 				public final ProjectionLevel1 level1;
+
 				@ProjectionConstructor
 				public ProjectionLevel2(String text, ProjectionLevel1 level1) {
 					this.text = text;
@@ -89,7 +95,8 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 						.constructorContext( Model.class, String.class, Model.ProjectionLevel2.class )
 						.methodParameterContext( 2, "level2" )
 						.multilineFailure( "Cyclic recursion starting from 'ObjectProjectionBinder(...)'",
-								"on type '" + Model.ProjectionLevel1.class.getName() + "', projection constructor, parameter at index 2 (level2)",
+								"on type '" + Model.ProjectionLevel1.class.getName()
+										+ "', projection constructor, parameter at index 2 (level2)",
 								"Index field path starting from that location and ending with a cycle: 'level2.level1.level2.'",
 								"A projection constructor cannot declare an unrestricted @ObjectProjection to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @ObjectProjection: includePaths, includeDepth, excludePaths, ..." ) );
@@ -107,6 +114,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 				@IndexedEmbedded(includeDepth = 10)
 				public Level2 level2;
 			}
+
 			class Level2 {
 				@DocumentId
 				public Integer id;
@@ -115,6 +123,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 				@IndexedEmbedded
 				Level1 level1;
 			}
+
 			class ProjectionLevel1 {
 				public final String text;
 				public final ProjectionLevel2 level2;
@@ -126,9 +135,11 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 					this.level2 = level2;
 				}
 			}
+
 			class ProjectionLevel2 {
 				public final String text;
 				public final ProjectionLevel1 level1;
+
 				@ProjectionConstructor
 				public ProjectionLevel2(String text, ProjectionLevel1 level1) {
 					this.text = text;
@@ -149,7 +160,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 				Arrays.asList(
 						Arrays.asList( "result1",
 								Arrays.asList( "result1_level2",
-									Arrays.asList( "result1_level2_level1", null ) ) ),
+										Arrays.asList( "result1_level2_level1", null ) ) ),
 						Arrays.asList( "result2",
 								Arrays.asList( "result2_level2",
 										Arrays.asList( "result2_level2_level1", null ) ) )
@@ -177,6 +188,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 				@IndexedEmbedded(includeDepth = 10)
 				public Level2 level2;
 			}
+
 			class Level2 {
 				@DocumentId
 				public Integer id;
@@ -185,6 +197,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 				@IndexedEmbedded
 				Level1 level1;
 			}
+
 			class ProjectionLevel1 {
 				public final String text;
 				public final ProjectionLevel2 level2;
@@ -196,9 +209,11 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 					this.level2 = level2;
 				}
 			}
+
 			class ProjectionLevel2 {
 				public final String text;
 				public final ProjectionLevel1 level1;
+
 				@ProjectionConstructor
 				public ProjectionLevel2(String text, ProjectionLevel1 level1) {
 					this.text = text;
@@ -247,6 +262,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 				@IndexedEmbedded(includeDepth = 10)
 				public Level2 level2;
 			}
+
 			class Level2 {
 				@DocumentId
 				public Integer id;
@@ -255,6 +271,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 				@IndexedEmbedded
 				Level1 level1;
 			}
+
 			class ProjectionLevel1 {
 				public final String text;
 				public final ProjectionLevel2 level2;
@@ -266,9 +283,11 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 					this.level2 = level2;
 				}
 			}
+
 			class ProjectionLevel2 {
 				public final String text;
 				public final ProjectionLevel1 level1;
+
 				@ProjectionConstructor
 				public ProjectionLevel2(String text, ProjectionLevel1 level1) {
 					this.text = text;
@@ -317,6 +336,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 				@IndexedEmbedded(includeDepth = 10)
 				public Level2 level2;
 			}
+
 			class Level2 {
 				@DocumentId
 				public Integer id;
@@ -325,6 +345,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 				@IndexedEmbedded
 				Level3 level3;
 			}
+
 			class Level3 {
 				@DocumentId
 				public Integer id;
@@ -333,27 +354,33 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 				@IndexedEmbedded
 				Level1 level1;
 			}
+
 			class ProjectionLevel1 {
 				public final String text;
 				public final ProjectionLevel2 level2;
+
 				@ProjectionConstructor
 				public ProjectionLevel1(String text, ProjectionLevel2 level2) {
 					this.text = text;
 					this.level2 = level2;
 				}
 			}
+
 			class ProjectionLevel2 {
 				public final String text;
 				public final ProjectionLevel3 level3;
+
 				@ProjectionConstructor
 				public ProjectionLevel2(String text, ProjectionLevel3 level3) {
 					this.text = text;
 					this.level3 = level3;
 				}
 			}
+
 			class ProjectionLevel3 {
 				public final String text;
 				public final ProjectionLevel1 level1;
+
 				@ProjectionConstructor
 				public ProjectionLevel3(String text, ProjectionLevel1 level1) {
 					this.text = text;
@@ -380,7 +407,8 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 						.constructorContext( Model.class, String.class, Model.ProjectionLevel2.class )
 						.methodParameterContext( 2, "level2" )
 						.multilineFailure( "Cyclic recursion starting from 'ObjectProjectionBinder(...)'",
-								"on type '" + Model.ProjectionLevel1.class.getName() + "', projection constructor, parameter at index 2 (level2)",
+								"on type '" + Model.ProjectionLevel1.class.getName()
+										+ "', projection constructor, parameter at index 2 (level2)",
 								"Index field path starting from that location and ending with a cycle: 'level2.level3.level1.level2.'",
 								"A projection constructor cannot declare an unrestricted @ObjectProjection to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @ObjectProjection: includePaths, includeDepth, excludePaths, ..." ) );
@@ -398,6 +426,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 				@IndexedEmbedded(includeDepth = 10)
 				public Level2 level2;
 			}
+
 			class Level2 {
 				@DocumentId
 				public Integer id;
@@ -406,6 +435,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 				@IndexedEmbedded
 				Level3 level3;
 			}
+
 			class Level3 {
 				@DocumentId
 				public Integer id;
@@ -414,27 +444,33 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 				@IndexedEmbedded
 				Level1 level1;
 			}
+
 			class ProjectionLevel1 {
 				public final String text;
 				public final ProjectionLevel2 level2;
+
 				@ProjectionConstructor
 				public ProjectionLevel1(String text, ProjectionLevel2 level2) {
 					this.text = text;
 					this.level2 = level2;
 				}
 			}
+
 			class ProjectionLevel2 {
 				public final String text;
 				public final ProjectionLevel3 level3;
+
 				@ProjectionConstructor
 				public ProjectionLevel2(String text, ProjectionLevel3 level3) {
 					this.text = text;
 					this.level3 = level3;
 				}
 			}
+
 			class ProjectionLevel3 {
 				public final String text;
 				public final ProjectionLevel2 level2;
+
 				@ProjectionConstructor
 				public ProjectionLevel3(String text, ProjectionLevel2 level2) {
 					this.text = text;
@@ -461,7 +497,8 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 						.constructorContext( Model.class, String.class, Model.ProjectionLevel3.class )
 						.methodParameterContext( 2, "level3" )
 						.multilineFailure( "Cyclic recursion starting from 'ObjectProjectionBinder(...)'",
-								"on type '" + Model.ProjectionLevel2.class.getName() + "', projection constructor, parameter at index 2 (level3)",
+								"on type '" + Model.ProjectionLevel2.class.getName()
+										+ "', projection constructor, parameter at index 2 (level3)",
 								"Index field path starting from that location and ending with a cycle: 'level3.level2.level3.'",
 								"A projection constructor cannot declare an unrestricted @ObjectProjection to itself, even indirectly",
 								"To break the cycle, you should consider adding filters to your @ObjectProjection: includePaths, includeDepth, excludePaths, ..." ) );

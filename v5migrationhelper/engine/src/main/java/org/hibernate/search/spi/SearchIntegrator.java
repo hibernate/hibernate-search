@@ -32,7 +32,7 @@ import org.apache.lucene.search.Query;
 @Deprecated
 public interface SearchIntegrator {
 
-	V5MigrationSearchScope scope(Class<?> ... targetTypes);
+	V5MigrationSearchScope scope(Class<?>... targetTypes);
 
 	/**
 	 * Return an Hibernate Search query object.
@@ -49,7 +49,8 @@ public interface SearchIntegrator {
 	 */
 	default <LOS> HSQuery createHSQuery(Query fullTextQuery, V5MigrationSearchSession<LOS> session,
 			Consumer<LOS> loadOptionsContributor, Class<?>... entityTypes) {
-		V5MigrationSearchScope scope = entityTypes == null || entityTypes.length == 0 ? scope( Object.class )
+		V5MigrationSearchScope scope = entityTypes == null || entityTypes.length == 0
+				? scope( Object.class )
 				: scope( entityTypes );
 		return new HSQueryImpl<>( scope, session, fullTextQuery, loadOptionsContributor );
 	}

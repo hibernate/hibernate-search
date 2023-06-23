@@ -57,7 +57,8 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 
 	@Override
 	public DocumentElement addObject(IndexObjectFieldReference fieldReference) {
-		ElasticsearchIndexObjectFieldReference elasticsearchFieldReference = (ElasticsearchIndexObjectFieldReference) fieldReference;
+		ElasticsearchIndexObjectFieldReference elasticsearchFieldReference =
+				(ElasticsearchIndexObjectFieldReference) fieldReference;
 
 		ElasticsearchIndexObjectField fieldSchemaNode = elasticsearchFieldReference.getSchemaNode();
 
@@ -67,7 +68,8 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 
 	@Override
 	public void addNullObject(IndexObjectFieldReference fieldReference) {
-		ElasticsearchIndexObjectFieldReference elasticsearchFieldReference = (ElasticsearchIndexObjectFieldReference) fieldReference;
+		ElasticsearchIndexObjectFieldReference elasticsearchFieldReference =
+				(ElasticsearchIndexObjectFieldReference) fieldReference;
 
 		ElasticsearchIndexObjectField fieldSchemaNode = elasticsearchFieldReference.getSchemaNode();
 

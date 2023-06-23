@@ -134,14 +134,14 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 		@Override
 		public SearchSort build() {
 			if ( MISSING_HIGHEST_KEYWORD_JSON.equals( missing ) ) {
-				this.missing = this.order == null || SortOrder.ASC.equals( this.order ) ?
-						MISSING_LAST_KEYWORD_JSON :
-						MISSING_FIRST_KEYWORD_JSON;
+				this.missing = this.order == null || SortOrder.ASC.equals( this.order )
+						? MISSING_LAST_KEYWORD_JSON
+						: MISSING_FIRST_KEYWORD_JSON;
 			}
 			if ( MISSING_LOWEST_KEYWORD_JSON.equals( missing ) ) {
-				this.missing = this.order == null || SortOrder.ASC.equals( this.order ) ?
-						MISSING_FIRST_KEYWORD_JSON :
-						MISSING_LAST_KEYWORD_JSON;
+				this.missing = this.order == null || SortOrder.ASC.equals( this.order )
+						? MISSING_FIRST_KEYWORD_JSON
+						: MISSING_LAST_KEYWORD_JSON;
 			}
 			return new ElasticsearchStandardFieldSort( this );
 		}

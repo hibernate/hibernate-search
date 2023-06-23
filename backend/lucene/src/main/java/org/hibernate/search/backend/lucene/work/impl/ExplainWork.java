@@ -80,7 +80,8 @@ class ExplainWork implements ReadWork<Explanation> {
 		BooleanQuery.Builder builder = new BooleanQuery.Builder()
 				.add( Queries.mainDocumentQuery(), BooleanClause.Occur.FILTER )
 				.add( Queries.term( MetadataFields.idFieldName(), explainedDocumentId ), BooleanClause.Occur.FILTER )
-				.add( new MappedTypeNameQuery( context.getIndexReaderMetadataResolver(), explainedDocumentTypeName ), BooleanClause.Occur.FILTER );
+				.add( new MappedTypeNameQuery( context.getIndexReaderMetadataResolver(), explainedDocumentTypeName ),
+						BooleanClause.Occur.FILTER );
 		if ( explainedDocumentFilter != null ) {
 			builder.add( explainedDocumentFilter, BooleanClause.Occur.FILTER );
 		}

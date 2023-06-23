@@ -47,7 +47,8 @@ public class CompositeProjectionInnerStepImpl implements CompositeProjectionInne
 	@Override
 	public <V> CompositeProjectionValueStep<?, V> as(Class<V> objectClass) {
 		SearchProjectionFactory<?, ?> projectionFactoryWithCorrectRoot = objectFieldPath == null
-				? projectionFactory : projectionFactory.withRoot( objectFieldPath );
+				? projectionFactory
+				: projectionFactory.withRoot( objectFieldPath );
 		return dslContext.scope().projectionRegistry().composite( objectClass )
 				.apply( projectionFactoryWithCorrectRoot, this,
 						// TODO HSEARCH-4806/HSEARCH-4807 pass an actual context with parameters

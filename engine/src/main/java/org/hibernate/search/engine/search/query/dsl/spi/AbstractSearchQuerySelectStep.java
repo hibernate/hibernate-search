@@ -17,13 +17,12 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 
 public abstract class AbstractSearchQuerySelectStep<
-				N extends SearchQueryOptionsStep<?, E, LOS, ?, ?>,
-				R,
-				E,
-				LOS,
-				PJF extends SearchProjectionFactory<R, E>,
-				PDF extends SearchPredicateFactory
-		>
+		N extends SearchQueryOptionsStep<?, E, LOS, ?, ?>,
+		R,
+		E,
+		LOS,
+		PJF extends SearchProjectionFactory<R, E>,
+		PDF extends SearchPredicateFactory>
 		implements SearchQuerySelectStep<N, R, E, LOS, PJF, PDF> {
 
 	@Override

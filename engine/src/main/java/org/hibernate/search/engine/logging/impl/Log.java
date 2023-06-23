@@ -198,10 +198,12 @@ public interface Log extends BasicLogger {
 	SearchException subtypeExpected(@FormatWith(ClassFormatter.class) Class<?> classToLoad,
 			@FormatWith(ClassFormatter.class) Class<?> superType);
 
-	@Message(id = ID_OFFSET + 43, value = "Invalid type '%1$s': this type is an interface. An implementation class is required.")
+	@Message(id = ID_OFFSET + 43,
+			value = "Invalid type '%1$s': this type is an interface. An implementation class is required.")
 	SearchException implementationRequired(@FormatWith(ClassFormatter.class) Class<?> classToLoad);
 
-	@Message(id = ID_OFFSET + 44, value = "Invalid type '%1$s': missing constructor. The type must expose a public constructor with a single parameter of type Map.")
+	@Message(id = ID_OFFSET + 44,
+			value = "Invalid type '%1$s': missing constructor. The type must expose a public constructor with a single parameter of type Map.")
 	SearchException noPublicMapArgConstructor(@FormatWith(ClassFormatter.class) Class<?> classToLoad);
 
 	@Message(id = ID_OFFSET + 46, value = "Cyclic recursion starting from '%1$s' on %2$s."
@@ -240,7 +242,8 @@ public interface Log extends BasicLogger {
 			@FormatWith(SimpleNameClassFormatter.class) Class<? extends TemporalAccessor> type, String value,
 			DateTimeFormatter formatter, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET + 58, value = "Invalid %1$s value: expected either a Number or a String that can be parsed into a %1$s. %2$s")
+	@Message(id = ID_OFFSET + 58,
+			value = "Invalid %1$s value: expected either a Number or a String that can be parsed into a %1$s. %2$s")
 	SearchException invalidNumberPropertyValue(@FormatWith(SimpleNameClassFormatter.class) Class<? extends Number> type,
 			String nestedErrorMessage, @Cause Exception cause);
 
@@ -475,8 +478,9 @@ public interface Log extends BasicLogger {
 			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext,
 			SearchQueryElementTypeKey<?> key, String hint, @Param EventContext context, @Cause Exception cause);
 
-	@Message(value = "Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)."
-			+ " If it already is, then '%1$s' is not available for fields of this type.")
+	@Message(
+			value = "Make sure the field is marked as searchable/sortable/projectable/aggregable/highlightable (whichever is relevant)."
+					+ " If it already is, then '%1$s' is not available for fields of this type.")
 	String missingSupportHintForValueField(SearchQueryElementTypeKey<?> key);
 
 	@Message(value = "Some object field features require a nested structure;"

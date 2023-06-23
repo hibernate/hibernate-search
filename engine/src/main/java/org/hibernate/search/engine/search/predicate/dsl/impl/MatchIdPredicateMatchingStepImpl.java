@@ -18,7 +18,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 public final class MatchIdPredicateMatchingStepImpl
 		extends AbstractPredicateFinalStep
 		implements MatchIdPredicateMatchingStep<MatchIdPredicateMatchingStepImpl>,
-				MatchIdPredicateMatchingMoreStep<MatchIdPredicateMatchingStepImpl, MatchIdPredicateOptionsStep<?>> {
+		MatchIdPredicateMatchingMoreStep<MatchIdPredicateMatchingStepImpl, MatchIdPredicateOptionsStep<?>> {
 
 	private final MatchIdPredicateBuilder matchIdBuilder;
 

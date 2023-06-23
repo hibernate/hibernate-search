@@ -17,12 +17,12 @@ public enum MultiTenancyStrategyName {
 	/**
 	 * Single tenant configuration.
 	 */
-	NONE("none"),
+	NONE( "none" ),
 
 	/**
 	 * The multi-tenancy information is stored in the index as a discriminator field.
 	 */
-	DISCRIMINATOR("discriminator");
+	DISCRIMINATOR( "discriminator" );
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

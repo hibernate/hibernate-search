@@ -90,7 +90,8 @@ public class OutboxPollingAutomaticIndexingStaticShardingUnevenShardsIT {
 				.with( indexingCountHelper::bind );
 
 		if ( processingEnabled ) {
-			context = context.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", TOTAL_SHARD_COUNT )
+			context = context
+					.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", TOTAL_SHARD_COUNT )
 					.withProperty( "hibernate.search.coordination.event_processor.shards.assigned", assignedShardIndices );
 		}
 		else {
@@ -142,7 +143,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingUnevenShardsIT {
 			int idStart = i;
 			int idEnd = Math.min( i + batchSize, entityCount );
 			with( sessionFactory ).runInTransaction( session -> {
-				for ( int j = idStart; j < idEnd ; j++ ) {
+				for ( int j = idStart; j < idEnd; j++ ) {
 					IndexedEntity entity = session.getReference( IndexedEntity.class, j );
 					entity.setText( "updated" );
 

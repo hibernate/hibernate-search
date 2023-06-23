@@ -43,7 +43,7 @@ public class ItemStock {
 	public void setAmountInStock(int amountInStock) {
 		this.amountInStock = amountInStock;
 	}
-// end::getters-setters[]
+	// end::getters-setters[]
 
 }
 // end::include[]

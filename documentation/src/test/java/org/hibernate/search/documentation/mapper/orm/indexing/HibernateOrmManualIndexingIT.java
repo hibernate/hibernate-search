@@ -45,7 +45,7 @@ public class HibernateOrmManualIndexingIT {
 			// tag::persist-automatic-indexing-periodic-flush-clear[]
 			entityManager.getTransaction().begin();
 			try {
-				for ( int i = 0 ; i < NUMBER_OF_BOOKS ; ++i ) { // <1>
+				for ( int i = 0; i < NUMBER_OF_BOOKS; ++i ) { // <1>
 					Book book = newBook( i );
 					entityManager.persist( book ); // <2>
 
@@ -79,7 +79,7 @@ public class HibernateOrmManualIndexingIT {
 
 			entityManager.getTransaction().begin();
 			try {
-				for ( int i = 0 ; i < NUMBER_OF_BOOKS ; ++i ) {
+				for ( int i = 0; i < NUMBER_OF_BOOKS; ++i ) {
 					Book book = newBook( i );
 					entityManager.persist( book ); // <3>
 

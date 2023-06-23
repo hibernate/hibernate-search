@@ -83,7 +83,8 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
-	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testSimpleDirectoryType")
+	@PortedFromSearch5(
+			original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testSimpleDirectoryType")
 	@SuppressWarnings("deprecation")
 	public void filesystemAccessStrategy_simple() {
 		testFileSystemAccessStrategy( "simple", org.apache.lucene.store.SimpleFSDirectory.class, true );
@@ -105,7 +106,8 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
-	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testInvalidDirectoryType")
+	@PortedFromSearch5(
+			original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testInvalidDirectoryType")
 	public void filesystemAccessStrategy_invalid() {
 		assertThatThrownBy( () -> setup( c -> c.withBackendProperty(
 				LuceneIndexSettings.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY,

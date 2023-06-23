@@ -42,7 +42,7 @@ public class DropIndexWork extends AbstractNonBulkableWork<Void> {
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.delete()
-					.pathComponent( indexName );
+							.pathComponent( indexName );
 
 			return builder.build();
 		}

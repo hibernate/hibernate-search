@@ -64,7 +64,7 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 
 		List<Bucket<T>> buckets = getTopBuckets( context );
 
-		if ( BucketOrder.COUNT_DESC.equals( order ) && (minDocCount > 0 || buckets.size() >= maxTermCount ) ) {
+		if ( BucketOrder.COUNT_DESC.equals( order ) && ( minDocCount > 0 || buckets.size() >= maxTermCount ) ) {
 			/*
 			 * Optimization: in this case, minDocCount and sorting can be safely ignored.
 			 * We already have all the buckets we need, and they are already sorted.
@@ -94,7 +94,8 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 	}
 
 	abstract FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
-			NestedDocsProvider nestedDocsProvider, int limit) throws IOException;
+			NestedDocsProvider nestedDocsProvider, int limit)
+			throws IOException;
 
 	abstract Set<T> collectFirstTerms(IndexReader reader, boolean descending, int limit)
 			throws IOException;

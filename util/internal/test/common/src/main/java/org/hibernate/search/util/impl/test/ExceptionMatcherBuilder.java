@@ -81,7 +81,8 @@ public class ExceptionMatcherBuilder {
 	public Matcher<? super Throwable> build() {
 		if ( !suppressedMatchers.isEmpty() ) {
 			@SuppressWarnings("unchecked")
-			Matcher<? super Throwable>[] suppressedMatchersAsArray = castedSuppressedMatchers().toArray( new Matcher[suppressedMatchers.size()] );
+			Matcher<? super Throwable>[] suppressedMatchersAsArray =
+					castedSuppressedMatchers().toArray( new Matcher[suppressedMatchers.size()] );
 			ExceptionMatcherBuilder.this.matching( hasSuppressed( CoreMatchers.hasItems( suppressedMatchersAsArray ) ) );
 			suppressedMatchers.clear();
 		}

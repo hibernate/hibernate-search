@@ -168,11 +168,10 @@ public class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterI
 
 	@Test
 	public void sameClassFails() {
-		assertThatThrownBy( () ->
-				Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
-						ctx -> ctx.exclude( EntityA.class )
-								.include( EntityA.class )
-				)
+		assertThatThrownBy( () -> Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+				ctx -> ctx.exclude( EntityA.class )
+						.include( EntityA.class )
+		)
 		).isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						EntityA.class.getName(),
@@ -181,11 +180,10 @@ public class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterI
 						"Already excluded types:"
 				);
 
-		assertThatThrownBy( () ->
-				Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
-						ctx -> ctx.include( EntityA.class )
-								.exclude( EntityA.class )
-				)
+		assertThatThrownBy( () -> Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+				ctx -> ctx.include( EntityA.class )
+						.exclude( EntityA.class )
+		)
 		).isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						EntityA.class.getName(),
@@ -197,11 +195,10 @@ public class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterI
 
 	@Test
 	public void sameNameFails() {
-		assertThatThrownBy( () ->
-				Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
-						ctx -> ctx.include( EntityA.INDEX )
-								.exclude( EntityA.INDEX )
-				)
+		assertThatThrownBy( () -> Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+				ctx -> ctx.include( EntityA.INDEX )
+						.exclude( EntityA.INDEX )
+		)
 		).isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						EntityA.class.getName(),

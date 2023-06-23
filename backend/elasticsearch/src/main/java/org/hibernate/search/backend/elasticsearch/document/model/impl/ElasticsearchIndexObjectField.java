@@ -16,12 +16,11 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementCon
 
 public final class ElasticsearchIndexObjectField
 		extends AbstractIndexObjectField<
-						ElasticsearchIndexObjectField,
-						ElasticsearchSearchIndexScope<?>,
-						ElasticsearchIndexCompositeNodeType,
-						ElasticsearchIndexCompositeNode,
-						ElasticsearchIndexField
-				>
+				ElasticsearchIndexObjectField,
+				ElasticsearchSearchIndexScope<?>,
+				ElasticsearchIndexCompositeNodeType,
+				ElasticsearchIndexCompositeNode,
+				ElasticsearchIndexField>
 		implements ElasticsearchIndexCompositeNode, ElasticsearchIndexField {
 
 	public ElasticsearchIndexObjectField(ElasticsearchIndexCompositeNode parent, String relativeFieldName,

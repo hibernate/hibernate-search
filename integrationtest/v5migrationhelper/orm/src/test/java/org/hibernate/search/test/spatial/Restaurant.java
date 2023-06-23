@@ -31,7 +31,7 @@ public class Restaurant {
 	@IndexedEmbedded
 	Position position;
 
-	public Restaurant(Integer id, String name, String address,double latitude, double longitude) {
+	public Restaurant(Integer id, String name, String address, double latitude, double longitude) {
 		this.id = id;
 		this.name = name;
 		this.position = new Position();

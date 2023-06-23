@@ -73,7 +73,7 @@ public final class CollectionHelper {
 	}
 
 	@SafeVarargs
-	public static <T> Set<T> asImmutableSet(T ... items) {
+	public static <T> Set<T> asImmutableSet(T... items) {
 		//The intention here is to save some memory by picking the simplest safe representation,
 		// as we usually require immutable sets for long living metadata:
 		switch ( items.length ) {
@@ -97,7 +97,7 @@ public final class CollectionHelper {
 	}
 
 	@SafeVarargs
-	public static <T> List<T> asImmutableList(T ... items) {
+	public static <T> List<T> asImmutableList(T... items) {
 		switch ( items.length ) {
 			case 0:
 				return Collections.emptyList();

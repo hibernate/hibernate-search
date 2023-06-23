@@ -50,19 +50,19 @@ public class V5MigrationHelperTestDefaultLuceneAnalysisConfigurer implements Luc
 				.tokenFilter( LowerCaseFilterFactory.class )
 				.tokenFilter( StopFilterFactory.class )
 				.tokenFilter( NGramFilterFactory.class )
-						.param( "minGramSize", "3" )
-						.param( "maxGramSize", "3" );
+				.param( "minGramSize", "3" )
+				.param( "maxGramSize", "3" );
 		context.analyzer( AnalysisNames.ANALYZER_STANDARD_STANDARD_LOWERCASE_STOP_STEMMER_ENGLISH ).custom()
 				.tokenizer( StandardTokenizerFactory.class )
 				// Skipping StandardFilter: it was removed in Lucene 7.5/8 because it was a no-op.
 				.tokenFilter( LowerCaseFilterFactory.class )
 				.tokenFilter( StopFilterFactory.class )
 				.tokenFilter( SnowballPorterFilterFactory.class )
-						.param( "language", "English" );
+				.param( "language", "English" );
 		context.analyzer( AnalysisNames.ANALYZER_STANDARD_HTML_STRIP_ESCAPED_LOWERCASE ).custom()
 				.tokenizer( StandardTokenizerFactory.class )
 				.charFilter( HTMLStripCharFilterFactory.class )
-						.param( "escapedTags", "escaped" )
+				.param( "escapedTags", "escaped" )
 				.tokenFilter( LowerCaseFilterFactory.class );
 	}
 }

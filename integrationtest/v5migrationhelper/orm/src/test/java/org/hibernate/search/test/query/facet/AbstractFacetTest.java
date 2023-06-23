@@ -49,7 +49,16 @@ public abstract class AbstractFacetTest extends SearchTestBase {
 	public static final int[] albumPrices = { 499, 999, 1500, 1500, 1500, 1600, 1700, 1800, 2000, 2500 };
 
 	public static final String[] releaseDates = {
-			"2001", "2002", "1972", "1982", "2010", "1968", "1973", "2003", "2002", "1988"
+			"2001",
+			"2002",
+			"1972",
+			"1982",
+			"2010",
+			"1968",
+			"1973",
+			"2003",
+			"2002",
+			"1988"
 	};
 
 	public static final String[] fruits = {

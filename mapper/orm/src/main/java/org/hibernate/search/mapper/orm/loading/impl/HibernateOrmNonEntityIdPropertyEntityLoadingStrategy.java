@@ -135,9 +135,9 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 						+ " Expected entity name: " + entityPersister.getEntityName()
 						+ " Targeted entity names: "
 						+ targetEntityTypeContexts.stream()
-						.map( LoadingTypeContext::entityPersister )
-						.map( EntityPersister::getEntityName )
-						.collect( Collectors.toList() )
+								.map( LoadingTypeContext::entityPersister )
+								.map( EntityPersister::getEntityName )
+								.collect( Collectors.toList() )
 		);
 	}
 }

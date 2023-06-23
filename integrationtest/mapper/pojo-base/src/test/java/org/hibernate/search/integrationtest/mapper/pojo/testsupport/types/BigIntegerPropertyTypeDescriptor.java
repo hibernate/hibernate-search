@@ -104,12 +104,14 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 		BigInteger id;
 
 	}
+
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
 	public static class TypeWithIdentifierBridge2 {
 		@DocumentId
 		BigInteger id;
 
 	}
+
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
 		@DocumentId
@@ -119,6 +121,7 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 		@GenericField(indexNullAs = "0")
 		BigInteger indexNullAsProperty;
 	}
+
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
 		@DocumentId

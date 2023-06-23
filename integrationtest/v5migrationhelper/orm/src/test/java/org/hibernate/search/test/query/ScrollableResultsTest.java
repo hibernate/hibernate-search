@@ -41,18 +41,18 @@ public class ScrollableResultsTest {
 	@Before
 	public void setUp() {
 		builder
-			.addAnnotatedClass( AlternateBook.class )
-			.addAnnotatedClass( Employee.class )
-			.setProperty( "hibernate.default_batch_fetch_size", "10" )
-			.build();
+				.addAnnotatedClass( AlternateBook.class )
+				.addAnnotatedClass( Employee.class )
+				.setProperty( "hibernate.default_batch_fetch_size", "10" )
+				.build();
 		sess = builder.openFullTextSession();
 		Transaction tx = sess.beginTransaction();
 		//create some entities to query:
 		for ( int i = 0; i < 324; i++ ) {
-			sess.persist( new AlternateBook( i , "book about the number " + i ) );
+			sess.persist( new AlternateBook( i, "book about the number " + i ) );
 		}
 		for ( int i = 0; i < 133; i++ ) {
-			sess.persist( new Employee( i , "Rossi", "dept. num. " + i ) );
+			sess.persist( new Employee( i, "Rossi", "dept. num. " + i ) );
 		}
 		tx.commit();
 	}
@@ -105,10 +105,10 @@ public class ScrollableResultsTest {
 		TermQuery tq = new TermQuery( new Term( "summary", "number" ) );
 		Sort sort = qb.sort().byField( "id" ).createSort();
 		ScrollableResults scrollableResults = sess
-			.createFullTextQuery( tq, AlternateBook.class )
-			.setSort( sort )
-			.setFetchSize( 10 )
-			.scroll();
+				.createFullTextQuery( tq, AlternateBook.class )
+				.setSort( sort )
+				.setFetchSize( 10 )
+				.scroll();
 		int position = -1;
 		while ( scrollableResults.next() ) {
 			position++;

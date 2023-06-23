@@ -62,8 +62,8 @@ public final class StubTreeNodeDiffer<N extends StubTreeNode<N>> {
 			String path = entry.getKey();
 			treeBuilder.startObject( path );
 			StubTreeNodeMismatch mismatch = entry.getValue();
-			treeBuilder.attribute( "expected" , mismatch.expected );
-			treeBuilder.attribute( "actual" , mismatch.actual );
+			treeBuilder.attribute( "expected", mismatch.expected );
+			treeBuilder.attribute( "actual", mismatch.actual );
 			treeBuilder.endObject();
 		}
 	}

@@ -44,20 +44,20 @@ public class SpatialDSLTest {
 		Coordinates coordinates = Point.fromDegrees( 24d, 31.5d );
 		Query query = builder
 				.spatial()
-					.onField( "location" )
-					.within( 51, Unit.KM )
-						.ofCoordinates( coordinates )
-					.createQuery();
+				.onField( "location" )
+				.within( 51, Unit.KM )
+				.ofCoordinates( coordinates )
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( POI.class )
 				.matchesExactlyIds( 2 );
 
 		query = builder
 				.spatial()
-					.onField( "location" )
-					.within( 500, Unit.KM )
-						.ofLatitude( 48.858333d ).andLongitude( 2.294444d )
-					.createQuery();
+				.onField( "location" )
+				.within( 500, Unit.KM )
+				.ofLatitude( 48.858333d ).andLongitude( 2.294444d )
+				.createQuery();
 
 		helper.assertThatQuery( query ).from( POI.class )
 				.matchesExactlyIds( 1 );

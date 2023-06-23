@@ -19,10 +19,11 @@ import org.hibernate.search.util.common.impl.Closer;
 
 public class ConfiguredIndexingPlanSynchronizationStrategyHolder {
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends IndexingPlanSynchronizationStrategy>> INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
-			ConfigurationProperty.forKey( StandalonePojoMapperSettings.Radicals.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY )
-					.asBeanReference( IndexingPlanSynchronizationStrategy.class )
-					.build();
+	private static final OptionalConfigurationProperty<
+			BeanReference<? extends IndexingPlanSynchronizationStrategy>> INDEXING_PLAN_SYNCHRONIZATION_STRATEGY =
+					ConfigurationProperty.forKey( StandalonePojoMapperSettings.Radicals.INDEXING_PLAN_SYNCHRONIZATION_STRATEGY )
+							.asBeanReference( IndexingPlanSynchronizationStrategy.class )
+							.build();
 
 	private final StandalonePojoSearchSessionMappingContext mappingContext;
 	private BeanHolder<? extends IndexingPlanSynchronizationStrategy> defaultSynchronizationStrategyHolder;

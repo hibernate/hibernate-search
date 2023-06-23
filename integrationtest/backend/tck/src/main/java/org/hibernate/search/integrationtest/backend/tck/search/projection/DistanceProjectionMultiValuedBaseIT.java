@@ -86,25 +86,25 @@ public class DistanceProjectionMultiValuedBaseIT {
 
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> mainIndex =
 			SimpleMappedIndex.of(
-							root -> SingleFieldIndexBinding.create(
-									root,
-									supportedFieldTypes,
-									TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault() ?
-											NO_ADDITIONAL_CONFIGURATION :
-											c -> c.projectable( Projectable.YES )
-							)
+					root -> SingleFieldIndexBinding.create(
+							root,
+							supportedFieldTypes,
+							TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+									? NO_ADDITIONAL_CONFIGURATION
+									: c -> c.projectable( Projectable.YES )
 					)
+			)
 					.name( "main" );
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> sortableIndex =
 			SimpleMappedIndex.of(
-							root -> SingleFieldIndexBinding.create(
-									root,
-									supportedFieldTypes,
-									TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault() ?
-											NO_ADDITIONAL_CONFIGURATION :
-											c -> c.projectable( Projectable.YES ).sortable( Sortable.YES )
-							)
+					root -> SingleFieldIndexBinding.create(
+							root,
+							supportedFieldTypes,
+							TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+									? NO_ADDITIONAL_CONFIGURATION
+									: c -> c.projectable( Projectable.YES ).sortable( Sortable.YES )
 					)
+			)
 					.name( "sortable" );
 
 	@BeforeClass

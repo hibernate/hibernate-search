@@ -35,6 +35,7 @@ public class Profile implements IProfile {
 	public Integer getId() {
 		return id;
 	}
+
 	@Override
 	public void setId(Integer id) {
 		this.id = id;

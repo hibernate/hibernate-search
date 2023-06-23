@@ -64,9 +64,9 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 		List list = fullTextQuery.list();
 		assertThat( list.size() ).isEqualTo( 2 );
 		assertThat( statistics.getSecondLevelCacheHitCount() )
-			.isEqualTo( 0 );
+				.isEqualTo( 0 );
 		assertThat( statistics.getQueryExecutionCount() )
-			.isEqualTo( 1 );
+				.isEqualTo( 1 );
 
 		transaction.commit();
 		clearData( session );
@@ -95,9 +95,9 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 		List list = fullTextQuery.list();
 		assertThat( list.size() ).isEqualTo( 2 );
 		assertThat( statistics.getSecondLevelCacheHitCount() )
-			.isEqualTo( 2 );
+				.isEqualTo( 2 );
 		assertThat( statistics.getQueryExecutionCount() )
-			.isEqualTo( 0 );
+				.isEqualTo( 0 );
 
 		transaction.commit();
 		clearData( session );
@@ -128,7 +128,7 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 		List list = fullTextQuery.list();
 		assertThat( list.size() ).isEqualTo( 2 );
 		assertThat( statistics.getSecondLevelCacheHitCount() )
-			.isEqualTo( 0 );
+				.isEqualTo( 0 );
 		assertThat( statistics.getQueryExecutionCount() )
 				.describedAs( "entities should be looked up and are already loaded" )
 				.isEqualTo( 0 );
@@ -167,7 +167,7 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 		List list = fullTextQuery.list();
 		assertThat( list.size() ).isEqualTo( 2 );
 		assertThat( statistics.getSecondLevelCacheHitCount() )
-			.isEqualTo( 1 );
+				.isEqualTo( 1 );
 		assertThat( statistics.getQueryExecutionCount() )
 				.describedAs( "entities should be looked up and are already loaded" )
 				.isEqualTo( 0 );
@@ -236,7 +236,7 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 	}
 
 	@Override
-	public void configure(Map<String,Object> cfg) {
+	public void configure(Map<String, Object> cfg) {
 		cfg.put( Environment.USE_SECOND_LEVEL_CACHE, "true" );
 		cfg.put( Environment.CACHE_REGION_FACTORY, CachingRegionFactory.class.getCanonicalName() );
 	}

@@ -73,8 +73,8 @@ public class LuceneExtractableSearchResult<H> {
 		ProjectionHitMapper<?> projectionHitMapper = requestContext.getLoadingContext().createProjectionHitMapper();
 		List<Object> extractedData = extractHits( projectionHitMapper, startInclusive, endExclusive );
 
-		Map<AggregationKey<?>, ?> extractedAggregations = aggregations.isEmpty() ?
-				Collections.emptyMap() : extractAggregations();
+		Map<AggregationKey<?>, ?> extractedAggregations =
+				aggregations.isEmpty() ? Collections.emptyMap() : extractAggregations();
 
 		return new LuceneLoadableSearchResult<>(
 				fromDocumentValueConvertContext, rootExtractor,
@@ -96,7 +96,8 @@ public class LuceneExtractableSearchResult<H> {
 	}
 
 	private List<Object> extractHits(ProjectionHitMapper<?> projectionHitMapper, int startInclusive,
-			int endExclusive) throws IOException {
+			int endExclusive)
+			throws IOException {
 		TopDocs topDocs = luceneCollectors.getTopDocs();
 		if ( topDocs == null ) {
 			return Collections.emptyList();

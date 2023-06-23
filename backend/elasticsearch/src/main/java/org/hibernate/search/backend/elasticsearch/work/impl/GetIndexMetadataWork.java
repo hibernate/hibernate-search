@@ -64,13 +64,15 @@ public class GetIndexMetadataWork extends AbstractNonBulkableWork<List<ExistingI
 	private Map<String, IndexAliasDefinition> getAliases(ElasticsearchWorkExecutionContext context, JsonObject index) {
 		JsonElement aliases = index.get( "aliases" );
 		if ( aliases == null || !aliases.isJsonObject() ) {
-			throw new AssertionFailure( "Elasticsearch API call succeeded, but the aliases weren't mentioned in the result: " + index );
+			throw new AssertionFailure(
+					"Elasticsearch API call succeeded, but the aliases weren't mentioned in the result: " + index );
 		}
 
 		GsonProvider gsonProvider = context.getGsonProvider();
 		Map<String, IndexAliasDefinition> result = new LinkedHashMap<>();
 		for ( Map.Entry<String, JsonElement> entry : aliases.getAsJsonObject().entrySet() ) {
-			IndexAliasDefinition aliasDefinition = gsonProvider.getGson().fromJson( entry.getValue(), IndexAliasDefinition.class );
+			IndexAliasDefinition aliasDefinition =
+					gsonProvider.getGson().fromJson( entry.getValue(), IndexAliasDefinition.class );
 			result.put( entry.getKey(), aliasDefinition );
 		}
 		return result;
@@ -79,7 +81,8 @@ public class GetIndexMetadataWork extends AbstractNonBulkableWork<List<ExistingI
 	private IndexSettings getSettings(ElasticsearchWorkExecutionContext context, JsonObject index) {
 		JsonElement settings = index.get( "settings" );
 		if ( settings == null || !settings.isJsonObject() ) {
-			throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested settings weren't mentioned in the result: " + index );
+			throw new AssertionFailure(
+					"Elasticsearch API call succeeded, but the requested settings weren't mentioned in the result: " + index );
 		}
 
 		JsonElement indexSettings = settings.getAsJsonObject().get( "index" );
@@ -148,7 +151,7 @@ public class GetIndexMetadataWork extends AbstractNonBulkableWork<List<ExistingI
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.get()
-					.multiValuedPathComponent( indexNames );
+							.multiValuedPathComponent( indexNames );
 			// This prevents the request from failing if the given index name does not match anything
 			builder.param( "ignore_unavailable", true );
 			// According to the documentation, this should prevent the request from failing

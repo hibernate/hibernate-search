@@ -50,7 +50,7 @@ public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStra
 	}
 
 	@SuppressWarnings("deprecation") // There's no other way to access the reflection manager
-	final HibernateOrmBootstrapIntrospector createIntrospector(Class<?> ... entityClasses) {
+	final HibernateOrmBootstrapIntrospector createIntrospector(Class<?>... entityClasses) {
 		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
 		// Some properties that are not relevant to our test, but necessary to create the Metadata
 		registryBuilder.applySetting( AvailableSettings.DIALECT, H2Dialect.class );

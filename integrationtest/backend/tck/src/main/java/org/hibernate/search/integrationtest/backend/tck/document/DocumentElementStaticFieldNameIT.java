@@ -291,8 +291,9 @@ public class DocumentElementStaticFieldNameIT<F> {
 		FirstLevelObjectBinding(IndexSchemaElement objectField, IndexObjectFieldReference objectFieldReference) {
 			super( objectField );
 			self = objectFieldReference;
-			IndexSchemaObjectField flattenedObjectField = objectField.objectField( "flattenedObject", ObjectStructure.FLATTENED )
-					.multiValued();
+			IndexSchemaObjectField flattenedObjectField =
+					objectField.objectField( "flattenedObject", ObjectStructure.FLATTENED )
+							.multiValued();
 			flattenedObject = new SecondLevelObjectBinding( flattenedObjectField );
 			IndexSchemaObjectField nestedObjectField = objectField.objectField( "nestedObject", ObjectStructure.NESTED )
 					.multiValued();

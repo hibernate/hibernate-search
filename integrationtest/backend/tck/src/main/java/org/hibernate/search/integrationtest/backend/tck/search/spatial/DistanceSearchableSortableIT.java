@@ -72,11 +72,10 @@ public class DistanceSearchableSortableIT {
 		StubMappingScope scope = index.createScope();
 		String fieldPath = "searchableNotSortable";
 
-		assertThatThrownBy( () ->
-				scope.query()
-						.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
-						.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
-						.toQuery()
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
+				.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
+				.toQuery()
 
 		)
 				.isInstanceOf( SearchException.class )
@@ -97,11 +96,10 @@ public class DistanceSearchableSortableIT {
 		StubMappingScope scope = index.createScope();
 		String fieldPath = "searchableNotSortableNotProjectable";
 
-		assertThatThrownBy( () ->
-				scope.query()
-						.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
-						.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
-						.toQuery()
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
+				.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
+				.toQuery()
 
 		)
 				.isInstanceOf( SearchException.class )
@@ -126,11 +124,10 @@ public class DistanceSearchableSortableIT {
 		StubMappingScope scope = index.createScope();
 		String fieldPath = "searchableDefaultSortable";
 
-		assertThatThrownBy( () ->
-				scope.query()
-						.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
-						.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
-						.toQuery()
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
+				.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
+				.toQuery()
 
 		)
 				.isInstanceOf( SearchException.class )
@@ -151,11 +148,10 @@ public class DistanceSearchableSortableIT {
 		StubMappingScope scope = index.createScope();
 		String fieldPath = "notSearchableSortable";
 
-		assertThatThrownBy( () ->
-				scope.query()
-						.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
-						.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
-						.toQuery()
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
+				.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
+				.toQuery()
 
 		)
 				.isInstanceOf( SearchException.class )
@@ -220,12 +216,22 @@ public class DistanceSearchableSortableIT {
 		final IndexFieldReference<GeoPoint> defaultSearchableSortable;
 
 		IndexBinding(IndexSchemaElement root) {
-			searchableSortable = root.field( "searchableSortable", f -> f.asGeoPoint().searchable( Searchable.YES ).sortable( Sortable.YES ) ).toReference();
-			searchableNotSortable = root.field( "searchableNotSortable", f -> f.asGeoPoint().searchable( Searchable.YES ).sortable( Sortable.NO ) ).toReference();
-			searchableNotSortableNotProjectable = root.field( "searchableNotSortableNotProjectable", f -> f.asGeoPoint().searchable( Searchable.YES ).sortable( Sortable.NO ).projectable( Projectable.NO ) ).toReference();
-			searchableDefaultSortable = root.field( "searchableDefaultSortable", f -> f.asGeoPoint().searchable( Searchable.YES ) ).toReference();
-			notSearchableSortable = root.field( "notSearchableSortable", f -> f.asGeoPoint().searchable( Searchable.NO ).sortable( Sortable.YES ) ).toReference();
-			defaultSearchableSortable = root.field( "defaultSearchableSortable", f -> f.asGeoPoint().sortable( Sortable.YES ) ).toReference();
+			searchableSortable = root
+					.field( "searchableSortable", f -> f.asGeoPoint().searchable( Searchable.YES ).sortable( Sortable.YES ) )
+					.toReference();
+			searchableNotSortable = root
+					.field( "searchableNotSortable", f -> f.asGeoPoint().searchable( Searchable.YES ).sortable( Sortable.NO ) )
+					.toReference();
+			searchableNotSortableNotProjectable = root.field( "searchableNotSortableNotProjectable",
+					f -> f.asGeoPoint().searchable( Searchable.YES ).sortable( Sortable.NO ).projectable( Projectable.NO ) )
+					.toReference();
+			searchableDefaultSortable =
+					root.field( "searchableDefaultSortable", f -> f.asGeoPoint().searchable( Searchable.YES ) ).toReference();
+			notSearchableSortable = root
+					.field( "notSearchableSortable", f -> f.asGeoPoint().searchable( Searchable.NO ).sortable( Sortable.YES ) )
+					.toReference();
+			defaultSearchableSortable =
+					root.field( "defaultSearchableSortable", f -> f.asGeoPoint().sortable( Sortable.YES ) ).toReference();
 		}
 	}
 

@@ -26,7 +26,7 @@ import org.hibernate.search.util.impl.test.reflect.WildcardTypeCapture.Of;
 
 import org.junit.Test;
 
-@SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types
+@SuppressWarnings({ "unchecked", "rawtypes" }) // Raw types are the only way to mock parameterized types
 public class TypePatternMatcherFactoryTest {
 
 	private final PojoBootstrapIntrospector introspectorMock = mock( PojoBootstrapIntrospector.class );
@@ -126,7 +126,7 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public void wildcardType() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
-				new WildcardTypeCapture<Of<?>>() { }.getType(),
+				new WildcardTypeCapture<Of<?>>() {}.getType(),
 				String.class
 		) )
 				.isInstanceOf( UnsupportedOperationException.class );
@@ -135,7 +135,7 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public <T> void typeVariable() {
 		// Must put this here, not in the lambda, otherwise the generated type is a bit different.
-		Type type = new TypeCapture<T>() { }.getType();
+		Type type = new TypeCapture<T>() {}.getType();
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				type,
 				String.class
@@ -186,7 +186,7 @@ public class TypePatternMatcherFactoryTest {
 	public <T> void rawSuperType_resultIsTypeVariable() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				String.class,
-				new TypeCapture<T>() { }.getType()
+				new TypeCapture<T>() {}.getType()
 		) )
 				.isInstanceOf( UnsupportedOperationException.class );
 	}
@@ -195,7 +195,7 @@ public class TypePatternMatcherFactoryTest {
 	public <T> void rawSuperType_resultIsWildcard() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				String.class,
-				new WildcardTypeCapture<Of<?>>() { }.getType()
+				new WildcardTypeCapture<Of<?>>() {}.getType()
 		) )
 				.isInstanceOf( UnsupportedOperationException.class );
 	}
@@ -204,7 +204,7 @@ public class TypePatternMatcherFactoryTest {
 	public void rawSuperType_resultIsParameterized() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				String.class,
-				new TypeCapture<List<String>>() { }.getType()
+				new TypeCapture<List<String>>() {}.getType()
 		) )
 				.isInstanceOf( UnsupportedOperationException.class );
 	}
@@ -248,8 +248,8 @@ public class TypePatternMatcherFactoryTest {
 		PojoTypeModel<T> resultTypeMock = mock( PojoTypeModel.class );
 
 		ExtractingTypePatternMatcher matcher = factory.createExtractingMatcher(
-				new TypeCapture<T[]>() { }.getType(),
-				new TypeCapture<T>() { }.getType()
+				new TypeCapture<T[]>() {}.getType(),
+				new TypeCapture<T>() {}.getType()
 		);
 		assertThat( matcher ).isInstanceOf( ArrayElementTypeMatcher.class );
 		assertThat( matcher.toString() )
@@ -274,8 +274,8 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public <T extends Iterable<?>> void genericArrayElement_boundedTypeVariable() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
-				new TypeCapture<T[]>() { }.getType(),
-				new TypeCapture<T>() { }.getType()
+				new TypeCapture<T[]>() {}.getType(),
+				new TypeCapture<T>() {}.getType()
 		) )
 				.isInstanceOf( UnsupportedOperationException.class );
 	}
@@ -283,8 +283,8 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public <T extends Object & Serializable> void genericArrayElement_multiBoundedTypeVariable() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
-				new TypeCapture<T[]>() { }.getType(),
-				new TypeCapture<T>() { }.getType()
+				new TypeCapture<T[]>() {}.getType(),
+				new TypeCapture<T>() {}.getType()
 		) )
 				.isInstanceOf( UnsupportedOperationException.class );
 	}
@@ -292,7 +292,7 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public <T> void genericArrayElement_resultIsRawType() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
-				new TypeCapture<T[]>() { }.getType(),
+				new TypeCapture<T[]>() {}.getType(),
 				Object.class
 		) )
 				.isInstanceOf( UnsupportedOperationException.class );
@@ -301,8 +301,8 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public <T, U> void genericArrayElement_resultIsDifferentTypeArgument() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
-				new TypeCapture<T[]>() { }.getType(),
-				new TypeCapture<U>() { }.getType()
+				new TypeCapture<T[]>() {}.getType(),
+				new TypeCapture<U>() {}.getType()
 		) )
 				.isInstanceOf( UnsupportedOperationException.class );
 	}
@@ -313,8 +313,8 @@ public class TypePatternMatcherFactoryTest {
 		PojoTypeModel<Integer> resultTypeMock = mock( PojoTypeModel.class );
 
 		ExtractingTypePatternMatcher matcher = factory.createExtractingMatcher(
-				new TypeCapture<Map<?, T>>() { }.getType(),
-				new TypeCapture<T>() { }.getType()
+				new TypeCapture<Map<?, T>>() {}.getType(),
+				new TypeCapture<T>() {}.getType()
 		);
 		assertThat( matcher ).isInstanceOf( ParameterizedTypeArgumentMatcher.class );
 		assertThat( matcher.toString() )
@@ -339,8 +339,8 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public <T> void parameterizedType_upperBoundedWildcard() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
-				new TypeCapture<Map<? extends Long, T>>() { }.getType(),
-				new TypeCapture<T>() { }.getType()
+				new TypeCapture<Map<? extends Long, T>>() {}.getType(),
+				new TypeCapture<T>() {}.getType()
 		) )
 				.isInstanceOf( UnsupportedOperationException.class );
 	}
@@ -348,8 +348,8 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public <T> void parameterizedType_lowerBoundedWildcard() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
-				new TypeCapture<Map<? super Long, T>>() { }.getType(),
-				new TypeCapture<T>() { }.getType()
+				new TypeCapture<Map<? super Long, T>>() {}.getType(),
+				new TypeCapture<T>() {}.getType()
 		) )
 				.isInstanceOf( UnsupportedOperationException.class );
 	}
@@ -357,8 +357,8 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public <T> void parameterizedType_onlyWildcards() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
-				new TypeCapture<Map<?, ?>>() { }.getType(),
-				new TypeCapture<T>() { }.getType()
+				new TypeCapture<Map<?, ?>>() {}.getType(),
+				new TypeCapture<T>() {}.getType()
 		) )
 				.isInstanceOf( UnsupportedOperationException.class );
 	}
@@ -366,8 +366,8 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public <T> void parameterizedType_rawType() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
-				new TypeCapture<Map<?, String>>() { }.getType(),
-				new TypeCapture<T>() { }.getType()
+				new TypeCapture<Map<?, String>>() {}.getType(),
+				new TypeCapture<T>() {}.getType()
 		) )
 				.isInstanceOf( UnsupportedOperationException.class );
 	}
@@ -375,8 +375,8 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public <T extends Iterable<?>> void parameterizedType_boundedTypeVariable() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
-				new TypeCapture<Map<?, T>>() { }.getType(),
-				new TypeCapture<T>() { }.getType()
+				new TypeCapture<Map<?, T>>() {}.getType(),
+				new TypeCapture<T>() {}.getType()
 		) )
 				.isInstanceOf( UnsupportedOperationException.class );
 	}
@@ -384,8 +384,8 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public <T extends Object & Serializable> void parameterizedType_multiBoundedTypeVariable() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
-				new TypeCapture<Map<?, T>>() { }.getType(),
-				new TypeCapture<T>() { }.getType()
+				new TypeCapture<Map<?, T>>() {}.getType(),
+				new TypeCapture<T>() {}.getType()
 		) )
 				.isInstanceOf( UnsupportedOperationException.class );
 	}
@@ -393,8 +393,8 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public <T, U> void parameterizedType_multipleTypeVariables() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
-				new TypeCapture<Map<T, U>>() { }.getType(),
-				new TypeCapture<T>() { }.getType()
+				new TypeCapture<Map<T, U>>() {}.getType(),
+				new TypeCapture<T>() {}.getType()
 		) )
 				.isInstanceOf( UnsupportedOperationException.class );
 	}
@@ -402,7 +402,7 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public <T, U> void parameterizedType_resultIsRawType() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
-				new TypeCapture<Map<?, T>>() { }.getType(),
+				new TypeCapture<Map<?, T>>() {}.getType(),
 				Object.class
 		) )
 				.isInstanceOf( UnsupportedOperationException.class );
@@ -411,8 +411,8 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public <T, U> void parameterizedType_resultIsDifferentTypeArgument() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
-				new TypeCapture<Map<?, T>>() { }.getType(),
-				new TypeCapture<U>() { }.getType()
+				new TypeCapture<Map<?, T>>() {}.getType(),
+				new TypeCapture<U>() {}.getType()
 		) )
 				.isInstanceOf( UnsupportedOperationException.class );
 	}

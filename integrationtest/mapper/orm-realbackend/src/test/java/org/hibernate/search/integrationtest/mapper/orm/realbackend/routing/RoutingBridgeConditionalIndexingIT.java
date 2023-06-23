@@ -169,7 +169,7 @@ public class RoutingBridgeConditionalIndexingIT {
 		public void setStatus(Status status) {
 			this.status = status;
 		}
-	// end::getters-setters[]
+		// end::getters-setters[]
 	}
 
 	public enum Status {

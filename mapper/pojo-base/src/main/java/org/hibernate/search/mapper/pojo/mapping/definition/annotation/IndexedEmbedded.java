@@ -100,7 +100,8 @@ import org.hibernate.search.util.common.annotation.Search5DeprecatedAPI;
 @Repeatable(IndexedEmbedded.List.class)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = IndexedEmbeddedProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = IndexedEmbeddedProcessor.class,
+		retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface IndexedEmbedded {
 
 	/**
@@ -137,7 +138,7 @@ public @interface IndexedEmbedded {
 	 * i.e. they must not include the {@link #name()}.
 	 * Paths <b>must</b> lead to a field and <b>cannot</b> end with some {@link #prefix() prefix used to construct a field name}.
 	 */
-	String[] includePaths() default {};
+	String[] includePaths() default { };
 
 
 	/**
@@ -156,7 +157,7 @@ public @interface IndexedEmbedded {
 	 * Paths <b>must</b> lead to a field and <b>cannot</b> end with some {@link #prefix() prefix used to construct a field name}.
 	 */
 	@Incubating
-	String[] excludePaths() default {};
+	String[] excludePaths() default { };
 
 	/**
 	 * The number of levels of indexed-embedded that will have all their fields included by default.

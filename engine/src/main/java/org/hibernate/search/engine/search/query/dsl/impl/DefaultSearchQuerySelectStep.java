@@ -29,13 +29,12 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 
 public final class DefaultSearchQuerySelectStep<R, E, LOS>
 		extends AbstractSearchQuerySelectStep<
-								SearchQueryOptionsStep<?, E, LOS, ?, ?>,
-								R,
-								E,
-								LOS,
-								SearchProjectionFactory<R, E>,
-								SearchPredicateFactory
-						> {
+				SearchQueryOptionsStep<?, E, LOS, ?, ?>,
+				R,
+				E,
+				LOS,
+				SearchProjectionFactory<R, E>,
+				SearchPredicateFactory> {
 
 	private final SearchQueryIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
@@ -96,7 +95,8 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS>
 
 	@Override
 	public SearchQueryOptionsStep<?, E, LOS, ?, ?> where(
-			BiConsumer<? super SearchPredicateFactory, ? super SimpleBooleanPredicateClausesCollector<?>> predicateContributor) {
+			BiConsumer<? super SearchPredicateFactory,
+					? super SimpleBooleanPredicateClausesCollector<?>> predicateContributor) {
 		return selectEntity().where( predicateContributor );
 	}
 

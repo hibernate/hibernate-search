@@ -32,17 +32,18 @@ import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.Schema
 public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator<StandalonePojoMappingPartialBuildState>
 		implements StandalonePojoMappingConfigurationContext {
 
-	private static final ConfigurationProperty<SchemaManagementStrategyName> SCHEMA_MANAGEMENT_STRATEGY
-			= ConfigurationProperty.forKey( StandalonePojoMapperSettings.Radicals.SCHEMA_MANAGEMENT_STRATEGY )
-			.as( SchemaManagementStrategyName.class, SchemaManagementStrategyName::of )
-			.withDefault( StandalonePojoMapperSettings.Defaults.SCHEMA_MANAGEMENT_STRATEGY )
-			.build();
-
-	private static final OptionalConfigurationProperty<List<BeanReference<? extends StandalonePojoMappingConfigurer>>> MAPPING_CONFIGURER =
-			ConfigurationProperty.forKey( StandalonePojoMapperSettings.Radicals.MAPPING_CONFIGURER )
-					.asBeanReference( StandalonePojoMappingConfigurer.class )
-					.multivalued()
+	private static final ConfigurationProperty<SchemaManagementStrategyName> SCHEMA_MANAGEMENT_STRATEGY =
+			ConfigurationProperty.forKey( StandalonePojoMapperSettings.Radicals.SCHEMA_MANAGEMENT_STRATEGY )
+					.as( SchemaManagementStrategyName.class, SchemaManagementStrategyName::of )
+					.withDefault( StandalonePojoMapperSettings.Defaults.SCHEMA_MANAGEMENT_STRATEGY )
 					.build();
+
+	private static final OptionalConfigurationProperty<
+			List<BeanReference<? extends StandalonePojoMappingConfigurer>>> MAPPING_CONFIGURER =
+					ConfigurationProperty.forKey( StandalonePojoMapperSettings.Radicals.MAPPING_CONFIGURER )
+							.asBeanReference( StandalonePojoMappingConfigurer.class )
+							.multivalued()
+							.build();
 
 	private static final ConfigurationProperty<Boolean> MULTI_TENANCY_ENABLED =
 			ConfigurationProperty.forKey( StandalonePojoMapperSettings.Radicals.MULTI_TENANCY_ENABLED )
@@ -71,8 +72,9 @@ public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator
 	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		this.tenancyMode(
-				MULTI_TENANCY_ENABLED.get( buildContext.configurationPropertySource() ) ?
-						TenancyMode.MULTI_TENANCY : TenancyMode.SINGLE_TENANCY
+				MULTI_TENANCY_ENABLED.get( buildContext.configurationPropertySource() )
+						? TenancyMode.MULTI_TENANCY
+						: TenancyMode.SINGLE_TENANCY
 		);
 		// Apply the user-provided mapping configurer if necessary.
 		// Has to happen before building entityTypeMetadataProvider as configurers can add more entities.

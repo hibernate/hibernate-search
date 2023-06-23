@@ -71,7 +71,8 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 			this.lastEntityNode = parentNode.lastEntityNode();
 			this.modelPathFromLastEntityNode = modelPathFromLastEntityNode;
 		}
-		this.reindexOnUpdate = parentNode != null ? parentNode.composeReindexOnUpdate( lastEntityNode, null )
+		this.reindexOnUpdate = parentNode != null
+				? parentNode.composeReindexOnUpdate( lastEntityNode, null )
 				: buildingHelper.getDefaultReindexOnUpdate();
 	}
 
@@ -80,7 +81,7 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 	 * reference the same type, just from a different root.
 	 * Thus fetching the same property results in the same property type.
 	 */
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public PojoIndexingDependencyCollectorPropertyNode<T, ?> property(String propertyName) {
 		return new PojoIndexingDependencyCollectorPropertyNode<>(
 				this,
@@ -163,8 +164,8 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 			 * entity A gets reindexed.
 			 * This is what the calls below achieve.
 			 */
-			for ( PojoRawTypeModel<?> concreteEntityType :
-					buildingHelper.getConcreteEntitySubTypesForEntitySuperType( rawType ) ) {
+			for ( PojoRawTypeModel<?> concreteEntityType : buildingHelper
+					.getConcreteEntitySubTypesForEntitySuperType( rawType ) ) {
 				PojoImplicitReindexingResolverOriginalTypeNodeBuilder<?> builder =
 						buildingHelper.getOrCreateResolverBuilder( concreteEntityType )
 								.containingEntitiesResolverRoot();
@@ -177,8 +178,8 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 		PojoTypeModel<?> valueType = dirtyPathFromEntityType.getTypeModel();
 		PojoRawTypeModel<?> valueRawType = valueType.rawType();
 		if ( buildingHelper.isEntity( valueRawType ) ) {
-			for ( PojoRawTypeModel<?> concreteEntityType :
-					buildingHelper.getConcreteEntitySubTypesForEntitySuperType( valueRawType ) ) {
+			for ( PojoRawTypeModel<?> concreteEntityType : buildingHelper
+					.getConcreteEntitySubTypesForEntitySuperType( valueRawType ) ) {
 				Optional<PojoModelPathValueNode> inversePath = buildingHelper.pathInverter().invertPath(
 						concreteEntityType, dirtyPathFromEntityType );
 				if ( !inversePath.isPresent() ) {
@@ -259,20 +260,20 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 	List<PojoIndexingDependencyCollectorTypeNode<? extends T>> polymorphic() {
 		if (
 			// No need for polymorphism on the root type:
-			// indexing/reindexing always works on actual instance types at the root.
-			// E.g. if there is a hierarchy of contained types, we'll have one reindexing resolver for each
-			// concrete type in the hierarchy.
-			parentNode == null
-			// For non-entity types, we have no idea what all the concrete subtypes are,
-			// so we cannot handle polymorphism.
-			|| lastEntityNode != this ) {
+		// indexing/reindexing always works on actual instance types at the root.
+		// E.g. if there is a hierarchy of contained types, we'll have one reindexing resolver for each
+		// concrete type in the hierarchy.
+		parentNode == null
+				// For non-entity types, we have no idea what all the concrete subtypes are,
+				// so we cannot handle polymorphism.
+				|| lastEntityNode != this ) {
 			return Collections.singletonList( this );
 		}
 
 		PojoRawTypeModel<? super T> superTypeModel = typeModel().rawType();
 		List<PojoIndexingDependencyCollectorTypeNode<? extends T>> result = new ArrayList<>();
-		for ( PojoRawTypeModel<?> concreteSubType :
-				buildingHelper.getConcreteEntitySubTypesForEntitySuperType( superTypeModel ) ) {
+		for ( PojoRawTypeModel<?> concreteSubType : buildingHelper
+				.getConcreteEntitySubTypesForEntitySuperType( superTypeModel ) ) {
 			result.add( castToRawSubType( concreteSubType ) );
 		}
 		return result;

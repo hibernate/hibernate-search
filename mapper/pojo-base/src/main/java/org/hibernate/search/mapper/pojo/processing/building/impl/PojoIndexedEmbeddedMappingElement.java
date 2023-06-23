@@ -33,7 +33,7 @@ public class PojoIndexedEmbeddedMappingElement implements MappingElement {
 		if ( relativePrefix == null ) {
 			return "@IndexedEmbedded(...)";
 		}
-		else if ( relativePrefix.indexOf( "." ) < (relativePrefix.length() - 1) ) {
+		else if ( relativePrefix.indexOf( "." ) < ( relativePrefix.length() - 1 ) ) {
 			return "@IndexedEmbedded(prefix = \"" + relativePrefix + "\", ...)";
 		}
 		else {

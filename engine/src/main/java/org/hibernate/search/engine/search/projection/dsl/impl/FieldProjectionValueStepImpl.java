@@ -24,7 +24,7 @@ public final class FieldProjectionValueStepImpl<T>
 			Class<T> clazz,
 			ValueConvert convert) {
 		super( dslContext.scope().fieldQueryElement( fieldPath, ProjectionTypeKeys.FIELD )
-						.type( clazz, convert ),
+				.type( clazz, convert ),
 				ProjectionAccumulator.single() );
 	}
 

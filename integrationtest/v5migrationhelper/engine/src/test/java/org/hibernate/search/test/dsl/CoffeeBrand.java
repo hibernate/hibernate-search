@@ -17,17 +17,35 @@ import org.hibernate.search.annotations.TermVector;
 class CoffeeBrand {
 
 	@DocumentId
-	public Integer getId() { return id; }
-	public void setId(Integer id) { this.id = id; }
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 	private Integer id;
 
 	@Field(termVector = TermVector.YES)
-	public String getName() { return name; }
-	public void setName(String name) { this.name = name; }
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	private String name;
 
 	@Field(termVector = TermVector.NO)
-	public String getDescription() { return description; }
-	public void setDescription(String description) { this.description = description; }
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 	private String description;
 }

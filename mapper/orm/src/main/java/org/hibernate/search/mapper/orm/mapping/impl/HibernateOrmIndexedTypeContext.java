@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<E>
 		implements ProjectionMappedTypeContext,
-				SearchIndexedEntity<E>, HibernateOrmScopeIndexedTypeContext<E>, AutomaticIndexingIndexedTypeContext {
+		SearchIndexedEntity<E>, HibernateOrmScopeIndexedTypeContext<E>, AutomaticIndexingIndexedTypeContext {
 
 	private final MappedIndexManager indexManager;
 

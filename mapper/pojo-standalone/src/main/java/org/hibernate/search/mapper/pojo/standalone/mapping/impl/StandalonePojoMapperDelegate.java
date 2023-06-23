@@ -49,7 +49,8 @@ public final class StandalonePojoMapperDelegate
 
 	@Override
 	public StandalonePojoMappingPartialBuildState prepareBuild(PojoMappingDelegate mappingDelegate) {
-		return new StandalonePojoMappingPartialBuildState( mappingDelegate, typeContextContainerBuilder.build(), schemaManagementListener );
+		return new StandalonePojoMappingPartialBuildState( mappingDelegate, typeContextContainerBuilder.build(),
+				schemaManagementListener );
 	}
 
 	@Override

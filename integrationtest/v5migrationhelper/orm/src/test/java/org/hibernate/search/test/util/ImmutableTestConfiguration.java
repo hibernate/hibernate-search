@@ -32,7 +32,9 @@ public class ImmutableTestConfiguration implements TestConfiguration {
 
 	public ImmutableTestConfiguration(Map<String, Object> settings, Class<?>[] annotatedClasses, Set<String> tenantIds) {
 		this.settings = settings == Collections.EMPTY_MAP ? settings : new HashMap<String, Object>( settings );
-		this.tenantIds = tenantIds == Collections.EMPTY_SET ? tenantIds : Collections.unmodifiableSet( new HashSet<String>( tenantIds ) );
+		this.tenantIds = tenantIds == Collections.EMPTY_SET
+				? tenantIds
+				: Collections.unmodifiableSet( new HashSet<String>( tenantIds ) );
 		this.annotatedClasses = new ArrayList<>( annotatedClasses.length );
 		Collections.addAll( this.annotatedClasses, annotatedClasses );
 	}

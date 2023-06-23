@@ -23,19 +23,19 @@ public class SimpleDataSampleParserTest {
 	@Test
 	public void test() throws IOException {
 		List<SampleDataset.DataSample> samples = CharSource.wrap( "\n"
-						+ "This is the first real line\n"
-						+ "Followed by another one\n"
-						+ "Then a few empty lines:\n"
-						+ "\n\n\n\n\n\n\n\n\n\n"
-						+ "Then line 4\n"
-						+ "Then line 5\n"
-						+ "Then line 6\n"
-						+ "Then line 7\n"
-						+ "Then line 8\n"
-						+ "Then line 9\n"
-						+ "\n"
-						+ "Then line 10\n"
-						+ "This is the first line of the next sample" )
+				+ "This is the first real line\n"
+				+ "Followed by another one\n"
+				+ "Then a few empty lines:\n"
+				+ "\n\n\n\n\n\n\n\n\n\n"
+				+ "Then line 4\n"
+				+ "Then line 5\n"
+				+ "Then line 6\n"
+				+ "Then line 7\n"
+				+ "Then line 8\n"
+				+ "Then line 9\n"
+				+ "\n"
+				+ "Then line 10\n"
+				+ "This is the first line of the next sample" )
 				.readLines( new SimpleDataSampleParser() );
 
 		assertThat( samples ).hasSize( 2 );

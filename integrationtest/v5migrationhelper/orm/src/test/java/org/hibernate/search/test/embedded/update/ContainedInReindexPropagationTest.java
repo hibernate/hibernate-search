@@ -112,7 +112,9 @@ public class ContainedInReindexPropagationTest extends SearchTestBase {
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
-				Dad.class, Grandpa.class, Son.class
+				Dad.class,
+				Grandpa.class,
+				Son.class
 		};
 	}
 }

@@ -41,9 +41,10 @@ public final class LeafValidators {
 		@Override
 		protected void doValidate(ValidationErrorCollector errorCollector, Double defaultedExpected,
 				Double defaultedActual, Object actual) {
-			if ( defaultedExpected == null || defaultedActual == null // One null and one non-null
+			if ( defaultedExpected == null
+					|| defaultedActual == null // One null and one non-null
 					|| Double.compare( defaultedExpected, defaultedActual ) != 0
-					&& Math.abs( defaultedExpected - defaultedActual ) > DEFAULT_DOUBLE_DELTA ) {
+							&& Math.abs( defaultedExpected - defaultedActual ) > DEFAULT_DOUBLE_DELTA ) {
 				// Don't display the default for the actual value: it could confuse users.
 				errorCollector.addError( ElasticsearchValidationMessages.INSTANCE.invalidValue(
 						defaultedExpected, actual
@@ -56,9 +57,10 @@ public final class LeafValidators {
 		@Override
 		protected void doValidate(ValidationErrorCollector errorCollector, Float defaultedExpected,
 				Float defaultedActual, Object actual) {
-			if ( defaultedExpected == null || defaultedActual == null // One null and one non-null
+			if ( defaultedExpected == null
+					|| defaultedActual == null // One null and one non-null
 					|| Float.compare( defaultedExpected, defaultedActual ) != 0
-					&& Math.abs( defaultedExpected - defaultedActual ) > DEFAULT_FLOAT_DELTA ) {
+							&& Math.abs( defaultedExpected - defaultedActual ) > DEFAULT_FLOAT_DELTA ) {
 				// Don't display the default for the actual value: it could confuse users.
 				errorCollector.addError( ElasticsearchValidationMessages.INSTANCE.invalidValue(
 						defaultedExpected, actual
@@ -82,7 +84,7 @@ public final class LeafValidators {
 
 			String expectedOutputFormat = defaultedExpected.get( 0 );
 			String actualOutputFormat = defaultedActual.isEmpty() ? null : defaultedActual.get( 0 );
-			if ( ! Objects.equals( expectedOutputFormat, actualOutputFormat ) ) {
+			if ( !Objects.equals( expectedOutputFormat, actualOutputFormat ) ) {
 				// Don't show the defaulted actual value, this might confuse users
 				errorCollector.addError( ElasticsearchValidationMessages.INSTANCE.invalidOutputFormat(
 						expectedOutputFormat, actualOutputFormat

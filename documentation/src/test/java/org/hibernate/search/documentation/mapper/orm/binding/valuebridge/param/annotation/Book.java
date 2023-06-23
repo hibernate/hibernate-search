@@ -69,6 +69,6 @@ public class Book {
 	public void setCensorshipAssessments(Map<Year, Boolean> censorshipAssessments) {
 		this.censorshipAssessments = censorshipAssessments;
 	}
-// end::getters-setters[]
+	// end::getters-setters[]
 }
 // end::include[]

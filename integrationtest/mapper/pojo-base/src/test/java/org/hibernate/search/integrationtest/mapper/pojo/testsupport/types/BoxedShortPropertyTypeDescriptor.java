@@ -25,10 +25,10 @@ public class BoxedShortPropertyTypeDescriptor extends PropertyTypeDescriptor<Sho
 	protected PropertyValues<Short, Short> createValues() {
 		return PropertyValues.<Short>passThroughBuilder()
 				.add( Short.MIN_VALUE, String.valueOf( Short.MIN_VALUE ) )
-				.add( (short)-1, "-1" )
-				.add( (short)0, "0" )
-				.add( (short)1, "1" )
-				.add( (short)42, "42" )
+				.add( (short) -1, "-1" )
+				.add( (short) 0, "0" )
+				.add( (short) 1, "1" )
+				.add( (short) 42, "42" )
 				.add( Short.MAX_VALUE, String.valueOf( Short.MAX_VALUE ) )
 				.build();
 	}

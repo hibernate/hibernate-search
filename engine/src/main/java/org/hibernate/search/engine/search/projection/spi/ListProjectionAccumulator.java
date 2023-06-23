@@ -21,10 +21,12 @@ final class ListProjectionAccumulator<E, V> implements ProjectionAccumulator<E, 
 	@SuppressWarnings("rawtypes")
 	static final Provider PROVIDER = new Provider() {
 		private final ListProjectionAccumulator instance = new ListProjectionAccumulator();
+
 		@Override
 		public ProjectionAccumulator get() {
 			return instance;
 		}
+
 		@Override
 		public boolean isSingleValued() {
 			return false;

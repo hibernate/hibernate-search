@@ -36,10 +36,10 @@ public class FootballTeam {
 	@Field(store = Store.YES)
 	private String name;
 
-	@Field( store = Store.YES )
+	@Field(store = Store.YES)
 	private double debtInMillions;
 
-	@Field( store = Store.YES)
+	@Field(store = Store.YES)
 	private int nrTitles;
 
 }

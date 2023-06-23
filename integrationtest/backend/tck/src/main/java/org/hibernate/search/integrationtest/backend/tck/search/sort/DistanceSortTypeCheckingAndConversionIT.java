@@ -105,7 +105,7 @@ public class DistanceSortTypeCheckingAndConversionIT {
 		String fieldPath = getNonSortableFieldPath();
 
 		assertThatThrownBy( () -> {
-				scope.sort().distance( fieldPath, CENTER_POINT );
+			scope.sort().distance( fieldPath, CENTER_POINT );
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -300,9 +300,10 @@ public class DistanceSortTypeCheckingAndConversionIT {
 				} );
 		BulkIndexer rawFieldCompatibleIndexer = rawFieldCompatibleIndex.bulkIndexer()
 				.add( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1,
-						document -> initDocument( rawFieldCompatibleIndex.binding(), document, BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) );
+						document -> initDocument( rawFieldCompatibleIndex.binding(), document,
+								BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) );
 		BulkIndexer missingFieldIndexer = missingFieldIndex.bulkIndexer()
-				.add( MISSING_FIELD_INDEX_DOCUMENT_1, document -> { } );
+				.add( MISSING_FIELD_INDEX_DOCUMENT_1, document -> {} );
 		mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer, missingFieldIndexer );
 	}
 
@@ -333,7 +334,7 @@ public class DistanceSortTypeCheckingAndConversionIT {
 		private final FirstLevelObjectMapping nested;
 
 		IndexBinding(IndexSchemaElement root) {
-			this( root, ignored -> { } );
+			this( root, ignored -> {} );
 		}
 
 		IndexBinding(IndexSchemaElement root,
@@ -368,7 +369,7 @@ public class DistanceSortTypeCheckingAndConversionIT {
 		final SimpleFieldModel<GeoPoint> fieldWithDslConverterModel;
 
 		CompatibleIndexBinding(IndexSchemaElement root) {
-			this( root, ignored -> { } );
+			this( root, ignored -> {} );
 		}
 
 		CompatibleIndexBinding(IndexSchemaElement root,

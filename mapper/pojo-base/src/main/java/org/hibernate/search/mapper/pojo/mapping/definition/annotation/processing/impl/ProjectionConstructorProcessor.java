@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
 
 public class ProjectionConstructorProcessor
 		implements ConstructorMappingAnnotationProcessor<ProjectionConstructor>,
-				TypeMappingAnnotationProcessor<ProjectionConstructor> {
+		TypeMappingAnnotationProcessor<ProjectionConstructor> {
 
 	@Override
 	public void process(ConstructorMappingStep mapping, ProjectionConstructor annotation,

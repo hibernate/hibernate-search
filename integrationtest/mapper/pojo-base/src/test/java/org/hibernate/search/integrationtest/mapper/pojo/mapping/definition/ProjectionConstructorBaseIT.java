@@ -39,7 +39,8 @@ import org.junit.Test;
 public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void typeLevelAnnotation() {
@@ -56,6 +57,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 		class MyProjection {
 			public final String text;
 			public final Integer integer;
+
 			public MyProjection(String text, Integer integer) {
 				this.text = text;
 				this.integer = integer;
@@ -97,10 +99,12 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 		class MyProjection {
 			public final String text;
 			public final Integer integer;
+
 			public MyProjection(String text, Integer integer) {
 				this.text = text;
 				this.integer = integer;
 			}
+
 			public MyProjection(String text, Integer integer, String somethingElse) {
 				this.text = text;
 				this.integer = integer;
@@ -132,15 +136,18 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 		class MyProjection {
 			public final String text;
 			public final Integer integer;
+
 			public MyProjection() {
 				this.text = "foo";
 				this.integer = 42;
 			}
+
 			@ProjectionConstructor
 			public MyProjection(String text, Integer integer) {
 				this.text = text;
 				this.integer = integer;
 			}
+
 			public MyProjection(String text, Integer integer, String somethingElse) {
 				this.text = text;
 				this.integer = integer;
@@ -181,11 +188,13 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 		abstract class MyAbstractProjection {
 			public final String text;
 			public final Integer integer;
+
 			@ProjectionConstructor
 			public MyAbstractProjection(String text, Integer integer) {
 				this.text = text;
 				this.integer = integer;
 			}
+
 			public MyAbstractProjection(String text, Integer integer, String somethingElse) {
 				this.text = text;
 				this.integer = integer;
@@ -257,11 +266,13 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 		class MyProjection {
 			public final String text;
 			public final Integer integer;
+
 			@ProjectionConstructor
 			public MyProjection() {
 				this.text = "foo";
 				this.integer = 42;
 			}
+
 			public MyProjection(String text, Integer integer) {
 				this.text = text;
 				this.integer = integer;
@@ -302,10 +313,12 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 		class MyNonProjection {
 			public final String text;
 			public final Integer integer;
+
 			public MyNonProjection() {
 				this.text = "foo";
 				this.integer = 42;
 			}
+
 			public MyNonProjection(String text, Integer integer) {
 				this.text = text;
 				this.integer = integer;
@@ -343,10 +356,12 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 		class MyProjection {
 			public final String text;
 			public final Integer integer;
+
 			public MyProjection() {
 				this.text = "foo";
 				this.integer = 42;
 			}
+
 			@ProjectionConstructor
 			public MyProjection(String text, Integer integer) {
 				this.text = text;
@@ -387,14 +402,17 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 		class MyNonProjection {
 			public final String text;
 			public final Integer integer;
+
 			public MyNonProjection() {
 				this.text = "foo";
 				this.integer = 42;
 			}
+
 			public MyNonProjection(String text, Integer integer) {
 				this.text = text;
 				this.integer = integer;
 			}
+
 			public MyNonProjection(String text, Integer integer, String somethingElse) {
 				this.text = text;
 				this.integer = integer;
@@ -404,10 +422,12 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 			public MyProjectionSubclass() {
 				super();
 			}
+
 			@ProjectionConstructor
 			public MyProjectionSubclass(String text, Integer integer) {
 				super( text + "_fromSubclass", integer );
 			}
+
 			public MyProjectionSubclass(String text, Integer integer, String somethingElse) {
 				super( text, integer, somethingElse );
 			}
@@ -455,15 +475,18 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 		class MyProjection {
 			public final String text;
 			public final Integer integer;
+
 			public MyProjection() {
 				this.text = "foo";
 				this.integer = 42;
 			}
+
 			@ProjectionConstructor
 			public MyProjection(String text, Integer integer) {
 				this.text = text;
 				this.integer = integer;
 			}
+
 			public MyProjection(String text, Integer integer, String somethingElse) {
 				this.text = text;
 				this.integer = integer;
@@ -473,9 +496,11 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 			public MyNonProjectionSubclass() {
 				super();
 			}
+
 			public MyNonProjectionSubclass(String text, Integer integer) {
 				super( text + "_fromSubclass", integer );
 			}
+
 			public MyNonProjectionSubclass(String text, Integer integer, String somethingElse) {
 				super( text, integer, somethingElse );
 			}
@@ -523,15 +548,18 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 		class MyProjection {
 			public final String text;
 			public final Integer integer;
+
 			public MyProjection() {
 				this.text = "foo";
 				this.integer = 42;
 			}
+
 			@ProjectionConstructor
 			public MyProjection(String text, Integer integer) {
 				this.text = text;
 				this.integer = integer;
 			}
+
 			public MyProjection(String text, Integer integer, String somethingElse) {
 				this.text = text;
 				this.integer = integer;
@@ -541,10 +569,12 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 			public MyProjectionSubclass() {
 				super();
 			}
+
 			@ProjectionConstructor
 			public MyProjectionSubclass(String text, Integer integer) {
 				super( text + "_fromSubclass", integer );
 			}
+
 			public MyProjectionSubclass(String text, Integer integer, String somethingElse) {
 				super( text, integer, somethingElse );
 			}
@@ -609,6 +639,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 		class MyProjection {
 			public final String text;
 			public final Integer integer;
+
 			@ProjectionConstructor
 			public MyProjection(String text, Integer integer) {
 				this.text = text;

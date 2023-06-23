@@ -73,8 +73,7 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 	}
 
 	public FutureAssert<T> isSuccessful() {
-		return isSuccessful( value -> {
-		} );
+		return isSuccessful( value -> {} );
 	}
 
 	public FutureAssert<T> isSuccessful(T expectedValue) {
@@ -98,7 +97,8 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 			failWithCauseAndMessage( e, "future <%s> should have succeeded, but instead it's been cancelled", actual, e );
 		}
 		catch (ExecutionException e) {
-			failWithCauseAndMessage( e, "future <%s> should have succeeded, but instead it failed with exception: %s", actual, e );
+			failWithCauseAndMessage( e, "future <%s> should have succeeded, but instead it failed with exception: %s", actual,
+					e );
 		}
 		return this;
 	}
@@ -139,7 +139,8 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 	public FutureAssert<T> isCancelled() {
 		try {
 			Object result = getNow();
-			failWithMessage( "future <%s> should have been cancelled, but instead it succeeded with result <%s>", actual, result );
+			failWithMessage( "future <%s> should have been cancelled, but instead it succeeded with result <%s>", actual,
+					result );
 		}
 		catch (TimeoutException e) {
 			failWithMessage( "future <%s> should have been cancelled, but instead it's still pending", actual );

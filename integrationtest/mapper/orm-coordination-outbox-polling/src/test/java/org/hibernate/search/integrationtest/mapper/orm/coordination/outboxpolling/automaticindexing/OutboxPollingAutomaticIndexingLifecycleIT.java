@@ -35,7 +35,8 @@ import org.junit.Test;
 public class OutboxPollingAutomaticIndexingLifecycleIT {
 
 	// The value doesn't matter, we just need to be sure that's the one that was configured.
-	private static final long BATCH_SIZE = HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_BATCH_SIZE;
+	private static final long BATCH_SIZE =
+			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_BATCH_SIZE;
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();

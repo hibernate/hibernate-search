@@ -43,6 +43,6 @@ public interface SpatialWithinPredicateFieldStep<N extends SpatialWithinPredicat
 	 *
 	 * @see #field(String)
 	 */
-	N fields(String ... fieldPaths);
+	N fields(String... fieldPaths);
 
 }

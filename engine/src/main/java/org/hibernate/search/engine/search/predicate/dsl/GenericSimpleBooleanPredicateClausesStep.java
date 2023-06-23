@@ -20,15 +20,12 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  * @param <S> The "self" type (the actual exposed type of this collector).
  * @param <C> The "collector" type (the type of collector passed to the consumer in {@link #with(Consumer)}).
  */
-public interface GenericSimpleBooleanPredicateClausesStep
-		<
-			S extends C,
-			C extends SimpleBooleanPredicateClausesCollector<?>
-		>
+public interface GenericSimpleBooleanPredicateClausesStep<
+		S extends C,
+		C extends SimpleBooleanPredicateClausesCollector<?>>
 		extends SimpleBooleanPredicateClausesCollector<C>, PredicateFinalStep {
 	@Override
-	default S add(PredicateFinalStep searchPredicate)
-	{
+	default S add(PredicateFinalStep searchPredicate) {
 		return add( searchPredicate.toPredicate() );
 	}
 

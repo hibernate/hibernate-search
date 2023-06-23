@@ -148,7 +148,7 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 
 	public interface DataClearConfig {
 
-		DataClearConfig tenants(String ... tenantIds);
+		DataClearConfig tenants(String... tenantIds);
 
 		DataClearConfig preClear(Consumer<Session> preClear);
 
@@ -252,7 +252,8 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 	}
 
 	@Override
-	public <R, E extends Throwable> R applyInTransaction(ThrowingBiFunction<? super Session, ? super Transaction, R, E> action) throws E {
+	public <R, E extends Throwable> R applyInTransaction(ThrowingBiFunction<? super Session, ? super Transaction, R, E> action)
+			throws E {
 		return with().applyInTransaction( action );
 	}
 
@@ -492,8 +493,8 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 			return;
 		}
 		if (
-				// Workaround until https://hibernate.atlassian.net/browse/HHH-5529 gets implemented
-				hasPotentiallyJoinTable( sessionFactory, entityType )
+			// Workaround until https://hibernate.atlassian.net/browse/HHH-5529 gets implemented
+		hasPotentiallyJoinTable( sessionFactory, entityType )
 				// Workaround until https://hibernate.atlassian.net/browse/HHH-14814 gets fixed
 				|| hasEntitySubclass( sessionFactory, entityType )
 		) {
@@ -642,7 +643,7 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 		private final List<ThrowingConsumer<Session, RuntimeException>> preClear = new ArrayList<>();
 
 		@Override
-		public DataClearConfig tenants(String ... tenantIds) {
+		public DataClearConfig tenants(String... tenantIds) {
 			Collections.addAll( this.tenantsIds, tenantIds );
 			return this;
 		}

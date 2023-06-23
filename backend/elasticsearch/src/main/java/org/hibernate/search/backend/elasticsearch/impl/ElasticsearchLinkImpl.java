@@ -176,7 +176,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 						// but expect it to match the version configured on backend creation (if any)
 						if ( configuredVersionOnBackendCreationOptional.isPresent()
 								&& !configuredVersionOnBackendCreationOptional.get()
-								.matches( configuredVersionOnStartOptional.get() ) ) {
+										.matches( configuredVersionOnStartOptional.get() ) ) {
 							throw log.incompatibleElasticsearchVersionOnStart(
 									configuredVersionOnBackendCreationOptional.get(),
 									configuredVersionOnStartOptional.get() );

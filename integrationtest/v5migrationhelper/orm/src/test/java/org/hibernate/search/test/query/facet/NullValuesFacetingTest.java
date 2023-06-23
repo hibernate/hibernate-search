@@ -36,7 +36,7 @@ public class NullValuesFacetingTest extends AbstractFacetTest {
 
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
-		return new Class[]{
+		return new Class[] {
 				Car.class
 		};
 	}

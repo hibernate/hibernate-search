@@ -111,7 +111,8 @@ public class EmbeddedCollectionFacetingTest extends SearchTestBase {
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
-				Author.class, Book.class
+				Author.class,
+				Book.class
 		};
 	}
 

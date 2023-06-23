@@ -74,8 +74,8 @@ public class MassIndexingIdClassIT {
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
 			backendMock.expectWorks(
-							IdClassEntity.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
-					)
+					IdClassEntity.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+			)
 					.add( "1", b -> b.field( "keyword", "key-A" ) )
 					.add( "2", b -> b.field( "keyword", "key-C" ) )
 					.add( "3", b -> b.field( "keyword", "key-C" ) )

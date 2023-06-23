@@ -37,7 +37,7 @@ class FacetBuildingContext<T> {
 			Double.class.getName(),
 			Float.class.getName(),
 			Date.class.getName()
-		);
+	);
 
 	private final QueryBuildingContext context;
 
@@ -168,5 +168,4 @@ class FacetBuildingContext<T> {
 		return sb.toString();
 	}
 }
-
 

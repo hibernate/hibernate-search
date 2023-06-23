@@ -315,8 +315,11 @@ public class ElasticsearchVersionTest {
 	}
 
 	private ObjectArrayAssert<Object> assertComponents(ElasticsearchVersion version) {
-		return assertThat( new Object[] { version.distribution(), version.major(),
-				toNullable( version.minor() ), toNullable( version.micro() ),
+		return assertThat( new Object[] {
+				version.distribution(),
+				version.major(),
+				toNullable( version.minor() ),
+				toNullable( version.micro() ),
 				version.qualifier().orElse( null ) } );
 	}
 

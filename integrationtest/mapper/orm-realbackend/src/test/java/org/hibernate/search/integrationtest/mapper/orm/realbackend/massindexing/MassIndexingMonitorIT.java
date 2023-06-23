@@ -66,50 +66,50 @@ public class MassIndexingMonitorIT {
 	@Test
 	public void testMassIndexingMonitor() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
-					assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) ).isZero();
+			assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) ).isZero();
 
-					MassIndexer indexer = Search.session( entityManager ).massIndexer()
-							.dropAndCreateSchemaOnStart( true )
-							// Concurrency leads to an unpredictable number of log events,
-							// because we skip logging in some cases where it's triggered concurrently.
-							// So, for this test which needs assertions on the number of log events, we avoid concurrency.
-							.threadsToLoadObjects( 1 );
-					try {
-						/*
-						 * The default period for logging in the default mass indexing monitor is 50.
-						 * We set the batch size to 49.
-						 * 50 = 5*5*2
-						 * 49 = 7*7
-						 * Thus a multiple of 49 cannot be a multiple of 50,
-						 * and if we set the batch size to 49, the bug described in HSEARCH-3462
-						 * will prevent any log from ever happening, except at the very end
-						 *
-						 * Regardless of this bug, here we also check that the mass indexing monitor works correctly:
-						 * the number of log events should be equal to NUMBER_OF_BOOKS / 50.
-						 */
-						int batchSize = 49;
-						indexer.batchSizeToLoadObjects( batchSize );
-						int expectedNumberOfLogs = NUMBER_OF_BOOKS / MASS_INDEXING_MONITOR_LOG_PERIOD;
+			MassIndexer indexer = Search.session( entityManager ).massIndexer()
+					.dropAndCreateSchemaOnStart( true )
+					// Concurrency leads to an unpredictable number of log events,
+					// because we skip logging in some cases where it's triggered concurrently.
+					// So, for this test which needs assertions on the number of log events, we avoid concurrency.
+					.threadsToLoadObjects( 1 );
+			try {
+				/*
+				 * The default period for logging in the default mass indexing monitor is 50.
+				 * We set the batch size to 49.
+				 * 50 = 5*5*2
+				 * 49 = 7*7
+				 * Thus a multiple of 49 cannot be a multiple of 50,
+				 * and if we set the batch size to 49, the bug described in HSEARCH-3462
+				 * will prevent any log from ever happening, except at the very end
+				 *
+				 * Regardless of this bug, here we also check that the mass indexing monitor works correctly:
+				 * the number of log events should be equal to NUMBER_OF_BOOKS / 50.
+				 */
+				int batchSize = 49;
+				indexer.batchSizeToLoadObjects( batchSize );
+				int expectedNumberOfLogs = NUMBER_OF_BOOKS / MASS_INDEXING_MONITOR_LOG_PERIOD;
 
-						// Example:
-						// Mass indexing progress: indexed 151 entities in 21 ms.
-						logged.expectEvent( Level.INFO, "Mass indexing progress: indexed", "entities in", "ms" ).times(
-								expectedNumberOfLogs );
+				// Example:
+				// Mass indexing progress: indexed 151 entities in 21 ms.
+				logged.expectEvent( Level.INFO, "Mass indexing progress: indexed", "entities in", "ms" ).times(
+						expectedNumberOfLogs );
 
-						// Example:
-						// Mass indexing progress: 26.50%. Mass indexing speed: 2765.605713 documents/second since last message, 2765.605713 documents/second since start.
-						logged.expectEvent(
-								Level.INFO, "Mass indexing progress:", "%", "Mass indexing speed:",
-								"documents/second since last message", "documents/second since start"
-						).times( expectedNumberOfLogs );
+				// Example:
+				// Mass indexing progress: 26.50%. Mass indexing speed: 2765.605713 documents/second since last message, 2765.605713 documents/second since start.
+				logged.expectEvent(
+						Level.INFO, "Mass indexing progress:", "%", "Mass indexing speed:",
+						"documents/second since last message", "documents/second since start"
+				).times( expectedNumberOfLogs );
 
-						indexer.startAndWait();
-					}
-					catch (InterruptedException e) {
-						fail( "Unexpected InterruptedException: " + e.getMessage() );
-					}
-					assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) ).isEqualTo( NUMBER_OF_BOOKS );
-				}
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+			assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) ).isEqualTo( NUMBER_OF_BOOKS );
+		}
 		);
 
 	}

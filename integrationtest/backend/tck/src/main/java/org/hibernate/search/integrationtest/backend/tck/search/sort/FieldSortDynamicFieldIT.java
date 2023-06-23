@@ -179,7 +179,7 @@ public class FieldSortDynamicFieldIT<F> {
 		IndexBinding(IndexSchemaElement root) {
 			for ( FieldTypeDescriptor<?> type : supportedFieldTypes ) {
 				root.fieldTemplate( "myTemplate" + type.getUniqueName(),
-								f -> type.configure( f ).sortable( Sortable.YES ) )
+						f -> type.configure( f ).sortable( Sortable.YES ) )
 						.matchingPathGlob( fieldPath( type, "*" ) );
 			}
 		}

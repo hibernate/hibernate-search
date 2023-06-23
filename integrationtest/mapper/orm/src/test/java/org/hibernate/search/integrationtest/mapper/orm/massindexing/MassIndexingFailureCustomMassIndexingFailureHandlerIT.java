@@ -74,7 +74,7 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
 		assertSingleEntityFailure( context, entityReference, failingOperationAsString,
 				e -> assertThat( e )
-				.isInstanceOf( SimulatedFailure.class )
+						.isInstanceOf( SimulatedFailure.class )
 						.hasMessage( exceptionMessage ) );
 	}
 
@@ -94,10 +94,10 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
 		assertSingleEntityFailure( context, entityReference, failingOperationAsString,
 				e -> assertThat( e )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Exception while invoking" )
-				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
-				.isInstanceOf( SimulatedFailure.class )
+						.isInstanceOf( SearchException.class )
+						.hasMessageContaining( "Exception while invoking" )
+						.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+						.isInstanceOf( SimulatedFailure.class )
 						.hasMessageContaining( exceptionMessage ) );
 	}
 
@@ -117,11 +117,11 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
 		assertSingleEntityFailure( context, entityReference, failingOperationAsString,
 				e -> assertThat( e )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Exception while building document for entity '" + entityReference + "'",
-						"Exception while invoking",
-						exceptionMessage )
+						.isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"Exception while building document for entity '" + entityReference + "'",
+								"Exception while invoking",
+								exceptionMessage )
 						.hasRootCauseInstanceOf( SimulatedFailure.class ) );
 	}
 
@@ -155,7 +155,8 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 	}
 
 	@Override
-	protected void assertMassIndexerLoadingOperationFailureHandling(Class<? extends Throwable> exceptionType, String exceptionMessage,
+	protected void assertMassIndexerLoadingOperationFailureHandling(Class<? extends Throwable> exceptionType,
+			String exceptionMessage,
 			String failingOperationAsString,
 			int failureFloodingThreshold, Class<? extends Throwable> closingExceptionType,
 			String closingExceptionMessage, String closingFailingOperationAsString) {
@@ -164,7 +165,7 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
 		assertSingleEntityFailure( context, null, failingOperationAsString,
 				e -> assertThat( e )
-				.isInstanceOf( SimulatedFailure.class )
+						.isInstanceOf( SimulatedFailure.class )
 						.hasMessageContainingAll( exceptionMessage ) );
 
 		verify( failureHandler, times( 1 ) ).handle( genericFailureContextCapture.capture() );
@@ -204,7 +205,7 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
 		assertSingleEntityFailure( context, entityReference, failingEntityIndexingOperationAsString,
 				e -> assertThat( e )
-				.isInstanceOf( SimulatedFailure.class )
+						.isInstanceOf( SimulatedFailure.class )
 						.hasMessage( failingEntityIndexingExceptionMessage ) );
 
 		MassIndexingFailureContext massIndexerOperationFailureContext = genericFailureContextCapture.getValue();

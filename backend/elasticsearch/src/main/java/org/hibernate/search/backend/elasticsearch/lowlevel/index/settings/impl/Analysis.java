@@ -43,10 +43,10 @@ public class Analysis {
 	private Map<String, JsonElement> extraAttributes;
 
 	public boolean isEmpty() {
-		return ! hasContent( analyzers, normalizers, tokenizers, tokenFilters, charFilters );
+		return !hasContent( analyzers, normalizers, tokenizers, tokenFilters, charFilters );
 	}
 
-	private boolean hasContent(Map<?, ?> ... maps) {
+	private boolean hasContent(Map<?, ?>... maps) {
 		for ( Map<?, ?> map : maps ) {
 			if ( map != null && !map.isEmpty() ) {
 				return true;

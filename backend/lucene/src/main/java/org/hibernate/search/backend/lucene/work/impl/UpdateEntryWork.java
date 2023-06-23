@@ -50,7 +50,8 @@ public class UpdateEntryWork extends AbstractSingleDocumentIndexingWork {
 			}
 		}
 		catch (IOException e) {
-			throw log.unableToIndexEntry( tenantId, entityTypeName, entityIdentifier, e.getMessage(), context.getEventContext(), e );
+			throw log.unableToIndexEntry( tenantId, entityTypeName, entityIdentifier, e.getMessage(), context.getEventContext(),
+					e );
 		}
 	}
 

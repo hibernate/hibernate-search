@@ -40,7 +40,8 @@ public class NestedRunner extends Suite {
 	}
 
 	private List<Runner> childRunners(final Class<?>[] classes, RunnerBuilder builder,
-			Object enclosingTestInstance) throws Throwable {
+			Object enclosingTestInstance)
+			throws Throwable {
 		final List<Runner> childRunners = new ArrayList<>( classes.length );
 		for ( Class<?> testClass : classes ) {
 			if ( !testClass.isAnnotationPresent( Nested.class ) ) {
@@ -59,7 +60,8 @@ public class NestedRunner extends Suite {
 	}
 
 	private Runner runnerForNonStaticNestedClass(Class<?> testClass, RunnerBuilder builder,
-			Object enclosingTestInstance) throws Throwable {
+			Object enclosingTestInstance)
+			throws Throwable {
 		RunWith runWith = testClass.getAnnotation( RunWith.class );
 		Class<? extends Runner> nestedClassRunnerClass =
 				runWith == null ? BlockJUnit4ClassRunner.class : runWith.value();

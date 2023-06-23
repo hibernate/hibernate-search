@@ -30,7 +30,7 @@ class StandalonePojoRawTypeModel<T> extends AbstractPojoHCAnnRawTypeModel<T, Sta
 	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
 	public Stream<StandalonePojoRawTypeModel<? super T>> ascendingSuperTypes() {
 		return introspector.ascendingSuperClasses( xClass )
-					.map( xc -> (StandalonePojoRawTypeModel<? super T>) introspector.typeModel( xc ) );
+				.map( xc -> (StandalonePojoRawTypeModel<? super T>) introspector.typeModel( xc ) );
 	}
 
 	@Override

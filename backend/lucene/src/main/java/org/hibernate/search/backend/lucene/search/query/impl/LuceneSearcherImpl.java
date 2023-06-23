@@ -70,20 +70,23 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	@Override
 	public LuceneLoadableSearchResult<H> search(IndexSearcher indexSearcher,
 			IndexReaderMetadataResolver metadataResolver,
-			int offset, Integer limit, int totalHitCountThreshold) throws IOException {
+			int offset, Integer limit, int totalHitCountThreshold)
+			throws IOException {
 		return doSearch( indexSearcher, metadataResolver, offset, limit, totalHitCountThreshold ).extract();
 	}
 
 	@Override
 	public LuceneExtractableSearchResult<H> scroll(IndexSearcher indexSearcher,
 			IndexReaderMetadataResolver metadataResolver,
-			int offset, int limit, int totalHitCountThreshold) throws IOException {
+			int offset, int limit, int totalHitCountThreshold)
+			throws IOException {
 		return doSearch( indexSearcher, metadataResolver, offset, limit, totalHitCountThreshold );
 	}
 
 	private LuceneExtractableSearchResult<H> doSearch(IndexSearcher indexSearcher,
 			IndexReaderMetadataResolver metadataResolver,
-			int offset, Integer limit, int totalHitCountThreshold) throws IOException {
+			int offset, Integer limit, int totalHitCountThreshold)
+			throws IOException {
 		if ( limit != null && (long) offset + limit > Integer.MAX_VALUE ) {
 			throw log.offsetLimitExceedsMaxValue( offset, limit );
 		}
@@ -91,9 +94,10 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		queryLog.executingLuceneQuery( requestContext.getLuceneQuery() );
 
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
-		LuceneCollectors luceneCollectors = ( limit != null || maxDocs <= PREFETCH_HITS_SIZE ) ?
-				collectMatchingDocs( indexSearcher, metadataResolver, offset, limit, maxDocs, totalHitCountThreshold ) :
-				collectMatchingDocsWithPrefetch( indexSearcher, metadataResolver, offset, limit, maxDocs, totalHitCountThreshold );
+		LuceneCollectors luceneCollectors = ( limit != null || maxDocs <= PREFETCH_HITS_SIZE )
+				? collectMatchingDocs( indexSearcher, metadataResolver, offset, limit, maxDocs, totalHitCountThreshold )
+				: collectMatchingDocsWithPrefetch( indexSearcher, metadataResolver, offset, limit, maxDocs,
+						totalHitCountThreshold );
 
 		return new LuceneExtractableSearchResult<>( requestContext, indexSearcher, luceneCollectors,
 				rootExtractor, aggregations, timeoutManager );
@@ -131,7 +135,8 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 	private LuceneCollectors collectMatchingDocs(IndexSearcher indexSearcher,
 			IndexReaderMetadataResolver metadataResolver, int offset, Integer limit,
-			int maxDocs, int totalHitCountThreshold) throws IOException {
+			int maxDocs, int totalHitCountThreshold)
+			throws IOException {
 		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver,
 				maxDocs, totalHitCountThreshold );
 		luceneCollectors.collectMatchingDocs( offset, limit );
@@ -140,7 +145,8 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 	private LuceneCollectors collectMatchingDocsWithPrefetch(IndexSearcher indexSearcher,
 			IndexReaderMetadataResolver metadataResolver, int offset, Integer limit,
-			int maxDocs, int totalHitCountThreshold) throws IOException {
+			int maxDocs, int totalHitCountThreshold)
+			throws IOException {
 
 		// prefetch:
 		LuceneCollectors luceneCollectors = collectMatchingDocs( indexSearcher, metadataResolver, offset, limit,
@@ -163,7 +169,8 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	}
 
 	private LuceneCollectors buildCollectors(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
-			int maxDocs, int totalHitCountThreshold) throws IOException {
+			int maxDocs, int totalHitCountThreshold)
+			throws IOException {
 		return extractionRequirements.createCollectors(
 				indexSearcher, requestContext.getLuceneQuery(), requestContext.getLuceneSort(),
 				metadataResolver, maxDocs, timeoutManager, totalHitCountThreshold

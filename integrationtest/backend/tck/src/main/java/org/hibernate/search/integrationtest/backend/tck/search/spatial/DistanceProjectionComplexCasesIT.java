@@ -112,11 +112,10 @@ public class DistanceProjectionComplexCasesIT extends AbstractSpatialWithinPredi
 		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatQuery( scope.query()
-				.select( f ->
-						f.distance(
-								"geoPoint_with_a_veeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyy_long_name",
-								GeoPoint.of( 45.74982800099999888371, 4.85417200099999888371 )
-						)
+				.select( f -> f.distance(
+						"geoPoint_with_a_veeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyy_long_name",
+						GeoPoint.of( 45.74982800099999888371, 4.85417200099999888371 )
+				)
 				)
 				.where( f -> f.matchAll() )
 				.toQuery() )

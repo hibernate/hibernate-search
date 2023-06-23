@@ -32,7 +32,8 @@ import org.junit.Test;
 public class ProjectionConstructorEntityReferenceProjectionIT extends AbstractProjectionConstructorIT {
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void noArg() {
@@ -45,6 +46,7 @@ public class ProjectionConstructorEntityReferenceProjectionIT extends AbstractPr
 		}
 		class MyProjection {
 			public final EntityReference entityReference;
+
 			@ProjectionConstructor
 			public MyProjection(@EntityReferenceProjection EntityReference entityReference) {
 				this.entityReference = entityReference;
@@ -86,6 +88,7 @@ public class ProjectionConstructorEntityReferenceProjectionIT extends AbstractPr
 		}
 		class MyProjection {
 			public final Object entityReference;
+
 			@ProjectionConstructor
 			public MyProjection(@EntityReferenceProjection Object entityReference) {
 				this.entityReference = entityReference;
@@ -127,6 +130,7 @@ public class ProjectionConstructorEntityReferenceProjectionIT extends AbstractPr
 		}
 		class MyProjection {
 			public final Integer entityReference;
+
 			@ProjectionConstructor
 			public MyProjection(@EntityReferenceProjection Integer entityReference) {
 				this.entityReference = entityReference;
@@ -141,7 +145,9 @@ public class ProjectionConstructorEntityReferenceProjectionIT extends AbstractPr
 						.typeContext( MyProjection.class.getName() )
 						.constructorContext( ProjectionConstructorEntityReferenceProjectionIT.class, Integer.class )
 						.methodParameterContext( 1, "entityReference" )
-						.failure( "Invalid projection definition for constructor parameter type '" + Integer.class.getName() + "'",
+						.failure(
+								"Invalid projection definition for constructor parameter type '" + Integer.class.getName()
+										+ "'",
 								"This projection results in values of type '" + EntityReference.class.getName() + "'" )
 				);
 	}

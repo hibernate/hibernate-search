@@ -26,8 +26,8 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 
 abstract class AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<
-				S extends AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<?, F>, F extends TemporalAccessor
-		>
+		S extends AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<?, F>,
+		F extends TemporalAccessor>
 		extends AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S, F> {
 
 	AbstractElasticsearchTemporalIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,

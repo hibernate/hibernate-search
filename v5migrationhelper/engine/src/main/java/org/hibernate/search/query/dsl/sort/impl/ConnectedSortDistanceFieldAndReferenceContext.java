@@ -14,7 +14,8 @@ import org.apache.lucene.search.Sort;
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public class ConnectedSortDistanceFieldAndReferenceContext extends ConnectedSortAdditionalSortFieldContext implements SortDistanceFieldAndReferenceContext {
+public class ConnectedSortDistanceFieldAndReferenceContext extends ConnectedSortAdditionalSortFieldContext
+		implements SortDistanceFieldAndReferenceContext {
 	public ConnectedSortDistanceFieldAndReferenceContext(QueryBuildingContext queryContext, SortFieldStates states) {
 		super( queryContext, states );
 	}

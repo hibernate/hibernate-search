@@ -421,7 +421,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	@TestForIssue(jiraKey = "HSEARCH-3349")
 	public void secondLevelCacheLookup() {
 		testLoading(
-				session -> { }, // No particular session setup needed
+				session -> {}, // No particular session setup needed
 				Arrays.asList(
 						Hierarchy6_A_B_Cacheable.class,
 						Hierarchy6_A_C_Cacheable.class
@@ -500,7 +500,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	@TestForIssue(jiraKey = "HSEARCH-3349")
 	public void typeChanged_secondLevelCacheLookup() {
 		testLoading(
-				session -> { }, // No particular session setup needed
+				session -> {}, // No particular session setup needed
 				Arrays.asList( Interface2.class ), // Implemented by B and C, but not D
 				Arrays.asList(
 						Hierarchy8_A_B_Cacheable.NAME,
@@ -530,9 +530,9 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 			Consumer<EntityCollector<T>> expectedLoadedEntitiesContributor,
 			Consumer<OrmSoftAssertions> assertionsContributor) {
 		testLoading(
-				session -> { }, // No particular session setup needed
+				session -> {}, // No particular session setup needed
 				targetClasses, targetIndexes,
-				o -> { }, // We don't use any particular loading option
+				o -> {}, // We don't use any particular loading option
 				hitDocumentReferencesContributor,
 				expectedLoadedEntitiesContributor,
 				assertionsContributor
@@ -547,7 +547,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 			Integer timeout, TimeUnit timeUnit, Consumer<Session> sessionSetup) {
 		testLoading(
 				sessionSetup, targetClasses, targetIndexes,
-				o -> { }, // We don't use any particular loading option
+				o -> {}, // We don't use any particular loading option
 				hitDocumentReferencesContributor,
 				expectedLoadedEntitiesContributor,
 				(assertions, ignored) -> assertionsContributor.accept( assertions ),

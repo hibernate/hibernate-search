@@ -24,7 +24,8 @@ public class SearchQueryEntityLoadingScrollingIT<T> extends SearchQueryEntityLoa
 	}
 
 	@Override
-	protected <T2> List<T2> getHits(List<String> targetIndexes, SearchQuery<T2> query, List<DocumentReference> hitDocumentReferences,
+	protected <T2> List<T2> getHits(List<String> targetIndexes, SearchQuery<T2> query,
+			List<DocumentReference> hitDocumentReferences,
 			Integer timeout, TimeUnit timeUnit) {
 		backendMock.expectScrollObjects(
 				targetIndexes,

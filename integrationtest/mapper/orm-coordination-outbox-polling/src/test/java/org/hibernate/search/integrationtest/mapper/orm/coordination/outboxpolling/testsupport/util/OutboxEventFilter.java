@@ -63,8 +63,7 @@ public class OutboxEventFilter {
 			@Override
 			public OutboxEventFinder create(Optional<OutboxEventPredicate> predicate) {
 				FilterById filterById = new FilterById();
-				OutboxEventPredicate
-						predicateWithFilter =
+				OutboxEventPredicate predicateWithFilter =
 						predicate.<OutboxEventPredicate>map( p -> OutboxEventAndPredicate.of( p, filterById ) )
 								.orElse( filterById );
 				return new FilteringFinder( delegate.create( predicate ),
@@ -104,13 +103,13 @@ public class OutboxEventFilter {
 
 	public List<UUID> findOutboxEventIdsNoFilter(Session session) {
 		return allEventsAllShardsFinder.createOutboxEventQueryForTests( session, alias -> alias + ".id", UUID.class,
-						/* use the same order as the outbox event finder */ null )
+				/* use the same order as the outbox event finder */ null )
 				.getResultList();
 	}
 
 	public Long countOutboxEventsNoFilter(Session session) {
 		return allEventsAllShardsFinder.createOutboxEventQueryForTests( session, alias -> "count(" + alias + ")", Long.class,
-						/* ordering wouldn't make sense for a count() */ OutboxEventOrder.NONE )
+				/* ordering wouldn't make sense for a count() */ OutboxEventOrder.NONE )
 				.getSingleResult();
 	}
 
@@ -157,7 +156,7 @@ public class OutboxEventFilter {
 
 		@Override
 		public List<OutboxEvent> findOutboxEvents(Session session, int maxResults) {
-			synchronized ( OutboxEventFilter.this ) {
+			synchronized (OutboxEventFilter.this) {
 				OutboxEventFinder delegate = filter ? delegateWithFilter : delegateWithoutFilter;
 				List<OutboxEvent> returned = delegate.findOutboxEvents( session, maxResults );
 				// Only return each event once.

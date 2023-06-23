@@ -36,7 +36,8 @@ public class LuceneIndexReaderRefreshSettingsPerShardIT extends AbstractSettings
 	 */
 	private static final int NON_ZERO_DELAY = 2000;
 
-	public LuceneIndexReaderRefreshSettingsPerShardIT(String ignoredLabel, SearchSetupHelper setupHelper, List<String> shardIds) {
+	public LuceneIndexReaderRefreshSettingsPerShardIT(String ignoredLabel, SearchSetupHelper setupHelper,
+			List<String> shardIds) {
 		super( ignoredLabel, setupHelper, shardIds );
 	}
 
@@ -57,7 +58,7 @@ public class LuceneIndexReaderRefreshSettingsPerShardIT extends AbstractSettings
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter
 		);
 		for ( int i = 0; i < 400; i++ ) {
-			plan.add( referenceProvider( String.valueOf( i ), routingKey( i ) ), document -> { } );
+			plan.add( referenceProvider( String.valueOf( i ), routingKey( i ) ), document -> {} );
 		}
 		plan.execute( OperationSubmitter.blocking() ).join();
 

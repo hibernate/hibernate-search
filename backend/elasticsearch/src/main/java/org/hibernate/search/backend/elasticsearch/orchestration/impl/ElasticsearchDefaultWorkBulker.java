@@ -19,7 +19,9 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 
 	private final ElasticsearchWorkSequenceBuilder sequenceBuilder;
-	private final BiFunction<List<? extends BulkableWork<?>>, DocumentRefreshStrategy, NonBulkableWork<BulkResult>> bulkWorkFactory;
+	private final BiFunction<List<? extends BulkableWork<?>>,
+			DocumentRefreshStrategy,
+			NonBulkableWork<BulkResult>> bulkWorkFactory;
 	private final int maxBulkSize;
 
 	private final List<BulkableWork<?>> currentBulkItems;

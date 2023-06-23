@@ -96,7 +96,8 @@ public class LuceneIndexIndexingPlan implements IndexIndexingPlan {
 	public CompletableFuture<MultiEntityOperationExecutionReport> executeAndReport(OperationSubmitter operationSubmitter) {
 		try {
 			List<CompletableFuture<MultiEntityOperationExecutionReport>> shardReportFutures = new ArrayList<>();
-			for ( Map.Entry<LuceneSerialWorkOrchestrator, List<SingleDocumentIndexingWork>> entry : worksByOrchestrator.entrySet() ) {
+			for ( Map.Entry<LuceneSerialWorkOrchestrator, List<SingleDocumentIndexingWork>> entry : worksByOrchestrator
+					.entrySet() ) {
 				LuceneSerialWorkOrchestrator orchestrator = entry.getKey();
 				List<SingleDocumentIndexingWork> works = entry.getValue();
 				LuceneIndexIndexingPlanExecution execution = new LuceneIndexIndexingPlanExecution(

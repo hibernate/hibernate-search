@@ -49,12 +49,13 @@ public class GenericFieldIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void defaultAttributes() {
 		@Indexed(index = INDEX_NAME)
-		class IndexedEntity	{
+		class IndexedEntity {
 			@DocumentId
 			Integer id;
 			@GenericField
@@ -71,7 +72,7 @@ public class GenericFieldIT {
 	@Test
 	public void name() {
 		@Indexed(index = INDEX_NAME)
-		class IndexedEntity	{
+		class IndexedEntity {
 			@DocumentId
 			Integer id;
 			@GenericField(name = "explicitName")
@@ -88,7 +89,7 @@ public class GenericFieldIT {
 	@Test
 	public void name_invalid_dot() {
 		@Indexed(index = INDEX_NAME)
-		class IndexedEntity	{
+		class IndexedEntity {
 			@DocumentId
 			Integer id;
 			@GenericField(name = "invalid.withdot")
@@ -109,7 +110,7 @@ public class GenericFieldIT {
 	@Test
 	public void searchable() {
 		@Indexed(index = INDEX_NAME)
-		class IndexedEntity	{
+		class IndexedEntity {
 			@DocumentId
 			Integer id;
 			@GenericField(searchable = Searchable.YES)
@@ -135,7 +136,7 @@ public class GenericFieldIT {
 	@Test
 	public void aggregable() {
 		@Indexed(index = INDEX_NAME)
-		class IndexedEntity	{
+		class IndexedEntity {
 			@DocumentId
 			Integer id;
 			@GenericField(aggregable = Aggregable.YES)
@@ -204,6 +205,7 @@ public class GenericFieldIT {
 
 			IndexedEntity() {
 			}
+
 			IndexedEntity(Integer id, Integer value) {
 				this.id = id;
 				this.value = value;
@@ -290,6 +292,7 @@ public class GenericFieldIT {
 
 			IndexedEntity() {
 			}
+
 			IndexedEntity(Integer id, Integer value) {
 				this.id = id;
 				this.value = value;

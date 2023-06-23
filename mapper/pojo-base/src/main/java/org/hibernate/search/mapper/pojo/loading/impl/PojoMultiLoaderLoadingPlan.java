@@ -19,7 +19,8 @@ public final class PojoMultiLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
 	private final PojoSelectionLoadingContext context;
 
 	private final Map<PojoLoadingTypeContext<? extends T>, PojoSingleLoaderLoadingPlan<?>> planByType = new LinkedHashMap<>();
-	private final Map<PojoSelectionLoadingStrategy<?>, PojoSingleLoaderLoadingPlan<?>> planByLoadingStrategy = new LinkedHashMap<>();
+	private final Map<PojoSelectionLoadingStrategy<?>, PojoSingleLoaderLoadingPlan<?>> planByLoadingStrategy =
+			new LinkedHashMap<>();
 
 	public PojoMultiLoaderLoadingPlan(PojoSelectionLoadingContext context) {
 		this.context = context;

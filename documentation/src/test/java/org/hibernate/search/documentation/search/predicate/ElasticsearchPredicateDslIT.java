@@ -62,8 +62,8 @@ public class ElasticsearchPredicateDslIT {
 									+ "}",
 							JsonObject.class
 					)
-					// tag::elasticsearch-fromJson-jsonObject[]
-					/* ... */; // <1>
+			// tag::elasticsearch-fromJson-jsonObject[]
+			/* ... */; // <1>
 			List<Book> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() ) // <2>
 					.where( f -> f.fromJson( jsonObject ) ) // <3>

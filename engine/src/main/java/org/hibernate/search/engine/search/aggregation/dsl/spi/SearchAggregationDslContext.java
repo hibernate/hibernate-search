@@ -20,8 +20,9 @@ import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
  * @param <PDF> The type of factory used to create predicates in {@link FieldSortOptionsStep#filter(Function)}.
  */
 public class SearchAggregationDslContext<SC extends SearchAggregationIndexScope<?>, PDF extends SearchPredicateFactory> {
-	public static <SC extends SearchAggregationIndexScope<?>, PDF extends SearchPredicateFactory>
-			SearchAggregationDslContext<SC, PDF> root(SC scope, PDF predicateFactory) {
+	public static <
+			SC extends SearchAggregationIndexScope<?>,
+			PDF extends SearchPredicateFactory> SearchAggregationDslContext<SC, PDF> root(SC scope, PDF predicateFactory) {
 		return new SearchAggregationDslContext<>( scope, predicateFactory );
 	}
 

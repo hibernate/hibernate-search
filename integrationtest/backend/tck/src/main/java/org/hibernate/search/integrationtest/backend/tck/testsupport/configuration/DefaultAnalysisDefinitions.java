@@ -16,24 +16,23 @@ public enum DefaultAnalysisDefinitions {
 	/**
 	 * The standard analyzer, as defined by Lucene, but with english stopwords.
 	 */
-	ANALYZER_STANDARD_ENGLISH("standard-english"),
+	ANALYZER_STANDARD_ENGLISH( "standard-english" ),
 	/**
 	 * Analyzer with a tokenizer on whitespaces.
 	 */
-	ANALYZER_WHITESPACE("analyzer_whitespace"),
+	ANALYZER_WHITESPACE( "analyzer_whitespace" ),
 	/**
 	 * Analyzer with a tokenizer on whitespaces and a lowercase token filter.
 	 */
-	ANALYZER_WHITESPACE_LOWERCASE("analyzer_whitespace_lowercase"),
+	ANALYZER_WHITESPACE_LOWERCASE( "analyzer_whitespace_lowercase" ),
 	/**
 	 * Ngram analyzer defined for query only.
 	 */
-	ANALYZER_NGRAM("analyzer_ngram"),
+	ANALYZER_NGRAM( "analyzer_ngram" ),
 	/**
 	 * A normalizer that lowercases the input.
 	 */
-	NORMALIZER_LOWERCASE("lowercase")
-	;
+	NORMALIZER_LOWERCASE( "lowercase" );
 
 	public final String name;
 

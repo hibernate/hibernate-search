@@ -143,9 +143,9 @@ public class MatchAllPredicateBaseIT {
 			}
 
 			public void contribute(BulkIndexer scoreIndexer) {
-				scoreIndexer.add( docId( 0 ), routingKey, document -> { } );
-				scoreIndexer.add( docId( 1 ), routingKey, document -> { } );
-				scoreIndexer.add( docId( 2 ), routingKey, document -> { } );
+				scoreIndexer.add( docId( 0 ), routingKey, document -> {} );
+				scoreIndexer.add( docId( 1 ), routingKey, document -> {} );
+				scoreIndexer.add( docId( 2 ), routingKey, document -> {} );
 			}
 
 			public List<String> docIdsExcept(int docOrdinal) {

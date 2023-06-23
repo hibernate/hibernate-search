@@ -25,7 +25,7 @@ import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 public class FieldSortOptionsStepImpl<PDF extends SearchPredicateFactory>
 		extends AbstractSortThenStep
 		implements FieldSortOptionsStep<FieldSortOptionsStepImpl<PDF>, PDF>,
-				FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<PDF>> {
+		FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<PDF>> {
 
 	private final SearchSortDslContext<?, ? extends PDF> dslContext;
 	private final FieldSortBuilder builder;

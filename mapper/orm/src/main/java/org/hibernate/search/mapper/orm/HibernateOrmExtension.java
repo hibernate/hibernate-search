@@ -45,16 +45,18 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 @SuppressWarnings("deprecation")
 public final class HibernateOrmExtension
 		implements IdentifierBridgeToDocumentIdentifierContextExtension<HibernateOrmMappingContext>,
-				IdentifierBridgeFromDocumentIdentifierContextExtension<HibernateOrmSessionContext>,
-				RoutingBridgeRouteContextExtension<HibernateOrmSessionContext>,
-				TypeBridgeWriteContextExtension<HibernateOrmSessionContext>,
-				PropertyBridgeWriteContextExtension<HibernateOrmSessionContext>,
-				ValueBridgeToIndexedValueContextExtension<HibernateOrmMappingContext>,
-				ValueBridgeFromIndexedValueContextExtension<HibernateOrmSessionContext>,
-				org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContextExtension<HibernateOrmMappingContext>,
-				ToDocumentValueConvertContextExtension<HibernateOrmMappingContext>,
-				org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContextExtension<HibernateOrmSessionContext>,
-				FromDocumentValueConvertContextExtension<HibernateOrmSessionContext> {
+		IdentifierBridgeFromDocumentIdentifierContextExtension<HibernateOrmSessionContext>,
+		RoutingBridgeRouteContextExtension<HibernateOrmSessionContext>,
+		TypeBridgeWriteContextExtension<HibernateOrmSessionContext>,
+		PropertyBridgeWriteContextExtension<HibernateOrmSessionContext>,
+		ValueBridgeToIndexedValueContextExtension<HibernateOrmMappingContext>,
+		ValueBridgeFromIndexedValueContextExtension<HibernateOrmSessionContext>,
+		org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContextExtension<
+				HibernateOrmMappingContext>,
+		ToDocumentValueConvertContextExtension<HibernateOrmMappingContext>,
+		org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContextExtension<
+				HibernateOrmSessionContext>,
+		FromDocumentValueConvertContextExtension<HibernateOrmSessionContext> {
 
 	private static final HibernateOrmExtension INSTANCE = new HibernateOrmExtension();
 

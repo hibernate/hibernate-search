@@ -38,7 +38,8 @@ public interface Log extends BasicLogger {
 			value = "The '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE + "' parameter was defined,"
 					+ " but the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE + "' parameter is empty."
 					+ " Set the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE + "' parameter"
-					+ " to select an entity manager factory, or do not set the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE
+					+ " to select an entity manager factory, or do not set the '"
+					+ MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE
 					+ "' parameter to try to use a default entity manager factory."
 	)
 	SearchException entityManagerFactoryReferenceIsEmpty();

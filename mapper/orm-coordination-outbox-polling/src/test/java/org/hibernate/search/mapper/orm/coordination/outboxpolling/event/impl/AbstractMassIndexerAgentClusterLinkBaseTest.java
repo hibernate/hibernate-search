@@ -92,7 +92,9 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 	}
 
 	protected abstract UUID other1Id();
+
 	protected abstract UUID other2Id();
+
 	protected abstract UUID other3Id();
 
 	protected abstract AgentType otherType();

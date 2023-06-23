@@ -131,9 +131,11 @@ abstract class AbstractEventProcessorClusterLinkTest {
 		repositoryMockHelper.defineSelfPreExisting( self );
 	}
 
-	protected final EventProcessorClusterLinkPulseExpectations.InstructionsStep expect(ShardAssignmentDescriptor selfStaticShardAssignment,
+	protected final EventProcessorClusterLinkPulseExpectations.InstructionsStep expect(
+			ShardAssignmentDescriptor selfStaticShardAssignment,
 			OutboxPollingEventProcessorClusterLink link) {
-		return EventProcessorClusterLinkPulseExpectations.expect( repositoryMockHelper, eventFinderMock, selfStaticShardAssignment, link );
+		return EventProcessorClusterLinkPulseExpectations.expect( repositoryMockHelper, eventFinderMock,
+				selfStaticShardAssignment, link );
 	}
 
 	public static UUID toUUID(long id) {

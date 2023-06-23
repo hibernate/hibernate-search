@@ -33,9 +33,11 @@ import com.google.gson.JsonPrimitive;
 
 public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsearchNestablePredicate {
 
-	private static final JsonObjectAccessor SIMPLE_QUERY_STRING_ACCESSOR = JsonAccessor.root().property( "simple_query_string" ).asObject();
+	private static final JsonObjectAccessor SIMPLE_QUERY_STRING_ACCESSOR =
+			JsonAccessor.root().property( "simple_query_string" ).asObject();
 	private static final JsonAccessor<String> QUERY_ACCESSOR = JsonAccessor.root().property( "query" ).asString();
-	private static final JsonAccessor<JsonElement> DEFAULT_OPERATOR_ACCESSOR = JsonAccessor.root().property( "default_operator" );
+	private static final JsonAccessor<JsonElement> DEFAULT_OPERATOR_ACCESSOR =
+			JsonAccessor.root().property( "default_operator" );
 	private static final JsonAccessor<JsonArray> FIELDS_ACCESSOR = JsonAccessor.root().property( "fields" ).asArray();
 	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
 	private static final JsonAccessor<String> FLAGS_ACCESSOR = JsonAccessor.root().property( "flags" ).asString();

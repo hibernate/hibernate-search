@@ -20,9 +20,9 @@ public class ConnectedPhraseMatchingContext implements PhraseMatchingContext {
 	private final FieldsContext fieldsContext;
 
 	public ConnectedPhraseMatchingContext(String fieldName,
-											PhraseQueryContext phraseContext,
-											QueryCustomizer queryCustomizer,
-											QueryBuildingContext queryContext) {
+			PhraseQueryContext phraseContext,
+			QueryCustomizer queryCustomizer,
+			QueryBuildingContext queryContext) {
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
 		this.phraseContext = phraseContext;

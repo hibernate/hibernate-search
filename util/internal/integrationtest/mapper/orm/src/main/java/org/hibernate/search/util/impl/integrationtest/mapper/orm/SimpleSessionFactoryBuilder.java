@@ -35,7 +35,8 @@ public final class SimpleSessionFactoryBuilder {
 	private static final Logger log = Logger.getLogger( SimpleSessionFactoryBuilder.class.getName() );
 
 	private boolean cleanUpSchemaOnBuildFailure = true;
-	private final List<Consumer<BootstrapServiceRegistryBuilder>> bootstrapServiceRegistryBuilderContributors = new ArrayList<>();
+	private final List<Consumer<BootstrapServiceRegistryBuilder>> bootstrapServiceRegistryBuilderContributors =
+			new ArrayList<>();
 	private final List<Consumer<StandardServiceRegistryBuilder>> serviceRegistryBuilderContributors = new ArrayList<>();
 	private final List<Consumer<MetadataSources>> metadataSourcesContributors = new ArrayList<>();
 	private final List<Consumer<MetadataImplementor>> metadataContributors = new ArrayList<>();
@@ -66,7 +67,7 @@ public final class SimpleSessionFactoryBuilder {
 		return onMetadataSources( sources -> sources.addAnnotatedClass( clazz ) );
 	}
 
-	public SimpleSessionFactoryBuilder addAnnotatedClasses(Class<?> firstClass, Class<?> ... otherClasses) {
+	public SimpleSessionFactoryBuilder addAnnotatedClasses(Class<?> firstClass, Class<?>... otherClasses) {
 		return addAnnotatedClasses( CollectionHelper.asList( firstClass, otherClasses ) );
 	}
 
@@ -74,7 +75,7 @@ public final class SimpleSessionFactoryBuilder {
 		return onMetadataSources( sources -> classes.forEach( sources::addAnnotatedClass ) );
 	}
 
-	public SimpleSessionFactoryBuilder addHbmFromClassPath(String firstPath, String ... otherPaths) {
+	public SimpleSessionFactoryBuilder addHbmFromClassPath(String firstPath, String... otherPaths) {
 		return addHbmFromClassPath( CollectionHelper.asList( firstPath, otherPaths ) );
 	}
 
@@ -82,7 +83,8 @@ public final class SimpleSessionFactoryBuilder {
 		return onMetadataSources( sources -> paths.forEach( sources::addResource ) );
 	}
 
-	public SimpleSessionFactoryBuilder onBootstrapServiceRegistryBuilder(Consumer<BootstrapServiceRegistryBuilder> contributor) {
+	public SimpleSessionFactoryBuilder onBootstrapServiceRegistryBuilder(
+			Consumer<BootstrapServiceRegistryBuilder> contributor) {
 		bootstrapServiceRegistryBuilderContributors.add( contributor );
 		return this;
 	}

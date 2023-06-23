@@ -149,7 +149,8 @@ public class TestInvalidPaths {
 		catch (SearchException se) {
 			assertTrue(
 					"Expected search exception to contain information about invalid leaf path c.indexed, instead got error: "
-							+ se.getMessage(), se.getMessage().contains( "c.indexed" ) );
+							+ se.getMessage(),
+					se.getMessage().contains( "c.indexed" ) );
 		}
 	}
 
@@ -164,7 +165,8 @@ public class TestInvalidPaths {
 		catch (SearchException se) {
 			assertTrue(
 					"Expected search exception to contain information about invalid leaf path embedded.field, instead got error: "
-							+ se.getMessage(), se.getMessage().contains( "embedded.field" ) );
+							+ se.getMessage(),
+					se.getMessage().contains( "embedded.field" ) );
 		}
 	}
 

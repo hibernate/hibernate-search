@@ -14,9 +14,9 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public enum IndexStatus {
 
-	GREEN("green"),
-	YELLOW("yellow"),
-	RED("red");
+	GREEN( "green" ),
+	YELLOW( "yellow" ),
+	RED( "red" );
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

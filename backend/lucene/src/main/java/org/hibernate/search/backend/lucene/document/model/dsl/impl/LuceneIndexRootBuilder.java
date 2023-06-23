@@ -49,7 +49,8 @@ public class LuceneIndexRootBuilder extends AbstractLuceneIndexCompositeNodeBuil
 	private ProjectionConverter<String, ?> idProjectionConverter;
 
 	public LuceneIndexRootBuilder(EventContext indexEventContext,
-			BackendMapperContext backendMapperContext, String mappedTypeName, LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry) {
+			BackendMapperContext backendMapperContext, String mappedTypeName,
+			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry) {
 		super( new LuceneIndexCompositeNodeType.Builder( ObjectStructure.FLATTENED ) );
 		this.indexEventContext = indexEventContext;
 		this.backendMapperContext = backendMapperContext;
@@ -64,7 +65,8 @@ public class LuceneIndexRootBuilder extends AbstractLuceneIndexCompositeNodeBuil
 
 	@Override
 	public LuceneIndexFieldTypeFactory createTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
-		return new LuceneIndexFieldTypeFactoryImpl( indexEventContext, backendMapperContext, analysisDefinitionRegistry, defaultsProvider );
+		return new LuceneIndexFieldTypeFactoryImpl( indexEventContext, backendMapperContext, analysisDefinitionRegistry,
+				defaultsProvider );
 	}
 
 	@Override

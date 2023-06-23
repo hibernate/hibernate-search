@@ -72,7 +72,7 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 		 */
 		long current = previous + increment;
 		int period = getStatusMessagePeriod();
-		if ( (previous / period) < (current / period) ) {
+		if ( ( previous / period ) < ( current / period ) ) {
 			long currentTime = System.nanoTime();
 			printStatusMessage( startTime, currentTime, totalCounter.longValue(), current );
 		}
@@ -119,15 +119,16 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 
 		log.indexingProgressRaw( doneCount, TimeUnit.NANOSECONDS.toMillis( elapsedNano ) );
 		float estimateSpeed = doneCount * 1_000_000_000f / elapsedNano;
-		float currentSpeed = ( currentStatusMessageInfo.documentsDone - previousStatusMessageInfo.documentsDone ) * 1_000_000_000f / intervalBetweenLogsNano;
+		float currentSpeed = ( currentStatusMessageInfo.documentsDone
+				- previousStatusMessageInfo.documentsDone ) * 1_000_000_000f / intervalBetweenLogsNano;
 		float estimatePercentileComplete = doneCount * 100f / totalTodoCount;
 		log.indexingProgressStats( currentSpeed, estimateSpeed, estimatePercentileComplete );
 	}
 
 	private static class StatusMessageInfo {
 		public static final BinaryOperator<StatusMessageInfo> UPDATE_IF_MORE_UP_TO_DATE_FUNCTION =
-				(StatusMessageInfo storedVal, StatusMessageInfo newVal) ->
-						newVal.isMoreUpToDateThan( storedVal ) ? newVal : storedVal;
+				(StatusMessageInfo storedVal,
+						StatusMessageInfo newVal) -> newVal.isMoreUpToDateThan( storedVal ) ? newVal : storedVal;
 
 		public final long currentTime;
 		public final long documentsDone;

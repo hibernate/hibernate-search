@@ -16,7 +16,8 @@ public abstract class LuceneFieldComparatorSource extends FieldComparatorSource 
 	protected NestedDocsProvider nestedDocsProvider;
 
 	public LuceneFieldComparatorSource(String nestedDocumentPath, Query filter) {
-		this.nestedDocsProvider = nestedDocumentPath == null ? null
+		this.nestedDocsProvider = nestedDocumentPath == null
+				? null
 				: new NestedDocsProvider( nestedDocumentPath, filter );
 	}
 

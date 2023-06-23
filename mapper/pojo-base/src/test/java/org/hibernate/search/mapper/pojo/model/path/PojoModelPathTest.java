@@ -61,16 +61,19 @@ public class PojoModelPathTest {
 
 	@Test
 	public void ofValue_propertyAndContainerExtractorPath() {
-		assertThat( PojoModelPath.ofValue( "foo", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) ) )
+		assertThat(
+				PojoModelPath.ofValue( "foo", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) ) )
 				.satisfies( isPath( "foo", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) ) );
 
 		assertThatThrownBy(
-				() -> PojoModelPath.ofValue( null, ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) )
+				() -> PojoModelPath.ofValue( null,
+						ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) )
 		)
 				.isInstanceOf( IllegalArgumentException.class );
 
 		assertThatThrownBy(
-				() -> PojoModelPath.ofValue( "", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) )
+				() -> PojoModelPath.ofValue( "",
+						ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) )
 		)
 				.isInstanceOf( IllegalArgumentException.class );
 
@@ -420,7 +423,7 @@ public class PojoModelPathTest {
 				.isEmpty();
 	}
 
-	private static <T extends PojoModelPath> Consumer<T> isPath(Object ... pathComponents) {
+	private static <T extends PojoModelPath> Consumer<T> isPath(Object... pathComponents) {
 		return path -> {
 			Deque<Object> components = new ArrayDeque<>();
 			PojoModelPath currentPath = path;

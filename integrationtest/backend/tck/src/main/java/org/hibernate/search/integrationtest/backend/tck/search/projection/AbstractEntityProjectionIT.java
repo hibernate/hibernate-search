@@ -306,8 +306,10 @@ public abstract class AbstractEntityProjectionIT {
 					assertThatThrownBy( query::fetchAll )
 							.isInstanceOf( SearchException.class )
 							.hasMessageContainingAll(
-									"Cannot project on entity type '" + mainIndex.typeName() + "': this type cannot be loaded from an external datasource,"
-											+ " and the documents from the index cannot be projected to its Java class '" + StubEntity.class.getName() + "'",
+									"Cannot project on entity type '" + mainIndex.typeName()
+											+ "': this type cannot be loaded from an external datasource,"
+											+ " and the documents from the index cannot be projected to its Java class '"
+											+ StubEntity.class.getName() + "'",
 									StubMappingHints.INSTANCE.noEntityProjectionAvailable()
 							);
 
@@ -375,7 +377,8 @@ public abstract class AbstractEntityProjectionIT {
 		CompositeProjectionDefinition<StubEntity> projectionDefinitionStub =
 				// Simulate a projection that instantiates the entity based on field values extracted from the index.
 				// Here we're just retrieving a field containing the ID.
-				(f, initialStep, ctx) -> initialStep.from( f.field( mainIndex.binding().idField.relativeFieldName, String.class ) )
+				(f, initialStep, ctx) -> initialStep
+						.from( f.field( mainIndex.binding().idField.relativeFieldName, String.class ) )
 						.as( id -> new StubEntity( reference( mainIndex.typeName(), id ) ) );
 		when( projectionRegistryMock.compositeOptional( StubEntity.class ) )
 				.thenReturn( Optional.of( projectionDefinitionStub ) );
@@ -445,7 +448,8 @@ public abstract class AbstractEntityProjectionIT {
 		CompositeProjectionDefinition<StubType3> type3ProjectionDefinitionStub =
 				// Simulate a projection that instantiates the entity based on field values extracted from the index.
 				// Here we're just retrieving a field containing the ID.
-				(f, initialStep, ctx) -> initialStep.from( f.field( multiIndex3.binding().idField.relativeFieldName, String.class ) )
+				(f, initialStep, ctx) -> initialStep
+						.from( f.field( multiIndex3.binding().idField.relativeFieldName, String.class ) )
 						.as( id -> new StubType3( reference( multiIndex3.typeName(), id ) ) );
 		when( projectionRegistryMock.compositeOptional( StubType3.class ) )
 				.thenReturn( Optional.of( type3ProjectionDefinitionStub ) );
@@ -459,7 +463,8 @@ public abstract class AbstractEntityProjectionIT {
 		CompositeProjectionDefinition<StubType4> type4ProjectionDefinitionStub =
 				// Simulate a projection that instantiates the entity based on field values extracted from the index.
 				// Here we're just retrieving a field containing the ID.
-				(f, initialStep, ctx) -> initialStep.from( f.field( multiIndex4.binding().idField.relativeFieldName, String.class ) )
+				(f, initialStep, ctx) -> initialStep
+						.from( f.field( multiIndex4.binding().idField.relativeFieldName, String.class ) )
 						.as( id -> new StubType4( reference( multiIndex4.typeName(), id ) ) );
 		when( projectionRegistryMock.compositeOptional( StubType4.class ) )
 				.thenReturn( Optional.of( type4ProjectionDefinitionStub ) );
@@ -543,7 +548,8 @@ public abstract class AbstractEntityProjectionIT {
 			idField = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE )
 					.map( root, "id", c -> c.projectable(
 							TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
-									? Projectable.DEFAULT : Projectable.YES ) );
+									? Projectable.DEFAULT
+									: Projectable.YES ) );
 			nested = ObjectFieldBinding.create( root, "nested" );
 		}
 	}
@@ -566,7 +572,8 @@ public abstract class AbstractEntityProjectionIT {
 			field = SimpleFieldModel.mapper( AnalyzedStringFieldTypeDescriptor.INSTANCE )
 					.map( objectField, "field", c -> c.projectable(
 							TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
-									? Projectable.DEFAULT : Projectable.YES ) );
+									? Projectable.DEFAULT
+									: Projectable.YES ) );
 		}
 
 		String fieldPath() {
@@ -579,16 +586,19 @@ public abstract class AbstractEntityProjectionIT {
 			super( documentReference );
 		}
 	}
+
 	static final class StubType2 extends StubEntity {
 		public StubType2(DocumentReference documentReference) {
 			super( documentReference );
 		}
 	}
+
 	static final class StubType3 extends StubEntity {
 		public StubType3(DocumentReference documentReference) {
 			super( documentReference );
 		}
 	}
+
 	static final class StubType4 extends StubEntity {
 		public StubType4(DocumentReference documentReference) {
 			super( documentReference );

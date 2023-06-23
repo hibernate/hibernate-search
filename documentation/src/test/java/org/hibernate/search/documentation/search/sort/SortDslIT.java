@@ -343,9 +343,9 @@ public class SortDslIT {
 
 	private MySearchParameters getSearchParameters() {
 		return () -> Arrays.asList(
-			new MySort( MySortType.GENRE, SortOrder.ASC ),
-			new MySort( MySortType.TITLE, SortOrder.DESC ),
-			new MySort( MySortType.PAGE_COUNT, SortOrder.DESC )
+				new MySort( MySortType.GENRE, SortOrder.ASC ),
+				new MySort( MySortType.TITLE, SortOrder.DESC ),
+				new MySort( MySortType.PAGE_COUNT, SortOrder.DESC )
 		);
 	}
 

@@ -45,7 +45,8 @@ public class OutboxPollingAutomaticIndexingStaticShardingIncompatibleConfigurati
 	@Rule
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
-	private void setup(String hbm2ddlAction, TestFailureHandler failureHandler, int totalShardCount, List<Integer> assignedShardIndices) {
+	private void setup(String hbm2ddlAction, TestFailureHandler failureHandler, int totalShardCount,
+			List<Integer> assignedShardIndices) {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
@@ -76,7 +77,8 @@ public class OutboxPollingAutomaticIndexingStaticShardingIncompatibleConfigurati
 		String[] expectedContent = new String[] {
 				"is statically assigned to shard ",
 				"this conflicts with agent '",
-				"' which expects ", " shards.",
+				"' which expects ",
+				" shards.",
 				"This can be a temporary situation caused by some application instances being forcibly stopped and replacements being spun up",
 				"consider adjusting the configuration or switching to dynamic sharding.",
 				"Registered agents:"

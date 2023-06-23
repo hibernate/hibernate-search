@@ -35,7 +35,8 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 	private PojoEntityTypeAdditionalMetadataBuilder entityTypeMetadataBuilder;
 	private PojoIndexedTypeAdditionalMetadataBuilder indexedTypeMetadataBuilder;
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<String, List<Consumer<PojoAdditionalMetadataCollectorPropertyNode>>> propertyContributors = new LinkedHashMap<>();
+	private final Map<String, List<Consumer<PojoAdditionalMetadataCollectorPropertyNode>>> propertyContributors =
+			new LinkedHashMap<>();
 
 	PojoTypeAdditionalMetadataBuilder(BeanResolver beanResolver, PojoRawTypeModel<?> rawTypeModel) {
 		this.beanResolver = beanResolver;
@@ -91,8 +92,8 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 
 	public PojoTypeAdditionalMetadata build() {
 		Map<String, Supplier<PojoPropertyAdditionalMetadata>> propertiesAdditionalMetadataSuppliers = new HashMap<>();
-		for ( Map.Entry<String, List<Consumer<PojoAdditionalMetadataCollectorPropertyNode>>> entry :
-				propertyContributors.entrySet() ) {
+		for ( Map.Entry<String, List<Consumer<PojoAdditionalMetadataCollectorPropertyNode>>> entry : propertyContributors
+				.entrySet() ) {
 			String propertyName = entry.getKey();
 			List<Consumer<PojoAdditionalMetadataCollectorPropertyNode>> contributors = entry.getValue();
 			propertiesAdditionalMetadataSuppliers.put( propertyName, () -> {

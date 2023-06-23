@@ -29,8 +29,9 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.impl.Contracts;
 
 class SpatialWithinPredicateFieldMoreStepImpl
-		implements SpatialWithinPredicateFieldMoreStep<SpatialWithinPredicateFieldMoreStepImpl, SpatialWithinPredicateOptionsStep<?>>,
-				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
+		implements
+		SpatialWithinPredicateFieldMoreStep<SpatialWithinPredicateFieldMoreStepImpl, SpatialWithinPredicateOptionsStep<?>>,
+		AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
 
 	private final CommonState commonState;
 

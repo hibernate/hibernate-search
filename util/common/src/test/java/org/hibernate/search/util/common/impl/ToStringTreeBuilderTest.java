@@ -22,15 +22,16 @@ public class ToStringTreeBuilderTest {
 		assertThat( toString( ToStringStyle.inlineDelimiterStructure() ) )
 				.isEqualTo(
 						"foo=value, children={"
-						+ " childrenFoo=23, child1={ child1Foo=customToString, [ foo, 42 ], [ foo2, 43 ] }, emptyChild={ },"
-						+ " appendable={ attr=val, nested={ attr=val2 } },"
-						+ " appendableAsObject={ attr=val, nested={ attr=val2 } },"
-						+ " nullAppendable=null,"
-						+ " list=[ { name=foo }, object={ name=foo, attr=bar }, { nestedList=[ first, second ], name=bar, nestedList2=[ first, second ] } ]"
-						+ " }, bar=value"
+								+ " childrenFoo=23, child1={ child1Foo=customToString, [ foo, 42 ], [ foo2, 43 ] }, emptyChild={ },"
+								+ " appendable={ attr=val, nested={ attr=val2 } },"
+								+ " appendableAsObject={ attr=val, nested={ attr=val2 } },"
+								+ " nullAppendable=null,"
+								+ " list=[ { name=foo }, object={ name=foo, attr=bar }, { nestedList=[ first, second ], name=bar, nestedList2=[ first, second ] } ]"
+								+ " }, bar=value"
 				);
 		assertThat( new ToStringTreeBuilder( ToStringStyle.inlineDelimiterStructure() ).toString() ).isEqualTo( "" );
-		assertThat( new ToStringTreeBuilder( ToStringStyle.inlineDelimiterStructure() ).startObject( "" ).endObject().toString() )
+		assertThat(
+				new ToStringTreeBuilder( ToStringStyle.inlineDelimiterStructure() ).startObject( "" ).endObject().toString() )
 				.isEqualTo( "{ }" );
 	}
 
@@ -39,59 +40,60 @@ public class ToStringTreeBuilderTest {
 		assertThat( toString( ToStringStyle.multilineDelimiterStructure() ) )
 				.isEqualTo(
 						"foo=value\n"
-						+ "children={\n"
-						+ "\tchildrenFoo=23\n"
-						+ "\tchild1={\n"
-						+ "\t\tchild1Foo=customToString\n"
-						+ "\t\t[\n"
-						+ "\t\t\tfoo\n"
-						+ "\t\t\t42\n"
-						+ "\t\t]\n"
-						+ "\t\t[\n"
-						+ "\t\t\tfoo2\n"
-						+ "\t\t\t43\n"
-						+ "\t\t]\n"
-						+ "\t}\n"
-						+ "\temptyChild={\n"
-						+ "\t}\n"
-						+ "\tappendable={\n"
-						+ "\t\tattr=val\n"
-						+ "\t\tnested={\n"
-						+ "\t\t\tattr=val2\n"
-						+ "\t\t}\n"
-						+ "\t}\n"
-						+ "\tappendableAsObject={\n"
-						+ "\t\tattr=val\n"
-						+ "\t\tnested={\n"
-						+ "\t\t\tattr=val2\n"
-						+ "\t\t}\n"
-						+ "\t}\n"
-						+ "\tnullAppendable=null\n"
-						+ "\tlist=[\n"
-						+ "\t\t{\n"
-						+ "\t\t\tname=foo\n"
-						+ "\t\t}\n"
-						+ "\t\tobject={\n"
-						+ "\t\t\tname=foo\n"
-						+ "\t\t\tattr=bar\n"
-						+ "\t\t}\n"
-						+ "\t\t{\n"
-						+ "\t\t\tnestedList=[\n"
-						+ "\t\t\t\tfirst\n"
-						+ "\t\t\t\tsecond\n"
-						+ "\t\t\t]\n"
-						+ "\t\t\tname=bar\n"
-						+ "\t\t\tnestedList2=[\n"
-						+ "\t\t\t\tfirst\n"
-						+ "\t\t\t\tsecond\n"
-						+ "\t\t\t]\n"
-						+ "\t\t}\n"
-						+ "\t]\n"
-						+ "}\n"
-						+ "bar=value"
+								+ "children={\n"
+								+ "\tchildrenFoo=23\n"
+								+ "\tchild1={\n"
+								+ "\t\tchild1Foo=customToString\n"
+								+ "\t\t[\n"
+								+ "\t\t\tfoo\n"
+								+ "\t\t\t42\n"
+								+ "\t\t]\n"
+								+ "\t\t[\n"
+								+ "\t\t\tfoo2\n"
+								+ "\t\t\t43\n"
+								+ "\t\t]\n"
+								+ "\t}\n"
+								+ "\temptyChild={\n"
+								+ "\t}\n"
+								+ "\tappendable={\n"
+								+ "\t\tattr=val\n"
+								+ "\t\tnested={\n"
+								+ "\t\t\tattr=val2\n"
+								+ "\t\t}\n"
+								+ "\t}\n"
+								+ "\tappendableAsObject={\n"
+								+ "\t\tattr=val\n"
+								+ "\t\tnested={\n"
+								+ "\t\t\tattr=val2\n"
+								+ "\t\t}\n"
+								+ "\t}\n"
+								+ "\tnullAppendable=null\n"
+								+ "\tlist=[\n"
+								+ "\t\t{\n"
+								+ "\t\t\tname=foo\n"
+								+ "\t\t}\n"
+								+ "\t\tobject={\n"
+								+ "\t\t\tname=foo\n"
+								+ "\t\t\tattr=bar\n"
+								+ "\t\t}\n"
+								+ "\t\t{\n"
+								+ "\t\t\tnestedList=[\n"
+								+ "\t\t\t\tfirst\n"
+								+ "\t\t\t\tsecond\n"
+								+ "\t\t\t]\n"
+								+ "\t\t\tname=bar\n"
+								+ "\t\t\tnestedList2=[\n"
+								+ "\t\t\t\tfirst\n"
+								+ "\t\t\t\tsecond\n"
+								+ "\t\t\t]\n"
+								+ "\t\t}\n"
+								+ "\t]\n"
+								+ "}\n"
+								+ "bar=value"
 				);
 		assertThat( new ToStringTreeBuilder( ToStringStyle.multilineDelimiterStructure() ).toString() ).isEqualTo( "" );
-		assertThat( new ToStringTreeBuilder( ToStringStyle.multilineDelimiterStructure() ).startObject( "" ).endObject().toString() )
+		assertThat( new ToStringTreeBuilder( ToStringStyle.multilineDelimiterStructure() ).startObject( "" ).endObject()
+				.toString() )
 				.isEqualTo( "{\n}" );
 	}
 
@@ -101,37 +103,37 @@ public class ToStringTreeBuilderTest {
 		assertThat( toString( style ) )
 				.isEqualTo(
 						"foo: value\n"
-						+ "children: \n"
-						+ "  childrenFoo: 23\n"
-						+ "  child1: \n"
-						+ "    child1Foo: customToString\n"
-						+ "      - foo\n"
-						+ "      - 42\n"
-						+ "      - foo2\n"
-						+ "      - 43\n"
-						+ "  emptyChild: \n"
-						+ "  appendable: \n"
-						+ "    attr: val\n"
-						+ "    nested: \n"
-						+ "      attr: val2\n"
-						+ "  appendableAsObject: \n"
-						+ "    attr: val\n"
-						+ "    nested: \n"
-						+ "      attr: val2\n"
-						+ "  nullAppendable: null\n"
-						+ "  list: \n"
-						+ "    - name: foo\n"
-						+ "    - object: \n"
-						+ "        name: foo\n"
-						+ "        attr: bar\n"
-						+ "    - nestedList: \n"
-						+ "        - first\n"
-						+ "        - second\n"
-						+ "      name: bar\n"
-						+ "      nestedList2: \n"
-						+ "        - first\n"
-						+ "        - second\n"
-						+ "bar: value"
+								+ "children: \n"
+								+ "  childrenFoo: 23\n"
+								+ "  child1: \n"
+								+ "    child1Foo: customToString\n"
+								+ "      - foo\n"
+								+ "      - 42\n"
+								+ "      - foo2\n"
+								+ "      - 43\n"
+								+ "  emptyChild: \n"
+								+ "  appendable: \n"
+								+ "    attr: val\n"
+								+ "    nested: \n"
+								+ "      attr: val2\n"
+								+ "  appendableAsObject: \n"
+								+ "    attr: val\n"
+								+ "    nested: \n"
+								+ "      attr: val2\n"
+								+ "  nullAppendable: null\n"
+								+ "  list: \n"
+								+ "    - name: foo\n"
+								+ "    - object: \n"
+								+ "        name: foo\n"
+								+ "        attr: bar\n"
+								+ "    - nestedList: \n"
+								+ "        - first\n"
+								+ "        - second\n"
+								+ "      name: bar\n"
+								+ "      nestedList2: \n"
+								+ "        - first\n"
+								+ "        - second\n"
+								+ "bar: value"
 				);
 		assertThat( new ToStringTreeBuilder( style ).toString() ).isEqualTo( "" );
 		assertThat( new ToStringTreeBuilder( style ).startObject( "" ).endObject().toString() )
@@ -142,43 +144,43 @@ public class ToStringTreeBuilderTest {
 		ToStringTreeBuilder builder = new ToStringTreeBuilder( style );
 		return builder.attribute( "foo", "value" )
 				.startObject( "children" )
-					.attribute( "childrenFoo", 23 )
-					.startObject( "child1" )
-						.attribute( "child1Foo", new Object() {
-							@Override
-							public String toString() {
-								return "customToString";
-							}
-						} )
-						.startList()
-							.value( "foo" )
-							.value( 42 )
-							.endList()
-						.attribute( null, Arrays.asList( "foo2", 43 ) )
-						.endObject()
-					.startObject( "emptyChild" )
-						.endObject()
-					.attribute( "appendable", new Appendable() )
-					.attribute( "appendableAsObject", (Object) new Appendable() )
-					.attribute( "nullAppendable" , null )
-					.startList( "list" )
-						.startObject()
-							.attribute( "name", "foo" )
-							.endObject()
-						.startObject( "object" )
-								.attribute( "name", "foo" )
-								.attribute( "attr", "bar" )
-								.endObject()
-						.startObject()
-							.startList( "nestedList" )
-								.value( "first" )
-								.value( "second" )
-								.endList()
-							.attribute( "name", "bar" )
-							.attribute( "nestedList2", Arrays.asList( "first", "second" ) )
-							.endObject()
-						.endList()
-					.endObject()
+				.attribute( "childrenFoo", 23 )
+				.startObject( "child1" )
+				.attribute( "child1Foo", new Object() {
+					@Override
+					public String toString() {
+						return "customToString";
+					}
+				} )
+				.startList()
+				.value( "foo" )
+				.value( 42 )
+				.endList()
+				.attribute( null, Arrays.asList( "foo2", 43 ) )
+				.endObject()
+				.startObject( "emptyChild" )
+				.endObject()
+				.attribute( "appendable", new Appendable() )
+				.attribute( "appendableAsObject", (Object) new Appendable() )
+				.attribute( "nullAppendable", null )
+				.startList( "list" )
+				.startObject()
+				.attribute( "name", "foo" )
+				.endObject()
+				.startObject( "object" )
+				.attribute( "name", "foo" )
+				.attribute( "attr", "bar" )
+				.endObject()
+				.startObject()
+				.startList( "nestedList" )
+				.value( "first" )
+				.value( "second" )
+				.endList()
+				.attribute( "name", "bar" )
+				.attribute( "nestedList2", Arrays.asList( "first", "second" ) )
+				.endObject()
+				.endList()
+				.endObject()
 				.attribute( "bar", "value" )
 				.toString();
 	}

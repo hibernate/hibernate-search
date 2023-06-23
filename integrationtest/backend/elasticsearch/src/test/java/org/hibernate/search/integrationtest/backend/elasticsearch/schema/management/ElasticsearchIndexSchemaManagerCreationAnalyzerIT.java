@@ -89,11 +89,11 @@ public class ElasticsearchIndexSchemaManagerCreationAnalyzerIT {
 						+ " 'tokenizer': {"
 						+ "   'custom-edgeNGram': {"
 						+ "     'type': 'edge_ngram',"
-									/*
-									 * Strangely enough, even if you send properly typed numbers
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of numbers...
-									 */
+						/*
+						 * Strangely enough, even if you send properly typed numbers
+						 * to Elasticsearch, when you ask for the current settings it
+						 * will spit back strings instead of numbers...
+						 */
 						+ "     'min_gram': '1',"
 						+ "     'max_gram': '10'"
 						+ "   }"
@@ -105,17 +105,17 @@ public class ElasticsearchIndexSchemaManagerCreationAnalyzerIT {
 						+ "   },"
 						+ "   'custom-word-delimiter': {"
 						+ "     'type': 'word_delimiter',"
-									/*
-									 * Strangely enough, even if you send properly typed booleans
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of booleans...
-									 */
+						/*
+						 * Strangely enough, even if you send properly typed booleans
+						 * to Elasticsearch, when you ask for the current settings it
+						 * will spit back strings instead of booleans...
+						 */
 						+ "     'generate_word_parts': 'false'"
 						+ "   }"
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( mainIndex.name() ).settings( "index.analysis" ).get()
-				);
+		);
 	}
 
 	@Test
@@ -150,66 +150,66 @@ public class ElasticsearchIndexSchemaManagerCreationAnalyzerIT {
 				.join();
 
 		assertJsonEquals( "{"
-						+ " 'analyzer': {"
-						+ "   'custom-analyzer': {"
-						+ "     'type': 'custom',"
-						+ "     'char_filter': ['custom-pattern-replace'],"
-						+ "     'tokenizer': 'custom-edgeNGram',"
-						+ "     'filter': ['custom-keep-types', 'custom-word-delimiter']"
-						+ "   }"
-						+ " },"
-						+ " 'char_filter': {"
-						+ "   'custom-pattern-replace': {"
-						+ "     'type': 'pattern_replace',"
-						+ "     'pattern': '[^0-9]',"
-						+ "     'replacement': '0',"
-						+ "     'tags': 'CASE_INSENSITIVE|COMMENTS'"
-						+ "   }"
-						+ " },"
-						+ " 'tokenizer': {"
-						+ "   'custom-edgeNGram': {"
-						+ "     'type': 'edge_ngram',"
-									/*
-									 * Strangely enough, even if you send properly typed numbers
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of numbers...
-									 */
-						+ "     'min_gram': '1',"
-						+ "     'max_gram': '10'"
-						+ "   }"
-						+ " },"
-						+ " 'filter': {"
-						+ "   'custom-keep-types': {"
-						+ "     'type': 'keep_types',"
-						+ "     'types': ['<NUM>', '<DOUBLE>']"
-						+ "   },"
-						+ "   'custom-word-delimiter': {"
-						+ "     'type': 'word_delimiter',"
-									/*
-									 * Strangely enough, even if you send properly typed booleans
-									 * to Elasticsearch, when you ask for the current settings it
-									 * will spit back strings instead of booleans...
-									 */
-						+ "     'generate_word_parts': 'false'"
-						+ "   }"
-						+ " }"
+				+ " 'analyzer': {"
+				+ "   'custom-analyzer': {"
+				+ "     'type': 'custom',"
+				+ "     'char_filter': ['custom-pattern-replace'],"
+				+ "     'tokenizer': 'custom-edgeNGram',"
+				+ "     'filter': ['custom-keep-types', 'custom-word-delimiter']"
+				+ "   }"
+				+ " },"
+				+ " 'char_filter': {"
+				+ "   'custom-pattern-replace': {"
+				+ "     'type': 'pattern_replace',"
+				+ "     'pattern': '[^0-9]',"
+				+ "     'replacement': '0',"
+				+ "     'tags': 'CASE_INSENSITIVE|COMMENTS'"
+				+ "   }"
+				+ " },"
+				+ " 'tokenizer': {"
+				+ "   'custom-edgeNGram': {"
+				+ "     'type': 'edge_ngram',"
+				/*
+				 * Strangely enough, even if you send properly typed numbers
+				 * to Elasticsearch, when you ask for the current settings it
+				 * will spit back strings instead of numbers...
+				 */
+				+ "     'min_gram': '1',"
+				+ "     'max_gram': '10'"
+				+ "   }"
+				+ " },"
+				+ " 'filter': {"
+				+ "   'custom-keep-types': {"
+				+ "     'type': 'keep_types',"
+				+ "     'types': ['<NUM>', '<DOUBLE>']"
+				+ "   },"
+				+ "   'custom-word-delimiter': {"
+				+ "     'type': 'word_delimiter',"
+				/*
+				 * Strangely enough, even if you send properly typed booleans
+				 * to Elasticsearch, when you ask for the current settings it
+				 * will spit back strings instead of booleans...
+				 */
+				+ "     'generate_word_parts': 'false'"
+				+ "   }"
+				+ " }"
 				+ "}",
 				elasticSearchClient.index( mainIndex.name() ).settings( "index.analysis" ).get() );
 
 		assertJsonEquals( "{"
-						+ " 'analyzer': {"
-						+ "   'custom-analyzer': {"
-						+ "     'type': 'custom',"
-						+ "     'tokenizer': 'whitespace',"
-						+ "     'filter': ['lowercase', 'asciifolding']"
-						+ "   },"
-						+ "   'custom-analyzer-2': {"
-						+ "     'type': 'custom',"
-						+ "     'tokenizer': 'whitespace',"
-						+ "     'filter': ['lowercase']"
-						+ "   }"
-							// elements defined in the default configurer shouldn't appear here: they've been overridden
-						+ " }"
+				+ " 'analyzer': {"
+				+ "   'custom-analyzer': {"
+				+ "     'type': 'custom',"
+				+ "     'tokenizer': 'whitespace',"
+				+ "     'filter': ['lowercase', 'asciifolding']"
+				+ "   },"
+				+ "   'custom-analyzer-2': {"
+				+ "     'type': 'custom',"
+				+ "     'tokenizer': 'whitespace',"
+				+ "     'filter': ['lowercase']"
+				+ "   }"
+				// elements defined in the default configurer shouldn't appear here: they've been overridden
+				+ " }"
 				+ "}",
 				elasticSearchClient.index( otherIndex.name() ).settings( "index.analysis" ).get() );
 	}

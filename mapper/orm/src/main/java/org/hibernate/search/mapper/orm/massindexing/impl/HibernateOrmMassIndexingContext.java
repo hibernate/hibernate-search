@@ -135,7 +135,8 @@ public final class HibernateOrmMassIndexingContext
 		private final HibernateOrmSessionTypeContextProvider typeContextProvider;
 
 		public HibernateOrmMassIndexingLoadingStrategy(HibernateOrmEntityLoadingStrategy<E, I> delegate,
-				Optional<ConditionalExpression> conditionalExpression, HibernateOrmSessionTypeContextProvider typeContextProvider) {
+				Optional<ConditionalExpression> conditionalExpression,
+				HibernateOrmSessionTypeContextProvider typeContextProvider) {
 			this.delegate = delegate;
 			this.conditionalExpression = conditionalExpression;
 			this.typeContextProvider = typeContextProvider;

@@ -46,7 +46,8 @@ public final class TestConfiguration {
 	 *
 	 * @return Configuration properties to use when bootstrapping a Standalone POJO Mapper.
 	 */
-	public static Map<String, String> standalonePojoMapperProperties(TestConfigurationProvider configurationProvider, BackendConfiguration backendConfiguration) {
+	public static Map<String, String> standalonePojoMapperProperties(TestConfigurationProvider configurationProvider,
+			BackendConfiguration backendConfiguration) {
 		Map<String, String> properties = new HashMap<>();
 
 		// Hack: override example properties set by caller

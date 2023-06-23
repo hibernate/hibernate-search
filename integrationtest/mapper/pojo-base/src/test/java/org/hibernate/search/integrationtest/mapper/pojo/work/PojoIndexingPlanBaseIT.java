@@ -76,8 +76,8 @@ public class PojoIndexingPlanBaseIT {
 		mapping = setupHelper.start()
 				.withConfiguration( builder -> builder
 						.addEntityType( IndexedEntity.class, context -> context
-								.selectionLoadingStrategy( (SelectionLoadingStrategy<IndexedEntity>)
-										(includedTypes, options) -> loaderMock ) ) )
+								.selectionLoadingStrategy(
+										(SelectionLoadingStrategy<IndexedEntity>) (includedTypes, options) -> loaderMock ) ) )
 				.setup( IndexedEntity.class, ContainedEntity.class );
 
 		backendMock.verifyExpectationsMet();

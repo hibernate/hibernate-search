@@ -19,11 +19,10 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  * @param <A> The type of result for this aggregation.
  */
 public interface RangeAggregationOptionsStep<
-				S extends RangeAggregationOptionsStep<?, PDF, F, A>,
-				PDF extends SearchPredicateFactory,
-				F,
-				A
-		>
+		S extends RangeAggregationOptionsStep<?, PDF, F, A>,
+		PDF extends SearchPredicateFactory,
+		F,
+		A>
 		extends AggregationFinalStep<A>, AggregationFilterStep<S, PDF> {
 
 }

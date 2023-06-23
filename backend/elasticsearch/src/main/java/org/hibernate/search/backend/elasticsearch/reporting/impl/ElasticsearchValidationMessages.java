@@ -53,8 +53,8 @@ public interface ElasticsearchValidationMessages {
 
 	@Message(
 			value = "Invalid formats. Every required formats must be in the list,"
-			+ " though it's not required to provide them in the same order, and the list must not contain unexpected formats."
-			+ " Expected '%1$s', actual is '%2$s', missing elements are '%3$s', unexpected elements are '%4$s'."
+					+ " though it's not required to provide them in the same order, and the list must not contain unexpected formats."
+					+ " Expected '%1$s', actual is '%2$s', missing elements are '%3$s', unexpected elements are '%4$s'."
 	)
 	String invalidFormat(List<String> expectedValue,
 			List<String> actualValue, List<String> missingFormats, List<String> unexpectedFormats);

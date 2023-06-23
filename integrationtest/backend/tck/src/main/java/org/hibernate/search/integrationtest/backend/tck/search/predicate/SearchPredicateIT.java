@@ -133,10 +133,9 @@ public class SearchPredicateIT {
 
 		// reuse the same predicate instance on a different scope,
 		// targeting a different index
-		assertThatThrownBy( () ->
-				otherIndex.createScope().query()
-						.where( predicate )
-						.toQuery() )
+		assertThatThrownBy( () -> otherIndex.createScope().query()
+				.where( predicate )
+				.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Invalid search predicate",
 						"You must build the predicate from a scope targeting indexes ", otherIndex.name(),
@@ -144,10 +143,9 @@ public class SearchPredicateIT {
 
 		// reuse the same predicate instance on a different scope,
 		// targeting different indexes
-		assertThatThrownBy( () ->
-				mainIndex.createScope( otherIndex ).query()
-						.where( predicate )
-						.toQuery() )
+		assertThatThrownBy( () -> mainIndex.createScope( otherIndex ).query()
+				.where( predicate )
+				.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Invalid search predicate",
 						"You must build the predicate from a scope targeting indexes ",
@@ -211,10 +209,9 @@ public class SearchPredicateIT {
 
 		// reuse the same predicate instance on a different scope,
 		// targeting a different index
-		assertThatThrownBy( () ->
-				otherIndex.createScope().query()
-						.where( f -> f.bool().must( predicate ) )
-						.toQuery() )
+		assertThatThrownBy( () -> otherIndex.createScope().query()
+				.where( f -> f.bool().must( predicate ) )
+				.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Invalid search predicate",
 						"You must build the predicate from a scope targeting indexes ", otherIndex.name(),
@@ -222,10 +219,9 @@ public class SearchPredicateIT {
 
 		// reuse the same predicate instance on a different scope,
 		// targeting different indexes
-		assertThatThrownBy( () ->
-				mainIndex.createScope( otherIndex ).query()
-						.where( f -> f.bool().must( predicate ) )
-						.toQuery() )
+		assertThatThrownBy( () -> mainIndex.createScope( otherIndex ).query()
+				.where( f -> f.bool().must( predicate ) )
+				.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Invalid search predicate",
 						"You must build the predicate from a scope targeting indexes ",
@@ -347,7 +343,7 @@ public class SearchPredicateIT {
 				.add( DOCUMENT_2, document -> {
 					document.addValue( mainIndex.binding().string, STRING_2 );
 				} )
-				.add( EMPTY, document -> { } )
+				.add( EMPTY, document -> {} )
 				.join();
 	}
 

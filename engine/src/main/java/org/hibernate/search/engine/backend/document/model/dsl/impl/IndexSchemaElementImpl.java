@@ -77,8 +77,8 @@ public class IndexSchemaElementImpl<B extends IndexCompositeNodeBuilder> impleme
 		checkRelativeNamedPredicateName( relativeNamedPredicateName );
 		return nestingContext.nestUnfiltered(
 				(inclusion, prefix) ->
-						// Ignore the prefix: it's not relevant here, and it's a deprecated feature anyway.
-						objectNodeBuilder.addNamedPredicate( relativeNamedPredicateName, inclusion, definition )
+				// Ignore the prefix: it's not relevant here, and it's a deprecated feature anyway.
+				objectNodeBuilder.addNamedPredicate( relativeNamedPredicateName, inclusion, definition )
 		);
 	}
 

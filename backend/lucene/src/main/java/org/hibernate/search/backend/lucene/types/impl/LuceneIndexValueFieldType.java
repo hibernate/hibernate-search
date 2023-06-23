@@ -17,10 +17,9 @@ import org.apache.lucene.analysis.Analyzer;
 
 public final class LuceneIndexValueFieldType<F>
 		extends AbstractIndexValueFieldType<
-						LuceneSearchIndexScope<?>,
-						LuceneSearchIndexValueFieldContext<F>,
-						F
-				>
+				LuceneSearchIndexScope<?>,
+				LuceneSearchIndexValueFieldContext<F>,
+				F>
 		implements IndexFieldType<F>, LuceneSearchIndexValueFieldTypeContext<F> {
 
 	private final LuceneFieldCodec<F> codec;
@@ -56,10 +55,9 @@ public final class LuceneIndexValueFieldType<F>
 
 	public static class Builder<F>
 			extends AbstractIndexValueFieldType.Builder<
-							LuceneSearchIndexScope<?>,
-							LuceneSearchIndexValueFieldContext<F>,
-							F
-					> {
+					LuceneSearchIndexScope<?>,
+					LuceneSearchIndexValueFieldContext<F>,
+					F> {
 
 		private LuceneFieldCodec<F> codec;
 		private Analyzer indexingAnalyzerOrNormalizer;

@@ -23,7 +23,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFa
  */
 public class MultitenancyTestHelper {
 
-	public static void enable(SimpleSessionFactoryBuilder builder, String ... tenantIds) {
+	public static void enable(SimpleSessionFactoryBuilder builder, String... tenantIds) {
 		MultitenancyTestHelper helper = new MultitenancyTestHelper( tenantIds );
 		helper.attachTo( builder );
 	}

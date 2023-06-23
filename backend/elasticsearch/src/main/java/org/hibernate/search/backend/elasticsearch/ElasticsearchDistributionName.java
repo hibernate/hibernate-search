@@ -22,13 +22,13 @@ public enum ElasticsearchDistributionName {
 	 * <p>
 	 * See: <a href="https://www.elastic.co/elasticsearch/">https://www.elastic.co/elasticsearch/</a>.
 	 */
-	ELASTIC("elastic"),
+	ELASTIC( "elastic" ),
 	/**
 	 * The OpenSearch distribution from the OpenSearch organization.
 	 * <p>
 	 * See: <a href="https://www.opensearch.org/">https://www.opensearch.org/</a>.
 	 */
-	OPENSEARCH("opensearch");
+	OPENSEARCH( "opensearch" );
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

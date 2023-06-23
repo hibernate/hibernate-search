@@ -12,10 +12,9 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldContext;
 
 public interface IndexValueField<
-				SC extends SearchIndexScope<?>,
-				NT extends AbstractIndexValueFieldType<SC, ?, ?>,
-				C extends IndexCompositeNode<SC, ?, ?>
-		>
+		SC extends SearchIndexScope<?>,
+		NT extends AbstractIndexValueFieldType<SC, ?, ?>,
+		C extends IndexCompositeNode<SC, ?, ?>>
 		extends IndexNode<SC>, IndexField<SC, C>, IndexValueFieldDescriptor,
 		SearchIndexValueFieldContext<SC> {
 

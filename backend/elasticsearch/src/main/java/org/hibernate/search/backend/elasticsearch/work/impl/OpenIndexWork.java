@@ -35,8 +35,8 @@ public class OpenIndexWork extends AbstractNonBulkableWork<Void> {
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.post()
-					.pathComponent( indexName )
-					.pathComponent( Paths._OPEN );
+							.pathComponent( indexName )
+							.pathComponent( Paths._OPEN );
 
 			return builder.build();
 		}

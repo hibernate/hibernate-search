@@ -17,7 +17,8 @@ import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 public class ActiveSessionFactoryRegistryUpdater implements Integrator {
 
 	@Override
-	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
+	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory,
+			SessionFactoryServiceRegistry serviceRegistry) {
 		ActiveSessionFactoryRegistry.getInstance().register( sessionFactory );
 	}
 

@@ -64,46 +64,46 @@ public class MassIndexingManualSchemaManagementIT {
 	public void cleanup() {
 		// Necessary to keep the server (ES) or filesystem (Lucene) clean after the tests,
 		// because the schema management strategy is "none"
-		with( entityManagerFactory ).runInTransaction( entityManager ->
-				Search.session( entityManager ).schemaManager().dropIfExisting()
-		);
+		with( entityManagerFactory )
+				.runInTransaction( entityManager -> Search.session( entityManager ).schemaManager().dropIfExisting()
+				);
 	}
 
 	@Test
 	public void testMassIndexingWithAutomaticDropAndCreate() {
 		// The index doesn't exist initially, since we delete it in "cleanup()" the schema management strategy is "none"
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
-					MassIndexer indexer = Search.session( entityManager ).massIndexer()
-							.dropAndCreateSchemaOnStart( true );
-					try {
-						indexer.startAndWait();
-					}
-					catch (InterruptedException e) {
-						fail( "Unexpected InterruptedException: " + e.getMessage() );
-					}
-					assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) ).isEqualTo( NUMBER_OF_BOOKS );
-				}
+			MassIndexer indexer = Search.session( entityManager ).massIndexer()
+					.dropAndCreateSchemaOnStart( true );
+			try {
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+			assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) ).isEqualTo( NUMBER_OF_BOOKS );
+		}
 		);
 	}
 
 	@Test
 	public void testMassIndexingWithManualDropAndCreate() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
-					// The index doesn't exist initially, since the schema management strategy is "none"
-					Search.session( entityManager ).schemaManager().dropAndCreate();
+			// The index doesn't exist initially, since the schema management strategy is "none"
+			Search.session( entityManager ).schemaManager().dropAndCreate();
 
-					assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) ).isZero();
+			assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) ).isZero();
 
-					MassIndexer indexer = Search.session( entityManager ).massIndexer()
-							.dropAndCreateSchemaOnStart( true );
-					try {
-						indexer.startAndWait();
-					}
-					catch (InterruptedException e) {
-						fail( "Unexpected InterruptedException: " + e.getMessage() );
-					}
-					assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) ).isEqualTo( NUMBER_OF_BOOKS );
-				}
+			MassIndexer indexer = Search.session( entityManager ).massIndexer()
+					.dropAndCreateSchemaOnStart( true );
+			try {
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+			assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) ).isEqualTo( NUMBER_OF_BOOKS );
+		}
 		);
 	}
 }

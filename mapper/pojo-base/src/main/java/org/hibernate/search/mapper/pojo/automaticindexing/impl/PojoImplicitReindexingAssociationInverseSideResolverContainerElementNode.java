@@ -23,9 +23,12 @@ class PojoImplicitReindexingAssociationInverseSideResolverContainerElementNode<C
 
 	private final ContainerExtractorHolder<C, V> extractorHolder;
 	private final PojoImplicitReindexingAssociationInverseSideResolverNode<? super V> nested;
-	private final ValueProcessor<PojoReindexingAssociationInverseSideCollector, ? super C, PojoImplicitReindexingAssociationInverseSideResolverRootContext> extractingDelegate;
+	private final ValueProcessor<PojoReindexingAssociationInverseSideCollector,
+			? super C,
+			PojoImplicitReindexingAssociationInverseSideResolverRootContext> extractingDelegate;
 
-	public PojoImplicitReindexingAssociationInverseSideResolverContainerElementNode(ContainerExtractorHolder<C, V> extractorHolder,
+	public PojoImplicitReindexingAssociationInverseSideResolverContainerElementNode(
+			ContainerExtractorHolder<C, V> extractorHolder,
 			PojoImplicitReindexingAssociationInverseSideResolverNode<? super V> nested) {
 		this.extractorHolder = extractorHolder;
 		this.nested = nested;

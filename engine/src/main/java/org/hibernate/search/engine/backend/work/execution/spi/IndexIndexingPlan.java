@@ -56,11 +56,11 @@ public interface IndexIndexingPlan {
 	 */
 	default CompletableFuture<?> execute(OperationSubmitter operationSubmitter) {
 		return executeAndReport( operationSubmitter ).thenApply( report -> {
-				report.throwable().ifPresent( t -> {
-					throw Throwables.toRuntimeException( t );
-				} );
-				return null;
+			report.throwable().ifPresent( t -> {
+				throw Throwables.toRuntimeException( t );
 			} );
+			return null;
+		} );
 	}
 
 	/**

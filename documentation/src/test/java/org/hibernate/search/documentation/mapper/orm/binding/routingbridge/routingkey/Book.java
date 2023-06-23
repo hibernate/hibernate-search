@@ -55,6 +55,6 @@ public class Book {
 	public void setGenre(Genre genre) {
 		this.genre = genre;
 	}
-// end::getters-setters[]
+	// end::getters-setters[]
 }
 // end::include[]

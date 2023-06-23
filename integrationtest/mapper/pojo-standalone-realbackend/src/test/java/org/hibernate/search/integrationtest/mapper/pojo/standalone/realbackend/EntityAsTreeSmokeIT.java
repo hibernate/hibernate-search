@@ -56,7 +56,8 @@ public class EntityAsTreeSmokeIT {
 				.withAnnotatedTypes( ContainedNonEntity.class, IndexedEntity.class, ContainedEntity.class )
 				.withConfiguration( b -> b
 						.addEntityType( IndexedEntity.class, c -> c
-								.selectionLoadingStrategy( SelectionLoadingStrategy.fromMap( simulatedIndexedEntityDatastore ) ) )
+								.selectionLoadingStrategy(
+										SelectionLoadingStrategy.fromMap( simulatedIndexedEntityDatastore ) ) )
 						.addEntityType( ContainedEntity.class ) )
 				.withConfiguration( b -> b.defaultReindexOnUpdate( ReindexOnUpdate.SHALLOW ) )
 				.setup();

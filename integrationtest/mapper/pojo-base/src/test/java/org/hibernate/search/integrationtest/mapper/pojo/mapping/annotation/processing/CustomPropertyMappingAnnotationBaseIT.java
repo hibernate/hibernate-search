@@ -54,7 +54,8 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	/**
 	 * Basic test checking that a simple property mapping will be applied as expected.
@@ -69,8 +70,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 			String text;
 		}
 
-		backendMock.expectSchema( INDEX_NAME, b ->
-				b.field( "myText", String.class )
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "myText", String.class )
 		);
 
 		SearchMapping mapping = setupHelper.start()
@@ -80,7 +80,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.FIELD, ElementType.METHOD})
+	@Target({ ElementType.FIELD, ElementType.METHOD })
 	@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = WorkingAnnotation.Processor.class))
 	private @interface WorkingAnnotation {
 		class Processor implements PropertyMappingAnnotationProcessor<WorkingAnnotation> {
@@ -111,7 +111,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.FIELD, ElementType.METHOD})
+	@Target({ ElementType.FIELD, ElementType.METHOD })
 	@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef())
 	private @interface AnnotationWithEmptyProcessorRef {
 	}
@@ -134,19 +134,21 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.FIELD, ElementType.METHOD})
+	@Target({ ElementType.FIELD, ElementType.METHOD })
 	@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = DifferentAnnotationType.Processor.class))
 	private @interface AnnotationWithProcessorWithDifferentAnnotationType {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.FIELD, ElementType.METHOD})
+	@Target({ ElementType.FIELD, ElementType.METHOD })
 	private @interface DifferentAnnotationType {
-		class Processor implements PropertyMappingAnnotationProcessor<CustomPropertyMappingAnnotationBaseIT.DifferentAnnotationType> {
+		class Processor
+				implements PropertyMappingAnnotationProcessor<CustomPropertyMappingAnnotationBaseIT.DifferentAnnotationType> {
 			public static final String TO_STRING = "DifferentAnnotationType.Processor";
 
 			@Override
-			public void process(PropertyMappingStep mapping, CustomPropertyMappingAnnotationBaseIT.DifferentAnnotationType annotation,
+			public void process(PropertyMappingStep mapping,
+					CustomPropertyMappingAnnotationBaseIT.DifferentAnnotationType annotation,
 					PropertyMappingAnnotationProcessorContext context) {
 				throw new UnsupportedOperationException( "This should not be called" );
 			}
@@ -206,7 +208,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.FIELD, ElementType.METHOD})
+	@Target({ ElementType.FIELD, ElementType.METHOD })
 	@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = AnnotatedElementAwareAnnotation.Processor.class))
 	private @interface AnnotatedElementAwareAnnotation {
 		class Processor implements PropertyMappingAnnotationProcessor<AnnotatedElementAwareAnnotation> {
@@ -272,7 +274,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.FIELD, ElementType.METHOD})
+	@Target({ ElementType.FIELD, ElementType.METHOD })
 	private @interface AnalyzerAnnotation {
 
 		String name();
@@ -280,7 +282,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.FIELD, ElementType.METHOD})
+	@Target({ ElementType.FIELD, ElementType.METHOD })
 	@Repeatable(MultiFieldAnnotation.List.class)
 	// Must be public in order for Hibernate Search to be able to access List#value
 	public @interface MultiFieldAnnotation {
@@ -288,7 +290,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 		String name();
 
 		@Retention(RetentionPolicy.RUNTIME)
-		@Target({ElementType.FIELD, ElementType.METHOD})
+		@Target({ ElementType.FIELD, ElementType.METHOD })
 		@interface List {
 			MultiFieldAnnotation[] value();
 		}
@@ -301,10 +303,12 @@ public class CustomPropertyMappingAnnotationBaseIT {
 		class IndexedEntityType {
 			Integer id;
 			String text;
+
 			@DocumentId
 			public Integer getId() {
 				return id;
 			}
+
 			@EventContextAwareAnnotation
 			public String getText() {
 				return text;
@@ -328,7 +332,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.FIELD, ElementType.METHOD})
+	@Target({ ElementType.FIELD, ElementType.METHOD })
 	@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = EventContextAwareAnnotation.Processor.class))
 	private @interface EventContextAwareAnnotation {
 

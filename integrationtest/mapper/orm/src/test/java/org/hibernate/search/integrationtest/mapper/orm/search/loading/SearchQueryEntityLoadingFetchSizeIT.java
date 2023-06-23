@@ -179,7 +179,7 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 		persistThatManyEntities( entityCount );
 
 		testLoadingThatManyEntities(
-				session -> { }, // No particular session setup
+				session -> {}, // No particular session setup
 				o -> {
 					if ( entityGraph != null ) {
 						o.graph( entityGraph, GraphSemantic.LOAD );

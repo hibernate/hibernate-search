@@ -36,13 +36,14 @@ class NativePersistenceRunner implements PersistenceRunner<Session, Transaction>
 	}
 
 	@Override
-	public <R, E extends Throwable> R applyInTransaction(ThrowingBiFunction<? super Session, ? super Transaction, R, E> action) throws E {
+	public <R, E extends Throwable> R applyInTransaction(ThrowingBiFunction<? super Session, ? super Transaction, R, E> action)
+			throws E {
 		return applyNoTransaction( session ->
-				//CHECKSTYLE:OFF: RegexpSinglelineJava - cannot use static import as that would clash with method of this class
-				OrmUtils.applyInTransaction( session, tx -> {
-					return action.apply( session, tx );
-				} )
-				//CHECKSTYLE:ON
+		//CHECKSTYLE:OFF: RegexpSinglelineJava - cannot use static import as that would clash with method of this class
+		OrmUtils.applyInTransaction( session, tx -> {
+			return action.apply( session, tx );
+		} )
+		//CHECKSTYLE:ON
 		);
 	}
 }

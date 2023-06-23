@@ -118,7 +118,8 @@ public class LuceneFieldHighlightProjection implements LuceneSearchProjection<Li
 
 		protected LeafReaderContext leafReaderContext;
 
-		protected HighlighterValues(String parentDocumentPath, String nestedDocumentPath, TopDocsDataCollectorExecutionContext context,
+		protected HighlighterValues(String parentDocumentPath, String nestedDocumentPath,
+				TopDocsDataCollectorExecutionContext context,
 				ProjectionAccumulator<String, ?, A, List<String>> accumulator) {
 			super( parentDocumentPath, nestedDocumentPath, accumulator, context );
 		}

@@ -120,7 +120,7 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	@Override
 	public void addTo(IndexScopeBuilder builder) {
 		checkStarted();
-		((StubIndexScope.Builder) builder ).add( backend, model );
+		( (StubIndexScope.Builder) builder ).add( backend, model );
 	}
 
 	@Override

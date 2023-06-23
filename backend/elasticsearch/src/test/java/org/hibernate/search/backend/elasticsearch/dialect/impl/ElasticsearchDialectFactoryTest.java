@@ -36,7 +36,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith( Parameterized.class )
+@RunWith(Parameterized.class)
 public class ElasticsearchDialectFactoryTest {
 
 	private enum ExpectedOutcome {
@@ -503,13 +503,23 @@ public class ElasticsearchDialectFactoryTest {
 
 	private static Object[] unsupported(ElasticsearchDistributionName distribution, String configuredVersionString) {
 		return new Object[] {
-				distribution, configuredVersionString, null, ExpectedOutcome.UNSUPPORTED, null, null
+				distribution,
+				configuredVersionString,
+				null,
+				ExpectedOutcome.UNSUPPORTED,
+				null,
+				null
 		};
 	}
 
 	private static Object[] ambiguous(ElasticsearchDistributionName distribution, String configuredVersionString) {
 		return new Object[] {
-				distribution, configuredVersionString, null, ExpectedOutcome.AMBIGUOUS, null, null
+				distribution,
+				configuredVersionString,
+				null,
+				ExpectedOutcome.AMBIGUOUS,
+				null,
+				null
 		};
 	}
 
@@ -518,8 +528,12 @@ public class ElasticsearchDialectFactoryTest {
 			Class<? extends ElasticsearchModelDialect> expectedModelDialectClass,
 			Class<? extends ElasticsearchProtocolDialect> expectedProtocolDialectClass) {
 		return new Object[] {
-				distribution, configuredVersionString, actualVersionString,
-				ExpectedOutcome.SUCCESS_WITH_WARNING, expectedModelDialectClass, expectedProtocolDialectClass
+				distribution,
+				configuredVersionString,
+				actualVersionString,
+				ExpectedOutcome.SUCCESS_WITH_WARNING,
+				expectedModelDialectClass,
+				expectedProtocolDialectClass
 		};
 	}
 
@@ -528,8 +542,12 @@ public class ElasticsearchDialectFactoryTest {
 			Class<? extends ElasticsearchModelDialect> expectedModelDialectClass,
 			Class<? extends ElasticsearchProtocolDialect> expectedProtocolDialectClass) {
 		return new Object[] {
-				distribution, configuredVersionString, actualVersionString,
-				ExpectedOutcome.SUCCESS, expectedModelDialectClass, expectedProtocolDialectClass
+				distribution,
+				configuredVersionString,
+				actualVersionString,
+				ExpectedOutcome.SUCCESS,
+				expectedModelDialectClass,
+				expectedProtocolDialectClass
 		};
 	}
 
@@ -589,7 +607,8 @@ public class ElasticsearchDialectFactoryTest {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "HSEARCH400561" )
-				.hasMessageContaining( "Ambiguous Elasticsearch version: '" + distributionName + ":" + configuredVersionString + "'." )
+				.hasMessageContaining(
+						"Ambiguous Elasticsearch version: '" + distributionName + ":" + configuredVersionString + "'." )
 				.hasMessageContaining( "Please use a more precise version to remove the ambiguity" );
 	}
 

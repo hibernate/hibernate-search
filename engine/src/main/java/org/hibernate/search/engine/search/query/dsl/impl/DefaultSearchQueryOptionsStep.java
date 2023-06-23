@@ -19,16 +19,15 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 
 final class DefaultSearchQueryOptionsStep<H, LOS>
 		extends AbstractSearchQueryOptionsStep<
-						DefaultSearchQueryOptionsStep<H, LOS>,
-						H,
-						LOS,
-						SearchPredicateFactory,
-						SearchSortFactory,
-						SearchAggregationFactory,
-						SearchQueryIndexScope<?>
-				>
+				DefaultSearchQueryOptionsStep<H, LOS>,
+				H,
+				LOS,
+				SearchPredicateFactory,
+				SearchSortFactory,
+				SearchAggregationFactory,
+				SearchQueryIndexScope<?>>
 		implements SearchQueryWhereStep<DefaultSearchQueryOptionsStep<H, LOS>, H, LOS, SearchPredicateFactory>,
-				SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, LOS>, H, LOS, SearchSortFactory, SearchAggregationFactory> {
+		SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, LOS>, H, LOS, SearchSortFactory, SearchAggregationFactory> {
 
 	DefaultSearchQueryOptionsStep(SearchQueryIndexScope<?> scope, SearchQueryBuilder<H> searchQueryBuilder,
 			SearchLoadingContextBuilder<?, LOS> loadingContextBuilder) {

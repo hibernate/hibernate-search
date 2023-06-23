@@ -21,4 +21,3 @@ public interface FacetFieldContext {
 	FacetContinuationContext onField(String fieldName);
 }
 
-

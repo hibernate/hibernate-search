@@ -14,7 +14,7 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 public class AsyncBackendLongWorkListStressTest extends SyncBackendLongWorkListStressTest {
 
 	@Override
-	public void configure(Map<String,Object> cfg) {
+	public void configure(Map<String, Object> cfg) {
 		super.configure( cfg );
 		cfg.put( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
 				AutomaticIndexingSynchronizationStrategyNames.ASYNC );

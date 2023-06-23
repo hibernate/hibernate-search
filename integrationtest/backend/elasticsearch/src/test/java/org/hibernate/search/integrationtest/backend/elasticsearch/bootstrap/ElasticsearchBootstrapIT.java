@@ -155,7 +155,9 @@ public class ElasticsearchBootstrapIT {
 				.isInstanceOf( SearchException.class )
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.defaultBackendContext()
-						.failure( "Invalid value for configuration property 'hibernate.search.backend.version': '" + versionWithMajorOnly + "'",
+						.failure(
+								"Invalid value for configuration property 'hibernate.search.backend.version': '"
+										+ versionWithMajorOnly + "'",
 								"Missing or imprecise Elasticsearch version",
 								"when configuration property 'hibernate.search.backend.version_check.enabled' is set to 'false'",
 								"the version is mandatory and must be at least as precise as 'x.y', where 'x' and 'y' are integers" )
@@ -167,7 +169,7 @@ public class ElasticsearchBootstrapIT {
 	 * and specifying the major and minor number of the Elasticsearch version.
 	 */
 	@Test
-	@TestForIssue(jiraKey = {"HSEARCH-3841", "HSEARCH-4214"})
+	@TestForIssue(jiraKey = { "HSEARCH-3841", "HSEARCH-4214" })
 	public void noVersionCheck_completeVersion() {
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
 		String versionWithMajorAndMinorOnly = actualVersion.distribution() + ":"
@@ -237,7 +239,8 @@ public class ElasticsearchBootstrapIT {
 
 		Map<String, Object> runtimeProperties = new HashMap<>();
 		runtimeProperties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED ), false );
-		runtimeProperties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION ), incompatibleVersionWithMajorAndMinorOnly );
+		runtimeProperties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION ),
+				incompatibleVersionWithMajorAndMinorOnly );
 		assertThatThrownBy(
 				() -> partialSetup.doSecondPhase( AllAwareConfigurationPropertySource.fromMap( runtimeProperties ) ) )
 				.isInstanceOf( SearchException.class )
@@ -294,7 +297,8 @@ public class ElasticsearchBootstrapIT {
 
 		Map<String, Object> runtimeProperties = new HashMap<>();
 		runtimeProperties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED ), false );
-		runtimeProperties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION ), versionWithMajorAndMinorOnly );
+		runtimeProperties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION ),
+				versionWithMajorAndMinorOnly );
 		partialSetup.doSecondPhase( AllAwareConfigurationPropertySource.fromMap( runtimeProperties ) );
 		// We do not expect any request, since the version check is disabled
 		assertThat( elasticsearchClientSpy.getRequestCount() ).isZero();
@@ -310,7 +314,7 @@ public class ElasticsearchBootstrapIT {
 	 * the custom settings/mapping are parsed.
 	 */
 	@Test
-	@TestForIssue(jiraKey = {"HSEARCH-4435"})
+	@TestForIssue(jiraKey = { "HSEARCH-4435" })
 	public void noVersionCheck_customSettingsAndMapping() {
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
 		String versionWithMajorAndMinorOnly = actualVersion.distribution() + ":"
@@ -343,14 +347,14 @@ public class ElasticsearchBootstrapIT {
 						+ "   'custom': {"
 						+ "   }"
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticsearchClient.index( index.name() ).type().getMapping() );
 	}
 
 	private void checkBackendWorks() {
 		index.schemaManager().createIfMissing( OperationSubmitter.blocking() ).join();
 		assertThatQuery( index.query().where( f -> f.matchAll() ) ).hasNoHits();
-		index.index( "1", document -> { } );
+		index.index( "1", document -> {} );
 		assertThatQuery( index.query().where( f -> f.matchAll() ) ).hasDocRefHitsAnyOrder( index.typeName(), "1" );
 	}
 }

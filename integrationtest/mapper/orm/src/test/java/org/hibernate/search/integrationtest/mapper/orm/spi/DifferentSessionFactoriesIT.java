@@ -57,8 +57,8 @@ public class DifferentSessionFactoriesIT {
 						.getServiceRegistry().getService( HibernateSearchContextProviderService.class );
 
 		// try to use an entityManager owned by the original session factory instead
-		assertThatThrownBy( () -> with( sessionFactory ).runNoTransaction( session ->
-				HibernateOrmSearchSession.get( contextProvider.get(), (SessionImplementor) session )
+		assertThatThrownBy( () -> with( sessionFactory ).runNoTransaction(
+				session -> HibernateOrmSearchSession.get( contextProvider.get(), (SessionImplementor) session )
 		) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(

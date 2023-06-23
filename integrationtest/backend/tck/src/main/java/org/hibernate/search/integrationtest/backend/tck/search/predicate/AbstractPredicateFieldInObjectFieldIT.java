@@ -51,8 +51,9 @@ public abstract class AbstractPredicateFieldInObjectFieldIT<V extends AbstractPr
 	public void inNamedPredicate_nested() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.named( binding.nested.absolutePath + "." + StubPredicateDefinition.NAME )
-						.param( StubPredicateDefinition.IMPL_PARAM_NAME, (PredicateDefinition) context ->
-								predicateWithRelativePath( context.predicate(), binding.nested, 0 )
+						.param( StubPredicateDefinition.IMPL_PARAM_NAME,
+								(PredicateDefinition) context -> predicateWithRelativePath( context.predicate(), binding.nested,
+										0 )
 										.toPredicate() ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
@@ -63,8 +64,9 @@ public abstract class AbstractPredicateFieldInObjectFieldIT<V extends AbstractPr
 	public void inNamedPredicate_flattened() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.named( binding.flattened.absolutePath + "." + StubPredicateDefinition.NAME )
-						.param( StubPredicateDefinition.IMPL_PARAM_NAME, (PredicateDefinition) context ->
-								predicateWithRelativePath( context.predicate(), binding.flattened, 0 )
+						.param( StubPredicateDefinition.IMPL_PARAM_NAME,
+								(PredicateDefinition) context -> predicateWithRelativePath( context.predicate(),
+										binding.flattened, 0 )
 										.toPredicate() ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
@@ -76,7 +78,8 @@ public abstract class AbstractPredicateFieldInObjectFieldIT<V extends AbstractPr
 		return predicate( f, objectFieldBinding.absoluteFieldPath( dataSet.fieldType ), matchingDocOrdinal );
 	}
 
-	protected final PredicateFinalStep predicateWithRelativePath(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
+	protected final PredicateFinalStep predicateWithRelativePath(SearchPredicateFactory f,
+			ObjectFieldBinding objectFieldBinding,
 			int matchingDocOrdinal) {
 		return predicate( f, objectFieldBinding.relativeFieldPath( dataSet.fieldType ), matchingDocOrdinal );
 	}
@@ -95,7 +98,7 @@ public abstract class AbstractPredicateFieldInObjectFieldIT<V extends AbstractPr
 			mainIndexer.add( docId( 0 ), routingKey,
 					document -> mainIndex.binding().initDocument( document, fieldType, fieldValue ) );
 			// Also add an empty document that shouldn't match
-			mainIndexer.add( docId( 1 ), routingKey, document -> { } );
+			mainIndexer.add( docId( 1 ), routingKey, document -> {} );
 
 			missingFieldIndexer.add( docId( MISSING_FIELD_INDEX_DOC_ORDINAL ), routingKey,
 					document -> missingFieldIndex.binding().initDocument() );

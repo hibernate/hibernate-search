@@ -110,7 +110,8 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 		// then we're being flexible enough regarding function argument types.
 		public void asList_transformer_flexibleFunctionArgumentTypes() {
 			assertThatQuery( index.query()
-					.select( f -> doFrom( f, startProjection( f ) ).asList( (Function<? super List<?>, Object>) ValueWrapper<List<?>>::new ) )
+					.select( f -> doFrom( f, startProjection( f ) )
+							.asList( (Function<? super List<?>, Object>) ValueWrapper<List<?>>::new ) )
 					.where( f -> f.matchAll() ) )
 					.hasHitsAnyOrder( expectedLists().stream().<ValueWrapper<List<?>>>map( ValueWrapper::new )
 							.collect( Collectors.toList() ) );
@@ -150,7 +151,8 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 		// then we're being flexible enough regarding function argument types.
 		public void asArray_transformer_flexibleFunctionArgumentTypes() {
 			assertThatQuery( index.query()
-					.select( f -> doFrom( f, startProjection( f ) ).asArray( (Function<? super Object[], Object>) ValueWrapper<Object[]>::new ) )
+					.select( f -> doFrom( f, startProjection( f ) )
+							.asArray( (Function<? super Object[], Object>) ValueWrapper<Object[]>::new ) )
 					.where( f -> f.matchAll() ) )
 					.hasHitsAnyOrder( expectedArrays().stream()
 							.<ValueWrapper<Object[]>>map( ValueWrapper::new )
@@ -174,13 +176,13 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 				// normally this would involve annotation mapping.
 				when( projectionRegistryMock.composite( ValueWrapper.class ) )
 						.thenReturn( (f, initialStep, ctx) ->
-								// Critically, in a real-world scenario the inner projections
-								// will be defined relative to the composite node
-								// (which may not be the root in the case of object projections).
-								// We need to do the same here, to check that the engine/backend compensates
-								// by passing a projection factory whose root is the composite node.
-								doFrom( f, index.binding().composite(), CompositeBinding::relativePath, initialStep )
-										.asArray( ValueWrapper<Object[]>::new ) );
+				// Critically, in a real-world scenario the inner projections
+				// will be defined relative to the composite node
+				// (which may not be the root in the case of object projections).
+				// We need to do the same here, to check that the engine/backend compensates
+				// by passing a projection factory whose root is the composite node.
+				doFrom( f, index.binding().composite(), CompositeBinding::relativePath, initialStep )
+						.asArray( ValueWrapper<Object[]>::new ) );
 				assertThatQuery( index.createScope().query()
 						.select( f -> startProjection( f ).as( ValueWrapper.class ) )
 						.where( f -> f.matchAll() ) )
@@ -199,10 +201,10 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 				// normally this would involve annotation mapping.
 				when( projectionRegistryMock.composite( ValueWrapper.class ) )
 						.thenReturn( (f, initialStep, ctx) ->
-								// Inner projections need to be defined relative to the composite node;
-								// see as_class.
-								doFrom( f, index.binding().compositeForMulti(), CompositeBinding::relativePath, initialStep )
-										.asArray( ValueWrapper<Object[]>::new ) );
+				// Inner projections need to be defined relative to the composite node;
+				// see as_class.
+				doFrom( f, index.binding().compositeForMulti(), CompositeBinding::relativePath, initialStep )
+						.asArray( ValueWrapper<Object[]>::new ) );
 				assertThatQuery( index.createScope().query()
 						.select( f -> startProjectionForMulti( f ).as( ValueWrapper.class ).multi() )
 						.where( f -> f.matchAll() ) )
@@ -353,24 +355,28 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 		}
 
 		@Override
-		protected CompositeProjectionValueStep<?, Pair<String, String>> doAs(CompositeProjectionFrom2AsStep<String, String> step) {
+		protected CompositeProjectionValueStep<?, Pair<String, String>> doAs(
+				CompositeProjectionFrom2AsStep<String, String> step) {
 			return step.as( Pair::new );
 		}
 
 		@Override
 		protected List<?> expectedList(int docOrdinal, int inDocOrdinal) {
-			return Arrays.asList( dataSet.field1Value( docOrdinal, inDocOrdinal ), dataSet.field2Value( docOrdinal, inDocOrdinal ) );
+			return Arrays.asList( dataSet.field1Value( docOrdinal, inDocOrdinal ),
+					dataSet.field2Value( docOrdinal, inDocOrdinal ) );
 		}
 
 		@Override
 		protected Pair<String, String> expectedTransformed(int docOrdinal, int inDocOrdinal) {
-			return new Pair<>( dataSet.field1Value( docOrdinal, inDocOrdinal ), dataSet.field2Value( docOrdinal, inDocOrdinal ) );
+			return new Pair<>( dataSet.field1Value( docOrdinal, inDocOrdinal ),
+					dataSet.field2Value( docOrdinal, inDocOrdinal ) );
 		}
 	}
 
 	@Nested
 	public class From3IT
-			extends AbstractFromSpecificNumberIT<CompositeProjectionFrom3AsStep<String, String, LocalDate>, Triplet<String, String, LocalDate>> {
+			extends AbstractFromSpecificNumberIT<CompositeProjectionFrom3AsStep<String, String, LocalDate>,
+					Triplet<String, String, LocalDate>> {
 		@Override
 		protected CompositeProjectionFrom3AsStep<String, String, LocalDate> doFrom(SearchProjectionFactory<?, ?> f,
 				CompositeBinding binding, BiFunction<CompositeBinding, SimpleFieldModel<?>, String> pathGetter,
@@ -441,16 +447,16 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 		CompositeBinding(IndexSchemaElement parent, String absolutePath) {
 			this.absolutePath = absolutePath;
 			field1 = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE,
-							c -> c.projectable( Projectable.YES ) )
+					c -> c.projectable( Projectable.YES ) )
 					.map( parent, "field1" );
 			field2 = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE,
-							c -> c.projectable( Projectable.YES ) )
+					c -> c.projectable( Projectable.YES ) )
 					.map( parent, "field2" );
 			field3 = SimpleFieldModel.mapper( LocalDateFieldTypeDescriptor.INSTANCE,
-							c -> c.projectable( Projectable.YES ) )
+					c -> c.projectable( Projectable.YES ) )
 					.map( parent, "field3" );
 			field4 = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE,
-							c -> c.projectable( Projectable.YES ) )
+					c -> c.projectable( Projectable.YES ) )
 					.map( parent, "field4" );
 		}
 
@@ -465,8 +471,10 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 	}
 
 	public abstract static class AbstractDataSet<B extends AbstractIndexBinding> {
-		private final FieldProjectionTestValues<String> stringValues = new FieldProjectionTestValues<>( KeywordStringFieldTypeDescriptor.INSTANCE );
-		private final FieldProjectionTestValues<LocalDate> localDateValues = new FieldProjectionTestValues<>( LocalDateFieldTypeDescriptor.INSTANCE );
+		private final FieldProjectionTestValues<String> stringValues =
+				new FieldProjectionTestValues<>( KeywordStringFieldTypeDescriptor.INSTANCE );
+		private final FieldProjectionTestValues<LocalDate> localDateValues =
+				new FieldProjectionTestValues<>( LocalDateFieldTypeDescriptor.INSTANCE );
 
 		public void contribute(SimpleMappedIndex<B> index, BulkIndexer indexer) {
 			indexer
@@ -482,8 +490,8 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 		}
 
 		public <T> List<List<T>> forEachDocumentAndObject(BiFunction<Integer, Integer, T> function) {
-			return forEachDocument( docOrdinal -> forEachObjectInDocument( inDocOrdinal ->
-					function.apply( docOrdinal, inDocOrdinal ) ) );
+			return forEachDocument(
+					docOrdinal -> forEachObjectInDocument( inDocOrdinal -> function.apply( docOrdinal, inDocOrdinal ) ) );
 		}
 
 		abstract <T> List<T> forEachObjectInDocument(IntFunction<T> function);

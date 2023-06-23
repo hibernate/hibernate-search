@@ -65,7 +65,7 @@ public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 	protected List<Double> createUniquelyMatchableValues() {
 		return Arrays.asList(
 				Double.MIN_VALUE, Double.MAX_VALUE,
-				- Double.MIN_VALUE, - Double.MAX_VALUE,
+				-Double.MIN_VALUE, -Double.MAX_VALUE,
 				// Elasticsearch doesn't support these: it fails when parsing them
 				//Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.NaN,
 				0.0,

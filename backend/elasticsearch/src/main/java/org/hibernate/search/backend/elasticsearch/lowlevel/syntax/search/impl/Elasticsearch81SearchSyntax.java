@@ -50,7 +50,7 @@ public class Elasticsearch81SearchSyntax implements ElasticsearchSearchSyntax {
 			JsonObject nestedObject = new JsonObject();
 			PATH_ACCESSOR.set( nestedObject, new JsonPrimitive( nestedPath ) );
 			NESTED_ACCESSOR.set( nextNestedObjectTarget, nestedObject );
-			if ( i == (nestedPathHierarchy.size() - 1) && filterOrNull != null ) {
+			if ( i == ( nestedPathHierarchy.size() - 1 ) && filterOrNull != null ) {
 				FILTER_ACCESSOR.set( nestedObject, filterOrNull );
 			}
 

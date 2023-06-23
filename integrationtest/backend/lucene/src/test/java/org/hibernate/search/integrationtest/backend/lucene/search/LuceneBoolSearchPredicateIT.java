@@ -60,14 +60,21 @@ public class LuceneBoolSearchPredicateIT {
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThat(
 				index.query()
-						.where( f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "fieldName" ).matching( "test" ) ) ) ) ) ) ) ) ).toPredicate() )
+						.where( f.bool()
+								.must( f.not( f.not( f.not( f.not(
+										f.not( f.not( f.not( f.match().field( "fieldName" ).matching( "test" ) ) ) ) ) ) ) ) )
+								.toPredicate() )
 						.toQuery()
 						.queryString()
 		).isEqualTo( "+(-fieldName:test #*:*) #__HSEARCH_type:main" );
 
 		assertThat(
 				index.query()
-						.where( f.not( f.bool().must( f.not( f.not( f.not( f.not( f.not( f.not( f.not( f.match().field( "fieldName" ).matching( "test" ) ) ) ) ) ) ) ) ) ).toPredicate() )
+						.where( f
+								.not( f.bool()
+										.must( f.not( f.not( f.not( f.not( f.not( f
+												.not( f.not( f.match().field( "fieldName" ).matching( "test" ) ) ) ) ) ) ) ) ) )
+								.toPredicate() )
 						.toQuery()
 						.queryString()
 		).isEqualTo( "+fieldName:test #__HSEARCH_type:main" );
@@ -110,35 +117,36 @@ public class LuceneBoolSearchPredicateIT {
 
 	@Test
 	public void nested() {
-		String expectedQueryString = "+(+fieldName:test +ToParentBlockJoinQuery (#__HSEARCH_type:child #__HSEARCH_nested_document_path:nested +(+nested.integer:[5 TO 10] +nested.text:value))) #__HSEARCH_type:main";
+		String expectedQueryString =
+				"+(+fieldName:test +ToParentBlockJoinQuery (#__HSEARCH_type:child #__HSEARCH_nested_document_path:nested +(+nested.integer:[5 TO 10] +nested.text:value))) #__HSEARCH_type:main";
 
 		assertThat(
 				index.query().where( f -> f.bool()
-								.must( f.match().field( "fieldName" ).matching( "test" ) )
-								.must( f.nested( "nested" )
-										.add( f.range().field( "nested.integer" )
-												.between( 5, 10 ) )
-										.add( f.match().field( "nested.text" )
-												.matching( "value" )
-										) )
-						).toQuery()
+						.must( f.match().field( "fieldName" ).matching( "test" ) )
+						.must( f.nested( "nested" )
+								.add( f.range().field( "nested.integer" )
+										.between( 5, 10 ) )
+								.add( f.match().field( "nested.text" )
+										.matching( "value" )
+								) )
+				).toQuery()
 						.queryString()
 		).isEqualTo( expectedQueryString );
 
 		// now the same query but using the bool predicate instead:
 		assertThat(
 				index.query().where( f -> f.bool()
-								.must( f.match().field( "fieldName" ).matching( "test" ) )
-								.must( f.nested( "nested" )
-										.add(
-												f.bool()
-														.must( f.range().field( "nested.integer" )
-																.between( 5, 10 ) )
-														.must( f.match().field( "nested.text" )
-																.matching( "value" )
-														)
-										) )
-						).toQuery()
+						.must( f.match().field( "fieldName" ).matching( "test" ) )
+						.must( f.nested( "nested" )
+								.add(
+										f.bool()
+												.must( f.range().field( "nested.integer" )
+														.between( 5, 10 ) )
+												.must( f.match().field( "nested.text" )
+														.matching( "value" )
+												)
+								) )
+				).toQuery()
 						.queryString()
 		).isEqualTo( expectedQueryString );
 	}
@@ -148,30 +156,32 @@ public class LuceneBoolSearchPredicateIT {
 		//bool query remains as there are > 1 clause
 		assertThat(
 				index.query().where( f -> f.nested( "nested" )
-								.add(
-										f.bool()
-												.must( f.range().field( "nested.integer" )
-														.between( 5, 10 )
-												)
-												.must( f.match().field( "nested.text" )
-														.matching( "value" )
-												)
-								)
-						).toQuery()
+						.add(
+								f.bool()
+										.must( f.range().field( "nested.integer" )
+												.between( 5, 10 )
+										)
+										.must( f.match().field( "nested.text" )
+												.matching( "value" )
+										)
+						)
+				).toQuery()
 						.queryString()
-		).isEqualTo( "+ToParentBlockJoinQuery (#__HSEARCH_type:child #__HSEARCH_nested_document_path:nested +(+nested.integer:[5 TO 10] +nested.text:value)) #__HSEARCH_type:main" );
+		).isEqualTo(
+				"+ToParentBlockJoinQuery (#__HSEARCH_type:child #__HSEARCH_nested_document_path:nested +(+nested.integer:[5 TO 10] +nested.text:value)) #__HSEARCH_type:main" );
 
 		// bool query is removed as there's only 1 clause
 		assertThat(
 				index.query().where( f -> f.nested( "nested" )
-								.add(
-										f.bool()
-												.must( f.range().field( "nested.integer" )
-														.between( 5, 10 ) )
-								)
-						).toQuery()
+						.add(
+								f.bool()
+										.must( f.range().field( "nested.integer" )
+												.between( 5, 10 ) )
+						)
+				).toQuery()
 						.queryString()
-		).isEqualTo( "+ToParentBlockJoinQuery (#__HSEARCH_type:child #__HSEARCH_nested_document_path:nested +nested.integer:[5 TO 10]) #__HSEARCH_type:main" );
+		).isEqualTo(
+				"+ToParentBlockJoinQuery (#__HSEARCH_type:child #__HSEARCH_nested_document_path:nested +nested.integer:[5 TO 10]) #__HSEARCH_type:main" );
 	}
 
 	private static class IndexBinding {

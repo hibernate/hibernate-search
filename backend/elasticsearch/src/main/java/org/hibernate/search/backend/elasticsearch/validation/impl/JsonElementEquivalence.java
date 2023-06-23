@@ -79,7 +79,7 @@ class JsonElementEquivalence {
 			return false;
 		}
 		int size = left.size();
-		for ( int i = 0 ; i < size ; ++i ) {
+		for ( int i = 0; i < size; ++i ) {
 			if ( !isNestedEquivalent( left.get( i ), right.get( i ) ) ) {
 				return false;
 			}

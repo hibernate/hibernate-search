@@ -109,7 +109,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 
 	@Override
 	public <A> void aggregation(AggregationKey<A> key, SearchAggregation<A> aggregation) {
-		if ( !(aggregation instanceof LuceneSearchAggregation) ) {
+		if ( !( aggregation instanceof LuceneSearchAggregation ) ) {
 			throw log.cannotMixLuceneSearchQueryWithOtherAggregations( aggregation );
 		}
 
@@ -166,10 +166,10 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 			throw log.highlighterNameCannotBeBlank();
 		}
 		if (
-				this.namedHighlighters.put(
-						highlighterName,
-						LuceneAbstractSearchHighlighter.from( scope, highlighter )
-				) != null
+			this.namedHighlighters.put(
+					highlighterName,
+					LuceneAbstractSearchHighlighter.from( scope, highlighter )
+			) != null
 		) {
 			throw log.highlighterWithTheSameNameCannotBeAdded( highlighterName );
 		}
@@ -231,7 +231,8 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 				sessionContext, loadingContext, definitiveLuceneQuery, luceneSort
 		);
 
-		LuceneAbstractSearchHighlighter resolvedGlobalHighlighter = this.globalHighlighter == null ? null : this.globalHighlighter.withFallbackDefaults();
+		LuceneAbstractSearchHighlighter resolvedGlobalHighlighter =
+				this.globalHighlighter == null ? null : this.globalHighlighter.withFallbackDefaults();
 		Map<String, LuceneAbstractSearchHighlighter> resolvedNamedHighlighters = new HashMap<>();
 		if ( resolvedGlobalHighlighter != null ) {
 			for ( Map.Entry<String, LuceneAbstractSearchHighlighter> entry : this.namedHighlighters.entrySet() ) {

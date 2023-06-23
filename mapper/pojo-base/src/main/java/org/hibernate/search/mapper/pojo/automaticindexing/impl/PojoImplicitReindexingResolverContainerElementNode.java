@@ -28,7 +28,9 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, V>
 
 	private final ContainerExtractorHolder<C, V> extractorHolder;
 	private final PojoImplicitReindexingResolverNode<? super V> nested;
-	private final ValueProcessor<PojoReindexingCollector, ? super C, PojoImplicitReindexingResolverRootContext> extractingDelegate;
+	private final ValueProcessor<PojoReindexingCollector,
+			? super C,
+			PojoImplicitReindexingResolverRootContext> extractingDelegate;
 
 	public PojoImplicitReindexingResolverContainerElementNode(ContainerExtractorHolder<C, V> extractorHolder,
 			PojoImplicitReindexingResolverNode<? super V> nested) {

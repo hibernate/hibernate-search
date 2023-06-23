@@ -24,8 +24,7 @@ import org.hibernate.search.util.common.impl.Contracts;
 class SimpleQueryStringPredicateFieldMoreStepImpl
 		implements SimpleQueryStringPredicateFieldMoreStep<
 				SimpleQueryStringPredicateFieldMoreStepImpl,
-				SimpleQueryStringPredicateOptionsStep<?>
-		> {
+				SimpleQueryStringPredicateOptionsStep<?>> {
 
 	private final CommonState commonState;
 

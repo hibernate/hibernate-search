@@ -136,15 +136,14 @@ public class CancellableExecutionCompletableFutureTest {
 
 		// Also test that the failure triggered by the cancellation ultimately
 		// gets reported as a suppressed exception.
-		Awaitility.await().untilAsserted( () ->
-				assertThat( Futures.getThrowableNow( future ) )
-						.extracting( Throwable::getSuppressed ).asInstanceOf( InstanceOfAssertFactories.ARRAY )
-						.hasSize( 1 )
-						.extracting( Function.identity() ) // Hack to get access to the ".first()" method
-						.first()
-						.asInstanceOf( InstanceOfAssertFactories.THROWABLE )
-						.isInstanceOf( RuntimeException.class )
-						.hasCauseInstanceOf( InterruptedException.class )
+		Awaitility.await().untilAsserted( () -> assertThat( Futures.getThrowableNow( future ) )
+				.extracting( Throwable::getSuppressed ).asInstanceOf( InstanceOfAssertFactories.ARRAY )
+				.hasSize( 1 )
+				.extracting( Function.identity() ) // Hack to get access to the ".first()" method
+				.first()
+				.asInstanceOf( InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( RuntimeException.class )
+				.hasCauseInstanceOf( InterruptedException.class )
 		);
 	}
 }

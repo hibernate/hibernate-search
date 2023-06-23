@@ -27,15 +27,15 @@ public class BrickLayer {
 
 	@SortableField(forField = "sortName")
 	@Fields({
-		@Field,
-		@Field(name = "sortName", analyze = Analyze.NO)
+			@Field,
+			@Field(name = "sortName", analyze = Analyze.NO)
 	})
 	private String name;
 
 	@SortableField(forField = "sortLastName")
 	@Fields({
-		@Field,
-		@Field(name = "sortLastName", analyze = Analyze.NO)
+			@Field,
+			@Field(name = "sortLastName", analyze = Analyze.NO)
 	})
 	private String lastName;
 

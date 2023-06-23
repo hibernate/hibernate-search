@@ -130,7 +130,7 @@ public abstract class SimpleGlobPattern {
 		@Override
 		protected boolean matches(String candidate, int startIndex) {
 			return literal.regionMatches( 0, candidate, startIndex, literal.length() )
-					&& next.matches( candidate,startIndex + literal.length() );
+					&& next.matches( candidate, startIndex + literal.length() );
 		}
 
 		@Override

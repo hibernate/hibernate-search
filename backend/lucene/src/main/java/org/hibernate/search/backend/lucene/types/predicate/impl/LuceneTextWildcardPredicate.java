@@ -57,7 +57,8 @@ public class LuceneTextWildcardPredicate extends AbstractLuceneLeafSingleFieldPr
 
 		@Override
 		protected Query buildQuery() {
-			BytesRef analyzedWildcard = LuceneWildcardExpressionHelper.analyzeWildcard( analyzerOrNormalizer, absoluteFieldPath, pattern );
+			BytesRef analyzedWildcard =
+					LuceneWildcardExpressionHelper.analyzeWildcard( analyzerOrNormalizer, absoluteFieldPath, pattern );
 			return new WildcardQuery( new Term( absoluteFieldPath, analyzedWildcard ) );
 		}
 	}

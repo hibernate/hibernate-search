@@ -25,11 +25,12 @@ import org.hibernate.search.util.common.AssertionFailure;
 
 final class HibernateOrmIntegrationPartialBuildState {
 
-	private static final OptionalConfigurationProperty<HibernateOrmIntegrationPartialBuildState> INTEGRATION_PARTIAL_BUILD_STATE =
-			ConfigurationProperty.forKey( HibernateOrmMapperSpiSettings.INTEGRATION_PARTIAL_BUILD_STATE )
-					.as( HibernateOrmIntegrationPartialBuildState.class,
-							HibernateOrmIntegrationPartialBuildState::parse )
-					.build();
+	private static final OptionalConfigurationProperty<
+			HibernateOrmIntegrationPartialBuildState> INTEGRATION_PARTIAL_BUILD_STATE =
+					ConfigurationProperty.forKey( HibernateOrmMapperSpiSettings.INTEGRATION_PARTIAL_BUILD_STATE )
+							.as( HibernateOrmIntegrationPartialBuildState.class,
+									HibernateOrmIntegrationPartialBuildState::parse )
+							.build();
 
 	public static Optional<HibernateOrmIntegrationPartialBuildState> get(ConfigurationPropertySource propertySource) {
 		return INTEGRATION_PARTIAL_BUILD_STATE.get( propertySource );

@@ -17,7 +17,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  */
 public interface NestedPredicateClausesStep<S extends NestedPredicateClausesStep<?>>
 		extends GenericSimpleBooleanPredicateClausesStep<S, NestedPredicateClausesCollector<?>>,
-				NestedPredicateClausesCollector<NestedPredicateClausesCollector<?>> {
+		NestedPredicateClausesCollector<NestedPredicateClausesCollector<?>> {
 
 	// TODO HSEARCH-3090 add tuning methods, like the "score_mode" in Elasticsearch (avg, min, ...)
 

@@ -90,9 +90,9 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingForExpectations()
+						+ defaultMetadataMappingForExpectations()
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
@@ -136,13 +136,13 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 						+ "   } }"
 						+ " ],"
 						+ " 'properties': {"
-							+ defaultMetadataMappingAndCommaForExpectations()
+						+ defaultMetadataMappingAndCommaForExpectations()
 						+ "   'staticObject': {"
 						+ "     'type': 'object',"
 						+ "     'dynamic': 'true'"
 						+ "   }"
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}

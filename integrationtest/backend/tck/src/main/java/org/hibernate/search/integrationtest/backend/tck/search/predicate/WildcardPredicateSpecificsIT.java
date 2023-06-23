@@ -42,7 +42,8 @@ public class WildcardPredicateSpecificsIT {
 	private static final String PATTERN_2 = "inter*on";
 	private static final String PATTERN_3 = "la*d";
 	private static final String TEXT_MATCHING_PATTERN_1 = "Localization in English is a must-have.";
-	private static final String TEXT_MATCHING_PATTERN_2 = "Internationalization allows to adapt the application to multiple locales.";
+	private static final String TEXT_MATCHING_PATTERN_2 =
+			"Internationalization allows to adapt the application to multiple locales.";
 	private static final String TEXT_MATCHING_PATTERN_3 = "A had to call the landlord.";
 	private static final String TEXT_MATCHING_PATTERN_2_AND_3 = "I had some interaction with that lad.";
 
@@ -173,10 +174,10 @@ public class WildcardPredicateSpecificsIT {
 
 		public void contribute(BulkIndexer indexer) {
 			indexer.add( DOCUMENT_1, document -> {
-						document.addValue( index.binding().analyzedStringField1.reference, TEXT_MATCHING_PATTERN_1 );
-						document.addValue( index.binding().normalizedField.reference, TERM_MATCHING_PATTERN_1 );
-						document.addValue( index.binding().nonAnalyzedField.reference, TERM_MATCHING_PATTERN_1 );
-					} )
+				document.addValue( index.binding().analyzedStringField1.reference, TEXT_MATCHING_PATTERN_1 );
+				document.addValue( index.binding().normalizedField.reference, TERM_MATCHING_PATTERN_1 );
+				document.addValue( index.binding().nonAnalyzedField.reference, TERM_MATCHING_PATTERN_1 );
+			} )
 					.add( DOCUMENT_2, document -> {
 						document.addValue( index.binding().analyzedStringField1.reference, TEXT_MATCHING_PATTERN_2 );
 						document.addValue( index.binding().normalizedField.reference, TERM_MATCHING_PATTERN_2 );
@@ -194,7 +195,7 @@ public class WildcardPredicateSpecificsIT {
 						document.addValue( index.binding().analyzedStringField2.reference, TEXT_MATCHING_PATTERN_1 );
 						document.addValue( index.binding().analyzedStringField3.reference, TEXT_MATCHING_PATTERN_3 );
 					} )
-					.add( EMPTY, document -> { } );
+					.add( EMPTY, document -> {} );
 		}
 	}
 }

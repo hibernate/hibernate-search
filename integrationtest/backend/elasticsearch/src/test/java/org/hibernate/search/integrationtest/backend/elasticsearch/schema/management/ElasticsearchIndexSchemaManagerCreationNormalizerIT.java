@@ -89,7 +89,7 @@ public class ElasticsearchIndexSchemaManagerCreationNormalizerIT {
 						+ "     'articles': ['l', 'd']"
 						+ "   }"
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( mainIndex.name() ).settings( "index.analysis" ).get() );
 	}
 
@@ -143,21 +143,21 @@ public class ElasticsearchIndexSchemaManagerCreationNormalizerIT {
 						+ "     'articles': ['l', 'd']"
 						+ "   }"
 						+ " }"
-				+ "}",
+						+ "}",
 				elasticSearchClient.index( mainIndex.name() ).settings( "index.analysis" ).get() );
 
 		assertJsonEquals( "{"
-						+ " 'normalizer': {"
-						+ "   'custom-normalizer': {"
-						+ "     'type': 'custom',"
-						+ "     'filter': ['lowercase', 'asciifolding']"
-						+ "   },"
-						+ "   'custom-normalizer-2': {"
-						+ "     'type': 'custom',"
-						+ "     'filter': ['lowercase']"
-						+ "   }"
-							// elements defined in the default configurer shouldn't appear here: they've been overridden
-						+ " }"
+				+ " 'normalizer': {"
+				+ "   'custom-normalizer': {"
+				+ "     'type': 'custom',"
+				+ "     'filter': ['lowercase', 'asciifolding']"
+				+ "   },"
+				+ "   'custom-normalizer-2': {"
+				+ "     'type': 'custom',"
+				+ "     'filter': ['lowercase']"
+				+ "   }"
+				// elements defined in the default configurer shouldn't appear here: they've been overridden
+				+ " }"
 				+ "}",
 				elasticSearchClient.index( otherIndex.name() ).settings( "index.analysis" ).get() );
 	}

@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.model.spi;
 
 
-
 final class SimplePojoRuntimeIntrospector implements PojoRuntimeIntrospector {
 
 	private static final SimplePojoRuntimeIntrospector INSTANCE = new SimplePojoRuntimeIntrospector();

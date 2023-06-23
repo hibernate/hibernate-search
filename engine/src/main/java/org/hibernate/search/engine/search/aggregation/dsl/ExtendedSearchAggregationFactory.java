@@ -21,9 +21,8 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
 public interface ExtendedSearchAggregationFactory<
-				S extends ExtendedSearchAggregationFactory<?, PDF>,
-				PDF extends SearchPredicateFactory
-		>
+		S extends ExtendedSearchAggregationFactory<?, PDF>,
+		PDF extends SearchPredicateFactory>
 		extends SearchAggregationFactory {
 
 	@Override

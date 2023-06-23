@@ -85,7 +85,8 @@ public abstract class AbstractPredicateMultiFieldIT<V extends AbstractPredicateT
 	protected abstract PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory f, String fieldPath,
 			String otherFieldPath, int matchingDocOrdinal);
 
-	protected abstract PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths, int matchingDocOrdinal);
+	protected abstract PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths,
+			int matchingDocOrdinal);
 
 	protected abstract PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory f, String fieldPath,
 			String[] fieldPaths, int matchingDocOrdinal);

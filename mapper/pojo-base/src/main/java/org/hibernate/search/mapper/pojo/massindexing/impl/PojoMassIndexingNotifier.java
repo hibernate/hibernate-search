@@ -147,9 +147,9 @@ public class PojoMassIndexingNotifier {
 
 	private boolean shouldNotBeReported(String operation) {
 		long failuresSoFar = failureCounts.computeIfAbsent(
-						operation,
-						s -> new AtomicLong( 0 )
-				)
+				operation,
+				s -> new AtomicLong( 0 )
+		)
 				.incrementAndGet();
 
 		return failureFloodingThreshold < failuresSoFar;

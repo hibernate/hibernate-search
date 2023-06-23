@@ -14,11 +14,10 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public abstract class AbstractIndexField<
-				S extends AbstractIndexField<S, SC, ?, C>,
-				SC extends SearchIndexScope<?>,
-				NT extends SearchIndexNodeTypeContext<SC, ? super S>,
-				C extends IndexCompositeNode<SC, ?, ?>
-		>
+		S extends AbstractIndexField<S, SC, ?, C>,
+		SC extends SearchIndexScope<?>,
+		NT extends SearchIndexNodeTypeContext<SC, ? super S>,
+		C extends IndexCompositeNode<SC, ?, ?>>
 		extends AbstractIndexNode<S, SC, NT>
 		implements IndexField<SC, C> {
 	protected final C parent;
@@ -38,7 +37,8 @@ public abstract class AbstractIndexField<
 		this.relativeName = relativeFieldName;
 		this.inclusion = inclusion;
 		this.multiValued = multiValued;
-		this.closestMultiValuedParentAbsolutePath = parent.multiValued() ? parent.absolutePath()
+		this.closestMultiValuedParentAbsolutePath = parent.multiValued()
+				? parent.absolutePath()
 				: parent.closestMultiValuedParentAbsolutePath();
 	}
 

@@ -115,11 +115,13 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		protected final Object getEffectiveMissingValue() {
 			Object effectiveMissingValue;
 			if ( missingValue == SortMissingValue.MISSING_FIRST ) {
-				effectiveMissingValue = order == SortOrder.DESC ? sortMissingValueLastPlaceholder
+				effectiveMissingValue = order == SortOrder.DESC
+						? sortMissingValueLastPlaceholder
 						: sortMissingValueFirstPlaceholder;
 			}
 			else if ( missingValue == SortMissingValue.MISSING_LAST ) {
-				effectiveMissingValue = order == SortOrder.DESC ? sortMissingValueFirstPlaceholder
+				effectiveMissingValue = order == SortOrder.DESC
+						? sortMissingValueFirstPlaceholder
 						: sortMissingValueLastPlaceholder;
 			}
 			else if ( missingValue == SortMissingValue.MISSING_LOWEST ) {

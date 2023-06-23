@@ -32,7 +32,7 @@ public class StubFieldProjection<F, V, A, P> extends StubSearchProjection<P> {
 	private final boolean singleValued;
 
 	public StubFieldProjection(String fieldPath, Class<F> fieldType, Class<V> expectedType,
-			ProjectionConverter<F,? extends V> converter,
+			ProjectionConverter<F, ? extends V> converter,
 			ProjectionAccumulator<F, V, A, P> accumulator, boolean singleValued) {
 		this.fieldPath = fieldPath;
 		this.fieldType = fieldType;

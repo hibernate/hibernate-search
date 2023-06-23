@@ -28,4 +28,3 @@ public class ClassLoadingException extends SearchException {
 	}
 }
 
-

@@ -20,11 +20,12 @@ import org.hibernate.search.util.common.AssertionFailure;
 
 public class BackendThreads {
 
-	private static final ConfigurationProperty<BeanReference<? extends ElasticsearchWorkExecutorProvider>> BACKEND_WORK_EXECUTOR_PROVIDER =
-			ConfigurationProperty.forKey( ElasticsearchBackendSpiSettings.Radicals.BACKEND_WORK_EXECUTOR_PROVIDER )
-					.asBeanReference( ElasticsearchWorkExecutorProvider.class )
-					.withDefault( ElasticsearchBackendSpiSettings.Defaults.BACKEND_WORK_EXECUTOR_PROVIDER )
-					.build();
+	private static final ConfigurationProperty<
+			BeanReference<? extends ElasticsearchWorkExecutorProvider>> BACKEND_WORK_EXECUTOR_PROVIDER =
+					ConfigurationProperty.forKey( ElasticsearchBackendSpiSettings.Radicals.BACKEND_WORK_EXECUTOR_PROVIDER )
+							.asBeanReference( ElasticsearchWorkExecutorProvider.class )
+							.withDefault( ElasticsearchBackendSpiSettings.Defaults.BACKEND_WORK_EXECUTOR_PROVIDER )
+							.build();
 	private final String prefix;
 
 	private ThreadPoolProvider threadPoolProvider;

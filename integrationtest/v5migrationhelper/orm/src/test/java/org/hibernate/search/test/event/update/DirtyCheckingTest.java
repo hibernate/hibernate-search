@@ -72,6 +72,6 @@ public class DirtyCheckingTest extends SearchTestBase {
 
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
-		return new Class<?>[]{ CheeseRollingCompetitor.class };
+		return new Class<?>[] { CheeseRollingCompetitor.class };
 	}
 }

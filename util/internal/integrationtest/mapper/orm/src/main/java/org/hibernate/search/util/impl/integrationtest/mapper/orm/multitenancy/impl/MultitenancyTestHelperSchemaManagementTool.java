@@ -73,8 +73,8 @@ class MultitenancyTestHelperSchemaManagementTool
 	}
 
 	private GenerationTargetToDatabase[] createSchemaTargets(ServiceRegistryImplementor serviceRegistry) {
-		H2LazyMultiTenantConnectionProvider multiTenantConnectionProvider = (H2LazyMultiTenantConnectionProvider)
-				serviceRegistry.getService( MultiTenantConnectionProvider.class );
+		H2LazyMultiTenantConnectionProvider multiTenantConnectionProvider =
+				(H2LazyMultiTenantConnectionProvider) serviceRegistry.getService( MultiTenantConnectionProvider.class );
 		GenerationTargetToDatabase[] targets = new GenerationTargetToDatabase[tenantIds.length];
 		int index = 0;
 		for ( String tenantId : tenantIds ) {
@@ -92,6 +92,7 @@ class MultitenancyTestHelperSchemaManagementTool
 	public SchemaCreator getSchemaCreator(Map options) {
 		return new SchemaCreator() {
 			final SchemaCreatorImpl delegate = (SchemaCreatorImpl) toolDelegate.getSchemaCreator( options );
+
 			@Override
 			public void doCreation(Metadata metadata, ExecutionOptions options, SourceDescriptor sourceDescriptor,
 					TargetDescriptor targetDescriptor) {
@@ -105,6 +106,7 @@ class MultitenancyTestHelperSchemaManagementTool
 	public SchemaDropper getSchemaDropper(Map options) {
 		return new SchemaDropper() {
 			final SchemaDropperImpl delegate = (SchemaDropperImpl) toolDelegate.getSchemaDropper( options );
+
 			@Override
 			public void doDrop(Metadata metadata, ExecutionOptions options, SourceDescriptor sourceDescriptor,
 					TargetDescriptor targetDescriptor) {

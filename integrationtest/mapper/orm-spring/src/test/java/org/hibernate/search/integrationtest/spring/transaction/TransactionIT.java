@@ -50,7 +50,7 @@ public class TransactionIT {
 	private HelperService helperService;
 
 	@Test
-	@TestForIssue( jiraKey = "HSEARCH-1270" )
+	@TestForIssue(jiraKey = "HSEARCH-1270")
 	public void innerTransactionRollback() {
 		Integer outerId = 1;
 		Integer innerId = 2;
@@ -58,10 +58,10 @@ public class TransactionIT {
 		// Check that inner transaction data is NOT pushed to the index (processed, but discarded).
 		backendMock.expectWorks( IndexedEntity.NAME )
 				.createAndDiscardFollowingWorks()
-				.add( innerId.toString(), b -> { } );
+				.add( innerId.toString(), b -> {} );
 		// Check that outer transaction data is pushed to the index.
 		backendMock.expectWorks( IndexedEntity.NAME )
-				.add( outerId.toString(), b -> { } );
+				.add( outerId.toString(), b -> {} );
 
 		helperService.doOuter( outerId, innerId );
 
@@ -69,7 +69,7 @@ public class TransactionIT {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HSEARCH-1270" )
+	@TestForIssue(jiraKey = "HSEARCH-1270")
 	public void innerTransactionRollback_flushBeforeInner() {
 		Integer outerId = 1;
 		Integer innerId = 2;
@@ -77,15 +77,15 @@ public class TransactionIT {
 		// Check that outer transaction data is processed.
 		backendMock.expectWorks( IndexedEntity.NAME )
 				.createFollowingWorks()
-				.add( outerId.toString(), b -> { } );
+				.add( outerId.toString(), b -> {} );
 		// Check that inner transaction data is NOT pushed to the index (processed, but discarded).
 		backendMock.expectWorks( IndexedEntity.NAME )
 				.createAndDiscardFollowingWorks()
-				.add( innerId.toString(), b -> { } );
+				.add( innerId.toString(), b -> {} );
 		// Check that outer transaction data is pushed to the index.
 		backendMock.expectWorks( IndexedEntity.NAME )
 				.executeFollowingWorks()
-				.add( outerId.toString(), b -> { } );
+				.add( outerId.toString(), b -> {} );
 
 		helperService.doOuterFlushBeforeInner( outerId, innerId );
 

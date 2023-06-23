@@ -42,11 +42,10 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.impl.Contracts;
 
 public abstract class AbstractSearchProjectionFactory<
-				S extends ExtendedSearchProjectionFactory<S, R, E>,
-				SC extends SearchProjectionIndexScope<?>,
-				R,
-				E
-		>
+		S extends ExtendedSearchProjectionFactory<S, R, E>,
+		SC extends SearchProjectionIndexScope<?>,
+		R,
+		E>
 		implements ExtendedSearchProjectionFactory<S, R, E> {
 
 	protected final SearchProjectionDslContext<SC> dslContext;

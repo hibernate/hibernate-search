@@ -33,9 +33,14 @@ public abstract class AbstractSettingsPerShardIT {
 		Set<String> explicitShardIds = CollectionHelper.asImmutableSet( "first", "second", "other", "yetanother" );
 
 		return new Object[][] {
-				{ "hash", new SearchSetupHelper( helper -> helper.createHashBasedShardingBackendSetupStrategy( 4 ) ),
+				{
+						"hash",
+						new SearchSetupHelper( helper -> helper.createHashBasedShardingBackendSetupStrategy( 4 ) ),
 						new ArrayList<>( hashShardIds ) },
-				{ "explicit", new SearchSetupHelper( ignored -> ShardingExplicitIT.explicitShardingBackendSetupStrategy( explicitShardIds ) ),
+				{
+						"explicit",
+						new SearchSetupHelper(
+								ignored -> ShardingExplicitIT.explicitShardingBackendSetupStrategy( explicitShardIds ) ),
 						new ArrayList<>( explicitShardIds ) }
 		};
 	}

@@ -1190,8 +1190,11 @@ public class PredicateDslIT {
 
 	private interface MySearchParameters {
 		Genre getGenreFilter();
+
 		String getFullTextFilter();
+
 		Integer getPageCountMaxFilter();
+
 		List<String> getAuthorFilters();
 	}
 }

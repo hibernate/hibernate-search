@@ -21,9 +21,14 @@ import org.hibernate.search.annotations.Indexed;
 @Indexed
 public class Dvd {
 
-	@Id @GeneratedValue @DocumentId private Integer id;
-	@Field private String title;
-	@Field private String description;
+	@Id
+	@GeneratedValue
+	@DocumentId
+	private Integer id;
+	@Field
+	private String title;
+	@Field
+	private String description;
 
 	protected Dvd() {
 	}

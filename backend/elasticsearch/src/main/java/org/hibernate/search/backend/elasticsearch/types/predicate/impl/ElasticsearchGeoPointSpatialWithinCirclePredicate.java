@@ -64,7 +64,8 @@ public class ElasticsearchGeoPointSpatialWithinCirclePredicate extends AbstractE
 		}
 
 		@Override
-		public Builder create(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
+		public Builder create(ElasticsearchSearchIndexScope<?> scope,
+				ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
 			return new Builder( codec, scope, field );
 		}
 	}

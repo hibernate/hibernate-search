@@ -50,7 +50,8 @@ public final class ContainerExtractorRegistry {
 	private final Map<String, ContainerExtractorDefinition<? extends ContainerExtractor>> extractorsByName = new HashMap<>();
 	private final List<String> defaultExtractors = new ArrayList<>();
 
-	private ContainerExtractorRegistry(Map<String, ContainerExtractorDefinition<? extends ContainerExtractor>> customExtractorsByName) {
+	private ContainerExtractorRegistry(
+			Map<String, ContainerExtractorDefinition<? extends ContainerExtractor>> customExtractorsByName) {
 		extractorsByName.putAll( customExtractorsByName );
 
 		// Caution: the order of calls below is meaningful

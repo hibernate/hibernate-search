@@ -33,11 +33,15 @@ import org.apache.lucene.search.Weight;
  */
 public class LongMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts {
 
-	public LongMultiValueRangeFacetCounts(String field, LongMultiValuesSource valueSource, FacetsCollector hits, LongRange... ranges) throws IOException {
+	public LongMultiValueRangeFacetCounts(String field, LongMultiValuesSource valueSource, FacetsCollector hits,
+			LongRange... ranges)
+			throws IOException {
 		this( field, valueSource, hits, null, ranges );
 	}
 
-	public LongMultiValueRangeFacetCounts(String field, LongMultiValuesSource valueSource, FacetsCollector hits, Query fastMatchQuery, LongRange... ranges) throws IOException {
+	public LongMultiValueRangeFacetCounts(String field, LongMultiValuesSource valueSource, FacetsCollector hits,
+			Query fastMatchQuery, LongRange... ranges)
+			throws IOException {
 		super( field, ranges, fastMatchQuery );
 		count( valueSource, hits.getMatchingDocs() );
 	}
@@ -59,7 +63,8 @@ public class LongMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts {
 				final IndexReaderContext topLevelContext = ReaderUtil.getTopLevelContext( hits.context );
 				final IndexSearcher searcher = new IndexSearcher( topLevelContext );
 				searcher.setQueryCache( null );
-				final Weight fastMatchWeight = searcher.createWeight( searcher.rewrite( fastMatchQuery ), ScoreMode.COMPLETE_NO_SCORES, 1 );
+				final Weight fastMatchWeight =
+						searcher.createWeight( searcher.rewrite( fastMatchQuery ), ScoreMode.COMPLETE_NO_SCORES, 1 );
 				Scorer s = fastMatchWeight.scorer( hits.context );
 				if ( s == null ) {
 					continue;

@@ -65,7 +65,8 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 		tx.begin();
 
 		QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( ProductArticle.class ).get();
-		org.apache.lucene.search.Query query = builder.keyword().wildcard().onField( "header" ).matching( "hib*" ).createQuery();
+		org.apache.lucene.search.Query query =
+				builder.keyword().wildcard().onField( "header" ).matching( "hib*" ).createQuery();
 		Sort dateDescending = builder.sort().byField( "creationDate" ).desc().createSort();
 		List<ProductArticle> result = em.createFullTextQuery( query, ProductArticle.class )
 				.setSort( dateDescending ).setFirstResult( 3 ).getResultList();

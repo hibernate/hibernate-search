@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
  * @author Gustavo Fernandes
  */
 @Deprecated
-@Retention( RetentionPolicy.RUNTIME )
+@Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
 public @interface NumericFields {

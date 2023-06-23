@@ -18,7 +18,7 @@ import org.hibernate.search.annotations.Spatial;
 @Spatial(name = "home")
 @Entity
 @Indexed
-@Table(name = "people")// User is a reserved name in most databases
+@Table(name = "people") // User is a reserved name in most databases
 public class User {
 
 	@Id

@@ -158,8 +158,8 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graphName_null() {
-		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction( session ->
-				Search.session( session ).search( model.getIndexedClass() )
+		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction(
+				session -> Search.session( session ).search( model.getIndexedClass() )
 						.where( f -> f.matchAll() )
 						.loading( o -> o.graph( (String) null, GraphSemantic.FETCH ) )
 						.toQuery()
@@ -171,8 +171,8 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graphName_invalid() {
-		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction( session ->
-				Search.session( session ).search( model.getIndexedClass() )
+		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction(
+				session -> Search.session( session ).search( model.getIndexedClass() )
 						.where( f -> f.matchAll() )
 						.loading( o -> o.graph( "invalidGraphName", GraphSemantic.FETCH ) )
 						.toQuery()
@@ -184,8 +184,8 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graphName_graphSemantic_null() {
-		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction( session ->
-				Search.session( session ).search( model.getIndexedClass() )
+		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction(
+				session -> Search.session( session ).search( model.getIndexedClass() )
 						.where( f -> f.matchAll() )
 						.loading( o -> o.graph( model.getEagerGraphName(), null ) )
 						.toQuery()
@@ -197,8 +197,8 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_null() {
-		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction( session ->
-				Search.session( session ).search( model.getIndexedClass() )
+		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction(
+				session -> Search.session( session ).search( model.getIndexedClass() )
 						.where( f -> f.matchAll() )
 						.loading( o -> o.graph( (RootGraph<?>) null, GraphSemantic.FETCH ) )
 						.toQuery()
@@ -210,8 +210,8 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_graphSemantic_null() {
-		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction( session ->
-				Search.session( session ).search( model.getIndexedClass() )
+		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction(
+				session -> Search.session( session ).search( model.getIndexedClass() )
 						.where( f -> f.matchAll() )
 						.loading( o -> o.graph( session.getEntityGraph( model.getEagerGraphName() ), null ) )
 						.toQuery()
@@ -223,7 +223,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	private void testLoadingWithEntityGraph(String graphName, GraphSemantic graphSemantic,
 			boolean expectEagerAssociationLoaded, boolean expectLazyAssociationLoaded) {
 		testLoading(
-				session -> { }, // No particular session setup
+				session -> {}, // No particular session setup
 				o -> {
 					if ( graphName != null || graphSemantic != null ) {
 						o.graph( graphName, graphSemantic );

@@ -82,7 +82,8 @@ public class SearchSetupHelper implements TestRule {
 	public SetupContext start(String backendName) {
 		Map<String, ?> backendRelativeProperties =
 				setupStrategy.createBackendConfigurationProperties( configurationProvider );
-		String backendPrefix = backendName == null ? EngineSettings.BACKEND + "."
+		String backendPrefix = backendName == null
+				? EngineSettings.BACKEND + "."
 				: EngineSettings.BACKENDS + "." + backendName + ".";
 		Map<String, Object> properties = new LinkedHashMap<>();
 		for ( Map.Entry<String, ?> entry : backendRelativeProperties.entrySet() ) {
@@ -163,12 +164,14 @@ public class SearchSetupHelper implements TestRule {
 
 		private final List<StubMappedIndex> mappedIndexes = new ArrayList<>();
 		private TenancyMode tenancyMode = TenancyMode.SINGLE_TENANCY;
-		private StubMappingSchemaManagementStrategy schemaManagementStrategy = StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP;
+		private StubMappingSchemaManagementStrategy schemaManagementStrategy =
+				StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP;
 
 		SetupContext(String defaultBackendName, AllAwareConfigurationPropertySource basePropertySource) {
 			this.unusedPropertyChecker = ConfigurationPropertyChecker.create();
 			this.propertySource = unusedPropertyChecker.wrap( basePropertySource )
-					.withOverride( unusedPropertyChecker.wrap( AllAwareConfigurationPropertySource.fromMap( overriddenProperties ) ) );
+					.withOverride(
+							unusedPropertyChecker.wrap( AllAwareConfigurationPropertySource.fromMap( overriddenProperties ) ) );
 		}
 
 		public SetupContext expectCustomBeans() {
@@ -206,7 +209,7 @@ public class SearchSetupHelper implements TestRule {
 					BackendSettings.INDEXES + "." + indexName + "." + keyRadical, value );
 		}
 
-		public SetupContext withIndexes(StubMappedIndex ... mappedIndexes) {
+		public SetupContext withIndexes(StubMappedIndex... mappedIndexes) {
 			return withIndexes( Arrays.asList( mappedIndexes ) );
 		}
 
@@ -241,9 +244,9 @@ public class SearchSetupHelper implements TestRule {
 							.build();
 			environments.add( environment );
 
-			SearchIntegration.Builder integrationBuilder = (previousMapping.isPresent()) ?
-					previousMapping.get().integration().restartBuilder( environment ) :
-					SearchIntegration.builder( environment );
+			SearchIntegration.Builder integrationBuilder = ( previousMapping.isPresent() )
+					? previousMapping.get().integration().restartBuilder( environment )
+					: SearchIntegration.builder( environment );
 
 			StubMappingInitiator initiator = new StubMappingInitiator( tenancyMode );
 			mappedIndexes.forEach( initiator::add );
@@ -255,7 +258,8 @@ public class SearchSetupHelper implements TestRule {
 
 			return overrides -> {
 				SearchIntegrationFinalizer finalizer =
-						integrationPartialBuildState.finalizer( propertySource.withOverride( overrides ), unusedPropertyChecker );
+						integrationPartialBuildState.finalizer( propertySource.withOverride( overrides ),
+								unusedPropertyChecker );
 				StubMappingImpl mapping = finalizer.finalizeMapping(
 						mappingKey,
 						(context, partialMapping) -> partialMapping.finalizeMapping( schemaManagementStrategy )
