@@ -147,12 +147,12 @@ public class MassIndexingEnvironmentIT {
 					.environment( new MassIndexingEnvironment() {
 						@Override
 						public void beforeExecution(Context context) {
-							if ( contextClass.isAssignableFrom( EntityIdentifierLoadingContext.class ) &&
-									context instanceof EntityIdentifierLoadingContext ) {
+							if ( contextClass.isAssignableFrom( EntityIdentifierLoadingContext.class )
+									&& context instanceof EntityIdentifierLoadingContext ) {
 								throw new UnsupportedOperationException( "don't call me in identifier loading." );
 							}
-							if ( contextClass.isAssignableFrom( EntityLoadingContext.class ) &&
-									context instanceof EntityIdentifierLoadingContext ) {
+							if ( contextClass.isAssignableFrom( EntityLoadingContext.class )
+									&& context instanceof EntityIdentifierLoadingContext ) {
 								throw new UnsupportedOperationException( "don't call me in entity loading." );
 							}
 

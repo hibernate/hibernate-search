@@ -405,8 +405,8 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 	}
 
 	private boolean isErrorLoggedOnly() {
-		return DocumentCommitStrategy.NONE.equals( commitStrategy ) &&
-				DocumentRefreshStrategy.NONE.equals( refreshStrategy );
+		return DocumentCommitStrategy.NONE.equals( commitStrategy )
+				&& DocumentRefreshStrategy.NONE.equals( refreshStrategy );
 	}
 
 }

@@ -286,8 +286,8 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			throw log.noHighlightableProvided();
 		}
 		if ( highlightable.contains( Highlightable.DEFAULT ) ) {
-			if ( TermVector.WITH_POSITIONS_OFFSETS.equals( termVector ) ||
-					TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS.equals( termVector ) ) {
+			if ( TermVector.WITH_POSITIONS_OFFSETS.equals( termVector )
+					|| TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS.equals( termVector ) ) {
 				highlightable = EnumSet.of( Highlightable.ANY );
 			}
 			else {

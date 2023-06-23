@@ -37,8 +37,8 @@ public final class TermsPredicateTestValues<F> extends AbstractPredicateTestValu
 	@SuppressWarnings("unchecked") // F == String for analyzed|normalized fields
 	public F matchingArg(int docOrdinal) {
 		F valueToMatch = fieldValue( docOrdinal );
-		if ( AnalyzedStringFieldTypeDescriptor.INSTANCE.equals( fieldType ) ||
-				NormalizedStringFieldTypeDescriptor.INSTANCE.equals( fieldType ) ) {
+		if ( AnalyzedStringFieldTypeDescriptor.INSTANCE.equals( fieldType )
+				|| NormalizedStringFieldTypeDescriptor.INSTANCE.equals( fieldType ) ) {
 			valueToMatch = (F) ( (String) valueToMatch ).toLowerCase( Locale.ROOT );
 		}
 		return valueToMatch;

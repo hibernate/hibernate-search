@@ -35,8 +35,10 @@ public final class ConfigurationRules {
 	}
 
 	public static boolean isClassIgnored(String className) {
-		return !className.endsWith( "Settings" ) || className.contains( ".impl." ) ||
-				className.contains( ".internal." ) || IGNORED_CLASSES.contains( className );
+		return !className.endsWith( "Settings" )
+				|| className.contains( ".impl." )
+				|| className.contains( ".internal." )
+				|| IGNORED_CLASSES.contains( className );
 	}
 
 	public static boolean isConstantIgnored(String className, String constantName, String constantValue) {

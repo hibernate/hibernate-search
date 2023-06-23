@@ -223,8 +223,8 @@ public class IndexingFieldTypesIT<F> {
 				return false;
 			}
 			IdAndValue<?> that = (IdAndValue<?>) o;
-			return Objects.equals( documentId, that.documentId ) &&
-					Objects.equals( fieldValue, that.fieldValue );
+			return Objects.equals( documentId, that.documentId )
+					&& Objects.equals( fieldValue, that.fieldValue );
 		}
 
 		@Override

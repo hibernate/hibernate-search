@@ -374,8 +374,8 @@ class LuceneStringIndexFieldTypeOptionsStep
 		if ( highlightable.contains( Highlightable.DEFAULT ) ) {
 			// means we have the default case, so let's check if either plain or unified highlighters can be applied:
 			if ( Projectable.YES.equals( projectable ) ) {
-				if ( TermVector.WITH_POSITIONS_OFFSETS.equals( termVector ) ||
-						TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS.equals( termVector ) ) {
+				if ( TermVector.WITH_POSITIONS_OFFSETS.equals( termVector )
+						|| TermVector.WITH_POSITIONS_OFFSETS_PAYLOADS.equals( termVector ) ) {
 					highlightable = EnumSet.of( Highlightable.ANY );
 				}
 				else {

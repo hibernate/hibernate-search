@@ -114,9 +114,10 @@ class RandomStringGenerator implements StringGenerator {
 		do {
 			codePoint = generator.nextInt( Character.MIN_CODE_POINT, Character.MAX_CODE_POINT );
 			type = Character.getType( codePoint );
-		} while ( type == Character.PRIVATE_USE ||
-				type == Character.SURROGATE ||
-				type == Character.UNASSIGNED );
+		}
+		while ( type == Character.PRIVATE_USE
+				|| type == Character.SURROGATE
+				|| type == Character.UNASSIGNED );
 		return codePoint;
 	}
 }

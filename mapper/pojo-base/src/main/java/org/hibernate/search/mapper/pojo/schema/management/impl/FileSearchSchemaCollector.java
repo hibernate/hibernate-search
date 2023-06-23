@@ -53,8 +53,8 @@ public class FileSearchSchemaCollector implements SearchSchemaCollector {
 	}
 
 	private Path checkOrCreateTargetDirectory(Path targetDirectory) throws IOException {
-		if ( Files.exists( targetDirectory ) &&
-				( !Files.isDirectory( targetDirectory ) || isNotEmpty( targetDirectory ) ) ) {
+		if ( Files.exists( targetDirectory )
+				&& ( !Files.isDirectory( targetDirectory ) || isNotEmpty( targetDirectory ) ) ) {
 			throw log.schemaExporterTargetIsNotEmptyDirectory( targetDirectory );
 		}
 		else {

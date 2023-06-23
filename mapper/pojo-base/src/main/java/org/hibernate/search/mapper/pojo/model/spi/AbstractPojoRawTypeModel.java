@@ -53,8 +53,8 @@ public abstract class AbstractPojoRawTypeModel<T, I extends PojoBootstrapIntrosp
 		 * We need to take the introspector into account, so that the engine does not confuse
 		 * type models from different mappers during bootstrap.
 		 */
-		return Objects.equals( introspector, that.introspector ) &&
-				Objects.equals( typeIdentifier, that.typeIdentifier );
+		return Objects.equals( introspector, that.introspector )
+				&& Objects.equals( typeIdentifier, that.typeIdentifier );
 	}
 
 	@Override

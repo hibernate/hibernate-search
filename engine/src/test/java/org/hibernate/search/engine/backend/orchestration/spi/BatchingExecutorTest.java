@@ -454,8 +454,8 @@ public class BatchingExecutorTest {
 
 		assumeFalse(
 				"This test only makes sense for offloading submitter",
-				OperationSubmitter.blocking().equals( operationSubmitter ) ||
-						OperationSubmitter.rejecting().equals( operationSubmitter )
+				OperationSubmitter.blocking().equals( operationSubmitter )
+						|| OperationSubmitter.rejecting().equals( operationSubmitter )
 		);
 
 		Runnable unblockExecutorSwitch = blockExecutor();

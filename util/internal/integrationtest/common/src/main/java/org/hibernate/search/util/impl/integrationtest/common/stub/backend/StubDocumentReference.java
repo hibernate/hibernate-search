@@ -47,8 +47,8 @@ public class StubDocumentReference implements DocumentReference {
 			return false;
 		}
 		StubDocumentReference that = (StubDocumentReference) o;
-		return Objects.equals( typeName, that.typeName ) &&
-				Objects.equals( id, that.id );
+		return Objects.equals( typeName, that.typeName )
+				&& Objects.equals( id, that.id );
 	}
 
 	@Override

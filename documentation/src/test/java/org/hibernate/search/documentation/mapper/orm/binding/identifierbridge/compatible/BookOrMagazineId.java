@@ -35,8 +35,8 @@ public class BookOrMagazineId implements Serializable {
 			return false;
 		}
 		BookOrMagazineId bookOrMagazineId = (BookOrMagazineId) o;
-		return publisherId.equals( bookOrMagazineId.publisherId ) &&
-				publisherSpecificBookId.equals( bookOrMagazineId.publisherSpecificBookId );
+		return publisherId.equals( bookOrMagazineId.publisherId )
+				&& publisherSpecificBookId.equals( bookOrMagazineId.publisherSpecificBookId );
 	}
 
 	@Override

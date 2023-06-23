@@ -192,8 +192,8 @@ public class MassIndexingIdClassIT {
 				return false;
 			}
 			MyIdClass myIdClass = (MyIdClass) o;
-			return Objects.equals( id1, myIdClass.id1 ) &&
-					Objects.equals( id2, myIdClass.id2 );
+			return Objects.equals( id1, myIdClass.id1 )
+					&& Objects.equals( id2, myIdClass.id2 );
 		}
 
 		@Override

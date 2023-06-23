@@ -334,8 +334,8 @@ public class ElasticsearchIndexIndexingPlanExecutionTest {
 				return false;
 			}
 			StubEntityReference that = (StubEntityReference) o;
-			return Objects.equals( typeName, that.typeName ) &&
-					Objects.equals( identifier, that.identifier );
+			return Objects.equals( typeName, that.typeName )
+					&& Objects.equals( identifier, that.identifier );
 		}
 
 		@Override

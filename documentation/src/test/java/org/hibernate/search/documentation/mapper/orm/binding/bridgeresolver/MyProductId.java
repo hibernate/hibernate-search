@@ -35,8 +35,8 @@ public class MyProductId implements Serializable {
 			return false;
 		}
 		MyProductId productId = (MyProductId) o;
-		return producerId.equals( productId.producerId ) &&
-				producerProductId.equals( productId.producerProductId );
+		return producerId.equals( productId.producerId )
+				&& producerProductId.equals( productId.producerProductId );
 	}
 
 	@Override

@@ -126,13 +126,13 @@ public class ConfigurationProperty implements Comparable<ConfigurationProperty> 
 			return false;
 		}
 		ConfigurationProperty that = (ConfigurationProperty) o;
-		return Objects.equals( key, that.key ) &&
-				Objects.equals( javadoc, that.javadoc ) &&
-				Objects.equals( sourceClass, that.sourceClass ) &&
-				type == that.type &&
-				Objects.equals( defaultValue, that.defaultValue ) &&
-				Objects.equals( anchorPrefix, that.anchorPrefix ) &&
-				Objects.equals( moduleName, that.moduleName );
+		return Objects.equals( key, that.key )
+				&& Objects.equals( javadoc, that.javadoc )
+				&& Objects.equals( sourceClass, that.sourceClass )
+				&& type == that.type
+				&& Objects.equals( defaultValue, that.defaultValue )
+				&& Objects.equals( anchorPrefix, that.anchorPrefix )
+				&& Objects.equals( moduleName, that.moduleName );
 	}
 
 	@Override

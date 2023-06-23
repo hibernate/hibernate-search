@@ -154,7 +154,8 @@ public class OperationSubmitterExecutorTest {
 
 		// we won't submit to the queue but just make sure that work got offloaded
 		AtomicBoolean worked = new AtomicBoolean( false );
-		OperationSubmitter.offloading( Runnable::run ).submitToExecutor( executor, () -> { }, r -> { worked.set( true ); }, (e, t) -> { } );
+		OperationSubmitter.offloading( Runnable::run )
+				.submitToExecutor( executor, () -> {}, r -> {worked.set( true );}, (e, t) -> {} );
 
 		await().untilAsserted( () -> assertThat( worked ).isTrue() );
 	}

@@ -68,9 +68,9 @@ public final class TreeFilterDefinition {
 			return false;
 		}
 		TreeFilterDefinition that = (TreeFilterDefinition) o;
-		return Objects.equals( includeDepth, that.includeDepth ) &&
-				includePaths.equals( that.includePaths ) &&
-				excludePaths.equals( that.excludePaths );
+		return Objects.equals( includeDepth, that.includeDepth )
+				&& includePaths.equals( that.includePaths )
+				&& excludePaths.equals( that.excludePaths );
 	}
 
 	@Override

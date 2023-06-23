@@ -35,8 +35,8 @@ final class ImmutableGeoPoint implements GeoPoint {
 			return false;
 		}
 		ImmutableGeoPoint that = (ImmutableGeoPoint) o;
-		return that.latitude == latitude &&
-				that.longitude == longitude;
+		return that.latitude == latitude
+				&& that.longitude == longitude;
 	}
 
 	@Override

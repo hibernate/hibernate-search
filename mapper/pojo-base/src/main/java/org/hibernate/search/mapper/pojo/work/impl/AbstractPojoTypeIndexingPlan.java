@@ -224,8 +224,8 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		while ( firstNonSearchThrowable instanceof SearchException ) {
 			firstNonSearchThrowable = exception.getCause();
 		}
-		return firstNonSearchThrowable != null &&
-				sessionContext.runtimeIntrospector().isIgnorableDataAccessThrowable( firstNonSearchThrowable );
+		return firstNonSearchThrowable != null
+				&& sessionContext.runtimeIntrospector().isIgnorableDataAccessThrowable( firstNonSearchThrowable );
 	}
 
 	protected abstract S createState(I identifier);
