@@ -8,9 +8,10 @@ package org.hibernate.search.backend.lucene.multitenancy.impl;
 
 import java.util.Set;
 
+import org.hibernate.search.util.common.reporting.EventContext;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
  * Defines how the additional information required by multiTenancy are handled.

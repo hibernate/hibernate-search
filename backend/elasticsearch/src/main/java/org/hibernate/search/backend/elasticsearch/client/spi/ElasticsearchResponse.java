@@ -7,8 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.client.spi;
 
 import com.google.gson.JsonObject;
-import org.apache.http.HttpHost;
 
+import org.apache.http.HttpHost;
 
 public final class ElasticsearchResponse {
 

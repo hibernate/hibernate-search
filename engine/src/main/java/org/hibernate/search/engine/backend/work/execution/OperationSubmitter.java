@@ -14,7 +14,6 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
 import org.hibernate.search.util.common.annotation.Incubating;
 
-
 /**
  * Interface defining how operation should be submitted to the queue or executor.
  * <p>

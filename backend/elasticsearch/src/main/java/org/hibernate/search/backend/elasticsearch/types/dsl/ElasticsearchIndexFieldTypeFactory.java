@@ -10,7 +10,6 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.Elasticse
 import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchSearchSortFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 
-
 public interface ElasticsearchIndexFieldTypeFactory extends IndexFieldTypeFactory {
 
 	/**

@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.mapper.orm.gettingstarted.withhsearch
 // tag::include[]
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;

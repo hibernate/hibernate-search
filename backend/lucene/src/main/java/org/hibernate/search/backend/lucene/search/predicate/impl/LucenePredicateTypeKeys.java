@@ -7,8 +7,8 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldState;
-import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 
 public final class LucenePredicateTypeKeys {
 

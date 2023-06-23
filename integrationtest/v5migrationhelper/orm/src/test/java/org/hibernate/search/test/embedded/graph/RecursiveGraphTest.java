@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.hibernate.Session;
 import org.hibernate.search.test.SearchTestBase;
+
 import org.junit.Test;
 
 /**

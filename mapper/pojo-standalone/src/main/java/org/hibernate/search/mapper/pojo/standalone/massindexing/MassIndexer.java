@@ -10,11 +10,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
-import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingOptions;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
+import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingOptions;
 import org.hibernate.search.util.common.annotation.Incubating;
-
 
 /**
  * A MassIndexer is useful to rebuild the indexes from the

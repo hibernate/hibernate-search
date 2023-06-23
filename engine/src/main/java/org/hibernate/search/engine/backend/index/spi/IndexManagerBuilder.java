@@ -8,7 +8,6 @@ package org.hibernate.search.engine.backend.index.spi;
 
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 
-
 public interface IndexManagerBuilder {
 
 	/**

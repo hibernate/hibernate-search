@@ -22,7 +22,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 
-
 /**
  * Implementation of the public API: a simple delegate to the actual implementor.
  *

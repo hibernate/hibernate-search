@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.backend.types.converter.runtime;
 
-
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;

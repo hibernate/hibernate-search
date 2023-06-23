@@ -11,6 +11,7 @@ import static org.junit.Assert.fail;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.util.common.SearchException;
+
 import org.junit.Test;
 
 /**

@@ -7,6 +7,7 @@
 package org.hibernate.search.batch.jsr352.jberet.impl;
 
 import java.lang.annotation.Annotation;
+
 import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.context.spi.Context;
 import javax.enterprise.context.spi.Contextual;
@@ -26,7 +27,6 @@ import org.hibernate.search.batch.jsr352.core.massindexing.step.spi.EntityReader
 
 import org.jberet.cdi.JobScoped;
 import org.jberet.cdi.PartitionScoped;
-
 
 /**
  * A CDI extension to explicitly add hibernate-search-jsr352-core types to the CDI context.

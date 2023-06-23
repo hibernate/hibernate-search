@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.test.session;
 
+import java.io.Serializable;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.InvocationHandler;
-import java.io.Serializable;
 
 import org.hibernate.Session;
 

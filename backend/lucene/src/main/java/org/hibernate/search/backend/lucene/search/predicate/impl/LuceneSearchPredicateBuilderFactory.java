@@ -16,7 +16,6 @@ import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredica
 
 import org.apache.lucene.search.Query;
 
-
 public class LuceneSearchPredicateBuilderFactory implements SearchPredicateBuilderFactory {
 
 	private final LuceneSearchIndexScope<?> scope;

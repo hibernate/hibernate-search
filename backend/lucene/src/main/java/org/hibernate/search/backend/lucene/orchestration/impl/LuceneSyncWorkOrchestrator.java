@@ -13,7 +13,6 @@ import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchM
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
 import org.hibernate.search.backend.lucene.work.impl.ReadWork;
 
-
 /**
  * An orchestrator that executes works synchronously in the current thread.
  * <p>

@@ -20,7 +20,6 @@ import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 
 import org.apache.lucene.index.IndexReader;
 
-
 public class LuceneIndexScopeImpl
 		implements IndexScope, LuceneIndexScope {
 

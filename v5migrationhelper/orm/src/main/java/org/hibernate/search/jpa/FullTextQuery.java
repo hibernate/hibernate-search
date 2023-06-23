@@ -14,9 +14,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.Query;
 
-import org.apache.lucene.search.Explanation;
-import org.apache.lucene.search.Sort;
-
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -35,6 +32,9 @@ import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.transform.ResultTransformer;
+
+import org.apache.lucene.search.Explanation;
+import org.apache.lucene.search.Sort;
 
 /**
  * The base interface for full-text queries using the JPA API ({@link javax.persistence.Query}).

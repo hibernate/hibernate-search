@@ -10,7 +10,6 @@ import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexV
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
-
 public class ElasticsearchIndexValueFieldTemplate
 		extends AbstractElasticsearchIndexFieldTemplate<ElasticsearchIndexValueFieldType<?>> {
 

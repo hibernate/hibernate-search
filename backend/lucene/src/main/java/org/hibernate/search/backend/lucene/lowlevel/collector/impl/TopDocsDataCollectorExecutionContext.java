@@ -12,6 +12,7 @@ import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetad
 
 import com.carrotsearch.hppc.IntIntHashMap;
 import com.carrotsearch.hppc.IntIntMap;
+
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;

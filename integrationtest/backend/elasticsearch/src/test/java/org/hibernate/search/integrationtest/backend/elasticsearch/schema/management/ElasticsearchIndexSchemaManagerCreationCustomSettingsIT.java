@@ -5,6 +5,7 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 

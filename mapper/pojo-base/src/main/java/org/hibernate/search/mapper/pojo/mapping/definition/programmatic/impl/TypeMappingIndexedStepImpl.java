@@ -15,7 +15,6 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
-
 class TypeMappingIndexedStepImpl implements TypeMappingIndexedStep, PojoTypeMetadataContributor {
 
 	private final PojoRawTypeIdentifier<?> typeIdentifier;

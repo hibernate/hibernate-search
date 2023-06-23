@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.binding.propertybridge.param.annotation;
 
 import java.math.BigDecimal;
+
 import javax.persistence.Embeddable;
 
 @Embeddable

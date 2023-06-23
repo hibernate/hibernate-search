@@ -13,17 +13,19 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-
-import org.apache.lucene.util.Version;
 
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Environment;
 import org.hibernate.search.test.testsupport.V5MigrationHelperJPASetupHelper;
 import org.hibernate.search.testsupport.TestConstants;
+
 import org.junit.Before;
 import org.junit.Rule;
+
+import org.apache.lucene.util.Version;
 
 /**
  * @author Emmanuel Bernard

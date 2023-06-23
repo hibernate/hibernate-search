@@ -18,9 +18,9 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBind
 import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 import org.hibernate.search.engine.mapper.model.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;

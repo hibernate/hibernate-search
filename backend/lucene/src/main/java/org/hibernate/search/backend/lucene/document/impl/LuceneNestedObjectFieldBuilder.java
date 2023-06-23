@@ -10,11 +10,10 @@ import java.util.List;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectField;
-import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
+import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 
 import org.apache.lucene.document.Document;
-
 
 class LuceneNestedObjectFieldBuilder extends AbstractLuceneObjectFieldBuilder {
 

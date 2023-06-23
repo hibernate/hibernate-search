@@ -7,6 +7,7 @@
 package org.hibernate.search.test.embedded.doubleinsert;
 
 import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;

@@ -9,12 +9,11 @@ package org.hibernate.search.backend.lucene.analysis.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
-
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
 
 public final class ScopedAnalyzer extends DelegatingAnalyzerWrapper {
 

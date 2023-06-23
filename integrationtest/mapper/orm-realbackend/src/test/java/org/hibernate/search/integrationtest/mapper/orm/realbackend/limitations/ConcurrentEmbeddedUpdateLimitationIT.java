@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.realbackend.limitations;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalJaxbMappingProducer.ENTITY_NAME;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
@@ -16,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;

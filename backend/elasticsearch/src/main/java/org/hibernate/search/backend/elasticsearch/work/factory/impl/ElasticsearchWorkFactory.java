@@ -40,7 +40,6 @@ import org.hibernate.search.backend.elasticsearch.work.impl.WaitForIndexStatusWo
 
 import com.google.gson.JsonObject;
 
-
 public interface ElasticsearchWorkFactory {
 
 	IndexWork.Builder index(String entityTypeName, Object entityIdentifier,

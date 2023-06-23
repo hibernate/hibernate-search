@@ -26,8 +26,8 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateO
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentReference;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 

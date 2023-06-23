@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.sort.dsl;
 
 import java.util.function.Function;
+
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 /**

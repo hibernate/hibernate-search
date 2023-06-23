@@ -26,10 +26,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 
-import org.hibernate.search.engine.common.tree.spi.TreeNestingContext;
-import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.common.tree.TreeFilterDefinition;
 import org.hibernate.search.engine.common.tree.spi.TreeFilterPathTracker;
+import org.hibernate.search.engine.common.tree.spi.TreeNestingContext;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 import org.hibernate.search.engine.reporting.spi.EventContexts;

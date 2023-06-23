@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.analysis.impl;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.AnalyzerWrapper;
 
-
 public final class HibernateSearchNormalizerWrapper extends AnalyzerWrapper {
 
 	private final String normalizerName;

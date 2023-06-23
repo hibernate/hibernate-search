@@ -13,7 +13,6 @@ import org.hibernate.search.engine.search.predicate.spi.MatchNonePredicateBuilde
 import org.apache.lucene.search.MatchNoDocsQuery;
 import org.apache.lucene.search.Query;
 
-
 class LuceneMatchNonePredicate extends AbstractLuceneSearchPredicate {
 
 	private LuceneMatchNonePredicate(Builder builder) {

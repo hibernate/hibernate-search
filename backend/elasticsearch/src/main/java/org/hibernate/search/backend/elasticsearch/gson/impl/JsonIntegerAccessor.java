@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.gson.impl;
 
 import com.google.gson.JsonElement;
 
-
 public class JsonIntegerAccessor extends AbstractTypingJsonAccessor<Integer> {
 
 	public JsonIntegerAccessor(JsonAccessor<JsonElement> parentAccessor) {

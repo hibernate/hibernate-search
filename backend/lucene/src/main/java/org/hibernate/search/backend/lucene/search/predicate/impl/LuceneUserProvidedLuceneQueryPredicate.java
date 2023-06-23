@@ -12,7 +12,6 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 
 import org.apache.lucene.search.Query;
 
-
 class LuceneUserProvidedLuceneQueryPredicate implements LuceneSearchPredicate {
 
 	private final Set<String> indexNames;

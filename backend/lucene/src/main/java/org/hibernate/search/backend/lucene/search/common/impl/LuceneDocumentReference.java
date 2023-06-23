@@ -10,8 +10,6 @@ import java.util.Objects;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 
-
-
 public class LuceneDocumentReference implements DocumentReference {
 
 	private final String typeName;

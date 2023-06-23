@@ -15,7 +15,6 @@ import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Query;
 
-
 public abstract class AbstractLuceneSearchPredicate implements LuceneSearchPredicate {
 
 	protected final Set<String> indexNames;

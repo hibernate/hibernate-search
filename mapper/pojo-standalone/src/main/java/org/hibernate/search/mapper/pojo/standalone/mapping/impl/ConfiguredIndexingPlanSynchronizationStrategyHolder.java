@@ -11,10 +11,10 @@ import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
-import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
-import org.hibernate.search.mapper.pojo.work.spi.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
 import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSearchSessionMappingContext;
+import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.work.spi.ConfiguredIndexingPlanSynchronizationStrategy;
 import org.hibernate.search.util.common.impl.Closer;
 
 public class ConfiguredIndexingPlanSynchronizationStrategyHolder {

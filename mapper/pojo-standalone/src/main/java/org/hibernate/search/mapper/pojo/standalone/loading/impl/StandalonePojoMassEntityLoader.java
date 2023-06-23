@@ -8,8 +8,8 @@ package org.hibernate.search.mapper.pojo.standalone.loading.impl;
 
 import java.util.List;
 
-import org.hibernate.search.mapper.pojo.standalone.loading.MassEntityLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoader;
+import org.hibernate.search.mapper.pojo.standalone.loading.MassEntityLoader;
 import org.hibernate.search.util.common.impl.Closer;
 
 public class StandalonePojoMassEntityLoader<I> implements PojoMassEntityLoader<I> {

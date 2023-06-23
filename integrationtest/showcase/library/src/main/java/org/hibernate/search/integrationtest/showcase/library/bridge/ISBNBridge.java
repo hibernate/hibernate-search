@@ -7,9 +7,9 @@
 package org.hibernate.search.integrationtest.showcase.library.bridge;
 
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalyzers;
+import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;

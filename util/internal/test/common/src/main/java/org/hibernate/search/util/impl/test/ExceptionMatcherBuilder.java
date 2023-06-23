@@ -19,7 +19,6 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.hamcrest.TypeSafeMatcher;
 
-
 public class ExceptionMatcherBuilder {
 
 	/**

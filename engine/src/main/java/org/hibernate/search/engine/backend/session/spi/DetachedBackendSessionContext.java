@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.engine.backend.session.spi;
 
-
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 
 /**
  * Provides visibility from the lower layers of Hibernate Search (engine, backend)

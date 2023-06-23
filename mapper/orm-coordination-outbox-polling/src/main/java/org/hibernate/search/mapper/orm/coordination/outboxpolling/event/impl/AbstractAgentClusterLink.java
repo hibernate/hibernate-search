@@ -19,8 +19,8 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.A
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentPersister;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentReference;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
-import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 abstract class AbstractAgentClusterLink<R> implements ToStringTreeAppendable {

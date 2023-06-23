@@ -10,6 +10,7 @@ import static org.assertj.core.api.Fail.fail;
 
 import java.io.Serializable;
 import java.util.Objects;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;

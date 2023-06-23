@@ -10,7 +10,6 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Da
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchIntegerFieldCodec;
 
-
 class ElasticsearchIntegerIndexFieldTypeOptionsStep
 		extends
 		AbstractElasticsearchNumericFieldTypeOptionsStep<ElasticsearchIntegerIndexFieldTypeOptionsStep, Integer> {

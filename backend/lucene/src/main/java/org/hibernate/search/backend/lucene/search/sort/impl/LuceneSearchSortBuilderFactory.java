@@ -15,7 +15,6 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
-
 public class LuceneSearchSortBuilderFactory implements SearchSortBuilderFactory {
 
 	private final LuceneSearchIndexScope<?> scope;

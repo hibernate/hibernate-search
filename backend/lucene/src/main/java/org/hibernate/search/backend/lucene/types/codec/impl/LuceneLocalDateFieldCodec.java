@@ -14,11 +14,11 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
 import java.util.Locale;
 
-import org.apache.lucene.document.StoredField;
-import org.apache.lucene.index.IndexableField;
-
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneLongDomain;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
+
+import org.apache.lucene.document.StoredField;
+import org.apache.lucene.index.IndexableField;
 
 public final class LuceneLocalDateFieldCodec extends AbstractLuceneNumericFieldCodec<LocalDate, Long> {
 

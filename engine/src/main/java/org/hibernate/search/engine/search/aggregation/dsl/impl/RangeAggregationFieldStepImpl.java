@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.engine.search.aggregation.dsl.impl;
 
-import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
-import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationRangeStep;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
+import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
+import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.common.impl.Contracts;
 

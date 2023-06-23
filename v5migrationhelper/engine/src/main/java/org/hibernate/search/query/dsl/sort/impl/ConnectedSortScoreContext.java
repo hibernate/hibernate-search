@@ -6,9 +6,10 @@
  */
 package org.hibernate.search.query.dsl.sort.impl;
 
-import org.apache.lucene.search.Sort;
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
 import org.hibernate.search.query.dsl.sort.SortScoreContext;
+
+import org.apache.lucene.search.Sort;
 
 /**
  * @author Yoann Rodiere

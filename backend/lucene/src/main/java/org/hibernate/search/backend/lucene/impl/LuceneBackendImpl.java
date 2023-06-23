@@ -12,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.lucene.cache.impl.LuceneQueryCachingContext;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexRootBuilder;
 import org.hibernate.search.backend.lucene.index.impl.IndexManagerBackendContext;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerBuilder;
@@ -36,8 +37,6 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
-import org.hibernate.search.backend.lucene.cache.impl.LuceneQueryCachingContext;
-
 
 public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 

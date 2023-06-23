@@ -18,7 +18,6 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-
 public class BulkWork extends AbstractNonBulkableWork<BulkResult> {
 
 	private static final JsonAccessor<JsonArray> BULK_ITEMS = JsonAccessor.root().property( "items" ).asArray();

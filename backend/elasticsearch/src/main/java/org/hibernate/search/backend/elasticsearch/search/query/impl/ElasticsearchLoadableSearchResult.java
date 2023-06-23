@@ -12,10 +12,10 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionTransformContext;
+import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.SearchResultTotal;
-import org.hibernate.search.engine.common.timing.Deadline;
 
 /**
  * A search result from the backend that offers a method to load data from the mapper.

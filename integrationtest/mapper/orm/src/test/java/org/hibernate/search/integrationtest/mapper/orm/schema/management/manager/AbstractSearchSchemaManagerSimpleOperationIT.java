@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.schema.management.manage
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.concurrent.CompletableFuture;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 

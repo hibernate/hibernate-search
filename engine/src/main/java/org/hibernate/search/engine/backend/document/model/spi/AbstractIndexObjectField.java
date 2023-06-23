@@ -17,7 +17,6 @@ import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 
-
 public abstract class AbstractIndexObjectField<
 				S extends AbstractIndexObjectField<S, SC, NT, C, F>,
 				SC extends SearchIndexScope<?>,

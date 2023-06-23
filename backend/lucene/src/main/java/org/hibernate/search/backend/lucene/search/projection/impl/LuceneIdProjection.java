@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import org.hibernate.search.backend.lucene.reporting.impl.LuceneSearchHints;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.IdentifierValues;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
+import org.hibernate.search.backend.lucene.reporting.impl.LuceneSearchHints;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;

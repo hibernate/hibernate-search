@@ -23,7 +23,6 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-
 class PhrasePredicateFieldMoreStepImpl
 		implements PhrasePredicateFieldMoreStep<PhrasePredicateFieldMoreStepImpl, PhrasePredicateOptionsStep<?>>,
 				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {

@@ -17,7 +17,6 @@ import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 
 import com.google.gson.JsonObject;
 
-
 public class ElasticsearchNestedPredicate extends AbstractElasticsearchSingleFieldPredicate {
 
 	private static final JsonAccessor<String> PATH_ACCESSOR = JsonAccessor.root().property( "path" ).asString();

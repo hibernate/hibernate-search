@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.CollectionTable;
 import javax.persistence.ElementCollection;

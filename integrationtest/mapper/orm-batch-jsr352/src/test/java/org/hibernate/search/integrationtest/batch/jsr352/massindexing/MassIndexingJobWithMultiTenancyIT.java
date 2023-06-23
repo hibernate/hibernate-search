@@ -12,6 +12,7 @@ import static org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil
 
 import java.util.Arrays;
 import java.util.List;
+
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;

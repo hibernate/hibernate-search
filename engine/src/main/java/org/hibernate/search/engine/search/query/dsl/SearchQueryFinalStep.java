@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.search.query.dsl;
 
-
 import org.hibernate.search.engine.search.query.SearchFetchable;
 import org.hibernate.search.engine.search.query.SearchQuery;
 

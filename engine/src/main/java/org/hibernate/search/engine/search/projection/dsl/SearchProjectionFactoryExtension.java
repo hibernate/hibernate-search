@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.search.projection.dsl;
 
-
 import java.util.Optional;
 
 /**

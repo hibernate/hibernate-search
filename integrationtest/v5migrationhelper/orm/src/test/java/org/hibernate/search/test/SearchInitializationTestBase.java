@@ -13,6 +13,7 @@ import org.hibernate.search.test.testsupport.V5MigrationHelperOrmSetupHelper;
 import org.hibernate.search.test.util.BackendTestHelper;
 import org.hibernate.search.test.util.ImmutableTestConfiguration;
 import org.hibernate.search.test.util.TestConfiguration;
+
 import org.junit.After;
 import org.junit.Rule;
 

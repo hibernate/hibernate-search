@@ -54,6 +54,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 import org.apache.http.HttpHost;
 
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)

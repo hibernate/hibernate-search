@@ -10,8 +10,8 @@ import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.work.spi.LuceneWorkExecutorProvider;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
-import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
 import org.hibernate.search.engine.common.execution.spi.DelegatingSimpleScheduledExecutor;
+import org.hibernate.search.engine.common.execution.spi.SimpleScheduledExecutor;
 
 public class DefaultLuceneWorkExecutorProvider implements LuceneWorkExecutorProvider {
 

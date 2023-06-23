@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.util.logging.impl;
 
-
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.MessageLogger;
 

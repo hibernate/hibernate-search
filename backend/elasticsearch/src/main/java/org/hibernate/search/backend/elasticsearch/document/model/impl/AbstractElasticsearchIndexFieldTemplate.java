@@ -10,7 +10,6 @@ import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexField
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
-
 public abstract class AbstractElasticsearchIndexFieldTemplate<FT>
 		extends AbstractIndexFieldTemplate<
 						ElasticsearchIndexModel,

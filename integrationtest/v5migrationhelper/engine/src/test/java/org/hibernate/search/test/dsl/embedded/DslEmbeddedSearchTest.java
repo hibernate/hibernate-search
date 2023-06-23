@@ -10,15 +10,17 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.lucene.search.Query;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SearchITHelper.AssertBuildingHSQueryContext;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.apache.lucene.search.Query;
 
 /**
  * @author Davide D'Alto

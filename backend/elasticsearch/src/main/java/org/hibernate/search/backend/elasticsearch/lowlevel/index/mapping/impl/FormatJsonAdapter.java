@@ -15,8 +15,6 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
-
-
 public class FormatJsonAdapter extends TypeAdapter<List<String>> {
 
 	private static final String FORMAT_SEPARATOR_REGEX = "\\|\\|";

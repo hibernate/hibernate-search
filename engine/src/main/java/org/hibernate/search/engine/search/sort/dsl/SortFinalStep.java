@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.search.sort.dsl;
 
-
 import org.hibernate.search.engine.search.sort.SearchSort;
 
 /**

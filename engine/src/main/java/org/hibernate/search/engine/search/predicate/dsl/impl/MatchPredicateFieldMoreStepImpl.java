@@ -24,7 +24,6 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-
 class MatchPredicateFieldMoreStepImpl
 		implements MatchPredicateFieldMoreStep<MatchPredicateFieldMoreStepImpl, MatchPredicateOptionsStep<?>>,
 				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {

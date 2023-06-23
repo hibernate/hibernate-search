@@ -12,7 +12,6 @@ import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateFi
 import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
-
 class SpatialWithinPredicateFieldStepImpl
 		implements SpatialWithinPredicateFieldStep<SpatialWithinPredicateFieldMoreStep<?, ?>> {
 

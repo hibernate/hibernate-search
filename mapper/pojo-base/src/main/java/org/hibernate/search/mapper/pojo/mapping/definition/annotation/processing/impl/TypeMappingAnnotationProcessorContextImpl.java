@@ -13,8 +13,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
-import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 public class TypeMappingAnnotationProcessorContextImpl
 		extends AbstractMappingAnnotationProcessorContext

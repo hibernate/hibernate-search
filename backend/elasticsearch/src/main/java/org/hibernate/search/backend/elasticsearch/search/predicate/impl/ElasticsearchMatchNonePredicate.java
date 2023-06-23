@@ -14,7 +14,6 @@ import org.hibernate.search.engine.search.predicate.spi.MatchNonePredicateBuilde
 
 import com.google.gson.JsonObject;
 
-
 class ElasticsearchMatchNonePredicate extends AbstractElasticsearchPredicate {
 
 	private static final JsonObjectAccessor MATCH_NONE_ACCESSOR = JsonAccessor.root().property( "match_none" )

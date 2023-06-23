@@ -5,18 +5,19 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+
 import org.junit.Test;
+
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.TermQuery;
 
 /**
  * Test using an entity which is in no package.

@@ -14,7 +14,6 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 
-
 public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder {
 
 	private final IndexManagerBackendContext backendContext;

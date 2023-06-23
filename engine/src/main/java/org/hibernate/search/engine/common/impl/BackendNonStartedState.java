@@ -7,8 +7,8 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
-import org.hibernate.search.engine.cfg.impl.ConfigurationPropertySourceExtractor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.impl.ConfigurationPropertySourceExtractor;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;

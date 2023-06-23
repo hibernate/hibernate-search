@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.search.aggregation;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;

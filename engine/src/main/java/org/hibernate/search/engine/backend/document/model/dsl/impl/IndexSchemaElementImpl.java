@@ -14,19 +14,19 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFieldBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexCompositeNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFieldBuilder;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 import org.hibernate.search.engine.common.tree.spi.TreeNestingContext;
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.impl.StringHelper;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
+import org.hibernate.search.util.common.impl.StringHelper;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class IndexSchemaElementImpl<B extends IndexCompositeNodeBuilder> implements IndexSchemaElement {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

@@ -15,7 +15,6 @@ import java.util.function.BinaryOperator;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
-
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**

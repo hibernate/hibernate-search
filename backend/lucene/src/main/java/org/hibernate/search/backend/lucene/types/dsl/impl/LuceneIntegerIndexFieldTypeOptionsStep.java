@@ -12,7 +12,6 @@ import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneIntegerFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
 
-
 class LuceneIntegerIndexFieldTypeOptionsStep
 		extends AbstractLuceneNumericIndexFieldTypeOptionsStep<LuceneIntegerIndexFieldTypeOptionsStep, Integer> {
 

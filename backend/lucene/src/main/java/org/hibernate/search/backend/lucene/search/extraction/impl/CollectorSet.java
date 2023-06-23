@@ -15,8 +15,8 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExec
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneCounterAdapter;
-import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.engine.common.timing.Deadline;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.MultiCollector;

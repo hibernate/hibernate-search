@@ -9,10 +9,10 @@ package org.hibernate.search.integrationtest.backend.tck.metamodel;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescriptor;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;

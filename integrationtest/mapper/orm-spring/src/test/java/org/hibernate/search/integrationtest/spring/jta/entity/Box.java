@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.spring.jta.entity;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;

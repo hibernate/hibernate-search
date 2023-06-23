@@ -21,8 +21,6 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 
-
-
 class LuceneNormalizerComponentsStep
 		implements LuceneNormalizerOptionalComponentsStep, LuceneAnalyzerBuilder {
 

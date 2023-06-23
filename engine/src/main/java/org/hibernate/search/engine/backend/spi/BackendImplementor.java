@@ -15,7 +15,6 @@ import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.IndexSettings;
 
-
 public interface BackendImplementor {
 
 	/**

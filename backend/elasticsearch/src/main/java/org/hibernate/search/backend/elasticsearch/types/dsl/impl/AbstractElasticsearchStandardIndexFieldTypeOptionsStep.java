@@ -14,7 +14,6 @@ import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.util.common.AssertionFailure;
 
-
 abstract class AbstractElasticsearchStandardIndexFieldTypeOptionsStep<S extends AbstractElasticsearchStandardIndexFieldTypeOptionsStep<?, F>, F>
 		extends AbstractElasticsearchIndexFieldTypeOptionsStep<S, F>
 		implements ElasticsearchStandardIndexFieldTypeOptionsStep<S, F> {

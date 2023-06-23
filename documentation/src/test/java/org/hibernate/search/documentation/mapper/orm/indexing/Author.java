@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.mapper.orm.indexing;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;

@@ -15,6 +15,7 @@ import com.carrotsearch.hppc.LongArrayList;
 import com.carrotsearch.hppc.LongIntHashMap;
 import com.carrotsearch.hppc.LongIntMap;
 import com.carrotsearch.hppc.cursors.IntCursor;
+
 import org.apache.lucene.facet.range.LongRange;
 
 /**

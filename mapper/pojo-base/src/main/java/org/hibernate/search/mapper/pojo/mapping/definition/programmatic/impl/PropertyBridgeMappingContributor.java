@@ -12,8 +12,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBind
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 
-
-
 class PropertyBridgeMappingContributor implements PojoPropertyMetadataContributor {
 
 	private final PropertyBinder binder;

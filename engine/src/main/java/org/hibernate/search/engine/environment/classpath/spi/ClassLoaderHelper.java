@@ -14,8 +14,8 @@ import java.util.Map;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.Throwables;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Utility class to load instances of other classes by using a fully qualified name,

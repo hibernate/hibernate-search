@@ -11,13 +11,13 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverDirtinessFilterNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverMultiNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverNode;
-import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverDirtinessFilterNode;
-import org.hibernate.search.mapper.pojo.model.path.impl.PojoRuntimePathsBuildingHelper;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoRuntimePathsBuildingHelper;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.util.common.AssertionFailure;
 
 abstract class AbstractPojoImplicitReindexingResolverNodeBuilder<T> {

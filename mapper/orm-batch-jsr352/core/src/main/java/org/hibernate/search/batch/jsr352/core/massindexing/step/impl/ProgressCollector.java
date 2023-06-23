@@ -7,6 +7,7 @@
 package org.hibernate.search.batch.jsr352.core.massindexing.step.impl;
 
 import java.io.Serializable;
+
 import javax.batch.api.partition.PartitionCollector;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;

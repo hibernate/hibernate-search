@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.runtime;
 
-
 import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;

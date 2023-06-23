@@ -14,11 +14,10 @@ import java.util.stream.Collectors;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
-import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-
 
 class ElasticsearchIndexScopeBuilder implements IndexScopeBuilder {
 

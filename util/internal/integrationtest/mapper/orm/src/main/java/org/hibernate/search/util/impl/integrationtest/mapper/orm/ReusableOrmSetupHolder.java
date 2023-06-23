@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -50,6 +51,7 @@ import org.hibernate.search.util.impl.test.function.ThrowingConsumer;
 import org.hibernate.search.util.impl.test.function.ThrowingFunction;
 
 import org.hibernate.testing.junit4.CustomParameterized;
+
 import org.junit.rules.MethodRule;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;

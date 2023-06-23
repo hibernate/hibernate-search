@@ -17,9 +17,9 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.dsl.SortOrderStep;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
 import org.hibernate.search.spatial.Coordinates;
+import org.hibernate.search.util.common.SearchException;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;

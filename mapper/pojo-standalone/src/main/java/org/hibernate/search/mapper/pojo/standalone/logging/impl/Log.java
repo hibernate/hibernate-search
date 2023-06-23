@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.standalone.logging.impl;
 
 import java.util.Collection;
 import java.util.List;
+
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;

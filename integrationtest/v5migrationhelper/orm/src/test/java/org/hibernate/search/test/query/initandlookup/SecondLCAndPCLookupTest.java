@@ -26,6 +26,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.StaticIndexingS
 import org.hibernate.stat.Statistics;
 
 import org.hibernate.testing.cache.CachingRegionFactory;
+
 import org.junit.Rule;
 import org.junit.Test;
 

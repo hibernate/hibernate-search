@@ -13,8 +13,8 @@ import static org.mockito.Mockito.when;
 import java.util.UUID;
 
 import org.hibernate.search.engine.reporting.FailureContext;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 import org.hibernate.search.util.common.SearchException;
 

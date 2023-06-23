@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 
-import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverCastedTypeNode;
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathCastedTypeNode;
 
 class PojoImplicitReindexingResolverCastedTypeNodeBuilder<T, U>

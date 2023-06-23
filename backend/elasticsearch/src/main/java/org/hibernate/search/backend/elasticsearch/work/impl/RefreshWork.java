@@ -14,7 +14,6 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
-
 public class RefreshWork extends AbstractNonBulkableWork<Void> {
 
 	protected RefreshWork(Builder builder) {

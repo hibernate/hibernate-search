@@ -15,7 +15,6 @@ import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuil
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 
-
 public class CompositeProjectionValueStepImpl<T>
 		extends CompositeProjectionOptionsStepImpl<T, T>
 		implements CompositeProjectionValueStep<CompositeProjectionOptionsStepImpl<T, T>, T> {

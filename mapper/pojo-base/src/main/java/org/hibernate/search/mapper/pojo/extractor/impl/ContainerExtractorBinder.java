@@ -17,19 +17,19 @@ import java.util.Optional;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
-import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CollectionElementExtractor;
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorDefinition;
 import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.ExtractingTypePatternMatcher;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
-import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
 
 /**
  * Binds {@link ContainerExtractorPath}s to a given input type,

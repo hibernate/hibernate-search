@@ -6,13 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.dsl.impl;
 
-
 import java.io.IOException;
 import java.util.List;
 import java.util.function.IntFunction;
 
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
-
 
 interface LuceneAnalysisComponentBuilder<T> {
 

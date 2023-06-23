@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl;
 
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 
 public class LuceneNumericFieldComparatorSource<E extends Number> extends LuceneFieldComparatorSource {
 

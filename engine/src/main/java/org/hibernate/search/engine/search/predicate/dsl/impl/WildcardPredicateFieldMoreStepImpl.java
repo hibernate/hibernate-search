@@ -20,7 +20,6 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 import org.hibernate.search.util.common.impl.Contracts;
 
-
 class WildcardPredicateFieldMoreStepImpl
 		implements WildcardPredicateFieldMoreStep<WildcardPredicateFieldMoreStepImpl, WildcardPredicateOptionsStep<?>>,
 				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {

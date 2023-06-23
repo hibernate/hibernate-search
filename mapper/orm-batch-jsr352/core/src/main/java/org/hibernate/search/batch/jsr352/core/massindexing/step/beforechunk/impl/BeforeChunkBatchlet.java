@@ -10,6 +10,7 @@ import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJo
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.PURGE_ALL_ON_START;
 
 import java.lang.invoke.MethodHandles;
+
 import javax.batch.api.AbstractBatchlet;
 import javax.batch.api.BatchProperty;
 import javax.batch.runtime.context.JobContext;

@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectField;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueField;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
@@ -27,7 +27,6 @@ import org.hibernate.search.engine.backend.document.spi.NoOpDocumentElement;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
-
 
 abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
 

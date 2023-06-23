@@ -10,11 +10,11 @@ import static org.junit.Assert.fail;
 
 import java.util.Map;
 
+import org.hibernate.search.util.common.impl.ToStringStyle;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeDiffer;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeMismatch;
-import org.hibernate.search.util.common.impl.ToStringStyle;
-import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 public class StubTreeNodeAssert<T extends StubTreeNode<T>> {
 

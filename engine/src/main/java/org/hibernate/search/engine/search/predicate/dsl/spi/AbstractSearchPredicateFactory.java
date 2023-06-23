@@ -57,7 +57,6 @@ import org.hibernate.search.engine.search.predicate.dsl.impl.WildcardPredicateFi
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateIndexScope;
 import org.hibernate.search.util.common.impl.Contracts;
 
-
 public abstract class AbstractSearchPredicateFactory<
 				S extends ExtendedSearchPredicateFactory<S>,
 				SC extends SearchPredicateIndexScope<?>

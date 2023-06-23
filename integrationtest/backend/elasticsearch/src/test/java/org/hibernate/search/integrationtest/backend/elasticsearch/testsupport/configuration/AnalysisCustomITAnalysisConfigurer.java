@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration;
 
-import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.tck.analysis.AnalysisCustomIT;
 
 public class AnalysisCustomITAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {

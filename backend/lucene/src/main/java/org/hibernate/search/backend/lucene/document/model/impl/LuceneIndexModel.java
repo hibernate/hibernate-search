@@ -18,7 +18,6 @@ import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
 
-
 public class LuceneIndexModel extends AbstractIndexModel<LuceneIndexModel, LuceneIndexRoot, LuceneIndexField>
 		implements AutoCloseable, IndexDescriptor {
 

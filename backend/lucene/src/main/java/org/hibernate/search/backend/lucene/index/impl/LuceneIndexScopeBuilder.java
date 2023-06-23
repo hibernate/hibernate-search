@@ -17,7 +17,6 @@ import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-
 class LuceneIndexScopeBuilder implements IndexScopeBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

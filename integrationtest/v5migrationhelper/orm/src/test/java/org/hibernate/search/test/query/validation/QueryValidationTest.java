@@ -6,17 +6,12 @@
  */
 package org.hibernate.search.test.query.validation;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.TermQuery;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
@@ -26,7 +21,12 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.common.SearchException;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.TermQuery;
 
 /**
  * @author Hardy Ferentschik

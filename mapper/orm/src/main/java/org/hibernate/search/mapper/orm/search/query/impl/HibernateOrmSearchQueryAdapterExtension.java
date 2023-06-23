@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.search.query.impl;
 
-
 import java.util.Optional;
 
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
-
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;

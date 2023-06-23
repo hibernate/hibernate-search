@@ -10,7 +10,6 @@ import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
-
 public class LuceneIndexValueFieldTemplate
 		extends AbstractLuceneIndexFieldTemplate<LuceneIndexValueFieldType<?>> {
 

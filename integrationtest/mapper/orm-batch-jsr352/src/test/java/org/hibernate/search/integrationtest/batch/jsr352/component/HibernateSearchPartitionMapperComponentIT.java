@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Properties;
+
 import javax.batch.api.partition.PartitionPlan;
 import javax.batch.runtime.context.JobContext;
 import javax.persistence.EntityManagerFactory;

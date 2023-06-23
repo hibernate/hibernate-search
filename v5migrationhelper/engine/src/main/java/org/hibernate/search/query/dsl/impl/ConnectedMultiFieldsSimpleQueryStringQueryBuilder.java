@@ -11,8 +11,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.lucene.search.Query;
-
 import org.hibernate.search.backend.lucene.search.spi.LuceneMigrationUtils;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -23,6 +21,8 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredica
 import org.hibernate.search.query.dsl.SimpleQueryStringTermination;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+
+import org.apache.lucene.search.Query;
 
 /**
  * @author Guillaume Smet

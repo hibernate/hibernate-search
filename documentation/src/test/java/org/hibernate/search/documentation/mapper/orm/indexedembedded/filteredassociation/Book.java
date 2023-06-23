@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.mapper.orm.indexedembedded.filteredas
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;

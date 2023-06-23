@@ -13,9 +13,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.util.impl.test.rule.log4j.Log4j2ConfigurationAccessor;
 import org.hibernate.search.util.impl.test.rule.log4j.LogChecker;
 import org.hibernate.search.util.impl.test.rule.log4j.LogExpectation;
-import org.hibernate.search.util.impl.test.rule.log4j.Log4j2ConfigurationAccessor;
 import org.hibernate.search.util.impl.test.rule.log4j.TestAppender;
 
 import org.junit.rules.TestRule;

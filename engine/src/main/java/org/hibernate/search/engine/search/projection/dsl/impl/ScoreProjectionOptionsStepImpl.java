@@ -10,7 +10,6 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ScoreProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 
-
 public final class ScoreProjectionOptionsStepImpl
 		implements ScoreProjectionOptionsStep<ScoreProjectionOptionsStepImpl> {
 

@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.bootstrap;
 
 import java.util.function.Consumer;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;

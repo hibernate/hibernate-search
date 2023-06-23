@@ -7,8 +7,8 @@
 package org.hibernate.search.mapper.pojo.massindexing.spi;
 
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
-import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReferenceFactoryDelegate;
 
 /**

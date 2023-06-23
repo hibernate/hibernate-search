@@ -9,14 +9,13 @@ package org.hibernate.search.engine.search.sort.dsl.impl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtensionIfSupportedMoreStep;
-import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtensionIfSupportedMoreStep;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
-import org.hibernate.search.engine.search.sort.dsl.spi.StaticSortThenStep;
+import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
-
+import org.hibernate.search.engine.search.sort.dsl.spi.StaticSortThenStep;
 
 public final class SearchSortFactoryExtensionStep
 		implements SearchSortFactoryExtensionIfSupportedMoreStep {

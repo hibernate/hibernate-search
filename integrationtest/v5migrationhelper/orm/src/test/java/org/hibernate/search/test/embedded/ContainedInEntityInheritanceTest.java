@@ -14,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 
-import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -26,7 +25,10 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+
 import org.junit.Test;
+
+import org.apache.lucene.search.Query;
 
 /**
  * @author Yoann Rodiere

@@ -7,8 +7,8 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.hibernate.search.query.dsl.SimpleQueryStringMatchingContext;
 import org.hibernate.search.query.dsl.SimpleQueryStringDefinitionTermination;
+import org.hibernate.search.query.dsl.SimpleQueryStringMatchingContext;
 import org.hibernate.search.query.dsl.SimpleQueryStringTermination;
 
 /**

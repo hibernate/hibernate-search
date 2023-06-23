@@ -12,7 +12,6 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFin
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchNonePredicateBuilder;
 
-
 public final class MatchNonePredicateFinalStepImpl extends AbstractPredicateFinalStep
 		implements MatchNonePredicateFinalStep {
 

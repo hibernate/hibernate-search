@@ -21,7 +21,6 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeCon
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionIndexScope;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-
 public final class EntityProjectionOptionsStepImpl<E>
 		implements EntityProjectionOptionsStep<EntityProjectionOptionsStepImpl<E>, E> {
 

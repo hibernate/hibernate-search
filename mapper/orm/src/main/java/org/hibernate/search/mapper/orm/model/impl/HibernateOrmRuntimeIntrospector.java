@@ -14,7 +14,6 @@ import org.hibernate.proxy.LazyInitializer;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
-
 /**
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */

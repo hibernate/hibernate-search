@@ -7,9 +7,10 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.Query;
 import org.hibernate.search.query.dsl.SimpleQueryStringContext;
 import org.hibernate.search.query.dsl.SimpleQueryStringMatchingContext;
+
+import org.apache.lucene.search.Query;
 
 /**
  * @author Guillaume Smet

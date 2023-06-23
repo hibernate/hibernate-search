@@ -8,8 +8,6 @@ package org.hibernate.search;
 
 import java.util.Set;
 
-import org.apache.lucene.analysis.Analyzer;
-
 import org.hibernate.SessionFactory;
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
@@ -24,6 +22,8 @@ import org.hibernate.search.query.dsl.FacetContext;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.dsl.sort.SortContext;
+
+import org.apache.lucene.analysis.Analyzer;
 
 /**
  * Provide application wide operations as well as access to the underlying Lucene resources.

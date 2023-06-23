@@ -22,7 +22,6 @@ import java.time.ZonedDateTime;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 
-
 /**
  * A factory for types of index fields.
  */

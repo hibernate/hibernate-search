@@ -9,9 +9,9 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 import java.util.concurrent.CompletionStage;
 
 import org.hibernate.CacheMode;
-import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexerFilteringTypeStep;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;

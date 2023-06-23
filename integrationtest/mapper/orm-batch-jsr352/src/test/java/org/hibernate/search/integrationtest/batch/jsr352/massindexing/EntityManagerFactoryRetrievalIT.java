@@ -12,16 +12,17 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.JobExecution;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
+import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Person;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.WhoAmI;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
-import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
 
 import org.junit.After;

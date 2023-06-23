@@ -23,8 +23,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.apache.http.HttpEntity;
 
+import org.apache.http.HttpEntity;
 
 public class ElasticsearchClientUtils {
 

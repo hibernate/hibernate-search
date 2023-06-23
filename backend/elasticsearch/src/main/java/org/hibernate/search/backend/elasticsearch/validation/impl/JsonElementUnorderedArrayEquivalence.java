@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.validation.impl;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
-
 /**
  * An {@link JsonElementEquivalence} that considers that arrays are unordered containers.
  *

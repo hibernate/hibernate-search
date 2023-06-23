@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
-
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;

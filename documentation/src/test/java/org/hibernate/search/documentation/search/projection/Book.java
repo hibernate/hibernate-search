@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.search.projection;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;

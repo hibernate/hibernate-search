@@ -12,6 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 
 import java.util.Arrays;
 import java.util.Optional;
+
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;

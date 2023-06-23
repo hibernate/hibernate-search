@@ -7,12 +7,11 @@
 package org.hibernate.search.backend.lucene.index.impl;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
-import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexRootBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
+import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-
 
 public class LuceneIndexManagerBuilder implements IndexManagerBuilder {
 

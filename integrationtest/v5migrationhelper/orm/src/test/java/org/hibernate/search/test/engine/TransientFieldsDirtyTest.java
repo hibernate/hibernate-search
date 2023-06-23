@@ -9,6 +9,7 @@ package org.hibernate.search.test.engine;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;

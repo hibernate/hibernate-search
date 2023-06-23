@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.schema.management.impl;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchValidationMessages;
 import org.hibernate.search.backend.elasticsearch.validation.impl.IndexAliasDefinitionValidator;
 import org.hibernate.search.backend.elasticsearch.validation.impl.IndexSettingsValidator;
@@ -16,7 +17,6 @@ import org.hibernate.search.backend.elasticsearch.validation.impl.RootTypeMappin
 import org.hibernate.search.backend.elasticsearch.validation.impl.ValidationContextType;
 import org.hibernate.search.backend.elasticsearch.validation.impl.ValidationErrorCollector;
 import org.hibernate.search.backend.elasticsearch.validation.impl.Validator;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 /**

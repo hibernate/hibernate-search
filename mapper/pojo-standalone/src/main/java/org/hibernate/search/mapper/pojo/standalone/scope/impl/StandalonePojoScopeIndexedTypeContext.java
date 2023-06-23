@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.scope.impl;
 
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.LoadingTypeContext;
-import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 /**
  * A mapper-specific indexed type context,

@@ -15,7 +15,6 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
-
 public abstract class AbstractExtraPropertiesJsonAdapter<T> extends TypeAdapter<T> {
 
 	interface FieldAdapter<T> {

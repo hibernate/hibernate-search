@@ -7,14 +7,14 @@
 package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
 import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.impl.StandalonePojoEntityTypeMetadataProvider;
 import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojoMappingHints;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.SchemaManagementListener;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 public final class StandalonePojoMapperDelegate
 		implements PojoMapperDelegate<StandalonePojoMappingPartialBuildState> {

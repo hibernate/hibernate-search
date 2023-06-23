@@ -10,9 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.TermQuery;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -23,6 +20,10 @@ import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.TermQuery;
 
 /**
  * Test for org.hibernate.search.query.ScrollableResultsImpl

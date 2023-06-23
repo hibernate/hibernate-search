@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;

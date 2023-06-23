@@ -17,6 +17,7 @@ import com.carrotsearch.hppc.LongHashSet;
 import com.carrotsearch.hppc.LongIntScatterMap;
 import com.carrotsearch.hppc.cursors.LongIntCursor;
 import com.carrotsearch.hppc.procedures.LongProcedure;
+
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;

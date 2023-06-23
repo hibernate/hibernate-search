@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.util.Collection;
 import java.util.Set;
+
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.ParameterExpression;

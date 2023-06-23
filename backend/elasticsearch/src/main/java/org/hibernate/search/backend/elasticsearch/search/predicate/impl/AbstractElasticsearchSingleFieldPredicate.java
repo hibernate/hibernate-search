@@ -9,8 +9,8 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexNodeContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 
 public abstract class AbstractElasticsearchSingleFieldPredicate extends AbstractElasticsearchNestablePredicate {
 

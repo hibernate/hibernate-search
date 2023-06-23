@@ -12,8 +12,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 
-
-
 class MarkerMappingContributor implements PojoPropertyMetadataContributor {
 
 	private final MarkerBinder binder;

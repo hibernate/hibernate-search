@@ -7,6 +7,7 @@
 package org.hibernate.search.batch.jsr352.jberet.context.jpa.impl;
 
 import java.lang.invoke.MethodHandles;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.Instance;

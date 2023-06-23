@@ -7,6 +7,7 @@
 package org.hibernate.search.test.inheritance;
 
 import java.io.Serializable;
+
 import javax.persistence.Entity;
 
 import org.hibernate.search.annotations.Analyze;

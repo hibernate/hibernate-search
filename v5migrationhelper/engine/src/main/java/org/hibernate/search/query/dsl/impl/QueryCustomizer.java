@@ -9,8 +9,8 @@ package org.hibernate.search.query.dsl.impl;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateOptionsCollector;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateOptionsCollector;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateScoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.query.dsl.QueryCustomization;

@@ -11,8 +11,8 @@ import java.time.Instant;
 import java.util.Collections;
 
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
-import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 public final class AgentPersister implements ToStringTreeAppendable {

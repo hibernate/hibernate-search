@@ -9,6 +9,7 @@ package org.hibernate.search.test.spatial;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
+
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;

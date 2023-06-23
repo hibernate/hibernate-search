@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.common.tree.spi;
 
-
 import java.util.Optional;
 import java.util.function.BiFunction;
 

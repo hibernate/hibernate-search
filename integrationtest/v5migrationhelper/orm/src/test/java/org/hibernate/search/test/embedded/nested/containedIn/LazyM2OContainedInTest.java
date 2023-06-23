@@ -20,6 +20,7 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
 import org.hibernate.testing.cache.CachingRegionFactory;
+
 import org.junit.Test;
 
 import org.apache.lucene.document.LongPoint;

@@ -13,7 +13,6 @@ import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchNativeI
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-
 class ElasticsearchNativeIndexFieldTypeMappingStepImpl
 		implements ElasticsearchNativeIndexFieldTypeMappingStep {
 

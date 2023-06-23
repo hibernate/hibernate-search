@@ -22,7 +22,6 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 
-
 public final class Futures {
 
 	private Futures() {

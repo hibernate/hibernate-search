@@ -12,8 +12,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 
-
-
 class TypeBridgeMappingContributor implements PojoTypeMetadataContributor {
 
 	private final TypeBinder binder;

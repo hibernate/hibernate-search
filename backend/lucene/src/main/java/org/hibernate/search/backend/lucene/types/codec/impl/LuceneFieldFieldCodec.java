@@ -9,13 +9,13 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
-import org.apache.lucene.index.IndexableField;
-
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+
+import org.apache.lucene.index.IndexableField;
 
 public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F> {
 

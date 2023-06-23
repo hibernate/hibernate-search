@@ -12,7 +12,6 @@ import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexC
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
-
 public class ElasticsearchIndexObjectFieldTemplate
 		extends AbstractElasticsearchIndexFieldTemplate<ElasticsearchIndexCompositeNodeType> {
 

@@ -29,8 +29,8 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOr
 import org.hibernate.search.backend.lucene.schema.management.impl.SchemaManagementIndexManagerContext;
 import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionIndexManagerContext;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
-import org.hibernate.search.engine.common.resources.spi.SavedState;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.common.resources.spi.SavedState;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;

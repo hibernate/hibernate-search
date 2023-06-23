@@ -8,11 +8,11 @@ package org.hibernate.search.query.dsl.sort;
 
 import java.util.function.Function;
 
-import org.apache.lucene.search.SortField;
-
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.util.common.SearchException;
+
+import org.apache.lucene.search.SortField;
 
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org

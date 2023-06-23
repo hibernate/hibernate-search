@@ -33,13 +33,13 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.P
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoModelPathBinder;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinalReference;
 import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinals;
 import org.hibernate.search.mapper.pojo.model.path.impl.PojoRuntimePathsBuildingHelper;
 import org.hibernate.search.mapper.pojo.model.path.spi.BindablePojoModelPath;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoModelPathBinder;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinition;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathEntityStateRepresentation;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;

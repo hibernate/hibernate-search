@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.mapping;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert.containsDocument;
 

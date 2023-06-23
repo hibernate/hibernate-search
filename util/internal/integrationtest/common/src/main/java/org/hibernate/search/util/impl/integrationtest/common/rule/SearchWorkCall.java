@@ -16,16 +16,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
-import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
+import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
-import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchWork;
 
 class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 

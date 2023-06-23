@@ -17,7 +17,6 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-
 public final class ProvidedIdentifierMapping implements IdentifierMappingImplementor<Object, Object> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

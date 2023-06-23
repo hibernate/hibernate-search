@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
-import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.impl.StandalonePojoEntityTypeMetadata;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.impl.StandalonePojoEntityTypeMetadata;
 
 class StandalonePojoContainedTypeContext<E> extends AbstractStandalonePojoTypeContext<E> {
 

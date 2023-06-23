@@ -28,7 +28,6 @@ import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-
 class RangePredicateFieldMoreStepImpl
 		implements RangePredicateFieldMoreStep<RangePredicateFieldMoreStepImpl, RangePredicateOptionsStep<?>>,
 				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {

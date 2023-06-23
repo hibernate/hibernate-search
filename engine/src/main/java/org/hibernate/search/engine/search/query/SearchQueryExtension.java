@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.search.query;
 
-
 import java.util.Optional;
 
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;

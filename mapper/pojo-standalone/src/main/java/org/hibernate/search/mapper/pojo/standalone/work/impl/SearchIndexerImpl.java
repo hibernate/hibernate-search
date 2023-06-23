@@ -11,10 +11,10 @@ import java.util.concurrent.CompletionStage;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
-import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 
 public class SearchIndexerImpl implements SearchIndexer {

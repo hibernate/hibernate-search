@@ -14,7 +14,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-
 public abstract class AbstractSingleDocumentIndexingWork
 		implements BulkableWork<Void>, SingleDocumentIndexingWork {
 

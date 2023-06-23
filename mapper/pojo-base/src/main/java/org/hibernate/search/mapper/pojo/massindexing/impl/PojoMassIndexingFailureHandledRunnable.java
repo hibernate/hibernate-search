@@ -7,8 +7,8 @@
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
 import java.lang.invoke.MethodHandles;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
 
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 

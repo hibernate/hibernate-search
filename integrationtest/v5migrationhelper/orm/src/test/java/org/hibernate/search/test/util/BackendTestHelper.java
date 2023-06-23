@@ -8,6 +8,8 @@ package org.hibernate.search.test.util;
 
 import java.io.IOException;
 
+import org.hibernate.search.test.TestResourceManager;
+
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
@@ -18,7 +20,6 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.hibernate.search.test.TestResourceManager;
 
 /**
  * Provides functionality useful for tests, e.g. for asserting the number of documents in a given index. Specific

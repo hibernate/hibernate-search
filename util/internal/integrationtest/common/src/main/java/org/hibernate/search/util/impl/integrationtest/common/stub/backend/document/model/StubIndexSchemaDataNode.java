@@ -9,15 +9,15 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.docum
 import java.util.Collection;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Highlightable;
-import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Norms;
-import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
+import org.hibernate.search.engine.backend.types.Searchable;
+import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
 import org.hibernate.search.util.common.reporting.EventContext;

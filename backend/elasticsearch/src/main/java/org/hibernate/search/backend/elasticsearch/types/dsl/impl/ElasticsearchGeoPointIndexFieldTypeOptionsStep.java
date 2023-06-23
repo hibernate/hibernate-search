@@ -20,7 +20,6 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-
 class ElasticsearchGeoPointIndexFieldTypeOptionsStep
 		extends AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<ElasticsearchGeoPointIndexFieldTypeOptionsStep, GeoPoint> {
 

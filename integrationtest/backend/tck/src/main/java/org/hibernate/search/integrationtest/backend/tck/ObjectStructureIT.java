@@ -30,7 +30,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-
 public class ObjectStructureIT {
 
 	private static final String EXPECTED_NESTED_MATCH_ID = "nestedQueryShouldMatchId";

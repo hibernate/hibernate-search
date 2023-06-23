@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.lowlevel.facet.impl;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.LabelAndValue;

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.spatial;
 
-import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.annotations.Latitude;
+import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**

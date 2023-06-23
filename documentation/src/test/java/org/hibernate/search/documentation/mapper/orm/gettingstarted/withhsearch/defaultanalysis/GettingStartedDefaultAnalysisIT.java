@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 

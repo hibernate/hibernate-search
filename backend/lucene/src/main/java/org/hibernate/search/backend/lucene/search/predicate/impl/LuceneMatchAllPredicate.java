@@ -13,7 +13,6 @@ import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
-
 class LuceneMatchAllPredicate extends AbstractLuceneSearchPredicate {
 
 	private LuceneMatchAllPredicate(Builder builder) {

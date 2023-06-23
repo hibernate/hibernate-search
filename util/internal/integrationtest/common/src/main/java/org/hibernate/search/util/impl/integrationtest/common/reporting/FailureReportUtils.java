@@ -12,9 +12,9 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.EventContextElement;
-import org.hibernate.search.util.common.SearchException;
 
 public final class FailureReportUtils {
 

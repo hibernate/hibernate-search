@@ -10,7 +10,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 
-
 class ArrayElementJsonAccessor extends AbstractCrawlingJsonAccessor<JsonArray> {
 	private final int index;
 

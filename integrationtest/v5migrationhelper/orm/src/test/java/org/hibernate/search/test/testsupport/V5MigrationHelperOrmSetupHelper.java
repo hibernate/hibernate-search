@@ -21,8 +21,8 @@ import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrateg
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.configuration.V5MigrationHelperTestLuceneBackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl.MultitenancyTestHelper;

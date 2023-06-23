@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 import java.io.IOException;
 
 import com.carrotsearch.hppc.IntIntMap;
+
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.ScoreDoc;
 

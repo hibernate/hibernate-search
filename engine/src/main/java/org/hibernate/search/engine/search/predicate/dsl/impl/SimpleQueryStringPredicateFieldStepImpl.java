@@ -12,7 +12,6 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredica
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
-
 public final class SimpleQueryStringPredicateFieldStepImpl
 		implements SimpleQueryStringPredicateFieldStep<SimpleQueryStringPredicateFieldMoreStep<?, ?>> {
 

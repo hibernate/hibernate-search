@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.spring.jta.entity;
 
 import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 

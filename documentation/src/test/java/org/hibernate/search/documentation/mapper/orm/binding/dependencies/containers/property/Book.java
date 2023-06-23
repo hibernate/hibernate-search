@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.mapper.orm.binding.dependencies.conta
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;

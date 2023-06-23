@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.test.envers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.util.List;
 
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
 import org.hibernate.Transaction;
 import org.hibernate.dialect.PostgreSQL81Dialect;
 import org.hibernate.envers.AuditReader;
@@ -24,11 +24,13 @@ import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.PortedToSearch6;
 
 import org.hibernate.testing.SkipForDialect;
+
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 
 /**
  * Unit test covering proper behavior and integration between Hibernate Search and Envers.

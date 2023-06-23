@@ -16,12 +16,14 @@ import java.util.TimeZone;
 
 import javax.persistence.EntityTransaction;
 
-import org.apache.lucene.search.Sort;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.jpa.JPATestCase;
 import org.hibernate.search.test.query.ProductArticle;
+
 import org.junit.Test;
+
+import org.apache.lucene.search.Sort;
 
 /**
  * @author Davide D'Alto

@@ -7,12 +7,12 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
-import org.hibernate.search.engine.common.resources.spi.SavedState;
-import org.hibernate.search.engine.cfg.impl.ConfigurationPropertySourceExtractor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.impl.ConfigurationPropertySourceExtractor;
+import org.hibernate.search.engine.common.resources.spi.SavedState;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 class IndexManagerNonStartedState {

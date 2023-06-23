@@ -17,10 +17,10 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractEl
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexObjectField;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexRoot;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexObjectFieldTemplate;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueFieldTemplate;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexRoot;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueField;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueFieldTemplate;
 import org.hibernate.search.backend.elasticsearch.index.DynamicMapping;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
@@ -35,7 +35,6 @@ import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexV
 import org.hibernate.search.engine.backend.document.model.dsl.spi.ImplicitFieldCollector;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.ImplicitFieldContributor;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
-import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.backend.document.model.spi.IndexIdentifier;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
@@ -45,6 +44,7 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConver
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
+import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;

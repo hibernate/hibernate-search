@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.testsupport.textbuilder;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 
 /**
  * Tests WordDictionary and WordInventor,

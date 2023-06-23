@@ -10,8 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.search.backend.elasticsearch.metamodel.ElasticsearchIndexDescriptor;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
+import org.hibernate.search.backend.elasticsearch.metamodel.ElasticsearchIndexDescriptor;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.index.IndexManager;

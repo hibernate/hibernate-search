@@ -10,8 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.engine.common.timing.Deadline;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingStrategy;
 
 public final class PojoMultiLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {

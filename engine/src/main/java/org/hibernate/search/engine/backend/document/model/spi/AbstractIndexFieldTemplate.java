@@ -11,7 +11,6 @@ import org.hibernate.search.engine.backend.common.spi.FieldPaths.RelativizedPath
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
-
 public abstract class AbstractIndexFieldTemplate<
 				M extends AbstractIndexModel<?, ?, F>,
 				F extends IndexField<?, C>,

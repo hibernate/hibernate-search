@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.model.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.annotation.Annotation;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 

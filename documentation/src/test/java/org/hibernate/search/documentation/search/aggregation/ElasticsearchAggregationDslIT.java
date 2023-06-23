@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.sql.Date;
 import java.util.function.Consumer;
+
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;

@@ -10,8 +10,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
-
-
 public abstract class AbstractTypeOrdering<T> {
 
 	protected AbstractTypeOrdering() {

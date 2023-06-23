@@ -13,12 +13,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.java.modules.pojo.standalone.elasticsearch.entity.Author;
-import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
+import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 
 public class AuthorService implements AutoCloseable {
 

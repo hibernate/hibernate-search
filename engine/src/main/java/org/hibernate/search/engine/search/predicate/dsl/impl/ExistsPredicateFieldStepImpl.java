@@ -14,7 +14,6 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslCo
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 
-
 public final class ExistsPredicateFieldStepImpl
 		extends AbstractPredicateFinalStep
 		implements ExistsPredicateFieldStep<ExistsPredicateOptionsStep<?>>,

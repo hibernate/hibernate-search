@@ -10,8 +10,8 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.query.impl.MappedTypeNameQuery;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.MappedTypeNameQuery;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;

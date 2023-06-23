@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Set;
+
 import org.hibernate.search.engine.search.common.BooleanOperator;
 
 /**

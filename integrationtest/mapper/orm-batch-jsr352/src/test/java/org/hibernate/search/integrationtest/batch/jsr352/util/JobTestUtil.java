@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Properties;
+
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;

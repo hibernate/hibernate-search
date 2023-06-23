@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.search.query.dsl;
 
-
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;

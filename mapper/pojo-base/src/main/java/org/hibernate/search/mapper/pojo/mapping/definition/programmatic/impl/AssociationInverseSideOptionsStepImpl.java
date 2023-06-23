@@ -13,8 +13,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
-
-
 class AssociationInverseSideOptionsStepImpl
 		extends DelegatingPropertyMappingStep
 		implements AssociationInverseSideOptionsStep, PojoPropertyMetadataContributor {

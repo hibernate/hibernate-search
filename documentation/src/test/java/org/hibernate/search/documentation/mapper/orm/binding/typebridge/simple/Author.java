@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.binding.typebridge.simple;
 
 import java.time.LocalDate;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;

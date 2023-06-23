@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.function.Consumer;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 

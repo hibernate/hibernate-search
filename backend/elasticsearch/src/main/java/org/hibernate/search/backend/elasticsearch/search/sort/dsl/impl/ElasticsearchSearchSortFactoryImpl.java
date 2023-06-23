@@ -17,7 +17,6 @@ import org.hibernate.search.engine.search.sort.dsl.spi.StaticSortThenStep;
 
 import com.google.gson.JsonObject;
 
-
 public class ElasticsearchSearchSortFactoryImpl
 		extends AbstractSearchSortFactory<
 						ElasticsearchSearchSortFactory,

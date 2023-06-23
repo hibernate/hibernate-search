@@ -14,7 +14,6 @@ import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneLocalDateFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
 
-
 class LuceneLocalDateIndexFieldTypeOptionsStep
 		extends AbstractLuceneTemporalIndexFieldTypeOptionsStep<LuceneLocalDateIndexFieldTypeOptionsStep, LocalDate> {
 

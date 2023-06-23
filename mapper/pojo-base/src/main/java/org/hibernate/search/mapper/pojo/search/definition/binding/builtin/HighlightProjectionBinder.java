@@ -22,7 +22,6 @@ import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBind
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
-
 /**
  * Binds a constructor parameter to a projection to highlights,
  * i.e. sequences of text that matched the query, extracted from the given field's value.

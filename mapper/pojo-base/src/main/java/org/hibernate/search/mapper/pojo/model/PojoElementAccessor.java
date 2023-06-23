@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.model;
 
-
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**

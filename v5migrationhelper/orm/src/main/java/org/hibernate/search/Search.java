@@ -6,11 +6,12 @@
  */
 package org.hibernate.search;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.Session;
 import org.hibernate.search.impl.ImplementationFactory;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
 
 /**
  * Helper class to get a {@code FullTextSession} from a regular ORM session.

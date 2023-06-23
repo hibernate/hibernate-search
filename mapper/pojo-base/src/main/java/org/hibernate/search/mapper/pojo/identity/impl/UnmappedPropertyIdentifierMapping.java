@@ -17,7 +17,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
-
 public final class UnmappedPropertyIdentifierMapping<I, E> implements IdentifierMappingImplementor<I, E> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

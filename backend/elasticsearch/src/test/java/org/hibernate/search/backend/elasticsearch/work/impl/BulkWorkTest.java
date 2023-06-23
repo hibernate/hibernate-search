@@ -33,6 +33,7 @@ import org.junit.Test;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
 import org.apache.http.HttpHost;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;

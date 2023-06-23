@@ -9,6 +9,7 @@ package org.hibernate.search.test.engine.indexapi;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;

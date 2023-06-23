@@ -13,7 +13,6 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 
-
 abstract class AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S extends AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<?, F>, F>
 		extends AbstractElasticsearchStandardIndexFieldTypeOptionsStep<S, F> {
 

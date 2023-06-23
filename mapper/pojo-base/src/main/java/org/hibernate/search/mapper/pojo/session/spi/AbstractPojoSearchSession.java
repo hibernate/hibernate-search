@@ -16,7 +16,6 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeSessionContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
-
 public abstract class AbstractPojoSearchSession implements PojoWorkSessionContext, PojoScopeSessionContext {
 
 	private final PojoSearchSessionMappingContext mappingContext;

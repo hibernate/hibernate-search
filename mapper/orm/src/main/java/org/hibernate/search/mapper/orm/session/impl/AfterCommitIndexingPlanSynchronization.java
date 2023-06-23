@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.session.impl;
 
 import java.lang.invoke.MethodHandles;
+
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 

@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 import java.util.Map;
+
 import javax.batch.api.partition.AbstractPartitionAnalyzer;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;

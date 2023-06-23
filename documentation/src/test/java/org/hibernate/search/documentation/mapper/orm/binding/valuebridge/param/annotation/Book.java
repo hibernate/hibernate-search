@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.mapper.orm.binding.valuebridge.param.
 import java.time.Year;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

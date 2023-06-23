@@ -6,11 +6,12 @@
  */
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.Query;
 import org.hibernate.search.query.dsl.SpatialContext;
 import org.hibernate.search.query.dsl.SpatialMatchingContext;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.query.dsl.WithinContext;
+
+import org.apache.lucene.search.Query;
 
 /**
  * @author Emmanuel Bernard

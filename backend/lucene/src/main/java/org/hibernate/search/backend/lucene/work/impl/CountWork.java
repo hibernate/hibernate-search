@@ -14,7 +14,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.IndexSearcher;
 
-
 public class CountWork implements ReadWork<Integer> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

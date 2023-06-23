@@ -8,9 +8,9 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.index.impl;
 
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 
 import com.google.gson.GsonBuilder;
 

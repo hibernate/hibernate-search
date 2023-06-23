@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.documentation.search.converter;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import java.util.stream.Stream;
+
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.EntityManagerFactory;

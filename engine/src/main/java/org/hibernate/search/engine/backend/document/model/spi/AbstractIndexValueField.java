@@ -14,7 +14,6 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementCon
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldContext;
 
-
 public abstract class AbstractIndexValueField<
 				S extends AbstractIndexValueField<S, SC, FT, C, F>,
 				SC extends SearchIndexScope<?>,

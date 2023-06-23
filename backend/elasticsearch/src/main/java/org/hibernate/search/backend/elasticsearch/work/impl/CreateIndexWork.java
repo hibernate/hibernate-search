@@ -21,7 +21,6 @@ import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexRe
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-
 public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> {
 
 	private static final String MAPPINGS_PROPERTY = "mappings";

@@ -11,7 +11,6 @@ import org.hibernate.search.util.common.impl.Contracts;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-
 /**
  * A {@link JsonAccessor} that ensures the accessed object is a {@link JsonObject}.
  *

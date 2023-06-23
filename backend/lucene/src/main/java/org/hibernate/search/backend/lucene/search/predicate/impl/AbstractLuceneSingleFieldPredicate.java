@@ -9,8 +9,8 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexNodeContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 
 public abstract class AbstractLuceneSingleFieldPredicate extends AbstractLuceneNestablePredicate {
 

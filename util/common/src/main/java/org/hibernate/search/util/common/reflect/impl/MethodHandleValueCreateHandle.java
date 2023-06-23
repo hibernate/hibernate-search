@@ -15,7 +15,6 @@ import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 
-
 public final class MethodHandleValueCreateHandle<T> implements ValueCreateHandle<T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

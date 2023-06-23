@@ -10,9 +10,9 @@ import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldReference;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexCompositeNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueField;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexCompositeNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;

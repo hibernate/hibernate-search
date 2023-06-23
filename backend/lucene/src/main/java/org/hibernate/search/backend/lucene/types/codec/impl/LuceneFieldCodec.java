@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-
 import org.apache.lucene.index.IndexableField;
 
 /**

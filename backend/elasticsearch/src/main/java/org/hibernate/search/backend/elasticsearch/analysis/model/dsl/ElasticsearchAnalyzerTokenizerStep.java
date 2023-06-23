@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.analysis.model.dsl;
 
-
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 
 /**

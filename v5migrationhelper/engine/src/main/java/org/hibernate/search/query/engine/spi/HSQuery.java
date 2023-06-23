@@ -10,12 +10,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.lucene.search.Explanation;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Sort;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.spatial.Coordinates;
+
+import org.apache.lucene.search.Explanation;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
 
 /**
  * Defines and executes an Hibernate Search query (wrapping a Lucene query).

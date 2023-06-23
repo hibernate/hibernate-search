@@ -18,8 +18,6 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
-
-
 class IndexingDependencyOptionsStepImpl
 		extends DelegatingPropertyMappingStep
 		implements IndexingDependencyOptionsStep, PojoPropertyMetadataContributor {

@@ -14,15 +14,16 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import javax.persistence.OptimisticLockException;
 
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentReference;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.ToStringTreeMultilineFormatter;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;

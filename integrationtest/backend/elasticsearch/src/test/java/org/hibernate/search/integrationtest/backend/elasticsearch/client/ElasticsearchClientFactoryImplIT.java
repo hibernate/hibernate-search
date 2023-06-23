@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
 import javax.net.ssl.SSLContext;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
@@ -86,6 +87,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.config.RegistryBuilder;

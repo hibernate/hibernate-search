@@ -6,12 +6,11 @@
  */
 package org.hibernate.search.test.query.facet;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
-import org.apache.lucene.search.Query;
-
 import org.hibernate.Session;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
@@ -20,7 +19,7 @@ import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import static org.junit.Assert.assertEquals;
+import org.apache.lucene.search.Query;
 
 /**
  * @author Hardy Ferentschik

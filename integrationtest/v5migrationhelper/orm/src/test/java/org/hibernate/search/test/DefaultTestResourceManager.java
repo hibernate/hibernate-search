@@ -7,6 +7,7 @@
 package org.hibernate.search.test;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,6 +19,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -33,8 +35,6 @@ import org.hibernate.search.test.testsupport.V5MigrationHelperOrmSetupHelper;
 import org.hibernate.search.test.util.TestConfiguration;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
-import java.util.Set;
 
 /**
  * Manages bootstrap and teardown of an Hibernate SessionFactory for purposes of

@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl;
 
 import java.time.Instant;
 import java.util.UUID;
+
 import javax.persistence.Transient;
 
 public class Agent {

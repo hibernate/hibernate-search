@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.analysis;
 
-import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
+import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;

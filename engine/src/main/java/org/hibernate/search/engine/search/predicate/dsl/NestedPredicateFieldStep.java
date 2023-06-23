@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl;
 
-
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 
 /**

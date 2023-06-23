@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl;
 
+import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBinder;
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.LatitudeLongitudeMarkerBinder;
-import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 
 public class LatitudeMarker {
 

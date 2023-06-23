@@ -11,13 +11,13 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocum
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContextExtension;
+import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContextExtension;
 
 /**
  * A single implementation for all the bridge context interfaces that rely on the session context.

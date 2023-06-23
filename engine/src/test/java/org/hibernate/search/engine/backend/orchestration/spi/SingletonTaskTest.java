@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.backend.orchestration.spi;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -21,8 +23,6 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.Test;
 
 import org.awaitility.Awaitility;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @TestForIssue(jiraKey = "HSEARCH-4363")
 public class SingletonTaskTest {

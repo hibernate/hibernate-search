@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.Query;
-
 import org.hibernate.search.backend.lucene.search.spi.LuceneMigrationUtils;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -15,6 +13,8 @@ import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateOp
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.query.dsl.SpatialTermination;
 import org.hibernate.search.spatial.Coordinates;
+
+import org.apache.lucene.search.Query;
 
 /**
  * @author Emmanuel Bernard

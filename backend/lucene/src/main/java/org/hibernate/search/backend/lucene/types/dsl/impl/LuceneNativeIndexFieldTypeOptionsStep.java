@@ -7,12 +7,11 @@
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
-import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
-
+import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 
 class LuceneNativeIndexFieldTypeOptionsStep<F>
 		extends AbstractLuceneIndexFieldTypeOptionsStep<LuceneNativeIndexFieldTypeOptionsStep<F>, F> {

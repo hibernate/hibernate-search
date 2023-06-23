@@ -6,15 +6,16 @@
  */
 package org.hibernate.search.test.query.timeout;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
 import javax.persistence.QueryTimeoutException;
-
-import org.apache.lucene.search.Query;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
@@ -24,10 +25,10 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.jpa.JPATestCase;
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.query.SlowQuery;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
+import org.junit.Before;
+import org.junit.Test;
+
+import org.apache.lucene.search.Query;
 
 /**
  * @author Emmanuel Bernard

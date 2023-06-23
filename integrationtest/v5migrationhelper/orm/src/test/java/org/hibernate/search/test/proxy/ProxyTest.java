@@ -11,10 +11,9 @@ import java.util.Set;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.test.SearchTestBase;
-import org.junit.Test;
 
+import org.junit.Test;
 
 /**
  * @author Hardy Ferentschik

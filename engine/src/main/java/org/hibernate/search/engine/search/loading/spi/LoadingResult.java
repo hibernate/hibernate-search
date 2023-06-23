@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.search.loading.spi;
 
-
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.common.EntityReference;
 

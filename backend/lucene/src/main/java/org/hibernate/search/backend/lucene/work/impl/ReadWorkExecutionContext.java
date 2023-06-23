@@ -11,7 +11,6 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.search.IndexSearcher;
 
-
 public interface ReadWorkExecutionContext {
 
 	IndexSearcher createSearcher();

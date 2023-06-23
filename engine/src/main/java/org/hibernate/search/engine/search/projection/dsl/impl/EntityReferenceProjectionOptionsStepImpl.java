@@ -10,7 +10,6 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.EntityReferenceProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 
-
 public final class EntityReferenceProjectionOptionsStepImpl<R>
 		implements EntityReferenceProjectionOptionsStep<EntityReferenceProjectionOptionsStepImpl<R>, R> {
 

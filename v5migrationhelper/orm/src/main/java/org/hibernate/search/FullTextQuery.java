@@ -13,8 +13,6 @@ import java.util.function.Function;
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 
-import org.apache.lucene.search.Sort;
-
 import org.hibernate.Session;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
@@ -30,6 +28,8 @@ import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.transform.ResultTransformer;
+
+import org.apache.lucene.search.Sort;
 
 /**
  * The base interface for full-text queries using the Hibernate ORM API ({@link org.hibernate.query.Query}).

@@ -18,13 +18,13 @@ import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInne
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorIdentifier;
 import org.hibernate.search.mapper.pojo.model.path.spi.ProjectionConstructorPath;
+import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorIdentifier;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 public final class PojoConstructorProjectionDefinition<T>

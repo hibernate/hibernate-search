@@ -51,7 +51,6 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.index.IndexOptions;
 
-
 class LuceneStringIndexFieldTypeOptionsStep
 		extends AbstractLuceneStandardIndexFieldTypeOptionsStep<LuceneStringIndexFieldTypeOptionsStep, String>
 		implements StringIndexFieldTypeOptionsStep<LuceneStringIndexFieldTypeOptionsStep> {

@@ -7,7 +7,9 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCompositeNodeSearchQueryElementFactory;
@@ -15,17 +17,14 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-
-import com.google.gson.JsonObject;
-import java.util.LinkedHashMap;
-import java.util.Optional;
-
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.definition.PredicateDefinitionContext;
 import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
+import org.hibernate.search.engine.search.predicate.definition.PredicateDefinitionContext;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+
+import com.google.gson.JsonObject;
 
 public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFieldPredicate {
 

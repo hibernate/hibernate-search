@@ -7,8 +7,8 @@
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoTypeIndexingDependencyConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 

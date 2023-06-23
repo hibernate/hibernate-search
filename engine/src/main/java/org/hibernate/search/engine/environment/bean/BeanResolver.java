@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.environment.bean;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

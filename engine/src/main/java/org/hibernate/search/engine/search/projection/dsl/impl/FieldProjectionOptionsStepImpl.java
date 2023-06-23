@@ -11,7 +11,6 @@ import org.hibernate.search.engine.search.projection.dsl.FieldProjectionOptionsS
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 
-
 public class FieldProjectionOptionsStepImpl<T, P>
 		implements FieldProjectionOptionsStep<FieldProjectionOptionsStepImpl<T, P>, P> {
 

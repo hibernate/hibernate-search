@@ -6,17 +6,18 @@
  */
 package org.hibernate.search.test.jpa;
 
-import org.apache.lucene.document.IntPoint;
-import org.apache.lucene.search.Query;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
+
+import org.apache.lucene.document.IntPoint;
+import org.apache.lucene.search.Query;
 
 /**
  * @author Emmanuel Bernard

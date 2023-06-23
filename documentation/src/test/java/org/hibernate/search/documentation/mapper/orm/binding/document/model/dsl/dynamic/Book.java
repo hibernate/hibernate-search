@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.mapper.orm.binding.document.model.dsl
 import java.io.Serializable;
 import java.util.Map;
 import java.util.TreeMap;
+
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;

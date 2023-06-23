@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.automaticindexing;
 
-
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.cfg.spi.ParseUtils;

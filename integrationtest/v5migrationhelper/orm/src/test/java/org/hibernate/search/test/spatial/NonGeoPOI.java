@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.test.spatial;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
 
 /**
  * Hibernate Search spatial : Non Geo enabled Point Of Interest test entity

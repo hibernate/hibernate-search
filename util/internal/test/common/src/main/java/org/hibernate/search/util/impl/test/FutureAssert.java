@@ -20,7 +20,6 @@ import java.util.function.Consumer;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractThrowableAssert;
 
-
 public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Future<T>> {
 
 	public static <T> FutureAssert<T> assertThatFuture(Future<T> future) {

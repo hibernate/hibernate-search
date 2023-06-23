@@ -14,7 +14,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.IndexSearcher;
 
-
 public class ScrollWork<ER> implements ReadWork<ER> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

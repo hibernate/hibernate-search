@@ -6,8 +6,8 @@
  */
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;

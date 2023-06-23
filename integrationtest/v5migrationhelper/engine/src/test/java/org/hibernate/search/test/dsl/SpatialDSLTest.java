@@ -6,16 +6,18 @@
  */
 package org.hibernate.search.test.dsl;
 
-import org.apache.lucene.search.Query;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.apache.lucene.search.Query;
 
 /**
  * @author Emmanuel Bernard

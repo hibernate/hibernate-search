@@ -11,7 +11,6 @@ import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingKeywordFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
-
 class PropertyMappingKeywordFieldOptionsStepImpl
 		extends AbstractPropertyMappingNonFullTextStandardFieldOptionsStep<PropertyMappingKeywordFieldOptionsStep>
 		implements PropertyMappingKeywordFieldOptionsStep {

@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.session.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.function.Function;
+
 import javax.transaction.Synchronization;
 
 import org.hibernate.Transaction;

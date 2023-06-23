@@ -10,15 +10,15 @@ import static org.hibernate.search.engine.reporting.spi.EventContexts.singleton;
 
 import java.lang.annotation.Annotation;
 
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoMethodParameterModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContextMessages;
-import org.hibernate.search.util.common.reporting.impl.AbstractSimpleEventContextElement;
 import org.hibernate.search.util.common.reporting.EventContext;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.reporting.impl.AbstractSimpleEventContextElement;
 
 public final class PojoEventContexts {
 

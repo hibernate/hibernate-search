@@ -15,7 +15,6 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-
 public final class UnconfiguredIdentifierMapping<E> implements IdentifierMappingImplementor<Object, E> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

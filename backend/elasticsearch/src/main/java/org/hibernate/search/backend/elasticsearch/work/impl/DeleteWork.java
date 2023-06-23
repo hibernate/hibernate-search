@@ -10,7 +10,6 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
 import com.google.gson.JsonObject;
 
-
 public class DeleteWork extends AbstractSingleDocumentIndexingWork {
 
 	private static final ElasticsearchRequestSuccessAssessor SUCCESS_ASSESSOR =

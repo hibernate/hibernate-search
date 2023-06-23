@@ -7,12 +7,12 @@
 
 package org.hibernate.search.test.util.progessmonitor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.concurrent.atomic.LongAdder;
 
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.test.batchindexing.TracingProgressMonitor;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Hardy Ferentschik

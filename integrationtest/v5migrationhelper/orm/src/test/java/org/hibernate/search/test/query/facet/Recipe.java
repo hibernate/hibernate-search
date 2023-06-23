@@ -9,6 +9,7 @@ package org.hibernate.search.test.query.facet;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;

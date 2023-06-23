@@ -8,9 +8,9 @@ package org.hibernate.search.test.embedded;
 
 import javax.persistence.Embeddable;
 
+import org.hibernate.annotations.Parent;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.annotations.Parent;
 
 /**
  * @author Emmanuel Bernard

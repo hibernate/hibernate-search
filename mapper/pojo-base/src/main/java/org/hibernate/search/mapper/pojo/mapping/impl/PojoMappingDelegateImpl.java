@@ -41,7 +41,6 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessin
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
-
 public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 
 	private final ThreadPoolProvider threadPoolProvider;

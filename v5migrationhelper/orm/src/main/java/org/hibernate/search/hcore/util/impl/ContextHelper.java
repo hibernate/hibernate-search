@@ -10,8 +10,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.impl.V5MigrationOrmSearchIntegratorAdapter;
+import org.hibernate.search.mapper.orm.Search;
 
 /**
  * Static helper class to retrieve the instance of the current {@code SearchIntegrator} / {@code ExtendedSearchIntegrator}.

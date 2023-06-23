@@ -11,7 +11,6 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.DocumentReferenceProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 
-
 public final class DocumentReferenceProjectionOptionsStepImpl
 		implements DocumentReferenceProjectionOptionsStep<DocumentReferenceProjectionOptionsStepImpl> {
 

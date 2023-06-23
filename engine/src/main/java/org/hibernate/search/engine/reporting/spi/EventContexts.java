@@ -11,12 +11,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.hibernate.search.util.common.reporting.impl.AbstractSimpleEventContextElement;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.reporting.impl.EngineEventContextMessages;
+import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.EventContextElement;
-import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.common.reporting.impl.AbstractSimpleEventContextElement;
 
 public class EventContexts {
 

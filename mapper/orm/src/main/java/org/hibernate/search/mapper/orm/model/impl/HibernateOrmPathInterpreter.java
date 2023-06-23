@@ -33,9 +33,9 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.path.spi.BindablePojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoModelPathBinder;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoModelPathWalker;
-import org.hibernate.search.mapper.pojo.model.path.spi.BindablePojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinition;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvider;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathEntityStateRepresentation;

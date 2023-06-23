@@ -17,13 +17,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
-import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoHCannOrmGenericContextHelper;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;

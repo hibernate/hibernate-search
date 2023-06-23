@@ -7,12 +7,13 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.FuzzyQuery;
-import org.apache.lucene.util.automaton.LevenshteinAutomata;
+import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
+
+import org.apache.lucene.search.FuzzyQuery;
+import org.apache.lucene.util.automaton.LevenshteinAutomata;
 
 /**
 * @author Emmanuel Bernard

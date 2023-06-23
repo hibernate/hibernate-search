@@ -9,10 +9,10 @@ package org.hibernate.search.mapper.pojo.session.spi;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
-import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
-import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkMappingContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 

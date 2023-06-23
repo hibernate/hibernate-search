@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.function.UnaryOperator;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 

@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.dsl;
 
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
-
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.dsl.ExtendedSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
+
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 
 /**
  * A factory for search sorts with some Lucene-specific methods.

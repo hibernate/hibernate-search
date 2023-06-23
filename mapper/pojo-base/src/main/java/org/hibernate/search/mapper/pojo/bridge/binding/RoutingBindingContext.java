@@ -7,8 +7,8 @@
 package org.hibernate.search.mapper.pojo.bridge.binding;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
+import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.dependency.PojoRoutingIndexingDependencyConfigurationContext;
 import org.hibernate.search.util.common.annotation.Incubating;
 

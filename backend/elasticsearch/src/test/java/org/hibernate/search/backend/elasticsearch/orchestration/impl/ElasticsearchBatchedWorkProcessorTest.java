@@ -26,7 +26,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
-
 public class ElasticsearchBatchedWorkProcessorTest {
 
 	/**

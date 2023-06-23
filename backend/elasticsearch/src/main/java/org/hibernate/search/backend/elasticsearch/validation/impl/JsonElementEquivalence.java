@@ -14,7 +14,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-
 /**
  * Determines whether two {@link JsonElement}s should be considered equivalent.
  *

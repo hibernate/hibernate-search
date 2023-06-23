@@ -19,11 +19,11 @@ import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.Elasti
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
+import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.SearchResultTotal;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
-import org.hibernate.search.engine.common.timing.Deadline;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

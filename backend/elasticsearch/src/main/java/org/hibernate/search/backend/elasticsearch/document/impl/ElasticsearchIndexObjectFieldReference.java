@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.document.impl;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexObjectField;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 
-
 public class ElasticsearchIndexObjectFieldReference implements IndexObjectFieldReference {
 
 	private ElasticsearchIndexObjectField schemaNode;

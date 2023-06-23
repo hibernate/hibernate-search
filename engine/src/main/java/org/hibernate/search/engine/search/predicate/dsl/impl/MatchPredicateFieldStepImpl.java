@@ -8,10 +8,9 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 
 import java.util.Arrays;
 
-import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldMoreStep;
+import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
-
 
 public final class MatchPredicateFieldStepImpl implements MatchPredicateFieldStep<MatchPredicateFieldMoreStep<?, ?>> {
 

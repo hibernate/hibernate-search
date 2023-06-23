@@ -17,7 +17,6 @@ import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBind
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingMultiContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-
 /**
  * Binds a constructor parameter to an object projection bound to a specific object field in the indexed document.
  * <p>

@@ -8,8 +8,8 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 
 import java.util.Arrays;
 
-import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldMoreStep;
+import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 public final class RangePredicateFieldStepImpl implements RangePredicateFieldStep<RangePredicateFieldMoreStep<?, ?>> {

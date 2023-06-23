@@ -15,7 +15,6 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.StaticPredicateFinal
 
 import org.apache.lucene.search.Query;
 
-
 public class LuceneSearchPredicateFactoryImpl
 		extends AbstractSearchPredicateFactory<
 						LuceneSearchPredicateFactory,

@@ -16,7 +16,6 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-
 public class PutIndexMappingWork extends AbstractNonBulkableWork<Void> {
 
 	protected PutIndexMappingWork(Builder builder) {

@@ -15,17 +15,17 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOrchestrator;
-import org.hibernate.search.backend.lucene.work.impl.SingleDocumentIndexingWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
+import org.hibernate.search.backend.lucene.work.impl.SingleDocumentIndexingWork;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
-import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 
 public class LuceneIndexIndexingPlan implements IndexIndexingPlan {
 

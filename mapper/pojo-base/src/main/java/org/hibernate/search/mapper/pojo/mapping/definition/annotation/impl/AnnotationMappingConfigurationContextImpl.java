@@ -30,9 +30,9 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationCont
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.util.common.jar.spi.JandexBehavior;
 import org.hibernate.search.util.common.jar.impl.JandexUtils;
 import org.hibernate.search.util.common.jar.impl.JarUtils;
+import org.hibernate.search.util.common.jar.spi.JandexBehavior;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 

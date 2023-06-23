@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.showcase.library.model;
 
 import java.util.StringJoiner;
+
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;

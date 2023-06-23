@@ -15,9 +15,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.Query;
-
 import org.hibernate.Hibernate;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Transaction;
@@ -30,8 +27,12 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.stat.Statistics;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.Query;
 
 /**
  * @author Emmanuel Bernard

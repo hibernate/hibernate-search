@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Arrays;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 

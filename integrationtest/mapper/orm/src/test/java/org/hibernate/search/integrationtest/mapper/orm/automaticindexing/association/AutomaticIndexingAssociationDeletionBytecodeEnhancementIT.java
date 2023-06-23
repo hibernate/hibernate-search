@@ -16,6 +16,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.hibernate.testing.bytecode.enhancement.BytecodeEnhancerRunner;
 import org.hibernate.testing.bytecode.enhancement.EnhancementOptions;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

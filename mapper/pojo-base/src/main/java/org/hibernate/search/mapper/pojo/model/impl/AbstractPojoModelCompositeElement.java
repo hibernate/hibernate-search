@@ -14,8 +14,8 @@ import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.PojoModelCompositeElement;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
+import org.hibernate.search.mapper.pojo.model.PojoModelCompositeElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;

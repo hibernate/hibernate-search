@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.backend.elasticsearch.client;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;

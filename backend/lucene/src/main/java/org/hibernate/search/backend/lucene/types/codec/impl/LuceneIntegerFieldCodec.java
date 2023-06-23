@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import org.apache.lucene.document.StoredField;
-import org.apache.lucene.index.IndexableField;
-
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneIntegerDomain;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
+
+import org.apache.lucene.document.StoredField;
+import org.apache.lucene.index.IndexableField;
 
 public final class LuceneIntegerFieldCodec extends AbstractLuceneNumericFieldCodec<Integer, Integer> {
 

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.multipletypes;
 
-
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;

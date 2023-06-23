@@ -10,7 +10,6 @@ import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.Luce
 
 import org.apache.lucene.search.SortField;
 
-
 /**
  * A sort collector for Lucene, using {@link SortField} to represent sorts.
  * <p>

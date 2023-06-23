@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.mu
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 @Indexed(index = Hierarchy2_A__NonAbstract_Indexed.NAME)

@@ -10,9 +10,9 @@ import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldReference;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueField;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;

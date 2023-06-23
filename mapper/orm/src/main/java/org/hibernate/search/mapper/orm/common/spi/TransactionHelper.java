@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.common.spi;
 
 import java.lang.invoke.MethodHandles;
 import java.util.function.Supplier;
+
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;

@@ -13,9 +13,9 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.loading.impl.LoadingMappingContext;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
+import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionMappingContext;
 import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanFilter;
 import org.hibernate.search.mapper.pojo.work.spi.ConfiguredSearchIndexingPlanFilter;
-import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionMappingContext;
 
 public interface HibernateOrmSearchSessionMappingContext
 		extends PojoSearchSessionMappingContext, LoadingMappingContext {

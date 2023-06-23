@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.java.modules.orm.lucene.service;
 
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

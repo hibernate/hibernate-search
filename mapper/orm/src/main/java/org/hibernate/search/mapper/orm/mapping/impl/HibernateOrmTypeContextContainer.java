@@ -15,10 +15,10 @@ import java.util.Map;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.automaticindexing.impl.AutomaticIndexingTypeContextProvider;
+import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContextProvider;
 import org.hibernate.search.mapper.orm.loading.impl.LoadingIndexedTypeContextProvider;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
-import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContextProvider;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRawTypeIdentifierResolver;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.orm.spi.BatchTypeIdentifierProvider;

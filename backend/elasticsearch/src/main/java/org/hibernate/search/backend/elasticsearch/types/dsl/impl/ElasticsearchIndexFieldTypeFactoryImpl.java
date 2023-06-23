@@ -36,8 +36,6 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.Gson;
 
-
-
 public class ElasticsearchIndexFieldTypeFactoryImpl
 		implements ElasticsearchIndexFieldTypeFactory, ElasticsearchIndexFieldTypeBuildContext {
 

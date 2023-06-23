@@ -13,8 +13,8 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.common.annotation.Param;
-import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBinder;
+import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext;
 
 /**
  * References a {@link ProjectionBinder}.

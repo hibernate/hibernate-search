@@ -9,11 +9,11 @@ package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.impl.StandalonePojoEntityTypeMetadata;
 import org.hibernate.search.mapper.pojo.standalone.scope.impl.StandalonePojoScopeIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSessionIndexedTypeContext;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 class StandalonePojoIndexedTypeContext<E> extends AbstractStandalonePojoTypeContext<E>
 		implements ProjectionMappedTypeContext,

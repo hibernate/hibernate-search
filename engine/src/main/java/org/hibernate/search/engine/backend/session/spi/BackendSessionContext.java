@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.backend.session.spi;
 
-
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 
 /**

@@ -44,8 +44,8 @@ import org.hibernate.search.engine.backend.mapping.spi.BackendMapperContext;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -59,7 +59,6 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-
 
 class ElasticsearchBackendImpl implements BackendImplementor,
 		ElasticsearchBackend {

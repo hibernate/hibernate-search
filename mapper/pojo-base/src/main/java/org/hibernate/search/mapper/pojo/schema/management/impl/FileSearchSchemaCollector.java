@@ -15,9 +15,9 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.common.schema.management.SchemaExport;
-import org.hibernate.search.mapper.pojo.schema.management.SearchSchemaCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.schema.management.SearchSchemaCollector;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class FileSearchSchemaCollector implements SearchSchemaCollector {

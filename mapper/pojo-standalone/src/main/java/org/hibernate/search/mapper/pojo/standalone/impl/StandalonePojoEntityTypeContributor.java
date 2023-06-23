@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.impl;
 
-import org.hibernate.search.mapper.pojo.standalone.model.impl.StandalonePojoPathsDefinition;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.standalone.model.impl.StandalonePojoPathsDefinition;
 
 class StandalonePojoEntityTypeContributor implements PojoTypeMetadataContributor {
 

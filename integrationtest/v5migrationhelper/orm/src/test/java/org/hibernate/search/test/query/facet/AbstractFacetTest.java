@@ -6,23 +6,23 @@
  */
 package org.hibernate.search.test.query.facet;
 
-import java.util.List;
+import static org.junit.Assert.assertEquals;
 
-import org.apache.lucene.search.Query;
+import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.test.SearchTestBase;
+
 import org.junit.After;
 import org.junit.Before;
 
-import static org.junit.Assert.assertEquals;
+import org.apache.lucene.search.Query;
 
 /**
  * @author Hardy Ferentschik

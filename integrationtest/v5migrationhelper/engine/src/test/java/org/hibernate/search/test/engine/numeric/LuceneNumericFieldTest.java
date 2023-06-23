@@ -13,8 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -26,10 +24,14 @@ import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexableField;
 
 @Category(SkipOnElasticsearch.class) // This test is Lucene-specific. The generic equivalent is NumericFieldTest.
 public class LuceneNumericFieldTest {

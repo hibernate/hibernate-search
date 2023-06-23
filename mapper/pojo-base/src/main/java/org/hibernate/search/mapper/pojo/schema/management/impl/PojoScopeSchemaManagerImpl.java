@@ -16,10 +16,10 @@ import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaColl
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.common.schema.management.SchemaExport;
-import org.hibernate.search.mapper.pojo.schema.management.SearchSchemaCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
+import org.hibernate.search.mapper.pojo.schema.management.SearchSchemaCollector;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.util.common.function.TriFunction;
 import org.hibernate.search.util.common.impl.Futures;

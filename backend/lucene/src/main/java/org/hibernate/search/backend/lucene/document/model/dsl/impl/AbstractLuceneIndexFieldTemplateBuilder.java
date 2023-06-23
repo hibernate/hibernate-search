@@ -8,9 +8,9 @@ package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexField;
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexFieldTemplate;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexField;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;

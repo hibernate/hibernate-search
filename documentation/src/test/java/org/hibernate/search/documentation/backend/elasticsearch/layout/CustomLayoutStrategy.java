@@ -7,7 +7,6 @@
 package org.hibernate.search.documentation.backend.elasticsearch.layout;
 
 // tag::include[]
-
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;

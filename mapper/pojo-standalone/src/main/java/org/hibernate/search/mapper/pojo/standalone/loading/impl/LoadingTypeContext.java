@@ -8,9 +8,9 @@ package org.hibernate.search.mapper.pojo.standalone.loading.impl;
 
 import java.util.Optional;
 
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface LoadingTypeContext<E> {
 

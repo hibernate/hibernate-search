@@ -14,12 +14,12 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.integrationtest.showcase.library.model.Account;
+import org.hibernate.search.integrationtest.showcase.library.model.Borrowal;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
-import org.hibernate.search.integrationtest.showcase.library.model.Account;
-import org.hibernate.search.integrationtest.showcase.library.model.Borrowal;
 
 /**
  * Create a summary of borrowals for a given user:

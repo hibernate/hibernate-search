@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.document.impl;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectField;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 
-
 public class LuceneIndexObjectFieldReference implements IndexObjectFieldReference {
 
 	private LuceneIndexObjectField schemaNode;

@@ -11,8 +11,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.lucene.document.DateTools;
-import org.apache.lucene.search.Query;
 import org.hibernate.search.annotations.CalendarBridge;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
@@ -22,9 +20,13 @@ import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.apache.lucene.document.DateTools;
+import org.apache.lucene.search.Query;
 
 /**
  * @author Davide D'Alto

@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 
 /**
  * A wrapper around {@link MappedIndexScope} providing some syntactic sugar,

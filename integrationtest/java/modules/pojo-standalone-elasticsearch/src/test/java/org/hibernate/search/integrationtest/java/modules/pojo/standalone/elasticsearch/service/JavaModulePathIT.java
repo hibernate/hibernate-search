@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.java.modules.pojo.standalone.elasticsearch.service;
 
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

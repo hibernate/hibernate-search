@@ -11,8 +11,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.hibernate.MappingException;
 import org.hibernate.boot.Metadata;

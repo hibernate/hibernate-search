@@ -6,14 +6,12 @@
  */
 package org.hibernate.search.engine.environment.bean.impl;
 
-
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-
 
 public final class NoConfiguredBeanManagerBeanProvider implements BeanProvider {
 

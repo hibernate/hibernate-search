@@ -6,11 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
-
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexObjectField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexObjectFieldTemplate;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueFieldTemplate;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueField;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueFieldTemplate;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplate;
 
 public interface ElasticsearchIndexNodeCollector {

@@ -10,8 +10,6 @@ import java.util.List;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.engine.search.projection.dsl.HighlightProjectionOptionsStep;
-import org.hibernate.search.engine.search.projection.dsl.impl.HighlightProjectionOptionsStepImpl;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
@@ -21,6 +19,7 @@ import org.hibernate.search.engine.search.projection.dsl.EntityProjectionOptions
 import org.hibernate.search.engine.search.projection.dsl.EntityReferenceProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.ExtendedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.FieldProjectionValueStep;
+import org.hibernate.search.engine.search.projection.dsl.HighlightProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.IdProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.ScoreProjectionOptionsStep;
@@ -33,6 +32,7 @@ import org.hibernate.search.engine.search.projection.dsl.impl.DocumentReferenceP
 import org.hibernate.search.engine.search.projection.dsl.impl.EntityProjectionOptionsStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.EntityReferenceProjectionOptionsStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.FieldProjectionValueStepImpl;
+import org.hibernate.search.engine.search.projection.dsl.impl.HighlightProjectionOptionsStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.IdProjectionOptionsStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.ScoreProjectionOptionsStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.SearchProjectionFactoryExtensionStep;
@@ -40,7 +40,6 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionIndexScope;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.impl.Contracts;
-
 
 public abstract class AbstractSearchProjectionFactory<
 				S extends ExtendedSearchProjectionFactory<S, R, E>,

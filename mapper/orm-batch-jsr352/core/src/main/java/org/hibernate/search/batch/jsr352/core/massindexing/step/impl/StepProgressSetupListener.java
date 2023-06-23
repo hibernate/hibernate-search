@@ -8,6 +8,7 @@ package org.hibernate.search.batch.jsr352.core.massindexing.step.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.function.BiFunction;
+
 import javax.batch.api.BatchProperty;
 import javax.batch.api.listener.AbstractStepListener;
 import javax.batch.runtime.context.JobContext;

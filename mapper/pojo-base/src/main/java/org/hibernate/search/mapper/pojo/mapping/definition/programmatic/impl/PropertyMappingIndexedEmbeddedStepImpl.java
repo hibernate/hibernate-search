@@ -24,7 +24,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.annotation.Search5DeprecatedAPI;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-
 class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingStep
 		implements PropertyMappingIndexedEmbeddedStep, PojoPropertyMetadataContributor {
 

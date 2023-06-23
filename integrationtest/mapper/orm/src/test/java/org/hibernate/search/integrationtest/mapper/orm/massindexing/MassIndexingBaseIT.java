@@ -13,6 +13,7 @@ import static org.hibernate.search.util.common.impl.CollectionHelper.asSet;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;

@@ -10,9 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Sort;
-
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -29,9 +26,13 @@ import org.hibernate.search.testsupport.AnalysisNames;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
 
 /**
  * Test to verify we apply the right sorting strategy for non-trivial mapped entities

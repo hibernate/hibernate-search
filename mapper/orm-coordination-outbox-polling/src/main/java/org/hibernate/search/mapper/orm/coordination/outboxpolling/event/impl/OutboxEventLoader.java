@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import javax.persistence.OptimisticLockException;
 
 import org.hibernate.LockMode;
@@ -21,8 +22,8 @@ import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
-import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 final class OutboxEventLoader implements ToStringTreeAppendable {

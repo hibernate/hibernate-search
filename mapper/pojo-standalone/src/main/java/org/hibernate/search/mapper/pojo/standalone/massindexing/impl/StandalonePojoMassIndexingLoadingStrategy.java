@@ -6,21 +6,21 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.massindexing.impl;
 
+import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoader;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoader;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingEntityLoadingContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingIdentifierLoadingContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoadingStrategy;
+import org.hibernate.search.mapper.pojo.standalone.loading.MassEntitySink;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassIdentifierSink;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingOptions;
-import org.hibernate.search.mapper.pojo.standalone.loading.MassEntitySink;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
+import org.hibernate.search.mapper.pojo.standalone.loading.impl.LoadingTypeContextProvider;
+import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLoadingTypeGroup;
+import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoMassEntityLoader;
+import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoMassEntitySink;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoMassIdentifierLoader;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoMassIdentifierSink;
-import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoMassEntityLoader;
-import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLoadingTypeGroup;
-import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoMassEntitySink;
-import org.hibernate.search.mapper.pojo.standalone.loading.impl.LoadingTypeContextProvider;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoader;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoader;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingIdentifierLoadingContext;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingEntityLoadingContext;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoadingStrategy;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 public class StandalonePojoMassIndexingLoadingStrategy<E, I>

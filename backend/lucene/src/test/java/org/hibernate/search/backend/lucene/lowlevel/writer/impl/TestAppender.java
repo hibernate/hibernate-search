@@ -16,7 +16,6 @@ import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.config.Property;
 
-
 public class TestAppender extends AbstractAppender {
 
 	private final Map<String, List<String>> eventMessagesByLogger = new LinkedHashMap<>();

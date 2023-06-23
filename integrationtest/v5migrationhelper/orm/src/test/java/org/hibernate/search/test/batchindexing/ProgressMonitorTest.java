@@ -7,17 +7,16 @@
 
 package org.hibernate.search.test.batchindexing;
 
-import org.apache.lucene.search.MatchAllDocsQuery;
-
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.progessmonitor.AssertingMassIndexerProgressMonitor;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import org.apache.lucene.search.MatchAllDocsQuery;
 
 /**
  * @author Hardy Ferentschik

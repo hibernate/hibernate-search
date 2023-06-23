@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.query.dsl.impl;
 
-
 import org.hibernate.search.query.facet.RangeFacet;
 
 /**

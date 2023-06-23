@@ -22,8 +22,8 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMapping
 import org.hibernate.search.testsupport.configuration.V5MigrationHelperTestLuceneBackendConfiguration;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 
 public final class V5MigrationHelperEngineSetupHelper
 		extends MappingSetupHelper<V5MigrationHelperEngineSetupHelper.SetupContext, SearchMappingBuilder, StandalonePojoMappingConfigurationContext, CloseableSearchMapping> {

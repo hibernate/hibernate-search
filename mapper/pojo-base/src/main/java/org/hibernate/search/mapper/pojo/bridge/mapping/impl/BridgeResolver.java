@@ -88,7 +88,6 @@ import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatche
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-
 public final class BridgeResolver {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

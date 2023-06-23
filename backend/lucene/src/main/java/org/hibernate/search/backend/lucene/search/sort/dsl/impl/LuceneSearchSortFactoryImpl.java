@@ -16,7 +16,6 @@ import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
-
 public class LuceneSearchSortFactoryImpl
 		extends AbstractSearchSortFactory<
 						LuceneSearchSortFactory,

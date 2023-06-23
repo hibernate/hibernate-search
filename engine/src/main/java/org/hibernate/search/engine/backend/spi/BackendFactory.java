@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.engine.backend.spi;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.BackendSettings;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.util.common.reporting.EventContext;
-
 
 public interface BackendFactory {
 

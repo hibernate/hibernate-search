@@ -15,13 +15,14 @@ import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner.TaskFactory;
 import org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
+import org.hibernate.search.util.common.SearchException;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

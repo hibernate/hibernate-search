@@ -8,6 +8,7 @@ package org.hibernate.search.test.query.facet;
 
 import org.hibernate.Session;
 import org.hibernate.search.testsupport.TestForIssue;
+
 import org.junit.Test;
 
 public class NullValuesFacetingTest extends AbstractFacetTest {

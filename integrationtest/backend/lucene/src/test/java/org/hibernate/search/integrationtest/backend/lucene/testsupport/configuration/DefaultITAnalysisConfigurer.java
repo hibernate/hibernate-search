@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.testsupport.configuration;
 
-import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
+import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;

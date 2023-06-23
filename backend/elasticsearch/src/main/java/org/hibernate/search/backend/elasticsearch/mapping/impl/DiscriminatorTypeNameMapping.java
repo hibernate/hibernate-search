@@ -10,19 +10,19 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.ImplicitFieldContributor;
-import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchStringImplicitFieldContributor;
+import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.MetadataFields;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
-import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionRequestContext;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.MetadataFields;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.ImplicitFieldContributor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;

@@ -8,6 +8,7 @@ package org.hibernate.search.test.embedded.nested;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;

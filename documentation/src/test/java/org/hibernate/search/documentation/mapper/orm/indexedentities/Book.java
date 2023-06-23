@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.indexedentities;
 
 import java.sql.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 

@@ -13,7 +13,6 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFin
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 
-
 public final class NotPredicateFinalStepImpl extends AbstractPredicateFinalStep
 		implements NotPredicateFinalStep {
 

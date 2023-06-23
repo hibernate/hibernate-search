@@ -27,15 +27,16 @@ import org.hibernate.search.backend.lucene.work.impl.IndexingWork;
 import org.hibernate.search.backend.lucene.work.impl.IndexingWorkExecutionContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
 
 public class LuceneBatchedWorkProcessorTest {
 

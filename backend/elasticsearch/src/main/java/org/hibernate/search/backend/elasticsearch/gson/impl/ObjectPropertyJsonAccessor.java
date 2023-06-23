@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.gson.impl;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-
 class ObjectPropertyJsonAccessor extends AbstractCrawlingJsonAccessor<JsonObject> {
 	private final String propertyName;
 

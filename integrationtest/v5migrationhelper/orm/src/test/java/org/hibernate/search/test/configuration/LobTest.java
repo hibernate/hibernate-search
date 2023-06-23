@@ -6,17 +6,17 @@
  */
 package org.hibernate.search.test.configuration;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 
-import org.apache.lucene.search.Query;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.dialect.Sybase11Dialect;
 import org.hibernate.dialect.SybaseASE15Dialect;
 import org.hibernate.search.FullTextQuery;
@@ -27,10 +27,12 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+
 import org.hibernate.testing.SkipForDialect;
+
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.apache.lucene.search.Query;
 
 /**
  * Tests that a field can be mapped as {@code @Lob}.

@@ -18,7 +18,6 @@ import java.util.function.Supplier;
 
 import org.junit.Test;
 
-
 public class CloserTest {
 
 	@Test

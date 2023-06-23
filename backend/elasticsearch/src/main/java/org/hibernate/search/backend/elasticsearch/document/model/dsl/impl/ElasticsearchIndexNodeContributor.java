@@ -8,10 +8,9 @@ package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexCompositeNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexField;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
-
 
 public interface ElasticsearchIndexNodeContributor {
 

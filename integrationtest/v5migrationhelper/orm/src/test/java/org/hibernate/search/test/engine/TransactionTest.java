@@ -17,6 +17,7 @@ import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestBase;
+
 import org.junit.Test;
 
 /**

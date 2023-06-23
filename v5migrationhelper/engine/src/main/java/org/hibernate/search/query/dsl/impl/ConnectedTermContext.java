@@ -7,11 +7,12 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.Query;
 import org.hibernate.search.query.dsl.FuzzyContext;
 import org.hibernate.search.query.dsl.TermContext;
 import org.hibernate.search.query.dsl.TermMatchingContext;
 import org.hibernate.search.query.dsl.WildcardContext;
+
+import org.apache.lucene.search.Query;
 
 /**
  * @author Emmanuel Bernard

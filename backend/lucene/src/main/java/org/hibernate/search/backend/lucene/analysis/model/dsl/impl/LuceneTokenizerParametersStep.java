@@ -13,8 +13,6 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisOpti
 
 import org.apache.lucene.analysis.util.TokenizerFactory;
 
-
-
 class LuceneTokenizerParametersStep
 		extends AbstractLuceneAnalysisComponentParametersStep<TokenizerFactory> {
 

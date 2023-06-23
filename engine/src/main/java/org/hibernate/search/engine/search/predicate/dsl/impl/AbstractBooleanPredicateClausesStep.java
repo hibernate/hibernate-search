@@ -19,7 +19,6 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFin
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 
-
 abstract class AbstractBooleanPredicateClausesStep<S extends C, C extends BooleanPredicateOptionsCollector<?>>
 		extends AbstractPredicateFinalStep
 		implements GenericBooleanPredicateClausesStep<S, C> {

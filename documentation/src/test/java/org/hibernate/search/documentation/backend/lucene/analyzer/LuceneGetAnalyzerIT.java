@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.backend.lucene.analyzer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
+
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;

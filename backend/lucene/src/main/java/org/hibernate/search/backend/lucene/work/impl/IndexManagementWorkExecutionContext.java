@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.util.common.reporting.EventContext;
-
 
 public interface IndexManagementWorkExecutionContext {
 

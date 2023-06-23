@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Date;
 import java.util.Optional;
+
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
@@ -22,8 +23,8 @@ import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescrip
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 
 import org.junit.Before;

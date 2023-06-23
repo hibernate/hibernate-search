@@ -11,10 +11,10 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
-import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationRangeMoreStep;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationRangeStep;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
+import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;

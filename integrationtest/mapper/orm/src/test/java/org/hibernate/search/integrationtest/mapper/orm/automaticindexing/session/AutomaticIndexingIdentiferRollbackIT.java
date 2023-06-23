@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.sessio
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.atomic.AtomicReference;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;

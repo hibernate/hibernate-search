@@ -13,7 +13,6 @@ import org.hibernate.search.util.common.SearchException;
 
 import org.junit.Test;
 
-
 /**
  * @author Mincong Huang
  */

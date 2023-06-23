@@ -7,20 +7,20 @@
 
 package org.hibernate.search.test.embedded.fieldoncollection;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public class FieldOnCollectionReindexTest extends SearchTestBase {
 

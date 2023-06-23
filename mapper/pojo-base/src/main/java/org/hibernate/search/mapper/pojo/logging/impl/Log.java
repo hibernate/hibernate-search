@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.logging.impl;
 
-import org.hibernate.search.engine.mapper.model.spi.MappingElement;
-import org.hibernate.search.mapper.pojo.model.path.spi.ProjectionConstructorPath;
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
 
@@ -25,6 +23,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.common.EntityReference;
+import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.DerivedDependencyWalkingInfo;
 import org.hibernate.search.mapper.pojo.common.annotation.impl.SearchProcessingWithContextException;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
@@ -35,6 +34,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.path.spi.ProjectionConstructorPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;

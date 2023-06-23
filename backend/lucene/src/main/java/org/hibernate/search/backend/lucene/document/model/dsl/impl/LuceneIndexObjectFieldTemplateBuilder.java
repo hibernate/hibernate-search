@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectFieldTemplate;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectFieldTemplate;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexCompositeNodeType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;

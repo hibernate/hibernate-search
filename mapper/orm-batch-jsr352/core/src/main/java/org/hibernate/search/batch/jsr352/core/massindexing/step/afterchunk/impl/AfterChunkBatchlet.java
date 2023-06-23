@@ -9,6 +9,7 @@ package org.hibernate.search.batch.jsr352.core.massindexing.step.afterchunk.impl
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.MERGE_SEGMENTS_ON_FINISH;
 
 import java.lang.invoke.MethodHandles;
+
 import javax.batch.api.AbstractBatchlet;
 import javax.batch.api.BatchProperty;
 import javax.batch.runtime.context.JobContext;

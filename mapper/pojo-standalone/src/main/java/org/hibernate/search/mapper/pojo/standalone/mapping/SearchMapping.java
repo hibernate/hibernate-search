@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSessionBuilder;
 import org.hibernate.search.util.common.annotation.Incubating;
 
-
 /**
  * The Hibernate Search mapping between the POJO model and the backend(s).
  * <p>

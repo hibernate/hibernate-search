@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.binding.propertybridge.sim
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

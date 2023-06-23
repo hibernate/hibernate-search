@@ -11,7 +11,6 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
-
 public class OpenIndexWork extends AbstractNonBulkableWork<Void> {
 
 	protected OpenIndexWork(Builder builder) {

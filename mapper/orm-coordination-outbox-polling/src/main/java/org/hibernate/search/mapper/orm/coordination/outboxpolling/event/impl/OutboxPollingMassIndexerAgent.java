@@ -27,8 +27,8 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.L
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentStartContext;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.spi.ToStringTreeAppendable;
 import org.hibernate.search.util.common.spi.ToStringTreeAppender;
 
 public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent, ToStringTreeAppendable {

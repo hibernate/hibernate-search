@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing.spi;
 
-import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoader;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoader;
 
 /**
  * A strategy for entity loading during mass indexing.

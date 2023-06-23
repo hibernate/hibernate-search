@@ -9,10 +9,10 @@ package org.hibernate.search.backend.elasticsearch.mapping.impl;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.ImplicitFieldContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.ImplicitFieldContributor;
 
 /**
  * Regroups behavior related to how type names are assigned to index documents.

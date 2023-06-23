@@ -12,7 +12,6 @@ import org.hibernate.search.engine.search.predicate.dsl.RegexpPredicateFieldMore
 import org.hibernate.search.engine.search.predicate.dsl.RegexpPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
-
 public final class RegexpPredicateFieldStepImpl
 		implements RegexpPredicateFieldStep<RegexpPredicateFieldMoreStep<?, ?>> {
 

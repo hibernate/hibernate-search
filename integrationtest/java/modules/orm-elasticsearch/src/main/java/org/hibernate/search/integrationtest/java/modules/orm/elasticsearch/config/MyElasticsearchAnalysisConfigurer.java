@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.java.modules.orm.elasticsearch.config;
 
-import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 
 public class MyElasticsearchAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
 

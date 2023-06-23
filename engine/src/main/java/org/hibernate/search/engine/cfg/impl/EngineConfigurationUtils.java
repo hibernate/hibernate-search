@@ -9,8 +9,8 @@ package org.hibernate.search.engine.cfg.impl;
 import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.BackendSettings;
-import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.EngineSettings;
 
 public final class EngineConfigurationUtils {
 

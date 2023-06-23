@@ -6,8 +6,9 @@
  */
 package org.hibernate.search.query.dsl.sort;
 
-import org.apache.lucene.search.SortField;
 import org.hibernate.search.util.common.SearchException;
+
+import org.apache.lucene.search.SortField;
 
 /**
  * A context from which one may add another sort definition to the sort list.

@@ -6,9 +6,10 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
-import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import java.util.Set;
+
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 
 public interface SimpleQueryStringPredicateBuilder extends SearchPredicateBuilder {
 

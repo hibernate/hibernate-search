@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+
 import javax.batch.api.BatchProperty;
 import javax.batch.api.chunk.AbstractItemReader;
 import javax.batch.runtime.context.JobContext;
@@ -42,9 +43,9 @@ import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.Defaults;
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
+import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.HibernateSearchPartitionMapper;
 import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.IndexScope;
 import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.PartitionContextData;
-import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.HibernateSearchPartitionMapper;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.EntityTypeDescriptor;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.IdOrder;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.JobContextUtil;

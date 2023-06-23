@@ -8,6 +8,10 @@ package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 
 import java.io.IOException;
 import java.util.Objects;
+
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.ChildDocIds;
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
+
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
@@ -16,9 +20,6 @@ import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.LongValues;
 import org.apache.lucene.search.LongValuesSource;
-
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.ChildDocIds;
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
 /**
  * An implementation of {@link LongValuesSource} for docvalues with multiple values per document,

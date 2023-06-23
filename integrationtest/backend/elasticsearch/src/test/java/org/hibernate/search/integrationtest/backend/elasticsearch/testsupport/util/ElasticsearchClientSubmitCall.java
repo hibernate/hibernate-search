@@ -17,6 +17,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.Call;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class ElasticsearchClientSubmitCall extends Call<ElasticsearchClientSubmitCall> {

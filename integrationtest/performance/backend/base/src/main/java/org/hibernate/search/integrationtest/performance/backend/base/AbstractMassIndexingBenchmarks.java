@@ -10,8 +10,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.dataset.Dataset;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.dataset.DatasetHolder;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.index.AbstractBackendHolder;

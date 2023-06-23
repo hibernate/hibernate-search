@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.batch.jsr352.core.massindexing.util.impl;
 
-
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters;
 
 /**

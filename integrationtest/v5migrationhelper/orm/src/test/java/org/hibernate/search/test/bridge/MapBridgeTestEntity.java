@@ -9,6 +9,7 @@ package org.hibernate.search.test.bridge;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;

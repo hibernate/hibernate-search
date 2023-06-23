@@ -6,14 +6,12 @@
  */
 package org.hibernate.search.test.query.facet;
 
+import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import org.apache.lucene.search.MatchAllDocsQuery;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -29,7 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import static org.junit.Assert.assertEquals;
+import org.apache.lucene.search.MatchAllDocsQuery;
 
 /**
  * @author Elmer van Chastelet

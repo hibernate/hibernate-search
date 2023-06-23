@@ -6,19 +6,19 @@
  */
 package org.hibernate.search.test.id;
 
-import java.util.List;
+import static org.junit.Assert.assertEquals;
 
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.TermQuery;
+import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
+
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.TermQuery;
 
 /**
  * @author Hardy Ferentschik

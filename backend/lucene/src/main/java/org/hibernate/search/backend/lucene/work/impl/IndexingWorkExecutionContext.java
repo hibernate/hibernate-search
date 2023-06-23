@@ -11,7 +11,6 @@ import java.io.IOException;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-
 public interface IndexingWorkExecutionContext {
 
 	EventContext getEventContext();

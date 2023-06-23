@@ -21,7 +21,6 @@ import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Rule;
 import org.junit.Test;
 
-
 /**
  * Test the behavior when an {@literal @IndexedEmbedded} with default paths (i.e. "include everything")
  * has another, nested {@literal @IndexedEmbedded} with non-default paths (i.e. "include those paths only").

@@ -6,11 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
-import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
-import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
-import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
-import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericRangeAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericTermsAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
@@ -24,6 +20,10 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericRan
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericTermsPredicate;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneStandardFieldSort;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
+import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
+import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 
 abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends AbstractLuceneNumericIndexFieldTypeOptionsStep<S, F>, F>
 		extends AbstractLuceneStandardIndexFieldTypeOptionsStep<S, F> {

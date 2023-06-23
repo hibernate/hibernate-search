@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;

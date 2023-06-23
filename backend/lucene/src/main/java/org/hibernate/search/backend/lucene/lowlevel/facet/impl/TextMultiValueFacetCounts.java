@@ -15,6 +15,7 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.TextMultiValu
 
 import com.carrotsearch.hppc.IntHashSet;
 import com.carrotsearch.hppc.procedures.IntProcedure;
+
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;

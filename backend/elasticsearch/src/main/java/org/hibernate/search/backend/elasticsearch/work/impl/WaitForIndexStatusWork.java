@@ -13,7 +13,6 @@ import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.common.timing.spi.StaticDeadline;
 
-
 public class WaitForIndexStatusWork extends AbstractNonBulkableWork<Void> {
 
 	protected WaitForIndexStatusWork(Builder builder) {

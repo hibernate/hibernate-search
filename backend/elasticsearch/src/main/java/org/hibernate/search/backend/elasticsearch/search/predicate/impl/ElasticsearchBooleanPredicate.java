@@ -26,7 +26,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-
 class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

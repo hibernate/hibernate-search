@@ -8,10 +8,10 @@ package org.hibernate.search.engine.search.projection.dsl.impl;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.definition.impl.DefaultProjectionDefinitionContext;
-import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromAsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom1AsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom2AsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom3AsStep;
+import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromAsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;

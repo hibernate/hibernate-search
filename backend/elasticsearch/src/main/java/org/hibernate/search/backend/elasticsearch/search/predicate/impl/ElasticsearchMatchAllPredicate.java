@@ -14,7 +14,6 @@ import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder
 
 import com.google.gson.JsonObject;
 
-
 class ElasticsearchMatchAllPredicate extends AbstractElasticsearchPredicate {
 
 	static final JsonObjectAccessor MATCH_ALL_ACCESSOR = JsonAccessor.root().property( "match_all" ).asObject();

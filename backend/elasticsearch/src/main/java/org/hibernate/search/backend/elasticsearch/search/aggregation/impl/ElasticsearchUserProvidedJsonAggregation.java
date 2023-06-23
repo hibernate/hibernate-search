@@ -10,7 +10,6 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 
 import com.google.gson.JsonObject;
 
-
 class ElasticsearchUserProvidedJsonAggregation extends AbstractElasticsearchAggregation<JsonObject> {
 
 	private final JsonObject requestJson;

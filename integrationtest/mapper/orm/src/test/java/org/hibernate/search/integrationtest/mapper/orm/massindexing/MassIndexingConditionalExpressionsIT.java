@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 import static org.junit.Assert.fail;
 
 import java.time.Instant;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;

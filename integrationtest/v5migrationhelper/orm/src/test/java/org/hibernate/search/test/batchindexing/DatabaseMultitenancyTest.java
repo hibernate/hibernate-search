@@ -22,6 +22,7 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 import org.hibernate.testing.RequiresDialect;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

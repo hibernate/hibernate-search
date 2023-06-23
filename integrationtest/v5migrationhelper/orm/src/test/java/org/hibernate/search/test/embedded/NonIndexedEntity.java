@@ -7,8 +7,8 @@
 package org.hibernate.search.test.embedded;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 /**
  * @author Emmanuel Bernard

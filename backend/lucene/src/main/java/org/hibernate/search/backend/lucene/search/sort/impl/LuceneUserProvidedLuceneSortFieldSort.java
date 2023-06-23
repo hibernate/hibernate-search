@@ -10,7 +10,6 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 
 import org.apache.lucene.search.SortField;
 
-
 class LuceneUserProvidedLuceneSortFieldSort extends AbstractLuceneSort {
 
 	private final SortField luceneSortField;

@@ -12,7 +12,6 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 
 import com.google.gson.JsonObject;
 
-
 class ElasticsearchUserProvidedJsonPredicate implements ElasticsearchSearchPredicate {
 
 	private final Set<String> indexNames;

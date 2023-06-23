@@ -30,7 +30,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
-
 @SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types
 public class ElasticsearchDefaultWorkSequenceBuilderTest {
 

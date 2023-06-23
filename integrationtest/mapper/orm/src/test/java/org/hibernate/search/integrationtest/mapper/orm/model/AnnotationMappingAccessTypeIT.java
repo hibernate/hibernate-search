@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 import static org.junit.Assert.fail;
 
 import java.io.Serializable;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.AttributeOverride;

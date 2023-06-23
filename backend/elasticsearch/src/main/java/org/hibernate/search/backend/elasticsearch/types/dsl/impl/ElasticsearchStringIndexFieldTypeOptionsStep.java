@@ -51,7 +51,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonPrimitive;
 
-
 class ElasticsearchStringIndexFieldTypeOptionsStep
 		extends AbstractElasticsearchStandardIndexFieldTypeOptionsStep<ElasticsearchStringIndexFieldTypeOptionsStep, String>
 		implements StringIndexFieldTypeOptionsStep<ElasticsearchStringIndexFieldTypeOptionsStep> {

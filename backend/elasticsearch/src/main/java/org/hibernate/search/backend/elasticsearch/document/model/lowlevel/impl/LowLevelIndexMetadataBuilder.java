@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.gson.impl.GsonUtils;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
@@ -17,9 +18,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetad
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.Analysis;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
-import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.ElasticsearchIndexMetadataSyntax;
-
 
 public class LowLevelIndexMetadataBuilder {
 

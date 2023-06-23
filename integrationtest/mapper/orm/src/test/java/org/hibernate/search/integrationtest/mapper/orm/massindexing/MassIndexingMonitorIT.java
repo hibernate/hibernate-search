@@ -11,6 +11,7 @@ import static org.assertj.core.api.Fail.fail;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.concurrent.CompletableFuture;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;

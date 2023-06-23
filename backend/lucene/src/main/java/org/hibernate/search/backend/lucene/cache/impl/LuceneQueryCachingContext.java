@@ -7,10 +7,12 @@
 package org.hibernate.search.backend.lucene.cache.impl;
 
 import java.util.Optional;
+
+import org.hibernate.search.backend.lucene.cache.QueryCachingConfigurationContext;
+
 import org.apache.lucene.search.QueryCache;
 import org.apache.lucene.search.QueryCachingPolicy;
 import org.apache.lucene.util.Version;
-import org.hibernate.search.backend.lucene.cache.QueryCachingConfigurationContext;
 
 public class LuceneQueryCachingContext implements QueryCachingConfigurationContext {
 

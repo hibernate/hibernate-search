@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.batch.jsr352.core.massindexing.util.impl;
 
-
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
 import javax.batch.runtime.context.JobContext;
 import javax.persistence.EntityManagerFactory;
 

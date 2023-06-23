@@ -12,7 +12,6 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRespon
 
 import com.google.gson.JsonObject;
 
-
 public class ClearScrollWork extends AbstractNonBulkableWork<Void> {
 
 	protected ClearScrollWork(Builder builder) {

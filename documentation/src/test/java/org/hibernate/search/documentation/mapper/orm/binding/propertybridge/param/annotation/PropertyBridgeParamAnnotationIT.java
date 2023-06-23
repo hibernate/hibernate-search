@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.documentation.mapper.orm.binding.propertybridge.param.annotation;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.math.BigDecimal;
 import java.util.List;
+
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;

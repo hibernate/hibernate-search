@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+
 import javax.persistence.Basic;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
@@ -43,6 +44,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.hibernate.testing.bytecode.enhancement.BytecodeEnhancerRunner;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

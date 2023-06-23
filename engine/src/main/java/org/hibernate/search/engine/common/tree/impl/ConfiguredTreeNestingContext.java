@@ -16,7 +16,6 @@ import org.hibernate.search.engine.common.tree.spi.TreeNodeInclusion;
 import org.hibernate.search.engine.mapper.model.spi.MappingElement;
 import org.hibernate.search.util.common.SearchException;
 
-
 public final class ConfiguredTreeNestingContext implements TreeNestingContext {
 
 	public static final ConfiguredTreeNestingContext ROOT =

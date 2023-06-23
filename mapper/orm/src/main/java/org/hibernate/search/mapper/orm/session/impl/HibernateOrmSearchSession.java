@@ -10,6 +10,7 @@ import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnore
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
+
 import javax.persistence.EntityManager;
 import javax.transaction.Synchronization;
 
@@ -38,13 +39,13 @@ import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanSessionContext;
-import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanFilter;
-import org.hibernate.search.mapper.pojo.work.spi.ConfiguredSearchIndexingPlanFilter;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanFilter;
 import org.hibernate.search.mapper.pojo.work.spi.ConfiguredIndexingPlanSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.work.spi.ConfiguredSearchIndexingPlanFilter;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;

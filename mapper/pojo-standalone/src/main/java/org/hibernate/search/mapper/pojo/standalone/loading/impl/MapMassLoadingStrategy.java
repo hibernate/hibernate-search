@@ -15,11 +15,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.mapper.pojo.standalone.loading.LoadingTypeGroup;
+import org.hibernate.search.mapper.pojo.standalone.loading.MassEntityLoader;
+import org.hibernate.search.mapper.pojo.standalone.loading.MassEntitySink;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassIdentifierLoader;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassIdentifierSink;
-import org.hibernate.search.mapper.pojo.standalone.loading.MassEntityLoader;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingOptions;
-import org.hibernate.search.mapper.pojo.standalone.loading.MassEntitySink;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
 
 public final class MapMassLoadingStrategy<E, I> implements MassLoadingStrategy<E, I> {

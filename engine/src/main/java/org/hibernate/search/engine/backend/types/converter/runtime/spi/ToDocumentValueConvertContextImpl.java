@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.engine.backend.types.converter.runtime.spi;
 
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContextExtension;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 
 public class ToDocumentValueConvertContextImpl implements ToDocumentValueConvertContext {
 	private final BackendMappingContext mappingContext;

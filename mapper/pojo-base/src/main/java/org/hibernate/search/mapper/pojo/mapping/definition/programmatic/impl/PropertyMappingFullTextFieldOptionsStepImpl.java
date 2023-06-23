@@ -17,7 +17,6 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCol
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFullTextFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
-
 class PropertyMappingFullTextFieldOptionsStepImpl
 		extends AbstractPropertyMappingStandardFieldOptionsStep<PropertyMappingFullTextFieldOptionsStep>
 		implements PropertyMappingFullTextFieldOptionsStep {

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.environment.bean.spi;
 
-
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.SearchException;

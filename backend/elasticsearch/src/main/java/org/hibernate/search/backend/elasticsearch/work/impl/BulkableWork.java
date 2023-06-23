@@ -10,7 +10,6 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 
 import com.google.gson.JsonObject;
 
-
 public interface BulkableWork<T> extends ElasticsearchWork {
 
 	DocumentRefreshStrategy getRefreshStrategy();

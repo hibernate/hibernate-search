@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.backend.document.model.spi;
 
-import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 import org.hibernate.search.engine.search.common.spi.SearchIndexNodeTypeContext;
+import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;

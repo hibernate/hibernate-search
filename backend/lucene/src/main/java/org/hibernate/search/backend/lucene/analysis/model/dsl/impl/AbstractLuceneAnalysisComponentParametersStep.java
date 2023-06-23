@@ -18,7 +18,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 
-
 abstract class AbstractLuceneAnalysisComponentParametersStep<T>
 		implements LuceneAnalysisComponentParametersStep, LuceneAnalysisComponentBuilder<T> {
 
