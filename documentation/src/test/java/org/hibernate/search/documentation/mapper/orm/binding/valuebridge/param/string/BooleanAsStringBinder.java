@@ -14,10 +14,9 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 public class BooleanAsStringBinder implements ValueBinder {
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void bind(ValueBindingContext<?> context) {
-		String trueAsString = (String) context.param( "trueAsString" ); // <1>
-		String falseAsString = (String) context.param( "falseAsString" );
+		String trueAsString = context.param( "trueAsString", String.class ); // <1>
+		String falseAsString = context.param( "falseAsString", String.class );
 
 		context.bridge( Boolean.class, // <2>
 				new BooleanAsStringBridge( trueAsString, falseAsString ) );

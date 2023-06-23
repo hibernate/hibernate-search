@@ -526,9 +526,8 @@ public class KeywordFieldIT {
 			}
 		}
 
-		@SuppressWarnings("uncheked")
 		private static String extractFixedPrefix(ValueBindingContext<?> context) {
-			return (String) context.param( "fixedPrefix" );
+			return context.param( "fixedPrefix", String.class );
 		}
 	}
 

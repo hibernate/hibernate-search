@@ -18,7 +18,6 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 public class FullNameBinder implements TypeBinder {
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void bind(TypeBindingContext context) {
 		context.dependencies()
 				.use( "firstName" )
@@ -29,7 +28,7 @@ public class FullNameBinder implements TypeBinder {
 				.toReference();
 
 		IndexFieldReference<String> fullNameSortField = null;
-		String sortField = (String) context.param( "sortField" ); // <1>
+		String sortField = context.param( "sortField", String.class ); // <1>
 		if ( "true".equalsIgnoreCase( sortField ) ) { // <2>
 			fullNameSortField = context.indexSchemaElement()
 					.field(

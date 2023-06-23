@@ -35,15 +35,43 @@ public interface PredicateDefinitionContext {
 	 * @return The value provided to {@link NamedPredicateOptionsStep#param(String, Object)} for this parameter.
 	 * @throws SearchException If no value was provided for this parameter.
 	 * @see NamedPredicateOptionsStep#param(String, Object)
+	 * @deprecated Use {@link #param(String, Class)} instead.
 	 */
-	Object param(String name);
+	@Deprecated
+	default Object param(String name) {
+		return param( name, Object.class );
+	}
+
+	/**
+	 * @param name The name of the parameter.
+	 * @param paramType The type of the parameter.
+	 * @param <T> The type of the parameter.
+	 * @return The value provided to {@link NamedPredicateOptionsStep#param(String, Object)} for this parameter.
+	 * @throws SearchException If no value was provided for this parameter.
+	 * @see NamedPredicateOptionsStep#param(String, Object)
+	 */
+	<T> T param(String name, Class<T> paramType);
 
 	/**
 	 * @param name The name of the parameter.
 	 * @return An optional containing the value provided to {@link NamedPredicateOptionsStep#param(String, Object)}
 	 * for this parameter, or {@code Optional.empty()} if no value was provided for this parameter.
 	 * @see NamedPredicateOptionsStep#param(String, Object)
+	 * @deprecated Use {@link #paramOptional(String, Class)} instead.
 	 */
-	Optional<Object> paramOptional(String name);
+	@Deprecated
+	default Optional<Object> paramOptional(String name) {
+		return paramOptional( name, Object.class );
+	}
+
+	/**
+	 * @param name The name of the parameter.
+	 * @param paramType The type of the parameter.
+	 * @param <T> The type of the parameter.
+	 * @return An optional containing the value provided to {@link NamedPredicateOptionsStep#param(String, Object)}
+	 * for this parameter, or {@code Optional.empty()} if no value was provided for this parameter.
+	 * @see NamedPredicateOptionsStep#param(String, Object)
+	 */
+	<T> Optional<T> paramOptional(String name, Class<T> paramType);
 
 }

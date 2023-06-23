@@ -24,13 +24,12 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContex
 public class InvoiceLineItemsSummaryBinder implements PropertyBinder {
 
 	@Override
-	@SuppressWarnings("uncheked")
 	public void bind(PropertyBindingContext context) {
 		context.dependencies()
 				.use( "category" )
 				.use( "amount" );
 
-		String fieldName = (String) context.param( "fieldName" ); // <1>
+		String fieldName = context.param( "fieldName", String.class ); // <1>
 		IndexSchemaObjectField summaryField = context.indexSchemaElement()
 				.objectField( fieldName ); // <2>
 

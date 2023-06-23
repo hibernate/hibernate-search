@@ -517,9 +517,8 @@ public class DocumentIdBaseIT {
 			}
 		}
 
-		@SuppressWarnings("uncheked")
 		private static String extractFixedPrefix(IdentifierBindingContext<?> context) {
-			return (String) context.param( "fixedPrefix" );
+			return context.param( "fixedPrefix", String.class );
 		}
 	}
 }

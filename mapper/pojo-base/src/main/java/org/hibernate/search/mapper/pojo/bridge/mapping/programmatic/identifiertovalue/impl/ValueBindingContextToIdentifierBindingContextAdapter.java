@@ -42,13 +42,13 @@ final class ValueBindingContextToIdentifierBindingContextAdapter<I> implements I
 	}
 
 	@Override
-	public Object param(String name) {
-		return delegate.param( name );
+	public <T> T param(String name, Class<T> paramType) {
+		return delegate.param( name, paramType );
 	}
 
 	@Override
-	public Optional<Object> paramOptional(String name) {
-		return delegate.paramOptional( name );
+	public <T> Optional<T> paramOptional(String name, Class<T> paramType) {
+		return delegate.paramOptional( name, paramType );
 	}
 
 	@Override

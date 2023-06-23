@@ -13,6 +13,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.mapper.pojo.bridge.binding.BindingContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 abstract class AbstractBindingContext implements BindingContext {
@@ -33,17 +34,23 @@ abstract class AbstractBindingContext implements BindingContext {
 	}
 
 	@Override
-	public Object param(String name) {
+	public <T> T param(String name, Class<T> paramType) {
+		Contracts.assertNotNull( name, "name" );
+		Contracts.assertNotNull( paramType, "paramType" );
+
 		Object value = params.get( name );
 		if ( value == null ) {
 			throw log.paramNotDefined( name );
 		}
 
-		return value;
+		return paramType.cast( value );
 	}
 
 	@Override
-	public Optional<Object> paramOptional(String name) {
-		return Optional.ofNullable( params.get( name ) );
+	public <T> Optional<T> paramOptional(String name, Class<T> paramType) {
+		Contracts.assertNotNull( name, "name" );
+		Contracts.assertNotNull( paramType, "paramType" );
+
+		return Optional.ofNullable( params.get( name ) ).map( paramType::cast );
 	}
 }

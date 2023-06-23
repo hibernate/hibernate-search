@@ -48,8 +48,8 @@ public @interface ProjectionBinderRef {
 	/**
 	 * @return Params that will get passed to the {@link ProjectionBinder}.
 	 *
-	 * @see ProjectionBindingContext#param(String)
-	 * @see ProjectionBindingContext#paramOptional(String)
+	 * @see ProjectionBindingContext#param(String, Class)
+	 * @see ProjectionBindingContext#paramOptional(String, Class)
 	 */
 	Param[] params() default { };
 

@@ -77,18 +77,24 @@ public class ProjectionBindingContextImpl<P> implements ProjectionBindingContext
 	}
 
 	@Override
-	public Object param(String name) {
+	public <T> T param(String name, Class<T> paramType) {
+		Contracts.assertNotNull( name, "name" );
+		Contracts.assertNotNull( paramType, "paramType" );
+
 		Object value = params.get( name );
 		if ( value == null ) {
 			throw log.paramNotDefined( name );
 		}
 
-		return value;
+		return paramType.cast( value );
 	}
 
 	@Override
-	public Optional<Object> paramOptional(String name) {
-		return Optional.ofNullable( params.get( name ) );
+	public <T> Optional<T> paramOptional(String name, Class<T> paramType) {
+		Contracts.assertNotNull( name, "name" );
+		Contracts.assertNotNull( paramType, "paramType" );
+
+		return Optional.ofNullable( params.get( name ) ).map( paramType::cast );
 	}
 
 	@Override

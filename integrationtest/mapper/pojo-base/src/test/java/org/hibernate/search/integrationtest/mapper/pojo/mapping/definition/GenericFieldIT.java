@@ -449,14 +449,13 @@ public class GenericFieldIT {
 			}
 		}
 
-		@SuppressWarnings("uncheked")
 		private static int extractBase(ValueBindingContext<?> context) {
-			Optional<Object> optionalBase = context.paramOptional( "base" );
+			Optional<Integer> optionalBase = context.paramOptional( "base", Integer.class );
 			if ( optionalBase.isPresent() ) {
-				return (Integer) optionalBase.get();
+				return optionalBase.get();
 			}
 
-			String stringBase = (String) context.param( "stringBase" );
+			String stringBase = context.param( "stringBase", String.class );
 			return Integer.parseInt( stringBase );
 		}
 	}

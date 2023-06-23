@@ -764,14 +764,13 @@ public class RoutingBridgeBaseIT {
 			context.bridge( Object.class, new ParametricBridge( modulus( context ) ) );
 		}
 
-		@SuppressWarnings("uncheked")
 		private static int modulus(RoutingBindingContext context) {
-			Optional<Object> optionalModulus = context.paramOptional( "modulus" );
+			Optional<Integer> optionalModulus = context.paramOptional( "modulus", Integer.class );
 			if ( optionalModulus.isPresent() ) {
-				return (Integer) optionalModulus.get();
+				return optionalModulus.get();
 			}
 
-			String stringModulus = (String) context.param( "stringModulus" );
+			String stringModulus = context.param( "stringModulus", String.class );
 			return Integer.parseInt( stringModulus );
 		}
 	}
