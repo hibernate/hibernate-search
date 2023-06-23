@@ -738,7 +738,7 @@ by defining a <<backend-lucene-analysis-analyzers,custom analyzer>> with the sam
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/analysis/MyLuceneAnalysisConfigurer.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/analysis/DefaultOverridingLuceneAnalysisConfigurer.java[tags=include]
 ----
 <1> Start the definition of a custom analyzer that happens to be named `default`.
 Here we rely on constants from `org.hibernate.search.engine.backend.analysis.AnalyzerNames` to use the correct name,
