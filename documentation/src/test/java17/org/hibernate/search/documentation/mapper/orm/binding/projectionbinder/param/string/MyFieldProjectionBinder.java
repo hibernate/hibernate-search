@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBind
 public class MyFieldProjectionBinder implements ProjectionBinder {
 	@Override
 	public void bind(ProjectionBindingContext context) {
-		String fieldName = (String) context.param( "fieldName" ); // <1>
+		String fieldName = context.param( "fieldName", String.class ); // <1>
 		context.definition(
 				String.class,
 				new MyProjectionDefinition( fieldName ) // <2>

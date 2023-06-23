@@ -175,7 +175,7 @@ public class NamedPredicateMultiIndexCompatibilityIT {
 		@Override
 		public SearchPredicate create(PredicateDefinitionContext context) {
 			return context.predicate().match().field( fieldName )
-					.matching( context.param( "value" ) )
+					.matching( context.param( "value", Object.class ) )
 					.toPredicate();
 		}
 	}

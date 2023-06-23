@@ -346,7 +346,7 @@ public class ProjectionConstructorProjectionBindingIT {
 	public static class ParametricBinder implements ProjectionBinder {
 		@Override
 		public void bind(ProjectionBindingContext context) {
-			String fieldPath = (String) context.param( "fieldPath" );
+			String fieldPath = context.param( "fieldPath", String.class );
 			context.definition( String.class,
 					(factory, context1) -> factory.field( fieldPath, String.class ).toProjection() );
 		}

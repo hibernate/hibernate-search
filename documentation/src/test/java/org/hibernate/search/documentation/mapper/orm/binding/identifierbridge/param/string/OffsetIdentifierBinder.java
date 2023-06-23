@@ -14,9 +14,8 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBi
 public class OffsetIdentifierBinder implements IdentifierBinder {
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void bind(IdentifierBindingContext<?> context) {
-		String offset = (String) context.param( "offset" ); // <1>
+		String offset = context.param( "offset", String.class ); // <1>
 		context.bridge(
 				Integer.class,
 				new OffsetIdentifierBridge( Integer.parseInt( offset ) ) // <2>

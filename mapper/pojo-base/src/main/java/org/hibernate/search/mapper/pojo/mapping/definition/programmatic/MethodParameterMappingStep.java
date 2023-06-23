@@ -48,8 +48,8 @@ public interface MethodParameterMappingStep {
 	 *
 	 * @param binder A {@link ProjectionBinder} responsible for creating a projection definition.
 	 * * @param params The parameters to make available to the binder through
-	 * {@link org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext#param(String)}
-	 * or {@link org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext#paramOptional(String)}.
+	 * {@link org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext#param(String, Class)}
+	 * or {@link org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext#paramOptional(String, Class)}.
 	 * @return {@code this}, for method chaining.
 	 * @see ProjectionDefinition
 	 * @see SearchProjectionFactory
@@ -79,8 +79,8 @@ public interface MethodParameterMappingStep {
 	 *
 	 * @param binder A {@link BeanReference} to a {@link ProjectionBinder} responsible for creating a projection definition.
 	 * @param params The parameters to make available to the binder through
-	 * {@link org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext#param(String)}
-	 * or {@link org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext#paramOptional(String)}.
+	 * {@link org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext#param(String, Class)}
+	 * or {@link org.hibernate.search.mapper.pojo.search.definition.binding.ProjectionBindingContext#paramOptional(String, Class)}.
 	 * @return {@code this}, for method chaining.
 	 * @see ProjectionDefinition
 	 * @see SearchProjectionFactory
