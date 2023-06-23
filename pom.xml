@@ -2685,6 +2685,9 @@
             <properties>
                 <!-- Spring isn't ready for JDK20 yet -->
                 <failsafe.spring.skip>true</failsafe.spring.skip>
+                <!-- impsort-maven-plugin doesn't work with JDK20 yet -->
+                <!-- See https://github.com/javaparser/javaparser/blob/master/javaparser-core/src/main/java/com/github/javaparser/ParserConfiguration.java#L169 -->
+                <format.skip>true</format.skip>
             </properties>
         </profile>
 
@@ -2704,6 +2707,8 @@
                 </surefire.jvm.args.java-version>
                 <!-- Spring isn't ready for JDK21 yet -->
                 <failsafe.spring.skip>true</failsafe.spring.skip>
+                <!-- impsort-maven-plugin doesn't work with JDK21 yet -->
+                <format.skip>true</format.skip>
             </properties>
         </profile>
 
@@ -2723,6 +2728,8 @@
                 </surefire.jvm.args.java-version>
                 <!-- Spring isn't ready for JDK22 yet -->
                 <failsafe.spring.skip>true</failsafe.spring.skip>
+                <!-- impsort-maven-plugin doesn't work with JDK22 yet -->
+                <format.skip>true</format.skip>
             </properties>
         </profile>
 
