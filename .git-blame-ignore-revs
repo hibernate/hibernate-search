@@ -1,0 +1,28 @@
+# HSEARCH-190 add pom HSEARCH-191 make change build system to get deps from JBoss repo, make doc build independent of h
+# ibernate core structure add maven deploy task HSEARCH-192 Move to Hibernate Core 3.3, fix compilations HSEARCH-193 move to a sma
+# ll solr jar with only analyzers
+de6d7566b7ef180e03c067fefb515d1b6f4b94e2
+# HSEARCH-82 deleted obsolete docbook support
+399f52c86cf06785a4725eec7e4649568cecbf91
+# HSEARCH-468 First step. Pushed main code into hibernate-search
+39529f69239ecf1f14dbf548a1b36eb40ee7b97e
+# Updated copyright headers to remove the obsolete svn keyword $
+50995fd82285b39a43679e06fe11d09110bbc21e
+# HSEARCH-677 renaming directory hibernate-search to hibernate-search-engine
+02b8eb4f6017e7fb44bee6013d7f8bf1ae23a7b1
+# HSEARCH-1310 Dropping the hibernate-search directory prefix, renaming hibernate-search into legacy
+354f2cadec6dee7d4dde2250e13f468e2d93cd27
+# HSEARCH-1602 Switching header in Java and XML files. Configuring Checkstyle to check java and xml resource files against these headers
+5a9396f82246f74a76d3fea15d712711662f11ec
+# HSEARCH-3179 Move code to a legacy directory to avoid conflicts when merging
+f62a71ed9c3e9daad6dc28f2e2967955b8889c2d
+# HSEARCH-3315 Move all the code of the util-common module to subpackages of org.hibernate.search.util.common
+f00dec7931b3f57007e80a0080bf29dacb61e06d
+# HSEARCH-3282 Copy the Search 5 code of the engine and orm modules to the new migration modules
+3146a1883d9620cb730c675512870b4d763b4ef0
+# HSEARCH-3282 Move hibernate-search-orm's integration tests to a separate module
+b90e89ae59f2e0a4deccc8e51160fcd0cf8554bf
+# HSEARCH-3282 Move legacy engine/orm integration tests to the migration helper's integration tests
+94cbe7cc876f0c09629ec785c6368cedf7efc6f6
+# HSEARCH-4053 Remove legacy code from Hibernate Search 5
+6507a3c968358e2c7bb0ea96c1e7e339faec1b53
