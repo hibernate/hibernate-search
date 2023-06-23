@@ -66,9 +66,9 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		assertJsonEquals(
 				ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations(
 						"'myField': {"
-								+ "'type': 'date',"
-								+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
-								+ "'doc_values': false"
+								+ "  'type': 'date',"
+								+ "  'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
+								+ "  'doc_values': false"
 						+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
@@ -90,8 +90,8 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		assertJsonEquals(
 				ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations(
 						"'myField': {"
-								+ "'type': 'boolean',"
-								+ "'doc_values': false"
+								+ "  'type': 'boolean',"
+								+ "  'doc_values': false"
 						+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
@@ -113,8 +113,8 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		assertJsonEquals(
 				ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations(
 						"'myField': {"
-								+ "'type': 'keyword',"
-								+ "'doc_values': false"
+								+ "  'type': 'keyword',"
+								+ "  'doc_values': false"
 						+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
@@ -136,8 +136,8 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		assertJsonEquals(
 				ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations(
 						"'myField': {"
-								+ "'type': 'text',"
-								+ "'analyzer': 'standard'"
+								+ "  'type': 'text',"
+								+ "  'analyzer': 'standard'"
 						+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
@@ -159,9 +159,9 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 		assertJsonEquals(
 				ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations(
 						"'myField': {"
-								+ "'type': 'text',"
-								+ "'analyzer': 'standard',"
-								+ "'norms': false"
+								+ "  'type': 'text',"
+								+ "  'analyzer': 'standard',"
+								+ "  'norms': false"
 						+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()

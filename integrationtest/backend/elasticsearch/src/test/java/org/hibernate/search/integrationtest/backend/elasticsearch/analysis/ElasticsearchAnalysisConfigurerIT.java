@@ -268,16 +268,16 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 		assertJsonEquals(
 				"{"
-					+ "'analyzer': {"
-							+ "'analyzer1': {"
-									+ "'type': 'custom',"
-									+ "'tokenizer': 'whitespace'"
-							+ "},"
-							+ "'analyzer2': {"
-									+ "'type': 'custom',"
-									+ "'tokenizer': 'whitespace'"
-							+ "}"
-					+ "}"
+						+ " 'analyzer': {"
+						+ "   'analyzer1': {"
+						+ "     'type': 'custom',"
+						+ "     'tokenizer': 'whitespace'"
+						+ "   },"
+						+ "   'analyzer2': {"
+						+ "     'type': 'custom',"
+						+ "     'tokenizer': 'whitespace'"
+						+ "   }"
+						+ " }"
 				+ "}",
 				client.index( index.name() ).settings( "index.analysis" ).get()
 		);

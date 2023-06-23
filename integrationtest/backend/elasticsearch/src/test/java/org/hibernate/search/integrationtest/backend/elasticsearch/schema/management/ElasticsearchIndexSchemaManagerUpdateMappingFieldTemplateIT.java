@@ -51,28 +51,28 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate1': {"
-									+ "'path_match': '*_t1',"
-									+ "'mapping': { 'type': 'integer', 'doc_values': false }"
-							+ "} },"
-							+ "{'myTemplate2': {"
-									+ "'path_match': '*_t2',"
-									+ "'mapping': { 'type': 'text', 'analyzer': 'default' }"
-							+ "} },"
-							+ "{ 'myTemplate3': {"
-									+ "'path_match': '*_t3',"
-									+ "'mapping': { 'type': 'keyword' }"
-							+ "} },"
-							+ "{ 'myTemplate4': {"
-									+ "'match_mapping_type': 'object',"
-									+ "'path_match': '*',"
-									+ "'mapping': { 'type': 'nested' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate1': {"
+						+ "     'path_match': '*_t1',"
+						+ "     'mapping': { 'type': 'integer', 'doc_values': false }"
+						+ "   } },"
+						+ "   {'myTemplate2': {"
+						+ "     'path_match': '*_t2',"
+						+ "     'mapping': { 'type': 'text', 'analyzer': 'default' }"
+						+ "   } },"
+						+ "   { 'myTemplate3': {"
+						+ "     'path_match': '*_t3',"
+						+ "     'mapping': { 'type': 'keyword' }"
+						+ "   } },"
+						+ "   { 'myTemplate4': {"
+						+ "     'match_mapping_type': 'object',"
+						+ "     'path_match': '*',"
+						+ "     'mapping': { 'type': 'nested' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForInitialization()
-					+ "}"
+						+ " }"
 				+ "}"
 		);
 
@@ -80,28 +80,28 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		assertJsonEqualsIgnoringUnknownFields(
 				"{"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate1': {"
-									+ "'path_match': '*_t1',"
-									+ "'mapping':" + integerMappingForExpectations()
-							+ "} },"
-							+ "{'myTemplate2': {"
-									+ "'path_match': '*_t2',"
-									+ "'mapping':" + textMappingForExpectations()
-							+ "} },"
-							+ "{ 'myTemplate3': {"
-									+ "'path_match': '*_t3',"
-									+ "'mapping':" + keywordMappingForExpectations()
-							+ "} },"
-							+ "{ 'myTemplate4': {"
-									+ "'match_mapping_type': 'object',"
-									+ "'path_match': '*',"
-									+ "'mapping': { 'type': 'nested' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate1': {"
+						+ "     'path_match': '*_t1',"
+						+ "     'mapping':" + integerMappingForExpectations()
+						+ "   } },"
+						+ "   {'myTemplate2': {"
+						+ "     'path_match': '*_t2',"
+						+ "     'mapping':" + textMappingForExpectations()
+						+ "   } },"
+						+ "   { 'myTemplate3': {"
+						+ "     'path_match': '*_t3',"
+						+ "     'mapping':" + keywordMappingForExpectations()
+						+ "   } },"
+						+ "   { 'myTemplate4': {"
+						+ "     'match_mapping_type': 'object',"
+						+ "     'path_match': '*',"
+						+ "     'mapping': { 'type': 'nested' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForExpectations()
-					+ "}"
+						+ " }"
 				+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -118,19 +118,19 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate1': {"
-									+ "'path_match': '*',"
-									+ "'mapping': { 'type': 'integer', 'doc_values': false }"
-							+ "} },"
-							+ "{ 'myTemplate3': {"
-									+ "'path_match': '*',"
-									+ "'mapping': { 'type': 'keyword' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate1': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping': { 'type': 'integer', 'doc_values': false }"
+						+ "   } },"
+						+ "   { 'myTemplate3': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping': { 'type': 'keyword' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForInitialization()
-					+ "}"
+						+ " }"
 				+ "}"
 		);
 
@@ -138,24 +138,24 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		assertJsonEqualsIgnoringUnknownFields(
 				"{"
-					+ "'dynamic': 'true',"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate1': {"
-									+ "'path_match': '*',"
-									+ "'mapping':" + integerMappingForExpectations()
-							+ "} },"
-							+ "{'myTemplate2': {"
-									+ "'path_match': '*',"
-									+ "'mapping':" + textMappingForExpectations()
-							+ "} },"
-							+ "{ 'myTemplate3': {"
-									+ "'path_match': '*',"
-									+ "'mapping':" + keywordMappingForExpectations()
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic': 'true',"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate1': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping':" + integerMappingForExpectations()
+						+ "   } },"
+						+ "   {'myTemplate2': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping':" + textMappingForExpectations()
+						+ "   } },"
+						+ "   { 'myTemplate3': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping':" + keywordMappingForExpectations()
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForExpectations()
-					+ "}"
+						+ " }"
 				+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -172,27 +172,27 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate1': {"
-									+ "'path_match': '*',"
-									+ "'mapping': { 'type': 'integer', 'doc_values': false }"
-							+ "} },"
-							+ "{'myTemplate2': {"
-									+ "'path_match': '*',"
-									+ "'mapping': { 'type': 'text', 'analyzer': 'default' }"
-							+ "} },"
-							+ "{ 'extraTemplate': {"
-									+ "'path_match': '*_extra',"
-									+ "'mapping': { 'type': 'keyword' }"
-							+ "} },"
-							+ "{ 'myTemplate3': {"
-									+ "'path_match': '*',"
-									+ "'mapping': { 'type': 'keyword' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate1': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping': { 'type': 'integer', 'doc_values': false }"
+						+ "   } },"
+						+ "   {'myTemplate2': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping': { 'type': 'text', 'analyzer': 'default' }"
+						+ "   } },"
+						+ "   { 'extraTemplate': {"
+						+ "     'path_match': '*_extra',"
+						+ "     'mapping': { 'type': 'keyword' }"
+						+ "   } },"
+						+ "   { 'myTemplate3': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping': { 'type': 'keyword' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForInitialization()
-					+ "}"
+						+ " }"
 				+ "}"
 		);
 
@@ -200,24 +200,24 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		assertJsonEqualsIgnoringUnknownFields(
 				"{"
-					+ "'dynamic': 'true',"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate1': {"
-									+ "'path_match': '*',"
-									+ "'mapping':" + integerMappingForExpectations()
-							+ "} },"
-							+ "{'myTemplate2': {"
-									+ "'path_match': '*',"
-									+ "'mapping':" + textMappingForExpectations()
-							+ "} },"
-							+ "{ 'myTemplate3': {"
-									+ "'path_match': '*',"
-									+ "'mapping':" + keywordMappingForExpectations()
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic': 'true',"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate1': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping':" + integerMappingForExpectations()
+						+ "   } },"
+						+ "   {'myTemplate2': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping':" + textMappingForExpectations()
+						+ "   } },"
+						+ "   { 'myTemplate3': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping':" + keywordMappingForExpectations()
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForExpectations()
-					+ "}"
+						+ " }"
 				+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -234,23 +234,23 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate2': {"
-									+ "'path_match': '*',"
-									+ "'mapping': { 'type': 'text', 'analyzer': 'default' }"
-							+ "} },"
-							+ "{'myTemplate1': {"
-									+ "'path_match': '*',"
-									+ "'mapping': { 'type': 'integer', 'doc_values': false }"
-							+ "} },"
-							+ "{ 'myTemplate3': {"
-									+ "'path_match': '*',"
-									+ "'mapping': { 'type': 'keyword' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate2': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping': { 'type': 'text', 'analyzer': 'default' }"
+						+ "   } },"
+						+ "   {'myTemplate1': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping': { 'type': 'integer', 'doc_values': false }"
+						+ "   } },"
+						+ "   { 'myTemplate3': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping': { 'type': 'keyword' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForInitialization()
-					+ "}"
+						+ " }"
 				+ "}"
 		);
 
@@ -258,24 +258,24 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		assertJsonEqualsIgnoringUnknownFields(
 				"{"
-					+ "'dynamic': 'true',"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate1': {"
-									+ "'path_match': '*',"
-									+ "'mapping':" + integerMappingForExpectations()
-							+ "} },"
-							+ "{'myTemplate2': {"
-									+ "'path_match': '*',"
-									+ "'mapping':" + textMappingForExpectations()
-							+ "} },"
-							+ "{ 'myTemplate3': {"
-									+ "'path_match': '*',"
-									+ "'mapping':" + keywordMappingForExpectations()
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic': 'true',"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate1': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping':" + integerMappingForExpectations()
+						+ "   } },"
+						+ "   {'myTemplate2': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping':" + textMappingForExpectations()
+						+ "   } },"
+						+ "   { 'myTemplate3': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping':" + keywordMappingForExpectations()
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForExpectations()
-					+ "}"
+						+ " }"
 				+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -290,19 +290,19 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate1': {"
-									+ "'path_match': '*',"
-									+ "'mapping': { 'type': 'integer', 'doc_values': false }"
-							+ "} },"
-							+ "{ 'myTemplate1': {"
-									+ "'path_match': '*',"
-									+ "'mapping': { 'type': 'keyword' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate1': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping': { 'type': 'integer', 'doc_values': false }"
+						+ "   } },"
+						+ "   { 'myTemplate1': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping': { 'type': 'keyword' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForInitialization()
-					+ "}"
+						+ " }"
 				+ "}"
 		);
 
@@ -310,16 +310,16 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		assertJsonEqualsIgnoringUnknownFields(
 				"{"
-					+ "'dynamic': 'true',"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate1': {"
-									+ "'path_match': '*',"
-									+ "'mapping':" + integerMappingForExpectations()
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic': 'true',"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate1': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping':" + integerMappingForExpectations()
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForExpectations()
-					+ "}"
+						+ " }"
 				+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -335,15 +335,15 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate': {"
-									+ "'match_mapping_type': 'object',"
-									+ "'mapping': { 'type': 'nested' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate': {"
+						+ "     'match_mapping_type': 'object',"
+						+ "     'mapping': { 'type': 'nested' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForInitialization()
-					+ "}"
+						+ " }"
 				+ "}"
 		);
 
@@ -351,17 +351,17 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		assertJsonEquals(
 				"{"
-					+ "'dynamic': 'true',"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate': {"
-									+ "'match_mapping_type': 'object',"
-									+ "'path_match': '*_suffix',"
-									+ "'mapping': { 'type': 'nested', 'dynamic': 'true' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic': 'true',"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate': {"
+						+ "     'match_mapping_type': 'object',"
+						+ "     'path_match': '*_suffix',"
+						+ "     'mapping': { 'type': 'nested', 'dynamic': 'true' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForExpectations()
-					+ "}"
+						+ " }"
 				+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -377,16 +377,16 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate': {"
-									+ "'match_mapping_type': 'object',"
-									+ "'path_match': '*_suffix2',"
-									+ "'mapping': { 'type': 'nested' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate': {"
+						+ "     'match_mapping_type': 'object',"
+						+ "     'path_match': '*_suffix2',"
+						+ "     'mapping': { 'type': 'nested' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForInitialization()
-					+ "}"
+						+ " }"
 				+ "}"
 		);
 
@@ -394,17 +394,17 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		assertJsonEquals(
 				"{"
-					+ "'dynamic': 'true',"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate': {"
-									+ "'match_mapping_type': 'object',"
-									+ "'path_match': '*_suffix',"
-									+ "'mapping': { 'type': 'nested', 'dynamic': 'true' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic': 'true',"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate': {"
+						+ "     'match_mapping_type': 'object',"
+						+ "     'path_match': '*_suffix',"
+						+ "     'mapping': { 'type': 'nested', 'dynamic': 'true' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForExpectations()
-					+ "}"
+						+ " }"
 				+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -419,15 +419,15 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate': {"
-									+ "'path_match': '*_suffix',"
-									+ "'mapping': { 'type': 'keyword' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate': {"
+						+ "     'path_match': '*_suffix',"
+						+ "     'mapping': { 'type': 'keyword' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForInitialization()
-					+ "}"
+						+ " }"
 				+ "}"
 		);
 
@@ -435,16 +435,16 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		assertJsonEqualsIgnoringUnknownFields(
 				"{"
-					+ "'dynamic': 'true',"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate': {"
-									+ "'path_match': '*',"
-									+ "'mapping':" + keywordMappingForExpectations()
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic': 'true',"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping':" + keywordMappingForExpectations()
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForExpectations()
-					+ "}"
+						+ " }"
 				+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -459,15 +459,15 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate': {"
-									+ "'path_match': '*',"
-									+ "'mapping': { 'type': 'nested' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping': { 'type': 'nested' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForInitialization()
-					+ "}"
+						+ " }"
 				+ "}"
 		);
 
@@ -475,17 +475,17 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		assertJsonEquals(
 				"{"
-					+ "'dynamic': 'true',"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate': {"
-									+ "'path_match': '*',"
-									+ "'match_mapping_type': 'object',"
-									+ "'mapping': { 'type': 'nested', 'dynamic': 'true' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic': 'true',"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate': {"
+						+ "     'path_match': '*',"
+						+ "     'match_mapping_type': 'object',"
+						+ "     'mapping': { 'type': 'nested', 'dynamic': 'true' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForExpectations()
-					+ "}"
+						+ " }"
 				+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -500,16 +500,16 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate': {"
-									+ "'path_match': '*',"
-									+ "'match_mapping_type': 'long',"
-									+ "'mapping': { 'type': 'nested' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate': {"
+						+ "     'path_match': '*',"
+						+ "     'match_mapping_type': 'long',"
+						+ "     'mapping': { 'type': 'nested' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForInitialization()
-					+ "}"
+						+ " }"
 				+ "}"
 		);
 
@@ -517,17 +517,17 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		assertJsonEquals(
 				"{"
-					+ "'dynamic': 'true',"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate': {"
-									+ "'path_match': '*',"
-									+ "'match_mapping_type': 'object',"
-									+ "'mapping': { 'type': 'nested', 'dynamic': 'true' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic': 'true',"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate': {"
+						+ "     'path_match': '*',"
+						+ "     'match_mapping_type': 'object',"
+						+ "     'mapping': { 'type': 'nested', 'dynamic': 'true' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForExpectations()
-					+ "}"
+						+ " }"
 				+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -542,16 +542,16 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate': {"
-									+ "'path_match': '*',"
-									+ "'match_mapping_type': 'long',"
-									+ "'mapping': { 'type': 'keyword' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate': {"
+						+ "     'path_match': '*',"
+						+ "     'match_mapping_type': 'long',"
+						+ "     'mapping': { 'type': 'keyword' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForInitialization()
-					+ "}"
+						+ " }"
 				+ "}"
 		);
 
@@ -559,16 +559,16 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		assertJsonEqualsIgnoringUnknownFields(
 				"{"
-					+ "'dynamic': 'true',"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate': {"
-									+ "'path_match': '*',"
-									+ "'mapping':" + keywordMappingForExpectations()
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic': 'true',"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping':" + keywordMappingForExpectations()
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForExpectations()
-					+ "}"
+						+ " }"
 				+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -583,16 +583,16 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate': {"
-									+ "'path_match': '*',"
-									+ "'match': '*_suffix',"
-									+ "'mapping': { 'type': 'keyword' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate': {"
+						+ "     'path_match': '*',"
+						+ "     'match': '*_suffix',"
+						+ "     'mapping': { 'type': 'keyword' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForInitialization()
-					+ "}"
+						+ " }"
 				+ "}"
 		);
 
@@ -600,16 +600,16 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		assertJsonEqualsIgnoringUnknownFields(
 				"{"
-					+ "'dynamic': 'true',"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate': {"
-									+ "'path_match': '*',"
-									+ "'mapping':" + keywordMappingForExpectations()
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic': 'true',"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping':" + keywordMappingForExpectations()
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForExpectations()
-					+ "}"
+						+ " }"
 				+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -624,15 +624,15 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate': {"
-									+ "'path_match': '*',"
-									+ "'mapping': { 'type': 'integer' }"
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping': { 'type': 'integer' }"
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForInitialization()
-					+ "}"
+						+ " }"
 				+ "}"
 		);
 
@@ -640,16 +640,16 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		assertJsonEqualsIgnoringUnknownFields(
 				"{"
-					+ "'dynamic': 'true',"
-					+ "'dynamic_templates': ["
-							+ "{'myTemplate': {"
-									+ "'path_match': '*',"
-									+ "'mapping':" + keywordMappingForExpectations()
-							+ "} }"
-					+ "],"
-					+ "'properties': {"
+						+ " 'dynamic': 'true',"
+						+ " 'dynamic_templates': ["
+						+ "   {'myTemplate': {"
+						+ "     'path_match': '*',"
+						+ "     'mapping':" + keywordMappingForExpectations()
+						+ "   } }"
+						+ " ],"
+						+ " 'properties': {"
 							+ defaultMetadataMappingForExpectations()
-					+ "}"
+						+ " }"
 				+ "}",
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -673,21 +673,21 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 	private String integerMappingForExpectations() {
 		return "{"
-				+ "'type': 'integer',"
-				+ "'doc_values': false"
+						+ "  'type': 'integer',"
+						+ "  'doc_values': false"
 				+ "}";
 	}
 
 	private String textMappingForExpectations() {
 		return "{"
-				+ "'type': 'text',"
-				+ "'analyzer': 'default'"
+						+ "  'type': 'text',"
+						+ "  'analyzer': 'default'"
 				+ "}";
 	}
 
 	private String keywordMappingForExpectations() {
 		return "{"
-				+ "'type': 'keyword'"
+						+ "  'type': 'keyword'"
 				+ "}";
 	}
 }

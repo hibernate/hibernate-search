@@ -71,7 +71,7 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 		assertJsonEquals(
 				"{"
 						+ "'" + defaultWriteAlias( index.name() ) + "': " + simpleWriteAliasDefinition() + ", "
-						+ "'" + defaultReadAlias( index.name() ) + "': " + simpleReadAliasDefinition()
+						+ "  '" + defaultReadAlias( index.name() ) + "': " + simpleReadAliasDefinition()
 				+ "}",
 				elasticsearchClient.index( index.name() ).aliases().get()
 		);
@@ -101,7 +101,7 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 		assertJsonEquals(
 				"{"
 						+ "'custom-write': " + simpleWriteAliasDefinition() + ", "
-						+ "'custom-read': " + simpleReadAliasDefinition()
+						+ "  'custom-read': " + simpleReadAliasDefinition()
 				+ "}",
 				elasticsearchClient.index( index.name() ).aliases().get()
 		);
@@ -126,7 +126,7 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 		assertJsonEquals(
 				"{"
 						+ "'" + defaultWriteAlias( index.name() ) + "': " + simpleWriteAliasDefinition() + ", "
-						+ "'" + defaultReadAlias( index.name() ) + "': " + simpleReadAliasDefinition()
+						+ "  '" + defaultReadAlias( index.name() ) + "': " + simpleReadAliasDefinition()
 						+ "}",
 				elasticsearchClient.index( index.name() ).aliases().get()
 		);

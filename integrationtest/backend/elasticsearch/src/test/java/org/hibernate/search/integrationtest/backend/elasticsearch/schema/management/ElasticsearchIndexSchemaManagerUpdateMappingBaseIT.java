@@ -55,15 +55,15 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 				.type().putMapping(
 						simpleMappingForInitialization(
 								"'myField': {"
-										+ "'type': 'date',"
-										+ "'index': true,"
-										+ "'doc_values': false,"
-										+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
-										+ "'ignore_malformed': true" // Ignored during migration
+										+ "  'type': 'date',"
+										+ "  'index': true,"
+										+ "  'doc_values': false,"
+										+ "  'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
+										+ "  'ignore_malformed': true" // Ignored during migration
 								+ "},"
 								+ "'NOTmyField': {" // Ignored during migration
-										+ "'type': 'date',"
-										+ "'index': true"
+										+ "  'type': 'date',"
+										+ "  'index': true"
 								+ "}"
 						)
 				);
@@ -73,13 +73,13 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 		assertJsonEquals(
 				simpleMappingForExpectations(
 						"'myField': {"
-								+ "'type': 'date',"
-								+ "'doc_values': false,"
-								+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
-								+ "'ignore_malformed': true" // Assert it was not removed
+								+ "  'type': 'date',"
+								+ "  'doc_values': false,"
+								+ "  'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
+								+ "  'ignore_malformed': true" // Assert it was not removed
 						+ "},"
 						+ "'NOTmyField': {" // Assert it was not removed
-								+ "'type': 'date'"
+								+ "  'type': 'date'"
 						+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
@@ -98,13 +98,13 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 				.type().putMapping(
 						simpleMappingForInitialization(
 								"'myField': {"
-										+ "'type': 'boolean',"
-										+ "'doc_values': false,"
-										+ "'index': true"
+										+ "  'type': 'boolean',"
+										+ "  'doc_values': false,"
+										+ "  'index': true"
 								+ "},"
 								+ "'NOTmyField': {" // Ignored during migration
-										+ "'type': 'boolean',"
-										+ "'index': true"
+										+ "  'type': 'boolean',"
+										+ "  'index': true"
 								+ "}"
 						)
 				);
@@ -114,11 +114,11 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 		assertJsonEquals(
 				simpleMappingForExpectations(
 						"'myField': {"
-								+ "'type': 'boolean',"
-								+ "'doc_values': false"
+								+ "  'type': 'boolean',"
+								+ "  'doc_values': false"
 						+ "},"
 						+ "'NOTmyField': {" // Assert it was not removed
-								+ "'type': 'boolean'"
+								+ "  'type': 'boolean'"
 						+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
@@ -151,16 +151,16 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 						simpleMappingForInitialization(
 								"'defaultAnalyzer': {"
-										+ "'type': 'text'"
+										+ "  'type': 'text'"
 								+ "},"
 								+ "'nonDefaultAnalyzer': {"
-										+ "'type': 'text',"
-										+ "'analyzer': 'customAnalyzer'"
+										+ "  'type': 'text',"
+										+ "  'analyzer': 'customAnalyzer'"
 								+ "},"
 								+ "'normalizer': {"
-										+ "'type': 'keyword',"
-										+ "'doc_values': false,"
-										+ "'normalizer': 'customNormalizer'"
+										+ "  'type': 'keyword',"
+										+ "  'doc_values': false,"
+										+ "  'normalizer': 'customNormalizer'"
 								+ "}"
 						)
 				);
@@ -170,16 +170,16 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 		assertJsonEquals(
 				simpleMappingForExpectations(
 						"'defaultAnalyzer': {"
-								+ "'type': 'text'"
+								+ "  'type': 'text'"
 						+ "},"
 						+ "'nonDefaultAnalyzer': {"
-								+ "'type': 'text',"
-								+ "'analyzer': 'customAnalyzer'"
+								+ "  'type': 'text',"
+								+ "  'analyzer': 'customAnalyzer'"
 						+ "},"
 						+ "'normalizer': {"
-								+ "'type': 'keyword',"
-								+ "'doc_values': false,"
-								+ "'normalizer': 'customNormalizer'"
+								+ "  'type': 'keyword',"
+								+ "  'doc_values': false,"
+								+ "  'normalizer': 'customNormalizer'"
 						+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
@@ -200,9 +200,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 		assertJsonEquals(
 				simpleMappingForExpectations(
 						"'myField': {"
-									+ "'type': 'boolean',"
-									+ "'doc_values': false"
-							+ "}"
+								+ "   'type': 'boolean',"
+								+ "   'doc_values': false"
+								+ " }"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
@@ -220,18 +220,18 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 				.type().putMapping(
 						"{"
 								// "dynamic" missing
-								+ "'properties': {"
+								+ "  'properties': {"
 										+ defaultMetadataMappingAndCommaForInitialization()
-										+ "'myField': {"
-												+ "'type': 'boolean',"
-												+ "'doc_values': false,"
-												+ "'index': true"
-										+ "},"
-										+ "'NOTmyField': {"
-												+ "'type': 'boolean',"
-												+ "'index': true"
-										+ "}"
-								+ "}"
+								+ "    'myField': {"
+								+ "      'type': 'boolean',"
+								+ "      'doc_values': false,"
+								+ "      'index': true"
+								+ "    },"
+								+ "    'NOTmyField': {"
+								+ "      'type': 'boolean',"
+								+ "      'index': true"
+								+ "    }"
+								+ "  }"
 						+ "}"
 				);
 
@@ -240,11 +240,11 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 		assertJsonEquals(
 				simpleMappingForExpectations(
 						"'myField': {"
-								+ "'type': 'boolean',"
-								+ "'doc_values': false"
+								+ "  'type': 'boolean',"
+								+ "  'doc_values': false"
 						+ "},"
 						+ "'NOTmyField': {" // Assert it was not removed
-								+ "'type': 'boolean'"
+								+ "  'type': 'boolean'"
 						+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
@@ -263,8 +263,8 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 				.type().putMapping(
 						simpleMappingForInitialization(
 								"'NOTmyField': {"
-										+ "'type': 'date',"
-										+ "'index': true"
+										+ "  'type': 'date',"
+										+ "  'index': true"
 								+ "}"
 						)
 				);
@@ -274,12 +274,12 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 		assertJsonEquals(
 				simpleMappingForExpectations(
 						"'myField': {"
-								+ "'type': 'date',"
-								+ "'doc_values': false,"
-								+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "'"
+								+ "  'type': 'date',"
+								+ "  'doc_values': false,"
+								+ "  'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "'"
 						+ "},"
 						+ "'NOTmyField': {" // Assert it was not removed
-								+ "'type': 'date'"
+								+ "  'type': 'date'"
 						+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
@@ -298,9 +298,9 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 				.type().putMapping(
 						simpleMappingForInitialization(
 							"'myField': {"
-									+ "'type': 'date',"
-									+ "'index': false," // Invalid
-									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "'"
+									+ "  'type': 'date',"
+									+ "  'index': false," // Invalid
+									+ "  'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "'"
 							+ "}"
 						)
 				);
@@ -331,8 +331,8 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'analyzer': {"
-							+ "'type': 'text',"
-							+ "'analyzer': 'standard'" // Invalid
+							+ "  'type': 'text',"
+							+ "  'analyzer': 'standard'" // Invalid
 					+ "}"
 				)
 		);
@@ -363,8 +363,8 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'normalizer': {"
-								+ "'type': 'keyword',"
-								+ "'normalizer': 'customNormalizer2'" // Invalid
+								+ "  'type': 'keyword',"
+								+ "  'normalizer': 'customNormalizer2'" // Invalid
 						+ "}"
 				)
 		);
@@ -404,19 +404,19 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 
 	private String generateAnalysisSettings() {
 		return "{"
-					+ "'analyzer': {"
-						+ "'customAnalyzer': {"
-								+ "'type': 'keyword'"
-						+ "}"
-					+ "},"
-					+ "'normalizer': {"
-						+ "'customNormalizer': {"
-								+ "'filter': ['asciifolding']"
-						+ "},"
-						+ "'customNormalizer2': {"
-								+ "'filter': ['asciifolding']"
-						+ "}"
-					+ "}"
+						+ " 'analyzer': {"
+						+ "  'customAnalyzer': {"
+						+ "    'type': 'keyword'"
+						+ "  }"
+						+ " },"
+						+ " 'normalizer': {"
+						+ "  'customNormalizer': {"
+						+ "    'filter': ['asciifolding']"
+						+ "  },"
+						+ "  'customNormalizer2': {"
+						+ "    'filter': ['asciifolding']"
+						+ "  }"
+						+ " }"
 				+ "}";
 	}
 

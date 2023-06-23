@@ -66,10 +66,10 @@ public class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'field': {"
-								+ "'type': 'keyword'"
+								+ "  'type': 'keyword'"
 						+ "},"
 						+ "'NOTmyField': {" // Ignored during validation
-								+ "'type': 'date'"
+								+ "  'type': 'date'"
 						+ "}"
 				)
 		);
@@ -77,10 +77,10 @@ public class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 		assertJsonEquals(
 				simpleMappingForExpectations(
 						"'field': {"
-								+ "'type': 'keyword'"
+								+ "  'type': 'keyword'"
 						+ "},"
 						+ "'NOTmyField': {" // Ignored during validation
-								+ "'type': 'date'"
+								+ "  'type': 'date'"
 						+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()
@@ -92,10 +92,10 @@ public class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 		assertJsonEquals(
 				simpleMappingForExpectations(
 						"'field': {"
-								+ "'type': 'keyword'"
+								+ "  'type': 'keyword'"
 						+ "},"
 						+ "'NOTmyField': {" // Ignored during validation
-								+ "'type': 'date'"
+								+ "  'type': 'date'"
 						+ "}"
 				),
 				elasticSearchClient.index( index.name() ).type().getMapping()

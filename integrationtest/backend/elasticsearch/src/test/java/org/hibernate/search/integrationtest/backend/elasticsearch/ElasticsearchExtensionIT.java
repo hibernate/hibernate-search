@@ -391,13 +391,13 @@ public class ElasticsearchExtensionIT {
 						f.extension( ElasticsearchExtension.get() )
 								.fromJson( gson.fromJson(
 										"{"
-											+ "'geo_distance': {"
-												+ "'distance': '200km',"
-												+ "'nativeField_geoPoint': {"
-													+ "'lat': 40,"
-													+ "'lon': -70"
-												+ "}"
-											+ "}"
+												+ " 'geo_distance': {"
+												+ "  'distance': '200km',"
+												+ "  'nativeField_geoPoint': {"
+												+ "   'lat': 40,"
+												+ "   'lon': -70"
+												+ "  }"
+												+ " }"
 										+ "}",
 										JsonObject.class
 								)
@@ -421,13 +421,13 @@ public class ElasticsearchExtensionIT {
 		SearchPredicate predicate3 = scope.predicate().extension( ElasticsearchExtension.get() )
 				.fromJson( gson.fromJson(
 						"{"
-							+ "'geo_distance': {"
-								+ "'distance': '200km',"
-								+ "'nativeField_geoPoint': {"
-									+ "'lat': 40,"
-									+ "'lon': -70"
-								+ "}"
-							+ "}"
+								+ " 'geo_distance': {"
+								+ "  'distance': '200km',"
+								+ "  'nativeField_geoPoint': {"
+								+ "   'lat': 40,"
+								+ "   'lon': -70"
+								+ "  }"
+								+ " }"
 						+ "}",
 						JsonObject.class
 				) )
@@ -459,13 +459,13 @@ public class ElasticsearchExtensionIT {
 						f.extension( ElasticsearchExtension.get() )
 								.fromJson(
 										"{"
-											+ "'geo_distance': {"
-												+ "'distance': '200km',"
-												+ "'nativeField_geoPoint': {"
-													+ "'lat': 40,"
-													+ "'lon': -70"
-												+ "}"
-											+ "}"
+												+ " 'geo_distance': {"
+												+ "  'distance': '200km',"
+												+ "  'nativeField_geoPoint': {"
+												+ "   'lat': 40,"
+												+ "   'lon': -70"
+												+ "  }"
+												+ " }"
 										+ "}"
 								)
 						)
@@ -487,13 +487,13 @@ public class ElasticsearchExtensionIT {
 		SearchPredicate predicate3 = scope.predicate().extension( ElasticsearchExtension.get() )
 				.fromJson(
 						"{"
-							+ "'geo_distance': {"
-								+ "'distance': '200km',"
-								+ "'nativeField_geoPoint': {"
-									+ "'lat': 40,"
-									+ "'lon': -70"
-								+ "}"
-							+ "}"
+								+ " 'geo_distance': {"
+								+ "  'distance': '200km',"
+								+ "  'nativeField_geoPoint': {"
+								+ "   'lat': 40,"
+								+ "   'lon': -70"
+								+ "  }"
+								+ " }"
 						+ "}"
 				)
 				.toPredicate();
@@ -848,13 +848,13 @@ public class ElasticsearchExtensionIT {
 		assertThat( result ).hasSize( 1 );
 		assertJsonEquals(
 				"{"
-						+ "'string': 'text 5',"
-						+ "'nativeField_string': 'text 2',"
-						+ "'nativeField_integer': 1,"
-						+ "'nativeField_geoPoint': {'lat': 45.12, 'lon': -75.34},"
-						+ "'nativeField_dateWithColons': '2018:01:25',"
-						+ "'nativeField_unsupportedType': 'foobar',"
-						+ "'nativeField_sort5': 'z'"
+						+ "  'string': 'text 5',"
+						+ "  'nativeField_string': 'text 2',"
+						+ "  'nativeField_integer': 1,"
+						+ "  'nativeField_geoPoint': {'lat': 45.12, 'lon': -75.34},"
+						+ "  'nativeField_dateWithColons': '2018:01:25',"
+						+ "  'nativeField_unsupportedType': 'foobar',"
+						+ "  'nativeField_sort5': 'z'"
 						+ "}",
 				result.get( 0 ).toString(),
 				JSONCompareMode.LENIENT
@@ -885,13 +885,13 @@ public class ElasticsearchExtensionIT {
 		assertThat( result ).hasSize( 1 );
 		assertJsonEquals(
 				"{"
-						+ "'string': 'text 5',"
-						+ "'nativeField_string': 'text 2',"
-						+ "'nativeField_integer': 1,"
-						+ "'nativeField_geoPoint': {'lat': 45.12, 'lon': -75.34},"
-						+ "'nativeField_dateWithColons': '2018:01:25',"
-						+ "'nativeField_unsupportedType': 'foobar',"
-						+ "'nativeField_sort5': 'z'"
+						+ "  'string': 'text 5',"
+						+ "  'nativeField_string': 'text 2',"
+						+ "  'nativeField_integer': 1,"
+						+ "  'nativeField_geoPoint': {'lat': 45.12, 'lon': -75.34},"
+						+ "  'nativeField_dateWithColons': '2018:01:25',"
+						+ "  'nativeField_unsupportedType': 'foobar',"
+						+ "  'nativeField_sort5': 'z'"
 						+ "}",
 				result.get( 0 ).toString(),
 				JSONCompareMode.LENIENT
@@ -928,8 +928,8 @@ public class ElasticsearchExtensionIT {
 		assertThat( result ).hasSize( 1 );
 		assertJsonEquals(
 				"{"
-						+ "'_id': '" + FIRST_ID + "',"
-						+ "'_index': '" + defaultPrimaryName( mainIndex.name() ) + "'"
+						+ "  '_id': '" + FIRST_ID + "',"
+						+ "  '_index': '" + defaultPrimaryName( mainIndex.name() ) + "'"
 						+ "}",
 				result.get( 0 ).toString(),
 				JSONCompareMode.LENIENT
@@ -966,8 +966,8 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.matchAll() )
 				.aggregation( documentCountPerValue, f -> f.fromJson( gson.fromJson(
 						"{"
-								+ "'value_count' : {"
-										+ "'field' : 'nativeField_aggregation'"
+								+ "  'value_count' : {"
+								+ "    'field' : 'nativeField_aggregation'"
 								+ " }"
 								+ "}",
 						JsonObject.class
@@ -976,7 +976,7 @@ public class ElasticsearchExtensionIT {
 		JsonObject aggregationResult = query.fetchAll().aggregation( documentCountPerValue );
 		assertJsonEquals(
 				"{"
-						+ "'value': 3"
+						+ "  'value': 3"
 						+ "}",
 				aggregationResult.toString()
 		);
@@ -994,16 +994,16 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.matchAll() )
 				.aggregation( documentCountPerValue, f -> f.fromJson(
 						"{"
-								+ "'value_count' : {"
-										+ "'field' : 'nativeField_aggregation'"
+								+ "  'value_count' : {"
+								+ "    'field' : 'nativeField_aggregation'"
 								+ " }"
-								+ "}"
+								+ "  }"
 				) )
 				.toQuery();
 		JsonObject aggregationResult = query.fetchAll().aggregation( documentCountPerValue );
 		assertJsonEquals(
 				"{"
-						+ "'value': 3"
+						+ "  'value': 3"
 						+ "}",
 				aggregationResult.toString()
 		);

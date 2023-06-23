@@ -105,9 +105,9 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 	public PredicateFinalStep createSlowPredicate(SearchPredicateFactory f) {
 		return f.extension( ElasticsearchExtension.get() )
 				.fromJson( "{\"script\": {"
-						+ "\"script\": \""
-								+ "long end = System.nanoTime() + 10000000L;"
-								+ "while ( System.nanoTime() < end ) {"
+								+ "  \"script\": \""
+								+ "  long end = System.nanoTime() + 10000000L;"
+								+ "  while ( System.nanoTime() < end ) {"
 										// We can't use Thread.sleep, so let's do something slow.
 										// Note that (0L, 100000000L) takes forever to execute on AWS ES Service,
 										// so we'll stick to a shorter range.

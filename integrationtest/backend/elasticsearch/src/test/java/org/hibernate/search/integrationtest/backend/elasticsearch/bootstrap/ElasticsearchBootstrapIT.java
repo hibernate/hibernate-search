@@ -339,10 +339,10 @@ public class ElasticsearchBootstrapIT {
 				.isEqualTo( "\"42\"" );
 		assertJsonEqualsIgnoringUnknownFields(
 				"{"
-					+ "'properties': {"
-							+ "'custom': {"
-							+ "}"
-					+ "}"
+						+ " 'properties': {"
+						+ "   'custom': {"
+						+ "   }"
+						+ " }"
 				+ "}",
 				elasticsearchClient.index( index.name() ).type().getMapping() );
 	}

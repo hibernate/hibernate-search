@@ -90,7 +90,7 @@ public class ElasticsearchProjectionDslIT {
 			assertThat( hits ).hasSize( 4 );
 			assertThat( hits ).allSatisfy( hit -> assertJsonEquals(
 					"{"
-							+ "'_index': '" + defaultPrimaryName( Book.NAME ) + "'"
+							+ "  '_index': '" + defaultPrimaryName( Book.NAME ) + "'"
 							+ "}",
 					hit.toString(),
 					JSONCompareMode.LENIENT

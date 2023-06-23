@@ -74,13 +74,13 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-					+ "'properties': {"
+						+ " 'properties': {"
 							+ defaultMetadataMappingAndCommaForInitialization()
-							+ "'myField': {"
-									+ "'type': 'integer',"
-									+ "'index': true"
-							+ "}"
-					+ "}"
+						+ "   'myField': {"
+						+ "     'type': 'integer',"
+						+ "     'index': true"
+						+ "   }"
+						+ " }"
 				+ "}"
 		);
 
@@ -100,14 +100,14 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-					+ "'dynamic': false,"
-					+ "'properties': {"
+						+ " 'dynamic': false,"
+						+ " 'properties': {"
 							+ defaultMetadataMappingAndCommaForInitialization()
-							+ "'myField': {"
-									+ "'type': 'integer',"
-									+ "'index': true"
-							+ "}"
-					+ "}"
+						+ "   'myField': {"
+						+ "     'type': 'integer',"
+						+ "     'index': true"
+						+ "   }"
+						+ " }"
 				+ "}"
 		);
 
@@ -128,7 +128,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-					+ "'dynamic': 'strict'"
+						+ " 'dynamic': 'strict'"
 				+ "}"
 		);
 
@@ -150,9 +150,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-					+ "}"
+						+ " 'dynamic': 'strict',"
+						+ " 'properties': {"
+						+ " }"
 				+ "}"
 		);
 
@@ -175,8 +175,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'keyword',"
-							+ "'index': true"
+							+ "  'type': 'keyword',"
+							+ "  'index': true"
 					+ "}"
 				)
 		);
@@ -199,7 +199,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'integer'"
+							+ "  'type': 'integer'"
 					+ "}"
 				)
 		);
@@ -218,8 +218,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'myField': {"
-								+ "'type': 'integer',"
-								+ "'index': true"
+								+ "  'type': 'integer',"
+								+ "  'index': true"
 						+ "}"
 				)
 		);
@@ -238,8 +238,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'integer',"
-							+ "'index': false"
+							+ "  'type': 'integer',"
+							+ "  'index': false"
 					+ "}"
 				)
 		);
@@ -263,8 +263,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'integer',"
-							+ "'index': false"
+							+ "  'type': 'integer',"
+							+ "  'index': false"
 					+ "}"
 				)
 		);
@@ -283,9 +283,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'text',"
-							+ "'analyzer': 'keyword',"
-							+ "'index': false"
+							+ "  'type': 'text',"
+							+ "  'analyzer': 'keyword',"
+							+ "  'index': false"
 					+ "}"
 				)
 		);
@@ -305,7 +305,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'date'"
+							+ "  'type': 'date'"
 					+ "}"
 				)
 		);
@@ -334,8 +334,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'date',"
-							+ "'format': '" + allFormats + "'"
+							+ "  'type': 'date',"
+							+ "  'format': '" + allFormats + "'"
 					+ "}"
 				)
 		);
@@ -361,8 +361,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'date',"
-							+ "'format': '" + firstFormat + "'"
+							+ "  'type': 'date',"
+							+ "  'format': '" + firstFormat + "'"
 					+ "}"
 				)
 		);
@@ -390,8 +390,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'date',"
-							+ "'format': '" + allFormats + "||yyyy" + "'"
+							+ "  'type': 'date',"
+							+ "  'format': '" + allFormats + "||yyyy" + "'"
 					+ "}"
 				)
 		);
@@ -417,8 +417,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'date',"
-							+ "'format': 'epoch_millis||strict_date_time'"
+							+ "  'type': 'date',"
+							+ "  'format': 'epoch_millis||strict_date_time'"
 					+ "}"
 				)
 		);
@@ -445,8 +445,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'text',"
-							+ "'index': true"
+							+ "  'type': 'text',"
+							+ "  'index': true"
 					+ "}"
 				)
 		);
@@ -469,9 +469,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'text',"
-							+ "'index': true,"
-							+ "'analyzer': 'keyword'"
+							+ "  'type': 'text',"
+							+ "  'index': true,"
+							+ "  'analyzer': 'keyword'"
 					+ "}"
 				)
 		);
@@ -489,9 +489,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'text',"
-							+ "'index': true,"
-							+ "'analyzer': 'keyword'"
+							+ "  'type': 'text',"
+							+ "  'index': true,"
+							+ "  'analyzer': 'keyword'"
 					+ "}"
 				)
 		);
@@ -515,9 +515,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'text',"
-							+ "'index': true,"
-							+ "'analyzer': 'keyword'"
+							+ "  'type': 'text',"
+							+ "  'index': true,"
+							+ "  'analyzer': 'keyword'"
 					+ "}"
 				)
 		);
@@ -541,10 +541,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'text',"
-							+ "'index': true,"
-							+ "'analyzer': 'keyword',"
-							+ "'search_analyzer': 'english'"
+							+ "  'type': 'text',"
+							+ "  'index': true,"
+							+ "  'analyzer': 'keyword',"
+							+ "  'search_analyzer': 'english'"
 					+ "}"
 				)
 		);
@@ -562,10 +562,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'text',"
-							+ "'index': true,"
-							+ "'analyzer': 'keyword',"
-							+ "'search_analyzer': 'english'"
+							+ "  'type': 'text',"
+							+ "  'index': true,"
+							+ "  'analyzer': 'keyword',"
+							+ "  'search_analyzer': 'english'"
 					+ "}"
 				)
 		);
@@ -591,11 +591,11 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'myField': {"
-								+ "'type': 'text',"
-								+ "'index': true,"
-								+ "'analyzer': 'keyword',"
-								+ "'search_analyzer': 'keyword'"
-								+ "}"
+								+ "  'type': 'text',"
+								+ "  'index': true,"
+								+ "  'analyzer': 'keyword',"
+								+ "  'search_analyzer': 'keyword'"
+								+ "  }"
 				)
 		);
 
@@ -613,11 +613,11 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'myField': {"
-								+ "'type': 'text',"
-								+ "'index': true,"
-								+ "'analyzer': 'keyword',"
-								+ "'search_analyzer': 'english'"
-								+ "}"
+								+ "  'type': 'text',"
+								+ "  'index': true,"
+								+ "  'analyzer': 'keyword',"
+								+ "  'search_analyzer': 'english'"
+								+ "  }"
 				)
 		);
 
@@ -639,8 +639,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'text',"
-							+ "'norms': false"
+							+ "  'type': 'text',"
+							+ "  'norms': false"
 					+ "}"
 				)
 		);
@@ -658,8 +658,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'text',"
-							+ "'norms': false"
+							+ "  'type': 'text',"
+							+ "  'norms': false"
 					+ "}"
 				)
 		);
@@ -683,7 +683,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'text'"
+							+ "  'type': 'text'"
 					+ "}"
 				)
 		);
@@ -701,7 +701,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'keyword'"
+							+ "  'type': 'keyword'"
 					+ "}"
 				)
 		);
@@ -719,9 +719,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'text',"
-							+ "'analyzer': 'english',"
-							+ "'term_vector': 'with_positions_offsets'"
+							+ "  'type': 'text',"
+							+ "  'analyzer': 'english',"
+							+ "  'term_vector': 'with_positions_offsets'"
 					+ "}"
 				)
 		);
@@ -739,8 +739,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'text',"
-							+ "'analyzer': 'english'"
+							+ "  'type': 'text',"
+							+ "  'analyzer': 'english'"
 					+ "}"
 				)
 		);
@@ -758,9 +758,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'text',"
-							+ "'analyzer': 'english',"
-							+ "'term_vector': 'with_offsets'"
+							+ "  'type': 'text',"
+							+ "  'analyzer': 'english',"
+							+ "  'term_vector': 'with_offsets'"
 					+ "}"
 				)
 		);
@@ -783,8 +783,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'integer',"
-							+ "'null_value': 739"
+							+ "  'type': 'integer',"
+							+ "  'null_value': 739"
 					+ "}"
 				)
 		);
@@ -802,7 +802,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'integer'"
+							+ "  'type': 'integer'"
 					+ "}"
 				)
 		);
@@ -825,8 +825,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'integer',"
-							+ "'null_value': 777"
+							+ "  'type': 'integer',"
+							+ "  'null_value': 777"
 					+ "}"
 				)
 		);
@@ -849,8 +849,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'integer',"
-							+ "'doc_values': true"
+							+ "  'type': 'integer',"
+							+ "  'doc_values': true"
 					+ "}"
 				)
 		);
@@ -868,7 +868,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'integer'"
+							+ "  'type': 'integer'"
 					+ "}"
 				)
 		);
@@ -886,8 +886,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'integer',"
-							+ "'doc_values': false"
+							+ "  'type': 'integer',"
+							+ "  'doc_values': false"
 					+ "}"
 				)
 		);
@@ -911,8 +911,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'integer',"
-							+ "'doc_values': false"
+							+ "  'type': 'integer',"
+							+ "  'doc_values': false"
 					+ "}"
 				)
 		);
@@ -931,8 +931,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'keyword',"
-							+ "'doc_values': true"
+							+ "  'type': 'keyword',"
+							+ "  'doc_values': true"
 					+ "}"
 				)
 		);
@@ -950,8 +950,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'scaled_float',"
-							+ "'scaling_factor': 100"
+							+ "  'type': 'scaled_float',"
+							+ "  'scaling_factor': 100"
 					+ "}"
 				)
 		);
@@ -969,8 +969,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'scaled_float',"
-							+ "'scaling_factor': 2"
+							+ "  'type': 'scaled_float',"
+							+ "  'scaling_factor': 2"
 					+ "}"
 				)
 		);
@@ -993,8 +993,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'keyword',"
-							+ "'index': true"
+							+ "  'type': 'keyword',"
+							+ "  'index': true"
 					+ "}"
 				)
 		);
@@ -1016,32 +1016,32 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
-					+ "'normalizer': {"
-							+ "'custom-normalizer': {"
-									+ "'char_filter': ['custom-char-mapping'],"
-									+ "'filter': ['custom-elision']"
-							+ "}"
-					+ "},"
-					+ "'char_filter': {"
-							+ "'custom-char-mapping': {"
-									+ "'type': 'mapping',"
-									+ "'mappings': ['foo => bar']"
-							+ "}"
-					+ "},"
-					+ "'filter': {"
-							+ "'custom-elision': {"
-									+ "'type': 'elision',"
-									+ "'articles': ['l', 'd']"
-							+ "}"
-					+ "}"
+						+ " 'normalizer': {"
+						+ "   'custom-normalizer': {"
+						+ "     'char_filter': ['custom-char-mapping'],"
+						+ "     'filter': ['custom-elision']"
+						+ "   }"
+						+ " },"
+						+ " 'char_filter': {"
+						+ "   'custom-char-mapping': {"
+						+ "     'type': 'mapping',"
+						+ "     'mappings': ['foo => bar']"
+						+ "   }"
+						+ " },"
+						+ " 'filter': {"
+						+ "   'custom-elision': {"
+						+ "     'type': 'elision',"
+						+ "     'articles': ['l', 'd']"
+						+ "   }"
+						+ " }"
 				+ "}"
 		);
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'keyword',"
-							+ "'index': true,"
-							+ "'normalizer': 'custom-normalizer'"
+							+ "  'type': 'keyword',"
+							+ "  'index': true,"
+							+ "  'normalizer': 'custom-normalizer'"
 					+ "}"
 				)
 		);
@@ -1058,32 +1058,32 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
-					+ "'normalizer': {"
-							+ "'custom-normalizer': {"
-									+ "'char_filter': ['custom-char-mapping'],"
-									+ "'filter': ['custom-elision']"
-							+ "}"
-					+ "},"
-					+ "'char_filter': {"
-							+ "'custom-char-mapping': {"
-									+ "'type': 'mapping',"
-									+ "'mappings': ['foo => bar']"
-							+ "}"
-					+ "},"
-					+ "'filter': {"
-							+ "'custom-elision': {"
-									+ "'type': 'elision',"
-									+ "'articles': ['l', 'd']"
-							+ "}"
-					+ "}"
-					+ "}"
+						+ " 'normalizer': {"
+						+ "   'custom-normalizer': {"
+						+ "     'char_filter': ['custom-char-mapping'],"
+						+ "     'filter': ['custom-elision']"
+						+ "   }"
+						+ " },"
+						+ " 'char_filter': {"
+						+ "   'custom-char-mapping': {"
+						+ "     'type': 'mapping',"
+						+ "     'mappings': ['foo => bar']"
+						+ "   }"
+						+ " },"
+						+ " 'filter': {"
+						+ "   'custom-elision': {"
+						+ "     'type': 'elision',"
+						+ "     'articles': ['l', 'd']"
+						+ "   }"
+						+ " }"
+						+ " }"
 		);
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'myField': {"
-							+ "'type': 'keyword',"
-							+ "'index': true,"
-							+ "'normalizer': 'custom-normalizer'"
+							+ "  'type': 'keyword',"
+							+ "  'index': true,"
+							+ "  'normalizer': 'custom-normalizer'"
 					+ "}"
 				)
 		);
