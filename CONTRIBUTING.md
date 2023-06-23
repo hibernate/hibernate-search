@@ -98,6 +98,8 @@ few prerequisite steps:
 As discussed in the linked page, this also includes:
     * [Setting](https://help.github.com/articles/set-up-git) up your local git install
     * Cloning your fork
+* Instruct git to ignore certain commits when using `git blame`:
+`git config blame.ignoreRevsFile .git-blame-ignore-revs`
     
 ### Development environment
 
