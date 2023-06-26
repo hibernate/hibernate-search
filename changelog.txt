@@ -1,6 +1,45 @@
 Hibernate Search Changelog
 ==========================
 
+6.2.0.CR1 (2023-06-26)
+-------------------------
+
+** Bug
+    * HSEARCH-4877 [Infinispan] Provided identifier bridge not applied in Search DSL and `id` projection
+    * HSEARCH-4876 StackOverflow error when processing cyclic indexed embedded with excludePaths
+
+** Deprecation
+    * HSEARCH-4866 Deprecate hibernate.search.automatic_indexing.enable_dirty_checks for removal
+
+** Epic
+    * HSEARCH-1800 Offer API to index and query third party datasources easily
+
+** Improvement
+    * HSEARCH-4880 Upgrade to Hibernate ORM 5.6.15.Final
+    * HSEARCH-4875 Upgrade -orm6 artifacts to Hibernate ORM 6.2.5.Final
+    * HSEARCH-4871 Upgrade to Elasticsearch client 8.8.1 and test against Elasticsearch 8.8.1
+    * HSEARCH-4870 Add compatibility with OpenSearch 2.8.0
+    * HSEARCH-4863 Minor improvements to the documentation of highlighting
+    * HSEARCH-4725 @ObjectProjection filtering (includeDepth, includePaths, excludePaths) to apply projection constructors down to a certain depth
+    * HSEARCH-4616 Rename automatic indexing to something more explicit
+
+** New Feature
+    * HSEARCH-1182 excludePaths on indexedEmbedded
+
+** Remove Feature
+    * HSEARCH-4869 Drop compatibility with Hibernate ORM 6.1 and 6.0 in -orm6 artifacts, get rid of deprecated/internal class references
+
+** Task
+    * HSEARCH-4882 Avoid compilation failures when calling AnnotationMappingConfigurationContext#add without Jandex in the classpath
+    * HSEARCH-4881 Avoid non-static loggers
+    * HSEARCH-4879 Extract Jandex-dependent code to dedicated classes
+    * HSEARCH-4878 Reduce verbosity of "HSEARCH000616: Ignoring ServiceConfigurationError" logs
+    * HSEARCH-4873 Test Hibernate Search against JDK 22 EA
+    * HSEARCH-4872 Limit what's tested during a Lucene 9 upgrade job
+    * HSEARCH-4865 Upgrade build dependencies to the latest version in Search 6.2.0.CR1
+    * HSEARCH-4847 Move getting started guides to separate documents
+    * HSEARCH-4811 Automated code formatting
+
 6.2.0.Beta1 (2023-06-02)
 -------------------------
 
