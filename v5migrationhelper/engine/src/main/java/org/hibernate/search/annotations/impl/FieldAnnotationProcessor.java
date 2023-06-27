@@ -49,6 +49,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
 
+@Deprecated
 public class FieldAnnotationProcessor implements PropertyMappingAnnotationProcessor<Field> {
 	private static final String LEGACY_DEFAULT_NULL_TOKEN = "__DEFAULT_NULL_TOKEN__";
 
