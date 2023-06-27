@@ -115,6 +115,7 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 				.toQuery();
 	}
 
+	@SafeVarargs // while the method doesn't need to be final anymore with JDK 11 it still requires a SafeVarargs to make Eclipse compiler happy
 	private TopFieldDocs[] retrieveTopDocs(LuceneSearchQuery<?> query, LuceneSearchResult<DocumentReference>... results) {
 		Sort sort = query.luceneSort();
 		TopFieldDocs[] allTopDocs = new TopFieldDocs[results.length];

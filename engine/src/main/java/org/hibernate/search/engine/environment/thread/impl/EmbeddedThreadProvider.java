@@ -34,7 +34,9 @@ public final class EmbeddedThreadProvider implements ThreadProvider {
 	@SuppressForbiddenApis(reason = "It's unclear how we will handle this without the security manager;"
 			+ " we'll see when the security manager actually gets removed from the JDK")
 	public ThreadFactory createThreadFactory(String prefix) {
+		@SuppressWarnings("removal")
 		SecurityManager s = System.getSecurityManager();
+		@SuppressWarnings({ "removal", "deprecation" })
 		ThreadGroup group = ( s != null ) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
 		String namePrefix = createFullThreadNamePrefix( prefix );
 		return new SimpleThreadFactory( group, namePrefix );
