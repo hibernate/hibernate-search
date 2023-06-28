@@ -36,19 +36,6 @@ Map settings() {
 					updateProperties: ['version.org.hibernate.orm']
 					// In this case we'll rebuild and test everything.
 			]
-		case 'lucene9':
-			return [
-					updateProperties: ['version.org.apache.lucene'],
-					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
-					// Need to rebuild these module in order to get upgrade changes built and used in tests.
-					// No need to rebuild modules on which these ones depend since those should stay unchanged.
-					// * hibernate-search-backend-lucene -- build the backend itself
-					// * hibernate-search-integrationtest-backend-tck -- rebuild TCK to address some changes in supported features
-					// * hibernate-search-util-internal-integrationtest-backend-lucene -- utils depend on Lucene so we want to rebuild them since they are modified too
-					// * hibernate-search-util-internal-test-common -- changes due to jdk 11 upgrade
-					// * hibernate-search-util-internal-integrationtest-jbatch-runtime -jakarta/-orm6 -- because of the new driver additional properties are needed to be configured
-					additionalMavenArgs: '-pl :hibernate-search-backend-lucene,:hibernate-search-integrationtest-backend-tck,:hibernate-search-util-internal-integrationtest-backend-lucene,:hibernate-search-util-internal-test-common,:hibernate-search-util-internal-integrationtest-jbatch-runtime,:hibernate-search-util-internal-integrationtest-jbatch-runtime-jakarta,:hibernate-search-util-internal-integrationtest-jbatch-runtime-orm6'
-			]
 		default:
 			return [:]
 	}
@@ -146,7 +133,7 @@ pipeline {
 					axis {
 						name 'DEPENDENCY_UPDATE_NAME'
 						// NOTE: Remember to update the settings() method above when changing this.
-						values 'jandex3', 'orm5.6', 'orm6.2', 'orm6.3', 'orm6-in-main-code', 'lucene9'
+						values 'jandex3', 'orm5.6', 'orm6.2', 'orm6.3', 'orm6-in-main-code'
 					}
 				}
 				stages {
