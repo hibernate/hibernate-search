@@ -16,25 +16,15 @@ Map settings() {
 					// Need to rebuild this module in order to insert the Jandex 3 dependency in tests
 					additionalMavenArgs: '-pl :hibernate-search-util-internal-test-common'
 			]
-		case 'orm5.6':
-			return [
-					updateProperties: ['version.org.hibernate'],
-					onlyRunTestDependingOn: ['hibernate-search-mapper-orm', 'hibernate-search-mapper-orm-jakarta']
-			]
 		case 'orm6.2':
 			return [
 					updateProperties: ['version.org.hibernate.orm'],
-					onlyRunTestDependingOn: ['hibernate-search-mapper-orm-orm6']
+					onlyRunTestDependingOn: ['hibernate-search-mapper-orm']
 			]
 		case 'orm6.3':
 			return [
 					updateProperties: ['version.org.hibernate.orm'],
-					onlyRunTestDependingOn: ['hibernate-search-mapper-orm-orm6']
-			]
-		case 'orm6-in-main-code':
-			return [
-					updateProperties: ['version.org.hibernate.orm']
-					// In this case we'll rebuild and test everything.
+					onlyRunTestDependingOn: ['hibernate-search-mapper-orm']
 			]
 		default:
 			return [:]
@@ -133,7 +123,7 @@ pipeline {
 					axis {
 						name 'DEPENDENCY_UPDATE_NAME'
 						// NOTE: Remember to update the settings() method above when changing this.
-						values 'jandex3', 'orm5.6', 'orm6.2', 'orm6.3', 'orm6-in-main-code'
+						values 'jandex3', 'orm6.2', 'orm6.3'
 					}
 				}
 				stages {
