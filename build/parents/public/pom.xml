@@ -278,10 +278,6 @@
                                 <configuration>
                                     <skip>${documentation.config.properties.skip}</skip>
                                     <mainClass>org.hibernate.search.configuration.properties.collector.impl.ConfigurationPropertyProcessor</mainClass>
-                                    <executableDependency>
-                                        <groupId>org.hibernate.search</groupId>
-                                        <artifactId>hibernate-search-configuration-properties-collector</artifactId>
-                                    </executableDependency>
                                     <arguments>
                                         <argument>${javadoc.org.hibernate.search.url}</argument>
                                         <argument>${project.build.directory}</argument>
