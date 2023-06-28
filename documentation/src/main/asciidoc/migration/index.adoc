@@ -44,6 +44,13 @@ Hibernate Search {hibernateSearchVersion} now:
 - is based on Lucene 9 for its Lucene backend.
 - requires using Hibernate ORM versions from the 6.2.x family.
 
+When migrating from previous versions of Hibernate Search
+- If you were using Hibernate ORM 6.2 and your corresponding Hibernate Search dependencies included references
+to artifacts ending with `-orm6` (e.g. `hibernate-search-mapper-orm-orm6`) just remove the `-orm6` suffix
+(e.g. use `hibernate-search-mapper-orm` instead) when you upgrade to this version of Hibernate Search.
+- If you were using previous Hibernate ORM versions (e.g. Hibernate ORM 5.6), you would need to migrate to Hibernate ORM 6.2 first
+before upgrading to this version of Hibernate Search.
+See https://github.com/hibernate/hibernate-orm/wiki/Migration-Guides/[Hibernate ORM migration guides].
 
 [[data-format]]
 == Data format and schema changes
