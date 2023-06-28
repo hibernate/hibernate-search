@@ -254,21 +254,9 @@
         <!-- slf4j: used by the AWS SDK -->
         <version.org.slf4j>1.7.36</version.org.slf4j>
 
-        <!-- >>> ORM -->
-        <version.org.hibernate>5.6.15.Final</version.org.hibernate>
-        <javadoc.org.hibernate.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/javadocs/</javadoc.org.hibernate.url>
-        <documentation.org.hibernate.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.url>
-        <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM.
-             DO NOT USE DEPENDENCY MANAGEMENT FOR THESE DEPENDENCIES!
-             Thanks to not using dependency management for these dependencies, we get a build failure
-             when the versions start diverging, thanks to the maven-enforcer-plugin
-             and to our own explicit dependencies in the relevant artifacts.
-          -->
-        <version.org.hibernate.commons.annotations>${version.org.hibernate.commons.annotations.orm6}</version.org.hibernate.commons.annotations>
-        <version.net.bytebuddy>${version.net.bytebuddy.orm6}</version.net.bytebuddy>
-
         <!-- >>> ORM 6 with Jakarta Persistence -->
         <version.org.hibernate.orm>6.2.5.Final</version.org.hibernate.orm>
+
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
         <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM 6.
@@ -277,14 +265,14 @@
              when the versions start diverging, thanks to the maven-enforcer-plugin
              and to our own explicit dependencies in the relevant artifacts.
           -->
+        <version.org.hibernate.commons.annotations>6.0.6.Final</version.org.hibernate.commons.annotations>
+        <version.net.bytebuddy>1.12.18</version.net.bytebuddy>
         <version.io.smallrye.jandex>3.0.5</version.io.smallrye.jandex>
-        <version.org.hibernate.commons.annotations.orm6>6.0.6.Final</version.org.hibernate.commons.annotations.orm6>
         <version.jakarta.persistence>3.1.0</version.jakarta.persistence>
         <version.jakarta.transaction-api>2.0.1</version.jakarta.transaction-api>
         <version.jakarta.interceptor-api>2.0.1</version.jakarta.interceptor-api>
         <version.jakarta.enterprise>3.0.1</version.jakarta.enterprise>
         <version.jakarta.xml.bind>4.0.0</version.jakarta.xml.bind>
-        <version.net.bytebuddy.orm6>1.12.18</version.net.bytebuddy.orm6>
 
         <!-- >>> JSR 352 -->
         <version.jakarta.batch>2.1.1</version.jakarta.batch>
