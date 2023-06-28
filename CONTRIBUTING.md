@@ -198,8 +198,6 @@ as well as any other technology Hibernate Search integrates with.
 Here are some notable sub-directories:
   * `performance`: performance tests.
   * `showcase/library`: a sample application using Hibernate Search in a Spring Boot environment.
-* `jakarta`: Modules that take the source code of other modules (e.g. mapper/orm)
-and transform it to use Jakarta EE instead of Java EE. 
 * `mapper`: The mappers, i.e. the modules that expose APIs to index and search user entities,
 and do the work of converting between user entities and documents to be indexed.
   * `pojo-base`: Contains base classes and APIs that are re-used in other POJO-based mapper.
@@ -208,8 +206,6 @@ and do the work of converting between user entities and documents to be indexed.
   in the orm mapper (see above) using an outbox, i.e. an event table in the database. 
   * `pojo-standalone`: A mapper for POJOs in standalone mode, i.e. without Hibernate ORM.
     Currently incubating, i.e. backwards-incompatible changes in APIs may happen.
-* `orm6`: Modules that take the source code of other modules (e.g. mapper/orm)
-and transform it to use Hibernate ORM 6 instead of Hibernate ORM 5.x.
 * `util`: Various modules containing util classes, both for runtime and for tests.
 
 ## <a id="building-from-source"></a> Building from source
