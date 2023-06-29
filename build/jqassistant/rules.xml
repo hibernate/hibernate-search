@@ -5,8 +5,9 @@
  ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
  ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
   -->
-<jqa:jqassistant-rules xmlns:jqa="http://www.buschmais.com/jqassistant/core/rule/schema/v1.3">
-
+<jqassistant-rules xmlns="http://schema.jqassistant.org/rule/v1.10"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://schema.jqassistant.org/rule/v1.10 https://schema.jqassistant.org/rule/jqassistant-rule-v1.10.xsd">
     <concept id="hsearch:SuppressJQAssistant">
         <description>
             Contributes the :SuppressJQAssistant label at the type level.
@@ -866,4 +867,4 @@
         <includeConstraint refId="hsearch:PackagesShouldNotHaveCyclicDependencies" />
     </group>
 
-</jqa:jqassistant-rules>
+</jqassistant-rules>
