@@ -295,7 +295,7 @@
         <cypher><![CDATA[
             // supertypes
             MATCH
-                (type:Type:Public)-[:EXTENDS|:IMPLEMENTS]->(superType:Type:Impl)
+                (type:Type:Public)-[:EXTENDS|IMPLEMENTS]->(superType:Type:Impl)
             RETURN
                 type AS ExposingSite, superType.fqn AS ExposedType
 
@@ -372,7 +372,7 @@
         <cypher><![CDATA[
             // supertypes
             MATCH
-                (type:Type:Api)-[:EXTENDS|:IMPLEMENTS]->(superType:Type:Spi)
+                (type:Type:Api)-[:EXTENDS|IMPLEMENTS]->(superType:Type:Spi)
             RETURN
                 type AS ExposingSite, superType AS ExposedType
 
@@ -423,7 +423,7 @@
         <cypher><![CDATA[
             // supertypes
             MATCH
-                (type:Type:Api)-[:EXTENDS|:IMPLEMENTS*]->(superType:Type)
+                (type:Type:Api)-[:EXTENDS|IMPLEMENTS*]->(superType:Type)
             WHERE
                 superType.fqn = "java.util.concurrent.CompletableFuture"
             RETURN
@@ -433,7 +433,7 @@
             UNION ALL
             MATCH
                 (type:Type:Api)-[:DECLARES]->(method)-[:RETURNS]->(returnType:Type)
-                        -[:EXTENDS|:IMPLEMENTS*0..]->(returnTypeOrSuperType:Type)
+                        -[:EXTENDS|IMPLEMENTS*0..]->(returnTypeOrSuperType:Type)
             WHERE
                 (method.visibility="public" OR method.visibility="protected")
                 AND returnTypeOrSuperType.fqn = "java.util.concurrent.CompletableFuture"
@@ -444,7 +444,7 @@
             UNION ALL
             MATCH
                 (type:Type:Api)-[:DECLARES]->(method)-[:HAS]->(parameter)-[:OF_TYPE]->(parameterType:Type)
-                        -[:EXTENDS|:IMPLEMENTS*0..]->(parameterTypeOrSuperType:Type)
+                        -[:EXTENDS|IMPLEMENTS*0..]->(parameterTypeOrSuperType:Type)
             WHERE
                 (method.visibility="public" OR method.visibility="protected")
                 AND parameterTypeOrSuperType.fqn = "java.util.concurrent.CompletableFuture"
@@ -455,7 +455,7 @@
             UNION ALL
             MATCH
                 (type:Type:Api)-[:DECLARES]->(field)-[:OF_TYPE]->(fieldType:Type)
-                        -[:EXTENDS|:IMPLEMENTS*0..]->(fieldTypeOrSuperType:Type)
+                        -[:EXTENDS|IMPLEMENTS*0..]->(fieldTypeOrSuperType:Type)
             WHERE
                 (field.visibility="public" OR field.visibility="protected")
                 AND fieldTypeOrSuperType.fqn = "java.util.concurrent.CompletableFuture"
