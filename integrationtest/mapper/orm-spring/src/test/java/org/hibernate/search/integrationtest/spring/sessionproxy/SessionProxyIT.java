@@ -102,7 +102,7 @@ public class SessionProxyIT {
 			assertThat( entityFromThread1_2 ).returns( entityFromThread1_1.getId(), IndexedEntity::getId );
 			assertThat( entityFromThread1_2 ).isSameAs( entityFromThread1_1 );
 
-			// Same call from another thread: another underlying session is used, so we should a different entity instance
+			// Same call from another thread: another underlying session is used, so we should get a different entity instance
 			ThreadPoolExecutor executorService = new ThreadPoolExecutor(
 					1, 1, 0L, TimeUnit.MILLISECONDS,
 					new LinkedBlockingQueue<>( 10 )

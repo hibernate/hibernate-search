@@ -331,7 +331,9 @@
         <version.org.google.guava>31.1-jre</version.org.google.guava>
 
         <!-- >>> Spring integration tests -->
-        <version.org.springframework.boot>2.7.7</version.org.springframework.boot>
+        <version.org.springframework.boot>3.1.1</version.org.springframework.boot>
+        <!-- Spring Boot 3 Atomikos starter and related libs version: -->
+        <version.com.atomikos>6.0.0</version.com.atomikos>
 
         <!-- Maven plugins versions -->
 
@@ -2500,10 +2502,6 @@
                     -Djdk.attach.allowAttachSelf=true
                     -Dnet.bytebuddy.experimental=true
                 </surefire.jvm.args.java-version>
-                <!-- Spring isn't ready for JDK20 yet -->
-                <failsafe.spring.skip>true</failsafe.spring.skip>
-                <!-- impsort-maven-plugin doesn't work with JDK20 yet -->
-                <!-- See https://github.com/javaparser/javaparser/blob/master/javaparser-core/src/main/java/com/github/javaparser/ParserConfiguration.java#L169 -->
                 <format.skip>true</format.skip>
             </properties>
         </profile>
@@ -2522,8 +2520,6 @@
                     -Djdk.attach.allowAttachSelf=true
                     -Dnet.bytebuddy.experimental=true
                 </surefire.jvm.args.java-version>
-                <!-- Spring isn't ready for JDK21 yet -->
-                <failsafe.spring.skip>true</failsafe.spring.skip>
                 <!-- impsort-maven-plugin doesn't work with JDK21 yet -->
                 <format.skip>true</format.skip>
             </properties>
@@ -2543,7 +2539,7 @@
                     -Djdk.attach.allowAttachSelf=true
                     -Dnet.bytebuddy.experimental=true
                 </surefire.jvm.args.java-version>
-                <!-- Spring isn't ready for JDK22 yet -->
+                <!-- Spring Boot 3 isn't ready for JDK22 yet -->
                 <failsafe.spring.skip>true</failsafe.spring.skip>
                 <!-- impsort-maven-plugin doesn't work with JDK22 yet -->
                 <format.skip>true</format.skip>

@@ -4,7 +4,6 @@ spring.jpa:
       session.events.auto: org.hibernate.search.integrationtest.spring.jta.timeout.TimeoutSessionEventListener
       search:
         background_failure_handler: org.hibernate.search.integrationtest.spring.jta.timeout.TimeoutFailureCollector
-
-spring.jta.atomikos:
+atomikos:
   properties:
-    defaultJtaTimeout: 1000
+    default-jta-timeout: 1000

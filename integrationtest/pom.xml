@@ -21,25 +21,38 @@
         <module>mapper/pojo-standalone-realbackend</module>
         <module>mapper/orm</module>
         <module>mapper/orm-cdi</module>
-<!--        <module>mapper/orm-spring</module>-->
         <module>mapper/orm-envers</module>
         <module>mapper/orm-realbackend</module>
         <module>mapper/orm-coordination-outbox-polling</module>
         <module>mapper/orm-batch-jsr352</module>
         <module>performance</module>
-<!--        <module>showcase/library</module>-->
         <module>v5migrationhelper/engine</module>
         <module>v5migrationhelper/orm</module>
     </modules>
 
     <profiles>
         <profile>
-            <id>javaModuleITs</id>
+            <id>springITs</id>
             <activation>
                 <property>
                     <name>java-version.test.release</name>
-                    <value>!8</value>
+                    <value>!11</value>
                 </property>
+            </activation>
+            <modules>
+                <!-- Spring Boot 3 requires at minimum JDK 17. Hence, we want to ignore these modules on JDK 11: -->
+                <module>mapper/orm-spring</module>
+                <module>showcase/library</module>
+            </modules>
+        </profile>
+        <profile>
+            <!--
+                We want to keep these module path tests within their own profile,
+                so we can easily exclude building them all in some scenarios like eclipse compiler profile etc.
+             -->
+            <id>javaModuleITs</id>
+            <activation>
+                <jdk>[11,)</jdk>
             </activation>
             <modules>
                 <module>java/modules/orm-elasticsearch</module>
