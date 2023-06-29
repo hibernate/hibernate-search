@@ -25,3 +25,14 @@ logging.level:
 # Default environment variable values for IDEs that are unable to extract them from the maven-failsafe configuration
 # These values are overridden when running tests from Intellij IDEA or directly from Maven
 JDBC_URL: jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1
+
+# since atomikos connection pool has a max size set to 1 ...
+# we will not be able to execute more than one transaction at a time, leading to errors in tests
+spring:
+  jta:
+    atomikos:
+      datasource:
+        bean-name: hsearch-datasource
+        min-pool-size: 2
+        max-pool-size: 10
+

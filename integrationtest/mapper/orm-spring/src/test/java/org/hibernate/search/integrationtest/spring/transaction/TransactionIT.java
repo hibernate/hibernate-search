@@ -32,7 +32,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+// Adding a property here is just a "workaround" to make sure that a different context is used for this test
+// otherwise there can be build errors when running all the tests via maven.
+@SpringBootTest(properties = "spring.jta.atomikos.datasource.bean-name=hsearch-datasource1")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class TransactionIT {
 

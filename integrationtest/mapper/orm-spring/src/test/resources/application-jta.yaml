@@ -11,11 +11,13 @@ spring.jpa:
         use_second_level_cache: false
         use_query_cache: false
 
-spring.jta.bitronix:
-  datasource:
-    unique-name: xaDataSource
-    allow-local-transactions: true
-    min-pool-size: 5
-    max-pool-size: 100
-  properties:
-    journal: 'null'
+spring:
+  jta:
+    atomikos:
+      datasource:
+        borrow-connection-timeout: 3000
+        local-transaction-mode: true # allow-local-transactions ?
+        min-pool-size: 5
+        max-pool-size: 100
+      properties:
+        transaction-manager-unique-name: xaDataSource
