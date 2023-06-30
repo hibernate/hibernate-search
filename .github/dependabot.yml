@@ -44,9 +44,6 @@ updates:
       - dependency-name: "net.bytebuddy:*"
       # Newer majors of the following artifacts comply with the Jakarta specification (jakarta.* packages),
       # but we comply with Java EE (javax.* packages) for now.
-      # TODO HSEARCH-4394 Remove these when switching to Jakarta EE as the default standard
-      - dependency-name: "org.jboss.weld.se:*"
-        update-types: ["version-update:semver-major"]
       - dependency-name: "org.jberet:*"
         update-types: ["version-update:semver-major"]
       # Sticking to Derby 10.15 for now since later versions require JDK 17+, and we need to test with JDK 11.
