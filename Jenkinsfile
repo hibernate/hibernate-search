@@ -483,24 +483,6 @@ stage('Non-default environments') {
 							-pl !integrationtest/java/modules/orm-elasticsearch \
 							-pl !integrationtest/java/modules/orm-coordination-outbox-polling-elasticsearch \
 					'''
-					if ( !buildEnv.slow ) {
-						// If the DB testing is reasonably fast, we'll also test ORM6 and Jakarta
-						artifactsToTest += ['hibernate-search-mapper-orm-orm6', 'hibernate-search-mapper-orm-jakarta']
-						mavenBuildAdditionalArgs += ''' \
-								-pl !orm6/documentation \
-								-pl !orm6/integrationtest/mapper/orm-batch-jsr352 \
-								-pl !orm6/integrationtest/v5migrationhelper/orm \
-								-pl !orm6/integrationtest/java/modules/orm-lucene \
-								-pl !orm6/integrationtest/java/modules/orm-elasticsearch \
-								-pl !orm6/integrationtest/java/modules/orm-coordination-outbox-polling-elasticsearch \
-								-pl !jakarta/documentation \
-								-pl !jakarta/integrationtest/mapper/orm-batch-jsr352 \
-								-pl !jakarta/integrationtest/v5migrationhelper/orm \
-								-pl !jakarta/integrationtest/java/modules/orm-lucene \
-								-pl !jakarta/integrationtest/java/modules/orm-elasticsearch \
-								-pl !jakarta/integrationtest/java/modules/orm-coordination-outbox-polling-elasticsearch \
-						'''
-					}
 					String mavenDockerArgs = ""
 					def startedContainers = false
 					// DB2 setup is super slow (~5 to 15 minutes).
