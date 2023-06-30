@@ -252,7 +252,7 @@ stage('Configure') {
 					new EsLocalBuildEnvironment(version: '8.5.3', condition: TestCondition.ON_DEMAND),
 					new EsLocalBuildEnvironment(version: '8.6.2', condition: TestCondition.ON_DEMAND),
 					new EsLocalBuildEnvironment(version: '8.7.1', condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(version: '8.8.1', condition: TestCondition.BEFORE_MERGE, isDefault: true),
+					new EsLocalBuildEnvironment(version: '8.8.2', condition: TestCondition.BEFORE_MERGE, isDefault: true),
 
 					// --------------------------------------------
 					// OpenSearch
