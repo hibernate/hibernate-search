@@ -271,7 +271,7 @@
         <version.jakarta.persistence>3.1.0</version.jakarta.persistence>
         <version.jakarta.transaction-api>2.0.1</version.jakarta.transaction-api>
         <version.jakarta.interceptor-api>2.0.1</version.jakarta.interceptor-api>
-        <version.jakarta.enterprise>3.0.1</version.jakarta.enterprise>
+        <version.jakarta.enterprise>4.0.1</version.jakarta.enterprise>
         <version.jakarta.xml.bind>4.0.0</version.jakarta.xml.bind>
 
         <!-- >>> JSR 352 -->
