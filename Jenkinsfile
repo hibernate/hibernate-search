@@ -257,7 +257,7 @@ stage('Configure') {
 					// --------------------------------------------
 					// OpenSearch
 					// Not testing 1.0 - 1.2 to make the build quicker.
-					new OpenSearchLocalBuildEnvironment(version: '1.3.10', condition: TestCondition.AFTER_MERGE),
+					new OpenSearchLocalBuildEnvironment(version: '1.3.11', condition: TestCondition.AFTER_MERGE),
 					// See https://opensearch.org/lines/1x.html for a list of all 1.x versions
 					new OpenSearchLocalBuildEnvironment(version: '2.0.1', condition: TestCondition.ON_DEMAND),
 					new OpenSearchLocalBuildEnvironment(version: '2.1.0', condition: TestCondition.ON_DEMAND),
