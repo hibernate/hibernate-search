@@ -1564,10 +1564,10 @@
                                     <excludes>
                                         <!-- As we are using ORM 6 and Jakarta we don't want javax dependencies: -->
                                         <exclude>javax.persistence:javax.persistence-api</exclude>
-                                        <exvlude>javax.transaction:javax.transaction-api</exvlude>
-                                        <exvlude>javax.enterprise:cdi-api</exvlude>
+                                        <exclude>javax.transaction:javax.transaction-api</exclude>
+                                        <exclude>javax.enterprise:cdi-api</exclude>
                                         <exclude>javax.xml.bind:jaxb-api</exclude>
-                                        <exvlude>javax.activation:javax.activation-api</exvlude>
+                                        <exclude>javax.activation:javax.activation-api</exclude>
                                         <!-- We use Jandex 3 instead: io.smallrye:jandex, io.smallrye:jandex-maven-plugin -->
                                         <exclude>org.jboss:jandex*</exclude>
                                     </excludes>
