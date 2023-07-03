@@ -1,3 +1,10 @@
 ---
 jira:
   projectKey: "HSEARCH"
+  ignore:
+      # Allow build dependency upgrades i.e. maven plugin version upgrades to not follow the PR formatting rules:
+    - user: dependabot[bot]
+      titlePattern: ".*\\bmaven\\b.*\\bplugin\\b.*"
+      # Allow Groovy (that is only used for scripting maven plugin) version upgrades to not follow the PR formatting rules:
+    - user: dependabot[bot]
+      titlePattern: ".*\\bgroovy-jsr223\\b.*"
