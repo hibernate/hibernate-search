@@ -908,33 +908,47 @@ index 4fd6258ed4..eaac4243ea 100644
  	HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy();
  
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/MutableEntityLoadingOptions.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/MutableEntityLoadingOptions.java
-index a8669bf79d..838d51df7b 100644
+index a8669bf79d..48e2214a60 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/MutableEntityLoadingOptions.java
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/MutableEntityLoadingOptions.java
-@@ -9,7 +9,7 @@
+@@ -9,7 +9,8 @@
  import java.util.ArrayList;
  import java.util.List;
  
 -import org.hibernate.persister.entity.EntityPersister;
 +import org.hibernate.metamodel.mapping.EntityMappingType;
++import org.hibernate.metamodel.model.domain.EntityDomainType;
  import org.hibernate.search.util.common.impl.Contracts;
  
  public class MutableEntityLoadingOptions {
-@@ -30,11 +30,11 @@ public void fetchSize(int fetchSize) {
+@@ -30,15 +31,20 @@ public void fetchSize(int fetchSize) {
  		this.fetchSize = fetchSize;
  	}
  
 -	public EntityGraphHint<?> entityGraphHintOrNullForType(EntityPersister entityPersister) {
+-		if ( entityGraphHints == null ) {
 +	public EntityGraphHint<?> entityGraphHintOrNullForType(EntityMappingType entityMappingType) {
- 		if ( entityGraphHints == null ) {
++		if ( entityGraphHints == null || entityGraphHints.isEmpty() ) {
  			return null;
  		}
 -		String hibernateOrmEntityName = entityPersister.getEntityName();
-+		String hibernateOrmEntityName = entityMappingType.getEntityName();
- 		for ( EntityGraphHint<?> entityGraphHint : entityGraphHints ) {
- 			if ( entityGraphHint.graph.appliesTo( hibernateOrmEntityName ) ) {
- 				return entityGraphHint;
-@@ -50,6 +50,9 @@ public void entityGraphHint(EntityGraphHint<?> entityGraphHint, boolean replaceE
+-		for ( EntityGraphHint<?> entityGraphHint : entityGraphHints ) {
+-			if ( entityGraphHint.graph.appliesTo( hibernateOrmEntityName ) ) {
+-				return entityGraphHint;
++		EntityMappingType testedType = entityMappingType;
++		while ( testedType != null ) {
++			for ( EntityGraphHint<?> entityGraphHint : entityGraphHints ) {
++				// This cast is fine because a RootGraph always applies to an entity type
++				EntityDomainType<?> graphedType = (EntityDomainType<?>) entityGraphHint.graph.getGraphedType();
++				if ( graphedType.getHibernateEntityName().equals( testedType.getEntityName() ) ) {
++					return entityGraphHint;
++				}
+ 			}
++			testedType = testedType.getSuperMappingType();
+ 		}
+ 		return null;
+ 	}
+@@ -50,6 +56,9 @@ public void entityGraphHint(EntityGraphHint<?> entityGraphHint, boolean replaceE
  		else if ( replaceExisting ) {
  			entityGraphHints.clear();
  		}
