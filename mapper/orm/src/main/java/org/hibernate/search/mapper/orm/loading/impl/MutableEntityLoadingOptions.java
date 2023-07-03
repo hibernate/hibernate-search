@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.metamodel.mapping.EntityMappingType;
+import org.hibernate.metamodel.model.domain.EntityDomainType;
 import org.hibernate.search.util.common.impl.Contracts;
 
 public class MutableEntityLoadingOptions {
@@ -31,14 +32,19 @@ public class MutableEntityLoadingOptions {
 	}
 
 	public EntityGraphHint<?> entityGraphHintOrNullForType(EntityMappingType entityMappingType) {
-		if ( entityGraphHints == null ) {
+		if ( entityGraphHints == null || entityGraphHints.isEmpty() ) {
 			return null;
 		}
-		String hibernateOrmEntityName = entityMappingType.getEntityName();
-		for ( EntityGraphHint<?> entityGraphHint : entityGraphHints ) {
-			if ( entityGraphHint.graph.appliesTo( hibernateOrmEntityName ) ) {
-				return entityGraphHint;
+		EntityMappingType testedType = entityMappingType;
+		while ( testedType != null ) {
+			for ( EntityGraphHint<?> entityGraphHint : entityGraphHints ) {
+				// This cast is fine because a RootGraph always applies to an entity type
+				EntityDomainType<?> graphedType = (EntityDomainType<?>) entityGraphHint.graph.getGraphedType();
+				if ( graphedType.getHibernateEntityName().equals( testedType.getEntityName() ) ) {
+					return entityGraphHint;
+				}
 			}
+			testedType = testedType.getSuperMappingType();
 		}
 		return null;
 	}
