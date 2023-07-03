@@ -353,7 +353,7 @@
         <version.exec.plugin>3.1.0</version.exec.plugin>
         <version.forbiddenapis.plugin>3.4</version.forbiddenapis.plugin>
         <version.install.plugin>3.1.1</version.install.plugin>
-        <version.jandex.plugin>3.0.3</version.jandex.plugin>
+        <version.jandex.plugin>3.1.2</version.jandex.plugin>
         <version.japicmp.plugin>0.17.2</version.japicmp.plugin>
         <version.jar.plugin>3.3.0</version.jar.plugin>
         <version.javadoc.plugin>3.5.0</version.javadoc.plugin>
