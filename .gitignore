@@ -44,3 +44,8 @@ nbactions.xml
 .DS_Store
 .attach_pid*
 
+# Bitronix transaction logs
+*.btm
+
+# Cache folders for formatting plugins:
+.cache
