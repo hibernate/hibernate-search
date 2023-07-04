@@ -62,6 +62,52 @@ Reading and writing to Lucene indexes created with Hibernate Search {hibernateSe
 using Hibernate Search {hibernateSearchVersion} may lead to exceptions, since there were incompatible changes applied to internal fields.
 You must recreate your Lucene indexes and reindex your database. The easiest way to do so is to use link:{hibernateSearchDocUrl}#indexing-massindexer[the `MassIndexer`] with link:{hibernateSearchDocUrl}#indexing-massindexer-parameters-drop-and-create-schema[`dropAndCreateSchemaOnStart(true)`].
 
+[[outboxpolling]]
+=== Outbox polling system tables
+
+If you use the incubating link:{hibernateSearchDocUrl}#coordination-outbox-polling[`outbox-polling` coordination strategy],
+with the PostgreSQL database you will be impacted by the changes to entities that represents the outbox event and agent,
+requiring database schema changes.
+The `payload` column changes its type from `oid` to `bytea` for both outbox event and agent tables.
+You can find suggested migration scripts below:
+
+.Postgresql:
+[,sql]
+----
+-- Change outbox event `payload` column type to bytea:
+-- Note the way existing LOBs are retrieved using lo_get function.
+alter table hsearch_outbox_event
+    alter column payload type bytea using lo_get(payload);
+
+-- Change agent `payload` column type to bytea:
+-- Note: even though agent table should've not used payload column so far, we still need to have a type cast.
+-- It can be done either with the same `lo_get()` function call, or with a pair of casts like `cast( cast( payload as text ) as bytea )`:
+alter table hsearch_agent
+    alter column payload type bytea using lo_get(payload);
+----
+Other databases:
+
+* CockroachDB: no migration required. Type of the `payload` is `bytes` in both cases.
+* MySQL: no migration required. Type of the `payload` is `longblob` in both cases.
+* MariaDB: no migration required. Type of the `payload` is `longblob` in both cases.
+* DB2: no migration required. Type of the `payload` is `blob` in both cases.
+* Oracle: no migration required. Type of the `payload` is `blob` in both cases.
+* MSSQL: no migration required. Type of the `payload` is `varbinary(max)` in both cases.
+* H2: no migration required. Type of the `payload` is `blob` in both cases.
+
+[NOTE]
+====
+In case database migration cannot be performed immediately when upgrading to a new version of Hibernate Search,
+a pair of configuration properties is available:
+[source]
+----
+hibernate.search.coordination.entity.mapping.agent.payload_type=materialized_blob
+hibernate.search.coordination.entity.mapping.outboxevent.payload_type=materialized_blob
+----
+Keep in mind that these properties are temporary, to help with the migration,
+and will be removed in the future versions of Hibernate Search.
+====
+
 [[configuration]]
 == Configuration changes
 
