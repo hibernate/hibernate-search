@@ -38,8 +38,6 @@
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
-            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
-            <version>${version.jakarta.persistence}</version>
         </dependency>
         <dependency>
             <groupId>jakarta.enterprise</groupId>
@@ -51,20 +49,14 @@
         <dependency>
             <groupId>jakarta.transaction</groupId>
             <artifactId>jakarta.transaction-api</artifactId>
-            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
-            <version>${version.jakarta.transaction-api}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate.common</groupId>
             <artifactId>hibernate-commons-annotations</artifactId>
-            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
-            <version>${version.org.hibernate.commons.annotations}</version>
         </dependency>
         <dependency>
             <groupId>io.smallrye</groupId>
             <artifactId>jandex</artifactId>
-            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
-            <version>${version.io.smallrye.jandex}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
@@ -83,8 +75,6 @@
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
-            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
-            <version>${version.net.bytebuddy}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

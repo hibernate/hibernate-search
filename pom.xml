@@ -265,27 +265,15 @@
              when the versions start diverging, thanks to the maven-enforcer-plugin
              and to our own explicit dependencies in the relevant artifacts.
           -->
-        <version.org.hibernate.commons.annotations>6.0.6.Final</version.org.hibernate.commons.annotations>
-        <version.net.bytebuddy>1.12.18</version.net.bytebuddy>
-        <version.io.smallrye.jandex>3.0.5</version.io.smallrye.jandex>
-        <version.jakarta.persistence>3.1.0</version.jakarta.persistence>
-        <version.jakarta.transaction-api>2.0.1</version.jakarta.transaction-api>
-        <version.jakarta.interceptor-api>2.0.1</version.jakarta.interceptor-api>
         <version.jakarta.enterprise>4.0.1</version.jakarta.enterprise>
-        <version.jakarta.xml.bind>4.0.0</version.jakarta.xml.bind>
 
         <!-- >>> JSR 352 -->
         <version.jakarta.batch>2.1.1</version.jakarta.batch>
         <version.org.jberet>2.1.1.Final</version.org.jberet>
 
         <!-- >>> Java EE/Jakarta EE dependencies -->
-        <!-- Used in the JSR352 integration in particular, but also in the ORM integration (?) and various tests -->
-        <version.jakarta.inject-api>2.0.1</version.jakarta.inject-api>
         <!-- This is used to generate a link to the Jakarta EE javadoc -->
         <javadoc.jakarta.batch.url>https://jakarta.ee/specifications/batch/2.0/apidocs/</javadoc.jakarta.batch.url>
-
-        <!-- >>> Tools (Maven plugins, ...) -->
-        <version.javax.enterprise>2.0</version.javax.enterprise>
 
         <!-- Test dependencies -->
 
@@ -715,6 +703,21 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Import Hibernate ORM BOM -->
+            <dependency>
+                <groupId>org.hibernate.orm</groupId>
+                <artifactId>hibernate-platform</artifactId>
+                <version>${version.org.hibernate.orm}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Dependencies we want to override -->
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>${version.org.jboss.logging.jboss-logging}</version>
+            </dependency>
+            <!--All other dependencies-->
             <dependency>
                 <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-util-common</artifactId>
@@ -878,16 +881,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.hibernate.orm</groupId>
-                <artifactId>hibernate-core</artifactId>
-                <version>${version.org.hibernate.orm}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.orm</groupId>
-                <artifactId>hibernate-envers</artifactId>
-                <version>${version.org.hibernate.orm}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.elasticsearch.client</groupId>
                 <artifactId>elasticsearch-rest-client</artifactId>
                 <version>${version.org.elasticsearch.client}</version>
@@ -906,11 +899,6 @@
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>auth</artifactId>
                 <version>${version.software.amazon.awssdk}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.logging</groupId>
-                <artifactId>jboss-logging</artifactId>
-                <version>${version.org.jboss.logging.jboss-logging}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.logging</groupId>
@@ -965,11 +953,6 @@
             </dependency>
 
             <!-- JakartaEE dependencies -->
-            <dependency>
-                <groupId>jakarta.inject</groupId>
-                <artifactId>jakarta.inject-api</artifactId>
-                <version>${version.jakarta.inject-api}</version>
-            </dependency>
             <dependency>
                 <groupId>jakarta.batch</groupId>
                 <artifactId>jakarta.batch-api</artifactId>
@@ -1173,25 +1156,6 @@
                 <groupId>org.openjdk.jmh</groupId>
                 <artifactId>jmh-core</artifactId>
                 <version>${version.org.openjdk.jmh}</version>
-            </dependency>
-
-            <!-- Hibernate ORM testing tools -->
-            <dependency>
-                <groupId>org.hibernate.orm</groupId>
-                <artifactId>hibernate-testing</artifactId>
-                <version>${version.org.hibernate.orm}</version>
-                <exclusions>
-                    <!-- we use Log4J 2 -->
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                    <!-- We don't need this stuff, and it causes dependency divergence errors -->
-                    <exclusion>
-                        <groupId>org.wildfly.transaction</groupId>
-                        <artifactId>wildfly-transaction-client-jakarta</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <!-- JBatch runtime -->
