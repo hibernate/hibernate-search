@@ -648,7 +648,7 @@
         <!-- See https://hub.docker.com/r/cockroachdb/cockroach/tags -->
         <test.database.run.cockroachdb.skip>true</test.database.run.cockroachdb.skip>
         <test.database.run.cockroachdb.image.name>cockroachdb/cockroach</test.database.run.cockroachdb.image.name>
-        <test.database.run.cockroachdb.image.tag>v22.1.12</test.database.run.cockroachdb.image.tag>
+        <test.database.run.cockroachdb.image.tag>v23.1.4</test.database.run.cockroachdb.image.tag>
 
         <!-- Property whose sole purpose is to be referenced in the definition of surefire.jvm.args.module
              when Weld is used. -->
