@@ -24,6 +24,7 @@ import jakarta.persistence.metamodel.EmbeddableType;
 import jakarta.persistence.metamodel.EntityType;
 import jakarta.persistence.metamodel.ManagedType;
 import jakarta.persistence.metamodel.Metamodel;
+import jakarta.persistence.metamodel.PluralAttribute;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -179,12 +180,7 @@ class OrmSetupHelperCleaner {
 			// only instances of subclasses, and those are handled separately.
 			return;
 		}
-		if (
-			// Workaround until https://hibernate.atlassian.net/browse/HHH-5529 gets implemented
-		hasPotentiallyJoinTable( sessionFactory, entityType )
-				// Workaround until https://hibernate.atlassian.net/browse/HHH-14814 gets fixed
-				|| hasEntitySubclass( sessionFactory, entityType )
-		) {
+		if ( hasSelfAssociation( entityType.getJavaType(), sessionFactory, entityType ) ) {
 			if ( mapping != null ) {
 				mapping.listenerEnabled( false );
 			}
@@ -281,24 +277,26 @@ class OrmSetupHelperCleaner {
 		return false;
 	}
 
-	private static boolean hasPotentiallyJoinTable(SessionFactoryImplementor sessionFactory,
+	private static boolean hasSelfAssociation(Class<?> entityJavaType, SessionFactoryImplementor sessionFactory,
 			ManagedType<?> managedType) {
 		for ( Attribute<?, ?> attribute : managedType.getAttributes() ) {
-			switch ( attribute.getPersistentAttributeType() ) {
-				case MANY_TO_ONE:
-				case ONE_TO_ONE:
-				case BASIC:
-					break;
-				case MANY_TO_MANY:
-				case ONE_TO_MANY:
-				case ELEMENT_COLLECTION:
+			if ( attribute.isAssociation() ) {
+				Class<?> type;
+				if ( attribute.isCollection() ) {
+					type = ( (PluralAttribute<?, ?, ?>) attribute ).getElementType().getJavaType();
+				}
+				else {
+					type = attribute.getJavaType();
+				}
+				if ( entityJavaType.isAssignableFrom( type ) ) {
 					return true;
-				case EMBEDDED:
-					EmbeddableType<?> embeddable = sessionFactory.getJpaMetamodel().embeddable( attribute.getJavaType() );
-					if ( hasPotentiallyJoinTable( sessionFactory, embeddable ) ) {
-						return true;
-					}
-					break;
+				}
+			}
+			if ( Attribute.PersistentAttributeType.EMBEDDED.equals( attribute.getPersistentAttributeType() ) ) {
+				EmbeddableType<?> embeddable = sessionFactory.getJpaMetamodel().embeddable( attribute.getJavaType() );
+				if ( hasSelfAssociation( entityJavaType, sessionFactory, embeddable ) ) {
+					return true;
+				}
 			}
 		}
 		return false;
