@@ -361,6 +361,15 @@
                                         <exec>
                                             <arg>start-single-node</arg>
                                             <arg>--insecure</arg>
+                                            <!-- Using in-memory storage to make things a bit faster -->
+                                            <arg>--store=type=mem,size=.5</arg>
+                                            <!--
+                                                See https://www.cockroachlabs.com/docs/v23.1/transaction-retry-error-reference.html#readwithinuncertaintyintervalerror.
+                                                Increasing this value will increase the time to recovery of failures as well as the frequency of uncertainty-based read restarts.
+                                                Default value is 500ms.
+                                            -->
+                                            <arg>--max-offset=100ms</arg>
+                                            <arg>--log=sinks: {stderr: {channels: [OPS]}}</arg>
                                         </exec>
                                     </cmd>
                                     <ulimits>
