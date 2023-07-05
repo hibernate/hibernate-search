@@ -45,8 +45,6 @@
         <dependency>
             <groupId>jakarta.transaction</groupId>
             <artifactId>jakarta.transaction-api</artifactId>
-            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
-            <version>${version.jakarta.transaction-api}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

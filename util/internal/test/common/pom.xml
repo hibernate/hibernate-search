@@ -78,20 +78,14 @@
         <dependency>
             <groupId>io.smallrye</groupId>
             <artifactId>jandex</artifactId>
-            <!-- DO NOT MANAGE this dependency. See the version property declaration. -->
-            <version>${version.io.smallrye.jandex}</version>
         </dependency>
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
-            <!-- DO NOT MANAGE this dependency. See the version property declaration. -->
-            <version>${version.net.bytebuddy}</version>
         </dependency>
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy-agent</artifactId>
-            <!-- DO NOT MANAGE this dependency. See the version property declaration. -->
-            <version>${version.net.bytebuddy}</version>
         </dependency>
     </dependencies>
 

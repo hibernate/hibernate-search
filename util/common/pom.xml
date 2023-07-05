@@ -28,8 +28,6 @@
         <dependency>
             <groupId>io.smallrye</groupId>
             <artifactId>jandex</artifactId>
-            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
-            <version>${version.io.smallrye.jandex}</version>
         </dependency>
 
         <dependency>

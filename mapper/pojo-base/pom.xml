@@ -31,8 +31,6 @@
         <dependency>
             <groupId>org.hibernate.common</groupId>
             <artifactId>hibernate-commons-annotations</artifactId>
-            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
-            <version>${version.org.hibernate.commons.annotations}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
