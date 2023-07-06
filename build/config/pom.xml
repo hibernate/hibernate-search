@@ -33,6 +33,18 @@
         <tmpdir.dependencies-javadoc-packagelists>${project.build.directory}/dependencies-javadoc-packagelists</tmpdir.dependencies-javadoc-packagelists>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-build-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>com.puppycrawl.tools</groupId>

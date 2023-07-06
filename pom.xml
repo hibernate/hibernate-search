@@ -151,6 +151,8 @@
     </mailingLists>
 
     <modules>
+        <module>bom/public</module>
+        <module>bom/build</module>
         <module>build/config</module>
         <module>build/parents/internal</module>
         <module>util/internal/test/common</module>
@@ -209,6 +211,7 @@
         <!-- >>> Elasticsearch -->
         <!-- The version of the Elasticsearch client used by Hibernate Search, independently of the version of the remote cluster -->
         <!-- Use the latest open-source version here. Currently, low-level clients are open-source even in 8.5+ -->
+        <!-- NOTE: when updating this version check if the Jackson version is still aligned. -->
         <version.org.elasticsearch.client>8.8.2</version.org.elasticsearch.client>
         <!-- The main compatible version of Elasticsearch, advertised by default. Used in documentation links. -->
         <!-- When updating the following version you will likely need to update the test profiles as well,
@@ -240,17 +243,17 @@
 
         <version.com.google.code.gson>2.9.1</version.com.google.code.gson>
         <version.software.amazon.awssdk>2.20.2</version.software.amazon.awssdk>
-        <!-- Jackson: used by the Elasticsearch REST client, the AWS SDK and in tests (wiremock, ...) -->
-        <version.com.fasterxml.jackson>2.13.4</version.com.fasterxml.jackson>
         <!--
-             In the past, there has been jackson-databind bugfix releases without any jackson-core release,
-             so we had to use different versions, e.g. jackson-core 2.13.4 and jackson-databind 2.13.4.2.
-             That's why we have two separate properties for jackson versions,
-             even though they may have the same value from time to time.
-         -->
-        <version.com.fasterxml.jackson.databind>2.13.4.2</version.com.fasterxml.jackson.databind>
-        <!-- Reactive-streams: used by the AWS SDK -->
-        <version.org.reactivestreams.reactive-streams>1.0.4</version.org.reactivestreams.reactive-streams>
+            Jackson is used by
+                * the Elasticsearch REST client sniffer,
+                * avro
+                * and Wiremock
+            We want to align this version on whatever the REST client is using.
+            But because we also want to include it in the public BOM, maven-enforcer-plugin will not catch that the
+            version is different from whatever version is in those mentioned libraries. So need to update it anytime we
+            are updating the Elasticsearch rest client version.
+        -->
+        <version.com.fasterxml.jackson>2.13.4</version.com.fasterxml.jackson>
         <!-- slf4j: used by the AWS SDK -->
         <version.org.slf4j>1.7.36</version.org.slf4j>
 
@@ -374,6 +377,7 @@
         <version.maven-wrapper-plugin>3.2.0</version.maven-wrapper-plugin>
         <version.impsort-maven-plugin>1.9.0</version.impsort-maven-plugin>
         <version.formatter-maven-plugin>2.23.0</version.formatter-maven-plugin>
+        <version.flatten-maven-plugin>1.5.0</version.flatten-maven-plugin>
 
         <!-- Asciidoctor -->
 
@@ -706,517 +710,6 @@
             **/org/hibernate/search/integrationtest/**
         </sonar.cpd.exclusions>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <!-- Import Hibernate ORM BOM -->
-            <dependency>
-                <groupId>org.hibernate.orm</groupId>
-                <artifactId>hibernate-platform</artifactId>
-                <version>${version.org.hibernate.orm}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <!-- Dependencies we want to override -->
-            <dependency>
-                <groupId>org.jboss.logging</groupId>
-                <artifactId>jboss-logging</artifactId>
-                <version>${version.org.jboss.logging.jboss-logging}</version>
-            </dependency>
-            <!--All other dependencies-->
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-common</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-test-common</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-test-orm</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-engine</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-backend-elasticsearch</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-backend-elasticsearch-aws</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-backend-lucene</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-pojo-base</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-pojo-standalone</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-orm</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-v5migrationhelper-engine</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-v5migrationhelper-orm</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-orm-batch-jsr352-jberet</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-orm-coordination-outbox-polling</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-documentation</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-backend-elasticsearch</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-backend-lucene</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-mapper-pojo-base</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-mapper-orm</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-mapper-orm-cdi</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-mapper-orm-spring</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-mapper-orm-envers</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-mapper-orm-realbackend</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-mapper-pojo-standalone-realbackend</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-showcase-library</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-v5migrationhelper-engine</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-v5migrationhelper-orm</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-mapper-orm-coordination-outbox-polling</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-mapper-orm-batch-jsr352</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-documentation</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-configuration-properties-collector</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.elasticsearch.client</groupId>
-                <artifactId>elasticsearch-rest-client</artifactId>
-                <version>${version.org.elasticsearch.client}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.elasticsearch.client</groupId>
-                <artifactId>elasticsearch-rest-client-sniffer</artifactId>
-                <version>${version.org.elasticsearch.client}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>${version.com.google.code.gson}</version>
-            </dependency>
-            <dependency>
-                <groupId>software.amazon.awssdk</groupId>
-                <artifactId>auth</artifactId>
-                <version>${version.software.amazon.awssdk}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.logging</groupId>
-                <artifactId>jboss-logging-annotations</artifactId>
-                <version>${version.org.jboss.logging.jboss-logging-tools}</version>
-                <scope>provided</scope>
-                <optional>true</optional>
-            </dependency>
-
-            <!-- Lucene backend -->
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-core</artifactId>
-                <version>${version.org.apache.lucene}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-analysis-common</artifactId>
-                <version>${version.org.apache.lucene}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-queryparser</artifactId>
-                <version>${version.org.apache.lucene}</version>
-                <exclusions>
-                    <!-- This artifact contains unstable, experimental code that we cannot reasonably rely on. -->
-                    <exclusion>
-                        <groupId>org.apache.lucene</groupId>
-                        <artifactId>lucene-sandbox</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-join</artifactId>
-                <version>${version.org.apache.lucene}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-facet</artifactId>
-                <version>${version.org.apache.lucene}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-highlighter</artifactId>
-                <version>${version.org.apache.lucene}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.carrotsearch</groupId>
-                <artifactId>hppc</artifactId>
-                <version>${version.com.carrotsearch.hppc}</version>
-            </dependency>
-
-            <!-- JakartaEE dependencies -->
-            <dependency>
-                <groupId>jakarta.batch</groupId>
-                <artifactId>jakarta.batch-api</artifactId>
-                <version>${version.jakarta.batch}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <!-- Jackson: used by the Elasticsearch REST client and in tests (wiremock, ...) -->
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>${version.com.fasterxml.jackson}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
-                <version>${version.com.fasterxml.jackson}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>${version.com.fasterxml.jackson.databind}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.reactivestreams</groupId>
-                <artifactId>reactive-streams</artifactId>
-                <version>${version.org.reactivestreams.reactive-streams}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${version.org.slf4j}</version>
-            </dependency>
-
-            <!-- Apache Avro used to serialize/deserialize objects in outbox polling coordination -->
-            <dependency>
-                <groupId>org.apache.avro</groupId>
-                <artifactId>avro</artifactId>
-                <version>${version.org.apache.avro}</version>
-            </dependency>
-
-            <!-- JBeret used by batch-jsr352 jberet module -->
-            <dependency>
-                <groupId>org.jberet</groupId>
-                <artifactId>jberet-core</artifactId>
-                <version>${version.org.jberet}</version>
-                <exclusions>
-                    <!-- These dependencies are marked as "provided" but will never be there at runtime.
-                         This confuses maven-enforcer-plugin, so we'll exclude them. -->
-                    <exclusion>
-                        <groupId>org.jboss.logging</groupId>
-                        <artifactId>jboss-logging-processor</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.infinispan</groupId>
-                        <artifactId>infinispan-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.infinispan</groupId>
-                        <artifactId>infinispan-commons</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <!-- Test -->
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${version.junit}</version>
-            </dependency>
-            <!--
-                Manage the upgrade from Hamcrest 1.x to 2.x:
-                http://hamcrest.org/JavaHamcrest/distributables#upgrading-from-hamcrest-1x
-             -->
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest</artifactId>
-                <version>${version.org.hamcrest}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest-core</artifactId>
-                <version>${version.org.hamcrest}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest-library</artifactId>
-                <version>${version.org.hamcrest}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.takari.junit</groupId>
-                <artifactId>takari-cpsuite</artifactId>
-                <version>${version.io.takari.junit}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${version.org.mockito}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-core</artifactId>
-                <version>${version.log4j}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-api</artifactId>
-                <version>${version.log4j}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-slf4j-impl</artifactId>
-                <version>${version.log4j}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.core</artifactId>
-                <version>${version.org.osgi.core}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.assertj</groupId>
-                <artifactId>assertj-core</artifactId>
-                <version>${version.org.assertj.assertj-core}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.awaitility</groupId>
-                <artifactId>awaitility</artifactId>
-                <version>${version.org.awaitily}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.skyscreamer</groupId>
-                <artifactId>jsonassert</artifactId>
-                <version>${version.org.skyscreamer.jsonassert}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.tomakehurst</groupId>
-                <artifactId>wiremock</artifactId>
-                <version>${version.com.github.tomakehurst.wiremock}</version>
-            </dependency>
-            <dependency>
-                <!-- Dependency management is necessary for Wiremock in particular (it has internal dependency divergence) -->
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>${version.org.apache.commons.lang3}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-math3</artifactId>
-                <version>${version.org.apache.commons.math3}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.weld.se</groupId>
-                <artifactId>weld-se-shaded</artifactId>
-                <version>${version.org.jboss.weld}</version>
-            </dependency>
-
-            <!-- JDBC Drivers -->
-            <dependency>
-                <groupId>com.h2database</groupId>
-                <artifactId>h2</artifactId>
-                <version>${version.com.h2database}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.derby</groupId>
-                <artifactId>derby</artifactId>
-                <version>${version.org.apache.derby}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.postgresql</groupId>
-                <artifactId>postgresql</artifactId>
-                <version>${version.org.postgresql}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mariadb.jdbc</groupId>
-                <artifactId>mariadb-java-client</artifactId>
-                <version>${version.org.mariadb.jdbc}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.mysql</groupId>
-                <artifactId>mysql-connector-j</artifactId>
-                <version>${version.mysql.mysql-connector-java}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ibm.db2</groupId>
-                <artifactId>jcc</artifactId>
-                <version>${version.com.ibm.db2.jcc}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.oracle.database.jdbc</groupId>
-                <artifactId>ojdbc11</artifactId>
-                <version>${version.com.oracle.database.jdbc}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.microsoft.sqlserver</groupId>
-                <artifactId>mssql-jdbc</artifactId>
-                <version>${version.com.microsoft.sqlserver.mssql-jdbc}</version>
-            </dependency>
-
-            <!-- Performance tests -->
-            <dependency>
-                <groupId>org.openjdk.jmh</groupId>
-                <artifactId>jmh-core</artifactId>
-                <version>${version.org.openjdk.jmh}</version>
-            </dependency>
-
-            <!-- JBatch runtime -->
-            <dependency>
-                <groupId>com.ibm.jbatch</groupId>
-                <artifactId>com.ibm.jbatch.container</artifactId>
-                <version>${version.com.ibm.jbatch}</version>
-            </dependency>
-
-            <!-- JBeret Core and JBeret SE runtime dependencies -->
-            <dependency>
-                <groupId>org.jboss.marshalling</groupId>
-                <artifactId>jboss-marshalling</artifactId>
-                <version>${version.org.jboss.marshalling}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wildfly.security</groupId>
-                <artifactId>wildfly-security-manager</artifactId>
-                <version>${version.org.wildfly.security.wildfly-security-manager}</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${version.org.google.guava}</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jberet</groupId>
-                <artifactId>jberet-se</artifactId>
-                <version>${version.org.jberet}</version>
-            </dependency>
-
-            <!-- For javadocs parsing -->
-            <dependency>
-                <groupId>org.jsoup</groupId>
-                <artifactId>jsoup</artifactId>
-                <version>${version.jsoup}</version>
-            </dependency>
-
-            <!-- Solve dependency convergence issues through exclusions for transitive-only dependencies -->
-            <dependency>
-                <groupId>org.glassfish.jaxb</groupId>
-                <artifactId>jaxb-core</artifactId>
-                <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
-                <exclusions>
-                    <!-- Also imported by jakarta.xml.bind-api -->
-                    <exclusion>
-                        <groupId>jakarta.activation</groupId>
-                        <artifactId>jakarta.activation-api</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <build>
         <defaultGoal>install</defaultGoal>
@@ -2271,6 +1764,33 @@
                                 <goal>${goal.formatter-maven-plugin}</goal>
                             </goals>
                             <phase>process-sources</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>${version.flatten-maven-plugin}</version>
+                    <configuration>
+                        <outputDirectory>${project.build.directory}</outputDirectory>
+                        <flattenMode>bom</flattenMode>
+                        <pomElements>
+                            <!-- We want property references to be replaced with values -->
+                            <dependencyManagement>resolve</dependencyManagement>
+                            <!--
+                                We don't want to show any properties in this BOM.
+                                The properties we need will be resolved, others have no value for the users of the BOM.
+                             -->
+                            <properties>remove</properties>
+                        </pomElements>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>flatten-pom</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>flatten</goal>
+                            </goals>
                         </execution>
                     </executions>
                 </plugin>

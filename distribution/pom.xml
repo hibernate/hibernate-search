@@ -38,6 +38,13 @@
          -->
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-bom</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-common</artifactId>
             <scope>compile</scope>
         </dependency>
