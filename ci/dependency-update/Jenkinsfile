@@ -10,12 +10,6 @@
 // NOTE: Remember to update the matrix axes below when adding/removing entries here.
 Map settings() {
 	switch (env.DEPENDENCY_UPDATE_NAME) {
-		case 'jandex3':
-			return [
-					onlyRunTestDependingOn: ['hibernate-search-mapper-pojo-base'],
-					// Need to rebuild this module in order to insert the Jandex 3 dependency in tests
-					additionalMavenArgs: '-pl :hibernate-search-util-internal-test-common'
-			]
 		case 'orm6.2':
 			return [
 					updateProperties: ['version.org.hibernate.orm'],
@@ -123,7 +117,7 @@ pipeline {
 					axis {
 						name 'DEPENDENCY_UPDATE_NAME'
 						// NOTE: Remember to update the settings() method above when changing this.
-						values 'jandex3', 'orm6.2', 'orm6.3'
+						values 'orm6.2', 'orm6.3'
 					}
 				}
 				stages {
