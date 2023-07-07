@@ -14,6 +14,11 @@
     <name>Hibernate Search - BOM</name>
     <packaging>pom</packaging>
 
+    <properties>
+        <!-- Public modules must be signed. -->
+        <release.gpg.signing.skip>false</release.gpg.signing.skip>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <!-- Hibernate Search artifacts-->

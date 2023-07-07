@@ -23,6 +23,8 @@
     <properties>
         <javadoc.packagelists.directory>${project.build.directory}/dependencies-javadoc-packagelists</javadoc.packagelists.directory>
         <documentation.config.properties.skip>false</documentation.config.properties.skip>
+        <!-- Public modules must be signed. -->
+        <release.gpg.signing.skip>false</release.gpg.signing.skip>
     </properties>
 
     <dependencyManagement>
@@ -319,36 +321,6 @@
                     <plugin>
                         <groupId>com.buschmais.jqassistant</groupId>
                         <artifactId>jqassistant-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>release</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                                <configuration>
-                                    <homedir>${env.RELEASE_GPG_HOMEDIR}</homedir>
-                                    <passphrase>${env.RELEASE_GPG_PASSPHRASE}</passphrase>
-                                </configuration>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>

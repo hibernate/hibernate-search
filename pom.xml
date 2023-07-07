@@ -511,6 +511,12 @@
         <!-- Output for property collection -->
         <documentation.config.properties.output.directory>${rootProject.directory}/target</documentation.config.properties.output.directory>
 
+        <!--
+            Determines if gpg signing should happen within the module during the release process.
+            Signing is disabled by default and only enabled (by overriding the property) in a modules that require it.
+        -->
+        <release.gpg.signing.skip>true</release.gpg.signing.skip>
+
         <!-- Test settings -->
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
 
@@ -1704,6 +1710,20 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
                     <version>${version.gpg.plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>sign-artifacts</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                            <configuration>
+                                <skip>${release.gpg.signing.skip}</skip>
+                                <homedir>${env.RELEASE_GPG_HOMEDIR}</homedir>
+                                <passphrase>${env.RELEASE_GPG_PASSPHRASE}</passphrase>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <artifactId>maven-antrun-plugin</artifactId>
@@ -2435,6 +2455,24 @@
                 <goal.impsort-maven-plugin>check</goal.impsort-maven-plugin>
                 <goal.formatter-maven-plugin>validate</goal.formatter-maven-plugin>
             </properties>
+        </profile>
+
+        <profile>
+            <id>release</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
 
         <!--
