@@ -1,6 +1,21 @@
 Hibernate Search Changelog
 ==========================
 
+6.2.0.Final (2023-07-07)
+-------------------------
+
+** Improvement
+    * HSEARCH-4892 Upgrade to Avro 1.11.2
+    * HSEARCH-4888 Upgrade -orm6 artifacts to Hibernate ORM 6.2.6.Final
+    * HSEARCH-4886 Upgrade to Elasticsearch client 8.8.2 and test against Elasticsearch 8.8.2
+    * HSEARCH-4884 Configuration property to have a dedicated docvalue field for the root document id in the Lucene backend's document
+
+** Task
+    * HSEARCH-4890 Adapt calls to RootGraph#appliesTo() to Hibernate ORM 6.3
+    * HSEARCH-4887 Test against latest Elasticsearch 7.17.11
+    * HSEARCH-4885 Test against latest OpenSearch 1.3.11
+    * HSEARCH-4883 Upgrade build dependencies to the latest version in Search 6.2.0.Final
+
 6.2.0.CR1 (2023-06-26)
 -------------------------
 
