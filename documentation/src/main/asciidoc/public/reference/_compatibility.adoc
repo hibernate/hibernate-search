@@ -106,16 +106,81 @@ Spring Boot automatically sets the version of dependencies without your knowledg
 While this is ordinarily a good thing, from time to time Spring Boot dependencies will be a little out of date.
 Thus, it is recommended to override Spring Boot's defaults at least for some key dependencies.
 
-With Maven, add this to your POM's `<properties>`:
+With Maven, there are a few ways to override these versions depending on how Spring is added to the application.
+If your application's POM file is using `spring-boot-starter-parent` as its parent POM
+then simply adding version properties to your POM's `<properties>` should help:
 
 [source, XML, subs="+attributes"]
 ----
 <properties>
     <hibernate.version>{hibernateVersion}</hibernate.version>
-    <elasticsearch.version>{elasticsearchClientVersions}</elasticsearch.version>
+    <elasticsearch-client.version>{elasticsearchClientVersions}</elasticsearch-client.version>
     <!-- ... plus any other properties of yours ... -->
 </properties>
 ----
+
+[TIP]
+====
+If, after setting the properties above,
+you still are getting the same version of the libraries,
+check if property names in the Spring Boot's BOM have changed, and if so use the new property name.
+====
+
+Alternatively, if either the `spring-boot-dependencies` or the `spring-boot-starter-parent` is imported into the dependency management (`<dependencyManagement>`)
+then overriding the versions can be done either by importing a BOM listing the dependencies we want to override,
+or by explicitly listing a dependency with its version that we want to be used:
+
+.Override dependencies either with another BOM or explicitly
+[source, XML, subs="+attributes"]
+----
+<dependencyManagement>
+    <dependencies>
+        <!--
+            Overriding Hibernate ORM version by importing the BOM.
+            Alternatively, can be done by adding specific dependencies as shown below for Elasticsearch dependencies.
+        -->
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-platform</artifactId>
+            <version>${version.org.hibernate.orm}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-dependencies</artifactId>
+            <version>{testSpringBootVersion}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+        <!-- Since there is no BOM for the Elasticsearch REST client, these dependencies have to be listed explicitly: -->
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-client</artifactId>
+            <version>{elasticsearchClientVersions}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-client-sniffer</artifactId>
+            <version>{elasticsearchClientVersions}</version>
+        </dependency>
+        <!-- Other dependency management entries -->
+    </dependencies>
+</dependencyManagement>
+----
+
+For other build tools refer to their documentation for details.
+
+[TIP]
+====
+Maven's `dependency` plugin (or your build tool corresponding alternative)
+can be used to verify that the version override was correctly applied, e.g.:
+[source, bash, subs="+attributes"]
+----
+# Show the dependency tree filtering for Hibernate and Elasticsearch dependencies to reduce the output:
+mvn dependency:tree "-Dincludes=org.hibernate.*,org.elasticsearch.*"
+----
+====
 
 [TIP]
 ====

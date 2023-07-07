@@ -13,9 +13,6 @@
     <description>Hibernate Search showcase based on the ORM and Elasticsearch integrations, using libraries and books as business objects</description>
 
     <properties>
-        <!-- Override the version of Hibernate ORM pulled by Spring Boot -->
-        <hibernate.version>${version.org.hibernate.orm}</hibernate.version>
-
         <test.elasticsearch.run.skip>${test.elasticsearch.connection.uris.defined}</test.elasticsearch.run.skip>
         <test.database.run.skip>false</test.database.run.skip>
 
@@ -30,12 +27,48 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Override the version of Hibernate ORM pulled by Spring Boot -->
+            <!--
+                Since we are importing a pom and not using it as a parent for this module,
+                we cannot use a version property like:
+                    <hibernate.version>${version.org.hibernate.orm}</hibernate.version>
+                or:
+                    <elasticsearch-client.version>${version.org.elasticsearch.client}</elasticsearch-client.version>
+                to override Spring's dependency version with the one we need. Instead, we are going import our bom to
+                override the versions. Placing it after the Spring bom - doesn't work and dependency versions
+                remain unchanged.
+            -->
+            <dependency>
+                <groupId>org.hibernate.orm</groupId>
+                <artifactId>hibernate-platform</artifactId>
+                <version>${version.org.hibernate.orm}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${version.org.springframework.boot}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- And as there's no Elasticsearch BOM we just list next dependencies explicitly: -->
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-client</artifactId>
+                <version>${version.org.elasticsearch.client}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-client-sniffer</artifactId>
+                <version>${version.org.elasticsearch.client}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
