@@ -341,6 +341,22 @@ so its behavior is roughly similar to that described in <<coordination-none>>,
 except entity data extracting happens on session closing instead of happening on Hibernate ORM session flushes,
 and indexing happens immediately after that instead of happening on transaction commit.
 
+[[mapper-pojo-standalone-configuration-from-property-file]]
+== Reading configuration properties from a file
+
+The Standalone POJO Mapper `SearchMappingBuilder` can also take properties from a `Reader` compatible with `java.util.Properties#load(Reader)`:
+
+.Loading configuration properties from a file using a `Reader`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entrypoints/StandalonePojoReadPropertiesFromFileIT.java[tags=setup]
+----
+<1> Get a reader representing a property file with configuration properties.
+<2> Start configuring the Standalone POJO Mapper.
+<3> Pass the property file reader to the builder.
+====
+
 [[mapper-pojo-standalone-configuration-other]]
 == Other configuration
 

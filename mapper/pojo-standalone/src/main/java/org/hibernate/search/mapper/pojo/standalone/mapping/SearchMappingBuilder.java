@@ -6,9 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.mapping;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
@@ -48,14 +53,12 @@ public final class SearchMappingBuilder {
 	}
 
 	private final ConfigurationPropertyChecker propertyChecker;
-	private final Map<String, Object> properties = new HashMap<>();
-	private final ConfigurationPropertySource propertySource;
 	private final StandalonePojoMappingKey mappingKey;
 	private final StandalonePojoMappingInitiator mappingInitiator;
+	private final Map<String, Object> properties = new HashMap<>();
 
 	SearchMappingBuilder(MethodHandles.Lookup lookup) {
 		propertyChecker = ConfigurationPropertyChecker.create();
-		propertySource = getPropertySource( properties, propertyChecker );
 		StandalonePojoBootstrapIntrospector introspector = StandalonePojoBootstrapIntrospector.create( lookup );
 		mappingKey = new StandalonePojoMappingKey();
 		mappingInitiator = new StandalonePojoMappingInitiator( introspector );
@@ -95,11 +98,44 @@ public final class SearchMappingBuilder {
 		return this;
 	}
 
+
+	/**
+	 * Reads the properties from the reader and sets them as overrides for already configured properties.
+	 * <p>
+	 * Provided reader should be compatible with {@link java.util.Properties#load(Reader)}.
+	 * <p>
+	 * Configuration properties are mentioned in {@link org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings},
+	 * or in the reference documentation for backend-related properties.
+	 *
+	 * @param propertiesReader A configuration property source reader.
+	 * Properties from it will be added as an override to previously set properties.
+	 * @return {@code this}, for call chaining.
+	 * @see ConfigurationPropertySource#withOverride(ConfigurationPropertySource)
+	 */
+	public SearchMappingBuilder properties(Reader propertiesReader) throws IOException {
+		Properties loaded = new Properties();
+		loaded.load( propertiesReader );
+
+		properties(
+				loaded.entrySet()
+						.stream()
+						.collect( Collectors.toMap( e -> Objects.toString( e.getKey() ), Map.Entry::getValue ) )
+		);
+
+		return this;
+	}
+
 	/**
 	 * Builds the search mapping.
 	 * @return The {@link SearchMapping}.
 	 */
 	public CloseableSearchMapping build() {
+		// Double-check if we've added any properties to the map before building the mapping.
+		// We do so to make sure we are tracking all the property keys:
+		ConfigurationPropertySource propertySource = properties.isEmpty()
+				? ConfigurationPropertySource.empty()
+				: getPropertySource( properties, propertyChecker );
+
 		SearchIntegrationEnvironment environment = null;
 		SearchIntegrationPartialBuildState integrationPartialBuildState = null;
 		StandalonePojoMapping mapping = null;
