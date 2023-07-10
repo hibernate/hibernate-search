@@ -21,9 +21,15 @@ import java.util.stream.Collectors;
 public class AsciiDocWriter implements BiConsumer<Map<String, ConfigurationProperty>, Writer> {
 
 	private final Predicate<Map.Entry<String, ConfigurationProperty>> filter;
+	private final String additionalPrefix;
 
 	public AsciiDocWriter(Predicate<Map.Entry<String, ConfigurationProperty>> filter) {
+		this( filter, "" );
+	}
+
+	public AsciiDocWriter(Predicate<Map.Entry<String, ConfigurationProperty>> filter, String additionalPrefix) {
 		this.filter = filter;
+		this.additionalPrefix = additionalPrefix;
 	}
 
 	@Override
@@ -47,7 +53,7 @@ public class AsciiDocWriter implements BiConsumer<Map<String, ConfigurationPrope
 		try {
 			for ( Map.Entry<String, Collection<ConfigurationProperty>> entry : groups.entrySet() ) {
 				tryToWriteLine( writer, "[[configuration-properties-aggregated-",
-						entry.getValue().iterator().next().anchorPrefix(), "]]" );
+						entry.getValue().iterator().next().anchorPrefix(), additionalPrefix, "]]" );
 				tryToWriteLine( writer, "== ", entry.getKey() );
 				writer.write( '\n' );
 				for ( ConfigurationProperty el : entry.getValue() ) {

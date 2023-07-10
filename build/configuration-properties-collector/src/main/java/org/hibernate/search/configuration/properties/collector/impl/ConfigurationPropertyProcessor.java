@@ -91,7 +91,8 @@ public class ConfigurationPropertyProcessor implements AutoCloseable {
 				writeProperties(
 						fileName + "-spi.adoc",
 						new AsciiDocWriter(
-								SPI_FILTER
+								SPI_FILTER,
+								"-spi"
 						)
 				);
 			}
