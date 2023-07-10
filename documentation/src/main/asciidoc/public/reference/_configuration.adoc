@@ -125,8 +125,8 @@ is equivalent to `hibernate.search.backend.hosts`.
 is equivalent to `hibernate.search.backends.myBackend.hosts`.
 +
 For a list of available property keys,
-see link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchBackendSettings.html[ElasticsearchBackendSettings]
-or link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneBackendSettings.html[LuceneBackendSettings]
+see <<configuration-properties-aggregated-hibernate-search-backend-elasticsearch, the Elasticsearch backend configuration properties appendix>>
+or <<configuration-properties-aggregated-hibernate-search-backend-lucene, the Lucene backend configuration properties appendix>>.
 
 IndexSettings::
 +
@@ -137,8 +137,9 @@ is equivalent to `hibernate.search.backend.indexes.myIndex.indexing.queue_size`.
 is equivalent to `hibernate.search.backends.myBackend.indexes.myIndex.indexing.queue_size`.
 +
 For a list of available property keys,
-see link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchIndexSettings.html[ElasticsearchIndexSettings]
-or link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneIndexSettings.html[LuceneIndexSettings]
+see <<configuration-properties-aggregated-hibernate-search-backend-elasticsearch, the Elasticsearch backend configuration properties appendix>>
+or <<configuration-properties-aggregated-hibernate-search-backend-lucene, the Lucene backend configuration properties appendix>>.
+Look for properties having a variant starting with a `hibernate.search.backend.indexes`.
 
 .Using the helper to build hibernate configuration
 ====
