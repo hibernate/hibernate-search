@@ -10,10 +10,8 @@ In particular, you might want to
 <<backend-lucene-configuration-directory-local-filesystem-location,set the location of your indexes in the filesystem>>.
 
 Other configuration properties are mentioned in the relevant parts of this documentation.
-You can find a full reference of available properties in the Hibernate Search javadoc:
-
-* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneBackendSettings.html[org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings].
-* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneIndexSettings.html[org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings].
+You can find a full reference of available properties in
+<<configuration-properties-aggregated-hibernate-search-backend-lucene, the Lucene backend configuration properties appendix>>.
 
 [[backend-lucene-configuration-directory]]
 == [[search-configuration-directory]] Index storage (`Directory`)

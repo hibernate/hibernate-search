@@ -51,5 +51,5 @@ For example `MyEntity.myEmbedded` or `MyEntity.myEmbedded.myNestedEmbedded`.
 == [[mapper-orm-mapping-configuration-other]] Other configuration
 
 Other configuration properties are mentioned in the relevant parts of this documentation.
-You can find a full reference of available properties in the Hibernate Search javadoc:
-link:{hibernateSearchJavadocUrl}/org/hibernate/search/mapper/orm/cfg/HibernateOrmMapperSettings.html[org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings].
+You can find a full reference of available properties in
+<<configuration-properties-aggregated-hibernate-search-mapper-orm, the ORM integration configuration properties appendix>>.

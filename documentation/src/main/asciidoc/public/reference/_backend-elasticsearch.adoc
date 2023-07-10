@@ -56,10 +56,8 @@ In particular your production Elasticsearch cluster is probably not reachable at
 so you will need to set the address of your cluster by <<backend-elasticsearch-configuration-client,configuring the client>>.
 
 Configuration properties are mentioned in the relevant parts of this documentation.
-You can find a full reference of available properties in the Hibernate Search javadoc:
-
-* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchBackendSettings.html[org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings].
-* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchIndexSettings.html[org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings].
+You can find a full reference of available properties in
+<<configuration-properties-aggregated-hibernate-search-backend-elasticsearch, the Elasticsearch backend configuration properties appendix>>.
 
 [[backend-elasticsearch-configuration-elasticsearch-cluster]]
 == [[elasticsearch-integration-server-configuration]] Configuration of the Elasticsearch cluster
