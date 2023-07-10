@@ -345,5 +345,5 @@ and indexing happens immediately after that instead of happening on transaction 
 == Other configuration
 
 Other configuration properties are mentioned in the relevant parts of this documentation.
-You can find a full reference of available properties in the Hibernate Search javadoc:
-link:{hibernateSearchJavadocUrl}/org/hibernate/search/mapper/pojo/standalone/cfg/StandalonePojoMapperSettings.html[org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings].
+You can find a full reference of available properties in
+<<configuration-properties-aggregated-hibernate-search-mapper-pojo-standalone, the Standalone POJO Mapper configuration properties appendix>>.
