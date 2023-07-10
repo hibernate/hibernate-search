@@ -8,3 +8,6 @@ jira:
       # Allow Groovy (that is only used for scripting maven plugin) version upgrades to not follow the PR formatting rules:
     - user: dependabot[bot]
       titlePattern: ".*\\bgroovy-jsr223\\b.*"
+      # Allow database drivers upgrades (since we only use them for tests)
+    - user: dependabot[bot]
+      titlePattern: ".*\\b(h2|derby|postgresql|mariadb-java-client|mysql-connector-j|jcc|ojdbc8|mssql-jdbc)\\b.*"
