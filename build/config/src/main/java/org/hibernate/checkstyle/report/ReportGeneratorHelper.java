@@ -7,95 +7,46 @@
 package org.hibernate.checkstyle.report;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.FieldInfo;
 import org.jboss.jandex.Index;
+import org.jboss.jandex.IndexReader;
+import org.jboss.jandex.IndexWriter;
 import org.jboss.jandex.MethodInfo;
 import org.jboss.jandex.MethodParameterInfo;
 
-public class ReportGenerator {
+final class ReportGeneratorHelper {
 
-	public static void main(String[] args) throws IOException {
-		generateReport(
-				args[1],
-				args[2],
-				createIndex( args[0] ),
-				createIgnoreRules( args )
-		);
+	private static final String INDEX_FILE_NAME = "hibernate-search-report-index.idx";
+
+	private ReportGeneratorHelper() {
 	}
 
-	private static void generateReport(String outputPath, String annotationName, Index index, Set<Pattern> ignoreRules)
-			throws IOException {
-		List<AnnotationInstance> incubating = index.getAnnotations( DotName.createSimple( annotationName ) );
-
-		try ( Writer writer = new OutputStreamWriter( new FileOutputStream( outputPath ), StandardCharsets.UTF_8 ) ) {
-			writer.write( "@defaultMessage Do not use code marked with " + annotationName + " annotation" );
-			writer.write( '\n' );
-			for ( AnnotationInstance annotationInstance : incubating ) {
-				AnnotationTarget target = annotationInstance.target();
-				String path = determinePath( target );
-				if ( path != null ) {
-					matchAnyIgnoreRule( path, ignoreRules ).ifPresent( rule -> {
-						try {
-							writer.write( "# Ignoring the following line because of the `" + rule.pattern() + "` rule:\n# " );
-						}
-						catch (IOException e) {
-							// just rethrow the exception as a runtime one:
-							throw new RuntimeException( e );
-						}
-					} );
-
-					writer.write( path );
-					writer.write( '\n' );
-				}
+	static Index createIndex(String sourcesPath) throws IOException {
+		Path indexPath = Path.of( sourcesPath ).resolve( INDEX_FILE_NAME );
+		if ( Files.exists( indexPath ) ) {
+			try ( InputStream input = new FileInputStream( indexPath.toFile() ) ) {
+				return new IndexReader( input ).read();
 			}
 		}
-	}
-
-	private static Optional<Pattern> matchAnyIgnoreRule(String path, Set<Pattern> rules) {
-		for ( Pattern rule : rules ) {
-			if ( rule.matcher( path ).matches() ) {
-				return Optional.of( rule );
-			}
-		}
-		return Optional.empty();
-	}
-
-	private static Set<Pattern> createIgnoreRules(String[] args) {
-		if ( args.length > 3 ) {
-			HashSet<Pattern> result = new HashSet<>();
-			for ( int index = 3; index < args.length; index++ ) {
-				result.add( Pattern.compile( args[index] ) );
-			}
-			return result;
-		}
-		else {
-			return Collections.emptySet();
-		}
-	}
-
-	private static Index createIndex(String sourcesPath) throws IOException {
 		List<File> classFiles = new ArrayList<>();
 		Files.walkFileTree( Path.of( sourcesPath ), new SimpleFileVisitor<>() {
 			@Override
@@ -107,10 +58,14 @@ public class ReportGenerator {
 			}
 		} );
 
-		return Index.of( classFiles.toArray( File[]::new ) );
+		Index index = Index.of( classFiles.toArray( File[]::new ) );
+		try ( OutputStream output = new FileOutputStream( indexPath.toFile() ) ) {
+			new IndexWriter( output ).write( index );
+		}
+		return index;
 	}
 
-	private static String determinePath(AnnotationTarget usageLocation) {
+	static String determinePath(AnnotationTarget usageLocation) {
 		switch ( usageLocation.kind() ) {
 			case CLASS: {
 				final DotName name = usageLocation.asClass().name();
@@ -140,7 +95,7 @@ public class ReportGenerator {
 
 	private static String parameters(MethodInfo methodInfo) {
 		return methodInfo.parameters().stream()
-				.map( ReportGenerator::parameterTypeToString )
+				.map( ReportGeneratorHelper::parameterTypeToString )
 				.collect( Collectors.joining( ",", "(", ")" ) );
 	}
 
@@ -156,9 +111,24 @@ public class ReportGenerator {
 			case PARAMETERIZED_TYPE:
 				return parameter.type().name().toString();
 			case ARRAY:
-				return parameter.type().asArrayType().component().name().toString() + "[]";
+				return parameter.type().asArrayType().constituent().name().toString() + "[]";
 			default:
 				throw new AssertionError( "Unknown parameter type: " + parameter.type().kind() );
 		}
+	}
+
+	static void writeReportLines(Writer writer, String path, Optional<Pattern> rule) throws IOException {
+		rule.ifPresent( r -> {
+			try {
+				writer.write( "# Ignoring the following line because of the `" + r.pattern() + "` rule:\n# " );
+			}
+			catch (IOException e) {
+				// just rethrow the exception as a runtime one:
+				throw new RuntimeException( e );
+			}
+		} );
+
+		writer.write( path );
+		writer.write( '\n' );
 	}
 }

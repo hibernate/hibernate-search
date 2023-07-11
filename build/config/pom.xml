@@ -162,18 +162,25 @@
                             <goal>java</goal>
                         </goals>
                         <configuration>
-                            <mainClass>org.hibernate.checkstyle.report.ReportGenerator</mainClass>
+                            <mainClass>org.hibernate.checkstyle.report.AnnotationReportGenerator</mainClass>
                             <arguments>
                                 <!-- The location of classes to process: -->
                                 <argument>${tmpdir.dependencies-to-parse}/hibernate-core</argument>
                                 <!--
-                                    The report output file path.
+                                    The report output directory path.
                                     We write to the build output directory so that the report is included in the jar:
                                 -->
-                                <argument>${project.build.outputDirectory}/hibernate-core-incubating.txt</argument>
+                                <argument>${project.build.outputDirectory}</argument>
+                                <!-- The report file name main part. Generator will add any suffixes and extensions it needs to it. -->
+                                <argument>hibernate-core-incubating</argument>
                                 <!-- The annotation to look for: -->
                                 <argument>org.hibernate.Incubating</argument>
                                 <!-- Ignore rules: -->
+                                <!--
+                                    Rules can start with a `-Rinternal ` or a `-Rpublic ` prefixes.
+                                    This would mean that a corresponding pattern will only be applied to filtering of internal/public rules.
+                                    If no prefix is specified then rule is considered to be both public and internal at the same time.
+                                -->
                                 <argument>^org\.hibernate\.query\.Query$</argument>
                                 <argument>^org\.hibernate\.query\.SelectionQuery$</argument>
                                 <argument>^org\.hibernate\.query\.MutationQuery$</argument>
@@ -190,17 +197,37 @@
                                 <argument>^org\.hibernate\.type\.spi\.TypeConfiguration$</argument>
                                 <argument>^org\.hibernate\.query\.spi\.ScrollableResultsImplementor$</argument>
                                 <argument>^org\.hibernate\.query\.sqm\.spi\.SqmCreationContext$</argument>
-
-                                <!-- Rules for things used in tests: -->
-                                <argument>^org\.hibernate\.SessionEventListener$</argument>
-                                <argument>^org\.hibernate\.tool\.schema\.spi\.SchemaCreator$</argument>
-                                <argument>^org\.hibernate\.tool\.schema\.spi\.SchemaValidator$</argument>
-                                <argument>^org\.hibernate\.tool\.schema\.spi\.SchemaMigrator$</argument>
-                                <argument>^org\.hibernate\.tool\.schema\.spi\.SchemaDropper$</argument>
-                                <argument>^org\.hibernate\.tool\.schema\.spi\.SchemaManagementTool$</argument>
-                                <argument>^org\.hibernate\.tool\.schema\.spi\.ExtractionTool$</argument>
-                                <argument>^org\.hibernate\.tool\.schema\.spi\.ExecutionOptions$</argument>
-                                <argument>^org\.hibernate\.collection\.spi\.LazyInitializable$</argument>
+                            </arguments>
+                            <!--
+                                While this will include more than we really need, it is easier to do so.
+                                Alternatively, if we would use plugin dependencies and add Jandex there,
+                                we would need to explicitly specify the version of Jandex, since dependency management
+                                doesn't seem to work on dependencies added to a plugin configuration >_<
+                            -->
+                            <includeProjectDependencies>true</includeProjectDependencies>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-hibernate-core-internal-report</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.hibernate.checkstyle.report.InternalReportGenerator</mainClass>
+                            <arguments>
+                                <!-- The location of classes to process: -->
+                                <argument>${tmpdir.dependencies-to-parse}/hibernate-core</argument>
+                                <!--
+                                    The report output directory path.
+                                    We write to the build output directory so that the report is included in the jar:
+                                -->
+                                <argument>${project.build.outputDirectory}</argument>
+                                <!-- The report file name main part. Generator will add any suffixes and extensions it needs to it. -->
+                                <argument>hibernate-core-internal-packages</argument>
+                                <!-- The base package to start from: -->
+                                <argument>org.hibernate</argument>
+                                <!-- Ignore rules: -->
                             </arguments>
                             <!--
                                 While this will include more than we really need, it is easier to do so.
