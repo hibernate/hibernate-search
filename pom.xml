@@ -255,6 +255,7 @@
         <version.org.slf4j>1.7.36</version.org.slf4j>
 
         <!-- >>> ORM 6 with Jakarta Persistence -->
+        <!-- IMPORTANT: Make sure that version.jakarta.persistence aligns with the imported version! -->
         <version.org.hibernate.orm>6.2.6.Final</version.org.hibernate.orm>
 
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
@@ -266,6 +267,12 @@
              and to our own explicit dependencies in the relevant artifacts.
           -->
         <version.jakarta.enterprise>4.0.1</version.jakarta.enterprise>
+        <!--
+            IMPORTANT:
+            Even though we are importing the Hibernate ORM BOM where Jakarta Persistence is managed, we don't have easy access
+            to its version. We need a version to be able to display it in the docs. This property is exactly to address that need.
+        -->
+        <version.jakarta.persistence>3.1.0</version.jakarta.persistence>
 
         <!-- >>> JSR 352 -->
         <version.jakarta.batch>2.1.1</version.jakarta.batch>
@@ -273,7 +280,7 @@
 
         <!-- >>> Java EE/Jakarta EE dependencies -->
         <!-- This is used to generate a link to the Jakarta EE javadoc -->
-        <javadoc.jakarta.batch.url>https://jakarta.ee/specifications/batch/2.1/apidocs/</javadoc.jakarta.batch.url>
+        <javadoc.jakarta.batch.url>https://jakarta.ee/specifications/batch/${parsed-version.jakarta.batch.majorVersion}.${parsed-version.jakarta.batch.minorVersion}/apidocs/</javadoc.jakarta.batch.url>
 
         <!-- Test dependencies -->
 
@@ -1427,6 +1434,16 @@
                         <configuration>
                             <propertyPrefix>parsed-version.jakarta.persistence</propertyPrefix>
                             <versionString>${version.jakarta.persistence}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-jakarta-batch-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.jakarta.batch</propertyPrefix>
+                            <versionString>${version.jakarta.batch}</versionString>
                         </configuration>
                     </execution>
                     <execution>
