@@ -31,6 +31,7 @@
         <format.skip>true</format.skip>
 
         <tmpdir.dependencies-javadoc-packagelists>${project.build.directory}/dependencies-javadoc-packagelists</tmpdir.dependencies-javadoc-packagelists>
+        <tmpdir.dependencies-to-parse>${project.build.directory}/dependencies-to-parse</tmpdir.dependencies-to-parse>
     </properties>
 
     <dependencyManagement>
@@ -46,6 +47,10 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>io.smallrye</groupId>
+            <artifactId>jandex</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
@@ -123,6 +128,87 @@
                             </artifactItems>
                             <includes>package-list,element-list</includes>
                             <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>unpack-dependencies-incubating-report</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.hibernate.orm</groupId>
+                                    <artifactId>hibernate-core</artifactId>
+                                    <type>jar</type>
+                                    <version>${version.org.hibernate.orm}</version>
+                                    <outputDirectory>${tmpdir.dependencies-to-parse}/hibernate-core</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-hibernate-core-incubating-report</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.hibernate.checkstyle.report.ReportGenerator</mainClass>
+                            <arguments>
+                                <!-- The location of classes to process: -->
+                                <argument>${tmpdir.dependencies-to-parse}/hibernate-core</argument>
+                                <!--
+                                    The report output file path.
+                                    We write to the build output directory so that the report is included in the jar:
+                                -->
+                                <argument>${project.build.outputDirectory}/hibernate-core-incubating.txt</argument>
+                                <!-- The annotation to look for: -->
+                                <argument>org.hibernate.Incubating</argument>
+                                <!-- Ignore rules: -->
+                                <argument>^org\.hibernate\.query\.Query$</argument>
+                                <argument>^org\.hibernate\.query\.SelectionQuery$</argument>
+                                <argument>^org\.hibernate\.query\.MutationQuery$</argument>
+                                <argument>^org\.hibernate\.query\.BindableType$</argument>
+
+                                <argument>^org\.hibernate\.metamodel\.MappingMetamodel$</argument>
+                                <argument>^org\.hibernate\.metamodel\.mapping\.Bindable$</argument>
+                                <argument>^org\.hibernate\.metamodel\.mapping\.SelectableMapping$</argument>
+                                <argument>^org\.hibernate\.metamodel\.mapping\.SelectablePath$</argument>
+                                <argument>^org\.hibernate\.metamodel\.model\.domain\.JpaMetamodel$</argument>
+
+                                <argument>^org\.hibernate\.boot\.spi\.BootstrapContext$</argument>
+                                <argument>^org\.hibernate\.collection\.spi\.PersistentCollection$</argument>
+                                <argument>^org\.hibernate\.type\.spi\.TypeConfiguration$</argument>
+                                <argument>^org\.hibernate\.query\.spi\.ScrollableResultsImplementor$</argument>
+                                <argument>^org\.hibernate\.query\.sqm\.spi\.SqmCreationContext$</argument>
+
+                                <!-- Rules for things used in tests: -->
+                                <argument>^org\.hibernate\.SessionEventListener$</argument>
+                                <argument>^org\.hibernate\.tool\.schema\.spi\.SchemaCreator$</argument>
+                                <argument>^org\.hibernate\.tool\.schema\.spi\.SchemaValidator$</argument>
+                                <argument>^org\.hibernate\.tool\.schema\.spi\.SchemaMigrator$</argument>
+                                <argument>^org\.hibernate\.tool\.schema\.spi\.SchemaDropper$</argument>
+                                <argument>^org\.hibernate\.tool\.schema\.spi\.SchemaManagementTool$</argument>
+                                <argument>^org\.hibernate\.tool\.schema\.spi\.ExtractionTool$</argument>
+                                <argument>^org\.hibernate\.tool\.schema\.spi\.ExecutionOptions$</argument>
+                                <argument>^org\.hibernate\.collection\.spi\.LazyInitializable$</argument>
+                            </arguments>
+                            <!--
+                                While this will include more than we really need, it is easier to do so.
+                                Alternatively, if we would use plugin dependencies and add Jandex there,
+                                we would need to explicitly specify the version of Jandex, since dependency management
+                                doesn't seem to work on dependencies added to a plugin configuration >_<
+                            -->
+                            <includeProjectDependencies>true</includeProjectDependencies>
                         </configuration>
                     </execution>
                 </executions>
