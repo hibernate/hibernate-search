@@ -273,7 +273,7 @@
 
         <!-- >>> Java EE/Jakarta EE dependencies -->
         <!-- This is used to generate a link to the Jakarta EE javadoc -->
-        <javadoc.jakarta.batch.url>https://jakarta.ee/specifications/batch/2.0/apidocs/</javadoc.jakarta.batch.url>
+        <javadoc.jakarta.batch.url>https://jakarta.ee/specifications/batch/2.1/apidocs/</javadoc.jakarta.batch.url>
 
         <!-- Test dependencies -->
 
@@ -480,8 +480,8 @@
          -->
         <maven.min.version>3.8.1</maven.min.version>
 
-        <!-- Whether javadoc problems (errors, warnings) should fail the build) -->
-        <failOnJavadocError>true</failOnJavadocError>
+        <!-- Whether javadoc warnings should fail the build -->
+        <failOnJavadocWarning>true</failOnJavadocWarning>
 
         <!-- Can be overridden by subprojects if dependency convergence cannot be achieved -->
         <enforcer.dependencyconvergence.skip>false</enforcer.dependencyconvergence.skip>

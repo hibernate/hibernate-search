@@ -52,7 +52,7 @@
                         <!-- Fail on error alternative -->
                         <quiet>true</quiet>
                         <verbose>false</verbose>
-                        <failOnWarnings>true</failOnWarnings>
+                        <failOnWarnings>${failOnJavadocWarning}</failOnWarnings>
                         <failOnError>true</failOnError>
                         <release>${maven.compiler.release}</release>
                         <!-- Exclude implementation classes from the javadoc -->
@@ -86,11 +86,6 @@
                             <offlineLink>
                                 <url>${javadoc.org.apache.lucene.queryparser.url}</url>
                                 <location>${javadoc.packagelists.directory}/lucene-queryparser</location>
-                            </offlineLink>
-                            <!-- For javax.batch in the JSR 352 modules -->
-                            <offlineLink>
-                                <url>${javadoc.javaee.url}</url>
-                                <location>${javadoc.packagelists.directory}/batch-api</location>
                             </offlineLink>
                             <!-- For jakarta.batch in the JSR 352 modules -->
                             <offlineLink>

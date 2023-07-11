@@ -105,19 +105,11 @@
                                     <artifactId>jakarta.batch-api</artifactId>
                                     <classifier>javadoc</classifier>
                                     <type>jar</type>
-                                    <version>${version.javax.batch}</version>
-                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/batch-api</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>jakarta.batch</groupId>
-                                    <artifactId>jakarta.batch-api</artifactId>
-                                    <classifier>javadoc</classifier>
-                                    <type>jar</type>
-                                    <version>${version.javax.batch}</version>
+                                    <version>${version.jakarta.batch}</version>
                                     <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/batch-api</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
-                            <includes>package-list</includes>
+                            <includes>package-list,element-list</includes>
                             <overWriteSnapshots>true</overWriteSnapshots>
                         </configuration>
                     </execution>
