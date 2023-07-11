@@ -1327,6 +1327,13 @@
                                         <type>jar</type>
                                         <path>hibernate-core-incubating.txt</path>
                                     </signaturesArtifact>
+                                    <signaturesArtifact>
+                                        <groupId>org.hibernate.search</groupId>
+                                        <artifactId>hibernate-search-build-config</artifactId>
+                                        <version>${project.version}</version>
+                                        <type>jar</type>
+                                        <path>hibernate-core-internal-packages.txt</path>
+                                    </signaturesArtifact>
                                 </signaturesArtifacts>
                             </configuration>
                             <phase>compile</phase>
@@ -1351,13 +1358,6 @@
                                         <version>${project.version}</version>
                                         <type>jar</type>
                                         <path>forbidden-internal.txt</path>
-                                    </signaturesArtifact>
-                                    <signaturesArtifact>
-                                        <groupId>org.hibernate.search</groupId>
-                                        <artifactId>hibernate-search-build-config</artifactId>
-                                        <version>${project.version}</version>
-                                        <type>jar</type>
-                                        <path>hibernate-core-incubating.txt</path>
                                     </signaturesArtifact>
                                 </signaturesArtifacts>
                             </configuration>
@@ -1384,13 +1384,6 @@
                                         <version>${project.version}</version>
                                         <type>jar</type>
                                         <path>forbidden-internal.txt</path>
-                                    </signaturesArtifact>
-                                    <signaturesArtifact>
-                                        <groupId>org.hibernate.search</groupId>
-                                        <artifactId>hibernate-search-build-config</artifactId>
-                                        <version>${project.version}</version>
-                                        <type>jar</type>
-                                        <path>hibernate-core-incubating.txt</path>
                                     </signaturesArtifact>
                                 </signaturesArtifacts>
                             </configuration>
