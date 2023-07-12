@@ -7,8 +7,8 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.ConfigurationPropertySourceExtractor;
+import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
 import org.hibernate.search.engine.common.resources.spi.SavedState;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
@@ -38,9 +38,9 @@ class IndexManagerNonStartedState {
 	}
 
 	void preStart(RootFailureCollector rootFailureCollector, BeanResolver beanResolver,
-			ConfigurationPropertySource rootPropertySource, SavedState savedState) {
+			ScopedConfigurationPropertySource rootPropertySource, SavedState savedState) {
 		indexFailureCollector = rootFailureCollector.withContext( eventContext );
-		ConfigurationPropertySource indexPropertySource = propertySourceExtractor.extract( rootPropertySource );
+		ScopedConfigurationPropertySource indexPropertySource = propertySourceExtractor.extract( rootPropertySource );
 		startContext = new IndexManagerStartContextImpl(
 				indexFailureCollector, beanResolver, indexPropertySource
 		);

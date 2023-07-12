@@ -9,6 +9,8 @@ package org.hibernate.search.engine.cfg.impl;
 import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 
 /**
  * This class is very similar to {@link FallbackConfigurationPropertySource}.
@@ -17,7 +19,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
  * the implementation of {@link #resolve(String)} would not work as expected,
  * returning the key resolved using the wrong source.
  */
-public class OverriddenConfigurationPropertySource implements ConfigurationPropertySource {
+public class OverriddenConfigurationPropertySource implements ScopedConfigurationPropertySource {
 	private final ConfigurationPropertySource main;
 	private final ConfigurationPropertySource override;
 
@@ -45,6 +47,26 @@ public class OverriddenConfigurationPropertySource implements ConfigurationPrope
 		else {
 			return main.resolve( key );
 		}
+	}
+
+	@Override
+	public ScopedConfigurationPropertySource withScope(BeanResolver beanResolver, String namespace, String name) {
+		ConfigurationPropertySource scopedMain = main;
+		ConfigurationPropertySource scopedOverride = override;
+		if ( main instanceof ScopedConfigurationPropertySource ) {
+			scopedMain = ( (ScopedConfigurationPropertySource) main ).withScope( beanResolver, namespace, name );
+		}
+		if ( override instanceof ScopedConfigurationPropertySource ) {
+			scopedOverride = ( (ScopedConfigurationPropertySource) override ).withScope( beanResolver, namespace, name );
+		}
+
+		if ( scopedMain != main || scopedOverride != override ) {
+			return new OverriddenConfigurationPropertySource(
+					scopedMain,
+					scopedOverride
+			);
+		}
+		return this;
 	}
 
 	@Override

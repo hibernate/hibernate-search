@@ -24,6 +24,7 @@ import org.hibernate.search.engine.cfg.impl.ConfigurationPropertySourceExtractor
 import org.hibernate.search.engine.cfg.impl.EngineConfigurationUtils;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -46,7 +47,7 @@ class IndexManagerBuildingStateHolder {
 					.build();
 
 	private final BeanResolver beanResolver;
-	private final ConfigurationPropertySource propertySource;
+	private final ScopedConfigurationPropertySource propertySource;
 	private final RootBuildContext rootBuildContext;
 
 	// Use a LinkedHashMap for deterministic iteration
@@ -54,7 +55,7 @@ class IndexManagerBuildingStateHolder {
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, IndexManagerInitialBuildState> indexManagerBuildStateByName = new LinkedHashMap<>();
 
-	IndexManagerBuildingStateHolder(BeanResolver beanResolver, ConfigurationPropertySource propertySource,
+	IndexManagerBuildingStateHolder(BeanResolver beanResolver, ScopedConfigurationPropertySource propertySource,
 			RootBuildContext rootBuildContext) {
 		this.beanResolver = beanResolver;
 		this.propertySource = propertySource;
@@ -121,7 +122,7 @@ class IndexManagerBuildingStateHolder {
 	private BackendInitialBuildState createBackend(Optional<String> backendNameOptional, TenancyMode tenancyMode,
 			EventContext eventContext) {
 		ConfigurationPropertySourceExtractor backendPropertySourceExtractor =
-				EngineConfigurationUtils.extractorForBackend( backendNameOptional );
+				EngineConfigurationUtils.extractorForBackend( beanResolver, backendNameOptional );
 		ConfigurationPropertySource backendPropertySource = backendPropertySourceExtractor.extract( propertySource );
 		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
 				BACKEND_TYPE.<BeanHolder<? extends BackendFactory>>getAndMap( backendPropertySource, beanResolver::resolve )
@@ -174,8 +175,8 @@ class IndexManagerBuildingStateHolder {
 			}
 
 			ConfigurationPropertySourceExtractor indexPropertySourceExtractor =
-					EngineConfigurationUtils.extractorForIndex( propertySourceExtractor, indexName );
-			ConfigurationPropertySource indexPropertySource = indexPropertySourceExtractor.extract( propertySource );
+					EngineConfigurationUtils.extractorForIndex( beanResolver, propertySourceExtractor, indexName );
+			ScopedConfigurationPropertySource indexPropertySource = indexPropertySourceExtractor.extract( propertySource );
 
 			IndexManagerBuilder builder = backend.createIndexManagerBuilder(
 					indexName, mappedTypeName, backendBuildContext, backendMapperContext, indexPropertySource

@@ -12,9 +12,9 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.mapping.PersistentClass;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -116,7 +116,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		BeanResolver beanResolver = buildContext.beanResolver();
-		ConfigurationPropertySource propertySource = buildContext.configurationPropertySource();
+		ScopedConfigurationPropertySource propertySource = buildContext.configurationPropertySource();
 
 		addConfigurationContributor(
 				new HibernateOrmMappingConfigurationContributor( basicTypeMetadataProvider, introspector )

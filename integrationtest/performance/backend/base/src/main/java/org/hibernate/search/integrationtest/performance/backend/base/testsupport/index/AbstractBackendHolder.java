@@ -16,6 +16,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
+import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
@@ -81,8 +82,9 @@ public abstract class AbstractBackendHolder {
 
 		SearchIntegrationPartialBuildState integrationPartialBuildState = integrationBuilder.prepareBuild();
 		try {
-			SearchIntegrationFinalizer finalizer =
-					integrationPartialBuildState.finalizer( propertySource, unusedPropertyChecker );
+			SearchIntegrationFinalizer finalizer = integrationPartialBuildState.finalizer(
+					ScopedConfigurationPropertySource.wrap( environment.beanResolver(), propertySource ),
+					unusedPropertyChecker );
 			mapping = finalizer.finalizeMapping(
 					mappingKey,
 					(context, partialMapping) -> partialMapping.finalizeMapping(

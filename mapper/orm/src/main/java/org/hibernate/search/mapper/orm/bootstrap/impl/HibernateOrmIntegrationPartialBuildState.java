@@ -14,6 +14,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -65,7 +66,7 @@ final class HibernateOrmIntegrationPartialBuildState {
 	}
 
 	HibernateSearchContextProviderService doBootSecondPhase(SessionFactoryImplementor sessionFactoryImplementor,
-			ConfigurationPropertySource propertySource, ConfigurationPropertyChecker propertyChecker) {
+			ScopedConfigurationPropertySource propertySource, ConfigurationPropertyChecker propertyChecker) {
 		SearchIntegrationFinalizer finalizer = integrationBuildState.finalizer( propertySource, propertyChecker );
 
 		HibernateOrmMapping mapping = finalizer.finalizeMapping(

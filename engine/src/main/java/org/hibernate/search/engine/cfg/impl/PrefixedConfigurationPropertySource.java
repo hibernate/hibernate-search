@@ -9,9 +9,11 @@ package org.hibernate.search.engine.cfg.impl;
 import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.impl.Contracts;
 
-public class PrefixedConfigurationPropertySource implements ConfigurationPropertySource {
+public class PrefixedConfigurationPropertySource implements ScopedConfigurationPropertySource {
 	private final ConfigurationPropertySource propertiesToPrefix;
 	private final String radix;
 	private final int radixLength;
@@ -22,6 +24,12 @@ public class PrefixedConfigurationPropertySource implements ConfigurationPropert
 		this.propertiesToPrefix = propertiesToPrefix;
 		this.radix = prefix + ".";
 		this.radixLength = radix.length();
+	}
+
+	private PrefixedConfigurationPropertySource(ConfigurationPropertySource propertiesToPrefix, String radix, int radixLength) {
+		this.propertiesToPrefix = propertiesToPrefix;
+		this.radix = radix;
+		this.radixLength = radixLength;
 	}
 
 	@Override
@@ -45,8 +53,20 @@ public class PrefixedConfigurationPropertySource implements ConfigurationPropert
 	}
 
 	@Override
-	public ConfigurationPropertySource withPrefix(String prefix) {
+	public ScopedConfigurationPropertySource withPrefix(String prefix) {
 		return new PrefixedConfigurationPropertySource( propertiesToPrefix, prefix + radix.substring( 0, radix.length() - 1 ) );
+	}
+
+	@Override
+	public ScopedConfigurationPropertySource withScope(BeanResolver beanResolver, String namespace, String name) {
+		if ( propertiesToPrefix instanceof ScopedConfigurationPropertySource ) {
+			return new PrefixedConfigurationPropertySource(
+					( (ScopedConfigurationPropertySource) propertiesToPrefix ).withScope( beanResolver, namespace, name ),
+					radix,
+					radixLength
+			);
+		}
+		return this;
 	}
 
 	@Override

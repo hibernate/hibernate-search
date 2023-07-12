@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
+import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
 import org.hibernate.search.engine.common.resources.impl.EngineThreads;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
@@ -99,7 +99,7 @@ public class SearchIntegrationBuilder implements SearchIntegration.Builder {
 
 	@Override
 	public SearchIntegrationPartialBuildState prepareBuild() {
-		ConfigurationPropertySource propertySource = environment.propertySource();
+		ScopedConfigurationPropertySource propertySource = environment.propertySource();
 		BeanResolver beanResolver = environment.beanResolver();
 		BeanHolder<? extends FailureHandler> failureHandlerHolder = null;
 		BeanHolder<? extends ThreadProvider> threadProviderHolder = null;

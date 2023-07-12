@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.logging.impl;
 
 import static org.jboss.logging.Logger.Level.DEBUG;
+import static org.jboss.logging.Logger.Level.WARN;
 
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.Set;
 
+import org.hibernate.search.engine.cfg.spi.ConfigurationProvider;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanNotFoundException;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingException;
@@ -558,4 +560,10 @@ public interface Log extends BasicLogger {
 					+ "Included paths are: '%1$s', excluded paths are: '%2$s'.")
 	SearchException cannotIncludeAndExcludePathsWithinSameFilter(Set<String> includePaths,
 			Set<String> excludePaths);
+
+	@LogMessage(level = WARN)
+	@Message(id = ID_OFFSET + 120,
+			value = "Multiple configuration providers are available for scope '%1$s'. "
+					+ "They will be taken under consideration in such priority: '%2$s'.")
+	void multipleConfigurationProvidersAvailable(String scope, List<ConfigurationProvider> configurationProviders);
 }

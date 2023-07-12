@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.engine.cfg.impl;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
 
 public interface ConfigurationPropertySourceExtractor {
 
-	ConfigurationPropertySource extract(ConfigurationPropertySource parentSource);
+	ScopedConfigurationPropertySource extract(ScopedConfigurationPropertySource parentSource);
 
 }

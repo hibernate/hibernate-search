@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.common.spi;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
+import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 
 public interface SearchIntegrationPartialBuildState {
@@ -32,7 +32,7 @@ public interface SearchIntegrationPartialBuildState {
 	 * tracking the given {@code configurationPropertySource}.
 	 * @return An object allowing the finalization of the search integration.
 	 */
-	SearchIntegrationFinalizer finalizer(ConfigurationPropertySource propertySource,
+	SearchIntegrationFinalizer finalizer(ScopedConfigurationPropertySource propertySource,
 			ConfigurationPropertyChecker propertyChecker);
 
 }

@@ -27,6 +27,7 @@ import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
@@ -104,7 +105,11 @@ public class IndexManagerBuildingStateHolderTest {
 				ArgumentCaptor.forClass( ConfigurationPropertySource.class );
 
 		IndexManagerBuildingStateHolder holder =
-				new IndexManagerBuildingStateHolder( beanResolverMock, configurationSourceMock, rootBuildContextMock );
+				new IndexManagerBuildingStateHolder(
+						beanResolverMock,
+						new ScopeInoringScopedConfigurationPropertySource( configurationSourceMock ),
+						rootBuildContextMock
+				);
 		verifyNoOtherBackendInteractionsAndReset();
 
 		when( configurationSourceMock.get( "backend.type" ) )
@@ -167,8 +172,11 @@ public class IndexManagerBuildingStateHolderTest {
 				ArgumentCaptor.forClass( ConfigurationPropertySource.class );
 
 		IndexManagerBuildingStateHolder holder =
-				new IndexManagerBuildingStateHolder( beanResolverMock, configurationSourceMock, rootBuildContextMock );
-		verifyNoOtherBackendInteractionsAndReset();
+				new IndexManagerBuildingStateHolder(
+						beanResolverMock,
+						new ScopeInoringScopedConfigurationPropertySource( configurationSourceMock ),
+						rootBuildContextMock
+				);
 
 		when( configurationSourceMock.get( "backends.myBackend.type" ) )
 				.thenReturn( (Optional) Optional.of( "someBackendType" ) );
@@ -236,7 +244,11 @@ public class IndexManagerBuildingStateHolderTest {
 		ArgumentCaptor<Throwable> throwableCaptor = ArgumentCaptor.forClass( Throwable.class );
 
 		IndexManagerBuildingStateHolder holder =
-				new IndexManagerBuildingStateHolder( beanResolverMock, configurationSourceMock, rootBuildContextMock );
+				new IndexManagerBuildingStateHolder(
+						beanResolverMock,
+						new ScopeInoringScopedConfigurationPropertySource( configurationSourceMock ),
+						rootBuildContextMock
+				);
 		verifyNoOtherBackendInteractionsAndReset();
 
 		when( configurationSourceMock.get( "backend.type" ) )
@@ -269,7 +281,11 @@ public class IndexManagerBuildingStateHolderTest {
 		ArgumentCaptor<Throwable> throwableCaptor = ArgumentCaptor.forClass( Throwable.class );
 
 		IndexManagerBuildingStateHolder holder =
-				new IndexManagerBuildingStateHolder( beanResolverMock, configurationSourceMock, rootBuildContextMock );
+				new IndexManagerBuildingStateHolder(
+						beanResolverMock,
+						new ScopeInoringScopedConfigurationPropertySource( configurationSourceMock ),
+						rootBuildContextMock
+				);
 		verifyNoOtherBackendInteractionsAndReset();
 
 		when( configurationSourceMock.get( "backend.type" ) )
@@ -341,5 +357,49 @@ public class IndexManagerBuildingStateHolderTest {
 				return BackendMappingHints.NONE;
 			}
 		};
+	}
+
+	private static class ScopeInoringScopedConfigurationPropertySource implements ScopedConfigurationPropertySource {
+
+		private final ConfigurationPropertySource delegate;
+
+		private ScopeInoringScopedConfigurationPropertySource(ConfigurationPropertySource delegate) {
+			this.delegate = delegate;
+		}
+
+		@Override
+		public ScopedConfigurationPropertySource withScope(BeanResolver beanResolver, String namespace, String name) {
+			return this;
+		}
+
+		@Override
+		public Optional<?> get(String key) {
+			return delegate.get( key );
+		}
+
+		@Override
+		public Optional<String> resolve(String key) {
+			return delegate.resolve( key );
+		}
+
+		@Override
+		public ScopedConfigurationPropertySource withPrefix(String prefix) {
+			return new ScopeInoringScopedConfigurationPropertySource( delegate.withPrefix( prefix ) );
+		}
+
+		@Override
+		public ScopedConfigurationPropertySource withMask(String mask) {
+			return new ScopeInoringScopedConfigurationPropertySource( delegate.withMask( mask ) );
+		}
+
+		@Override
+		public ScopedConfigurationPropertySource withFallback(ConfigurationPropertySource fallback) {
+			return new ScopeInoringScopedConfigurationPropertySource( delegate.withFallback( fallback ) );
+		}
+
+		@Override
+		public ScopedConfigurationPropertySource withOverride(ConfigurationPropertySource override) {
+			return new ScopeInoringScopedConfigurationPropertySource( delegate.withOverride( override ) );
+		}
 	}
 }

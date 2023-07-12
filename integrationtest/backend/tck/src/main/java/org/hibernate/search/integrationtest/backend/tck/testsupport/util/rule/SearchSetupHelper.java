@@ -22,6 +22,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
+import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
@@ -258,7 +259,9 @@ public class SearchSetupHelper implements TestRule {
 
 			return overrides -> {
 				SearchIntegrationFinalizer finalizer =
-						integrationPartialBuildState.finalizer( propertySource.withOverride( overrides ),
+						integrationPartialBuildState.finalizer(
+								ScopedConfigurationPropertySource.wrap( environment.beanResolver(), propertySource )
+										.withOverride( overrides ),
 								unusedPropertyChecker );
 				StubMappingImpl mapping = finalizer.finalizeMapping(
 						mappingKey,

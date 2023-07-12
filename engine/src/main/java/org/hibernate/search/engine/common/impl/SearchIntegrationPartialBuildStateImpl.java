@@ -16,8 +16,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
+import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
 import org.hibernate.search.engine.common.resources.impl.EngineThreads;
 import org.hibernate.search.engine.common.resources.spi.SavedState;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
@@ -115,7 +115,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	}
 
 	@Override
-	public SearchIntegrationFinalizer finalizer(ConfigurationPropertySource propertySource,
+	public SearchIntegrationFinalizer finalizer(ScopedConfigurationPropertySource propertySource,
 			ConfigurationPropertyChecker configurationPropertyChecker) {
 		return new SearchIntegrationFinalizerImpl(
 				propertySource.withMask( SearchIntegrationEnvironment.CONFIGURATION_PROPERTIES_MASK ),
@@ -125,10 +125,10 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 
 	private class SearchIntegrationFinalizerImpl implements SearchIntegrationFinalizer {
 
-		private final ConfigurationPropertySource propertySource;
+		private final ScopedConfigurationPropertySource propertySource;
 		private final ConfigurationPropertyChecker propertyChecker;
 
-		private SearchIntegrationFinalizerImpl(ConfigurationPropertySource propertySource,
+		private SearchIntegrationFinalizerImpl(ScopedConfigurationPropertySource propertySource,
 				ConfigurationPropertyChecker propertyChecker) {
 			this.propertySource = propertySource;
 			this.propertyChecker = propertyChecker;

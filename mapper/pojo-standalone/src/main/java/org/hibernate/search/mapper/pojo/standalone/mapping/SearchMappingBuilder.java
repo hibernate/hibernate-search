@@ -20,6 +20,7 @@ import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
@@ -151,7 +152,10 @@ public final class SearchMappingBuilder {
 			integrationPartialBuildState = integrationBuilder.prepareBuild();
 
 			SearchIntegrationFinalizer finalizer =
-					integrationPartialBuildState.finalizer( propertySource, propertyChecker );
+					integrationPartialBuildState.finalizer( ScopedConfigurationPropertySource.wrap(
+							environment.beanResolver(),
+							propertySource
+					), environment.propertyChecker() );
 
 			mapping = finalizer.finalizeMapping(
 					mappingKey,

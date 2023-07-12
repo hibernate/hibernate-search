@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
@@ -46,6 +46,6 @@ public interface MappingBuildContext {
 
 	ThreadPoolProvider threadPoolProvider();
 
-	ConfigurationPropertySource configurationPropertySource();
+	ScopedConfigurationPropertySource configurationPropertySource();
 
 }

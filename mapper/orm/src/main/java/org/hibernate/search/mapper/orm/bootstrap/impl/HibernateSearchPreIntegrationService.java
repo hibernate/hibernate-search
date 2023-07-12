@@ -23,6 +23,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
+import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
@@ -121,7 +122,12 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 			}
 
 			if ( partialBuildState.isPresent() ) {
-				return new PreBooted( propertyChecker, propertySource, partialBuildState.get() );
+				HibernateOrmIntegrationPartialBuildState state = partialBuildState.get();
+				return new PreBooted(
+						ScopedConfigurationPropertySource.wrap( state.beanResolver(), propertySource ),
+						propertyChecker,
+						state
+				);
 			}
 			else {
 				// Most common path (except for Quarkus): Hibernate Search wasn't pre-booted ahead of time,
@@ -131,9 +137,8 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 				// its implementation is overridden by Quarkus to make it clear to SubstrateVM
 				// that the first phase of boot is never executed in the native binary.
 				return HibernateOrmIntegrationBooterBehavior.bootFirstPhase( () -> {
-					SearchIntegrationEnvironment environment =
-							createEnvironment( propertyChecker, propertySource, registry );
-					return new NotBooted( propertyChecker, propertySource, environment, registry );
+					SearchIntegrationEnvironment environment = createEnvironment( propertyChecker, propertySource, registry );
+					return new NotBooted( propertySource, propertyChecker, environment, registry );
 				} );
 			}
 		}
@@ -174,15 +179,15 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 		}
 	}
 
+	private final ScopedConfigurationPropertySource propertySource;
 	private final ConfigurationPropertyChecker propertyChecker;
-	private final ConfigurationPropertySource propertySource;
 
 	private CoordinationConfigurationContextImpl coordinationStrategyConfiguration;
 
-	protected HibernateSearchPreIntegrationService(ConfigurationPropertyChecker propertyChecker,
-			ConfigurationPropertySource propertySource) {
-		this.propertyChecker = propertyChecker;
+	protected HibernateSearchPreIntegrationService(ScopedConfigurationPropertySource propertySource,
+			ConfigurationPropertyChecker propertyChecker) {
 		this.propertySource = propertySource;
+		this.propertyChecker = propertyChecker;
 	}
 
 	@Override
@@ -196,7 +201,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 		closer.push( CoordinationConfigurationContextImpl::close, coordinationStrategyConfiguration );
 	}
 
-	ConfigurationPropertySource propertySource() {
+	ScopedConfigurationPropertySource propertySource() {
 		return propertySource;
 	}
 
@@ -223,10 +228,10 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 		private final SearchIntegrationEnvironment environment;
 		private final ServiceRegistry serviceRegistry;
 
-		NotBooted(ConfigurationPropertyChecker propertyChecker,
-				ConfigurationPropertySource propertySource, SearchIntegrationEnvironment environment,
+		NotBooted(ConfigurationPropertySource propertySource, ConfigurationPropertyChecker propertyChecker,
+				SearchIntegrationEnvironment environment,
 				ServiceRegistry serviceRegistry) {
-			super( propertyChecker, propertySource );
+			super( ScopedConfigurationPropertySource.wrap( environment.beanResolver(), propertySource ), propertyChecker );
 			this.environment = environment;
 			this.serviceRegistry = serviceRegistry;
 		}
@@ -276,10 +281,9 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 
 		private final HibernateOrmIntegrationPartialBuildState partialBuildState;
 
-		PreBooted(ConfigurationPropertyChecker propertyChecker,
-				ConfigurationPropertySource propertySource,
+		PreBooted(ScopedConfigurationPropertySource propertySource, ConfigurationPropertyChecker propertyChecker,
 				HibernateOrmIntegrationPartialBuildState partialBuildState) {
-			super( propertyChecker, propertySource );
+			super( propertySource, propertyChecker );
 			this.partialBuildState = partialBuildState;
 		}
 

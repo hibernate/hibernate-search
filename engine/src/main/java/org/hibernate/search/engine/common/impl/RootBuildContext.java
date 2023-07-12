@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
 import org.hibernate.search.engine.common.resources.impl.EngineThreads;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -18,7 +18,7 @@ import org.hibernate.search.engine.reporting.spi.FailureCollector;
 
 class RootBuildContext {
 
-	private final ConfigurationPropertySource propertySource;
+	private final ScopedConfigurationPropertySource propertySource;
 
 	private final ClassResolver classResolver;
 	private final ResourceResolver resourceResolver;
@@ -31,7 +31,7 @@ class RootBuildContext {
 	private final EngineThreads engineThreads;
 	private final TimingSource timingSource;
 
-	RootBuildContext(ConfigurationPropertySource propertySource,
+	RootBuildContext(ScopedConfigurationPropertySource propertySource,
 			ClassResolver classResolver, ResourceResolver resourceResolver,
 			BeanResolver beanResolver,
 			FailureCollector failureCollector,
@@ -48,7 +48,7 @@ class RootBuildContext {
 		this.timingSource = timingSource;
 	}
 
-	ConfigurationPropertySource getConfigurationPropertySource() {
+	ScopedConfigurationPropertySource getConfigurationPropertySource() {
 		return propertySource;
 	}
 
