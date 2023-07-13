@@ -38,6 +38,31 @@ https://hibernate.org/search/releases/#compatibility-matrix[compatibility matrix
 The https://hibernate.org/community/compatibility-policy/[compatibility policy] may also be of interest.
 ====
 
+[TIP]
+====
+If you get Hibernate Search from Maven, it is recommended to import Hibernate Search BOM
+as part of your dependency management to keep all its artifact versions aligned:
+[source, XML, subs="+attributes"]
+----
+<dependencyManagement>
+    <dependencies>
+        <!--
+            Import Hibernate Search BOM
+            to get all of its artifact versions aligned:
+        -->
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-bom</artifactId>
+            <version>{hibernateSearchVersion}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+        <!-- Any other dependency management entries -->
+    </dependencies>
+</dependencyManagement>
+----
+====
+
 [NOTE]
 .Elasticsearch 7.11+ licensing
 ====
@@ -137,7 +162,8 @@ or by explicitly listing a dependency with its version that we want to be used:
     <dependencies>
         <!--
             Overriding Hibernate ORM version by importing the BOM.
-            Alternatively, can be done by adding specific dependencies as shown below for Elasticsearch dependencies.
+            Alternatively, can be done by adding specific dependencies
+            as shown below for Elasticsearch dependencies.
         -->
         <dependency>
             <groupId>org.hibernate.orm</groupId>
@@ -153,7 +179,10 @@ or by explicitly listing a dependency with its version that we want to be used:
             <type>pom</type>
             <scope>import</scope>
         </dependency>
-        <!-- Since there is no BOM for the Elasticsearch REST client, these dependencies have to be listed explicitly: -->
+        <!--
+            Since there is no BOM for the Elasticsearch REST client,
+            these dependencies have to be listed explicitly:
+        -->
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-client</artifactId>

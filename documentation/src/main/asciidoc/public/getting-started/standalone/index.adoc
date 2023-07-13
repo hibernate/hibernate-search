@@ -49,6 +49,25 @@ For more advanced setups, you are encouraged to have a look at the xref:{referen
 == Dependencies
 
 The Hibernate Search artifacts can be found in Maven's http://central.sonatype.org/[Central Repository].
+If you get Hibernate Search from Maven, it is recommended to import Hibernate Search BOM
+as part of your dependency management to keep all its artifact versions aligned:
+
+[source, XML, subs="+attributes"]
+----
+<dependencyManagement>
+    <dependencies>
+        <!-- Import Hibernate Search BOM to get all of its artifact versions aligned: -->
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-bom</artifactId>
+            <version>{hibernateSearchVersion}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+        <!-- Any other dependency management entries -->
+    </dependencies>
+</dependencyManagement>
+----
 
 If you do not want to, or cannot, fetch the JARs from a Maven repository,
 you can get them from the
@@ -71,16 +90,21 @@ If you get Hibernate Search from Maven, use these dependencies:
 +
 [source, XML, subs="+attributes"]
 ----
-<dependency>
-   <groupId>org.hibernate.search</groupId>
-   <artifactId>hibernate-search-mapper-pojo-standalone</artifactId>
-   <version>{hibernateSearchVersion}</version>
-</dependency>
-<dependency>
-   <groupId>org.hibernate.search</groupId>
-   <artifactId>hibernate-search-backend-lucene</artifactId>
-   <version>{hibernateSearchVersion}</version>
-</dependency>
+<dependencies>
+    <!--
+        Add dependencies without specifying versions
+        as that is already taken care by dependency management:
+    -->
+    <dependency>
+       <groupId>org.hibernate.search</groupId>
+       <artifactId>hibernate-search-mapper-pojo-standalone</artifactId>
+    </dependency>
+    <dependency>
+       <groupId>org.hibernate.search</groupId>
+       <artifactId>hibernate-search-backend-lucene</artifactId>
+    </dependency>
+    <!-- Any other dependency entries -->
+</dependencies>
 ----
 +
 If you get Hibernate Search from the distribution bundle,
@@ -95,16 +119,21 @@ If you get Hibernate Search from Maven, use these dependencies:
 +
 [source, XML, subs="+attributes"]
 ----
-<dependency>
-   <groupId>org.hibernate.search</groupId>
-   <artifactId>hibernate-search-mapper-pojo-standalone</artifactId>
-   <version>{hibernateSearchVersion}</version>
-</dependency>
-<dependency>
-   <groupId>org.hibernate.search</groupId>
-   <artifactId>hibernate-search-backend-elasticsearch</artifactId>
-   <version>{hibernateSearchVersion}</version>
-</dependency>
+<dependencies>
+    <!--
+        Add dependencies without specifying versions
+        as that is already taken care by dependency management:
+    -->
+    <dependency>
+       <groupId>org.hibernate.search</groupId>
+       <artifactId>hibernate-search-mapper-pojo-standalone</artifactId>
+    </dependency>
+    <dependency>
+       <groupId>org.hibernate.search</groupId>
+       <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+    </dependency>
+    <!-- Any other dependency entries -->
+</dependencies>
 ----
 +
 If you get Hibernate Search from the distribution bundle,
