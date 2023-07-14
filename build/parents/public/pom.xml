@@ -23,6 +23,12 @@
     <properties>
         <javadoc.packagelists.directory>${project.build.directory}/dependencies-javadoc-packagelists</javadoc.packagelists.directory>
         <documentation.config.properties.skip>false</documentation.config.properties.skip>
+        <!--
+            POMs of public modules will be flattened and will include the list of dependencies
+            with resolved versions.
+            Thus, there's no need for dependency management sections in these POMs.
+        -->
+        <flatten-maven-plugin.dependencyManagement.action>remove</flatten-maven-plugin.dependencyManagement.action>
     </properties>
 
     <build>
@@ -204,6 +210,10 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

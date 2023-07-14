@@ -541,6 +541,14 @@
         <!-- Output for property collection -->
         <documentation.config.properties.output.directory>${rootProject.directory}/target</documentation.config.properties.output.directory>
 
+        <!--
+            Defines what to do with dependency management section of the flattened pom.
+            We'd like to keep the section for the BOMs (since it is the BOM's only purpose).
+            But in case of other published modules, we only need the dependencies themselves and not the management section.
+            By default, we want to preserve the section and property references to be replaced with values.
+        -->
+        <flatten-maven-plugin.dependencyManagement.action>resolve</flatten-maven-plugin.dependencyManagement.action>
+
         <!-- Test settings -->
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
 
@@ -2413,6 +2421,34 @@
                                 <goal>${goal.formatter-maven-plugin}</goal>
                             </goals>
                             <phase>process-sources</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+                <!-- Public BOM will be flattened too, so we manage this plugin in the root pom. -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>${version.flatten-maven-plugin}</version>
+                    <configuration>
+                        <outputDirectory>${project.build.directory}</outputDirectory>
+                        <flattenMode>bom</flattenMode>
+                        <pomElements>
+                            <!-- Specific modules can decide what to do about the dependency management section -->
+                            <dependencyManagement>${flatten-maven-plugin.dependencyManagement.action}</dependencyManagement>
+                            <!--
+                                We don't want to show any properties in the BOM/POMs.
+                                The properties we need will be resolved, others have no value for the users of the BOM/POMs.
+                             -->
+                            <properties>remove</properties>
+                        </pomElements>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>flatten-pom</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>flatten</goal>
+                            </goals>
                         </execution>
                     </executions>
                 </plugin>
