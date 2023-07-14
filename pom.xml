@@ -336,6 +336,14 @@
         <version.org.asciidoctor.asciidoctorj>2.5.6</version.org.asciidoctor.asciidoctorj>
         <version.org.asciidoctor.asciidoctorj-pdf>1.5.0-alpha.18</version.org.asciidoctor.asciidoctorj-pdf>
 
+        <!--
+            Defines what to do with dependency management section of the flattened pom.
+            We'd like to keep the section for the BOMs (since it is the BOM's only purpose).
+            But in case of other published modules, we only need the dependencies themselves and not the management section.
+            By default, we want to preserve the section and property references to be replaced with values.
+        -->
+        <flatten-maven-plugin.dependencyManagement.action>resolve</flatten-maven-plugin.dependencyManagement.action>
+
         <!-- Test settings -->
 
         <!-- Container images for various integration tests -->
@@ -579,11 +587,11 @@
                         <outputDirectory>${project.build.directory}</outputDirectory>
                         <flattenMode>bom</flattenMode>
                         <pomElements>
-                            <!-- We want property references to be replaced with values -->
-                            <dependencyManagement>resolve</dependencyManagement>
+                            <!-- Specific modules can decide what to do about the dependency management section -->
+                            <dependencyManagement>${flatten-maven-plugin.dependencyManagement.action}</dependencyManagement>
                             <!--
-                                We don't want to show any properties in this BOM.
-                                The properties we need will be resolved, others have no value for the users of the BOM.
+                                We don't want to show any properties in the BOM/POMs.
+                                The properties we need will be resolved, others have no value for the users of the BOM/POMs.
                              -->
                             <properties>remove</properties>
                         </pomElements>
