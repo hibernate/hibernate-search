@@ -20,6 +20,8 @@
     <description>Helper to migrate from Hibernate Search 5 to 6, providing partial support for Hibernate Search 5 Engine APIs on top of Hibernate Search 6</description>
 
     <properties>
+        <!-- This is a publicly distributed module that should be published: -->
+        <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
         <java.module.name>org.hibernate.search.v5migrationhelper.engine</java.module.name>
 
         <!-- This is based on legacy code and there are plenty of problems that we don't care to fix -->

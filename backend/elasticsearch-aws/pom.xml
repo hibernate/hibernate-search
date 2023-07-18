@@ -20,6 +20,8 @@
     <description>Configurer for the Hibernate Search Elasticsearch backend enabling connection to an AWS-hosted Elasticsearch cluster</description>
 
     <properties>
+        <!-- This is a publicly distributed module that should be published: -->
+        <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
         <java.module.name>org.hibernate.search.backend.elasticsearch.aws</java.module.name>
     </properties>
 

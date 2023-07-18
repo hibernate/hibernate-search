@@ -15,6 +15,8 @@
     <description>Hibernate Search Backend relying on embedded instances of Lucene</description>
 
     <properties>
+        <!-- This is a publicly distributed module that should be published: -->
+        <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
         <java.module.name>org.hibernate.search.backend.lucene</java.module.name>
     </properties>
 

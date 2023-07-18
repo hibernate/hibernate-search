@@ -22,13 +22,17 @@
     <packaging>pom</packaging>
 
     <properties>
-        <!-- Skip artifact deployment: we publish through other means. -->
-        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
         <!--
             Any javadoc warnings should've been caught already while the previous modules were built.
             Also see additional explanations on this property in the `hibernate-search-mapper-orm-batch-jsr352-core` module.
         -->
         <failOnJavadocWarning>false</failOnJavadocWarning>
+        <!--
+            This module is specifically about building a ZIP that is published not through Maven but through SourceForge.
+            Hence, we don't want it to either be signed or deployed:
+         -->
+        <release.gpg.signing.skip>true</release.gpg.signing.skip>
+        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
     </properties>
 
     <dependencies>

@@ -20,6 +20,8 @@
     <description>Hibernate Search Batch JSR-352 integration - for JBeret</description>
 
     <properties>
+        <!-- This is a publicly distributed module that should be published: -->
+        <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
         <java.module.name>org.hibernate.search.batch.jsr352.jberet</java.module.name>
         <documentation.config.properties.skip>true</documentation.config.properties.skip>
     </properties>
