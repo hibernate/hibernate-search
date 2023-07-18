@@ -21,6 +21,12 @@
     <properties>
         <!-- Public modules must be signed. -->
         <release.gpg.signing.skip>false</release.gpg.signing.skip>
+        <!--
+            Since the properties live in the parent POM maven version plugin does not pick them up for an update.
+            Hence, we trick the plugin into updating the versions by introducing a property that resides in the same POM
+            as a dependency management is defined, and which is copying the value of the main POM property.
+        -->
+        <version.upgradeable.org.hibernate.orm>${version.org.hibernate.orm}</version.upgradeable.org.hibernate.orm>
     </properties>
 
     <dependencyManagement>
@@ -55,7 +61,7 @@
             <dependency>
                 <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-platform</artifactId>
-                <version>${version.org.hibernate.orm}</version>
+                <version>${version.upgradeable.org.hibernate.orm}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
