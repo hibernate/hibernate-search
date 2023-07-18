@@ -20,6 +20,8 @@
     <description>Hibernate Search Backend relying on remote Elasticsearch clusters</description>
 
     <properties>
+        <!-- This is a publicly distributed module that should be published: -->
+        <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
         <java.module.name>org.hibernate.search.backend.elasticsearch</java.module.name>
     </properties>
 

@@ -20,6 +20,8 @@
     <description>Hibernate Search Mapper for POJOs in standalone mode (no ORM)</description>
 
     <properties>
+        <!-- This is a publicly distributed module that should be published: -->
+        <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
         <java.module.name>org.hibernate.search.mapper.pojo.standalone</java.module.name>
     </properties>
 

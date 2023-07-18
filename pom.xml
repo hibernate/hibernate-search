@@ -337,6 +337,12 @@
         <version.org.asciidoctor.asciidoctorj-pdf>1.5.0-alpha.18</version.org.asciidoctor.asciidoctorj-pdf>
 
         <!--
+            We don't want to publish any modules by default.
+            Specific modules will override the setting at their own level.
+        -->
+        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+
+        <!--
             Defines what to do with dependency management section of the flattened pom.
             We'd like to keep the section for the BOMs (since it is the BOM's only purpose).
             But in case of other published modules, we only need the dependencies themselves and not the management section.

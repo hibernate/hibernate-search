@@ -19,7 +19,6 @@
     <description>Hibernate Search common build configuration files</description>
 
     <properties>
-        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
         <jqassistant.skip>true</jqassistant.skip>
 
         <!--
