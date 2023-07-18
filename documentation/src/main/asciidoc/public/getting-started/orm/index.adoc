@@ -14,12 +14,12 @@
 :relfilesuffix: /../en-US/html_single/index.html
 
 [[mapper-orm-getting-started]]
-= [[getting-started]] Getting started with the Hibernate ORM integration
+= [[getting-started]] Getting started with Hibernate Search in Hibernate ORM
 
 :numbered:
 
 This guide will walk you through the initial steps required
-to index and query your Hibernate ORM entities using Hibernate Search.
+to index and query your http://hibernate.org/orm/[Hibernate ORM] entities using http://hibernate.org/search/[Hibernate Search].
 
 // Note as relfile -prefix/-suffix are just prepended/appended to the string created based on the file location we reference to
 // in some cases we need to get rid of some of the leading/trailing `..` in those strings. That is when we use `just-to-be-removed`.
@@ -53,8 +53,10 @@ link:http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernate
 
 In order to use Hibernate Search, you will need at least two direct dependencies:
 
-* a dependency to the "mapper", which extracts data from your domain model and maps it to indexable documents;
-* and a dependency to the "backend", which allows indexing and searching these documents.
+* a dependency to the xref:{reference-documentation-location}#architecture-hsearch-components-mapper["mapper"],
+which extracts data from your domain model and maps it to indexable documents;
+* and a dependency to the xref:{reference-documentation-location}#architecture-hsearch-components-backend["backend"],
+which allows indexing and searching these documents.
 
 Below are the most common setups and matching dependencies for a quick start;
 read xref:{reference-documentation-location}#architecture[Architecture] for more information.
@@ -171,7 +173,8 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarte
 ====
 
 To make these entities searchable, you will need to map them to an index structure.
-The mapping can be defined using annotations, or using a programmatic API;
+The mapping can be defined using xref:{reference-documentation-location}#mapping-annotations[annotations],
+or using a xref:{reference-documentation-location}#mapping-programmatic[programmatic API];
 this getting started guide will show you a simple annotation mapping.
 For more details, refer to xref:{reference-documentation-location}#mapping[Mapping entities to indexes].
 
@@ -189,13 +192,12 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarte
 ----
 <1> `@Indexed` marks `Book` as indexed, i.e. an index will be created for that entity, and that index will be kept up to date.
 <2> By default, the JPA `@Id` is used to generate a document identifier.
-When there is no JPA `@Id` (e.g. when using the xref:{reference-documentation-location}#mapper-pojo-standalone[Standalone POJO Mapper]),
-the ID can be mapped explicitly with xref:{reference-documentation-location}#mapping-identifiermapping-explicit[`@DocumentId`].
+In some more complex scenarios it might be needed to map the ID explicitly with xref:{reference-documentation-location}#mapping-identifiermapping-explicit[`@DocumentId`].
 <3> `@FullTextField` maps a property to a full-text index field with the same name and type.
 Full-text fields are broken down into tokens and normalized (lowercased, ...).
 Here we're relying on default analysis configuration,
 but most applications need to customize it;
-this will be addressed further down.
+this will be addressed <<mapper-orm-getting-started-analysis,further down>>.
 <4> `@KeywordField` maps a property to a non-analyzed index field.
 Useful for identifiers, for example.
 <5> Hibernate Search is not just for full-text search: you can index non-`String` types with the `@GenericField` annotation,
@@ -258,7 +260,7 @@ See xref:{reference-documentation-location}#mapping-changes[Changing the mapping
 [[mapper-orm-getting-started-initialization-indexing]]
 === [[getting-started-initialization-indexing]] [[_initial_indexing]] Initial indexing
 
-As we'll see later, Hibernate Search takes care of triggering indexing
+As we'll see <<mapper-orm-getting-started-indexing,later>>, Hibernate Search takes care of triggering indexing
 every time an entity changes in the application.
 
 However, data already present in the database when you add the Hibernate Search integration
@@ -317,7 +319,8 @@ The following code will prepare a search query targeting the index for the `Book
 filtering the results so that at least one field among `title` and `authors.name`
 contains the string `refactoring`.
 The matches are implicitly on words ("tokens") instead of the full string,
-and are case-insensitive: that's because the targeted fields are *full-text* fields.
+and are case-insensitive: that's because the targeted fields are *full-text* fields
+with the <<mapper-orm-getting-started-analysis-default-analyzer,default analyzer>> being applied.
 
 .Using Hibernate Search to query the indexes
 ====
@@ -384,7 +387,7 @@ But it can get much better: what if we want a search with the term "refactored"
 to match our book whose title contains "refactoring"?
 That's possible with custom analysis.
 
-Analysis is how text is supposed to be processed when indexing and searching.
+Analysis defines how both the indexed text and search terms are supposed to be processed.
 This involves _analyzers_,
 which are made up of three types of components, applied one after the other:
 
@@ -395,6 +398,7 @@ which are made up of three types of components, applied one after the other:
 * zero or more token filters, to normalize the tokens and remove meaningless tokens.
 `[A, GREAT, résume]` => `[great, resume]`.
 
+[[mapper-orm-getting-started-analysis-default-analyzer]]
 There are built-in analyzers,
 in particular the default one, which will:
 
@@ -403,7 +407,7 @@ of the http://unicode.org/reports/tr29/[Unicode Text Segmentation algorithm];
 * filter (normalize) tokens by turning uppercase letters to lowercase.
 
 The default analyzer is a good fit for most language, but is not very advanced.
-To get the most of analysis, you will need to define a custom analyzer
+To get the most out of analysis, you will need to define a custom analyzer
 by picking the tokenizer and filters most suited to your specific needs.
 
 The following paragraphs will explain how to configure and use
@@ -452,7 +456,7 @@ Here too, Lucene-specific names are expected;
 see xref:{reference-documentation-location}#backend-lucene-analysis-analyzers[Custom analyzers and normalizers] for information about available token filters, their name and their parameters.
 <4> Set the value of a parameter for the last added char filter/tokenizer/token filter.
 <5> Define another custom analyzer, called "name", to analyze author names.
-On contrary to the first one, do not use enable stemming,
+On contrary to the first one, do not enable stemming (no `snowballPorter` token filter),
 as it is unlikely to lead to useful results on proper nouns.
 <6> Assign the configurer to the backend in the Hibernate Search configuration (here in `persistence.xml`).
 For more information about the format of bean references, see xref:{reference-documentation-location}#configuration-bean-reference-parsing[Parsing of bean references].
@@ -479,7 +483,7 @@ see xref:{reference-documentation-location}#backend-elasticsearch-analysis-analy
 must be defined separately and assigned a new name.
 <5> Set the value of a parameter for the char filter/tokenizer/token filter being defined.
 <6> Define another custom analyzer, named "name", to analyze author names.
-On contrary to the first one, do not use enable stemming,
+On contrary to the first one, do not enable stemming (no `snowball_english` token filter),
 as it is unlikely to lead to useful results on proper nouns.
 <7> Assign the configurer to the backend in the Hibernate Search configuration (here in `persistence.xml`).
 For more information about the format of bean references, see xref:{reference-documentation-location}#configuration-bean-reference-parsing[Parsing of bean references].
@@ -545,7 +549,8 @@ and xref:{reference-documentation-location}#indexing-massindexer[mass indexing].
 When querying, you will probably want to know more about
 xref:{reference-documentation-location}#search-dsl-predicate[predicates],
 xref:{reference-documentation-location}#search-dsl-sort[sorts], xref:{reference-documentation-location}#search-dsl-projection[projections],
-xref:{reference-documentation-location}#search-dsl-aggregation[aggregations].
+xref:{reference-documentation-location}#search-dsl-aggregation[aggregations],
+xref:{reference-documentation-location}#search-dsl-highlighting[highlights].
 
 And if the reference documentation is not enough,
 you can find pointers to external resources for Hibernate Search as well as related software
