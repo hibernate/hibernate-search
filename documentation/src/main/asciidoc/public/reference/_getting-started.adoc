@@ -4,6 +4,6 @@
 To get started with Hibernate Search, check out the following guides:
 
 * If your entities **are** defined in Hibernate ORM,
-see xref:../getting-started/orm/index.adoc#mapper-orm-getting-started[Getting started with the Hibernate ORM integration].
+see xref:../getting-started/orm/index.adoc#mapper-orm-getting-started[Getting started with Hibernate Search in Hibernate ORM].
 * If your entities are **not** defined in Hibernate ORM,
-see xref:../getting-started/standalone/index.adoc#mapper-pojo-standalone-getting-started[Getting started with the Standalone POJO Mapper] instead.
+see xref:../getting-started/standalone/index.adoc#mapper-pojo-standalone-getting-started[Getting started with Hibernate Search's Standalone POJO Mapper] instead.
