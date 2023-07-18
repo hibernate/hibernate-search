@@ -68,15 +68,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--
-            Without this dependency we get: Compilation failure: [ERROR] unknown enum constant XmlAccessType.FIELD
-            And if we only have it as <scope>provided</scope> - we will fail to generate the Javadocs.
-         -->
-        <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-test-orm</artifactId>

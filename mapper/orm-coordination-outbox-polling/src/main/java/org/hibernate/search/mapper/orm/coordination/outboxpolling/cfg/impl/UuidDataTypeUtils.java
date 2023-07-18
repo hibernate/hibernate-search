@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.SQLServerDialect;
+import org.hibernate.type.SqlTypes;
 
 public final class UuidDataTypeUtils {
 	private UuidDataTypeUtils() {
@@ -29,14 +30,19 @@ public final class UuidDataTypeUtils {
 	 * <p>
 	 * Otherwise, when {@code value != "default" } a user passed value will be used.
 	 */
-	public static String uuidType(String value, Dialect dialect) {
+	public static int uuidType(String value, Dialect dialect) {
 		if ( DEFAULT.equalsIgnoreCase( value ) ) {
 			// See HSEARCH-4749 why MSSQL is treated differently
 			if ( dialect instanceof SQLServerDialect ) {
-				return UUID_BINARY;
+				return SqlTypes.BINARY;
 			}
-			return UUID_CHAR;
+			return SqlTypes.CHAR;
 		}
-		return value;
+		if ( UUID_CHAR.equals( value ) ) {
+			return SqlTypes.CHAR;
+		}
+		else {
+			return SqlTypes.BINARY;
+		}
 	}
 }

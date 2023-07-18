@@ -6,49 +6,51 @@
  */
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.boot.jaxb.internal.MappingBinder;
-import org.hibernate.boot.model.source.internal.hbm.MappingDocument;
+import org.hibernate.boot.ResourceStreamLocator;
+import org.hibernate.boot.jaxb.mapping.JaxbEntityMappings;
+import org.hibernate.boot.spi.AdditionalMappingContributions;
+import org.hibernate.boot.spi.AdditionalMappingContributor;
+import org.hibernate.boot.spi.InFlightMetadataCollector;
 import org.hibernate.boot.spi.MetadataBuildingContext;
-import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateSearchOrmMappingProducer;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
-import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 
-import org.jboss.jandex.IndexView;
-
-@SuppressWarnings("deprecation")
-public class HibernateSearchCompositeMappingProducer implements org.hibernate.boot.spi.AdditionalJaxbMappingProducer {
+public class HibernateSearchCompositeMappingProducer implements AdditionalMappingContributor {
 
 	@Override
-	@SuppressForbiddenApis(reason = "Strangely, this SPI involves the internal MappingBinder class,"
-			+ " and there's nothing we can do about it")
-	public Collection<MappingDocument> produceAdditionalMappings(final MetadataImplementor metadata,
-			IndexView jandexIndex, final MappingBinder mappingBinder, final MetadataBuildingContext buildingContext) {
+	public String getContributorName() {
+		return "hibernate-search";
+	}
+
+	@Override
+	public void contribute(AdditionalMappingContributions contributions, InFlightMetadataCollector metadata,
+			ResourceStreamLocator resourceStreamLocator, MetadataBuildingContext buildingContext) {
 		Optional<HibernateSearchPreIntegrationService> preIntegrationServiceOptional =
 				HibernateOrmUtils.getServiceOrEmpty( buildingContext.getBootstrapContext().getServiceRegistry(),
 						HibernateSearchPreIntegrationService.class );
 		if ( !preIntegrationServiceOptional.isPresent() ) {
-			// Hibernate Search is disabled
-			return Collections.emptyList();
+			return;
 		}
-
 		HibernateSearchPreIntegrationService preIntegrationService = preIntegrationServiceOptional.get();
-		List<MappingDocument> mappings = new ArrayList<>();
+
 		ConfigurationPropertySource propertySource = preIntegrationService.propertySource()
 				.withMask( HibernateOrmMapperSettings.Radicals.COORDINATION );
+
 		for ( HibernateSearchOrmMappingProducer mappingProducer : preIntegrationService
 				.coordinationStrategyConfiguration().mappingProducers() ) {
-			mappings.addAll( mappingProducer.produceMappings( propertySource, metadata.getDatabase().getDialect(),
-					mappingBinder, buildingContext ) );
+			for ( Map.Entry<Class<?>, JaxbEntityMappings> entry : mappingProducer.produceMappings(
+					propertySource,
+					metadata.getDatabase().getDialect(),
+					buildingContext
+			).entrySet() ) {
+				contributions.contributeEntity( entry.getKey() );
+				contributions.contributeBinding( entry.getValue() );
+			}
 		}
-		return mappings;
 	}
 }

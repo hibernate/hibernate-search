@@ -18,6 +18,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.Session;
+import org.hibernate.binder.internal.TenantIdBinder;
+import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.mapping.Property;
@@ -153,5 +155,9 @@ public final class HibernateOrmUtils {
 		}
 		properties.sort( PropertyComparator.INSTANCE );
 		return properties;
+	}
+
+	public static boolean isDiscriminatorMultiTenancyEnabled(MetadataBuildingContext buildingContext) {
+		return buildingContext.getMetadataCollector().getFilterDefinition( TenantIdBinder.FILTER_NAME ) != null;
 	}
 }

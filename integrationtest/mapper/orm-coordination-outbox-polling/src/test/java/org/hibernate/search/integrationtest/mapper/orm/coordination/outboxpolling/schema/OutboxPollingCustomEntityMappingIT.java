@@ -25,7 +25,6 @@ import jakarta.persistence.Id;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.MappingException;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.env.spi.NameQualifierSupport;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -105,8 +104,8 @@ public class OutboxPollingCustomEntityMappingIT {
 				.withProperty( "hibernate.search.coordination.outboxevent.entity.mapping",
 						"<entity-mappings><ciao></ciao></entity-mappings>" )
 				.setup( IndexedEntity.class ) )
-				.isInstanceOf( MappingException.class )
-				.hasMessageContainingAll( "Unable to perform unmarshalling", "unexpected element" );
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Unable to process provided entity mappings", "unexpected element" );
 	}
 
 	@Test
@@ -115,8 +114,8 @@ public class OutboxPollingCustomEntityMappingIT {
 				.withProperty( "hibernate.search.coordination.agent.entity.mapping",
 						"<entity-mappings><ciao></ciao></entity-mappings>" )
 				.setup( IndexedEntity.class ) )
-				.isInstanceOf( MappingException.class )
-				.hasMessageContainingAll( "Unable to perform unmarshalling", "unexpected element" );
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Unable to process provided entity mappings", "unexpected element" );
 	}
 
 	@Test

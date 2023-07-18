@@ -211,4 +211,7 @@ public interface Log extends BasicLogger {
 			value = "'%1$s' failed to retrieve events to process due to a locking failure; will try again later.")
 	void eventProcessorFindEventsUnableToLock(String name, @Cause PersistenceException lockException);
 
+	@Message(id = ID_OFFSET + 35,
+			value = "Unable to process provided entity mappings: %1$s")
+	SearchException unableToProcessEntityMappings(String causeMessage, @Cause Exception cause);
 }

@@ -9,8 +9,7 @@ package org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg;
 import java.lang.invoke.MethodHandles;
 import java.util.UUID;
 
-import org.hibernate.id.uuid.CustomVersionOneStrategy;
-import org.hibernate.id.uuid.StandardRandomStrategy;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -33,7 +32,7 @@ public enum UuidGenerationStrategy {
 	RANDOM( "random" ) {
 		@Override
 		public String strategy() {
-			return StandardRandomStrategy.class.getName();
+			return UuidGenerator.Style.RANDOM.name();
 		}
 	},
 	/**
@@ -46,7 +45,7 @@ public enum UuidGenerationStrategy {
 	TIME( "time" ) {
 		@Override
 		public String strategy() {
-			return CustomVersionOneStrategy.class.getName();
+			return UuidGenerator.Style.TIME.name();
 		}
 	};
 

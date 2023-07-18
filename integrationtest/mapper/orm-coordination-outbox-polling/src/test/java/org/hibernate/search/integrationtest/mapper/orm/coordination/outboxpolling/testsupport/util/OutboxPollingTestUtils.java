@@ -17,6 +17,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.PersistenceRunner;
 
 public class OutboxPollingTestUtils {
@@ -35,7 +36,9 @@ public class OutboxPollingTestUtils {
 				.atMost( Duration.ofSeconds( 5 ) )
 				.untilAsserted( () -> {
 					runner.runInTransaction( session -> {
-						List<Agent> agents = session.createQuery( "select a from Agent a order by a.id", Agent.class )
+						List<Agent> agents = session
+								.createQuery( "select a from " + OutboxPollingAgentAdditionalJaxbMappingProducer.ENTITY_NAME
+										+ " a order by a.id", Agent.class )
 								.list();
 						assertThat( agents )
 								.hasSize( expectedAgentCount )
