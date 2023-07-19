@@ -73,6 +73,48 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <!--
+                        We cannot include this execution in the root pom because it depends on a project artifact
+                        that we need to build first.
+                        It should be enough to only run this rule on this build module, since the check it performs is always
+                        the same - get the property value, and compare it to the dependency version from dependency management.
+                    -->
+                    <execution>
+                        <id>enforce-custom-rules</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <versionAlignRule>
+                                    <propertiesToCheck>
+                                        <!--
+                                            We want to make sure that the value we store in the property matches
+                                            the version that is imported from the Hibernate ORM BOM
+                                         -->
+                                        <item>
+                                            <property>${version.jakarta.persistence}</property>
+                                            <artifact>jakarta.persistence:jakarta.persistence-api</artifact>
+                                            <failOnNotFound>true</failOnNotFound>
+                                        </item>
+                                    </propertiesToCheck>
+                                </versionAlignRule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate.search</groupId>
+                        <artifactId>hibernate-search-build-enforcer</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <!-- See https://maven.apache.org/plugins/maven-dependency-plugin/examples/unpacking-artifacts.html -->
