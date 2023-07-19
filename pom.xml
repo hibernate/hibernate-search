@@ -151,6 +151,7 @@
     </mailingLists>
 
     <modules>
+        <module>build/enforcer</module>
         <module>bom/public</module>
         <module>bom/build</module>
         <module>build/config</module>
@@ -378,6 +379,7 @@
         <version.impsort-maven-plugin>1.9.0</version.impsort-maven-plugin>
         <version.formatter-maven-plugin>2.23.0</version.formatter-maven-plugin>
         <version.flatten-maven-plugin>1.5.0</version.flatten-maven-plugin>
+        <version.sisu-maven-plugin>0.9.0.M1</version.sisu-maven-plugin>
 
         <!-- Asciidoctor -->
 
@@ -1813,6 +1815,11 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.eclipse.sisu</groupId>
+                    <artifactId>sisu-maven-plugin</artifactId>
+                    <version>${version.sisu-maven-plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
