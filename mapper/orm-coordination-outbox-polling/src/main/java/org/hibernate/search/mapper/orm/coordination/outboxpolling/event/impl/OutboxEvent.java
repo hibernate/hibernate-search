@@ -26,6 +26,7 @@ public final class OutboxEvent {
 	private int retries = 0;
 	private Instant processAfter;
 	private Status status = Status.PENDING;
+	private String tenantId;
 
 	@Transient
 	private Object originalEntityId;
@@ -54,6 +55,7 @@ public final class OutboxEvent {
 				", processAfter=" + processAfter +
 				", status=" + status +
 				", originalEntityId=" + originalEntityId +
+				", tenantId=" + tenantId +
 				'}';
 	}
 
@@ -127,6 +129,14 @@ public final class OutboxEvent {
 
 	public void setOriginalEntityId(Object originalEntityId) {
 		this.originalEntityId = originalEntityId;
+	}
+
+	public String getTenantId() {
+		return tenantId;
+	}
+
+	public void setTenantId(String tenantId) {
+		this.tenantId = tenantId;
 	}
 
 	OutboxEventReference getReference() {

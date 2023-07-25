@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -20,16 +21,29 @@ public class AbortedEventsGenerator {
 	private final BackendMock backendMock;
 	private final String tenantId;
 
+	private final String indexName;
+	private final BiConsumer<Session, Integer> entityCreator;
+
 	public AbortedEventsGenerator(SessionFactory sessionFactory, BackendMock backendMock) {
-		this.sessionFactory = sessionFactory;
-		this.backendMock = backendMock;
-		this.tenantId = null;
+		this( sessionFactory, backendMock, null );
 	}
 
 	public AbortedEventsGenerator(SessionFactory sessionFactory, BackendMock backendMock, String tenantId) {
+		this( sessionFactory, backendMock, tenantId, IndexedEntity.INDEX, (session, id) -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( id );
+			entity1.setIndexedField( "initialValue" );
+			session.persist( entity1 );
+		} );
+	}
+
+	public AbortedEventsGenerator(SessionFactory sessionFactory, BackendMock backendMock, String tenantId,
+			String indexName, BiConsumer<Session, Integer> entityCreator) {
 		this.sessionFactory = sessionFactory;
 		this.backendMock = backendMock;
 		this.tenantId = tenantId;
+		this.indexName = indexName;
+		this.entityCreator = entityCreator;
 	}
 
 	void generateThreeAbortedEvents() {
@@ -44,25 +58,14 @@ public class AbortedEventsGenerator {
 	}
 
 	private void generateThreeAbortedEvents(Session session) {
-		IndexedEntity entity1 = new IndexedEntity();
-		entity1.setId( 1 );
-		entity1.setIndexedField( "initialValue" );
-		session.persist( entity1 );
-
-		IndexedEntity entity2 = new IndexedEntity();
-		entity2.setId( 2 );
-		entity2.setIndexedField( "initialValue" );
-		session.persist( entity2 );
-
-		IndexedEntity entity3 = new IndexedEntity();
-		entity3.setId( 3 );
-		entity3.setIndexedField( "initialValue" );
-		session.persist( entity3 );
+		entityCreator.accept( session, 1 );
+		entityCreator.accept( session, 2 );
+		entityCreator.accept( session, 3 );
 
 		CompletableFuture<?> failingFuture = new CompletableFuture<>();
 		failingFuture.completeExceptionally( new SimulatedFailure( "Indexing work failed!" ) );
 
-		backendMock.expectWorks( IndexedEntity.INDEX, tenantId )
+		backendMock.expectWorks( indexName, tenantId )
 				.createAndExecuteFollowingWorks( failingFuture )
 				.add( "1", b -> b
 						.field( "indexedField", "initialValue" )
