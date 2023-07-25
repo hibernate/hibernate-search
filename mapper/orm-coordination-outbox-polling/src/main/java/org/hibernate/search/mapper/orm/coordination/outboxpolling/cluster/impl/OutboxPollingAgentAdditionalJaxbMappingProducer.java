@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.Length;
+import org.hibernate.binder.internal.TenantIdBinder;
 import org.hibernate.boot.jaxb.mapping.JaxbEntityMappings;
 import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.dialect.Dialect;
@@ -50,7 +51,8 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_TABLE,
 			SqlTypes.CHAR, PayloadMappingUtils.payload(
 					HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_PAYLOAD_TYPE ),
-			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY.strategy()
+			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY.strategy(),
+			false
 	) );
 
 	private static final OptionalConfigurationProperty<String> AGENT_ENTITY_MAPPING =
@@ -152,7 +154,9 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 					schema.orElse( "" ),
 					catalog.orElse( "" ),
 					table.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_TABLE ),
-					resolvedUuidType, resolvedPayloadType, resolvedUuidStrategy );
+					resolvedUuidType, resolvedPayloadType, resolvedUuidStrategy,
+					buildingContext.getMetadataCollector().getFilterDefinition( TenantIdBinder.FILTER_NAME ) != null
+			);
 		}
 
 		log.agentGeneratedEntityMapping( marshall( mappings ) );
@@ -161,8 +165,10 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 	}
 
 	private static JaxbEntityMappings createMappings(String schema, String catalog,
-			String table, int resolvedUuidType, int resolvedPayloadType, String resolvedUuidStrategy) {
-		return new AdditionalMappingBuilder( Agent.class, ENTITY_NAME )
+			String table, int resolvedUuidType, int resolvedPayloadType, String resolvedUuidStrategy,
+			boolean tenantIdRequired) {
+		AdditionalMappingBuilder builder = new AdditionalMappingBuilder(
+				Agent.class, ENTITY_NAME )
 				.id( resolvedUuidType, resolvedUuidStrategy )
 				.table( schema, catalog, table )
 				.enumAttribute( "type", null, false )
@@ -171,7 +177,10 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 				.enumAttribute( "state", null, false )
 				.attribute( "totalShardCount", null, true )
 				.attribute( "assignedShardIndex", null, true )
-				.attribute( "payload", Length.LONG32, true, resolvedPayloadType )
-				.build();
+				.attribute( "payload", Length.LONG32, true, resolvedPayloadType );
+		if ( tenantIdRequired ) {
+			builder.tenantId( "tenantId" );
+		}
+		return builder.build();
 	}
 }

@@ -20,6 +20,7 @@ public class Agent {
 	private Integer totalShardCount;
 	private Integer assignedShardIndex;
 	private byte[] payload;
+	private String tenantId;
 
 	protected Agent() {
 	}
@@ -44,6 +45,7 @@ public class Agent {
 				", currentState=" + state +
 				", totalShardCount=" + totalShardCount +
 				", assignedShardIndex=" + assignedShardIndex +
+				", tenantId=" + tenantId +
 				'}';
 	}
 
@@ -110,6 +112,14 @@ public class Agent {
 
 	public void setPayload(byte[] payload) {
 		this.payload = payload;
+	}
+
+	public String getTenantId() {
+		return tenantId;
+	}
+
+	public void setTenantId(String tenantId) {
+		this.tenantId = tenantId;
 	}
 
 	@Transient

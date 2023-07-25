@@ -9,6 +9,9 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.function.BiConsumer;
+
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.OutboxPollingExtension;
@@ -21,8 +24,35 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class OutboxPollingSearchMappingMultiTenancyIT {
+
+	@Parameterized.Parameters(name = "entity = {0}")
+	public static Object[][] params() {
+		return new Object[][] {
+				{
+						IndexedMultiTenantEntity.INDEX,
+						IndexedMultiTenantEntity.class,
+						(BiConsumer<Session, Integer>) (session, id) -> {
+							IndexedMultiTenantEntity entity1 = new IndexedMultiTenantEntity();
+							entity1.setId( id );
+							entity1.setIndexedField( "initialValue" );
+							session.persist( entity1 );
+						} },
+				{
+						IndexedEntity.INDEX,
+						IndexedEntity.class,
+						(BiConsumer<Session, Integer>) (session, id) -> {
+							IndexedEntity entity1 = new IndexedEntity();
+							entity1.setId( id );
+							entity1.setIndexedField( "initialValue" );
+							session.persist( entity1 );
+						} },
+		};
+	}
 
 	private static final String TENANT_1_ID = "tenant1";
 	private static final String TENANT_2_ID = "tenant2";
@@ -40,17 +70,28 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 	private AbortedEventsGenerator abortedEventsGenerator1;
 	private AbortedEventsGenerator abortedEventsGenerator2;
 
+	@Parameterized.Parameter(0)
+	public String indexName;
+
+	@Parameterized.Parameter(1)
+	public Class<?> indexedEntity;
+
+	@Parameterized.Parameter(2)
+	public BiConsumer<Session, Integer> entityCreator;
+
 	@Before
 	public void before() {
-		backendMock.expectSchema( IndexedEntity.INDEX, b -> b.field( "indexedField", String.class ) );
+		backendMock.expectSchema( indexName, b -> b.field( "indexedField", String.class ) );
 		sessionFactory = ormSetupHelper.start()
 				.tenants( TENANT_1_ID, TENANT_2_ID, TENANT_3_ID )
 				.withProperty( "hibernate.search.coordination.event_processor.retry_delay", 0 )
-				.setup( IndexedEntity.class );
+				.setup( indexedEntity );
 		backendMock.verifyExpectationsMet();
 		searchMapping = Search.mapping( sessionFactory ).extension( OutboxPollingExtension.get() );
-		abortedEventsGenerator1 = new AbortedEventsGenerator( sessionFactory, backendMock, TENANT_1_ID );
-		abortedEventsGenerator2 = new AbortedEventsGenerator( sessionFactory, backendMock, TENANT_2_ID );
+		abortedEventsGenerator1 =
+				new AbortedEventsGenerator( sessionFactory, backendMock, TENANT_1_ID, indexName, entityCreator );
+		abortedEventsGenerator2 =
+				new AbortedEventsGenerator( sessionFactory, backendMock, TENANT_2_ID, indexName, entityCreator );
 	}
 
 	@Test
@@ -146,7 +187,7 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 		assertThat( searchMapping.countAbortedEvents( TENANT_2_ID ) ).isEqualTo( 3 );
 		assertThat( searchMapping.countAbortedEvents( TENANT_3_ID ) ).isZero();
 
-		backendMock.expectWorks( IndexedEntity.INDEX, TENANT_2_ID )
+		backendMock.expectWorks( indexName, TENANT_2_ID )
 				.createAndExecuteFollowingWorks()
 				.addOrUpdate( "1", b -> b
 						.field( "indexedField", "initialValue" )

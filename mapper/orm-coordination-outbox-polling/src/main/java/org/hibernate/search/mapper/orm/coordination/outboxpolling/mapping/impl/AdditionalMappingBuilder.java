@@ -20,6 +20,7 @@ import org.hibernate.boot.jaxb.mapping.JaxbEntityMappings;
 import org.hibernate.boot.jaxb.mapping.JaxbId;
 import org.hibernate.boot.jaxb.mapping.JaxbIndex;
 import org.hibernate.boot.jaxb.mapping.JaxbTable;
+import org.hibernate.boot.jaxb.mapping.JaxbTenantId;
 import org.hibernate.boot.jaxb.mapping.JaxbUuidGenerator;
 
 public class AdditionalMappingBuilder {
@@ -66,6 +67,12 @@ public class AdditionalMappingBuilder {
 
 	public AdditionalMappingBuilder attribute(String name, Integer length, Boolean nullable, Integer type) {
 		entity.getAttributes().getBasicAttributes().add( createAttribute( name, length, nullable, type ) );
+		return this;
+	}
+
+	public AdditionalMappingBuilder tenantId(String name) {
+		entity.setTenantId( new JaxbTenantId() );
+		entity.getTenantId().setName( name );
 		return this;
 	}
 

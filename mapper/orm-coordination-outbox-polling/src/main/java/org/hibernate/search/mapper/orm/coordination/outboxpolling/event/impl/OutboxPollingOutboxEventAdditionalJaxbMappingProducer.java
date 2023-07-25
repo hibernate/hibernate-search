@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.Length;
+import org.hibernate.binder.internal.TenantIdBinder;
 import org.hibernate.boot.jaxb.mapping.JaxbEntityMappings;
 import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.dialect.Dialect;
@@ -53,7 +54,8 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			PayloadMappingUtils.payload(
 					HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_PAYLOAD_TYPE ),
 			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_GEN_STRATEGY
-					.strategy()
+					.strategy(),
+			false
 	) );
 
 	private static final OptionalConfigurationProperty<String> OUTBOXEVENT_ENTITY_MAPPING =
@@ -156,7 +158,8 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 					catalog.orElse( "" ),
 					table.orElse(
 							HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE ),
-					resolvedUuidType, resolvedPayloadType, resolvedUuidStrategy
+					resolvedUuidType, resolvedPayloadType, resolvedUuidStrategy,
+					buildingContext.getMetadataCollector().getFilterDefinition( TenantIdBinder.FILTER_NAME ) != null
 			);
 		}
 
@@ -166,8 +169,10 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 	}
 
 	private static JaxbEntityMappings createMappings(String schema, String catalog,
-			String table, int resolvedUuidType, int resolvedPayloadType, String resolvedUuidStrategy) {
-		return new AdditionalMappingBuilder( OutboxEvent.class, ENTITY_NAME )
+			String table, int resolvedUuidType, int resolvedPayloadType, String resolvedUuidStrategy,
+			boolean tenantIdRequired) {
+		AdditionalMappingBuilder builder = new AdditionalMappingBuilder(
+				OutboxEvent.class, ENTITY_NAME )
 				.id( resolvedUuidType, resolvedUuidStrategy )
 				.index( "entityIdHash" )
 				.index( "status" )
@@ -179,7 +184,10 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 				.attribute( "payload", Length.LONG32, false, resolvedPayloadType )
 				.attribute( "retries", null, false )
 				.attribute( "processAfter", null, false )
-				.enumAttribute( "status", null, false )
-				.build();
+				.enumAttribute( "status", null, false );
+		if ( tenantIdRequired ) {
+			builder.tenantId( "tenantId" );
+		}
+		return builder.build();
 	}
 }
