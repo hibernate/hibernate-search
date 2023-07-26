@@ -107,7 +107,7 @@ public class ElasticsearchDialectFactory {
 	}
 
 	private ElasticsearchProtocolDialect createProtocolDialectElasticV8(ElasticsearchVersion version, int minor) {
-		if ( minor > 8 ) {
+		if ( minor > 9 ) {
 			log.unknownElasticsearchVersion( version );
 		}
 		else if ( minor == 0 ) {

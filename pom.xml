@@ -212,7 +212,7 @@
         <!-- The version of the Elasticsearch client used by Hibernate Search, independently of the version of the remote cluster -->
         <!-- Use the latest open-source version here. Currently, low-level clients are open-source even in 8.5+ -->
         <!-- NOTE: when updating this version check if the Jackson version is still aligned. -->
-        <version.org.elasticsearch.client>8.8.2</version.org.elasticsearch.client>
+        <version.org.elasticsearch.client>8.9.0</version.org.elasticsearch.client>
         <!-- The main compatible version of Elasticsearch, advertised by default. Used in documentation links. -->
         <!-- When updating the following version you will likely need to update the test profiles as well,
              to make sure the corresponding profile (e.g. elasticsearch-8.4) becomes the default. -->
@@ -249,7 +249,7 @@
                 * avro
                 * and Wiremock
             We want to align this version on whatever the REST client is using.
-            But because we also want to include it in the public BOM, maven-enforcer-plugin will not catch that the
+            But because we also want to include it in the BOM to align versions, maven-enforcer-plugin will not catch that the
             version is different from whatever version is in those mentioned libraries. So need to update it anytime we
             are updating the Elasticsearch rest client version.
         -->
