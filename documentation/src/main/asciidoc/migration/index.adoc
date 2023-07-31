@@ -20,7 +20,7 @@ NOTE: If you think something is missing or something does not work, please link:
 
 If you're looking to migrate from an earlier version,
 you should migrate step-by-step, from one minor version to the next,
-following the migration guide of link:https://hibernate.org/search/documentation/[each version].
+following the migration guide of link:https://hibernate.org/search/documentation/migrate/[each version].
 
 [WARNING]
 ====
@@ -54,6 +54,9 @@ See https://github.com/hibernate/hibernate-orm/wiki/Migration-Guides/[Hibernate 
 
 [[data-format]]
 == Data format and schema changes
+
+[[indexes]]
+=== Indexes
 
 Elasticsearch indexes created with Hibernate Search {hibernateSearchPreviousStableVersionShort}
 can be read from and written to with Hibernate Search {hibernateSearchVersion}.
