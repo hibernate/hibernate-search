@@ -11,3 +11,8 @@ jira:
       # Allow database drivers upgrades (since we only use them for tests)
     - user: dependabot[bot]
       titlePattern: ".*\\b(h2|derby|postgresql|mariadb-java-client|mysql-connector-j|jcc|ojdbc8|mssql-jdbc)\\b.*"
+      # Allow common utils upgrades, since we only use them for tests:
+      #   * commons-lang3 (to solve dependency convergence for Wiremock)
+      #   * commons-math3 (used in hibernate-search-util-common tests)
+    - user: dependabot[bot]
+      titlePattern: ".*\\borg.apache.commons:(commons-lang3|commons-math3)\\b.*"
