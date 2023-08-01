@@ -240,14 +240,34 @@ public class CodeSourceTest {
 					try ( InputStream is = codeSource.readOrNull( NON_EXISTING_FILE_RELATIVE_PATH ) ) {
 						assertThat( is ).isNull();
 					}
-					// TODO HSEARCH-4744 support reading the content of nested JARs
-					assertThatThrownBy( codeSource::classesPathOrFail )
-							.isInstanceOf( IOException.class )
-							.hasMessageContainingAll(
-									"Cannot open filesystem for code source at",
-									location.toString(),
-									"URI points to content inside a nested JAR"
-							);
+					if ( JarUtils.javaVersion() > 12 ) {
+						// we are on JDK13+ and we should be able to read the nested JAR:
+						Path nestedClassesPath = codeSource.classesPathOrFail();
+						Path nestedJarRoot = nestedClassesPath.getRoot();
+
+						try ( Stream<Path> files = Files.walk( nestedJarRoot ).filter( Files::isRegularFile ) ) {
+							assertThat( files )
+									.containsExactlyInAnyOrder(
+											nestedJarRoot.resolve( META_INF_FILE_RELATIVE_PATH ),
+											nestedClassesPath.resolve( SIMPLE_CLASS_RELATIVE_PATH )
+									);
+						}
+					}
+					else {
+						// we are on JDK11/12 and inner JAR cannot be opened:
+						assertThatThrownBy( codeSource::classesPathOrFail )
+								.isInstanceOf( IOException.class )
+								.hasMessageContainingAll(
+										"Cannot open filesystem for code source at",
+										location.toString(),
+										"Cannot open a ZIP filesystem for code source at",
+										location.toString(),
+										"because the URI points to content inside a nested JAR.",
+										"Run your application on JDK13+ to get nested JAR support",
+										"or disable JAR scanning by setting a mapping configurer that calls .discoverAnnotatedTypesFromRootMappingAnnotations(false)",
+										"See the reference documentation for information about mapping configurers."
+								);
+					}
 				}
 			}
 		}
