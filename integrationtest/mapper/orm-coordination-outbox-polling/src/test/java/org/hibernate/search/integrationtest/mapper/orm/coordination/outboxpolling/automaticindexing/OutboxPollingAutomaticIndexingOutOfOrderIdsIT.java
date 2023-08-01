@@ -414,7 +414,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			ps.setTimestamp( 2, newCreated );
 			ps.setString( 3, rowToUpdateId );
 
-			jdbc.getResultSetReturn().executeUpdate( ps );
+			jdbc.getResultSetReturn().executeUpdate( ps, OUTBOX_EVENT_UPDATE_ID_AND_TIME );
 		}
 	}
 
