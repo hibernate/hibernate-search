@@ -135,7 +135,10 @@ public interface Log extends BasicLogger {
 	IOException cannotInterpretCodeSourceUrl(URL url);
 
 	@Message(id = ID_OFFSET + 18,
-			value = "Cannot open a ZIP filesystem for code source at '%1$s', because the URI points to content inside a nested JAR.")
-	IOException cannotOpenNestedJar(URI uri);
+			value = "Cannot open a ZIP filesystem for code source at '%1$s', because the URI points to content inside a nested JAR. "
+					+ "Run your application on JDK13+ to get nested JAR support, "
+					+ "or disable JAR scanning by setting a mapping configurer that calls .discoverAnnotatedTypesFromRootMappingAnnotations(false). "
+					+ "See the reference documentation for information about mapping configurers.")
+	SearchException cannotOpenNestedJar(URI uri, @Cause Throwable e);
 
 }
