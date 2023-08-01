@@ -12,12 +12,12 @@ Map settings() {
 	switch (env.DEPENDENCY_UPDATE_NAME) {
 		case 'orm6.2':
 			return [
-					updateProperties: ['version.upgradeable.org.hibernate.orm'],
+					updateProperties: ['version.org.hibernate.orm'],
 					onlyRunTestDependingOn: ['hibernate-search-mapper-orm']
 			]
 		case 'orm6.3':
 			return [
-					updateProperties: ['version.upgradeable.org.hibernate.orm'],
+					updateProperties: ['version.org.hibernate.orm'],
 					onlyRunTestDependingOn: ['hibernate-search-mapper-orm']
 			]
 		default:
