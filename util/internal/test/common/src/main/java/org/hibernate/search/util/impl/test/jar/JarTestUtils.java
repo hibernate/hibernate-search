@@ -53,6 +53,11 @@ public final class JarTestUtils {
 			URI jarUri = new URI( "jar:file", null, jarPath.toUri().getPath(), null );
 			Map<String, String> zipFsEnv = new HashMap<>();
 			zipFsEnv.put( "create", "true" );
+			if ( Runtime.version().feature() < 17 ) {
+				// tests that run on JDK11 and try to use Spring Boot 2.7 cannot work with a compressed jar,
+				// so we try to create it with no compression:
+				zipFsEnv.put( "noCompression", "true" );
+			}
 			if ( additionalZipFsEnv != null ) {
 				zipFsEnv.putAll( additionalZipFsEnv );
 			}

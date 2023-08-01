@@ -11,6 +11,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -19,8 +21,13 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiFunction;
 
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.Log;
@@ -31,6 +38,30 @@ class CodeSource implements Closeable {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String JAR_URI_PATH_SEPARATOR = "!/";
+	private static final BiFunction<Path, URI, FileSystem> NESTED_JAR_FILESYSTEM_CREATOR;
+
+	static {
+		BiFunction<Path, URI, FileSystem> creator;
+		try {
+			Method newFileSystem = FileSystems.class.getMethod( "newFileSystem", Path.class, Map.class );
+			creator = (path, jarUri) -> {
+				try {
+					return (FileSystem) newFileSystem.invoke( null, path, Collections.emptyMap() );
+				}
+				catch (IllegalAccessException | InvocationTargetException e) {
+					throw log.cannotOpenNestedJar( jarUri, e );
+				}
+			};
+		}
+		catch (NoSuchMethodException ignored) {
+			creator = (path, jarUri) -> {
+				throw log.cannotOpenNestedJar( jarUri, null );
+			};
+		}
+		NESTED_JAR_FILESYSTEM_CREATOR = creator;
+	}
+
+	private final List<FileSystem> fileSystems = new ArrayList<>();
 	private final URL codeSourceLocation;
 	private FileSystem nonDefaultFileSystem;
 	private Path classesPathInFileSystem;
@@ -134,18 +165,13 @@ class CodeSource implements Closeable {
 
 	private void tryInitJarFileSystem(URI jarUri) throws IOException {
 		try {
-			nonDefaultFileSystem = FileSystems.newFileSystem( jarUri, Collections.emptyMap() );
+			changeFileSystemAndMarkPreviousOneForClosing( FileSystems.newFileSystem( jarUri, Collections.emptyMap() ) );
 			classesPathInFileSystem = nonDefaultFileSystem.getRootDirectories().iterator().next();
 			// The ZipFileSystemProvider ignores the "path inside the JAR",
 			// so we need to take care of that ourselves.
-			String nestedPath = extractedJarNestedPath( jarUri );
-			if ( nestedPath != null ) {
-				Path nestedPathInFileSystem = classesPathInFileSystem.resolve( nestedPath );
-				if ( Files.isRegularFile( nestedPathInFileSystem ) ) {
-					// TODO HSEARCH-4744 support reading the content of nested JARs
-					throw log.cannotOpenNestedJar( jarUri );
-				}
-				classesPathInFileSystem = nestedPathInFileSystem;
+			Path nestedPath = extractedJarNestedPath( jarUri );
+			if ( nestedPath != null && ( !Files.isRegularFile( nestedPath ) ) ) {
+				classesPathInFileSystem = nestedPath;
 			}
 		}
 		catch (RuntimeException | IOException e) {
@@ -157,7 +183,7 @@ class CodeSource implements Closeable {
 		}
 	}
 
-	private String extractedJarNestedPath(URI jarUri) throws IOException {
+	private Path extractedJarNestedPath(URI jarUri) {
 		String spec = jarUri.getSchemeSpecificPart();
 		if ( spec == null ) {
 			return null;
@@ -169,18 +195,41 @@ class CodeSource implements Closeable {
 		else {
 			int afterPathSeparatorIndex = pathSeparatorIndex + JAR_URI_PATH_SEPARATOR.length();
 			int secondPathSeparatorIndex = spec.indexOf( JAR_URI_PATH_SEPARATOR, afterPathSeparatorIndex );
-			if ( 0 <= secondPathSeparatorIndex && secondPathSeparatorIndex + JAR_URI_PATH_SEPARATOR.length() < spec.length() ) {
-				// TODO HSEARCH-4744 support reading the content of nested JARs
-				throw log.cannotOpenNestedJar( jarUri );
+			while ( 0 <= secondPathSeparatorIndex ) {
+				Path nestedPathInFileSystem = classesPathInFileSystem.resolve(
+						spec.substring( afterPathSeparatorIndex, secondPathSeparatorIndex )
+				);
+				if ( Files.isRegularFile( nestedPathInFileSystem ) ) {
+					changeFileSystemAndMarkPreviousOneForClosing(
+							NESTED_JAR_FILESYSTEM_CREATOR.apply( nestedPathInFileSystem, jarUri ) );
+					classesPathInFileSystem = nonDefaultFileSystem.getRootDirectories().iterator().next();
+				}
+				else {
+					return nestedPathInFileSystem;
+				}
+				afterPathSeparatorIndex = secondPathSeparatorIndex;
+				secondPathSeparatorIndex = spec.indexOf( JAR_URI_PATH_SEPARATOR, afterPathSeparatorIndex );
 			}
-			return spec.substring( afterPathSeparatorIndex, secondPathSeparatorIndex );
+			return classesPathInFileSystem.resolve(
+					spec.substring( afterPathSeparatorIndex, secondPathSeparatorIndex ) );
 		}
+	}
+
+	private void changeFileSystemAndMarkPreviousOneForClosing(FileSystem fileSystem) {
+		if ( this.nonDefaultFileSystem != null ) {
+			// we will be closing the filesystems in a reverse order:
+			fileSystems.add( 0, nonDefaultFileSystem );
+		}
+		this.nonDefaultFileSystem = fileSystem;
 	}
 
 	@Override
 	public void close() throws IOException {
 		if ( nonDefaultFileSystem != null ) {
-			nonDefaultFileSystem.close();
+			changeFileSystemAndMarkPreviousOneForClosing( null );
+		}
+		try ( Closer<IOException> closer = new Closer<>() ) {
+			closer.pushAll( FileSystem::close, fileSystems );
 		}
 	}
 }
