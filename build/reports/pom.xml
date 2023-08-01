@@ -10,9 +10,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.hibernate.search</groupId>
-        <artifactId>hibernate-search-parent</artifactId>
+        <artifactId>hibernate-search-parent-dependencies</artifactId>
         <version>7.0.0-SNAPSHOT</version>
-        <relativePath>../..</relativePath>
+        <relativePath>../parents/dependencies</relativePath>
     </parent>
     <artifactId>hibernate-search-reports</artifactId>
 
@@ -32,18 +32,6 @@
         -->
         <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-build-bom</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>

@@ -9,9 +9,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.hibernate.search</groupId>
-        <artifactId>hibernate-search-parent</artifactId>
+        <artifactId>hibernate-search-parent-dependencies</artifactId>
         <version>7.0.0-SNAPSHOT</version>
-        <relativePath>../..</relativePath>
+        <relativePath>../parents/dependencies</relativePath>
     </parent>
     <artifactId>hibernate-search-build-config</artifactId>
 
@@ -34,17 +34,6 @@
         <tmpdir.dependencies-to-parse>${project.build.directory}/dependencies-to-parse</tmpdir.dependencies-to-parse>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-build-bom</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>

@@ -10,9 +10,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.hibernate.search</groupId>
-        <artifactId>hibernate-search-parent</artifactId>
+        <artifactId>hibernate-search-parent-dependencies</artifactId>
         <version>7.0.0-SNAPSHOT</version>
-        <relativePath>../../..</relativePath>
+        <relativePath>../dependencies</relativePath>
     </parent>
     <artifactId>hibernate-search-parent-internal</artifactId>
     <packaging>pom</packaging>
@@ -49,18 +49,6 @@
         <sonar.sources>${rootProject.emptySubdirectory}</sonar.sources>
         <sonar.tests>${project.basedir}/src</sonar.tests>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-build-bom</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <build>
         <pluginManagement>
