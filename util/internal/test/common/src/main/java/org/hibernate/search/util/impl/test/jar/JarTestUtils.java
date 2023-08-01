@@ -53,6 +53,11 @@ public final class JarTestUtils {
 			URI jarUri = new URI( "jar:file", null, jarPath.toUri().getPath(), null );
 			Map<String, String> zipFsEnv = new HashMap<>();
 			zipFsEnv.put( "create", "true" );
+			if ( !canReadNestedJar() ) {
+				// tests that run on JDK11 and try to use Spring Boot 2.7 cannot work with a compressed jar,
+				// so we try to create it with no compression:
+				zipFsEnv.put( "noCompression", "true" );
+			}
 			if ( additionalZipFsEnv != null ) {
 				zipFsEnv.putAll( additionalZipFsEnv );
 			}
@@ -87,6 +92,16 @@ public final class JarTestUtils {
 		catch (Exception e) {
 			throw new IllegalStateException(
 					"Exception turning " + jarOrDirectoryPath + " into an unpacked directory: " + e.getMessage(), e );
+		}
+	}
+
+	private static boolean canReadNestedJar() {
+		try {
+			FileSystems.class.getMethod( "newFileSystem", Path.class, Map.class );
+			return true;
+		}
+		catch (NoSuchMethodException e) {
+			return false;
 		}
 	}
 
