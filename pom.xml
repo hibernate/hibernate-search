@@ -6,7 +6,7 @@
  ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hibernate.search</groupId>
@@ -151,10 +151,10 @@
     </mailingLists>
 
     <modules>
-        <module>build/enforcer</module>
         <module>bom/public</module>
+        <module>build/parents/build</module>
+        <module>build/enforcer</module>
         <module>build/config</module>
-        <module>build/parents/dependencies</module>
         <module>build/parents/internal</module>
         <module>util/internal/test/common</module>
         <module>util/internal/test/orm</module>
@@ -185,81 +185,6 @@
           -->
         <version.org.hibernate.search.previous-stable>6.2.0.CR1</version.org.hibernate.search.previous-stable>
 
-        <!-- Maven plugins versions -->
-
-        <version.assembly.plugin>3.4.2</version.assembly.plugin>
-        <version.buildhelper.plugin>3.3.0</version.buildhelper.plugin>
-        <version.checkstyle.plugin>3.3.0</version.checkstyle.plugin>
-        <version.bundle.plugin>5.1.9</version.bundle.plugin>
-        <version.clean.plugin>3.3.1</version.clean.plugin>
-        <!-- Needing 3.6.2 at least because of MCOMPILER-294 -->
-        <version.compiler.plugin>3.10.1</version.compiler.plugin>
-        <version.dependency.plugin>3.6.0</version.dependency.plugin>
-        <!-- Check dependencies for security vulnerabilities -->
-        <version.dependency-check.plugin>7.2.1</version.dependency-check.plugin>
-        <version.deploy.plugin>3.1.1</version.deploy.plugin>
-        <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
-        <version.enforcer.plugin>3.3.0</version.enforcer.plugin>
-        <version.exec.plugin>3.1.0</version.exec.plugin>
-        <version.forbiddenapis.plugin>3.4</version.forbiddenapis.plugin>
-        <version.install.plugin>3.1.1</version.install.plugin>
-        <version.jandex.plugin>3.1.2</version.jandex.plugin>
-        <version.japicmp.plugin>0.17.2</version.japicmp.plugin>
-        <version.jar.plugin>3.3.0</version.jar.plugin>
-        <version.javadoc.plugin>3.5.0</version.javadoc.plugin>
-        <version.jdeps.plugin>0.5.1</version.jdeps.plugin>
-        <version.nexus-staging.plugin>1.6.13</version.nexus-staging.plugin>
-        <version.processor.plugin>4.5</version.processor.plugin>
-        <version.project-info.plugin>3.4.5</version.project-info.plugin>
-        <version.resources.plugin>3.3.1</version.resources.plugin>
-        <version.shade.plugin>3.5.0</version.shade.plugin>
-        <version.source.plugin>3.3.0</version.source.plugin>
-        <!-- Surefire versions are a minefield of bugs: be careful with upgrades -->
-        <version.surefire.plugin>3.0.0-M8</version.surefire.plugin>
-        <version.surefire.plugin.java-version.asm>9.5</version.surefire.plugin.java-version.asm>
-        <version.jacoco.plugin>0.8.8</version.jacoco.plugin>
-        <version.com.buschmais.jqassistant.plugin>2.0.3</version.com.buschmais.jqassistant.plugin>
-        <version.docker.maven.plugin>0.40.2</version.docker.maven.plugin>
-        <version.moditect.plugin>1.0.0.RC2</version.moditect.plugin>
-        <version.sonar.plugin>3.9.1.2184</version.sonar.plugin>
-        <version.scripting.plugin>3.0.0</version.scripting.plugin>
-        <version.gpg.plugin>3.1.0</version.gpg.plugin>
-        <version.org.apache.groovy.groovy-jsr223>4.0.13</version.org.apache.groovy.groovy-jsr223>
-        <version.com.puppycrawl.tools.checkstyle>10.9.3</version.com.puppycrawl.tools.checkstyle>
-        <version.versions.plugin>2.16.0</version.versions.plugin>
-        <version.maven-wrapper-plugin>3.2.0</version.maven-wrapper-plugin>
-        <version.impsort-maven-plugin>1.9.0</version.impsort-maven-plugin>
-        <version.formatter-maven-plugin>2.23.0</version.formatter-maven-plugin>
-        <version.flatten-maven-plugin>1.5.0</version.flatten-maven-plugin>
-        <version.sisu-maven-plugin>0.9.0.M1</version.sisu-maven-plugin>
-
-        <!-- Asciidoctor -->
-
-        <version.asciidoctor.plugin>2.2.4</version.asciidoctor.plugin>
-        <version.org.hibernate.infra.hibernate-asciidoctor-theme>1.0.6.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
-        <version.org.jruby>9.3.2.0</version.org.jruby>
-        <version.org.asciidoctor.asciidoctorj>2.5.6</version.org.asciidoctor.asciidoctorj>
-        <version.org.asciidoctor.asciidoctorj-pdf>1.5.0-alpha.18</version.org.asciidoctor.asciidoctorj-pdf>
-
-        <version.jsoup>1.15.3</version.jsoup>
-
-        <!-- Maven Central repository -->
-
-        <mavencentral.repo.url>https://repo.maven.apache.org/maven2/</mavencentral.repo.url>
-
-        <!-- Eclipse repository (for the ECJ compiler, disabled by default) -->
-
-        <eclipse.repo.id>eclipse-staging</eclipse.repo.id>
-        <eclipse.repo.url>https://repo.eclipse.org/content/repositories/eclipse-staging/</eclipse.repo.url>
-
-        <!-- Repository Deployment URLs -->
-
-        <ossrh.releases.repo.id>ossrh</ossrh.releases.repo.id>
-        <ossrh.releases.repo.url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</ossrh.releases.repo.url>
-        <ossrh.releases.repo.baseUrl>https://oss.sonatype.org/</ossrh.releases.repo.baseUrl>
-        <ossrh.snapshots.repo.id>ossrh</ossrh.snapshots.repo.id>
-        <ossrh.snapshots.repo.url>https://oss.sonatype.org/content/repositories/snapshots</ossrh.snapshots.repo.url>
-
         <!-- Build settings -->
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -281,52 +206,17 @@
         <java-version.test.launcher.java_home>${java-version.test.compiler.java_home}</java-version.test.launcher.java_home>
         <java-version.test.launcher>${java-version.test.launcher.java_home}/bin/java</java-version.test.launcher>
 
-        <!-- Properties overridden in profiles to disable certain tests that only work with specific Java versions -->
-        <!-- These are only used in integration tests, hence the default to "none", which is overridden in integration tests -->
-        <java-version.test.java17.add-main-source-phase.default>none</java-version.test.java17.add-main-source-phase.default>
-        <java-version.test.java17.add-main-source-phase>${java-version.test.java17.add-main-source-phase.default}</java-version.test.java17.add-main-source-phase>
-        <!-- These are used in all modules -->
-        <java-version.test.java11.add-test-source-phase>generate-test-sources</java-version.test.java11.add-test-source-phase>
-        <java-version.test.java17.add-test-source-phase>generate-test-sources</java-version.test.java17.add-test-source-phase>
-
-        <!-- Set this through a property so that it can be overridden from the commandline -->
-        <maven.compiler.failOnWarning>true</maven.compiler.failOnWarning>
-
-        <maven.compiler.release>${java-version.main.release}</maven.compiler.release>
-        <maven.compiler.testRelease>${java-version.test.release}</maven.compiler.testRelease>
-
-        <!-- Also set source/target, because several other plugins rely on this and don't understand release -->
-        <maven.compiler.source>${maven.compiler.release}</maven.compiler.source>
-        <maven.compiler.target>${maven.compiler.release}</maven.compiler.target>
-        <maven.compiler.testSource>${maven.compiler.testRelease}</maven.compiler.testSource>
-        <maven.compiler.testTarget>${maven.compiler.testRelease}</maven.compiler.testTarget>
-
         <!--
-            This is an explicit setting to control compiler plugin execution for the no `-parameters` flag case.
-            Needed as when `testIncludes` doesn't match any test classes, it brings all test sources and re-compiles them.
-         -->
-        <maven.compiler.testSources.noParameterCompilation.skip>true</maven.compiler.testSources.noParameterCompilation.skip>
-        <java-version.test.java17.noParameters.skip>${maven.compiler.testSources.noParameterCompilation.skip}</java-version.test.java17.noParameters.skip>
-        <!--
-                Options to compile with the Eclipse compiler when building with maven (not with the IDE).
-                See profile "compiler-eclipse".
-                Note the version of ECJ is overridden because the one bundled with the latest plexus-compiler version
-                is outdated and leads to compilation errors.
-         -->
-        <version.org.codehaus.plexus.plexus-compiler.compiler-eclipse>2.12.1</version.org.codehaus.plexus.plexus-compiler.compiler-eclipse>
-        <version.org.eclipse.jdt.ecj>3.34.0</version.org.eclipse.jdt.ecj>
+             The absolute path to the root project directory.
+             This property is set by the build-helper plugin.
+             We initialize it to some crude, potentially wrong value,
+             because the Sonar Maven plugin uses this property indirectly,
+             but ignores any change made by other plugins.
+             This default value is the best we can do without the help of a Maven plugin.
 
-        <!--
-            The absolute path to the root project directory.
-            This property is set by the build-helper plugin.
-            We initialize it to some crude, potentially wrong value,
-            because the Sonar Maven plugin uses this property indirectly,
-            but ignores any change made by other plugins.
-            This default value is the best we can do without the help of a Maven plugin.
-
-            Useful resources:
-             - https://www.mojohaus.org/build-helper-maven-plugin/rootlocation-mojo.html
-         -->
+             Useful resources:
+              - https://www.mojohaus.org/build-helper-maven-plugin/rootlocation-mojo.html
+          -->
         <rootProject.directory>${user.dir}</rootProject.directory>
         <!--
             The absolute path to an empty subdirectory of the root project.
@@ -344,26 +234,73 @@
          -->
         <maven.min.version>3.8.1</maven.min.version>
 
-        <!-- Whether javadoc warnings should fail the build -->
-        <failOnJavadocWarning>true</failOnJavadocWarning>
+        <!-- Set this through a property so that it can be overridden from the commandline -->
+        <maven.compiler.failOnWarning>true</maven.compiler.failOnWarning>
 
-        <!-- Can be overridden by subprojects if dependency convergence cannot be achieved -->
-        <enforcer.dependencyconvergence.skip>false</enforcer.dependencyconvergence.skip>
+        <maven.compiler.release>${java-version.main.release}</maven.compiler.release>
+        <maven.compiler.testRelease>${java-version.test.release}</maven.compiler.testRelease>
 
-        <!-- Set empty default value to avoid Maven leaving property references (${...}) when it doesn't find a value -->
-        <maven.javadoc.skip>false</maven.javadoc.skip>
-        <!-- We control whether we should download javadoc based on this property
-             that defines the phase of some Maven plugin executions,
-             because just skipping those plugins doesn't skip dependency resolution,
-             which will fail if javadoc wasn't downloaded. -->
-        <javadoc.download.phase>generate-resources</javadoc.download.phase>
-        <!--
-            Some profiles might want to ignore running a property collection processor entirely.
-            In such case set this property to `none`.
-        -->
-        <documentation.config.properties.phase>process-resources</documentation.config.properties.phase>
-        <!-- Output for property collection -->
-        <documentation.config.properties.output.directory>${rootProject.directory}/target</documentation.config.properties.output.directory>
+        <!-- Also set source/target, because several other plugins rely on this and don't understand release -->
+        <maven.compiler.source>${maven.compiler.release}</maven.compiler.source>
+        <maven.compiler.target>${maven.compiler.release}</maven.compiler.target>
+        <maven.compiler.testSource>${maven.compiler.testRelease}</maven.compiler.testSource>
+        <maven.compiler.testTarget>${maven.compiler.testRelease}</maven.compiler.testTarget>
+
+        <!-- Plugin versions -->
+        <version.clean.plugin>3.3.1</version.clean.plugin>
+        <version.install.plugin>3.1.1</version.install.plugin>
+        <version.enforcer.plugin>3.3.0</version.enforcer.plugin>
+        <version.project-info.plugin>3.4.5</version.project-info.plugin>
+        <version.japicmp.plugin>0.17.2</version.japicmp.plugin>
+        <version.nexus-staging.plugin>1.6.13</version.nexus-staging.plugin>
+        <version.deploy.plugin>3.1.1</version.deploy.plugin>
+        <version.gpg.plugin>3.1.0</version.gpg.plugin>
+        <version.flatten-maven-plugin>1.5.0</version.flatten-maven-plugin>
+        <version.assembly.plugin>3.4.2</version.assembly.plugin>
+        <version.buildhelper.plugin>3.3.0</version.buildhelper.plugin>
+        <version.checkstyle.plugin>3.3.0</version.checkstyle.plugin>
+        <version.bundle.plugin>5.1.9</version.bundle.plugin>
+        <!-- Needing 3.6.2 at least because of MCOMPILER-294 -->
+        <version.compiler.plugin>3.10.1</version.compiler.plugin>
+        <version.dependency.plugin>3.6.0</version.dependency.plugin>
+        <!-- Check dependencies for security vulnerabilities -->
+        <version.dependency-check.plugin>8.3.1</version.dependency-check.plugin>
+        <version.exec.plugin>3.1.0</version.exec.plugin>
+        <version.forbiddenapis.plugin>3.4</version.forbiddenapis.plugin>
+        <version.jandex.plugin>3.1.2</version.jandex.plugin>
+        <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
+        <version.jar.plugin>3.3.0</version.jar.plugin>
+        <version.javadoc.plugin>3.5.0</version.javadoc.plugin>
+        <version.jdeps.plugin>0.5.1</version.jdeps.plugin>
+        <version.processor.plugin>4.5</version.processor.plugin>
+        <version.resources.plugin>3.3.1</version.resources.plugin>
+        <version.shade.plugin>3.5.0</version.shade.plugin>
+        <version.source.plugin>3.3.0</version.source.plugin>
+        <!-- Surefire versions are a minefield of bugs: be careful with upgrades -->
+        <version.surefire.plugin>3.0.0-M8</version.surefire.plugin>
+        <version.surefire.plugin.java-version.asm>9.5</version.surefire.plugin.java-version.asm>
+        <version.jacoco.plugin>0.8.10</version.jacoco.plugin>
+        <version.com.buschmais.jqassistant.plugin>2.0.3</version.com.buschmais.jqassistant.plugin>
+        <version.docker.maven.plugin>0.40.2</version.docker.maven.plugin>
+        <version.moditect.plugin>1.0.0.RC2</version.moditect.plugin>
+        <version.sonar.plugin>3.9.1.2184</version.sonar.plugin>
+        <version.scripting.plugin>3.0.0</version.scripting.plugin>
+        <version.org.apache.groovy.groovy-jsr223>4.0.13</version.org.apache.groovy.groovy-jsr223>
+        <version.com.puppycrawl.tools.checkstyle>10.9.3</version.com.puppycrawl.tools.checkstyle>
+        <version.versions.plugin>2.16.0</version.versions.plugin>
+        <version.maven-wrapper-plugin>3.2.0</version.maven-wrapper-plugin>
+        <version.impsort-maven-plugin>1.9.0</version.impsort-maven-plugin>
+        <version.formatter-maven-plugin>2.23.0</version.formatter-maven-plugin>
+        <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
+        <version.sisu-maven-plugin>0.9.0.M1</version.sisu-maven-plugin>
+
+        <!-- Repository Deployment URLs -->
+
+        <ossrh.releases.repo.id>ossrh</ossrh.releases.repo.id>
+        <ossrh.releases.repo.url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</ossrh.releases.repo.url>
+        <ossrh.releases.repo.baseUrl>https://oss.sonatype.org/</ossrh.releases.repo.baseUrl>
+        <ossrh.snapshots.repo.id>ossrh</ossrh.snapshots.repo.id>
+        <ossrh.snapshots.repo.url>https://oss.sonatype.org/content/repositories/snapshots</ossrh.snapshots.repo.url>
 
         <!--
             Determines if gpg signing should happen within the module during the release process.
@@ -371,104 +308,48 @@
         -->
         <release.gpg.signing.skip>true</release.gpg.signing.skip>
 
-        <!-- Test settings -->
-        <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
+        <!-- Can be overridden by subprojects if dependency convergence cannot be achieved -->
+        <enforcer.dependencyconvergence.skip>false</enforcer.dependencyconvergence.skip>
 
-        <surefire.jvm.args.memory>-Xmx512m -Xms128m</surefire.jvm.args.memory>
-        <!-- JVM args to be customized depending on the Java version -->
-        <surefire.jvm.args.java-version>
-            -Djdk.attach.allowAttachSelf=true
-        </surefire.jvm.args.java-version>
-        <!-- JVM args generated by JaCoCo -->
-        <surefire.jvm.args.jacoco></surefire.jvm.args.jacoco>
-        <failsafe.jvm.args.jacoco></failsafe.jvm.args.jacoco>
-        <!-- JVM args to be customized by each Maven module -->
-        <surefire.jvm.args.module></surefire.jvm.args.module>
-        <surefire.jvm.args.module.add-opens></surefire.jvm.args.module.add-opens>
+        <!-- Maven Central repository -->
+
+        <mavencentral.repo.url>https://repo.maven.apache.org/maven2/</mavencentral.repo.url>
+
+        <!-- Eclipse repository (for the ECJ compiler, disabled by default) -->
+
+        <eclipse.repo.id>eclipse-staging</eclipse.repo.id>
+        <eclipse.repo.url>https://repo.eclipse.org/content/repositories/eclipse-staging/</eclipse.repo.url>
         <!--
-             Pass these properties as system properties to be able to switch to
-             a different database without re-compiling the hibernate.properties file
-             (which is located in a dependency of the integration tests modules)
+                Options to compile with the Eclipse compiler when building with maven (not with the IDE).
+                See profile "compiler-eclipse".
+                Note the version of ECJ is overridden because the one bundled with the latest plexus-compiler version
+                is outdated and leads to compilation errors.
          -->
-        <failsafe.jvm.args.hibernate-orm></failsafe.jvm.args.hibernate-orm>
-        <!-- Database profile jdbc java arguments -->
-        <failsafe.jvm.args.jdbc></failsafe.jvm.args.jdbc>
-        <!-- Argument passed from the command line -->
-        <test.launcher.args></test.launcher.args>
-        <surefire.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} ${surefire.jvm.args.jacoco} ${test.launcher.args}</surefire.jvm.args>
-        <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} ${failsafe.jvm.args.jacoco} ${failsafe.jvm.args.hibernate-orm} ${failsafe.jvm.args.jdbc} ${test.launcher.args}</failsafe.jvm.args>
+        <version.org.codehaus.plexus.plexus-compiler.compiler-eclipse>2.12.1</version.org.codehaus.plexus.plexus-compiler.compiler-eclipse>
+        <version.org.eclipse.jdt.ecj>3.34.0</version.org.eclipse.jdt.ecj>
 
-        <!-- Disable integration tests selectively. To be set in specific profile, e.g. for a specific JDK version. -->
-        <failsafe.spring.skip>${skipITs}</failsafe.spring.skip>
+        <!-- Asciidoctor -->
 
-        <!-- This allows us to distinguish between multiple executions of the same test in test reports. -->
-        <surefire.reportNameSuffix>${surefire.module}-${surefire.integration}-${surefire.environment}</surefire.reportNameSuffix>
-        <!-- This should be set from the command line by CI jobs that execute the same tests in multiple environments -->
-        <surefire.environment>default</surefire.environment>
-        <!-- This should be set in modules that re-execute tests imported from a dependency (using <dependenciesToScan>)
-             to differentiate multiple executions of the same tests in multiple modules. -->
-        <surefire.module>default</surefire.module>
-        <!-- This should be set in modules that transform Hibernate Search code for a different integration
-             (Jakarta EE, ORM 6, ...). -->
-        <surefire.integration>default</surefire.integration>
+        <version.asciidoctor.plugin>2.2.4</version.asciidoctor.plugin>
+        <version.org.hibernate.infra.hibernate-asciidoctor-theme>1.0.6.Final</version.org.hibernate.infra.hibernate-asciidoctor-theme>
+        <version.org.jruby>9.3.2.0</version.org.jruby>
+        <version.org.asciidoctor.asciidoctorj>2.5.6</version.org.asciidoctor.asciidoctorj>
+        <version.org.asciidoctor.asciidoctorj-pdf>1.5.0-alpha.18</version.org.asciidoctor.asciidoctorj-pdf>
 
-        <!-- Containers executions tests properties -->
-        <test.containers.run.skip>false</test.containers.run.skip>
+        <!-- Test settings -->
 
-        <!-- Elasticsearch tests properties -->
-
-        <!-- Control how an Elasticsearch instance is run automatically during tests -->
-        <!-- By default, the plugin is not skipped, but each container (elastic, opensearch, etc.) is skipped;
-             Maven profiles will re-enable the right container depending on configuration.
-          -->
-        <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
-
-        <!-- If an external connection url is defined this property will be true -->
-        <!-- See elasticsearch-run and elasticsearch-do-not-run profiles -->
-        <test.elasticsearch.connection.uris.defined></test.elasticsearch.connection.uris.defined>
+        <!-- Container images for various integration tests -->
+        <!-- The latest version of Elasticsearch tested against by default -->
+        <version.org.elasticsearch.latest>8.9.0</version.org.elasticsearch.latest>
+        <test.elasticsearch.version>${version.org.elasticsearch.latest}</test.elasticsearch.version>
 
         <test.elasticsearch.run.elastic.skip>true</test.elasticsearch.run.elastic.skip>
         <test.elasticsearch.run.elastic.image.name>elastic/elasticsearch</test.elasticsearch.run.elastic.image.name>
         <test.elasticsearch.run.elastic.image.tag>${test.elasticsearch.version}</test.elasticsearch.run.elastic.image.tag>
+
         <test.elasticsearch.run.opensearch.skip>true</test.elasticsearch.run.opensearch.skip>
         <test.elasticsearch.run.opensearch.image.name>opensearchproject/opensearch</test.elasticsearch.run.opensearch.image.name>
         <test.elasticsearch.run.opensearch.image.tag>${test.elasticsearch.version}</test.elasticsearch.run.opensearch.image.tag>
-        <!--
-             These properties are transparently passed as system properties to integration tests,
-             and retrieved by a test utility:
-             org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration
-             This is better than configuration files filtered by Maven,
-             because we will be able to change the configuration without re-compiling the configuration file
-             (which is located in a dependency of the integration tests modules).
-         -->
-        <test.elasticsearch.distribution>elastic</test.elasticsearch.distribution>
-        <test.elasticsearch.version>${version.org.elasticsearch.latest}</test.elasticsearch.version>
-        <test.elasticsearch.connection.uris></test.elasticsearch.connection.uris>
-        <test.elasticsearch.connection.username></test.elasticsearch.connection.username>
-        <test.elasticsearch.connection.password></test.elasticsearch.connection.password>
-        <test.elasticsearch.connection.aws.signing.enabled>false</test.elasticsearch.connection.aws.signing.enabled>
-        <test.elasticsearch.connection.aws.region></test.elasticsearch.connection.aws.region>
-        <test.elasticsearch.connection.aws.credentials.type></test.elasticsearch.connection.aws.credentials.type>
-        <test.elasticsearch.connection.aws.credentials.access_key_id></test.elasticsearch.connection.aws.credentials.access_key_id>
-        <test.elasticsearch.connection.aws.credentials.secret_access_key></test.elasticsearch.connection.aws.credentials.secret_access_key>
-        <!-- Property whose sole purpose is to be referenced in the definition of surefire.jvm.args.module
-             when elasticsearch connection is necessary -->
-        <test.elasticsearch.connection.jvm.args>
-            -Dhibernate.search.backend.uris=${test.elasticsearch.connection.uris}
-            -Dhibernate.search.backend.username=${test.elasticsearch.connection.username}
-            -Dhibernate.search.backend.password=${test.elasticsearch.connection.password}
-            -Dhibernate.search.backend.aws.signing.enabled=${test.elasticsearch.connection.aws.signing.enabled}
-            -Dhibernate.search.backend.aws.region=${test.elasticsearch.connection.aws.region}
-            -Dhibernate.search.backend.aws.credentials.type=${test.elasticsearch.connection.aws.credentials.type}
-            -Dhibernate.search.backend.aws.credentials.access_key_id=${test.elasticsearch.connection.aws.credentials.access_key_id}
-            -Dhibernate.search.backend.aws.credentials.secret_access_key=${test.elasticsearch.connection.aws.credentials.secret_access_key}
-        </test.elasticsearch.connection.jvm.args>
-
-        <!-- Lucene tests properties -->
-
-        <test.lucene.indexes.path>${project.build.directory}/test-indexes/</test.lucene.indexes.path>
-
-        <!-- Mapper ORM tests properties -->
 
         <!-- Run containers for additional ORM databases -->
         <test.database.run.skip>true</test.database.run.skip>
@@ -508,17 +389,45 @@
         <test.database.run.cockroachdb.image.name>cockroachdb/cockroach</test.database.run.cockroachdb.image.name>
         <test.database.run.cockroachdb.image.tag>v23.1.4</test.database.run.cockroachdb.image.tag>
 
-        <!-- Property whose sole purpose is to be referenced in the definition of surefire.jvm.args.module
-             when Weld is used. -->
-        <!-- Weld performs illegal accesses to java.base to generate proxies, so we need to allow them. -->
-        <test.weld.jvm.args>
-            --add-opens java.base/java.security=ALL-UNNAMED
-            --add-opens java.base/java.lang=ALL-UNNAMED
-        </test.weld.jvm.args>
+        <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
 
-        <!-- Eclipse plugin options -->
+        <surefire.jvm.args.memory>-Xmx512m -Xms128m</surefire.jvm.args.memory>
+        <!-- JVM args to be customized depending on the Java version -->
+        <surefire.jvm.args.java-version>
+            -Djdk.attach.allowAttachSelf=true
+        </surefire.jvm.args.java-version>
+        <!-- JVM args generated by JaCoCo -->
+        <surefire.jvm.args.jacoco></surefire.jvm.args.jacoco>
+        <failsafe.jvm.args.jacoco></failsafe.jvm.args.jacoco>
+        <!-- JVM args to be customized by each Maven module -->
+        <surefire.jvm.args.module></surefire.jvm.args.module>
+        <surefire.jvm.args.module.add-opens></surefire.jvm.args.module.add-opens>
+        <!--
+             Pass these properties as system properties to be able to switch to
+             a different database without re-compiling the hibernate.properties file
+             (which is located in a dependency of the integration tests modules)
+         -->
+        <failsafe.jvm.args.hibernate-orm></failsafe.jvm.args.hibernate-orm>
+        <!-- Database profile jdbc java arguments -->
+        <failsafe.jvm.args.jdbc></failsafe.jvm.args.jdbc>
+        <!-- Argument passed from the command line -->
+        <test.launcher.args></test.launcher.args>
+        <surefire.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} ${surefire.jvm.args.jacoco} ${test.launcher.args}</surefire.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} ${failsafe.jvm.args.jacoco} ${failsafe.jvm.args.hibernate-orm} ${failsafe.jvm.args.jdbc} ${test.launcher.args}</failsafe.jvm.args>
 
-        <m2e.apt.activation>jdt_apt</m2e.apt.activation>
+        <!-- Disable integration tests selectively. To be set in specific profile, e.g. for a specific JDK version. -->
+        <failsafe.spring.skip>${skipITs}</failsafe.spring.skip>
+
+        <!-- This allows us to distinguish between multiple executions of the same test in test reports. -->
+        <surefire.reportNameSuffix>${surefire.module}-${surefire.integration}-${surefire.environment}</surefire.reportNameSuffix>
+        <!-- This should be set from the command line by CI jobs that execute the same tests in multiple environments -->
+        <surefire.environment>default</surefire.environment>
+        <!-- This should be set in modules that re-execute tests imported from a dependency (using <dependenciesToScan>)
+             to differentiate multiple executions of the same tests in multiple modules. -->
+        <surefire.module>default</surefire.module>
+        <!-- This should be set in modules that transform Hibernate Search code for a different integration
+             (Jakarta EE, ORM 6, ...). -->
+        <surefire.integration>default</surefire.integration>
 
         <!-- Formatting -->
         <format.skip>false</format.skip>
@@ -573,285 +482,122 @@
 
     <build>
         <defaultGoal>install</defaultGoal>
-        <plugins>
-            <plugin>
-                <artifactId>exec-maven-plugin</artifactId>
-                <groupId>org.codehaus.mojo</groupId>
-                <executions>
-                    <execution>
-                        <id>print-java-main-compiler-version</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${java-version.main.compiler}</executable>
-                            <commandlineArgs>-version</commandlineArgs>
-                            <inheritIo>true</inheritIo>
-                        </configuration>
-                    </execution>
-                    <!-- This is necessary even if we have the above,
-                         because javac -version doesn't print the full version for Early Access releases -->
-                    <execution>
-                        <id>print-java-main-compiler-java-version</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${java-version.main.compiler.java_home}/bin/java</executable>
-                            <commandlineArgs>-version</commandlineArgs>
-                            <inheritIo>true</inheritIo>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>print-java-main-release-version</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>echo</executable>
-                            <commandlineArgs>Main code compiled with -release ${maven.compiler.release}</commandlineArgs>
-                            <inheritIo>true</inheritIo>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>print-java-test-compiler-version</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${java-version.test.compiler}</executable>
-                            <commandlineArgs>-version</commandlineArgs>
-                            <inheritIo>true</inheritIo>
-                        </configuration>
-                    </execution>
-                    <!-- This is necessary even if we have the above,
-                         because javac -version doesn't print the full version for Early Access releases -->
-                    <execution>
-                        <id>print-java-test-compiler-java-version</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${java-version.test.compiler.java_home}/bin/java</executable>
-                            <commandlineArgs>-version</commandlineArgs>
-                            <inheritIo>true</inheritIo>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>print-java-test-launcher-version</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${java-version.test.launcher}</executable>
-                            <commandlineArgs>-version</commandlineArgs>
-                            <inheritIo>true</inheritIo>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>print-java-test-release-version</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>echo</executable>
-                            <commandlineArgs>Tests compiled with -release ${maven.compiler.testRelease}</commandlineArgs>
-                            <inheritIo>true</inheritIo>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>com.github.marschall</groupId>
-                <artifactId>jdeps-maven-plugin</artifactId>
-                <!--
-                    Not enabling automatic executions; run:
-                     > mvn jdeps:jdeps
-                     to get a report.
-                -->
-                <configuration>
-                    <!-- Allows to see which JRE profiles will be needed -->
-                    <profile>true</profile>
-                    <failOnWarning>true</failOnWarning>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>set-root-location-property</id>
-                        <goals>
-                            <goal>rootlocation</goal>
-                        </goals>
-                        <configuration>
-                            <rootLocationProperty>rootProject.directory</rootLocationProperty>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>parse-project-version</id>
-                        <goals>
-                            <goal>parse-version</goal>
-                        </goals>
-                        <configuration>
-                            <propertyPrefix>parsed-version.org.hibernate.search</propertyPrefix>
-                            <versionString>${project.version}</versionString>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>parse-project-previous-stable-version</id>
-                        <goals>
-                            <goal>parse-version</goal>
-                        </goals>
-                        <configuration>
-                            <propertyPrefix>parsed-version.org.hibernate.search.previous-stable</propertyPrefix>
-                            <versionString>${version.org.hibernate.search.previous-stable}</versionString>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>add-main-source-java17</id>
-                        <phase>${java-version.test.java17.add-main-source-phase}</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/main/java17</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>add-test-source-java17</id>
-                        <phase>${java-version.test.java17.add-test-source-phase}</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/test/java17</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>add-test-source-java17-noparameters</id>
-                        <phase>${java-version.test.java17.add-test-source-phase}</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/test/java17-noparameters</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Skip the deploy plugin explicitly: we use nexus-staging-maven-plugin instead -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <!--
-                 Configure the nexus-staging-maven-plugin explicitly (without <extension>true</extension>)
-                 in order to work around a problem in the "reports" module (see that module's POM for more info).
-             -->
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <extensions>false</extensions><!-- This is essential: do not put true here -->
-                <configuration>
-                    <serverId>${ossrh.releases.repo.id}</serverId>
-                    <!-- The following, by default, is only used for actual releases, not for snapshot deployments -->
-                    <nexusUrl>${ossrh.releases.repo.baseUrl}</nexusUrl>
-                    <!-- oss.sonatype.org has been very slow when closing repositories lately;
-                         let's raise the timeout until we switch to s01.sonatype.org -->
-                    <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>default-deploy</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <!--
-                                This will only put artifacts in a staging directory.
-                                See the "reports" module for actual deployment, at the end of the build.
-                             -->
-                            <goal>deploy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>enforce-common-rules</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireJavaVersion>
-                                    <version>[${jdk.min.version},)</version>
-                                </requireJavaVersion>
-                                <requireMavenVersion>
-                                    <version>${maven.min.version}</version>
-                                </requireMavenVersion>
-                                <banDuplicatePomDependencyVersions />
-                                <bannedDependencies>
-                                    <excludes>
-                                        <!-- As we are using ORM 6 and Jakarta we don't want javax dependencies: -->
-                                        <exclude>javax.persistence:javax.persistence-api</exclude>
-                                        <exclude>javax.transaction:javax.transaction-api</exclude>
-                                        <exclude>javax.enterprise:cdi-api</exclude>
-                                        <exclude>javax.xml.bind:jaxb-api</exclude>
-                                        <exclude>javax.activation:javax.activation-api</exclude>
-                                        <!-- We use Jandex 3 instead: io.smallrye:jandex, io.smallrye:jandex-maven-plugin -->
-                                        <exclude>org.jboss:jandex*</exclude>
-                                    </excludes>
-                                </bannedDependencies>
-                            </rules>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>enforce-dependency-convergence</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${enforcer.dependencyconvergence.skip}</skip>
-                            <rules>
-                                <DependencyConvergence />
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>de.thetaphi</groupId>
-                <artifactId>forbiddenapis</artifactId>
-            </plugin>
-        </plugins>
         <pluginManagement>
             <plugins>
                 <!--
-                    Build configuration
+                    Clean and install plugins will be called from the root,
+                    so we want to make sure that their versions are aligned
                  -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${version.clean.plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>${version.install.plugin}</version>
+                </plugin>
+                <!--
+                    We want to do some custom enforcer rules on the public BOM,
+                 `  hence we manage enforcer version in the root pom.
+                 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${version.enforcer.plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-common-rules</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <requireJavaVersion>
+                                        <version>[${jdk.min.version},)</version>
+                                    </requireJavaVersion>
+                                    <requireMavenVersion>
+                                        <version>${maven.min.version}</version>
+                                    </requireMavenVersion>
+                                    <banDuplicatePomDependencyVersions />
+                                </rules>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>enforce-dependency-convergence</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <skip>${enforcer.dependencyconvergence.skip}</skip>
+                                <rules>
+                                    <DependencyConvergence />
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <!-- We want to deploy the public BOM, so we manage this plugin in the root pom. -->
+                <plugin>
+                    <groupId>org.sonatype.plugins</groupId>
+                    <artifactId>nexus-staging-maven-plugin</artifactId>
+                    <version>${version.nexus-staging.plugin}</version>
+                </plugin>
+                <!-- We want to disable this plugin as soon as possible, hence we manage it in the root pom. -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${version.deploy.plugin}</version>
+                </plugin>
+                <!-- Public BOM must be also signed, so we manage this plugin in the root pom. -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>${version.gpg.plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>sign-artifacts</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                            <configuration>
+                                <skip>${release.gpg.signing.skip}</skip>
+                                <homedir>${env.RELEASE_GPG_HOMEDIR}</homedir>
+                                <passphrase>${env.RELEASE_GPG_PASSPHRASE}</passphrase>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <!-- Public BOM will be flattened too, so we manage this plugin in the root pom. -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>${version.flatten-maven-plugin}</version>
+                    <configuration>
+                        <outputDirectory>${project.build.directory}</outputDirectory>
+                        <flattenMode>bom</flattenMode>
+                        <pomElements>
+                            <!-- We want property references to be replaced with values -->
+                            <dependencyManagement>resolve</dependencyManagement>
+                            <!--
+                                We don't want to show any properties in this BOM.
+                                The properties we need will be resolved, others have no value for the users of the BOM.
+                             -->
+                            <properties>remove</properties>
+                        </pomElements>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>flatten-pom</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>flatten</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-wrapper-plugin</artifactId>
@@ -864,16 +610,6 @@
                     <groupId>com.github.marschall</groupId>
                     <artifactId>jdeps-maven-plugin</artifactId>
                     <version>${version.jdeps.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-clean-plugin</artifactId>
-                    <version>${version.clean.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-install-plugin</artifactId>
-                    <version>${version.install.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -890,6 +626,7 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${version.compiler.plugin}</version>
                     <configuration>
+                        <fork>true</fork>
                         <showWarnings>true</showWarnings>
                         <showDeprecation>true</showDeprecation>
                         <failOnWarning>${maven.compiler.failOnWarning}</failOnWarning>
@@ -904,50 +641,14 @@
                         <execution>
                             <id>default-compile</id>
                             <configuration>
-                                <fork>true</fork>
                                 <executable>${java-version.main.compiler}</executable>
-                                <annotationProcessorPaths>
-                                    <path>
-                                        <groupId>org.jboss.logging</groupId>
-                                        <artifactId>jboss-logging-processor</artifactId>
-                                        <version>${version.org.jboss.logging.jboss-logging-tools}</version>
-                                    </path>
-                                    <path>
-                                        <groupId>org.jboss.logging</groupId>
-                                        <artifactId>jboss-logging</artifactId>
-                                        <version>${version.org.jboss.logging.jboss-logging}</version>
-                                    </path>
-                                </annotationProcessorPaths>
                             </configuration>
                         </execution>
                         <execution>
                             <id>default-testCompile</id>
                             <configuration>
-                                <fork>true</fork>
                                 <proc>none</proc>
                                 <executable>${java-version.test.compiler}</executable>
-                                <compilerArgs combine.self="append">
-                                    <compilerArg>-parameters</compilerArg>
-                                </compilerArgs>
-                                <testExcludes>
-                                    <testExclude>**/noparameters/**/*</testExclude>
-                                </testExcludes>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>noparameters-testCompile</id>
-                            <phase>test-compile</phase>
-                            <goals>
-                                <goal>testCompile</goal>
-                            </goals>
-                            <configuration>
-                                <skip>${java-version.test.java17.noParameters.skip}</skip>
-                                <fork>true</fork>
-                                <proc>none</proc>
-                                <executable>${java-version.test.compiler}</executable>
-                                <testIncludes>
-                                    <testInclude>**/noparameters/**/*</testInclude>
-                                </testIncludes>
                             </configuration>
                         </execution>
                     </executions>
@@ -957,11 +658,7 @@
                     <artifactId>maven-processor-plugin</artifactId>
                     <version>${version.processor.plugin}</version>
                 </plugin>
-                <plugin>
-                    <groupId>org.sonatype.plugins</groupId>
-                    <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>${version.nexus-staging.plugin}</version>
-                </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
@@ -988,18 +685,8 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <version>${version.deploy.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>${version.dependency.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>${version.enforcer.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -1045,193 +732,11 @@
                             <suppressAnnotation>org.hibernate.search.util.impl.test.annotation.SuppressForbiddenApis</suppressAnnotation>
                         </suppressAnnotations>
                     </configuration>
-                    <executions>
-                        <execution>
-                            <id>verify-forbidden-apis-main-public</id>
-                            <configuration>
-                                <bundledSignatures>
-                                    <!-- These signatures on the top are not specific to any JDK version -->
-                                    <bundledSignature>jdk-system-out</bundledSignature>
-                                    <bundledSignature>jdk-non-portable</bundledSignature>
-                                    <!-- The jdk-reflection is not yet something we can avoid -->
-                                    <!--<bundledSignature>jdk-reflection</bundledSignature>-->
-
-                                    <!-- These signatures can safely be limited to the current JDK;
-                                         see https://github.com/policeman-tools/forbidden-apis/issues/197#issuecomment-1080370368
-                                     -->
-                                    <bundledSignature>jdk-unsafe</bundledSignature>
-
-                                    <!-- All following signatures should be replicated for each target JDK version we intend to support -->
-                                    <bundledSignature>jdk-deprecated-1.8</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-9</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-10</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-11</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-12</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-13</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-14</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-15</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-16</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-17</bundledSignature>
-                                    <bundledSignature>jdk-deprecated-18</bundledSignature>
-
-                                    <bundledSignature>jdk-internal-1.8</bundledSignature>
-                                    <bundledSignature>jdk-internal-9</bundledSignature>
-                                    <bundledSignature>jdk-internal-10</bundledSignature>
-                                    <bundledSignature>jdk-internal-11</bundledSignature>
-                                    <bundledSignature>jdk-internal-12</bundledSignature>
-                                    <bundledSignature>jdk-internal-13</bundledSignature>
-                                    <bundledSignature>jdk-internal-14</bundledSignature>
-                                    <bundledSignature>jdk-internal-15</bundledSignature>
-                                    <bundledSignature>jdk-internal-16</bundledSignature>
-                                    <bundledSignature>jdk-internal-17</bundledSignature>
-                                    <bundledSignature>jdk-internal-18</bundledSignature>
-                                </bundledSignatures>
-                                <signaturesArtifacts>
-                                    <signaturesArtifact>
-                                        <groupId>org.hibernate.search</groupId>
-                                        <artifactId>hibernate-search-build-config</artifactId>
-                                        <version>${project.version}</version>
-                                        <type>jar</type>
-                                        <path>forbidden-public.txt</path>
-                                    </signaturesArtifact>
-                                    <signaturesArtifact>
-                                        <groupId>org.hibernate.search</groupId>
-                                        <artifactId>hibernate-search-build-config</artifactId>
-                                        <version>${project.version}</version>
-                                        <type>jar</type>
-                                        <path>hibernate-core-incubating.txt</path>
-                                    </signaturesArtifact>
-                                    <signaturesArtifact>
-                                        <groupId>org.hibernate.search</groupId>
-                                        <artifactId>hibernate-search-build-config</artifactId>
-                                        <version>${project.version}</version>
-                                        <type>jar</type>
-                                        <path>hibernate-core-internal-packages.txt</path>
-                                    </signaturesArtifact>
-                                </signaturesArtifacts>
-                            </configuration>
-                            <phase>compile</phase>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>verify-forbidden-apis-main-internal</id>
-                            <configuration>
-                                <bundledSignatures>
-                                    <!-- This will automatically choose the right signatures based on 'targetVersion': -->
-                                    <bundledSignature>jdk-unsafe</bundledSignature>
-                                    <bundledSignature>jdk-deprecated</bundledSignature>
-                                    <bundledSignature>jdk-non-portable</bundledSignature>
-                                    <bundledSignature>jdk-internal</bundledSignature>
-                                </bundledSignatures>
-                                <signaturesArtifacts>
-                                    <signaturesArtifact>
-                                        <groupId>org.hibernate.search</groupId>
-                                        <artifactId>hibernate-search-build-config</artifactId>
-                                        <version>${project.version}</version>
-                                        <type>jar</type>
-                                        <path>forbidden-internal.txt</path>
-                                    </signaturesArtifact>
-                                </signaturesArtifacts>
-                            </configuration>
-                            <!-- Disabled by default; see parents/internal -->
-                            <phase>none</phase>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>verify-forbidden-apis-tests</id>
-                            <configuration>
-                                <bundledSignatures>
-                                    <!-- This will automatically choose the right signatures based on 'targetVersion': -->
-                                    <bundledSignature>jdk-unsafe</bundledSignature>
-                                    <bundledSignature>jdk-deprecated</bundledSignature>
-                                    <bundledSignature>jdk-non-portable</bundledSignature>
-                                    <bundledSignature>jdk-internal</bundledSignature>
-                                </bundledSignatures>
-                                <signaturesArtifacts>
-                                    <signaturesArtifact>
-                                        <groupId>org.hibernate.search</groupId>
-                                        <artifactId>hibernate-search-build-config</artifactId>
-                                        <version>${project.version}</version>
-                                        <type>jar</type>
-                                        <path>forbidden-internal.txt</path>
-                                    </signaturesArtifact>
-                                </signaturesArtifacts>
-                            </configuration>
-                            <phase>test-compile</phase>
-                            <goals>
-                                <goal>testCheck</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
                     <version>${version.checkstyle.plugin}</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.hibernate.search</groupId>
-                            <artifactId>hibernate-search-build-config</artifactId>
-                            <version>${project.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>com.puppycrawl.tools</groupId>
-                            <artifactId>checkstyle</artifactId>
-                            <version>${version.com.puppycrawl.tools.checkstyle}</version>
-                        </dependency>
-                    </dependencies>
-                    <configuration>
-                        <!-- Location is relative to the classpath -->
-                        <configLocation>checkstyle.xml</configLocation>
-                        <logViolationsToConsole>true</logViolationsToConsole>
-                        <failOnViolation>true</failOnViolation>
-                        <violationSeverity>error</violationSeverity>
-                        <includeTestResources>true</includeTestResources>
-                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                        <resourceIncludes>**/*.xml,**/*.properties</resourceIncludes>
-                        <!-- generated respectively copied code -->
-                        <excludes>
-                            **/Generated.java,**/TypeHelper*.java,**/MatchSuppressor.java,**/CommentSuppressor.java,**/NeverSuppress.java,
-                            **/*_$logger.java,**/*_$bundle.java,
-                            **/module-info.java,
-                            **/avro/generated/**/*.java
-                        </excludes>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>check-style</id>
-                            <phase>verify</phase>
-                            <!-- not using checkstyle:checkstyle here, as for
-                                some reason checkstyle:check finds more errors -->
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <!--
-                            Execution specific to test sources that are compiled with no `-parameters` flag.
-                            Checks whether package of such tests is constructed with a `noparameters` subpackage.
-                            -->
-                            <id>check-style-noparameters</id>
-                            <phase>verify</phase>
-                            <!-- not using checkstyle:checkstyle here, as for
-                                some reason checkstyle:check finds more errors -->
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                            <configuration>
-                                <skip>${maven.compiler.testSources.noParameterCompilation.skip}</skip>
-                                <configLocation>checkstyle-noparameters.xml</configLocation>
-                                <testSourceDirectories>
-                                    <testSourceDirectory>${project.basedir}/src/test/java17-noparameters</testSourceDirectory>
-                                </testSourceDirectories>
-                            </configuration>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.moditect</groupId>
@@ -1241,7 +746,7 @@
                 <plugin>
                     <groupId>org.jboss.maven.plugins</groupId>
                     <artifactId>maven-injection-plugin</artifactId>
-                    <version>1.0.2</version>
+                    <version>${version.maven.injection.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>io.smallrye</groupId>
@@ -1275,12 +780,6 @@
                              See https://issues.apache.org/jira/browse/SUREFIRE-1226?focusedCommentId=16187391&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-16187391
                          -->
                         <trimStackTrace>false</trimStackTrace>
-                        <systemPropertyVariables>
-                            <org.hibernate.search.test.property-set-in-maven-config>someValue</org.hibernate.search.test.property-set-in-maven-config>
-                            <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
-                            <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
-                            <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
-                        </systemPropertyVariables>
                         <jvm>${java-version.test.launcher}</jvm>
                         <argLine>${surefire.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.reportNameSuffix}</reportNameSuffix>
@@ -1322,14 +821,6 @@
                              See https://issues.apache.org/jira/browse/SUREFIRE-1226?focusedCommentId=16187391&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-16187391
                          -->
                         <trimStackTrace>false</trimStackTrace>
-                        <systemPropertyVariables>
-                            <org.hibernate.search.test.property-set-in-maven-config>someValue</org.hibernate.search.test.property-set-in-maven-config>
-                            <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
-                            <org.hibernate.search.version>${project.version}</org.hibernate.search.version>
-                            <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
-                            <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
-                            <org.hibernate.search.integrationtest.backend.elasticsearch.version>${test.elasticsearch.distribution}:${test.elasticsearch.version}</org.hibernate.search.integrationtest.backend.elasticsearch.version>
-                        </systemPropertyVariables>
                         <jvm>${java-version.test.launcher}</jvm>
                         <argLine>${failsafe.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.reportNameSuffix}</reportNameSuffix>
@@ -1478,34 +969,9 @@
                         </dependency>
                     </dependencies>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                    <version>${version.gpg.plugin}</version>
-                    <executions>
-                        <execution>
-                            <id>sign-artifacts</id>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>sign</goal>
-                            </goals>
-                            <configuration>
-                                <skip>${release.gpg.signing.skip}</skip>
-                                <homedir>${env.RELEASE_GPG_HOMEDIR}</homedir>
-                                <passphrase>${env.RELEASE_GPG_PASSPHRASE}</passphrase>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-antrun-plugin</artifactId>
-                    <version>3.1.0</version>
-                </plugin>
-
                 <!--
-                    Code formatting configuration:
-                -->
-
+                   Code formatting configuration:
+               -->
                 <plugin>
                     <groupId>net.revelc.code</groupId>
                     <artifactId>impsort-maven-plugin</artifactId>
@@ -1549,42 +1015,6 @@
                         <skip>${format.skip}</skip>
                         <removeTrailingWhitespace>true</removeTrailingWhitespace>
                     </configuration>
-                    <executions>
-                        <execution>
-                            <id>source-formatting</id>
-                            <goals>
-                                <goal>${goal.formatter-maven-plugin}</goal>
-                            </goals>
-                            <phase>process-sources</phase>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>flatten-maven-plugin</artifactId>
-                    <version>${version.flatten-maven-plugin}</version>
-                    <configuration>
-                        <outputDirectory>${project.build.directory}</outputDirectory>
-                        <flattenMode>bom</flattenMode>
-                        <pomElements>
-                            <!-- We want property references to be replaced with values -->
-                            <dependencyManagement>resolve</dependencyManagement>
-                            <!--
-                                We don't want to show any properties in this BOM.
-                                The properties we need will be resolved, others have no value for the users of the BOM.
-                             -->
-                            <properties>remove</properties>
-                        </pomElements>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>flatten-pom</id>
-                            <phase>process-resources</phase>
-                            <goals>
-                                <goal>flatten</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.eclipse.sisu</groupId>
@@ -1593,6 +1023,197 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <!-- Skip the deploy plugin explicitly: we use nexus-staging-maven-plugin instead -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <!--
+                 Configure the nexus-staging-maven-plugin explicitly (without <extension>true</extension>)
+                 in order to work around a problem in the "reports" module (see that module's POM for more info).
+             -->
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <extensions>false</extensions><!-- This is essential: do not put true here -->
+                <configuration>
+                    <serverId>${ossrh.releases.repo.id}</serverId>
+                    <!-- The following, by default, is only used for actual releases, not for snapshot deployments -->
+                    <nexusUrl>${ossrh.releases.repo.baseUrl}</nexusUrl>
+                    <!-- oss.sonatype.org has been very slow when closing repositories lately;
+                         let's raise the timeout until we switch to s01.sonatype.org -->
+                    <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <!--
+                                This will only put artifacts in a staging directory.
+                                See the "reports" module for actual deployment, at the end of the build.
+                             -->
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>exec-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <executions>
+                    <execution>
+                        <id>print-java-main-compiler-version</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${java-version.main.compiler}</executable>
+                            <commandlineArgs>-version</commandlineArgs>
+                            <inheritIo>true</inheritIo>
+                        </configuration>
+                    </execution>
+                    <!-- This is necessary even if we have the above,
+                         because javac -version doesn't print the full version for Early Access releases -->
+                    <execution>
+                        <id>print-java-main-compiler-java-version</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${java-version.main.compiler.java_home}/bin/java</executable>
+                            <commandlineArgs>-version</commandlineArgs>
+                            <inheritIo>true</inheritIo>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>print-java-main-release-version</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>echo</executable>
+                            <commandlineArgs>Main code compiled with -release ${maven.compiler.release}</commandlineArgs>
+                            <inheritIo>true</inheritIo>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>print-java-test-compiler-version</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${java-version.test.compiler}</executable>
+                            <commandlineArgs>-version</commandlineArgs>
+                            <inheritIo>true</inheritIo>
+                        </configuration>
+                    </execution>
+                    <!-- This is necessary even if we have the above,
+                         because javac -version doesn't print the full version for Early Access releases -->
+                    <execution>
+                        <id>print-java-test-compiler-java-version</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${java-version.test.compiler.java_home}/bin/java</executable>
+                            <commandlineArgs>-version</commandlineArgs>
+                            <inheritIo>true</inheritIo>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>print-java-test-launcher-version</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${java-version.test.launcher}</executable>
+                            <commandlineArgs>-version</commandlineArgs>
+                            <inheritIo>true</inheritIo>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>print-java-test-release-version</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>echo</executable>
+                            <commandlineArgs>Tests compiled with -release ${maven.compiler.testRelease}</commandlineArgs>
+                            <inheritIo>true</inheritIo>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.github.marschall</groupId>
+                <artifactId>jdeps-maven-plugin</artifactId>
+                <!--
+                    Not enabling automatic executions; run:
+                     > mvn jdeps:jdeps
+                     to get a report.
+                -->
+                <configuration>
+                    <!-- Allows to see which JRE profiles will be needed -->
+                    <profile>true</profile>
+                    <failOnWarning>true</failOnWarning>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>set-root-location-property</id>
+                        <goals>
+                            <goal>rootlocation</goal>
+                        </goals>
+                        <configuration>
+                            <rootLocationProperty>rootProject.directory</rootLocationProperty>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-project-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.org.hibernate.search</propertyPrefix>
+                            <versionString>${project.version}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-project-previous-stable-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.org.hibernate.search.previous-stable</propertyPrefix>
+                            <versionString>${version.org.hibernate.search.previous-stable}</versionString>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
 
     <distributionManagement>
@@ -1645,7 +1266,9 @@
                     </oldVersion>
                     <newVersion>
                         <file>
-                            <path>${project.build.directory}/${project.artifactId}-${project.version}.${project.packaging}</path>
+                            <path>
+                                ${project.build.directory}/${project.artifactId}-${project.version}.${project.packaging}
+                            </path>
                         </file>
                     </newVersion>
                     <parameter>
@@ -1679,72 +1302,22 @@
             </modules>
         </profile>
 
-        <!-- Profile used when testing dependency updates on CI -->
         <profile>
-            <id>dependency-update</id>
-            <properties>
-                <!-- Skip parts of the build that may fail but don't matter when testing upgrades -->
-                <checkstyle.skip>true</checkstyle.skip>
-                <maven.javadoc.skip>true</maven.javadoc.skip>
-                <javadoc.download.phase>none</javadoc.download.phase>
-                <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
-                <documentation.config.properties.phase>none</documentation.config.properties.phase>
-            </properties>
+            <id>release</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <!-- We don't care about deprecation and other warnings when
-                                 testing compatibility with updated dependencies. -->
-                            <failOnWarning>false</failOnWarning>
-                        </configuration>
+                        <artifactId>maven-gpg-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>
-            <repositories>
-                <!--
-                    Enable the sonatype-oss Snapshots repository, for Hibernate ORM 6+ in particular.
-                 -->
-                <repository>
-                    <id>sonatype-oss</id>
-                    <name>JBoss Public Maven Repository Group</name>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-                    <layout>default</layout>
-                    <releases>
-                        <!-- versions-maven-plugin will ignore this repo, even for snapshots,
-                             unless we enable releases.
-                             This is most likely a bug. -->
-                        <enabled>true</enabled>
-                        <updatePolicy>never</updatePolicy>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                        <updatePolicy>always</updatePolicy>
-                    </snapshots>
-                </repository>
-                <!--
-                    Enable the JBoss Snapshots repository, for Hibernate ORM 5.6 in particular.
-                 -->
-                <repository>
-                    <id>jboss-public-repository-group</id>
-                    <name>JBoss Public Maven Repository Group</name>
-                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-                    <layout>default</layout>
-                    <releases>
-                        <!-- versions-maven-plugin will ignore this repo, even for snapshots,
-                             unless we enable releases.
-                             This is most likely a bug. -->
-                        <enabled>true</enabled>
-                        <updatePolicy>never</updatePolicy>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                        <updatePolicy>always</updatePolicy>
-                    </snapshots>
-                </repository>
-            </repositories>
         </profile>
 
         <profile>
@@ -1937,9 +1510,124 @@
         </profile>
 
         <profile>
-            <id>perf</id>
+            <id>coverage</id>
             <properties>
-                <org.hibernate.search.enable_performance_tests>true</org.hibernate.search.enable_performance_tests>
+                <!--
+                    Caution, we use @{...} for late property evaluation here:
+                    http://maven.apache.org/surefire/maven-surefire-plugin/faq.html#late-property-evaluation
+                    This is necessary for Jacoco to work as expected.
+                    However, we wrap the @{...} references into two early-evaluated properties
+                    because in certain environments (IntelliJ IDEA), the use of late property evaluation
+                    is not supported and breaks test execution.
+                    This is because IntelliJ tries to parse the POM to retrieve the surefire/failsafe
+                    argLine and pass them to the test execution directly,
+                    but then fails to evaluate "@{...}" references, resulting in errors.
+                    As a result, this profile will not work in IntelliJ,
+                    but we don't need JaCoCo in IntelliJ anyway.
+                 -->
+                <surefire.jvm.args.jacoco>@{surefire.jvm.args.jacoco.lateEval}</surefire.jvm.args.jacoco>
+                <failsafe.jvm.args.jacoco>@{failsafe.jvm.args.jacoco.lateEval}</failsafe.jvm.args.jacoco>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/*_$logger.class</exclude>
+                                <exclude>**/*_$bundle.class</exclude>
+                                <!-- Exclude DTOs generated by Avro -->
+                                <exclude>org/hibernate/search/mapper/orm/coordination/outboxpolling/avro/generated/impl/**</exclude>
+                            </excludes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>jacoco-prepare-agent</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>surefire.jvm.args.jacoco.lateEval</propertyName>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>jacoco-prepare-prepare-agent-integration</id>
+                                <!--
+                                    This is necessary in order for the property to be set before we process resources,
+                                    such as arquillian.xml in WildFly tests or maven.properties in OSGi tests.
+                                 -->
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>prepare-agent-integration</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>failsafe.jvm.args.jacoco.lateEval</propertyName>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!--
+           A profile executing jqassistant scanning and analysis for all relevant modules.
+           Our rules are in build/jqassistant/rules.xml.
+           See CONTRIBUTING.md for usage.
+       -->
+        <profile>
+            <id>jqassistant</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.buschmais.jqassistant</groupId>
+                        <artifactId>jqassistant-maven-plugin</artifactId>
+                        <version>${version.com.buschmais.jqassistant.plugin}</version>
+                        <configuration>
+                            <configurationLocations>
+                                <!-- Any JQAssistant configurations go in this yml file:  -->
+                                <configurationLocation>build/jqassistant/.jqassistant.yml</configurationLocation>
+                            </configurationLocations>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>scan</goal>
+                                    <goal>analyze</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>owasp</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <version>${version.dependency-check.plugin}</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>aggregate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>ci-sources-check</id>
+            <properties>
+                <goal.impsort-maven-plugin>check</goal.impsort-maven-plugin>
+                <goal.formatter-maven-plugin>validate</goal.formatter-maven-plugin>
             </properties>
         </profile>
 
@@ -1968,40 +1656,7 @@
                      Anyway, let's disable these checks so the build works correctly in IDEA. -->
                 <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
             </properties>
-            <dependencies>
-                <!-- Intellij IDEA doesn't understand <annotationProcessorPaths> in
-                     the maven-compiler-plugin configuration, so we need this in order
-                     for compilation to work in the IDE. -->
-                <dependency>
-                    <groupId>org.jboss.logging</groupId>
-                    <artifactId>jboss-logging-processor</artifactId>
-                    <version>${version.org.jboss.logging.jboss-logging-tools}</version>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.openjdk.jmh</groupId>
-                    <artifactId>jmh-generator-annprocess</artifactId>
-                    <version>${version.org.openjdk.jmh}</version>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <configuration>
-                                <!-- Intellij IDEA only understands the main configuration,
-                                     so we need to do this in order for (most) @ProjectionConstructor tests to work fine. -->
-                                <compilerArgs combine.self="append">
-                                    <compilerArg>-parameters</compilerArg>
-                                </compilerArgs>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
+            <!-- See build parent POM for any additional IDEA-specific configurations. -->
         </profile>
 
         <profile>
@@ -2109,146 +1764,6 @@
                         </plugin>
                     </plugins>
                 </pluginManagement>
-            </build>
-        </profile>
-
-        <profile>
-            <id>coverage</id>
-            <properties>
-                <!--
-                    Caution, we use @{...} for late property evaluation here:
-                    http://maven.apache.org/surefire/maven-surefire-plugin/faq.html#late-property-evaluation
-                    This is necessary for Jacoco to work as expected.
-                    However, we wrap the @{...} references into two early-evaluated properties
-                    because in certain environments (IntelliJ IDEA), the use of late property evaluation
-                    is not supported and breaks test execution.
-                    This is because IntelliJ tries to parse the POM to retrieve the surefire/failsafe
-                    argLine and pass them to the test execution directly,
-                    but then fails to evaluate "@{...}" references, resulting in errors.
-                    As a result, this profile will not work in IntelliJ,
-                    but we don't need JaCoCo in IntelliJ anyway.
-                 -->
-                <surefire.jvm.args.jacoco>@{surefire.jvm.args.jacoco.lateEval}</surefire.jvm.args.jacoco>
-                <failsafe.jvm.args.jacoco>@{failsafe.jvm.args.jacoco.lateEval}</failsafe.jvm.args.jacoco>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
-                        <configuration>
-                            <excludes>
-                                <exclude>**/*_$logger.class</exclude>
-                                <exclude>**/*_$bundle.class</exclude>
-                                <!-- Exclude DTOs generated by Avro -->
-                                <exclude>org/hibernate/search/mapper/orm/coordination/outboxpolling/avro/generated/impl/**</exclude>
-                            </excludes>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>jacoco-prepare-agent</id>
-                                <goals>
-                                    <goal>prepare-agent</goal>
-                                </goals>
-                                <configuration>
-                                    <propertyName>surefire.jvm.args.jacoco.lateEval</propertyName>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>jacoco-prepare-prepare-agent-integration</id>
-                                <!--
-                                    This is necessary in order for the property to be set before we process resources,
-                                    such as arquillian.xml in WildFly tests or maven.properties in OSGi tests.
-                                 -->
-                                <phase>initialize</phase>
-                                <goals>
-                                    <goal>prepare-agent-integration</goal>
-                                </goals>
-                                <configuration>
-                                    <propertyName>failsafe.jvm.args.jacoco.lateEval</propertyName>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!--
-            A profile executing jqassistant scanning and analysis for all relevant modules.
-            Our rules are in build/jqassistant/rules.xml.
-            See CONTRIBUTING.md for usage.
-        -->
-        <profile>
-            <id>jqassistant</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.buschmais.jqassistant</groupId>
-                        <artifactId>jqassistant-maven-plugin</artifactId>
-                        <version>${version.com.buschmais.jqassistant.plugin}</version>
-                        <configuration>
-                            <configurationLocations>
-                                <!-- Any JQAssistant configurations go in this yml file:  -->
-                                <configurationLocation>build/jqassistant/.jqassistant.yml</configurationLocation>
-                            </configurationLocations>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>scan</goal>
-                                    <goal>analyze</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>owasp</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.owasp</groupId>
-                        <artifactId>dependency-check-maven</artifactId>
-                        <version>${version.dependency-check.plugin}</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>aggregate</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>ci-sources-check</id>
-            <properties>
-                <goal.impsort-maven-plugin>check</goal.impsort-maven-plugin>
-                <goal.formatter-maven-plugin>validate</goal.formatter-maven-plugin>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>release</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                    </plugin>
-                </plugins>
             </build>
         </profile>
 
