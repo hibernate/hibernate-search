@@ -322,7 +322,7 @@ Additionally, some configuration properties have been deprecated:
 * `hibernate.search.automatic_indexing.synchronization.strategy` is now deprecated in favor of `hibernate.search.indexing.plan.synchronization.strategy`.
 * `hibernate.search.automatic_indexing.enabled` is now deprecated in favor of `hibernate.search.indexing.listeners.enabled`.
 * `hibernate.search.automatic_indexing.enable_dirty_check` is now deprecated with no alternative to replace it.
-A dirty check will always be performed when considering triggering the reindexing.
+After its removal in a future version, a dirty check will always be performed when considering whether to trigger reindexing.
 
 [[api]]
 == API changes

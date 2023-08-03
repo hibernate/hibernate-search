@@ -98,7 +98,8 @@ public final class HibernateOrmMapperSettings {
 	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK}.
 	 *
 	 * @deprecated This setting will be removed in a future version. There will be no alternative provided to replace it.
-	 * A dirty check will always be performed when considering triggering the reindexing.
+	 * After the removal of this property in a future version,
+	 * a dirty check will always be performed when considering whether to trigger reindexing.
 	 */
 	@Deprecated
 	public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = PREFIX + Radicals.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK;
@@ -260,7 +261,8 @@ public final class HibernateOrmMapperSettings {
 				AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.SYNCHRONIZATION_STRATEGY;
 		/**
 		 * @deprecated This setting will be removed in a future version. There will be no alternative provided to replace it.
-		 * A dirty check will always be performed when considering triggering the reindexing.
+		 * After the removal of this property in a future version,
+		 * a dirty check will always be performed when considering whether to trigger reindexing.
 		 */
 		@Deprecated
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK =
@@ -310,7 +312,8 @@ public final class HibernateOrmMapperSettings {
 		public static final String SYNCHRONIZATION_STRATEGY = "synchronization.strategy";
 		/**
 		 * @deprecated This setting will be removed in a future version. There will be no alternative provided to replace it.
-		 * A dirty check will always be performed when considering triggering the reindexing.
+		 * After the removal of this property in a future version,
+		 * a dirty check will always be performed when considering whether to trigger reindexing.
 		 */
 		@Deprecated
 		public static final String ENABLE_DIRTY_CHECK = "enable_dirty_check";
@@ -381,7 +384,8 @@ public final class HibernateOrmMapperSettings {
 								"write-sync" );
 		/**
 		 * @deprecated This setting will be removed in a future version. There will be no alternative provided to replace it.
-		 * A dirty check will always be performed when considering triggering the reindexing.
+		 * After the removal of this property in a future version,
+		 * a dirty check will always be performed when considering whether to trigger reindexing.
 		 */
 		@Deprecated
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
