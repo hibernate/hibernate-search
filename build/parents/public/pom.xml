@@ -10,9 +10,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.hibernate.search</groupId>
-        <artifactId>hibernate-search-parent-dependencies</artifactId>
+        <artifactId>hibernate-search-parent-build</artifactId>
         <version>7.0.0-SNAPSHOT</version>
-        <relativePath>../dependencies</relativePath>
+        <relativePath>../build</relativePath>
     </parent>
     <artifactId>hibernate-search-parent-public</artifactId>
     <packaging>pom</packaging>
@@ -23,7 +23,7 @@
     <properties>
         <javadoc.packagelists.directory>${project.build.directory}/dependencies-javadoc-packagelists</javadoc.packagelists.directory>
         <documentation.config.properties.skip>false</documentation.config.properties.skip>
-        <!-- Public modules must be signed. -->
+        <!-- Only public modules must be signed. -->
         <release.gpg.signing.skip>false</release.gpg.signing.skip>
     </properties>
 
