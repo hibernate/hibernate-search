@@ -42,6 +42,7 @@
             <modules>
                 <!-- Spring Boot 3 requires at minimum JDK 17. Hence, we want to ignore these modules on JDK 11: -->
                 <module>mapper/orm-spring</module>
+                <module>mapper/orm-spring-uberjar</module>
                 <module>showcase/library</module>
             </modules>
         </profile>

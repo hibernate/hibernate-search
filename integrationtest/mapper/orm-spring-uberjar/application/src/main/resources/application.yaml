@@ -1,0 +1,13 @@
+spring.jpa:
+  properties:
+    hibernate:
+      dialect: org.hibernate.dialect.H2Dialect
+    hibernate.search:
+      backend:
+        directory.root: ${LUCENE_ROOT_PATH:target/test-indexes}/${random.uuid}
+
+spring.datasource:
+  driver-class: org.h2.Driver
+  url: jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1
+  username: sa
+  password: sa
