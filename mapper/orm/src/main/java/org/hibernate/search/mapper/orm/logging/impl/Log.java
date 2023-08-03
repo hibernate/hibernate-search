@@ -335,7 +335,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 125, value = "Configuration property '%1$s' is deprecated. "
 			+ "This setting will be removed in a future version. "
 			+ "There will be no alternative provided to replace it. "
-			+ "A dirty check will always be performed when considering triggering the reindexing.")
+			+ "After the removal of this property in a future version, "
+			+ "a dirty check will always be performed when considering whether to trigger reindexing.")
 	void automaticIndexingEnableDirtyCheckIsDeprecated(String deprecatedProperty);
 
 	@Message(id = ID_OFFSET + 126,
