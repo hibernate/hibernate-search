@@ -31,7 +31,8 @@ public class AutomaticIndexingDirtyCheckIT {
 			+ "'hibernate.search.automatic_indexing.enable_dirty_check' is deprecated. "
 			+ "This setting will be removed in a future version. "
 			+ "There will be no alternative provided to replace it. "
-			+ "A dirty check will always be performed when considering triggering the reindexing.";
+			+ "After the removal of this property in a future version, "
+			+ "a dirty check will always be performed when considering whether to trigger reindexing.";
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();
