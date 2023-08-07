@@ -236,6 +236,60 @@ When Hibernate Search is unable to handle an association,
 it will throw an exception on bootstrap.
 If this happens, refer to <<mapping-reindexing-basics>> to know more.
 
+[[mapping-indexedembedded-includeEmbeddedObjectId]]
+== Embedding the entity identifier
+
+Mapping a property as an <<mapping-identifiermapping,identifier>> in the indexed-embedded type
+will not automatically result into it being embedded when using `@IndexedEmbedded` on that type,
+because document identifiers are not fields.
+
+To embed the data of such a property, you can use `@IndexedEmbedded(includeEmbeddedObjectId = true)`,
+which will have Hibernate Search automatically insert a field in the resulting embedded object
+for the indexed-embedded type's <<mapping-identifiermapping-basics,identifier property>>.
+
+The index field will be defined as if the following <<mapping-directfieldmapping,field annotation>>
+was put on the identifier property of the embedded type:
+`@GenericField(searchable = Searchable.YES, projectable = Projectable.YES)`.
+The name of the index field will be the name of the identifier property.
+Its bridge will be the identifier bridge referenced by the embedded type's
+<<mapping-identifiermapping-explicit,`@DocumentId` annotation>>, if any,
+or the default value bridge for the identifier property type's, by default.
+
+[TIP]
+====
+If you need more advanced mapping (custom name, custom bridge, sortable, ...),
+do not use `includeEmbeddedObjectId`.
+
+Instead, define the field explicitly in the indexed-embedded type
+by annotating the identifier property with <<mapping-directfieldmapping,`@GenericField` or a similar field annotation>>,
+and make sure the field is included by `@IndexedEmbedded`
+by <<mapper-orm-indexedembedded-filtering,configuring filters as necessary>>.
+====
+
+Below is an example of using `includeEmbeddedObjectId`:
+
+.Including indexed-embedded IDs with `includeEmbeddedObjectId`
+====
+This mapping will declare the following fields in the `Employee` index:
+
+* `name`
+* `department.name`: implicitly included by `@IndexedEmbedded`.
+* `department.id`: explicitly inserted by `includeEmbeddedObjectId = true.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/includeembeddedobjectid/Department.java[tags=include;!getters-setters]
+----
+<1> The `Department` identifier is not mapped to an index field (not <<mapping-directfieldmapping,`@*Field` annotation>>).
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/includeembeddedobjectid/Employee.java[tags=include;!getters-setters]
+----
+<1> `@IndexedEmbedded` will insert a `department.id` field into the `Employee` index for the `Department` identifier,
+even though in `Department` the identifier property is not mapped to an index field.
+====
+
 [[mapping-indexedembedded-filtering]]
 == [[mapper-orm-indexedembedded-filtering]] [[search-mapping-associated-viapaths]] Filtering embedded fields and breaking `@IndexedEmbedded` cycles
 
@@ -329,7 +383,7 @@ i.e. a filter cannot reference a path that was excluded by a nested `@IndexedEmb
 ====
 
 Below are three examples: one leveraging `includePaths` only,
-one leveraging `excludePaths`, and one leveraging `includePaths` and `includeDepth`
+one leveraging `excludePaths`, and one leveraging `includePaths` and `includeDepth`.
 
 [[indexedembedded-includePath]]
 .Filtering indexed-embedded fields with `includePaths`
