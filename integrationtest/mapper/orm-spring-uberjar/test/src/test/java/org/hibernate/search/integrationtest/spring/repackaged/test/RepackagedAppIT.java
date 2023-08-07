@@ -12,6 +12,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.jar.JarEntry;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
@@ -38,7 +39,7 @@ public class RepackagedAppIT {
 	 */
 	@Test
 	public void canReadJar() throws Exception {
-		Path target = Path.of( this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI() );
+		Path target = Paths.get( this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI() );
 		Path jar = target.resolve( "../lib/app.jar" );
 
 		try ( JarFile outerJar = new JarFile( jar.toFile() ) ) {
