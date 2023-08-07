@@ -56,3 +56,5 @@ updates:
       # (see https://search.maven.org/artifact/software.amazon.awssdk/aws-sdk-java-pom/2.17.257/pom)
       - dependency-name: "org.slf4j:*"
         update-types: ["version-update:semver-major"]
+      # We only define a maven's minimum version, so we don't need it to be updated to the latest:
+      - dependency-name: "org.apache.maven:maven-core"
