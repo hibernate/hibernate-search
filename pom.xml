@@ -490,7 +490,7 @@
              WARNING: Do not forget to call 'mvn -N io.takari:maven:wrapper'
              when you update this property!
          -->
-        <maven.min.version>3.8.1</maven.min.version>
+        <maven.min.version>3.9.4</maven.min.version>
 
         <!-- Whether javadoc warnings should fail the build -->
         <failOnJavadocWarning>true</failOnJavadocWarning>
