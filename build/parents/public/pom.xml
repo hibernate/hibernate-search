@@ -23,9 +23,12 @@
     <properties>
         <javadoc.packagelists.directory>${project.build.directory}/dependencies-javadoc-packagelists</javadoc.packagelists.directory>
         <documentation.config.properties.skip>false</documentation.config.properties.skip>
-        <!-- Only public modules must be signed. -->
-        <release.gpg.signing.skip>false</release.gpg.signing.skip>
-        <enforcer.publicModuleIsSignedAndPublishedRule.skip>false</enforcer.publicModuleIsSignedAndPublishedRule.skip>
+        <!-- This POM is flattened into child POMs, so it doesn't need to be published.
+             However, child POMs need to set <deploy.skip>false</deploy.skip> in order to get published.
+             -->
+        <deploy.skip>true</deploy.skip>
+        <!-- This will make sure the build fails if we forget to set <deploy.skip>false</deploy.skip> in a child module -->
+        <enforcer.publicModuleIsDeployedRule.skip>false</enforcer.publicModuleIsDeployedRule.skip>
         <!--
             POMs of public modules will be flattened and will include the list of dependencies
             with resolved versions.
@@ -149,9 +152,9 @@
                             <goal>enforce</goal>
                         </goals>
                         <configuration>
-                            <skip>${enforcer.publicModuleIsSignedAndPublishedRule.skip}</skip>
+                            <skip>${enforcer.publicModuleIsDeployedRule.skip}</skip>
                             <rules>
-                                <publicModuleIsSignedAndPublishedRule/>
+                                <publicModuleIsDeployedRule/>
                             </rules>
                         </configuration>
                     </execution>

@@ -31,9 +31,8 @@
             This module is specifically about building a ZIP that is published not through Maven but through SourceForge.
             Hence, we don't want it to either be signed or deployed:
          -->
-        <release.gpg.signing.skip>true</release.gpg.signing.skip>
-        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-        <enforcer.publicModuleIsSignedAndPublishedRule.skip>true</enforcer.publicModuleIsSignedAndPublishedRule.skip>
+        <deploy.skip>true</deploy.skip>
+        <enforcer.publicModuleIsDeployedRule.skip>true</enforcer.publicModuleIsDeployedRule.skip>
     </properties>
 
     <dependencies>

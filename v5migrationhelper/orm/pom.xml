@@ -21,7 +21,7 @@
 
     <properties>
         <!-- This is a publicly distributed module that should be published: -->
-        <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
+        <deploy.skip>false</deploy.skip>
         <java.module.name>org.hibernate.search.v5migrationhelper.orm</java.module.name>
 
         <!-- This is based on legacy code and there are plenty of problems that we don't care to fix -->

@@ -303,10 +303,10 @@
         <ossrh.snapshots.repo.url>https://oss.sonatype.org/content/repositories/snapshots</ossrh.snapshots.repo.url>
 
         <!--
-            Determines if gpg signing should happen within the module during the release process.
-            Signing is disabled by default and only enabled (by overriding the property) in a modules that require it.
+            We don't want to publish or sign any modules by default.
+            Specific modules will override the setting at their own level.
         -->
-        <release.gpg.signing.skip>true</release.gpg.signing.skip>
+        <deploy.skip>true</deploy.skip>
 
         <!-- Can be overridden by subprojects if dependency convergence cannot be achieved -->
         <enforcer.dependencyconvergence.skip>false</enforcer.dependencyconvergence.skip>
@@ -335,12 +335,6 @@
         <version.org.jruby>9.3.2.0</version.org.jruby>
         <version.org.asciidoctor.asciidoctorj>2.5.6</version.org.asciidoctor.asciidoctorj>
         <version.org.asciidoctor.asciidoctorj-pdf>1.5.0-alpha.18</version.org.asciidoctor.asciidoctorj-pdf>
-
-        <!--
-            We don't want to publish any modules by default.
-            Specific modules will override the setting at their own level.
-        -->
-        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
 
         <!--
             Defines what to do with dependency management section of the flattened pom.
@@ -557,6 +551,9 @@
                     <groupId>org.sonatype.plugins</groupId>
                     <artifactId>nexus-staging-maven-plugin</artifactId>
                     <version>${version.nexus-staging.plugin}</version>
+                    <configuration>
+                        <skipNexusStagingDeployMojo>${deploy.skip}</skipNexusStagingDeployMojo>
+                    </configuration>
                 </plugin>
                 <!-- We want to disable this plugin as soon as possible, hence we manage it in the root pom. -->
                 <plugin>
@@ -577,7 +574,7 @@
                                 <goal>sign</goal>
                             </goals>
                             <configuration>
-                                <skip>${release.gpg.signing.skip}</skip>
+                                <skip>${deploy.skip}</skip>
                                 <homedir>${env.RELEASE_GPG_HOMEDIR}</homedir>
                                 <passphrase>${env.RELEASE_GPG_PASSPHRASE}</passphrase>
                             </configuration>

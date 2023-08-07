@@ -16,9 +16,7 @@
 
     <properties>
         <!-- This is a publicly distributed module that should be published: -->
-        <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
-        <!-- Only public modules must be signed. -->
-        <release.gpg.signing.skip>false</release.gpg.signing.skip>
+        <deploy.skip>false</deploy.skip>
     </properties>
 
     <dependencyManagement>
