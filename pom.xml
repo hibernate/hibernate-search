@@ -346,6 +346,20 @@
 
         <!-- Test settings -->
 
+        <!-- Properties overridden in profiles to disable certain tests that only work with specific Java versions -->
+        <!-- These are only used in integration tests, hence the default to "none", which is overridden in integration tests -->
+        <java-version.test.java17.add-main-source-phase.default>none</java-version.test.java17.add-main-source-phase.default>
+        <java-version.test.java17.add-main-source-phase>${java-version.test.java17.add-main-source-phase.default}</java-version.test.java17.add-main-source-phase>
+        <!-- These are used in all modules -->
+        <java-version.test.java17.add-test-source-phase>generate-test-sources</java-version.test.java17.add-test-source-phase>
+
+        <!--
+            This is an explicit setting to control compiler plugin execution for the no `-parameters` flag case.
+            Needed as when `testIncludes` doesn't match any test classes, it brings all test sources and re-compiles them.
+         -->
+        <maven.compiler.testSources.noParameterCompilation.skip>true</maven.compiler.testSources.noParameterCompilation.skip>
+        <java-version.test.java17.noParameters.skip>${maven.compiler.testSources.noParameterCompilation.skip}</java-version.test.java17.noParameters.skip>
+
         <!-- Container images for various integration tests -->
         <!-- The latest version of Elasticsearch tested against by default -->
         <version.org.elasticsearch.latest>8.9.0</version.org.elasticsearch.latest>
@@ -1218,6 +1232,42 @@
                         <configuration>
                             <propertyPrefix>parsed-version.org.hibernate.search.previous-stable</propertyPrefix>
                             <versionString>${version.org.hibernate.search.previous-stable}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-main-source-java17</id>
+                        <phase>${java-version.test.java17.add-main-source-phase}</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/java17</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-test-source-java17</id>
+                        <phase>${java-version.test.java17.add-test-source-phase}</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/java17</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-test-source-java17-noparameters</id>
+                        <phase>${java-version.test.java17.add-test-source-phase}</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/java17-noparameters</source>
+                            </sources>
                         </configuration>
                     </execution>
                 </executions>
