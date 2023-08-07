@@ -797,8 +797,6 @@
                         <execution>
                             <id>default-compile</id>
                             <configuration>
-                                <fork>true</fork>
-                                <executable>${java-version.main.compiler}</executable>
                                 <annotationProcessorPaths>
                                     <path>
                                         <groupId>org.jboss.logging</groupId>
@@ -816,9 +814,6 @@
                         <execution>
                             <id>default-testCompile</id>
                             <configuration>
-                                <fork>true</fork>
-                                <proc>none</proc>
-                                <executable>${java-version.test.compiler}</executable>
                                 <compilerArgs combine.self="append">
                                     <compilerArg>-parameters</compilerArg>
                                 </compilerArgs>
