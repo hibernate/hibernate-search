@@ -19,3 +19,6 @@ jira:
       # Allow JMH upgrades, since it is a performance testing dependency
     - user: dependabot[bot]
       titlePattern: ".*\\borg.openjdk.jmh\\b.*"
+    # Guava is used in our test utils:
+    - user: dependabot[bot]
+      titlePattern: ".*\\bcom.google.guava\\b.*"
