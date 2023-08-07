@@ -474,6 +474,7 @@
          -->
         <sonar.coverage.exclusions>
             **/org/hibernate/checkstyle/**,
+            **/org/hibernate/search/build/enforcer/**,
             **/org/hibernate/search/util/impl/test/**,
             **/org/hibernate/search/util/impl/integrationtest/**,
             **/org/hibernate/search/integrationtest/**
@@ -483,6 +484,7 @@
          -->
         <sonar.cpd.exclusions>
             **/org/hibernate/checkstyle/**,
+            **/org/hibernate/search/build/enforcer/**,
             **/src/test/java/**,
             **/org/hibernate/search/integrationtest/**
         </sonar.cpd.exclusions>
