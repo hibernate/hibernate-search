@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.build.enforcer;
 
+import static org.hibernate.search.build.enforcer.MavenProjectUtils.isAnyParentPublicParent;
+import static org.hibernate.search.build.enforcer.MavenProjectUtils.isProjectNotDeployed;
+
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -22,7 +25,6 @@ import org.apache.maven.project.MavenProject;
 @Named("dependencyManagementIncludesAllPublicArtifactsRule") // rule name - must start with lowercase character
 public class DependencyManagementIncludesAllPublicArtifactsRule extends AbstractEnforcerRule {
 
-	private static final String HIBERNATE_SEARCH_PARENT_PUBLIC = "hibernate-search-parent-public";
 	// Inject needed Maven components
 	@Inject
 	private MavenSession session;
@@ -49,16 +51,5 @@ public class DependencyManagementIncludesAllPublicArtifactsRule extends Abstract
 			throw new EnforcerRuleException( "Unexpected dependencies listed in the dependency management section: "
 					+ dependencies.values() );
 		}
-	}
-
-	private boolean isAnyParentPublicParent(MavenProject project) {
-		return project.hasParent()
-				&& ( HIBERNATE_SEARCH_PARENT_PUBLIC.equals( project.getParent().getArtifactId() )
-						|| isAnyParentPublicParent( project.getParent() ) );
-	}
-
-	private boolean isProjectNotDeployed(MavenProject project) {
-		return Boolean.TRUE.toString()
-				.equals( project.getProperties().getOrDefault( "skipNexusStagingDeployMojo", Boolean.FALSE ).toString() );
 	}
 }

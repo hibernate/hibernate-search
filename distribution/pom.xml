@@ -33,6 +33,7 @@
          -->
         <release.gpg.signing.skip>true</release.gpg.signing.skip>
         <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+        <enforcer.publicModuleIsSignedAndPublishedRule.skip>true</enforcer.publicModuleIsSignedAndPublishedRule.skip>
     </properties>
 
     <dependencies>

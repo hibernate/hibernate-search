@@ -25,6 +25,7 @@
         <documentation.config.properties.skip>false</documentation.config.properties.skip>
         <!-- Only public modules must be signed. -->
         <release.gpg.signing.skip>false</release.gpg.signing.skip>
+        <enforcer.publicModuleIsSignedAndPublishedRule.skip>false</enforcer.publicModuleIsSignedAndPublishedRule.skip>
         <!--
             POMs of public modules will be flattened and will include the list of dependencies
             with resolved versions.
@@ -138,6 +139,31 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-custom-published-modules-rules</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${enforcer.publicModuleIsSignedAndPublishedRule.skip}</skip>
+                            <rules>
+                                <publicModuleIsSignedAndPublishedRule/>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate.search</groupId>
+                        <artifactId>hibernate-search-build-enforcer</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
