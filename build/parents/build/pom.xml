@@ -168,9 +168,6 @@
         <!-- Spring Boot 3 Atomikos starter and related libs version: -->
         <version.com.atomikos>6.0.0</version.com.atomikos>
 
-        <!-- Only public modules must be signed. -->
-        <release.gpg.signing.skip>true</release.gpg.signing.skip>
-
         <version.jsoup>1.15.3</version.jsoup>
 
         <!-- Properties overridden in profiles to disable certain tests that only work with specific Java versions -->

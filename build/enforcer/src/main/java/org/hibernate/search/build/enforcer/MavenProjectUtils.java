@@ -10,7 +10,8 @@ import org.apache.maven.project.MavenProject;
 
 public class MavenProjectUtils {
 
-	private static final String HIBERNATE_SEARCH_PARENT_PUBLIC = "hibernate-search-parent-public";
+	public static final String HIBERNATE_SEARCH_PARENT_PUBLIC = "hibernate-search-parent-public";
+	public static final String DEPLOY_SKIP = "deploy.skip";
 
 	private MavenProjectUtils() {
 	}
@@ -21,13 +22,8 @@ public class MavenProjectUtils {
 						|| isAnyParentPublicParent( project.getParent() ) );
 	}
 
-	public static boolean isProjectNotDeployed(MavenProject project) {
+	public static boolean isProjectDeploySkipped(MavenProject project) {
 		return Boolean.TRUE.toString()
-				.equals( project.getProperties().getOrDefault( "skipNexusStagingDeployMojo", Boolean.FALSE ).toString() );
-	}
-
-	public static boolean isProjectSigned(MavenProject project) {
-		return Boolean.FALSE.toString()
-				.equals( project.getProperties().getOrDefault( "release.gpg.signing.skip", Boolean.FALSE ).toString() );
+				.equals( project.getProperties().getOrDefault( DEPLOY_SKIP, Boolean.FALSE ).toString() );
 	}
 }

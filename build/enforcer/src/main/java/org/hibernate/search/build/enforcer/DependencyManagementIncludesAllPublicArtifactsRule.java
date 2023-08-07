@@ -6,9 +6,12 @@
  */
 package org.hibernate.search.build.enforcer;
 
+import static org.hibernate.search.build.enforcer.MavenProjectUtils.DEPLOY_SKIP;
 import static org.hibernate.search.build.enforcer.MavenProjectUtils.isAnyParentPublicParent;
-import static org.hibernate.search.build.enforcer.MavenProjectUtils.isProjectNotDeployed;
+import static org.hibernate.search.build.enforcer.MavenProjectUtils.isProjectDeploySkipped;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -30,26 +33,46 @@ public class DependencyManagementIncludesAllPublicArtifactsRule extends Abstract
 	private MavenSession session;
 
 	public void execute() throws EnforcerRuleException {
-
 		Map<String, Dependency> dependencies = session.getCurrentProject()
 				.getDependencyManagement()
 				.getDependencies()
 				.stream()
 				.collect( Collectors.toMap( Dependency::getArtifactId, Function.identity() ) );
 
+		List<String> problems = new ArrayList<>();
+
 		for ( MavenProject project : session.getAllProjects() ) {
-			if ( isAnyParentPublicParent( project )
-					&& !isProjectNotDeployed( project )
-					&& ( dependencies.remove( project.getArtifactId() ) == null ) ) {
-				throw new EnforcerRuleException(
-						"`" + project.getGroupId() + ":" + project.getArtifactId()
-								+ "` is missing in the dependency management." );
+			boolean publicParent = isAnyParentPublicParent( project );
+			boolean deploySkipped = isProjectDeploySkipped( project );
+			if ( dependencies.remove( project.getArtifactId() ) == null ) {
+				// The project is NOT in the dependencies
+
+				if ( publicParent && !deploySkipped ) {
+					problems.add( "`" + project.getGroupId() + ":" + project.getArtifactId()
+							+ "` is missing from the dependency management section." );
+				}
+			}
+			else {
+				// The project IS in the dependencies
+
+				if ( !publicParent || deploySkipped ) {
+					problems.add( "`" + project.getGroupId() + ":" + project.getArtifactId()
+							+ "` either is misconfigured, or it is not published so it should not be in the dependency management section:"
+							+ " [parents include '" + MavenProjectUtils.HIBERNATE_SEARCH_PARENT_PUBLIC
+							+ "' = " + publicParent
+							+ ", Maven property '" + DEPLOY_SKIP + "' = " + deploySkipped + "]" );
+				}
+
 			}
 		}
 
-		if ( !dependencies.isEmpty() ) {
-			throw new EnforcerRuleException( "Unexpected dependencies listed in the dependency management section: "
-					+ dependencies.values() );
+		for ( Dependency dependency : dependencies.values() ) {
+			problems.add( "`" + dependency.getGroupId() + ":" + dependency.getArtifactId()
+					+ "` is not a Hibernate Search artifact so it should not be in the dependency management section:" );
+		}
+
+		if ( !problems.isEmpty() ) {
+			throw new EnforcerRuleException( String.join( ";\n", problems ) );
 		}
 	}
 }
