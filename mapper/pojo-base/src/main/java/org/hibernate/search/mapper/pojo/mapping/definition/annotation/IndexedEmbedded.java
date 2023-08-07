@@ -195,12 +195,12 @@ public @interface IndexedEmbedded {
 	/**
 	 * Whether the identifier of embedded objects should be included as an index field.
 	 * <p>
-	 * The index field will defined as if the following annotation was put on the identifier property
+	 * The index field will be defined as if the following annotation was put on the identifier property
 	 * of the embedded type:
 	 * {@code @GenericField(searchable = Searchable.YES, projectable = Projectable.YES)}.
 	 * The name of the index field will be the name of the identifier property.
-	 * Its bridge will be the identifier bridge applied to the identifier property using {@link DocumentId} if any,
-	 * or the default value bridge for the property type by default.
+	 * Its bridge will be the identifier bridge referenced by the embedded type's {@link DocumentId} annotation, if any,
+	 * or the default value bridge for the identifier property's type, by default.
 	 * <p>
 	 * If you need more advanced mapping (custom name, custom bridge, sortable, ...),
 	 * define the field explicitly in the embedded type by annotating the identifier property
