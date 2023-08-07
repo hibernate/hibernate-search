@@ -16,3 +16,6 @@ jira:
       #   * commons-math3 (used in hibernate-search-util-common tests)
     - user: dependabot[bot]
       titlePattern: ".*\\borg.apache.commons:(commons-lang3|commons-math3)\\b.*"
+      # Allow JMH upgrades, since it is a performance testing dependency
+    - user: dependabot[bot]
+      titlePattern: ".*\\borg.openjdk.jmh\\b.*"
