@@ -87,14 +87,14 @@
                     <execution>
                         <phase>verify</phase>
                         <goals>
-                            <goal>java</goal>
+                            <goal>exec</goal>
                         </goals>
                         <configuration>
                             <!--
                                 We don't want to execute the spring jar if we are not running the tests.
                              -->
                             <skip>${failsafe.spring.skip}</skip>
-                            <mainClass>org.springframework.boot.loader.JarLauncher</mainClass>
+                            <executable>${java-version.test.launcher}</executable>
                             <arguments>
                                 <argument>-jar</argument>
                                 <argument>${project.build.directory}/lib/app.jar</argument>
