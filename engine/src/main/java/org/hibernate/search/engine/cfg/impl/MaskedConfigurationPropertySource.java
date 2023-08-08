@@ -9,11 +9,9 @@ package org.hibernate.search.engine.cfg.impl;
 import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
-import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.impl.Contracts;
 
-public class MaskedConfigurationPropertySource implements ScopedConfigurationPropertySource {
+public class MaskedConfigurationPropertySource implements ConfigurationPropertySource {
 	private final ConfigurationPropertySource propertiesToMask;
 	private final String radix;
 
@@ -35,19 +33,8 @@ public class MaskedConfigurationPropertySource implements ScopedConfigurationPro
 	}
 
 	@Override
-	public ScopedConfigurationPropertySource withMask(String mask) {
+	public ConfigurationPropertySource withMask(String mask) {
 		return new MaskedConfigurationPropertySource( propertiesToMask, radix + mask );
-	}
-
-	@Override
-	public ScopedConfigurationPropertySource withScope(BeanResolver beanResolver, String namespace, String name) {
-		if ( propertiesToMask instanceof ScopedConfigurationPropertySource ) {
-			return new MaskedConfigurationPropertySource(
-					( (ScopedConfigurationPropertySource) propertiesToMask ).withScope( beanResolver, namespace, name ),
-					radix.substring( 0, radix.length() - 1 )
-			);
-		}
-		return this;
 	}
 
 	@Override

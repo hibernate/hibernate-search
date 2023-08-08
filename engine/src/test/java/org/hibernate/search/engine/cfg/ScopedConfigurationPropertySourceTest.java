@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.cfg.impl.RescopableConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProvider;
 import org.hibernate.search.engine.cfg.spi.ConfigurationScope;
@@ -34,7 +33,7 @@ import org.junit.Test;
 
 import org.apache.logging.log4j.Level;
 
-public class RescopableConfigurationPropertySourceTest {
+public class ScopedConfigurationPropertySourceTest {
 
 	@Rule
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
@@ -78,19 +77,16 @@ public class RescopableConfigurationPropertySourceTest {
 		assertPair( propertySource, "foo", "global-bar" );
 
 		propertySource = propertySource.withScope(
-				resolver,
 				"backend"
 		);
 		assertPair( propertySource, "foo", "backend-bar" );
 
 		propertySource = propertySource.withScope(
-				resolver,
 				"index"
 		);
 		assertPair( propertySource, "foo", "index-bar" );
 
 		propertySource = propertySource.withScope(
-				resolver,
 				"index",
 				"my-index"
 		);
@@ -107,17 +103,23 @@ public class RescopableConfigurationPropertySourceTest {
 					}
 					if ( scope.matchExact( "backend" ) ) {
 						return Optional
-								.of( fromMap( singletonMap( "hibernate.search.someOtherKey", "backend-bar" ) ) );
+								.of( fromMap( singletonMap( "hibernate.search.someOtherKey", "backend-bar" ) )
+										.withMask( "hibernate" )
+										.withMask( "search" ) );
 					}
 
 					if ( scope.matchExact( "index", "my-index" ) ) {
 						return Optional.of(
-								fromMap( singletonMap( "hibernate.search.someOtherKey", "index-my-index-bar" ) ) );
+								fromMap( singletonMap( "hibernate.search.someOtherKey", "index-my-index-bar" ) )
+										.withMask( "hibernate" )
+										.withMask( "search" ) );
 					}
 
 					if ( scope.matchExact( "index" ) ) {
 						return Optional
-								.of( fromMap( singletonMap( "hibernate.search.someOtherKey", "index-bar" ) ) );
+								.of( fromMap( singletonMap( "hibernate.search.someOtherKey", "index-bar" ) )
+										.withMask( "hibernate" )
+										.withMask( "search" ) );
 					}
 
 
@@ -130,19 +132,16 @@ public class RescopableConfigurationPropertySourceTest {
 		assertPair( propertySource, "foo", "global-bar" );
 
 		propertySource = propertySource.withScope(
-				resolver,
 				"backend"
 		);
 		assertPair( propertySource, "foo", "backend-bar" );
 
 		propertySource = propertySource.withScope(
-				resolver,
 				"index"
 		);
 		assertPair( propertySource, "foo", "index-bar" );
 
 		propertySource = propertySource.withScope(
-				resolver,
 				"index",
 				"my-index"
 		);
@@ -162,34 +161,34 @@ public class RescopableConfigurationPropertySourceTest {
 		);
 		AllAwareConfigurationPropertySource propertySource = fromMap( singletonMap( "prefix.key", "value" ) );
 
-		ScopedConfigurationPropertySource scoped = ( (ScopedConfigurationPropertySource) propertySource.withMask( "prefix" ) )
-				.withScope( resolver, ConfigurationScopeNamespace.GLOBAL );
+		ScopedConfigurationPropertySource scoped = ScopedConfigurationPropertySource.wrap(
+				resolver,
+				propertySource.withMask( "prefix" )
+		);
 
 		assertThat( scoped.get( "key" ) )
 				.isPresent()
 				.get()
 				.isEqualTo( "value" );
 
-		scoped = ( (ScopedConfigurationPropertySource) propertySource.withPrefix( "other" ) )
-				.withScope( resolver, ConfigurationScopeNamespace.GLOBAL );
+		scoped = ScopedConfigurationPropertySource.wrap( resolver, propertySource.withPrefix( "other" ) )
+				.withScope( ConfigurationScopeNamespace.GLOBAL );
 
 		assertThat( scoped.get( "other.prefix.key" ) )
 				.isPresent()
 				.get()
 				.isEqualTo( "value" );
 
-		scoped = ( (ScopedConfigurationPropertySource) propertySource
-				.withFallback( fromMap( singletonMap( "prefix.key", "fallback-value" ) ) ) )
-				.withScope( resolver, ConfigurationScopeNamespace.GLOBAL );
+		scoped = ScopedConfigurationPropertySource.wrap( resolver, propertySource
+				.withFallback( fromMap( singletonMap( "prefix.key", "fallback-value" ) ) ) );
 
 		assertThat( scoped.get( "prefix.key" ) )
 				.isPresent()
 				.get()
 				.isEqualTo( "value" );
 
-		scoped = ( (ScopedConfigurationPropertySource) propertySource
-				.withOverride( fromMap( singletonMap( "prefix.key", "override-value" ) ) ) )
-				.withScope( resolver, ConfigurationScopeNamespace.GLOBAL );
+		scoped = ScopedConfigurationPropertySource.wrap( resolver, propertySource
+				.withOverride( fromMap( singletonMap( "prefix.key", "override-value" ) ) ) );
 
 		assertThat( scoped.get( "prefix.key" ) )
 				.isPresent()
@@ -253,6 +252,146 @@ public class RescopableConfigurationPropertySourceTest {
 				.isEqualTo( "global-value-a" );
 	}
 
+	@Test
+	public void almostRealisticScenario() {
+		BeanResolver resolver = resolver(
+				scope -> {
+					if ( scope.matchExact( "global" ) ) {
+						return Optional.of( fromMap( asMap(
+								"hibernate.search.backend.my-backend.index.my-index.override-setting", "global",
+								"hibernate.search.global-specific-setting", "global"
+						) ) );
+					}
+					if ( scope.matchExact( "backend", "my-backend" ) ) {
+						return Optional.of( fromMap( asMap(
+								"index.my-index.override-setting", "my-backend",
+								"my-backend-specific-setting", "my-backend"
+						) ) );
+					}
+
+					if ( scope.matchExact( "backend" ) ) {
+						return Optional.of( fromMap( asMap(
+								"my-backend.index.my-index.override-setting", "backend",
+								"backend-specific-setting", "backend"
+						) ) );
+					}
+
+					if ( scope.matchExact( "index", "my-index" ) ) {
+						return Optional.of( fromMap( asMap(
+								"override-setting", "my-index",
+								"my-index-specific-setting", "my-index"
+						) ) );
+					}
+
+					if ( scope.matchExact( "index" ) ) {
+						return Optional.of( fromMap( asMap(
+								"my-index.override", "index",
+								"index-specific-setting", "index"
+						) ) );
+					}
+
+
+					return Optional.empty();
+				}
+		);
+
+		ConfigurationPropertySource userSource = fromMap(
+				asMap( "hibernate.search.backend.my-backend.index.my-index.override-setting", "user" ) );
+
+		assertThat( userSource.get( "hibernate.search.backend.my-backend.index.my-index.override-setting" ) )
+				.isPresent()
+				.get()
+				.isEqualTo( "user" );
+
+		ScopedConfigurationPropertySource source = ScopedConfigurationPropertySource.wrap( resolver, userSource )
+				.withMask( "hibernate.search" );
+
+		assertThat( source.get( "backend.my-backend.index.my-index.override-setting" ) )
+				.isPresent()
+				.get()
+				.isEqualTo( "user" );
+
+		source = source.withMask( "backend" )
+				.withMask( "my-backend" )
+				.withScope( "backend" )
+				.withScope( "backend", "my-backend" );
+		assertThat( source.get( "index.my-index.override-setting" ) )
+				.isPresent()
+				.get()
+				.isEqualTo( "user" );
+
+		source = source.withMask( "index" )
+				.withMask( "my-index" )
+				.withScope( "index" )
+				.withScope( "index", "my-index" );
+		assertThat( source.get( "override-setting" ) )
+				.isPresent()
+				.get()
+				.isEqualTo( "user" );
+
+
+		userSource = fromMap(
+				asMap( "hibernate.search.backend.my-backend.index.my-index.user-setting", "user" ) );
+
+		assertThat( userSource.get( "hibernate.search.backend.my-backend.index.my-index.user-setting" ) )
+				.isPresent()
+				.get()
+				.isEqualTo( "user" );
+
+		assertThat( userSource.get( "hibernate.search.backend.my-backend.index.my-index.override-setting" ) )
+				.isEmpty();
+
+		source = ScopedConfigurationPropertySource.wrap( resolver, userSource )
+				.withMask( "hibernate.search" );
+
+		assertThat( source.get( "backend.my-backend.index.my-index.override-setting" ) )
+				.isPresent()
+				.get()
+				.isEqualTo( "global" );
+		assertThat( source.get( "backend.my-backend.index.my-index.user-setting" ) )
+				.isPresent()
+				.get()
+				.isEqualTo( "user" );
+
+		source = source.withMask( "backend" )
+				.withMask( "my-backend" )
+				.withScope( "backend" )
+				.withScope( "backend", "my-backend" );
+		assertThat( source.get( "index.my-index.override-setting" ) )
+				.isPresent()
+				.get()
+				.isEqualTo( "my-backend" );
+		assertThat( source.get( "index.my-index.user-setting" ) )
+				.isPresent()
+				.get()
+				.isEqualTo( "user" );
+
+		source = source.withMask( "index" )
+				.withMask( "my-index" )
+				.withScope( "index" )
+				.withScope( "index", "my-index" );
+		assertThat( source.get( "override-setting" ) )
+				.isPresent()
+				.get()
+				.isEqualTo( "my-index" );
+		assertThat( source.get( "user-setting" ) )
+				.isPresent()
+				.get()
+				.isEqualTo( "user" );
+
+	}
+
+	private Map<String, String> asMap(String... properties) {
+		if ( properties.length % 2 != 0 ) {
+			throw new IllegalStateException( "Odd number of properties. Properties are a list of (name,value) pairs" );
+		}
+		Map<String, String> map = new HashMap<>();
+		for ( int index = 0; index < properties.length / 2; index += 2 ) {
+			map.put( properties[index], properties[index + 1] );
+		}
+		return map;
+	}
+
 	private void assertPair(ScopedConfigurationPropertySource propertySource, String main, String scope) {
 		assertThat( propertySource.get( "someKey" ) )
 				.isPresent()
@@ -269,16 +408,10 @@ public class RescopableConfigurationPropertySourceTest {
 	}
 
 	private ScopedConfigurationPropertySource createPropertySource(BeanResolver resolver, String... properties) {
-		if ( properties.length % 2 != 0 ) {
-			throw new IllegalStateException( "Odd number of properties. Properties are a list of (name,value) pairs" );
-		}
-		Map<String, String> map = new HashMap<>();
-		for ( int index = 0; index < properties.length / 2; index += 2 ) {
-			map.put( properties[index], properties[index + 1] );
-		}
-		return new RescopableConfigurationPropertySource(
+
+		return ScopedConfigurationPropertySource.wrap(
 				resolver,
-				fromMap( map )
+				fromMap( asMap( properties ) )
 		);
 	}
 

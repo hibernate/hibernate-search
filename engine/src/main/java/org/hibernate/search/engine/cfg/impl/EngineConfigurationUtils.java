@@ -12,43 +12,41 @@ import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationScopeNamespace;
 import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
-import org.hibernate.search.engine.environment.bean.BeanResolver;
 
 public final class EngineConfigurationUtils {
 
 	private EngineConfigurationUtils() {
 	}
 
-	public static ConfigurationPropertySourceExtractor extractorForBackend(BeanResolver beanResolver,
-			Optional<String> backendNameOptional) {
+	public static ConfigurationPropertySourceExtractor extractorForBackend(Optional<String> backendNameOptional) {
 		if ( !backendNameOptional.isPresent() ) {
 			return engineSource -> engineSource
-					.withScope( beanResolver, ConfigurationScopeNamespace.BACKEND )
-					.withMask( EngineSettings.Radicals.BACKEND );
+					.withMask( EngineSettings.Radicals.BACKEND )
+					.withScope( ConfigurationScopeNamespace.BACKEND );
 		}
 		else {
 			return engineSource -> engineSource
-					// First we want to get the defaults for the default backend
-					.withScope( beanResolver, ConfigurationScopeNamespace.BACKEND )
-					// and then on top of that put the backend specific ones (for a particular backend name)
-					.withScope( beanResolver, ConfigurationScopeNamespace.BACKEND, backendNameOptional.get() )
 					.withMask( EngineSettings.Radicals.BACKENDS )
-					.withMask( backendNameOptional.get() );
+					// First we want to get the defaults for the default backend
+					.withScope( ConfigurationScopeNamespace.BACKEND )
+					.withMask( backendNameOptional.get() )
+					// and then on top of that put the backend specific ones (for a particular backend name)
+					.withScope( ConfigurationScopeNamespace.BACKEND, backendNameOptional.get() );
 		}
 	}
 
 	public static ConfigurationPropertySourceExtractor extractorForIndex(
-			BeanResolver beanResolver,
 			ConfigurationPropertySourceExtractor extractorForBackend,
 			String indexName) {
 		return engineSource -> {
 			ScopedConfigurationPropertySource backendSource = extractorForBackend.extract( engineSource );
 			return backendSource
+					.withMask( BackendSettings.INDEXES )
 					// First we want to get the defaults for the default index
-					.withScope( beanResolver, ConfigurationScopeNamespace.INDEX )
-					// First we want to get the defaults for the default index
-					.withScope( beanResolver, ConfigurationScopeNamespace.INDEX, indexName )
-					.withMask( BackendSettings.INDEXES ).withMask( indexName )
+					.withScope( ConfigurationScopeNamespace.INDEX )
+					.withMask( indexName )
+					// and then on top of that put the index specific ones (for a particular index name)
+					.withScope( ConfigurationScopeNamespace.INDEX, indexName )
 					.withFallback( backendSource );
 		};
 	}

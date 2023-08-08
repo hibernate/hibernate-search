@@ -9,12 +9,10 @@ package org.hibernate.search.engine.cfg.impl;
 import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.ScopedConfigurationPropertySource;
-import org.hibernate.search.engine.environment.bean.BeanResolver;
 
-public class FallbackConfigurationPropertySource implements ScopedConfigurationPropertySource {
-	protected final ConfigurationPropertySource main;
-	protected final ConfigurationPropertySource fallback;
+public class FallbackConfigurationPropertySource implements ConfigurationPropertySource {
+	private final ConfigurationPropertySource main;
+	private final ConfigurationPropertySource fallback;
 
 	public FallbackConfigurationPropertySource(ConfigurationPropertySource main, ConfigurationPropertySource fallback) {
 		this.main = main;
@@ -40,26 +38,6 @@ public class FallbackConfigurationPropertySource implements ScopedConfigurationP
 		else {
 			return main.resolve( key );
 		}
-	}
-
-	@Override
-	public ScopedConfigurationPropertySource withScope(BeanResolver beanResolver, String namespace, String name) {
-		ConfigurationPropertySource scopedMain = main;
-		ConfigurationPropertySource scopedFallback = fallback;
-		if ( main instanceof ScopedConfigurationPropertySource ) {
-			scopedMain = ( (ScopedConfigurationPropertySource) main ).withScope( beanResolver, namespace, name );
-		}
-		if ( fallback instanceof ScopedConfigurationPropertySource ) {
-			scopedFallback = ( (ScopedConfigurationPropertySource) fallback ).withScope( beanResolver, namespace, name );
-		}
-
-		if ( scopedMain != main || scopedFallback != fallback ) {
-			return new FallbackConfigurationPropertySource(
-					scopedMain,
-					scopedFallback
-			);
-		}
-		return this;
 	}
 
 	@Override

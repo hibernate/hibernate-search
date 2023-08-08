@@ -6,46 +6,184 @@
  */
 package org.hibernate.search.engine.cfg.spi;
 
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.impl.FallbackConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.impl.MaskedConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.impl.OverriddenConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.impl.PrefixedConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.impl.RescopableConfigurationPropertySource;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.annotation.Incubating;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 @Incubating
-public interface ScopedConfigurationPropertySource extends ConfigurationPropertySource {
+public final class ScopedConfigurationPropertySource implements ConfigurationPropertySource {
 
-	static ScopedConfigurationPropertySource wrap(BeanResolver resolver,
+	public static ScopedConfigurationPropertySource wrap(BeanResolver resolver,
 			ConfigurationPropertySource configurationPropertySource) {
-		return new RescopableConfigurationPropertySource( resolver, configurationPropertySource );
+		return new ScopedConfigurationPropertySource( resolver, configurationPropertySource );
 	}
 
-	default ScopedConfigurationPropertySource withScope(BeanResolver beanResolver, String namespace) {
-		return withScope( beanResolver, namespace, null );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private final BeanResolver beanResolver;
+	private final ConfigurationScope scope;
+	private final ConfigurationPropertySource delegate;
+	private final ConfigurationPropertySource delegateNoScope;
+	private final Map<ConfigurationScope,
+			List<Function<ConfigurationPropertySource, ConfigurationPropertySource>>> scopeModifiers;
+
+	private ScopedConfigurationPropertySource(BeanResolver beanResolver, ConfigurationPropertySource delegate) {
+		this(
+				beanResolver,
+				ConfigurationScope.GLOBAL,
+				delegate.withFallback( scopeFallback( beanResolver, ConfigurationScope.GLOBAL, Map.of() ) ),
+				delegate,
+				Map.of()
+		);
 	}
 
-	ScopedConfigurationPropertySource withScope(BeanResolver beanResolver, String namespace, String name);
+	private ScopedConfigurationPropertySource(
+			BeanResolver beanResolver,
+			ConfigurationScope scope,
+			ConfigurationPropertySource delegate,
+			ConfigurationPropertySource delegateNoScope,
+			Map<ConfigurationScope, List<Function<ConfigurationPropertySource, ConfigurationPropertySource>>> scopeModifiers) {
+		this.scope = scope;
+		this.beanResolver = beanResolver;
+		this.delegate = delegate;
+		this.delegateNoScope = delegateNoScope;
+		this.scopeModifiers = new LinkedHashMap<>();
+		for ( Map.Entry<ConfigurationScope,
+				List<Function<ConfigurationPropertySource, ConfigurationPropertySource>>> entry : scopeModifiers.entrySet() ) {
+			this.scopeModifiers.put( entry.getKey(), new ArrayList<>( entry.getValue() ) );
+		}
+		this.scopeModifiers.computeIfAbsent( scope, ignored -> new ArrayList<>() );
+	}
+
+	private ScopedConfigurationPropertySource(
+			BeanResolver beanResolver,
+			ConfigurationScope scope,
+			ConfigurationPropertySource delegate,
+			ConfigurationPropertySource delegateNoScope,
+			Map<ConfigurationScope, List<Function<ConfigurationPropertySource, ConfigurationPropertySource>>> scopeModifiers,
+			Function<ConfigurationPropertySource, ConfigurationPropertySource> modifier) {
+		this( beanResolver, scope, delegate, delegateNoScope, scopeModifiers );
+		this.scopeModifiers.get( scope ).add( modifier );
+	}
+
+	public ScopedConfigurationPropertySource withScope(String namespace) {
+		return withScope( namespace, null );
+	}
+
+	public ScopedConfigurationPropertySource withScope(String namespace, String name) {
+		ConfigurationScope reduced = scope.reduce( namespace, name );
+		return new ScopedConfigurationPropertySource(
+				beanResolver,
+				reduced,
+				delegateNoScope.withFallback( scopeFallback( beanResolver, reduced, scopeModifiers ) ),
+				delegateNoScope,
+				scopeModifiers
+		);
+	}
 
 	@Override
-	default ScopedConfigurationPropertySource withPrefix(String prefix) {
-		return new PrefixedConfigurationPropertySource( this, prefix );
+	public Optional<?> get(String key) {
+		return delegate.get( key );
 	}
 
 	@Override
-	default ScopedConfigurationPropertySource withMask(String mask) {
-		return new MaskedConfigurationPropertySource( this, mask );
+	public Optional<String> resolve(String key) {
+		return delegate.resolve( key );
 	}
 
 	@Override
-	default ScopedConfigurationPropertySource withFallback(ConfigurationPropertySource fallback) {
-		return new FallbackConfigurationPropertySource( this, fallback );
+	public ScopedConfigurationPropertySource withPrefix(String prefix) {
+		return new ScopedConfigurationPropertySource(
+				beanResolver,
+				scope,
+				delegate.withPrefix( prefix ),
+				delegateNoScope.withPrefix( prefix ),
+				scopeModifiers,
+				source -> source.withPrefix( prefix )
+		);
 	}
 
 	@Override
-	default ScopedConfigurationPropertySource withOverride(ConfigurationPropertySource override) {
-		return new OverriddenConfigurationPropertySource( this, override );
+	public ScopedConfigurationPropertySource withMask(String mask) {
+		return new ScopedConfigurationPropertySource(
+				beanResolver,
+				scope,
+				delegate.withMask( mask ),
+				delegateNoScope.withMask( mask ),
+				scopeModifiers,
+				source -> source.withMask( mask )
+		);
+	}
+
+	@Override
+	public ScopedConfigurationPropertySource withFallback(ConfigurationPropertySource fallback) {
+		return new ScopedConfigurationPropertySource(
+				beanResolver,
+				scope,
+				delegate.withFallback( fallback ),
+				delegateNoScope.withFallback( fallback ),
+				scopeModifiers,
+				source -> source.withFallback( fallback )
+		);
+	}
+
+	@Override
+	public ScopedConfigurationPropertySource withOverride(ConfigurationPropertySource override) {
+		return new ScopedConfigurationPropertySource(
+				beanResolver,
+				scope,
+				delegate.withOverride( override ),
+				delegateNoScope.withOverride( override ),
+				scopeModifiers,
+				source -> source.withOverride( override )
+		);
+	}
+
+	private static ConfigurationPropertySource scopeFallback(BeanResolver beanResolver, ConfigurationScope scope,
+			Map<ConfigurationScope, List<Function<ConfigurationPropertySource, ConfigurationPropertySource>>> scopeModifiers) {
+		try ( BeanHolder<List<ConfigurationProvider>> configurationProviderHolders =
+				beanResolver.resolve( beanResolver.allConfiguredForRole( ConfigurationProvider.class ) ) ) {
+			List<ConfigurationProvider> configurationProviders = configurationProviderHolders.get()
+					.stream().sorted().collect( Collectors.toList() );
+
+			if ( configurationProviders.size() > 1 ) {
+				log.multipleConfigurationProvidersAvailable( scope.toString(), configurationProviders );
+			}
+
+			ConfigurationPropertySource fallback = ConfigurationPropertySource.empty();
+			ConfigurationScope scopeIterator = scope;
+			do {
+				for ( ConfigurationProvider provider : configurationProviders ) {
+					fallback = provider.get( scopeIterator )
+							.map( source -> transform( source, scopeModifiers.getOrDefault( scope, List.of() ) ) )
+							.map( fallback::withFallback )
+							.orElse( fallback );
+				}
+				scopeIterator = scopeIterator.parent();
+			}
+			while ( scopeIterator != null );
+
+			return fallback;
+		}
+	}
+
+	private static ConfigurationPropertySource transform(ConfigurationPropertySource source,
+			List<Function<ConfigurationPropertySource, ConfigurationPropertySource>> transformers) {
+		for ( Function<ConfigurationPropertySource, ConfigurationPropertySource> transformer : transformers ) {
+			source = transformer.apply( source );
+		}
+		return source;
 	}
 }
