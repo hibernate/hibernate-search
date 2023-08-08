@@ -79,10 +79,11 @@ class IndexManagerBuildingStateHolder {
 	}
 
 	IndexManagerBuildingState getIndexManagerBuildingState(BackendMapperContext backendMapperContext,
-			Optional<String> backendName, String indexName,
+			Optional<String> backendNameOptional, String indexName,
 			String mappedTypeName) {
-		return getBackend( backendName.orElse( null ) )
-				.createIndexManagerBuildingState( backendMapperContext, indexName, mappedTypeName );
+		String backendName = backendNameOptional.orElse( null );
+		return getBackend( backendName )
+				.createIndexManagerBuildingState( backendMapperContext, backendName, indexName, mappedTypeName );
 	}
 
 	private BackendInitialBuildState getBackend(String backendName) {
@@ -121,7 +122,7 @@ class IndexManagerBuildingStateHolder {
 	private BackendInitialBuildState createBackend(Optional<String> backendNameOptional, TenancyMode tenancyMode,
 			EventContext eventContext) {
 		ConfigurationPropertySourceExtractor backendPropertySourceExtractor =
-				EngineConfigurationUtils.extractorForBackend( backendNameOptional );
+				EngineConfigurationUtils.extractorForBackend( beanResolver, backendNameOptional );
 		ConfigurationPropertySource backendPropertySource = backendPropertySourceExtractor.extract( propertySource );
 		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
 				BACKEND_TYPE.<BeanHolder<? extends BackendFactory>>getAndMap( backendPropertySource, beanResolver::resolve )
@@ -167,14 +168,14 @@ class IndexManagerBuildingStateHolder {
 		}
 
 		IndexManagerInitialBuildState createIndexManagerBuildingState(
-				BackendMapperContext backendMapperContext, String indexName, String mappedTypeName) {
+				BackendMapperContext backendMapperContext, String backendName, String indexName, String mappedTypeName) {
 			IndexManagerInitialBuildState state = indexManagerBuildStateByName.get( indexName );
 			if ( state != null ) {
 				throw log.twoTypesTargetSameIndex( indexName, state.mappedTypeName, mappedTypeName );
 			}
 
 			ConfigurationPropertySourceExtractor indexPropertySourceExtractor =
-					EngineConfigurationUtils.extractorForIndex( propertySourceExtractor, indexName );
+					EngineConfigurationUtils.extractorForIndex( beanResolver, propertySourceExtractor, backendName, indexName );
 			ConfigurationPropertySource indexPropertySource = indexPropertySourceExtractor.extract( propertySource );
 
 			IndexManagerBuilder builder = backend.createIndexManagerBuilder(
