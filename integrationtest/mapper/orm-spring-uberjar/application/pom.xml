@@ -56,8 +56,14 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-loader</artifactId>
+            <version>${version.org.springframework.boot}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -78,6 +84,8 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <finalName>app-repackaged</finalName>
                     <mainClass>
                         org.hibernate.search.integrationtest.spring.repackaged.application.Application
                     </mainClass>
@@ -98,6 +106,10 @@
                          -->
                         <LUCENE_ROOT_PATH>${project.build.directory}/test-indexes/</LUCENE_ROOT_PATH>
                     </environmentVariables>
+                    <systemPropertyVariables>
+                        <test.launcher-command>${java-version.test.launcher}</test.launcher-command>
+                        <test.repackaged-jar-path>${project.build.directory}/app-repackaged.jar</test.repackaged-jar-path>
+                    </systemPropertyVariables>
                 </configuration>
                 <executions>
                     <execution>
