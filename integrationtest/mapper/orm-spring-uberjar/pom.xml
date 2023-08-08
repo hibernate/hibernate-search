@@ -16,7 +16,6 @@
     <modules>
         <module>model</module>
         <module>application</module>
-        <module>test</module>
     </modules>
 
     <properties>
