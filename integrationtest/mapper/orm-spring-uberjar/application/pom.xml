@@ -79,7 +79,7 @@
                 </executions>
                 <configuration>
                     <mainClass>
-                        org.hibernate.search.integrationtest.spring.repackaged.application.RepackagedApplication
+                        org.hibernate.search.integrationtest.spring.repackaged.application.Application
                     </mainClass>
                 </configuration>
             </plugin>
@@ -88,6 +88,7 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <skip>${failsafe.spring.skip}</skip>
+                    <classesDirectory>${project.build.outputDirectory}</classesDirectory>
                     <environmentVariables>
                         <!--
                              The test settings add a different suffix to this value for each test execution.
