@@ -114,6 +114,22 @@
 
     <profiles>
         <profile>
+            <id>testWithJdk8</id>
+            <activation>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>8</value>
+                </property>
+            </activation>
+            <properties>
+                <!--
+                    We expect that running the repackaged app on JDK8 should fail,
+                    since it cannot read the nested jar:
+                 -->
+                <spring.exec.success.code>1</spring.exec.success.code>
+            </properties>
+        </profile>
+        <profile>
             <id>testWithJdk11</id>
             <activation>
                 <property>
