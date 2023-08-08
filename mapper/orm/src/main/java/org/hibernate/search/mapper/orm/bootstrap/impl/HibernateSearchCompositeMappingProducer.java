@@ -17,6 +17,7 @@ import org.hibernate.boot.model.source.internal.hbm.MappingDocument;
 import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySourceScopeUtils;
 import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateSearchOrmMappingProducer;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -45,6 +46,11 @@ public class HibernateSearchCompositeMappingProducer implements org.hibernate.bo
 		List<MappingDocument> mappings = new ArrayList<>();
 		ConfigurationPropertySource propertySource = preIntegrationService.propertySource()
 				.withMask( SearchIntegrationEnvironment.CONFIGURATION_PROPERTIES_MASK )
+				.withFallback(
+						ConfigurationPropertySourceScopeUtils.fallback(
+								preIntegrationService.beanResolver(),
+								ConfigurationPropertySourceScopeUtils.global()
+						) )
 				.withMask( HibernateOrmMapperSettings.Radicals.COORDINATION );
 		for ( HibernateSearchOrmMappingProducer mappingProducer : preIntegrationService
 				.coordinationStrategyConfiguration().mappingProducers() ) {
