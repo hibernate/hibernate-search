@@ -4,13 +4,14 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.spring.repackaged.test;
+package org.hibernate.search.integrationtest.spring.repackaged.application;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.jar.JarEntry;
@@ -19,7 +20,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Projection
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.jar.impl.JandexUtils;
 import org.hibernate.search.util.common.jar.impl.JarUtils;
+import org.hibernate.search.util.impl.test.SystemHelper;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import org.jboss.jandex.ClassInfo;
@@ -31,7 +34,47 @@ import acme.org.hibernate.search.integrationtest.spring.repackaged.model.MyEntit
 import acme.org.hibernate.search.integrationtest.spring.repackaged.model.MyProjection;
 import org.springframework.boot.loader.jar.JarFile;
 
-public class RepackagedAppIT {
+/**
+ * This test is NOT a @SpringBootTest:
+ * it manipulates the repackaged JAR
+ * to inspect it and run it in a separate JVM.
+ */
+public class RepackagedApplicationIT {
+	private String javaLauncherCommand;
+	private Path repackedJarPath;
+
+	@Before
+	public void init() {
+		javaLauncherCommand = System.getProperty( "test.launcher-command" );
+		String repackedJarPathString = System.getProperty( "test.repackaged-jar-path" );
+		repackedJarPath = repackedJarPathString == null ? null : Paths.get( repackedJarPathString );
+
+		if ( javaLauncherCommand == null
+				|| repackedJarPath == null
+				|| !Files.exists( repackedJarPath ) ) {
+			throw new IllegalStateException( "Tests seem to be running from an IDE."
+					+ " This test cannot run from the IDE"
+					+ " as it requires the application to get repackaged through a Maven plugin" );
+		}
+	}
+
+	/**
+	 * Test makes sure that the (repackaged) application behaves as expected on the current JDK.
+	 */
+	@Test
+	public void smokeTest() throws Exception {
+		Process process = SystemHelper.runCommandWithInheritedIO( javaLauncherCommand, "-jar", repackedJarPath.toString() );
+		if ( JarUtils.javaVersion() >= 13 ) {
+			assertThat( process.exitValue() )
+					.as( "Starting the repackaged application should succeed" )
+					.isEqualTo( 0 );
+		}
+		else {
+			assertThat( process.exitValue() )
+					.as( "Starting the repackaged application should fail" )
+					.isNotEqualTo( 0 );
+		}
+	}
 
 	/**
 	 * Test makes sure that our utils can read the classes from the nested jar inside a Spring's repackaged uberjar.
@@ -39,10 +82,7 @@ public class RepackagedAppIT {
 	 */
 	@Test
 	public void canReadJar() throws Exception {
-		Path target = Paths.get( this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI() );
-		Path jar = target.resolve( "../lib/app.jar" );
-
-		try ( JarFile outerJar = new JarFile( jar.toFile() ) ) {
+		try ( JarFile outerJar = new JarFile( repackedJarPath.toFile() ) ) {
 			for ( JarEntry jarEntry : outerJar ) {
 				if ( jarEntry.getName().contains( "hibernate-search-integrationtest-spring-repackaged-model" ) ) {
 					URL innerJarURL = outerJar.getNestedJarFile( jarEntry ).getUrl();
