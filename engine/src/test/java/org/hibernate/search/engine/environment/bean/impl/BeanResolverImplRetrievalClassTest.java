@@ -36,7 +36,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -56,7 +55,7 @@ public class BeanResolverImplRetrievalClassTest {
 	@Mock
 	private BeanProvider beanManagerBeanProviderMock;
 
-	@Mock(answer = Answers.CALLS_REAL_METHODS)
+	@Mock
 	private ConfigurationPropertySource configurationSourceMock;
 
 	@Mock
@@ -86,9 +85,11 @@ public class BeanResolverImplRetrievalClassTest {
 
 		when( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
 				.thenReturn( Collections.singletonList( beanConfigurer1 ) );
+		when( configurationSourceMock.withMask( any() ) )
+				.thenCallRealMethod();
 		when( configurationSourceMock.withFallback( any() ) )
 				.thenCallRealMethod();
-		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
+		when( configurationSourceMock.get( EngineSpiSettings.BEAN_CONFIGURERS ) )
 				.thenReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2 ) ) );
 		beanResolver = BeanResolverImpl.create( classResolverMock, serviceResolverMock, beanManagerBeanProviderMock,
 				configurationSourceMock );
