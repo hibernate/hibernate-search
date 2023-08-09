@@ -83,6 +83,8 @@ public class BeanResolverImplRetrievalBuiltinTest {
 
 		when( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
 				.thenReturn( Collections.singletonList( beanConfigurer1 ) );
+		when( configurationSourceMock.withFallback( any() ) )
+				.thenCallRealMethod();
 		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
 				.thenReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2 ) ) );
 		beanResolver = BeanResolverImpl.create( classResolverMock, serviceResolverMock, beanManagerBeanProviderMock,

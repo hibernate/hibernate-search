@@ -99,6 +99,8 @@ public class BeanResolverImplBaseTest {
 
 		when( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
 				.thenReturn( Collections.singletonList( beanConfigurer1 ) );
+		when( configurationSourceMock.withFallback( any() ) )
+				.thenCallRealMethod();
 		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
 				.thenReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2 ) ) );
 		beanResolver = BeanResolverImpl.create( classResolverMock, serviceResolverMock, beanManagerBeanProviderMock,
@@ -467,7 +469,7 @@ public class BeanResolverImplBaseTest {
 
 	private void verifyNoOtherInteractionsAndReset() {
 		verifyNoMoreInteractions( classResolverMock, serviceResolverMock, beanManagerBeanProviderMock,
-				configurationSourceMock,
+				configurationSourceMock, configurationSourceMock,
 				type1InternalBeanFactoryMock, type2InternalBeanFactoryMock,
 				type3InternalBean1FactoryMock, type3InternalBean2FactoryMock,
 				roleInternalBean1FactoryMock, roleInternalBean2FactoryMock,
