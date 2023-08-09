@@ -1,0 +1,17 @@
+# Do not generate module-info with moditect-maven-plugin:
+# This module depends on Lucene jars that have split packages module issue
+name: org.hibernate.search.v5migrationhelper.orm
+
+requires:
+  - module: ...
+
+exports:
+  - package: org\.hibernate\.search(\..+)*\.(logging|reporting)\.impl
+    pattern: true
+    to:
+      - org.jboss.logging
+      - org.hibernate.search.engine
+  - package: org\.hibernate\.search(\..+)*\.impl
+    pattern: true
+    to:
+      - org.hibernate.search.engine

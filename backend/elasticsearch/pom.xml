@@ -62,22 +62,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.moditect</groupId>
-                <artifactId>moditect-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-module-infos</id>
-                        <configuration>
-                            <module>
-                                <moduleInfo>
-                                    <opens>
-                                        org.hibernate.search.backend.elasticsearch.lowlevel.index.* to com.google.gson
-                                    </opens>
-                                </moduleInfo>
-                            </module>
-                        </configuration>
-                    </execution>
-                </executions>
+                <groupId>io.github.dmlloyd.module-info</groupId>
+                <artifactId>module-info</artifactId>
             </plugin>
         </plugins>
     </build>

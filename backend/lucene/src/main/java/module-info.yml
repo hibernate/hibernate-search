@@ -1,0 +1,17 @@
+# Do not generate module-info with the plugin:
+# Lucene has split packages module issue and thus cannot be consumed as a module.
+name: org.hibernate.search.backend.lucene
+
+requires:
+  - module: ...
+
+exports:
+  - package: org\.hibernate\.search(\..+)*\.(logging|reporting)\.impl
+    pattern: true
+    to:
+      - org.jboss.logging
+      - org.hibernate.search.engine
+  - package: org\.hibernate\.search(\..+)*\.impl
+    pattern: true
+    to:
+      - org.hibernate.search.engine

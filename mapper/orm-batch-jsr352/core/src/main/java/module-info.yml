@@ -1,0 +1,29 @@
+name: org.hibernate.search.batch.jsr352.core
+
+requires:
+  - module: jakarta.inject
+  - module: jakarta.batch
+  - module: jakarta.persistence
+  - module: org.jboss.logging
+
+  - module: org.hibernate.search.engine
+    transitive: true
+  - module: org.hibernate.search.mapper.orm
+    transitive: true
+  - module: org.hibernate.search.mapper.pojo
+    transitive: true
+  - module: org.hibernate.search.util.common
+    transitive: true
+  - module: org.hibernate.orm.core
+    transitive: true
+
+exports:
+  - package: org\.hibernate\.search(\..+)*\.(logging|reporting)\.impl
+    pattern: true
+    to:
+      - org.jboss.logging
+      - org.hibernate.search.engine
+  - package: org\.hibernate\.search(\..+)*\.impl
+    pattern: true
+    to:
+      - org.hibernate.search.engine

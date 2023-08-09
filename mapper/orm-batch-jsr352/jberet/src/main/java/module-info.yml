@@ -1,0 +1,24 @@
+name: org.hibernate.search.batch.jsr352.jberet
+
+requires:
+  - module: jakarta.inject
+  - module: jakarta.cdi
+  - module: jakarta.persistence
+  - module: org.jberet.core
+  - module: org.jboss.logging
+
+  - module: org.hibernate.search.batch.jsr352.core
+    transitive: true
+  - module: org.hibernate.search.util.common
+    transitive: true
+
+exports:
+  - package: org\.hibernate\.search(\..+)*\.(logging|reporting)\.impl
+    pattern: true
+    to:
+      - org.jboss.logging
+      - org.hibernate.search.engine
+  - package: org\.hibernate\.search(\..+)*\.impl
+    pattern: true
+    to:
+      - org.hibernate.search.engine

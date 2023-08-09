@@ -282,7 +282,6 @@
         <version.jacoco.plugin>0.8.10</version.jacoco.plugin>
         <version.com.buschmais.jqassistant.plugin>2.0.3</version.com.buschmais.jqassistant.plugin>
         <version.docker.maven.plugin>0.40.2</version.docker.maven.plugin>
-        <version.moditect.plugin>1.0.0.RC2</version.moditect.plugin>
         <version.sonar.plugin>3.9.1.2184</version.sonar.plugin>
         <version.scripting.plugin>3.0.0</version.scripting.plugin>
         <version.org.apache.groovy.groovy-jsr223>4.0.13</version.org.apache.groovy.groovy-jsr223>
@@ -293,6 +292,7 @@
         <version.formatter-maven-plugin>2.23.0</version.formatter-maven-plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
         <version.sisu-maven-plugin>0.9.0.M1</version.sisu-maven-plugin>
+        <version.module-info>2.2-SNAPSHOT</version.module-info>
 
         <!-- Repository Deployment URLs -->
 
@@ -766,11 +766,6 @@
                     <version>${version.checkstyle.plugin}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.moditect</groupId>
-                    <artifactId>moditect-maven-plugin</artifactId>
-                    <version>${version.moditect.plugin}</version>
-                </plugin>
-                <plugin>
                     <groupId>org.jboss.maven.plugins</groupId>
                     <artifactId>maven-injection-plugin</artifactId>
                     <version>${version.maven.injection.plugin}</version>
@@ -1047,6 +1042,24 @@
                     <groupId>org.eclipse.sisu</groupId>
                     <artifactId>sisu-maven-plugin</artifactId>
                     <version>${version.sisu-maven-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>io.github.dmlloyd.module-info</groupId>
+                    <artifactId>module-info</artifactId>
+                    <version>${version.module-info}</version>
+                    <executions>
+                        <execution>
+                            <id>module-info</id>
+                            <phase>prepare-package</phase>
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+                            <configuration>
+                                <exportExcludes>^.*\b(impl|internal|_private|private_)\b.*$</exportExcludes>
+                                <moduleName>${java.module.name}</moduleName>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>

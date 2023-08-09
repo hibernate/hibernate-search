@@ -1,0 +1,32 @@
+name: org.hibernate.search.backend.elasticsearch.aws
+
+requires:
+  - module: org.apache.httpcomponents.httpasyncclient
+  - module: org.apache.httpcomponents.httpclient
+  - module: software.amazon.awssdk.regions
+
+  - module: org.apache.httpcomponents.httpasyncclient
+  - module: org.apache.httpcomponents.httpclient
+  - module: org.apache.httpcomponents.httpcore
+  - module: software.amazon.awssdk.regions
+  - module: software.amazon.awssdk.auth
+  - module: software.amazon.awssdk.http
+  - module: org.jboss.logging
+
+  - module: org.hibernate.search.backend.elasticsearch
+    transitive: true
+  - module: org.hibernate.search.engine
+    transitive: true
+  - module: org.hibernate.search.util.common
+    transitive: true
+
+exports:
+  - package: org\.hibernate\.search(\..+)*\.(logging|reporting)\.impl
+    pattern: true
+    to:
+      - org.jboss.logging
+      - org.hibernate.search.engine
+  - package: org\.hibernate\.search(\..+)*\.impl
+    pattern: true
+    to:
+      - org.hibernate.search.engine

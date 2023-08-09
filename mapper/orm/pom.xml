@@ -84,28 +84,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.moditect</groupId>
-                <artifactId>moditect-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-module-infos</id>
-                        <configuration>
-                            <module>
-                                <moduleInfo>
-                                    <requires>
-                                        static jakarta.cdi;
-                                        org.hibernate.*.impl;
-                                        org.hibernate.*.internal;
-                                        org.hibernate.*.impl.*;
-                                        org.hibernate.*.internal.*;
-                                        transitive org.hibernate.*;
-                                        *;
-                                    </requires>
-                                </moduleInfo>
-                            </module>
-                        </configuration>
-                    </execution>
-                </executions>
+                <groupId>io.github.dmlloyd.module-info</groupId>
+                <artifactId>module-info</artifactId>
             </plugin>
         </plugins>
     </build>

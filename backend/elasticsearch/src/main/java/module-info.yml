@@ -1,0 +1,32 @@
+name: org.hibernate.search.backend.elasticsearch
+
+requires:
+  - module: elasticsearch.rest.client
+  - module: elasticsearch.rest.client.sniffer
+  - module: org.apache.httpcomponents.httpclient
+  - module: com.google.gson
+  - module: org.apache.httpcomponents.httpasyncclient
+  - module: org.apache.httpcomponents.httpcore
+  - module: org.apache.httpcomponents.httpcore.nio
+  - module: org.jboss.logging
+
+  - module: org.hibernate.search.engine
+    transitive: true
+  - module: org.hibernate.search.util.common
+    transitive: true
+
+opens:
+  - package: org\.hibernate\.search\.backend\.elasticsearch\.lowlevel\.index(\..+)*
+    pattern: true
+    to:
+      - com.google.gson
+exports:
+  - package: org\.hibernate\.search(\..+)*\.(logging|reporting)\.impl
+    pattern: true
+    to:
+      - org.jboss.logging
+      - org.hibernate.search.engine
+  - package: org\.hibernate\.search(\..+)*\.impl
+    pattern: true
+    to:
+      - org.hibernate.search.engine

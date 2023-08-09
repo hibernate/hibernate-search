@@ -1,0 +1,41 @@
+name: org.hibernate.search.mapper.orm.coordination.outboxpolling
+
+requires:
+  - module: jakarta.persistence
+  - module: org.apache.avro
+  - module: org.jboss.logging
+
+  - module: org.hibernate.orm.core
+    transitive: true
+  - module: org.hibernate.search.engine
+    transitive: true
+  - module: org.hibernate.search.mapper.orm
+    transitive: true
+  - module: org.hibernate.search.mapper.pojo
+    transitive: true
+  - module: org.hibernate.search.util.common
+    transitive: true
+
+opens:
+  - package: org.hibernate.search.mapper.orm.coordination.outboxpolling.avro.generated.impl
+    to:
+      - org.apache.avro
+  - package: org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl
+    to:
+      - org.hibernate.orm.core
+      - net.bytebuddy
+  - package: org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl
+    to:
+      - org.hibernate.orm.core
+      - net.bytebuddy
+
+exports:
+  - package: org\.hibernate\.search(\..+)*\.(logging|reporting)\.impl
+    pattern: true
+    to:
+      - org.jboss.logging
+      - org.hibernate.search.engine
+  - package: org\.hibernate\.search(\..+)*\.impl
+    pattern: true
+    to:
+      - org.hibernate.search.engine

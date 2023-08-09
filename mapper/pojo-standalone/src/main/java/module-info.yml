@@ -1,0 +1,23 @@
+name: org.hibernate.search.mapper.pojo.standalone
+
+requires:
+  - module: org.jboss.logging
+  - module: org.hibernate.commons.annotations
+    transitive: true
+  - module: org.hibernate.search.engine
+    transitive: true
+  - module: org.hibernate.search.mapper.pojo
+    transitive: true
+  - module: org.hibernate.search.util.common
+    transitive: true
+
+exports:
+  - package: org\.hibernate\.search(\..+)*\.(logging|reporting)\.impl
+    pattern: true
+    to:
+      - org.jboss.logging
+      - org.hibernate.search.engine
+  - package: org\.hibernate\.search(\..+)*\.impl
+    pattern: true
+    to:
+      - org.hibernate.search.engine

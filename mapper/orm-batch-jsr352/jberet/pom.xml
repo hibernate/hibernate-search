@@ -61,17 +61,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.moditect</groupId>
-                <artifactId>moditect-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-module-infos</id>
-                        <!-- Do not generate module-info with moditect-maven-plugin:
-                                jberet-core.jar has an invalid automatic module name: org.jberet.jberet-core
-                                dash is an invalid character! -->
-                        <phase>none</phase>
-                    </execution>
-                </executions>
+                <groupId>io.github.dmlloyd.module-info</groupId>
+                <artifactId>module-info</artifactId>
             </plugin>
         </plugins>
     </build>
