@@ -69,17 +69,15 @@ public final class SearchIntegrationEnvironment implements AutoCloseable {
 		propertyChecker = builder.propertyChecker;
 		beanProvider = builder.beanProvider;
 
-
 		ConfigurationPropertySource userPropertySource = builder.propertySource.withMask( CONFIGURATION_PROPERTIES_MASK );
 
-		propertySource = userPropertySource.withFallback(
-				ConfigurationPropertySourceScopeUtils.fallback( BeanResolverImpl.create(
-						classResolver, serviceResolver, beanProvider,
-						userPropertySource
-				), ConfigurationPropertySourceScopeUtils.global() )
-		);
+		beanResolver = BeanResolverImpl.create( classResolver, serviceResolver, beanProvider,
+				// This is the property source without the ConfigurationProvider fallback.
+				// BeanResolverImpl.create() will apply its own, limited, fallback configuration.
+				userPropertySource );
 
-		beanResolver = BeanResolverImpl.create( classResolver, serviceResolver, beanProvider, propertySource );
+		propertySource = userPropertySource.withFallback( ConfigurationPropertySourceScopeUtils.fallback(
+				beanResolver, ConfigurationPropertySourceScopeUtils.global() ) );
 	}
 
 	private SearchIntegrationEnvironment(SearchIntegrationEnvironment source, ConfigurationPropertySource propertySource,

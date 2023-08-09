@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySourceScopeUtils;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -43,7 +44,7 @@ public final class BeanResolverImpl implements BeanResolver {
 					.build();
 
 	public static BeanResolverImpl create(ClassResolver classResolver, ServiceResolver serviceResolver,
-			BeanProvider beanManagerBeanProvider, ConfigurationPropertySource configurationPropertySource) {
+			BeanProvider beanManagerBeanProvider, ConfigurationPropertySource nonDefaultedConfigurationPropertySource) {
 		if ( beanManagerBeanProvider == null ) {
 			beanManagerBeanProvider = new NoConfiguredBeanManagerBeanProvider();
 		}
@@ -53,11 +54,18 @@ public final class BeanResolverImpl implements BeanResolver {
 			beanConfigurer.configure( configurationContext );
 		}
 
-		ConfigurationBeanRegistry emptyBeanRegistry = new ConfigurationBeanRegistry( Collections.emptyMap() );
-		BeanResolverImpl beanResolverForConfigurers =
-				new BeanResolverImpl( classResolver, emptyBeanRegistry, beanManagerBeanProvider );
+		// The bean resolver used to resolve the ConfigurationProvider
+		// and the BeanConfigurers set through configuration properties
+		// will only take into account BeanConfigurers registered through the Java ServiceLoader,
+		// not those set through configuration properties.
+		ConfigurationBeanRegistry beanRegistryForConfiguration = configurationContext.buildRegistry();
+		BeanResolverImpl beanResolverForConfiguration =
+				new BeanResolverImpl( classResolver, beanRegistryForConfiguration, beanManagerBeanProvider );
+		ConfigurationPropertySource configurationPropertySource = nonDefaultedConfigurationPropertySource
+				.withFallback( ConfigurationPropertySourceScopeUtils.fallback(
+						beanResolverForConfiguration, ConfigurationPropertySourceScopeUtils.global() ) );
 		try ( BeanHolder<List<BeanConfigurer>> beanConfigurersFromConfigurationProperties =
-				BEAN_CONFIGURERS.getAndTransform( configurationPropertySource, beanResolverForConfigurers::resolve ) ) {
+				BEAN_CONFIGURERS.getAndTransform( configurationPropertySource, beanResolverForConfiguration::resolve ) ) {
 			for ( BeanConfigurer beanConfigurer : beanConfigurersFromConfigurationProperties.get() ) {
 				beanConfigurer.configure( configurationContext );
 			}
