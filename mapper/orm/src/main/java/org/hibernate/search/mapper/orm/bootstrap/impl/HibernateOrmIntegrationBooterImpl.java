@@ -180,7 +180,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 		try {
 			return partialBuildState.doBootSecondPhase( sessionFactoryImplementor,
-					preIntegrationService.propertySource(), preIntegrationService.propertyChecker() );
+					preIntegrationService.rawPropertySource(), preIntegrationService.propertyChecker() );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )

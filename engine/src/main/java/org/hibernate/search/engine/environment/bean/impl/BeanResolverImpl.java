@@ -15,8 +15,8 @@ import java.util.Map;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySourceScopeUtils;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
+import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -44,7 +44,7 @@ public final class BeanResolverImpl implements BeanResolver {
 					.build();
 
 	public static BeanResolverImpl create(ClassResolver classResolver, ServiceResolver serviceResolver,
-			BeanProvider beanManagerBeanProvider, ConfigurationPropertySource nonDefaultedConfigurationPropertySource) {
+			BeanProvider beanManagerBeanProvider, ConfigurationPropertySource rawConfigurationPropertySource) {
 		if ( beanManagerBeanProvider == null ) {
 			beanManagerBeanProvider = new NoConfiguredBeanManagerBeanProvider();
 		}
@@ -61,9 +61,8 @@ public final class BeanResolverImpl implements BeanResolver {
 		ConfigurationBeanRegistry beanRegistryForConfiguration = configurationContext.buildRegistry();
 		BeanResolverImpl beanResolverForConfiguration =
 				new BeanResolverImpl( classResolver, beanRegistryForConfiguration, beanManagerBeanProvider );
-		ConfigurationPropertySource configurationPropertySource = nonDefaultedConfigurationPropertySource
-				.withFallback( ConfigurationPropertySourceScopeUtils.fallback(
-						beanResolverForConfiguration, ConfigurationPropertySourceScopeUtils.global() ) );
+		ConfigurationPropertySource configurationPropertySource = SearchIntegrationEnvironment.rootPropertySource(
+				rawConfigurationPropertySource, beanResolverForConfiguration );
 		try ( BeanHolder<List<BeanConfigurer>> beanConfigurersFromConfigurationProperties =
 				BEAN_CONFIGURERS.getAndTransform( configurationPropertySource, beanResolverForConfiguration::resolve ) ) {
 			for ( BeanConfigurer beanConfigurer : beanConfigurersFromConfigurationProperties.get() ) {

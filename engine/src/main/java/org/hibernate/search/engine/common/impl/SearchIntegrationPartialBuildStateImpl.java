@@ -18,7 +18,6 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySourceScopeUtils;
 import org.hibernate.search.engine.common.resources.impl.EngineThreads;
 import org.hibernate.search.engine.common.resources.spi.SavedState;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
@@ -119,12 +118,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	public SearchIntegrationFinalizer finalizer(ConfigurationPropertySource propertySource,
 			ConfigurationPropertyChecker configurationPropertyChecker) {
 		return new SearchIntegrationFinalizerImpl(
-				propertySource.withMask( SearchIntegrationEnvironment.CONFIGURATION_PROPERTIES_MASK )
-						.withFallback(
-								ConfigurationPropertySourceScopeUtils.fallback(
-										beanResolver,
-										ConfigurationPropertySourceScopeUtils.global()
-								) ),
+				SearchIntegrationEnvironment.rootPropertySource( propertySource, beanResolver ),
 				configurationPropertyChecker
 		);
 	}
