@@ -23,6 +23,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProvider;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
@@ -175,14 +176,14 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 	}
 
 	private final ConfigurationPropertyChecker propertyChecker;
-	private final ConfigurationPropertySource propertySource;
+	private final ConfigurationPropertySource rawPropertySource;
 
 	private CoordinationConfigurationContextImpl coordinationStrategyConfiguration;
 
 	protected HibernateSearchPreIntegrationService(ConfigurationPropertyChecker propertyChecker,
-			ConfigurationPropertySource propertySource) {
+			ConfigurationPropertySource rawPropertySource) {
 		this.propertyChecker = propertyChecker;
-		this.propertySource = propertySource;
+		this.rawPropertySource = rawPropertySource;
 	}
 
 	@Override
@@ -196,14 +197,27 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 		closer.push( CoordinationConfigurationContextImpl::close, coordinationStrategyConfiguration );
 	}
 
-	ConfigurationPropertySource propertySource() {
-		return propertySource;
+	/**
+	 * @return The raw property source, without a mask or defaults from {@link ConfigurationProvider} applied.
+	 * Raw property sources are expected as input to engine SPIs such as
+	 * {@link SearchIntegrationEnvironment#builder(ConfigurationPropertySource, ConfigurationPropertyChecker)}
+	 * or {@link SearchIntegrationPartialBuildState#finalizer(ConfigurationPropertySource, ConfigurationPropertyChecker)}.
+	 * @see SearchIntegrationEnvironment#rootPropertySource(ConfigurationPropertySource, BeanResolver)
+	 */
+	ConfigurationPropertySource rawPropertySource() {
+		return rawPropertySource;
 	}
+
+	/**
+	 * @return A property source with the proper mask and defaults from {@link ConfigurationProvider} applied.
+	 * @see SearchIntegrationEnvironment#rootPropertySource(ConfigurationPropertySource, BeanResolver)
+	 */
+	abstract ConfigurationPropertySource propertySource();
 
 	public CoordinationConfigurationContextImpl coordinationStrategyConfiguration() {
 		if ( coordinationStrategyConfiguration == null ) {
 			coordinationStrategyConfiguration =
-					CoordinationConfigurationContextImpl.configure( propertySource, beanResolver() );
+					CoordinationConfigurationContextImpl.configure( propertySource(), beanResolver() );
 		}
 		return coordinationStrategyConfiguration;
 	}
@@ -224,9 +238,10 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 		private final ServiceRegistry serviceRegistry;
 
 		NotBooted(ConfigurationPropertyChecker propertyChecker,
-				ConfigurationPropertySource propertySource, SearchIntegrationEnvironment environment,
+				ConfigurationPropertySource rawPropertySource,
+				SearchIntegrationEnvironment environment,
 				ServiceRegistry serviceRegistry) {
-			super( propertyChecker, propertySource );
+			super( propertyChecker, rawPropertySource );
 			this.environment = environment;
 			this.serviceRegistry = serviceRegistry;
 		}
@@ -235,6 +250,11 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 		protected void doClose(Closer<RuntimeException> closer) {
 			super.doClose( closer );
 			closer.push( SearchIntegrationEnvironment::close, environment );
+		}
+
+		@Override
+		ConfigurationPropertySource propertySource() {
+			return environment.propertySource();
 		}
 
 		@Override
@@ -274,12 +294,15 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 
 	static class PreBooted extends HibernateSearchPreIntegrationService {
 
+		private final ConfigurationPropertySource propertySource;
 		private final HibernateOrmIntegrationPartialBuildState partialBuildState;
 
 		PreBooted(ConfigurationPropertyChecker propertyChecker,
-				ConfigurationPropertySource propertySource,
+				ConfigurationPropertySource rawPropertySource,
 				HibernateOrmIntegrationPartialBuildState partialBuildState) {
-			super( propertyChecker, propertySource );
+			super( propertyChecker, rawPropertySource );
+			this.propertySource = SearchIntegrationEnvironment.rootPropertySource(
+					rawPropertySource, partialBuildState.beanResolver() );
 			this.partialBuildState = partialBuildState;
 		}
 
@@ -287,6 +310,11 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 		protected void doClose(Closer<RuntimeException> closer) {
 			super.doClose( closer );
 			closer.push( HibernateOrmIntegrationPartialBuildState::closeOnFailure, partialBuildState );
+		}
+
+		@Override
+		ConfigurationPropertySource propertySource() {
+			return propertySource;
 		}
 
 		@Override

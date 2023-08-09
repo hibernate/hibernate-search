@@ -27,7 +27,7 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 public final class CoordinationConfigurationContextImpl implements CoordinationConfigurationContext, AutoCloseable {
 
 	private static final ConfigurationProperty<BeanReference<? extends CoordinationStrategy>> COORDINATION_STRATEGY =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.COORDINATION_STRATEGY )
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.COORDINATION_STRATEGY )
 					.asBeanReference( CoordinationStrategy.class )
 					.withDefault( HibernateOrmMapperSettings.Defaults.COORDINATION_STRATEGY )
 					.build();

@@ -27,6 +27,17 @@ import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 public final class SearchIntegrationEnvironment implements AutoCloseable {
 	public static final String CONFIGURATION_PROPERTIES_MASK = "hibernate.search";
 
+	public static ConfigurationPropertySource rootPropertySource(ConfigurationPropertySource propertySource,
+			BeanResolver beanResolver) {
+		return propertySource
+				.withMask( CONFIGURATION_PROPERTIES_MASK )
+				.withFallback(
+						ConfigurationPropertySourceScopeUtils.fallback(
+								beanResolver,
+								ConfigurationPropertySourceScopeUtils.global()
+						) );
+	}
+
 	private final ConfigurationPropertySource propertySource;
 	private final ConfigurationPropertyChecker propertyChecker;
 	private final ClassResolver classResolver;
@@ -69,15 +80,14 @@ public final class SearchIntegrationEnvironment implements AutoCloseable {
 		propertyChecker = builder.propertyChecker;
 		beanProvider = builder.beanProvider;
 
-		ConfigurationPropertySource userPropertySource = builder.propertySource.withMask( CONFIGURATION_PROPERTIES_MASK );
+		// This is the property source without any mask or ConfigurationProvider defaults applied.
+		ConfigurationPropertySource rawPropertySource = builder.propertySource;
 
 		beanResolver = BeanResolverImpl.create( classResolver, serviceResolver, beanProvider,
-				// This is the property source without the ConfigurationProvider fallback.
 				// BeanResolverImpl.create() will apply its own, limited, fallback configuration.
-				userPropertySource );
+				rawPropertySource );
 
-		propertySource = userPropertySource.withFallback( ConfigurationPropertySourceScopeUtils.fallback(
-				beanResolver, ConfigurationPropertySourceScopeUtils.global() ) );
+		propertySource = rootPropertySource( rawPropertySource, beanResolver );
 	}
 
 	private SearchIntegrationEnvironment(SearchIntegrationEnvironment source, ConfigurationPropertySource propertySource,
@@ -88,13 +98,7 @@ public final class SearchIntegrationEnvironment implements AutoCloseable {
 		this.serviceResolver = source.serviceResolver;
 		beanProvider = source.beanProvider;
 		beanResolver = source.beanResolver;
-		this.propertySource = propertySource
-				.withMask( CONFIGURATION_PROPERTIES_MASK )
-				.withFallback(
-						ConfigurationPropertySourceScopeUtils.fallback(
-								beanResolver,
-								ConfigurationPropertySourceScopeUtils.global()
-						) );
+		this.propertySource = rootPropertySource( propertySource, beanResolver );
 	}
 
 	@Override
