@@ -8,6 +8,7 @@ package org.hibernate.search.engine.environment.bean.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -84,6 +85,8 @@ public class BeanResolverImplRetrievalBeanTest {
 
 		when( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
 				.thenReturn( Collections.singletonList( beanConfigurer1 ) );
+		when( configurationSourceMock.withFallback( any() ) )
+				.thenCallRealMethod();
 		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
 				.thenReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2 ) ) );
 		beanResolver = BeanResolverImpl.create( classResolverMock, serviceResolverMock, beanManagerBeanProviderMock,

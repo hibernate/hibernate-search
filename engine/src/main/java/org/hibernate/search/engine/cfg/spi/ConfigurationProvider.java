@@ -9,6 +9,7 @@ package org.hibernate.search.engine.cfg.spi;
 import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 
 /**
  * Allows integrators to provide their default configuration properties for various scopes that would override
@@ -36,6 +37,15 @@ public interface ConfigurationProvider extends Comparable<ConfigurationProvider>
 	 *         Assuming we want to redefine a property {@code hibernate.search.backend.directory.type} in the backend scope,
 	 *         then Hibernate Search would expect that the property source returned by this provider for a backend scope
 	 *         will contain a value for a {@code directory.type} key.
+	 *     </li>
+	 *     <li>
+	 *         For global-scope property sources,
+	 *         the {@link EngineSpiSettings#BEAN_CONFIGURERS bean_configurers} configuration property
+	 *         is only ever looked up if this provider was registered by
+	 *         a {@link BeanConfigurer} added through the Java {@link java.util.ServiceLoader} system.
+	 *         A provider registered by a {@link BeanConfigurer} added through
+	 *         the {@link EngineSpiSettings#BEAN_CONFIGURERS bean_configurers} configuration property
+	 *         cannot itself set the {@link EngineSpiSettings#BEAN_CONFIGURERS bean_configurers} configuration property.
 	 *     </li>
 	 * </ul>
 	 *
