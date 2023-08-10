@@ -13,7 +13,7 @@ import groovy.transform.Field
 @Library('hibernate-jenkins-pipeline-helpers@1.2')
 import org.hibernate.jenkins.pipeline.helpers.job.JobHelper
 
-@Field final String MAVEN_TOOL = 'Apache Maven 3.8'
+@Field final String MAVEN_TOOL = 'Apache Maven 3.9'
 @Field final String JDK_TOOL = 'OpenJDK 11 Latest'
 
 // Performance node pattern, to be used for stages involving performance tests.
