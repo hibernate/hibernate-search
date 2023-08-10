@@ -198,7 +198,6 @@
                             <goal>add-module-info</goal>
                         </goals>
                         <configuration>
-                            <jvmVersion>9</jvmVersion>
                             <module>
                                 <moduleInfo>
                                     <name>${java.module.name}</name>
@@ -231,7 +230,12 @@
                                 </moduleInfo>
                             </module>
                             <jdepsExtraArgs>
-                                <arg>--multi-release=9</arg>
+                                <!--
+                                    Running the jdeps tool will fail without this option, if there are any multi-release jars
+                                    on the path. And since some modules might have such jars, e.g. util-common has Jandex,
+                                    it's safer to add this additional option:
+                                -->
+                                <arg>--multi-release=${java-version.main.release}</arg>
                             </jdepsExtraArgs>
                         </configuration>
                     </execution>
