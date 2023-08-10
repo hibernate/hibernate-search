@@ -4,14 +4,17 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.cfg.spi;
+package org.hibernate.search.engine.cfg.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.impl.EmptyConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProvider;
+import org.hibernate.search.engine.cfg.spi.ConfigurationScope;
+import org.hibernate.search.engine.cfg.spi.ConfigurationScopeNamespaces;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.logging.impl.Log;
@@ -25,6 +28,10 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public final class ConfigurationPropertySourceScopeUtils {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private static final Comparator<ConfigurationProvider> CONFIGURATION_PROVIDER_COMPARATOR =
+			Comparator.comparing( ConfigurationProvider::priority )
+					.thenComparing( cp -> cp.getClass().getName() );
+
 	private ConfigurationPropertySourceScopeUtils() {
 	}
 
@@ -33,22 +40,17 @@ public final class ConfigurationPropertySourceScopeUtils {
 	}
 
 	public static ConfigurationScope backend() {
-		return global().reduce( ConfigurationScopeNamespace.BACKEND, null );
+		return global().reduce( ConfigurationScopeNamespaces.BACKEND, null );
 	}
 
 	public static ConfigurationScope backend(String backendName) {
 		return backend()
-				.reduce( ConfigurationScopeNamespace.BACKEND, backendName );
-	}
-
-	public static ConfigurationScope index(String backendName) {
-		return backend( backendName )
-				.reduce( ConfigurationScopeNamespace.INDEX, null );
+				.reduce( ConfigurationScopeNamespaces.BACKEND, backendName );
 	}
 
 	public static ConfigurationScope index(String backendName, String indexName) {
-		return index( backendName )
-				.reduce( ConfigurationScopeNamespace.INDEX, indexName );
+		return backend( backendName )
+				.reduce( ConfigurationScopeNamespaces.INDEX, indexName );
 	}
 
 	/**
@@ -59,8 +61,9 @@ public final class ConfigurationPropertySourceScopeUtils {
 	public static ConfigurationPropertySource fallback(BeanResolver beanResolver, ConfigurationScope scope) {
 		try ( BeanHolder<List<ConfigurationProvider>> configurationProviderHolders =
 				beanResolver.resolve( beanResolver.allConfiguredForRole( ConfigurationProvider.class ) ) ) {
-			List<ConfigurationProvider> configurationProviders = configurationProviderHolders.get()
-					.stream().sorted().collect( Collectors.toList() );
+			List<ConfigurationProvider> configurationProviders = configurationProviderHolders.get().stream()
+					.sorted( CONFIGURATION_PROVIDER_COMPARATOR )
+					.collect( Collectors.toList() );
 
 			if ( configurationProviders.size() > 1 ) {
 				log.multipleConfigurationProvidersAvailable( scope.toString(), configurationProviders );

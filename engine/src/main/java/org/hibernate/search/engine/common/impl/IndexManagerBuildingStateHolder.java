@@ -122,8 +122,9 @@ class IndexManagerBuildingStateHolder {
 	private BackendInitialBuildState createBackend(Optional<String> backendNameOptional, TenancyMode tenancyMode,
 			EventContext eventContext) {
 		ConfigurationPropertySourceExtractor backendPropertySourceExtractor =
-				EngineConfigurationUtils.extractorForBackend( beanResolver, backendNameOptional );
-		ConfigurationPropertySource backendPropertySource = backendPropertySourceExtractor.extract( propertySource );
+				EngineConfigurationUtils.extractorForBackend( backendNameOptional );
+		ConfigurationPropertySource backendPropertySource =
+				backendPropertySourceExtractor.extract( beanResolver, propertySource );
 		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
 				BACKEND_TYPE.<BeanHolder<? extends BackendFactory>>getAndMap( backendPropertySource, beanResolver::resolve )
 						.orElseGet( () -> createDefaultBackendFactory( backendPropertySource ) ) ) {
@@ -175,8 +176,9 @@ class IndexManagerBuildingStateHolder {
 			}
 
 			ConfigurationPropertySourceExtractor indexPropertySourceExtractor =
-					EngineConfigurationUtils.extractorForIndex( beanResolver, propertySourceExtractor, backendName, indexName );
-			ConfigurationPropertySource indexPropertySource = indexPropertySourceExtractor.extract( propertySource );
+					EngineConfigurationUtils.extractorForIndex( propertySourceExtractor, backendName, indexName );
+			ConfigurationPropertySource indexPropertySource =
+					indexPropertySourceExtractor.extract( beanResolver, propertySource );
 
 			IndexManagerBuilder builder = backend.createIndexManagerBuilder(
 					indexName, mappedTypeName, backendBuildContext, backendMapperContext, indexPropertySource

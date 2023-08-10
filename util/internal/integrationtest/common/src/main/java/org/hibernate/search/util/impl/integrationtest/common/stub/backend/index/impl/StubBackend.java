@@ -29,15 +29,17 @@ public class StubBackend implements BackendImplementor, Backend {
 	private final EventContext eventContext;
 	private final StubBackendBehavior behavior;
 	private final TimingSource timingSource;
+	private final ConfigurationPropertySource propertySource;
 
 	StubBackend(EventContext eventContext, BackendBuildContext context, StubBackendBehavior behavior,
 			CompletionStage<BackendMappingHandle> mappingHandlePromise,
-			TimingSource timingSource) {
+			TimingSource timingSource, ConfigurationPropertySource propertySource) {
 		this.backendName = context.backendName();
 		this.eventContext = eventContext;
 		this.behavior = behavior;
 		this.timingSource = timingSource;
-		behavior.onCreateBackend( context, mappingHandlePromise );
+		this.propertySource = propertySource;
+		behavior.onCreateBackend( new StubBackendBuildContext( context, propertySource ), mappingHandlePromise );
 	}
 
 	@Override
@@ -92,6 +94,7 @@ public class StubBackend implements BackendImplementor, Backend {
 	public IndexManagerBuilder createIndexManagerBuilder(String indexName, String mappedTypeName,
 			BackendBuildContext context, BackendMapperContext backendMapperContext,
 			ConfigurationPropertySource propertySource) {
+		this.behavior.onCreateIndex( new StubIndexCreateContext( indexName, propertySource ) );
 		return new StubIndexManagerBuilder( this, indexName, mappedTypeName );
 	}
 }

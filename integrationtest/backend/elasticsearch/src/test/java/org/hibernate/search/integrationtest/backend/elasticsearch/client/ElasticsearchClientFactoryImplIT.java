@@ -1161,7 +1161,7 @@ public class ElasticsearchClientFactoryImplIT {
 		Map<String, Object> beanResolverConfiguration = new HashMap<>();
 		// Accept Wiremock's self-signed SSL certificates
 		beanResolverConfiguration.put(
-				EngineSpiSettings.Radicals.BEAN_CONFIGURERS,
+				EngineSpiSettings.BEAN_CONFIGURERS,
 				Collections.singletonList( elasticsearchSslBeanConfigurer() )
 		);
 

@@ -563,6 +563,6 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 120,
 			value = "Multiple configuration providers are available for scope '%1$s'. "
-					+ "They will be taken under consideration in such priority: '%2$s'.")
+					+ "They will be taken under consideration in the following order: '%2$s'.")
 	void multipleConfigurationProvidersAvailable(String scope, List<ConfigurationProvider> configurationProviders);
 }

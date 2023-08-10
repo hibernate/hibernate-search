@@ -12,29 +12,31 @@ import java.util.function.Predicate;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * Holds a configuration scope. It is <strong>not expected</strong> for anyone to create the scopes.
+ Holds a configuration scope.
+ * <p>
+ * It is <strong>not expected</strong> for service implementors to create the scopes.
  * Hibernate Search will create the scope itself, and it will pass a corresponding scope to the {@link ConfigurationProvider}
  * whenever it is required.
  * <p>
- * Key points about the {@link #reduce(String, String) scope reduction} are:
- * <ul>
- *     <li>Scope always starts as the global scope</li>
- *     <li>If a scope is reduced by some namespace with a name then this scope <strong>must already be reduced</strong> by this namespace <strong>without</strong> the name</li>
- * </ul>
- * For example a sequence of scope reduction can look as:
+ * Scope always starts as the global scope.
+ * This global scope should always be reachable through recursively accessing the {@link #parent() parent scope},
+ * unless the current scope is already a global scope.
+ * <p>
+ * An example of a scope sequence:
  * <ul>
  *     <li>{@code [namespace:global]} -- scope always starts with the global scope</li>
- *     <li>{@code [namespace:backend]} -- next is unnamed/default backend scope</li>
- *     <li>{@code [namespace:backend name:backend-name]} -- next there <strong>may</strong> be an <strong>optional</strong> named backend scope</li>
- *     <li>{@code [namespace:index]} -- next is unnamed/default index scope</li>
- *     <li>{@code [namespace:index name:index-name]} -- next is a scope specific to an index with a particular name</li>
+ *     <li>
+ *         {@code [namespace:backend name:backend-name]} -- next a backend scope with an <strong>optional</strong> backend named.
+ *     		If the name is not present, it means that scope represents a default backend.
+ *     	</li>
+ *     <li>{@code [namespace:index name:index-name]} -- next is a scope specific to an index</li>
  * </ul>
- * @see ConfigurationScopeNamespace
+ * @see ConfigurationScopeNamespaces
  * @see ConfigurationProvider
  */
 @Incubating
 public final class ConfigurationScope {
-	public static final ConfigurationScope GLOBAL = new ConfigurationScope( null, ConfigurationScopeNamespace.GLOBAL, null );
+	public static final ConfigurationScope GLOBAL = new ConfigurationScope( null, ConfigurationScopeNamespaces.GLOBAL, null );
 
 	private final ConfigurationScope parent;
 	private final String namespace;
