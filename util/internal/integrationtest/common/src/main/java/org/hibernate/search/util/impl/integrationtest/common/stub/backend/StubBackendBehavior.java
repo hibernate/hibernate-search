@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
@@ -22,6 +21,8 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendBuildContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexCreateContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchWork;
@@ -31,10 +32,12 @@ public abstract class StubBackendBehavior {
 	protected StubBackendBehavior() {
 	}
 
-	public abstract void onCreateBackend(BackendBuildContext context,
+	public abstract void onCreateBackend(StubBackendBuildContext context,
 			CompletionStage<BackendMappingHandle> mappingHandlePromise);
 
 	public abstract void onStopBackend();
+
+	public abstract void onCreateIndex(StubIndexCreateContext context);
 
 	public abstract void onAddField(String indexName, String absoluteFieldPath);
 

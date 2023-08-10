@@ -10,25 +10,26 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * Allows integrators to provide their default configuration properties for various scopes that would override
  * Hibernate Search specific ones.
  */
-public interface ConfigurationProvider extends Comparable<ConfigurationProvider> {
+@Incubating
+public interface ConfigurationProvider {
 
 	/**
+	 * Provide a configuration property source for the given scope.
+	 * <p>
 	 * Property sources created by this provider <strong>must</strong> follow these rules:
 	 * <ul>
 	 *     <li>
-	 *         A property source only contains properties that are relevant for the scope.
-	 *         E.g. a global scope property source should not contain any configuration properties for a specific index.
-	 *     </li>
-	 *     <li>
-	 *         A specific property should only be present in one property source.
-	 *         Since these property sources are added as fallbacks a value from the first property source it occurs in will be used
-	 *         (starting from the least specific one (global)).
-	 *         E.g. if a property is defined in a global scope source and then overridden in a backend/index scope,
+	 *         A property source only contains properties that are relevant for the given scope.
+	 *         E.g. a global scope property source should not contain any configuration properties
+	 *         for a specific index with the {@code backend.indexes.myindex} prefix;
+	 *         if such a property is defined in a global scope source and then overridden in a backend/index scope
+	 *         (without the prefix),
 	 *         the value will be taken from the global source and backend/index ones will be silently ignored.
 	 *     </li>
 	 *     <li>
@@ -55,8 +56,15 @@ public interface ConfigurationProvider extends Comparable<ConfigurationProvider>
 	 */
 	Optional<ConfigurationPropertySource> get(ConfigurationScope scope);
 
-	@Override
-	default int compareTo(ConfigurationProvider o) {
-		return o != null ? this.getClass().getSimpleName().compareTo( o.getClass().getSimpleName() ) : 1;
+	/**
+	 * Defines a priority of a particular configuration provider.
+	 * <p>
+	 * If multiple configuration providers are available they will be sorted by their {@link #priority() priority}
+	 * and then by FQCN to guarantee a predictable order.
+	 *
+	 * @return The priority of the current provider.
+	 */
+	default int priority() {
+		return 0;
 	}
 }

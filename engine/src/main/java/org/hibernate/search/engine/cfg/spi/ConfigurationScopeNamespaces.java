@@ -15,8 +15,8 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * @see	ConfigurationProvider
  */
 @Incubating
-public final class ConfigurationScopeNamespace {
-	private ConfigurationScopeNamespace() {
+public final class ConfigurationScopeNamespaces {
+	private ConfigurationScopeNamespaces() {
 	}
 
 	public static final String GLOBAL = "global";
