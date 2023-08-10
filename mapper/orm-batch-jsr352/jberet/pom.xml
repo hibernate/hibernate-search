@@ -57,22 +57,4 @@
             <artifactId>jboss-logging-annotations</artifactId>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.moditect</groupId>
-                <artifactId>moditect-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-module-infos</id>
-                        <!-- Do not generate module-info with moditect-maven-plugin:
-                                jberet-core.jar has an invalid automatic module name: org.jberet.jberet-core
-                                dash is an invalid character! -->
-                        <phase>none</phase>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>
