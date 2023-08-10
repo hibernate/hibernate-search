@@ -40,7 +40,7 @@ class IndexManagerNonStartedState {
 	void preStart(RootFailureCollector rootFailureCollector, BeanResolver beanResolver,
 			ConfigurationPropertySource rootPropertySource, SavedState savedState) {
 		indexFailureCollector = rootFailureCollector.withContext( eventContext );
-		ConfigurationPropertySource indexPropertySource = propertySourceExtractor.extract( rootPropertySource );
+		ConfigurationPropertySource indexPropertySource = propertySourceExtractor.extract( beanResolver, rootPropertySource );
 		startContext = new IndexManagerStartContextImpl(
 				indexFailureCollector, beanResolver, indexPropertySource
 		);
