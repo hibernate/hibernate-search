@@ -8,11 +8,11 @@ package org.hibernate.search.engine.cfg;
 
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.engine.cfg.impl.ConfigurationPropertySourceScopeUtils.backend;
+import static org.hibernate.search.engine.cfg.impl.ConfigurationPropertySourceScopeUtils.fallback;
+import static org.hibernate.search.engine.cfg.impl.ConfigurationPropertySourceScopeUtils.global;
+import static org.hibernate.search.engine.cfg.impl.ConfigurationPropertySourceScopeUtils.index;
 import static org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource.fromMap;
-import static org.hibernate.search.engine.cfg.spi.ConfigurationPropertySourceScopeUtils.backend;
-import static org.hibernate.search.engine.cfg.spi.ConfigurationPropertySourceScopeUtils.fallback;
-import static org.hibernate.search.engine.cfg.spi.ConfigurationPropertySourceScopeUtils.global;
-import static org.hibernate.search.engine.cfg.spi.ConfigurationPropertySourceScopeUtils.index;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,7 +34,7 @@ import org.junit.Test;
 
 import org.apache.logging.log4j.Level;
 
-public class ConfigurationPropertySourceTest {
+public class ConfigurationProviderTest {
 
 	@Rule
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
@@ -80,9 +80,6 @@ public class ConfigurationPropertySourceTest {
 		assertPair( propertySource, "foo", "global-bar" );
 
 		propertySource = propertySource.withFallback( fallback( resolver, backend() ) );
-		assertPair( propertySource, "foo", "global-bar" );
-
-		propertySource = propertySource.withFallback( fallback( resolver, index( null ) ) );
 		assertPair( propertySource, "foo", "global-bar" );
 
 		propertySource = propertySource.withFallback( fallback( resolver, index( null, "my-index" ) ) );
@@ -136,6 +133,11 @@ public class ConfigurationPropertySourceTest {
 			}
 
 			@Override
+			public int priority() {
+				return 2;
+			}
+
+			@Override
 			public String toString() {
 				return "ConfigurationProviderA";
 			}
@@ -153,6 +155,11 @@ public class ConfigurationPropertySourceTest {
 			}
 
 			@Override
+			public int priority() {
+				return 1;
+			}
+
+			@Override
 			public String toString() {
 				return "ConfigurationProviderB";
 			}
@@ -161,7 +168,7 @@ public class ConfigurationPropertySourceTest {
 		logged.expectEvent(
 				Level.DEBUG,
 				"Multiple configuration providers are available for scope 'global'.",
-				"They will be taken under consideration in such priority: '[ConfigurationProviderA, ConfigurationProviderB]'."
+				"They will be taken under consideration in the following order: '[ConfigurationProviderB, ConfigurationProviderA]'."
 		);
 		ConfigurationPropertySource propertySource = fromMap( asMap(
 				"prefix.key2", "value"
@@ -176,7 +183,7 @@ public class ConfigurationPropertySourceTest {
 		assertThat( propertySource.get( "prefix.key" ) )
 				.isPresent()
 				.get()
-				.isEqualTo( "global-value-a" );
+				.isEqualTo( "global-value-b" );
 	}
 
 	@Test
@@ -249,7 +256,6 @@ public class ConfigurationPropertySourceTest {
 				.isEqualTo( "user" );
 
 		source = source.withMask( "index" )
-				.withFallback( fallback( resolver, index( "my-backend" ) ) )
 				.withMask( "my-index" )
 				.withFallback( fallback( resolver, index( "my-backend", "my-index" ) ) );
 		assertThat( source.get( "override-setting" ) )

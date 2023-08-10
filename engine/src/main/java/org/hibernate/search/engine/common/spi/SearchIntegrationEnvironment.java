@@ -7,8 +7,8 @@
 package org.hibernate.search.engine.common.spi;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.impl.ConfigurationPropertySourceScopeUtils;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySourceScopeUtils;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.impl.BeanResolverImpl;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;

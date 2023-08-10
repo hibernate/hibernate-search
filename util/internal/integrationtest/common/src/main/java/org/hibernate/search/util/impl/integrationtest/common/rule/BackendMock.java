@@ -20,7 +20,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -33,7 +32,9 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendBuildContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexCreateContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchWork;
 
 import org.junit.rules.TestRule;
@@ -124,7 +125,7 @@ public class BackendMock implements TestRule {
 		}
 	}
 
-	public BackendMock onCreate(Consumer<BackendBuildContext> behavior) {
+	public BackendMock onCreate(Consumer<StubBackendBuildContext> behavior) {
 		backendBehavior().addCreateBackendBehavior( context -> {
 			behavior.accept( context );
 			return null;
@@ -135,6 +136,14 @@ public class BackendMock implements TestRule {
 	public BackendMock onStop(Runnable behavior) {
 		backendBehavior().addStopBackendBehavior( () -> {
 			behavior.run();
+			return null;
+		} );
+		return this;
+	}
+
+	public BackendMock onCreateIndex(Consumer<StubIndexCreateContext> behavior) {
+		backendBehavior().addCreateIndexBehavior( context -> {
+			behavior.accept( context );
 			return null;
 		} );
 		return this;

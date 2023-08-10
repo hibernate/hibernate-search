@@ -7,9 +7,10 @@
 package org.hibernate.search.engine.cfg.impl;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 
 public interface ConfigurationPropertySourceExtractor {
 
-	ConfigurationPropertySource extract(ConfigurationPropertySource parentSource);
+	ConfigurationPropertySource extract(BeanResolver beanResolver, ConfigurationPropertySource parentSource);
 
 }

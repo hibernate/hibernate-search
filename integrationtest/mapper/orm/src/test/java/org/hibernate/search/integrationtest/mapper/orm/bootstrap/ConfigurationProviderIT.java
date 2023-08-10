@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.bootstrap;
 
 import static java.util.Collections.singletonMap;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource.fromMap;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
@@ -18,6 +19,7 @@ import jakarta.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProvider;
+import org.hibernate.search.engine.cfg.spi.ConfigurationScopeNamespaces;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
@@ -43,16 +45,38 @@ public class ConfigurationProviderIT {
 	@Test
 	public void smoke() {
 		backendMock.expectAnySchema( INDEX_NAME );
+		backendMock.onCreate( context -> {
+			assertThat( context.backendConfigurationPropertySource().get( "some.backend.setting" ) )
+					.isPresent()
+					.get().isEqualTo( false );
+		} );
+		backendMock.onCreateIndex( context -> {
+			assertThat( context.getPropertySource().get( "some.index.setting" ) )
+					.isPresent()
+					.get().isEqualTo( 123 );
+		} );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withProperty( EngineSpiSettings.BEAN_CONFIGURERS, Collections.singletonList(
 						(BeanConfigurer) context -> context.define(
 								ConfigurationProvider.class,
 								BeanReference.ofInstance( scope -> {
-									if ( scope.matchExact( "global" ) ) {
+									if ( scope.matchExact( ConfigurationScopeNamespaces.GLOBAL ) ) {
 										return Optional.of( fromMap( singletonMap(
 												HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED,
 												false
+										) ) );
+									}
+									if ( scope.matchAny( ConfigurationScopeNamespaces.BACKEND ) ) {
+										return Optional.of( fromMap( singletonMap(
+												"some.backend.setting",
+												false
+										) ) );
+									}
+									if ( scope.matchAny( ConfigurationScopeNamespaces.INDEX ) ) {
+										return Optional.of( fromMap( singletonMap(
+												"some.index.setting",
+												123
 										) ) );
 									}
 									return Optional.empty();
