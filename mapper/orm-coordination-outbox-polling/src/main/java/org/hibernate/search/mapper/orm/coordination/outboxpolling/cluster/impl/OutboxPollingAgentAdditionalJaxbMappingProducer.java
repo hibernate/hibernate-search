@@ -140,7 +140,9 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 			int resolvedUuidType = UuidDataTypeUtils.uuidType(
 					uuidType.orElse(
 							HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_UUID_TYPE ),
-					dialect );
+					dialect,
+					ENTITY_MAPPING_AGENT_UUID_TYPE.resolveOrRaw( propertySource )
+			);
 			@SuppressWarnings("deprecation")
 			int resolvedPayloadType = PayloadMappingUtils.payload(
 					payloadType.orElse(

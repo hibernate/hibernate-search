@@ -223,6 +223,8 @@
                                 <argument>^org\.hibernate\.metamodel\.model\.domain\.JpaMetamodel$</argument>
 
                                 <argument>^org\.hibernate\.boot\.spi\.BootstrapContext$</argument>
+                                <argument>^org\.hibernate\.boot\.spi\.AdditionalMappingContributor$</argument>
+                                <argument>^org\.hibernate\.boot\.spi\.AdditionalMappingContributions$</argument>
                                 <argument>^org\.hibernate\.collection\.spi\.PersistentCollection$</argument>
                                 <argument>^org\.hibernate\.type\.spi\.TypeConfiguration$</argument>
                                 <argument>^org\.hibernate\.query\.spi\.ScrollableResultsImplementor$</argument>
