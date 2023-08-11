@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl;
 
+import static org.hibernate.search.mapper.orm.coordination.outboxpolling.impl.HibernateOrmUtils.isDiscriminatorMultiTenancyEnabled;
 import static org.hibernate.search.mapper.orm.coordination.outboxpolling.mapping.impl.JaxbMappingHelper.marshall;
 import static org.hibernate.search.mapper.orm.coordination.outboxpolling.mapping.impl.JaxbMappingHelper.unmarshall;
 
@@ -14,7 +15,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.Length;
-import org.hibernate.binder.internal.TenantIdBinder;
 import org.hibernate.boot.jaxb.mapping.JaxbEntityMappings;
 import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.dialect.Dialect;
@@ -107,7 +107,13 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 		Optional<String> table = ENTITY_MAPPING_AGENT_TABLE.get( propertySource );
 
 		Optional<UuidGenerationStrategy> uuidStrategy = ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY.get( propertySource );
-		Optional<String> uuidType = ENTITY_MAPPING_AGENT_UUID_TYPE.get( propertySource );
+		Optional<Integer> uuidType = ENTITY_MAPPING_AGENT_UUID_TYPE.getAndMap( propertySource,
+				value -> UuidDataTypeUtils.uuidType(
+						value,
+						propertySource,
+						ENTITY_MAPPING_AGENT_UUID_TYPE,
+						dialect
+				) );
 		Optional<PayloadType> payloadType = ENTITY_MAPPING_AGENT_PAYLOAD_TYPE.get( propertySource );
 
 		// only allow configuring the entire mapping or table/catalog/schema/generator/datatype names
@@ -137,12 +143,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 			mappings = unmarshall( mapping.get() );
 		}
 		else {
-			int resolvedUuidType = UuidDataTypeUtils.uuidType(
-					uuidType.orElse(
-							HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_UUID_TYPE ),
-					dialect,
-					ENTITY_MAPPING_AGENT_UUID_TYPE.resolveOrRaw( propertySource )
-			);
+			int resolvedUuidType = uuidType.orElseGet( () -> UuidDataTypeUtils.defaultUuidType( dialect ) );
 			@SuppressWarnings("deprecation")
 			int resolvedPayloadType = PayloadMappingUtils.payload(
 					payloadType.orElse(
@@ -157,7 +158,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 					catalog.orElse( "" ),
 					table.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_TABLE ),
 					resolvedUuidType, resolvedPayloadType, resolvedUuidStrategy,
-					buildingContext.getMetadataCollector().getFilterDefinition( TenantIdBinder.FILTER_NAME ) != null
+					isDiscriminatorMultiTenancyEnabled( buildingContext )
 			);
 		}
 

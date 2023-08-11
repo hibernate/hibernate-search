@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
+import static org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils.isDiscriminatorMultiTenancyEnabled;
+
 import java.util.List;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -73,8 +75,8 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		HibernateSearchPreIntegrationService preIntegrationService =
 				HibernateOrmUtils.getServiceOrFail( serviceRegistry, HibernateSearchPreIntegrationService.class );
 
-		boolean multiTenancyEnabled = ( (MetadataImplementor) metadata ).getMetadataBuildingOptions()
-				.isMultiTenancyEnabled();
+		boolean multiTenancyEnabled = ( (MetadataImplementor) metadata ).getMetadataBuildingOptions().isMultiTenancyEnabled()
+				|| isDiscriminatorMultiTenancyEnabled( metadata );
 
 		return new HibernateOrmMappingInitiator( basicTypeMetadataProvider, jandexIndex, introspector,
 				preIntegrationService, multiTenancyEnabled );

@@ -11,6 +11,8 @@ import java.util.Locale;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.SQLServerDialect;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.type.SqlTypes;
@@ -42,14 +44,12 @@ public final class UuidDataTypeUtils {
 	 * Otherwise, when {@code value != "default" } a user passed value will be used.
 	 */
 	@SuppressWarnings("deprecation")
-	public static int uuidType(String value, Dialect dialect, String propertyName) {
+	public static int uuidType(String value, ConfigurationPropertySource source,
+			OptionalConfigurationProperty<String> property, Dialect dialect) {
 		if ( DEFAULT.equalsIgnoreCase( value ) ) {
-			// See HSEARCH-4749 why MSSQL is treated differently
-			if ( dialect instanceof SQLServerDialect ) {
-				return SqlTypes.BINARY;
-			}
-			return SqlTypes.CHAR;
+			return defaultUuidType( dialect );
 		}
+		String propertyName = property.resolveOrRaw( source );
 		if ( UUID_CHAR.equalsIgnoreCase( value ) ) {
 			log.usingDeprecatedPropertyValue( propertyName, value, "CHAR" );
 			return SqlTypes.CHAR;
@@ -58,16 +58,22 @@ public final class UuidDataTypeUtils {
 			log.usingDeprecatedPropertyValue( propertyName, value, "BINARY" );
 			return SqlTypes.BINARY;
 		}
-		return TypeCodeConverter.INSTANCE.convert( value, propertyName );
+		return TypeCodeConverter.convert( value );
+	}
+
+	public static int defaultUuidType(Dialect dialect) {
+		// See HSEARCH-4749 why MSSQL is treated differently
+		if ( dialect instanceof SQLServerDialect ) {
+			return SqlTypes.BINARY;
+		}
+		return SqlTypes.CHAR;
 	}
 
 	// Copied and adapted from ORM's ConfigurationHelper$TypeCodeConverter
 	private static class TypeCodeConverter {
 
-		public static final TypeCodeConverter INSTANCE = new TypeCodeConverter();
-
-		public int convert(String value, String propertyName) {
-			final String string = value.toString().toUpperCase( Locale.ROOT );
+		public static int convert(String value) {
+			final String string = value.toUpperCase( Locale.ROOT );
 			final Integer typeCode = JdbcTypeNameMapper.getTypeCode( string );
 			if ( typeCode != null ) {
 				return typeCode;
@@ -76,7 +82,7 @@ public final class UuidDataTypeUtils {
 				return Integer.parseInt( string );
 			}
 			catch (NumberFormatException ex) {
-				throw log.unableToParseJdbcTypeCode( propertyName, value, ex.getMessage(), ex );
+				throw log.unableToParseJdbcTypeCode( value, ex.getMessage(), ex );
 			}
 		}
 	}

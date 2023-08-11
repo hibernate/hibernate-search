@@ -185,10 +185,15 @@ public final class OrmSetupHelper
 		}
 
 		public SetupContext tenants(String... tenants) {
-			withConfiguration( b -> MultitenancyTestHelper.enable( b, tenants ) );
+			return tenants( true, tenants );
+		}
+
+		public SetupContext tenants(boolean enableMultitenancyHelper, String... tenants) {
+			if ( enableMultitenancyHelper ) {
+				withConfiguration( b -> MultitenancyTestHelper.enable( b, tenants ) );
+			}
 			if ( coordinationStrategyExpectations.requiresTenantIds ) {
-				withProperty( HibernateOrmMapperSettings.MULTI_TENANCY_TENANT_IDS,
-						String.join( ",", tenants ) );
+				withProperty( HibernateOrmMapperSettings.MULTI_TENANCY_TENANT_IDS, String.join( ",", tenants ) );
 			}
 			return thisAsC();
 		}

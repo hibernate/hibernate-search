@@ -20,7 +20,10 @@ public final class PayloadMappingUtils {
 			case MATERIALIZED_BLOB:
 				return SqlTypes.MATERIALIZED_BLOB;
 			case LONG32VARBINARY:
-				return SqlTypes.LONG32VARBINARY;
+				// TODO: check with Yoann
+				//  note it's not the `LONG32VARBINARY` ... Postgres driver doesn't know about such type and simply fails
+				//  to process events ...
+				return SqlTypes.LONGVARBINARY;
 			default:
 				throw new AssertionFailure( "Unsupported PayloadType: " + type );
 		}
