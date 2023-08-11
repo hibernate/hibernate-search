@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import jakarta.persistence.PersistenceException;
 
+import org.hibernate.boot.jaxb.mapping.JaxbEntityMappings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentReference;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
@@ -46,7 +47,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 1,
 			value = "Generated entity mapping for outbox events used in the outbox-polling coordination strategy: %1$s")
-	void outboxEventGeneratedEntityMapping(String xmlMappingDefinition);
+	void outboxEventGeneratedEntityMapping(@FormatWith(JaxbEntityMappingsFormatter.class) JaxbEntityMappings mappings);
 
 	@Message(id = ID_OFFSET + 3, value = "Max '%1$s' retries exhausted to process the event. Event will be aborted.")
 	SearchException maxRetryExhausted(int retries);
@@ -97,7 +98,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 14,
 			value = "Generated entity mapping for agents used in the outbox-polling coordination strategy: %1$s")
-	void agentGeneratedEntityMapping(String xmlMappingDefinition);
+	void agentGeneratedEntityMapping(@FormatWith(JaxbEntityMappingsFormatter.class) JaxbEntityMappings xmlMappingDefinition);
 
 	@Message(id = ID_OFFSET + 15, value = "The pulse interval must be greater than or equal to the polling interval"
 			+ " i.e. in this case at least %s")

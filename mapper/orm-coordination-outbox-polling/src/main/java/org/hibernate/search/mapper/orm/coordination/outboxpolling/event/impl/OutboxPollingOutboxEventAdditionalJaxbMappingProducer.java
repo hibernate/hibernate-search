@@ -165,7 +165,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			);
 		}
 
-		log.outboxEventGeneratedEntityMapping( marshall( mappings ) );
+		log.outboxEventGeneratedEntityMapping( mappings );
 
 		return Map.of( OutboxEvent.class, mappings );
 	}
