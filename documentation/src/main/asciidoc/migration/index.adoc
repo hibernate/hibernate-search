@@ -284,6 +284,10 @@ alter table hsearch_agent
 
 The configuration properties are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
+`hibernate.search.coordination.entity.mapping.outboxevent.uuid_type` and `hibernate.search.coordination.entity.mapping.agent.uuid_type`
+now accept names of SQL type codes from `org.hibernate.type.SqlTypes` or their corresponding int values.
+The value `default` is still valid. `uuid-binary` and `uuid-char` are accepted and converted to their corresponding `org.hibernate.type.SqlTypes` alternatives, but they are deprecated and will not be accepted in the future versions of Hibernate Search.
+
 [[api]]
 == API changes
 

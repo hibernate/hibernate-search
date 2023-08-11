@@ -144,7 +144,9 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			int resolvedUuidType = UuidDataTypeUtils.uuidType(
 					uuidType.orElse(
 							HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_TYPE ),
-					dialect );
+					dialect,
+					ENTITY_MAPPING_OUTBOXEVENT_UUID_TYPE.resolveOrRaw( propertySource )
+			);
 			@SuppressWarnings("deprecation")
 			int resolvedPayloadType = PayloadMappingUtils.payload(
 					payloadType.orElse(

@@ -214,4 +214,14 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 35,
 			value = "Unable to process provided entity mappings: %1$s")
 	SearchException unableToProcessEntityMappings(String causeMessage, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET + 36,
+			value = "Couldn't interpret a '%1$s' property value '%2$s' as JDBC type code or type code name. %3$s")
+	SearchException unableToParseJdbcTypeCode(String property, String value, String causeMessage, @Cause Exception cause);
+
+	@LogMessage(level = WARN)
+	@Message(id = ID_OFFSET + 37,
+			value = "Configuration property '%1$s' is configured with a deprecated value '%2$s'. "
+					+ "Use the '%3$s' instead.")
+	void usingDeprecatedPropertyValue(String property, String value, String correctValue);
 }

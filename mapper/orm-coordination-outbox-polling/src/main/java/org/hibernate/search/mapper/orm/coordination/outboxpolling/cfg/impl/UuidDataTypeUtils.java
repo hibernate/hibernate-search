@@ -6,17 +6,28 @@
  */
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Locale;
+
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.SQLServerDialect;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.type.SqlTypes;
+import org.hibernate.type.descriptor.JdbcTypeNameMapper;
 
 public final class UuidDataTypeUtils {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private UuidDataTypeUtils() {
 	}
 
-	public static final String DEFAULT = "default";
-	public static final String UUID_BINARY = "uuid-binary";
-	public static final String UUID_CHAR = "uuid-char";
+	private static final String DEFAULT = "default";
+	@Deprecated
+	private static final String UUID_BINARY = "uuid-binary";
+	@Deprecated
+	private static final String UUID_CHAR = "uuid-char";
 
 	/**
 	 * @return In case of {@code value == "default" } a database specific result will be returned.
@@ -30,7 +41,8 @@ public final class UuidDataTypeUtils {
 	 * <p>
 	 * Otherwise, when {@code value != "default" } a user passed value will be used.
 	 */
-	public static int uuidType(String value, Dialect dialect) {
+	@SuppressWarnings("deprecation")
+	public static int uuidType(String value, Dialect dialect, String propertyName) {
 		if ( DEFAULT.equalsIgnoreCase( value ) ) {
 			// See HSEARCH-4749 why MSSQL is treated differently
 			if ( dialect instanceof SQLServerDialect ) {
@@ -38,11 +50,34 @@ public final class UuidDataTypeUtils {
 			}
 			return SqlTypes.CHAR;
 		}
-		if ( UUID_CHAR.equals( value ) ) {
+		if ( UUID_CHAR.equalsIgnoreCase( value ) ) {
+			log.usingDeprecatedPropertyValue( propertyName, value, "CHAR" );
 			return SqlTypes.CHAR;
 		}
-		else {
+		else if ( UUID_BINARY.equalsIgnoreCase( value ) ) {
+			log.usingDeprecatedPropertyValue( propertyName, value, "BINARY" );
 			return SqlTypes.BINARY;
+		}
+		return TypeCodeConverter.INSTANCE.convert( value, propertyName );
+	}
+
+	// Copied and adapted from ORM's ConfigurationHelper$TypeCodeConverter
+	private static class TypeCodeConverter {
+
+		public static final TypeCodeConverter INSTANCE = new TypeCodeConverter();
+
+		public int convert(String value, String propertyName) {
+			final String string = value.toString().toUpperCase( Locale.ROOT );
+			final Integer typeCode = JdbcTypeNameMapper.getTypeCode( string );
+			if ( typeCode != null ) {
+				return typeCode;
+			}
+			try {
+				return Integer.parseInt( string );
+			}
+			catch (NumberFormatException ex) {
+				throw log.unableToParseJdbcTypeCode( propertyName, value, ex.getMessage(), ex );
+			}
 		}
 	}
 }

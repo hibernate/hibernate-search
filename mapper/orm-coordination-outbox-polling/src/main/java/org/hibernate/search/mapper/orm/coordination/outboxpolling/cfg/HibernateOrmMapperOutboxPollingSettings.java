@@ -417,7 +417,8 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_UUID_GEN_STRATEGY;
 
 	/**
-	 * The name of the {@link org.hibernate.type.BasicType Hibernate ORM registered basic type} used for representing an UUID in the outbox event table.
+	 * The name of the {@link org.hibernate.type.SqlTypes Hibernate ORM constant type code used to identify a generic SQL type}
+	 * used for representing an UUID in the outbox event table.
 	 * <p>
 	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
@@ -495,7 +496,8 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY;
 
 	/**
-	 * The name of the {@link org.hibernate.type.BasicType Hibernate ORM registered basic type} used for representing an UUID in the agent table.
+	 * The name of the {@link org.hibernate.type.SqlTypes Hibernate ORM constant type code used to identify a generic SQL type}
+	 * used for representing an UUID in the agent table.
 	 * <p>
 	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
