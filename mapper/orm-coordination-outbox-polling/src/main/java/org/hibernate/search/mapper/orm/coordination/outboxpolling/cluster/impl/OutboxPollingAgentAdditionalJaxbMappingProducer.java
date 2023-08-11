@@ -161,7 +161,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 			);
 		}
 
-		log.agentGeneratedEntityMapping( marshall( mappings ) );
+		log.agentGeneratedEntityMapping( mappings );
 
 		return Map.of( Agent.class, mappings );
 	}
