@@ -9,6 +9,8 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.List;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.OutboxPollingExtension;
@@ -93,19 +95,19 @@ public class OutboxPollingSearchMappingIT {
 	public void reprocessAbortedEvents() {
 		assertThat( searchMapping.countAbortedEvents() ).isZero();
 
-		abortedEventsGenerator.generateThreeAbortedEvents();
+		List<Integer> generatedIDs = abortedEventsGenerator.generateThreeAbortedEvents();
 
 		assertThat( searchMapping.countAbortedEvents() ).isEqualTo( 3 );
 
 		backendMock.expectWorks( IndexedEntity.INDEX )
 				.createAndExecuteFollowingWorks()
-				.addOrUpdate( "1", b -> b
+				.addOrUpdate( Integer.toString( generatedIDs.get( 0 ) ), b -> b
 						.field( "indexedField", "initialValue" )
 				)
-				.addOrUpdate( "2", b -> b
+				.addOrUpdate( Integer.toString( generatedIDs.get( 1 ) ), b -> b
 						.field( "indexedField", "initialValue" )
 				)
-				.addOrUpdate( "3", b -> b
+				.addOrUpdate( Integer.toString( generatedIDs.get( 2 ) ), b -> b
 						.field( "indexedField", "initialValue" )
 				);
 		assertThat( searchMapping.reprocessAbortedEvents() ).isEqualTo( 3 );

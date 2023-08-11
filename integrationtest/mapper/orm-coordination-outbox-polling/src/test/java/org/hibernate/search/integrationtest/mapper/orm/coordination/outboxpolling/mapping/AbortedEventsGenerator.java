@@ -8,7 +8,10 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
 import org.hibernate.Session;
@@ -16,6 +19,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 
 public class AbortedEventsGenerator {
+	private static final AtomicInteger ID_GENERATOR = new AtomicInteger( 1 );
 
 	private final SessionFactory sessionFactory;
 	private final BackendMock backendMock;
@@ -46,59 +50,66 @@ public class AbortedEventsGenerator {
 		this.entityCreator = entityCreator;
 	}
 
-	void generateThreeAbortedEvents() {
+	List<Integer> generateThreeAbortedEvents() {
+		List<Integer> generatedIds;
 		if ( tenantId == null ) {
-			with( sessionFactory ).runInTransaction( this::generateThreeAbortedEvents );
+			generatedIds = with( sessionFactory ).applyInTransaction( this::generateThreeAbortedEvents );
 		}
 		else {
-			with( sessionFactory, tenantId ).runInTransaction( this::generateThreeAbortedEvents );
+			generatedIds = with( sessionFactory, tenantId ).applyInTransaction( this::generateThreeAbortedEvents );
 		}
-
 		backendMock.verifyExpectationsMet();
+		return generatedIds;
 	}
 
-	private void generateThreeAbortedEvents(Session session) {
-		entityCreator.accept( session, 1 );
-		entityCreator.accept( session, 2 );
-		entityCreator.accept( session, 3 );
+	private List<Integer> generateThreeAbortedEvents(Session session) {
+		int id1 = ID_GENERATOR.getAndIncrement();
+		int id2 = ID_GENERATOR.getAndIncrement();
+		int id3 = ID_GENERATOR.getAndIncrement();
+		entityCreator.accept( session, id1 );
+		entityCreator.accept( session, id2 );
+		entityCreator.accept( session, id3 );
 
 		CompletableFuture<?> failingFuture = new CompletableFuture<>();
 		failingFuture.completeExceptionally( new SimulatedFailure( "Indexing work failed!" ) );
-
+		String id1String = Integer.toString( id1 );
+		String id2String = Integer.toString( id2 );
+		String id3String = Integer.toString( id3 );
 		backendMock.expectWorks( indexName, tenantId )
 				.createAndExecuteFollowingWorks( failingFuture )
-				.add( "1", b -> b
+				.add( id1String, b -> b
 						.field( "indexedField", "initialValue" )
 				)
-				.add( "2", b -> b
+				.add( id2String, b -> b
 						.field( "indexedField", "initialValue" )
 				)
-				.add( "3", b -> b
-						.field( "indexedField", "initialValue" )
-				)
-				// retry (fails too):
-				.createAndExecuteFollowingWorks( failingFuture )
-				.addOrUpdate( "1", b -> b
-						.field( "indexedField", "initialValue" )
-				)
-				.addOrUpdate( "2", b -> b
-						.field( "indexedField", "initialValue" )
-				)
-				.addOrUpdate( "3", b -> b
+				.add( id3String, b -> b
 						.field( "indexedField", "initialValue" )
 				)
 				// retry (fails too):
 				.createAndExecuteFollowingWorks( failingFuture )
-				.addOrUpdate( "1", b -> b
+				.addOrUpdate( id1String, b -> b
 						.field( "indexedField", "initialValue" )
 				)
-				.addOrUpdate( "2", b -> b
+				.addOrUpdate( id2String, b -> b
 						.field( "indexedField", "initialValue" )
 				)
-				.addOrUpdate( "3", b -> b
+				.addOrUpdate( id3String, b -> b
+						.field( "indexedField", "initialValue" )
+				)
+				// retry (fails too):
+				.createAndExecuteFollowingWorks( failingFuture )
+				.addOrUpdate( id1String, b -> b
+						.field( "indexedField", "initialValue" )
+				)
+				.addOrUpdate( id2String, b -> b
+						.field( "indexedField", "initialValue" )
+				)
+				.addOrUpdate( id3String, b -> b
 						.field( "indexedField", "initialValue" )
 				);
 		// no more retry
+		return Arrays.asList( id1, id2, id3 );
 	}
 
 	public static class SimulatedFailure extends RuntimeException {

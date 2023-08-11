@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.junit.Assume.assumeTrue;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,8 +23,6 @@ import jakarta.persistence.Id;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.dialect.H2Dialect;
-import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.jdbc.spi.JdbcCoordinator;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.OutboxEventFilter;
@@ -372,18 +369,6 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			SharedSessionContractImplementor implementor = session.unwrap( SharedSessionContractImplementor.class );
 
 			JdbcCoordinator jdbc = implementor.getJdbcCoordinator();
-			JdbcEnvironment env = implementor.getJdbcServices().getJdbcEnvironment();
-
-			String javaVersionString = System.getProperty( "java.version" );
-			if ( javaVersionString != null && !javaVersionString.trim().isEmpty() ) {
-				boolean oldJavaVersion = javaVersionString.startsWith( "1." );
-				assumeTrue(
-						"The H2 actual maximum available precision depends on operating system and JVM and can be 3 (milliseconds) or higher. "
-								+
-								"Higher precision is not available before Java 9.",
-						!( oldJavaVersion && env.getDialect() instanceof H2Dialect )
-				);
-			}
 
 			List<String> uuids = new ArrayList<>();
 			List<java.sql.Timestamp> times = new ArrayList<>();
