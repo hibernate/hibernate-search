@@ -279,7 +279,7 @@
         <version.surefire.plugin.java-version.asm>9.5</version.surefire.plugin.java-version.asm>
         <version.jacoco.plugin>0.8.10</version.jacoco.plugin>
         <version.com.buschmais.jqassistant.plugin>2.0.3</version.com.buschmais.jqassistant.plugin>
-        <version.docker.maven.plugin>0.40.2</version.docker.maven.plugin>
+        <version.docker.maven.plugin>0.43.3</version.docker.maven.plugin>
         <version.moditect.plugin>1.0.0.Final</version.moditect.plugin>
         <version.sonar.plugin>3.9.1.2184</version.sonar.plugin>
         <version.scripting.plugin>3.0.0</version.scripting.plugin>
