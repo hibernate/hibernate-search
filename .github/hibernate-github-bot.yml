@@ -4,7 +4,7 @@ jira:
   ignore:
       # Allow build dependency upgrades i.e. maven plugin version upgrades to not follow the PR formatting rules:
     - user: dependabot[bot]
-      titlePattern: ".*\\bmaven\\b.*\\bplugin\\b.*"
+      titlePattern: ".*\\b(maven|surefire)\\b.*\\bplugin\\b.*"
       # Allow Groovy (that is only used for scripting maven plugin) version upgrades to not follow the PR formatting rules:
     - user: dependabot[bot]
       titlePattern: ".*\\bgroovy-jsr223\\b.*"
@@ -22,3 +22,12 @@ jira:
     # Guava is used in our test utils:
     - user: dependabot[bot]
       titlePattern: ".*\\bcom.google.guava\\b.*"
+    # Asciidoctor is used for rendering the documentation:
+    - user: dependabot[bot]
+      titlePattern: ".*\\b(org.asciidoctor|org.jruby)\\b.*"
+    # Forbidden APIs:
+    - user: dependabot[bot]
+      titlePattern: ".*\\bforbiddenapis\\b.*"
+    # Eclipse compiler:
+    - user: dependabot[bot]
+      titlePattern: ".*\\borg.codehaus.plexus.plexus-compiler\\b.*"
