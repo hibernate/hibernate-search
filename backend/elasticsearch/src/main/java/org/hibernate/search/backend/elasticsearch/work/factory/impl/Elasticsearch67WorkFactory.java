@@ -34,8 +34,8 @@ import com.google.gson.JsonObject;
 @SuppressWarnings("deprecation") // We use Paths.DOC on purpose
 public class Elasticsearch67WorkFactory extends Elasticsearch7WorkFactory {
 
-	public Elasticsearch67WorkFactory(GsonProvider gsonProvider) {
-		super( gsonProvider );
+	public Elasticsearch67WorkFactory(GsonProvider gsonProvider, Boolean ignoreShardFailures) {
+		super( gsonProvider, ignoreShardFailures );
 	}
 
 
@@ -57,7 +57,11 @@ public class Elasticsearch67WorkFactory extends Elasticsearch7WorkFactory {
 	@Override
 	public <T> SearchWork.Builder<T> search(JsonObject payload,
 			ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
-		return SearchWork.Builder.forElasticsearch63to68( payload, searchResultExtractor );
+		SearchWork.Builder<T> builder = SearchWork.Builder.forElasticsearch63to68( payload, searchResultExtractor );
+		if ( ignoreShardFailures ) {
+			builder.ignoreShardFailures();
+		}
+		return builder;
 	}
 
 	@Override

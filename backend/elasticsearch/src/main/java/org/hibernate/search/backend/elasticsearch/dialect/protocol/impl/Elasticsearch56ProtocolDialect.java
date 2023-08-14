@@ -32,8 +32,8 @@ public class Elasticsearch56ProtocolDialect implements ElasticsearchProtocolDial
 	}
 
 	@Override
-	public ElasticsearchWorkFactory createWorkFactory(GsonProvider gsonProvider) {
-		return new Elasticsearch56WorkFactory( gsonProvider );
+	public ElasticsearchWorkFactory createWorkFactory(GsonProvider gsonProvider, Boolean ignoreShardFailures) {
+		return new Elasticsearch56WorkFactory( gsonProvider, ignoreShardFailures );
 	}
 
 	@Override

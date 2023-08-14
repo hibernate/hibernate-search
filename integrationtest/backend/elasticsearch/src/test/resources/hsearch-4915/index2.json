@@ -1,0 +1,14 @@
+{
+  "properties": {
+    "_entity_type": {
+      "type": "keyword",
+      "index": false
+    },
+    "field": {
+      "type": "integer"
+    }
+  },
+  "_source": {
+    "enabled": false
+  }
+}
