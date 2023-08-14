@@ -56,6 +56,12 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 					.withDefault( ElasticsearchBackendSettings.Defaults.SCROLL_TIMEOUT )
 					.build();
 
+	private static final ConfigurationProperty<Boolean> QUERY_SHARD_FAILURE_IGNORE =
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.QUERY_SHARD_FAILURE_IGNORE )
+					.asBoolean()
+					.withDefault( ElasticsearchBackendSettings.Defaults.QUERY_SHARD_FAILURE_IGNORE )
+					.build();
+
 	private final BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder;
 	private final BackendThreads threads;
 	private final GsonProvider defaultGsonProvider;
@@ -145,7 +151,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 			gsonProvider = GsonProvider.create( GsonBuilder::new, logPrettyPrinting );
 			indexMetadataSyntax = protocolDialect.createIndexMetadataSyntax();
 			searchSyntax = protocolDialect.createSearchSyntax();
-			workFactory = protocolDialect.createWorkFactory( gsonProvider );
+			workFactory = protocolDialect.createWorkFactory( gsonProvider, QUERY_SHARD_FAILURE_IGNORE.get( propertySource ) );
 			searchResultExtractorFactory = protocolDialect.createSearchResultExtractorFactory();
 			scrollTimeout = SCROLL_TIMEOUT.get( propertySource );
 		}

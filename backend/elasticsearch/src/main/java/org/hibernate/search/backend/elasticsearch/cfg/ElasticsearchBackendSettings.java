@@ -301,6 +301,23 @@ public final class ElasticsearchBackendSettings {
 	public static final String MAX_KEEP_ALIVE = "max_keep_alive";
 
 	/**
+	 * This property defines if partial shard failures are ignored.
+	 * <p>
+	 * In case all shards fail, Elasticsearch cluster will return a 400 status code itself,
+	 * but if only some of the shards fail, then the client will receive a successful partial response from the shards
+	 * that were successful.
+	 * <p>
+	 * To prevent getting any partial results this setting can be set to {@code false}.
+	 * While if the partial failures should be ignored and considered as valid results then the value should be set to {@code true}.
+	 * <p>
+	 * Expects a Boolean value such as {@code true} or {@code false},
+	 * or a string that can be parsed into a Boolean value.
+	 * <p>
+	 * Defaults to {@link Defaults#QUERY_SHARD_FAILURE_IGNORE}.
+	 */
+	public static final String QUERY_SHARD_FAILURE_IGNORE = "query.shard_failure.ignore";
+
+	/**
 	 * Default values for the different settings if no values are given.
 	 */
 	public static final class Defaults {
@@ -332,5 +349,6 @@ public final class ElasticsearchBackendSettings {
 		public static final BeanReference<IndexLayoutStrategy> LAYOUT_STRATEGY =
 				BeanReference.of( IndexLayoutStrategy.class, SimpleIndexLayoutStrategy.NAME );
 		public static final int SCROLL_TIMEOUT = 60;
+		public static final boolean QUERY_SHARD_FAILURE_IGNORE = false;
 	}
 }
