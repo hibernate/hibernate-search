@@ -22,14 +22,18 @@ import com.google.gson.JsonObject;
  */
 public class Elasticsearch56WorkFactory extends Elasticsearch63WorkFactory {
 
-	public Elasticsearch56WorkFactory(GsonProvider gsonProvider) {
-		super( gsonProvider );
+	public Elasticsearch56WorkFactory(GsonProvider gsonProvider, Boolean ignoreShardFailures) {
+		super( gsonProvider, ignoreShardFailures );
 	}
 
 	@Override
 	public <T> SearchWork.Builder<T> search(JsonObject payload,
 			ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
-		return SearchWork.Builder.forElasticsearch62AndBelow( payload, searchResultExtractor );
+		SearchWork.Builder<T> builder = SearchWork.Builder.forElasticsearch62AndBelow( payload, searchResultExtractor );
+		if ( ignoreShardFailures ) {
+			builder.ignoreShardFailures();
+		}
+		return builder;
 	}
 
 }

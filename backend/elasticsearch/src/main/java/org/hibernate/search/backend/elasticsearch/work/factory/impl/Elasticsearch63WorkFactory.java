@@ -25,8 +25,8 @@ import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexMappingWork;
 @SuppressWarnings("deprecation") // We use Paths.DOC on purpose
 public class Elasticsearch63WorkFactory extends Elasticsearch67WorkFactory {
 
-	public Elasticsearch63WorkFactory(GsonProvider gsonProvider) {
-		super( gsonProvider );
+	public Elasticsearch63WorkFactory(GsonProvider gsonProvider, Boolean ignoreShardFailures) {
+		super( gsonProvider, ignoreShardFailures );
 	}
 
 	@Override

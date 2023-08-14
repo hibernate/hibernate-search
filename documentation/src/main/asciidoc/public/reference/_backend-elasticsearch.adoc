@@ -1346,6 +1346,24 @@ hibernate.search.backend.scroll_timeout = 60
 ----
 The default for this property is `60`.
 
+[[backend-elasticsearch-search-ignore-partial-shard-failure]]
+=== Partial shard failure
+
+With the Elasticsearch backend, <<search-dsl-query-fetching-results,fetching results>> may result in partial shard failures,
+i.e. some of the shards will fail to produce results while the others will succeed.
+In such situations, an Elasticsearch cluster will produce a response with a successful status code, but will contain additional
+information on failed shards, and the reason they have failed.
+
+By default, Hibernate Search will check if any shards have failed while fetching the results and if so -- will throw an exception.
+
+Use the following configuration property at the backend level to change the default behaviour:
+
+[source]
+----
+hibernate.search.backend.query.shard_failure.ignore = true
+----
+The default for this property is `false`.
+
 [[backend-elasticsearch-access-client]]
 == [[elasticsearch-client-access]] Retrieving the REST client
 

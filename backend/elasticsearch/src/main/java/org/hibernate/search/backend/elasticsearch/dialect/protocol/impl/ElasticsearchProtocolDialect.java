@@ -37,7 +37,7 @@ public interface ElasticsearchProtocolDialect {
 
 	ElasticsearchSearchSyntax createSearchSyntax();
 
-	ElasticsearchWorkFactory createWorkFactory(GsonProvider gsonProvider);
+	ElasticsearchWorkFactory createWorkFactory(GsonProvider gsonProvider, Boolean ignoreShardFailures);
 
 	ElasticsearchSearchResultExtractorFactory createSearchResultExtractorFactory();
 

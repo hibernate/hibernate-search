@@ -92,7 +92,7 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 
 		private Builder(JsonObject payload, ElasticsearchSearchResultExtractor<R> resultExtractor, Boolean trackTotalHits,
 				boolean allowPartialSearchResultsSupported) {
-			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
+			super( ElasticsearchRequestSuccessAssessor.SHARD_FAILURE_CHECKED_INSTANCE );
 			this.payload = payload;
 			this.resultExtractor = resultExtractor;
 			this.trackTotalHits = trackTotalHits;
@@ -133,6 +133,11 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 			if ( trackTotalHits != null && trackTotalHits ) {
 				trackTotalHits = false;
 			}
+			return this;
+		}
+
+		public Builder<R> ignoreShardFailures() {
+			resultAssessor = ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE;
 			return this;
 		}
 

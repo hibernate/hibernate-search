@@ -47,9 +47,11 @@ import com.google.gson.JsonObject;
 public class Elasticsearch7WorkFactory implements ElasticsearchWorkFactory {
 
 	protected final GsonProvider gsonProvider;
+	protected final Boolean ignoreShardFailures;
 
-	public Elasticsearch7WorkFactory(GsonProvider gsonProvider) {
+	public Elasticsearch7WorkFactory(GsonProvider gsonProvider, Boolean ignoreShardFailures) {
 		this.gsonProvider = gsonProvider;
+		this.ignoreShardFailures = ignoreShardFailures;
 	}
 
 	@Override
@@ -94,7 +96,11 @@ public class Elasticsearch7WorkFactory implements ElasticsearchWorkFactory {
 
 	@Override
 	public <T> SearchWork.Builder<T> search(JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
-		return SearchWork.Builder.forElasticsearch7AndAbove( payload, searchResultExtractor );
+		SearchWork.Builder<T> builder = SearchWork.Builder.forElasticsearch7AndAbove( payload, searchResultExtractor );
+		if ( ignoreShardFailures ) {
+			builder.ignoreShardFailures();
+		}
+		return builder;
 	}
 
 	@Override

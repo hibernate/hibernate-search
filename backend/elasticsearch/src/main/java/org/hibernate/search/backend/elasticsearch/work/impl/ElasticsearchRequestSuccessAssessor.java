@@ -31,9 +31,16 @@ public class ElasticsearchRequestSuccessAssessor {
 	private static final JsonAccessor<String> ERROR_TYPE =
 			JsonAccessor.root().property( "error" ).property( "type" ).asString();
 
+	private static final JsonAccessor<Integer> FAILED_SHARDS_COUNT = JsonAccessor.root()
+			.property( "_shards" )
+			.property( "failed" )
+			.asInteger();
 	private static final int TIME_OUT_HTTP_STATUS_CODE = 408;
 
+	public static final ElasticsearchRequestSuccessAssessor SHARD_FAILURE_CHECKED_INSTANCE =
+			builder().ignoreShardFailures( false ).build();
 	public static final ElasticsearchRequestSuccessAssessor DEFAULT_INSTANCE = builder().build();
+
 
 	public static Builder builder() {
 		return new Builder();
@@ -42,6 +49,7 @@ public class ElasticsearchRequestSuccessAssessor {
 	public static class Builder {
 		private final Set<Integer> ignoredErrorStatuses = new HashSet<>();
 		private final Set<String> ignoredErrorTypes = new HashSet<>();
+		private boolean ignoreShardFailures = true;
 
 		public Builder ignoreErrorStatuses(int... ignoredErrorStatuses) {
 			for ( int ignoredErrorStatus : ignoredErrorStatuses ) {
@@ -55,6 +63,11 @@ public class ElasticsearchRequestSuccessAssessor {
 			return this;
 		}
 
+		public Builder ignoreShardFailures(boolean ignoreShardFailures) {
+			this.ignoreShardFailures = ignoreShardFailures;
+			return this;
+		}
+
 		public ElasticsearchRequestSuccessAssessor build() {
 			return new ElasticsearchRequestSuccessAssessor( this );
 		}
@@ -62,10 +75,12 @@ public class ElasticsearchRequestSuccessAssessor {
 
 	private final Set<Integer> ignoredErrorStatuses;
 	private final Set<String> ignoredErrorTypes;
+	private final boolean ignoreShardFailures;
 
 	private ElasticsearchRequestSuccessAssessor(Builder builder) {
 		this.ignoredErrorStatuses = Collections.unmodifiableSet( new HashSet<>( builder.ignoredErrorStatuses ) );
 		this.ignoredErrorTypes = Collections.unmodifiableSet( new HashSet<>( builder.ignoredErrorTypes ) );
+		this.ignoreShardFailures = builder.ignoreShardFailures;
 	}
 
 	@Override
@@ -74,6 +89,7 @@ public class ElasticsearchRequestSuccessAssessor {
 				.append( getClass().getSimpleName() ).append( "[" )
 				.append( "ignoredErrorStatuses=" ).append( ignoredErrorStatuses )
 				.append( ", ignoredErrorTypes=" ).append( ignoredErrorTypes )
+				.append( ", ignoreShardFailures=" ).append( ignoreShardFailures )
 				.append( "]" )
 				.toString();
 	}
@@ -116,9 +132,14 @@ public class ElasticsearchRequestSuccessAssessor {
 	private boolean isSuccess(Optional<Integer> statusCode, JsonObject responseBody) {
 		return statusCode.map(
 				c -> ElasticsearchClientUtils.isSuccessCode( c ) || ignoredErrorStatuses.contains( c )
-		)
-				.orElse( false )
+		).orElse( false )
+				&& ( FAILED_SHARDS_COUNT.get( responseBody ).map( this::checkShardFailures )
+						.orElse( true ) )
 				|| ERROR_TYPE.get( responseBody ).map( ignoredErrorTypes::contains ).orElse( false );
+	}
+
+	private boolean checkShardFailures(Integer failures) {
+		return ignoreShardFailures || failures == 0;
 	}
 
 }
