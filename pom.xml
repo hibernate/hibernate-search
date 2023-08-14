@@ -254,7 +254,7 @@
         <version.deploy.plugin>3.1.1</version.deploy.plugin>
         <version.gpg.plugin>3.1.0</version.gpg.plugin>
         <version.flatten-maven-plugin>1.5.0</version.flatten-maven-plugin>
-        <version.assembly.plugin>3.4.2</version.assembly.plugin>
+        <version.assembly.plugin>3.6.0</version.assembly.plugin>
         <version.buildhelper.plugin>3.3.0</version.buildhelper.plugin>
         <version.checkstyle.plugin>3.3.0</version.checkstyle.plugin>
         <version.bundle.plugin>5.1.9</version.bundle.plugin>
