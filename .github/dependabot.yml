@@ -28,11 +28,6 @@ updates:
         update-types: [ "version-update:semver-patch" ]
         # ignore spring boot 3+ for now as some required dependencies are not compatible with this version yet:
         versions: ["[3.0.0,)"]
-      # Upgrading to asciidoctorj-pdf 1.5.0 or later won't work for
-      # some reason; we're getting strange errors that led me to think the
-      # font-size has the wrong type (string instead of number).
-      # See b8f044eea92d6f2dd3421779f54b8923e00a26b7
-      - dependency-name: org.asciidoctor:asciidoctorj-pdf
       # We strictly align these dependencies on the version used in Hibernate ORM.
       - dependency-name: "org.jboss:jandex"
       - dependency-name: "io.smallrye:jandex"
