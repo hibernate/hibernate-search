@@ -131,5 +131,7 @@ are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVers
 [[behavior]]
 == Behavior changes
 
-The behavior of Hibernate Search {hibernateSearchVersion}
-is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+The default value for `hibernate.search.backend.query.shard_failure.ignore` is changed from `true` to `false` which means
+that now Hibernate Search will throw an exception if at least one shard failed during a search operation.
+To get the previous behavior set this configuration property explicitly to `true`.
+Note, this setting must be set for each elasticsearch backend, if multiple are defined.
