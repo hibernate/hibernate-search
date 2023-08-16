@@ -1583,6 +1583,16 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>parse-elasticsearch-test-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.test.elasticsearch.version</propertyPrefix>
+                            <versionString>${test.elasticsearch.version}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>parse-gson-version</id>
                         <goals>
                             <goal>parse-version</goal>
