@@ -349,6 +349,6 @@ public final class ElasticsearchBackendSettings {
 		public static final BeanReference<IndexLayoutStrategy> LAYOUT_STRATEGY =
 				BeanReference.of( IndexLayoutStrategy.class, SimpleIndexLayoutStrategy.NAME );
 		public static final int SCROLL_TIMEOUT = 60;
-		public static final boolean QUERY_SHARD_FAILURE_IGNORE = false;
+		public static final boolean QUERY_SHARD_FAILURE_IGNORE = true;
 	}
 }
