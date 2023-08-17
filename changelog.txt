@@ -1,6 +1,27 @@
 Hibernate Search Changelog
 ==========================
 
+6.2.1.Final (2023-08-17)
+-------------------------
+
+** Bug
+    * HSEARCH-4915 Errors returned by OpenSearch/ElasticSearch not forwarded to caller
+
+** Improvement
+    * HSEARCH-4905 Add compatibility with OpenSearch 2.9.0
+    * HSEARCH-4904 Upgrade to Elasticsearch client 8.9.0 and test against Elasticsearch 8.9.0
+    * HSEARCH-4903 Upgrade -orm6 artifacts to Hibernate ORM 6.2.7.Final
+    * HSEARCH-4899 Use the links to Appendix instead of Javadocs where possible in reference documentation
+    * HSEARCH-4898 Give more context in the Hibernate Search getting started guides
+    * HSEARCH-4744 Support Jandex index reading and building for nested JARs
+
+** Task
+    * HSEARCH-4916 Test against latest OpenSearch 1.3.12
+    * HSEARCH-4910 Investigate slow startup of Elasticsearch container in integration tests
+    * HSEARCH-4907 Fix links and formatting in the migration guide
+    * HSEARCH-4906 Test against latest Elasticsearch 7.17.12
+    * HSEARCH-4897 Allow providing configuration defaults for every backend through SPI
+
 6.2.0.Final (2023-07-07)
 -------------------------
 
