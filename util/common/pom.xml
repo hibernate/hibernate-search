@@ -78,24 +78,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>testWithJdk11</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>11</value>
-                </property>
-            </activation>
-            <properties>
-                <!--
-                    We want to use a different version of Spring Boot when testing with JDK11
-                    since 3+ requires JDK17+ and our tests won't run on JDK11.
-                -->
-                <version.org.springframework.boot>2.7.14</version.org.springframework.boot>
-            </properties>
-        </profile>
-    </profiles>
 </project>
 
