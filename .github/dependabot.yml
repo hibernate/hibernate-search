@@ -53,17 +53,12 @@ updates:
       # AWS SDK releases way too often (every week?); ignore all patch updates
       - dependency-name: "software.amazon.awssdk:*"
         update-types: ["version-update:semver-patch"]
-      # JRuby releases way too often (every two weeks?) and is only used during the build; ignore all patch updates
-      - dependency-name: "org.jruby:jruby-complete"
-        update-types: ["version-update:semver-patch"]
       # Groovy is only used during the build; ignore all patch updates
       - dependency-name: "org.apache.groovy:groovy-jsr223"
         update-types: [ "version-update:semver-patch" ]
       # We don't care that much about being on the very latest version of some integration test dependencies
       - dependency-name: "org.springframework.boot:*"
         update-types: [ "version-update:semver-patch" ]
-        # ignore spring boot 3+ for now as some required dependencies are not compatible with this version yet:
-        versions: ["[3.0.0,)"]
       # We strictly align these dependencies on the version used in Hibernate ORM.
       - dependency-name: "io.smallrye:jandex"
       - dependency-name: "jakarta.persistence:jakarta.persistence-api"
@@ -86,3 +81,7 @@ updates:
         update-types: ["version-update:semver-major"]
       # We only define a maven's minimum version, so we don't need it to be updated to the latest:
       - dependency-name: "org.apache.maven:maven-core"
+      # This dependency uses classifiers (-jdk8, ...) in its version, and dependabot can't decide which versions are relevant.
+      # See https://github.com/dependabot/dependabot-core/issues/4028
+      # And, additionally, it is only for performance testing.
+      - dependency-name: "org.bsc.maven:maven-processor-plugin"
