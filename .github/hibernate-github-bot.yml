@@ -4,7 +4,7 @@ jira:
   ignore:
       # Allow build dependency upgrades i.e. maven plugin version upgrades to not follow the PR formatting rules:
     - user: dependabot[bot]
-      titlePattern: ".*\\b(maven|surefire)\\b.*\\bplugin\\b.*"
+      titlePattern: ".*\\b((maven|surefire)\\b.*\\bplugin|owasp)\\b.*"
       # Allow Groovy (that is only used for scripting maven plugin) version upgrades to not follow the PR formatting rules:
     - user: dependabot[bot]
       titlePattern: ".*\\bgroovy-jsr223\\b.*"
@@ -31,3 +31,6 @@ jira:
     # Eclipse compiler:
     - user: dependabot[bot]
       titlePattern: ".*\\borg.codehaus.plexus.plexus-compiler\\b.*"
+    # JBeret integration tests runtime dependencies:
+    - user: dependabot[bot]
+      titlePattern: ".*\\b(jboss-marshalling|wildfly-security-manager)\\b.*"
