@@ -61,8 +61,7 @@ public class ElasticsearchShardsFailedExceptionIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Elasticsearch request failed",
-						"\"successful\": 1,",
-						"\"failed\": 1,"
+						"\"type\": \"query_shard_exception\","
 				);
 	}
 
@@ -75,8 +74,7 @@ public class ElasticsearchShardsFailedExceptionIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Elasticsearch request failed",
-						"\"successful\": 1,",
-						"\"failed\": 1,"
+						"\"type\": \"query_shard_exception\","
 				);
 	}
 
