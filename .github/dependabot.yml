@@ -13,6 +13,39 @@ updates:
     # We don't trigger Jenkins or GitHub Actions builds on pull requests from dependabot,
     # so we can safely use a high limit here.
     open-pull-requests-limit: 20
+    groups:
+      # This group combines all build-only dependencies. Published artifacts do not depend on them.
+      # Grouping such dependencies will make Dependabot create PRs with a branch name
+      # following the pattern (`dependabot/maven/build-dependencies-.*`)
+      # and with a title like `Bump the build-dependencies group with 8 updates` that we can easily
+      # use for Hibernate Bot rules.
+      build-dependencies:
+        patterns:
+          # Maven plugin patterns:
+          - "*maven*plugin*"
+          - "*surefire*"
+          - "*forbiddenapis*"
+          - "*owasp*"
+          # DB drivers:
+          - "com.h2database:h2"
+          - "org.apache.derby:derby"
+          - "org.postgresql:postgresql"
+          - "org.mariadb.jdbc:mariadb-java-client"
+          - "com.mysql:mysql-connector-j"
+          - "com.ibm.db2:jcc"
+          - "com.oracle.database.jdbc:ojdbc*"
+          - "com.microsoft.sqlserver:mssql-jdbc"
+          # Other test dependencies
+          - "org.apache.groovy:groovy-jsr223" # used for scripting maven plugin
+          - "org.apache.commons:commons-lang3" # used in hibernate-search-util-common tests
+          - "org.apache.commons:commons-math3" # used to solve dependency convergence for Wiremock
+          - "org.openjdk.jmh:*" # performance testing dependency
+          - "com.google.guava:guava" # Guava is used in our test utils
+          - "org.asciidoctor:*" # Asciidoctor is used for rendering the documentation
+          - "org.codehaus.plexus:*" # Eclipse compiler
+          - "org.jboss.marshalling:jboss-marshalling" # JBeret IT dependency
+          - "org.wildfly.security:wildfly-security-manager" # JBeret IT dependency
+          - "org.springframework.boot:*" # Spring is only for ITs
     ignore:
       # These dependencies are updated manually
       - dependency-name: "org.hibernate:*"
