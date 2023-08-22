@@ -113,10 +113,12 @@ include::../components/_writing-reading-intro-note.adoc[]
 
 [WARNING]
 ====
-Indexing synchronization is only relevant when <<coordination-none,coordination is disabled>>.
-
-With coordination strategies such as <<coordination-outbox-polling,`outbox-polling`>>,
-indexing happens in background threads and is always asynchronous.
+When using the <<coordination-outbox-polling,`outbox-polling` coordination strategy>>,
+the actual indexing plan performing the index changes
+is created asynchronously in a background thread.
+Because of that, with that coordination strategy it does not make sense
+to set a non-default indexing plan synchronization strategy,
+and doing so will lead to an exception on startup.
 ====
 
 When a transaction is committed (<<mapper-orm,Hibernate ORM integration>>)
