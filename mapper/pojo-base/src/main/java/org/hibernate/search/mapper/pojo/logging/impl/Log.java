@@ -623,12 +623,6 @@ public interface Log extends BasicLogger {
 					+ " Valid names for mapped entity types are: %2$s")
 	SearchException unknownEntityNameForMappedEntityType(String invalidName, Collection<String> validNames);
 
-	@Message(id = ID_OFFSET + 90, value = "The required identifier type '%1$s'"
-			+ " does not match the actual identifier type '%2$s':"
-			+ " the required identifier must be a superclass of the actual identifier.")
-	SearchException wrongRequiredIdentifierType(@FormatWith(ClassFormatter.class) Class<?> requiredIdentifierType,
-			@FormatWith(ClassFormatter.class) Class<?> actualIdentifierType);
-
 	/*
 	 * This is not an exception factory nor a logging statement.
 	 * The returned string is passed to the FailureHandler,
