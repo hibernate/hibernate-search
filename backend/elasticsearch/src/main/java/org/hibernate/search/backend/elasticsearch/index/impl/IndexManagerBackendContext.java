@@ -6,13 +6,18 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
+import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
@@ -40,14 +45,31 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.Gson;
 
 public class IndexManagerBackendContext implements SearchBackendContext, WorkExecutionBackendContext {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private static final OptionalConfigurationProperty<IndexStatus> LIFECYCLE_MINIMAL_REQUIRED_STATUS =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS )
+					.as( IndexStatus.class, IndexStatus::of )
+					.build();
+
+	private static final ConfigurationProperty<Integer> LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
+					.asIntegerPositiveOrZero()
+					.withDefault( ElasticsearchIndexSettings.Defaults.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
+					.build();
 
 	private final ElasticsearchBackend backendAPI;
 	private final EventContext eventContext;
@@ -173,7 +195,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	}
 
 	ElasticsearchIndexSchemaManager createSchemaManager(ElasticsearchIndexModel model,
-			ElasticsearchIndexLifecycleExecutionOptions lifecycleExecutionOptions) {
+			ConfigurationPropertySource indexPropertySource) {
 		LowLevelIndexMetadataBuilder builder = new LowLevelIndexMetadataBuilder(
 				link.getGsonProvider(),
 				link.getIndexMetadataSyntax(),
@@ -181,12 +203,32 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		);
 		model.contributeLowLevelMetadata( builder );
 		IndexMetadata expectedMetadata = builder.build();
+
+		boolean isStatusCheckPossible = link.getWorkFactory().isWaitForIndexStatusSupported();
+
+		ElasticsearchIndexLifecycleExecutionOptions executionOptions = new ElasticsearchIndexLifecycleExecutionOptions(
+				LIFECYCLE_MINIMAL_REQUIRED_STATUS.getAndTransform( indexPropertySource, optional -> {
+					if ( optional.isPresent() && !isStatusCheckPossible ) {
+						// Forbid explicit requirement when the status check is impossible
+						throw log.cannotRequireIndexStatus();
+					}
+					else if ( !optional.isPresent() && isStatusCheckPossible ) {
+						// Default requirement when the status check is possible
+						return Optional.of( IndexStatus.YELLOW );
+					}
+					else {
+						return optional;
+					}
+				} ).orElse( null ),
+				LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT.get( indexPropertySource )
+		);
+
 		return new ElasticsearchIndexSchemaManager(
 				backendAPI.name(),
 				userFacingGson,
 				link.getWorkFactory(), generalPurposeOrchestrator,
 				indexLayoutStrategy, model.names(), expectedMetadata,
-				lifecycleExecutionOptions
+				executionOptions
 		);
 	}
 

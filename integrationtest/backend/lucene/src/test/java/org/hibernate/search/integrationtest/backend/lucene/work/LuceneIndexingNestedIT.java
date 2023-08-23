@@ -22,6 +22,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -118,8 +119,12 @@ public class LuceneIndexingNestedIT {
 	public void purge() throws IOException {
 		setup( MultiTenancyStrategyName.NONE );
 
-		index.createWorkspace( sessionContext ).purge( Collections.emptySet(), OperationSubmitter.blocking() ).join();
-		index.createWorkspace( sessionContext ).refresh( OperationSubmitter.blocking() ).join();
+		index.createWorkspace( sessionContext )
+				.purge( Collections.emptySet(), OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL )
+				.join();
+		index.createWorkspace( sessionContext )
+				.refresh( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL )
+				.join();
 
 		assertThat( countWithField( "nestedObject.field1" ) ).isEqualTo( 0 );
 	}

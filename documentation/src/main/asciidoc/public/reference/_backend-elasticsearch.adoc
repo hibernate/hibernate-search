@@ -13,6 +13,8 @@ Hibernate Search's Elasticsearch backend is compatible with multiple distributio
 * <<backend-elasticsearch-compatibility-opensearch,OpenSearch clusters running version {openSearchCompatibleVersions}>>
 * <<backend-elasticsearch-compatibility-amazon-opensearch-service,Amazon OpenSearch Service clusters running version {openSearchCompatibleVersions}>>
 (requires extra configuration)
+* <<backend-elasticsearch-compatibility-amazon-opensearch-serverless,Amazon OpenSearch Serverless clusters>>
+(incubating, requires extra configuration)
 
 [TIP]
 ====
@@ -28,7 +30,8 @@ refer to the https://hibernate.org/community/compatibility-policy/#compatibility
 Where possible, the distribution and version running on your cluster will be automatically detected on startup,
 and Hibernate Search will adapt based on that.
 
-When your cluster is not available on startup,
+With <<backend-elasticsearch-compatibility-amazon-opensearch-serverless,Amazon OpenSearch Serverless>>,
+or when your cluster is not available on startup,
 you will have to configure the version Hibernate Search should expect explicitly:
 see <<backend-elasticsearch-configuration-version>> for details.
 
@@ -72,6 +75,48 @@ link:{amazonOpenSearchServiceUrl}/supported-operations.html#version_7_1[closing 
 and as a result <<mapper-orm-schema-management-manager-create-or-update,automatic schema updates>>
 (<<schema-management-concepts-update-failure,not recommended in production>>)
 <<schema-management-concepts-index-closing,will fail when trying to update analyzer definitions>>.
+
+[[backend-elasticsearch-compatibility-amazon-opensearch-serverless]]
+=== Amazon OpenSearch Serverless (incubating)
+
+include::../components/_incubating-warning.adoc[]
+
+link:{amazonOpenSearchServerlessUrl}[Amazon OpenSearch Serverless] compatibility is implemented and incubating;
+feel free to provide feedback on https://hibernate.atlassian.net/browse/HSEARCH-4867[HSEARCH-4867].
+
+However, be aware that:
+
+* Hibernate Search does not currently get tested against Amazon OpenSearch Serverless;
+see https://hibernate.atlassian.net/browse/HSEARCH-4919[HSEARCH-4919].
+* Connecting to an Amazon OpenSearch Serverless cluster
+requires <<backend-elasticsearch-configuration-aws,proprietary authentication>> that involves extra configuration.
+* Compatibility with Amazon OpenSearch Serverless must be enabled
+explicitly by <<backend-elasticsearch-configuration-version-check,setting `hibernate.search.backend.version` to `amazon-opensearch-serverless`>>.
+
+Also, link:{amazonOpenSearchServerlessUrl}[Amazon OpenSearch Serverless] has its own, specific limitations:
+
+* link:{amazonOpenSearchServiceUrl}/serverless-genref.html#serverless-operations[Closing indexes is not possible],
+and as a result <<mapper-orm-schema-management-manager-create-or-update,automatic schema updates>>
+(<<schema-management-concepts-update-failure,not recommended in production>>)
+<<schema-management-concepts-index-closing,will fail when trying to update analyzer definitions>>.
+* <<backend-elasticsearch-configuration-version-check,Distribution/version detection on startup>>
+is not possible, so it is disabled by default and cannot be enabled explicitly.
+* <<backend-elasticsearch-index-lifecycle,Minimal index status requirement>> for schema management
+is not possible, so it is disabled by default and cannot be enabled explicitly.
+* <<indexing-workspace-purge,Purging>>, <<indexing-workspace-flush,flushing>>, <<indexing-workspace-refresh,refreshing>>, or <<indexing-workspace-merge-segments,merging segments>>
+link:{amazonOpenSearchServiceUrl}/serverless-genref.html#serverless-operations[is not possible],
+so attempts to <<indexing-workspace,perform these operations explicitly>> will always fail.
+* The <<indexing-massindexer,mass indexer>> will fail if you attempt a purge on start (the default),
+because Amazon OpenSearch Serverless link:{amazonOpenSearchServiceUrl}/serverless-genref.html#serverless-operations[doesn’t support it].
+Use <<indexing-massindexer-parameters-drop-and-create-schema,`.dropAndCreateSchemaOnStart(...)`>>
+to drop the indexes on start instead.
+See https://hibernate.atlassian.net/browse/HSEARCH-4930[HSEARCH-4930].
+* The <<indexing-massindexer,mass indexer>> will skip the flush, refresh and merge-segments operations by default,
+and attempting to enable them explicitly will result in failures,
+because Amazon OpenSearch Serverless link:{amazonOpenSearchServiceUrl}/serverless-genref.html#serverless-operations[doesn’t support them].
+* The <<mapper-orm-indexing-jsr352,JSR-352 integration>> is not currently supported.
+See https://hibernate.atlassian.net/browse/HSEARCH-4929[HSEARCH-4929],
+https://hibernate.atlassian.net/browse/HSEARCH-4930[HSEARCH-4930].
 
 [[backend-elasticsearch-upgrading]]
 === [[_upgrading_elasticsearch]] Upgrading Elasticsearch
@@ -227,8 +272,9 @@ your password will be transmitted in clear text over the network.
 
 The Hibernate Search Elasticsearch backend, once configured, will work just fine in most setups.
 However, if you need to use
-<<backend-elasticsearch-compatibility-amazon-opensearch-service,Amazon OpenSearch Service>>,
-you will find it requires a proprietary authentication method:
+<<backend-elasticsearch-compatibility-amazon-opensearch-service,Amazon OpenSearch Service>>
+or <<backend-elasticsearch-compatibility-amazon-opensearch-serverless,Amazon OpenSearch Serverless>>,
+you will find they require a proprietary authentication method:
 link:{amazonOpenSearchServiceUrl}/request-signing.html[request signing].
 
 While request signing is not supported by default,
@@ -405,16 +451,29 @@ and will infer the correct behavior to adopt.
 
 You can force Hibernate Search to expect a specific version of Elasticsearch/OpenSearch by
 setting the property `hibernate.search.backend.version` to a version string
-following the format `x.y.z-qualifier` or `<distribution>:x.y.z-qualifier`, where:
+following the format `x.y.z-qualifier` or `<distribution>:x.y.z-qualifier`
+or just `<distribution>`, where:
 
-* `<distribution>` is either `elastic` or `opensearch`. Optional, defaults to `elastic`.
+* `<distribution>` is either `elastic`, `opensearch` or `amazon-opensearch-serverless`. Optional, defaults to `elastic`.
 * `x`, `y` and `z` are integers. `x` is mandatory, `y` and `z` are optional.
 * `qualifier` is a string of word characters (alphanumeric or `_`). Optional.
 
-For example, `8`, `8.0`, `8.9`, `opensearch:2.9` are all valid version strings.
+For example, `8`, `8.0`, `8.9`, `opensearch:2.9`, `amazon-opensearch-service`
+are all valid version strings.
+
+[NOTE]
+====
+<<backend-elasticsearch-compatibility-amazon-opensearch-serverless,Amazon OpenSearch Serverless>>
+is a special case as it doesn't use version numbers.
+
+When using that platform, you **must** set the version
+and it must be set to simply `amazon-opensearch-serverless`,
+without a trailing `:` or version number.
+====
 
 Hibernate Search will still query the Elasticsearch/OpenSearch cluster
 to detect the actual distribution and version of the cluster
+(except where not supported, i.e. <<backend-elasticsearch-compatibility-amazon-opensearch-serverless,Amazon OpenSearch Serverless>>),
 in order to check that the configured distribution and version match the actual ones.
 
 [[backend-elasticsearch-configuration-version-check-disabling]]
@@ -473,7 +532,9 @@ hibernate.search.backend.indexes.<index-name>.schema_management.minimal_required
 ----
 
 * `minimal_required_status` defines the minimal required status of an index before creation is considered complete.
-The default for this property is `yellow`.
+The default for this property is `yellow`,
+except on <<backend-elasticsearch-compatibility-amazon-opensearch-serverless,Amazon OpenSearch Serverless>>
+where index status checks are skipped because that platform does not support index status checks.
 * `minimal_required_status_wait_timeout` defines the maximum time to wait for this status,
 as an <<configuration-property-types,integer value>> in milliseconds.
 The default for this property is `10000`.

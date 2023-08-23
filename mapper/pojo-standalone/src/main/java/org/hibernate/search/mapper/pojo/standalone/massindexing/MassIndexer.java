@@ -63,7 +63,7 @@ public interface MassIndexer {
 	/**
 	 * Merges each index into a single segment after the initial index purge, just before indexing.
 	 * <p>
-	 * Defaults to {@code true}.
+	 * Defaults to {@code true} for indexes that support it, {@code false} for other indexes.
 	 * <p>
 	 * This setting has no effect if {@code purgeAllOnStart} is set to false.
 	 * @param enable {@code true} to enable this operation, {@code false} to disable it.

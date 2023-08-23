@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.dataset.Dataset;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.dataset.DatasetHolder;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils;
@@ -80,7 +81,7 @@ public class IndexInitializer {
 			futures.add( future );
 		} );
 		CompletableFuture.allOf( futures.toArray( new CompletableFuture[0] ) ).join();
-		workspace.flush( OperationSubmitter.blocking() ).join();
+		workspace.flush( OperationSubmitter.blocking(), UnsupportedOperationBehavior.IGNORE ).join();
 
 		log( index, " ... added " + futures.size() + " documents to the index." );
 	}
@@ -89,7 +90,7 @@ public class IndexInitializer {
 		log( index, "Starting index initialization..." );
 		log( index, "Purging..." );
 		IndexWorkspace workspace = index.createWorkspace();
-		workspace.purge( Collections.emptySet(), OperationSubmitter.blocking() ).join();
+		workspace.purge( Collections.emptySet(), OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL ).join();
 		log( index, "Finished purge." );
 
 		addToIndex( index, idStream );

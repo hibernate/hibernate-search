@@ -10,12 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
+import org.hibernate.search.util.common.function.TriFunction;
 
 public class PojoScopeWorkspaceImpl implements PojoScopeWorkspace {
 
@@ -30,36 +31,41 @@ public class PojoScopeWorkspaceImpl implements PojoScopeWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> mergeSegments(OperationSubmitter operationSubmitter) {
-		return doOperationOnTypes( IndexWorkspace::mergeSegments, operationSubmitter );
+	public CompletableFuture<?> mergeSegments(OperationSubmitter operationSubmitter,
+			UnsupportedOperationBehavior unsupportedOperationBehavior) {
+		return doOperationOnTypes( IndexWorkspace::mergeSegments, operationSubmitter, unsupportedOperationBehavior );
 	}
 
 	@Override
-	public CompletableFuture<?> purge(Set<String> routingKeys, OperationSubmitter operationSubmitter) {
-		return doOperationOnTypes( (indexWorkspace, submitter) -> indexWorkspace.purge( routingKeys, submitter ),
-				operationSubmitter );
+	public CompletableFuture<?> purge(Set<String> routingKeys, OperationSubmitter operationSubmitter,
+			UnsupportedOperationBehavior unsupportedOperationBehavior) {
+		return doOperationOnTypes(
+				(indexWorkspace, submitter, unsupportedBehavior) ->
+						indexWorkspace.purge( routingKeys, submitter, unsupportedBehavior ),
+				operationSubmitter, unsupportedOperationBehavior );
 	}
 
 	@Override
-	public CompletableFuture<?> flush(OperationSubmitter operationSubmitter) {
-		return doOperationOnTypes( IndexWorkspace::flush, operationSubmitter );
+	public CompletableFuture<?> flush(OperationSubmitter operationSubmitter,
+			UnsupportedOperationBehavior unsupportedOperationBehavior) {
+		return doOperationOnTypes( IndexWorkspace::flush, operationSubmitter, unsupportedOperationBehavior );
 	}
 
 	@Override
-	public CompletableFuture<?> refresh(OperationSubmitter operationSubmitter) {
-		return doOperationOnTypes( IndexWorkspace::refresh, operationSubmitter );
+	public CompletableFuture<?> refresh(OperationSubmitter operationSubmitter,
+			UnsupportedOperationBehavior unsupportedOperationBehavior) {
+		return doOperationOnTypes( IndexWorkspace::refresh, operationSubmitter, unsupportedOperationBehavior );
 	}
 
 	private CompletableFuture<?> doOperationOnTypes(
-			BiFunction<IndexWorkspace,
-					OperationSubmitter,
-					CompletableFuture<?>> operation,
-			OperationSubmitter operationSubmitter) {
+			TriFunction<IndexWorkspace, OperationSubmitter, UnsupportedOperationBehavior, CompletableFuture<?>> operation,
+			OperationSubmitter operationSubmitter,
+			UnsupportedOperationBehavior unsupportedOperationBehavior) {
 		CompletableFuture<?>[] futures = new CompletableFuture<?>[delegates.size()];
 		int typeCounter = 0;
 
 		for ( IndexWorkspace delegate : delegates ) {
-			futures[typeCounter++] = operation.apply( delegate, operationSubmitter );
+			futures[typeCounter++] = operation.apply( delegate, operationSubmitter, unsupportedOperationBehavior );
 		}
 
 		// TODO HSEARCH-3110 use a FailureHandler here?

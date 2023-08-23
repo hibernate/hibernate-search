@@ -121,7 +121,8 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 			ElasticsearchModelDialect dialect;
 			ElasticsearchVersion version;
-			if ( configuredVersion.isPresent() ) {
+			if ( configuredVersion.isPresent()
+					&& ElasticsearchDialectFactory.isPreciseEnoughForModelDialect( configuredVersion.get() ) ) {
 				version = configuredVersion.get();
 			}
 			else {

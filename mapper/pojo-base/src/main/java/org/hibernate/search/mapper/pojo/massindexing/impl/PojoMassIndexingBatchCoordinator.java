@@ -17,6 +17,7 @@ import java.util.concurrent.Future;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEnvironment;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
@@ -47,10 +48,10 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	private final PojoScopeDelegate<?, ?, ?> pojoScopeDelegate;
 	private final int typesToIndexInParallel;
 	private final int documentBuilderThreads;
-	private final boolean mergeSegmentsOnFinish;
+	private final Boolean mergeSegmentsOnFinish;
 	private final boolean dropAndCreateSchemaOnStart;
 	private final boolean purgeAtStart;
-	private final boolean mergeSegmentsAfterPurge;
+	private final Boolean mergeSegmentsAfterPurge;
 
 	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
 
@@ -64,8 +65,8 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 			Set<String> tenantIds,
 			PojoScopeDelegate<?, ?, ?> pojoScopeDelegate,
 			MassIndexingEnvironment environment,
-			int typesToIndexInParallel, int documentBuilderThreads, boolean mergeSegmentsOnFinish,
-			boolean dropAndCreateSchemaOnStart, boolean purgeAtStart, boolean mergeSegmentsAfterPurge) {
+			int typesToIndexInParallel, int documentBuilderThreads, Boolean mergeSegmentsOnFinish,
+			boolean dropAndCreateSchemaOnStart, Boolean purgeAtStart, Boolean mergeSegmentsAfterPurge) {
 		super( notifier, environment );
 		this.mappingContext = mappingContext;
 		this.typeGroupsToIndex = typeGroupsToIndex;
@@ -133,15 +134,25 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 
 		if ( purgeAtStart ) {
 			Futures.unwrappedExceptionGet(
-					allTenantsWorkspace.purge( Collections.emptySet(), OperationSubmitter.blocking() )
+					allTenantsWorkspace.purge( Collections.emptySet(), OperationSubmitter.blocking(),
+							UnsupportedOperationBehavior.FAIL )
 			);
 
-			if ( mergeSegmentsAfterPurge ) {
+			if ( isEnabledWithDefault( mergeSegmentsAfterPurge, true ) ) {
 				Futures.unwrappedExceptionGet(
-						allTenantsWorkspace.mergeSegments( OperationSubmitter.blocking() )
+						allTenantsWorkspace.mergeSegments( OperationSubmitter.blocking(),
+								failIfUnsupportedAndExplicitlyEnabled( mergeSegmentsAfterPurge ) )
 				);
 			}
 		}
+	}
+
+	private boolean isEnabledWithDefault(Boolean enabled, boolean defaultValue) {
+		return enabled != null ? enabled : defaultValue;
+	}
+
+	private UnsupportedOperationBehavior failIfUnsupportedAndExplicitlyEnabled(Boolean enabled) {
+		return enabled == Boolean.TRUE ? UnsupportedOperationBehavior.FAIL : UnsupportedOperationBehavior.IGNORE;
 	}
 
 	private SessionContext createSessionContext(String tenantId) {
@@ -193,8 +204,9 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	 * Operations to do after all subthreads finished their work on index
 	 */
 	private void afterBatch() throws InterruptedException {
-		if ( mergeSegmentsOnFinish ) {
-			Futures.unwrappedExceptionGet( allTenantsWorkspace.mergeSegments( OperationSubmitter.blocking() ) );
+		if ( isEnabledWithDefault( mergeSegmentsOnFinish, false ) ) {
+			Futures.unwrappedExceptionGet( allTenantsWorkspace.mergeSegments( OperationSubmitter.blocking(),
+					failIfUnsupportedAndExplicitlyEnabled( mergeSegmentsOnFinish ) ) );
 		}
 		flushAndRefresh();
 		applyToAllContexts(
@@ -210,8 +222,10 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	}
 
 	private void flushAndRefresh() throws InterruptedException {
-		Futures.unwrappedExceptionGet( allTenantsWorkspace.flush( OperationSubmitter.blocking() ) );
-		Futures.unwrappedExceptionGet( allTenantsWorkspace.refresh( OperationSubmitter.blocking() ) );
+		Futures.unwrappedExceptionGet( allTenantsWorkspace.flush( OperationSubmitter.blocking(),
+				UnsupportedOperationBehavior.IGNORE ) );
+		Futures.unwrappedExceptionGet( allTenantsWorkspace.refresh( OperationSubmitter.blocking(),
+				UnsupportedOperationBehavior.IGNORE ) );
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 
@@ -27,7 +28,8 @@ class StubIndexWorkspace implements IndexWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> mergeSegments(OperationSubmitter operationSubmitter) {
+	public CompletableFuture<?> mergeSegments(OperationSubmitter operationSubmitter,
+			UnsupportedOperationBehavior unsupportedOperationBehavior) {
 		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.MERGE_SEGMENTS )
 				// In a real-world backend the operation would cross tenants,
 				// because that doesn't matter,
@@ -39,7 +41,8 @@ class StubIndexWorkspace implements IndexWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> purge(Set<String> routingKeys, OperationSubmitter operationSubmitter) {
+	public CompletableFuture<?> purge(Set<String> routingKeys, OperationSubmitter operationSubmitter,
+			UnsupportedOperationBehavior unsupportedOperationBehavior) {
 		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.PURGE )
 				.tenantIdentifiers( tenantIdentifiers )
 				.routingKeys( routingKeys )
@@ -48,7 +51,8 @@ class StubIndexWorkspace implements IndexWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> flush(OperationSubmitter operationSubmitter) {
+	public CompletableFuture<?> flush(OperationSubmitter operationSubmitter,
+			UnsupportedOperationBehavior unsupportedOperationBehavior) {
 		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.FLUSH )
 				// In a real-world backend the operation would cross tenants,
 				// because that doesn't matter,
@@ -60,7 +64,8 @@ class StubIndexWorkspace implements IndexWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> refresh(OperationSubmitter operationSubmitter) {
+	public CompletableFuture<?> refresh(OperationSubmitter operationSubmitter,
+			UnsupportedOperationBehavior unsupportedOperationBehavior) {
 		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.REFRESH )
 				// In a real-world backend the operation would cross tenants,
 				// because that doesn't matter,

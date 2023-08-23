@@ -22,6 +22,7 @@ import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParame
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.SerializationUtil;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
@@ -63,13 +64,22 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
 			BatchMappingContext mappingContext = (BatchMappingContext) Search.mapping( emf );
 			PojoScopeWorkspace workspace = mappingContext.scope( Object.class ).pojoWorkspace( tenantId );
-			Futures.unwrappedExceptionJoin( workspace.purge( Collections.emptySet(), OperationSubmitter.blocking() ) );
+			Futures.unwrappedExceptionJoin( workspace.purge( Collections.emptySet(), OperationSubmitter.blocking(),
+					UnsupportedOperationBehavior.FAIL ) );
 
-			// This is necessary because the batchlet is not executed inside a transaction
-			Futures.unwrappedExceptionJoin( workspace.flush( OperationSubmitter.blocking() ) );
+			// This does not look necessary as (in Hibernate Search 6+) the purge should already commit
+			// its changes, even on Lucene.
+			// TODO HSEARCH-4487 remove this while we're refactoring?
+			Futures.unwrappedExceptionJoin( workspace.flush( OperationSubmitter.blocking(),
+					// If not supported, we're on Amazon OpenSearch Serverless,
+					// and in this case purge writes are safe even without a flush.
+					UnsupportedOperationBehavior.IGNORE ) );
 
 			if ( mergeSegmentsAfterPurge ) {
-				Futures.unwrappedExceptionJoin( workspace.mergeSegments( OperationSubmitter.blocking() ) );
+				Futures.unwrappedExceptionJoin( workspace.mergeSegments( OperationSubmitter.blocking(),
+						serializedMergeSegmentsAfterPurge != null
+								? UnsupportedOperationBehavior.FAIL
+								: UnsupportedOperationBehavior.IGNORE ) );
 			}
 		}
 		return null;

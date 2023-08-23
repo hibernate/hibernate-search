@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
@@ -22,7 +23,7 @@ public class IndexWorkspaceFlushIT extends AbstractIndexWorkspaceSimpleOperation
 
 	@Override
 	protected CompletableFuture<?> executeAsync(IndexWorkspace workspace) {
-		return workspace.flush( OperationSubmitter.rejecting() );
+		return workspace.flush( OperationSubmitter.rejecting(), UnsupportedOperationBehavior.FAIL );
 	}
 
 	@Override

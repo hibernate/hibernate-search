@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.common.annotation;
 
+import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.CLASS;
@@ -28,7 +29,7 @@ import java.lang.annotation.Target;
  * @author Gunnar Morling
  */
 @Documented
-@Target({ TYPE, METHOD })
+@Target({ TYPE, METHOD, FIELD })
 @Retention(CLASS)
 public @interface Incubating {
 }

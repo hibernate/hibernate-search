@@ -152,12 +152,15 @@ final class ElasticsearchSchemaAccessor {
 			ElasticsearchIndexLifecycleExecutionOptions executionOptions,
 			OperationSubmitter operationSubmitter) {
 		IndexStatus requiredIndexStatus = executionOptions.getRequiredStatus();
+		if ( requiredIndexStatus == null ) {
+			return CompletableFuture.completedFuture( null );
+		}
 		int requiredStatusTimeoutInMs = executionOptions.getRequiredStatusTimeoutInMs();
 
 		URLEncodedString name = indexNames.write();
 
 		NonBulkableWork<?> work =
-				getWorkFactory().waitForIndexStatusWork( name, requiredIndexStatus, requiredStatusTimeoutInMs )
+				getWorkFactory().waitForIndexStatus( name, requiredIndexStatus, requiredStatusTimeoutInMs )
 						.build();
 		return execute( work, operationSubmitter )
 				.exceptionally( Futures.handler( e -> {

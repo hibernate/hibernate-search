@@ -23,6 +23,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
@@ -65,7 +66,7 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 				DocumentRefreshStrategy.NONE,
 				OperationSubmitter.blocking()
 		).join();
-		workspace.refresh( OperationSubmitter.blocking() ).join();
+		workspace.refresh( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL ).join();
 
 		SearchQuery<DocumentReference> text1Query = index
 				.createScope().query()
@@ -102,7 +103,7 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 				DocumentRefreshStrategy.NONE,
 				OperationSubmitter.blocking()
 		).join();
-		workspace.refresh( OperationSubmitter.blocking() ).join();
+		workspace.refresh( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL ).join();
 
 		// Search queries are unaffected: text == "text1"
 		assertThatQuery( text1Query ).hasTotalHitCount( 1 );

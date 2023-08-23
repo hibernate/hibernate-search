@@ -24,6 +24,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.logging.impl.Log;
@@ -235,7 +236,7 @@ public class IndexIndexerIT {
 	private void refreshIfNecessary() {
 		if ( DocumentRefreshStrategy.NONE.equals( refreshStrategy ) ) {
 			IndexWorkspace workspace = index.createWorkspace();
-			workspace.refresh( OperationSubmitter.blocking() ).join();
+			workspace.refresh( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL ).join();
 		}
 	}
 

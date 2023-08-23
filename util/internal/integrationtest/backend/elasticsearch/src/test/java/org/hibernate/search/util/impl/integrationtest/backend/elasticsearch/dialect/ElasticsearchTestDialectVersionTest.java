@@ -19,11 +19,13 @@ public class ElasticsearchTestDialectVersionTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		System.setProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.version", "elastic:1.1.1" );
+		System.setProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.distribution", "elastic" );
+		System.setProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.version", "1.1.1" );
 	}
 
 	@AfterClass
 	public static void afterClass() {
+		System.clearProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.distribution" );
 		System.clearProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.version" );
 	}
 
