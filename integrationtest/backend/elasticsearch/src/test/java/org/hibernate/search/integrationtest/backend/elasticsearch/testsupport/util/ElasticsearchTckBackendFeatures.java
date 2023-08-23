@@ -14,7 +14,7 @@ import java.math.BigInteger;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 
-class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
+public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
 	ElasticsearchTckBackendFeatures() {
 	}
@@ -195,6 +195,16 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// that is now fixed with https://github.com/elastic/elasticsearch/pull/87414
 		return isActualVersion(
 				esVersion -> !esVersion.isBetween( "7.15", "8.3" ),
+				osVersion -> true
+		);
+	}
+
+	public static boolean supportsIndexClosingAndOpening() {
+		return isActualVersion(
+				// See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_7_1
+				// See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_7_4
+				esVersion -> !( esVersion.isAws() && esVersion.isLessThan( "7.4" ) ),
+				// See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_opensearch_1.0
 				osVersion -> true
 		);
 	}
