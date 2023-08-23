@@ -4,30 +4,73 @@
 [[backend-elasticsearch-compatibility]]
 == Compatibility
 
-Hibernate Search expects an link:{elasticsearchUrl}[Elasticsearch] cluster running version {elasticsearchExpectedRunningVersions},
-or an link:{openSearchUrl}[OpenSearch] cluster running version {opensearchExpectedRunningVersions}.
+[[backend-elasticsearch-compatibility-overview]]
+=== Overview
 
-The version running on your cluster will be automatically detected on startup,
-and Hibernate Search will adapt based on the detected version;
-see <<backend-elasticsearch-configuration-version>> for details.
+Hibernate Search's Elasticsearch backend is compatible with multiple distributions of Elasticsearch:
+
+* <<backend-elasticsearch-compatibility-elasticsearch,Elasticsearch clusters running version {elasticsearchCompatibleVersions}>>,
+* <<backend-elasticsearch-compatibility-opensearch,OpenSearch clusters running version {openSearchCompatibleVersions}>>
+* <<backend-elasticsearch-compatibility-amazon-opensearch-service,Amazon OpenSearch Service clusters running version {openSearchCompatibleVersions}>>
+(requires extra configuration)
 
 [TIP]
 ====
-For information about which versions of Hibernate Search you can upgrade to,
-while retaining backward compatibility with a given version of Elasticsearch/OpenSearch,
+For information about which versions of Hibernate Search
+are compatible with a given version of Elasticsearch/OpenSearch,
+refer to the https://hibernate.org/search/releases/#compatibility-matrix[compatibility matrix].
+
+For information about which future versions of Hibernate Search you can expect
+to retain compatibility with currently compatible versions of Elasticsearch/OpenSearch,
 refer to the https://hibernate.org/community/compatibility-policy/#compatibility-third-party-hsearch-elasticsearch[compatibility policy].
 ====
 
+Where possible, the distribution and version running on your cluster will be automatically detected on startup,
+and Hibernate Search will adapt based on that.
+
+When your cluster is not available on startup,
+you will have to configure the version Hibernate Search should expect explicitly:
+see <<backend-elasticsearch-configuration-version>> for details.
+
 The targeted version is mostly transparent to Hibernate Search users,
 but there are a few differences in how Hibernate Search behaves depending
-on the Elasticsearch version that may affect you.
-The following table details those differences.
+on the Elasticsearch distribution and version that may affect you.
+The following sections detail those differences.
 
-[cols="h,4*",options="header"]
-|===============
-| 2+|Elasticsearch 2+|OpenSearch
-||7.x|8.x|1.x|2.x
-|===============
+[[backend-elasticsearch-compatibility-elasticsearch]]
+=== Elasticsearch
+
+Hibernate Search's Elasticsearch backend is compatible with
+link:{elasticsearchUrl}[Elasticsearch] clusters running version {elasticsearchCompatibleVersions}
+and regularly tested against versions {elasticsearchTestedVersions}.
+
+Using Elasticsearch currently doesn't require specific configuration
+and doesn't imply specific limitations.
+
+[[backend-elasticsearch-compatibility-opensearch]]
+=== OpenSearch
+
+Hibernate Search's Elasticsearch backend is compatible with
+link:{openSearchUrl}[OpenSearch] clusters running version {openSearchCompatibleVersions}
+and regularly tested against versions {openSearchTestedVersions}.
+
+Using OpenSearch currently doesn't require specific configuration
+and doesn't imply specific limitations.
+
+[[backend-elasticsearch-compatibility-amazon-opensearch-service]]
+=== Amazon OpenSearch Service
+
+Hibernate Search's Elasticsearch backend is compatible with link:{amazonOpenSearchServiceUrl}[Amazon OpenSearch Service]
+and regularly tested against key versions.
+
+Using Amazon OpenSearch Service
+requires <<backend-elasticsearch-configuration-aws,proprietary authentication>> that involves extra configuration.
+
+Using Amazon OpenSearch Service implies a single limitations:
+closing indexes is not possible,
+and as a result <<mapper-orm-schema-management-manager-create-or-update,automatic schema updates>>
+(<<schema-management-concepts-update-failure,not recommended in production>>)
+<<schema-management-concepts-index-closing,will fail when trying to update analyzer definitions>>.
 
 [[backend-elasticsearch-upgrading]]
 === [[_upgrading_elasticsearch]] Upgrading Elasticsearch
@@ -182,7 +225,8 @@ your password will be transmitted in clear text over the network.
 === [[elasticsearch-integration-configuration-aws]] Authentication on Amazon Web Services
 
 The Hibernate Search Elasticsearch backend, once configured, will work just fine in most setups.
-However, if you need to use Amazon's link:{amazonOpenSearchServiceUrl}[managed OpenSearch service],
+However, if you need to use
+<<backend-elasticsearch-compatibility-amazon-opensearch-service,Amazon OpenSearch Service>>,
 you will find it requires a proprietary authentication method:
 https://docs.aws.amazon.com/opensearch-service/latest/developerguide/request-signing.html[request signing].
 
@@ -349,7 +393,7 @@ Any setting defined by a custom http client configurer will override any other s
 == [[backend-elasticsearch-configuration-dialect]] Version compatibility
 
 [[backend-elasticsearch-configuration-version-check]]
-=== Version check on startup
+=== Version assumed by Hibernate Search
 
 Different distributions and versions of Elasticsearch/OpenSearch expose slightly different APIs.
 As a result, Hibernate Search needs to be aware of the distribution and version it is talking to
@@ -366,12 +410,11 @@ following the format `x.y.z-qualifier` or `<distribution>:x.y.z-qualifier`, wher
 * `x`, `y` and `z` are integers. `x` is mandatory, `y` and `z` are optional.
 * `qualifier` is a string of word characters (alphanumeric or `_`). Optional.
 
-For example, `7`, 7.0`, `7.10`, `opensearch:1.0` are all valid version strings.
+For example, `8`, `8.0`, `8.9`, `opensearch:2.9` are all valid version strings.
 
 Hibernate Search will still query the Elasticsearch/OpenSearch cluster
-to detect the actual distribution and version of the cluster,
-but it will check that the configured distribution and version match the actual ones.
-This can be helpful while developing, in particular.
+to detect the actual distribution and version of the cluster
+in order to check that the configured distribution and version match the actual ones.
 
 [[backend-elasticsearch-configuration-version-check-disabling]]
 === Disabling the version check on startup
@@ -383,10 +426,13 @@ To do that, set the property `hibernate.search.backend.version_check.enabled` to
 
 You will also have to set the property `hibernate.search.backend.version` to a version string
 as explained in the <<backend-elasticsearch-configuration-version-check,previous section>>.
+
 In this case, both major **and minor** version numbers (`x` **and `y`** in the formats above)
 are mandatory,
-but all other components (distribution, micro, qualifier) remain optional.
-For example, `7.0`, `7.10`, `opensearch:1.0` are all valid version strings in this case, but `7` is not precise enough.
+but the `distribution` can be left out if it is the default (`elasticsearch`),
+and all other components (micro, qualifier) remain optional.
+For example, `8.0`, `8.9`, `opensearch:2.9` are all valid version strings in this case,
+but `8` is not precise enough.
 
 [[backend-elasticsearch-configuration-logging]]
 == [[elasticsearch-log-json-pretty-printing]] Request logging

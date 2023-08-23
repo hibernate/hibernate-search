@@ -83,7 +83,7 @@ which allows indexing and searching these documents.
 Below are the most common setups and matching dependencies for a quick start;
 read xref:{reference-documentation-location}#architecture[Architecture] for more information.
 
-Standalone POJO Mapper + Lucene::
+Standalone POJO Mapper + xref:{reference-documentation-location}#backend-lucene[Lucene]::
 Allows indexing of entities that are not defined in Hibernate ORM,
 in a single application node,
 storing the index on the local filesystem.
@@ -112,7 +112,7 @@ If you get Hibernate Search from Maven, use these dependencies:
 If you get Hibernate Search from the distribution bundle,
 copy the JARs from `dist/engine`, `dist/mapper/pojo-standalone`, `dist/backend/lucene`,
 and their respective `lib` subdirectories.
-Standalone POJO Mapper + link:{elasticsearchUrl}[Elasticsearch] (or link:{openSearchUrl}[OpenSearch])::
+Standalone POJO Mapper + xref:{reference-documentation-location}#backend-elasticsearch-compatibility-elasticsearch[Elasticsearch] (or xref:{reference-documentation-location}#backend-elasticsearch-compatibility-opensearch[OpenSearch])::
 Allows indexing of entities that are not defined in Hibernate ORM,
 on multiple application nodes,
 storing the index on a remote Elasticsearch or OpenSearch cluster (to be configured separately).

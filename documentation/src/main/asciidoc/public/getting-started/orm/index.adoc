@@ -80,7 +80,7 @@ which allows indexing and searching these documents.
 Below are the most common setups and matching dependencies for a quick start;
 read xref:{reference-documentation-location}#architecture[Architecture] for more information.
 
-Hibernate ORM + Lucene::
+Hibernate ORM + xref:{reference-documentation-location}#backend-lucene[Lucene]::
 Allows indexing of ORM entities in a single application node,
 storing the index on the local filesystem.
 +
@@ -108,7 +108,7 @@ If you get Hibernate Search from Maven, use these dependencies:
 If you get Hibernate Search from the distribution bundle,
 copy the JARs from `dist/engine`, `dist/mapper/orm`, `dist/backend/lucene`,
 and their respective `lib` subdirectories.
-Hibernate ORM + link:{elasticsearchUrl}[Elasticsearch] (or link:{openSearchUrl}[OpenSearch])::
+Hibernate ORM + xref:{reference-documentation-location}#backend-elasticsearch-compatibility-elasticsearch[Elasticsearch] (or xref:{reference-documentation-location}#backend-elasticsearch-compatibility-opensearch[OpenSearch])::
 Allows indexing of ORM entities on multiple application nodes,
 storing the index on a remote Elasticsearch or OpenSearch cluster (to be configured separately).
 +

@@ -77,7 +77,8 @@ Only the low-level Java REST client, which Hibernate Search depends on, remains 
 .OpenSearch
 ====
 While it historically targeted link:{elasticsearchUrl}[Elastic's Elasticsearch distribution],
-Hibernate Search is also compatible with link:{openSearchUrl}[OpenSearch] and regularly tested against it.
+Hibernate Search is also compatible with link:{openSearchUrl}[OpenSearch] and regularly tested against it;
+see <<backend-elasticsearch-compatibility>> for more information.
 
 Every section of this documentation referring to Elasticsearch
 is also relevant for the OpenSearch distribution.

@@ -134,7 +134,7 @@ and updates the schema of existing indexes if possible.
 With the Elasticsearch backend, <<schema-management-concepts-update-failure,updating a schema may fail>>.
 
 With the Elasticsearch backend, <<schema-management-concepts-index-closing,updating a schema may close indexes while updating analyzer definitions>>
-(which is not possible at all on AWS).
+(which is not possible at all on <<backend-elasticsearch-compatibility-amazon-opensearch-service,Amazon OpenSearch Service>>).
 
 With the Lucene backend, schema update is a no-op,
 because <<schema-management-concepts-lucene-schema,local Lucene indexes don't have a schema>>.
@@ -251,11 +251,11 @@ when multiple clients use Elasticsearch indexes managed by Hibernate Search:
 those clients should be synchronized in such a way that while Hibernate Search is starting,
 no other client needs to access the index.
 +
-Also, since Elasticsearch on Amazon Web Services (AWS)
-https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-supported-es-operations.html[does not support the `_close`/`_open` operations],
+Also, since <<backend-elasticsearch-compatibility-amazon-opensearch-service,Amazon OpenSearch Service>>
+https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html[does not support the `_close`/`_open` operations],
 **the schema update will fail** when trying to update analyzer definitions
-on an AWS Elasticsearch cluster.
-The only workaround is to avoid the schema update on AWS.
+on an Amazon OpenSearch Service cluster.
+The only workaround is to avoid the schema update on that platform.
 It should be avoided in production environments regardless:
 see <<schema-management-concepts-update-failure>>.
 
