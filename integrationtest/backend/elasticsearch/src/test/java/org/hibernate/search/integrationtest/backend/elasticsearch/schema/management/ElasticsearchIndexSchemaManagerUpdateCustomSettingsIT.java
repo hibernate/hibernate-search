@@ -15,10 +15,10 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
@@ -45,9 +45,8 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 	@Before
 	public void checkAssumption() {
 		assumeFalse(
-				"This test only is only relevant if we are allowed to open/close Elasticsearch indexes." +
-						" These operations are not available on AWS in particular.",
-				ElasticsearchTestHostConnectionConfiguration.get().isAws()
+				"This test only is only relevant if we are allowed to open/close Elasticsearch indexes.",
+				ElasticsearchTckBackendFeatures.supportsIndexClosingAndOpening()
 		);
 	}
 

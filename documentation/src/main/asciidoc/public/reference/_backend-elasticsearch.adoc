@@ -67,7 +67,8 @@ Using Amazon OpenSearch Service
 requires <<backend-elasticsearch-configuration-aws,proprietary authentication>> that involves extra configuration.
 
 Using Amazon OpenSearch Service implies a single limitations:
-closing indexes is not possible,
+when running Elasticsearch (not OpenSearch) and only in version 7.1 or older,
+https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_7_1[closing indexes is not possible],
 and as a result <<mapper-orm-schema-management-manager-create-or-update,automatic schema updates>>
 (<<schema-management-concepts-update-failure,not recommended in production>>)
 <<schema-management-concepts-index-closing,will fail when trying to update analyzer definitions>>.
