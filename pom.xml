@@ -291,6 +291,7 @@
         <version.formatter-maven-plugin>2.23.0</version.formatter-maven-plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
         <version.sisu-maven-plugin>0.9.0.M2</version.sisu-maven-plugin>
+        <gitflow-incremental-builder.version>4.5.0</gitflow-incremental-builder.version>
 
         <!-- Repository Deployment URLs -->
 
@@ -1039,6 +1040,11 @@
                     <groupId>org.eclipse.sisu</groupId>
                     <artifactId>sisu-maven-plugin</artifactId>
                     <version>${version.sisu-maven-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>io.github.gitflow-incremental-builder</groupId>
+                    <artifactId>gitflow-incremental-builder</artifactId>
+                    <version>${gitflow-incremental-builder.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -1819,6 +1825,45 @@
                         </plugin>
                     </plugins>
                 </pluginManagement>
+            </build>
+        </profile>
+
+        <profile>
+            <id>incremental</id>
+            <activation>
+                <property>
+                    <name>incremental</name>
+                </property>
+            </activation>
+            <properties>
+                <!-- The *local* main, not refs/remotes/... -->
+                <!-- This property is overridden in CI jobs to point to refs/remotes/...
+                        so that CI build can find the sources to compare to. -->
+                <gib.referenceBranch>main</gib.referenceBranch>
+                <gib.disableSelectedProjectsHandling>true</gib.disableSelectedProjectsHandling>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.github.gitflow-incremental-builder</groupId>
+                        <artifactId>gitflow-incremental-builder</artifactId>
+                        <extensions>true</extensions>
+                        <!-- https://github.com/gitflow-incremental-builder/gitflow-incremental-builder#configuration
+                             General recap: Anything that is directly set in <configuration> cannot be redefined via '-D...'!
+                             See also: https://github.com/gitflow-incremental-builder/gitflow-incremental-builder/issues/213 -->
+                        <configuration>
+                            <!-- pointless to attempt incremental build if something like mvnw was changed -->
+                            <skipIfPathMatches>\.mvn[/\\].*|mvnw.*</skipIfPathMatches>
+                            <!--
+                                Let's ignore any changes in the files that do not affect documentation, classes, build resources
+                                e.g. various readme or text files.
+
+                                Use [/\\] for path separators because of Windows.
+                            -->
+                            <excludePathsMatching>[/\\][^/\\]*\.(md|txt)|[/\\]\..*|[/\\].*[/\\]README\.(md|txt)|[/\\]ci[/\\]dependency-update[/\\].*</excludePathsMatching>
+                        </configuration>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
 

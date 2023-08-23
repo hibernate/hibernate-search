@@ -149,6 +149,7 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
 @Field boolean enableDefaultBuild = false
 @Field boolean enableDefaultBuildIT = false
 @Field boolean deploySnapshot = false
+@Field boolean incrementalBuild = false
 
 this.helper = new JobHelper(this)
 
@@ -356,6 +357,10 @@ Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse', 'postgresql', 'elast
 			environments.content.any { key, envSet -> envSet.enabled.any { buildEnv -> buildEnv.requiresDefaultBuildArtifacts() } } ||
 			deploySnapshot
 
+	if (helper.scmSource.pullRequest) {
+		incrementalBuild = true
+	}
+
 	echo """Branch: ${helper.scmSource.branch.name}
 PR: ${helper.scmSource.pullRequest?.id}
 params.ENVIRONMENT_SET: ${params.ENVIRONMENT_SET}
@@ -366,7 +371,36 @@ Resulting execution plan:
     enableDefaultBuildIT=$enableDefaultBuildIT
     environments=${environments.enabledAsString}
     deploySnapshot=$deploySnapshot
+    incrementalBuild=$incrementalBuild
 """
+}
+
+stage('Pre-build sources') {
+	// we want this stage to only be executed when we are planning to use incremental build
+	if (!incrementalBuild) {
+		echo 'Skipping pre-building sources for non-pull request builds.'
+		helper.markStageSkipped()
+		return
+	}
+	if (!enableDefaultBuild) {
+		echo 'Skipping default build and integration tests in the default environment'
+		helper.markStageSkipped()
+		return
+	}
+	runBuildOnNode( NODE_PATTERN_BASE ) {
+		withMavenWorkspace {
+			sh """ \
+					mvn clean install \
+					--fail-at-end \
+					-Pdist -Pjqassistant -Pci-sources-check \
+					-DskipITs -DskipTests \
+			"""
+
+			dir(helper.configuration.maven.localRepositoryPath) {
+				stash name:'default-build-result', includes:"org/hibernate/search/**"
+			}
+		}
+	}
 }
 
 stage('Default build') {
@@ -377,9 +411,16 @@ stage('Default build') {
 	}
 	runBuildOnNode( NODE_PATTERN_BASE, [time: 2, unit: 'HOURS'] ) {
 		withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
+			if ( incrementalBuild ) {
+				dir(helper.configuration.maven.localRepositoryPath) {
+					unstash name:'default-build-result'
+				}
+			}
+			// If we are in the pull request we've already run JQAssistant and source formatting checks
 			String mavenArgs = """ \
 					--fail-at-end \
-					-Pdist -Pcoverage -Pjqassistant -Pci-sources-check \
+					-Pdist -Pcoverage \
+					${incrementalBuild ? ('-Dincremental -Dgib.referenceBranch=refs/remotes/origin/'+helper.scmSource.pullRequest.target.name) : '-Pjqassistant -Pci-sources-check'} \
 					${enableDefaultBuildIT ? '' : '-DskipITs'} \
 					${toTestJdkArg(environments.content.jdk.default)} \
 			"""
@@ -458,9 +499,12 @@ stage('Non-default environments') {
 		executions.put(buildEnv.tag, {
 			runBuildOnNode {
 				withMavenWorkspace {
+					// NOTE: we are not relying on incremental build in this case as
+					// we'd better recompile everything with the same compiler rather than get some strange errors
 					mavenNonDefaultBuild buildEnv, """ \
 							-DskipTests -DskipITs \
 							-P${buildEnv.mavenProfile},!javaModuleITs \
+							-Dgib.buildAll=true \
 					"""
 				}
 			}
@@ -865,11 +909,17 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 		}
 	}
 
-	String argsWithProjectSelection = args
+	// We want to run relevant integration test modules only (see array of module names)
+	// and in PRs we want to run only those affected by changes
+	// (see gib.disableSelectedProjectsHandling=true).
+	String argsWithProjectSelection = """ \
+		${incrementalBuild ? ('-Dincremental -Dgib.disableSelectedProjectsHandling=true -Dgib.referenceBranch=refs/remotes/origin/' + helper.scmSource.pullRequest.target.name) : ''} \
+		${args} \
+	"""
 	if ( artifactsToTest ) {
 		argsWithProjectSelection = '-pl ' +
 				sh(script: "./ci/list-dependent-integration-tests.sh ${artifactsToTest.join(',')}", returnStdout: true).trim() +
-				' ' + args
+				' ' + argsWithProjectSelection
 	}
 
 	pullContainerImages( argsWithProjectSelection )
