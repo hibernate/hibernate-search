@@ -1173,6 +1173,23 @@
                             <inheritIo>true</inheritIo>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>print-artifact-id-and-basedir</id>
+                        <!--
+                            We don't want this to be executed on a regular basis.
+                            This output is used in the implementation of `list-integration-tests-for-modified-modules.sh`.
+                            See the script itself for any details.
+                         -->
+                        <phase>none</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>echo</executable>
+                            <commandlineArgs>artifact-id-and-basedir-output ${project.artifactId}=${project.basedir}</commandlineArgs>
+                            <inheritIo>true</inheritIo>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
