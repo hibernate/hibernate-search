@@ -12,16 +12,13 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
-import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.metamodel.ElasticsearchIndexDescriptor;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchBatchingWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexLifecycleExecutionOptions;
 import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexSchemaManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.WorkExecutionIndexManagerContext;
@@ -38,7 +35,6 @@ import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributo
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -58,18 +54,6 @@ class ElasticsearchIndexManagerImpl
 	private static final OptionalConfigurationProperty<String> OBSOLETE_LIFECYCLE_STRATEGY =
 			ConfigurationProperty.forKey( "lifecycle.strategy" )
 					.asString()
-					.build();
-
-	private static final ConfigurationProperty<IndexStatus> LIFECYCLE_MINIMAL_REQUIRED_STATUS =
-			ConfigurationProperty.forKey( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS )
-					.as( IndexStatus.class, IndexStatus::of )
-					.withDefault( ElasticsearchIndexSettings.Defaults.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS )
-					.build();
-
-	private static final ConfigurationProperty<Integer> LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT =
-			ConfigurationProperty.forKey( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
-					.asIntegerPositiveOrZero()
-					.withDefault( ElasticsearchIndexSettings.Defaults.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
 					.build();
 
 	private final IndexManagerBackendContext backendContext;
@@ -109,7 +93,7 @@ class ElasticsearchIndexManagerImpl
 			 * Useful for compile-time boot.
 			 */
 			schemaManager = backendContext.createSchemaManager(
-					model, createLifecycleExecutionOptions( context.configurationPropertySource() )
+					model, context.configurationPropertySource()
 			);
 
 			// HSEARCH-3759: the lifecycle strategy is now the schema management strategy, at the mapper level
@@ -252,14 +236,6 @@ class ElasticsearchIndexManagerImpl
 	private EventContext getBackendAndIndexEventContext() {
 		return backendContext.getEventContext().append(
 				EventContexts.fromIndexName( model.hibernateSearchName() )
-		);
-	}
-
-	private ElasticsearchIndexLifecycleExecutionOptions createLifecycleExecutionOptions(
-			ConfigurationPropertySource propertySource) {
-		return new ElasticsearchIndexLifecycleExecutionOptions(
-				LIFECYCLE_MINIMAL_REQUIRED_STATUS.get( propertySource ),
-				LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT.get( propertySource )
 		);
 	}
 

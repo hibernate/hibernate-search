@@ -19,10 +19,6 @@ import org.hibernate.search.backend.elasticsearch.work.factory.impl.Elasticsearc
 
 import com.google.gson.JsonObject;
 
-/**
- * A delete by query work for ES5, using the core delete-by-query API.
- *
- */
 public class DeleteByQueryWork extends AbstractNonBulkableWork<Void> {
 
 	private final NonBulkableWork<?> refreshWork;
@@ -35,10 +31,14 @@ public class DeleteByQueryWork extends AbstractNonBulkableWork<Void> {
 	@Override
 	protected CompletableFuture<?> beforeExecute(ElasticsearchWorkExecutionContext executionContext,
 			ElasticsearchRequest request) {
-		/*
-		 * Refresh the index so as to minimize the risk of version conflict
-		 */
-		return refreshWork.execute( executionContext );
+		if ( refreshWork != null ) {
+			// Refresh the index in order to minimize the risk of version conflict.
+			return refreshWork.execute( executionContext );
+		}
+		else {
+			// Refresh is not supported, just hope for the best.
+			return CompletableFuture.completedFuture( null );
+		}
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class DeleteByQueryWork extends AbstractNonBulkableWork<Void> {
 			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 			this.indexName = indexName;
 			this.payload = payload;
-			this.refreshWorkBuilder = workFactory.refresh().index( indexName );
+			this.refreshWorkBuilder = workFactory.isRefreshSupported() ? workFactory.refresh().index( indexName ) : null;
 		}
 
 		public Builder routingKeys(Collection<String> routingKeys) {
@@ -94,7 +94,7 @@ public class DeleteByQueryWork extends AbstractNonBulkableWork<Void> {
 		}
 
 		protected NonBulkableWork<?> buildRefreshWork() {
-			return refreshWorkBuilder.build();
+			return refreshWorkBuilder != null ? refreshWorkBuilder.build() : null;
 		}
 
 		@Override

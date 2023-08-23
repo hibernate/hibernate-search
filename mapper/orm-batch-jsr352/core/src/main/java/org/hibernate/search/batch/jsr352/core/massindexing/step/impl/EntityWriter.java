@@ -27,6 +27,7 @@ import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.MassIndexin
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
@@ -113,7 +114,10 @@ public class EntityWriter extends AbstractItemWriter {
 			 * which is necessary because the runtime will perform a checkpoint
 			 * just after we return from this method.
 			 */
-			Futures.unwrappedExceptionJoin( workspace.flush( OperationSubmitter.blocking() ) );
+			Futures.unwrappedExceptionJoin( workspace.flush( OperationSubmitter.blocking(),
+					// If not supported, we're on Amazon OpenSearch Serverless,
+					// and in this case purge writes are safe even without a flush.
+					UnsupportedOperationBehavior.IGNORE ) );
 		}
 
 		// update work count

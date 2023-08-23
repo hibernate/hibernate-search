@@ -40,15 +40,15 @@ class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final String ELASTICSEARCH_SERVICE_NAME = "es";
-
 	private final Aws4Signer signer;
 	private final Region region;
+	private final String service;
 	private final AwsCredentialsProvider credentialsProvider;
 
-	AwsSigningRequestInterceptor(Region region, AwsCredentialsProvider credentialsProvider) {
+	AwsSigningRequestInterceptor(Region region, String service, AwsCredentialsProvider credentialsProvider) {
 		this.signer = Aws4Signer.create();
 		this.region = region;
+		this.service = service;
 		this.credentialsProvider = credentialsProvider;
 	}
 
@@ -73,7 +73,7 @@ class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 		Aws4SignerParams signerParams = Aws4SignerParams.builder()
 				.awsCredentials( credentials )
 				.signingRegion( region )
-				.signingName( ELASTICSEARCH_SERVICE_NAME )
+				.signingName( service )
 				.build();
 
 		awsRequest = signer.sign( awsRequest, signerParams );
@@ -125,6 +125,11 @@ class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 		else {
 			path = pathAndQuery;
 			queryParameters = Collections.emptyList();
+		}
+
+		// For some reason this is needed on Amazon OpenSearch Serverless
+		if ( "aoss".equals( service ) ) {
+			awsRequestBuilder.appendHeader( "x-amz-content-sha256", "required" );
 		}
 
 		awsRequestBuilder.encodedPath( path );

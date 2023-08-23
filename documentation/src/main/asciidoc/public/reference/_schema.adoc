@@ -252,10 +252,11 @@ those clients should be synchronized in such a way that while Hibernate Search i
 no other client needs to access the index.
 +
 Also, on <<backend-elasticsearch-compatibility-amazon-opensearch-service,Amazon OpenSearch Service>>
-running Elasticsearch (not OpenSearch) in version 7.1 or older
-link:{amazonOpenSearchServiceUrl}/supported-operations.html#version_7_1[the `_close`/`_open` operations are not supported],
+running Elasticsearch (not OpenSearch) in version 7.1 or older,
+as well as on <<backend-elasticsearch-compatibility-amazon-opensearch-serverless,Amazon OpenSearch Serverless>>,
+the `_close`/`_open` operations are not supported,
 so **the schema update will fail** when trying to update analyzer definitions.
-The only workaround is to avoid the schema update on that platform.
+The only workaround is to avoid the schema update on these platforms.
 It should be avoided in production environments regardless:
 see <<schema-management-concepts-update-failure>>.
 

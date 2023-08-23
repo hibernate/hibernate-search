@@ -22,7 +22,12 @@ The `MassIndexer` takes the following approach to achieve a reasonably high thro
 
 * Indexes are purged completely when mass indexing starts.
 * Mass indexing is performed by several parallel threads,
-each loading data from the database and sending indexing requests to the indexes.
+each loading data from the database and sending indexing requests to the indexes,
+not triggering any <<concepts-commit-refresh,commit or refresh>>.
+* An implicit <<indexing-workspace-flush,flush>> (commit) and <<indexing-workspace-refresh,refresh>>
+are performed upon mass indexing completion,
+except for <<backend-elasticsearch-compatibility-amazon-opensearch-serverless,Amazon OpenSearch Serverless>>
+since it doesn't support explicit flushes or refreshes.
 
 [WARNING]
 ====
@@ -268,7 +273,7 @@ Only set this to `false` if you know the index is already empty;
 otherwise, you will end up with duplicates in the index.
 
 |`mergeSegmentsAfterPurge(boolean)`
-|`true`
+|`true` in general, `false` on <<backend-elasticsearch-compatibility-amazon-opensearch-serverless,Amazon OpenSearch Serverless>>
 |Force merging of each index into a single segment after the initial index purge, just before indexing.
 This setting has no effect if `purgeAllOnStart` is set to false.
 

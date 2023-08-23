@@ -107,7 +107,10 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a Boolean value such as {@code true} or {@code false},
 	 * or a string that can be parsed into a Boolean value.
 	 * <p>
-	 * Defaults to {@link Defaults#VERSION_CHECK_ENABLED}.
+	 * Defaults to {@code true} when the {@link #VERSION} is unconfigured
+	 * or set to a distribution that supports version checking,
+	 * and to {@code false} when the {@link #VERSION} is set
+	 * to a distribution that does not support version checking (like Amazon OpenSearch Serverless).
 	 */
 	public static final String VERSION_CHECK_ENABLED = "version_check.enabled";
 
@@ -335,6 +338,12 @@ public final class ElasticsearchBackendSettings {
 		public static final boolean DISCOVERY_ENABLED = false;
 		public static final int DISCOVERY_REFRESH_INTERVAL = 10;
 		public static final boolean LOG_JSON_PRETTY_PRINTING = false;
+		/**
+		 * @deprecated The default for the {@link ElasticsearchBackendSettings#VERSION_CHECK_ENABLED} property
+		 * is now dynamic and depends on the value of the {@link ElasticsearchBackendSettings#VERSION} property.
+		 * @see ElasticsearchBackendSettings#VERSION_CHECK_ENABLED
+		 */
+		@Deprecated
 		public static final boolean VERSION_CHECK_ENABLED = true;
 
 		/**

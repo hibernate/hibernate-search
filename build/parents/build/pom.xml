@@ -1161,7 +1161,8 @@
                         <systemPropertyVariables>
                             <org.hibernate.search.version>${project.version}</org.hibernate.search.version>
                             <org.hibernate.search.enable_performance_tests>${test.performance.enable}</org.hibernate.search.enable_performance_tests>
-                            <org.hibernate.search.integrationtest.backend.elasticsearch.version>${test.elasticsearch.distribution}:${test.elasticsearch.version}</org.hibernate.search.integrationtest.backend.elasticsearch.version>
+                            <org.hibernate.search.integrationtest.backend.elasticsearch.distribution>${test.elasticsearch.distribution}</org.hibernate.search.integrationtest.backend.elasticsearch.distribution>
+                            <org.hibernate.search.integrationtest.backend.elasticsearch.version>${test.elasticsearch.version}</org.hibernate.search.integrationtest.backend.elasticsearch.version>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>

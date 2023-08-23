@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
@@ -176,7 +177,7 @@ public interface Log extends BasicLogger {
 	SearchException failedToDetectElasticsearchVersion(String causeMessage, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 81,
-			value = "Incompatible Elasticsearch version running on the cluster: '%s'."
+			value = "Incompatible Elasticsearch version: '%s'."
 					+ " Refer to the documentation to know which versions of Elasticsearch"
 					+ " are compatible with Hibernate Search.")
 	SearchException unsupportedElasticsearchVersion(ElasticsearchVersion version);
@@ -373,11 +374,14 @@ public interface Log extends BasicLogger {
 			@Cause Throwable cause);
 
 	@Message(id = ID_OFFSET + 57, value = "Invalid Elasticsearch version: '%1$s'."
-			+ " Expected format is 'x.y.z-qualifier' or '<distribution>:x.y.z-qualifier',"
+			+ " Expected format is 'x.y.z-qualifier' or '<distribution>:x.y.z-qualifier' or just '<distribution>',"
 			+ " where '<distribution>' is one of %2$s (defaults to '%3$s'),"
 			+ " 'x', 'y' and 'z' are integers,"
 			+ " and 'qualifier' is an string of word characters (alphanumeric or '_')."
-			+ " Incomplete versions are allowed, for example 'elastic:7.0', '7.0' or just '7'.")
+			+ " Incomplete versions are allowed, for example 'elastic:7.0', '7.0' or just '7'."
+			+ " Note that the format '<distribution>' without a version number"
+			+ " is only useful for distributions that don't support version numbers,"
+			+ " such as Amazon OpenSearch Serverless.")
 	SearchException invalidElasticsearchVersionWithOptionalDistribution(String invalidRepresentation,
 			List<String> validDistributions, String defaultDistribution, @Cause Throwable cause);
 
@@ -533,10 +537,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 97,
 			value = "Missing or imprecise Elasticsearch version:"
-					+ " when configuration property '%1$s' is set to 'false', "
-					+ " the version is mandatory and must be at least as precise as 'x.y',"
+					+ " configuration property '%1$s' is set to 'false',"
+					+ " so you must set the version explicitly with at least as much precision as 'x.y',"
 					+ " where 'x' and 'y' are integers.")
-	SearchException impreciseElasticsearchVersionWhenNoVersionCheck(String versionCheckPropertyKey);
+	SearchException impreciseElasticsearchVersionWhenVersionCheckDisabled(String versionCheckPropertyKey);
 
 	@Message(id = ID_OFFSET + 98, value = "The lifecycle strategy cannot be set at the index level anymore."
 			+ " Set the schema management strategy via the property 'hibernate.search.schema_management.strategy' instead.")
@@ -810,4 +814,30 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 172, value = "'%1$s' cannot be nested in an object projection. "
 			+ "%2$s")
 	SearchException cannotUseProjectionInNestedContext(String projection, String hint, @Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET + 173, value = "The targeted Elasticsearch cluster is reachable, but does not expose its version."
+			+ " Check that the configured Elasticsearch hosts/URI points to the right server."
+			+ " If you are targeting Amazon OpenSearch Serverless, you must set the configuration property '%1$s' explicitly to '%2$s'."
+			+ " See the reference documentation for more information.")
+	SearchException unableToFetchElasticsearchVersion(String versionConfigPropertyKey,
+			ElasticsearchVersion expectedAWSOpenSearchServerlessVersion);
+
+	@Message(id = ID_OFFSET + 174, value = "Cannot check the Elasticsearch version because the targeted Elasticsearch distribution '%s' does not expose its version.")
+	SearchException cannotCheckElasticsearchVersion(ElasticsearchDistributionName distributionName);
+
+	@Message(id = ID_OFFSET + 175,
+			value = "Unexpected Amazon OpenSearch Serverless version: '%1$s'."
+					+ " Amazon OpenSearch Serverless doesn't use version numbers."
+					+ " Set the version to simply '%2$s'.")
+	SearchException unexpectedAwsOpenSearchServerlessVersion(ElasticsearchVersion configuredVersion,
+			ElasticsearchVersion expectedAWSOpenSearchServerlessVersion);
+
+	@Message(id = ID_OFFSET + 176, value = "Cannot execute '%s' because Amazon OpenSearch Serverless does not support this operation."
+			+ " Either avoid this operation or switch to another Elasticsearch/OpenSearch distribution.")
+	SearchException cannotExecuteOperationOnAmazonOpenSearchServerless(String operation);
+
+	@Message(id = ID_OFFSET + 177, value = "The targeted Elasticsearch cluster does not expose index status,"
+			+ " so index status requirements cannot be enforced.")
+	SearchException cannotRequireIndexStatus();
+
 }

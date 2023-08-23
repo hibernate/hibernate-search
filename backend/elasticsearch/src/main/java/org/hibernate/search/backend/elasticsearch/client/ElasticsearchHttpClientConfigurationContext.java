@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.client;
 
+import java.util.Optional;
+
+import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 
@@ -34,5 +37,11 @@ public interface ElasticsearchHttpClientConfigurationContext {
 	 * @see <a href="http://hc.apache.org/httpcomponents-client-ga/">the Apache HTTP Client documentation</a>
 	 */
 	HttpAsyncClientBuilder clientBuilder();
+
+	/**
+	 * @return The version of Elasticsearch/OpenSearch configured on the backend.
+	 * May be empty if not configured explicitly (in which case it will only be known after the client is built).
+	 */
+	Optional<ElasticsearchVersion> configuredVersion();
 
 }

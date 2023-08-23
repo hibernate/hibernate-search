@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
@@ -497,7 +498,8 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 						timeoutExecutorService,
 						threadPoolProvider.isScheduledExecutorBlocking()
 				),
-				GsonProvider.create( GsonBuilder::new, true )
+				GsonProvider.create( GsonBuilder::new, true ),
+				Optional.of( ElasticsearchTestDialect.getActualVersion() )
 		);
 	}
 

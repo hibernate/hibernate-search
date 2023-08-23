@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.impl.Futures;
@@ -24,12 +25,13 @@ public class SearchWorkspaceImpl implements SearchWorkspace {
 
 	@Override
 	public void mergeSegments() {
-		Futures.unwrappedExceptionJoin( delegate.mergeSegments( OperationSubmitter.blocking() ) );
+		Futures.unwrappedExceptionJoin(
+				delegate.mergeSegments( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL ) );
 	}
 
 	@Override
 	public CompletableFuture<?> mergeSegmentsAsync() {
-		return delegate.mergeSegments( OperationSubmitter.rejecting() );
+		return delegate.mergeSegments( OperationSubmitter.rejecting(), UnsupportedOperationBehavior.FAIL );
 	}
 
 	@Override
@@ -44,31 +46,32 @@ public class SearchWorkspaceImpl implements SearchWorkspace {
 
 	@Override
 	public void purge(Set<String> routingKeys) {
-		Futures.unwrappedExceptionJoin( delegate.purge( routingKeys, OperationSubmitter.blocking() ) );
+		Futures.unwrappedExceptionJoin(
+				delegate.purge( routingKeys, OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL ) );
 	}
 
 	@Override
 	public CompletableFuture<?> purgeAsync(Set<String> routingKeys) {
-		return delegate.purge( routingKeys, OperationSubmitter.rejecting() );
+		return delegate.purge( routingKeys, OperationSubmitter.rejecting(), UnsupportedOperationBehavior.FAIL );
 	}
 
 	@Override
 	public void flush() {
-		Futures.unwrappedExceptionJoin( delegate.flush( OperationSubmitter.blocking() ) );
+		Futures.unwrappedExceptionJoin( delegate.flush( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL ) );
 	}
 
 	@Override
 	public CompletableFuture<?> flushAsync() {
-		return delegate.flush( OperationSubmitter.rejecting() );
+		return delegate.flush( OperationSubmitter.rejecting(), UnsupportedOperationBehavior.FAIL );
 	}
 
 	@Override
 	public void refresh() {
-		Futures.unwrappedExceptionJoin( delegate.refresh( OperationSubmitter.blocking() ) );
+		Futures.unwrappedExceptionJoin( delegate.refresh( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL ) );
 	}
 
 	@Override
 	public CompletableFuture<?> refreshAsync() {
-		return delegate.refresh( OperationSubmitter.rejecting() );
+		return delegate.refresh( OperationSubmitter.rejecting(), UnsupportedOperationBehavior.FAIL );
 	}
 }

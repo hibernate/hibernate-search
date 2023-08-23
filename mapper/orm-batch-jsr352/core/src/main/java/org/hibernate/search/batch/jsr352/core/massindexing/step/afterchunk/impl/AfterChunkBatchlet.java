@@ -19,6 +19,7 @@ import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParame
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.SerializationUtil;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
@@ -53,7 +54,9 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
 			BatchMappingContext mappingContext = (BatchMappingContext) Search.mapping( emf );
 			PojoScopeWorkspace workspace = mappingContext.scope( Object.class ).pojoWorkspace( tenantId );
-			Futures.unwrappedExceptionJoin( workspace.mergeSegments( OperationSubmitter.blocking() ) );
+			Futures.unwrappedExceptionJoin( workspace.mergeSegments( OperationSubmitter.blocking(),
+					serializedMergeSegmentsOnFinish != null ? UnsupportedOperationBehavior.FAIL
+							: UnsupportedOperationBehavior.IGNORE ) );
 		}
 		return null;
 	}

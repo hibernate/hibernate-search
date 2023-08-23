@@ -44,7 +44,7 @@ without waiting for the `SearchSession` to be closed or the Hibernate ORM transa
 
 This interface offers the following methods:
 
-`purge()`::
+[[indexing-workspace-purge]]`purge()`::
 Delete all documents from indexes targeted by this workspace.
 +
 With multi-tenancy enabled, only documents of the current tenant will be removed:

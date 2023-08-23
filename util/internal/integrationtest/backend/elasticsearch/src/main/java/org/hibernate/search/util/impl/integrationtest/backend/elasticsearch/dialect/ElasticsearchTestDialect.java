@@ -9,14 +9,13 @@ package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dia
 import java.util.Comparator;
 import java.util.function.Predicate;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 
 public class ElasticsearchTestDialect {
 
-	private static final ElasticsearchVersion ACTUAL_VERSION = ElasticsearchVersion.of(
-			System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.version" )
-	);
+	private static ElasticsearchVersion actualVersion;
 
 	private static final ElasticsearchTestDialect INSTANCE = new ElasticsearchTestDialect();
 	private static final String LOCAL_DATE_DEFAULT_FORMAT = "uuuu-MM-dd";
@@ -26,7 +25,15 @@ public class ElasticsearchTestDialect {
 	}
 
 	public static ElasticsearchVersion getActualVersion() {
-		return ACTUAL_VERSION;
+		if ( actualVersion == null ) {
+			ElasticsearchDistributionName distribution =
+					ElasticsearchDistributionName.of( System.getProperty(
+							"org.hibernate.search.integrationtest.backend.elasticsearch.distribution" ) );
+			String versionString = System.getProperty(
+					"org.hibernate.search.integrationtest.backend.elasticsearch.version" );
+			actualVersion = ElasticsearchVersion.of( distribution, versionString.isBlank() ? null : versionString );
+		}
+		return actualVersion;
 	}
 
 	public String getLocalDateDefaultMappingFormat() {
@@ -38,7 +45,7 @@ public class ElasticsearchTestDialect {
 			Predicate<ElasticsearchVersionCondition> opensearchPredicate
 	) {
 		return isVersion(
-				ACTUAL_VERSION,
+				actualVersion,
 				elasticsearchPredicate,
 				opensearchPredicate
 		);
@@ -110,7 +117,7 @@ public class ElasticsearchTestDialect {
 				throw new IllegalArgumentException( "Qualifiers are ignored for version ranges." );
 			}
 
-			return Comparator.comparing( ElasticsearchVersion::major )
+			return Comparator.comparing( (ElasticsearchVersion version) -> version.majorOptional().orElse( defaultInt ) )
 					.thenComparing( version -> version.minor().orElse( defaultInt ) )
 					.thenComparing( version -> version.micro().orElse( defaultInt ) )
 					.compare( a, b );

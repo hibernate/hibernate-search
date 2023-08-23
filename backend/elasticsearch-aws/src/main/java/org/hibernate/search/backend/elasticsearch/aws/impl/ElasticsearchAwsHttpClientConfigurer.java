@@ -8,6 +8,8 @@ package org.hibernate.search.backend.elasticsearch.aws.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
+import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsBackendSettings;
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsCredentialsTypeNames;
 import org.hibernate.search.backend.elasticsearch.aws.logging.impl.Log;
@@ -67,13 +69,24 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 		}
 
 		Region region = REGION.getAndMapOrThrow( propertySource, Region::of, log::missingPropertyForSigning );
-
+		String service;
+		switch ( context.configuredVersion().map( ElasticsearchVersion::distribution )
+				.orElse( ElasticsearchDistributionName.OPENSEARCH ) ) {
+			case AMAZON_OPENSEARCH_SERVERLESS:
+				service = "aoss";
+				break;
+			case ELASTIC:
+			case OPENSEARCH:
+			default:
+				service = "es";
+				break;
+		}
 		AwsCredentialsProvider credentialsProvider = createCredentialsProvider( context.beanResolver(), propertySource );
 
-		log.debugf( "AWS request signing is enabled [region = '%s', credentialsProvider = '%s'].",
-				region, credentialsProvider );
+		log.debugf( "AWS request signing is enabled [region = '%s', service = '%s', credentialsProvider = '%s'].",
+				region, service, credentialsProvider );
 
-		AwsSigningRequestInterceptor signingInterceptor = new AwsSigningRequestInterceptor( region, credentialsProvider );
+		AwsSigningRequestInterceptor signingInterceptor = new AwsSigningRequestInterceptor( region, service, credentialsProvider );
 
 		context.clientBuilder().addInterceptorLast( signingInterceptor );
 	}

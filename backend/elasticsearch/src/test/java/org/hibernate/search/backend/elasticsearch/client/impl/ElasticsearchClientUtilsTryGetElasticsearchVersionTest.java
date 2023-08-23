@@ -34,7 +34,7 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
 @RunWith(Parameterized.class)
-public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
+public class ElasticsearchClientUtilsTryGetElasticsearchVersionTest {
 
 	@Parameterized.Parameters(name = "{0} - {1}")
 	public static Object[][] data() {
@@ -69,7 +69,7 @@ public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
 	@Mock
 	private ElasticsearchClient clientMock;
 
-	public ElasticsearchClientUtilsGetElasticsearchVersionTest(String distributionString, String versionString,
+	public ElasticsearchClientUtilsTryGetElasticsearchVersionTest(String distributionString, String versionString,
 			ElasticsearchDistributionName expectedDistribution,
 			int expectedMajor, int expectedMinor, int expectedMicro, String expectedQualifier) {
 		this.distributionString = distributionString;
@@ -84,10 +84,10 @@ public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
 	@Test
 	public void testValid() {
 		doMock( distributionString, versionString );
-		ElasticsearchVersion version = ElasticsearchClientUtils.getElasticsearchVersion( clientMock );
+		ElasticsearchVersion version = ElasticsearchClientUtils.tryGetElasticsearchVersion( clientMock );
 		assertThat( version ).isNotNull();
 		assertThat( version.distribution() ).isEqualTo( expectedDistribution );
-		assertThat( version.major() ).isEqualTo( expectedMajor );
+		assertThat( version.majorOptional() ).hasValue( expectedMajor );
 		assertThat( version.minor() ).hasValue( expectedMinor );
 		assertThat( version.micro() ).hasValue( expectedMicro );
 		if ( expectedQualifier != null ) {
@@ -102,10 +102,9 @@ public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
 	public void testInvalid_distribution() {
 		String invalidDistributionName = "QWDWQD" + distributionString;
 		doMock( invalidDistributionName, versionString );
-		assertThatThrownBy( () -> ElasticsearchClientUtils.getElasticsearchVersion( clientMock ) )
+		assertThatThrownBy( () -> ElasticsearchClientUtils.tryGetElasticsearchVersion( clientMock ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Unable to detect the Elasticsearch version running on the cluster",
 						"Invalid Elasticsearch distribution name",
 						"'" + invalidDistributionName.toLowerCase( Locale.ROOT ) + "'",
 						"Valid names are: [elastic, opensearch]" );
@@ -115,13 +114,23 @@ public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
 	public void testInvalid_version() {
 		String invalidVersionString = versionString.substring( 0, versionString.length() - 1 ) + "-A-B";
 		doMock( distributionString, invalidVersionString );
-		assertThatThrownBy( () -> ElasticsearchClientUtils.getElasticsearchVersion( clientMock ) )
+		assertThatThrownBy( () -> ElasticsearchClientUtils.tryGetElasticsearchVersion( clientMock ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Unable to detect the Elasticsearch version running on the cluster",
 						"Invalid Elasticsearch version",
 						"'" + invalidVersionString.toLowerCase( Locale.ROOT ) + "'",
 						"Expected format is 'x.y.z-qualifier'" );
+	}
+
+	@Test
+	public void testHttpStatus404() {
+		// This should only happen on Amazon OpenSearch Service,
+		// which doesn't allow retrieving the version.
+		when( clientMock.submit( any() ) )
+				.thenReturn( CompletableFuture.completedFuture( new ElasticsearchResponse(
+						new HttpHost( "mockHost:9200" ), 404, "", null ) ) );
+		ElasticsearchVersion version = ElasticsearchClientUtils.tryGetElasticsearchVersion( clientMock );
+		assertThat( version ).isNull();
 	}
 
 	private void doMock(String theDistributionString, String theVersionString) {

@@ -304,6 +304,7 @@
                         <openSearchCompatibleVersions>${version.org.opensearch.compatible.expected.text}</openSearchCompatibleVersions>
                         <openSearchTestedVersions>${version.org.opensearch.compatible.regularly-tested.text}</openSearchTestedVersions>
                         <amazonOpenSearchServiceUrl>https://docs.aws.amazon.com/opensearch-service/latest/developerguide</amazonOpenSearchServiceUrl>
+                        <amazonOpenSearchServerlessUrl>https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless-overview.html</amazonOpenSearchServerlessUrl>
                         <wildflyUrl>https://wildfly.org/</wildflyUrl>
                         <quarkusUrl>https://quarkus.io/</quarkusUrl>
                         <springUrl>https://spring.io/</springUrl>

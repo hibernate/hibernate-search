@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer;
@@ -140,7 +141,8 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 	public ElasticsearchClientImplementor create(BeanResolver beanResolver, ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix,
 			SimpleScheduledExecutor timeoutExecutorService,
-			GsonProvider gsonProvider) {
+			GsonProvider gsonProvider,
+			Optional<ElasticsearchVersion> configuredVersion) {
 		Optional<Integer> requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
 		int connectionTimeoutMs = CONNECTION_TIMEOUT.get( propertySource );
 
@@ -156,8 +158,8 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		else {
 			ServerUris hosts = ServerUris.fromOptionalStrings( PROTOCOL.get( propertySource ),
 					HOSTS.get( propertySource ), URIS.get( propertySource ) );
-			restClientHolder = createClient( beanResolver, propertySource, threadProvider, threadNamePrefix, hosts,
-					PATH_PREFIX.get( propertySource ) );
+			restClientHolder = createClient( beanResolver, propertySource, threadProvider, threadNamePrefix,
+					configuredVersion, hosts, PATH_PREFIX.get( propertySource ) );
 			sniffer = createSniffer( propertySource, restClientHolder.get(), hosts );
 		}
 
@@ -170,6 +172,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	private BeanHolder<? extends RestClient> createClient(BeanResolver beanResolver, ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix,
+			Optional<ElasticsearchVersion> configuredVersion,
 			ServerUris hosts, String pathPrefix) {
 		RestClientBuilder builder = RestClient.builder( hosts.asHostsArray() );
 		if ( !pathPrefix.isEmpty() ) {
@@ -191,7 +194,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 									b,
 									beanResolver, propertySource,
 									threadProvider, threadNamePrefix,
-									hosts,
+									configuredVersion, hosts,
 									httpClientConfigurersHolder.get(), customConfig
 							)
 					)
@@ -239,6 +242,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 	private HttpAsyncClientBuilder customizeHttpClientConfig(HttpAsyncClientBuilder builder,
 			BeanResolver beanResolver, ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix,
+			Optional<ElasticsearchVersion> configuredVersion,
 			ServerUris hosts, Iterable<ElasticsearchHttpClientConfigurer> configurers,
 			Optional<? extends BeanHolder<? extends ElasticsearchHttpClientConfigurer>> customConfig) {
 		builder.setMaxConnTotal( MAX_TOTAL_CONNECTION.get( propertySource ) )
@@ -272,7 +276,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		}
 
 		ElasticsearchHttpClientConfigurationContextImpl clientConfigurationContext =
-				new ElasticsearchHttpClientConfigurationContextImpl( beanResolver, propertySource, builder );
+				new ElasticsearchHttpClientConfigurationContextImpl( beanResolver, propertySource, builder, configuredVersion );
 
 		for ( ElasticsearchHttpClientConfigurer configurer : configurers ) {
 			configurer.configure( clientConfigurationContext );

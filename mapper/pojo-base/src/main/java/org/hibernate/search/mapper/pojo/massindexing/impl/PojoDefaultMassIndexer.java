@@ -57,10 +57,10 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 	// default settings defined here:
 	private int typesToIndexInParallel = 1;
 	private int documentBuilderThreads = 6;
-	private boolean mergeSegmentsOnFinish = false;
+	private Boolean mergeSegmentsOnFinish;
 	private Boolean dropAndCreateSchemaOnStart;
 	private Boolean purgeAtStart;
-	private boolean mergeSegmentsAfterPurge = true;
+	private Boolean mergeSegmentsAfterPurge;
 	private Long failureFloodingThreshold = null;
 
 	private MassIndexingFailureHandler failureHandler;

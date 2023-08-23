@@ -51,27 +51,22 @@ public class ElasticsearchClientUtils {
 		return new GsonHttpEntity( gson, bodyParts );
 	}
 
-	public static ElasticsearchVersion getElasticsearchVersion(ElasticsearchClient client) {
-		try {
-			return tryGetElasticsearchVersion( client );
-		}
-		catch (RuntimeException e) {
-			throw log.failedToDetectElasticsearchVersion( e.getMessage(), e );
-		}
-	}
-
-	private static ElasticsearchVersion tryGetElasticsearchVersion(ElasticsearchClient client) {
+	public static ElasticsearchVersion tryGetElasticsearchVersion(ElasticsearchClient client) {
 		ElasticsearchRequest request = ElasticsearchRequest.get().build();
 		ElasticsearchResponse response = null;
 		try {
 			response = Futures.unwrappedExceptionJoin( client.submit( request ) );
+
+			if ( response.statusCode() == 404 ) {
+				return null;
+			}
 
 			if ( !ElasticsearchClientUtils.isSuccessCode( response.statusCode() ) ) {
 				throw log.elasticsearchResponseIndicatesFailure();
 			}
 
 			ElasticsearchDistributionName distributionOptional = DISTRIBUTION_ACCESSOR.get( response.body() )
-					.map( ElasticsearchDistributionName::of )
+					.map( ElasticsearchDistributionName::fromServerResponseRepresentation )
 					// Only the Elastic distribution doesn't mention what it is.
 					.orElse( ElasticsearchDistributionName.ELASTIC );
 			String version = VERSION_ACCESSOR.get( response.body() )
