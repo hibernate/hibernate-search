@@ -253,7 +253,7 @@ no other client needs to access the index.
 +
 Also, on <<backend-elasticsearch-compatibility-amazon-opensearch-service,Amazon OpenSearch Service>>
 running Elasticsearch (not OpenSearch) in version 7.1 or older
-https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_7_1[the `_close`/`_open` operations are not supported],
+link:{amazonOpenSearchServiceUrl}/supported-operations.html#version_7_1[the `_close`/`_open` operations are not supported],
 so **the schema update will fail** when trying to update analyzer definitions.
 The only workaround is to avoid the schema update on that platform.
 It should be avoided in production environments regardless:

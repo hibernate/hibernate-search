@@ -303,7 +303,7 @@
                         <openSearchUrl>https://www.opensearch.org</openSearchUrl>
                         <openSearchCompatibleVersions>${version.org.opensearch.compatible.expected.text}</openSearchCompatibleVersions>
                         <openSearchTestedVersions>${version.org.opensearch.compatible.regularly-tested.text}</openSearchTestedVersions>
-                        <amazonOpenSearchServiceUrl>https://docs.aws.amazon.com/opensearch-service/latest/developerguide/</amazonOpenSearchServiceUrl>
+                        <amazonOpenSearchServiceUrl>https://docs.aws.amazon.com/opensearch-service/latest/developerguide</amazonOpenSearchServiceUrl>
                         <wildflyUrl>https://wildfly.org/</wildflyUrl>
                         <quarkusUrl>https://quarkus.io/</quarkusUrl>
                         <springUrl>https://spring.io/</springUrl>
