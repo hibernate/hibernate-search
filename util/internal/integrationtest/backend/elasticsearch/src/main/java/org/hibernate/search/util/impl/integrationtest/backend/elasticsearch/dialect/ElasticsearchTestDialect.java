@@ -40,21 +40,43 @@ public class ElasticsearchTestDialect {
 		return LOCAL_DATE_DEFAULT_FORMAT;
 	}
 
+	public boolean supportsExplicitPurge() {
+		return isActualVersion(
+				es -> true,
+				os -> true,
+				aoss -> false
+		);
+	}
+
 	public static boolean isActualVersion(
 			Predicate<ElasticsearchVersionCondition> elasticsearchPredicate,
-			Predicate<ElasticsearchVersionCondition> opensearchPredicate
+			Predicate<ElasticsearchVersionCondition> openSearchPredicate
+	) {
+		return isActualVersion(
+				elasticsearchPredicate,
+				openSearchPredicate,
+				null
+		);
+	}
+
+	public static boolean isActualVersion(
+			Predicate<ElasticsearchVersionCondition> elasticsearchPredicate,
+			Predicate<ElasticsearchVersionCondition> openSearchPredicate,
+			Predicate<ElasticsearchVersionCondition> amazonOpenSearchServerlessPredicate
 	) {
 		return isVersion(
-				actualVersion,
+				getActualVersion(),
 				elasticsearchPredicate,
-				opensearchPredicate
+				openSearchPredicate,
+				amazonOpenSearchServerlessPredicate
 		);
 	}
 
 	static boolean isVersion(
 			ElasticsearchVersion version,
 			Predicate<ElasticsearchVersionCondition> elasticsearchPredicate,
-			Predicate<ElasticsearchVersionCondition> opensearchPredicate
+			Predicate<ElasticsearchVersionCondition> openSearchPredicate,
+			Predicate<ElasticsearchVersionCondition> amazonOpenSearchServerlessPredicate
 	) {
 		ElasticsearchVersionCondition condition = new ElasticsearchVersionCondition( version );
 
@@ -62,7 +84,16 @@ public class ElasticsearchTestDialect {
 			case ELASTIC:
 				return elasticsearchPredicate.test( condition );
 			case OPENSEARCH:
-				return opensearchPredicate.test( condition );
+				return openSearchPredicate.test( condition );
+			case AMAZON_OPENSEARCH_SERVERLESS:
+				if ( amazonOpenSearchServerlessPredicate != null ) {
+					return amazonOpenSearchServerlessPredicate.test( condition );
+				}
+				else {
+					// The caller doesn't handle AOSS; let's behave as if we were on the latest OpenSearch version.
+					condition = new ElasticsearchVersionCondition( ElasticsearchVersion.of( "opensearch:999.999" ) );
+					return openSearchPredicate.test( condition );
+				}
 			default:
 				throw new IllegalStateException( "Unknown distribution" );
 		}

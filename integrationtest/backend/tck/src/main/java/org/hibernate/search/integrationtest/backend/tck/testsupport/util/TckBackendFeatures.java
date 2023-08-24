@@ -113,4 +113,17 @@ public abstract class TckBackendFeatures {
 	public boolean supportsHighlighterUnifiedPhraseMatching() {
 		return false;
 	}
+
+	public boolean supportsExplicitMergeSegments() {
+		return true;
+	}
+
+	public boolean supportsExplicitFlush() {
+		return true;
+	}
+
+	public boolean supportsExplicitRefresh() {
+		return true;
+	}
+
 }
