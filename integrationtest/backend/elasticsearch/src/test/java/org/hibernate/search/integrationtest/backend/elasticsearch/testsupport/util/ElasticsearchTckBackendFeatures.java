@@ -13,6 +13,7 @@ import java.math.BigInteger;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 
 public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
@@ -203,9 +204,58 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		return isActualVersion(
 				// See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_7_1
 				// See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_7_4
-				esVersion -> !( esVersion.isAws() && esVersion.isLessThan( "7.4" ) ),
+				es -> !( es.isAws() && es.isLessThan( "7.4" ) ),
 				// See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_opensearch_1.0
-				osVersion -> true
+				os -> true,
+				aoss -> false
+		);
+	}
+
+	public static boolean supportsVersionCheck() {
+		return isActualVersion(
+				es -> true,
+				os -> true,
+				aoss -> false
+		);
+	}
+
+	public static boolean supportsIndexStatusCheck() {
+		return isActualVersion(
+				es -> true,
+				os -> true,
+				aoss -> false
+		);
+	}
+
+	@Override
+	public boolean supportsExplicitPurge() {
+		return ElasticsearchTestDialect.get().supportsExplicitPurge();
+	}
+
+	@Override
+	public boolean supportsExplicitMergeSegments() {
+		return isActualVersion(
+				es -> true,
+				os -> true,
+				aoss -> false
+		);
+	}
+
+	@Override
+	public boolean supportsExplicitFlush() {
+		return isActualVersion(
+				es -> true,
+				os -> true,
+				aoss -> false
+		);
+	}
+
+	@Override
+	public boolean supportsExplicitRefresh() {
+		return isActualVersion(
+				es -> true,
+				os -> true,
+				aoss -> false
 		);
 	}
 }
