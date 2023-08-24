@@ -25,6 +25,10 @@ public class ElasticsearchBackendConfiguration extends BackendConfiguration {
 		Map<String, String> properties = new LinkedHashMap<>();
 		properties.put( "log.json_pretty_printing", "true" );
 		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( properties );
+		if ( ElasticsearchDistributionName.AMAZON_OPENSEARCH_SERVERLESS.equals( ElasticsearchTestDialect.getActualVersion().distribution() ) ) {
+			// The distribution/version cannot be detected on Amazon OpenSearch Serverless
+			properties.put( "version", ElasticsearchTestDialect.getActualVersion().toString() );
+		}
 		return properties;
 	}
 
