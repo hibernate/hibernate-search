@@ -78,4 +78,6 @@ public abstract class BackendConfiguration {
 
 	public abstract Map<String, String> rawBackendProperties();
 
+	public abstract boolean supportsExplicitPurge();
+
 }

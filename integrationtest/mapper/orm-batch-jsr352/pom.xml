@@ -132,6 +132,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
+                            <skip>${test.elasticsearch.skip}</skip>
                             <reportNameSuffix>${surefire.reportNameSuffix}-elasticsearch-jbatch</reportNameSuffix>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
@@ -151,6 +152,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
+                            <skip>${test.elasticsearch.skip}</skip>
                             <reportNameSuffix>${surefire.reportNameSuffix}-elasticsearch-jberet</reportNameSuffix>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
@@ -178,6 +180,26 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>amazon-opensearch-serverless</id>
+            <activation>
+                <property>
+                    <name>test.elasticsearch.distribution</name>
+                    <value>amazon-opensearch-serverless</value>
+                </property>
+            </activation>
+            <properties>
+                <!-- The JSR-352 job executes a purge on startup and thus cannot
+                     work with Amazon OpenSearch Serverless (which doesn't support purge/delete-by-query).
+                     See https://hibernate.atlassian.net/browse/HSEARCH-4929,
+                     https://hibernate.atlassian.net/browse/HSEARCH-4930
+                 -->
+                <test.elasticsearch.skip>true</test.elasticsearch.skip>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
 

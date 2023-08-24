@@ -9,6 +9,8 @@ package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 
 public class ElasticsearchBackendConfiguration extends BackendConfiguration {
@@ -25,4 +27,11 @@ public class ElasticsearchBackendConfiguration extends BackendConfiguration {
 		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( properties );
 		return properties;
 	}
+
+	@Override
+	public boolean supportsExplicitPurge() {
+		return !ElasticsearchDistributionName.AMAZON_OPENSEARCH_SERVERLESS
+				.equals( ElasticsearchTestDialect.getActualVersion().distribution() );
+	}
+
 }
