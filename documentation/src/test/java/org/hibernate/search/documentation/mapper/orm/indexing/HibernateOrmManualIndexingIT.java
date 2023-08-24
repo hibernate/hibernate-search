@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.indexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.Arrays;
 
@@ -227,6 +228,16 @@ public class HibernateOrmManualIndexingIT {
 			SearchWorkspace bookAndAuthorWorkspace = searchSession.workspace( Book.class, Author.class ); // <4>
 			// end::workspace-retrieval-session[]
 		} );
+	}
+
+	@Test
+	public void purge() {
+		assumeTrue( "This test only makes sense if the backend supports explicit purges",
+				BackendConfigurations.simple().supportsExplicitPurge() );
+
+		int numberOfBooks = 10;
+		EntityManagerFactory entityManagerFactory = setup( true );
+		initBooksAndAuthors( entityManagerFactory, numberOfBooks );
 
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			assertBookCount( entityManager, numberOfBooks );

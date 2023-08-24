@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.indexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.Properties;
 
@@ -17,14 +18,24 @@ import jakarta.batch.runtime.BatchStatus;
 import jakarta.batch.runtime.JobExecution;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
+import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.orm.Search;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class HibernateOrmBatchJsr352IT extends AbstractHibernateOrmMassIndexingIT {
 
 	private static final int JOB_TIMEOUT_MS = 30_000;
 	private static final int THREAD_SLEEP = 1000;
+
+	@Before
+	public void checkAssumptions() {
+		assumeTrue(
+				"This test only makes sense if the backend supports explicit purge",
+				BackendConfigurations.simple().supportsExplicitPurge()
+		);
+	}
 
 	@Test
 	public void simple() throws Exception {

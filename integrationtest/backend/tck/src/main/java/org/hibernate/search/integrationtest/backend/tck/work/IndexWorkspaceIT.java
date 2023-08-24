@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.work;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.Collections;
 
@@ -19,6 +20,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSession;
@@ -52,7 +54,14 @@ public class IndexWorkspaceIT {
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
-	public void initSessionContexts() {
+	public void checkAssumptions() {
+		assumeTrue(
+				"This test only makes sense if the backend supports explicit purge, mergeSegments, flush and refresh",
+				TckConfiguration.get().getBackendFeatures().supportsExplicitPurge()
+						&& TckConfiguration.get().getBackendFeatures().supportsExplicitMergeSegments()
+						&& TckConfiguration.get().getBackendFeatures().supportsExplicitFlush()
+						&& TckConfiguration.get().getBackendFeatures().supportsExplicitRefresh()
+		);
 	}
 
 	@Test

@@ -7,9 +7,11 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.bootstrap;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assume.assumeTrue;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
@@ -33,6 +35,10 @@ public class ElasticsearchBootstrapFailureIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3621")
 	public void cannotConnect() {
+		assumeTrue( "This test only works if the very first request to Elasticsearch"
+				+ " is a version check, i.e. if version checks are supported",
+				ElasticsearchTckBackendFeatures.supportsVersionCheck() );
+
 		assertThatThrownBy(
 				() -> setupHelper.start()
 						.withBackendProperty(
