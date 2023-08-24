@@ -35,4 +35,9 @@ class BackendMockSetupStrategy implements BackendSetupStrategy {
 		}
 		return setupContext;
 	}
+
+	@Override
+	public boolean supportsExplicitRefresh() {
+		return true;
+	}
 }

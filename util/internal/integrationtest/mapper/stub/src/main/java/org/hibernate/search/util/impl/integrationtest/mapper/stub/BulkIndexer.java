@@ -40,19 +40,22 @@ public class BulkIndexer {
 	private final BackendMappingContext mappingContext;
 	private final String tenantId;
 	private final IndexIndexer indexer;
-	private final boolean refresh;
+	private final boolean refreshEachBatch;
+	private final boolean refreshAtEnd;
 
 	private List<StubDocumentProvider> buildingBatch = new ArrayList<>();
 
 	private final List<IndexingQueue> indexingQueues;
 	private int currentQueueIndex;
 
-	BulkIndexer(MappedIndexManager indexManager, StubSession sessionContext, boolean refresh) {
+	BulkIndexer(MappedIndexManager indexManager, StubSession sessionContext,
+			boolean refreshEachBatch, boolean refreshAtEnd) {
 		this.indexManager = indexManager;
 		this.mappingContext = sessionContext.mappingContext();
 		this.tenantId = sessionContext.tenantIdentifier();
 		this.indexer = indexManager.createIndexer( sessionContext );
-		this.refresh = refresh;
+		this.refreshEachBatch = refreshEachBatch;
+		this.refreshAtEnd = refreshAtEnd;
 		this.indexingQueues = new ArrayList<>( PARALLELISM );
 		for ( int i = 0; i < PARALLELISM; i++ ) {
 			indexingQueues.add( new IndexingQueue() );
@@ -120,7 +123,7 @@ public class BulkIndexer {
 			indexingFutures[i] = indexingQueues.get( i ).future;
 		}
 		CompletableFuture<?> future = CompletableFuture.allOf( indexingFutures );
-		if ( refresh ) {
+		if ( refreshAtEnd ) {
 			IndexWorkspace workspace = indexManager.createWorkspace(
 					mappingContext,
 					asSetIgnoreNull( tenantId )
@@ -153,7 +156,8 @@ public class BulkIndexer {
 					StubDocumentProvider documentProvider = batch.get( i );
 					batchFutures[i] = indexer.add(
 							documentProvider.getReferenceProvider(), documentProvider.getContributor(),
-							DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
+							DocumentCommitStrategy.NONE,
+							refreshEachBatch ? DocumentRefreshStrategy.FORCE : DocumentRefreshStrategy.NONE,
 							OperationSubmitter.blocking()
 					);
 				}

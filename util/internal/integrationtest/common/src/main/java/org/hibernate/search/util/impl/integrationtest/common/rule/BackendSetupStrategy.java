@@ -26,6 +26,8 @@ public interface BackendSetupStrategy {
 			TestConfigurationProvider configurationProvider,
 			CompletionStage<BackendMappingHandle> mappingHandlePromise);
 
+	boolean supportsExplicitRefresh();
+
 	static BackendSetupStrategy withSingleBackendMock(BackendMock defaultBackendMock) {
 		return new BackendMockSetupStrategy( defaultBackendMock, Collections.emptyMap() );
 	}

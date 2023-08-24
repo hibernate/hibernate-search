@@ -49,19 +49,16 @@ public class HibernateOrmMassIndexerMultiTenancyIT {
 						String.join( ",", TENANT_1_ID, TENANT_2_ID, TENANT_3_ID ) )
 				.setup( Book.class, Author.class );
 		initData( sessionFactory, TENANT_1_ID, HibernateOrmMassIndexerMultiTenancyIT::newAuthor );
-		with( sessionFactory, TENANT_1_ID ).runNoTransaction( entityManager -> {
-			assertBookCount( entityManager, 0 );
-			assertAuthorCount( entityManager, 0 );
+		with( sessionFactory, TENANT_1_ID ).runNoTransaction( session -> {
+			assertBookAndAuthorCount( session, 0, 0 );
 		} );
 		initData( sessionFactory, TENANT_2_ID, HibernateOrmMassIndexerMultiTenancyIT::newAuthor );
-		with( sessionFactory, TENANT_2_ID ).runNoTransaction( entityManager -> {
-			assertBookCount( entityManager, 0 );
-			assertAuthorCount( entityManager, 0 );
+		with( sessionFactory, TENANT_2_ID ).runNoTransaction( session -> {
+			assertBookAndAuthorCount( session, 0, 0 );
 		} );
 		initData( sessionFactory, TENANT_3_ID, HibernateOrmMassIndexerMultiTenancyIT::newAuthor );
-		with( sessionFactory, TENANT_3_ID ).runNoTransaction( entityManager -> {
-			assertBookCount( entityManager, 0 );
-			assertAuthorCount( entityManager, 0 );
+		with( sessionFactory, TENANT_3_ID ).runNoTransaction( session -> {
+			assertBookAndAuthorCount( session, 0, 0 );
 		} );
 	}
 
@@ -74,19 +71,19 @@ public class HibernateOrmMassIndexerMultiTenancyIT {
 		// tag::explicitTenants[]
 		searchMapping.scope( Object.class ) // <2>
 				.massIndexer( asSet( "tenant1", "tenant2" ) ) // <3>
+				// end::explicitTenants[]
+				.purgeAllOnStart( BackendConfigurations.simple().supportsExplicitPurge() )
+				// tag::explicitTenants[]
 				.startAndWait(); // <4>
 		// end::explicitTenants[]
-		with( sessionFactory, TENANT_1_ID ).runInTransaction( entityManager -> {
-			assertBookCount( entityManager, NUMBER_OF_BOOKS );
-			assertAuthorCount( entityManager, NUMBER_OF_BOOKS );
+		with( sessionFactory, TENANT_1_ID ).runInTransaction( session -> {
+			assertBookAndAuthorCount( session, NUMBER_OF_BOOKS, NUMBER_OF_BOOKS );
 		} );
-		with( sessionFactory, TENANT_2_ID ).runInTransaction( entityManager -> {
-			assertBookCount( entityManager, NUMBER_OF_BOOKS );
-			assertAuthorCount( entityManager, NUMBER_OF_BOOKS );
+		with( sessionFactory, TENANT_2_ID ).runInTransaction( session -> {
+			assertBookAndAuthorCount( session, NUMBER_OF_BOOKS, NUMBER_OF_BOOKS );
 		} );
-		with( sessionFactory, TENANT_3_ID ).runInTransaction( entityManager -> {
-			assertBookCount( entityManager, 0 );
-			assertAuthorCount( entityManager, 0 );
+		with( sessionFactory, TENANT_3_ID ).runInTransaction( session -> {
+			assertBookAndAuthorCount( session, 0, 0 );
 		} );
 	}
 
@@ -99,40 +96,34 @@ public class HibernateOrmMassIndexerMultiTenancyIT {
 		// tag::implicitTenants[]
 		searchMapping.scope( Object.class ) // <2>
 				.massIndexer() // <3>
+				// end::implicitTenants[]
+				.purgeAllOnStart( BackendConfigurations.simple().supportsExplicitPurge() )
+				// tag::implicitTenants[]
 				.startAndWait(); // <4>
 		// end::implicitTenants[]
-		with( sessionFactory, TENANT_1_ID ).runInTransaction( entityManager -> {
-			assertBookCount( entityManager, NUMBER_OF_BOOKS );
-			assertAuthorCount( entityManager, NUMBER_OF_BOOKS );
+		with( sessionFactory, TENANT_1_ID ).runInTransaction( session -> {
+			assertBookAndAuthorCount( session, NUMBER_OF_BOOKS, NUMBER_OF_BOOKS );
 		} );
-		with( sessionFactory, TENANT_2_ID ).runInTransaction( entityManager -> {
-			assertBookCount( entityManager, NUMBER_OF_BOOKS );
-			assertAuthorCount( entityManager, NUMBER_OF_BOOKS );
+		with( sessionFactory, TENANT_2_ID ).runInTransaction( session -> {
+			assertBookAndAuthorCount( session, NUMBER_OF_BOOKS, NUMBER_OF_BOOKS );
 		} );
-		with( sessionFactory, TENANT_3_ID ).runInTransaction( entityManager -> {
-			assertBookCount( entityManager, NUMBER_OF_BOOKS );
-			assertAuthorCount( entityManager, NUMBER_OF_BOOKS );
+		with( sessionFactory, TENANT_3_ID ).runInTransaction( session -> {
+			assertBookAndAuthorCount( session, NUMBER_OF_BOOKS, NUMBER_OF_BOOKS );
 		} );
 	}
 
-	private static void assertBookCount(Session session, int expectedCount) {
-		SearchSession searchSession = Search.session( session );
-		assertThat(
-				searchSession.search( Book.class )
-						.where( f -> f.matchAll() )
-						.fetchTotalHitCount()
-		)
-				.isEqualTo( expectedCount );
-	}
-
-	private static void assertAuthorCount(Session session, int expectedCount) {
-		SearchSession searchSession = Search.session( session );
-		assertThat(
-				searchSession.search( Author.class )
-						.where( f -> f.matchAll() )
-						.fetchTotalHitCount()
-		)
-				.isEqualTo( expectedCount );
+	void assertBookAndAuthorCount(Session session, int expectedBookCount, int expectedAuthorCount) {
+		setupHelper.assertions().searchAfterIndexChangesAndPotentialRefresh( () -> {
+			SearchSession searchSession = Search.session( session );
+			assertThat( searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.fetchTotalHitCount() )
+					.isEqualTo( expectedBookCount );
+			assertThat( searchSession.search( Author.class )
+					.where( f -> f.matchAll() )
+					.fetchTotalHitCount() )
+					.isEqualTo( expectedAuthorCount );
+		} );
 	}
 
 	private static void initData(SessionFactory sessionFactory, String tenantId, Function<Integer, Author> authorInit) {

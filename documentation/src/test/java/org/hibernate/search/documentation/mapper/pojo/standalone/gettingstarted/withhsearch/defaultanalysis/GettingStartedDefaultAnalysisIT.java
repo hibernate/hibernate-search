@@ -112,8 +112,6 @@ public class GettingStartedDefaultAnalysisIT {
 		}
 		// end::indexing[]
 		Integer bookId = 2;
-		// Make sure changes are visible
-		searchMapping.scope( Book.class ).workspace().refresh();
 
 		// tag::searching-objects[]
 		try ( SearchSession session = searchMapping.createSession() ) { // <1>
@@ -217,8 +215,6 @@ public class GettingStartedDefaultAnalysisIT {
 			session.indexingPlan().addOrUpdate( book );
 		}
 		// end::indexing-addOrUpdate[]
-		// Make sure changes are visible
-		searchMapping.scope( Book.class ).workspace().refresh();
 		try ( SearchSession session = searchMapping.createSession() ) {
 			assertThat( session.search( Book.class )
 					.select( f -> f.id( Integer.class ) )
@@ -245,8 +241,6 @@ public class GettingStartedDefaultAnalysisIT {
 			session.indexingPlan().delete( book );
 		}
 		// end::indexing-delete[]
-		// Make sure changes are visible
-		searchMapping.scope( Book.class ).workspace().refresh();
 		try ( SearchSession session = searchMapping.createSession() ) {
 			assertThat( session.search( Book.class )
 					.select( f -> f.id( Integer.class ) )

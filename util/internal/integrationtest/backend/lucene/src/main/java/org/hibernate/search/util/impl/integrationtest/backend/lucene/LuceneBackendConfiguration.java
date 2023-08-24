@@ -33,4 +33,9 @@ public class LuceneBackendConfiguration extends BackendConfiguration {
 		return true;
 	}
 
+	@Override
+	public boolean supportsExplicitRefresh() {
+		return true;
+	}
+
 }

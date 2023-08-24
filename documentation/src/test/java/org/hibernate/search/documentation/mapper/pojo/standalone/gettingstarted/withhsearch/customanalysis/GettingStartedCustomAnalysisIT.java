@@ -106,8 +106,6 @@ public class GettingStartedCustomAnalysisIT {
 			session.indexingPlan().add( author );
 			session.indexingPlan().add( book );
 		}
-		// Make sure changes are visible
-		searchMapping.scope( Book.class ).workspace().refresh();
 
 		// tag::searching[]
 		try ( SearchSession session = searchMapping.createSession() ) {

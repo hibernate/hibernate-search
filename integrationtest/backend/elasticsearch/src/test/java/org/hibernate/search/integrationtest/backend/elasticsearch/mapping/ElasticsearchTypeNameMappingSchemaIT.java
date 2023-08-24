@@ -20,6 +20,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.impl.ElasticsearchBackendI
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
@@ -63,10 +64,12 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 
 	@Test
 	public void schema() {
-		clientSpy.expectNext(
-				ElasticsearchRequest.get().build(),
-				ElasticsearchRequestAssertionMode.STRICT
-		);
+		if ( ElasticsearchTckBackendFeatures.supportsVersionCheck() ) {
+			clientSpy.expectNext(
+					ElasticsearchRequest.get().build(),
+					ElasticsearchRequestAssertionMode.STRICT
+			);
+		}
 		clientSpy.expectNext(
 				ElasticsearchRequest.get()
 						.multiValuedPathComponent( defaultAliases( index.name() ) )

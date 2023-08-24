@@ -6,16 +6,19 @@
  */
 package org.hibernate.search.documentation.mapper.orm.indexing;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
 
-import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
 
+import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -38,14 +41,16 @@ public class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingI
 						Search.session( entityManager );
 				// tag::simple[]
 				searchSession.massIndexer() // <2>
+						// end::simple[]
+						.purgeAllOnStart( BackendConfigurations.simple().supportsExplicitPurge() )
+						// tag::simple[]
 						.startAndWait(); // <3>
 				// end::simple[]
 			}
 			catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
-			assertBookCount( entityManager, NUMBER_OF_BOOKS );
-			assertAuthorCount( entityManager, NUMBER_OF_BOOKS );
+			assertBookAndAuthorCount( entityManager, NUMBER_OF_BOOKS, NUMBER_OF_BOOKS );
 		} );
 	}
 
@@ -62,14 +67,18 @@ public class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingI
 				massIndexer.type( Book.class ).reindexOnly( "e.publicationYear <= 2100" ); // <3>
 				massIndexer.type( Author.class ).reindexOnly( "e.birthDate < :birthDate" ) // <4>
 						.param( "birthDate", LocalDate.ofYearDay( 2100, 77 ) ); // <5>
+				// end::reindexOnly[]
+				if ( ! BackendConfigurations.simple().supportsExplicitPurge() ) {
+					massIndexer.purgeAllOnStart( false );
+				}
+				// tag::reindexOnly[]
 				massIndexer.startAndWait(); // <6>
 				// end::reindexOnly[]
 			}
 			catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
-			assertBookCount( entityManager, 651 );
-			assertAuthorCount( entityManager, 651 );
+			assertBookAndAuthorCount( entityManager, 651, 651 );
 		} );
 	}
 
@@ -80,14 +89,16 @@ public class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingI
 				SearchSession searchSession = Search.session( entityManager );
 				// tag::select-type[]
 				searchSession.massIndexer( Book.class ) // <1>
+						// end::select-type[]
+						.purgeAllOnStart( BackendConfigurations.simple().supportsExplicitPurge() )
+						// tag::select-type[]
 						.startAndWait(); // <2>
 				// end::select-type[]
 			}
 			catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
-			assertBookCount( entityManager, NUMBER_OF_BOOKS );
-			assertAuthorCount( entityManager, 0 );
+			assertBookAndAuthorCount( entityManager, NUMBER_OF_BOOKS, 0 );
 		} );
 	}
 
@@ -95,21 +106,26 @@ public class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingI
 	public void async_reactive() {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
-			// tag::async[]
-			searchSession.massIndexer() // <1>
-					.start() // <2>
-					.thenRun( () -> { // <3>
-						log.info( "Mass indexing succeeded!" );
-					} )
-					.exceptionally( throwable -> {
-						log.error( "Mass indexing failed!", throwable );
-						return null;
-					} );
+			CompletionStage<?> completionStage =
+					// tag::async[]
+					searchSession.massIndexer() // <1>
+							// end::async[]
+							.purgeAllOnStart( BackendConfigurations.simple().supportsExplicitPurge() )
+							// tag::async[]
+							.start() // <2>
+							.thenRun( () -> { // <3>
+								log.info( "Mass indexing succeeded!" );
+							} )
+							.exceptionally( throwable -> {
+								log.error( "Mass indexing failed!", throwable );
+								return null;
+							} );
 			// end::async[]
+			Future<?> future = completionStage.toCompletableFuture();
 			await().untilAsserted( () -> {
-				assertBookCount( entityManager, NUMBER_OF_BOOKS );
-				assertAuthorCount( entityManager, NUMBER_OF_BOOKS );
+				assertThatFuture( future ).isSuccessful();
 			} );
+			assertBookAndAuthorCount( entityManager, NUMBER_OF_BOOKS, NUMBER_OF_BOOKS );
 		} );
 	}
 
@@ -120,14 +136,17 @@ public class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingI
 			// tag::async[]
 
 			// OR
-			Future<?> future = searchSession.massIndexer().start()
+			Future<?> future = searchSession.massIndexer()
+					// end::async[]
+					.purgeAllOnStart( BackendConfigurations.simple().supportsExplicitPurge() )
+					// tag::async[]
+					.start()
 					.toCompletableFuture(); // <4>
 			// end::async[]
 			await().untilAsserted( () -> {
-				assertBookCount( entityManager, NUMBER_OF_BOOKS );
-				assertAuthorCount( entityManager, NUMBER_OF_BOOKS );
 				assertThatFuture( future ).isSuccessful();
 			} );
+			assertBookAndAuthorCount( entityManager, NUMBER_OF_BOOKS, NUMBER_OF_BOOKS );
 		} );
 	}
 
@@ -141,14 +160,30 @@ public class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingI
 						.idFetchSize( 150 ) // <2>
 						.batchSizeToLoadObjects( 25 ) // <3>
 						.threadsToLoadObjects( 12 ) // <4>
+						// end::parameters[]
+						.purgeAllOnStart( BackendConfigurations.simple().supportsExplicitPurge() )
+						// tag::parameters[]
 						.startAndWait(); // <5>
 				// end::parameters[]
 			}
 			catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
-			assertBookCount( entityManager, NUMBER_OF_BOOKS );
-			assertAuthorCount( entityManager, NUMBER_OF_BOOKS );
+			assertBookAndAuthorCount( entityManager, NUMBER_OF_BOOKS, NUMBER_OF_BOOKS );
+		} );
+	}
+
+	void assertBookAndAuthorCount(EntityManager entityManager, int expectedBookCount, int expectedAuthorCount) {
+		setupHelper.assertions().searchAfterIndexChangesAndPotentialRefresh( () -> {
+			SearchSession searchSession = Search.session( entityManager );
+			assertThat( searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.fetchTotalHitCount() )
+					.isEqualTo( expectedBookCount );
+			assertThat( searchSession.search( Author.class )
+					.where( f -> f.matchAll() )
+					.fetchTotalHitCount() )
+					.isEqualTo( expectedAuthorCount );
 		} );
 	}
 }

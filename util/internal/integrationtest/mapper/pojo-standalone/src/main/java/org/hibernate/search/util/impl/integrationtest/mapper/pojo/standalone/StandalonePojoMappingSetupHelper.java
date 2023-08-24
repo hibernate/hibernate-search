@@ -73,6 +73,7 @@ public final class StandalonePojoMappingSetupHelper
 
 	private final MethodHandles.Lookup lookup;
 	private final SchemaManagementStrategyName schemaManagementStrategyName;
+	private final StandalonePojoAssertionHelper assertionHelper;
 
 	private ReindexOnUpdate defaultReindexOnUpdate;
 
@@ -81,11 +82,17 @@ public final class StandalonePojoMappingSetupHelper
 		super( backendSetupStrategy );
 		this.lookup = lookup;
 		this.schemaManagementStrategyName = schemaManagementStrategyName;
+		this.assertionHelper = new StandalonePojoAssertionHelper( backendSetupStrategy );
 	}
 
 	public StandalonePojoMappingSetupHelper disableAssociationReindexing() {
 		this.defaultReindexOnUpdate = ReindexOnUpdate.SHALLOW;
 		return this;
+	}
+
+	@Override
+	public StandalonePojoAssertionHelper assertions() {
+		return assertionHelper;
 	}
 
 	@Override

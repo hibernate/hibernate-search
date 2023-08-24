@@ -10,10 +10,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEqualsIgnoringUnknownFields;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
@@ -24,6 +26,7 @@ import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
@@ -71,11 +74,15 @@ public class ElasticsearchBootstrapIT {
 		// We do not expect the client to be created in the first phase
 		assertThat( elasticsearchClientSpy.getCreatedClientCount() ).isZero();
 
-		// In the *second* phase, however, we expect the client to be created and used to check the version
-		elasticsearchClientSpy.expectNext(
-				ElasticsearchRequest.get().build(), ElasticsearchRequestAssertionMode.EXTENSIBLE
-		);
+		// In the *second* phase, however, we expect the client to be created
+		// and if possible used to check the version
+		if ( ElasticsearchTckBackendFeatures.supportsVersionCheck() ) {
+			elasticsearchClientSpy.expectNext(
+					ElasticsearchRequest.get().build(), ElasticsearchRequestAssertionMode.EXTENSIBLE
+			);
+		}
 		partialSetup.doSecondPhase();
+		assertThat( elasticsearchClientSpy.getCreatedClientCount() ).isNotZero();
 		elasticsearchClientSpy.verifyExpectationsMet();
 
 		checkBackendWorks();
@@ -88,6 +95,9 @@ public class ElasticsearchBootstrapIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3841")
 	public void noVersionCheck_missingVersion() {
+		assumeTrue( "This test only makes sense if version checks are supported",
+				ElasticsearchTckBackendFeatures.supportsVersionCheck() );
+
 		assertThatThrownBy(
 				() -> setupHelper.start()
 						.withBackendProperty(
@@ -113,13 +123,16 @@ public class ElasticsearchBootstrapIT {
 	}
 
 	/**
-	 * Check that an exception is thrown when version_check.enabled is false
+	 * Check that an exception is thrown when version checks are not used
 	 * while specifying only the major number of the Elasticsearch version.
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3841")
 	public void noVersionCheck_incompleteVersion() {
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
+
+		assumeTrue( "This test only makes sense if the Elasticsearch version has both a major and minor number",
+				actualVersion.majorOptional().isPresent() && actualVersion.minor().isPresent() );
 		String versionWithMajorOnly = actualVersion.distribution() + ":" + actualVersion.majorOptional().getAsInt();
 
 		assertThatThrownBy(
@@ -152,19 +165,29 @@ public class ElasticsearchBootstrapIT {
 	}
 
 	/**
-	 * Check everything works fine when version_check.enabled is false
-	 * and specifying the major and minor number of the Elasticsearch version.
+	 * Check that an exception is thrown when version checks are not used
+	 * and specifying a precise enough Elasticsearch version
+	 * (generally major and minor number, but may be less e.g. on Amazon OpenSearch Serverless).
 	 */
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3841", "HSEARCH-4214" })
 	public void noVersionCheck_completeVersion() {
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
-		String versionWithMajorAndMinorOnly = actualVersion.distribution() + ":"
-				+ actualVersion.majorOptional().getAsInt() + "." + actualVersion.minor().getAsInt();
+
+		String configuredVersion;
+		if ( actualVersion.majorOptional().isPresent() && actualVersion.minor().isPresent() ) {
+			configuredVersion = actualVersion.distribution() + ":"
+					+ actualVersion.majorOptional().getAsInt() + "." + actualVersion.minor().getAsInt();
+		}
+		else {
+			// This should only happen when testing Amazon OpenSearch Serverless
+			checkAmazonOpenSearchServerless();
+			configuredVersion = "amazon-opensearch-serverless";
+		}
 
 		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
 				.withBackendProperty(
-						ElasticsearchBackendSettings.VERSION, versionWithMajorAndMinorOnly
+						ElasticsearchBackendSettings.VERSION, configuredVersion
 				)
 				.withBackendProperty(
 						ElasticsearchBackendImplSettings.CLIENT_FACTORY,
@@ -177,7 +200,7 @@ public class ElasticsearchBootstrapIT {
 		assertThat( elasticsearchClientSpy.getCreatedClientCount() ).isZero();
 
 		Map<String, Object> runtimeProperties = new HashMap<>();
-		runtimeProperties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED ), false );
+		ensureNoVersionCheck( runtimeProperties );
 		partialSetup.doSecondPhase( AllAwareConfigurationPropertySource.fromMap( runtimeProperties ) );
 		// We do not expect any request, since the version check is disabled
 		assertThat( elasticsearchClientSpy.getRequestCount() ).isZero();
@@ -188,20 +211,34 @@ public class ElasticsearchBootstrapIT {
 	}
 
 	/**
-	 * Check that an exception is thrown when version_check.enabled is false
+	 * Check that an exception is thrown when version checks are not used
 	 * and specifying a version on backend creation, and a different one on backend start.
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4214")
 	public void noVersionCheck_versionOverrideOnStart_incompatibleVersion() {
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
-		String versionWithMajorOnly = actualVersion.distribution() + ":" + actualVersion.majorOptional().getAsInt();
-		String incompatibleVersionWithMajorAndMinorOnly = actualVersion.distribution() + ":"
-				+ ( actualVersion.majorOptional().getAsInt() == 2 ? "42." : "2." ) + actualVersion.minor().getAsInt();
+
+		String configuredVersionOnBackendCreation;
+		String incompatibleConfiguredVersionOnBackendStart;
+		if ( actualVersion.majorOptional().isPresent() && actualVersion.minor().isPresent() ) {
+			// This is the case we're most interested in, with major version mismatches
+			configuredVersionOnBackendCreation = actualVersion.distribution() + ":"
+					+ actualVersion.majorOptional().getAsInt();
+			incompatibleConfiguredVersionOnBackendStart = actualVersion.distribution() + ":"
+					+ ( actualVersion.majorOptional().getAsInt() == 2 ? "42." : "2." ) + actualVersion.minor()
+					.getAsInt();
+		}
+		else {
+			// This should only happen when testing Amazon OpenSearch Serverless
+			checkAmazonOpenSearchServerless();
+			configuredVersionOnBackendCreation = actualVersion.toString();
+			incompatibleConfiguredVersionOnBackendStart = "opensearch:99.9";
+		}
 
 		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
 				.withBackendProperty(
-						ElasticsearchBackendSettings.VERSION, versionWithMajorOnly
+						ElasticsearchBackendSettings.VERSION, configuredVersionOnBackendCreation
 				)
 				.withBackendProperty(
 						ElasticsearchBackendImplSettings.CLIENT_FACTORY,
@@ -214,9 +251,9 @@ public class ElasticsearchBootstrapIT {
 		assertThat( elasticsearchClientSpy.getCreatedClientCount() ).isZero();
 
 		Map<String, Object> runtimeProperties = new HashMap<>();
-		runtimeProperties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED ), false );
+		ensureNoVersionCheck( runtimeProperties );
 		runtimeProperties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION ),
-				incompatibleVersionWithMajorAndMinorOnly );
+				incompatibleConfiguredVersionOnBackendStart );
 		assertThatThrownBy(
 				() -> partialSetup.doSecondPhase( AllAwareConfigurationPropertySource.fromMap( runtimeProperties ) ) )
 				.isInstanceOf( SearchException.class )
@@ -224,10 +261,10 @@ public class ElasticsearchBootstrapIT {
 						.defaultBackendContext()
 						.failure(
 								"Invalid value for configuration property 'hibernate.search.backend.version': '"
-										+ incompatibleVersionWithMajorAndMinorOnly + "'",
+										+ incompatibleConfiguredVersionOnBackendStart + "'",
 								"Incompatible Elasticsearch version:"
-										+ " version '" + incompatibleVersionWithMajorAndMinorOnly
-										+ "' does not match version '" + versionWithMajorOnly + "' that was provided"
+										+ " version '" + incompatibleConfiguredVersionOnBackendStart
+										+ "' does not match version '" + configuredVersionOnBackendCreation + "' that was provided"
 										+ " when the backend was created.",
 								"You can provide a more precise version on startup,"
 										+ " but you cannot override the version that was provided when the backend was created." )
@@ -235,13 +272,16 @@ public class ElasticsearchBootstrapIT {
 	}
 
 	/**
-	 * Check everything works fine when version_check.enabled is false
+	 * Check everything works fine when version checks are not used
 	 * and specifying a version on backend creation, and a more precise one on backend start.
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4214")
 	public void noVersionCheck_versionOverrideOnStart_compatibleVersion() {
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
+
+		assumeTrue( "This test only makes sense if the Elasticsearch version has both a major and minor number",
+				actualVersion.majorOptional().isPresent() && actualVersion.minor().isPresent() );
 		String versionWithMajorOnly = actualVersion.distribution() + ":" + actualVersion.majorOptional().getAsInt();
 		String versionWithMajorAndMinorOnly = actualVersion.distribution() + ":"
 				+ actualVersion.majorOptional().getAsInt() + "." + actualVersion.minor().getAsInt();
@@ -282,11 +322,20 @@ public class ElasticsearchBootstrapIT {
 	@TestForIssue(jiraKey = { "HSEARCH-4435" })
 	public void noVersionCheck_customSettingsAndMapping() {
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
-		String versionWithMajorAndMinorOnly = actualVersion.distribution() + ":"
-				+ actualVersion.majorOptional().getAsInt() + "." + actualVersion.minor().getAsInt();
+
+		String configuredVersion;
+		if ( actualVersion.majorOptional().isPresent() && actualVersion.minor().isPresent() ) {
+			configuredVersion = actualVersion.distribution() + ":"
+					+ actualVersion.majorOptional().getAsInt() + "." + actualVersion.minor().getAsInt();
+		}
+		else {
+			// This should only happen when testing Amazon OpenSearch Serverless
+			checkAmazonOpenSearchServerless();
+			configuredVersion = actualVersion.toString();
+		}
 
 		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
-				.withBackendProperty( ElasticsearchBackendSettings.VERSION, versionWithMajorAndMinorOnly )
+				.withBackendProperty( ElasticsearchBackendSettings.VERSION, configuredVersion )
 				.withBackendProperty( ElasticsearchBackendImplSettings.CLIENT_FACTORY,
 						elasticsearchClientSpy.factoryReference() )
 				.withBackendProperty( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
@@ -300,7 +349,7 @@ public class ElasticsearchBootstrapIT {
 		assertThat( elasticsearchClientSpy.getCreatedClientCount() ).isZero();
 
 		Map<String, Object> runtimeProperties = new HashMap<>();
-		runtimeProperties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED ), false );
+		ensureNoVersionCheck( runtimeProperties );
 		partialSetup.doSecondPhase( AllAwareConfigurationPropertySource.fromMap( runtimeProperties ) );
 		checkBackendWorks();
 
@@ -314,6 +363,21 @@ public class ElasticsearchBootstrapIT {
 						+ " }"
 						+ "}",
 				elasticsearchClient.index( index.name() ).type().getMapping() );
+	}
+
+	private static void ensureNoVersionCheck(Map<String, Object> properties) {
+		if ( ElasticsearchTckBackendFeatures.supportsVersionCheck() ) {
+			properties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED ),
+					false );
+		}
+		// Else nothing to do: version checks are unsupported and disabled by default.
+	}
+
+	private void checkAmazonOpenSearchServerless() {
+		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
+		if ( actualVersion.distribution() != ElasticsearchDistributionName.AMAZON_OPENSEARCH_SERVERLESS ) {
+			throw new IllegalStateException( "Unexpected actual Elasticsearch version: " + actualVersion + ". Tests are buggy?" );
+		}
 	}
 
 	private void checkBackendWorks() {

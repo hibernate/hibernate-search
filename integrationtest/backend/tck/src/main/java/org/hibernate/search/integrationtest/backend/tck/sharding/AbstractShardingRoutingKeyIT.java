@@ -144,9 +144,8 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 				.join();
 
 		// No routing key => all documents should be purged
-		index.createWorkspace().refresh( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL ).join();
-		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
-				.hasNoHits();
+		index.searchAfterIndexChanges( () -> assertThatQuery( index.query().where( f -> f.matchAll() ) )
+				.hasNoHits() );
 	}
 
 	@Test
@@ -169,10 +168,9 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 		 * One routing key => all documents indexed with that routing key should be purged,
 		 * and only those documents.
 		 */
-		index.createWorkspace().refresh( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL ).join();
-		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
+		index.searchAfterIndexChanges( () -> assertThatQuery( index.query().where( f -> f.matchAll() ) )
 				.hits().asNormalizedDocRefs()
-				.containsExactlyInAnyOrder( docRefsForRoutingKeys( otherRoutingKeys, docIdByRoutingKey ) );
+				.containsExactlyInAnyOrder( docRefsForRoutingKeys( otherRoutingKeys, docIdByRoutingKey ) ) );
 	}
 
 	@Test
@@ -193,10 +191,9 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 		 * Two routing keys => all documents indexed with these routing keys should be returned,
 		 * and only those documents.
 		 */
-		index.createWorkspace().refresh( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL ).join();
-		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
+		index.searchAfterIndexChanges( () -> assertThatQuery( index.query().where( f -> f.matchAll() ) )
 				.hits().asNormalizedDocRefs()
-				.containsExactlyInAnyOrder( docRefsForRoutingKeys( otherRoutingKeys, docIdByRoutingKey ) );
+				.containsExactlyInAnyOrder( docRefsForRoutingKeys( otherRoutingKeys, docIdByRoutingKey ) ) );
 	}
 
 	@Test
@@ -208,10 +205,8 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 				.join();
 
 		// All routing keys => all documents should be purged
-		index.createWorkspace().refresh( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL )
-				.join();
-		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
-				.hasNoHits();
+		index.searchAfterIndexChanges( () -> assertThatQuery( index.query().where( f -> f.matchAll() ) )
+				.hasNoHits() );
 	}
 
 	private void assumePurgeSupported() {

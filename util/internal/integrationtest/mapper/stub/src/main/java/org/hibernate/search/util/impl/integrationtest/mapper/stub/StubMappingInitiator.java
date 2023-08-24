@@ -18,10 +18,12 @@ import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 
 public class StubMappingInitiator implements MappingInitiator<StubMappedIndex, StubMappingPartialBuildState> {
 
+	private final StubMappingBackendFeatures backendFeatures;
 	private final TenancyMode tenancyMode;
 	private final List<StubMappedIndex> mappedIndexes = new ArrayList<>();
 
-	public StubMappingInitiator(TenancyMode tenancyMode) {
+	public StubMappingInitiator(StubMappingBackendFeatures backendFeatures, TenancyMode tenancyMode) {
+		this.backendFeatures = backendFeatures;
 		this.tenancyMode = tenancyMode;
 	}
 
@@ -40,7 +42,7 @@ public class StubMappingInitiator implements MappingInitiator<StubMappedIndex, S
 	@Override
 	public Mapper<StubMappingPartialBuildState> createMapper(MappingBuildContext buildContext,
 			TypeMetadataContributorProvider<StubMappedIndex> contributorProvider) {
-		return new StubMapper( buildContext, contributorProvider, tenancyMode );
+		return new StubMapper( buildContext, contributorProvider, backendFeatures, tenancyMode );
 	}
 
 }

@@ -34,4 +34,10 @@ public class ElasticsearchBackendConfiguration extends BackendConfiguration {
 				.equals( ElasticsearchTestDialect.getActualVersion().distribution() );
 	}
 
+	@Override
+	public boolean supportsExplicitRefresh() {
+		return !ElasticsearchDistributionName.AMAZON_OPENSEARCH_SERVERLESS
+				.equals( ElasticsearchTestDialect.getActualVersion().distribution() );
+	}
+
 }
