@@ -10,10 +10,6 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 
 public abstract class TckBackendFeatures {
 
-	public boolean worksFineWithStrictAboveRangedQueriesOnDecimalScaledField() {
-		return true;
-	}
-
 	public boolean normalizesStringMissingValues() {
 		return true;
 	}
