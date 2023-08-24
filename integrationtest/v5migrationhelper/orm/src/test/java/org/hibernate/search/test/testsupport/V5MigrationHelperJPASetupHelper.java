@@ -24,6 +24,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupSt
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmAssertionHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleEntityManagerFactoryBuilder;
 
 public final class V5MigrationHelperJPASetupHelper
@@ -39,8 +40,16 @@ public final class V5MigrationHelperJPASetupHelper
 		);
 	}
 
+	private final OrmAssertionHelper assertionHelper;
+
 	private V5MigrationHelperJPASetupHelper(BackendSetupStrategy backendSetupStrategy) {
 		super( backendSetupStrategy );
+		this.assertionHelper = new OrmAssertionHelper( backendSetupStrategy );
+	}
+
+	@Override
+	public OrmAssertionHelper assertions() {
+		return assertionHelper;
 	}
 
 	@Override

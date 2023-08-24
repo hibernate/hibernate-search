@@ -104,6 +104,7 @@ public final class OrmSetupHelper
 
 	private final Collection<BackendMock> backendMocks;
 	private final SchemaManagementStrategyName schemaManagementStrategyName;
+	private final OrmAssertionHelper assertionHelper;
 	private CoordinationStrategyExpectations coordinationStrategyExpectations =
 			DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS;
 
@@ -112,11 +113,17 @@ public final class OrmSetupHelper
 		super( backendSetupStrategy );
 		this.backendMocks = backendMocks;
 		this.schemaManagementStrategyName = schemaManagementStrategyName;
+		this.assertionHelper = new OrmAssertionHelper( backendSetupStrategy );
 	}
 
 	public OrmSetupHelper coordinationStrategy(CoordinationStrategyExpectations coordinationStrategyExpectations) {
 		this.coordinationStrategyExpectations = coordinationStrategyExpectations;
 		return this;
+	}
+
+	@Override
+	public OrmAssertionHelper assertions() {
+		return assertionHelper;
 	}
 
 	public boolean areEntitiesProcessedInSession() {

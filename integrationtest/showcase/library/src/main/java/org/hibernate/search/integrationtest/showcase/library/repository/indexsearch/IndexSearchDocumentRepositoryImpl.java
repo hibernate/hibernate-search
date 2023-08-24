@@ -20,7 +20,6 @@ import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
 import org.hibernate.search.integrationtest.showcase.library.model.Document;
 import org.hibernate.search.integrationtest.showcase.library.model.LibraryServiceOption;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -150,9 +149,9 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 
 	@Override
 	public void purge() {
-		SearchWorkspace workspace = Search.session( entityManager ).workspace( Document.class );
-		workspace.purge();
-		workspace.flush();
-		workspace.refresh();
+		// This is faster than a workspace(...).purge(),
+		// and works even on Amazon OpenSearch Serverless.
+		Search.session( entityManager ).schemaManager( Document.class )
+				.dropAndCreate();
 	}
 }

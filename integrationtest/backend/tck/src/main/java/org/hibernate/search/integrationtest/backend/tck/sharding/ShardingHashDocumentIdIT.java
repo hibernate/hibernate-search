@@ -116,12 +116,10 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 				.join();
 
 		// One or more explicit routing key => no document should be purged, since no documents was indexed with that routing key.
-		index.createWorkspace().refresh( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL )
-				.join();
-		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
+		index.searchAfterIndexChanges( () -> assertThatQuery( index.query().where( f -> f.matchAll() ) )
 				.hits().asNormalizedDocRefs()
 				.hasSize( TOTAL_DOCUMENT_COUNT )
-				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );
+				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) ) );
 	}
 
 	private void assumePurgeSupported() {

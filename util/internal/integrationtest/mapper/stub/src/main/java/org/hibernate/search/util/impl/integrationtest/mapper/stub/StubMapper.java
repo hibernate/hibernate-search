@@ -35,6 +35,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 	private final ContextualFailureCollector failureCollector;
 	private final TypeMetadataContributorProvider<StubMappedIndex> contributorProvider;
 
+	private final StubMappingBackendFeatures backendFeatures;
 	private final TenancyMode tenancyMode;
 
 	private final Map<StubTypeModel, MappedIndexManagerBuilder> indexManagerBuilders = new HashMap<>();
@@ -42,9 +43,11 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 
 	StubMapper(MappingBuildContext buildContext,
 			TypeMetadataContributorProvider<StubMappedIndex> contributorProvider,
+			StubMappingBackendFeatures backendFeatures,
 			TenancyMode tenancyMode) {
 		this.failureCollector = buildContext.failureCollector();
 		this.contributorProvider = contributorProvider;
+		this.backendFeatures = backendFeatures;
 		this.tenancyMode = tenancyMode;
 	}
 
@@ -134,7 +137,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 			throw new MappingAbortedException();
 		}
 
-		return new StubMappingPartialBuildState( mappedIndexesByTypeIdentifier );
+		return new StubMappingPartialBuildState( backendFeatures, mappedIndexesByTypeIdentifier );
 	}
 
 	@Override

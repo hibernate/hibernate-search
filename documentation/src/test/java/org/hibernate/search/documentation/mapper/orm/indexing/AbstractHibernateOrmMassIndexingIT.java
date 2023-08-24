@@ -11,7 +11,6 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 
 import java.time.LocalDate;
 
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
@@ -40,29 +39,16 @@ abstract class AbstractHibernateOrmMassIndexingIT {
 				.setup( Book.class, Author.class );
 		initData( entityManagerFactory );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
-			assertBookCount( entityManager, 0 );
-			assertAuthorCount( entityManager, 0 );
+			SearchSession searchSession = Search.session( entityManager );
+			assertThat( searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.fetchTotalHitCount() )
+					.isZero();
+			assertThat( searchSession.search( Author.class )
+					.where( f -> f.matchAll() )
+					.fetchTotalHitCount() )
+					.isZero();
 		} );
-	}
-
-	static void assertBookCount(EntityManager entityManager, int expectedCount) {
-		SearchSession searchSession = Search.session( entityManager );
-		assertThat(
-				searchSession.search( Book.class )
-						.where( f -> f.matchAll() )
-						.fetchTotalHitCount()
-		)
-				.isEqualTo( expectedCount );
-	}
-
-	protected void assertAuthorCount(EntityManager entityManager, int expectedCount) {
-		SearchSession searchSession = Search.session( entityManager );
-		assertThat(
-				searchSession.search( Author.class )
-						.where( f -> f.matchAll() )
-						.fetchTotalHitCount()
-		)
-				.isEqualTo( expectedCount );
 	}
 
 	protected void initData(EntityManagerFactory entityManagerFactory) {

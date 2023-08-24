@@ -16,10 +16,13 @@ import jakarta.batch.operations.JobOperator;
 import jakarta.batch.runtime.BatchRuntime;
 import jakarta.batch.runtime.BatchStatus;
 import jakarta.batch.runtime.JobExecution;
+import jakarta.persistence.EntityManager;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -53,10 +56,7 @@ public class HibernateOrmBatchJsr352IT extends AbstractHibernateOrmMassIndexingI
 		assertThat( jobExecution.getBatchStatus() ).isEqualTo( BatchStatus.COMPLETED );
 
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
-			Search.session( entityManager ).workspace().refresh();
-
-			assertBookCount( entityManager, NUMBER_OF_BOOKS );
-			assertAuthorCount( entityManager, NUMBER_OF_BOOKS );
+			assertBookAndAuthorCount( entityManager, NUMBER_OF_BOOKS, NUMBER_OF_BOOKS );
 		} );
 	}
 
@@ -77,8 +77,7 @@ public class HibernateOrmBatchJsr352IT extends AbstractHibernateOrmMassIndexingI
 		assertThat( jobExecution.getBatchStatus() ).isEqualTo( BatchStatus.COMPLETED );
 
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
-			Search.session( entityManager ).workspace().refresh();
-			assertAuthorCount( entityManager, NUMBER_OF_BOOKS / 2 );
+			assertBookAndAuthorCount( entityManager, 0, NUMBER_OF_BOOKS / 2 );
 		} );
 	}
 
@@ -92,6 +91,21 @@ public class HibernateOrmBatchJsr352IT extends AbstractHibernateOrmMassIndexingI
 		return author;
 	}
 
+	void assertBookAndAuthorCount(EntityManager entityManager, int expectedBookCount, int expectedAuthorCount) {
+		setupHelper.assertions().searchAfterIndexChanges(
+				entityManager.getEntityManagerFactory().unwrap( SessionFactory.class ),
+				() -> {
+					SearchSession searchSession = Search.session( entityManager );
+					assertThat( searchSession.search( Book.class )
+							.where( f -> f.matchAll() )
+							.fetchTotalHitCount() )
+							.isEqualTo( expectedBookCount );
+					assertThat( searchSession.search( Author.class )
+							.where( f -> f.matchAll() )
+							.fetchTotalHitCount() )
+							.isEqualTo( expectedAuthorCount );
+				} );
+	}
 
 	private static JobExecution waitForTermination(JobOperator jobOperator, JobExecution jobExecution, int timeoutInMs)
 			throws InterruptedException {

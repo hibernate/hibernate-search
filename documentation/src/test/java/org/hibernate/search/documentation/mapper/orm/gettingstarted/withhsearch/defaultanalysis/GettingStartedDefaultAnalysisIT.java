@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
+import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.TestConfiguration;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
@@ -83,6 +84,9 @@ public class GettingStartedDefaultAnalysisIT {
 				SearchSession searchSession = Search.session( entityManager ); // <1>
 
 				MassIndexer indexer = searchSession.massIndexer( Book.class ) // <2>
+						// end::manual-index[]
+						.purgeAllOnStart( BackendConfigurations.simple().supportsExplicitPurge() )
+						// tag::manual-index[]
 						.threadsToLoadObjects( 7 ); // <3>
 
 				indexer.startAndWait(); // <4>

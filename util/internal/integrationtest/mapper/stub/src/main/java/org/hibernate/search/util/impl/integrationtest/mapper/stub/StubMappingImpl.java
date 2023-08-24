@@ -30,6 +30,7 @@ import org.hibernate.search.util.common.impl.Futures;
 public class StubMappingImpl
 		implements StubMapping, MappingImplementor<StubMappingImpl>, EntityReferenceFactory {
 
+	private final StubMappingBackendFeatures backendFeatures;
 	private final Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier;
 	private final StubMappingSchemaManagementStrategy schemaManagementStrategy;
 
@@ -39,8 +40,10 @@ public class StubMappingImpl
 
 	StubMappingFixture fixture = new StubMappingFixture( this );
 
-	StubMappingImpl(Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier,
+	StubMappingImpl(StubMappingBackendFeatures backendFeatures,
+			Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier,
 			StubMappingSchemaManagementStrategy schemaManagementStrategy) {
+		this.backendFeatures = backendFeatures;
 		this.mappedIndexesByTypeIdentifier = mappedIndexesByTypeIdentifier;
 		this.schemaManagementStrategy = schemaManagementStrategy;
 		this.toDocumentFieldValueConvertContext = new ToDocumentValueConvertContextImpl( this );
@@ -52,6 +55,10 @@ public class StubMappingImpl
 			closer.push( SearchIntegration::close, integrationHandle, SearchIntegration.Handle::getOrNull );
 			integrationHandle = null;
 		}
+	}
+
+	StubMappingBackendFeatures backendFeatures() {
+		return backendFeatures;
 	}
 
 	@Override

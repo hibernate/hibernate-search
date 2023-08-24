@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
@@ -93,10 +94,12 @@ public class ElasticsearchFieldAttributesIT {
 
 	private void matchMapping(Consumer<IndexSchemaElement> mapping, JsonObject properties) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( mapping );
-		clientSpy.expectNext(
-				ElasticsearchRequest.get().build(),
-				ElasticsearchRequestAssertionMode.STRICT
-		);
+		if ( ElasticsearchTckBackendFeatures.supportsVersionCheck() ) {
+			clientSpy.expectNext(
+					ElasticsearchRequest.get().build(),
+					ElasticsearchRequestAssertionMode.STRICT
+			);
+		}
 		clientSpy.expectNext(
 				ElasticsearchRequest.get()
 						.multiValuedPathComponent( defaultAliases( index.name() ) )

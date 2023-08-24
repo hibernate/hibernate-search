@@ -24,6 +24,7 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoAssertionHelper;
 
 public final class V5MigrationHelperEngineSetupHelper
 		extends
@@ -38,8 +39,16 @@ public final class V5MigrationHelperEngineSetupHelper
 		);
 	}
 
+	private final StandalonePojoAssertionHelper assertionHelper;
+
 	private V5MigrationHelperEngineSetupHelper(BackendSetupStrategy backendSetupStrategy) {
 		super( backendSetupStrategy );
+		this.assertionHelper = new StandalonePojoAssertionHelper( backendSetupStrategy );
+	}
+
+	@Override
+	public StandalonePojoAssertionHelper assertions() {
+		return assertionHelper;
 	}
 
 	@Override

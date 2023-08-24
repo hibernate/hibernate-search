@@ -15,6 +15,7 @@ import java.util.Arrays;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
@@ -300,25 +301,27 @@ public class HibernateOrmManualIndexingIT {
 	}
 
 	private void assertBookCount(EntityManager entityManager, int expectedCount) {
-		SearchSession searchSession = Search.session( entityManager );
-		searchSession.workspace().refresh();
-		assertThat(
-				searchSession.search( Book.class )
-						.where( f -> f.matchAll() )
-						.fetchTotalHitCount()
-		)
-				.isEqualTo( expectedCount );
+		setupHelper.assertions().searchAfterIndexChanges(
+				entityManager.getEntityManagerFactory().unwrap( SessionFactory.class ),
+				() -> {
+					SearchSession searchSession = Search.session( entityManager );
+					assertThat( searchSession.search( Book.class )
+							.where( f -> f.matchAll() )
+							.fetchTotalHitCount() )
+							.isEqualTo( expectedCount );
+				} );
 	}
 
 	private void assertAuthorCount(EntityManager entityManager, int expectedCount) {
-		SearchSession searchSession = Search.session( entityManager );
-		searchSession.workspace().refresh();
-		assertThat(
-				searchSession.search( Author.class )
-						.where( f -> f.matchAll() )
-						.fetchTotalHitCount()
-		)
-				.isEqualTo( expectedCount );
+		setupHelper.assertions().searchAfterIndexChanges(
+				entityManager.getEntityManagerFactory().unwrap( SessionFactory.class ),
+				() -> {
+					SearchSession searchSession = Search.session( entityManager );
+					assertThat( searchSession.search( Author.class )
+							.where( f -> f.matchAll() )
+							.fetchTotalHitCount() )
+							.isEqualTo( expectedCount );
+				} );
 	}
 
 	private EntityManagerFactory setup(boolean automaticIndexingEnabled) {

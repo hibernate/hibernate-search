@@ -69,14 +69,15 @@ public class HibernateOrmSchemaManagerIT {
 				// tag::simple[]
 				SearchSchemaManager schemaManager = searchSession.schemaManager(); // <2>
 				schemaManager.dropAndCreate(); // <3>
-				searchSession.massIndexer().startAndWait(); // <4>
+				searchSession.massIndexer()
+						.purgeAllOnStart( false )
+						.startAndWait(); // <4>
 				// end::simple[]
 			}
 			catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
-			assertBookCount( entityManager, NUMBER_OF_BOOKS );
-			assertAuthorCount( entityManager, NUMBER_OF_BOOKS );
+			assertBookAndAuthorCount( entityManager, NUMBER_OF_BOOKS, NUMBER_OF_BOOKS );
 		} );
 	}
 
@@ -89,12 +90,14 @@ public class HibernateOrmSchemaManagerIT {
 				SearchSchemaManager schemaManager = searchSession.schemaManager( Book.class ); // <1>
 				schemaManager.dropAndCreate(); // <2>
 				// end::select-type[]
-				searchSession.massIndexer( Book.class ).startAndWait();
+				searchSession.massIndexer( Book.class )
+						.purgeAllOnStart( false )
+						.startAndWait();
 			}
 			catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
-			assertBookCount( entityManager, NUMBER_OF_BOOKS );
+			assertBookAndAuthorCount( entityManager, NUMBER_OF_BOOKS, null );
 		} );
 	}
 
@@ -157,24 +160,20 @@ public class HibernateOrmSchemaManagerIT {
 		} );
 	}
 
-	private void assertBookCount(EntityManager entityManager, int expectedCount) {
-		SearchSession searchSession = Search.session( entityManager );
-		assertThat(
-				searchSession.search( Book.class )
+	void assertBookAndAuthorCount(EntityManager entityManager, int expectedBookCount, Integer expectedAuthorCount) {
+		setupHelper.assertions().searchAfterIndexChangesAndPotentialRefresh( () -> {
+			SearchSession searchSession = Search.session( entityManager );
+			assertThat( searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.fetchTotalHitCount() )
+					.isEqualTo( expectedBookCount );
+			if ( expectedAuthorCount != null ) {
+				assertThat( searchSession.search( Author.class )
 						.where( f -> f.matchAll() )
-						.fetchTotalHitCount()
-		)
-				.isEqualTo( expectedCount );
-	}
-
-	private void assertAuthorCount(EntityManager entityManager, int expectedCount) {
-		SearchSession searchSession = Search.session( entityManager );
-		assertThat(
-				searchSession.search( Author.class )
-						.where( f -> f.matchAll() )
-						.fetchTotalHitCount()
-		)
-				.isEqualTo( expectedCount );
+						.fetchTotalHitCount() )
+						.isEqualTo( (int) expectedAuthorCount );
+			}
+		} );
 	}
 
 	private Book newBook(int id) {

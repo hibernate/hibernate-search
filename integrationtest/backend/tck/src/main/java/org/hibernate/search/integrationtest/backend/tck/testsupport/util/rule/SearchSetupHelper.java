@@ -248,7 +248,8 @@ public class SearchSetupHelper implements TestRule {
 					? previousMapping.get().integration().restartBuilder( environment )
 					: SearchIntegration.builder( environment );
 
-			StubMappingInitiator initiator = new StubMappingInitiator( tenancyMode );
+			StubMappingInitiator initiator = new StubMappingInitiator( TckConfiguration.get().getBackendFeatures(),
+					tenancyMode );
 			mappedIndexes.forEach( initiator::add );
 			StubMappingKey mappingKey = new StubMappingKey();
 			integrationBuilder.addMappingInitiator( mappingKey, initiator );

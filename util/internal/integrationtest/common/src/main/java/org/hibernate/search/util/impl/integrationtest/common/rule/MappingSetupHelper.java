@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
+import org.hibernate.search.util.impl.integrationtest.common.assertion.MappingAssertionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 
 import org.junit.rules.RuleChain;
@@ -48,6 +49,8 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, BC, 
 	public String toString() {
 		return backendSetupStrategy.toString();
 	}
+
+	public abstract MappingAssertionHelper<? super R> assertions();
 
 	public C start() {
 		C setupContext = createSetupContext();

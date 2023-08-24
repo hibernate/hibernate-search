@@ -73,4 +73,9 @@ class ActualBackendSetupStrategy implements BackendSetupStrategy {
 		}
 		return setupContext;
 	}
+
+	@Override
+	public boolean supportsExplicitRefresh() {
+		return allConfigurations.stream().allMatch( BackendConfiguration::supportsExplicitRefresh );
+	}
 }

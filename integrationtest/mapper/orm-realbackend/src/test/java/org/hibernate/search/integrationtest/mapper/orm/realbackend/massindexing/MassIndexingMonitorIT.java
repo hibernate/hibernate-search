@@ -108,7 +108,9 @@ public class MassIndexingMonitorIT {
 			catch (InterruptedException e) {
 				fail( "Unexpected InterruptedException: " + e.getMessage() );
 			}
-			assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) ).isEqualTo( NUMBER_OF_BOOKS );
+			setupHelper.assertions().searchAfterIndexChangesAndPotentialRefresh(
+					() -> assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) )
+							.isEqualTo( NUMBER_OF_BOOKS ) );
 		}
 		);
 

@@ -80,4 +80,6 @@ public abstract class BackendConfiguration {
 
 	public abstract boolean supportsExplicitPurge();
 
+	public abstract boolean supportsExplicitRefresh();
+
 }

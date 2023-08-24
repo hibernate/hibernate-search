@@ -17,10 +17,12 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
@@ -28,6 +30,8 @@ import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.util.common.AssertionFailure;
+
+import org.awaitility.Awaitility;
 
 /**
  * A wrapper around {@link MappedIndexManager} providing some syntactic sugar,
@@ -56,7 +60,7 @@ public abstract class StubMappedIndex {
 	private String typeName;
 	private String backendName;
 	private MappedIndexManager manager;
-	private StubMapping mapping;
+	private StubMappingImpl mapping;
 
 	public StubMappedIndex() {
 		this.indexName = "indexName";
@@ -124,7 +128,18 @@ public abstract class StubMappedIndex {
 	}
 
 	public BulkIndexer bulkIndexer(StubSession sessionContext, boolean refresh) {
-		return new BulkIndexer( delegate(), sessionContext, refresh );
+		boolean refreshEachBatch;
+		boolean refreshAtEnd;
+		if ( mapping.backendFeatures().supportsExplicitRefresh() ) {
+			refreshEachBatch = false;
+			refreshAtEnd = refresh;
+		}
+		else {
+			// This will perform poorly, but we don't have a choice since we can't do an explicit refresh.
+			refreshEachBatch = refresh;
+			refreshAtEnd = false;
+		}
+		return new BulkIndexer( delegate(), sessionContext, refreshEachBatch, refreshAtEnd );
 	}
 
 	public IndexIndexingPlan createIndexingPlan() {
@@ -230,11 +245,26 @@ public abstract class StubMappedIndex {
 		this.manager = manager;
 	}
 
-	protected void onMappingCreated(StubMapping mapping) {
+	protected void onMappingCreated(StubMappingImpl mapping) {
 		this.mapping = mapping;
 	}
 
 	protected MappedIndexManager delegate() {
 		return manager;
+	}
+
+	public void searchAfterIndexChanges(Runnable assertion) {
+		if ( mapping.backendFeatures().supportsExplicitRefresh() ) {
+			createWorkspace().refresh( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL ).join();
+			assertion.run();
+		}
+		else {
+			// This will lead to potentially long (~1s) waits,
+			// but we don't have a choice since we can't do an explicit refresh.
+			// Also, this will only work for assertions that don't pass before changes,
+			// but do pass afterward.
+			// Things like "checking we still have the same state" may produce false positives.
+			Awaitility.await().untilAsserted( assertion::run );
+		}
 	}
 }

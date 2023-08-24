@@ -21,6 +21,7 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoAssertionHelper;
 
 import org.junit.After;
 import org.junit.Before;
@@ -35,6 +36,8 @@ public class StandalonePojoMassLoadingIT {
 	private Map<String, Book> books;
 
 	private CloseableSearchMapping searchMapping;
+
+	private StandalonePojoAssertionHelper assertions = new StandalonePojoAssertionHelper( BackendConfigurations.simple() );
 
 	@Before
 	public void setup() {
@@ -95,15 +98,19 @@ public class StandalonePojoMassLoadingIT {
 				this.searchMapping;
 		// tag::massIndexer[]
 		searchMapping.scope( Object.class ).massIndexer() // <2>
+				// end::massIndexer[]
+				.purgeAllOnStart( BackendConfigurations.simple().supportsExplicitPurge() )
+				// tag::massIndexer[]
 				.startAndWait(); // <3>
 		// end::massIndexer[]
 
 		try ( SearchSession searchSession = searchMapping.createSession() ) {
-			assertThat( searchSession.search( Book.class )
-					.select( f -> f.id( String.class ) )
-					.where( f -> f.matchAll() )
-					.fetchAllHits() )
-					.containsExactlyInAnyOrderElementsOf( books.keySet() );
+			assertions.searchAfterIndexChangesAndPotentialRefresh(
+					() -> assertThat( searchSession.search( Book.class )
+							.select( f -> f.id( String.class ) )
+							.where( f -> f.matchAll() )
+							.fetchAllHits() )
+							.containsExactlyInAnyOrderElementsOf( books.keySet() ) );
 		}
 	}
 
