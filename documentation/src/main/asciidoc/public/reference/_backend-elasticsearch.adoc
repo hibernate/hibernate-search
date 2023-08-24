@@ -68,7 +68,7 @@ requires <<backend-elasticsearch-configuration-aws,proprietary authentication>> 
 
 Using Amazon OpenSearch Service implies a single limitations:
 when running Elasticsearch (not OpenSearch) and only in version 7.1 or older,
-https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_7_1[closing indexes is not possible],
+link:{amazonOpenSearchServiceUrl}/supported-operations.html#version_7_1[closing indexes is not possible],
 and as a result <<mapper-orm-schema-management-manager-create-or-update,automatic schema updates>>
 (<<schema-management-concepts-update-failure,not recommended in production>>)
 <<schema-management-concepts-index-closing,will fail when trying to update analyzer definitions>>.
@@ -229,7 +229,7 @@ The Hibernate Search Elasticsearch backend, once configured, will work just fine
 However, if you need to use
 <<backend-elasticsearch-compatibility-amazon-opensearch-service,Amazon OpenSearch Service>>,
 you will find it requires a proprietary authentication method:
-https://docs.aws.amazon.com/opensearch-service/latest/developerguide/request-signing.html[request signing].
+link:{amazonOpenSearchServiceUrl}/request-signing.html[request signing].
 
 While request signing is not supported by default,
 you can enable it with an additional dependency and a bit of configuration.
