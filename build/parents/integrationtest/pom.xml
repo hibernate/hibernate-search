@@ -518,6 +518,32 @@
             </properties>
         </profile>
 
+        <profile>
+            <id>amazon-opensearch-serverless</id>
+            <activation>
+                <property>
+                    <name>test.elasticsearch.distribution</name>
+                    <value>amazon-opensearch-serverless</value>
+                </property>
+            </activation>
+            <properties>
+                <!-- We'll simulate testing against Amazon OpenSearch Serverless by:
+                     1. Using the Amazon OpenSearch Serverless in Hibernate Search
+                     2. Connecting to a (local) OpenSearch container running the latest version
+                 -->
+                <!-- Amazon OpenSearch Serverless doesn't use versions -->
+                <test.elasticsearch.version/>
+                <!-- We'll simulate Amazon OpenSearch Serverless with a (local)
+                     OpenSearch container running the latest version -->
+                <test.elasticsearch.run.opensearch.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.opensearch.skip>
+                <test.elasticsearch.run.elastic.skip>true</test.elasticsearch.run.elastic.skip>
+                <test.elasticsearch.run.opensearch.image.tag>${version.org.opensearch.latest}</test.elasticsearch.run.opensearch.image.tag>
+                <!-- This is just to fix docker-maven-plugin, which complains about
+                     invalid image names (missing version) even for disabled images -->
+                <test.elasticsearch.run.elastic.image.tag>${version.org.elasticsearch.latest}</test.elasticsearch.run.elastic.image.tag>
+            </properties>
+        </profile>
+
         <!-- =============================== -->
         <!-- Database profiles               -->
         <!-- =============================== -->

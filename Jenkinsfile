@@ -255,16 +255,22 @@ stage('Configure') {
 					new LocalOpenSearchBuildEnvironment(version: '2.6.0', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '2.7.0', condition: TestCondition.ON_DEMAND),
 					new LocalOpenSearchBuildEnvironment(version: '2.8.0', condition: TestCondition.ON_DEMAND),
-					new LocalOpenSearchBuildEnvironment(version: '2.9.0', condition: TestCondition.BEFORE_MERGE)
+					new LocalOpenSearchBuildEnvironment(version: '2.9.0', condition: TestCondition.BEFORE_MERGE),
 					// See https://opensearch.org/lines/2x.html for a list of all 2.x versions
+
+					// --------------------------------------------
+					// Amazon OpenSearch Serverless dialect running against a local OpenSearch instance
+					// WARNING: this does NOT actually run against Amazon OpenSearch Serverless (yet)
+					// See https://hibernate.atlassian.net/browse/HSEARCH-4919
+					new AmazonOpenSearchServerlessLocalBuildEnvironment(condition: TestCondition.AFTER_MERGE)
 			],
 			amazonElasticsearch: [
 					// --------------------------------------------
-					// AWS Elasticsearch service (OpenDistro)
+					// Amazon Elasticsearch Service (OpenDistro)
 					new AmazonElasticsearchServiceBuildEnvironment(version: '7.10', condition: TestCondition.AFTER_MERGE),
 
 					// --------------------------------------------
-					// AWS OpenSearch service
+					// Amazon OpenSearch Service
 					new AmazonOpenSearchServiceBuildEnvironment(version: '1.3', condition: TestCondition.AFTER_MERGE),
 					new AmazonOpenSearchServiceBuildEnvironment(version: '2.5', condition: TestCondition.AFTER_MERGE),
 					// Also test static credentials, but only for the latest version
@@ -748,7 +754,7 @@ class LocalElasticsearchBuildEnvironment extends BuildEnvironment {
 	String version
 	String getTagPrefix() { 'elasticsearch-local' }
 	@Override
-	String getTag() { "$tagPrefix-$version" }
+	String getTag() { tagPrefix + (version ? '-' + version : '') }
 	String getDistribution() { 'elastic' }
 }
 
@@ -757,7 +763,18 @@ class LocalOpenSearchBuildEnvironment extends LocalElasticsearchBuildEnvironment
 	@Override
 	String getTagPrefix() { 'opensearch-local' }
 	@Override
-	String getDistribution() { "opensearch" }
+	String getDistribution() { 'opensearch' }
+}
+
+class AmazonOpenSearchServerlessLocalBuildEnvironment
+		extends LocalOpenSearchBuildEnvironment {
+	{
+		setVersion('')
+	}
+	@Override
+	String getTagPrefix() { 'amazon-opensearch-serverless' }
+	@Override
+	String getDistribution() { 'amazon-opensearch-serverless' }
 }
 
 class AmazonElasticsearchServiceBuildEnvironment extends LocalElasticsearchBuildEnvironment {
@@ -766,7 +783,7 @@ class AmazonElasticsearchServiceBuildEnvironment extends LocalElasticsearchBuild
 	String getTagPrefix() { 'amazon-elasticsearch-service' }
 	@Override
 	String getTag() {
-		"$tagPrefix-$version" + (staticCredentials ? '-credentials-static' : '')
+		tagPrefix + (version ? '-' + version : '') + (staticCredentials ? '-credentials-static' : '')
 	}
 	String getLockedResourcesPrefix() { 'es' }
 	String getLockedResourcesLabel() {

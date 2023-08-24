@@ -312,13 +312,16 @@ You may redefine the distribution/version to use by specifying the properties
 ./mvnw clean install -Dtest.elasticsearch.distribution=elastic -Dtest.elasticsearch.version=6.0.0 
 ```
 The following distribution options are supported:
-* `elastic` - for Elasticsearch distribution
-* `opensearch` - for Opensearch distribution
+* `elastic` for Elasticsearch distribution
+* `opensearch` for OpenSearch (local or Amazon OpenSearch Service)
+* `amazon-opensearch-serverless` for Amazon OpenSearch Serverless
 
 For available versions of Elasticsearch distribution from Elastic see [DockerHub](https://hub.docker.com/r/elastic/elasticsearch/tags).
 Please note that Elasticsearch [distributions starting with version 7.11 are not open-source](https://opensource.org/node/1099).
 
 For available versions of [OpenSearch](https://www.opensearch.org/) distribution see [DockerHub](https://hub.docker.com/r/opensearchproject/opensearch/tags).
+
+For Amazon OpenSearch Serverless, the version must be unset (set to an empty string).
 
 Alternatively, you can prevent the build from launching an Elasticsearch server automatically
 and run Elasticsearch-related tests against your own server using the
