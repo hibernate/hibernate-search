@@ -16,11 +16,10 @@ import java.util.NoSuchElementException;
  */
 public abstract class HashTable<T> implements Iterable<T> {
 
-	final T[] buckets;
+	final Object[] buckets;
 
-	@SuppressWarnings("unchecked")
 	HashTable(int size) {
-		this.buckets = (T[]) new Object[size];
+		this.buckets = new Object[size];
 	}
 
 	/**
@@ -41,11 +40,12 @@ public abstract class HashTable<T> implements Iterable<T> {
 			}
 
 			@Override
+			@SuppressWarnings("unchecked")
 			public T next() {
 				if ( !hasNext() ) {
 					throw new NoSuchElementException();
 				}
-				return buckets[index++];
+				return (T) buckets[index++];
 			}
 		};
 	}
@@ -63,8 +63,9 @@ public abstract class HashTable<T> implements Iterable<T> {
 	 * @return The content of the bucket at index {@code index}.
 	 * @throws ArrayIndexOutOfBoundsException If the given index is negative or higher than the table's size.
 	 */
+	@SuppressWarnings("unchecked")
 	public final T get(int index) {
-		return buckets[index];
+		return (T) buckets[index];
 	}
 
 	/**
