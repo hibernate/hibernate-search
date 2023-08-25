@@ -375,19 +375,19 @@ Resulting execution plan:
 """
 }
 
-stage('Pre-build sources') {
-	// we want this stage to only be executed when we are planning to use incremental build
-	if (!incrementalBuild) {
-		echo 'Skipping pre-building sources for non-pull request builds.'
-		helper.markStageSkipped()
-		return
-	}
-	if (!enableDefaultBuild) {
-		echo 'Skipping default build and integration tests in the default environment'
-		helper.markStageSkipped()
-		return
-	}
-	runBuildOnNode( NODE_PATTERN_BASE ) {
+runBuildOnNode( NODE_PATTERN_BASE, [time: 2, unit: 'HOURS'] ) {
+	stage('Pre-build sources') {
+		// we want this stage to only be executed when we are planning to use incremental build
+		if (!incrementalBuild) {
+			echo 'Skipping pre-building sources for non-pull request builds.'
+			helper.markStageSkipped()
+			return
+		}
+		if (!enableDefaultBuild) {
+			echo 'Skipping default build and integration tests in the default environment'
+			helper.markStageSkipped()
+			return
+		}
 		withMavenWorkspace {
 			sh """ \
 					mvn clean install \
@@ -401,15 +401,12 @@ stage('Pre-build sources') {
 			}
 		}
 	}
-}
-
-stage('Default build') {
-	if (!enableDefaultBuild) {
-		echo 'Skipping default build and integration tests in the default environment'
-		helper.markStageSkipped()
-		return
-	}
-	runBuildOnNode( NODE_PATTERN_BASE, [time: 2, unit: 'HOURS'] ) {
+	stage('Default build') {
+		if (!enableDefaultBuild) {
+			echo 'Skipping default build and integration tests in the default environment'
+			helper.markStageSkipped()
+			return
+		}
 		withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
 			if ( incrementalBuild ) {
 				dir(helper.configuration.maven.localRepositoryPath) {
