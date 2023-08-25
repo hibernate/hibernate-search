@@ -463,6 +463,7 @@ stage('Default build') {
 								""" : """ \
 										-Dsonar.branch.name=${helper.scmSource.branch.name} \
 								"""} \
+								$mavenArgs \
 						"""
 					}
 				}
