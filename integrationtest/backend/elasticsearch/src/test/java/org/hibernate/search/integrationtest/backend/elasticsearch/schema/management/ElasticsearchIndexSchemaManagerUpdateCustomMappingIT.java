@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.schema.manage
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
@@ -41,7 +41,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomMappingIT {
 
 	@Before
 	public void checkAssumption() {
-		assumeFalse(
+		assumeTrue(
 				"This test only is only relevant if we are allowed to open/close Elasticsearch indexes.",
 				ElasticsearchTckBackendFeatures.supportsIndexClosingAndOpening()
 		);
