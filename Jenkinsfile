@@ -203,72 +203,72 @@ stage('Configure') {
                             slow: true,
                             condition: TestCondition.AFTER_MERGE),
 			],
-			esLocal: [
+			localElasticsearch: [
 					// --------------------------------------------
 					// Elasticsearch distribution from Elastic
 					// Not testing 7.0/7.1/7.2 to make the build quicker.
 					// The only difference with 7.3+ is they have a bug in their BigInteger support.
-					new EsLocalBuildEnvironment(version: '7.2.1', condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(version: '7.6.2', condition: TestCondition.AFTER_MERGE),
+					new LocalElasticsearchBuildEnvironment(version: '7.2.1', condition: TestCondition.ON_DEMAND),
+					new LocalElasticsearchBuildEnvironment(version: '7.6.2', condition: TestCondition.AFTER_MERGE),
 					// Not testing 7.7 to make the build quicker.
 					// The only difference with 7.7+ is how we create templates for tests.
-					new EsLocalBuildEnvironment(version: '7.7.1', condition: TestCondition.ON_DEMAND),
+					new LocalElasticsearchBuildEnvironment(version: '7.7.1', condition: TestCondition.ON_DEMAND),
 					// Not testing 7.9 to make the build quicker.
 					// The only difference with 7.10+ is an additional test for exists on null values,
 					// which is disabled on 7.10 but enabled on all older versions (not just 7.9).
-					new EsLocalBuildEnvironment(version: '7.9.3', condition: TestCondition.AFTER_MERGE),
-					new EsLocalBuildEnvironment(version: '7.10.1', condition: TestCondition.AFTER_MERGE),
+					new LocalElasticsearchBuildEnvironment(version: '7.9.3', condition: TestCondition.AFTER_MERGE),
+					new LocalElasticsearchBuildEnvironment(version: '7.10.1', condition: TestCondition.AFTER_MERGE),
 					// Not testing 7.11 to make the build quicker.
 					// The only difference with 7.12+ is that wildcard predicates on analyzed fields get their pattern normalized,
 					// and that was deemed a bug: https://github.com/elastic/elasticsearch/pull/53127
-					new EsLocalBuildEnvironment(version: '7.11.2', condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(version: '7.12.1', condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(version: '7.13.2', condition: TestCondition.ON_DEMAND),
+					new LocalElasticsearchBuildEnvironment(version: '7.11.2', condition: TestCondition.ON_DEMAND),
+					new LocalElasticsearchBuildEnvironment(version: '7.12.1', condition: TestCondition.ON_DEMAND),
+					new LocalElasticsearchBuildEnvironment(version: '7.13.2', condition: TestCondition.ON_DEMAND),
 					// 7.14 and 7.15 have annoying bugs that make almost all of our test suite fail,
 					// so we don't test them
 					// See https://hibernate.atlassian.net/browse/HSEARCH-4340
-					new EsLocalBuildEnvironment(version: '7.16.3', condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(version: '7.17.12', condition: TestCondition.AFTER_MERGE),
+					new LocalElasticsearchBuildEnvironment(version: '7.16.3', condition: TestCondition.ON_DEMAND),
+					new LocalElasticsearchBuildEnvironment(version: '7.17.12', condition: TestCondition.AFTER_MERGE),
 					// Not testing 8.0 because we know there are problems in 8.0.1 (see https://hibernate.atlassian.net/browse/HSEARCH-4497)
 					// Not testing 8.1-8.6 to make the build quicker.
-					new EsLocalBuildEnvironment(version: '8.1.3', condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(version: '8.2.3', condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(version: '8.3.3', condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(version: '8.4.3', condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(version: '8.5.3', condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(version: '8.6.2', condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(version: '8.7.1', condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(version: '8.8.2', condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(version: '8.9.1', condition: TestCondition.BEFORE_MERGE, isDefault: true),
+					new LocalElasticsearchBuildEnvironment(version: '8.1.3', condition: TestCondition.ON_DEMAND),
+					new LocalElasticsearchBuildEnvironment(version: '8.2.3', condition: TestCondition.ON_DEMAND),
+					new LocalElasticsearchBuildEnvironment(version: '8.3.3', condition: TestCondition.ON_DEMAND),
+					new LocalElasticsearchBuildEnvironment(version: '8.4.3', condition: TestCondition.ON_DEMAND),
+					new LocalElasticsearchBuildEnvironment(version: '8.5.3', condition: TestCondition.ON_DEMAND),
+					new LocalElasticsearchBuildEnvironment(version: '8.6.2', condition: TestCondition.ON_DEMAND),
+					new LocalElasticsearchBuildEnvironment(version: '8.7.1', condition: TestCondition.ON_DEMAND),
+					new LocalElasticsearchBuildEnvironment(version: '8.8.2', condition: TestCondition.ON_DEMAND),
+					new LocalElasticsearchBuildEnvironment(version: '8.9.1', condition: TestCondition.BEFORE_MERGE, isDefault: true),
 
 					// --------------------------------------------
 					// OpenSearch
 					// Not testing 1.0 - 1.2 to make the build quicker.
-					new OpenSearchLocalBuildEnvironment(version: '1.3.12', condition: TestCondition.AFTER_MERGE),
+					new LocalOpenSearchBuildEnvironment(version: '1.3.12', condition: TestCondition.AFTER_MERGE),
 					// See https://opensearch.org/lines/1x.html for a list of all 1.x versions
-					new OpenSearchLocalBuildEnvironment(version: '2.0.1', condition: TestCondition.ON_DEMAND),
-					new OpenSearchLocalBuildEnvironment(version: '2.1.0', condition: TestCondition.ON_DEMAND),
-					new OpenSearchLocalBuildEnvironment(version: '2.2.1', condition: TestCondition.ON_DEMAND),
-					new OpenSearchLocalBuildEnvironment(version: '2.3.0', condition: TestCondition.ON_DEMAND),
-					new OpenSearchLocalBuildEnvironment(version: '2.4.1', condition: TestCondition.ON_DEMAND),
-					new OpenSearchLocalBuildEnvironment(version: '2.5.0', condition: TestCondition.ON_DEMAND),
-					new OpenSearchLocalBuildEnvironment(version: '2.6.0', condition: TestCondition.ON_DEMAND),
-					new OpenSearchLocalBuildEnvironment(version: '2.7.0', condition: TestCondition.ON_DEMAND),
-					new OpenSearchLocalBuildEnvironment(version: '2.8.0', condition: TestCondition.ON_DEMAND),
-					new OpenSearchLocalBuildEnvironment(version: '2.9.0', condition: TestCondition.BEFORE_MERGE)
+					new LocalOpenSearchBuildEnvironment(version: '2.0.1', condition: TestCondition.ON_DEMAND),
+					new LocalOpenSearchBuildEnvironment(version: '2.1.0', condition: TestCondition.ON_DEMAND),
+					new LocalOpenSearchBuildEnvironment(version: '2.2.1', condition: TestCondition.ON_DEMAND),
+					new LocalOpenSearchBuildEnvironment(version: '2.3.0', condition: TestCondition.ON_DEMAND),
+					new LocalOpenSearchBuildEnvironment(version: '2.4.1', condition: TestCondition.ON_DEMAND),
+					new LocalOpenSearchBuildEnvironment(version: '2.5.0', condition: TestCondition.ON_DEMAND),
+					new LocalOpenSearchBuildEnvironment(version: '2.6.0', condition: TestCondition.ON_DEMAND),
+					new LocalOpenSearchBuildEnvironment(version: '2.7.0', condition: TestCondition.ON_DEMAND),
+					new LocalOpenSearchBuildEnvironment(version: '2.8.0', condition: TestCondition.ON_DEMAND),
+					new LocalOpenSearchBuildEnvironment(version: '2.9.0', condition: TestCondition.BEFORE_MERGE)
 					// See https://opensearch.org/lines/2x.html for a list of all 2.x versions
 			],
-			esAws: [
+			amazonElasticsearch: [
 					// --------------------------------------------
 					// AWS Elasticsearch service (OpenDistro)
-					new EsAwsBuildEnvironment(version: '7.10', condition: TestCondition.AFTER_MERGE),
+					new AmazonElasticsearchServiceBuildEnvironment(version: '7.10', condition: TestCondition.AFTER_MERGE),
 
 					// --------------------------------------------
 					// AWS OpenSearch service
-					new OpenSearchAwsBuildEnvironment(version: '1.3', condition: TestCondition.AFTER_MERGE),
-					new OpenSearchAwsBuildEnvironment(version: '2.5', condition: TestCondition.AFTER_MERGE),
+					new AmazonOpenSearchServiceBuildEnvironment(version: '1.3', condition: TestCondition.AFTER_MERGE),
+					new AmazonOpenSearchServiceBuildEnvironment(version: '2.5', condition: TestCondition.AFTER_MERGE),
 					// Also test static credentials, but only for the latest version
-					new OpenSearchAwsBuildEnvironment(version: '2.5', condition: TestCondition.AFTER_MERGE, staticCredentials: true)
+					new AmazonOpenSearchServiceBuildEnvironment(version: '2.5', condition: TestCondition.AFTER_MERGE, staticCredentials: true)
 			]
 	])
 
@@ -568,7 +568,7 @@ stage('Non-default environments') {
 	}
 
 	// Test Elasticsearch integration with multiple versions in a local instance
-	environments.content.esLocal.enabled.each { EsLocalBuildEnvironment buildEnv ->
+	environments.content.localElasticsearch.enabled.each { LocalElasticsearchBuildEnvironment buildEnv ->
 		executions.put(buildEnv.tag, {
 			runBuildOnNode {
 				withMavenWorkspace {
@@ -584,7 +584,7 @@ stage('Non-default environments') {
 	}
 
 	// Test Elasticsearch integration with multiple versions in an AWS instance
-	environments.content.esAws.enabled.each { EsAwsBuildEnvironment buildEnv ->
+	environments.content.amazonElasticsearch.enabled.each { AmazonElasticsearchServiceBuildEnvironment buildEnv ->
 		if (!env.ES_AWS_REGION) {
 			throw new IllegalStateException("Environment variable ES_AWS_REGION is not set")
 		}
@@ -744,42 +744,43 @@ class DatabaseBuildEnvironment extends BuildEnvironment {
 	String getTag() { "database-$dbName" }
 }
 
-class EsLocalBuildEnvironment extends BuildEnvironment {
+class LocalElasticsearchBuildEnvironment extends BuildEnvironment {
 	String version
+	String getTagPrefix() { 'elasticsearch-local' }
 	@Override
-    String getTag() { "elasticsearch-local-$version" }
-    String getDistribution() { "elastic" }
+	String getTag() { "$tagPrefix-$version" }
+	String getDistribution() { 'elastic' }
 }
 
-class OpenSearchLocalBuildEnvironment extends EsLocalBuildEnvironment {
+class LocalOpenSearchBuildEnvironment extends LocalElasticsearchBuildEnvironment {
 	String version
 	@Override
-	String getTag() { "opensearch-local-$version" }
+	String getTagPrefix() { 'opensearch-local' }
 	@Override
 	String getDistribution() { "opensearch" }
 }
 
-class EsAwsBuildEnvironment extends EsLocalBuildEnvironment {
+class AmazonElasticsearchServiceBuildEnvironment extends LocalElasticsearchBuildEnvironment {
 	boolean staticCredentials = false
 	@Override
-	String getTag() { "elasticsearch-aws-$version" + (staticCredentials ? "-credentials-static" : "") }
-	String getNameEmbeddableVersion() {
-		version.replaceAll('\\.', '-')
+	String getTagPrefix() { 'amazon-elasticsearch-service' }
+	@Override
+	String getTag() {
+		"$tagPrefix-$version" + (staticCredentials ? '-credentials-static' : '')
 	}
+	String getLockedResourcesPrefix() { 'es' }
 	String getLockedResourcesLabel() {
-		"es-aws-${nameEmbeddableVersion}"
+		"$lockedResourcesPrefix-aws-${version.replaceAll('\\.', '-')}"
 	}
 }
 
-class OpenSearchAwsBuildEnvironment extends EsAwsBuildEnvironment {
+class AmazonOpenSearchServiceBuildEnvironment extends AmazonElasticsearchServiceBuildEnvironment {
 	@Override
-	String getTag() { "opensearch-aws-$version" + (staticCredentials ? "-credentials-static" : "") }
+	String getTagPrefix() { 'amazon-opensearch-service' }
 	@Override
-	String getDistribution() { "opensearch" }
+	String getDistribution() { 'opensearch' }
 	@Override
-	String getLockedResourcesLabel() {
-		"opensearch-aws-${nameEmbeddableVersion}"
-	}
+	String getLockedResourcesPrefix() { 'opensearch' }
 }
 
 void keepOnlyEnvironmentsMatchingFilter(String regex) {
