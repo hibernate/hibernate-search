@@ -160,7 +160,7 @@ i.e. simply all indexed types.
 == Running the mass indexer asynchronously
 
 It is possible to run the mass indexer asynchronously,
-because, the mass indexer does not rely on the original Hibernate ORM session.
+because it does not rely on the original Hibernate ORM session.
 When used asynchronously, the mass indexer will return a completion stage
 to track the completion of mass indexing:
 
