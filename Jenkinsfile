@@ -451,7 +451,7 @@ stage('Default build') {
 								mvn sonar:sonar \
 								-Dsonar.organization=\${SONARCLOUD_ORGANIZATION} \
 								-Dsonar.host.url=https://sonarcloud.io \
-								-Dsonar.login=\${SONARCLOUD_TOKEN} \
+								-Dsonar.token=\${SONARCLOUD_TOKEN} \
 								${helper.scmSource.pullRequest ? """ \
 										-Dsonar.pullrequest.branch=${helper.scmSource.branch.name} \
 										-Dsonar.pullrequest.key=${helper.scmSource.pullRequest.id} \
