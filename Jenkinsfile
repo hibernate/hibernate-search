@@ -383,7 +383,8 @@ stage('Default build') {
 	}
 	runBuildOnNode( NODE_PATTERN_BASE, [time: 2, unit: 'HOURS'] ) {
 		withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
-			if (incrementalBuild) {
+			boolean sonarEnabled = enableDefaultBuildIT && helper.configuration.file?.sonar?.credentials
+			if (incrementalBuild && sonarEnabled) {
 				// We won't be building all classes in the incremental build,
 				// which is a problem for Sonar since it needs access to compiled classes.
 				// So in incremental builds, we build all sources first, but skipping tests.
@@ -392,6 +393,7 @@ stage('Default build') {
 						--fail-at-end \
 						-Pdist -Pjqassistant -Pci-sources-check \
 						-DskipITs -DskipTests \
+						${toTestJdkArg(environments.content.jdk.default)} \
 				"""
 				dir(helper.configuration.maven.localRepositoryPath) {
 					unstash name:'default-build-result'
@@ -417,39 +419,37 @@ stage('Default build') {
 			"""
 
 			// Don't try to report to SonarCloud if coverage data is missing
-			if (enableDefaultBuildIT) {
-				if (helper.configuration.file?.sonar?.credentials) {
-					def sonarCredentialsId = helper.configuration.file.sonar.credentials
-					// WARNING: Make sure credentials are evaluated by sh, not Groovy.
-					// To that end, escape the '$' when referencing the variables.
-					// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
-					withCredentials([usernamePassword(
-									credentialsId: sonarCredentialsId,
-									usernameVariable: 'SONARCLOUD_ORGANIZATION',
-									passwordVariable: 'SONARCLOUD_TOKEN'
-					)]) {
-						sh """ \
-								mvn sonar:sonar \
-								-Dsonar.organization=\${SONARCLOUD_ORGANIZATION} \
-								-Dsonar.host.url=https://sonarcloud.io \
-								-Dsonar.token=\${SONARCLOUD_TOKEN} \
-								${helper.scmSource.pullRequest ? """ \
-										-Dsonar.pullrequest.branch=${helper.scmSource.branch.name} \
-										-Dsonar.pullrequest.key=${helper.scmSource.pullRequest.id} \
-										-Dsonar.pullrequest.base=${helper.scmSource.pullRequest.target.name} \
-										${helper.scmSource.gitHubRepoId ? """ \
-												-Dsonar.pullrequest.provider=GitHub \
-												-Dsonar.pullrequest.github.repository=${helper.scmSource.gitHubRepoId} \
-										""" : ''} \
-								""" : """ \
-										-Dsonar.branch.name=${helper.scmSource.branch.name} \
-								"""} \
-						"""
-					}
+			if (sonarEnabled) {
+				def sonarCredentialsId = helper.configuration.file.sonar.credentials
+				// WARNING: Make sure credentials are evaluated by sh, not Groovy.
+				// To that end, escape the '$' when referencing the variables.
+				// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
+				withCredentials([usernamePassword(
+								credentialsId: sonarCredentialsId,
+								usernameVariable: 'SONARCLOUD_ORGANIZATION',
+								passwordVariable: 'SONARCLOUD_TOKEN'
+				)]) {
+					sh """ \
+							mvn sonar:sonar \
+							-Dsonar.organization=\${SONARCLOUD_ORGANIZATION} \
+							-Dsonar.host.url=https://sonarcloud.io \
+							-Dsonar.token=\${SONARCLOUD_TOKEN} \
+							${helper.scmSource.pullRequest ? """ \
+									-Dsonar.pullrequest.branch=${helper.scmSource.branch.name} \
+									-Dsonar.pullrequest.key=${helper.scmSource.pullRequest.id} \
+									-Dsonar.pullrequest.base=${helper.scmSource.pullRequest.target.name} \
+									${helper.scmSource.gitHubRepoId ? """ \
+											-Dsonar.pullrequest.provider=GitHub \
+											-Dsonar.pullrequest.github.repository=${helper.scmSource.gitHubRepoId} \
+									""" : ''} \
+							""" : """ \
+									-Dsonar.branch.name=${helper.scmSource.branch.name} \
+							"""} \
+					"""
 				}
-				else {
-					echo "No Sonar organization configured - skipping Sonar report."
-				}
+			}
+			else {
+				echo "Skipping Sonar report."
 			}
 
 			dir(helper.configuration.maven.localRepositoryPath) {
