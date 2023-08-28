@@ -1856,6 +1856,9 @@
                                 Use [/\\] for path separators because of Windows.
                             -->
                             <excludePathsMatching>[/\\][^/\\]*\.(md|txt)|[/\\]\..*|[/\\].*[/\\]README\.(md|txt)|[/\\]ci[/\\]dependency-update[/\\].*</excludePathsMatching>
+                            <!-- The reports module always needs to be built, otherwise we don't generate
+                                 some important reports like coverage reports -->
+                            <forceBuildModules>hibernate-search-reports</forceBuildModules>
                         </configuration>
                     </plugin>
                 </plugins>
