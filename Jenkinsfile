@@ -417,10 +417,10 @@ stage('Default build') {
 			String itMavenArgs = """ \
 					${commonMavenArgs} \
 					-pl ${allITProjects} \
-					${incrementalBuild ?
-							('-Dincremental -Dgib.referenceBranch=refs/remotes/origin/'+helper.scmSource.pullRequest.target.name)
-							: ''
-					} \
+					${incrementalBuild ? """ \
+							-Dincremental \
+							-Dgib.referenceBranch=refs/remotes/origin/${helper.scmSource.pullRequest.target.name} \
+					""" : '' } \
 			"""
 			pullContainerImages( itMavenArgs )
 			sh """ \
@@ -900,7 +900,10 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 	// and in PRs we want to run only those affected by changes
 	// (see gib.disableSelectedProjectsHandling=true).
 	String argsWithProjectSelection = """ \
-		${incrementalBuild ? ('-Dincremental -Dgib.disableSelectedProjectsHandling=true -Dgib.referenceBranch=refs/remotes/origin/' + helper.scmSource.pullRequest.target.name) : ''} \
+		${incrementalBuild ? """ \
+				-Dincremental -Dgib.disableSelectedProjectsHandling=true \
+				-Dgib.referenceBranch=refs/remotes/origin/${helper.scmSource.pullRequest.target.name} \
+		""" : ''} \
 		${args} \
 	"""
 	if ( artifactsToTest ) {
