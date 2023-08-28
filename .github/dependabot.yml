@@ -23,6 +23,7 @@ updates:
         patterns:
           # Maven plugin patterns:
           - "*maven*plugin*"
+          - "org.apache.maven*:*"
           - "*surefire*"
           - "*forbiddenapis*"
           - "*owasp*"
