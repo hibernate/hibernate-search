@@ -404,7 +404,7 @@ stage('Default build') {
 					"} \
 			"""
 			dir(helper.configuration.maven.localRepositoryPath) {
-				unstash name:'default-build-result'
+				stash name:'default-build-result', includes:"org/hibernate/search/**"
 			}
 
 			if (!enableDefaultBuildIT) {
