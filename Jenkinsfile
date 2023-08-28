@@ -899,10 +899,12 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 	// We want to run relevant integration test modules only (see array of module names)
 	// and in PRs we want to run only those affected by changes
 	// (see gib.disableSelectedProjectsHandling=true).
+	String incrementalProjectsListFile = 'target/.gib-impacted'
 	String argsWithProjectSelection = """ \
 		${incrementalBuild ? """ \
 				-Dincremental -Dgib.disableSelectedProjectsHandling=true \
 				-Dgib.referenceBranch=refs/remotes/origin/${helper.scmSource.pullRequest.target.name} \
+				-Dgib.logImpactedTo='${incrementalProjectsListFile}' \
 		""" : ''} \
 		${args} \
 	"""
@@ -924,6 +926,15 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 					--fail-at-end \
 					$argsWithProjectSelection \
 	"""
+
+	// In incremental builds, the Maven execution above
+	// created a file listing projects relevant to the incremental build.
+	// If it is empty, it means the incremental build didn't actually do anything,
+	// so make sure to mark the stage as skipped.
+	if (incrementalBuild && 0 == sh(script: "test ! -s '${incrementalProjectsListFile}'", returnStatus: true)) {
+		echo 'Skipping stage because PR changes do not affect tested modules'
+		helper.markStageSkipped()
+	}
 }
 
 String toTestJdkArg(BuildEnvironment buildEnv) {
