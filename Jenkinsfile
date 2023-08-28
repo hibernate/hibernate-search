@@ -383,44 +383,54 @@ stage('Default build') {
 	}
 	runBuildOnNode( NODE_PATTERN_BASE, [time: 2, unit: 'HOURS'] ) {
 		withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
-			boolean sonarEnabled = enableDefaultBuildIT && helper.configuration.file?.sonar?.credentials
-			if (incrementalBuild && sonarEnabled) {
-				// We won't be building all classes in the incremental build,
-				// which is a problem for Sonar since it needs access to compiled classes.
-				// So in incremental builds, we build all sources first, but skipping tests.
-				sh """ \
-						mvn clean install \
-						--fail-at-end \
-						-Pdist -Pjqassistant -Pci-sources-check \
-						-DskipITs -DskipTests \
-						${toTestJdkArg(environments.content.jdk.default)} \
-				"""
-				dir(helper.configuration.maven.localRepositoryPath) {
-					unstash name:'default-build-result'
-				}
-			}
-			// If we are in the pull request we've already run JQAssistant and source formatting checks
-			String mavenArgs = """ \
+			String commonMavenArgs = """ \
 					--fail-at-end \
 					-Pdist -Pcoverage \
-					${incrementalBuild ? ('-Dincremental -Dgib.referenceBranch=refs/remotes/origin/'+helper.scmSource.pullRequest.target.name) : '-Pjqassistant -Pci-sources-check'} \
-					${enableDefaultBuildIT ? '' : '-DskipITs'} \
 					${toTestJdkArg(environments.content.jdk.default)} \
 			"""
-			pullContainerImages( mavenArgs )
+
+			echo "Building code and running unit tests and basic checks."
 			sh """ \
-					mvn clean \
+					mvn \
+					${commonMavenArgs} \
+					-Pjqassistant -Pci-sources-check \
+					-DskipITs \
+					${toTestJdkArg(environments.content.jdk.default)} \
+					clean \
 					${deploySnapshot ? "\
 							deploy \
 					" : "\
 							install \
 					"} \
-					$mavenArgs \
+			"""
+			dir(helper.configuration.maven.localRepositoryPath) {
+				unstash name:'default-build-result'
+			}
+
+			if (!enableDefaultBuildIT) {
+				echo "Skipping integration tests in the default environment."
+				return
+			}
+
+			echo "Running integration tests in the default environment."
+			String allITProjects = sh(script: "./ci/list-dependent-integration-tests.sh hibernate-search-engine", returnStdout: true).trim()
+			String itMavenArgs = """ \
+					${commonMavenArgs} \
+					-pl ${allITProjects} \
+					${incrementalBuild ?
+							('-Dincremental -Dgib.referenceBranch=refs/remotes/origin/'+helper.scmSource.pullRequest.target.name)
+							: ''
+					} \
+			"""
+			pullContainerImages( itMavenArgs )
+			sh """ \
+					mvn \
+					${itMavenArgs} \
+					verify \
 			"""
 
-			// Don't try to report to SonarCloud if coverage data is missing
-			if (sonarEnabled) {
-				def sonarCredentialsId = helper.configuration.file.sonar.credentials
+			def sonarCredentialsId = helper.configuration.file?.sonar?.credentials
+			if (sonarCredentialsId) {
 				// WARNING: Make sure credentials are evaluated by sh, not Groovy.
 				// To that end, escape the '$' when referencing the variables.
 				// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
@@ -449,11 +459,7 @@ stage('Default build') {
 				}
 			}
 			else {
-				echo "Skipping Sonar report."
-			}
-
-			dir(helper.configuration.maven.localRepositoryPath) {
-				stash name:'default-build-result', includes:"org/hibernate/search/**"
+				echo "Skipping Sonar report: no credentials."
 			}
 		}
 	}
