@@ -414,11 +414,14 @@ stage('Default build') {
 
 			echo "Running integration tests in the default environment."
 			String allITProjects = sh(script: "./ci/list-dependent-integration-tests.sh hibernate-search-engine", returnStdout: true).trim()
+			// We want to run relevant integration test modules only (see array of module names)
+			// and in PRs we want to run only those affected by changes
+			// (see gib.disableSelectedProjectsHandling=true).
 			String itMavenArgs = """ \
 					${commonMavenArgs} \
 					-pl ${allITProjects} \
 					${incrementalBuild ? """ \
-							-Dincremental \
+							-Dincremental -Dgib.disableSelectedProjectsHandling=true \
 							-Dgib.referenceBranch=refs/remotes/origin/${helper.scmSource.pullRequest.target.name} \
 					""" : '' } \
 			"""
