@@ -375,40 +375,24 @@ Resulting execution plan:
 """
 }
 
-runBuildOnNode( NODE_PATTERN_BASE, [time: 2, unit: 'HOURS'] ) {
-	stage('Pre-build sources') {
-		// we want this stage to only be executed when we are planning to use incremental build
-		if (!incrementalBuild) {
-			echo 'Skipping pre-building sources for non-pull request builds.'
-			helper.markStageSkipped()
-			return
-		}
-		if (!enableDefaultBuild) {
-			echo 'Skipping default build and integration tests in the default environment'
-			helper.markStageSkipped()
-			return
-		}
-		withMavenWorkspace {
-			sh """ \
-					mvn clean install \
-					--fail-at-end \
-					-Pdist -Pjqassistant -Pci-sources-check \
-					-DskipITs -DskipTests \
-			"""
-
-			dir(helper.configuration.maven.localRepositoryPath) {
-				stash name:'default-build-result', includes:"org/hibernate/search/**"
-			}
-		}
+stage('Default build') {
+	if (!enableDefaultBuild) {
+		echo 'Skipping default build and integration tests in the default environment'
+		helper.markStageSkipped()
+		return
 	}
-	stage('Default build') {
-		if (!enableDefaultBuild) {
-			echo 'Skipping default build and integration tests in the default environment'
-			helper.markStageSkipped()
-			return
-		}
+	runBuildOnNode( NODE_PATTERN_BASE, [time: 2, unit: 'HOURS'] ) {
 		withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
-			if ( incrementalBuild ) {
+			if (incrementalBuild) {
+				// We won't be building all classes in the incremental build,
+				// which is a problem for Sonar since it needs access to compiled classes.
+				// So in incremental builds, we build all sources first, but skipping tests.
+				sh """ \
+						mvn clean install \
+						--fail-at-end \
+						-Pdist -Pjqassistant -Pci-sources-check \
+						-DskipITs -DskipTests \
+				"""
 				dir(helper.configuration.maven.localRepositoryPath) {
 					unstash name:'default-build-result'
 				}
