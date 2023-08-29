@@ -408,15 +408,24 @@ stage('Default build') {
 			}
 
 			echo "Running integration tests in the default environment."
-			String allITProjects = sh(script: "./ci/list-dependent-integration-tests.sh hibernate-search-engine", returnStdout: true).trim()
-			// We want to run relevant integration test modules only (see array of module names)
-			// and in PRs we want to run only those affected by changes
-			// (see gib.disableSelectedProjectsHandling=true).
+			// We want to include all (relevant) modules in this second build,
+			// so that their coverage data is taken into account by jacoco:report-aggregate:
+			// if some modules are not in the build or classes are not compiled,
+			// Jacoco will just not report coverage for these classes.
+			// In PRs, "relevant" modules are only those affected by changes.
+			// However:
+			// - Maven will normally not recompile anything as class files are still here.
+			// - We disable running unit tests (surefire) because we already ran them just above.
+			// - We disable a couple checks that were run above.
+			// - We activate a profile that fixes the second Maven execution
+			//   by disabling a few misbehaving plugins whose output is already there anyway.
 			String itMavenArgs = """ \
 					${commonMavenArgs} \
-					-pl ${allITProjects} \
+					-DskipSurefireTests \
+					-Pskip-checks \
+					-Pci-rebuild \
 					${incrementalBuild ? """ \
-							-Dincremental -Dgib.disableSelectedProjectsHandling=true \
+							-Dincremental \
 							-Dgib.referenceBranch=refs/remotes/origin/${helper.scmSource.pullRequest.target.name} \
 					""" : '' } \
 			"""
