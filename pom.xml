@@ -602,16 +602,9 @@
                     <version>${version.flatten-maven-plugin}</version>
                     <configuration>
                         <outputDirectory>${project.build.directory}</outputDirectory>
-                        <flattenMode>bom</flattenMode>
-                        <pomElements>
-                            <!-- Specific modules can decide what to do about the dependency management section -->
-                            <dependencyManagement>${flatten-maven-plugin.dependencyManagement.action}</dependencyManagement>
-                            <!--
-                                We don't want to show any properties in the BOM/POMs.
-                                The properties we need will be resolved, others have no value for the users of the BOM/POMs.
-                             -->
-                            <properties>remove</properties>
-                        </pomElements>
+                        <!-- Keep things like url, inceptionYear, authors...
+                             everything that's required by the OSSRH Maven repository -->
+                        <flattenMode>ossrh</flattenMode>
                     </configuration>
                     <executions>
                         <execution>
