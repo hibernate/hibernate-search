@@ -1283,6 +1283,7 @@
             <properties>
                 <!-- Skip parts of the build that may fail but don't matter when testing upgrades -->
                 <checkstyle.skip>true</checkstyle.skip>
+                <format.skip>true</format.skip>
                 <maven.javadoc.skip>true</maven.javadoc.skip>
                 <javadoc.download.phase>none</javadoc.download.phase>
                 <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
