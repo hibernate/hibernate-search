@@ -907,7 +907,7 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 	// and in PRs we want to run only those affected by changes
 	// (see gib.disableSelectedProjectsHandling=true).
 	String incrementalProjectsListFile = 'target/.gib-impacted'
-	String argsWithProjectSelection = """ \
+	args = """ \
 		${incrementalBuild ? """ \
 				-Dincremental -Dgib.disableSelectedProjectsHandling=true \
 				-Dgib.referenceBranch=refs/remotes/origin/${helper.scmSource.pullRequest.target.name} \
@@ -915,13 +915,17 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 		""" : ''} \
 		${args} \
 	"""
+	if ( buildEnv.requiresDefaultBuildArtifacts() ) {
+		// - We disable a couple checks that were run above.
+		// - We activate a profile that fixes the second Maven execution for some modules
+		//   by disabling a few misbehaving plugins whose output is already there anyway.
+		args += ' -Pskip-checks'
+	}
 	if ( artifactsToTest ) {
-		argsWithProjectSelection = '-pl ' +
-				sh(script: "./ci/list-dependent-integration-tests.sh ${artifactsToTest.join(',')}", returnStdout: true).trim() +
-				' ' + argsWithProjectSelection
+		args += ' -pl ' + sh(script: "./ci/list-dependent-integration-tests.sh ${artifactsToTest.join(',')}", returnStdout: true).trim()
 	}
 
-	pullContainerImages( argsWithProjectSelection )
+	pullContainerImages( args )
 
 	// Add a suffix to tests to distinguish between different executions
 	// of the same test in different environments in reports
@@ -931,7 +935,7 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, List<String> a
 			mvn clean install -Dsurefire.environment=$testSuffix \
 					${toTestJdkArg(buildEnv)} \
 					--fail-at-end \
-					$argsWithProjectSelection \
+					$args \
 	"""
 
 	// In incremental builds, the Maven execution above
