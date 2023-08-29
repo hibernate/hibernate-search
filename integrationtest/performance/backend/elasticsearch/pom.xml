@@ -19,6 +19,9 @@
     <description>Performance tests for the Elasticsearch backend</description>
 
     <properties>
+        <!-- We don't want to use a Jacoco agent here, and we don't want to rely on these tests for coverage either -->
+        <jacoco.skip>true</jacoco.skip>
+
         <test.elasticsearch.run.skip>${test.elasticsearch.connection.uris.defined}</test.elasticsearch.run.skip>
     </properties>
 

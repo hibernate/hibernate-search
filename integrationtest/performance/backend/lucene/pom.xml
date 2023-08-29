@@ -18,6 +18,11 @@
     <name>Hibernate Search ITs - Performance - Backend - Lucene</name>
     <description>Performance tests for the Lucene backend</description>
 
+    <properties>
+        <!-- We don't want to use a Jacoco agent here, and we don't want to rely on these tests for coverage either -->
+        <jacoco.skip>true</jacoco.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>

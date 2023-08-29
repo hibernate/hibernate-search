@@ -53,6 +53,7 @@
              -->
             <id>javaModuleITs</id>
             <activation>
+                <!-- Hack to activate by default, except when explicitly disabled -->
                 <jdk>[11,)</jdk>
             </activation>
             <modules>
