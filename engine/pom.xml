@@ -44,14 +44,6 @@
             <plugin>
                 <groupId>org.jboss.maven.plugins</groupId>
                 <artifactId>maven-injection-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>bytecode</goal>
-                        </goals>
-                    </execution>
-                </executions>
                 <configuration>
                     <bytecodeInjections>
                         <bytecodeInjection>
