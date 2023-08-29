@@ -105,6 +105,11 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-integrationtest-mapper-orm-spring</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-integrationtest-mapper-orm-envers</artifactId>
             <scope>test</scope>
         </dependency>
@@ -116,6 +121,11 @@
         <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-integrationtest-mapper-pojo-standalone-realbackend</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-integrationtest-showcase-library</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -140,6 +150,11 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-integrationtest-spring-repackaged-application</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-documentation</artifactId>
             <scope>test</scope>
         </dependency>
@@ -147,6 +162,41 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-dependencies-rules</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <dependenciesIncludeAllTestCoverageModules>
+                                    <excludes>
+                                        <!-- These modules are legacy and we don't care about test coverage. -->
+                                        <exclude>hibernate-search-v5migrationhelper-engine</exclude>
+                                        <exclude>hibernate-search-v5migrationhelper-orm</exclude>
+                                        <!-- These modules do not actually contain code to be covered or test executions,
+                                             they are basically false positives. -->
+                                        <exclude>hibernate-search-integrationtest-backend-tck</exclude>
+                                        <exclude>hibernate-search-integrationtest-performance-backend-base</exclude>
+                                        <exclude>hibernate-search-integrationtest-spring-repackaged-model</exclude>
+                                    </excludes>
+                                </dependenciesIncludeAllTestCoverageModules>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate.search</groupId>
+                        <artifactId>hibernate-search-build-enforcer</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
             <!--
                 Hack to deploy in the "reports" module without deploying the "reports" module itself.
                 The default lifecycle bindings of the plugin is to "stage locally" every artifact throughout
@@ -202,6 +252,45 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <profile>
+            <!--
+                We want to keep these module path tests within their own profile,
+                so we can easily exclude building them all in some scenarios like eclipse compiler profile etc.
+             -->
+            <id>javaModuleITs</id>
+            <activation>
+                <!-- Hack to activate by default, except when explicitly disabled -->
+                <jdk>[11,)</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate.search</groupId>
+                    <artifactId>hibernate-search-integrationtest-java-modules-orm-coordination-outbox-polling-elasticsearch</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate.search</groupId>
+                    <artifactId>hibernate-search-integrationtest-java-modules-orm-elasticsearch</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate.search</groupId>
+                    <artifactId>hibernate-search-integrationtest-java-modules-orm-lucene</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate.search</groupId>
+                    <artifactId>hibernate-search-integrationtest-java-modules-pojo-standalone-elasticsearch</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate.search</groupId>
+                    <artifactId>hibernate-search-integrationtest-java-modules-pojo-standalone-lucene</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 </project>
