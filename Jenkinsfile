@@ -261,16 +261,11 @@ stage('Configure') {
 			esAws: [
 					// --------------------------------------------
 					// AWS Elasticsearch service (OpenDistro)
-					new EsAwsBuildEnvironment(version: '7.1', condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '7.4', condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '7.7', condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '7.8', condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '7.10', condition: TestCondition.AFTER_MERGE),
 
 					// --------------------------------------------
 					// AWS OpenSearch service
 					new OpenSearchAwsBuildEnvironment(version: '1.3', condition: TestCondition.AFTER_MERGE),
-					new OpenSearchAwsBuildEnvironment(version: '2.3', condition: TestCondition.ON_DEMAND),
 					new OpenSearchAwsBuildEnvironment(version: '2.5', condition: TestCondition.AFTER_MERGE),
 					// Also test static credentials, but only for the latest version
 					new OpenSearchAwsBuildEnvironment(version: '2.5', condition: TestCondition.AFTER_MERGE, staticCredentials: true)
