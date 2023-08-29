@@ -5,8 +5,11 @@
  ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
  ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
   -->
+<!-- child.project.url.inherit.append.path is weird but necessary to have correct URLs in flattened POMs,
+     see XSD for more info. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+         child.project.url.inherit.append.path="false">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hibernate.search</groupId>
@@ -26,7 +29,11 @@
         <url>https://hibernate.atlassian.net/browse/HSEARCH</url>
     </issueManagement>
 
-    <scm>
+    <!-- The various child.*.append.path are weird but necessary to have correct URLs in flattened POMs,
+         see XSD for more info. -->
+    <scm child.scm.connection.inherit.append.path="false"
+         child.scm.developerConnection.inherit.append.path="false"
+         child.scm.url.inherit.append.path="false">
         <connection>scm:git:git://github.com/hibernate/hibernate-search.git</connection>
         <developerConnection>scm:git:git@github.com:hibernate/hibernate-search.git</developerConnection>
         <url>http://github.com/hibernate/hibernate-search</url>
@@ -401,6 +408,7 @@
         <version.maven-wrapper-plugin>3.2.0</version.maven-wrapper-plugin>
         <version.impsort-maven-plugin>1.9.0</version.impsort-maven-plugin>
         <version.formatter-maven-plugin>2.23.0</version.formatter-maven-plugin>
+        <version.flatten-maven-plugin>1.7.3</version.flatten-maven-plugin>
 
         <!-- Asciidoctor -->
 
