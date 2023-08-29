@@ -380,7 +380,7 @@ stage('Default build') {
 		withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
 			String commonMavenArgs = """ \
 					--fail-at-end \
-					-Pdist -Pcoverage \
+					-Pcoverage \
 					${toTestJdkArg(environments.content.jdk.default)} \
 			"""
 
@@ -388,9 +388,9 @@ stage('Default build') {
 			sh """ \
 					mvn \
 					${commonMavenArgs} \
+					-Pdist \
 					-Pjqassistant -Pci-sources-check \
 					-DskipITs \
-					${toTestJdkArg(environments.content.jdk.default)} \
 					clean \
 					${deploySnapshot ? "\
 							deploy \
