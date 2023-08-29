@@ -29,12 +29,6 @@
         <deploy.skip>true</deploy.skip>
         <!-- This will make sure the build fails if we forget to set <deploy.skip>false</deploy.skip> in a child module -->
         <enforcer.publicModuleIsDeployedRule.skip>false</enforcer.publicModuleIsDeployedRule.skip>
-        <!--
-            POMs of public modules will be flattened and will include the list of dependencies
-            with resolved versions.
-            Thus, there's no need for dependency management sections in these POMs.
-        -->
-        <flatten-maven-plugin.dependencyManagement.action>remove</flatten-maven-plugin.dependencyManagement.action>
     </properties>
 
     <build>
