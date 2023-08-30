@@ -20,6 +20,16 @@ Map settings() {
 					updateProperties: ['version.org.hibernate.orm'],
 					onlyRunTestDependingOn: ['hibernate-search-mapper-orm']
 			]
+		case 'lucene9':
+			return [
+					updateProperties: ['version.org.apache.lucene'],
+					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
+			]
+		case 'lucene10':
+			return [
+					updateProperties: ['version.org.apache.lucene'],
+					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
+			]
 		default:
 			return [:]
 	}
@@ -117,7 +127,7 @@ pipeline {
 					axis {
 						name 'DEPENDENCY_UPDATE_NAME'
 						// NOTE: Remember to update the settings() method above when changing this.
-						values 'orm6.2', 'orm6.3'
+						values 'orm6.2', 'orm6.3', 'lucene9', 'lucene10'
 					}
 				}
 				stages {
