@@ -7,10 +7,6 @@
 package org.hibernate.search.documentation.mapper.orm.indexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.documentation.mapper.orm.indexing.HibernateOrmMassIndexerIT.NUMBER_OF_BOOKS;
-import static org.hibernate.search.documentation.mapper.orm.indexing.HibernateOrmMassIndexerIT.assertAuthorCount;
-import static org.hibernate.search.documentation.mapper.orm.indexing.HibernateOrmMassIndexerIT.assertBookCount;
-import static org.hibernate.search.documentation.mapper.orm.indexing.HibernateOrmMassIndexerIT.initData;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Properties;
@@ -19,36 +15,16 @@ import jakarta.batch.operations.JobOperator;
 import jakarta.batch.runtime.BatchRuntime;
 import jakarta.batch.runtime.BatchStatus;
 import jakarta.batch.runtime.JobExecution;
-import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
-import org.hibernate.search.documentation.testsupport.BackendConfigurations;
-import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
-public class HibernateOrmBatchJsr352IT {
+public class HibernateOrmBatchJsr352IT extends AbstractHibernateOrmMassIndexingIT {
 
 	private static final int JOB_TIMEOUT_MS = 30_000;
 	private static final int THREAD_SLEEP = 1000;
-
-	@Rule
-	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
-			BackendConfigurations.simple() );
-
-	private EntityManagerFactory entityManagerFactory;
-
-	@Before
-	public void setup() {
-		this.entityManagerFactory = setupHelper.start()
-				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
-				.setup( Book.class, Author.class );
-		initData( entityManagerFactory, HibernateOrmBatchJsr352IT::newAuthor );
-	}
 
 	@Test
 	public void simple() throws Exception {
@@ -95,7 +71,8 @@ public class HibernateOrmBatchJsr352IT {
 		} );
 	}
 
-	private static Author newAuthor(int id) {
+	@Override
+	protected Author newAuthor(int id) {
 		Author author = new Author();
 		author.setId( id );
 		author.setFirstName( "John" + id );
@@ -103,6 +80,7 @@ public class HibernateOrmBatchJsr352IT {
 		author.setLastName( "Smith" + ( id % 2 ) );
 		return author;
 	}
+
 
 	private static JobExecution waitForTermination(JobOperator jobOperator, JobExecution jobExecution, int timeoutInMs)
 			throws InterruptedException {
