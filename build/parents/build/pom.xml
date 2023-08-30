@@ -1344,6 +1344,22 @@
                         <updatePolicy>always</updatePolicy>
                     </snapshots>
                 </repository>
+                <repository>
+                    <id>apache-snapshots</id>
+                    <url>https://repository.apache.org/content/groups/snapshots</url>
+                    <layout>default</layout>
+                    <releases>
+                        <!-- versions-maven-plugin will ignore this repo, even for snapshots,
+                             unless we enable releases.
+                             This is most likely a bug. -->
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>always</updatePolicy>
+                    </snapshots>
+                </repository>
             </repositories>
         </profile>
 
