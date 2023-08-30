@@ -96,7 +96,7 @@ public class MassIndexingManualSchemaManagementIT {
 			assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) ).isZero();
 
 			MassIndexer indexer = Search.session( entityManager ).massIndexer()
-					.dropAndCreateSchemaOnStart( true );
+					.purgeAllOnStart( false );
 			try {
 				indexer.startAndWait();
 			}
