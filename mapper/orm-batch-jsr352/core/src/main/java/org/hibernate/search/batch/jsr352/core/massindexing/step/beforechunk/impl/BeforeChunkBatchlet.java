@@ -9,7 +9,7 @@ package org.hibernate.search.batch.jsr352.core.massindexing.step.beforechunk.imp
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.MERGE_SEGMENTS_AFTER_PURGE;
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.PURGE_ALL_ON_START;
 
-import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 
 import jakarta.batch.api.AbstractBatchlet;
 import jakarta.batch.api.BatchProperty;
@@ -17,14 +17,15 @@ import jakarta.batch.runtime.context.JobContext;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManagerFactory;
 
-import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.Defaults;
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.SerializationUtil;
+import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.work.SearchWorkspace;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
+import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
+import org.hibernate.search.util.common.impl.Futures;
 
 /**
  * Enhancements before the chunk step {@code produceLuceneDoc} (lucene document production)
@@ -32,8 +33,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @author Mincong Huang
  */
 public class BeforeChunkBatchlet extends AbstractBatchlet {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Inject
 	private JobContext jobContext;
@@ -62,15 +61,15 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 		if ( purgeAllOnStart ) {
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
-			SearchWorkspace workspace = Search.mapping( emf ).scope( Object.class ).workspace( tenantId );
-			workspace.purge();
+			BatchMappingContext mappingContext = (BatchMappingContext) Search.mapping( emf );
+			PojoScopeWorkspace workspace = mappingContext.scope( Object.class ).pojoWorkspace( tenantId );
+			Futures.unwrappedExceptionJoin( workspace.purge( Collections.emptySet(), OperationSubmitter.blocking() ) );
 
 			// This is necessary because the batchlet is not executed inside a transaction
-			workspace.flush();
+			Futures.unwrappedExceptionJoin( workspace.flush( OperationSubmitter.blocking() ) );
 
 			if ( mergeSegmentsAfterPurge ) {
-				log.startMergeSegments();
-				workspace.mergeSegments();
+				Futures.unwrappedExceptionJoin( workspace.mergeSegments( OperationSubmitter.blocking() ) );
 			}
 		}
 		return null;
