@@ -17,6 +17,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import jakarta.persistence.OptimisticLockException;
+
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.orchestration.spi.SingletonTask;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -275,9 +277,21 @@ public final class OutboxPollingEventProcessor implements ToStringTreeAppendable
 						// (complete() will be called, re-scheduling the polling for later)
 						return;
 					}
-					List<OutboxEvent> events = eventFinder.get().findOutboxEvents( session, batchSize );
-					if ( events.isEmpty() ) {
-						// Nothing to do, try again later (complete() will be called, re-scheduling the polling for later)
+
+					List<OutboxEvent> events;
+					try {
+						events = eventFinder.get().findOutboxEvents( session, batchSize );
+						if ( events.isEmpty() ) {
+							// Nothing to do, try again later (complete() will be called, re-scheduling the polling for later)
+							return;
+						}
+					}
+					catch (OptimisticLockException lockException) {
+						// Don't be fooled by the exception type, this is actually a *pessimistic* lock failure.
+						// It can happen with some databases (CockroachDB in particular, perhaps others)
+						// that treat transaction failures as a matter of course that applications should deal with.
+						// See also https://www.cockroachlabs.com/docs/v23.1/transaction-retry-error-reference.html
+						log.eventProcessorFindEventsUnableToLock( name, lockException );
 						return;
 					}
 

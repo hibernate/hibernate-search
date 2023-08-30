@@ -18,6 +18,9 @@ import jakarta.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Environment;
+import org.hibernate.dialect.CockroachDialect;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.TestFailureHandler;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
@@ -26,6 +29,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,6 +55,9 @@ public class OutboxPollingAutomaticIndexingConcurrencyIT {
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
+
+	@Rule
+	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	private final TestFailureHandler failureHandler = new TestFailureHandler();
 
@@ -80,14 +87,26 @@ public class OutboxPollingAutomaticIndexingConcurrencyIT {
 		return context.setup( IndexedEntity.class );
 	}
 
-	// Note: we're talking about *database* deadlocks here.
-	// We're not protecting against infinite execution because we expect
-	// the deadlock to be detected by the database,
-	// which would abort the transaction,
-	// which would cause a failure in the background thread and eventually would fail the test.
+	// Check that database (transaction) deadlocks, if they happen,
+	// do not prevent Hibernate Search from doing its job
+	// and do not cause errors to be reported.
+	// Ideally these deadlocks should not happen at all,
+	// and indeed for most databases they will not due to how our queries are designed,
+	// but on some databases (CockroachDB) that's very hard (impossible?) to achieve.
 	@Test
-	public void noDeadlock() {
+	public void resilientToTransactionDeadlocks() {
 		SessionFactory sessionFactory = sessionFactories.get( 0 );
+
+		Dialect dialect = sessionFactory.unwrap( SessionFactoryImplementor.class ).getJdbcServices().getDialect();
+		// CockroachDB seems to trigger deadlocks whatever we do.
+		// For other DBs, our queries should be optimized so as not to trigger any deadlock.
+		if ( !( dialect instanceof CockroachDialect ) ) {
+			// We're using two different ways to match the logs,
+			// in case the ID or message gets updated and we forget to update this test.
+			logged.expectMessage( "HSEARCH850034" ).never();
+			logged.expectMessage( "failed", "retrieve event", "lock" )
+					.never();
+		}
 
 		for ( int i = 0; i < ENTITY_COUNT; i += ENTITY_UPDATE_BATCH_SIZE ) {
 			int idStart = i;

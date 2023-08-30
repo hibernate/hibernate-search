@@ -85,7 +85,7 @@ public interface Log extends BasicLogger {
 	void eventProcessorDisabled(String tenantId);
 
 	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 11, value = "'%1$s' failed to obtain a lock on events to process; will try again later.")
+	@Message(id = ID_OFFSET + 11, value = "'%1$s' failed to obtain a lock on events to update/delete; will try again later.")
 	void outboxEventProcessorUnableToLock(String name, @Cause OptimisticLockException lockException);
 
 	@Message(id = ID_OFFSET + 12, value = "Unable to serialize OutboxEvent payload with Avro: %1$s")
@@ -203,5 +203,12 @@ public interface Log extends BasicLogger {
 			value = "Configuration property `%1$s` is deprecated and will be removed in the future versions of Hibernate Search."
 					+ " This property is only to help with the schema migration and should not be used as a long term solution.")
 	void usingDeprecatedPayloadTypeConfigurationProperty(String configurationProperty);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 34,
+			// Warning: we check that this message does NOT appear in logs in some tests.
+			// If you update this message, make sure to also update OutboxPollingAutomaticIndexingConcurrencyIT.
+			value = "'%1$s' failed to retrieve events to process due to a locking failure; will try again later.")
+	void eventProcessorFindEventsUnableToLock(String name, @Cause OptimisticLockException lockException);
 
 }
