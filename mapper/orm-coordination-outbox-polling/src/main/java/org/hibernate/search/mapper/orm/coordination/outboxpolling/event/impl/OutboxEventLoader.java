@@ -53,10 +53,11 @@ final class OutboxEventLoader implements ToStringTreeAppendable {
 		if ( dialect.supportsSkipLocked() ) {
 			lockOptions = new LockOptions( LockMode.UPGRADE_SKIPLOCKED );
 		}
-		// If SKIP_LOCKED is not supported, we just do basic locking and hope for the best
+		// If LockMode.UPGRADE_SKIPLOCKED is not supported, we just do basic locking and hope for the best
 		// (in particular we hope for transaction deadlocks to be detected by the database and result in a failure,
 		// so that we can try again later).
-		// HSEARCH-4634: CockroachDB doesn't support SKIP_LOCKED (https://github.com/cockroachdb/cockroach/issues/40476?version=v22.1),
+		// HSEARCH-4634: CockroachDB doesn't support LockMode.UPGRADE_SKIPLOCKED
+		// (https://github.com/cockroachdb/cockroach/issues/40476?version=v22.1),
 		// but fortunately it doesn't suffer from lock escalation,
 		// so as long as we target a distinct set of events in each processor (we do),
 		// locking shouldn't trigger any deadlocks.
@@ -88,7 +89,7 @@ final class OutboxEventLoader implements ToStringTreeAppendable {
 		catch (OptimisticLockException lockException) {
 			// Don't be fooled by the exception type, this is actually a *pessimistic* lock failure.
 			// It can happen with some databases (Mariadb before 10.6, perhaps others) that do not support
-			// skipping locked rows (see LockOptions.SKIP_LOCKED).
+			// skipping locked rows (see LockOptions.UPGRADE_SKIPLOCKED).
 			// If that happens, we will just log something and try again later.
 			// See also https://jira.mariadb.org/browse/MDEV-13115
 			log.outboxEventProcessorUnableToLock( processorName, lockException );
