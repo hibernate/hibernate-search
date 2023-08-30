@@ -14,4 +14,8 @@ public interface BatchMappingContext {
 
 	BatchSessionContext sessionContext(EntityManager entityManager);
 
+	<T> BatchScopeContext<T> scope(Class<T> expectedSuperType);
+
+	<T> BatchScopeContext<T> scope(Class<T> expectedSuperType, String entityName);
+
 }

@@ -8,21 +8,21 @@ package org.hibernate.search.batch.jsr352.core.massindexing.step.afterchunk.impl
 
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.MERGE_SEGMENTS_ON_FINISH;
 
-import java.lang.invoke.MethodHandles;
-
 import jakarta.batch.api.AbstractBatchlet;
 import jakarta.batch.api.BatchProperty;
 import jakarta.batch.runtime.context.JobContext;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManagerFactory;
 
-import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.Defaults;
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.SerializationUtil;
+import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
+import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
+import org.hibernate.search.util.common.impl.Futures;
 
 /**
  * Enhancements after the chunk step {@code produceLuceneDoc} (lucene document production)
@@ -30,8 +30,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @author Mincong Huang
  */
 public class AfterChunkBatchlet extends AbstractBatchlet {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Inject
 	private JobContext jobContext;
@@ -51,11 +49,11 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 		);
 
 		if ( mergeSegmentsOnFinish ) {
-			log.startMergeSegments();
-
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
-			Search.mapping( emf ).scope( Object.class ).workspace( tenantId ).mergeSegments();
+			BatchMappingContext mappingContext = (BatchMappingContext) Search.mapping( emf );
+			PojoScopeWorkspace workspace = mappingContext.scope( Object.class ).pojoWorkspace( tenantId );
+			Futures.unwrappedExceptionJoin( workspace.mergeSegments( OperationSubmitter.blocking() ) );
 		}
 		return null;
 	}

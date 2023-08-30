@@ -27,15 +27,17 @@ import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.schema.management.impl.SearchSchemaManagerImpl;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
+import org.hibernate.search.mapper.orm.spi.BatchScopeContext;
 import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.work.impl.SearchWorkspaceImpl;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
+import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 
 @SuppressWarnings("deprecation")
-public class SearchScopeImpl<E> implements SearchScope<E> {
+public class SearchScopeImpl<E> implements SearchScope<E>, BatchScopeContext<E> {
 
 	private final HibernateOrmScopeMappingContext mappingContext;
 	private final TenancyConfiguration tenancyConfiguration;
@@ -96,12 +98,17 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	@Override
 	public SearchWorkspace workspace() {
-		return workspace( (String) null );
+		return workspace( null );
 	}
 
 	@Override
 	public SearchWorkspace workspace(String tenantId) {
-		return new SearchWorkspaceImpl( delegate.workspace( tenantId ) );
+		return new SearchWorkspaceImpl( pojoWorkspace( tenantId ) );
+	}
+
+	@Override
+	public PojoScopeWorkspace pojoWorkspace(String tenantId) {
+		return delegate.workspace( tenantId );
 	}
 
 	@Override

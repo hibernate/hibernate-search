@@ -48,7 +48,6 @@ import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRawTypeIdentifierR
 import org.hibernate.search.mapper.orm.reporting.impl.HibernateOrmMappingHints;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.schema.management.impl.SchemaManagementListener;
-import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeMappingContext;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
@@ -227,12 +226,22 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public <T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types) {
+	public <T> SearchScopeImpl<T> scope(Class<T> type) {
+		return scope( Collections.singleton( type ) );
+	}
+
+	@Override
+	public <T> SearchScopeImpl<T> scope(Class<T> expectedSuperType, String entityName) {
+		return scope( expectedSuperType, Collections.singleton( entityName ) );
+	}
+
+	@Override
+	public <T> SearchScopeImpl<T> scope(Collection<? extends Class<? extends T>> types) {
 		return createScope( types );
 	}
 
 	@Override
-	public <T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
+	public <T> SearchScopeImpl<T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
 		return createScope( expectedSuperType, entityNames );
 	}
 

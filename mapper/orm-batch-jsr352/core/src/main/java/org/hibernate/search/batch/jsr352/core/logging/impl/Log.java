@@ -87,12 +87,6 @@ public interface Log extends BasicLogger {
 	)
 	void analyzeIndexProgress(String progress);
 
-	@LogMessage(level = Level.INFO)
-	@Message(id = ID_OFFSET + 15,
-			value = "Merging index segments for all entities ..."
-	)
-	void startMergeSegments();
-
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET + 17,
 			value = "Checkpoint reached. Sending checkpoint ID to batch runtime... (entity='%1$s', checkpointInfo='%2$s')"

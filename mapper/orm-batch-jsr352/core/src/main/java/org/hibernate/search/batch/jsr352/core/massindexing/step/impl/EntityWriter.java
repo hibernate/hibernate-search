@@ -30,9 +30,9 @@ import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
-import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
+import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -63,7 +63,7 @@ public class EntityWriter extends AbstractItemWriter {
 	private SearchMapping searchMapping;
 	private BatchMappingContext mappingContext;
 	private PojoRawTypeIdentifier<?> typeIdentifier;
-	private SearchWorkspace workspace;
+	private PojoScopeWorkspace workspace;
 
 	private WriteMode writeMode;
 
@@ -83,7 +83,7 @@ public class EntityWriter extends AbstractItemWriter {
 		searchMapping = Search.mapping( emf );
 		mappingContext = (BatchMappingContext) searchMapping;
 		typeIdentifier = mappingContext.typeContextProvider().byEntityName().getOrFail( entityName ).typeIdentifier();
-		workspace = searchMapping.scope( typeIdentifier.javaClass(), entityName ).workspace( tenantId );
+		workspace = mappingContext.scope( typeIdentifier.javaClass(), entityName ).pojoWorkspace( tenantId );
 
 		/*
 		 * Always execute works as updates on the first checkpoint interval,
@@ -113,7 +113,7 @@ public class EntityWriter extends AbstractItemWriter {
 			 * which is necessary because the runtime will perform a checkpoint
 			 * just after we return from this method.
 			 */
-			workspace.flush();
+			Futures.unwrappedExceptionJoin( workspace.flush( OperationSubmitter.blocking() ) );
 		}
 
 		// update work count
