@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.PersistenceException;
 
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentReference;
@@ -86,7 +86,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 11, value = "'%1$s' failed to obtain a lock on events to update/delete; will try again later.")
-	void outboxEventProcessorUnableToLock(String name, @Cause OptimisticLockException lockException);
+	void outboxEventProcessorUnableToLock(String name, @Cause PersistenceException lockException);
 
 	@Message(id = ID_OFFSET + 12, value = "Unable to serialize OutboxEvent payload with Avro: %1$s")
 	SearchException unableToSerializeOutboxEventPayloadWithAvro(String causeMessage, @Cause Throwable cause);
@@ -209,6 +209,6 @@ public interface Log extends BasicLogger {
 			// Warning: we check that this message does NOT appear in logs in some tests.
 			// If you update this message, make sure to also update OutboxPollingAutomaticIndexingConcurrencyIT.
 			value = "'%1$s' failed to retrieve events to process due to a locking failure; will try again later.")
-	void eventProcessorFindEventsUnableToLock(String name, @Cause OptimisticLockException lockException);
+	void eventProcessorFindEventsUnableToLock(String name, @Cause PersistenceException lockException);
 
 }

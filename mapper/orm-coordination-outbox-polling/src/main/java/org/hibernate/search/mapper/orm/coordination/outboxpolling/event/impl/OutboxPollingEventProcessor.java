@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.PessimisticLockException;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.orchestration.spi.SingletonTask;
@@ -286,8 +287,8 @@ public final class OutboxPollingEventProcessor implements ToStringTreeAppendable
 							return;
 						}
 					}
-					catch (OptimisticLockException lockException) {
-						// Don't be fooled by the exception type, this is actually a *pessimistic* lock failure.
+					catch (PessimisticLockException | OptimisticLockException lockException) {
+						// Note OptimisticLockException is sometimes (always?) thrown to indicate a *pessimistic* lock failure.
 						// It can happen with some databases (CockroachDB in particular, perhaps others)
 						// that treat transaction failures as a matter of course that applications should deal with.
 						// See also https://www.cockroachlabs.com/docs/v23.1/transaction-retry-error-reference.html

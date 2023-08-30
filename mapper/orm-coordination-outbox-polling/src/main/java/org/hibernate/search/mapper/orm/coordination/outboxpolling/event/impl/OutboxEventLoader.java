@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.PessimisticLockException;
 
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
@@ -86,8 +87,8 @@ final class OutboxEventLoader implements ToStringTreeAppendable {
 			query.setLockOptions( lockOptions );
 			return query.getResultList();
 		}
-		catch (OptimisticLockException lockException) {
-			// Don't be fooled by the exception type, this is actually a *pessimistic* lock failure.
+		catch (PessimisticLockException | OptimisticLockException lockException) {
+			// Note OptimisticLockException is sometimes (always?) thrown to indicate a *pessimistic* lock failure.
 			// It can happen with some databases (Mariadb before 10.6, perhaps others) that do not support
 			// skipping locked rows (see LockOptions.UPGRADE_SKIPLOCKED).
 			// If that happens, we will just log something and try again later.
