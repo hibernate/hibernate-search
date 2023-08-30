@@ -1,0 +1,111 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.documentation.mapper.orm.indexing;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+
+import java.time.LocalDate;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+
+import org.hibernate.search.documentation.testsupport.BackendConfigurations;
+import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.session.SearchSession;
+
+import org.junit.Before;
+import org.junit.Rule;
+
+abstract class AbstractHibernateOrmMassIndexingIT {
+
+	protected static final int NUMBER_OF_BOOKS = 1000;
+	private static final int INIT_DATA_TRANSACTION_SIZE = 500;
+
+	@Rule
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
+
+	protected EntityManagerFactory entityManagerFactory;
+
+	@Before
+	public void setup() {
+		this.entityManagerFactory = setupHelper.start()
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
+				.setup( Book.class, Author.class );
+		initData( entityManagerFactory );
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			assertBookCount( entityManager, 0 );
+			assertAuthorCount( entityManager, 0 );
+		} );
+	}
+
+	static void assertBookCount(EntityManager entityManager, int expectedCount) {
+		SearchSession searchSession = Search.session( entityManager );
+		assertThat(
+				searchSession.search( Book.class )
+						.where( f -> f.matchAll() )
+						.fetchTotalHitCount()
+		)
+				.isEqualTo( expectedCount );
+	}
+
+	protected void assertAuthorCount(EntityManager entityManager, int expectedCount) {
+		SearchSession searchSession = Search.session( entityManager );
+		assertThat(
+				searchSession.search( Author.class )
+						.where( f -> f.matchAll() )
+						.fetchTotalHitCount()
+		)
+				.isEqualTo( expectedCount );
+	}
+
+	protected void initData(EntityManagerFactory entityManagerFactory) {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
+			try {
+				int i = 0;
+				while ( i < NUMBER_OF_BOOKS ) {
+					entityManager.getTransaction().begin();
+					int end = Math.min( i + INIT_DATA_TRANSACTION_SIZE, NUMBER_OF_BOOKS );
+					for ( ; i < end; ++i ) {
+						Author author = newAuthor( i );
+
+						Book book = newBook( i );
+						book.setAuthor( author );
+						author.getBooks().add( book );
+
+						entityManager.persist( author );
+						entityManager.persist( book );
+					}
+					entityManager.getTransaction().commit();
+				}
+			}
+			catch (RuntimeException e) {
+				entityManager.getTransaction().rollback();
+				throw e;
+			}
+		} );
+	}
+
+	private Book newBook(int id) {
+		Book book = new Book();
+		book.setId( id );
+		book.setTitle( "This is the title of book #" + id );
+		book.setPublicationYear( 1450 + id );
+		return book;
+	}
+
+	protected Author newAuthor(int id) {
+		Author author = new Author();
+		author.setId( id );
+		author.setFirstName( "John" + id );
+		author.setLastName( "Smith" + id );
+		author.setBirthDate( LocalDate.ofYearDay( 1450 + id, 33 ) );
+		return author;
+	}
+}
