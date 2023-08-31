@@ -481,9 +481,17 @@ stage('Default build') {
 stage('Non-default environments') {
 	Map<String, Closure> executions = [:]
 
+	Closure addExecution = { String tag, Closure execution ->
+		executions.put( tag, {
+			// This nested stage is necessary to be able to mark a single parallel execution as skipped
+			// See https://stackoverflow.com/a/59210261/6692043
+			stage( tag, execution )
+		} )
+	}
+
 	// Test with multiple JDKs
 	environments.content.jdk.enabled.each { JdkBuildEnvironment buildEnv ->
-		executions.put(buildEnv.tag, {
+		addExecution(buildEnv.tag, {
 			runBuildOnNode {
 				withMavenWorkspace {
 					// Re-run integration tests against the JARs produced by the default build,
@@ -496,7 +504,7 @@ stage('Non-default environments') {
 
 	// Build with different compilers
 	environments.content.compiler.enabled.each { CompilerBuildEnvironment buildEnv ->
-		executions.put(buildEnv.tag, {
+		addExecution(buildEnv.tag, {
 			runBuildOnNode {
 				withMavenWorkspace {
 					// NOTE: we are not relying on incremental build in this case as
@@ -513,7 +521,7 @@ stage('Non-default environments') {
 
 	// Test ORM integration with multiple databases
 	environments.content.database.enabled.each { DatabaseBuildEnvironment buildEnv ->
-		executions.put(buildEnv.tag, {
+		addExecution(buildEnv.tag, {
 			runBuildOnNode(NODE_PATTERN_BASE, [time: buildEnv.slow ? 2 : 1, unit: 'HOURS']) {
 				withMavenWorkspace {
 					def artifactsToTest = ['hibernate-search-mapper-orm']
@@ -575,7 +583,7 @@ stage('Non-default environments') {
 
 	// Test Elasticsearch integration with multiple versions in a local instance
 	environments.content.localElasticsearch.enabled.each { LocalElasticsearchBuildEnvironment buildEnv ->
-		executions.put(buildEnv.tag, {
+		addExecution(buildEnv.tag, {
 			runBuildOnNode {
 				withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
@@ -601,7 +609,7 @@ stage('Non-default environments') {
 				throw new IllegalStateException("Missing AWS credentials")
 			}
 		}
-		executions.put(buildEnv.tag, {
+		addExecution(buildEnv.tag, {
 			lock(label: buildEnv.lockedResourcesLabel, variable: 'LOCKED_RESOURCE_URI') {
 				runBuildOnNode(NODE_PATTERN_BASE + '&&AWS') {
 					if (awsCredentialsId == null) {
