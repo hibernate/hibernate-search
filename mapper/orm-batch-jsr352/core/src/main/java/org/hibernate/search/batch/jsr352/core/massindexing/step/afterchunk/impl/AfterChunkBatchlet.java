@@ -55,7 +55,8 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 			BatchMappingContext mappingContext = (BatchMappingContext) Search.mapping( emf );
 			PojoScopeWorkspace workspace = mappingContext.scope( Object.class ).pojoWorkspace( tenantId );
 			Futures.unwrappedExceptionJoin( workspace.mergeSegments( OperationSubmitter.blocking(),
-					serializedMergeSegmentsOnFinish != null ? UnsupportedOperationBehavior.FAIL
+					serializedMergeSegmentsOnFinish != null
+							? UnsupportedOperationBehavior.FAIL
 							: UnsupportedOperationBehavior.IGNORE ) );
 		}
 		return null;

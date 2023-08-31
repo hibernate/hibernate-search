@@ -40,8 +40,8 @@ public class PojoScopeWorkspaceImpl implements PojoScopeWorkspace {
 	public CompletableFuture<?> purge(Set<String> routingKeys, OperationSubmitter operationSubmitter,
 			UnsupportedOperationBehavior unsupportedOperationBehavior) {
 		return doOperationOnTypes(
-				(indexWorkspace, submitter, unsupportedBehavior) ->
-						indexWorkspace.purge( routingKeys, submitter, unsupportedBehavior ),
+				(indexWorkspace, submitter, unsupportedBehavior) -> indexWorkspace.purge( routingKeys, submitter,
+						unsupportedBehavior ),
 				operationSubmitter, unsupportedOperationBehavior );
 	}
 

@@ -208,7 +208,8 @@ public class ElasticsearchVersionTest {
 
 	@Test
 	public void exactMatch_amazonOpensearchServerless() {
-		assertMatch( "amazon-opensearch-serverless", ElasticsearchDistributionName.AMAZON_OPENSEARCH_SERVERLESS, null ).isTrue();
+		assertMatch( "amazon-opensearch-serverless", ElasticsearchDistributionName.AMAZON_OPENSEARCH_SERVERLESS, null )
+				.isTrue();
 	}
 
 	@Test

@@ -1048,6 +1048,15 @@
                         <skip>${format.skip}</skip>
                         <removeTrailingWhitespace>true</removeTrailingWhitespace>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>code-formatting</id>
+                            <goals>
+                                <goal>${goal.formatter-maven-plugin}</goal>
+                            </goals>
+                            <phase>process-sources</phase>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.eclipse.sisu</groupId>

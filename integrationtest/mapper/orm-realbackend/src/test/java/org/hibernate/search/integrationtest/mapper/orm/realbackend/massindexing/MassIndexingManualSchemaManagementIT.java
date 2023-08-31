@@ -81,8 +81,8 @@ public class MassIndexingManualSchemaManagementIT {
 			catch (InterruptedException e) {
 				fail( "Unexpected InterruptedException: " + e.getMessage() );
 			}
-			setupHelper.assertions().searchAfterIndexChangesAndPotentialRefresh( () ->
-					assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) )
+			setupHelper.assertions().searchAfterIndexChangesAndPotentialRefresh(
+					() -> assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) )
 							.isEqualTo( NUMBER_OF_BOOKS ) );
 		} );
 	}
@@ -103,8 +103,8 @@ public class MassIndexingManualSchemaManagementIT {
 			catch (InterruptedException e) {
 				fail( "Unexpected InterruptedException: " + e.getMessage() );
 			}
-			setupHelper.assertions().searchAfterIndexChangesAndPotentialRefresh( () ->
-					assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) )
+			setupHelper.assertions().searchAfterIndexChangesAndPotentialRefresh(
+					() -> assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) )
 							.isEqualTo( NUMBER_OF_BOOKS ) );
 		} );
 	}

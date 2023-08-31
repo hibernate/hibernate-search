@@ -86,7 +86,8 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 		log.debugf( "AWS request signing is enabled [region = '%s', service = '%s', credentialsProvider = '%s'].",
 				region, service, credentialsProvider );
 
-		AwsSigningRequestInterceptor signingInterceptor = new AwsSigningRequestInterceptor( region, service, credentialsProvider );
+		AwsSigningRequestInterceptor signingInterceptor =
+				new AwsSigningRequestInterceptor( region, service, credentialsProvider );
 
 		context.clientBuilder().addInterceptorLast( signingInterceptor );
 	}
