@@ -226,6 +226,7 @@
                                 <argument>^org\.hibernate\.collection\.spi\.PersistentCollection$</argument>
                                 <argument>^org\.hibernate\.type\.spi\.TypeConfiguration$</argument>
                                 <argument>^org\.hibernate\.query\.spi\.ScrollableResultsImplementor$</argument>
+                                <argument>^org\.hibernate\.query\.spi\.QueryParameterBindingTypeResolver$</argument>
                                 <argument>^org\.hibernate\.query\.sqm\.spi\.SqmCreationContext$</argument>
                             </arguments>
                             <!--
