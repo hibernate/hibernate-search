@@ -200,6 +200,14 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		);
 	}
 
+	@Override
+	public boolean supportsHighlighterUnifiedPhraseMatching() {
+		return isActualVersion(
+				esVersion -> !esVersion.isLessThan( "8.10" ),
+				osVersion -> false
+		);
+	}
+
 	public static boolean supportsIndexClosingAndOpening() {
 		return isActualVersion(
 				// See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_7_1

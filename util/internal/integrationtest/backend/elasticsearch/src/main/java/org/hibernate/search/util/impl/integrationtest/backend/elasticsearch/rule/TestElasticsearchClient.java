@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
@@ -87,6 +88,14 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 
 	public IndexClient index(URLEncodedString primaryIndexName, URLEncodedString writeAlias, URLEncodedString readAlias) {
 		return new IndexClient( primaryIndexName, writeAlias, readAlias );
+	}
+
+	public String getActualVersion() {
+		ElasticsearchResponse response = performRequestIgnore404( ElasticsearchRequest.get().build() );
+		return response.body()
+				.getAsJsonObject( "version" )
+				.get( "number" )
+				.getAsString();
 	}
 
 	public class IndexClient {
@@ -476,6 +485,10 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 	}
 
 	public void open(TestConfigurationProvider configurationProvider) {
+		open( configurationProvider, Optional.of( ElasticsearchTestDialect.getActualVersion() ) );
+	}
+
+	public void open(TestConfigurationProvider configurationProvider, Optional<ElasticsearchVersion> elasticsearchVersion) {
 		Map<String, Object> map = new LinkedHashMap<>();
 		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( map );
 		ConfigurationPropertySource backendProperties = AllAwareConfigurationPropertySource.fromMap( map );
@@ -499,7 +512,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 						threadPoolProvider.isScheduledExecutorBlocking()
 				),
 				GsonProvider.create( GsonBuilder::new, true ),
-				Optional.of( ElasticsearchTestDialect.getActualVersion() )
+				elasticsearchVersion
 		);
 	}
 

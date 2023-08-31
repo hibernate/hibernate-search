@@ -11,23 +11,9 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ElasticsearchTestDialectVersionTest {
-
-	@BeforeClass
-	public static void beforeClass() {
-		System.setProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.distribution", "elastic" );
-		System.setProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.version", "1.1.1" );
-	}
-
-	@AfterClass
-	public static void afterClass() {
-		System.clearProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.distribution" );
-		System.clearProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.version" );
-	}
 
 	@Test
 	public void isBetween() {

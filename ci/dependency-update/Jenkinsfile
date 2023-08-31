@@ -30,6 +30,14 @@ Map settings() {
 					updateProperties: ['version.org.apache.lucene'],
 					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
 			]
+		case 'elasticsearch-latest':
+			return [
+					// There are no properties to update in this case.
+					updateProperties: [],
+					onlyRunTestDependingOn: ['hibernate-search-backend-elasticsearch'],
+					// We want to use the snapshot version of an image from the ES registry since that's where they are publishing their snapshots.
+					additionalMavenArgs: '-Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=master-SNAPSHOT'
+			]
 		default:
 			return [:]
 	}
@@ -127,7 +135,7 @@ pipeline {
 					axis {
 						name 'DEPENDENCY_UPDATE_NAME'
 						// NOTE: Remember to update the settings() method above when changing this.
-						values 'orm6.2', 'orm6.3', 'lucene9', 'lucene10'
+						values 'orm6.2', 'orm6.3', 'lucene9', 'lucene10', 'elasticsearch-latest'
 					}
 				}
 				stages {

@@ -6,12 +6,16 @@
  */
 package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect;
 
+import java.io.IOException;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
 public class ElasticsearchTestDialect {
 
@@ -29,8 +33,28 @@ public class ElasticsearchTestDialect {
 			ElasticsearchDistributionName distribution =
 					ElasticsearchDistributionName.of( System.getProperty(
 							"org.hibernate.search.integrationtest.backend.elasticsearch.distribution" ) );
-			String versionString = System.getProperty(
-					"org.hibernate.search.integrationtest.backend.elasticsearch.version" );
+			String versionString = "";
+
+			if ( distribution != ElasticsearchDistributionName.AMAZON_OPENSEARCH_SERVERLESS ) {
+				try ( TestElasticsearchClient client = new TestElasticsearchClient() ) {
+					client.open( new TestConfigurationProvider(), Optional.empty() );
+					versionString = client.getActualVersion();
+					if ( versionString != null ) {
+						// If we got a snapshot version back from the actual cluster we want to drop that qualifier part of version.
+						// Qualifiers are not allowed when comparing versions with a comparator from this class
+						// (see this#compare(ElasticsearchVersion a, ElasticsearchVersion b, int defaultInt)).
+						int dashIndex = versionString.indexOf( '-' );
+						if ( dashIndex > -1 ) {
+							versionString = versionString.substring( 0, dashIndex );
+						}
+					}
+				}
+				catch (IOException e) {
+					throw new IllegalStateException(
+							"Wasn't able to detect the actual version of " + distribution.toString() + "cluster", e );
+				}
+			}
+
 			actualVersion = ElasticsearchVersion.of( distribution, versionString.isBlank() ? null : versionString );
 		}
 		return actualVersion;
