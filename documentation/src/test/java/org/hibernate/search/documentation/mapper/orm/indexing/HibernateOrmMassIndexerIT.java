@@ -68,7 +68,7 @@ public class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingI
 				massIndexer.type( Author.class ).reindexOnly( "e.birthDate < :birthDate" ) // <4>
 						.param( "birthDate", LocalDate.ofYearDay( 2100, 77 ) ); // <5>
 				// end::reindexOnly[]
-				if ( ! BackendConfigurations.simple().supportsExplicitPurge() ) {
+				if ( !BackendConfigurations.simple().supportsExplicitPurge() ) {
 					massIndexer.purgeAllOnStart( false );
 				}
 				// tag::reindexOnly[]

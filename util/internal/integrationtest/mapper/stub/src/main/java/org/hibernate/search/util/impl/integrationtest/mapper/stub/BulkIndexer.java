@@ -128,8 +128,8 @@ public class BulkIndexer {
 					mappingContext,
 					asSetIgnoreNull( tenantId )
 			);
-			future = future.thenCompose( ignored ->
-					workspace.refresh( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL ) );
+			future = future.thenCompose(
+					ignored -> workspace.refresh( OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL ) );
 		}
 		return future;
 	}

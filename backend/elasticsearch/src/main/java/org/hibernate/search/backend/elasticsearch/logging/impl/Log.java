@@ -822,7 +822,8 @@ public interface Log extends BasicLogger {
 	SearchException unableToFetchElasticsearchVersion(String versionConfigPropertyKey,
 			ElasticsearchVersion expectedAWSOpenSearchServerlessVersion);
 
-	@Message(id = ID_OFFSET + 174, value = "Cannot check the Elasticsearch version because the targeted Elasticsearch distribution '%s' does not expose its version.")
+	@Message(id = ID_OFFSET + 174,
+			value = "Cannot check the Elasticsearch version because the targeted Elasticsearch distribution '%s' does not expose its version.")
 	SearchException cannotCheckElasticsearchVersion(ElasticsearchDistributionName distributionName);
 
 	@Message(id = ID_OFFSET + 175,
@@ -832,8 +833,9 @@ public interface Log extends BasicLogger {
 	SearchException unexpectedAwsOpenSearchServerlessVersion(ElasticsearchVersion configuredVersion,
 			ElasticsearchVersion expectedAWSOpenSearchServerlessVersion);
 
-	@Message(id = ID_OFFSET + 176, value = "Cannot execute '%s' because Amazon OpenSearch Serverless does not support this operation."
-			+ " Either avoid this operation or switch to another Elasticsearch/OpenSearch distribution.")
+	@Message(id = ID_OFFSET + 176,
+			value = "Cannot execute '%s' because Amazon OpenSearch Serverless does not support this operation."
+					+ " Either avoid this operation or switch to another Elasticsearch/OpenSearch distribution.")
 	SearchException cannotExecuteOperationOnAmazonOpenSearchServerless(String operation);
 
 	@Message(id = ID_OFFSET + 177, value = "The targeted Elasticsearch cluster does not expose index status,"

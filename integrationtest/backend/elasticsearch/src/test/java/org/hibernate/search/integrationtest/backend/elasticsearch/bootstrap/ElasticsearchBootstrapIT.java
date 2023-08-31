@@ -227,7 +227,7 @@ public class ElasticsearchBootstrapIT {
 					+ actualVersion.majorOptional().getAsInt();
 			incompatibleConfiguredVersionOnBackendStart = actualVersion.distribution() + ":"
 					+ ( actualVersion.majorOptional().getAsInt() == 2 ? "42." : "2." ) + actualVersion.minor()
-					.getAsInt();
+							.getAsInt();
 		}
 		else {
 			// This should only happen when testing Amazon OpenSearch Serverless
@@ -264,7 +264,8 @@ public class ElasticsearchBootstrapIT {
 										+ incompatibleConfiguredVersionOnBackendStart + "'",
 								"Incompatible Elasticsearch version:"
 										+ " version '" + incompatibleConfiguredVersionOnBackendStart
-										+ "' does not match version '" + configuredVersionOnBackendCreation + "' that was provided"
+										+ "' does not match version '" + configuredVersionOnBackendCreation
+										+ "' that was provided"
 										+ " when the backend was created.",
 								"You can provide a more precise version on startup,"
 										+ " but you cannot override the version that was provided when the backend was created." )
@@ -376,7 +377,8 @@ public class ElasticsearchBootstrapIT {
 	private void checkAmazonOpenSearchServerless() {
 		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
 		if ( actualVersion.distribution() != ElasticsearchDistributionName.AMAZON_OPENSEARCH_SERVERLESS ) {
-			throw new IllegalStateException( "Unexpected actual Elasticsearch version: " + actualVersion + ". Tests are buggy?" );
+			throw new IllegalStateException(
+					"Unexpected actual Elasticsearch version: " + actualVersion + ". Tests are buggy?" );
 		}
 	}
 
