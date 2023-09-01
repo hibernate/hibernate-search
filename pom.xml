@@ -269,7 +269,7 @@
         <version.javax.persistence>2.2</version.javax.persistence>
         <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>1.1.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>
         <version.javax.enterprise>2.0</version.javax.enterprise>
-        <version.net.bytebuddy>1.12.9</version.net.bytebuddy>
+        <version.net.bytebuddy>1.12.18</version.net.bytebuddy>
 
         <!-- >>> ORM 5 with Jakarta Persistence -->
         <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM 5 -jakarta artifacts.
