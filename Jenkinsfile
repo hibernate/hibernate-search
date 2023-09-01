@@ -530,7 +530,6 @@ stage('Non-default environments') {
 					// so we skip them.
 					String mavenBuildAdditionalArgs = ''' \
 							-pl !documentation \
-							-pl !integrationtest/mapper/orm-spring \
 							-pl !integrationtest/mapper/orm-batch-jsr352 \
 							-pl !integrationtest/v5migrationhelper/orm \
 							-pl !integrationtest/java/modules/orm-lucene \
