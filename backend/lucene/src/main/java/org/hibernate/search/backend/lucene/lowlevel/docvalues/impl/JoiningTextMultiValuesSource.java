@@ -35,7 +35,7 @@ public abstract class JoiningTextMultiValuesSource extends TextMultiValuesSource
 
 	protected final NestedDocsProvider nestedDocsProvider;
 
-	public JoiningTextMultiValuesSource(NestedDocsProvider nestedDocsProvider) {
+	protected JoiningTextMultiValuesSource(NestedDocsProvider nestedDocsProvider) {
 		this.nestedDocsProvider = nestedDocsProvider;
 	}
 
@@ -84,15 +84,12 @@ public abstract class JoiningTextMultiValuesSource extends TextMultiValuesSource
 					return hasNextValue();
 				}
 
-				currentParentDoc = parentDoc;
-				nextOrd = NO_MORE_ORDS; // To be set in the next call to hasNextValue()
-
 				return childDocsWithValues.advanceExactParent( parentDoc );
 			}
 
 			@Override
 			public boolean hasNextValue() throws IOException {
-				if ( nextOrd != NO_MORE_ORDS ) {
+				if ( super.hasNextValue() ) {
 					return true;
 				}
 
@@ -101,7 +98,6 @@ public abstract class JoiningTextMultiValuesSource extends TextMultiValuesSource
 					return true;
 				}
 				else {
-					nextOrd = NO_MORE_ORDS;
 					return false;
 				}
 			}

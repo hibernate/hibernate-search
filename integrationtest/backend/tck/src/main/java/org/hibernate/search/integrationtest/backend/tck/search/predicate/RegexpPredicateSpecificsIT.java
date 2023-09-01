@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.Collections;
 import java.util.function.Function;
@@ -164,6 +165,10 @@ public class RegexpPredicateSpecificsIT {
 
 	@Test
 	public void flag_complement() {
+		assumeTrue(
+				"Lucene 10 does not have a `COMPLEMENT` flag. ",
+				TckConfiguration.get().getBackendFeatures().supportsComplementRegexFlag()
+		);
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().complementField.relativeFieldName;
 
@@ -207,6 +212,10 @@ public class RegexpPredicateSpecificsIT {
 
 	@Test
 	public void flag_interval() {
+		assumeTrue(
+				"Lucene 10 does not have a `COMPLEMENT` flag. ",
+				TckConfiguration.get().getBackendFeatures().supportsComplementRegexFlag()
+		);
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().intervalField.relativeFieldName;
 
@@ -235,7 +244,7 @@ public class RegexpPredicateSpecificsIT {
 		assertThatQuery( scope.query()
 				.where( f -> f.regexp().field( absoluteFieldPath )
 						.matching( TEXT_INTERVAL )
-						.flags( RegexpQueryFlag.COMPLEMENT, RegexpQueryFlag.INTERVAL, RegexpQueryFlag.ANY_STRING )
+						.flags( RegexpQueryFlag.INTERVAL, RegexpQueryFlag.ANY_STRING )
 				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
 
@@ -243,7 +252,7 @@ public class RegexpPredicateSpecificsIT {
 		assertThatQuery( scope.query()
 				.where( f -> f.regexp().field( absoluteFieldPath )
 						.matching( TEXT_INTERVAL )
-						.flags( RegexpQueryFlag.COMPLEMENT, RegexpQueryFlag.INTERSECTION, RegexpQueryFlag.ANY_STRING )
+						.flags( RegexpQueryFlag.INTERSECTION, RegexpQueryFlag.ANY_STRING )
 				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
@@ -278,7 +287,7 @@ public class RegexpPredicateSpecificsIT {
 		assertThatQuery( scope.query()
 				.where( f -> f.regexp().field( absoluteFieldPath )
 						.matching( TEXT_INTERSECTION )
-						.flags( RegexpQueryFlag.COMPLEMENT, RegexpQueryFlag.INTERVAL, RegexpQueryFlag.INTERSECTION )
+						.flags( RegexpQueryFlag.INTERVAL, RegexpQueryFlag.INTERSECTION )
 				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
 
@@ -286,7 +295,7 @@ public class RegexpPredicateSpecificsIT {
 		assertThatQuery( scope.query()
 				.where( f -> f.regexp().field( absoluteFieldPath )
 						.matching( TEXT_INTERSECTION )
-						.flags( RegexpQueryFlag.COMPLEMENT, RegexpQueryFlag.INTERVAL, RegexpQueryFlag.ANY_STRING )
+						.flags( RegexpQueryFlag.INTERVAL, RegexpQueryFlag.ANY_STRING )
 				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
@@ -329,7 +338,7 @@ public class RegexpPredicateSpecificsIT {
 		assertThatQuery( scope.query()
 				.where( f -> f.regexp().field( absoluteFieldPath )
 						.matching( TEXT_ANYSTRING )
-						.flags( RegexpQueryFlag.COMPLEMENT, RegexpQueryFlag.INTERVAL, RegexpQueryFlag.INTERSECTION )
+						.flags( RegexpQueryFlag.INTERVAL, RegexpQueryFlag.INTERSECTION )
 				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
