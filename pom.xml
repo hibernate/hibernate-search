@@ -300,7 +300,7 @@
         <version.jakarta.interceptor-api>2.0.1</version.jakarta.interceptor-api>
         <version.jakarta.enterprise>3.0.1</version.jakarta.enterprise>
         <version.jakarta.xml.bind>4.0.0</version.jakarta.xml.bind>
-        <version.net.bytebuddy.orm6>1.12.22</version.net.bytebuddy.orm6>
+        <version.net.bytebuddy.orm6>1.14.7</version.net.bytebuddy.orm6>
 
         <!-- >>> JSR 352 -->
         <version.javax.batch>1.0.1</version.javax.batch>
