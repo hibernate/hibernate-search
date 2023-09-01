@@ -261,7 +261,7 @@
         <version.net.bytebuddy>${version.net.bytebuddy.orm6}</version.net.bytebuddy>
 
         <!-- >>> ORM 6 with Jakarta Persistence -->
-        <version.org.hibernate.orm>6.2.7.Final</version.org.hibernate.orm>
+        <version.org.hibernate.orm>6.2.8.Final</version.org.hibernate.orm>
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
         <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM 6.
@@ -277,7 +277,7 @@
         <version.jakarta.interceptor-api>2.0.1</version.jakarta.interceptor-api>
         <version.jakarta.enterprise>3.0.1</version.jakarta.enterprise>
         <version.jakarta.xml.bind>4.0.0</version.jakarta.xml.bind>
-        <version.net.bytebuddy.orm6>1.12.18</version.net.bytebuddy.orm6>
+        <version.net.bytebuddy.orm6>1.14.7</version.net.bytebuddy.orm6>
 
         <!-- >>> JSR 352 -->
         <version.jakarta.batch>2.1.1</version.jakarta.batch>
