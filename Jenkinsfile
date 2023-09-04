@@ -628,8 +628,7 @@ stage('Non-default environments') {
 								mavenNonDefaultBuild buildEnv, """ \
 										--fail-fast \
 										-pl ${[
-											'org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch',
-											'org.hibernate.search:hibernate-search-integrationtest-showcase-library'
+											'org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch'
 											 ].join(',')} \
 										-Dtest.elasticsearch.distribution=$buildEnv.distribution \
 										-Dtest.elasticsearch.version=$buildEnv.version \
@@ -669,7 +668,7 @@ stage('Non-default environments') {
 								retry(count: 3) {
 									mavenNonDefaultBuild buildEnv, """ \
 										--fail-fast \
-										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
+										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch \
 										-Dtest.elasticsearch.distribution=$buildEnv.distribution \
 										-Dtest.elasticsearch.version=$buildEnv.version \
 										-Dtest.elasticsearch.connection.uris=$env.LOCKED_RESOURCE_URI \
