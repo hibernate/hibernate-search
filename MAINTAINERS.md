@@ -103,22 +103,25 @@ have not been kept up-to-date, and might need a refresh.
 
 * Check that everything has been pushed to the upstream repository.
 * Check that the CI job for the branch you want to release is green.
-* Check there are no outstanding issues in JIRA.
+* Check Jira:
+  * Check there are no outstanding issues assigned to the release.
+  * Check there are no resolved/closed issues in the current `*-backlog` "version";
+    if there are, you might want to assign them to your release.
 * **If it's a `.CR` or `.Final` release**:
   * Check that the [migration guide](documentation/src/main/asciidoc/migration/index.adoc) is up to date.
     In particular, check the git history for API/SPI changes
     and document them in the migration guide.
 * If you **added a new Maven module** that should be included in the distribution,
   **check that it has been included in the distribution** (javadoc and ZIP distribution).
-  * `mvn clean install -Pdocumentation-pdf,dist`
-  * Check the distribution package as built by Maven (distribution/target/hibernate-search-<version>-dist).
+  * `mvn clean install -Pdocumentation-pdf,dist -DskipTests`
+  * Check the distribution package as built by Maven (`distribution/target/hibernate-search-<version>-dist`).
     In particular, check the jar files in the subdirectories:
     * `lib/required`
     * `lib/optional`
     * `lib/provided`
 
     They should contain the appropriate dependencies, without duplicates.
-    The creation of these directories is driven by the assembly plugin (distribution/src/main/assembly/dist.xml)
+    The creation of these directories is driven by the assembly plugin (`distribution/src/main/assembly/dist.xml`)
     which is very specific and might break with the inclusion of new dependencies.
 
 ### Performing the release
@@ -136,13 +139,15 @@ and the documentation to [docs.jboss.org](https://docs.jboss.org/hibernate/searc
   * Use the "Transition" action to transition your issues from "Resolved" to "Closed".
 * Release the version on JIRA:
   * Go to [the list of releases](https://hibernate.atlassian.net/projects/HSEARCH?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page)
-  * Clock "Release" next to the version to release.
+  * Click "Release" next to the version to release.
 * Do *not* update the repository (in particular changelog.txt and README.md), 
   the release job does it for you.
 * Trigger the release on CI:
-  * Go to CI, to [the "hibernate-search" CI job](https://ci.hibernate.org/job/hibernate-search/).
+  * Go to CI, to [the "hibernate-search-release" CI job](https://ci.hibernate.org/job/hibernate-search-release/).
   * Click the "run" button (the green triangle on top of a clock, to the right) next to the branch you want to release.
   * **Be careful** when filling the form with the build parameters.
+  * Note that for new branches where the job has never run, the first run will not ask for parameters and thus will fail:
+    that's expected, just run it again.
 * Release the artifacts on the [OSSRH repository manager](https://oss.sonatype.org/#stagingRepositories).
   * Log into Nexus. The credentials can be found on Bitwarden; ask a teammate if you don't have access.
   * Click "staging repositories" to the left.
