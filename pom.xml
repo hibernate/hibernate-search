@@ -352,6 +352,8 @@
         <!-- Overridden in profiles to disable the plugin (which doesn't have a 'skip' property...) -->
         <injection-plugin.phase>compile</injection-plugin.phase>
 
+        <javadoc.generate.jar.phase>none</javadoc.generate.jar.phase>
+
         <!-- Test settings -->
 
         <!-- Properties overridden in profiles to disable certain tests that only work with specific Java versions -->
@@ -1392,6 +1394,10 @@
                     <value>true</value>
                 </property>
             </activation>
+            <properties>
+                <!-- We want this execution to happen before moditect (which executes at package phase) -->
+                <javadoc.generate.jar.phase>prepare-package</javadoc.generate.jar.phase>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
