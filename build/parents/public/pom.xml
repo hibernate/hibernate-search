@@ -297,6 +297,17 @@
                                 </goals>
                                 <phase>process-resources</phase>
                             </execution>
+                            <execution>
+                                <!--
+                                    This is the default name of an execution that is added automatically if release profile is enabled.
+                                    We want to "override" it so that we can control when it is actually executed.
+                                 -->
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <phase>${javadoc.generate.jar.phase}</phase>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
