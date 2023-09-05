@@ -1,6 +1,74 @@
 Hibernate Search Changelog
 ==========================
 
+7.0.0.Beta1 (2023-09-05)
+-------------------------
+
+** Bug
+    * HSEARCH-4915 Errors returned by OpenSearch/ElasticSearch not forwarded to caller
+
+** Improvement
+    * HSEARCH-4931 Upgrade to Hibernate ORM 6.3.0.Final
+    * HSEARCH-4921 Upgrade to Elasticsearch client 8.9.1 and test against Elasticsearch 8.9.1
+    * HSEARCH-4914 Handle transaction deadlocks more gracefully when retrieving outbox events (especially on CockroachDB)
+    * HSEARCH-4913 Generate module-info for `hibernate-search-mapper-orm-batch-jsr352-jberet`
+    * HSEARCH-4909 Improve documentation of outbox polling coordination configuration 
+    * HSEARCH-4908 Upgrade to Hibernate ORM 6.3.0.CR1
+    * HSEARCH-4905 Add compatibility with OpenSearch 2.9.0
+    * HSEARCH-4904 Upgrade to Elasticsearch client 8.9.0 and test against Elasticsearch 8.9.0
+    * HSEARCH-4903 Upgrade -orm6 artifacts to Hibernate ORM 6.2.7.Final
+    * HSEARCH-4902 Flatten all public POMs
+    * HSEARCH-4899 Use the links to Appendix instead of Javadocs where possible in reference documentation
+    * HSEARCH-4898 Give more context in the Hibernate Search getting started guides
+    * HSEARCH-4896 Upgrade Jackson to 2.15.0
+    * HSEARCH-4892 Upgrade to Avro 1.11.2
+    * HSEARCH-4891 Upgrade JBeret to 2.1.2.Final
+    * HSEARCH-4888 Upgrade -orm6 artifacts to Hibernate ORM 6.2.6.Final
+    * HSEARCH-4886 Upgrade to Elasticsearch client 8.8.2 and test against Elasticsearch 8.8.2
+    * HSEARCH-4859 Add a "type" parameter to APIs that retrieve a parameter of arbitrary type
+    * HSEARCH-4744 Support Jandex index reading and building for nested JARs
+    * HSEARCH-4742 Expose a way for `SearchMappingBuilder` to get properties from a file
+    * HSEARCH-4688 Upgrade to Jandex 3.0
+    * HSEARCH-4602 Upgrade to CDI 4
+    * HSEARCH-4556 Upgrade to JDK 11 as the baseline and drop JDK 8 compatibility
+    * HSEARCH-4555 Upgrade to JBoss logging 3.5.3.Final
+    * HSEARCH-4532 Switch to Hibernate ORM 6's LONG32VARBINARY type for payloads of outbox-polling entities
+    * HSEARCH-4395 Switch to ORM 6 as the default ORM version and drop support for ORM 5
+    * HSEARCH-4394 Switch to Jakarta EE as the default standard instead of Java EE
+    * HSEARCH-4393 Upgrade to Lucene 9.x
+
+** New Feature
+    * HSEARCH-4867 Experimental compatibility with Amazon OpenSearch Serverless
+    * HSEARCH-4861 Publish a Hibernate Search BOM
+    * HSEARCH-4845 Have a dedicated docvalue field for the root document id in the Lucene backend's document
+
+** Remove Feature
+    * HSEARCH-4868 Drop compatibility with Elasticsearch 5.x/6.x
+
+** Task
+    * HSEARCH-4926 Improve casts in HashTable
+    * HSEARCH-4925 Improve documentation of Elasticsearch/OpenSearch compatibility
+    * HSEARCH-4924 Use gitflow incremental builder for pull request builds
+    * HSEARCH-4917 Split dependabot configuration for build (plugins, ...)/test dependencies and runtime (public) dependencies
+    * HSEARCH-4916 Test against latest OpenSearch 1.3.12
+    * HSEARCH-4912 Use Maven 3.9.4 in CI builds and as a required minimum version for the build
+    * HSEARCH-4910 Investigate slow startup of Elasticsearch container in integration tests
+    * HSEARCH-4907 Fix links and formatting in the migration guide
+    * HSEARCH-4906 Test against latest Elasticsearch 7.17.12
+    * HSEARCH-4901 Use `element-list` along side `package-list` for javadoc links
+    * HSEARCH-4900 Create a custom enforcer rule to check that all dependencies of published modules are listed in a BOM
+    * HSEARCH-4897 Allow providing configuration defaults for every backend through SPI
+    * HSEARCH-4894 Fix timeouts on CockroachDB test runs
+    * HSEARCH-4890 Adapt calls to RootGraph#appliesTo() to Hibernate ORM 6.3
+    * HSEARCH-4889 Forbid usage of internal/incubating Hibernate ORM code (API/SPI/...)
+    * HSEARCH-4887 Test against latest Elasticsearch 7.17.11
+    * HSEARCH-4885 Test against latest OpenSearch 1.3.11
+    * HSEARCH-4816 Document @IndexedEmbedded#includeEmbeddedObjectId
+    * HSEARCH-4805 Remove workarounds related to HHH-15604/HHH-16209 from tests
+    * HSEARCH-4787 Upgrade to Mockito 5
+    * HSEARCH-4755 Upgrade to Spring Boot 3 for -orm6 artifacts
+    * HSEARCH-4699 Rely on Hibernate ORM's BOM (hibernate-platform) to align on ORM's version of dependencies
+
 6.2.0.CR1 (2023-06-26)
 -------------------------
 
