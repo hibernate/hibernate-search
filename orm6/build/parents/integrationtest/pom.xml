@@ -341,7 +341,7 @@
         <profile>
             <id>ci-cockroachdb</id>
             <properties>
-                <db.dialect>org.hibernate.dialect.CockroachDBDialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.CockroachDialect</db.dialect>
             </properties>
         </profile>
     </profiles>
