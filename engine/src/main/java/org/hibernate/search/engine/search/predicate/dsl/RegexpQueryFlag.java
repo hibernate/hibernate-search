@@ -10,7 +10,9 @@ public enum RegexpQueryFlag {
 
 	/**
 	 * Enables {@code COMPLEMENT} operator ({@code ~})
+	 * @deprecated This flag will be removed in a future version.
 	 */
+	@Deprecated
 	COMPLEMENT,
 	/**
 	 * Enables {@code INTERVAL} operator ({@code <>})

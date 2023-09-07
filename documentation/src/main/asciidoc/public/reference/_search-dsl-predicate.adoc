@@ -662,6 +662,8 @@ The following flags/operators are available:
 For example `+a~bc+` matches `aac` but not `abc`.
 +
 Don't forget to use parentheses if you need to negate a composite pattern, e.g. `+a~(bc)+`
++
+Note this operator is deprecated and will be removed in a future version of Hibernate Search.
 * `INTERVAL`: the `<>` operator matches a non-negative integer range, both ends included.
 +
 For example `+a<1-10>+` matches `a1`, `a2`, ... `a9`, `a10`, but not `a11`.
