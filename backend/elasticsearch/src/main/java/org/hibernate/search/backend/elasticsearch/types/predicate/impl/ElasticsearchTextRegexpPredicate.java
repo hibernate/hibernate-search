@@ -113,8 +113,6 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 	 */
 	private static String getFlagName(RegexpQueryFlag flag) {
 		switch ( flag ) {
-			case COMPLEMENT:
-				return "COMPLEMENT";
 			case INTERVAL:
 				return "INTERVAL";
 			case INTERSECTION:
