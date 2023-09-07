@@ -894,7 +894,7 @@ public class PredicateDslIT {
 			hits = searchSession.search( Book.class )
 					.where( f -> f.regexp().field( "description" )
 							.matching( "r@t" )
-							.flags( RegexpQueryFlag.ANY_STRING, RegexpQueryFlag.COMPLEMENT )
+							.flags( RegexpQueryFlag.ANY_STRING )
 					)
 					.fetchHits( 20 );
 			// end::regexp-flags[]

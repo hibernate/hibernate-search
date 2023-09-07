@@ -73,9 +73,6 @@ public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPred
 
 		for ( RegexpQueryFlag operation : flags ) {
 			switch ( operation ) {
-				case COMPLEMENT:
-					flag |= RegExp.COMPLEMENT;
-					break;
 				case INTERVAL:
 					flag |= RegExp.INTERVAL;
 					break;

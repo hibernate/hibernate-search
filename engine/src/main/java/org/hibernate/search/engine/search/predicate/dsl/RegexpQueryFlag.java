@@ -9,10 +9,6 @@ package org.hibernate.search.engine.search.predicate.dsl;
 public enum RegexpQueryFlag {
 
 	/**
-	 * Enables {@code COMPLEMENT} operator ({@code ~})
-	 */
-	COMPLEMENT,
-	/**
 	 * Enables {@code INTERVAL} operator ({@code <>})
 	 */
 	INTERVAL,
