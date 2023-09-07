@@ -88,6 +88,9 @@ alter table hsearch_agent
     alter column id TYPE varchar(36) USING gen_random_uuid();
 ----
 
+NOTE: When using Hibernate ORM 6, i.e. when using `-orm6` artifacts
+the new `id` column type is `char(36)` instead of `varchar(36)`.
+
 .CockroachDB:
 [,sql]
 ----
@@ -120,6 +123,9 @@ alter table hsearch_agent
     rename column tmp to id;
 ----
 
+NOTE: When using Hibernate ORM 6, i.e. when using `-orm6` artifacts
+the new `id` column type is `char(36)` instead of `varchar(36)`.
+
 .MySQL:
 [,sql]
 ----
@@ -148,6 +154,9 @@ set id = uuid()
 where 1 = 1;
 ----
 
+NOTE: When using Hibernate ORM 6, i.e. when using `-orm6` artifacts
+the new `id` column type is `char(36)` instead of `varchar(36)`.
+
 .MariaDB:
 [,sql]
 ----
@@ -172,6 +181,9 @@ update hsearch_agent
 set id = uuid()
 where 1 = 1;
 ----
+
+NOTE: When using Hibernate ORM 6, i.e. when using `-orm6` artifacts
+the new `id` column type is `char(36)` instead of `varchar(36)`.
 
 .DB2:
 [,sql]
@@ -210,6 +222,9 @@ set id = regexp_replace(concat(rawtohex(generate_unique()), 'AAAAAA'), '([A-F0-9
 where 1 = 1;
 ----
 
+NOTE: When using Hibernate ORM 6, i.e. when using `-orm6` artifacts
+the new `id` column type is `character(36)` instead of `varchar(36)`.
+
 .Oracle:
 [,sql]
 ----
@@ -240,6 +255,9 @@ alter table hsearch_agent
 alter table hsearch_agent
     add constraint hsearch_agent_pkey primary key (id);
 ----
+
+NOTE: When using Hibernate ORM 6, i.e. when using `-orm6` artifacts
+the new `id` column type is `char(36)` instead of `varchar(36)`.
 
 .MSSQL:
 [,sql]
@@ -274,6 +292,9 @@ set id = convert(binary, newid())
 where 1 = 1;
 ----
 
+NOTE: When using Hibernate ORM 6, i.e. when using `-orm6` artifacts
+the new `id` column type is `binary(16)` instead of `binary(255)`.
+
 .H2:
 [,sql]
 ----
@@ -298,6 +319,9 @@ update hsearch_agent
 set id = random_uuid()
 where 1 = 1;
 ----
+
+NOTE: When using Hibernate ORM 6, i.e. when using `-orm6` artifacts
+the new `id` column type is `char(36)` instead of `varchar(36)`.
 
 [[configuration]]
 == Configuration changes
