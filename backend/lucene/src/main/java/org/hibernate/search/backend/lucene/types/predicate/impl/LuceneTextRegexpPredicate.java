@@ -65,6 +65,7 @@ public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPred
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	private static int toFlagsMask(Set<RegexpQueryFlag> flags) {
 		int flag = 0;
 		if ( flags == null || flags.isEmpty() ) {

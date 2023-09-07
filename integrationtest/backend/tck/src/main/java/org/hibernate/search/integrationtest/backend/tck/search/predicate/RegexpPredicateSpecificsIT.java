@@ -30,6 +30,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
+@SuppressWarnings("deprecation") // for complement operator ~
 public class RegexpPredicateSpecificsIT {
 
 	private static final String DOCUMENT_1 = "document1";

@@ -111,6 +111,7 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 	 * @param flag The flag as defined in Hibernate Search.
 	 * @return The name of this flag in Elasticsearch (might be different from flag.name()).
 	 */
+	@SuppressWarnings("deprecation")
 	private static String getFlagName(RegexpQueryFlag flag) {
 		switch ( flag ) {
 			case COMPLEMENT:

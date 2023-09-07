@@ -877,6 +877,7 @@ public class PredicateDslIT {
 		} );
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void regexp() {
 		withinSearchSession( searchSession -> {
