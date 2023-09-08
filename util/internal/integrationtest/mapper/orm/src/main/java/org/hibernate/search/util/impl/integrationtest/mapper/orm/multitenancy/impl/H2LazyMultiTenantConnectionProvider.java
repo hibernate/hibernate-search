@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl;
 import org.hibernate.engine.jdbc.connections.spi.AbstractMultiTenantConnectionProvider;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 import org.hibernate.search.util.common.impl.Closer;
@@ -18,11 +17,15 @@ import org.hibernate.service.spi.Stoppable;
 
 import org.hibernate.testing.env.ConnectionProviderBuilder;
 
+import org.jboss.logging.Logger;
+
 public class H2LazyMultiTenantConnectionProvider extends AbstractMultiTenantConnectionProvider
 		implements Stoppable {
 
+	private static final Logger log = Logger.getLogger( H2LazyMultiTenantConnectionProvider.class.getName() );
+
 	private final String[] tenantIds;
-	private final Map<String, DriverManagerConnectionProviderImpl> delegates = new HashMap<>();
+	private final Map<String, ConnectionProvider> delegates = new HashMap<>();
 
 	public H2LazyMultiTenantConnectionProvider(String[] tenantIds) {
 		this.tenantIds = tenantIds;
@@ -31,7 +34,15 @@ public class H2LazyMultiTenantConnectionProvider extends AbstractMultiTenantConn
 	@Override
 	public void stop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( DriverManagerConnectionProviderImpl::stop, delegates.values() );
+			for ( ConnectionProvider connectionProvider : delegates.values() ) {
+				if ( connectionProvider instanceof Stoppable ) {
+					closer.push( Stoppable::stop, ( (Stoppable) connectionProvider ) );
+				}
+				else {
+					log.warn( "Connection provider " + connectionProvider
+							+ " does not implement Stoppable. This provider will not be stopped." );
+				}
+			}
 		}
 	}
 
@@ -43,20 +54,19 @@ public class H2LazyMultiTenantConnectionProvider extends AbstractMultiTenantConn
 
 	@Override
 	public ConnectionProvider selectConnectionProvider(String tenantIdentifier) {
-		DriverManagerConnectionProviderImpl connectionProviderImpl = getOrCreateDelegates().get( tenantIdentifier );
+		ConnectionProvider connectionProviderImpl = getOrCreateDelegates().get( tenantIdentifier );
 		if ( connectionProviderImpl == null ) {
 			throw new HibernateException( "Unknown tenant identifier" );
 		}
 		return connectionProviderImpl;
 	}
 
-	private Map<String, DriverManagerConnectionProviderImpl> getOrCreateDelegates() {
+	private Map<String, ConnectionProvider> getOrCreateDelegates() {
 		if ( !delegates.isEmpty() ) {
 			return delegates;
 		}
 		for ( String tenantId : tenantIds ) {
-			DriverManagerConnectionProviderImpl connectionProvider =
-					ConnectionProviderBuilder.buildConnectionProvider( tenantId );
+			ConnectionProvider connectionProvider = ConnectionProviderBuilder.buildConnectionProvider( tenantId );
 			delegates.put( tenantId, connectionProvider );
 		}
 		return delegates;
