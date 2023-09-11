@@ -287,8 +287,8 @@ The configuration properties are backward-compatible with Hibernate Search {hibe
 [[api]]
 == API changes
 
-The https://hibernate.org/community/compatibility-policy/#code-categorization[API]
-is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+The complement operator (`~`) used for link:{hibernateSearchDocUrl}#search-dsl-predicate-regexp-flags[matching regular expression patterns with flags]
+is now removed with no alternative to replace it.
 
 [[spi]]
 == SPI changes
