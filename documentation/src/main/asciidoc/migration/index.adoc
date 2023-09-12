@@ -385,6 +385,8 @@ use the (more flexible) syntax `f.composite().from(<some projection>, <some proj
 * `SearchSession#automaticIndexingSynchronizationStrategy(..)` and related `AutomaticIndexingSynchronizationStrategy`/`AutomaticIndexingSynchronizationConfigurationContext`/`AutomaticIndexingSynchronizationStrategyNames`:
 use `SearchSession#indexingPlanSynchronizationStrategy(..)` and `IndexingPlanSynchronizationStrategy`/`IndexingPlanSynchronizationStrategyConfigurationContext`/`IndexingPlanSynchronizationStrategyNames` instead.
 Note the new API is still incubating and might change.
+* The complement operator (`~`) used for link:{hibernateSearchDocUrl}#search-dsl-predicate-regexp-flags[matching regular expression patterns with flags]
+is now deprecated for removal with no alternative to replace it.
 
 [[spi]]
 == SPI changes
