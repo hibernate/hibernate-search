@@ -99,19 +99,6 @@ Other databases:
 * MSSQL: no migration required. Type of the `payload` is `varbinary(max)` in both cases.
 * H2: no migration required. Type of the `payload` is `blob` in both cases.
 
-[NOTE]
-====
-In case database migration cannot be performed immediately when upgrading to a new version of Hibernate Search,
-a pair of configuration properties is available:
-[source]
-----
-hibernate.search.coordination.entity.mapping.agent.payload_type=materialized_blob
-hibernate.search.coordination.entity.mapping.outboxevent.payload_type=materialized_blob
-----
-Keep in mind that these properties are temporary, to help with the migration,
-and will be removed in the future versions of Hibernate Search.
-====
-
 If you were using Hibernate Search 6.2 with Hibernate ORM 5, i.e. using regular Hibernate Search artifacts and not `-orm6`/`-jakarta` ones
 this upgrade will also mean the upgrade of Hibernate ORM to 6.3. Doing so will lead to a potential type mismatch when using Hibernate ORM's schema validation.
 To prevent that, `id` column types can be updated from `varchar` to `char` where applicable.

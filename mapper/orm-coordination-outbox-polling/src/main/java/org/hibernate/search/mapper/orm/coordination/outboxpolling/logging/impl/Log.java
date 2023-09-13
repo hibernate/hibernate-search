@@ -199,12 +199,6 @@ public interface Log extends BasicLogger {
 			+ " Valid names are: %2$s.")
 	SearchException invalidPayloadTypeName(String name, List<String> values);
 
-	@LogMessage(level = WARN)
-	@Message(id = ID_OFFSET + 33,
-			value = "Configuration property `%1$s` is deprecated and will be removed in the future versions of Hibernate Search."
-					+ " This property is only to help with the schema migration and should not be used as a long term solution.")
-	void usingDeprecatedPayloadTypeConfigurationProperty(String configurationProperty);
-
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 34,
 			// Warning: we check that this message does NOT appear in logs in some tests.
