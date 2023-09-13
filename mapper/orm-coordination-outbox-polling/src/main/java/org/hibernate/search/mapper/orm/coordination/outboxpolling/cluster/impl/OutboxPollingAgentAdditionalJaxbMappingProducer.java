@@ -23,9 +23,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateSearchOrmMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.PayloadType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.UuidGenerationStrategy;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.PayloadMappingUtils;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.UuidDataTypeUtils;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.spi.HibernateOrmMapperOutboxPollingSpiSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
@@ -49,8 +47,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 	@SuppressWarnings("deprecation")
 	public static final String ENTITY_DEFINITION = marshall( createMappings( "", "",
 			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_TABLE,
-			SqlTypes.CHAR, PayloadMappingUtils.payload(
-					HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_PAYLOAD_TYPE ),
+			SqlTypes.CHAR,
 			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY.strategy(),
 			false
 	) );
@@ -91,13 +88,6 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 					.asString()
 					.build();
 
-	@SuppressWarnings("deprecation")
-	private static final OptionalConfigurationProperty<PayloadType> ENTITY_MAPPING_AGENT_PAYLOAD_TYPE =
-			ConfigurationProperty.forKey(
-					HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.ENTITY_MAPPING_AGENT_PAYLOAD_TYPE )
-					.as( PayloadType.class, PayloadType::of )
-					.build();
-
 	@Override
 	public Map<Class<?>, JaxbEntityMappings> produceMappings(ConfigurationPropertySource propertySource, Dialect dialect,
 			MetadataBuildingContext buildingContext) {
@@ -114,13 +104,11 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 						ENTITY_MAPPING_AGENT_UUID_TYPE,
 						dialect
 				) );
-		Optional<PayloadType> payloadType = ENTITY_MAPPING_AGENT_PAYLOAD_TYPE.get( propertySource );
 
 		// only allow configuring the entire mapping or table/catalog/schema/generator/datatype names
 		if ( mapping.isPresent()
 				&& ( schema.isPresent()
-						|| catalog.isPresent() || table.isPresent() || uuidStrategy.isPresent() || uuidType.isPresent()
-						|| payloadType.isPresent() ) ) {
+						|| catalog.isPresent() || table.isPresent() || uuidStrategy.isPresent() || uuidType.isPresent() ) ) {
 			throw log.agentConfigurationPropertyConflict(
 					AGENT_ENTITY_MAPPING.resolveOrRaw( propertySource ),
 					new String[] {
@@ -128,14 +116,9 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 							ENTITY_MAPPING_AGENT_CATALOG.resolveOrRaw( propertySource ),
 							ENTITY_MAPPING_AGENT_TABLE.resolveOrRaw( propertySource ),
 							ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY.resolveOrRaw( propertySource ),
-							ENTITY_MAPPING_AGENT_UUID_TYPE.resolveOrRaw( propertySource ),
-							ENTITY_MAPPING_AGENT_PAYLOAD_TYPE.resolveOrRaw( propertySource )
+							ENTITY_MAPPING_AGENT_UUID_TYPE.resolveOrRaw( propertySource )
 					}
 			);
-		}
-		if ( payloadType.isPresent() ) {
-			log.usingDeprecatedPayloadTypeConfigurationProperty(
-					ENTITY_MAPPING_AGENT_PAYLOAD_TYPE.resolveOrRaw( propertySource ) );
 		}
 
 		JaxbEntityMappings mappings;
@@ -144,11 +127,6 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 		}
 		else {
 			int resolvedUuidType = uuidType.orElseGet( () -> UuidDataTypeUtils.defaultUuidType( dialect ) );
-			@SuppressWarnings("deprecation")
-			int resolvedPayloadType = PayloadMappingUtils.payload(
-					payloadType.orElse(
-							HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_PAYLOAD_TYPE )
-			);
 			String resolvedUuidStrategy = uuidStrategy.orElse(
 					HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY )
 					.strategy();
@@ -157,7 +135,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 					schema.orElse( "" ),
 					catalog.orElse( "" ),
 					table.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_TABLE ),
-					resolvedUuidType, resolvedPayloadType, resolvedUuidStrategy,
+					resolvedUuidType, resolvedUuidStrategy,
 					isDiscriminatorMultiTenancyEnabled( buildingContext )
 			);
 		}
@@ -168,7 +146,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 	}
 
 	private static JaxbEntityMappings createMappings(String schema, String catalog,
-			String table, int resolvedUuidType, int resolvedPayloadType, String resolvedUuidStrategy,
+			String table, int resolvedUuidType, String resolvedUuidStrategy,
 			boolean tenantIdRequired) {
 		AdditionalMappingBuilder builder = new AdditionalMappingBuilder(
 				Agent.class, ENTITY_NAME )
@@ -180,7 +158,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer implements Hibernat
 				.enumAttribute( "state", null, false )
 				.attribute( "totalShardCount", null, true )
 				.attribute( "assignedShardIndex", null, true )
-				.attribute( "payload", Length.LONG32, true, resolvedPayloadType );
+				.attribute( "payload", Length.LONG32, true );
 		if ( tenantIdRequired ) {
 			builder.tenantId( "tenantId" );
 		}

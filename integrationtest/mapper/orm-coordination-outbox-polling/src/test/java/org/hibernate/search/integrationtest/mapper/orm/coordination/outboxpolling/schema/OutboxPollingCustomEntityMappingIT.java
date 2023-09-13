@@ -33,7 +33,6 @@ import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpollin
 import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.TestingOutboxPollingInternalConfigurer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.avro.impl.EventPayloadSerializationUtils;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.PayloadType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer;
@@ -50,8 +49,6 @@ import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.apache.logging.log4j.Level;
 
 public class OutboxPollingCustomEntityMappingIT {
 
@@ -390,91 +387,6 @@ public class OutboxPollingCustomEntityMappingIT {
 						"something-incompatible",
 						"Valid names are: [auto, random, time]"
 				);
-	}
-
-	@Test
-	public void validMappingWithDefaultPayloadType() {
-		testPayloadType( null );
-	}
-
-	@Test
-	public void validMappingWithExplicitDefaultPayloadType() {
-		testPayloadType( PayloadType.LONG32VARBINARY );
-	}
-
-	@Test
-	@SuppressWarnings("deprecation")
-	public void validMappingWithNonDefaultPayloadType() {
-		testPayloadType( PayloadType.MATERIALIZED_BLOB );
-	}
-
-	@SuppressWarnings("deprecation")
-	private void testPayloadType(PayloadType payloadType) {
-		KeysStatementInspector statementInspector = new KeysStatementInspector();
-
-		backendMock.expectAnySchema( IndexedEntity.INDEX );
-		OrmSetupHelper.SetupContext setupContext = ormSetupHelper.start()
-				.withProperty(
-						HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
-						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter )
-				)
-				// Allow ORM to create schema as we want to use non-default for this testcase:
-				.withProperty( "jakarta.persistence.create-database-schemas", true )
-				.withProperty( "hibernate.show_sql", true )
-				.withProperty( "hibernate.format_sql", true )
-				.withProperty( "hibernate.session_factory.statement_inspector", statementInspector );
-
-		if ( payloadType != null ) {
-			setupContext
-					.withProperty(
-							HibernateOrmMapperOutboxPollingSettings.COORDINATION_ENTITY_MAPPING_AGENT_PAYLOAD_TYPE,
-							payloadType
-					)
-					.withProperty(
-							HibernateOrmMapperOutboxPollingSettings.COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_PAYLOAD_TYPE,
-							payloadType
-					);
-			logged.expectEvent(
-					Level.WARN,
-					"Configuration property `hibernate.search.coordination.entity.mapping.outboxevent.payload_type` is deprecated and will be removed in the future versions of Hibernate Search",
-					"This property is only to help with the schema migration and should not be used as a long term solution"
-			);
-			logged.expectEvent(
-					Level.WARN,
-					"Configuration property `hibernate.search.coordination.entity.mapping.agent.payload_type` is deprecated and will be removed in the future versions of Hibernate Search",
-					"This property is only to help with the schema migration and should not be used as a long term solution"
-			);
-		}
-		sessionFactory = setupContext.setup( IndexedEntity.class );
-
-		backendMock.verifyExpectationsMet();
-
-		int id = 1;
-		with( sessionFactory ).runInTransaction( session -> {
-			IndexedEntity entity = new IndexedEntity();
-			entity.setId( id );
-			entity.setIndexedField( "value for the field" );
-			session.persist( entity );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.add( "1", f -> f.field( "indexedField", "value for the field" ) );
-		} );
-
-		await().untilAsserted( () -> {
-			with( sessionFactory ).runInTransaction( session -> {
-				assertEventPayload( session );
-				assertAgentPayload( session );
-			} );
-		} );
-		// The events were hidden until now, to ensure they were not processed in separate batches.
-		// Make them visible to Hibernate Search now.
-		eventFilter.showAllEventsUpToNow( sessionFactory );
-		eventFilter.awaitUntilNoMoreVisibleEvents( sessionFactory );
-
-		backendMock.verifyExpectationsMet();
-
-		assertThat( statementInspector.countByKey( ORIGINAL_OUTBOX_EVENT_TABLE_NAME ) ).isPositive();
-		assertThat( statementInspector.countByKey( ORIGINAL_AGENT_TABLE_NAME ) ).isPositive();
 	}
 
 	private void assertEventUUIDVersion(Session session, int expectedVersion) {

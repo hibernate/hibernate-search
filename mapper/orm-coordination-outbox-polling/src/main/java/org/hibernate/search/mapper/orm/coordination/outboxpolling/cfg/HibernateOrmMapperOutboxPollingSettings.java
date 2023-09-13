@@ -429,25 +429,6 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_UUID_TYPE;
 
 	/**
-	 * The name of the {@link org.hibernate.type.SqlTypes SQL type} used for representing the payload in the outbox event table.
-	 * <p>
-	 * Supported values are:
-	 * <ul>
-	 *     <li>{@link PayloadType#MATERIALIZED_BLOB}, used in previous versions of Hibernate Search.</li>
-	 *     <li>{@link PayloadType#LONG32VARBINARY}, the new default and the value that will be used moving forward.</li>
-	 * </ul>
-	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
-	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
-	 * <p>
-	 * The default value is {@link  Defaults#COORDINATION_ENTITY_MAPPING_AGENT_PAYLOAD_TYPE}.
-	 * @deprecated The setting is only available to help migrate existing applications to the current version of Hibernate Search.
-	 * This setting will be removed in the future releases.
-	 */
-	@Deprecated
-	public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_PAYLOAD_TYPE =
-			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_PAYLOAD_TYPE;
-
-	/**
 	 * The database catalog to use for the agent table.
 	 * <p>
 	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
@@ -508,26 +489,6 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_AGENT_UUID_TYPE;
 
 	/**
-	 * The name of the {@link org.hibernate.type.SqlTypes SQL type} used for representing the payload in the agent table.
-	 * <p>
-	 * Supported values are:
-	 * <ul>
-	 *     <li>{@link PayloadType#MATERIALIZED_BLOB}, used in previous versions of Hibernate Search.</li>
-	 *     <li>{@link PayloadType#LONG32VARBINARY}, the new default and the value that will be used moving forward.</li>
-	 * </ul>
-	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
-	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
-	 * <p>
-	 * The default value is {@link  Defaults#COORDINATION_ENTITY_MAPPING_AGENT_PAYLOAD_TYPE}.
-	 * @deprecated The setting is only available to help migrate existing applications to the current version of Hibernate Search.
-	 * This setting will be removed in the future releases.
-	 */
-	@Deprecated
-	public static final String COORDINATION_ENTITY_MAPPING_AGENT_PAYLOAD_TYPE =
-			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_AGENT_PAYLOAD_TYPE;
-
-
-	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
 	 */
 	public static final class Radicals {
@@ -573,9 +534,6 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 				COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_UUID_GEN_STRATEGY;
 		public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_UUID_TYPE =
 				COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_UUID_TYPE;
-		@Deprecated
-		public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_PAYLOAD_TYPE =
-				COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_PAYLOAD_TYPE;
 		public static final String COORDINATION_ENTITY_MAPPING_AGENT_CATALOG =
 				COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_AGENT_CATALOG;
 		public static final String COORDINATION_ENTITY_MAPPING_AGENT_SCHEMA =
@@ -586,9 +544,6 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 				COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY;
 		public static final String COORDINATION_ENTITY_MAPPING_AGENT_UUID_TYPE =
 				COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_AGENT_UUID_TYPE;
-		@Deprecated
-		public static final String COORDINATION_ENTITY_MAPPING_AGENT_PAYLOAD_TYPE =
-				COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_AGENT_PAYLOAD_TYPE;
 	}
 
 	/**
@@ -623,8 +578,6 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String ENTITY_MAPPING_AGENT_CATALOG = ENTITY_MAPPING_AGENT_PREFIX + "catalog";
 		public static final String ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY = ENTITY_MAPPING_AGENT_PREFIX + "uuid_gen_strategy";
 		public static final String ENTITY_MAPPING_AGENT_UUID_TYPE = ENTITY_MAPPING_AGENT_PREFIX + "uuid_type";
-		@Deprecated
-		public static final String ENTITY_MAPPING_AGENT_PAYLOAD_TYPE = ENTITY_MAPPING_AGENT_PREFIX + "payload_type";
 		public static final String ENTITY_MAPPING_OUTBOXEVENT_PREFIX = ENTITY_MAPPING_PREFIX + "outboxevent.";
 		public static final String ENTITY_MAPPING_OUTBOXEVENT_TABLE = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "table";
 		public static final String ENTITY_MAPPING_OUTBOXEVENT_SCHEMA = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "schema";
@@ -632,8 +585,6 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String ENTITY_MAPPING_OUTBOXEVENT_UUID_GEN_STRATEGY =
 				ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "uuid_gen_strategy";
 		public static final String ENTITY_MAPPING_OUTBOXEVENT_UUID_TYPE = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "uuid_type";
-		@Deprecated
-		public static final String ENTITY_MAPPING_OUTBOXEVENT_PAYLOAD_TYPE = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "payload_type";
 	}
 
 	/**
@@ -664,16 +615,12 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final UuidGenerationStrategy COORDINATION_ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY =
 				UuidGenerationStrategy.AUTO;
 		public static final String COORDINATION_ENTITY_MAPPING_AGENT_UUID_TYPE = "default";
-		@Deprecated
-		public static final PayloadType COORDINATION_ENTITY_MAPPING_AGENT_PAYLOAD_TYPE = PayloadType.LONG32VARBINARY;
 
 		// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
 		public static final String COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE = HSEARCH_PREFIX + "OUTBOX_EVENT";
 		public static final UuidGenerationStrategy COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_GEN_STRATEGY =
 				UuidGenerationStrategy.AUTO;
 		public static final String COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_TYPE = "default";
-		@Deprecated
-		public static final PayloadType COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_PAYLOAD_TYPE = PayloadType.LONG32VARBINARY;
 	}
 
 	/**
