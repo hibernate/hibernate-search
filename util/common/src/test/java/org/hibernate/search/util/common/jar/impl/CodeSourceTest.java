@@ -26,10 +26,12 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.function.ThrowingConsumer;
+
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
 import org.springframework.boot.loader.jar.JarFile;
 
 public class CodeSourceTest {
