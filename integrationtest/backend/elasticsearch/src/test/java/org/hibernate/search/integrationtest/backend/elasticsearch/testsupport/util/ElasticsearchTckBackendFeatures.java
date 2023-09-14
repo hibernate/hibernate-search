@@ -161,7 +161,7 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// https://github.com/elastic/elasticsearch/issues/91246
 		// Hopefully this will get fixed in a future version.
 		return isActualVersion(
-				esVersion -> !esVersion.isBetween( "7.17.7", "7.17" ) && !esVersion.isBetween( "8.5.0", "8.9.2" ),
+				esVersion -> !esVersion.isBetween( "7.17.7", "7.17" ) && !esVersion.isBetween( "8.5.0", "8.10.0" ),
 				osVersion -> true
 		);
 	}
@@ -203,7 +203,7 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	@Override
 	public boolean supportsHighlighterUnifiedPhraseMatching() {
 		return isActualVersion(
-				esVersion -> !esVersion.isLessThan( "8.10" ),
+				esVersion -> !esVersion.isAtMost( "8.9" ),
 				osVersion -> false
 		);
 	}
