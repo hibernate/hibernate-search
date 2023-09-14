@@ -45,7 +45,7 @@ public class HighlighterUnifiedIT extends AbstractHighlighterIT {
 
 	@Override
 	protected boolean supportsPhraseMatching() {
-		return false;
+		return TckConfiguration.get().getBackendFeatures().supportsHighlighterUnifiedPhraseMatching();
 	}
 
 	@Test
