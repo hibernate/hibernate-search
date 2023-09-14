@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.function.ThrowingConsumer;
 
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -389,6 +390,17 @@ public class CodeSourceTest {
 		}
 	}
 
+	@Test
+	public void initFileSystem_windowsJar() throws IOException {
+		Assume.assumeTrue(System.getProperty("os.name").toLowerCase().contains("windows"));
+		Path jarPath = createJar( root -> {
+			addMetaInfFile( root );
+			addSimpleClass( root );
+		} );
+
+		new CodeSource(jarPath.toUri().toURL()).initFileSystem(); //Not getting an exception means it works
+	}
+
 	private Path createDir(ThrowingConsumer<Path, IOException> contributor) throws IOException {
 		Path dirPath = temporaryFolder.newFolder().toPath();
 		contributor.accept( dirPath );
@@ -424,5 +436,4 @@ public class CodeSourceTest {
 	private static URLClassLoader createIsolatedClassLoader(URL jarURL) {
 		return new URLClassLoader( new URL[] { jarURL }, null );
 	}
-
 }
