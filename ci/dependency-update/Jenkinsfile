@@ -29,7 +29,9 @@ Map settings() {
 		case 'orm6.3':
 			return [
 					updateProperties: ['version.org.hibernate.orm'],
-					onlyRunTestDependingOn: ['hibernate-search-mapper-orm-orm6']
+					onlyRunTestDependingOn: ['hibernate-search-mapper-orm-orm6'],
+					// we need to recompile this module since it has incompatible return type and will result in a build error:
+					additionalMavenArgs: '-pl :hibernate-search-util-internal-integrationtest'
 			]
 		case 'orm6-in-main-code':
 			return [
