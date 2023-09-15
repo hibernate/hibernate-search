@@ -42,7 +42,7 @@ import org.apache.lucene.search.Query;
 public class LobTest extends SearchTestBase {
 
 	@Test
-	@SkipForDialect(value = { SybaseDialect.class },
+	@SkipForDialect(value = SybaseDialect.class,
 			comment = "Sybase does not support @Lob")
 	public void testCreateIndexSearchEntityWithLobField() {
 		// create and index
