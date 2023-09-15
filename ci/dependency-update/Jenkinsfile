@@ -30,8 +30,9 @@ Map settings() {
 			return [
 					updateProperties: ['version.org.hibernate.orm'],
 					onlyRunTestDependingOn: ['hibernate-search-mapper-orm-orm6'],
-					// we need to recompile this module since it has incompatible return type and will result in a build error:
-					additionalMavenArgs: '-pl :hibernate-search-util-internal-integrationtest'
+					// we need to recompile this module since it has incompatible return type and will result in a build error.
+					// Note: we *must* rebuild the `-orm6` artifact (not the regular one), since that's where the orm6 upgrade is applied:
+					additionalMavenArgs: '-pl :hibernate-search-util-internal-integrationtest-mapper-orm-orm6'
 			]
 		case 'orm6-in-main-code':
 			return [
