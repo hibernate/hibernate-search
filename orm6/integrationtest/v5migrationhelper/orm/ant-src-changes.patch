@@ -5,7 +5,7 @@ index fc90c71105..eb45ab96a2 100644
 @@ -17,8 +17,7 @@
  import org.hibernate.Session;
  import org.hibernate.Transaction;
- 
+
 -import org.hibernate.dialect.Sybase11Dialect;
 -import org.hibernate.dialect.SybaseASE15Dialect;
 +import org.hibernate.dialect.SybaseDialect;
@@ -17,7 +17,7 @@ index fc90c71105..eb45ab96a2 100644
  
  	@Test
 -	@SkipForDialect(value = { SybaseASE15Dialect.class, Sybase11Dialect.class },
-+	@SkipForDialect(value = { SybaseDialect.class },
++	@SkipForDialect(value = SybaseDialect.class,
  			comment = "Sybase does not support @Lob")
  	public void testCreateIndexSearchEntityWithLobField() {
  		// create and index
