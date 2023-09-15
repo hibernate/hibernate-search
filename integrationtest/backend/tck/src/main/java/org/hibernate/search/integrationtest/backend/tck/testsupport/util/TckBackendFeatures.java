@@ -31,10 +31,6 @@ public abstract class TckBackendFeatures implements StubMappingBackendFeatures {
 		return true;
 	}
 
-	public boolean supportsValuesForDynamicField(Class<?> javaType) {
-		return true;
-	}
-
 	public boolean projectionPreservesNulls() {
 		return true;
 	}
