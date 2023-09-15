@@ -22,8 +22,7 @@
 |
 |Elasticsearch server (for the <<backend-elasticsearch,Elasticsearch backend>>)
 |{elasticsearchCompatibleVersions}
-|Other minor versions (e.g. {elasticsearchOtherPotentiallyCompatibleVersions}) may work
-but are not given priority for bugfixes and new features.
+|Most of older minor versions (e.g. {elasticsearchOtherPotentiallyCompatibleVersions}) are not given priority for bugfixes and new features.
 |OpenSearch server (for the <<backend-elasticsearch,Elasticsearch backend>>)
 |{openSearchCompatibleVersions}
 |Other minor versions may work

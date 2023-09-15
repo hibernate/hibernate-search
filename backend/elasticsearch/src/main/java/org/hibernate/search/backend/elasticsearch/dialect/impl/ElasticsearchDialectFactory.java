@@ -78,6 +78,7 @@ public class ElasticsearchDialectFactory {
 
 	private ElasticsearchModelDialect createModelDialectElastic(ElasticsearchVersion version) {
 		OptionalInt majorOptional = version.majorOptional();
+		OptionalInt minorOptional = version.minor();
 		// The major/minor version numbers should be set at this point,
 		// because `isPreciseEnoughForModelDialect` was called
 		// to decide whether to retrieve the version from the cluster or not.
@@ -87,7 +88,7 @@ public class ElasticsearchDialectFactory {
 		}
 		int major = majorOptional.getAsInt();
 
-		if ( major < 7 ) {
+		if ( major < 7 || ( major == 7 && minorOptional.isPresent() && minorOptional.getAsInt() < 10 ) ) {
 			throw log.unsupportedElasticsearchVersion( version );
 		}
 		else if ( major == 7 ) {
@@ -100,6 +101,7 @@ public class ElasticsearchDialectFactory {
 
 	private ElasticsearchModelDialect createModelDialectOpenSearch(ElasticsearchVersion version) {
 		OptionalInt majorOptional = version.majorOptional();
+		OptionalInt minorOptional = version.minor();
 		// The major/minor version numbers should be set at this point,
 		// because `isPreciseEnoughForModelDialect` was called
 		// to decide whether to retrieve the version from the cluster or not.
@@ -109,7 +111,7 @@ public class ElasticsearchDialectFactory {
 		}
 		int major = majorOptional.getAsInt();
 
-		if ( major < 1 ) {
+		if ( major < 1 || ( major == 1 && minorOptional.isPresent() && minorOptional.getAsInt() < 3 ) ) {
 			throw log.unsupportedElasticsearchVersion( version );
 		}
 		else {
@@ -150,7 +152,7 @@ public class ElasticsearchDialectFactory {
 		int major = majorOptional.getAsInt();
 		int minor = minorOptional.getAsInt();
 
-		if ( major < 7 ) {
+		if ( major < 7 || ( major == 7 && minor < 10 ) ) {
 			throw log.unsupportedElasticsearchVersion( version );
 		}
 		else if ( major == 7 ) {
@@ -195,7 +197,7 @@ public class ElasticsearchDialectFactory {
 		int major = majorOptional.getAsInt();
 		int minor = minorOptional.getAsInt();
 
-		if ( major < 1 ) {
+		if ( major < 1 || ( major == 1 && minor < 3 ) ) {
 			throw log.unsupportedElasticsearchVersion( version );
 		}
 		else if ( major == 1 ) {

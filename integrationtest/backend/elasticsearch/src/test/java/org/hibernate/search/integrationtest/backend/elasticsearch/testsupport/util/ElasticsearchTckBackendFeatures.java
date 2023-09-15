@@ -52,22 +52,6 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
-	public boolean supportsValuesForDynamicField(Class<?> javaType) {
-		if ( BigInteger.class.equals( javaType ) ) {
-			// For some reason, ES 5.6 to 7.2 fail to index BigInteger values
-			// with "No matching token for number_type [BIG_INTEGER]".
-			// It's fixed in Elasticsearch 7.3, though.
-			return isActualVersion(
-					esVersion -> !esVersion.isLessThan( "7.3.0" ),
-					osVersion -> true
-			);
-		}
-		else {
-			return true;
-		}
-	}
-
-	@Override
 	public boolean fieldsProjectableByDefault() {
 		return true;
 	}
@@ -88,11 +72,7 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	@Override
 	public boolean supportsExistsForFieldWithoutDocValues(Class<?> fieldType) {
 		if ( GeoPoint.class.equals( fieldType ) ) {
-			// See https://github.com/elastic/elasticsearch/issues/65306
-			return isActualVersion(
-					esVersion -> esVersion.isAtMost( "7.9" ),
-					osVersion -> false
-			);
+			return false;
 		}
 		return true;
 	}
@@ -210,9 +190,8 @@ public class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
 	public static boolean supportsIndexClosingAndOpening() {
 		return isActualVersion(
-				// See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_7_1
-				// See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_7_4
-				es -> !( es.isAws() && es.isLessThan( "7.4" ) ),
+				// See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_7_10
+				es -> true,
 				// See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html#version_opensearch_1.0
 				os -> true,
 				aoss -> false
