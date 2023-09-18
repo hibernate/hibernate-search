@@ -51,13 +51,14 @@ public class CodeSourceTest {
 			addSimpleClass( root );
 		} );
 
-		try ( URLClassLoader isolatedClassLoader = createIsolatedClassLoader( dirPath.toUri().toURL() ) ) {
+		URL dirPathUrl = dirPath.toUri().toURL();
+		try ( URLClassLoader isolatedClassLoader = createIsolatedClassLoader( dirPathUrl ) ) {
 			Class<?> classInIsolatedClassLoader = isolatedClassLoader.loadClass( SimpleClass.class.getName() );
 
 			// Check preconditions: this is the situation that we want to test.
 			URL location = classInIsolatedClassLoader.getProtectionDomain().getCodeSource().getLocation();
 			assertThat( location.getProtocol() ).isEqualTo( "file" );
-			assertThat( location.toExternalForm() ).contains( dirPath.toString() );
+			assertThat( location.toExternalForm() ).contains( dirPathUrl.toString() );
 
 			// Check that the JAR can be opened and that we can access other files within it
 			try ( CodeSource codeSource = new CodeSource( location ) ) {
@@ -86,13 +87,14 @@ public class CodeSourceTest {
 			addSimpleClass( root );
 		} );
 
-		try ( URLClassLoader isolatedClassLoader = createIsolatedClassLoader( jarPath.toUri().toURL() ) ) {
+		URL jarPathUrl = jarPath.toUri().toURL();
+		try ( URLClassLoader isolatedClassLoader = createIsolatedClassLoader( jarPathUrl ) ) {
 			Class<?> classInIsolatedClassLoader = isolatedClassLoader.loadClass( SimpleClass.class.getName() );
 
 			// Check preconditions: this is the situation that we want to test.
 			URL location = classInIsolatedClassLoader.getProtectionDomain().getCodeSource().getLocation();
 			assertThat( location.getProtocol() ).isEqualTo( "file" );
-			assertThat( location.toExternalForm() ).contains( jarPath.toString() );
+			assertThat( location.toExternalForm() ).contains( jarPathUrl.toString() );
 
 			// Check that the JAR can be opened and that we can access other files within it
 			try ( CodeSource codeSource = new CodeSource( location ) ) {
@@ -130,7 +132,7 @@ public class CodeSourceTest {
 			URL location = classInIsolatedClassLoader.getProtectionDomain().getCodeSource().getLocation();
 			// For some reason the "jar" scheme gets replaced with "file"
 			assertThat( location.getProtocol() ).isEqualTo( "file" );
-			assertThat( location.toExternalForm() ).contains( jarPath.toString() );
+			assertThat( location.toExternalForm() ).contains( jarPath.toUri().toURL().toString() );
 
 			// Check that the JAR can be opened and that we can access other files within it
 			try ( CodeSource codeSource = new CodeSource( location ) ) {
