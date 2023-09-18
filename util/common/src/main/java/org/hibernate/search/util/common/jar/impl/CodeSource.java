@@ -150,7 +150,7 @@ class CodeSource implements Closeable {
 				else {
 					// The URI points to a regular file, so hopefully an actual JAR file.
 					// We'll try to open a ZIP filesystem to work on the contents of the JAR file.
-					URI jarUri = new URI( "jar:file", null, path.toString(), null );
+					URI jarUri = new URI( "jar:file", null, path.toUri().getPath(), null );
 					tryInitJarFileSystem( jarUri );
 				}
 			}
