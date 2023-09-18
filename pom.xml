@@ -1150,6 +1150,7 @@
                             <executable>echo</executable>
                             <commandlineArgs>Main code compiled with -release ${maven.compiler.release}</commandlineArgs>
                             <inheritIo>true</inheritIo>
+                            <workingDirectory>${rootProject.directory}/build/script</workingDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -1200,6 +1201,7 @@
                             <executable>echo</executable>
                             <commandlineArgs>Tests compiled with -release ${maven.compiler.testRelease}</commandlineArgs>
                             <inheritIo>true</inheritIo>
+                            <workingDirectory>${rootProject.directory}/build/script</workingDirectory>
                         </configuration>
                     </execution>
                 </executions>
