@@ -1,0 +1,76 @@
+# The main CI of Hibernate Search is https://ci.hibernate.org/job/hibernate-search/.
+# However, Hibernate Search builds run on GitHub actions regularly
+# to check that it still works and can be used in GitHub forks.
+# See https://docs.github.com/en/actions
+# for more information about GitHub actions.
+
+name: Hibernate Search GitHub Actions Build
+
+on:
+  push:
+    branches:
+      - '!3.*'
+      - '!4.*'
+      - '!5.*'
+      - '!dependabot/**'
+      - '**'
+    tags:
+      - '**'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - '!3.*'
+      - '!4.*'
+      - '!5.*'
+      # Ignore dependabot PRs that are not just about build dependencies;
+      # we'll reject such dependant PRs and send a PR ourselves.
+      - 'dependabot/maven/build-dependencies-**'
+      - '!dependabot/**'
+      - '**'
+
+concurrency:
+  group: "workflow = ${{ github.workflow }}, ref = ${{ github.event.ref }}, pr = ${{ github.event.pull_request.id }}"
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.repository != 'hibernate/hibernate-search' }}
+
+env:
+  MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end"
+jobs:
+  build:
+    name: Linux - JDK 17
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      - name: Generate .m2 cache key
+        id: m2-cache-key
+        run: |
+          echo "key=m2-cache-$(/bin/date -u "+%Y-%U")" >> $GITHUB_OUTPUT
+      - name: Cache Maven local repository
+        id: cache-maven
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          # refresh cache every week to avoid unlimited growth
+          key: ${{ steps.m2-cache-key.outputs.key }}
+      - name: Set up Maven
+        run: ./mvnw -v
+      - name: Docker cleanup
+        run: ./ci/docker-cleanup.sh
+      - name: Build and test
+        run: ./mvnw $MAVEN_ARGS install -Pjqassistant -Pdist -Pci-sources-check
+      - name: Docker cleanup
+        if: always()
+        run: ./ci/docker-cleanup.sh
+      - name: Omit produced artifacts from build cache
+        run: rm -r ~/.m2/repository/org/hibernate/search
+      - name: Upload build reports (if build failed)
+        uses: actions/upload-artifact@v3
+        if: ${{ failure() || cancelled() }}
+        with:
+          name: ${{ format('build-reports-{0}', github.job) }}
+          path: |
+            ./**/*-reports/
+          retention-days: 2
