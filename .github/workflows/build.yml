@@ -14,6 +14,7 @@ on:
       - '!3.*'
       - '!4.*'
       - '!5.*'
+      - '!6.*'
       - '!dependabot/**'
       - '**'
     tags:
@@ -24,6 +25,7 @@ on:
       - '!3.*'
       - '!4.*'
       - '!5.*'
+      - '!6.*'
       # Ignore dependabot PRs that are not just about build dependencies;
       # we'll reject such dependant PRs and send a PR ourselves.
       - 'dependabot/maven/build-dependencies-**'
@@ -63,6 +65,10 @@ jobs:
         if: "startsWith(matrix.os.runs-on, 'windows')"
         run: git config --global core.longpaths true
       - uses: actions/checkout@v4
+        with:
+          # Fetch the whole history to make sure that gitflow incremental builder
+          # can find the base commit.
+          fetch-depth: 0
       - name: Set up Java ${{ matrix.os.java.version }}
         uses: actions/setup-java@v1
         with:
@@ -79,8 +85,13 @@ jobs:
         run: ./mvnw -v
       - name: Docker cleanup
         run: ./ci/docker-cleanup.sh
-      - name: Build and test
-        run: ./mvnw $MAVEN_ARGS install -Pjqassistant -Pdist -Pci-sources-check
+      - name: Building code and running unit tests and basic checks
+        run: ./mvnw $MAVEN_ARGS install -Pjqassistant -Pdist -Pci-sources-check -DskipITs
+      - name: Running integration tests in the default environment
+        run: |
+          ./mvnw $MAVEN_ARGS verify \
+          -DskipSurefireTests -Pskip-checks -Pci-rebuild \
+          ${{ github.event.pull_request.base.ref && format('-Dincremental -Dgib.referenceBranch=refs/remotes/origin/{0}', github.event.pull_request.base.ref) || '' }}
       - name: Docker cleanup
         if: always()
         run: ./ci/docker-cleanup.sh
