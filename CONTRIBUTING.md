@@ -94,11 +94,12 @@ few prerequisite steps:
 
 * Make sure you have a [Hibernate JIRA account](https://hibernate.atlassian.net)
 * Make sure you have a [GitHub account](https://github.com/signup/free)
-* [Fork](https://help.github.com/articles/fork-a-repo/) the Hibernate Search [repository](https://github.com/hibernate/hibernate-search).
-As discussed in the linked page, this also includes:
-    * [Setting](https://help.github.com/articles/set-up-git) up your local git install
-    * Cloning your fork
-* Instruct git to ignore certain commits when using `git blame`:
+* Make sure you have [set up git locally](https://help.github.com/articles/set-up-git)
+* On Windows, run `git config --global core.longpaths true`
+so that you are able to clone the Hibernate Search repository
+* [Fork](https://help.github.com/articles/fork-a-repo/) the [Hibernate Search repository](https://github.com/hibernate/hibernate-search)
+* Instruct git to ignore certain commits when using `git blame`.
+From the directory of your local clone, run this:
 `git config blame.ignoreRevsFile .git-blame-ignore-revs`
     
 ### Development environment
