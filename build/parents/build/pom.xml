@@ -141,7 +141,7 @@
         <version.org.jboss.weld>5.1.1.Final</version.org.jboss.weld>
 
         <!-- >>> JDBC Drivers -->
-        <version.com.h2database>2.2.222</version.com.h2database>
+        <version.com.h2database>2.2.224</version.com.h2database>
         <!-- Sticking to Derby 10.15 for now since later versions require JDK 17+, and we need to test with JDK 11.
              See https://db.apache.org/derby/derby_downloads.html -->
         <version.org.apache.derby>10.15.2.0</version.org.apache.derby>
