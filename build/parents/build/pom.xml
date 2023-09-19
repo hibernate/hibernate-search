@@ -45,7 +45,6 @@
         <!-- >>> Elasticsearch -->
         <!-- The version of the Elasticsearch client used by Hibernate Search, independently of the version of the remote cluster -->
         <!-- Use the latest open-source version here. Currently, low-level clients are open-source even in 8.5+ -->
-        <!-- NOTE: when updating this version check if the Jackson version is still aligned. -->
         <version.org.elasticsearch.client>8.10.0</version.org.elasticsearch.client>
         <!-- The main compatible version of Elasticsearch, advertised by default. Used in documentation links. -->
         <!-- When updating the following version you will likely need to update the test profiles as well,
@@ -79,16 +78,7 @@
 
         <version.com.google.code.gson>2.9.1</version.com.google.code.gson>
         <version.software.amazon.awssdk>2.20.2</version.software.amazon.awssdk>
-        <!--
-            Jackson is used by
-                * the Elasticsearch REST client sniffer,
-                * avro
-                * and Wiremock
-            We want to align this version on whatever the REST client is using.
-            But because we also want to include it in the BOM to align versions, maven-enforcer-plugin will not catch that the
-            version is different from whatever version is in those mentioned libraries. So need to update it anytime we
-            are updating the Elasticsearch rest client version.
-        -->
+        <!-- Jackson: used by the Elasticsearch REST client, by Avro, by the AWS SDK and in tests (wiremock, ...) -->
         <version.com.fasterxml.jackson>2.15.2</version.com.fasterxml.jackson>
         <!-- slf4j: used by the AWS SDK -->
         <version.org.slf4j>1.7.36</version.org.slf4j>
@@ -465,12 +455,7 @@
                 </exclusions>
             </dependency>
 
-            <!--
-                We don't really use Jackson directly, but elasticsearch-rest-client-sniffer
-                To resolve dependency convergence issue between `avro` and `elasticsearch-rest-client-sniffer`
-                elasticsearch-rest-client-sniffer only has `jackson-core` while avro has all 3.
-                We want the versions of those to be aligned
-            -->
+            <!-- Jackson: used by the Elasticsearch REST client, by Avro, by the AWS SDK and in tests (wiremock, ...) -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
