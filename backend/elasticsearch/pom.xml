@@ -49,6 +49,14 @@
             <artifactId>gson</artifactId>
         </dependency>
 
+        <!-- We only depend on Jackson indirectly through the Elasticsearch client sniffer,
+             but Dependabot apparently ignores dependency management,
+             so we need this explicit dependency to have Dependabot update versions. -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.hibernate.search</groupId>
