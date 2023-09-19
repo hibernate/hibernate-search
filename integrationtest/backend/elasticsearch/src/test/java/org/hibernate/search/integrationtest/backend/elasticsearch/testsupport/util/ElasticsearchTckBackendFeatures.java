@@ -272,7 +272,7 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// https://github.com/elastic/elasticsearch/issues/91246
 		// Hopefully this will get fixed in a future version.
 		return isActualVersion(
-				esVersion -> !esVersion.isBetween( "7.17.7", "7.17" ) && !esVersion.isBetween( "8.5.0", "8.10.0" ),
+				esVersion -> !esVersion.isBetween( "7.17.7", "7.17" ) && !esVersion.isBetween( "8.5.0", "8.10.1" ),
 				osVersion -> true
 		);
 	}
