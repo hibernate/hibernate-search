@@ -73,6 +73,8 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.os.java.version }}
+      - name: Log branches
+        run: git branch -a
       # https://github.com/actions/cache/blob/main/examples.md#java---maven
       - name: Cache local Maven repository
         uses: actions/cache@v3
