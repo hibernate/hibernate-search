@@ -88,9 +88,9 @@ jobs:
       - name: Building code and running unit tests and basic checks
         run: ./mvnw $MAVEN_ARGS install -Pjqassistant -Pdist -Pci-sources-check -DskipITs
       - name: Running integration tests in the default environment
-        run: |
-          ./mvnw $MAVEN_ARGS verify \
-          -DskipSurefireTests -Pskip-checks -Pci-rebuild \
+        run: >
+          ./mvnw $MAVEN_ARGS verify
+          -DskipSurefireTests -Pskip-checks -Pci-rebuild
           ${{ github.event.pull_request.base.ref && format('-Dincremental -Dgib.referenceBranch=refs/remotes/origin/{0}', github.event.pull_request.base.ref) || '' }}
       - name: Docker cleanup
         if: always()
