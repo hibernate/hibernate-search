@@ -1045,7 +1045,6 @@
                         <!-- store outside of target to speed up formatting when mvn clean is used -->
                         <cachedir>.cache/formatter-maven-plugin-${version.formatter-maven-plugin}</cachedir>
                         <configFile>hibernate_search_style.xml</configFile>
-                        <lineEnding>LF</lineEnding>
                         <skip>${format.skip}</skip>
                         <removeTrailingWhitespace>true</removeTrailingWhitespace>
                     </configuration>

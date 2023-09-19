@@ -4,14 +4,10 @@
 * text=auto
 
 # Force LF as internal repository format for all following files;
-# this overrides user settings to enforce the *right format* :
-*.java text
+# this overrides user settings to enforce the *right format*
+# Also, specify we want Java-friendly readable chunk headers for diff
+*.java text diff=java
 *.xml text
 *.txt text
 *.md text
 *.properties text
-
-# Specify we want Java-friendly readable chunk headers for diff:
-
-*.java	diff=java
-
