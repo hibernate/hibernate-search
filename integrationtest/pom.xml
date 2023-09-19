@@ -33,6 +33,12 @@
     <profiles>
         <profile>
             <id>springITs</id>
+            <activation>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>!11</value>
+                </property>
+            </activation>
             <modules>
                 <!-- Spring Boot 3 requires at minimum JDK 17. Hence, we want to ignore these modules on JDK 11: -->
                 <module>mapper/orm-spring</module>

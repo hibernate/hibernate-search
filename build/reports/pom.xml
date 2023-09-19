@@ -244,6 +244,12 @@
                 so we can easily exclude building them all in some scenarios like building on JDK11 etc.
              -->
             <id>springITs</id>
+            <activation>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>!11</value>
+                </property>
+            </activation>
             <dependencies>
                 <dependency>
                     <groupId>org.hibernate.search</groupId>
