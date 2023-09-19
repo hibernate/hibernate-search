@@ -89,7 +89,7 @@
             version is different from whatever version is in those mentioned libraries. So need to update it anytime we
             are updating the Elasticsearch rest client version.
         -->
-        <version.com.fasterxml.jackson>2.15.0</version.com.fasterxml.jackson>
+        <version.com.fasterxml.jackson>2.15.2</version.com.fasterxml.jackson>
         <!-- slf4j: used by the AWS SDK -->
         <version.org.slf4j>1.7.36</version.org.slf4j>
 
