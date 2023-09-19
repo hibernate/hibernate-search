@@ -989,7 +989,8 @@
                                     if ( isFalseString( '${test.database.run.cockroachdb.skip}' ) ) {
                                         images += '${test.database.run.cockroachdb.image.name}:${test.database.run.cockroachdb.image.tag}'
                                     }
-                                    new File('${containerImagesListFile}').append( images.join('\n') + '\n' )
+                                    // Exclude images from non-dockerhub repositories
+                                    new File('${containerImagesListFile}').append( images.findAll{ref -> !(ref ==~ /^(?!((.*\.)?docker\.io))[\w\d\.]+\/[\w\d\.]+\/[\w\d\.]+(:.+)?$/)}.join('\n') + '\n' )
                                 ]]></script>
                             </configuration>
                         </execution>
