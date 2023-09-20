@@ -56,13 +56,22 @@ jobs:
             runs-on: 'ubuntu-latest',
             java: {
               version: 17
+            },
+            maven: {
+              args: ''
             }
           }
+          # We can't start Linux containers on GitHub Actions' Windows VMs,
+          # so we can't run Elasticsearch tests.
+          # See https://github.com/actions/runner-images/issues/1143#issuecomment-972929995
           - {
             name: "Windows JDK 17",
             runs-on: 'windows-latest',
             java: {
               version: 17
+            },
+            maven: {
+              args: '-Dtest.elasticsearch.skip=true'
             }
           }
     steps:
@@ -91,10 +100,12 @@ jobs:
       - name: Docker cleanup
         run: ./ci/docker-cleanup.sh
       - name: Building code and running unit tests and basic checks
-        run: ./mvnw $MAVEN_ARGS install -Pjqassistant -Pdist -Pci-sources-check -DskipITs
+        run: |
+          ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} install \
+          -Pjqassistant -Pdist -Pci-sources-check -DskipITs
       - name: Running integration tests in the default environment
         run: |
-          ./mvnw $MAVEN_ARGS verify \
+          ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} verify \
           -DskipSurefireTests -Pskip-checks -Pci-rebuild \
           ${{ github.event.pull_request.base.ref && format('-Dincremental -Dgib.referenceBranch=refs/remotes/origin/{0}', github.event.pull_request.base.ref) || '' }}
       - name: Docker cleanup
