@@ -222,6 +222,10 @@ and run unit tests and integration tests.
 ./mvnw clean install
 ```
 
+Note: on Windows, you will need a Docker install able to run Linux containers.
+If you don't have that, you can skip the Elasticsearch tests:
+`./mvnw clean install -Dtest.elasticsearch.skip=true`.
+
 Note: the produced JARs are compatible with Java 8 and later,
 regardless of the JDK used to build Hibernate Search.
 
@@ -302,6 +306,17 @@ Or more simply, if the newer JDK you want to test against is newer than 17 and i
 ./mvnw clean install -Djava-version.test.release=18
 ```
 
+### Lucene
+
+The Lucene integration tests do not, by themselves,
+require any external setup.
+
+If you are not interested in Lucene integration tests (e.g. you only want to test Elasticsearch),
+you can skip all Lucene tests with:
+
+```bash
+./mvnw clean install -Dtest.lucene.skip=true
+```
 ### Elasticsearch
 
 The Elasticsearch integration tests run against one single version of Elasticsearch at a time,
@@ -323,6 +338,13 @@ Please note that Elasticsearch [distributions starting with version 7.11 are not
 For available versions of [OpenSearch](https://www.opensearch.org/) distribution see [DockerHub](https://hub.docker.com/r/opensearchproject/opensearch/tags).
 
 For Amazon OpenSearch Serverless, the version must be unset (set to an empty string).
+
+When necessary (e.g. you don't have Docker, or are on Windows and can't run Linux containers),
+you can skip all Elasticsearch tests (and thus the Elasticsearch container startup) with:
+
+```bash
+./mvnw clean install -Dtest.elasticsearch.skip=true
+```
 
 Alternatively, you can prevent the build from launching an Elasticsearch server automatically
 and run Elasticsearch-related tests against your own server using the

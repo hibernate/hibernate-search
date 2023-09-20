@@ -20,7 +20,7 @@
     <description>Hibernate Search reference documentation</description>
 
     <properties>
-        <test.elasticsearch.run.skip>${test.elasticsearch.connection.uris.defined}</test.elasticsearch.run.skip>
+        <test.elasticsearch.run.skip>${test.elasticsearch.run.skip.forRelevantModules}</test.elasticsearch.run.skip>
         <test.database.run.skip>false</test.database.run.skip>
 
         <asciidoctor.base-output-dir>${project.build.directory}/asciidoctor/</asciidoctor.base-output-dir>
@@ -128,6 +128,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
+                            <skip>${test.lucene.skip}</skip>
                             <reportNameSuffix>${surefire.reportNameSuffix}-lucene</reportNameSuffix>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch</classpathDependencyExclude>
@@ -146,6 +147,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
+                            <skip>${test.elasticsearch.skip}</skip>
                             <reportNameSuffix>${surefire.reportNameSuffix}-elasticsearch</reportNameSuffix>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>

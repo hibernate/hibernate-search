@@ -52,6 +52,7 @@
                             <goal>verify</goal>
                         </goals>
                         <configuration>
+                            <skip>${test.lucene.skip}</skip>
                             <!-- WARNING: When using <dependenciesToScan>, be sure to set the Maven property surefire.module -->
                             <dependenciesToScan>
                                 <dependency>${project.groupId}:hibernate-search-integrationtest-backend-tck</dependency>
