@@ -1,1 +1,1 @@
-org.hibernate.search.batch.jsr352.core.context.jpa.impl.ActiveSessionFactoryRegistryUpdater
+org.hibernate.search.jakarta.batch.core.context.jpa.impl.ActiveSessionFactoryRegistryUpdater

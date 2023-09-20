@@ -47,16 +47,16 @@ public final class MessageConstants {
 	public static final int BACKEND_ES_AWS_ID_RANGE_MIN = 409000;
 	public static final int BACKEND_ES_AWS_ID_RANGE_MAX = 409999;
 
-	public static final int BATCH_JSR352_CORE_ID_RANGE_MIN = 500000;
-	public static final int BATCH_JSR352_CORE_ID_RANGE_MAX = 508999;
+	public static final int JAKARTA_BATCH_CORE_ID_RANGE_MIN = 500000;
+	public static final int JAKARTA_BATCH_CORE_ID_RANGE_MAX = 508999;
 
 	/*
 	 * Legacy range from Search 5:
 	 * JSR352 integration: min = 500000, max = undefined (max used: 500033)
 	 */
 
-	public static final int BATCH_JSR352_JBERET_ID_RANGE_MIN = 509000;
-	public static final int BATCH_JSR352_JBERET_ID_RANGE_MAX = 509999;
+	public static final int JAKARTA_BATCH_JBERET_ID_RANGE_MIN = 509000;
+	public static final int JAKARTA_BATCH_JBERET_ID_RANGE_MAX = 509999;
 
 	public static final int BACKEND_LUCENE_ID_RANGE_MIN = 600000;
 	public static final int BACKEND_LUCENE_ID_RANGE_MAX = 609999;

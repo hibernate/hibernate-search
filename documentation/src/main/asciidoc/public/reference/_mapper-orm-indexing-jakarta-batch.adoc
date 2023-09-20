@@ -410,8 +410,8 @@ If you want to use a different Jakarta Batch implementation that happens to allo
 
 1. You must map the following two scope annotations
 to the relevant scope in the dependency injection mechanism:
- * `org.hibernate.search.batch.jsr352.core.inject.scope.spi.HibernateSearchJobScoped`
- * `org.hibernate.search.batch.jsr352.core.inject.scope.spi.HibernateSearchPartitionScoped`
+ * `org.hibernate.search.jakarta.batch.core.inject.scope.spi.HibernateSearchJobScoped`
+ * `org.hibernate.search.jakarta.batch.core.inject.scope.spi.HibernateSearchPartitionScoped`
 2. You must make sure that the dependency injection mechanism will register
 all injection-annotated classes (`@Named`, ...) from the
 `hibernate-search-mapper-orm-jakarta-batch-core` module in the dependency injection context.
