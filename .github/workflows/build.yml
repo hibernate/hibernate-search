@@ -64,6 +64,10 @@ jobs:
           # We can't start Linux containers on GitHub Actions' Windows VMs,
           # so we can't run Elasticsearch tests.
           # See https://github.com/actions/runner-images/issues/1143#issuecomment-972929995
+          # For some reason docker-maven-plugin will error out with "All pipe instances are busy"
+          # on GitHub Actions' Windows VMs (when using Bash?),
+          # so we also explicitly disable docker-maven-plugin.
+          # See https://github.com/fabric8io/docker-maven-plugin/issues/548#issuecomment-255477600
           - {
             name: "Windows JDK 17",
             runs-on: 'windows-latest',
@@ -71,7 +75,7 @@ jobs:
               version: 17
             },
             maven: {
-              args: '-Dtest.elasticsearch.skip=true'
+              args: '-Dtest.elasticsearch.skip=true -Dtest.containers.run.skip=true'
             }
           }
     steps:
