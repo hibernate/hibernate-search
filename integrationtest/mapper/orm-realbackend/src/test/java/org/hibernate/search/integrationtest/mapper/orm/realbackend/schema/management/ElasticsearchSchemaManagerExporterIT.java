@@ -14,15 +14,18 @@ import static org.junit.Assume.assumeFalse;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManagerFactory;
 
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.testsupport.BackendConfigurations;
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.util.Article;
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.util.Book;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
@@ -35,7 +38,10 @@ public class ElasticsearchSchemaManagerExporterIT {
 	@Rule
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 	@Rule
-	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
+	public OrmSetupHelper setupHelper = OrmSetupHelper.withMultipleBackends(
+			BackendConfigurations.simple(),
+			Collections.singletonMap( Article.BACKEND_NAME, BackendConfigurations.simple() )
+	);
 
 	private EntityManagerFactory entityManagerFactory;
 
@@ -51,15 +57,11 @@ public class ElasticsearchSchemaManagerExporterIT {
 		String version = ElasticsearchTestDialect.getActualVersion().toString();
 		entityManagerFactory = setupHelper.start()
 				// so that we don't try to do anything with the schema and allow to run without ES being up:
-				.withProperty( "hibernate.search.schema_management.strategy", "none" )
-
-				.withProperty( "hibernate.search.backend.type", "elasticsearch" )
-				.withProperty( "hibernate.search.backend.version_check.enabled", false )
-				.withProperty( "hibernate.search.backend.version", version )
-
-				.withProperty( "hibernate.search.backends." + Article.BACKEND_NAME + ".type", "elasticsearch" )
-				.withProperty( "hibernate.search.backends." + Article.BACKEND_NAME + ".version_check.enabled", false )
-				.withProperty( "hibernate.search.backends." + Article.BACKEND_NAME + ".version", version )
+				.withProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY, "none" )
+				.withBackendProperty( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED, false )
+				.withBackendProperty( ElasticsearchBackendSettings.VERSION, version )
+				.withBackendProperty( Article.BACKEND_NAME, ElasticsearchBackendSettings.VERSION_CHECK_ENABLED, false )
+				.withBackendProperty( Article.BACKEND_NAME, ElasticsearchBackendSettings.VERSION, version )
 				.setup( Book.class, Article.class );
 
 		Path directory = temporaryFolder.newFolder().toPath();
