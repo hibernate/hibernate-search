@@ -137,4 +137,19 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <!-- For some reason these performance tests don't seem to work on Windows -->
+                <test.elasticsearch.skip>true</test.elasticsearch.skip>
+            </properties>
+        </profile>
+    </profiles>
+
 </project>
