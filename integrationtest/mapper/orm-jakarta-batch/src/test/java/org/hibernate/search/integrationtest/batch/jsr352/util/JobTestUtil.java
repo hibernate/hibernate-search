@@ -39,18 +39,18 @@ public final class JobTestUtil {
 	public static final int JOB_TIMEOUT_MS = 30_000;
 
 	private static final int THREAD_SLEEP_MS = 100;
-	private static final String JSR325_TYPE_FOR_IDE_TESTS = "jbatch";
+	private static final String JAKARTA_BATCH_TYPE_FOR_IDE_TESTS = "jbatch";
 
 	private JobTestUtil() {
 	}
 
 	public static JobOperator getAndCheckRuntime() {
 		JobOperator operator = BatchRuntime.getJobOperator();
-		String expectedType = System.getProperty( "org.hibernate.search.integrationtest.jsr352.type" );
+		String expectedType = System.getProperty( "org.hibernate.search.integrationtest.jakarta.batch.type" );
 
 		// only for tests run from the IDE only
 		if ( expectedType == null ) {
-			expectedType = JSR325_TYPE_FOR_IDE_TESTS;
+			expectedType = JAKARTA_BATCH_TYPE_FOR_IDE_TESTS;
 		}
 
 		assertThat( operator ).extracting( Object::getClass ).asString()

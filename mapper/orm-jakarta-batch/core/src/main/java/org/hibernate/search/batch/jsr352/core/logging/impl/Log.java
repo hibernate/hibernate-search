@@ -21,7 +21,7 @@ import org.jboss.logging.annotations.ValidIdRange;
 import org.jboss.logging.annotations.ValidIdRanges;
 
 /**
- * Hibernate Search log abstraction for the JSR 352 integration.
+ * Hibernate Search log abstraction for the Jakarta Batch integration.
  *
  * @author Mincong Huang
  */

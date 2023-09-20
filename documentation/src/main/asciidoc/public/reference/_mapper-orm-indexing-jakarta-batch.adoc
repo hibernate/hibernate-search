@@ -22,7 +22,7 @@ If the runtime is JBeret, you need to add the following dependency:
 ----
 <dependency>
    <groupId>org.hibernate.search</groupId>
-   <artifactId>hibernate-search-mapper-orm-batch-jsr352-jberet</artifactId>
+   <artifactId>hibernate-search-mapper-orm-jakarta-batch-jberet</artifactId>
    <version>{hibernateSearchVersion}</version>
 </dependency>
 ----
@@ -33,7 +33,7 @@ For any other runtime, you need to add the following dependency:
 ----
 <dependency>
    <groupId>org.hibernate.search</groupId>
-   <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>
+   <artifactId>hibernate-search-mapper-orm-jakarta-batch-core</artifactId>
    <version>{hibernateSearchVersion}</version>
 </dependency>
 ----
@@ -58,7 +58,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 The following table contains all the job parameters you can use to customize the mass-indexing job.
 
 [cols="2,1,3a",options="header"]
-.Job Parameters in JSR 352 Integration
+.Job Parameters in Jakarta Batch Integration
 |===
 |Parameter Name / Builder Method |Default value |Description
 
@@ -414,7 +414,7 @@ to the relevant scope in the dependency injection mechanism:
  * `org.hibernate.search.batch.jsr352.core.inject.scope.spi.HibernateSearchPartitionScoped`
 2. You must make sure that the dependency injection mechanism will register
 all injection-annotated classes (`@Named`, ...) from the
-`hibernate-search-mapper-orm-batch-jsr352-core` module in the dependency injection context.
+`hibernate-search-mapper-orm-jakarta-batch-core` module in the dependency injection context.
 For instance this can be achieved in Spring DI using the `@ComponentScan` annotation.
 3. You must register a single bean in the dependency injection context
 that will implement the `EntityManagerFactoryRegistry` interface.

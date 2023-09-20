@@ -29,7 +29,7 @@ public class JobContextData {
 	private EntityManagerFactory entityManagerFactory;
 
 	/*
-	 * In JSR 352 standard, only string values can be propagated using job properties, but class types are frequently
+	 * In Jakarta Batch standard, only string values can be propagated using job properties, but class types are frequently
 	 * used too. So this map has string keys to facilitate lookup for values extracted from job properties.
 	 */
 	private Map<String, EntityTypeDescriptor> entityTypeDescriptorMap;
