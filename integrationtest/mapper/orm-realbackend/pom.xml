@@ -124,8 +124,6 @@
                             <reportNameSuffix>${surefire.reportNameSuffix}-multiplebackends</reportNameSuffix>
                             <includes>
                                 <include>org.hibernate.search.integrationtest.mapper.orm.realbackend.bootstrap.BackendTypeAutoDetectMultipleBackendTypesInClasspathIT</include>
-                                <include>org.hibernate.search.integrationtest.mapper.orm.realbackend.schema.management.ElasticsearchSchemaManagerExporterIT</include>
-                                <include>org.hibernate.search.integrationtest.mapper.orm.realbackend.schema.management.LuceneSchemaManagerExporterIT</include>
                             </includes>
                         </configuration>
                     </execution>

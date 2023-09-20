@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,17 +32,16 @@ public class LuceneSchemaManagerExporterIT {
 	@Rule
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 	@Rule
-	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
+	public OrmSetupHelper setupHelper = OrmSetupHelper.withMultipleBackends(
+			BackendConfigurations.simple(),
+			Map.of( Article.BACKEND_NAME, BackendConfigurations.simple() )
+	);
 
 	private EntityManagerFactory entityManagerFactory;
 
 	@Test
 	public void lucene() throws IOException {
-		entityManagerFactory = setupHelper.start()
-				.withProperty( "hibernate.search.backend.type", "lucene" )
-
-				.withProperty( "hibernate.search.backends." + Article.BACKEND_NAME + ".type", "lucene" )
-				.setup( Book.class, Article.class );
+		entityManagerFactory = setupHelper.start().setup( Book.class, Article.class );
 
 		Path directory = temporaryFolder.newFolder().toPath();
 		Search.mapping( entityManagerFactory ).scope( Object.class ).schemaManager().exportExpectedSchema( directory );
