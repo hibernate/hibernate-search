@@ -66,6 +66,9 @@
                             <goal>integration-test</goal>
                             <goal>verify</goal>
                         </goals>
+                        <configuration>
+                            <skip>${test.lucene.skip}</skip>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

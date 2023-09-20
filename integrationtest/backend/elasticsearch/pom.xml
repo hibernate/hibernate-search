@@ -15,7 +15,7 @@
     <properties>
         <surefire.module>elasticsearch</surefire.module>
 
-        <test.elasticsearch.run.skip>${test.elasticsearch.connection.uris.defined}</test.elasticsearch.run.skip>
+        <test.elasticsearch.run.skip>${test.elasticsearch.run.skip.forRelevantModules}</test.elasticsearch.run.skip>
     </properties>
 
     <dependencies>
@@ -72,6 +72,7 @@
                             <goal>verify</goal>
                         </goals>
                         <configuration>
+                            <skip>${test.elasticsearch.skip}</skip>
                             <!-- WARNING: When using <dependenciesToScan>, be sure to set the Maven property surefire.module -->
                             <dependenciesToScan>
                                 <dependency>${project.groupId}:hibernate-search-integrationtest-backend-tck</dependency>

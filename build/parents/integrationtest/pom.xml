@@ -467,7 +467,6 @@
             </activation>
             <properties>
                 <test.elasticsearch.connection.uris>http://localhost:9200</test.elasticsearch.connection.uris>
-                <test.elasticsearch.connection.uris.defined>false</test.elasticsearch.connection.uris.defined>
             </properties>
         </profile>
         <!-- Profile enabled when an Elasticsearch instance must NOT be run by Maven -->
@@ -480,7 +479,21 @@
                 </property>
             </activation>
             <properties>
-                <test.elasticsearch.connection.uris.defined>true</test.elasticsearch.connection.uris.defined>
+                <test.elasticsearch.run.skip.forRelevantModules>true</test.elasticsearch.run.skip.forRelevantModules>
+            </properties>
+        </profile>
+        <!-- Profile enabled when Elasticsearch tests are skipped -->
+        <profile>
+            <id>elasticsearch-test-skip</id>
+            <activation>
+                <!-- Activate if test.elasticsearch.connection.uris has been defined explicitly -->
+                <property>
+                    <name>test.elasticsearch.skip</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <test.elasticsearch.run.skip.forRelevantModules>true</test.elasticsearch.run.skip.forRelevantModules>
             </properties>
         </profile>
 

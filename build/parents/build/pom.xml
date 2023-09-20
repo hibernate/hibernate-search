@@ -183,17 +183,27 @@
         <!-- Containers executions tests properties -->
         <test.containers.run.skip>false</test.containers.run.skip>
 
+        <!-- Lucene tests properties -->
+
+        <!-- To skip all Lucene tests from the CLI -->
+        <test.lucene.skip>false</test.lucene.skip>
+
         <!-- Elasticsearch tests properties -->
+
+        <!-- To skip all Elasticsearch tests from the CLI -->
+        <test.elasticsearch.skip>false</test.elasticsearch.skip>
 
         <!-- Control how an Elasticsearch instance is run automatically during tests -->
         <!-- By default, the plugin is not skipped, but each container (elastic, opensearch, etc.) is skipped;
              Maven profiles will re-enable the right container depending on configuration.
           -->
         <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
-
-        <!-- If an external connection url is defined this property will be true -->
-        <!-- See elasticsearch-run and elasticsearch-do-not-run profiles -->
-        <test.elasticsearch.connection.uris.defined></test.elasticsearch.connection.uris.defined>
+        <!-- This is set to true automatically when the Elasticsearch instance should not be started
+             even for modules that include Elasticsearch tests,
+             be it because Elasticsearch tests are disabled
+             or because an Elasticsearch instance is provided externally.
+             See elasticsearch-run, elasticsearch-test-skip and elasticsearch-do-not-run profiles -->
+        <test.elasticsearch.run.skip.forRelevantModules>false</test.elasticsearch.run.skip.forRelevantModules>
 
         <!--
              These properties are transparently passed as system properties to integration tests,

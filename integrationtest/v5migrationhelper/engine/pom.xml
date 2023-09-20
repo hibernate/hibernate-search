@@ -78,6 +78,7 @@
                             <goal>verify</goal>
                         </goals>
                         <configuration>
+                            <skip>${test.lucene.skip}</skip>
                             <includes>
                                 <include>**/*IT.java</include>
                                 <!--

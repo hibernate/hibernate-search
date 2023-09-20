@@ -68,7 +68,6 @@
         </dependency>
     </dependencies>
 
-
     <build>
         <plugins>
             <plugin>
@@ -123,5 +122,20 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>skipLuceneTests</id>
+            <activation>
+                <property>
+                    <name>test.lucene.skip</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <failsafe.spring.skip>true</failsafe.spring.skip>
+            </properties>
+        </profile>
+    </profiles>
 </project>
 

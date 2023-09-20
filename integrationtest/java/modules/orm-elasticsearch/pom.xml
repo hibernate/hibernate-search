@@ -17,7 +17,7 @@
     <description>Hibernate Search integration tests for Java 11+ modules</description>
 
     <properties>
-        <test.elasticsearch.run.skip>${test.elasticsearch.connection.uris.defined}</test.elasticsearch.run.skip>
+        <test.elasticsearch.run.skip>${test.elasticsearch.run.skip.forRelevantModules}</test.elasticsearch.run.skip>
         <test.database.run.skip>false</test.database.run.skip>
 
         <maven.compiler.release>11</maven.compiler.release>
@@ -71,6 +71,9 @@
                             <goal>integration-test</goal>
                             <goal>verify</goal>
                         </goals>
+                        <configuration>
+                            <skip>${test.elasticsearch.skip}</skip>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
