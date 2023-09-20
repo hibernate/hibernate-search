@@ -90,7 +90,7 @@ public class EntityWriter extends AbstractItemWriter {
 		 * Always execute works as updates on the first checkpoint interval,
 		 * because we may be recovering from a failure, and there's no way
 		 * to accurately detect that situation.
-		 * Indeed, JSR-352 only specify that checkpoint state will be
+		 * Indeed, Jakarta Batch only specify that checkpoint state will be
 		 * saved *after* each chunk, so when we fail during the very first checkpoint,
 		 * we have no way of detecting this failure.
 		 */

@@ -9,8 +9,8 @@
     </parent>
     <artifactId>hibernate-search-integrationtest-mapper-orm-batch-jsr352</artifactId>
 
-    <name>Hibernate Search ITs - ORM - Batch JSR-352</name>
-    <description>Hibernate Search integration tests for the Batch JSR-352 integration</description>
+    <name>Hibernate Search ITs - ORM - Jakarta Batch</name>
+    <description>Hibernate Search integration tests for the Jakarta Batch integration</description>
 
     <properties>
         <test.elasticsearch.run.skip>${test.elasticsearch.run.skip.forRelevantModules}</test.elasticsearch.run.skip>
@@ -191,7 +191,7 @@
                 </property>
             </activation>
             <properties>
-                <!-- The JSR-352 job executes a purge on startup and thus cannot
+                <!-- The Jakarta Batch job executes a purge on startup and thus cannot
                      work with Amazon OpenSearch Serverless (which doesn't support purge/delete-by-query).
                      See https://hibernate.atlassian.net/browse/HSEARCH-4929,
                      https://hibernate.atlassian.net/browse/HSEARCH-4930

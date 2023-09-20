@@ -8,7 +8,7 @@ include::../components/_mapper-orm-only-note.adoc[]
 
 While <<listener-triggered-indexing,listener-triggered indexing>> and
 the <<indexing-massindexer,`MassIndexer`>>
-or <<mapper-orm-indexing-jsr352,the mass indexing job>>
+or <<mapper-orm-indexing-jakarta-batch,the mass indexing job>>
 should take care of most needs,
 it is sometimes necessary to control indexing manually,
 for example to reindex just a few entity instances

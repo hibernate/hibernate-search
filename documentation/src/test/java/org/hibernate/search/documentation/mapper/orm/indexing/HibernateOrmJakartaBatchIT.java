@@ -27,7 +27,7 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.junit.Before;
 import org.junit.Test;
 
-public class HibernateOrmBatchJsr352IT extends AbstractHibernateOrmMassIndexingIT {
+public class HibernateOrmJakartaBatchIT extends AbstractHibernateOrmMassIndexingIT {
 
 	private static final int JOB_TIMEOUT_MS = 30_000;
 	private static final int THREAD_SLEEP = 1000;

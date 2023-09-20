@@ -21,7 +21,7 @@ import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.ValidationU
 import org.hibernate.search.util.common.SearchException;
 
 /**
- * A utility class to start the Hibernate Search JSR-352 mass indexing job.
+ * A utility class to start the Hibernate Search Jakarta Batch mass indexing job.
  * <p>
  * Use it like this:
  * <code>
