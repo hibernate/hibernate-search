@@ -9,7 +9,7 @@
     xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/jobXML_2_0.xsd" version="2.0">
 
     <listeners>
-        <listener ref="org.hibernate.search.batch.jsr352.core.massindexing.spi.JobContextSetupListener">
+        <listener ref="org.hibernate.search.jakarta.batch.core.massindexing.spi.JobContextSetupListener">
             <properties>
                 <property name="entityManagerFactoryNamespace" value="#{jobParameters['entityManagerFactoryNamespace']}" />
                 <property name="entityManagerFactoryReference" value="#{jobParameters['entityManagerFactoryReference']}" />
@@ -33,7 +33,7 @@
     </listeners>
 
     <step id="beforeChunk" next="produceLuceneDoc">
-        <batchlet ref="org.hibernate.search.batch.jsr352.core.massindexing.step.beforechunk.impl.BeforeChunkBatchlet">
+        <batchlet ref="org.hibernate.search.jakarta.batch.core.massindexing.step.beforechunk.impl.BeforeChunkBatchlet">
             <properties>
                 <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}" />
                 <property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}" />
@@ -44,7 +44,7 @@
 
     <step id="produceLuceneDoc" next="afterChunk">
         <listeners>
-            <listener ref="org.hibernate.search.batch.jsr352.core.massindexing.step.impl.StepProgressSetupListener">
+            <listener ref="org.hibernate.search.jakarta.batch.core.massindexing.step.impl.StepProgressSetupListener">
                 <properties>
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
@@ -53,7 +53,7 @@
         </listeners>
         <!-- Here we use the property from the partition plan, so that defaults are correctly applied -->
         <chunk item-count="#{partitionPlan['checkpointInterval']}">
-            <reader ref="org.hibernate.search.batch.jsr352.core.massindexing.step.spi.EntityReader">
+            <reader ref="org.hibernate.search.jakarta.batch.core.massindexing.step.spi.EntityReader">
                 <properties>
                 	<!-- Used to re-create the job context data as necessary -->
 	                <property name="entityManagerFactoryNamespace" value="#{jobParameters['entityManagerFactoryNamespace']}" />
@@ -76,7 +76,7 @@
                     <property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
                 </properties>
             </reader>
-            <writer ref="org.hibernate.search.batch.jsr352.core.massindexing.step.impl.EntityWriter">
+            <writer ref="org.hibernate.search.jakarta.batch.core.massindexing.step.impl.EntityWriter">
                 <properties>
                     <property name="entityName" value="#{partitionPlan['entityName']}" />
                     <property name="partitionId" value="#{partitionPlan['partitionId']}" />
@@ -85,7 +85,7 @@
             </writer>
         </chunk>
         <partition>
-            <mapper ref="org.hibernate.search.batch.jsr352.core.massindexing.step.impl.HibernateSearchPartitionMapper">
+            <mapper ref="org.hibernate.search.jakarta.batch.core.massindexing.step.impl.HibernateSearchPartitionMapper">
                 <properties>
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
                     <property name="idFetchSize" value="#{jobParameters['idFetchSize']}" />
@@ -96,13 +96,13 @@
                     <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}" />
                 </properties>
             </mapper>
-            <collector ref="org.hibernate.search.batch.jsr352.core.massindexing.step.impl.ProgressCollector" />
-            <analyzer ref="org.hibernate.search.batch.jsr352.core.massindexing.step.impl.ProgressAggregator" />
+            <collector ref="org.hibernate.search.jakarta.batch.core.massindexing.step.impl.ProgressCollector" />
+            <analyzer ref="org.hibernate.search.jakarta.batch.core.massindexing.step.impl.ProgressAggregator" />
         </partition>
     </step>
 
     <step id="afterChunk">
-        <batchlet ref="org.hibernate.search.batch.jsr352.core.massindexing.step.afterchunk.impl.AfterChunkBatchlet">
+        <batchlet ref="org.hibernate.search.jakarta.batch.core.massindexing.step.afterchunk.impl.AfterChunkBatchlet">
             <properties>
                 <property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}" />
                 <property name="tenantId" value="#{jobParameters['tenantId']}" />

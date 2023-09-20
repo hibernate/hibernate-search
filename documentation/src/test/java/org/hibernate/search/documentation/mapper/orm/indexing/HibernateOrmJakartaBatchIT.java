@@ -19,8 +19,8 @@ import jakarta.batch.runtime.JobExecution;
 import jakarta.persistence.EntityManager;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
+import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJob;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
