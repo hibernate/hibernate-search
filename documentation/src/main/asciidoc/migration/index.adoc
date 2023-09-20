@@ -53,6 +53,17 @@ to artifacts ending with `-orm6` (e.g. `hibernate-search-mapper-orm-orm6`) just 
 before upgrading to this version of Hibernate Search.
 See https://github.com/hibernate/hibernate-orm/wiki/Migration-Guides/[Hibernate ORM migration guides].
 
+[[artifact-changes]]
+== Artifact changes
+
+With the move to Jakarta EE Hibernate Search previous batch artifacts (`hibernate-search-mapper-orm-batch-jsr352-core`/`hibernate-search-mapper-orm-batch-jsr352-jberet`)
+will now relocate to the new ones (`hibernate-search-mapper-orm-jakarta-batch-core`/`hibernate-search-mapper-orm-jakarta-batch-jberet`) matching the naming of Jakarta EE specification.
+This also means that the corresponding Java module names and packages are also updated:
+
+* The core module is now named `org.hibernate.search.jakarta.batch.core` and the base package for this module is `org.hibernate.search.jakarta.batch.core`
+* The JBeret module is now named `org.hibernate.search.jakarta.batch.jberet` and the base package for this module is `org.hibernate.search.jakarta.batch.jberet`
+
+
 [[data-format]]
 == Data format and schema changes
 
