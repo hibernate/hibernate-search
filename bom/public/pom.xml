@@ -74,12 +74,12 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>
+                <artifactId>hibernate-search-mapper-orm-jakarta-batch-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-orm-batch-jsr352-jberet</artifactId>
+                <artifactId>hibernate-search-mapper-orm-jakarta-batch-jberet</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

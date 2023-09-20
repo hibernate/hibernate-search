@@ -10,75 +10,41 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.hibernate.search</groupId>
-        <artifactId>hibernate-search-parent-public</artifactId>
+        <artifactId>hibernate-search-parent</artifactId>
         <version>7.0.0-SNAPSHOT</version>
-        <relativePath>../../../build/parents/public</relativePath>
+        <relativePath>../../..</relativePath>
     </parent>
+    <packaging>pom</packaging>
     <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>
 
-    <name>Hibernate Search Jakarta Batch Core</name>
+    <name>Hibernate Search Jakarta Batch Core (JSR-352 relocation)</name>
     <description>Core of the Hibernate Search Jakarta Batch integration</description>
 
     <properties>
         <!-- This is a publicly distributed module that should be published: -->
         <deploy.skip>false</deploy.skip>
-        <java.module.name>org.hibernate.search.batch.jsr352.core</java.module.name>
-        <!--
-            We want to skip the javadoc warnings for this module, since Jakarta Batch API is using proper modules,
-            resulting in a warning like:
-                [WARNING] Javadoc Warnings
-                [WARNING] warning: The code being documented uses packages in the unnamed module, but the packages defined in https://jakarta.ee/specifications/batch/2.1/apidocs/ are in named modules.
-                [WARNING] 1 warning
-            when trying to build this module. Since it cannot be suppressed, but the generated docs are actually OK
-            and links point to correct addresses, we just ignore all warnings for this module.
-        -->
-        <failOnJavadocWarning>false</failOnJavadocWarning>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-mapper-orm</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-util-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging-annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.inject</groupId>
-            <artifactId>jakarta.inject-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.batch</groupId>
-            <artifactId>jakarta.batch-api</artifactId>
-        </dependency>
-
-        <!-- This dependency is only here to solve Moditect errors.
-             For some reason, the jakarta.transaction module requires jakarta.cdi,
-             but the jakarta.transaction-api Maven module doesn't depend on jakarta.enterprise.cdi-api,
-             and that doesn't play well with Moditect, which ends up throwing an exception:
-               Execution add-module-infos of goal org.moditect:moditect-maven-plugin:1.0.0.RC2:add-module-info failed: Module jakarta.interceptor not found, required by jakarta.transaction
-         -->
-        <dependency>
-            <groupId>jakarta.enterprise</groupId>
-            <artifactId>jakarta.enterprise.cdi-api</artifactId>
-            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
-            <version>${version.jakarta.enterprise}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-util-internal-test-orm</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <distributionManagement>
+        <relocation>
+            <artifactId>hibernate-search-mapper-orm-jakarta-batch-core</artifactId>
+        </relocation>
+    </distributionManagement>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <configuration>
+                    <!-- Keep dependency management -->
+                    <flattenMode>bom</flattenMode>
+                    <pomElements>
+                        <!-- But not properties, they are not useful in a bom -->
+                        <properties>remove</properties>
+                        <distributionManagement>keep</distributionManagement>
+                    </pomElements>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

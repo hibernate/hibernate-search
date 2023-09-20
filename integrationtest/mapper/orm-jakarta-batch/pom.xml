@@ -7,7 +7,7 @@
         <version>7.0.0-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
-    <artifactId>hibernate-search-integrationtest-mapper-orm-batch-jsr352</artifactId>
+    <artifactId>hibernate-search-integrationtest-mapper-orm-jakarta-batch</artifactId>
 
     <name>Hibernate Search ITs - ORM - Jakarta Batch</name>
     <description>Hibernate Search integration tests for the Jakarta Batch integration</description>
@@ -25,12 +25,12 @@
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>
+            <artifactId>hibernate-search-mapper-orm-jakarta-batch-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-mapper-orm-batch-jsr352-jberet</artifactId>
+            <artifactId>hibernate-search-mapper-orm-jakarta-batch-jberet</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -104,7 +104,7 @@
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>lucene</org.hibernate.search.integrationtest.backend.type>
-                                <org.hibernate.search.integrationtest.jsr352.type>jbatch</org.hibernate.search.integrationtest.jsr352.type>
+                                <org.hibernate.search.integrationtest.jakarta.batch.type>jbatch</org.hibernate.search.integrationtest.jakarta.batch.type>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
@@ -122,7 +122,7 @@
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>lucene</org.hibernate.search.integrationtest.backend.type>
-                                <org.hibernate.search.integrationtest.jsr352.type>jberet</org.hibernate.search.integrationtest.jsr352.type>
+                                <org.hibernate.search.integrationtest.jakarta.batch.type>jberet</org.hibernate.search.integrationtest.jakarta.batch.type>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
@@ -142,7 +142,7 @@
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>
-                                <org.hibernate.search.integrationtest.jsr352.type>jbatch</org.hibernate.search.integrationtest.jsr352.type>
+                                <org.hibernate.search.integrationtest.jakarta.batch.type>jbatch</org.hibernate.search.integrationtest.jakarta.batch.type>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
@@ -161,7 +161,7 @@
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>
-                                <org.hibernate.search.integrationtest.jsr352.type>jberet</org.hibernate.search.integrationtest.jsr352.type>
+                                <org.hibernate.search.integrationtest.jakarta.batch.type>jberet</org.hibernate.search.integrationtest.jakarta.batch.type>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>

@@ -72,11 +72,21 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-mapper-orm-jakarta-batch-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-mapper-orm-jakarta-batch-jberet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>
+            <type>pom</type>
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-mapper-orm-batch-jsr352-jberet</artifactId>
+            <type>pom</type>
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
@@ -135,7 +145,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-integrationtest-mapper-orm-batch-jsr352</artifactId>
+            <artifactId>hibernate-search-integrationtest-mapper-orm-jakarta-batch</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

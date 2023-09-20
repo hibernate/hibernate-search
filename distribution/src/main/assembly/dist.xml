@@ -118,25 +118,25 @@
             </includes>
         </dependencySet>
         <dependencySet>
-            <outputDirectory>dist/mapper/orm/batch-jsr352/core</outputDirectory>
+            <outputDirectory>dist/mapper/orm/jakarta-batch/core</outputDirectory>
             <scope>runtime</scope>
             <useProjectArtifact>false</useProjectArtifact>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <useStrictFiltering>true</useStrictFiltering>
             <includes>
-                <include>org.hibernate.search:hibernate-search-mapper-orm-batch-jsr352-core</include>
+                <include>org.hibernate.search:hibernate-search-mapper-orm-jakarta-batch-core</include>
             </includes>
         </dependencySet>
         <dependencySet>
-            <outputDirectory>dist/mapper/orm/batch-jsr352/jberet</outputDirectory>
+            <outputDirectory>dist/mapper/orm/jakarta-batch/jberet</outputDirectory>
             <scope>runtime</scope>
             <useProjectArtifact>false</useProjectArtifact>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <useStrictFiltering>true</useStrictFiltering>
             <includes>
-                <include>org.hibernate.search:hibernate-search-mapper-orm-batch-jsr352-jberet</include>
+                <include>org.hibernate.search:hibernate-search-mapper-orm-jakarta-batch-jberet</include>
             </includes>
         </dependencySet>
         <dependencySet>

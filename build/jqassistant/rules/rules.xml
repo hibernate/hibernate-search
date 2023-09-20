@@ -280,7 +280,7 @@
                         WHEN 'hibernate-search-mapper-pojo-standalone' THEN 'StandalonePojo'
                         WHEN 'hibernate-search-mapper-orm' THEN 'HibernateOrm'
                         WHEN 'hibernate-search-mapper-orm-coordination-outbox-polling' THEN 'OutboxPolling'
-                        WHEN 'hibernate-search-mapper-orm-batch-jsr352-jberet' THEN 'JBeret'
+                        WHEN 'hibernate-search-mapper-orm-jakarta-batch-jberet' THEN 'JBeret'
                         ELSE 'UNKNOWN-MODULE-SPECIFIC-KEYWORD-PLEASE-UPDATE-JQASSISTANT-RULES'
                     END
             RETURN

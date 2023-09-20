@@ -91,7 +91,7 @@
         <!-- Jakarta Batch integration -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>
+            <artifactId>hibernate-search-mapper-orm-jakarta-batch-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

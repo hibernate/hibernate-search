@@ -103,7 +103,7 @@
         -->
         <version.jakarta.persistence>3.1.0</version.jakarta.persistence>
 
-        <!-- >>> JSR 352 -->
+        <!-- >>> Jakarta Batch -->
         <version.jakarta.batch>2.1.1</version.jakarta.batch>
         <version.org.jberet>2.1.2.Final</version.org.jberet>
 
@@ -145,10 +145,10 @@
         <!-- >>> Performance tests -->
         <version.org.openjdk.jmh>1.37</version.org.openjdk.jmh>
 
-        <!-- >>> JSR 352: JBatch runtime -->
+        <!-- >>> Jakarta Batch: JBatch runtime -->
         <version.com.ibm.jbatch>2.1.1</version.com.ibm.jbatch>
 
-        <!-- >>> JSR 352: JBeret SE dependencies -->
+        <!-- >>> Jakarta Batch: JBeret SE dependencies -->
         <version.org.jboss.marshalling>2.1.2.Final</version.org.jboss.marshalling>
         <version.org.wildfly.security.wildfly-security-manager>1.1.2.Final</version.org.wildfly.security.wildfly-security-manager>
         <version.org.google.guava>32.1.2-jre</version.org.google.guava>
@@ -313,17 +313,29 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>
+                <artifactId>hibernate-search-mapper-orm-jakarta-batch-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-orm-batch-jsr352-jberet</artifactId>
+                <artifactId>hibernate-search-mapper-orm-jakarta-batch-jberet</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-mapper-orm-coordination-outbox-polling</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>
+                <type>pom</type>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-mapper-orm-batch-jsr352-jberet</artifactId>
+                <type>pom</type>
                 <version>${project.version}</version>
             </dependency>
 
@@ -442,7 +454,7 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- JBeret used by batch-jsr352 jberet module -->
+            <!-- JBeret used by Jakarta Batch JBeret module -->
             <dependency>
                 <groupId>org.jberet</groupId>
                 <artifactId>jberet-core</artifactId>
@@ -621,7 +633,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-mapper-orm-batch-jsr352</artifactId>
+                <artifactId>hibernate-search-integrationtest-mapper-orm-jakarta-batch</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

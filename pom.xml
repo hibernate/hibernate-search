@@ -177,6 +177,8 @@
         <module>mapper/orm-coordination-outbox-polling</module>
         <module>mapper/orm-batch-jsr352/core</module>
         <module>mapper/orm-batch-jsr352/jberet</module>
+        <module>mapper/orm-jakarta-batch/core</module>
+        <module>mapper/orm-jakarta-batch/jberet</module>
         <module>v5migrationhelper/engine</module>
         <module>v5migrationhelper/orm</module>
         <module>util/internal/integrationtest</module>

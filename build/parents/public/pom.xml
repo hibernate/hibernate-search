@@ -93,7 +93,7 @@
                                 <url>${javadoc.org.apache.lucene.queryparser.url}</url>
                                 <location>${javadoc.packagelists.directory}/lucene-queryparser</location>
                             </offlineLink>
-                            <!-- For jakarta.batch in the JSR 352 modules -->
+                            <!-- For jakarta.batch in the Jakarta Batch modules -->
                             <offlineLink>
                                 <url>${javadoc.jakarta.batch.url}</url>
                                 <location>${javadoc.packagelists.directory}/batch-api</location>
