@@ -55,7 +55,7 @@ public final class JobTestUtil {
 
 		assertThat( operator ).extracting( Object::getClass ).asString()
 				.contains( expectedType );
-		log.infof( "JSR-352 operator type is %s (%s)", expectedType, operator.getClass() );
+		log.infof( "Jakarta Batch operator type is %s (%s)", expectedType, operator.getClass() );
 		return operator;
 	}
 

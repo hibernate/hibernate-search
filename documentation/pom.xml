@@ -88,7 +88,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- JSR-352 integration -->
+        <!-- Jakarta Batch integration -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>

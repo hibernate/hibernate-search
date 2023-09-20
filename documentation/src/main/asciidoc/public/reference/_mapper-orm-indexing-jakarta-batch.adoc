@@ -1,20 +1,20 @@
-[[mapper-orm-indexing-jsr352]]
-= [[jsr352-integration]] Reindexing large volumes of data with the JSR-352 integration
+[[mapper-orm-indexing-jakarta-batch]]
+= [[mapper-orm-indexing-jsr352]] [[jsr352-integration]] Reindexing large volumes of data with the Jakarta Batch integration
 
 include::../components/_mapper-orm-only-note.adoc[]
 
-Hibernate Search provides a JSR-352 job to perform mass indexing. It covers not only the existing
+Hibernate Search provides a Jakarta Batch job to perform mass indexing. It covers not only the existing
 functionality of the mass indexer described above, but also benefits from some powerful standard
-features of the Java Batch Platform (JSR-352), such as failure recovery using checkpoints, chunk
+features of Jakarta Batch, such as failure recovery using checkpoints, chunk
 oriented processing, and parallel execution. This batch job accepts different entity type(s) as
 input, loads the relevant entities from the database, then rebuilds the full-text index from these.
 
 However, it requires a batch runtime for the execution. Please notice that we
 don't provide any batch runtime, you are free to choose one that fits you needs, e.g. the default
-batch runtime embedded in your Java EE container. We provide full integration to the JBeret
-implementation (see <<jsr-352-emf-jberet,how to configure it here>>).
+batch runtime embedded in your Jakarta EE container. We provide full integration to the JBeret
+implementation (see <<mapper-orm-indexing-jakarta-batch-emf-jberet,how to configure it here>>).
 As for other implementations, they can also be used, but will require
-<<jsr-352-emf-other-implementation,a bit more configuration on your side>>.
+<<mapper-orm-indexing-jakarta-batch-emf-other-implementation,a bit more configuration on your side>>.
 
 If the runtime is JBeret, you need to add the following dependency:
 
@@ -40,11 +40,11 @@ For any other runtime, you need to add the following dependency:
 
 Here is an example of how to run a batch instance:
 
-.Reindexing everything using a `JSR-352` mass-indexing job
+.Reindexing everything using a Jakarta Batch mass-indexing job
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmBatchJsr352IT.java[tags=simple]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmJakartaBatchIT.java[tags=simple]
 ----
 <1> Start building parameters for a mass-indexing job.
 <2> Define some parameters. In this case, the list of the entity types to be indexed.
@@ -52,8 +52,8 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 <4> Start the job.
 ====
 
-[[mapper-orm-indexing-jsr352-parameters]]
-== [[_job_parameters]] Job Parameters
+[[mapper-orm-indexing-jakarta-batch-parameters]]
+== [[mapper-orm-indexing-jsr352-parameters]][[_job_parameters]] Job Parameters
 
 The following table contains all the job parameters you can use to customize the mass-indexing job.
 
@@ -109,7 +109,7 @@ will attempt to preload everything in memory.
 |-
 |Use HQL / JPQL to index entities of a target entity type. Your query should contain only one entity
 type. Mixing this approach with the criteria restriction is not allowed. Please notice that there's
-no query validation for your input. See <<jsr-352-indexing-mode>> for more detail and limitations.
+no query validation for your input. See <<mapper-orm-indexing-jakarta-batch-indexing-mode>> for more detail and limitations.
 
 |`maxResultsPerEntity` / `.maxResultsPerEntity(int)`
 |-
@@ -146,11 +146,11 @@ The string that will identify the `EntityManagerFactory`.
 |`entityManagerFactoryNamespace` / `.entityManagerFactoryNamespace(String)`
 |-
 |-
-|See <<jsr-352-emf,Selecting the persistence unit (EntityManagerFactory)>>
+|See <<mapper-orm-indexing-jakarta-batch-emf,Selecting the persistence unit (EntityManagerFactory)>>
 |===
 
-[[jsr-352-indexing-mode]]
-== Indexing mode
+[[mapper-orm-indexing-jakarta-batch-indexing-mode]]
+== [[jsr-352-indexing-mode]] Indexing mode
 
 The mass indexing job allows you to define your own entities to be indexed -- you can start a full
 indexing or a partial indexing through 2 different methods: selecting the desired entity types,
@@ -160,7 +160,7 @@ or using HQL.
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmBatchJsr352IT.java[tags=hql]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmJakartaBatchIT.java[tags=hql]
 ----
 <1> Start building parameters for a mass-indexing job.
 <2> Define the entity type to be indexed.
@@ -203,8 +203,8 @@ Because of those limitations, we suggest you use this approach only for indexing
 and only if you know that no entities matching the query will be created during indexing.
 ====
 
-[[mapper-orm-indexing-jsr352-parallel-indexing]]
-== [[_parallel_indexing]] Parallel indexing
+[[mapper-orm-indexing-jakarta-batch-parallel-indexing]]
+== [[mapper-orm-indexing-jsr352-parallel-indexing]][[_parallel_indexing]] Parallel indexing
 
 For better performance, indexing is performed in parallel using multiple threads. The set of
 entities to index is split into multiple partitions. Each thread processes one partition at a time.
@@ -219,8 +219,8 @@ is highly dependent on your overall architecture, database design and even data 
 You should experiment with these settings to find out what's best in your particular case.
 ====
 
-[[mapper-orm-indexing-jsr352-parallel-indexing-threads]]
-=== [[_threads]] Threads
+[[mapper-orm-indexing-jakarta-batch-parallel-indexing-threads]]
+=== [[mapper-orm-indexing-jsr352-parallel-indexing-threads]][[_threads]] Threads
 
 The maximum number of threads used by the job execution is defined through method `maxThreads()`.
 Within the N threads given, there’s 1 thread reserved for the core, so only N - 1 threads are
@@ -240,12 +240,12 @@ MassIndexingJob.parameters()
 [NOTE]
 ====
 Note that the batch runtime cannot guarantee the requested number of threads are available, it will
-use as many as possible up to the requested maximum (JSR352 v1.0 Final Release, page 34). Note also that all
+use as many as possible up to the requested maximum (Jakarta Batch Specification v2.1 Final Release, page 29). Note also that all
 batch jobs share the same thread pool, so it's not always a good idea to execute jobs concurrently.
 ====
 
-[[mapper-orm-indexing-jsr352-parallel-indexing-rows-per-partition]]
-=== [[_rows_per_partition]] Rows per partition
+[[mapper-orm-indexing-jakarta-batch-parallel-indexing-rows-per-partition]]
+=== [[mapper-orm-indexing-jsr352-parallel-indexing-rows-per-partition]][[_rows_per_partition]] Rows per partition
 
 Each partition consists of a fixed number of elements to index. You may tune exactly how many elements
 a partition will hold with `rowsPerPartition`.
@@ -267,7 +267,7 @@ That aspect of processing is addressed by chunking.
 
 Instead, `rowsPerPartition` is more about how parallel your mass indexing job will be.
 
-Please see the <<jsr-352-chunking,Chunking section>> to see how to tune chunking.
+Please see the <<mapper-orm-indexing-jakarta-batch-chunking,Chunking section>> to see how to tune chunking.
 ====
 
 When `rowsPerPartition` is low, there will be many small partitions,
@@ -278,7 +278,7 @@ Also, due to the failure recovery mechanisms, there is some overhead in starting
 so with an unnecessarily large number of partitions, this overhead will add up.
 
 When `rowsPerPartition` is high, there will be a few big partitions,
-so you will be able to take advantage of a higher <<jsr-352-chunking,chunk size>>,
+so you will be able to take advantage of a higher <<mapper-orm-indexing-jakarta-batch-chunking,chunk size>>,
 and thus a higher fetch size,
 which will reduce the number of database accesses,
 and the overhead of starting a new partition will be less noticeable,
@@ -290,8 +290,8 @@ Each partition deals with one root entity type, so two different entity types wi
 the same partition.
 ====
 
-[[jsr-352-chunking]]
-== Chunking and session clearing
+[[mapper-orm-indexing-jakarta-batch-chunking]]
+== [[jsr-352-chunking]] Chunking and session clearing
 
 The mass indexing job supports restart a suspended or failed job more or less from where it stopped.
 
@@ -329,7 +329,7 @@ so in a 1000-element partition, having a 100-element checkpoint interval will be
 having a 1000-element checkpoint interval.
 
 On the other hand, *chunks shouldn't be too small* in absolute terms.
-Performing a checkpoint means your JSR-352 runtime
+Performing a checkpoint means your Jakarta Batch runtime
 will write information about the progress of the job execution to its persistent storage,
 which also has a cost.
 Also, a new transaction and session are created for each chunk
@@ -341,8 +341,8 @@ which essentially means that the less you do it, the faster indexing will be.
 Thus having a 1-element checkpoint interval is definitely not a good idea.
 ====
 
-[[jsr-352-emf]]
-== Selecting the persistence unit (EntityManagerFactory)
+[[mapper-orm-indexing-jakarta-batch-emf]]
+== [[jsr-352-emf]] Selecting the persistence unit (EntityManagerFactory)
 
 [CAUTION]
 ====
@@ -351,10 +351,10 @@ you must make sure that the entity manager factory used by the mass indexer
 will stay open during the whole mass indexing process.
 ====
 
-[[jsr-352-emf-jberet]]
-=== JBeret
+[[mapper-orm-indexing-jakarta-batch-emf-jberet]]
+=== [[jsr-352-emf-jberet]] JBeret
 
-If your JSR-352 runtime is JBeret (used in WildFly in particular),
+If your Jakarta Batch runtime is JBeret (used in WildFly in particular),
 you can use CDI to retrieve the `EntityManagerFactory`.
 
 If you use only one persistence unit, the mass indexer will be able to access your database
@@ -403,10 +403,10 @@ Due to limitations of the CDI APIs, it is not currently possible to reference
 an entity manager factory by its persistence unit name when using the mass indexer with CDI.
 ====
 
-[[jsr-352-emf-other-implementation]]
-=== Other DI-enabled JSR-352 implementations
+[[mapper-orm-indexing-jakarta-batch-emf-other-implementation]]
+=== [[jsr-352-emf-other-implementation]] Other DI-enabled Jakarta Batch implementations
 
-If you want to use a different JSR-352 implementation that happens to allow dependency injection:
+If you want to use a different Jakarta Batch implementation that happens to allow dependency injection:
 
 1. You must map the following two scope annotations
 to the relevant scope in the dependency injection mechanism:
@@ -419,10 +419,10 @@ For instance this can be achieved in Spring DI using the `@ComponentScan` annota
 3. You must register a single bean in the dependency injection context
 that will implement the `EntityManagerFactoryRegistry` interface.
 
-[[mapper-orm-indexing-jsr352-no-dependency-injection]]
-=== [[_plain_java_environment_no_dependency_injection_at_all]] Plain Java environment (no dependency injection at all)
+[[mapper-orm-indexing-jakarta-batch-no-dependency-injection]]
+=== [[mapper-orm-indexing-jsr352-no-dependency-injection]][[_plain_java_environment_no_dependency_injection_at_all]] Plain Java environment (no dependency injection at all)
 
-The following will work only if your JSR-352 runtime does not support dependency injection at all,
+The following will work only if your Jakarta Batch runtime does not support dependency injection at all,
 i.e. it ignores `@Inject` annotations in batch artifacts.
 This is the case for JBatch in Java SE mode, for instance.
 

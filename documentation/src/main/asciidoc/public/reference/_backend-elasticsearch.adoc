@@ -114,7 +114,7 @@ See https://hibernate.atlassian.net/browse/HSEARCH-4930[HSEARCH-4930].
 * The <<indexing-massindexer,mass indexer>> will skip the flush, refresh and merge-segments operations by default,
 and attempting to enable them explicitly will result in failures,
 because Amazon OpenSearch Serverless link:{amazonOpenSearchServiceUrl}/serverless-genref.html#serverless-operations[doesn’t support them].
-* The <<mapper-orm-indexing-jsr352,JSR-352 integration>> is not currently supported.
+* The <<mapper-orm-indexing-jakarta-batch,Jakarta Batch integration>> is not currently supported.
 See https://hibernate.atlassian.net/browse/HSEARCH-4929[HSEARCH-4929],
 https://hibernate.atlassian.net/browse/HSEARCH-4930[HSEARCH-4930].
 

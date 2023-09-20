@@ -20,14 +20,14 @@ import org.jboss.logging.annotations.ValidIdRanges;
 @ValidIdRanges({
 		@ValidIdRange(min = MessageConstants.BATCH_JSR352_JBERET_ID_RANGE_MIN,
 				max = MessageConstants.BATCH_JSR352_JBERET_ID_RANGE_MAX),
-		// Exceptions for legacy messages from Search 5 (JSR-352 Core module)
+		// Exceptions for legacy messages from Search 5 (Jakarta Batch Core module)
 		@ValidIdRange(min = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MIN,
 				max = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MIN + 5),
 })
 public interface Log extends BasicLogger {
 
 	// -----------------------------------
-	// Pre-existing messages from Search 5 (JSR-352 Core module)
+	// Pre-existing messages from Search 5 (Jakarta Batch Core module)
 	// DO NOT ADD ANY NEW MESSAGES HERE
 	// -----------------------------------
 	int ID_OFFSET_LEGACY = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MIN;

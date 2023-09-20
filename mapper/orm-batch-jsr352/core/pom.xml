@@ -16,8 +16,8 @@
     </parent>
     <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>
 
-    <name>Hibernate Search Batch JSR-352 Core</name>
-    <description>Core of the Hibernate Search Batch JSR-352 integration</description>
+    <name>Hibernate Search Jakarta Batch Core</name>
+    <description>Core of the Hibernate Search Jakarta Batch integration</description>
 
     <properties>
         <!-- This is a publicly distributed module that should be published: -->

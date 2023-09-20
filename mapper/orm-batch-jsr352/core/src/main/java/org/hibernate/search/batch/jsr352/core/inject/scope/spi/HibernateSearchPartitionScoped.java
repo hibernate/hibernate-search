@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 import jakarta.inject.Scope;
 
 /**
- * Scope for partition execution, to be mapped to the scopes specific to each JSR-352 implementation.
+ * Scope for partition execution, to be mapped to the scopes specific to each Jakarta Batch implementation.
  */
 @Target({ TYPE })
 @Retention(RUNTIME)

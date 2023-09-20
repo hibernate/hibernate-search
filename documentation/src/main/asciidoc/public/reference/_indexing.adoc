@@ -13,6 +13,6 @@ include::_indexing-workspace.adoc[]
 
 include::_mapper-orm-indexing-manual.adoc[]
 
-include::_mapper-orm-indexing-jsr352.adoc[]
+include::_mapper-orm-indexing-jakarta-batch.adoc[]
 
 :leveloffset: -1
