@@ -130,6 +130,9 @@ class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 			backendMock.expectWorks( IndexedEntity.NAME )
 					.add( String.valueOf( i ), b -> b.field( "text", "initial" ) );
 		}
+
+		// The filter is there to make sure we don't consume all events while we're creating them,
+		// which apparently can happen on Windows.
 		eventFilter.showAllEvents();
 	}
 
