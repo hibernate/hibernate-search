@@ -16,6 +16,9 @@
         <test.elasticsearch.run.skip>${test.elasticsearch.run.skip.forRelevantModules}</test.elasticsearch.run.skip>
         <test.database.run.skip>false</test.database.run.skip>
 
+        <test.lucene.skip>${failsafe.spring.skip}</test.lucene.skip>
+        <test.elasticsearch.skip>${failsafe.spring.skip}</test.elasticsearch.skip>
+
         <!--
             Remove Hibernate system properties from parent settings:
             They are supposed to be handled by the spring.datasource subsystem
@@ -155,7 +158,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <skip>${failsafe.spring.skip}</skip>
                     <!--
                         Since we do not pass the Hibernate ORM settings through system properties directly
                         (see the override of the failsafe.jvm.args.hibernate-orm near the top of this file),

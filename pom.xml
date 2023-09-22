@@ -447,7 +447,7 @@
         <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.misc} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} ${failsafe.jvm.args.jacoco} ${failsafe.jvm.args.hibernate-orm} ${failsafe.jvm.args.jdbc} ${test.launcher.args}</failsafe.jvm.args>
 
         <!-- Disable integration tests selectively. To be set in specific profile, e.g. for a specific JDK version. -->
-        <failsafe.spring.skip>${skipITs}</failsafe.spring.skip>
+        <failsafe.spring.skip>false</failsafe.spring.skip>
 
         <!-- This allows us to distinguish between multiple executions of the same test in test reports. -->
         <surefire.reportNameSuffix>${surefire.module}-${surefire.integration}-${surefire.environment}</surefire.reportNameSuffix>

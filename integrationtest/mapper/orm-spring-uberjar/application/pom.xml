@@ -11,6 +11,10 @@
 
     <name>Hibernate Search ITs - Spring Repackaged JAR Application</name>
 
+    <properties>
+        <test.lucene.skip>${failsafe.spring.skip}</test.lucene.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>
@@ -94,7 +98,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <skip>${failsafe.spring.skip}</skip>
+                    <skip>${test.lucene.skip}</skip>
                     <classesDirectory>${project.build.outputDirectory}</classesDirectory>
                     <environmentVariables>
                         <!--
@@ -122,20 +126,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>skipLuceneTests</id>
-            <activation>
-                <property>
-                    <name>test.lucene.skip</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <properties>
-                <failsafe.spring.skip>true</failsafe.spring.skip>
-            </properties>
-        </profile>
-    </profiles>
 </project>
 
