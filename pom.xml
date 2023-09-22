@@ -227,7 +227,7 @@
         <!-- The versions of Elasticsearch that may work, but are not given priority for bugfixes and new features -->
         <version.org.elasticsearch.compatible.not-regularly-tested.text>7.0 or 8.0</version.org.elasticsearch.compatible.not-regularly-tested.text>
         <!-- The latest version of Elasticsearch tested against by default -->
-        <version.org.elasticsearch.latest>8.10.1</version.org.elasticsearch.latest>
+        <version.org.elasticsearch.latest>8.10.2</version.org.elasticsearch.latest>
         <!-- The versions of OpenSearch advertised as compatible with Hibernate Search -->
         <!-- Make sure to only mention tested versions here -->
         <version.org.opensearch.compatible.regularly-tested.text>1.3 or 2.9</version.org.opensearch.compatible.regularly-tested.text>
