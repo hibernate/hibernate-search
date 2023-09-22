@@ -100,19 +100,4 @@
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>windows</id>
-            <activation>
-                <os>
-                    <family>windows</family>
-                </os>
-            </activation>
-            <properties>
-                <!-- For some reason these outbox-polling tests don't seem to work on Windows -->
-                <skipITs>true</skipITs>
-            </properties>
-        </profile>
-    </profiles>
-
 </project>
