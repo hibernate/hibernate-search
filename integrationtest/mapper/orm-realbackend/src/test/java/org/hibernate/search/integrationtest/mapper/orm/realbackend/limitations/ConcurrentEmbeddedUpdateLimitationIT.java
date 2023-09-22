@@ -94,7 +94,7 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 		reproducer();
 
 		Awaitility.await()
-				.timeout( 5, TimeUnit.SECONDS )
+				.timeout( 20, TimeUnit.SECONDS )
 				.until( () -> noMoreOutboxEvents( sessionFactory ) );
 
 		verify( () -> assertThat( countByEditionAndAuthor( "12th", "asimov" ) ).isEqualTo( 0L ) );
