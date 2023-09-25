@@ -89,9 +89,8 @@ public abstract class JoiningLongMultiValuesSource extends LongMultiValuesSource
 			return LongMultiValues.EMPTY;
 		}
 
-		return new LongMultiValues() {
-			int currentParentDoc = -1;
-			int remainingValuesForChild = 0;
+		return new LongMultiValues.DocValuesLongMultiValues( values ) {
+			private int currentParentDoc = -1;
 
 			@Override
 			public boolean advanceExact(int parentDoc) throws IOException {
@@ -99,33 +98,26 @@ public abstract class JoiningLongMultiValuesSource extends LongMultiValuesSource
 				if ( parentDoc == currentParentDoc ) {
 					return hasNextValue();
 				}
-
 				currentParentDoc = parentDoc;
-				remainingValuesForChild = 0; // To be set in the next call to hasNextValue()
-
-				return childDocsWithValues.advanceExactParent( parentDoc );
+				boolean found = childDocsWithValues.advanceExactParent( parentDoc );
+				if ( found ) {
+					// Position the iterator on the next child so that updateRemaining()
+					// can get the relevant docvalues.
+					childDocsWithValues.nextChild();
+				}
+				updateRemaining( found );
+				return found;
 			}
 
 			@Override
 			public boolean hasNextValue() throws IOException {
-				if ( remainingValuesForChild > 0 ) {
+				if ( super.hasNextValue() ) {
 					return true;
 				}
 
-				if ( childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS ) {
-					remainingValuesForChild = values.docValueCount();
-					return true;
-				}
-				else {
-					remainingValuesForChild = 0;
-					return false;
-				}
-			}
-
-			@Override
-			public long nextValue() throws IOException {
-				--remainingValuesForChild;
-				return values.nextValue();
+				boolean hasNextChildDocWithValue = childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS;
+				updateRemaining( hasNextChildDocWithValue );
+				return hasNextChildDocWithValue;
 			}
 		};
 	}
