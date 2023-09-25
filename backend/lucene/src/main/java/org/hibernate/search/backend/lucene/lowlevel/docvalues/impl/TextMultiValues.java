@@ -86,11 +86,8 @@ public abstract class TextMultiValues {
 	};
 
 	protected static class DocValuesTextMultiValues extends TextMultiValues {
-
 		protected final SortedSetDocValues values;
-		protected long nextOrd;
-		protected int docValueCount = 0;
-		protected int nextOrdIndex = 0;
+		private int remaining;
 
 		DocValuesTextMultiValues(SortedSetDocValues values) {
 			this.values = values;
@@ -99,28 +96,23 @@ public abstract class TextMultiValues {
 		@Override
 		public boolean advanceExact(int doc) throws IOException {
 			boolean found = values.advanceExact( doc );
-			if ( found ) {
-				nextOrd = values.nextOrd();
-				docValueCount = values.docValueCount();
-			}
-			else {
-				docValueCount = 0;
-			}
-			nextOrdIndex = 0;
+			updateRemaining( found );
 			return found;
+		}
+
+		protected final void updateRemaining(boolean hasDocValue) {
+			remaining = hasDocValue ? values.docValueCount() : 0;
 		}
 
 		@Override
 		public boolean hasNextValue() throws IOException {
-			return nextOrdIndex < docValueCount;
+			return remaining > 0;
 		}
 
 		@Override
 		public long nextOrd() throws IOException {
-			nextOrdIndex++;
-			long previousOrd = nextOrd;
-			nextOrd = values.nextOrd();
-			return previousOrd;
+			--remaining;
+			return values.nextOrd();
 		}
 
 		@Override

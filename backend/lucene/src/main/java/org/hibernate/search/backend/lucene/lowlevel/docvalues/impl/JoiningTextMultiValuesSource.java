@@ -75,7 +75,7 @@ public abstract class JoiningTextMultiValuesSource extends TextMultiValuesSource
 		}
 
 		return new TextMultiValues.DocValuesTextMultiValues( values ) {
-			int currentParentDoc = -1;
+			private int currentParentDoc = -1;
 
 			@Override
 			public boolean advanceExact(int parentDoc) throws IOException {
@@ -83,8 +83,15 @@ public abstract class JoiningTextMultiValuesSource extends TextMultiValuesSource
 				if ( parentDoc == currentParentDoc ) {
 					return hasNextValue();
 				}
-
-				return childDocsWithValues.advanceExactParent( parentDoc );
+				currentParentDoc = parentDoc;
+				boolean found = childDocsWithValues.advanceExactParent( parentDoc );
+				if ( found ) {
+					// Position the iterator on the next child so that updateRemaining()
+					// can get the relevant docvalues.
+					childDocsWithValues.nextChild();
+				}
+				updateRemaining( found );
+				return found;
 			}
 
 			@Override
@@ -93,13 +100,9 @@ public abstract class JoiningTextMultiValuesSource extends TextMultiValuesSource
 					return true;
 				}
 
-				if ( childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS ) {
-					nextOrd = values.nextOrd();
-					return true;
-				}
-				else {
-					return false;
-				}
+				boolean hasNextChildDocWithValue = childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS;
+				updateRemaining( hasNextChildDocWithValue );
+				return hasNextChildDocWithValue;
 			}
 		};
 	}
