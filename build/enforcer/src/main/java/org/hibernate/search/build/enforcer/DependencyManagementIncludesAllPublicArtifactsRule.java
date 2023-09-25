@@ -8,6 +8,7 @@ package org.hibernate.search.build.enforcer;
 
 import static org.hibernate.search.build.enforcer.MavenProjectUtils.DEPLOY_SKIP;
 import static org.hibernate.search.build.enforcer.MavenProjectUtils.isAnyParentPublicParent;
+import static org.hibernate.search.build.enforcer.MavenProjectUtils.isAnyParentRelocationParent;
 import static org.hibernate.search.build.enforcer.MavenProjectUtils.isProjectDeploySkipped;
 
 import java.util.ArrayList;
@@ -43,11 +44,13 @@ public class DependencyManagementIncludesAllPublicArtifactsRule extends Abstract
 
 		for ( MavenProject project : session.getAllProjects() ) {
 			boolean publicParent = isAnyParentPublicParent( project );
+			boolean relocationParent = isAnyParentRelocationParent( project );
+			boolean shouldBePublished = publicParent || relocationParent;
 			boolean deploySkipped = isProjectDeploySkipped( project );
 			if ( dependencies.remove( project.getArtifactId() ) == null ) {
 				// The project is NOT in the dependencies
 
-				if ( publicParent && !deploySkipped ) {
+				if ( shouldBePublished && !deploySkipped ) {
 					problems.add( "`" + project.getGroupId() + ":" + project.getArtifactId()
 							+ "` is missing from the dependency management section." );
 				}
@@ -55,11 +58,13 @@ public class DependencyManagementIncludesAllPublicArtifactsRule extends Abstract
 			else {
 				// The project IS in the dependencies
 
-				if ( !publicParent || deploySkipped ) {
+				if ( !shouldBePublished || deploySkipped ) {
 					problems.add( "`" + project.getGroupId() + ":" + project.getArtifactId()
 							+ "` either is misconfigured, or it is not published so it should not be in the dependency management section:"
 							+ " [parents include '" + MavenProjectUtils.HIBERNATE_SEARCH_PARENT_PUBLIC
 							+ "' = " + publicParent
+							+ " [parents include '" + MavenProjectUtils.HIBERNATE_SEARCH_PARENT_RELOCATION
+							+ "' = " + relocationParent
 							+ ", Maven property '" + DEPLOY_SKIP + "' = " + deploySkipped + "]" );
 				}
 

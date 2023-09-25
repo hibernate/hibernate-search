@@ -12,13 +12,13 @@
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-parent-relocation</artifactId>
         <version>7.0.0-SNAPSHOT</version>
-        <relativePath>../../../build/parents/relocation</relativePath>
+        <relativePath>../../build/parents/relocation</relativePath>
     </parent>
     <packaging>pom</packaging>
-    <artifactId>hibernate-search-mapper-orm-batch-jsr352-jberet</artifactId>
-    
-    <name>Hibernate Search Jakarta Batch JBeret (JSR-352 relocation)</name>
-    <description>Hibernate Search Jakarta Batch integration - for JBeret</description>
+    <artifactId>hibernate-search-mapper-orm-coordination-outbox-polling</artifactId>
+
+    <name>Hibernate Search ORM Integration - Coordination - Outbox Polling (Relocation)</name>
+    <description>Hibernate ORM integration using outbox polling as coordination strategy</description>
 
     <properties>
         <!-- This is a publicly distributed module that should be published: -->
@@ -27,7 +27,7 @@
 
     <distributionManagement>
         <relocation>
-            <artifactId>hibernate-search-mapper-orm-jakarta-batch-jberet</artifactId>
+            <artifactId>hibernate-search-mapper-orm-outbox-polling</artifactId>
         </relocation>
     </distributionManagement>
 </project>

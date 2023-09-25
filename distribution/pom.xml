@@ -171,7 +171,7 @@
                                 ${basedir}/../backend/elasticsearch-aws/src/main/java;
                                 ${basedir}/../backend/lucene/src/main/java;
                                 ${basedir}/../mapper/lucene/src/main/java;
-                                ${basedir}/../mapper/orm-coordination-outbox-polling/src/main/java;
+                                ${basedir}/../mapper/orm-outbox-polling/src/main/java;
                                 ${basedir}/../mapper/orm-jakarta-batch/core/src/main/java;
                             </sourcepath>
                             <docfilessubdirs>true</docfilessubdirs>
