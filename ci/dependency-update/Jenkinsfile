@@ -10,12 +10,6 @@
 // NOTE: Remember to update the matrix axes below when adding/removing entries here.
 Map settings() {
 	switch (env.DEPENDENCY_UPDATE_NAME) {
-		case 'orm6.2':
-			return [
-					updateProperties: ['version.org.hibernate.orm'],
-					onlyRunTestDependingOn: ['hibernate-search-mapper-orm'],
-					requiresSourceModifications: true
-			]
 		case 'orm6.3':
 			return [
 					updateProperties: ['version.org.hibernate.orm'],
@@ -143,7 +137,7 @@ pipeline {
 					axis {
 						name 'DEPENDENCY_UPDATE_NAME'
 						// NOTE: Remember to update the settings() method above when changing this.
-						values 'orm6.2', 'orm6.3', 'lucene9', 'lucene10', 'elasticsearch-latest'
+						values 'orm6.3', 'lucene9', 'lucene10', 'elasticsearch-latest'
 					}
 				}
 				stages {
