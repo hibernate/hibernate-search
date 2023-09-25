@@ -27,6 +27,7 @@ updates:
           - "*surefire*"
           - "*forbiddenapis*"
           - "*owasp*"
+          - "io.github.gitflow-incremental-builder:*"
           # DB drivers:
           - "com.h2database:h2"
           - "org.apache.derby:derby"
