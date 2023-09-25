@@ -159,6 +159,7 @@
 
     <modules>
         <module>bom/public</module>
+        <module>build/parents/relocation</module>
         <module>build/parents/build</module>
         <module>build/enforcer</module>
         <module>build/config</module>
@@ -175,6 +176,7 @@
         <module>mapper/pojo-standalone</module>
         <module>mapper/orm</module>
         <module>mapper/orm-outbox-polling</module>
+        <module>mapper/orm-coordination-outbox-polling</module>
         <module>mapper/orm-batch-jsr352/core</module>
         <module>mapper/orm-batch-jsr352/jberet</module>
         <module>mapper/orm-jakarta-batch/core</module>

@@ -107,14 +107,14 @@
             </includes>
         </dependencySet>
         <dependencySet>
-            <outputDirectory>dist/mapper/orm/coordination-outbox-polling</outputDirectory>
+            <outputDirectory>dist/mapper/orm/outbox-polling</outputDirectory>
             <scope>runtime</scope>
             <useProjectArtifact>false</useProjectArtifact>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <useStrictFiltering>true</useStrictFiltering>
             <includes>
-                <include>org.hibernate.search:hibernate-search-mapper-orm-coordination-outbox-polling</include>
+                <include>org.hibernate.search:hibernate-search-mapper-orm-outbox-polling</include>
             </includes>
         </dependencySet>
         <dependencySet>

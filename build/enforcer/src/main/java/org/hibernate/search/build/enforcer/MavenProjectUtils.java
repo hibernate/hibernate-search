@@ -12,6 +12,7 @@ public class MavenProjectUtils {
 
 	public static final String HIBERNATE_SEARCH_PARENT_PUBLIC = "hibernate-search-parent-public";
 	public static final String HIBERNATE_SEARCH_PARENT_INTEGRATION_TEST = "hibernate-search-parent-integrationtest";
+	public static final String HIBERNATE_SEARCH_PARENT_RELOCATION = "hibernate-search-parent-relocation";
 	public static final String DEPLOY_SKIP = "deploy.skip";
 
 	private MavenProjectUtils() {
@@ -20,7 +21,13 @@ public class MavenProjectUtils {
 	public static boolean isAnyParentPublicParent(MavenProject project) {
 		return project.hasParent()
 				&& ( HIBERNATE_SEARCH_PARENT_PUBLIC.equals( project.getParent().getArtifactId() )
-						|| isAnyParentPublicParent( project.getParent() ) );
+				|| isAnyParentPublicParent( project.getParent() ) );
+	}
+
+	public static boolean isAnyParentRelocationParent(MavenProject project) {
+		return project.hasParent()
+				&& ( HIBERNATE_SEARCH_PARENT_RELOCATION.equals( project.getParent().getArtifactId() )
+				|| isAnyParentRelocationParent( project.getParent() ) );
 	}
 
 	public static boolean isAnyParentIntegrationTestParent(MavenProject project) {
