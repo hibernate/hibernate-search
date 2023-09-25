@@ -23,7 +23,7 @@
         <module>mapper/orm-cdi</module>
         <module>mapper/orm-envers</module>
         <module>mapper/orm-realbackend</module>
-        <module>mapper/orm-coordination-outbox-polling</module>
+        <module>mapper/orm-outbox-polling</module>
         <module>mapper/orm-jakarta-batch</module>
         <module>performance</module>
         <module>v5migrationhelper/engine</module>
@@ -59,7 +59,7 @@
             <modules>
                 <module>java/modules/orm-elasticsearch</module>
                 <module>java/modules/orm-lucene</module>
-                <module>java/modules/orm-coordination-outbox-polling-elasticsearch</module>
+                <module>java/modules/orm-outbox-polling-elasticsearch</module>
                 <module>java/modules/pojo-standalone-elasticsearch</module>
                 <module>java/modules/pojo-standalone-lucene</module>
             </modules>

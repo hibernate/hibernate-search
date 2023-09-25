@@ -184,7 +184,7 @@ You will also need to add this dependency:
 ----
 <dependency>
    <groupId>org.hibernate.search</groupId>
-   <artifactId>hibernate-search-mapper-orm-coordination-outbox-polling</artifactId>
+   <artifactId>hibernate-search-mapper-orm-outbox-polling</artifactId>
    <version>{hibernateSearchVersion}</version>
 </dependency>
 ----

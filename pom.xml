@@ -174,7 +174,7 @@
         <module>mapper/pojo-base</module>
         <module>mapper/pojo-standalone</module>
         <module>mapper/orm</module>
-        <module>mapper/orm-coordination-outbox-polling</module>
+        <module>mapper/orm-outbox-polling</module>
         <module>mapper/orm-batch-jsr352/core</module>
         <module>mapper/orm-batch-jsr352/jberet</module>
         <module>mapper/orm-jakarta-batch/core</module>
