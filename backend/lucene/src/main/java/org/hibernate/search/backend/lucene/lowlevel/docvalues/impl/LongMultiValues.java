@@ -65,7 +65,7 @@ public abstract class LongMultiValues {
 		}
 	};
 
-	private static class DocValuesLongMultiValues extends LongMultiValues {
+	protected static class DocValuesLongMultiValues extends LongMultiValues {
 
 		private final SortedNumericDocValues values;
 		private int remaining;
@@ -77,12 +77,16 @@ public abstract class LongMultiValues {
 		@Override
 		public boolean advanceExact(int doc) throws IOException {
 			boolean found = values.advanceExact( doc );
-			this.remaining = found ? values.docValueCount() : 0;
+			updateRemaining( found );
 			return found;
 		}
 
+		protected final void updateRemaining(boolean hasDocValue) {
+			remaining = hasDocValue ? values.docValueCount() : 0;
+		}
+
 		@Override
-		public boolean hasNextValue() {
+		public boolean hasNextValue() throws IOException {
 			return remaining > 0;
 		}
 
