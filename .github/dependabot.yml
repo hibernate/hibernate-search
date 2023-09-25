@@ -9,6 +9,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "tuesday"
     assignees: ["yrodiere"]
     # We don't trigger Jenkins or GitHub Actions builds on pull requests from dependabot,
     # so we can safely use a high limit here.
