@@ -63,6 +63,12 @@ This also means that the corresponding Java module names and packages are also u
 * The core module is now named `org.hibernate.search.jakarta.batch.core` and the base package for this module is `org.hibernate.search.jakarta.batch.core`
 * The JBeret module is now named `org.hibernate.search.jakarta.batch.jberet` and the base package for this module is `org.hibernate.search.jakarta.batch.jberet`
 
+Outbox polling for Hibernate ORM artifact is getting a shorter name: `hibernate-search-mapper-orm-outbox-polling`.
+For most of the users this should only be the change in the dependencies, unless some setting keys from `HibernateOrmMapperOutboxPollingSettings`
+where referenced in the code, then an import update will be required as well.
+The corresponding Java module name and base package are updated to:
+
+* The module is now named `org.hibernate.search.mapper.orm.outboxpolling` and the base package for this module is `org.hibernate.search.mapper.orm.outboxpolling`
 
 [[data-format]]
 == Data format and schema changes
