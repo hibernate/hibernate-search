@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.spring.jta.timeout;
 
 import org.hibernate.BaseSessionEventListener;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingEventProcessor;
+import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxPollingEventProcessor;
 
 public class TimeoutSessionEventListener extends BaseSessionEventListener {
 

@@ -323,7 +323,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-orm-coordination-outbox-polling</artifactId>
+                <artifactId>hibernate-search-mapper-orm-outbox-polling</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -628,7 +628,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-mapper-orm-coordination-outbox-polling</artifactId>
+                <artifactId>hibernate-search-integrationtest-mapper-orm-outbox-polling</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -643,7 +643,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-java-modules-orm-coordination-outbox-polling-elasticsearch</artifactId>
+                <artifactId>hibernate-search-integrationtest-java-modules-orm-outbox-polling-elasticsearch</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

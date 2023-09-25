@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<project
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+    xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-parent-public</artifactId>
+        <version>7.0.0-SNAPSHOT</version>
+        <relativePath>../../build/parents/public</relativePath>
+    </parent>
+    <artifactId>hibernate-search-mapper-orm-outbox-polling</artifactId>
+
+    <name>Hibernate Search ORM Integration - Coordination - Outbox Polling</name>
+    <description>Hibernate ORM integration using outbox polling as coordination strategy</description>
+
+    <properties>
+        <!-- This is a publicly distributed module that should be published: -->
+        <deploy.skip>false</deploy.skip>
+        <java.module.name>org.hibernate.search.mapper.orm.outboxpolling</java.module.name>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-mapper-orm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro</artifactId>
+        </dependency>
+
+        <!-- We only depend on Jackson indirectly through Avro,
+             but Dependabot apparently ignores dependency management,
+             so we need these explicit dependencies to have Dependabot update versions. -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+
+        <!-- This dependency is only here to solve Moditect errors.
+             For some reason, the jakarta.transaction module requires jakarta.cdi,
+             but the jakarta.transaction-api Maven module doesn't depend on jakarta.enterprise.cdi-api,
+             and that doesn't play well with Moditect, which ends up throwing an exception:
+               Execution add-module-infos of goal org.moditect:moditect-maven-plugin:1.0.0.RC2:add-module-info failed: Module jakarta.interceptor not found, required by jakarta.transaction
+         -->
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
+            <version>${version.jakarta.enterprise}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-test-orm</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <!-- We use Avro-generated DTOs instead of GenericRecord,
+                       because that allows us to write type-safe code
+                       to convert between Hibernate Search objects and Avro objects (DTOs) -->
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>schema</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${project.basedir}/src/main/avro/schema</sourceDirectory>
+                            <!-- These sources are checked into the source repository,
+                                 because otherwise the experience of importing the project into IDEA
+                                 is very bad.
+                                 See https://hibernate.atlassian.net/browse/HSEARCH-4638 -->
+                            <outputDirectory>${project.basedir}/src/main/avro/generated</outputDirectory>
+                            <customConversions>org.apache.avro.Conversions$UUIDConversion</customConversions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-generated-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/avro/generated</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.moditect</groupId>
+                <artifactId>moditect-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-module-infos</id>
+                        <configuration>
+                            <module>
+                                <moduleInfo>
+                                    <!-- cluster and event packages to expose Agent and OutboxEvent entities to ORM and ByteBuddy -->
+                                    <opens>
+                                        org.hibernate.search.mapper.orm.outboxpolling.avro.generated.impl to org.apache.avro;
+                                        org.hibernate.search.mapper.orm.outboxpolling.cluster.impl to org.hibernate.orm.core, net.bytebuddy;
+                                        org.hibernate.search.mapper.orm.outboxpolling.event.impl to org.hibernate.orm.core, net.bytebuddy;
+                                    </opens>
+                                </moduleInfo>
+                            </module>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

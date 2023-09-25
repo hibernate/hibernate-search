@@ -536,7 +536,7 @@ stage('Non-default environments') {
 							-pl !integrationtest/v5migrationhelper/orm \
 							-pl !integrationtest/java/modules/orm-lucene \
 							-pl !integrationtest/java/modules/orm-elasticsearch \
-							-pl !integrationtest/java/modules/orm-coordination-outbox-polling-elasticsearch \
+							-pl !integrationtest/java/modules/orm-outbox-polling-elasticsearch \
 					'''
 					String mavenDockerArgs = ""
 					def startedContainers = false

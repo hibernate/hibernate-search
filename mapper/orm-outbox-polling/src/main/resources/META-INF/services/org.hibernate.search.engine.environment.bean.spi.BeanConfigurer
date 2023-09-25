@@ -1,0 +1,1 @@
+org.hibernate.search.mapper.orm.outboxpolling.impl.OutboxPollingBeanConfigurer
