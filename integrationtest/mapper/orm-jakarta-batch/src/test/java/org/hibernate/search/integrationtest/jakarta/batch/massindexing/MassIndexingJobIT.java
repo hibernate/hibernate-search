@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.integrationtest.jakarta.batch.util.JobTestUtil.JOB_TIMEOUT_MS;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -27,6 +28,8 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 
+import org.hibernate.dialect.MySQLDialect;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.integrationtest.jakarta.batch.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.jakarta.batch.massindexing.entity.CompanyGroup;
 import org.hibernate.search.integrationtest.jakarta.batch.massindexing.entity.Person;
@@ -55,7 +58,7 @@ import org.junit.rules.MethodRule;
 /**
  * @author Mincong Huang
  */
-public class BatchIndexingJobIT {
+public class MassIndexingJobIT {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -115,6 +118,19 @@ public class BatchIndexingJobIT {
 			companies.forEach( session::persist );
 			people.forEach( session::persist );
 			whos.forEach( session::persist );
+		} );
+
+		setupHolder.runInTransaction( em -> {
+			List<CompanyGroup> groups = new ArrayList<>();
+			for ( int i = 0; i < INSTANCE_PER_ENTITY_TYPE; i += 3 ) {
+				int index1 = i;
+				int index2 = i + 1;
+				int index3 = i + 2;
+				groups.add( new CompanyGroup( "group" + index1, companies.get( index1 ) ) );
+				groups.add( new CompanyGroup( "group" + index2, companies.get( index1 ), companies.get( index2 ) ) );
+				groups.add( new CompanyGroup( "group" + index3, companies.get( index3 ) ) );
+			}
+			groups.forEach( em::persist );
 		} );
 	}
 
@@ -185,27 +201,45 @@ public class BatchIndexingJobIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2637")
-	public void indexedEmbeddedCollection()
-			throws InterruptedException,
-			IOException {
-		setupHolder.runInTransaction( em -> {
-			CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-			CriteriaQuery<Company> criteria = criteriaBuilder.createQuery( Company.class );
-			Root<Company> root = criteria.from( Company.class );
-			Path<Integer> id = root.get( root.getModel().getId( int.class ) );
-			criteria.orderBy( criteriaBuilder.asc( id ) );
-			List<Company> companies = em.createQuery( criteria ).getResultList();
-			List<CompanyGroup> groups = new ArrayList<>();
-			for ( int i = 0; i < INSTANCE_PER_ENTITY_TYPE; i += 3 ) {
-				int index1 = i;
-				int index2 = i + 1;
-				int index3 = i + 2;
-				groups.add( new CompanyGroup( "group" + index1, companies.get( index1 ) ) );
-				groups.add( new CompanyGroup( "group" + index2, companies.get( index1 ), companies.get( index2 ) ) );
-				groups.add( new CompanyGroup( "group" + index3, companies.get( index3 ) ) );
-			}
-			groups.forEach( em::persist );
-		} );
+	public void indexedEmbeddedCollection() throws InterruptedException {
+		List<CompanyGroup> groupsContainingGoogle =
+				JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Google" );
+		List<CompanyGroup> groupsContainingRedHat =
+				JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Red Hat" );
+		List<CompanyGroup> groupsContainingMicrosoft =
+				JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Microsoft" );
+		assertEquals( 0, groupsContainingGoogle.size() );
+		assertEquals( 0, groupsContainingRedHat.size() );
+		assertEquals( 0, groupsContainingMicrosoft.size() );
+
+		long executionId = jobOperator.start(
+				MassIndexingJob.NAME,
+				MassIndexingJob.parameters()
+						.forEntities( CompanyGroup.class )
+						.checkpointInterval( CHECKPOINT_INTERVAL )
+						.build()
+		);
+		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
+		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
+		assertCompletion( executionId );
+		assertProgress( executionId, CompanyGroup.class, INSTANCE_PER_ENTITY_TYPE );
+
+		groupsContainingGoogle = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Google" );
+		groupsContainingRedHat = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Red Hat" );
+		groupsContainingMicrosoft = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Microsoft" );
+		assertEquals( 2 * INSTANCES_PER_DATA_TEMPLATE, groupsContainingGoogle.size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, groupsContainingRedHat.size() );
+		assertEquals( INSTANCES_PER_DATA_TEMPLATE, groupsContainingMicrosoft.size() );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4487")
+	public void indexedEmbeddedCollection_idFetchSize_entityFetchSize_mysql() throws InterruptedException {
+		assumeTrue( "This test only makes sense on MySQL,"
+				+ " which is the only JDBC driver that accepts (and, in a sense, requires)"
+				+ " passing Integer.MIN_VALUE for the JDBC fetch size",
+				emf.unwrap( SessionFactoryImplementor.class ).getJdbcServices()
+						.getJdbcEnvironment().getDialect() instanceof MySQLDialect );
 
 		List<CompanyGroup> groupsContainingGoogle =
 				JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Google" );
@@ -222,6 +256,9 @@ public class BatchIndexingJobIT {
 				MassIndexingJob.parameters()
 						.forEntities( CompanyGroup.class )
 						.checkpointInterval( CHECKPOINT_INTERVAL )
+						// For MySQL, this is the only way to get proper scrolling
+						.idFetchSize( Integer.MIN_VALUE )
+						.entityFetchSize( Integer.MIN_VALUE )
 						.build()
 		);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
