@@ -22,13 +22,15 @@ Map settings() {
 			return [
 					updateProperties: ['version.org.apache.lucene'],
 					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
-					requiresSourceModifications: true
+					requiresSourceModifications: true,
+					additionalMavenArgs: '-Dtest.elasticsearch.skip=true'
 			]
 		case 'lucene10':
 			return [
 					updateProperties: ['version.org.apache.lucene'],
 					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
-					requiresSourceModifications: true
+					requiresSourceModifications: true,
+					additionalMavenArgs: '-Dtest.elasticsearch.skip=true'
 			]
 		case 'elasticsearch-latest':
 			return [
@@ -38,7 +40,8 @@ Map settings() {
 					// We want to use the snapshot version of an image from the ES registry since that's where they are publishing their snapshots.
 					additionalMavenArgs: '-Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=master-SNAPSHOT',
 					// This job won't change the versions in the pom. We are passing the latest Elasticsearch version through an additional maven argument `-D`
-					requiresSourceModifications: false
+					requiresSourceModifications: false,
+					additionalMavenArgs: '-Dtest.lucene.skip=true'
 			]
 		default:
 			return [:]
