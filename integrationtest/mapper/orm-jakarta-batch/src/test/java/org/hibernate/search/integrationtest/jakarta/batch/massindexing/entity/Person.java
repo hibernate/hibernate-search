@@ -26,15 +26,15 @@ public class Person {
 	private String firstName;
 
 	@FullTextField
-	private String famillyName;
+	private String familyName;
 
 	public Person() {
 	}
 
-	public Person(String id, String firstName, String famillyName) {
+	public Person(String id, String firstName, String familyName) {
 		this.id = id;
 		this.firstName = firstName;
-		this.famillyName = famillyName;
+		this.familyName = familyName;
 	}
 
 	public String getId() {
@@ -53,17 +53,17 @@ public class Person {
 		this.firstName = firstName;
 	}
 
-	public String getFamillyName() {
-		return famillyName;
+	public String getFamilyName() {
+		return familyName;
 	}
 
-	public void setFamillyName(String famillyName) {
-		this.famillyName = famillyName;
+	public void setFamilyName(String familyName) {
+		this.familyName = familyName;
 	}
 
 	@Override
 	public String toString() {
-		return "Person [id=" + id + ", firstName=" + firstName + ", famillyName=" + famillyName
+		return "Person [id=" + id + ", firstName=" + firstName + ", familyName=" + familyName
 				+ "]";
 	}
 }
