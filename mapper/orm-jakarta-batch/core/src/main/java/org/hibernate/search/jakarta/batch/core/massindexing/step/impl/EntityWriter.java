@@ -17,9 +17,12 @@ import jakarta.batch.runtime.context.JobContext;
 import jakarta.batch.runtime.context.StepContext;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.LockModeType;
 
+import org.hibernate.CacheMode;
+import org.hibernate.FlushMode;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
@@ -27,11 +30,13 @@ import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperati
 import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
 import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
+import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.EntityTypeDescriptor;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.MassIndexingPartitionProperties;
+import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.PersistenceUtil;
+import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.SerializationUtil;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.SearchException;
@@ -41,12 +46,25 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public class EntityWriter extends AbstractItemWriter {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final String ID_PARAMETER_NAME = "ids";
 
 	@Inject
 	private JobContext jobContext;
 
 	@Inject
 	private StepContext stepContext;
+
+	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.CHECKPOINT_INTERVAL)
+	private String serializedCheckpointInterval;
+
+	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.CACHE_MODE)
+	private String serializedCacheMode;
+
+	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.ENTITY_FETCH_SIZE)
+	private String serializedEntityFetchSize;
 
 	@Inject
 	@BatchProperty(name = MassIndexingPartitionProperties.ENTITY_NAME)
@@ -60,10 +78,12 @@ public class EntityWriter extends AbstractItemWriter {
 	@BatchProperty(name = MassIndexingJobParameters.TENANT_ID)
 	private String tenantId;
 
+	private CacheMode cacheMode;
+	private int entityFetchSize;
+
 	private EntityManagerFactory emf;
-	private SearchMapping searchMapping;
 	private BatchMappingContext mappingContext;
-	private PojoRawTypeIdentifier<?> typeIdentifier;
+	private EntityTypeDescriptor<?, ?> type;
 	private PojoScopeWorkspace workspace;
 
 	private WriteMode writeMode;
@@ -81,10 +101,20 @@ public class EntityWriter extends AbstractItemWriter {
 		JobContextData jobContextData = (JobContextData) jobContext.getTransientUserData();
 
 		emf = jobContextData.getEntityManagerFactory();
-		searchMapping = Search.mapping( emf );
+		SearchMapping searchMapping = Search.mapping( emf );
 		mappingContext = (BatchMappingContext) searchMapping;
-		typeIdentifier = mappingContext.typeContextProvider().byEntityName().getOrFail( entityName ).typeIdentifier();
-		workspace = mappingContext.scope( typeIdentifier.javaClass(), entityName ).pojoWorkspace( tenantId );
+		type = jobContextData.getEntityTypeDescriptor( entityName );
+		workspace = mappingContext.scope( type.javaClass(), entityName ).pojoWorkspace( tenantId );
+
+		cacheMode = SerializationUtil.parseCacheModeParameter(
+				MassIndexingJobParameters.CACHE_MODE, serializedCacheMode, MassIndexingJobParameters.Defaults.CACHE_MODE
+		);
+		int checkpointInterval = SerializationUtil.parseIntegerParameter(
+				MassIndexingJobParameters.CHECKPOINT_INTERVAL, serializedCheckpointInterval
+		);
+		Integer entityFetchSizeRaw = SerializationUtil.parseIntegerParameterOptional(
+				MassIndexingJobParameters.ENTITY_FETCH_SIZE, serializedEntityFetchSize, null );
+		entityFetchSize = MassIndexingJobParameters.Defaults.entityFetchSize( entityFetchSizeRaw, checkpointInterval );
 
 		/*
 		 * Always execute works as updates on the first checkpoint interval,
@@ -98,42 +128,64 @@ public class EntityWriter extends AbstractItemWriter {
 	}
 
 	@Override
-	public void writeItems(List<Object> entities) {
-		try ( Session session = emf.unwrap( SessionFactory.class )
-				.withOptions()
-				.tenantIdentifier( tenantId )
-				.openSession() ) {
+	public void writeItems(List<Object> entityIds) {
+		try ( Session session = PersistenceUtil.openSession( emf, tenantId ) ) {
+			SessionImplementor sessionImplementor = session.unwrap( SessionImplementor.class );
 
 			PojoIndexer indexer = mappingContext.sessionContext( session ).createIndexer();
 
-			indexAndWaitForCompletion( entities, indexer );
+			int i = 0;
+			while ( i < entityIds.size() ) {
+				int fromIndex = i;
+				i += entityFetchSize;
+				int toIndex = Math.min( i, entityIds.size() );
 
-			/*
-			 * Flush after each write operation
-			 * This ensures the writes have actually been persisted,
-			 * which is necessary because the runtime will perform a checkpoint
-			 * just after we return from this method.
-			 */
-			Futures.unwrappedExceptionJoin( workspace.flush( OperationSubmitter.blocking(),
-					// If not supported, we're on Amazon OpenSearch Serverless,
-					// and in this case purge writes are safe even without a flush.
-					UnsupportedOperationBehavior.IGNORE ) );
+				List<?> entities = loadEntities( sessionImplementor, entityIds.subList( fromIndex, toIndex ) );
+
+				indexAndWaitForCompletion( entities, indexer );
+			}
 		}
+
+		/*
+		 * Flush after each write operation
+		 * This ensures the writes have actually been persisted,
+		 * which is necessary because the runtime will perform a checkpoint
+		 * just after we return from this method.
+		 */
+		Futures.unwrappedExceptionJoin( workspace.flush( OperationSubmitter.blocking(),
+				// If not supported, we're on Amazon OpenSearch Serverless,
+				// and in this case purge writes are safe even without a flush.
+				UnsupportedOperationBehavior.IGNORE ) );
 
 		// update work count
 		PartitionContextData partitionData = (PartitionContextData) stepContext.getTransientUserData();
-		partitionData.documentAdded( entities.size() );
+		partitionData.documentAdded( entityIds.size() );
 
 		/*
 		 * We can switch to a faster mode, without checks, because we know the next items
 		 * we'll write haven't been written to the index yet.
 		 */
 		this.writeMode = WriteMode.ADD;
+	}
 
+	@Override
+	public void close() throws Exception {
 		log.closingEntityWriter( partitionIdStr, entityName );
 	}
 
-	private void indexAndWaitForCompletion(List<Object> entities, PojoIndexer indexer) {
+	private List<?> loadEntities(SessionImplementor session, List<Object> entityIds) {
+		return type.createLoadingQuery( session, ID_PARAMETER_NAME )
+				.setParameter( ID_PARAMETER_NAME, entityIds )
+				.setReadOnly( true )
+				.setCacheable( false )
+				.setLockMode( LockModeType.NONE )
+				.setCacheMode( cacheMode )
+				.setHibernateFlushMode( FlushMode.MANUAL )
+				.setFetchSize( entityFetchSize )
+				.list();
+	}
+
+	private void indexAndWaitForCompletion(List<?> entities, PojoIndexer indexer) {
 		if ( entities == null || entities.isEmpty() ) {
 			return;
 		}
@@ -157,13 +209,13 @@ public class EntityWriter extends AbstractItemWriter {
 		log.processEntity( entity );
 
 		if ( WriteMode.ADD.equals( writeMode ) ) {
-			return indexer.add( typeIdentifier, null, null, entity,
+			return indexer.add( type.typeIdentifier(), null, null, entity,
 					// Commit and refresh are handled globally after all documents are indexed.
 					DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, OperationSubmitter.blocking()
 			);
 		}
 
-		return indexer.addOrUpdate( typeIdentifier, null, null, entity,
+		return indexer.addOrUpdate( type.typeIdentifier(), null, null, entity,
 				// Commit and refresh are handled globally after all documents are indexed.
 				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, OperationSubmitter.blocking()
 		);

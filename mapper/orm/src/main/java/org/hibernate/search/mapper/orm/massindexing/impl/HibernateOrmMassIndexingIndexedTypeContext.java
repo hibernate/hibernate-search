@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
-import org.hibernate.search.mapper.orm.loading.impl.LoadingTypeContext;
+import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
 
 public interface HibernateOrmMassIndexingIndexedTypeContext<E> extends LoadingTypeContext<E> {
 

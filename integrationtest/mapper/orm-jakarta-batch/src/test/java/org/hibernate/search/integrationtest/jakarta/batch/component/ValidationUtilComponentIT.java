@@ -100,19 +100,19 @@ public class ValidationUtilComponentIT {
 
 	@Test
 	public void validateSessionClearInterval_lessThanCheckpointInterval() throws Exception {
-		ValidationUtil.validateSessionClearInterval( 99, 100 );
+		ValidationUtil.validateEntityFetchSize( 99, 100 );
 		// ok
 	}
 
 	@Test
 	public void validateSessionClearInterval_equalToCheckpointInterval() {
-		ValidationUtil.validateSessionClearInterval( 100, 100 );
+		ValidationUtil.validateEntityFetchSize( 100, 100 );
 		// ok
 	}
 
 	@Test(expected = SearchException.class)
 	public void validateSessionClearInterval_greaterThanCheckpointInterval() throws Exception {
-		ValidationUtil.validateSessionClearInterval( 101, 100 );
+		ValidationUtil.validateEntityFetchSize( 101, 100 );
 	}
 
 	private static class NotIndexed {

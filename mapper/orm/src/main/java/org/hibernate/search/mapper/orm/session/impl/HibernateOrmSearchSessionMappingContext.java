@@ -11,7 +11,7 @@ import java.util.Collection;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.mapper.orm.loading.impl.LoadingMappingContext;
+import org.hibernate.search.mapper.orm.loading.spi.LoadingMappingContext;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionMappingContext;
 import org.hibernate.search.mapper.pojo.work.SearchIndexingPlanFilter;

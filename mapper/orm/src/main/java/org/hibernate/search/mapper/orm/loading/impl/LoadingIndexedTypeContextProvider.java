@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
+import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface LoadingIndexedTypeContextProvider {

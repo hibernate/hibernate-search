@@ -258,7 +258,6 @@ public class MassIndexingJobIT {
 						.checkpointInterval( CHECKPOINT_INTERVAL )
 						// For MySQL, this is the only way to get proper scrolling
 						.idFetchSize( Integer.MIN_VALUE )
-						.entityFetchSize( Integer.MIN_VALUE )
 						.build()
 		);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
@@ -291,7 +290,7 @@ public class MassIndexingJobIT {
 				MassIndexingJob.parameters()
 						.forEntity( Company.class )
 						.purgeAllOnStart( true )
-						.restrictedBy( "select c from Company c where c.name like 'NEVER_MATCH'" )
+						.reindexOnly( "name like :name", Map.of( "name", "NEVER_MATCH" ) )
 						.build()
 		);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
@@ -317,7 +316,7 @@ public class MassIndexingJobIT {
 				MassIndexingJob.parameters()
 						.forEntity( Company.class )
 						.purgeAllOnStart( false )
-						.restrictedBy( "select c from Company c where c.name like 'NEVER_MATCH'" )
+						.reindexOnly( "name like :name", Map.of( "name", "NEVER_MATCH" ) )
 						.build()
 		);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
@@ -327,7 +326,7 @@ public class MassIndexingJobIT {
 	}
 
 	@Test
-	public void hql()
+	public void reindexOnly()
 			throws InterruptedException,
 			IOException {
 		// searches before mass index,
@@ -341,7 +340,7 @@ public class MassIndexingJobIT {
 				MassIndexingJob.parameters()
 						.forEntity( Company.class )
 						.checkpointInterval( CHECKPOINT_INTERVAL )
-						.restrictedBy( "select c from Company c where c.name like 'Google%' or c.name like 'Red Hat%'" )
+						.reindexOnly( "name like 'Google%' or name like 'Red Hat%'", Map.of() )
 						.build()
 		);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
@@ -355,7 +354,7 @@ public class MassIndexingJobIT {
 	}
 
 	@Test
-	public void hql_maxResults()
+	public void reindexOnly_maxResults()
 			throws InterruptedException,
 			IOException {
 		// searches before mass index,
@@ -369,7 +368,7 @@ public class MassIndexingJobIT {
 				MassIndexingJob.parameters()
 						.forEntity( Company.class )
 						.checkpointInterval( CHECKPOINT_INTERVAL )
-						.restrictedBy( "select c from Company c where c.name like 'Google%' or c.name like 'Red Hat%'" )
+						.reindexOnly( "name like 'Google%' or name like 'Red Hat%'", Map.of() )
 						.maxResultsPerEntity( maxResults )
 						.build()
 		);
@@ -447,7 +446,8 @@ public class MassIndexingJobIT {
 		 * Thus we check our own object.
 		 */
 		StepProgress progress = getMainStepProgress( executionId );
-		assertEquals( Long.valueOf( progressValue ), progress.getEntityProgress().get( entityType.getName() ) );
+		assertEquals( Long.valueOf( progressValue ),
+				progress.getEntityProgress().get( emf.getMetamodel().entity( entityType ).getName() ) );
 	}
 
 	private StepProgress getMainStepProgress(long executionId) {

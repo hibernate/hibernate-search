@@ -10,6 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.junit.Assume.assumeTrue;
 
+import java.time.Year;
+import java.util.Map;
 import java.util.Properties;
 
 import jakarta.batch.operations.JobOperator;
@@ -61,34 +63,25 @@ public class HibernateOrmJakartaBatchIT extends AbstractHibernateOrmMassIndexing
 	}
 
 	@Test
-	public void hql() throws Exception {
-		// tag::hql[]
+	public void reindexOnly() throws Exception {
+		// tag::reindexOnly[]
 		Properties jobProps = MassIndexingJob.parameters() // <1>
 				.forEntities( Author.class ) // <2>
-				.restrictedBy( "from Author a where a.lastName = 'Smith1'" ) // <3>
+				.reindexOnly( "birthDate < :cutoff", // <3>
+						Map.of( "cutoff", Year.of( 1950 ).atDay( 1 ) ) ) // <4>
 				.build();
 
-		JobOperator jobOperator = BatchRuntime.getJobOperator(); // <4>
-		long executionId = jobOperator.start( MassIndexingJob.NAME, jobProps ); // <5>
-		// end::hql[]
+		JobOperator jobOperator = BatchRuntime.getJobOperator(); // <5>
+		long executionId = jobOperator.start( MassIndexingJob.NAME, jobProps ); // <6>
+		// end::reindexOnly[]
 
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
 		jobExecution = waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 		assertThat( jobExecution.getBatchStatus() ).isEqualTo( BatchStatus.COMPLETED );
 
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
-			assertBookAndAuthorCount( entityManager, 0, NUMBER_OF_BOOKS / 2 );
+			assertBookAndAuthorCount( entityManager, 0, 500 );
 		} );
-	}
-
-	@Override
-	protected Author newAuthor(int id) {
-		Author author = new Author();
-		author.setId( id );
-		author.setFirstName( "John" + id );
-		// use the id % 2
-		author.setLastName( "Smith" + ( id % 2 ) );
-		return author;
 	}
 
 	void assertBookAndAuthorCount(EntityManager entityManager, int expectedBookCount, int expectedAuthorCount) {

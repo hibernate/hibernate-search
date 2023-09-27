@@ -86,7 +86,7 @@ abstract class AbstractHibernateOrmMassIndexingIT {
 		return book;
 	}
 
-	protected Author newAuthor(int id) {
+	private Author newAuthor(int id) {
 		Author author = new Author();
 		author.setId( id );
 		author.setFirstName( "John" + id );

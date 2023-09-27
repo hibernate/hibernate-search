@@ -20,7 +20,8 @@ import org.hibernate.search.jakarta.batch.core.context.jpa.spi.EntityManagerFact
 import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.mapping.SearchMapping;
+import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
+import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
 import org.hibernate.search.util.common.impl.StringHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -80,15 +81,15 @@ public final class JobContextUtil {
 	}
 
 	private static JobContextData createData(EntityManagerFactory emf, String entityTypes) {
-		SearchMapping mapping = Search.mapping( emf );
+		BatchMappingContext mapping = (BatchMappingContext) Search.mapping( emf );
 		List<String> entityNamesToIndex = Arrays.asList( entityTypes.split( "," ) );
 
-		Set<Class<?>> entityTypesToIndex = new LinkedHashSet<>();
+		Set<LoadingTypeContext<?>> entityTypesToIndex = new LinkedHashSet<>();
 		for ( String s : entityNamesToIndex ) {
-			entityTypesToIndex.add( mapping.indexedEntity( s ).javaClass() );
+			entityTypesToIndex.add( mapping.typeContextProvider().byEntityName().getOrFail( s ) );
 		}
 
-		List<EntityTypeDescriptor> descriptors = PersistenceUtil.createDescriptors( emf, entityTypesToIndex );
+		List<EntityTypeDescriptor<?, ?>> descriptors = PersistenceUtil.createDescriptors( entityTypesToIndex );
 
 		JobContextData jobContextData = new JobContextData();
 		jobContextData.setEntityManagerFactory( emf );

@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.mapper.orm.spi;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeContext;
+import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
 import org.hibernate.search.util.common.data.spi.KeyValueProvider;
 
-public interface BatchTypeIdentifierProvider {
+public interface BatchTypeContextProvider {
 
-	KeyValueProvider<String, ? extends PojoTypeContext<?>> byEntityName();
+	KeyValueProvider<String, ? extends LoadingTypeContext<?>> byEntityName();
 
 }

@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.jakarta.batch.core.massindexing.util.impl;
 
-import org.hibernate.search.jakarta.batch.core.massindexing.step.impl.IndexScope;
-
 /**
  * Information about a target partition which can not be stored in the partition properties as String values. In
  * particular, the boundary properties help us to identify the lower boundary and upper boundary of a given partition,
@@ -18,24 +16,18 @@ import org.hibernate.search.jakarta.batch.core.massindexing.step.impl.IndexScope
  */
 public class PartitionBound {
 
-	private Class<?> entityType;
+	private EntityTypeDescriptor<?, ?> entityType;
 	private Object lowerBound;
 	private Object upperBound;
-	private IndexScope indexScope;
 
-	public PartitionBound(Class<?> entityType, Object lowerBound, Object upperBound, IndexScope indexScope) {
+	public PartitionBound(EntityTypeDescriptor<?, ?> entityType, Object lowerBound, Object upperBound) {
 		this.entityType = entityType;
 		this.lowerBound = lowerBound;
 		this.upperBound = upperBound;
-		this.indexScope = indexScope;
-	}
-
-	public IndexScope getIndexScope() {
-		return indexScope;
 	}
 
 	public String getEntityName() {
-		return entityType.getName();
+		return entityType.jpaEntityName();
 	}
 
 	public Object getLowerBound() {
@@ -46,17 +38,9 @@ public class PartitionBound {
 		return upperBound;
 	}
 
-	public boolean hasUpperBound() {
-		return upperBound != null;
-	}
-
-	public boolean hasLowerBound() {
-		return lowerBound != null;
-	}
-
 	@Override
 	public String toString() {
 		return "PartitionBound [entityType=" + entityType + ", lowerBound=" + lowerBound + ", upperBound=" + upperBound
-				+ ", indexScope=" + indexScope + "]";
+				+ "]";
 	}
 }

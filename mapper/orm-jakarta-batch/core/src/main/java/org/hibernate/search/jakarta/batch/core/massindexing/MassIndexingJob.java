@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.jakarta.batch.core.massindexing;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,8 +18,10 @@ import java.util.stream.Collectors;
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.CacheMode;
+import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.SerializationUtil;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.ValidationUtil;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.impl.Contracts;
 
 /**
  * A utility class to start the Hibernate Search Jakarta Batch mass indexing job.
@@ -95,11 +99,11 @@ public final class MassIndexingJob {
 		private Boolean purgeAllOnStart;
 		private Integer idFetchSize;
 		private Integer entityFetchSize;
-		private Integer sessionClearInterval;
 		private Integer checkpointInterval;
 		private Integer rowsPerPartition;
 		private Integer maxThreads;
-		private String customQueryHql;
+		private String reindexOnlyHql;
+		private String serializedReindexOnlyParameters;
 		private Integer maxResultsPerEntity;
 		private String tenantId;
 
@@ -160,23 +164,6 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * The number of entities to process before clearing the session. The value defined must be greater
-		 * than 0, and equal to or less than the value of {@link #checkpointInterval}.
-		 * <p>
-		 * This is an optional parameter, its default value is
-		 * {@link MassIndexingJobParameters.Defaults#SESSION_CLEAR_INTERVAL_DEFAULT_RAW},
-		 * or the value of {@link #checkpointInterval} if it is smaller.
-		 *
-		 * @param sessionClearInterval the number of entities to process before clearing the session.
-		 *
-		 * @return itself
-		 */
-		public ParametersBuilder sessionClearInterval(int sessionClearInterval) {
-			this.sessionClearInterval = sessionClearInterval;
-			return this;
-		}
-
-		/**
 		 * The number of entities to process before triggering the next checkpoint. The value defined must be greater
 		 * than 0, and equal to or less than the value of {@link #rowsPerPartition}.
 		 * <p>
@@ -212,19 +199,21 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * Specifies the fetch size to be used when loading entities from
-		 * database. Some databases accept special values, for example MySQL
-		 * might benefit from using {@link Integer#MIN_VALUE}, otherwise it
-		 * will attempt to preload everything in memory.
+		 * Specifies the fetch size to be used when loading entities from the database.
+		 * <p>
+		 * The value defined must be greater
+		 * than 0, and equal to or less than the value of {@link #checkpointInterval}.
 		 * <p>
 		 * This is an optional parameter, its default value is
-		 * the value of the session clear interval.
+		 * {@link MassIndexingJobParameters.Defaults#ENTITY_FETCH_SIZE_RAW},
+		 * or the value of {@link #checkpointInterval} if it is smaller.
 		 *
 		 * @param entityFetchSize the fetch size to be used when loading entities
 		 *
 		 * @return itself
 		 */
 		public ParametersBuilder entityFetchSize(int entityFetchSize) {
+			Contracts.assertStrictlyPositive( entityFetchSize, "entityFetchSize" );
 			this.entityFetchSize = entityFetchSize;
 			return this;
 		}
@@ -321,19 +310,43 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * Use HQL / JPQL to index entities of a target entity type. Your query should contain only one entity type.
-		 * Mixing this approach with the criteria restriction is not allowed. Please notice that there's no query
-		 * validation for your input.
+		 * Use a JPQL/HQL conditional expression to limit the entities to be re-indexed.
+		 * <p>
+		 * The letter {@code e} is supposed to be used here as query alias.
+		 * For instance a valid expression could be the following:
+		 * <pre>
+		 *     manager.level &lt; 2
+		 * </pre>
+		 * ... to filter instances that have a manager whose level is strictly less than 2.
+		 * <p>
+		 * Parameters can be used, so assuming the parameter "max" is defined
+		 * in the {@code parameters} {@link Map},
+		 * this is valid as well:
+		 * <pre>
+		 *     manager.level &lt; :max
+		 * </pre>
+		 * ... to filter instances that have a manager whose level is strictly less than {@code :max}.
 		 *
-		 * @param hql HQL / JPQL.
+		 * @param hql A JPQL/HQL conditional expression, e.g. {@code manager.level < 2}
+		 * @param parameters A map of named parameters parameters that may be used in the conditional expression
+		 * with the usual JPQL/HQL colon-prefixed syntax (e.g. ":myparam").
 		 *
 		 * @return itself
 		 */
-		public ParametersBuilder restrictedBy(String hql) {
-			if ( hql == null ) {
-				throw new NullPointerException( "The HQL is null." );
+		public ParametersBuilder reindexOnly(String hql, Map<String, ?> parameters) {
+			Contracts.assertNotNull( hql, "hql" );
+			Contracts.assertNotNull( parameters, "parameters" );
+			this.reindexOnlyHql = hql;
+			try {
+				this.serializedReindexOnlyParameters = parameters == null
+						? null
+						: SerializationUtil.serialize( parameters );
 			}
-			this.customQueryHql = hql;
+			catch (IOException e) {
+				throw new IllegalArgumentException(
+						"Failed to serialize parameters; the parameters must be a serializable Map with serializable keys and values.",
+						e );
+			}
 			return this;
 		}
 
@@ -389,10 +402,10 @@ public final class MassIndexingJob {
 					defaultedCheckpointInterval,
 					rowsPerPartition != null ? rowsPerPartition : MassIndexingJobParameters.Defaults.ROWS_PER_PARTITION
 			);
-			int defaultedSessionClearInterval =
-					MassIndexingJobParameters.Defaults.sessionClearInterval( sessionClearInterval,
+			int defaultedEntityFetchSize =
+					MassIndexingJobParameters.Defaults.entityFetchSize( entityFetchSize,
 							defaultedCheckpointInterval );
-			ValidationUtil.validateSessionClearInterval( defaultedSessionClearInterval, defaultedCheckpointInterval );
+			ValidationUtil.validateEntityFetchSize( defaultedEntityFetchSize, defaultedCheckpointInterval );
 
 			Properties jobParams = new Properties();
 
@@ -402,9 +415,10 @@ public final class MassIndexingJob {
 					entityManagerFactoryReference );
 			addIfNotNull( jobParams, MassIndexingJobParameters.ID_FETCH_SIZE, idFetchSize );
 			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_FETCH_SIZE, entityFetchSize );
-			addIfNotNull( jobParams, MassIndexingJobParameters.CUSTOM_QUERY_HQL, customQueryHql );
+			addIfNotNull( jobParams, MassIndexingJobParameters.REINDEX_ONLY_HQL, reindexOnlyHql );
+			addIfNotNull( jobParams, MassIndexingJobParameters.REINDEX_ONLY_PARAMETERS,
+					serializedReindexOnlyParameters );
 			addIfNotNull( jobParams, MassIndexingJobParameters.CHECKPOINT_INTERVAL, checkpointInterval );
-			addIfNotNull( jobParams, MassIndexingJobParameters.SESSION_CLEAR_INTERVAL, sessionClearInterval );
 			addIfNotNull( jobParams, MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY, maxResultsPerEntity );
 			addIfNotNull( jobParams, MassIndexingJobParameters.MAX_THREADS, maxThreads );
 			addIfNotNull( jobParams, MassIndexingJobParameters.MERGE_SEGMENTS_AFTER_PURGE, mergeSegmentsAfterPurge );

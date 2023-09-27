@@ -9,13 +9,15 @@ package org.hibernate.search.mapper.orm.loading.impl;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
-import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
+import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmEntityLoadingStrategy;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmQueryLoader;
+import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
 import org.hibernate.search.util.common.AssertionFailure;
 
 public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
@@ -33,8 +35,14 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 	}
 
 	@Override
-	public HibernateOrmQueryLoader<E, I> createQueryLoader(
-			List<LoadingTypeContext<? extends E>> typeContexts, Optional<ConditionalExpression> conditionalExpression) {
+	public HibernateOrmQueryLoader<E, I> createQueryLoader(List<LoadingTypeContext<? extends E>> typeContexts,
+			List<ConditionalExpression> conditionalExpressions) {
+		return createQueryLoader( typeContexts, conditionalExpressions, null );
+	}
+
+	@Override
+	public HibernateOrmQueryLoader<E, I> createQueryLoader(List<LoadingTypeContext<? extends E>> typeContexts,
+			List<ConditionalExpression> conditionalExpressions, String order) {
 		Set<Class<? extends E>> includedTypesFilter;
 		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, rootEntityMappingType, typeContexts ) ) {
 			// All concrete types are included, no need to filter by type.
@@ -47,16 +55,16 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 			}
 		}
 
-		if ( conditionalExpression.isPresent() ) {
+		if ( !conditionalExpressions.isEmpty() || order != null ) {
 			if ( typeContexts.size() != 1 ) {
-				throw new AssertionFailure( "conditional expression is always defined on a single type" );
+				throw new AssertionFailure( "conditional/order expression is always defined on a single type" );
 			}
 
 			EntityMappingType entityMappingType = typeContexts.get( 0 ).entityMappingType();
-			return new HibernateOrmQueryLoader<>(
-					queryFactory, entityMappingType, includedTypesFilter, conditionalExpression.get() );
+			return new HibernateOrmQueryLoaderImpl<>( queryFactory, entityMappingType,
+					includedTypesFilter, conditionalExpressions, order );
 		}
-		return new HibernateOrmQueryLoader<>( queryFactory, includedTypesFilter );
+		return new HibernateOrmQueryLoaderImpl<>( queryFactory, includedTypesFilter );
 	}
 
 }

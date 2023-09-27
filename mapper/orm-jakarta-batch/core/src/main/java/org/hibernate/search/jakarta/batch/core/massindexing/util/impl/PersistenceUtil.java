@@ -18,12 +18,7 @@ import org.hibernate.SessionBuilder;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.StatelessSessionBuilder;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.metamodel.MappingMetamodel;
-import org.hibernate.metamodel.mapping.EmbeddableMappingType;
-import org.hibernate.metamodel.mapping.EntityIdentifierMapping;
-import org.hibernate.metamodel.mapping.EntityMappingType;
-import org.hibernate.search.jakarta.batch.core.massindexing.step.impl.IndexScope;
+import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
 import org.hibernate.search.util.common.impl.StringHelper;
 
 /**
@@ -79,45 +74,12 @@ public final class PersistenceUtil {
 		return builder.openStatelessSession();
 	}
 
-	/**
-	 * Determines the index scope using the input parameters.
-	 *
-	 * @see IndexScope
-	 */
-	public static IndexScope getIndexScope(String hql) {
-		if ( StringHelper.isNotEmpty( hql ) ) {
-			return IndexScope.HQL;
-		}
-		else {
-			return IndexScope.FULL_ENTITY;
-		}
-	}
-
-	public static List<EntityTypeDescriptor> createDescriptors(EntityManagerFactory entityManagerFactory, Set<Class<?>> types) {
-		SessionFactoryImplementor sessionFactory = entityManagerFactory.unwrap( SessionFactoryImplementor.class );
-		List<EntityTypeDescriptor> result = new ArrayList<>( types.size() );
-		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
-		for ( Class<?> type : types ) {
-			result.add( createDescriptor( metamodel, type ) );
+	public static List<EntityTypeDescriptor<?, ?>> createDescriptors(Set<LoadingTypeContext<?>> types) {
+		List<EntityTypeDescriptor<?, ?>> result = new ArrayList<>( types.size() );
+		for ( LoadingTypeContext<?> type : types ) {
+			result.add( EntityTypeDescriptor.create( type ) );
 		}
 		return result;
-	}
-
-	private static <T> EntityTypeDescriptor createDescriptor(MappingMetamodel metamodel, Class<T> type) {
-		EntityMappingType entityMappingType = metamodel.findEntityDescriptor( type );
-		IdOrder idOrder = createIdOrder( entityMappingType );
-		return new EntityTypeDescriptor( type, idOrder );
-	}
-
-	private static IdOrder createIdOrder(EntityMappingType entityMappingType) {
-		EntityIdentifierMapping identifierMapping = entityMappingType.getIdentifierMapping();
-		if ( identifierMapping.getPartMappingType() instanceof EmbeddableMappingType ) {
-			return new CompositeIdOrder( identifierMapping,
-					(EmbeddableMappingType) identifierMapping.getPartMappingType() );
-		}
-		else {
-			return new SingularIdOrder( identifierMapping.getAttributeName() );
-		}
 	}
 
 }

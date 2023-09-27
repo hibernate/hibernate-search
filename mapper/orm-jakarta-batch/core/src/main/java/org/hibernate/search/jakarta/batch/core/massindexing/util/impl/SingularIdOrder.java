@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.jakarta.batch.core.massindexing.util.impl;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
+import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
 
 /**
  * Order over a single ID attribute.
@@ -19,35 +17,39 @@ import jakarta.persistence.criteria.Root;
  * @author Mincong Huang
  * @author Yoann Rodiere
  */
-public class SingularIdOrder implements IdOrder {
+public class SingularIdOrder<E> implements IdOrder {
 
 	private final String idPropertyName;
 
-	public SingularIdOrder(String idPropertyName) {
-		this.idPropertyName = idPropertyName;
+	public SingularIdOrder(LoadingTypeContext<E> type) {
+		this.idPropertyName = type.entityMappingType().getIdentifierMapping().getAttributeName();
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // Can't do better without addings generics for the ID type everywhere
-	public Predicate idGreater(CriteriaBuilder builder, Root<?> root, Object idObj) {
-		return builder.greaterThan( root.get( idPropertyName ), (Comparable<? super Object>) idObj );
+	public ConditionalExpression idGreater(String paramNamePrefix, Object idObj) {
+		return restrict( paramNamePrefix, ">", idObj );
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // Can't do better without addings generics for the ID type everywhere
-	public Predicate idGreaterOrEqual(CriteriaBuilder builder, Root<?> root, Object idObj) {
-		return builder.greaterThanOrEqualTo( root.get( idPropertyName ), (Comparable<? super Object>) idObj );
+	public ConditionalExpression idGreaterOrEqual(String paramNamePrefix, Object idObj) {
+		return restrict( paramNamePrefix, ">=", idObj );
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // Can't do better without addings generics for the ID type everywhere
-	public Predicate idLesser(CriteriaBuilder builder, Root<?> root, Object idObj) {
-		return builder.lessThan( root.get( idPropertyName ), (Comparable<? super Object>) idObj );
+	public ConditionalExpression idLesser(String paramNamePrefix, Object idObj) {
+		return restrict( paramNamePrefix, "<", idObj );
 	}
 
 	@Override
-	public void addAscOrder(CriteriaBuilder builder, CriteriaQuery<?> criteria, Root<?> root) {
-		criteria.orderBy( builder.asc( root.get( idPropertyName ) ) );
+	public String ascOrder() {
+		return idPropertyName + " asc";
+	}
+
+	private ConditionalExpression restrict(String paramNamePrefix, String operator, Object idObj) {
+		String paramName = paramNamePrefix + "REF";
+		var expression = new ConditionalExpression( idPropertyName + " " + operator + " :" + paramName );
+		expression.param( paramName, idObj );
+		return expression;
 	}
 
 }

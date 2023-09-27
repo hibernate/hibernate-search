@@ -12,6 +12,8 @@ import java.util.List;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.query.Query;
+import org.hibernate.search.mapper.orm.loading.spi.LoadingSessionContext;
+import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 
 /**

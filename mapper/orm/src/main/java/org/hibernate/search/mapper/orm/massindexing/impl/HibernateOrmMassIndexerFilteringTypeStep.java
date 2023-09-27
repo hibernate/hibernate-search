@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
+import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexerFilteringTypeStep;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexerReindexParameterStep;
 

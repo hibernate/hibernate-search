@@ -199,7 +199,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 <2> Create a `MassIndexer` targeting every indexed entity type.
 <3> Reindex only the books published before year 1950.
 <4> Reindex only the authors born prior to a given local date.
-<5> In this example the date is passed as a query parameter.
+<5> In this example the cutoff date is passed as a query parameter.
 <6> Start the mass indexing process and return when it is over.
 ====
 

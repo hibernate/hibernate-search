@@ -10,7 +10,7 @@ import jakarta.persistence.EntityManager;
 
 public interface BatchMappingContext {
 
-	BatchTypeIdentifierProvider typeContextProvider();
+	BatchTypeContextProvider typeContextProvider();
 
 	BatchSessionContext sessionContext(EntityManager entityManager);
 

@@ -26,8 +26,8 @@
                 <property name="sessionClearInterval" value="#{jobParameters['sessionClearInterval']}" />
                 <property name="checkpointInterval" value="#{jobParameters['checkpointInterval']}" />
                 <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}" />
-
-                <property name="customQueryCriteria" value="#{jobParameters['customQueryCriteria']}" />
+                <property name="reindexOnlyHql" value="#{jobParameters['reindexOnlyHql']}" />
+                <property name="reindexOnlyParameters" value="#{jobParameters['reindexOnlyParameters']}" />
             </properties>
         </listener>
     </listeners>
@@ -53,7 +53,7 @@
         </listeners>
         <!-- Here we use the property from the partition plan, so that defaults are correctly applied -->
         <chunk item-count="#{partitionPlan['checkpointInterval']}">
-            <reader ref="org.hibernate.search.jakarta.batch.core.massindexing.step.spi.EntityReader">
+            <reader ref="org.hibernate.search.jakarta.batch.core.massindexing.step.spi.EntityIdReader">
                 <properties>
                 	<!-- Used to re-create the job context data as necessary -->
 	                <property name="entityManagerFactoryNamespace" value="#{jobParameters['entityManagerFactoryNamespace']}" />
@@ -67,12 +67,11 @@
                     <property name="upperBound" value="#{partitionPlan['upperBound']}" />
                     <property name="indexScope" value="#{partitionPlan['indexScope']}" />
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
-                    <property name="cacheMode" value="#{jobParameters['cacheMode']}" />
-                    <property name="entityFetchSize" value="#{jobParameters['entityFetchSize']}" />
+                    <property name="idFetchSize" value="#{jobParameters['entityFetchSize']}" />
                     <!-- Here we use the property from the partition plan, so that defaults are correctly applied -->
                     <property name="checkpointInterval" value="#{partitionPlan['checkpointInterval']}" />
-                    <property name="sessionClearInterval" value="#{jobParameters['sessionClearInterval']}" />
-                    <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
+                    <property name="reindexOnlyHql" value="#{jobParameters['reindexOnlyHql']}" />
+                    <property name="reindexOnlyParameters" value="#{jobParameters['reindexOnlyParameters']}" />
                     <property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
                 </properties>
             </reader>
@@ -81,6 +80,10 @@
                     <property name="entityName" value="#{partitionPlan['entityName']}" />
                     <property name="partitionId" value="#{partitionPlan['partitionId']}" />
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
+                    <property name="cacheMode" value="#{jobParameters['cacheMode']}" />
+                    <!-- Here we use the property from the partition plan, so that defaults are correctly applied -->
+                    <property name="checkpointInterval" value="#{partitionPlan['checkpointInterval']}" />
+                    <property name="entityFetchSize" value="#{jobParameters['entityFetchSize']}" />
                 </properties>
             </writer>
         </chunk>
@@ -89,7 +92,8 @@
                 <properties>
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
                     <property name="idFetchSize" value="#{jobParameters['idFetchSize']}" />
-                    <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
+                    <property name="reindexOnlyHql" value="#{jobParameters['reindexOnlyHql']}" />
+                    <property name="reindexOnlyParameters" value="#{jobParameters['reindexOnlyParameters']}" />
                     <property name="maxThreads" value="#{jobParameters['maxThreads']}" />
                     <property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
                     <property name="checkpointInterval" value="#{jobParameters['checkpointInterval']}" />

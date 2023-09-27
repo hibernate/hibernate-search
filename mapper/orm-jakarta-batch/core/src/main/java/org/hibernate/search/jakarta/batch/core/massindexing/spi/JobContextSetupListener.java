@@ -89,10 +89,6 @@ public class JobContextSetupListener extends AbstractJobListener {
 	private String serializedCheckpointInterval;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.SESSION_CLEAR_INTERVAL)
-	private String serializedSessionClearInterval;
-
-	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.ROWS_PER_PARTITION)
 	private String serializedRowsPerPartition;
 
@@ -138,17 +134,17 @@ public class JobContextSetupListener extends AbstractJobListener {
 		);
 		int checkpointInterval =
 				MassIndexingJobParameters.Defaults.checkpointInterval( checkpointIntervalRaw, rowsPerPartition );
-		Integer sessionClearIntervalRaw = SerializationUtil.parseIntegerParameterOptional(
-				MassIndexingJobParameters.SESSION_CLEAR_INTERVAL, serializedSessionClearInterval, null
+		Integer entityFetchSizeRaw = SerializationUtil.parseIntegerParameterOptional(
+				MassIndexingJobParameters.ENTITY_FETCH_SIZE, serializedEntityFetchSize, null
 		);
-		int sessionClearInterval =
-				MassIndexingJobParameters.Defaults.sessionClearInterval( sessionClearIntervalRaw, checkpointInterval );
+		int entityFetchSize =
+				MassIndexingJobParameters.Defaults.entityFetchSize( entityFetchSizeRaw, checkpointInterval );
 
-		ValidationUtil.validatePositive( MassIndexingJobParameters.SESSION_CLEAR_INTERVAL, sessionClearInterval );
+		ValidationUtil.validatePositive( MassIndexingJobParameters.ENTITY_FETCH_SIZE, entityFetchSize );
 		ValidationUtil.validatePositive( MassIndexingJobParameters.CHECKPOINT_INTERVAL, checkpointInterval );
 		ValidationUtil.validatePositive( MassIndexingJobParameters.ROWS_PER_PARTITION, rowsPerPartition );
 		ValidationUtil.validateCheckpointInterval( checkpointInterval, rowsPerPartition );
-		ValidationUtil.validateSessionClearInterval( sessionClearInterval, checkpointInterval );
+		ValidationUtil.validateEntityFetchSize( entityFetchSize, checkpointInterval );
 	}
 
 	private void validateJobSettings() {

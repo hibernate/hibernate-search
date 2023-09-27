@@ -28,7 +28,7 @@ public interface MassIndexerFilteringTypeStep {
 	 * </pre>
 	 * ... to filter instances that have a manager whose level is strictly less than {@code :max}.
 	 *
-	 * @param conditionalExpression A JPQL/HQL query text which express the condition to apply
+	 * @param conditionalExpression A JPQL/HQL query text which expresses the condition to apply
 	 * @return A new step to define optional parameters for the JPQL/HQL conditional expression or other expressions.
 	 */
 	MassIndexerReindexParameterStep reindexOnly(String conditionalExpression);
