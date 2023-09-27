@@ -25,13 +25,15 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.BackendSe
 import org.hibernate.search.util.impl.integrationtest.common.extension.MappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoAssertionHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
 public final class V5MigrationHelperEngineSetupHelper
 		extends
 		MappingSetupHelper<V5MigrationHelperEngineSetupHelper.SetupContext,
 				SearchMappingBuilder,
 				StandalonePojoMappingConfigurationContext,
-				CloseableSearchMapping> {
+				CloseableSearchMapping,
+				V5MigrationHelperEngineSetupHelper.SetupVariant> {
 
 	public static V5MigrationHelperEngineSetupHelper create() {
 		return new V5MigrationHelperEngineSetupHelper(
@@ -52,7 +54,12 @@ public final class V5MigrationHelperEngineSetupHelper
 	}
 
 	@Override
-	protected SetupContext createSetupContext() {
+	protected SetupVariant defaultSetupVariant() {
+		return SetupVariant.variant();
+	}
+
+	@Override
+	protected SetupContext createSetupContext(SetupVariant variant) {
 		return new SetupContext();
 	}
 
@@ -61,12 +68,21 @@ public final class V5MigrationHelperEngineSetupHelper
 		toClose.close();
 	}
 
+	public static final class SetupVariant extends StandalonePojoMappingSetupHelper.SetupVariant {
+		private static final SetupVariant INSTANCE = new SetupVariant();
+
+		public static SetupVariant variant() {
+			return INSTANCE;
+		}
+	}
+
 	public final class SetupContext
 			extends
 			MappingSetupHelper<SetupContext,
 					SearchMappingBuilder,
 					StandalonePojoMappingConfigurationContext,
-					CloseableSearchMapping>.AbstractSetupContext {
+					CloseableSearchMapping,
+					SetupVariant>.AbstractSetupContext {
 
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> properties = new LinkedHashMap<>();

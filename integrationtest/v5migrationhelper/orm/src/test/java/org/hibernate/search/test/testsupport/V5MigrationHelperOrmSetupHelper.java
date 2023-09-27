@@ -27,6 +27,7 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.MappingSe
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmAssertionHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl.MultitenancyTestHelper;
 
@@ -40,7 +41,8 @@ public final class V5MigrationHelperOrmSetupHelper
 		MappingSetupHelper<V5MigrationHelperOrmSetupHelper.SetupContext,
 				SimpleSessionFactoryBuilder,
 				SimpleSessionFactoryBuilder,
-				SessionFactory>
+				SessionFactory,
+				V5MigrationHelperOrmSetupHelper.SetupVariant>
 		implements TestRule {
 
 	public static V5MigrationHelperOrmSetupHelper create() {
@@ -62,7 +64,12 @@ public final class V5MigrationHelperOrmSetupHelper
 	}
 
 	@Override
-	protected SetupContext createSetupContext() {
+	protected SetupVariant defaultSetupVariant() {
+		return SetupVariant.variant();
+	}
+
+	@Override
+	protected SetupContext createSetupContext(SetupVariant setupVariant) {
 		return new SetupContext();
 	}
 
@@ -88,12 +95,24 @@ public final class V5MigrationHelperOrmSetupHelper
 		};
 	}
 
+	public static class SetupVariant extends OrmSetupHelper.SetupVariant {
+		private static final SetupVariant INSTANCE = new SetupVariant();
+
+		public static SetupVariant variant() {
+			return INSTANCE;
+		}
+
+		protected SetupVariant() {
+		}
+	}
+
 	public final class SetupContext
 			extends
 			MappingSetupHelper<SetupContext,
 					SimpleSessionFactoryBuilder,
 					SimpleSessionFactoryBuilder,
-					SessionFactory>.AbstractSetupContext {
+					SessionFactory,
+					SetupVariant>.AbstractSetupContext {
 
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();

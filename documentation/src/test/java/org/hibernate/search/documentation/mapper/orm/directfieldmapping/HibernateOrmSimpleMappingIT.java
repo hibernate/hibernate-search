@@ -18,7 +18,6 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 
@@ -60,21 +59,19 @@ class HibernateOrmSimpleMappingIT {
 	}
 
 	@RegisterExtension
-	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
-			BackendConfigurations.simple() );
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 	private EntityManagerFactory entityManagerFactory;
 
-	public void init(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
-		setupHelper.withAnnotationProcessingEnabled( annotationProcessingEnabled )
-				.withMappingConfigurer( mappingContributor );
-		entityManagerFactory = setupHelper.start().setup( Book.class );
+	public void init(DocumentationSetupHelper.SetupVariant variant) {
+		entityManagerFactory = setupHelper.start( variant )
+				.setup( Book.class );
 		initData();
 	}
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void sort(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
-		init( annotationProcessingEnabled, mappingContributor );
+	void sort(DocumentationSetupHelper.SetupVariant variant) {
+		init( variant );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -93,8 +90,8 @@ class HibernateOrmSimpleMappingIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void projection_simple(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
-		init( annotationProcessingEnabled, mappingContributor );
+	void projection_simple(DocumentationSetupHelper.SetupVariant variant) {
+		init( variant );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 

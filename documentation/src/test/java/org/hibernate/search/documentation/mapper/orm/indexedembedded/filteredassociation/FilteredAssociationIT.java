@@ -17,7 +17,6 @@ import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 
@@ -51,20 +50,18 @@ class FilteredAssociationIT {
 	}
 
 	@RegisterExtension
-	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
-			BackendConfigurations.simple() );
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 	private EntityManagerFactory entityManagerFactory;
 
-	public void init(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
-		setupHelper.withAnnotationProcessingEnabled( annotationProcessingEnabled )
-				.withMappingConfigurer( mappingContributor );
-		entityManagerFactory = setupHelper.start().setup( Book.class, BookEdition.class );
+	public void init(DocumentationSetupHelper.SetupVariant variant) {
+		entityManagerFactory = setupHelper.start( variant )
+				.setup( Book.class, BookEdition.class );
 	}
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void reindexing(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
-		init( annotationProcessingEnabled, mappingContributor );
+	void reindexing(DocumentationSetupHelper.SetupVariant variant) {
+		init( variant );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book = new Book();
 			book.setId( 0 );

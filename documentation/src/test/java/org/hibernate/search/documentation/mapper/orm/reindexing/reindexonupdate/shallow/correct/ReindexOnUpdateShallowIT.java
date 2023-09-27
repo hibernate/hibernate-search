@@ -17,7 +17,6 @@ import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 
@@ -45,21 +44,18 @@ class ReindexOnUpdateShallowIT {
 	}
 
 	@RegisterExtension
-	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
-			BackendConfigurations.simple() );
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 	private EntityManagerFactory entityManagerFactory;
 
-	public void init(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
-		setupHelper.withAnnotationProcessingEnabled( annotationProcessingEnabled )
-				.withMappingConfigurer( mappingContributor );
-		entityManagerFactory = setupHelper.start().setup( Book.class, BookCategory.class );
+	public void init(DocumentationSetupHelper.SetupVariant variant) {
+		entityManagerFactory = setupHelper.start( variant )
+				.setup( Book.class, BookCategory.class );
 	}
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void reindexOnUpdateShallow(Boolean annotationProcessingEnabled,
-			HibernateOrmSearchMappingConfigurer mappingContributor) {
-		init( annotationProcessingEnabled, mappingContributor );
+	void reindexOnUpdateShallow(DocumentationSetupHelper.SetupVariant variant) {
+		init( variant );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			BookCategory category = new BookCategory();
 			category.setId( 1 );

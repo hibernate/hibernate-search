@@ -37,7 +37,8 @@ public final class StandalonePojoMappingSetupHelper
 		MappingSetupHelper<StandalonePojoMappingSetupHelper.SetupContext,
 				SearchMappingBuilder,
 				StandalonePojoMappingConfigurationContext,
-				CloseableSearchMapping> {
+				CloseableSearchMapping,
+				StandalonePojoMappingSetupHelper.SetupVariant> {
 
 	/**
 	 * @param lookup A {@link MethodHandles.Lookup} with private access to the test method,
@@ -96,7 +97,12 @@ public final class StandalonePojoMappingSetupHelper
 	}
 
 	@Override
-	protected SetupContext createSetupContext() {
+	protected SetupVariant defaultSetupVariant() {
+		return SetupVariant.variant();
+	}
+
+	@Override
+	protected SetupContext createSetupContext(SetupVariant setupVariant) {
 		return new SetupContext( schemaManagementStrategyName );
 	}
 
@@ -105,12 +111,24 @@ public final class StandalonePojoMappingSetupHelper
 		toClose.close();
 	}
 
+	public static class SetupVariant {
+		private static final SetupVariant INSTANCE = new SetupVariant();
+
+		public static SetupVariant variant() {
+			return INSTANCE;
+		}
+
+		protected SetupVariant() {
+		}
+	}
+
 	public final class SetupContext
 			extends
 			MappingSetupHelper<SetupContext,
 					SearchMappingBuilder,
 					StandalonePojoMappingConfigurationContext,
-					CloseableSearchMapping>.AbstractSetupContext {
+					CloseableSearchMapping,
+					SetupVariant>.AbstractSetupContext {
 
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> properties = new LinkedHashMap<>();

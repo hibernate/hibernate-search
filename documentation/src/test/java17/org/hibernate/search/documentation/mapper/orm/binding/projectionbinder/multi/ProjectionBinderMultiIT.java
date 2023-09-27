@@ -12,13 +12,13 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.impl.CollectionHelper;
@@ -55,16 +55,15 @@ class ProjectionBinderMultiIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
-	public void init(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
-		setupHelper.withAnnotationProcessingEnabled( annotationProcessingEnabled )
-				.withMappingConfigurer( mappingContributor );
-		entityManagerFactory = setupHelper.start().setup( Book.class );
+	public void init(DocumentationSetupHelper.SetupVariant variant) {
+		entityManagerFactory = setupHelper.start( variant )
+				.setup( Book.class );
 	}
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void smoke(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
-		init( annotationProcessingEnabled, mappingContributor );
+	void smoke(DocumentationSetupHelper.SetupVariant variant) {
+		init( variant );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book = new Book();
 			book.setTags( List.of( "robot", "crime" ) );

@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.documentation.testsupport;
 
+import static org.hibernate.search.documentation.testsupport.DocumentationSetupHelper.SetupVariant.variant;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -37,7 +40,8 @@ public final class DocumentationSetupHelper
 		MappingSetupHelper<DocumentationSetupHelper.SetupContext,
 				SimpleSessionFactoryBuilder,
 				SimpleSessionFactoryBuilder,
-				SessionFactory> {
+				SessionFactory,
+				DocumentationSetupHelper.SetupVariant> {
 
 	public static List<? extends Arguments> testParamsForBothAnnotationsAndProgrammatic(
 			Consumer<ProgrammaticMappingConfigurationContext> programmaticMappingContributor
@@ -54,11 +58,11 @@ public final class DocumentationSetupHelper
 				additionalAnnotatedClasses.isEmpty()
 						? null
 						: context -> context.annotationMapping().add( additionalAnnotatedClasses );
-		result.add( Arguments.of( null, annotationMappingConfigurer ) );
+		result.add( Arguments.of( variant( null, annotationMappingConfigurer ) ) );
 		// Programmatic mapping
 		HibernateOrmSearchMappingConfigurer programmaticMappingConfigurer =
 				context -> programmaticMappingContributor.accept( context.programmaticMapping() );
-		result.add( Arguments.of( false, programmaticMappingConfigurer ) );
+		result.add( Arguments.of( variant( false, programmaticMappingConfigurer ) ) );
 		return result;
 	}
 
@@ -98,21 +102,6 @@ public final class DocumentationSetupHelper
 		this.assertionHelper = new OrmAssertionHelper( backendSetupStrategy );
 	}
 
-	public DocumentationSetupHelper withMappingConfigurer(HibernateOrmSearchMappingConfigurer defaultMappingConfigurer) {
-		if ( this.defaultMappingConfigurer != null ) {
-			throw new IllegalStateException();
-		}
-		this.defaultMappingConfigurer = defaultMappingConfigurer;
-
-		return this;
-	}
-
-	public DocumentationSetupHelper withAnnotationProcessingEnabled(Boolean annotationProcessingEnabled) {
-		this.annotationProcessingEnabled = annotationProcessingEnabled;
-
-		return this;
-	}
-
 	@Override
 	public String toString() {
 		return super.toString()
@@ -125,8 +114,16 @@ public final class DocumentationSetupHelper
 	}
 
 	@Override
-	protected SetupContext createSetupContext() {
-		return new SetupContext( annotationProcessingEnabled, defaultMappingConfigurer );
+	protected SetupVariant defaultSetupVariant() {
+		return SetupVariant.variant( null, null );
+	}
+
+	@Override
+	protected SetupContext createSetupContext(SetupVariant setupVariant) {
+		return new SetupContext(
+				setupVariant.annotationProcessingEnabled.orElse( annotationProcessingEnabled ),
+				setupVariant.defaultMappingConfigurer.orElse( defaultMappingConfigurer )
+		);
 	}
 
 	@Override
@@ -134,12 +131,37 @@ public final class DocumentationSetupHelper
 		toClose.close();
 	}
 
+	public static final class SetupVariant {
+		private final Optional<Boolean> annotationProcessingEnabled;
+		private final Optional<HibernateOrmSearchMappingConfigurer> defaultMappingConfigurer;
+
+		public static SetupVariant variant(Boolean annotationProcessingEnabled,
+				HibernateOrmSearchMappingConfigurer defaultMappingConfigurer) {
+			return new SetupVariant( annotationProcessingEnabled, defaultMappingConfigurer );
+		}
+
+		public static SetupVariant variant(HibernateOrmSearchMappingConfigurer defaultMappingConfigurer) {
+			return new SetupVariant( null, defaultMappingConfigurer );
+		}
+
+		public static SetupVariant variant(Boolean annotationProcessingEnabled) {
+			return new SetupVariant( annotationProcessingEnabled, null );
+		}
+
+		private SetupVariant(Boolean annotationProcessingEnabled,
+				HibernateOrmSearchMappingConfigurer defaultMappingConfigurer) {
+			this.annotationProcessingEnabled = Optional.ofNullable( annotationProcessingEnabled );
+			this.defaultMappingConfigurer = Optional.ofNullable( defaultMappingConfigurer );
+		}
+	}
+
 	public final class SetupContext
 			extends
 			MappingSetupHelper<SetupContext,
 					SimpleSessionFactoryBuilder,
 					SimpleSessionFactoryBuilder,
-					SessionFactory>.AbstractSetupContext {
+					SessionFactory,
+					SetupVariant>.AbstractSetupContext {
 
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
