@@ -27,6 +27,7 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.MappingSe
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmAssertionHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleEntityManagerFactoryBuilder;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -39,7 +40,8 @@ public final class V5MigrationHelperJPASetupHelper
 		MappingSetupHelper<V5MigrationHelperJPASetupHelper.SetupContext,
 				SimpleEntityManagerFactoryBuilder,
 				SimpleEntityManagerFactoryBuilder,
-				EntityManagerFactory>
+				EntityManagerFactory,
+				V5MigrationHelperJPASetupHelper.SetupVariant>
 		implements TestRule {
 
 	public static V5MigrationHelperJPASetupHelper create() {
@@ -61,7 +63,12 @@ public final class V5MigrationHelperJPASetupHelper
 	}
 
 	@Override
-	protected SetupContext createSetupContext() {
+	protected SetupVariant defaultSetupVariant() {
+		return SetupVariant.variant();
+	}
+
+	@Override
+	protected SetupContext createSetupContext(SetupVariant setupVariant) {
 		return new SetupContext();
 	}
 
@@ -87,12 +94,24 @@ public final class V5MigrationHelperJPASetupHelper
 		};
 	}
 
+	public static class SetupVariant extends OrmSetupHelper.SetupVariant {
+		private static final SetupVariant INSTANCE = new SetupVariant();
+
+		public static SetupVariant variant() {
+			return INSTANCE;
+		}
+
+		protected SetupVariant() {
+		}
+	}
+
 	public final class SetupContext
 			extends
 			MappingSetupHelper<SetupContext,
 					SimpleEntityManagerFactoryBuilder,
 					SimpleEntityManagerFactoryBuilder,
-					EntityManagerFactory>.AbstractSetupContext {
+					EntityManagerFactory,
+					SetupVariant>.AbstractSetupContext {
 
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();

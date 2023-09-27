@@ -20,7 +20,6 @@ import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
@@ -65,18 +64,16 @@ class HibernateOrmIndexedIT {
 			DEFAULT_BACKEND_CONFIGURATION, NAMED_BACKEND_CONFIGURATIONS );
 	private EntityManagerFactory entityManagerFactory;
 
-	public void init(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
-		setupHelper.withAnnotationProcessingEnabled( annotationProcessingEnabled )
-				.withMappingConfigurer( mappingContributor );
-		entityManagerFactory = setupHelper.start().setup( Book.class, User.class, Author.class );
+	public void init(DocumentationSetupHelper.SetupVariant variant) {
+		entityManagerFactory = setupHelper.start( variant )
+				.setup( Book.class, User.class, Author.class );
 		initData();
 	}
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void search_separateQueries(Boolean annotationProcessingEnabled,
-			HibernateOrmSearchMappingConfigurer mappingContributor) {
-		init( annotationProcessingEnabled, mappingContributor );
+	void search_separateQueries(DocumentationSetupHelper.SetupVariant variant) {
+		init( variant );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -94,9 +91,8 @@ class HibernateOrmIndexedIT {
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("params")
-	void search_singleQuery(Boolean annotationProcessingEnabled,
-			HibernateOrmSearchMappingConfigurer mappingContributor) {
-		init( annotationProcessingEnabled, mappingContributor );
+	void search_singleQuery(DocumentationSetupHelper.SetupVariant variant) {
+		init( variant );
 		assertThatThrownBy(
 				() -> with( entityManagerFactory ).runInTransaction( entityManager -> {
 					SearchSession searchSession = Search.session( entityManager );

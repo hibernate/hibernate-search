@@ -36,7 +36,8 @@ public final class OrmSetupHelper
 		MappingSetupHelper<OrmSetupHelper.SetupContext,
 				SimpleSessionFactoryBuilder,
 				SimpleSessionFactoryBuilder,
-				SessionFactory> {
+				SessionFactory,
+				OrmSetupHelper.SetupVariant> {
 
 	private static final CoordinationStrategyExpectations DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS;
 	private static final Map<String, Object> DEFAULT_PROPERTIES;
@@ -166,13 +167,18 @@ public final class OrmSetupHelper
 		return assertionHelper;
 	}
 
-	public boolean areEntitiesProcessedInSession() {
-		return coordinationStrategyExpectations.sync;
+	@Override
+	protected SetupVariant defaultSetupVariant() {
+		return SetupVariant.variant();
 	}
 
 	@Override
-	protected SetupContext createSetupContext() {
+	protected SetupContext createSetupContext(SetupVariant setupVariant) {
 		return new SetupContext( schemaManagementStrategyName );
+	}
+
+	public boolean areEntitiesProcessedInSession() {
+		return coordinationStrategyExpectations.sync;
 	}
 
 	@Override
@@ -189,12 +195,24 @@ public final class OrmSetupHelper
 		}
 	}
 
+	public static class SetupVariant {
+		private static final SetupVariant INSTANCE = new SetupVariant();
+
+		public static SetupVariant variant() {
+			return INSTANCE;
+		}
+
+		protected SetupVariant() {
+		}
+	}
+
 	public final class SetupContext
 			extends
 			MappingSetupHelper<SetupContext,
 					SimpleSessionFactoryBuilder,
 					SimpleSessionFactoryBuilder,
-					SessionFactory>.AbstractSetupContext {
+					SessionFactory,
+					SetupVariant>.AbstractSetupContext {
 
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
