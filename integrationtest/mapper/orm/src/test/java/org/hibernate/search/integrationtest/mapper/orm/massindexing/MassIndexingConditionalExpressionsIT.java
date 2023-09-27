@@ -137,7 +137,7 @@ public class MassIndexingConditionalExpressionsIT {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H0_Indexed.class );
-			indexer.type( H0_Indexed.class ).reindexOnly( "e.number = 2" );
+			indexer.type( H0_Indexed.class ).reindexOnly( "number = 2" );
 
 			backendMock.expectWorks( H0_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "2", b -> b.field( "text", "text2" ) )
@@ -163,7 +163,7 @@ public class MassIndexingConditionalExpressionsIT {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H0_Indexed.class );
-			indexer.type( H0_Indexed.class ).reindexOnly( "e.number < :number and e.moment > :moment" )
+			indexer.type( H0_Indexed.class ).reindexOnly( "number < :number and moment > :moment" )
 					.param( "moment", INSTANT_1 )
 					.param( "number", INT_1 );
 
@@ -190,7 +190,7 @@ public class MassIndexingConditionalExpressionsIT {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
-			indexer.type( H1_Root_NotIndexed.class ).reindexOnly( "e.rootNumber = 2" );
+			indexer.type( H1_Root_NotIndexed.class ).reindexOnly( "rootNumber = 2" );
 
 			backendMock.expectWorks( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "10", b -> b.field( "rootText", "text10" )
@@ -220,7 +220,7 @@ public class MassIndexingConditionalExpressionsIT {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
-			indexer.type( H1_B_Indexed.class ).reindexOnly( "e.rootNumber = 2" );
+			indexer.type( H1_B_Indexed.class ).reindexOnly( "rootNumber = 2" );
 
 			backendMock.expectWorks( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "10", b -> b.field( "rootText", "text10" )
@@ -250,7 +250,7 @@ public class MassIndexingConditionalExpressionsIT {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
-			indexer.type( H1_B_Indexed.class ).reindexOnly( "e.bNumber = 2" );
+			indexer.type( H1_B_Indexed.class ).reindexOnly( "bNumber = 2" );
 
 			backendMock.expectWorks( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "10", b -> b.field( "rootText", "text10" )
@@ -280,7 +280,7 @@ public class MassIndexingConditionalExpressionsIT {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_B_Indexed.class );
-			indexer.type( H1_B_Indexed.class ).reindexOnly( "e.bNumber = 2" );
+			indexer.type( H1_B_Indexed.class ).reindexOnly( "bNumber = 2" );
 
 			backendMock.expectWorks( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "10", b -> b.field( "rootText", "text10" )
@@ -310,8 +310,8 @@ public class MassIndexingConditionalExpressionsIT {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
-			indexer.type( H2_Root_Indexed.class ).reindexOnly( "e.rootNumber = 2" );
-			indexer.type( H2_B_Indexed.class ).reindexOnly( "e.rootNumber = 0" );
+			indexer.type( H2_Root_Indexed.class ).reindexOnly( "rootNumber = 2" );
+			indexer.type( H2_B_Indexed.class ).reindexOnly( "rootNumber = 0" );
 
 			backendMock.expectWorks( H2_Root_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "2", b -> b.field( "rootText", "text2" ) )
@@ -364,11 +364,11 @@ public class MassIndexingConditionalExpressionsIT {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
 
-			indexer.type( H2_Root_Indexed.class ).reindexOnly( "e.rootNumber = :number and e.rootMoment > :moment" )
+			indexer.type( H2_Root_Indexed.class ).reindexOnly( "rootNumber = :number and rootMoment > :moment" )
 					.param( "number", INT_2 )
 					.param( "moment", INSTANT_0 );
 
-			indexer.type( H2_B_Indexed.class ).reindexOnly( "e.bNumber = :number and e.rootMoment < :moment" )
+			indexer.type( H2_B_Indexed.class ).reindexOnly( "bNumber = :number and rootMoment < :moment" )
 					.param( "number", INT_0 )
 					.param( "moment", INSTANT_1 );
 
@@ -415,7 +415,7 @@ public class MassIndexingConditionalExpressionsIT {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_B_Indexed.class );
-			indexer.type( H2_B_Indexed.class ).reindexOnly( "e.rootNumber = 2" );
+			indexer.type( H2_B_Indexed.class ).reindexOnly( "rootNumber = 2" );
 
 			backendMock.expectWorks( H2_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "14", b -> b
@@ -448,9 +448,9 @@ public class MassIndexingConditionalExpressionsIT {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H3_Root.class );
 
-			indexer.type( H3_A_Indexed.class ).reindexOnly( "e.myProperty = :myProperty" )
+			indexer.type( H3_A_Indexed.class ).reindexOnly( "myProperty = :myProperty" )
 					.param( "myProperty", KEYWORD_A_1 );
-			indexer.type( H3_B_Indexed.class ).reindexOnly( "e.myProperty = :myProperty" )
+			indexer.type( H3_B_Indexed.class ).reindexOnly( "myProperty = :myProperty" )
 					.param( "myProperty", KEYWORD_B_1 );
 
 			backendMock.expectWorks( H3_A_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
@@ -484,7 +484,7 @@ public class MassIndexingConditionalExpressionsIT {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H3_Root.class );
 
-			indexer.type( H3_I.class ).reindexOnly( "e.myProperty = :p1 or e.myProperty = :p2" )
+			indexer.type( H3_I.class ).reindexOnly( "myProperty = :p1 or myProperty = :p2" )
 					.param( "p1", KEYWORD_A_1 )
 					.param( "p2", KEYWORD_B_1 );
 
@@ -520,7 +520,7 @@ public class MassIndexingConditionalExpressionsIT {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
 
-			indexer.type( H2_Root_Indexed.class ).reindexOnly( "e.rootNumber = :number or e.rootMoment > :moment" )
+			indexer.type( H2_Root_Indexed.class ).reindexOnly( "rootNumber = :number or rootMoment > :moment" )
 					.param( "number", INT_2 )
 					.param( "moment", INSTANT_0 );
 
