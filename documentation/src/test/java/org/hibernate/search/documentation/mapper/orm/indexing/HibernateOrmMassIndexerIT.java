@@ -12,7 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.lang.invoke.MethodHandles;
-import java.time.LocalDate;
+import java.time.Year;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
 
@@ -64,9 +64,9 @@ public class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingI
 						Search.session( entityManager );
 				// tag::reindexOnly[]
 				MassIndexer massIndexer = searchSession.massIndexer(); // <2>
-				massIndexer.type( Book.class ).reindexOnly( "e.publicationYear <= 2100" ); // <3>
-				massIndexer.type( Author.class ).reindexOnly( "e.birthDate < :birthDate" ) // <4>
-						.param( "birthDate", LocalDate.ofYearDay( 2100, 77 ) ); // <5>
+				massIndexer.type( Book.class ).reindexOnly( "publicationYear < 1950" ); // <3>
+				massIndexer.type( Author.class ).reindexOnly( "birthDate < :cutoff" ) // <4>
+						.param( "cutoff", Year.of( 1950 ).atDay( 1 ) ); // <5>
 				// end::reindexOnly[]
 				if ( !BackendConfigurations.simple().supportsExplicitPurge() ) {
 					massIndexer.purgeAllOnStart( false );
@@ -78,7 +78,7 @@ public class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingI
 			catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
-			assertBookAndAuthorCount( entityManager, 651, 651 );
+			assertBookAndAuthorCount( entityManager, 500, 500 );
 		} );
 	}
 

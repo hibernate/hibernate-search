@@ -14,12 +14,19 @@ public interface MassIndexerFilteringTypeStep {
 	/**
 	 * Use a JPQL/HQL conditional expression to limit the entities to be re-indexed.
 	 * <p>
-	 * The letter {@code e} is supposed to be used here as query alias.
 	 * For instance a valid expression could be the following:
 	 * <pre>
-	 *     <strong>e</strong>.manager.level &lt; 2
+	 *     manager.level &lt; 2
 	 * </pre>
-	 * To filter instances that have a manager whose level is strictly less than 2.
+	 * ... to filter instances that have a manager whose level is strictly less than 2.
+	 * <p>
+	 * Parameters can be used, so assuming the parameter "max" is defined
+	 * in the {@link MassIndexerReindexParameterStep#param(String, Object) next step},
+	 * this is valid as well:
+	 * <pre>
+	 *     manager.level &lt; :max
+	 * </pre>
+	 * ... to filter instances that have a manager whose level is strictly less than {@code :max}.
 	 *
 	 * @param conditionalExpression A JPQL/HQL query text which express the condition to apply
 	 * @return A new step to define optional parameters for the JPQL/HQL conditional expression or other expressions.
