@@ -190,7 +190,7 @@ index a17a46c893..45316ede5d 100644
  import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
  import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
  import org.hibernate.search.util.common.AssertionFailure;
-@@ -22,13 +22,13 @@
+@@ -22,13 +22,13 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
  		implements HibernateOrmEntityLoadingStrategy<E, I> {
  
  	private final SessionFactoryImplementor sessionFactory;
@@ -207,7 +207,7 @@ index a17a46c893..45316ede5d 100644
  		this.queryFactory = queryFactory;
  	}
  
-@@ -36,7 +36,7 @@
+@@ -36,7 +36,7 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
  	public HibernateOrmQueryLoader<E, I> createQueryLoader(
  			List<LoadingTypeContext<? extends E>> typeContexts, Optional<ConditionalExpression> conditionalExpression) {
  		Set<Class<? extends E>> includedTypesFilter;
@@ -321,7 +321,7 @@ diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/CriteriaType
 index 0ad329e389..bdd92e70f1 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/CriteriaTypeQueryFactory.java
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/CriteriaTypeQueryFactory.java
-@@ -26,16 +26,14 @@
+@@ -26,16 +26,14 @@ class CriteriaTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E
  
  	public static <E> CriteriaTypeQueryFactory<E, ?> create(EntityDomainType<E> type,
  			String uniquePropertyName) {
@@ -355,7 +355,7 @@ index 8dea14d074..2280fb4fd4 100644
  import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
  import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
  import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
-@@ -22,20 +21,20 @@
+@@ -22,20 +21,20 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
  		extends AbstractHibernateOrmLoadingStrategy<E, I> {
  
  	public static HibernateOrmEntityLoadingStrategy<?, ?> create(SessionFactoryImplementor sessionFactory,
@@ -529,7 +529,7 @@ diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrm
 index 61cf2863dc..033ccecf9e 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java
-@@ -29,7 +29,7 @@
+@@ -29,7 +29,7 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
  	private final TransactionHelper transactionHelper;
  	private final long totalCount;
  	private long totalLoaded = 0;
@@ -561,7 +561,7 @@ index ab527b92d3..48140e8931 100644
  import org.hibernate.search.mapper.orm.logging.impl.Log;
  import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
  import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
-@@ -26,30 +26,30 @@
+@@ -26,30 +26,30 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
  	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
  
  	public static <I> HibernateOrmEntityLoadingStrategy<?, ?> create(SessionFactoryImplementor sessionFactory,
@@ -745,7 +745,7 @@ index 8220212f46..3c20b4003b 100644
  
  /**
   * An entity loader for indexed entities whose document ID is the entity ID.
-@@ -24,12 +24,12 @@
+@@ -24,12 +24,12 @@ class HibernateOrmSelectionEntityByIdLoader<E> extends AbstractHibernateOrmSelec
  	private final PersistenceContextLookupStrategy persistenceContextLookup;
  	private final EntityLoadingCacheLookupStrategyImplementor cacheLookupStrategyImplementor;
  
@@ -788,7 +788,7 @@ index 11409cad25..58b36111c5 100644
  import org.hibernate.query.Query;
  import org.hibernate.search.mapper.orm.logging.impl.Log;
  import org.hibernate.search.util.common.impl.CollectionHelper;
-@@ -33,14 +33,14 @@
+@@ -33,14 +33,14 @@ class HibernateOrmSelectionEntityByNonIdPropertyLoader<E> extends AbstractHibern
  	private final String documentIdSourcePropertyName;
  	private final ValueReadHandle<?> documentIdSourceHandle;
  
@@ -895,7 +895,7 @@ index 4fd6258ed4..eaac4243ea 100644
  import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
  
  public interface LoadingTypeContext<E> {
-@@ -21,9 +21,9 @@
+@@ -21,9 +21,9 @@ public interface LoadingTypeContext<E> {
  	PojoRawTypeIdentifier<E> typeIdentifier();
  
  	/**
@@ -1064,7 +1064,7 @@ index 82c86985ab..1d289634b7 100644
  
  	Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName);
 diff --git a/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java b/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
-index 6a8b56d211..60f6fe4f6f 100644
+index 6fbfb8b005..0c63c4cddb 100644
 --- a/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
 +++ b/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
 @@ -253,14 +253,10 @@ SearchException foundMultipleEntitiesForDocumentId(String entityName, String doc
@@ -1097,7 +1097,7 @@ index 3e83b7bc62..04702fd757 100644
  import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContext;
  import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityIdEntityLoadingStrategy;
  import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityLoadingStrategy;
-@@ -32,7 +32,7 @@
+@@ -32,7 +32,7 @@ abstract class AbstractHibernateOrmTypeContext<E>
  
  	private final PojoRawTypeIdentifier<E> typeIdentifier;
  	private final String jpaEntityName;
@@ -1106,7 +1106,7 @@ index 3e83b7bc62..04702fd757 100644
  	private final boolean documentIdIsEntityId;
  	private final HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy;
  	private final PojoPathFilter dirtyFilter;
-@@ -44,23 +44,22 @@
+@@ -44,23 +44,22 @@ abstract class AbstractHibernateOrmTypeContext<E>
  	AbstractHibernateOrmTypeContext(AbstractBuilder<E> builder, SessionFactoryImplementor sessionFactory) {
  		this.typeIdentifier = builder.typeIdentifier;
  		this.jpaEntityName = builder.jpaEntityName;
@@ -2002,7 +2002,7 @@ index 9d00283d91..8a1986f613 100644
  	private SearchScrollResult<H> currentChunk;
  	private H currentHit;
  	private int currentIndexInScroll;
-@@ -42,7 +35,7 @@
+@@ -42,7 +35,7 @@ public class HibernateOrmSearchScrollableResultsAdapter<H> implements Scrollable
  	private boolean closed;
  
  	public HibernateOrmSearchScrollableResultsAdapter(SearchScroll<H> scroll, int maxResults,

@@ -96,7 +96,7 @@ index 9d1db50953..237341e6a5 100644
  		}
  
 diff --git a/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/CompositeIdOrder.java b/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/CompositeIdOrder.java
-index 34524445c8..7a1b35c4b0 100644
+index cd105c6dbe..2aab3bce78 100644
 --- a/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/CompositeIdOrder.java
 +++ b/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/CompositeIdOrder.java
 @@ -7,10 +7,7 @@
@@ -110,23 +110,25 @@ index 34524445c8..7a1b35c4b0 100644
  import java.util.function.BiFunction;
  
  import jakarta.persistence.EmbeddedId;
-@@ -21,7 +18,8 @@
+@@ -23,7 +20,10 @@
  import jakarta.persistence.criteria.Predicate;
  import jakarta.persistence.criteria.Root;
  
 -import org.hibernate.type.ComponentType;
 +import org.hibernate.metamodel.mapping.EmbeddableMappingType;
 +import org.hibernate.metamodel.mapping.EntityIdentifierMapping;
++import org.hibernate.metamodel.mapping.ModelPart;
++import org.hibernate.metamodel.model.domain.NavigableRole;
  
  /**
   * Order over multiple ID attributes.
-@@ -49,32 +47,12 @@
+@@ -51,32 +51,12 @@
   */
  public class CompositeIdOrder implements IdOrder {
  
 -	private final ComponentType componentType;
-+	private final EntityIdentifierMapping mapping;
-+	private final EmbeddableMappingType mappingType;
++	private final EntityIdentifierMapping idMapping;
++	private final EmbeddableMappingType idMappingType;
  
 -	private final List<String> propertyPaths;
 -
@@ -152,66 +154,62 @@ index 34524445c8..7a1b35c4b0 100644
 -			// Prepend the path prefix to each property; we will only use absolute path from now on
 -			iterator.set( pathPrefix + propertyName );
 -		}
-+	public CompositeIdOrder(EntityIdentifierMapping mapping, EmbeddableMappingType mappingType) {
-+		this.mapping = mapping;
-+		this.mappingType = mappingType;
++	public CompositeIdOrder(EntityIdentifierMapping idMapping, EmbeddableMappingType idMappingType) {
++		this.idMapping = idMapping;
++		this.idMappingType = idMappingType;
  	}
  
  	@Override
-@@ -107,54 +85,51 @@ public Predicate idLesser(CriteriaBuilder builder, Root<?> root, Object idObj) {
+@@ -98,10 +78,8 @@ public Predicate idLesser(CriteriaBuilder builder, Root<?> root, Object idObj) {
  
  	@Override
  	public void addAscOrder(CriteriaBuilder builder, CriteriaQuery<?> criteria, Root<?> root) {
 -		ArrayList<Order> orders = new ArrayList<>( propertyPaths.size() );
--		for ( String path : propertyPaths ) {
--			orders.add( builder.asc( root.get( path ) ) );
+-		for ( String pathString : propertyPaths ) {
+-			orders.add( builder.asc( toPath( root, pathString ) ) );
 -		}
 +		ArrayList<Order> orders = new ArrayList<>();
-+		mapping.forEachSelectable( (i, selectable) ->
-+				orders.add( builder.asc( root.get( selectable.getSelectablePath().getFullPath() ) ) ) );
++		idMappingType.forEachSubPart( (i, subPart) -> orders.add( builder.asc( toPath( root, subPart ) ) ) );
  		criteria.orderBy( orders );
  	}
  
- 	private Predicate restrictLexicographically(BiFunction<String, Object, Predicate> strictOperator,
+@@ -109,51 +87,49 @@ public void addAscOrder(CriteriaBuilder builder, CriteriaQuery<?> criteria, Root
+ 	private Predicate restrictLexicographically(
+ 			BiFunction<Expression<Comparable<? super Object>>, Comparable<? super Object>, Predicate> strictOperator,
  			CriteriaBuilder builder, Root<?> root, Object idObj, boolean orEquals) {
 -		int propertyPathsSize = propertyPaths.size();
 -		int expressionsInOr = propertyPathsSize + ( orEquals ? 1 : 0 );
-+		Object[] selectableValues = mappingType.getValues( idObj );
-+		int selectablesSize = selectableValues.length;
- 
--		Predicate[] or = new Predicate[expressionsInOr];
++		Object[] selectableValues = idMappingType.getValues( idObj );
 +		List<Predicate> or = new ArrayList<>();
  
+-		Predicate[] or = new Predicate[expressionsInOr];
+-
 -		for ( int i = 0; i < propertyPathsSize; i++ ) {
-+		mapping.forEachSelectable( (i, selectable) -> {
++		idMappingType.forEachSubPart( (i, subPart) -> {
  			// Group expressions together in a single conjunction (A and B and C...).
  			Predicate[] and = new Predicate[i + 1];
 -			int j = 0;
 -			for ( ; j < and.length - 1; j++ ) {
 -				// The first N-1 expressions have symbol `=`
--				String path = propertyPaths.get( j );
--				Object val = getPropertyValue( idObj, j );
--				and[j] = builder.equal( root.get( path ), val );
+-				and[j] = builder.equal( toPath( root, propertyPaths.get( j ) ),
+-						getPropertyValue( idObj, j ) );
 -			}
 -			// The last expression has whatever symbol is defined by "strictOperator"
--			String path = propertyPaths.get( j );
--			Object val = getPropertyValue( idObj, j );
--			and[j] = strictOperator.apply( path, val );
+-			and[j] = strictOperator.apply( toPath( root, propertyPaths.get( j ) ),
+-					(Comparable<? super Object>) getPropertyValue( idObj, j ) );
  
 -			or[i] = builder.and( and );
 -		}
-+			mapping.forEachSelectable( (j, previousSelectable) -> {
++			idMappingType.forEachSubPart( (j, previousSubPart) -> {
 +				if ( j < i ) {
 +					// The first N-1 expressions have symbol `=`
-+					String path = previousSelectable.getSelectablePath().getFullPath();
-+					Object val = selectableValues[j];
-+					and[j] = builder.equal( root.get( path ), val );
++					and[j] = builder.equal( toPath( root, previousSubPart ),
++							selectableValues[j] );
 +				}
 +			} );
 +			// The last expression has whatever symbol is defined by "strictOperator"
-+			String path = selectable.getSelectablePath().getFullPath();
-+			Object val = selectableValues[i];
-+			and[i] = strictOperator.apply( path, val );
++			and[i] = strictOperator.apply( toPath( root, subPart ),
++					(Comparable<? super Object>) selectableValues[i] );
 +
 +			or.add( builder.and( and ) );
 +		} );
@@ -219,15 +217,13 @@ index 34524445c8..7a1b35c4b0 100644
  		if ( orEquals ) {
 -			Predicate[] and = new Predicate[propertyPathsSize];
 -			for ( int i = 0; i < propertyPathsSize; i++ ) {
--				String path = propertyPaths.get( i );
--				Object val = getPropertyValue( idObj, i );
-+			Predicate[] and = new Predicate[selectablesSize];
-+			mapping.forEachSelectable( (i, previousSelectable) -> {
-+				String path = previousSelectable.getSelectablePath().getFullPath();
-+				Object val = selectableValues[i];
- 				and[i] = builder.equal( root.get( path ), val );
+-				and[i] = builder.equal( toPath( root, propertyPaths.get( i ) ),
+-						getPropertyValue( idObj, i ) );
 -			}
 -			or[or.length - 1] = builder.and( and );
++			Predicate[] and = new Predicate[selectableValues.length];
++			idMappingType.forEachSubPart( (i, subPart) -> {
++				and[i] = builder.equal( toPath( root, subPart ), selectableValues[i] );
 +			} );
 +			or.add( builder.and( and ) );
  		}
@@ -237,10 +233,29 @@ index 34524445c8..7a1b35c4b0 100644
 +		return builder.or( or.toArray( new Predicate[0] ) );
  	}
  
+-	@SuppressWarnings("unchecked")
+-	private <T> Path<T> toPath(Path<?> parent, String pathString) {
+-		Path<?> result = parent;
+-		for ( String pathElement : pathString.split( "\\." ) ) {
+-			result = result.get( pathElement );
++	private <T> Path<T> toPath(Root<?> root, ModelPart subPart) {
++		return toPath( root, subPart.getNavigableRole() );
++	}
++
++	private <T> Path<T> toPath(Path<?> parent, NavigableRole role) {
++		if ( role == idMappingType.getNavigableRole() ) {
++			return parent.get( idMapping.getAttributeName() );
++		}
++		else {
++			return toPath( parent, role.getParent() ).get( role.getLocalName() );
+ 		}
+-		return (Path<T>) result;
+-	}
+-
 -	private Object getPropertyValue(Object obj, int ourIndex) {
 -		int theirIndex = propertyIndices.get( ourIndex );
 -		return componentType.getPropertyValue( obj, theirIndex );
--	}
+ 	}
  }
 diff --git a/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/PersistenceUtil.java b/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/PersistenceUtil.java
 index 2faf9f6a2e..51639b2963 100644
