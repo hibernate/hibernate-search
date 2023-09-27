@@ -17,7 +17,9 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.IdClass;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -78,43 +80,34 @@ public class CompositeIdOrder implements IdOrder {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Predicate idGreater(CriteriaBuilder builder, Root<?> root, Object idObj) {
-		BiFunction<String, Object, Predicate> strictOperator =
-				(String path, Object obj) -> builder.greaterThan( root.get( path ), (Comparable<? super Object>) idObj );
-		return restrictLexicographically( strictOperator, builder, root, idObj, false );
+		return restrictLexicographically( builder::greaterThan, builder, root, idObj, false );
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Predicate idGreaterOrEqual(CriteriaBuilder builder, Root<?> root, Object idObj) {
-		/*
-		 * Caution, using Restrictions::ge here won't cut it, we really need
-		 * to separate the strict operator from the equals.
-		 */
-		BiFunction<String, Object, Predicate> strictOperator =
-				(String path, Object obj) -> builder.greaterThan( root.get( path ), (Comparable<? super Object>) idObj );
-		return restrictLexicographically( strictOperator, builder, root, idObj, true );
+		// Caution, using 'builder::greaterThanOrEqualTo' here won't cut it, we really need
+		// to separate the strict operator from the equals.
+		return restrictLexicographically( builder::greaterThan, builder, root, idObj, true );
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Predicate idLesser(CriteriaBuilder builder, Root<?> root, Object idObj) {
-		BiFunction<String, Object, Predicate> strictOperator =
-				(String path, Object obj) -> builder.lessThan( root.get( path ), (Comparable<? super Object>) idObj );
-		return restrictLexicographically( strictOperator, builder, root, idObj, false );
+		return restrictLexicographically( builder::lessThan, builder, root, idObj, false );
 	}
 
 	@Override
 	public void addAscOrder(CriteriaBuilder builder, CriteriaQuery<?> criteria, Root<?> root) {
 		ArrayList<Order> orders = new ArrayList<>( propertyPaths.size() );
-		for ( String path : propertyPaths ) {
-			orders.add( builder.asc( root.get( path ) ) );
+		for ( String pathString : propertyPaths ) {
+			orders.add( builder.asc( toPath( root, pathString ) ) );
 		}
 		criteria.orderBy( orders );
 	}
 
-	private Predicate restrictLexicographically(BiFunction<String, Object, Predicate> strictOperator,
+	@SuppressWarnings("unchecked")
+	private Predicate restrictLexicographically(
+			BiFunction<Expression<Comparable<? super Object>>, Comparable<? super Object>, Predicate> strictOperator,
 			CriteriaBuilder builder, Root<?> root, Object idObj, boolean orEquals) {
 		int propertyPathsSize = propertyPaths.size();
 		int expressionsInOr = propertyPathsSize + ( orEquals ? 1 : 0 );
@@ -127,14 +120,12 @@ public class CompositeIdOrder implements IdOrder {
 			int j = 0;
 			for ( ; j < and.length - 1; j++ ) {
 				// The first N-1 expressions have symbol `=`
-				String path = propertyPaths.get( j );
-				Object val = getPropertyValue( idObj, j );
-				and[j] = builder.equal( root.get( path ), val );
+				and[j] = builder.equal( toPath( root, propertyPaths.get( j ) ),
+						getPropertyValue( idObj, j ) );
 			}
 			// The last expression has whatever symbol is defined by "strictOperator"
-			String path = propertyPaths.get( j );
-			Object val = getPropertyValue( idObj, j );
-			and[j] = strictOperator.apply( path, val );
+			and[j] = strictOperator.apply( toPath( root, propertyPaths.get( j ) ),
+					(Comparable<? super Object>) getPropertyValue( idObj, j ) );
 
 			or[i] = builder.and( and );
 		}
@@ -142,15 +133,23 @@ public class CompositeIdOrder implements IdOrder {
 		if ( orEquals ) {
 			Predicate[] and = new Predicate[propertyPathsSize];
 			for ( int i = 0; i < propertyPathsSize; i++ ) {
-				String path = propertyPaths.get( i );
-				Object val = getPropertyValue( idObj, i );
-				and[i] = builder.equal( root.get( path ), val );
+				and[i] = builder.equal( toPath( root, propertyPaths.get( i ) ),
+						getPropertyValue( idObj, i ) );
 			}
 			or[or.length - 1] = builder.and( and );
 		}
 
 		// Group the disjunction of multiple expressions (X or Y or Z...).
 		return builder.or( or );
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> Path<T> toPath(Path<?> parent, String pathString) {
+		Path<?> result = parent;
+		for ( String pathElement : pathString.split( "\\." ) ) {
+			result = result.get( pathElement );
+		}
+		return (Path<T>) result;
 	}
 
 	private Object getPropertyValue(Object obj, int ourIndex) {

@@ -52,7 +52,7 @@ diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpollin
 index 248a41acc8..9eaa45dd23 100644
 --- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java
 +++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java
-@@ -39,6 +39,8 @@
+@@ -39,6 +39,8 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
  
  	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
  
@@ -95,7 +95,7 @@ index 12807b781d..95897ef188 100644
  import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
  import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
  import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-@@ -39,6 +40,8 @@
+@@ -39,6 +40,8 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
  
  	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
  
@@ -104,7 +104,7 @@ index 12807b781d..95897ef188 100644
  	private static final String CLASS_NAME = OutboxEvent.class.getName();
  
  	// Setting both the JPA entity name and the native entity name to the FQCN so that:
-@@ -68,7 +71,7 @@
+@@ -68,7 +71,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
  			"                <column length=\"2147483647\" />\n" +
  			"        </property>\n" +
  			"        <property name=\"retries\" type=\"integer\" nullable=\"false\" />\n" +
