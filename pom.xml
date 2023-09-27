@@ -178,7 +178,7 @@
 
         <!-- Dependencies versions -->
 
-        <version.org.hibernate>5.3.31.Final</version.org.hibernate>
+        <version.org.hibernate>5.3.32.Final</version.org.hibernate>
         <version.org.hibernate.commons.annotations>5.0.5.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
 
