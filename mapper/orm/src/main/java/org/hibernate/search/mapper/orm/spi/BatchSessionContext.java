@@ -6,9 +6,10 @@
  */
 package org.hibernate.search.mapper.orm.spi;
 
+import org.hibernate.search.mapper.orm.loading.spi.LoadingSessionContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 
-public interface BatchSessionContext {
+public interface BatchSessionContext extends LoadingSessionContext {
 
 	PojoIndexer createIndexer();
 

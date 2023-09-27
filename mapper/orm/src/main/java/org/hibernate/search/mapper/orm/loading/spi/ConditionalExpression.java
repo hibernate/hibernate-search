@@ -4,20 +4,28 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.massindexing.impl;
+package org.hibernate.search.mapper.orm.loading.spi;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.query.Query;
 
-public class ConditionalExpression {
+public final class ConditionalExpression {
 
 	private final String hql;
 	private final Map<String, Object> params = new HashMap<>();
 
 	public ConditionalExpression(String hql) {
 		this.hql = hql;
+	}
+
+	@Override
+	public String toString() {
+		return "ConditionalExpression[" +
+				"hql='" + hql + '\'' +
+				", params=" + params +
+				']';
 	}
 
 	public String hql() {

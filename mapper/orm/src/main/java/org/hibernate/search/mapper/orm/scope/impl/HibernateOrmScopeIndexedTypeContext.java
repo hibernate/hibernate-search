@@ -7,8 +7,8 @@
 package org.hibernate.search.mapper.orm.scope.impl;
 
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
-import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityLoadingStrategy;
-import org.hibernate.search.mapper.orm.loading.impl.LoadingTypeContext;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmEntityLoadingStrategy;
+import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 

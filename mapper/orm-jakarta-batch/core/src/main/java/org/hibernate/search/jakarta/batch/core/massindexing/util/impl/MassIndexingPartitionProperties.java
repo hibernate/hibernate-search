@@ -27,5 +27,4 @@ public final class MassIndexingPartitionProperties {
 
 	public static final String UPPER_BOUND = "upperBound";
 
-	public static final String INDEX_SCOPE = "indexScope";
 }

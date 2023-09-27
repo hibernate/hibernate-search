@@ -6,10 +6,7 @@
  */
 package org.hibernate.search.jakarta.batch.core.massindexing.util.impl;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
 
 /**
  * Provides ID-based, order-sensitive restrictions
@@ -22,23 +19,26 @@ import jakarta.persistence.criteria.Root;
 public interface IdOrder {
 
 	/**
-	 * @param idObj The ID all results should be greater than.
-	 * @return A "greater than" restriction on the ID.
+	 * @param paramNamePrefix A unique prefix for the name of parameters added by the resulting expression.
+	 * @param idObj The ID all results should be lesser than.
+	 * @return A "strictly greater than" restriction on the ID.
 	 */
-	Predicate idGreater(CriteriaBuilder builder, Root<?> root, Object idObj);
+	ConditionalExpression idGreater(String paramNamePrefix, Object idObj);
 
 	/**
-	 * @param idObj The ID all results should be greater than or equal to.
+	 * @param paramNamePrefix A unique prefix for the name of parameters added by the resulting expression.
+	 * @param idObj The ID all results should be lesser than.
 	 * @return A "greater or equal" restriction on the ID.
 	 */
-	Predicate idGreaterOrEqual(CriteriaBuilder builder, Root<?> root, Object idObj);
+	ConditionalExpression idGreaterOrEqual(String paramNamePrefix, Object idObj);
 
 	/**
+	 * @param paramNamePrefix A unique prefix for the name of parameters added by the resulting expression.
 	 * @param idObj The ID all results should be lesser than.
 	 * @return A "lesser than" restriction on the ID.
 	 */
-	Predicate idLesser(CriteriaBuilder builder, Root<?> root, Object idObj);
+	ConditionalExpression idLesser(String paramNamePrefix, Object idObj);
 
-	void addAscOrder(CriteriaBuilder builder, CriteriaQuery<?> criteria, Root<?> root);
+	String ascOrder();
 
 }

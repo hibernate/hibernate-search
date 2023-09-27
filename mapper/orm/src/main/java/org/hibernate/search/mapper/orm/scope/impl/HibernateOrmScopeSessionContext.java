@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.scope.impl;
 
-import org.hibernate.search.mapper.orm.loading.impl.LoadingSessionContext;
+import org.hibernate.search.mapper.orm.loading.spi.LoadingSessionContext;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingSessionContext;
 import org.hibernate.search.mapper.orm.spi.BatchSessionContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeSessionContext;

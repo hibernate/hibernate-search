@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,7 +18,7 @@ import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.metamodel.model.domain.EntityDomainType;
 import org.hibernate.metamodel.model.domain.JpaMetamodel;
 import org.hibernate.query.Query;
-import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
+import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
 
 public interface TypeQueryFactory<E, I> {
 
@@ -43,10 +44,12 @@ public interface TypeQueryFactory<E, I> {
 			Set<? extends Class<? extends E>> includedTypesFilter);
 
 	Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityMappingType entityMappingType,
-			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression);
+			Set<? extends Class<? extends E>> includedTypesFilter,
+			List<ConditionalExpression> conditionalExpressions);
 
 	Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityMappingType entityMappingType,
-			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression);
+			Set<? extends Class<? extends E>> includedTypesFilter,
+			List<ConditionalExpression> conditionalExpressions, String order);
 
 	Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName);
 

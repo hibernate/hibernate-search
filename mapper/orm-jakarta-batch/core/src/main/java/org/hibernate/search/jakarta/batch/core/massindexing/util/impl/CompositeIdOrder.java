@@ -7,23 +7,18 @@
 package org.hibernate.search.jakarta.batch.core.massindexing.util.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiFunction;
 
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.IdClass;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Order;
-import jakarta.persistence.criteria.Path;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 
 import org.hibernate.metamodel.mapping.EmbeddableMappingType;
 import org.hibernate.metamodel.mapping.EntityIdentifierMapping;
 import org.hibernate.metamodel.mapping.ModelPart;
 import org.hibernate.metamodel.model.domain.NavigableRole;
+import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
+import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
 
 /**
  * Order over multiple ID attributes.
@@ -49,87 +44,110 @@ import org.hibernate.metamodel.model.domain.NavigableRole;
  * @author Mincong Huang
  * @author Yoann Rodiere
  */
-public class CompositeIdOrder implements IdOrder {
+public class CompositeIdOrder<E> implements IdOrder {
 
 	private final EntityIdentifierMapping idMapping;
 	private final EmbeddableMappingType idMappingType;
 
-	public CompositeIdOrder(EntityIdentifierMapping idMapping, EmbeddableMappingType idMappingType) {
-		this.idMapping = idMapping;
-		this.idMappingType = idMappingType;
+	public CompositeIdOrder(LoadingTypeContext<E> type) {
+		this.idMapping = type.entityMappingType().getIdentifierMapping();
+		this.idMappingType = (EmbeddableMappingType) idMapping.getPartMappingType();
 	}
 
 	@Override
-	public Predicate idGreater(CriteriaBuilder builder, Root<?> root, Object idObj) {
-		return restrictLexicographically( builder::greaterThan, builder, root, idObj, false );
+	public ConditionalExpression idGreater(String paramNamePrefix, Object idObj) {
+		return restrictLexicographically( paramNamePrefix, idObj, ">", false );
 	}
 
 	@Override
-	public Predicate idGreaterOrEqual(CriteriaBuilder builder, Root<?> root, Object idObj) {
-		// Caution, using 'builder::greaterThanOrEqualTo' here won't cut it, we really need
-		// to separate the strict operator from the equals.
-		return restrictLexicographically( builder::greaterThan, builder, root, idObj, true );
+	public ConditionalExpression idGreaterOrEqual(String paramNamePrefix, Object idObj) {
+		// Caution, using ">=" here won't cut it, we really need to separate the strict operator from the equals.
+		return restrictLexicographically( paramNamePrefix, idObj, ">", true );
 	}
 
 	@Override
-	public Predicate idLesser(CriteriaBuilder builder, Root<?> root, Object idObj) {
-		return restrictLexicographically( builder::lessThan, builder, root, idObj, false );
+	public ConditionalExpression idLesser(String paramNamePrefix, Object idObj) {
+		return restrictLexicographically( paramNamePrefix, idObj, "<", false );
 	}
 
 	@Override
-	public void addAscOrder(CriteriaBuilder builder, CriteriaQuery<?> criteria, Root<?> root) {
-		ArrayList<Order> orders = new ArrayList<>();
-		idMappingType.forEachSubPart( (i, subPart) -> orders.add( builder.asc( toPath( root, subPart ) ) ) );
-		criteria.orderBy( orders );
+	public String ascOrder() {
+		StringBuilder builder = new StringBuilder();
+		idMappingType.forEachSubPart( (i, subPart) -> {
+			if ( builder.length() != 0 ) {
+				builder.append( ", " );
+			}
+			toPath( builder, subPart.getNavigableRole() );
+			builder.append( " asc" );
+		} );
+		return builder.toString();
 	}
 
-	@SuppressWarnings("unchecked")
-	private Predicate restrictLexicographically(
-			BiFunction<Expression<Comparable<? super Object>>, Comparable<? super Object>, Predicate> strictOperator,
-			CriteriaBuilder builder, Root<?> root, Object idObj, boolean orEquals) {
-		Object[] selectableValues = idMappingType.getValues( idObj );
-		List<Predicate> or = new ArrayList<>();
+	private ConditionalExpression restrictLexicographically(String paramNamePrefix, Object idObj,
+			String strictOperator, boolean orEquals) {
+		List<String> orClauses = new ArrayList<>();
 
 		idMappingType.forEachSubPart( (i, subPart) -> {
 			// Group expressions together in a single conjunction (A and B and C...).
-			Predicate[] and = new Predicate[i + 1];
+			String[] andClauses = new String[i + 1];
 
 			idMappingType.forEachSubPart( (j, previousSubPart) -> {
 				if ( j < i ) {
 					// The first N-1 expressions have symbol `=`
-					and[j] = builder.equal( toPath( root, previousSubPart ),
-							selectableValues[j] );
+					andClauses[j] = toPath( previousSubPart ) + " = :" + paramNamePrefix + j;
 				}
 			} );
-			// The last expression has whatever symbol is defined by "strictOperator"
-			and[i] = strictOperator.apply( toPath( root, subPart ),
-					(Comparable<? super Object>) selectableValues[i] );
 
-			or.add( builder.and( and ) );
+			// The last expression has whatever symbol is defined by "strictOperator"
+			andClauses[i] = toPath( subPart ) + " " + strictOperator + " :" + paramNamePrefix + i;
+
+			orClauses.add( junction( Arrays.asList( andClauses ), " and " ) );
 		} );
 
+
 		if ( orEquals ) {
-			Predicate[] and = new Predicate[selectableValues.length];
-			idMappingType.forEachSubPart( (i, subPart) -> {
-				and[i] = builder.equal( toPath( root, subPart ), selectableValues[i] );
-			} );
-			or.add( builder.and( and ) );
+			List<String> andClauses = new ArrayList<>();
+			idMappingType.forEachSubPart( (i, subPart) -> andClauses.add( toPath( subPart ) + " = :" + paramNamePrefix + i ) );
+			orClauses.add( junction( andClauses, " and " ) );
 		}
 
-		// Group the disjunction of multiple expressions (X or Y or Z...).
-		return builder.or( or.toArray( new Predicate[0] ) );
+		var expression = new ConditionalExpression( junction( orClauses, " or " ) );
+		Object[] selectableValues = idMappingType.getValues( idObj );
+		for ( int i = 0; i < selectableValues.length; i++ ) {
+			expression.param( paramNamePrefix + i, selectableValues[i] );
+		}
+		return expression;
 	}
 
-	private <T> Path<T> toPath(Root<?> root, ModelPart subPart) {
-		return toPath( root, subPart.getNavigableRole() );
+	private String toPath(ModelPart subPart) {
+		StringBuilder builder = new StringBuilder();
+		toPath( builder, subPart.getNavigableRole() );
+		return builder.toString();
 	}
 
-	private <T> Path<T> toPath(Path<?> parent, NavigableRole role) {
+	private void toPath(StringBuilder builder, NavigableRole role) {
 		if ( role == idMappingType.getNavigableRole() ) {
-			return parent.get( idMapping.getAttributeName() );
+			builder.append( idMapping.getAttributeName() );
 		}
 		else {
-			return toPath( parent, role.getParent() ).get( role.getLocalName() );
+			toPath( builder, role.getParent() );
+			builder.append( "." );
+			builder.append( role.getLocalName() );
 		}
+	}
+
+	private String junction(List<String> clauses, String operator) {
+		StringBuilder junctionBuilder = new StringBuilder();
+		boolean first = true;
+		for ( String clause : clauses ) {
+			if ( first ) {
+				first = false;
+			}
+			else {
+				junctionBuilder.append( operator );
+			}
+			junctionBuilder.append( "(" ).append( clause ).append( ")" );
+		}
+		return junctionBuilder.toString();
 	}
 }

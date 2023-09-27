@@ -19,16 +19,12 @@ import jakarta.batch.runtime.context.JobContext;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.LockModeType;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.metamodel.EntityType;
-import jakarta.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.StatelessSession;
-import org.hibernate.query.Query;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
 import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
@@ -37,6 +33,7 @@ import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.MassIndexi
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.PartitionBound;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.PersistenceUtil;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.SerializationUtil;
+import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -71,8 +68,12 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 	private String serializedIdFetchSize;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_HQL)
-	private String customQueryHql;
+	@BatchProperty(name = MassIndexingJobParameters.REINDEX_ONLY_HQL)
+	private String reindexOnlyHql;
+
+	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.REINDEX_ONLY_PARAMETERS)
+	private String serializedReindexOnlyParameters;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.MAX_THREADS)
@@ -104,7 +105,8 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 	 */
 	public HibernateSearchPartitionMapper(
 			String serializedIdFetchSize,
-			String customQueryHql,
+			String reindexOnlyHql,
+			String serializedReindexOnlyParameters,
 			String serializedMaxThreads,
 			String serializedMaxResultsPerEntity,
 			String serializedRowsPerPartition,
@@ -112,7 +114,8 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 			String tenantId,
 			JobContext jobContext) {
 		this.serializedIdFetchSize = serializedIdFetchSize;
-		this.customQueryHql = customQueryHql;
+		this.reindexOnlyHql = reindexOnlyHql;
+		this.serializedReindexOnlyParameters = serializedReindexOnlyParameters;
 		this.serializedMaxThreads = serializedMaxThreads;
 		this.serializedMaxResultsPerEntity = serializedMaxResultsPerEntity;
 		this.serializedRowsPerPartition = serializedRowsPerPartition;
@@ -144,23 +147,15 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 					MassIndexingJobParameters.ID_FETCH_SIZE, serializedIdFetchSize,
 					MassIndexingJobParameters.Defaults.ID_FETCH_SIZE
 			);
+			ConditionalExpression reindexOnly =
+					SerializationUtil.parseReindexOnlyParameters( reindexOnlyHql, serializedReindexOnlyParameters );
 
-			List<EntityTypeDescriptor> entityTypeDescriptors = jobData.getEntityTypeDescriptors();
+			List<EntityTypeDescriptor<?, ?>> entityTypeDescriptors = jobData.getEntityTypeDescriptors();
 			List<PartitionBound> partitionBounds = new ArrayList<>();
 
-			switch ( PersistenceUtil.getIndexScope( customQueryHql ) ) {
-				case HQL:
-					Class<?> clazz = entityTypeDescriptors.get( 0 ).getJavaClass();
-					partitionBounds.add( new PartitionBound( clazz, null, null, IndexScope.HQL ) );
-					break;
-
-				case FULL_ENTITY:
-					for ( EntityTypeDescriptor entityTypeDescriptor : entityTypeDescriptors ) {
-						partitionBounds.addAll( buildPartitionUnitsFrom( emf, ss, entityTypeDescriptor,
-								maxResults, idFetchSize, rowsPerPartition,
-								IndexScope.FULL_ENTITY ) );
-					}
-					break;
+			for ( EntityTypeDescriptor<?, ?> entityTypeDescriptor : entityTypeDescriptors ) {
+				partitionBounds.addAll( buildPartitionUnitsFrom( ss, entityTypeDescriptor,
+						maxResults, idFetchSize, rowsPerPartition, reindexOnly ) );
 			}
 
 			// Build partition plan
@@ -176,7 +171,6 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 						SerializationUtil.serialize( bound.getLowerBound() ) );
 				props[i].setProperty( MassIndexingPartitionProperties.UPPER_BOUND,
 						SerializationUtil.serialize( bound.getUpperBound() ) );
-				props[i].setProperty( MassIndexingPartitionProperties.INDEX_SCOPE, bound.getIndexScope().name() );
 				props[i].setProperty(
 						MassIndexingPartitionProperties.CHECKPOINT_INTERVAL,
 						String.valueOf( checkpointInterval )
@@ -200,33 +194,17 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 		}
 	}
 
-	@SuppressWarnings("unchecked") // Can't do much better without adding generics to EntityTypeDescriptor
-	private List<PartitionBound> buildPartitionUnitsFrom(EntityManagerFactory emf, StatelessSession ss,
-			EntityTypeDescriptor entityTypeDescriptor,
-			Integer maxResults, int fetchSize, int rowsPerPartition,
-			IndexScope indexScope) {
-		Class<?> javaClass = entityTypeDescriptor.getJavaClass();
+	private List<PartitionBound> buildPartitionUnitsFrom(StatelessSession ss,
+			EntityTypeDescriptor<?, ?> type,
+			Integer maxResults, int fetchSize, int rowsPerPartition, ConditionalExpression reindexOnly) {
 		List<PartitionBound> partitionUnits = new ArrayList<>();
 
 		Object lowerID;
 		Object upperID = null;
 
-		CriteriaBuilder builder = emf.getCriteriaBuilder();
-		CriteriaQuery<?> criteria = builder.createQuery();
-		Root<?> root = criteria.from( javaClass );
-
-		entityTypeDescriptor.getIdOrder().addAscOrder( builder, criteria, root );
-
-		EntityType<?> model = root.getModel();
-		Class<?> javaType = model.getIdType().getJavaType();
-
-		@SuppressWarnings("rawtypes")
-		SingularAttribute singularAttribute = model.getId( javaType );
-		criteria.select( root.get( singularAttribute ) );
-
-		Query<?> query = ss.createQuery( criteria );
-
-		query.setFetchSize( fetchSize )
+		SelectionQuery<?> query = type.createIdentifiersQuery( (SharedSessionContractImplementor) ss,
+				reindexOnly == null ? List.of() : List.of( reindexOnly ) )
+				.setFetchSize( fetchSize )
 				.setReadOnly( true )
 				.setCacheable( false )
 				.setLockMode( LockModeType.NONE );
@@ -248,13 +226,13 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 			while ( scroll.scroll( rowsPerPartition ) ) {
 				lowerID = upperID;
 				upperID = scroll.get();
-				partitionUnits.add( new PartitionBound( javaClass, lowerID, upperID, indexScope ) );
+				partitionUnits.add( new PartitionBound( type, lowerID, upperID ) );
 			}
 
 			// add an additional partition on the tail
 			lowerID = upperID;
 			upperID = null;
-			partitionUnits.add( new PartitionBound( javaClass, lowerID, upperID, indexScope ) );
+			partitionUnits.add( new PartitionBound( type, lowerID, upperID ) );
 			return partitionUnits;
 		}
 	}

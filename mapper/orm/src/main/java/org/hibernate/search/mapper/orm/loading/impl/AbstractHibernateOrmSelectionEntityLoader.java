@@ -13,6 +13,9 @@ import org.hibernate.exception.LockTimeoutException;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.common.timing.Deadline;
+import org.hibernate.search.mapper.orm.loading.spi.EntityGraphHint;
+import org.hibernate.search.mapper.orm.loading.spi.LoadingSessionContext;
+import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchQueryHints;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 

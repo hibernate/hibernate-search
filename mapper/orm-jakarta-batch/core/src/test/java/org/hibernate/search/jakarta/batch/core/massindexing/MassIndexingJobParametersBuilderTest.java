@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.CacheMode;
@@ -33,7 +34,7 @@ public class MassIndexingJobParametersBuilderTest {
 	private static final boolean MERGE_SEGMENTS_ON_FINISH = true;
 	private static final boolean PURGE_ALL_ON_START = true;
 	private static final int ID_FETCH_SIZE = Integer.MIN_VALUE;
-	private static final int ENTITY_FETCH_SIZE = Integer.MIN_VALUE + 1;
+	private static final int ENTITY_FETCH_SIZE = 12;
 	private static final int MAX_RESULTS_PER_ENTITY = 10_000;
 	private static final int MAX_THREADS = 2;
 	private static final int ROWS_PER_PARTITION = 500;
@@ -131,34 +132,39 @@ public class MassIndexingJobParametersBuilderTest {
 		MassIndexingJob.parameters().forEntity( null );
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testRestrictedBy_stringNull() {
-		MassIndexingJob.parameters().forEntity( String.class ).restrictedBy( (String) null );
+		MassIndexingJob.parameters().forEntity( String.class ).reindexOnly( null, Map.of() );
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testRestrictedBy_mapNull() {
+		MassIndexingJob.parameters().forEntity( String.class ).reindexOnly( "foo", null );
 	}
 
 	@Test(expected = SearchException.class)
-	public void testSessionClearInterval_greaterThanCheckpointInterval() {
+	public void testEntityFetchSize_greaterThanCheckpointInterval() {
 		MassIndexingJob.parameters()
 				.forEntity( UnusedEntity.class )
-				.sessionClearInterval( 5 )
+				.entityFetchSize( 5 )
 				.checkpointInterval( 4 )
 				.build();
 	}
 
 	@Test
-	public void testSessionClearInterval_defaultGreaterThanCheckpointInterval() {
+	public void testEntityFetchSize_defaultGreaterThanCheckpointInterval() {
 		MassIndexingJob.parameters()
 				.forEntity( UnusedEntity.class )
-				.checkpointInterval( MassIndexingJobParameters.Defaults.SESSION_CLEAR_INTERVAL_DEFAULT_RAW - 1 )
+				.checkpointInterval( MassIndexingJobParameters.Defaults.ENTITY_FETCH_SIZE_RAW - 1 )
 				.build();
 		// ok, session clear interval will default to the value of checkpointInterval
 	}
 
 	@Test(expected = SearchException.class)
-	public void testSessionClearInterval_greaterThanDefaultCheckpointInterval() {
+	public void testEntityFetchSize_greaterThanDefaultCheckpointInterval() {
 		MassIndexingJob.parameters()
 				.forEntity( UnusedEntity.class )
-				.sessionClearInterval( MassIndexingJobParameters.Defaults.CHECKPOINT_INTERVAL_DEFAULT_RAW + 1 )
+				.entityFetchSize( MassIndexingJobParameters.Defaults.CHECKPOINT_INTERVAL_DEFAULT_RAW + 1 )
 				.build();
 	}
 
@@ -217,11 +223,25 @@ public class MassIndexingJobParametersBuilderTest {
 
 	@Test
 	public void testEntityFetchSize() throws Exception {
-		for ( int allowedValue : Arrays.asList( Integer.MAX_VALUE, 0, Integer.MIN_VALUE ) ) {
+		for ( int allowedValue : Arrays.asList( Integer.MAX_VALUE, 1 ) ) {
 			MassIndexingJob.parameters()
 					.forEntity( UnusedEntity.class )
 					.entityFetchSize( allowedValue );
 		}
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testEntityFetchSize_zero() throws Exception {
+		MassIndexingJob.parameters()
+				.forEntity( UnusedEntity.class )
+				.entityFetchSize( 0 );
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testEntityFetchSize_negative() throws Exception {
+		MassIndexingJob.parameters()
+				.forEntity( UnusedEntity.class )
+				.entityFetchSize( -1 );
 	}
 
 	private static class UnusedEntity {

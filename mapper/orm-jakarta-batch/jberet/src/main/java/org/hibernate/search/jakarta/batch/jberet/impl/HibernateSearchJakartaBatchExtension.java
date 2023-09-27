@@ -23,7 +23,7 @@ import org.hibernate.search.jakarta.batch.core.context.jpa.spi.EntityManagerFact
 import org.hibernate.search.jakarta.batch.core.inject.scope.spi.HibernateSearchJobScoped;
 import org.hibernate.search.jakarta.batch.core.inject.scope.spi.HibernateSearchPartitionScoped;
 import org.hibernate.search.jakarta.batch.core.massindexing.spi.JobContextSetupListener;
-import org.hibernate.search.jakarta.batch.core.massindexing.step.spi.EntityReader;
+import org.hibernate.search.jakarta.batch.core.massindexing.step.spi.EntityIdReader;
 
 import org.jberet.cdi.JobScoped;
 import org.jberet.cdi.PartitionScoped;
@@ -57,7 +57,7 @@ public class HibernateSearchJakartaBatchExtension implements Extension {
 
 	public void afterTypeDiscovery(@Observes AfterTypeDiscovery event, BeanManager beanManager) {
 		registerType( event, beanManager, JobContextSetupListener.class );
-		registerType( event, beanManager, EntityReader.class );
+		registerType( event, beanManager, EntityIdReader.class );
 	}
 
 	public void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager beanManager) {

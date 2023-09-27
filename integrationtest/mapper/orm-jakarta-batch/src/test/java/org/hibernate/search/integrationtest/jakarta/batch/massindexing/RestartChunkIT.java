@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import jakarta.batch.operations.JobOperator;
@@ -110,24 +111,24 @@ public class RestartChunkIT {
 	@TestForIssue(jiraKey = "HSEARCH-2616")
 	public void failureBeforeFirstRead_hql() throws InterruptedException, IOException {
 		SimulatedFailure.raiseExceptionOnNextRead();
-		doTest( "select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
+		doTest( "name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
 	public void failureDuringFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException, IOException {
 		SimulatedFailure.raiseExceptionAfterXWrites( (int) ( CHECKPOINT_INTERVAL * 0.5 ) );
-		doTest( "select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
+		doTest( "name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
 	public void failureDuringNonFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException, IOException {
 		SimulatedFailure.raiseExceptionAfterXWrites( (int) ( CHECKPOINT_INTERVAL * 2.5 ) );
-		doTest( "select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
+		doTest( "name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
 	}
 
-	private void doTest(String hql, long expectedTotal, long expectedGoogle) throws InterruptedException, IOException {
+	private void doTest(String reindexOnly, long expectedTotal, long expectedGoogle) throws InterruptedException, IOException {
 		assertEquals( 0, JobTestUtil.nbDocumentsInIndex( emf, SimulatedFailureCompany.class ) );
 		List<SimulatedFailureCompany> google =
 				JobTestUtil.findIndexedResults( emf, SimulatedFailureCompany.class, "name", "Google" );
@@ -136,8 +137,8 @@ public class RestartChunkIT {
 		// start the job
 		MassIndexingJob.ParametersBuilder builder = MassIndexingJob.parameters()
 				.forEntities( SimulatedFailureCompany.class );
-		if ( hql != null ) {
-			builder = builder.restrictedBy( hql );
+		if ( reindexOnly != null ) {
+			builder = builder.reindexOnly( reindexOnly, Map.of() );
 		}
 		Properties parameters = builder
 				.checkpointInterval( CHECKPOINT_INTERVAL )
@@ -187,7 +188,7 @@ public class RestartChunkIT {
 
 		public SimulatedFailureCompany() {
 			// Called by Hibernate ORM entity loading, which in turn
-			// is called by the EntityReader phase of the batch.
+			// is called by the EntityIdReader phase of the batch.
 			SimulatedFailure.read();
 		}
 

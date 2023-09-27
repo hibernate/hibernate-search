@@ -43,9 +43,8 @@ public final class MassIndexingJobParameters {
 
 	public static final String CHECKPOINT_INTERVAL = "checkpointInterval";
 
-	public static final String SESSION_CLEAR_INTERVAL = "sessionClearInterval";
-
-	public static final String CUSTOM_QUERY_HQL = "customQueryHQL";
+	public static final String REINDEX_ONLY_HQL = "reindexOnlyHql";
+	public static final String REINDEX_ONLY_PARAMETERS = "reindexOnlyParameters";
 
 	public static final String TENANT_ID = "tenantId";
 
@@ -77,14 +76,14 @@ public final class MassIndexingJobParameters {
 			}
 		}
 
-		public static final int SESSION_CLEAR_INTERVAL_DEFAULT_RAW = 200;
+		public static final int ENTITY_FETCH_SIZE_RAW = 200;
 
-		public static int sessionClearInterval(Integer sessionClearIntervalRaw, Integer checkpointInterval) {
-			if ( sessionClearIntervalRaw != null ) {
-				return sessionClearIntervalRaw;
+		public static int entityFetchSize(Integer entityFetchSizeRaw, Integer checkpointInterval) {
+			if ( entityFetchSizeRaw != null ) {
+				return entityFetchSizeRaw;
 			}
-			if ( checkpointInterval == null || checkpointInterval > SESSION_CLEAR_INTERVAL_DEFAULT_RAW ) {
-				return SESSION_CLEAR_INTERVAL_DEFAULT_RAW;
+			if ( checkpointInterval == null || checkpointInterval > ENTITY_FETCH_SIZE_RAW ) {
+				return ENTITY_FETCH_SIZE_RAW;
 			}
 			else {
 				return checkpointInterval;

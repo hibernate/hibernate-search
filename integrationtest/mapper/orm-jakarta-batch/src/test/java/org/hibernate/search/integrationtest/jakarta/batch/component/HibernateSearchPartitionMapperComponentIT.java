@@ -22,7 +22,6 @@ import org.hibernate.search.integrationtest.jakarta.batch.massindexing.entity.Co
 import org.hibernate.search.integrationtest.jakarta.batch.massindexing.entity.Person;
 import org.hibernate.search.integrationtest.jakarta.batch.util.BackendConfigurations;
 import org.hibernate.search.integrationtest.jakarta.batch.util.JobTestUtil;
-import org.hibernate.search.integrationtest.jakarta.batch.util.PersistenceUnitTestUtil;
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
 import org.hibernate.search.jakarta.batch.core.massindexing.step.impl.HibernateSearchPartitionMapper;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.MassIndexingPartitionProperties;
@@ -43,7 +42,6 @@ import org.junit.rules.MethodRule;
  */
 public class HibernateSearchPartitionMapperComponentIT {
 
-	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
 	private static final int COMP_ROWS = 3;
 	private static final int PERS_ROWS = 8;
 
@@ -79,14 +77,13 @@ public class HibernateSearchPartitionMapperComponentIT {
 		} );
 
 		final String fetchSize = String.valueOf( 200 * 1000 );
-		final String hql = null;
 		final String maxThreads = String.valueOf( 1 );
 		final String rowsPerPartition = String.valueOf( 3 );
 
 		mockedJobContext = mock( JobContext.class );
 		partitionMapper = new HibernateSearchPartitionMapper(
 				fetchSize,
-				hql,
+				null, null,
 				maxThreads,
 				null,
 				rowsPerPartition,
@@ -97,7 +94,7 @@ public class HibernateSearchPartitionMapperComponentIT {
 	}
 
 	/**
-	 * Prove that there're N partitions for each root entity,
+	 * Prove that there are N partitions for each root entity,
 	 * where N stands for the ceiling number of the division
 	 * between the rows to index and the max rows per partition.
 	 */
@@ -105,10 +102,9 @@ public class HibernateSearchPartitionMapperComponentIT {
 	public void testMapPartitions() throws Exception {
 		JobContextData jobData = new JobContextData();
 		jobData.setEntityManagerFactory( emf );
-		jobData.setEntityTypeDescriptors( Arrays.asList(
-				JobTestUtil.createSimpleEntityTypeDescriptor( emf, Company.class ),
-				JobTestUtil.createSimpleEntityTypeDescriptor( emf, Person.class )
-		) );
+		var companyType = JobTestUtil.createEntityTypeDescriptor( emf, Company.class );
+		var personType = JobTestUtil.createEntityTypeDescriptor( emf, Person.class );
+		jobData.setEntityTypeDescriptors( Arrays.asList( companyType, personType ) );
 		when( mockedJobContext.getTransientUserData() ).thenReturn( jobData );
 
 		PartitionPlan partitionPlan = partitionMapper.mapPartitions();
@@ -117,10 +113,10 @@ public class HibernateSearchPartitionMapperComponentIT {
 		int persPartitions = 0;
 		for ( Properties p : partitionPlan.getPartitionProperties() ) {
 			String entityName = p.getProperty( MassIndexingPartitionProperties.ENTITY_NAME );
-			if ( entityName.equals( Company.class.getName() ) ) {
+			if ( entityName.equals( companyType.jpaEntityName() ) ) {
 				compPartitions++;
 			}
-			if ( entityName.equals( Person.class.getName() ) ) {
+			if ( entityName.equals( personType.jpaEntityName() ) ) {
 				persPartitions++;
 			}
 			/*

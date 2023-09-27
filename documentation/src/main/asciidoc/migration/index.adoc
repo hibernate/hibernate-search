@@ -288,26 +288,48 @@ alter table hsearch_agent
 
 The configuration properties are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
-`hibernate.search.coordination.entity.mapping.outboxevent.uuid_type` and `hibernate.search.coordination.entity.mapping.agent.uuid_type`
+However, some configuration values are deprecated:
+
+* `hibernate.search.coordination.entity.mapping.outboxevent.uuid_type` and `hibernate.search.coordination.entity.mapping.agent.uuid_type`
 now accept names of SQL type codes from `org.hibernate.type.SqlTypes` or their corresponding int values.
 The value `default` is still valid. `uuid-binary` and `uuid-char` are accepted and converted to their corresponding `org.hibernate.type.SqlTypes` alternatives, but they are deprecated and will not be accepted in the future versions of Hibernate Search.
 
 [[api]]
 == API changes
 
-The complement operator (`~`) used for link:{hibernateSearchDocUrl}#search-dsl-predicate-regexp-flags[matching regular expression patterns with flags]
+The https://hibernate.org/community/compatibility-policy/#code-categorization[API]
+is for the most part backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+
+However, some APIs changed:
+
+* The complement operator (`~`) used for link:{hibernateSearchDocUrl}#search-dsl-predicate-regexp-flags[matching regular expression patterns with flags]
 is now removed with no alternative to replace it.
+* The Hibernate Search job for Jakarta Batch no longer accepts a `customQueryHQL` / `.restrictedBy(String)` parameter.
+Use `.reindexOnly(String hql, Map parameters)` instead.
+* The Hibernate Search job for Jakarta Batch no longer accepts a `sessionClearInterval` / `.sessionClearInterval(int)` parameter.
+Use `entityFetchSize`/`.entityFetchSize(int)` instead.
 
 [[spi]]
 == SPI changes
 
 The https://hibernate.org/community/compatibility-policy/#code-categorization[SPI]
-are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+are for the most part backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
 [[behavior]]
 == Behavior changes
 
-The default value for `hibernate.search.backend.query.shard_failure.ignore` is changed from `true` to `false` which means
+The behavior of Hibernate Search {hibernateSearchVersion}
+is for the most part backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+
+However, parts of Hibernate Search now behave differently:
+
+* The default value for `hibernate.search.backend.query.shard_failure.ignore` is changed from `true` to `false` which means
 that now Hibernate Search will throw an exception if at least one shard failed during a search operation.
 To get the previous behavior set this configuration property explicitly to `true`.
 Note, this setting must be set for each elasticsearch backend, if multiple are defined.
+* The Hibernate Search job for Jakarta Batch will now list identifiers in one session (with one DB connection),
+while loading entities in another (with another DB connection).
+This is to sidestep limitations of scrolling in some JDBC drivers.
+* For entities whose document ID is based on a different property than the entity ID,
+the Hibernate Search job for Jakarta Batch will now build the partition plan using that property
+instead of using the entity ID indiscriminately.

@@ -38,9 +38,9 @@ public final class ValidationUtil {
 		}
 	}
 
-	public static void validateSessionClearInterval(int sessionClearInterval, int checkpointInterval) {
-		if ( sessionClearInterval > checkpointInterval ) {
-			throw log.illegalSessionClearInterval( sessionClearInterval, checkpointInterval );
+	public static void validateEntityFetchSize(int entityFetchSize, int checkpointInterval) {
+		if ( entityFetchSize > checkpointInterval ) {
+			throw log.illegalEntityFetchSize( entityFetchSize, checkpointInterval );
 		}
 	}
 

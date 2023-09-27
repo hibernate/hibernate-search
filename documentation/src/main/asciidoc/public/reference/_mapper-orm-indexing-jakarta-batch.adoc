@@ -100,10 +100,9 @@ accept special values, for example MySQL might benefit from using `Integer#MIN_V
 will attempt to preload everything in memory.
 
 |`entityFetchSize` / `.entityFetchSize(int)`
-|The value of `sessionClearInterval`
-|Specifies the fetch size to be used when loading entities from database. Some databases
-accept special values, for example MySQL might benefit from using `Integer#MIN_VALUE`, otherwise it
-will attempt to preload everything in memory.
+|200, or the value of `checkpointInterval` if it is smaller
+|Specifies the fetch size to be used when loading entities from database. The value defined must be greater
+than 0, and equal to or less than the value of `checkpointInterval`.
 
 |`customQueryHQL` / `.restrictedBy(String)`
 |-
@@ -132,11 +131,6 @@ request maximum.
 |The number of entities to process before triggering a checkpoint. The value defined must be greater
 than 0, and equal to or less than the value of `rowsPerPartition`.
 
-|`sessionClearInterval` / `.sessionClearInterval(int)`
-|200, or the value of `checkpointInterval` if it is smaller
-|The number of entities to process before clearing the session. The value defined must be greater
-than 0, and equal to or less than the value of `checkpointInterval`.
-
 |`entityManagerFactoryReference` / `.entityManagerFactoryReference(String)`
 |-
 |**This parameter is required** when there is more than one persistence unit.
@@ -149,58 +143,37 @@ The string that will identify the `EntityManagerFactory`.
 |See <<mapper-orm-indexing-jakarta-batch-emf,Selecting the persistence unit (EntityManagerFactory)>>
 |===
 
-[[mapper-orm-indexing-jakarta-batch-indexing-mode]]
-== [[jsr-352-indexing-mode]] Indexing mode
+[[mapper-orm-indexing-jakarta-batch-conditional]]
+== [[mapper-orm-indexing-jakarta-batch-indexing-mode]] [[jsr-352-indexing-mode]] Conditional indexing
 
-The mass indexing job allows you to define your own entities to be indexed -- you can start a full
-indexing or a partial indexing through 2 different methods: selecting the desired entity types,
-or using HQL.
+You can select a subset of target entities to be indexed
+by passing a condition as string to the mass indexing job.
+The condition will be applied when querying the database for entities to index.
 
-.Conditional reindexing using a `restrictedBy` HQL parameter
+The condition string is expected to follow the link:{hibernateDocUrl}#query-language[Hibernate Query Language (HQL)] syntax.
+Accessible entity properties are those of the entity being reindexed (and nothing more).
+
+.Conditional indexing using a `reindexOnly` HQL parameter
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmJakartaBatchIT.java[tags=hql]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmJakartaBatchIT.java[tags=reindexOnly]
 ----
 <1> Start building parameters for a mass-indexing job.
 <2> Define the entity type to be indexed.
-<3> Restrict the scope of the job using an HQL restriction.
-<4> Get `JobOperator` form the framework.
-<5> Start the job.
+<3> Reindex only the authors born prior to a given local date.
+<4> In this example the cutoff date is passed as a query parameter.
+<5> Get `JobOperator` from the framework.
+<6> Start the job.
 ====
-
-While the full indexing is useful when you perform the very first indexing, or
-after extensive changes to your whole database, it may also be time-consuming.
-If your want to reindex only part of your data, you need to add restrictions using HQL:
-they help you to define a customized selection, and only the entities inside that selection will be indexed. A typical
-use-case is to index the new entities appeared since yesterday.
-
-Note that, as detailed below, some features may not be supported depending on the indexing mode.
-
-.Comparison of each indexing mode
-|===
-| Indexing mode | Scope | Parallel Indexing
-
-| Full Indexation
-| All entities
-| Supported
-
-| HQL
-| Some entities
-| Not supported
-|===
 
 [WARNING]
 ====
-When using the HQL mode, there isn't any query validation before the job's start.
-If the query is invalid, the job will start and fail.
+Even if the reindexing is applied on a subset of entities, by default *all entities* will be purged at the start.
+The purge <<mapper-orm-indexing-jakarta-batch-parameters,can be disabled completely>>,
+but when enabled there is no way to filter the entities that will be purged.
 
-Also, parallel indexing is disabled in HQL mode,
-because our current parallelism implementations relies on selection order,
-which might not be provided by the HQL given by user.
-
-Because of those limitations, we suggest you use this approach only for indexing small numbers of entities,
-and only if you know that no entities matching the query will be created during indexing.
+See https://hibernate.atlassian.net/browse/HSEARCH-3304[HSEARCH-3304] for more information.
 ====
 
 [[mapper-orm-indexing-jakarta-batch-parallel-indexing]]
@@ -315,7 +288,7 @@ But the size of a chunk is not only about saving progress, it is also about perf
  * a new Hibernate session is opened for each chunk;
  * a new transaction is started for each chunk;
  * inside a chunk, the session is cleared periodically
-   according to the `sessionClearInterval` parameter,
+   according to the `entityFetchSize` parameter,
    which must thereby be smaller than (or equal to) the chunk size;
  * documents are flushed to the index at the end of each chunk.
 

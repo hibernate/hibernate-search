@@ -17,16 +17,16 @@ import jakarta.batch.runtime.BatchRuntime;
 import jakarta.batch.runtime.BatchStatus;
 import jakarta.batch.runtime.JobExecution;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.metamodel.EntityType;
-import jakarta.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.EntityTypeDescriptor;
-import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.SingularIdOrder;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -122,9 +122,11 @@ public final class JobTestUtil {
 				.fetchHits( 1000 );
 	}
 
-	public static EntityTypeDescriptor createSimpleEntityTypeDescriptor(EntityManagerFactory emf, Class<?> clazz) {
-		EntityType<?> entityType = emf.getMetamodel().entity( clazz );
-		SingularAttribute<?, ?> idAttribute = entityType.getId( entityType.getIdType().getJavaType() );
-		return new EntityTypeDescriptor( clazz, new SingularIdOrder( idAttribute.getName() ) );
+	public static EntityTypeDescriptor<?, ?> createEntityTypeDescriptor(EntityManagerFactory emf, Class<?> clazz) {
+		SearchMapping mapping = Search.mapping( emf );
+		BatchMappingContext mappingContext = (BatchMappingContext) mapping;
+		LoadingTypeContext<?> type = mappingContext.typeContextProvider()
+				.byEntityName().getOrFail( mapping.indexedEntity( clazz ).jpaName() );
+		return EntityTypeDescriptor.create( type );
 	}
 }

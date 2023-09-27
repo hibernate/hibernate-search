@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.batch.api.BatchProperty;
 import jakarta.batch.api.chunk.AbstractItemReader;
@@ -19,41 +20,39 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.LockModeType;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
-import org.hibernate.query.Query;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.jakarta.batch.core.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.jakarta.batch.core.inject.scope.spi.HibernateSearchPartitionScoped;
 import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
 import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
 import org.hibernate.search.jakarta.batch.core.massindexing.step.impl.HibernateSearchPartitionMapper;
-import org.hibernate.search.jakarta.batch.core.massindexing.step.impl.IndexScope;
 import org.hibernate.search.jakarta.batch.core.massindexing.step.impl.PartitionContextData;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.EntityTypeDescriptor;
-import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.IdOrder;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.JobContextUtil;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.MassIndexingPartitionProperties;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.PartitionBound;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.PersistenceUtil;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.SerializationUtil;
+import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
- * Entity reader reads entities from database. During the open of the read stream, this reader builds a scrollable
- * result. Then, it scrolls from one entity to another at each reading. An entity reader reaches its end when there’s no
- * more item to read. Each reader contains only one entity type.
+ * Reads entity identifiers from the database.
  * <p>
- * The reading range is restricted by the {@link PartitionBound}, which always represents as a left-closed interval.
+ * This reader builds a scroll and outputs IDs from that scroll.
+ * <p>
+ * Each reader pertains to only one entity type.
+ * <p>
+ * The reading range is restricted by the {@link PartitionBound}, which always represents a left-closed interval.
  * See {@link HibernateSearchPartitionMapper} for more information about these bounds.
  *
  * @author Mincong Huang
@@ -61,7 +60,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 // Same hack as in JobContextSetupListener.
 @Named(value = "org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader")
 @HibernateSearchPartitionScoped
-public class EntityReader extends AbstractItemReader {
+public class EntityIdReader extends AbstractItemReader {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -87,28 +86,20 @@ public class EntityReader extends AbstractItemReader {
 	private StepContext stepContext;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.CACHE_MODE)
-	private String serializedCacheMode;
-
-	@Inject
 	@BatchProperty(name = MassIndexingPartitionProperties.ENTITY_NAME)
 	private String entityName;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.ENTITY_FETCH_SIZE)
-	private String serializedEntityFetchSize;
+	@BatchProperty(name = MassIndexingJobParameters.ID_FETCH_SIZE)
+	private String serializedIdFetchSize;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.CHECKPOINT_INTERVAL)
-	private String serializedCheckpointInterval;
+	@BatchProperty(name = MassIndexingJobParameters.REINDEX_ONLY_HQL)
+	private String reindexOnlyHql;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.SESSION_CLEAR_INTERVAL)
-	private String serializedSessionClearInterval;
-
-	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_HQL)
-	private String customQueryHql;
+	@BatchProperty(name = MassIndexingJobParameters.REINDEX_ONLY_PARAMETERS)
+	private String serializedReindexOnlyParameters;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY)
@@ -130,42 +121,38 @@ public class EntityReader extends AbstractItemReader {
 	@BatchProperty(name = MassIndexingPartitionProperties.UPPER_BOUND)
 	private String serializedUpperBound;
 
-	@Inject
-	@BatchProperty(name = MassIndexingPartitionProperties.INDEX_SCOPE)
-	private String indexScopeName;
-
-	private JobContextData jobData;
 	private EntityManagerFactory emf;
+	private EntityTypeDescriptor<?, ?> type;
+
+	private int idFetchSize;
+	private Integer maxResults;
+	private ConditionalExpression reindexOnly;
+	private Object upperBound;
+	private Object lowerBound;
 
 	private ChunkState chunkState;
 
-	public EntityReader() {
+	public EntityIdReader() {
 	}
 
-	public EntityReader(String serializedCacheMode,
-			String entityName,
-			String serializedEntityFetchSize,
-			String serializedCheckpointInterval,
-			String serializedSessionClearInterval,
-			String hql,
+	public EntityIdReader(String entityName,
+			String serializedIdFetchSize,
+			String reindexOnlyHql,
+			String serializedReindexOnlyParameters,
 			String serializedMaxResultsPerEntity,
 			String partitionIdStr,
 			String serializedLowerBound,
 			String serializedUpperBound,
-			String indexScopeName,
 			JobContext jobContext,
 			StepContext stepContext) {
-		this.serializedCacheMode = serializedCacheMode;
 		this.entityName = entityName;
-		this.serializedEntityFetchSize = serializedEntityFetchSize;
-		this.serializedCheckpointInterval = serializedCheckpointInterval;
-		this.serializedSessionClearInterval = serializedSessionClearInterval;
-		this.customQueryHql = hql;
+		this.serializedIdFetchSize = serializedIdFetchSize;
+		this.reindexOnlyHql = reindexOnlyHql;
+		this.serializedReindexOnlyParameters = serializedReindexOnlyParameters;
 		this.serializedMaxResultsPerEntity = serializedMaxResultsPerEntity;
 		this.serializedPartitionId = partitionIdStr;
 		this.serializedLowerBound = serializedLowerBound;
 		this.serializedUpperBound = serializedUpperBound;
-		this.indexScopeName = indexScopeName;
 		this.jobContext = jobContext;
 		this.stepContext = stepContext;
 	}
@@ -181,53 +168,34 @@ public class EntityReader extends AbstractItemReader {
 	public void open(Serializable checkpointInfo) throws IOException, ClassNotFoundException {
 		log.openingReader( serializedPartitionId, entityName );
 
-		final int partitionId =
-				SerializationUtil.parseIntegerParameter( MassIndexingPartitionProperties.PARTITION_ID, serializedPartitionId );
-		boolean isRestarted = checkpointInfo != null;
-
-		jobData = getOrCreateJobContextData();
+		JobContextData jobData = getOrCreateJobContextData();
 
 		emf = jobData.getEntityManagerFactory();
+		type = jobData.getEntityTypeDescriptor( entityName );
 
-		PartitionContextData partitionData;
-		IndexScope indexScope = IndexScope.valueOf( indexScopeName );
-		CacheMode cacheMode = SerializationUtil.parseCacheModeParameter(
-				MassIndexingJobParameters.CACHE_MODE, serializedCacheMode, MassIndexingJobParameters.Defaults.CACHE_MODE
+		idFetchSize = SerializationUtil.parseIntegerParameterOptional(
+				MassIndexingJobParameters.ID_FETCH_SIZE, serializedIdFetchSize,
+				MassIndexingJobParameters.Defaults.ID_FETCH_SIZE
 		);
-		int checkpointInterval = SerializationUtil.parseIntegerParameter(
-				MassIndexingJobParameters.CHECKPOINT_INTERVAL, serializedCheckpointInterval
-		);
-		Integer sessionClearIntervalRaw = SerializationUtil.parseIntegerParameterOptional(
-				MassIndexingJobParameters.SESSION_CLEAR_INTERVAL, serializedSessionClearInterval, null );
-		int sessionClearInterval =
-				MassIndexingJobParameters.Defaults.sessionClearInterval( sessionClearIntervalRaw, checkpointInterval );
-		int entityFetchSize = SerializationUtil.parseIntegerParameterOptional(
-				MassIndexingJobParameters.ENTITY_FETCH_SIZE, serializedEntityFetchSize, sessionClearInterval
-		);
-		Integer maxResults = SerializationUtil.parseIntegerParameterOptional(
+		reindexOnly = SerializationUtil.parseReindexOnlyParameters( reindexOnlyHql, serializedReindexOnlyParameters );
+		maxResults = SerializationUtil.parseIntegerParameterOptional(
 				MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY, serializedMaxResultsPerEntity, null
 		);
-		FetchingStrategy fetchingStrategy;
-		switch ( indexScope ) {
-			case HQL:
-				fetchingStrategy = createHqlFetchingStrategy( cacheMode, entityFetchSize, maxResults );
-				break;
 
-			case FULL_ENTITY:
-				fetchingStrategy = createCriteriaFetchingStrategy( cacheMode, entityFetchSize, maxResults );
-				break;
+		upperBound = SerializationUtil.deserialize( serializedUpperBound );
+		lowerBound = SerializationUtil.deserialize( serializedLowerBound );
 
-			default:
-				// This should never happen.
-				throw new IllegalStateException( "Unknown value from enum: " + IndexScope.class );
-		}
+		chunkState = new ChunkState( checkpointInfo );
 
-		chunkState = new ChunkState( emf, tenantId, fetchingStrategy, sessionClearInterval, checkpointInfo );
-
+		PartitionContextData partitionData;
+		boolean isRestarted = checkpointInfo != null;
 		if ( isRestarted ) {
 			partitionData = (PartitionContextData) stepContext.getPersistentUserData();
 		}
 		else {
+			final int partitionId =
+					SerializationUtil.parseIntegerParameter( MassIndexingPartitionProperties.PARTITION_ID,
+							serializedPartitionId );
 			partitionData = new PartitionContextData( partitionId, entityName );
 		}
 
@@ -249,17 +217,17 @@ public class EntityReader extends AbstractItemReader {
 	}
 
 	/**
-	 * Read item from database using JPA. Each read, there will be only one entity fetched.
+	 * Read item from database using JPA. Each read, there will be only one identifier fetched.
 	 */
 	@Override
 	public Object readItem() {
-		log.readingEntity();
+		log.readingEntityId();
 
-		Object entity = chunkState.next();
-		if ( entity == null ) {
+		Object id = chunkState.next();
+		if ( id == null ) {
 			log.noMoreResults();
 		}
-		return entity;
+		return id;
 	}
 
 	/**
@@ -290,122 +258,7 @@ public class EntityReader extends AbstractItemReader {
 		);
 	}
 
-	/**
-	 * Create a {@link FetchingStrategy} that creates scrolls from HQL
-	 * and uses the last item's index in the result list as a checkpoint ID.
-	 * <p>
-	 * We use the item index as a checkpoint ID only because it's the only solution,
-	 * given that we cannot modify the HQL to dynamically add a constraint based on the last
-	 * treated element.
-	 */
-	private FetchingStrategy createHqlFetchingStrategy(
-			CacheMode cacheMode, int entityFetchSize, Integer maxResults) {
-		String hql = customQueryHql;
-
-		return (session, lastCheckpointInfo) -> {
-			Query<?> query = session.createQuery( hql, Object.class );
-
-			if ( lastCheckpointInfo != null ) {
-				query.setFirstResult( lastCheckpointInfo.getProcessedEntityCount() );
-			}
-
-			if ( maxResults != null ) {
-				int remaining;
-				if ( lastCheckpointInfo != null ) {
-					remaining = maxResults - lastCheckpointInfo.getProcessedEntityCount();
-				}
-				else {
-					remaining = maxResults;
-				}
-				query.setMaxResults( remaining );
-			}
-
-			return query.setReadOnly( true )
-					.setCacheable( false )
-					.setLockMode( LockModeType.NONE )
-					.setHibernateFlushMode( FlushMode.MANUAL )
-					.setCacheMode( cacheMode )
-					.setFetchSize( entityFetchSize )
-					// The FORWARD_ONLY mode is not enough for PostgreSQL when using setFirstResult
-					.scroll( ScrollMode.SCROLL_SENSITIVE );
-		};
-	}
-
-	/**
-	 * Create a {@link FetchingStrategy} that creates scrolls from criteria
-	 * and uses the last returned entity's ID as a checkpoint ID.
-	 */
-	private FetchingStrategy createCriteriaFetchingStrategy(
-			CacheMode cacheMode, int entityFetchSize, Integer maxResults)
-			throws IOException, ClassNotFoundException {
-		Class<?> entityType = jobData.getEntityType( entityName );
-		Object upperBound = SerializationUtil.deserialize( serializedUpperBound );
-		Object lowerBound = SerializationUtil.deserialize( serializedLowerBound );
-
-		EntityTypeDescriptor typeDescriptor = jobData.getEntityTypeDescriptor( entityType );
-		IdOrder idOrder = typeDescriptor.getIdOrder();
-
-		return (session, lastCheckpointInfo) -> {
-			CriteriaBuilder builder = session.getCriteriaBuilder();
-			CriteriaQuery<?> criteria = builder.createQuery( entityType );
-			Root<?> root = criteria.from( entityType );
-
-			// build orders for this entity
-			idOrder.addAscOrder( builder, criteria, root );
-
-			ArrayList<Predicate> predicates = new ArrayList<>( 2 );
-
-			// build criteria using bounds
-			if ( upperBound != null ) {
-				predicates.add( idOrder.idLesser( builder, root, upperBound ) );
-			}
-			if ( lastCheckpointInfo != null ) {
-				predicates.add( idOrder.idGreater( builder, root, lastCheckpointInfo.getLastProcessedEntityId() ) );
-			}
-			else if ( lowerBound != null ) {
-				predicates.add( idOrder.idGreaterOrEqual( builder, root, lowerBound ) );
-			}
-
-			if ( !predicates.isEmpty() ) {
-				criteria.where( predicates.toArray( new Predicate[predicates.size()] ) );
-			}
-
-			Query<?> query = session.createQuery( criteria );
-
-			if ( maxResults != null ) {
-				int remaining;
-				if ( lastCheckpointInfo != null ) {
-					remaining = maxResults - lastCheckpointInfo.getProcessedEntityCount();
-				}
-				else {
-					remaining = maxResults;
-				}
-				query.setMaxResults( remaining );
-			}
-
-			return query
-					.setReadOnly( true )
-					.setCacheable( false )
-					.setLockMode( LockModeType.NONE )
-					.setCacheMode( cacheMode )
-					.setHibernateFlushMode( FlushMode.MANUAL )
-					.setFetchSize( entityFetchSize )
-					.scroll( ScrollMode.FORWARD_ONLY );
-		};
-	}
-
-	private interface FetchingStrategy {
-
-		ScrollableResults<?> createScroll(Session session, CheckpointInfo lastCheckpointInfo);
-
-	}
-
-	private static class ChunkState implements AutoCloseable {
-		private final EntityManagerFactory emf;
-		private final String tenantId;
-		private final FetchingStrategy fetchingStrategy;
-		private final int clearInterval;
-
+	private class ChunkState implements AutoCloseable {
 		private Session session;
 		private ScrollableResults<?> scroll;
 
@@ -413,13 +266,7 @@ public class EntityReader extends AbstractItemReader {
 		private int processedEntityCount = 0;
 		private Object lastProcessedEntityId;
 
-		public ChunkState(
-				EntityManagerFactory emf, String tenantId, FetchingStrategy fetchingStrategy, int clearInterval,
-				Serializable checkpointInfo) {
-			this.emf = emf;
-			this.tenantId = tenantId;
-			this.fetchingStrategy = fetchingStrategy;
-			this.clearInterval = clearInterval;
+		public ChunkState(Serializable checkpointInfo) {
 			this.lastCheckpointInfo = (CheckpointInfo) checkpointInfo;
 		}
 
@@ -431,21 +278,13 @@ public class EntityReader extends AbstractItemReader {
 			if ( scroll == null ) {
 				start();
 			}
-			// Mind the "else": we don't clear a session we just created.
-			else if ( processedEntityCount % clearInterval == 0 ) {
-				/*
-				 * This must be executed before we extract the entity,
-				 * because the returned entity must be attached to the session.
-				 */
-				session.clear();
-			}
 			if ( !scroll.next() ) {
 				return null;
 			}
-			Object entity = scroll.get();
-			lastProcessedEntityId = session.getIdentifier( entity );
+			Object id = scroll.get();
+			lastProcessedEntityId = id;
 			++processedEntityCount;
-			return entity;
+			return id;
 		}
 
 		/**
@@ -488,7 +327,7 @@ public class EntityReader extends AbstractItemReader {
 		private void start() {
 			session = PersistenceUtil.openSession( emf, tenantId );
 			try {
-				scroll = fetchingStrategy.createScroll( session, lastCheckpointInfo );
+				scroll = createScroll( type, session.unwrap( SessionImplementor.class ) );
 			}
 			catch (Throwable t) {
 				try {
@@ -501,6 +340,44 @@ public class EntityReader extends AbstractItemReader {
 			}
 		}
 
+		private <E, I> ScrollableResults<I> createScroll(EntityTypeDescriptor<E, I> type, SessionImplementor session) {
+			List<ConditionalExpression> conditions = new ArrayList<>();
+			if ( reindexOnly != null ) {
+				conditions.add( reindexOnly );
+			}
+			if ( upperBound != null ) {
+				conditions.add( type.idOrder().idLesser( "HIBERNATE_SEARCH_PARTITION_UPPER_BOUND_", upperBound ) );
+			}
+			if ( lastCheckpointInfo != null ) {
+				conditions.add( type.idOrder().idGreater( "HIBERNATE_SEARCH_LAST_CHECKPOINT_",
+						lastCheckpointInfo.getLastProcessedEntityId() ) );
+			}
+			else if ( lowerBound != null ) {
+				conditions.add( type.idOrder().idGreaterOrEqual( "HIBERNATE_SEARCH_PARTITION_LOWER_BOUND_", lowerBound ) );
+			}
+
+			SelectionQuery<I> query = type.createIdentifiersQuery( session, conditions );
+
+			if ( maxResults != null ) {
+				int remaining;
+				if ( lastCheckpointInfo != null ) {
+					remaining = maxResults - lastCheckpointInfo.getProcessedEntityCount();
+				}
+				else {
+					remaining = maxResults;
+				}
+				query.setMaxResults( remaining );
+			}
+
+			return query
+					.setReadOnly( true )
+					.setCacheable( false )
+					.setLockMode( LockModeType.NONE )
+					.setCacheMode( CacheMode.IGNORE )
+					.setHibernateFlushMode( FlushMode.MANUAL )
+					.setFetchSize( idFetchSize )
+					.scroll( ScrollMode.FORWARD_ONLY );
+		}
 	}
 
 	private static class CheckpointInfo implements Serializable {

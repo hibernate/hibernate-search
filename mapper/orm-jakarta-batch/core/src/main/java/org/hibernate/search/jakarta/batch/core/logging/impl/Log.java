@@ -95,21 +95,21 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET + 18,
-			value = "Opening EntityReader of partitionId='%1$s', entity='%2$s'."
+			value = "Opening EntityIdReader of partitionId='%1$s', entity='%2$s'."
 	)
 	void openingReader(String partitionId, String entityName);
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET + 19,
-			value = "Closing EntityReader of partitionId='%1$s', entity='%2$s'."
+			value = "Closing EntityIdReader of partitionId='%1$s', entity='%2$s'."
 	)
 	void closingReader(String partitionId, String entityName);
 
 	@LogMessage(level = Level.TRACE)
 	@Message(id = ID_OFFSET + 21,
-			value = "Reading entity..."
+			value = "Reading entity identifier..."
 	)
-	void readingEntity();
+	void readingEntityId();
 
 	@LogMessage(level = Level.INFO)
 	@Message(id = ID_OFFSET + 22,
@@ -119,9 +119,9 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = Level.TRACE)
 	@Message(id = ID_OFFSET + 23,
-			value = "Processing entity with id: '%1$s'"
+			value = "Processing entity: '%1$s'"
 	)
-	void processEntity(Object entityId);
+	void processEntity(Object entity);
 
 	@LogMessage(level = Level.INFO)
 	@Message(id = ID_OFFSET + 26,
@@ -159,11 +159,11 @@ public interface Log extends BasicLogger {
 	SearchException failingEntityTypes(String failingEntityNames);
 
 	@Message(id = ID_OFFSET + 33,
-			value = "The value of parameter '" + MassIndexingJobParameters.SESSION_CLEAR_INTERVAL
+			value = "The value of parameter '" + MassIndexingJobParameters.ENTITY_FETCH_SIZE
 					+ "' (value=%1$d) should be equal to or less than the value of parameter '"
 					+ MassIndexingJobParameters.CHECKPOINT_INTERVAL + "' (value=%2$d)."
 	)
-	SearchException illegalSessionClearInterval(int sessionClearInterval, int checkpointInterval);
+	SearchException illegalEntityFetchSize(int entityFetchSize, int checkpointInterval);
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET + 34,

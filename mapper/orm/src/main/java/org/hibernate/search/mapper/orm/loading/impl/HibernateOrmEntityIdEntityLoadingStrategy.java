@@ -14,6 +14,10 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmEntityLoadingStrategy;
+import org.hibernate.search.mapper.orm.loading.spi.LoadingSessionContext;
+import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
+import org.hibernate.search.mapper.orm.loading.spi.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.jakarta.batch.core.massindexing.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +33,7 @@ public class JobContextData {
 	 * In Jakarta Batch standard, only string values can be propagated using job properties, but class types are frequently
 	 * used too. So this map has string keys to facilitate lookup for values extracted from job properties.
 	 */
-	private Map<String, EntityTypeDescriptor> entityTypeDescriptorMap;
+	private Map<String, EntityTypeDescriptor<?, ?>> entityTypeDescriptorMap;
 
 	public JobContextData() {
 		entityTypeDescriptorMap = new HashMap<>();
@@ -46,14 +47,14 @@ public class JobContextData {
 		this.entityManagerFactory = entityManagerFactory;
 	}
 
-	public void setEntityTypeDescriptors(Collection<EntityTypeDescriptor> descriptors) {
-		for ( EntityTypeDescriptor descriptor : descriptors ) {
-			entityTypeDescriptorMap.put( descriptor.getJavaClass().getName(), descriptor );
+	public void setEntityTypeDescriptors(Collection<EntityTypeDescriptor<?, ?>> descriptors) {
+		for ( EntityTypeDescriptor<?, ?> descriptor : descriptors ) {
+			entityTypeDescriptorMap.put( descriptor.jpaEntityName(), descriptor );
 		}
 	}
 
-	public EntityTypeDescriptor getEntityTypeDescriptor(String entityName) {
-		EntityTypeDescriptor descriptor = entityTypeDescriptorMap.get( entityName );
+	public EntityTypeDescriptor<?, ?> getEntityTypeDescriptor(String entityName) {
+		EntityTypeDescriptor<?, ?> descriptor = entityTypeDescriptorMap.get( entityName );
 		if ( descriptor == null ) {
 			String msg = String.format( Locale.ROOT, "entity type %s not found.", entityName );
 			throw new NoSuchElementException( msg );
@@ -61,23 +62,14 @@ public class JobContextData {
 		return descriptor;
 	}
 
-	public EntityTypeDescriptor getEntityTypeDescriptor(Class<?> entityType) {
-		return getEntityTypeDescriptor( entityType.getName() );
-	}
-
-	public List<EntityTypeDescriptor> getEntityTypeDescriptors() {
-		return entityTypeDescriptorMap.values().stream()
-				.collect( Collectors.toList() );
+	public List<EntityTypeDescriptor<?, ?>> getEntityTypeDescriptors() {
+		return new ArrayList<>( entityTypeDescriptorMap.values() );
 	}
 
 	public List<Class<?>> getEntityTypes() {
 		return entityTypeDescriptorMap.values().stream()
-				.map( EntityTypeDescriptor::getJavaClass )
+				.map( EntityTypeDescriptor::javaClass )
 				.collect( Collectors.toList() );
-	}
-
-	public Class<?> getEntityType(String entityName) {
-		return getEntityTypeDescriptor( entityName ).getJavaClass();
 	}
 
 	@Override

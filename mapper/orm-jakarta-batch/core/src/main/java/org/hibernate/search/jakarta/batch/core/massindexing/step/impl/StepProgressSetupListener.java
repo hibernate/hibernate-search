@@ -6,8 +6,9 @@
  */
 package org.hibernate.search.jakarta.batch.core.massindexing.step.impl;
 
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.function.BiFunction;
+import java.util.List;
 
 import jakarta.batch.api.BatchProperty;
 import jakarta.batch.api.listener.AbstractStepListener;
@@ -15,15 +16,19 @@ import jakarta.batch.runtime.context.JobContext;
 import jakarta.batch.runtime.context.StepContext;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.LockModeType;
 
+import org.hibernate.CacheMode;
+import org.hibernate.FlushMode;
 import org.hibernate.Session;
-import org.hibernate.query.Query;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
 import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
+import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.EntityTypeDescriptor;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.PersistenceUtil;
+import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.SerializationUtil;
+import org.hibernate.search.mapper.orm.loading.spi.ConditionalExpression;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -46,8 +51,12 @@ public class StepProgressSetupListener extends AbstractStepListener {
 	private String tenantId;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_HQL)
-	private String customQueryHql;
+	@BatchProperty(name = MassIndexingJobParameters.REINDEX_ONLY_HQL)
+	private String reindexOnlyHql;
+
+	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.REINDEX_ONLY_PARAMETERS)
+	private String serializedReindexOnlyParameters;
 
 	/**
 	 * Setup the step-level indexing progress. The {@code StepProgress} will be initialized if this is the first start,
@@ -58,36 +67,21 @@ public class StepProgressSetupListener extends AbstractStepListener {
 	 * (*): for partitions' sub-threads, they store other things as a transient user data.
 	 */
 	@Override
-	public void beforeStep() {
+	public void beforeStep() throws IOException, ClassNotFoundException {
 		StepProgress stepProgress = (StepProgress) stepContext.getPersistentUserData();
 
 		if ( stepProgress == null ) {
 			stepProgress = new StepProgress();
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
-
-			IndexScope indexScope = PersistenceUtil.getIndexScope( customQueryHql );
-			BiFunction<Session, Class<?>, Long> rowCountFunction;
-			switch ( indexScope ) {
-				case HQL:
-					// We can't estimate the number of results when using HQL
-					rowCountFunction = (session, clazz) -> null;
-					break;
-
-				case FULL_ENTITY:
-					rowCountFunction = StepProgressSetupListener::countAll;
-					break;
-
-				default:
-					// This should never happen.
-					throw new IllegalStateException( "Unknown value from enum: " + IndexScope.class );
-			}
+			ConditionalExpression reindexOnly =
+					SerializationUtil.parseReindexOnlyParameters( reindexOnlyHql, serializedReindexOnlyParameters );
 
 			try ( Session session = PersistenceUtil.openSession( emf, tenantId ) ) {
-				for ( Class<?> entityType : jobData.getEntityTypes() ) {
-					Long rowCount = rowCountFunction.apply( session, entityType );
-					log.rowsToIndex( entityType.getName(), rowCount );
-					stepProgress.setRowsToIndex( entityType.getName(), rowCount );
+				for ( EntityTypeDescriptor<?, ?> type : jobData.getEntityTypeDescriptors() ) {
+					Long rowCount = countAll( session, type, reindexOnly );
+					log.rowsToIndex( type.jpaEntityName(), rowCount );
+					stepProgress.setRowsToIndex( type.jpaEntityName(), rowCount );
 				}
 			}
 		}
@@ -104,15 +98,14 @@ public class StepProgressSetupListener extends AbstractStepListener {
 		stepContext.setPersistentUserData( stepProgress );
 	}
 
-	private static Long countAll(Session session, Class<?> entityType) {
-		CriteriaBuilder builder = session.getCriteriaBuilder();
-		CriteriaQuery<Long> criteria = builder.createQuery( Long.class );
-		criteria.select( builder.count( criteria.from( entityType ) ) );
-
-		Query<Long> query = session.createQuery( criteria );
-		query.setCacheable( false )
+	private static Long countAll(Session session, EntityTypeDescriptor<?, ?> type, ConditionalExpression reindexOnly) {
+		return type.createCountQuery( session.unwrap( SessionImplementor.class ),
+				reindexOnly == null ? List.of() : List.of( reindexOnly ) )
+				.setReadOnly( true )
+				.setCacheable( false )
+				.setLockMode( LockModeType.NONE )
+				.setCacheMode( CacheMode.IGNORE )
+				.setHibernateFlushMode( FlushMode.MANUAL )
 				.uniqueResult();
-
-		return query.getSingleResult();
 	}
 }

@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -107,10 +108,10 @@ public class MassIndexingJobWithCompositeIdIT {
 
 	@Test
 	@Ignore("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
-	public void canHandleIdClass_hql() throws Exception {
+	public void canHandleIdClass_reindexOnly() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithIdClass.class )
-				.restrictedBy( "select e from EntityWithIdClass e where e.month >= 7" )
+				.reindexOnly( "month >= :month", Map.of( "month", 7 ) )
 				.rowsPerPartition( 13 ) // Ensure there're more than 1 partition, so that a WHERE clause is applied.
 				.checkpointInterval( 4 )
 				.build();
@@ -137,10 +138,10 @@ public class MassIndexingJobWithCompositeIdIT {
 	}
 
 	@Test
-	public void canHandleEmbeddedId_hql() throws Exception {
+	public void canHandleEmbeddedId_reindexOnly() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithEmbeddedId.class )
-				.restrictedBy( "select e from EntityWithEmbeddedId e where e.embeddableDateId.month >= 7" )
+				.reindexOnly( "embeddableDateId.month >= :month", Map.of( "month", 7 ) )
 				.rowsPerPartition( 13 ) // Ensure there're more than 1 partition, so that a WHERE clause is applied.
 				.checkpointInterval( 4 )
 				.build();

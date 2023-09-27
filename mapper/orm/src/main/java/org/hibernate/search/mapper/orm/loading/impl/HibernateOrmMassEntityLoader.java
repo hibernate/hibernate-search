@@ -12,6 +12,7 @@ import org.hibernate.FlushMode;
 import org.hibernate.LockOptions;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmQueryLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntitySink;
 

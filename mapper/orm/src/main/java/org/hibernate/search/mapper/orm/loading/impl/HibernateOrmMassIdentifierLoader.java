@@ -13,6 +13,7 @@ import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
+import org.hibernate.search.mapper.orm.loading.spi.HibernateOrmQueryLoader;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierSink;

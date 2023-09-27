@@ -4,13 +4,11 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.loading.impl;
+package org.hibernate.search.mapper.orm.loading.spi;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 
@@ -39,7 +37,10 @@ public interface HibernateOrmEntityLoadingStrategy<E, I> {
 			LoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions);
 
-	HibernateOrmQueryLoader<E, I> createQueryLoader(
-			List<LoadingTypeContext<? extends E>> typeContexts, Optional<ConditionalExpression> conditionalExpression);
+	HibernateOrmQueryLoader<E, I> createQueryLoader(List<LoadingTypeContext<? extends E>> typeContexts,
+			List<ConditionalExpression> conditionalExpressions);
+
+	HibernateOrmQueryLoader<E, I> createQueryLoader(List<LoadingTypeContext<? extends E>> typeContexts,
+			List<ConditionalExpression> conditionalExpressions, String order);
 
 }
