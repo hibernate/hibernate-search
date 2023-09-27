@@ -14,12 +14,16 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
 import org.hibernate.metamodel.mapping.EmbeddableMappingType;
 import org.hibernate.metamodel.mapping.EntityIdentifierMapping;
+import org.hibernate.metamodel.mapping.ModelPart;
+import org.hibernate.metamodel.model.domain.NavigableRole;
 
 /**
  * Order over multiple ID attributes.
@@ -47,83 +51,67 @@ import org.hibernate.metamodel.mapping.EntityIdentifierMapping;
  */
 public class CompositeIdOrder implements IdOrder {
 
-	private final EntityIdentifierMapping mapping;
-	private final EmbeddableMappingType mappingType;
+	private final EntityIdentifierMapping idMapping;
+	private final EmbeddableMappingType idMappingType;
 
-	public CompositeIdOrder(EntityIdentifierMapping mapping, EmbeddableMappingType mappingType) {
-		this.mapping = mapping;
-		this.mappingType = mappingType;
+	public CompositeIdOrder(EntityIdentifierMapping idMapping, EmbeddableMappingType idMappingType) {
+		this.idMapping = idMapping;
+		this.idMappingType = idMappingType;
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Predicate idGreater(CriteriaBuilder builder, Root<?> root, Object idObj) {
-		BiFunction<String, Object, Predicate> strictOperator =
-				(String path, Object obj) -> builder.greaterThan( root.get( path ), (Comparable<? super Object>) idObj );
-		return restrictLexicographically( strictOperator, builder, root, idObj, false );
+		return restrictLexicographically( builder::greaterThan, builder, root, idObj, false );
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Predicate idGreaterOrEqual(CriteriaBuilder builder, Root<?> root, Object idObj) {
-		/*
-		 * Caution, using Restrictions::ge here won't cut it, we really need
-		 * to separate the strict operator from the equals.
-		 */
-		BiFunction<String, Object, Predicate> strictOperator =
-				(String path, Object obj) -> builder.greaterThan( root.get( path ), (Comparable<? super Object>) idObj );
-		return restrictLexicographically( strictOperator, builder, root, idObj, true );
+		// Caution, using 'builder::greaterThanOrEqualTo' here won't cut it, we really need
+		// to separate the strict operator from the equals.
+		return restrictLexicographically( builder::greaterThan, builder, root, idObj, true );
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Predicate idLesser(CriteriaBuilder builder, Root<?> root, Object idObj) {
-		BiFunction<String, Object, Predicate> strictOperator =
-				(String path, Object obj) -> builder.lessThan( root.get( path ), (Comparable<? super Object>) idObj );
-		return restrictLexicographically( strictOperator, builder, root, idObj, false );
+		return restrictLexicographically( builder::lessThan, builder, root, idObj, false );
 	}
 
 	@Override
 	public void addAscOrder(CriteriaBuilder builder, CriteriaQuery<?> criteria, Root<?> root) {
 		ArrayList<Order> orders = new ArrayList<>();
-		mapping.forEachSelectable(
-				(i, selectable) -> orders.add( builder.asc( root.get( selectable.getSelectablePath().getFullPath() ) ) ) );
+		idMappingType.forEachSubPart( (i, subPart) -> orders.add( builder.asc( toPath( root, subPart ) ) ) );
 		criteria.orderBy( orders );
 	}
 
-	private Predicate restrictLexicographically(BiFunction<String, Object, Predicate> strictOperator,
+	@SuppressWarnings("unchecked")
+	private Predicate restrictLexicographically(
+			BiFunction<Expression<Comparable<? super Object>>, Comparable<? super Object>, Predicate> strictOperator,
 			CriteriaBuilder builder, Root<?> root, Object idObj, boolean orEquals) {
-		Object[] selectableValues = mappingType.getValues( idObj );
-		int selectablesSize = selectableValues.length;
-
+		Object[] selectableValues = idMappingType.getValues( idObj );
 		List<Predicate> or = new ArrayList<>();
 
-		mapping.forEachSelectable( (i, selectable) -> {
+		idMappingType.forEachSubPart( (i, subPart) -> {
 			// Group expressions together in a single conjunction (A and B and C...).
 			Predicate[] and = new Predicate[i + 1];
 
-			mapping.forEachSelectable( (j, previousSelectable) -> {
+			idMappingType.forEachSubPart( (j, previousSubPart) -> {
 				if ( j < i ) {
 					// The first N-1 expressions have symbol `=`
-					String path = previousSelectable.getSelectablePath().getFullPath();
-					Object val = selectableValues[j];
-					and[j] = builder.equal( root.get( path ), val );
+					and[j] = builder.equal( toPath( root, previousSubPart ),
+							selectableValues[j] );
 				}
 			} );
 			// The last expression has whatever symbol is defined by "strictOperator"
-			String path = selectable.getSelectablePath().getFullPath();
-			Object val = selectableValues[i];
-			and[i] = strictOperator.apply( path, val );
+			and[i] = strictOperator.apply( toPath( root, subPart ),
+					(Comparable<? super Object>) selectableValues[i] );
 
 			or.add( builder.and( and ) );
 		} );
 
 		if ( orEquals ) {
-			Predicate[] and = new Predicate[selectablesSize];
-			mapping.forEachSelectable( (i, previousSelectable) -> {
-				String path = previousSelectable.getSelectablePath().getFullPath();
-				Object val = selectableValues[i];
-				and[i] = builder.equal( root.get( path ), val );
+			Predicate[] and = new Predicate[selectableValues.length];
+			idMappingType.forEachSubPart( (i, subPart) -> {
+				and[i] = builder.equal( toPath( root, subPart ), selectableValues[i] );
 			} );
 			or.add( builder.and( and ) );
 		}
@@ -132,4 +120,16 @@ public class CompositeIdOrder implements IdOrder {
 		return builder.or( or.toArray( new Predicate[0] ) );
 	}
 
+	private <T> Path<T> toPath(Root<?> root, ModelPart subPart) {
+		return toPath( root, subPart.getNavigableRole() );
+	}
+
+	private <T> Path<T> toPath(Path<?> parent, NavigableRole role) {
+		if ( role == idMappingType.getNavigableRole() ) {
+			return parent.get( idMapping.getAttributeName() );
+		}
+		else {
+			return toPath( parent, role.getParent() ).get( role.getLocalName() );
+		}
+	}
 }

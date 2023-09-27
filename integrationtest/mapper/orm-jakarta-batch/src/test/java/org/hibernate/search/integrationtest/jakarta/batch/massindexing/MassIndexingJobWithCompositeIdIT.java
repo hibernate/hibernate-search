@@ -93,7 +93,7 @@ public class MassIndexingJobWithCompositeIdIT {
 
 	@Test
 	@Ignore("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
-	public void canHandleIdClass_strategyFull() throws Exception {
+	public void canHandleIdClass() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithIdClass.class )
 				.rowsPerPartition( 13 ) // Ensure there're more than 1 partition, so that a WHERE clause is applied.
@@ -107,10 +107,10 @@ public class MassIndexingJobWithCompositeIdIT {
 
 	@Test
 	@Ignore("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
-	public void canHandleIdClass_strategyHql() throws Exception {
+	public void canHandleIdClass_hql() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithIdClass.class )
-				.restrictedBy( "select e from EntityWithIdClass e where e.month = 6" )
+				.restrictedBy( "select e from EntityWithIdClass e where e.month >= 7" )
 				.rowsPerPartition( 13 ) // Ensure there're more than 1 partition, so that a WHERE clause is applied.
 				.checkpointInterval( 4 )
 				.build();
@@ -122,8 +122,7 @@ public class MassIndexingJobWithCompositeIdIT {
 	}
 
 	@Test
-	@Ignore("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
-	public void canHandleEmbeddedId_strategyFull() throws Exception {
+	public void canHandleEmbeddedId() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithEmbeddedId.class )
 				.rowsPerPartition( 13 ) // Ensure there're more than 1 partition, so that a WHERE clause is applied.
@@ -138,11 +137,10 @@ public class MassIndexingJobWithCompositeIdIT {
 	}
 
 	@Test
-	@Ignore("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
-	public void canHandleEmbeddedId_strategyHql() throws Exception {
+	public void canHandleEmbeddedId_hql() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithEmbeddedId.class )
-				.restrictedBy( "select e from EntityWithIdClass e where e.embeddableDateId.month = 6" )
+				.restrictedBy( "select e from EntityWithEmbeddedId e where e.embeddableDateId.month >= 7" )
 				.rowsPerPartition( 13 ) // Ensure there're more than 1 partition, so that a WHERE clause is applied.
 				.checkpointInterval( 4 )
 				.build();
@@ -165,14 +163,14 @@ public class MassIndexingJobWithCompositeIdIT {
 		private EmbeddableDateId embeddableDateId;
 
 		@FullTextField
-		private String value;
+		private String text;
 
 		public EntityWithEmbeddedId() {
 		}
 
 		public EntityWithEmbeddedId(LocalDate d) {
 			this.embeddableDateId = new EmbeddableDateId( d );
-			this.value = DateTimeFormatter.ofPattern( "yyyyMMdd", Locale.ROOT ).format( d );
+			this.text = DateTimeFormatter.ofPattern( "yyyyMMdd", Locale.ROOT ).format( d );
 		}
 
 		public EmbeddableDateId getEmbeddableDateId() {
@@ -183,17 +181,17 @@ public class MassIndexingJobWithCompositeIdIT {
 			this.embeddableDateId = embeddableDateId;
 		}
 
-		public String getValue() {
-			return value;
+		public String getText() {
+			return text;
 		}
 
-		public void setValue(String value) {
-			this.value = value;
+		public void setText(String text) {
+			this.text = text;
 		}
 
 		@Override
 		public String toString() {
-			return "MyDate [embeddableDateId=" + embeddableDateId + ", value=" + value + "]";
+			return "MyDate [embeddableDateId=" + embeddableDateId + ", text=" + text + "]";
 		}
 
 		/**
