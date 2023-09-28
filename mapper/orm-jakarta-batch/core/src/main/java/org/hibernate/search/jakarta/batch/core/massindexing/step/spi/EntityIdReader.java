@@ -21,12 +21,10 @@ import jakarta.inject.Named;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.LockModeType;
 
-import org.hibernate.CacheMode;
-import org.hibernate.FlushMode;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
-import org.hibernate.Session;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.StatelessSession;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.query.SelectionQuery;
 import org.hibernate.search.jakarta.batch.core.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.jakarta.batch.core.inject.scope.spi.HibernateSearchPartitionScoped;
@@ -259,7 +257,7 @@ public class EntityIdReader extends AbstractItemReader {
 	}
 
 	private class ChunkState implements AutoCloseable {
-		private Session session;
+		private StatelessSession session;
 		private ScrollableResults<?> scroll;
 
 		private CheckpointInfo lastCheckpointInfo;
@@ -318,16 +316,16 @@ public class EntityIdReader extends AbstractItemReader {
 					scroll = null;
 				}
 				if ( session != null ) {
-					closer.push( Session::close, session );
+					closer.push( StatelessSession::close, session );
 					session = null;
 				}
 			}
 		}
 
 		private void start() {
-			session = PersistenceUtil.openSession( emf, tenantId );
+			session = PersistenceUtil.openStatelessSession( emf, tenantId );
 			try {
-				scroll = createScroll( type, session.unwrap( SessionImplementor.class ) );
+				scroll = createScroll( type, session );
 			}
 			catch (Throwable t) {
 				try {
@@ -340,7 +338,7 @@ public class EntityIdReader extends AbstractItemReader {
 			}
 		}
 
-		private <E, I> ScrollableResults<I> createScroll(EntityTypeDescriptor<E, I> type, SessionImplementor session) {
+		private <E, I> ScrollableResults<I> createScroll(EntityTypeDescriptor<E, I> type, StatelessSession session) {
 			List<ConditionalExpression> conditions = new ArrayList<>();
 			if ( reindexOnly != null ) {
 				conditions.add( reindexOnly );
@@ -356,7 +354,7 @@ public class EntityIdReader extends AbstractItemReader {
 				conditions.add( type.idOrder().idGreaterOrEqual( "HIBERNATE_SEARCH_PARTITION_LOWER_BOUND_", lowerBound ) );
 			}
 
-			SelectionQuery<I> query = type.createIdentifiersQuery( session, conditions );
+			SelectionQuery<I> query = type.createIdentifiersQuery( (SharedSessionContractImplementor) session, conditions );
 
 			if ( maxResults != null ) {
 				int remaining;
@@ -373,8 +371,6 @@ public class EntityIdReader extends AbstractItemReader {
 					.setReadOnly( true )
 					.setCacheable( false )
 					.setLockMode( LockModeType.NONE )
-					.setCacheMode( CacheMode.IGNORE )
-					.setHibernateFlushMode( FlushMode.MANUAL )
 					.setFetchSize( idFetchSize )
 					.scroll( ScrollMode.FORWARD_ONLY );
 		}

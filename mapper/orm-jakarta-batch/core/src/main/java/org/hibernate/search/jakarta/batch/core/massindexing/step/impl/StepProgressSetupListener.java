@@ -18,10 +18,8 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.LockModeType;
 
-import org.hibernate.CacheMode;
-import org.hibernate.FlushMode;
-import org.hibernate.Session;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.StatelessSession;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
 import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.jakarta.batch.core.massindexing.impl.JobContextData;
@@ -77,7 +75,7 @@ public class StepProgressSetupListener extends AbstractStepListener {
 			ConditionalExpression reindexOnly =
 					SerializationUtil.parseReindexOnlyParameters( reindexOnlyHql, serializedReindexOnlyParameters );
 
-			try ( Session session = PersistenceUtil.openSession( emf, tenantId ) ) {
+			try ( StatelessSession session = PersistenceUtil.openStatelessSession( emf, tenantId ) ) {
 				for ( EntityTypeDescriptor<?, ?> type : jobData.getEntityTypeDescriptors() ) {
 					Long rowCount = countAll( session, type, reindexOnly );
 					log.rowsToIndex( type.jpaEntityName(), rowCount );
@@ -98,14 +96,12 @@ public class StepProgressSetupListener extends AbstractStepListener {
 		stepContext.setPersistentUserData( stepProgress );
 	}
 
-	private static Long countAll(Session session, EntityTypeDescriptor<?, ?> type, ConditionalExpression reindexOnly) {
-		return type.createCountQuery( session.unwrap( SessionImplementor.class ),
+	private static Long countAll(StatelessSession session, EntityTypeDescriptor<?, ?> type, ConditionalExpression reindexOnly) {
+		return type.createCountQuery( (SharedSessionContractImplementor) session,
 				reindexOnly == null ? List.of() : List.of( reindexOnly ) )
 				.setReadOnly( true )
 				.setCacheable( false )
 				.setLockMode( LockModeType.NONE )
-				.setCacheMode( CacheMode.IGNORE )
-				.setHibernateFlushMode( FlushMode.MANUAL )
 				.uniqueResult();
 	}
 }
