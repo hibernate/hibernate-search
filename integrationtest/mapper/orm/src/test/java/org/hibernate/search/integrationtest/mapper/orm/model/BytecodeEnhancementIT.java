@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedAssert.assertThatManaged;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.annotations.LazyGroup;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -37,33 +39,29 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.util.common.impl.CollectionHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.bytecodeenhacement.extension.BytecodeEnhanced;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
-import org.hibernate.testing.bytecode.enhancement.BytecodeEnhancerRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
-import org.junit.runner.RunWith;
+@BytecodeEnhanced
+@ParameterizedPerClass
+class BytecodeEnhancementIT {
 
-@RunWith(BytecodeEnhancerRunner.class)
-public class BytecodeEnhancementIT {
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	private SessionFactory sessionFactory;
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
-
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@ParameterizedSetup
+	public void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "mappedSuperClassText", String.class )
 				.field( "entitySuperClassText", String.class )
@@ -85,7 +83,7 @@ public class BytecodeEnhancementIT {
 				.field( "transientText", String.class )
 		);
 
-		setupContext
+		OrmSetupHelper.SetupContext setupContext = ormSetupHelper.start()
 				/*
 				 * This is necessary in order for the BytecodeEnhancerRunner to work correctly.
 				 * Otherwise classes can be successfully loaded from the application classloader
@@ -99,6 +97,8 @@ public class BytecodeEnhancementIT {
 						ContainedEntity.class,
 						ContainedEmbeddable.class
 				);
+
+		sessionFactory = setupContext.setup();
 	}
 
 	@Test
@@ -111,7 +111,7 @@ public class BytecodeEnhancementIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3581")
 	public void test() {
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			// This cast is necessary to work around https://hibernate.atlassian.net/browse/HHH-14006
 			( (IndexedEntitySuperClass) entity1 ).id = 1;
@@ -176,7 +176,7 @@ public class BytecodeEnhancementIT {
 
 		AtomicReference<IndexedEntity> entityFromTransaction = new AtomicReference<>();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = session.getReference( IndexedEntity.class, 1 );
 			entityFromTransaction.set( entity );
 
@@ -224,7 +224,8 @@ public class BytecodeEnhancementIT {
 		assertOnlyLoadedPropertiesAre( entity, IndexedEntity.LAZY_PROPERTY_NAMES, expectedLoadedProperties );
 	}
 
-	private static void assertOnlyLoadedPropertiesAre(ContainedEmbeddable embeddable, String... expectedLoadedProperties) {
+	private static void assertOnlyLoadedPropertiesAre(ContainedEmbeddable embeddable,
+			String... expectedLoadedProperties) {
 		assertOnlyLoadedPropertiesAre( embeddable, ContainedEmbeddable.LAZY_PROPERTY_NAMES, expectedLoadedProperties );
 	}
 
