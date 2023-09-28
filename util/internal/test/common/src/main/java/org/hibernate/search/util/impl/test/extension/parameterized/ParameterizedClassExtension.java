@@ -153,6 +153,10 @@ final class ParameterizedClassExtension
 
 		@Override
 		public String getDisplayName(int invocationIndex) {
+			// setup is not necessarily parameterized
+			if ( envArguments.isEmpty() ) {
+				return name;
+			}
 			return "Configuration #" + envIndex + ": " + Arrays.toString( envArguments.get( envIndex ) ) + " : " + name;
 		}
 
