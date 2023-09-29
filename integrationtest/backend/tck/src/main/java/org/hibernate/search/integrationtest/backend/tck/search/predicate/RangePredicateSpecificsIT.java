@@ -56,7 +56,7 @@ class RangePredicateSpecificsIT<F> {
 	}
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
 

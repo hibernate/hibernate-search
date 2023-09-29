@@ -41,7 +41,7 @@ class MatchIdPredicateSpecificsIT {
 	private static final String INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1 = "incompatibleIdConverter_document1";
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final StubMappedIndex mainIndex =
 			StubMappedIndex.withoutFields().name( "main" );

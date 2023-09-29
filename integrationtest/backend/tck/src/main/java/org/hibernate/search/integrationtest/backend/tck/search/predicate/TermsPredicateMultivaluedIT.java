@@ -56,7 +56,7 @@ class TermsPredicateMultivaluedIT<F> {
 			SimpleMappedIndex.of( root -> new IndexBinding( root, types ) ).name( "simpleField" );
 
 	@RegisterExtension
-	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@BeforeAll
 	static void setup() {

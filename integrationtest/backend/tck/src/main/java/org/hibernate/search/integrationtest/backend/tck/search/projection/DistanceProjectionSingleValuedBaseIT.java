@@ -53,6 +53,7 @@ import org.assertj.core.api.ListAssert;
 /**
  * Tests basic behavior of projections on the distance between a given point and the value of a single-valued field.
  */
+
 class DistanceProjectionSingleValuedBaseIT {
 
 	private static final GeoPointFieldTypeDescriptor fieldType = GeoPointFieldTypeDescriptor.INSTANCE;
@@ -77,7 +78,7 @@ class DistanceProjectionSingleValuedBaseIT {
 	}
 
 	@RegisterExtension
-	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> mainIndex =
 			SimpleMappedIndex.of(

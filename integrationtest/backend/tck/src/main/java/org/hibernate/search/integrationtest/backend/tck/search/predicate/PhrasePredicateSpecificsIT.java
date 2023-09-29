@@ -45,7 +45,7 @@ class PhrasePredicateSpecificsIT {
 	private static final String PHRASE_1_TEXT_SLOP_NO_MATCH = "Completely unrelated phrase.";
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

@@ -65,6 +65,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * for all single-field aggregations (range, terms, ...)
  * on supported types.
  */
+
 class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 	private static final String AGGREGATION_NAME = "aggregationName";
@@ -93,7 +94,7 @@ class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 	}
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "Main" );

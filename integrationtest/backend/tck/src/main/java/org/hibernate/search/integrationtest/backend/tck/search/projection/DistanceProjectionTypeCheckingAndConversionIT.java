@@ -46,6 +46,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Tests behavior related to type checking and type conversion of
  * projections on the distance between a field value and a given point.
  */
+
 class DistanceProjectionTypeCheckingAndConversionIT {
 
 	private static final GeoPointFieldTypeDescriptor fieldType = GeoPointFieldTypeDescriptor.INSTANCE;
@@ -60,7 +61,7 @@ class DistanceProjectionTypeCheckingAndConversionIT {
 	private static final String MISSING_FIELD_INDEX_DOCUMENT_1 = "missing_field_1";
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );

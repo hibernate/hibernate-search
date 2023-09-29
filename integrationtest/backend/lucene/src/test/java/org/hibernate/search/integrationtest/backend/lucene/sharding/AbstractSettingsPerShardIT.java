@@ -18,13 +18,17 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedClass;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * A basic test for explicit sharding with explicit routing keys.
  */
+@ParameterizedClass
 public abstract class AbstractSettingsPerShardIT {
 
 	public static List<? extends Arguments> params() {
@@ -58,10 +62,14 @@ public abstract class AbstractSettingsPerShardIT {
 
 	public List<String> shardIds;
 
+	protected Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction;
+
+	@ParameterizedSetup(ParameterizedSetup.Lifecycle.PER_METHOD)
+	@MethodSource("params")
 	protected void init(String strategy, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
 			List<String> shardIds) {
 		this.strategy = strategy;
-		this.setupHelper.with( setupStrategyFunction );
+		this.setupStrategyFunction = setupStrategyFunction;
 		this.shardIds = shardIds;
 	}
 
@@ -79,5 +87,4 @@ public abstract class AbstractSettingsPerShardIT {
 			ctx.explicitRouting();
 		}
 	}
-
 }

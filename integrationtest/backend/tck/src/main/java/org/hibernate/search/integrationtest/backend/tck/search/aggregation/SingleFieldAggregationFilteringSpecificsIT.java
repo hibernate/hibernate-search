@@ -42,6 +42,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * {@link org.hibernate.search.engine.search.aggregation.dsl.AggregationFilterStep#filter(Function) filtering}
  * that is not tested in {@link SingleFieldAggregationBaseIT}.
  */
+
 class SingleFieldAggregationFilteringSpecificsIT<F> {
 
 	private static final Set<FieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
@@ -65,7 +66,7 @@ class SingleFieldAggregationFilteringSpecificsIT<F> {
 	}
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new );
 

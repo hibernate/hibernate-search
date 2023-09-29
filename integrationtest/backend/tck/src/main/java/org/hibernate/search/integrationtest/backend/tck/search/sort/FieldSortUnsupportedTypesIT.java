@@ -34,6 +34,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Tests basic behavior of field sort common to all unsupported types,
  * i.e. error messages.
  */
+
 class FieldSortUnsupportedTypesIT<F> {
 
 	private static Stream<FieldTypeDescriptor<?>> unsupportedTypeDescriptors() {
@@ -50,7 +51,7 @@ class FieldSortUnsupportedTypesIT<F> {
 	}
 
 	@RegisterExtension
-	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

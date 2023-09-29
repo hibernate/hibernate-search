@@ -32,12 +32,13 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Behavior that is specific to the field type is tested elsewhere,
  * e.g. {@link DistanceProjectionSingleValuedBaseIT} and {@link DistanceProjectionTypeCheckingAndConversionIT}.
  */
+
 class DistanceProjectionTypeIndependentIT {
 
 	private static final GeoPoint SOME_POINT = GeoPoint.of( 45.749828, 4.854172 );
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

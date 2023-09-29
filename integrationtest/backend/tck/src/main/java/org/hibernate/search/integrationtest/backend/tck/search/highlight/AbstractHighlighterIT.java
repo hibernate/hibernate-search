@@ -46,7 +46,7 @@ import org.apache.logging.log4j.Level;
 abstract class AbstractHighlighterIT {
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@RegisterExtension
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();

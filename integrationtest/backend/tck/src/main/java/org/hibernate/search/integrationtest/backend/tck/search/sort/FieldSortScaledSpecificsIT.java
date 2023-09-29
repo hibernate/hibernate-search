@@ -27,7 +27,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 class FieldSortScaledSpecificsIT {
 
 	@RegisterExtension
-	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( root -> new IndexBinding( root, 2 ) ).name( "main" );

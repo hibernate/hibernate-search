@@ -31,11 +31,12 @@ import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguratio
 
 //CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
 // cannot make a private constructor.
+
 class DistanceProjectionBaseIT {
 	//CHECKSTYLE:ON
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static DistanceProjectionTestValues testValues() {
 		return new DistanceProjectionTestValues();

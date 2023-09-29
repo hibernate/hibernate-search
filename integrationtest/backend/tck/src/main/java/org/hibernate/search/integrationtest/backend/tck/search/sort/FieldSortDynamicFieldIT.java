@@ -63,7 +63,7 @@ class FieldSortDynamicFieldIT<F> {
 	private static final int DOCUMENT_3_ORDINAL = 5;
 
 	@RegisterExtension
-	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );

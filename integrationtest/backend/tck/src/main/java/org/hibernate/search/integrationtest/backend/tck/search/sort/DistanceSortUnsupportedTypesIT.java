@@ -33,6 +33,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Tests basic behavior of distance sort common to all unsupported types,
  * i.e. error messages.
  */
+
 class DistanceSortUnsupportedTypesIT<F> {
 
 	private static Stream<FieldTypeDescriptor<?>> unsupportedTypeDescriptors() {
@@ -49,7 +50,7 @@ class DistanceSortUnsupportedTypesIT<F> {
 	}
 
 	@RegisterExtension
-	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

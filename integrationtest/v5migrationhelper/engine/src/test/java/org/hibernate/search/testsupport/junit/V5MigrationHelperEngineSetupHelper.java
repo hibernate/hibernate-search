@@ -44,7 +44,7 @@ public final class V5MigrationHelperEngineSetupHelper
 	private final StandalonePojoAssertionHelper assertionHelper;
 
 	private V5MigrationHelperEngineSetupHelper(BackendSetupStrategy backendSetupStrategy) {
-		super( backendSetupStrategy, Type.METHOD );
+		super( backendSetupStrategy );
 		this.assertionHelper = new StandalonePojoAssertionHelper( backendSetupStrategy );
 	}
 

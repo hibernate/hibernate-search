@@ -36,6 +36,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * when referencing dynamic fields using their name.
  */
 @TestForIssue(jiraKey = "HSEARCH-3273")
+
 class DocumentElementDynamicFieldNameIT<F> {
 
 	private static List<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
@@ -49,7 +50,7 @@ class DocumentElementDynamicFieldNameIT<F> {
 	}
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.ofAdvanced( IndexBinding::new );
 

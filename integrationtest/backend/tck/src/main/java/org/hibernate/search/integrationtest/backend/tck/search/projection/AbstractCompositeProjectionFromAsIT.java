@@ -56,11 +56,12 @@ import org.mockito.quality.Strictness;
 //CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
 // cannot make a private constructor.
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
+
 public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractCompositeProjectionFromAsIT.AbstractIndexBinding> {
 	//CHECKSTYLE:ON
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
 

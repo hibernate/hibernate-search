@@ -36,6 +36,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexCreateContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchWork;
+import org.hibernate.search.util.impl.test.extension.ExtensionLifecycleUtils;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
@@ -47,63 +48,46 @@ import org.opentest4j.TestAbortedException;
 
 public class BackendMock implements BeforeEachCallback, AfterEachCallback, BeforeAllCallback, AfterAllCallback {
 
-	public enum Type {
-		CLASS,
-		METHOD;
-	}
-
 	private final VerifyingStubBackendBehavior backendBehavior =
 			new VerifyingStubBackendBehavior( this::indexingWorkExpectations );
 
 	private volatile boolean started = false;
+	private boolean callOncePerClass = false;
 
 	private volatile BackendIndexingWorkExpectations indexingWorkExpectations = BackendIndexingWorkExpectations.sync();
 
 	private final Map<String, StubTreeNodeDiffer<StubDocumentNode>> documentDiffers = new ConcurrentHashMap<>();
 
-	private final Type type;
-
-
-	protected BackendMock(Type type) {
-		this.type = type;
-	}
-
-	public static BackendMock create(Type type) {
-		return new BackendMock( type );
-	}
-
 	public static BackendMock create() {
-		return create( Type.METHOD );
+		return new BackendMock();
 	}
 
-	public static BackendMock createGlobal() {
-		return create( Type.CLASS );
+	protected BackendMock() {
 	}
 
 	@Override
 	public void beforeAll(ExtensionContext context) {
-		if ( Type.CLASS.equals( type ) ) {
-			doBefore();
-		}
+		callOncePerClass = true;
+		doBefore();
 	}
 
 	@Override
 	public void afterAll(ExtensionContext context) {
-		if ( Type.CLASS.equals( type ) ) {
+		if ( ExtensionLifecycleUtils.isAll( context, callOncePerClass ) ) {
 			doAfter( context );
 		}
 	}
 
 	@Override
 	public void beforeEach(ExtensionContext context) {
-		if ( Type.METHOD.equals( type ) ) {
+		if ( ExtensionLifecycleUtils.isEach( context, !callOncePerClass ) ) {
 			doBefore();
 		}
 	}
 
 	@Override
 	public void afterEach(ExtensionContext context) {
-		if ( Type.METHOD.equals( type ) ) {
+		if ( ExtensionLifecycleUtils.isEach( context, !callOncePerClass ) ) {
 			doAfter( context );
 		}
 	}

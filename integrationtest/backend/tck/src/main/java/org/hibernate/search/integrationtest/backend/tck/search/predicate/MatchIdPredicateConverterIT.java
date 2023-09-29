@@ -24,6 +24,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * as a string with the prefix `document`. In the DSL the user will still use the integer type when
  * looking for entities matching an id.
  */
+
 class MatchIdPredicateConverterIT {
 
 	private static final String DOCUMENT_1 = "document1";
@@ -31,7 +32,7 @@ class MatchIdPredicateConverterIT {
 	private static final String DOCUMENT_3 = "document3";
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final StubMappedIndex index = StubMappedIndex.ofAdvancedNonRetrievable( ctx -> ctx
 			.idDslConverter( Integer.class, (value, context) -> "document" + value ) );

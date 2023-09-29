@@ -56,6 +56,7 @@ import org.apache.lucene.search.TopFieldDocs;
  * <p>
  * This is a use case in Infinispan, in particular.
  */
+
 class LuceneSearchTopDocsMergeFieldSortIT<F> {
 
 	private static final Set<FieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
@@ -100,7 +101,7 @@ class LuceneSearchTopDocsMergeFieldSortIT<F> {
 	private static final int DOCUMENT_3_ORDINAL = 5;
 
 	@RegisterExtension
-	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
 			root -> SingleFieldIndexBinding.create( root, supportedFieldTypes, c -> c.sortable( Sortable.YES ) );

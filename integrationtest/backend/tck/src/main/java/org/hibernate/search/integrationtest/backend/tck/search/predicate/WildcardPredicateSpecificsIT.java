@@ -58,7 +58,7 @@ class WildcardPredicateSpecificsIT {
 	private static final String TERM_MATCHING_PATTERN_2_AND_3 = "Internationalization";
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

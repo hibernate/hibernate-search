@@ -49,6 +49,7 @@ import org.assertj.core.api.Assertions;
  * and {@link IndexObjectFieldTypeDescriptorBaseIT}.
  */
 @TestForIssue(jiraKey = "HSEARCH-3589")
+
 class IndexFieldDescriptorIT {
 
 	public static List<? extends Arguments> params() {
@@ -60,7 +61,7 @@ class IndexFieldDescriptorIT {
 	}
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

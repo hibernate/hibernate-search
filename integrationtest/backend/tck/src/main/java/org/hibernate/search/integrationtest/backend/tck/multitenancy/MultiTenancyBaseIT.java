@@ -57,8 +57,7 @@ class MultiTenancyBaseIT {
 	private static final Integer INTEGER_VALUE_5 = 5;
 
 	@RegisterExtension
-	public final SearchSetupHelper setupHelper =
-			SearchSetupHelper.create( TckBackendHelper::createMultiTenancyBackendSetupStrategy );
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
@@ -67,7 +66,9 @@ class MultiTenancyBaseIT {
 
 	@BeforeEach
 	void setup() {
-		StubMapping mapping = setupHelper.start().withIndex( index ).withMultiTenancy().setup();
+		StubMapping mapping = setupHelper.start( TckBackendHelper::createMultiTenancyBackendSetupStrategy )
+				.withIndex( index ).withMultiTenancy()
+				.setup();
 
 		tenant1SessionContext = mapping.session( TENANT_1 );
 		tenant2SessionContext = mapping.session( TENANT_2 );

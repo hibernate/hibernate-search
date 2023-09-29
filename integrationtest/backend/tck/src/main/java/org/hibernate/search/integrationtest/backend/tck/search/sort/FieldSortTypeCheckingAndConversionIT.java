@@ -57,6 +57,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Tests behavior related to type checking and type conversion of DSL arguments
  * for sorts by field value.
  */
+
 class FieldSortTypeCheckingAndConversionIT<F> {
 
 	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = new ArrayList<>();
@@ -94,7 +95,7 @@ class FieldSortTypeCheckingAndConversionIT<F> {
 	private static final int AFTER_DOCUMENT_3_ORDINAL = 6;
 
 	@RegisterExtension
-	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );

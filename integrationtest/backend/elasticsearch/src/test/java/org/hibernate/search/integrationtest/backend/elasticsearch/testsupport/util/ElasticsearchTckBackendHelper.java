@@ -72,10 +72,6 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 	@Override
 	public TckBackendSetupStrategy<?> createHashBasedShardingBackendSetupStrategy(int shardCount) {
 		return new ElasticsearchTckBackendSetupStrategy() {
-			{
-				useConfigurationTestRule();
-			}
-
 			@Override
 			public SearchSetupHelper.SetupContext startSetup(SearchSetupHelper.SetupContext setupHelper) {
 				// Make sure automatically created indexes will have an appropriate number of shards
@@ -88,9 +84,6 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 	@Override
 	public TckBackendSetupStrategy<?> createRarePeriodicRefreshBackendSetupStrategy() {
 		return new ElasticsearchTckBackendSetupStrategy() {
-			{
-				useConfigurationTestRule();
-			}
 
 			@Override
 			public SearchSetupHelper.SetupContext startSetup(SearchSetupHelper.SetupContext setupHelper) {

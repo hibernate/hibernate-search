@@ -39,7 +39,7 @@ class SearchQueryScrollIT {
 	private static final int EXACT_DIVISOR_CHUNK_SIZE = 25;
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

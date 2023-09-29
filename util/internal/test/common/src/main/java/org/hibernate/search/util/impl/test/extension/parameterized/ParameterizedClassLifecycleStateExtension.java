@@ -55,12 +55,14 @@ final class ParameterizedClassLifecycleStateExtension implements InvocationInter
 
 	private static void write(ExtensionContext context, StoreKey key, Object value) {
 		ExtensionContext.Store store = context.getRoot().getStore( extensionNamespace( context ) );
-		store.put( key, value );
+		if ( store != null ) {
+			store.put( key, value );
+		}
 	}
 
 	private static <T> T read(ExtensionContext context, StoreKey key, Class<T> clazz) {
 		ExtensionContext.Store store = context.getRoot().getStore( extensionNamespace( context ) );
-		return store.get( key, clazz );
+		return store == null ? null : store.get( key, clazz );
 	}
 
 	private static ExtensionContext.Namespace extensionNamespace(ExtensionContext context) {

@@ -169,7 +169,7 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 	}
 
 	public static ReusableOrmSetupHolder withBackendMock(BackendMock backendMock) {
-		return new ReusableOrmSetupHolder( OrmSetupHelper.withBackendMockGlobal( backendMock ),
+		return new ReusableOrmSetupHolder( OrmSetupHelper.withBackendMockLegacy( backendMock ),
 				Collections.singletonList( backendMock ), IndexDataClearStrategy.NONE );
 	}
 
@@ -180,12 +180,12 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 			allBackendMocks.add( defaultBackendMock );
 		}
 		allBackendMocks.addAll( namedBackendMocks.values() );
-		return new ReusableOrmSetupHolder( OrmSetupHelper.withBackendMocksGlobal( defaultBackendMock, namedBackendMocks ),
+		return new ReusableOrmSetupHolder( OrmSetupHelper.withBackendMocksLegacy( defaultBackendMock, namedBackendMocks ),
 				allBackendMocks, IndexDataClearStrategy.NONE );
 	}
 
 	public static ReusableOrmSetupHolder withSingleBackend(BackendConfiguration backendConfiguration) {
-		return new ReusableOrmSetupHolder( OrmSetupHelper.withSingleBackendGlobal( backendConfiguration ),
+		return new ReusableOrmSetupHolder( OrmSetupHelper.withSingleBackendLegacy( backendConfiguration ),
 				Collections.emptyList(), IndexDataClearStrategy.DROP_AND_CREATE_SCHEMA );
 	}
 
@@ -267,10 +267,12 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 		return with().applyInTransaction( action );
 	}
 
+	@Override
 	public <E extends Throwable> void runInTransaction(ThrowingConsumer<? super Session, E> action) throws E {
 		with().runInTransaction( action );
 	}
 
+	@Override
 	public <E extends Throwable> void runNoTransaction(ThrowingConsumer<? super Session, E> action) throws E {
 		with().runNoTransaction( action );
 	}

@@ -35,10 +35,11 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * {@link org.hibernate.search.engine.search.sort.dsl.SortFilterStep#filter(Function) filtering}
  * that is not tested in {@link DistanceSortBaseIT}.
  */
+
 class DistanceSortFilteringSpecificsIT {
 
 	@RegisterExtension
-	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

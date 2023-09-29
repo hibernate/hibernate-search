@@ -80,7 +80,7 @@ public final class StandalonePojoMappingSetupHelper
 
 	private StandalonePojoMappingSetupHelper(MethodHandles.Lookup lookup, BackendSetupStrategy backendSetupStrategy,
 			SchemaManagementStrategyName schemaManagementStrategyName) {
-		super( backendSetupStrategy, Type.METHOD );
+		super( backendSetupStrategy );
 		this.lookup = lookup;
 		this.schemaManagementStrategyName = schemaManagementStrategyName;
 		this.assertionHelper = new StandalonePojoAssertionHelper( backendSetupStrategy );

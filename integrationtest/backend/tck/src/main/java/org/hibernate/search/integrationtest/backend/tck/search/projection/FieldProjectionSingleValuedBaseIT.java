@@ -41,6 +41,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * <p>
  * See {@link FieldProjectionMultiValuedBaseIT} for multi-valued fields.
  */
+
 class FieldProjectionSingleValuedBaseIT<F> {
 
 	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = FieldTypeDescriptor.getAll();
@@ -65,7 +66,7 @@ class FieldProjectionSingleValuedBaseIT<F> {
 	}
 
 	@RegisterExtension
-	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
 			root -> SingleFieldIndexBinding.createWithSingleValuedNestedFields(

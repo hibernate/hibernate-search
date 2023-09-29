@@ -53,6 +53,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Tests behavior related to type checking and type conversion of DSL arguments
  * for sorts by field value.
  */
+
 class DistanceSortTypeCheckingAndConversionIT {
 
 	private static final GeoPointFieldTypeDescriptor fieldType = GeoPointFieldTypeDescriptor.INSTANCE;
@@ -73,7 +74,7 @@ class DistanceSortTypeCheckingAndConversionIT {
 	private static final int DOCUMENT_3_ORDINAL = 5;
 
 	@RegisterExtension
-	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );

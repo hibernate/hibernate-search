@@ -35,12 +35,13 @@ import org.apache.lucene.search.TotalHits;
  * <p>
  * This is a use case in Infinispan, in particular.
  */
+
 class LuceneSearchTopDocsTotalHitCountOnMatchAllDocsIT {
 
 	private static final int DOCUMENT_COUNT = 2000;
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

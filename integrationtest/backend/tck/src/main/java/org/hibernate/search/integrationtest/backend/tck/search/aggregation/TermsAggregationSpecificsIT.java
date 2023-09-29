@@ -53,6 +53,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * <p>
  * Behavior common to all single-field aggregations is tested in {@link SingleFieldAggregationBaseIT}.
  */
+
 class TermsAggregationSpecificsIT<F> {
 
 	private static final String AGGREGATION_NAME = "aggregationName";
@@ -78,7 +79,7 @@ class TermsAggregationSpecificsIT<F> {
 	}
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

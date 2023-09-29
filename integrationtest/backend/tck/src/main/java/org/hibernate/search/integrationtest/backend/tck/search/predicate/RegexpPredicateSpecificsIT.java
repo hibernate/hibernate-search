@@ -62,7 +62,7 @@ class RegexpPredicateSpecificsIT {
 	private static final String TEXT_ANYSTRING_NOT_MATCHING = "foo99";
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

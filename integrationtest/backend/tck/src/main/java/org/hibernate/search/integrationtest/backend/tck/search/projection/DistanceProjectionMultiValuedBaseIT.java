@@ -52,6 +52,7 @@ import org.assertj.core.api.ListAssert;
  * Tests basic behavior of projections on the distance between a given point and the value of a multi-valued field.
  */
 @TestForIssue(jiraKey = "HSEARCH-3391")
+
 class DistanceProjectionMultiValuedBaseIT {
 
 	private static final GeoPointFieldTypeDescriptor fieldType = GeoPointFieldTypeDescriptor.INSTANCE;
@@ -81,7 +82,7 @@ class DistanceProjectionMultiValuedBaseIT {
 	}
 
 	@RegisterExtension
-	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> mainIndex =
 			SimpleMappedIndex.of(

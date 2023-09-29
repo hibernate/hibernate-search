@@ -19,7 +19,7 @@ public class BackendMockTestRule extends BackendMock implements TestRule {
 	}
 
 	private BackendMockTestRule() {
-		super( Type.CLASS );
+		super();
 	}
 
 	@Override
