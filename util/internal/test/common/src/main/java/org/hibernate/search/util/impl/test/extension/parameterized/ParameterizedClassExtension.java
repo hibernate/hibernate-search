@@ -118,17 +118,17 @@ final class ParameterizedClassExtension
 	}
 
 	private static void write(ExtensionContext context, StoreKey key, Object value) {
-		ExtensionContext.Store store = context.getRoot().getStore(
-				ExtensionContext.Namespace.create( context.getRequiredTestMethod() )
-		);
+		ExtensionContext.Store store = context.getRoot().getStore( extensionNamespace( context ) );
 		store.put( key, value );
 	}
 
 	private static <T> T read(ExtensionContext context, StoreKey key, Class<T> clazz) {
-		ExtensionContext.Store store = context.getRoot().getStore(
-				ExtensionContext.Namespace.create( context.getRequiredTestMethod() )
-		);
+		ExtensionContext.Store store = context.getRoot().getStore( extensionNamespace( context ) );
 		return store.get( key, clazz );
+	}
+
+	private static ExtensionContext.Namespace extensionNamespace(ExtensionContext context) {
+		return ExtensionContext.Namespace.create( context.getRequiredTestClass(), ParameterizedClassExtension.class );
 	}
 
 	@Override

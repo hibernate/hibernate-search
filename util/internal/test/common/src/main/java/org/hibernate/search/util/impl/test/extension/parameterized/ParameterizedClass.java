@@ -11,6 +11,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * Marks test classes that carry class-level parameters, requiring a
@@ -20,5 +21,6 @@ import org.junit.jupiter.api.TestInstance;
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(ParameterizedClassLifecycleStateExtension.class)
 public @interface ParameterizedClass {
 }
