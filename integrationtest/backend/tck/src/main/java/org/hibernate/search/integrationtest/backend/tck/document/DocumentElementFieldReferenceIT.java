@@ -39,6 +39,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Test the basic behavior of implementations of {@link DocumentElement}
  * when referencing fields using a {@link IndexFieldReference}.
  */
+
 class DocumentElementFieldReferenceIT<F> {
 
 	private static List<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
@@ -52,7 +53,7 @@ class DocumentElementFieldReferenceIT<F> {
 	}
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.ofAdvanced( IndexBinding::new );
 

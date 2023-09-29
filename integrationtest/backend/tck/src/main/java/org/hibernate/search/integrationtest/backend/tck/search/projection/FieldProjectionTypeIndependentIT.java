@@ -30,10 +30,11 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Behavior that is specific to the field type is tested elsewhere,
  * e.g. {@link FieldProjectionSingleValuedBaseIT} and {@link FieldProjectionTypeCheckingAndConversionIT}.
  */
+
 class FieldProjectionTypeIndependentIT {
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

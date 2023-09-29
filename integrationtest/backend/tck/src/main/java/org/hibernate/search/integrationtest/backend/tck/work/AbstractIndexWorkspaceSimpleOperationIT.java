@@ -104,7 +104,7 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 	protected abstract void assertSuccess(StubMappedIndex index);
 
 	private void setup() {
-		setupHelper.start().withIndex( index ).setup();
+		startHelper().withIndex( index ).setup();
 
 		beforeInitData( index );
 
@@ -116,6 +116,10 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 				.join();
 
 		afterInitData( index );
+	}
+
+	protected SearchSetupHelper.SetupContext startHelper() {
+		return setupHelper.start();
 	}
 
 	private static class IndexBinding {

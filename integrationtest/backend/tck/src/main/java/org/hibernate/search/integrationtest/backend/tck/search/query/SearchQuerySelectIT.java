@@ -26,7 +26,7 @@ class SearchQuerySelectIT {
 	//CHECKSTYLE:ON
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<AbstractEntityProjectionIT.IndexBinding> selectEntityMainIndex =
 			SimpleMappedIndex.of( AbstractEntityProjectionIT.IndexBinding::new ).name( "entityMain" );

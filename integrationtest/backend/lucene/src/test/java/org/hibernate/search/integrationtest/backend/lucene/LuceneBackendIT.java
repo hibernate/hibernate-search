@@ -27,7 +27,7 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 class LuceneBackendIT {
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final StubMappedIndex index = StubMappedIndex.withoutFields();
 

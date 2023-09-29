@@ -25,9 +25,11 @@ import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchRes
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SingleFieldDocumentBuilder;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedClass;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -35,6 +37,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Test indexing and searching with built-in analyzer definitions.
  * See {@link AnalyzerNames}.
  */
+@ParameterizedClass
 class AnalysisBuiltinIT {
 
 	public static List<? extends Arguments> params() {
@@ -52,15 +55,14 @@ class AnalysisBuiltinIT {
 	public SearchSetupHelper setupHelper = SearchSetupHelper.create();
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
+	@ParameterizedSetup(ParameterizedSetup.Lifecycle.PER_METHOD)
+	@MethodSource("params")
 	public void init(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
-		this.setupHelper.with( setupStrategyFunction );
-		setupHelper.start().withIndex( index ).setup();
+		setupHelper.start( setupStrategyFunction ).withIndex( index ).setup();
 	}
 
-	@ParameterizedTest(name = "{0}")
-	@MethodSource("params")
-	void analyzer_default(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
-		init( setupStrategyFunction );
+	@Test
+	void analyzer_default() {
 		SimpleFieldModel<String> field = index.binding().defaultAnalyzer;
 		initData( field );
 
@@ -81,10 +83,8 @@ class AnalysisBuiltinIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), "7" );
 	}
 
-	@ParameterizedTest(name = "{0}")
-	@MethodSource("params")
-	void analyzer_standard(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
-		init( setupStrategyFunction );
+	@Test
+	void analyzer_standard() {
 		SimpleFieldModel<String> field = index.binding().standardAnalyzer;
 		initData( field );
 
@@ -105,10 +105,8 @@ class AnalysisBuiltinIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), "7" );
 	}
 
-	@ParameterizedTest(name = "{0}")
-	@MethodSource("params")
-	void analyzer_simple(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
-		init( setupStrategyFunction );
+	@Test
+	void analyzer_simple() {
 		SimpleFieldModel<String> field = index.binding().simpleAnalyzer;
 		initData( field );
 
@@ -129,10 +127,8 @@ class AnalysisBuiltinIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), "7" );
 	}
 
-	@ParameterizedTest(name = "{0}")
-	@MethodSource("params")
-	void analyzer_whitespace(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
-		init( setupStrategyFunction );
+	@Test
+	void analyzer_whitespace() {
 		SimpleFieldModel<String> field = index.binding().whitespaceAnalyzer;
 		initData( field );
 
@@ -153,10 +149,8 @@ class AnalysisBuiltinIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), "7" );
 	}
 
-	@ParameterizedTest(name = "{0}")
-	@MethodSource("params")
-	void analyzer_stop(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
-		init( setupStrategyFunction );
+	@Test
+	void analyzer_stop() {
 		SimpleFieldModel<String> field = index.binding().stopAnalyzer;
 		initData( field );
 
@@ -177,10 +171,8 @@ class AnalysisBuiltinIT {
 				.hasNoHits();
 	}
 
-	@ParameterizedTest(name = "{0}")
-	@MethodSource("params")
-	void analyzer_keyword(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
-		init( setupStrategyFunction );
+	@Test
+	void analyzer_keyword() {
 		SimpleFieldModel<String> field = index.binding().keywordAnalyzer;
 		initData( field );
 

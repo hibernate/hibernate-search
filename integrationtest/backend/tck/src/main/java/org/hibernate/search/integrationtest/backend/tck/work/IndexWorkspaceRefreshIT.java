@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
@@ -24,7 +25,12 @@ import org.junit.jupiter.api.BeforeEach;
 class IndexWorkspaceRefreshIT extends AbstractIndexWorkspaceSimpleOperationIT {
 
 	public IndexWorkspaceRefreshIT() {
-		super( SearchSetupHelper.create( helper -> helper.createRarePeriodicRefreshBackendSetupStrategy() ) );
+		super( SearchSetupHelper.create() );
+	}
+
+	@Override
+	protected SearchSetupHelper.SetupContext startHelper() {
+		return setupHelper.start( TckBackendHelper::createRarePeriodicRefreshBackendSetupStrategy );
 	}
 
 	@BeforeEach

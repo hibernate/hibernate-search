@@ -37,6 +37,7 @@ import org.apache.lucene.search.TopFieldDocs;
  * <p>
  * This is a use case in Infinispan, in particular.
  */
+
 class LuceneSearchTopDocsMergeScoreSortIT {
 
 	private static final String SEGMENT_0 = "seg0";
@@ -50,7 +51,7 @@ class LuceneSearchTopDocsMergeScoreSortIT {
 	private static final String SEGMENT_1_DOC_NON_MATCHING = "1_nonMatching";
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

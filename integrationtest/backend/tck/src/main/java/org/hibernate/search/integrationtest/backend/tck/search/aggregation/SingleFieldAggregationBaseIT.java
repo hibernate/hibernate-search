@@ -52,6 +52,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Tests basic behavior common to all single-field aggregations (range, terms, ...)
  * on supported types.
  */
+
 class SingleFieldAggregationBaseIT<F> {
 
 	private static final String AGGREGATION_NAME = "aggregationName";
@@ -82,7 +83,7 @@ class SingleFieldAggregationBaseIT<F> {
 	}
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
 			root -> SingleFieldIndexBinding.create( root, supportedFieldTypes, c -> c.aggregable( Aggregable.YES ) );

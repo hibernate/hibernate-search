@@ -37,7 +37,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 public abstract class AbstractIndexingPlanFilterIT {
 
 	@RegisterExtension
-	public static BackendMock backendMock = BackendMock.createGlobal();
+	public static BackendMock backendMock = BackendMock.create();
 
 	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );

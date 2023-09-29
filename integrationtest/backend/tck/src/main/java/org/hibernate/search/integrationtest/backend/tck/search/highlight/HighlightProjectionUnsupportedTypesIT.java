@@ -34,6 +34,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Tests basic behavior of highlight projections common to all unsupported types,
  * i.e. error messages.
  */
+
 class HighlightProjectionUnsupportedTypesIT<F> {
 
 	private static Stream<FieldTypeDescriptor<?>> unsupportedTypeDescriptors() {
@@ -48,7 +49,7 @@ class HighlightProjectionUnsupportedTypesIT<F> {
 	}
 
 	@RegisterExtension
-	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

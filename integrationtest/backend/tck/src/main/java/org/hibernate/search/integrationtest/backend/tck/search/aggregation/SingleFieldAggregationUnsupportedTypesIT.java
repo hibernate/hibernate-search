@@ -40,6 +40,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Tests behavior common to all single-field aggregations (range, terms, ...)
  * on unsupported types.
  */
+
 class SingleFieldAggregationUnsupportedTypesIT<F> {
 
 	private static final Set<FieldTypeDescriptor<?>> unsupportedFieldTypes = new LinkedHashSet<>();
@@ -63,7 +64,7 @@ class SingleFieldAggregationUnsupportedTypesIT<F> {
 	}
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

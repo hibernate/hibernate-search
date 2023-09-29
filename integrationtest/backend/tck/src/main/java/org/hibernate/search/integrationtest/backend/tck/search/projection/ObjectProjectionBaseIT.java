@@ -28,11 +28,12 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 //CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
 // cannot make a private constructor.
+
 class ObjectProjectionBaseIT {
 	//CHECKSTYLE:ON
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@BeforeAll
 	static void setup() {

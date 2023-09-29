@@ -35,10 +35,10 @@ class SearchMappingNoDefaultBackendIT {
 	private static final String BACKEND_2_NAME = "stubBackend2";
 
 	@RegisterExtension
-	public static BackendMock backend1Mock = BackendMock.createGlobal();
+	public static BackendMock backend1Mock = BackendMock.create();
 
 	@RegisterExtension
-	public static BackendMock backend2Mock = BackendMock.createGlobal();
+	public static BackendMock backend2Mock = BackendMock.create();
 
 	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper;

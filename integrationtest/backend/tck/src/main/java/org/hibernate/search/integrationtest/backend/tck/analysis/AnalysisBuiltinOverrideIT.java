@@ -37,14 +37,13 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 class AnalysisBuiltinOverrideIT {
 
 	@RegisterExtension
-	public final SearchSetupHelper setupHelper =
-			SearchSetupHelper.create( TckBackendHelper::createAnalysisBuiltinOverridesBackendSetupStrategy );
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@BeforeEach
 	void setup() {
-		setupHelper.start().withIndex( index ).setup();
+		setupHelper.start( TckBackendHelper::createAnalysisBuiltinOverridesBackendSetupStrategy ).withIndex( index ).setup();
 	}
 
 	@Test

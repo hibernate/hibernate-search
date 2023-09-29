@@ -52,6 +52,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 /**
  * Tests basic behavior of sorts by distance.
  */
+
 class DistanceSortBaseIT {
 
 	private static final GeoPointFieldTypeDescriptor fieldType = GeoPointFieldTypeDescriptor.INSTANCE;
@@ -92,7 +93,7 @@ class DistanceSortBaseIT {
 	private static final int AFTER_DOCUMENT_3_ORDINAL = 6;
 
 	@RegisterExtension
-	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
 			root -> SingleFieldIndexBinding.create( root, supportedFieldTypes, c -> c.sortable( Sortable.YES ) );

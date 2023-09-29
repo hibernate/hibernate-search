@@ -8,28 +8,20 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
-
-import org.junit.jupiter.api.extension.Extension;
 
 public abstract class TckBackendSetupStrategy<C extends BackendConfiguration> {
 
 	protected final C backendConfiguration;
 	protected final Map<String, Object> properties = new LinkedHashMap<>();
 	private boolean expectCustomBeans = false;
-	private boolean useConfigurationTestRule = false;
 
 	public TckBackendSetupStrategy(C backendConfiguration) {
 		this.backendConfiguration = backendConfiguration;
 		properties.putAll( backendConfiguration.rawBackendProperties() );
-	}
-
-	public final Optional<Extension> extension() {
-		return useConfigurationTestRule ? backendConfiguration.extension() : Optional.empty();
 	}
 
 	public Map<String, ?> createBackendConfigurationProperties(TestConfigurationProvider configurationProvider) {
@@ -52,11 +44,6 @@ public abstract class TckBackendSetupStrategy<C extends BackendConfiguration> {
 
 	public TckBackendSetupStrategy<C> expectCustomBeans() {
 		expectCustomBeans = true;
-		return this;
-	}
-
-	protected TckBackendSetupStrategy<C> useConfigurationTestRule() {
-		useConfigurationTestRule = true;
 		return this;
 	}
 

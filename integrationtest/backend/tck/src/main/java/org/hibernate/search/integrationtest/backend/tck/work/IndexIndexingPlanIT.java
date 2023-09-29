@@ -37,14 +37,17 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubEntityRefe
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSession;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedClass;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import org.awaitility.Awaitility;
 
+@ParameterizedClass
 class IndexIndexingPlanIT {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -72,13 +75,14 @@ class IndexIndexingPlanIT {
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@RegisterExtension
-	public SearchSetupHelper setupHelper = SearchSetupHelper.create();
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 	private StubSession sessionContext;
 
+	@ParameterizedSetup(ParameterizedSetup.Lifecycle.PER_METHOD)
+	@MethodSource("params")
 	public void init(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
 			String tenantId) {
-		setupHelper.with( setupStrategyFunction );
-		SearchSetupHelper.SetupContext setupContext = setupHelper.start().withIndex( index );
+		SearchSetupHelper.SetupContext setupContext = setupHelper.start( setupStrategyFunction ).withIndex( index );
 		if ( MULTI_TENANCY_LABEL.equals( label ) ) {
 			setupContext.withMultiTenancy();
 		}
@@ -88,11 +92,8 @@ class IndexIndexingPlanIT {
 		sessionContext = mapping.session( tenantId );
 	}
 
-	@ParameterizedTest(name = "{0}")
-	@MethodSource("params")
-	void success(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
-			String tenantId) {
-		init( label, setupStrategyFunction, tenantId );
+	@Test
+	void success() {
 		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 
 		// Add
@@ -138,11 +139,8 @@ class IndexIndexingPlanIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), "3" );
 	}
 
-	@ParameterizedTest(name = "{0}")
-	@MethodSource("params")
-	void discard(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
-			String tenantId) {
-		init( label, setupStrategyFunction, tenantId );
+	@Test
+	void discard() {
 		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
@@ -160,11 +158,8 @@ class IndexIndexingPlanIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), "2" );
 	}
 
-	@ParameterizedTest(name = "{0}")
-	@MethodSource("params")
-	void add_failure(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
-			String tenantId) {
-		init( label, setupStrategyFunction, tenantId );
+	@Test
+	void add_failure() {
 		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
 		plan.add( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
@@ -187,12 +182,8 @@ class IndexIndexingPlanIT {
 		}
 	}
 
-	@ParameterizedTest(name = "{0}")
-	@MethodSource("params")
-	void addOrUpdate_failure(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
-			String tenantId) {
-		init( label, setupStrategyFunction, tenantId );
-
+	@Test
+	void addOrUpdate_failure() {
 		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 		plan.addOrUpdate( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
 		plan.addOrUpdate( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
@@ -215,12 +206,8 @@ class IndexIndexingPlanIT {
 		}
 	}
 
-	@ParameterizedTest(name = "{0}")
-	@MethodSource("params")
-	void delete_failure(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
-			String tenantId) {
-		init( label, setupStrategyFunction, tenantId );
-
+	@Test
+	void delete_failure() {
 		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 		plan.delete( referenceProvider( "1" ) );
 		plan.delete( referenceProvider( "2" ) );
@@ -243,13 +230,9 @@ class IndexIndexingPlanIT {
 		}
 	}
 
-	@ParameterizedTest(name = "{0}")
-	@MethodSource("params")
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3852")
-	void failure_report(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
-			String tenantId) {
-		init( label, setupStrategyFunction, tenantId );
-
+	void failure_report() {
 		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
 		plan.add( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );

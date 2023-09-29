@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -56,7 +57,7 @@ public final class TestConfigurationProvider
 
 	@Override
 	public void beforeEach(ExtensionContext context) {
-		testId = context.getDisplayName().replaceAll( "[^A-Za-z0-9_+().\\[\\]=]+", "_" );
+		testId = UUID.randomUUID().toString();
 	}
 
 	public BeanResolver createBeanResolverForTest() {

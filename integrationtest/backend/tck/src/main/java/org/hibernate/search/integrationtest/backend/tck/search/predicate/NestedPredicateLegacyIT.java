@@ -32,6 +32,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Tests for the legacy syntax of nested predicate definition.
  */
 @SuppressWarnings("deprecation")
+
 class NestedPredicateLegacyIT {
 
 	private static final String DOCUMENT_1 = "nestedQueryShouldMatchId";
@@ -52,7 +53,7 @@ class NestedPredicateLegacyIT {
 	private static final String NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 = "secondNonMatchingWord";
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new );
 	private static final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex =

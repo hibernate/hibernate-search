@@ -54,7 +54,7 @@ public final class V5MigrationHelperOrmSetupHelper
 	private final OrmAssertionHelper assertionHelper;
 
 	private V5MigrationHelperOrmSetupHelper(BackendSetupStrategy backendSetupStrategy) {
-		super( backendSetupStrategy, Type.METHOD );
+		super( backendSetupStrategy );
 		this.assertionHelper = new OrmAssertionHelper( backendSetupStrategy );
 	}
 

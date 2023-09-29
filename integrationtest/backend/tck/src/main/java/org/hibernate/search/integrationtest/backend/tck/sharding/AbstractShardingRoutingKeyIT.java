@@ -40,6 +40,7 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper;
+	private final Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction;
 
 	private final Set<String> routingKeys;
 	private final int documentCountPerRoutingKey;
@@ -50,7 +51,8 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 	public AbstractShardingRoutingKeyIT(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
 			Set<String> routingKeys) {
 		super( RoutingMode.EXPLICIT_ROUTING_KEYS );
-		this.setupHelper = SearchSetupHelper.create( setupStrategyFunction );
+		this.setupHelper = SearchSetupHelper.create();
+		this.setupStrategyFunction = setupStrategyFunction;
 		this.routingKeys = routingKeys;
 		documentCountPerRoutingKey = 100;
 		totalDocumentCount = routingKeys.size() * documentCountPerRoutingKey;
@@ -58,7 +60,7 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 
 	@BeforeEach
 	void setup() {
-		SearchSetupHelper.SetupContext setupContext = setupHelper.start();
+		SearchSetupHelper.SetupContext setupContext = setupHelper.start( setupStrategyFunction );
 		configure( setupContext );
 		setupContext.withIndex( index ).setup();
 

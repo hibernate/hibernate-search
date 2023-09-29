@@ -28,10 +28,11 @@ import org.junit.jupiter.api.extension.RegisterExtension;
  * Tests for basic index descriptor features that are not tested elsewhere.
  */
 @TestForIssue(jiraKey = "HSEARCH-3589")
+
 class IndexDescriptorIT {
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

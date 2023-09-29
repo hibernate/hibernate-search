@@ -26,7 +26,7 @@ class AndPredicateBaseIT {
 	//CHECKSTYLE:ON
 
 	@RegisterExtension
-	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@BeforeAll
 	static void setup() {

@@ -40,6 +40,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * {@link org.hibernate.search.engine.search.sort.dsl.SortFilterStep#filter(Function) filtering}
  * that is not tested in {@link FieldSortBaseIT}.
  */
+
 class FieldSortFilteringSpecificsIT<F> {
 
 	private static Stream<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
@@ -56,7 +57,7 @@ class FieldSortFilteringSpecificsIT<F> {
 	}
 
 	@RegisterExtension
-	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

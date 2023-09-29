@@ -36,6 +36,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Tests behavior of all single-field aggregations (range, terms, ...)
  * when invalid fields are targeted.
  */
+
 class SingleFieldAggregationInvalidFieldIT<F> {
 
 	private static final IntegerFieldTypeDescriptor FIELD_TYPE = IntegerFieldTypeDescriptor.INSTANCE;
@@ -51,7 +52,7 @@ class SingleFieldAggregationInvalidFieldIT<F> {
 	}
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

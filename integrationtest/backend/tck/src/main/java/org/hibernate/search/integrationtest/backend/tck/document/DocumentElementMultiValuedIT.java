@@ -34,6 +34,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Test the behavior of implementations of {@link DocumentElement}
  * when it comes to multi-valued fields.
  */
+
 class DocumentElementMultiValuedIT<F> {
 
 	private static List<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
@@ -47,7 +48,7 @@ class DocumentElementMultiValuedIT<F> {
 	}
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

@@ -56,6 +56,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 /**
  * Tests basic behavior of sorts by field value common to all supported types.
  */
+
 class FieldSortBaseIT<F> {
 
 	private static final Set<FieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
@@ -100,7 +101,7 @@ class FieldSortBaseIT<F> {
 	private static final int AFTER_DOCUMENT_3_ORDINAL = 6;
 
 	@RegisterExtension
-	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
 			root -> SingleFieldIndexBinding.create( root, supportedFieldTypes, c -> c.sortable( Sortable.YES ) );

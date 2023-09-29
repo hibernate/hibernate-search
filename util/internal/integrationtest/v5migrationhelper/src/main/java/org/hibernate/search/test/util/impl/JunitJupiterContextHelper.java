@@ -37,7 +37,7 @@ public final class JunitJupiterContextHelper {
 
 			@Override
 			public ExtensionContext getRoot() {
-				return null;
+				return this;
 			}
 
 			@Override
@@ -112,7 +112,7 @@ public final class JunitJupiterContextHelper {
 
 			@Override
 			public Store getStore(Namespace namespace) {
-				throw new UnsupportedOperationException();
+				return null;
 			}
 
 			@Override

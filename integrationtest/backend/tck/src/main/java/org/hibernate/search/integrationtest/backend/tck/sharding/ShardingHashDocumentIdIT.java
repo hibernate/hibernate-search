@@ -40,9 +40,7 @@ class ShardingHashDocumentIdIT extends AbstractShardingIT {
 	private static final int TOTAL_DOCUMENT_COUNT = SHARD_COUNT * ESTIMATED_DOCUMENT_COUNT_PER_SHARD;
 
 	@RegisterExtension
-	public final SearchSetupHelper setupHelper = SearchSetupHelper.create(
-			tckBackendHelper -> tckBackendHelper.createHashBasedShardingBackendSetupStrategy( SHARD_COUNT )
-	);
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final Map<String, List<String>> docIdByRoutingKey = new HashMap<>();
 	private final List<String> docIds = new ArrayList<>();
@@ -53,7 +51,8 @@ class ShardingHashDocumentIdIT extends AbstractShardingIT {
 
 	@BeforeEach
 	void setup() {
-		setupHelper.start().withIndex( index ).setup();
+		setupHelper.start( tckBackendHelper -> tckBackendHelper.createHashBasedShardingBackendSetupStrategy( SHARD_COUNT ) )
+				.withIndex( index ).setup();
 
 		// Do not provide explicit routing keys when indexing; the backend should fall back to using IDs
 		for ( int documentIdAsInteger = 0; documentIdAsInteger < TOTAL_DOCUMENT_COUNT;

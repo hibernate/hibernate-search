@@ -21,6 +21,7 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.MappingAssertionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
+import org.hibernate.search.util.impl.test.extension.ExtensionLifecycleUtils;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
@@ -37,39 +38,33 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, BC, 
 		AfterAllCallback, AfterEachCallback, AfterTestExecutionCallback,
 		BeforeAllCallback, BeforeEachCallback, BeforeTestExecutionCallback, TestExecutionExceptionHandler {
 
-	protected enum Type {
-		CLASS,
-		METHOD;
-	}
-
 	private final TestConfigurationProvider configurationProvider;
 	private final BackendSetupStrategy backendSetupStrategy;
 	private final ComposedExtension delegate;
+	private boolean callOncePerClass = false;
 
 	private final List<R> toClose = new ArrayList<>();
 
-	private Type type;
-
-	protected MappingSetupHelper(BackendSetupStrategy backendSetupStrategy, Type t) {
-		this.type = t;
+	protected MappingSetupHelper(BackendSetupStrategy backendSetupStrategy) {
 		this.configurationProvider = new TestConfigurationProvider();
 		this.backendSetupStrategy = backendSetupStrategy;
 		Optional<Extension> setupStrategyTestExtension = backendSetupStrategy.getTestRule();
 		ComposedExtension.FullExtension ownActions = new ComposedExtension.FullExtension.Builder()
 				.withAfterAll( afterAllContext -> {
-					if ( Type.CLASS.equals( type ) ) {
+					if ( ExtensionLifecycleUtils.isAll( afterAllContext, callOncePerClass ) ) {
 						cleanUp();
 					}
 				} ).withAfterEach( afterEachContext -> {
-					if ( Type.METHOD.equals( type ) ) {
+					if ( ExtensionLifecycleUtils.isEach( afterEachContext, !callOncePerClass ) ) {
 						cleanUp();
 					}
 				} ).withBeforeAll( beforeAllContext -> {
-					if ( Type.CLASS.equals( type ) ) {
+					callOncePerClass = true;
+					if ( ExtensionLifecycleUtils.isAll( beforeAllContext, callOncePerClass ) ) {
 						init();
 					}
 				} ).withBeforeEach( beforeEachContext -> {
-					if ( Type.METHOD.equals( type ) ) {
+					if ( ExtensionLifecycleUtils.isEach( beforeEachContext, !callOncePerClass ) ) {
 						init();
 					}
 				} ).build();

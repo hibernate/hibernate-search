@@ -18,7 +18,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 class EntityReferenceProjectionIT extends AbstractEntityReferenceProjectionIT {
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final StubMappedIndex mainIndex = StubMappedIndex.withoutFields();
 

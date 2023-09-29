@@ -48,8 +48,7 @@ class IndexWorkspaceIT {
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@RegisterExtension
-	public final SearchSetupHelper multiTenancySetupHelper =
-			SearchSetupHelper.create( TckBackendHelper::createMultiTenancyBackendSetupStrategy );
+	public final SearchSetupHelper multiTenancySetupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
@@ -94,7 +93,8 @@ class IndexWorkspaceIT {
 
 	@Test
 	void runMergeSegmentsPurgeAndFlushAndRefreshWithMultiTenancy() {
-		multiTenancySetupHelper.start().withIndex( index ).withMultiTenancy().setup();
+		multiTenancySetupHelper.start( TckBackendHelper::createMultiTenancyBackendSetupStrategy )
+				.withIndex( index ).withMultiTenancy().setup();
 		StubSession tenant1SessionContext = index.mapping().session( TENANT_1 );
 		StubSession tenant2SessionContext = index.mapping().session( TENANT_2 );
 

@@ -30,7 +30,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 class HighlightProjectionTypeIndependentIT {
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 	private static final SimpleMappedIndex<NestedIndexBinding> nestedIndex =

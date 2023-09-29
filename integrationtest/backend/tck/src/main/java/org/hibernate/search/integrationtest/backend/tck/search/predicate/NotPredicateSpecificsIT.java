@@ -50,7 +50,7 @@ class NotPredicateSpecificsIT {
 	private static final Integer FIELD5_VALUE3 = 142_000; // Different from document 1
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 

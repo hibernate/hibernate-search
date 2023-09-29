@@ -44,6 +44,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingImp
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInitiator;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingKey;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
+import org.hibernate.search.util.impl.test.extension.ExtensionLifecycleUtils;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
@@ -51,7 +52,6 @@ import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
-import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 
@@ -59,15 +59,9 @@ public class SearchSetupHelper
 		implements AfterAllCallback, AfterEachCallback, AfterTestExecutionCallback,
 		BeforeAllCallback, BeforeEachCallback, BeforeTestExecutionCallback, TestExecutionExceptionHandler {
 
-	private enum Type {
-		CLASS,
-		METHOD;
-	}
-
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final TestConfigurationProvider configurationProvider;
-	private final Type type;
+	private final TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 	private TckBackendSetupStrategy<?> setupStrategy;
 	private ComposedExtension delegate;
 
@@ -75,40 +69,27 @@ public class SearchSetupHelper
 	private final List<SearchIntegrationPartialBuildState> integrationPartialBuildStates = new ArrayList<>();
 	private final List<StubMappingImpl> mappings = new ArrayList<>();
 	private TckBackendAccessor backendAccessor;
+	private boolean callOncePerClass = false;
 
 	public static SearchSetupHelper create() {
-		return new SearchSetupHelper( Type.METHOD, TckBackendHelper::createDefaultBackendSetupStrategy );
+		return new SearchSetupHelper();
 	}
 
-	public static SearchSetupHelper createGlobal() {
-		return new SearchSetupHelper( Type.CLASS, TckBackendHelper::createDefaultBackendSetupStrategy );
-	}
-
-	public static SearchSetupHelper create(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
-		return new SearchSetupHelper( Type.METHOD, setupStrategyFunction );
-	}
-
-	public static SearchSetupHelper createGlobal(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
-		return new SearchSetupHelper( Type.CLASS, setupStrategyFunction );
-	}
-
-	public SearchSetupHelper(Type type, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
-		this.configurationProvider = new TestConfigurationProvider();
-		this.type = type;
-		init( setupStrategyFunction );
-	}
-
-	private void init(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
-		this.setupStrategy = setupStrategyFunction.apply( TckConfiguration.get().getBackendHelper() );
-		Optional<Extension> setupStrategyTestExtension = setupStrategy.extension();
-
+	private SearchSetupHelper() {
 		ComposedExtension.FullExtension ownActions = new ComposedExtension.FullExtension.Builder()
+				.withBeforeAll( beforeAllContext -> {
+					// BeforeAll callback can be called if an extension
+					// is added in a static context, i.e. @RegisterExtension static MyExtension = ....;
+					// Or when the test class is annotated with @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+					// which also implies that we'd want to have only a BeforeAll, AfterAll callbacks:
+					callOncePerClass = true;
+				} )
 				.withAfterAll( afterAllContext -> {
-					if ( Type.CLASS.equals( type ) ) {
+					if ( ExtensionLifecycleUtils.isAll( afterAllContext, callOncePerClass ) ) {
 						cleanUp();
 					}
 				} ).withAfterEach( afterEachContext -> {
-					if ( Type.METHOD.equals( type ) ) {
+					if ( ExtensionLifecycleUtils.isEach( afterEachContext, !callOncePerClass ) ) {
 						cleanUp();
 					}
 				} ).withTestExecutionExceptionHandler( (testExecutionExceptionContext, throwable) -> {
@@ -123,24 +104,27 @@ public class SearchSetupHelper
 
 		this.delegate = new ComposedExtension(
 				ownActions,
-				setupStrategyTestExtension
-						.<Extension>map( extension -> new ComposedExtension( extension, configurationProvider ) )
-						.orElse( configurationProvider )
+				configurationProvider
 		);
 	}
 
-	public SearchSetupHelper with(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
-		init( setupStrategyFunction );
-		return this;
+	public SetupContext start() {
+		return start( null, TckBackendHelper::createDefaultBackendSetupStrategy );
 	}
 
-	public SetupContext start() {
-		return start( null );
+	public SetupContext start(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
+		return start( null, setupStrategyFunction );
 	}
 
 	public SetupContext start(String backendName) {
-		Map<String, ?> backendRelativeProperties =
-				setupStrategy.createBackendConfigurationProperties( configurationProvider );
+		return start( backendName, TckBackendHelper::createDefaultBackendSetupStrategy );
+	}
+
+	public SetupContext start(String backendName,
+			Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
+		this.setupStrategy = setupStrategyFunction.apply( TckConfiguration.get().getBackendHelper() );
+
+		Map<String, ?> backendRelativeProperties = setupStrategy.createBackendConfigurationProperties( configurationProvider );
 		String backendPrefix = backendName == null
 				? EngineSettings.BACKEND + "."
 				: EngineSettings.BACKENDS + "." + backendName + ".";
@@ -151,13 +135,16 @@ public class SearchSetupHelper
 
 		AllAwareConfigurationPropertySource propertySource = AllAwareConfigurationPropertySource.fromMap( properties );
 
-		SetupContext setupContext = new SetupContext( backendName, propertySource );
+		SetupContext setupContext = new SetupContext( propertySource );
 
 		return setupStrategy.startSetup( setupContext );
 	}
 
 	public TckBackendAccessor getBackendAccessor() {
 		if ( backendAccessor == null ) {
+			if ( setupStrategy == null ) {
+				setupStrategy = TckConfiguration.get().getBackendHelper().createDefaultBackendSetupStrategy();
+			}
 			backendAccessor = setupStrategy.createBackendAccessor( configurationProvider );
 		}
 		return backendAccessor;
@@ -236,7 +223,7 @@ public class SearchSetupHelper
 		private StubMappingSchemaManagementStrategy schemaManagementStrategy =
 				StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP;
 
-		SetupContext(String defaultBackendName, AllAwareConfigurationPropertySource basePropertySource) {
+		SetupContext(AllAwareConfigurationPropertySource basePropertySource) {
 			this.unusedPropertyChecker = ConfigurationPropertyChecker.create();
 			this.propertySource = unusedPropertyChecker.wrap( basePropertySource )
 					.withOverride( unusedPropertyChecker.wrap(
@@ -345,6 +332,7 @@ public class SearchSetupHelper
 		}
 
 		public StubMapping setup() {
+
 			return setupFirstPhaseOnly().doSecondPhase();
 		}
 

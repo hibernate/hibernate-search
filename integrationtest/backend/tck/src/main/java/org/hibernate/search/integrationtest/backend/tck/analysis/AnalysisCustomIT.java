@@ -84,8 +84,7 @@ public class AnalysisCustomIT {
 	}
 
 	@RegisterExtension
-	public final SearchSetupHelper setupHelper =
-			SearchSetupHelper.create( TckBackendHelper::createAnalysisCustomBackendSetupStrategy );
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private SimpleMappedIndex<IndexBinding> index;
 
@@ -257,7 +256,7 @@ public class AnalysisCustomIT {
 	private void setup(String fieldName,
 			Function<StringIndexFieldTypeOptionsStep<?>, StandardIndexFieldTypeOptionsStep<?, String>> typeContributor) {
 		index = SimpleMappedIndex.of( ctx -> new IndexBinding( ctx, fieldName, typeContributor ) );
-		setupHelper.start().withIndex( index ).setup();
+		setupHelper.start( TckBackendHelper::createAnalysisCustomBackendSetupStrategy ).withIndex( index ).setup();
 	}
 
 	private void initData(Consumer<SingleFieldDocumentBuilder<String>> valueContributor) {

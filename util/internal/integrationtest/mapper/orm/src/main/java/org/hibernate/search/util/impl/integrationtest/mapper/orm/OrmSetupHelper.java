@@ -65,56 +65,57 @@ public final class OrmSetupHelper
 	}
 
 	public static OrmSetupHelper withBackendMock(BackendMock backendMock) {
-		return withBackendMock( Type.METHOD, backendMock, JUPITER_ASSUMPTION_CHECK );
+		return withBackendMock( backendMock, JUPITER_ASSUMPTION_CHECK );
 	}
 
 	public static OrmSetupHelper withBackendMocks(BackendMock defaultBackendMock,
 			Map<String, BackendMock> namedBackendMocks) {
-		return withBackendMocks( Type.METHOD, defaultBackendMock, namedBackendMocks, JUPITER_ASSUMPTION_CHECK );
+		return withBackendMocks( defaultBackendMock, namedBackendMocks, JUPITER_ASSUMPTION_CHECK );
 	}
 
 	public static OrmSetupHelper withSingleBackend(BackendConfiguration backendConfiguration) {
-		return withSingleBackend( Type.METHOD, backendConfiguration, JUPITER_ASSUMPTION_CHECK );
+		return withSingleBackend( backendConfiguration, JUPITER_ASSUMPTION_CHECK );
 	}
 
 	public static OrmSetupHelper withMultipleBackends(BackendConfiguration defaultBackendConfiguration,
 			Map<String, BackendConfiguration> namedBackendConfigurations) {
-		return withMultipleBackends( Type.METHOD, defaultBackendConfiguration, namedBackendConfigurations,
+		return withMultipleBackends(
+				defaultBackendConfiguration, namedBackendConfigurations,
 				JUPITER_ASSUMPTION_CHECK );
 	}
 
-	public static OrmSetupHelper withBackendMockGlobal(BackendMock backendMock) {
-		return withBackendMock( Type.CLASS, backendMock, VINTAGE_ASSUMPTION_CHECK );
+	public static OrmSetupHelper withBackendMockLegacy(BackendMock backendMock) {
+		return withBackendMock( backendMock, VINTAGE_ASSUMPTION_CHECK );
 	}
 
-	public static OrmSetupHelper withBackendMocksGlobal(BackendMock defaultBackendMock,
+	public static OrmSetupHelper withBackendMocksLegacy(BackendMock defaultBackendMock,
 			Map<String, BackendMock> namedBackendMocks) {
-		return withBackendMocks( Type.CLASS, defaultBackendMock, namedBackendMocks, VINTAGE_ASSUMPTION_CHECK );
+		return withBackendMocks( defaultBackendMock, namedBackendMocks, VINTAGE_ASSUMPTION_CHECK );
 	}
 
-	public static OrmSetupHelper withSingleBackendGlobal(BackendConfiguration backendConfiguration) {
-		return withSingleBackend( Type.CLASS, backendConfiguration, VINTAGE_ASSUMPTION_CHECK );
+	public static OrmSetupHelper withSingleBackendLegacy(BackendConfiguration backendConfiguration) {
+		return withSingleBackend( backendConfiguration, VINTAGE_ASSUMPTION_CHECK );
 	}
 
 	public static OrmSetupHelper withMultipleBackendsGlobal(BackendConfiguration defaultBackendConfiguration,
 			Map<String, BackendConfiguration> namedBackendConfigurations) {
-		return withMultipleBackends( Type.CLASS, defaultBackendConfiguration, namedBackendConfigurations,
+		return withMultipleBackends(
+				defaultBackendConfiguration, namedBackendConfigurations,
 				VINTAGE_ASSUMPTION_CHECK );
 	}
 
-	private static OrmSetupHelper withBackendMock(Type type, BackendMock backendMock,
+	private static OrmSetupHelper withBackendMock(BackendMock backendMock,
 			BiConsumer<Boolean, String> assumptionTrueCheck) {
 		return new OrmSetupHelper(
 				BackendSetupStrategy.withSingleBackendMock( backendMock ),
 				Collections.singleton( backendMock ),
 				// Mock backend => avoid schema management unless we want to test it
 				SchemaManagementStrategyName.NONE,
-				type,
 				assumptionTrueCheck
 		);
 	}
 
-	private static OrmSetupHelper withBackendMocks(Type type, BackendMock defaultBackendMock,
+	private static OrmSetupHelper withBackendMocks(BackendMock defaultBackendMock,
 			Map<String, BackendMock> namedBackendMocks, BiConsumer<Boolean, String> assumptionTrueCheck) {
 		List<BackendMock> backendMocks = new ArrayList<>();
 		if ( defaultBackendMock != null ) {
@@ -126,31 +127,28 @@ public final class OrmSetupHelper
 				backendMocks,
 				// Mock backend => avoid schema management unless we want to test it
 				SchemaManagementStrategyName.NONE,
-				type,
 				assumptionTrueCheck
 		);
 	}
 
-	private static OrmSetupHelper withSingleBackend(Type type, BackendConfiguration backendConfiguration,
+	private static OrmSetupHelper withSingleBackend(BackendConfiguration backendConfiguration,
 			BiConsumer<Boolean, String> assumptionTrueCheck) {
 		return new OrmSetupHelper(
 				BackendSetupStrategy.withSingleBackend( backendConfiguration ),
 				Collections.emptyList(),
 				// Real backend => ensure we clean up everything before and after the tests
 				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP,
-				type,
 				assumptionTrueCheck
 		);
 	}
 
-	private static OrmSetupHelper withMultipleBackends(Type type, BackendConfiguration defaultBackendConfiguration,
+	private static OrmSetupHelper withMultipleBackends(BackendConfiguration defaultBackendConfiguration,
 			Map<String, BackendConfiguration> namedBackendConfigurations, BiConsumer<Boolean, String> assumptionTrueCheck) {
 		return new OrmSetupHelper(
 				BackendSetupStrategy.withMultipleBackends( defaultBackendConfiguration, namedBackendConfigurations ),
 				Collections.emptyList(),
 				// Real backend => ensure to clean up everything
 				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP,
-				type,
 				assumptionTrueCheck
 		);
 	}
@@ -163,9 +161,9 @@ public final class OrmSetupHelper
 			DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS;
 
 	private OrmSetupHelper(BackendSetupStrategy backendSetupStrategy, Collection<BackendMock> backendMocks,
-			SchemaManagementStrategyName schemaManagementStrategyName, Type type,
+			SchemaManagementStrategyName schemaManagementStrategyName,
 			BiConsumer<Boolean, String> assumptionTrueCheck) {
-		super( backendSetupStrategy, type );
+		super( backendSetupStrategy );
 		this.backendMocks = backendMocks;
 		this.schemaManagementStrategyName = schemaManagementStrategyName;
 		this.assertionHelper = new OrmAssertionHelper( backendSetupStrategy );

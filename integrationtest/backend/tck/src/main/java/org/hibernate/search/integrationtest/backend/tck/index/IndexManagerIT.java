@@ -23,7 +23,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 class IndexManagerIT {
 
 	@RegisterExtension
-	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private static final StubMappedIndex index = StubMappedIndex.withoutFields();
 
