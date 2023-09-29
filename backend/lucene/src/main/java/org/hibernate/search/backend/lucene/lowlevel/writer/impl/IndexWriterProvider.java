@@ -71,9 +71,15 @@ public class IndexWriterProvider {
 	 * Should be used when stopping the index.
 	 */
 	public void clear() throws IOException {
-		IndexWriterDelegatorImpl indexWriterDelegator = currentWriter.getAndSet( null );
-		if ( indexWriterDelegator != null ) {
-			indexWriterDelegator.close();
+		currentWriterModificationLock.lock();
+		try {
+			IndexWriterDelegatorImpl indexWriterDelegator = currentWriter.getAndSet( null );
+			if ( indexWriterDelegator != null ) {
+				indexWriterDelegator.close();
+			}
+		}
+		finally {
+			currentWriterModificationLock.unlock();
 		}
 	}
 
