@@ -7,15 +7,10 @@
 package org.hibernate.search.integrationtest.jakarta.batch.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.integrationtest.jakarta.batch.util.JobTestUtil.JOB_TIMEOUT_MS;
 import static org.hibernate.search.integrationtest.jakarta.batch.util.JobTestUtil.findIndexedResultsInTenant;
 
 import java.util.Arrays;
 import java.util.List;
-
-import jakarta.batch.operations.JobOperator;
-import jakarta.batch.runtime.BatchStatus;
-import jakarta.batch.runtime.JobExecution;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.integrationtest.jakarta.batch.massindexing.entity.Company;
@@ -48,8 +43,6 @@ public class MassIndexingJobWithMultiTenancyIT {
 	@Rule
 	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private JobOperator jobOperator;
-
 	private final List<Company> companies = Arrays.asList(
 			new Company( "Google" ),
 			new Company( "Red Hat" ),
@@ -66,8 +59,6 @@ public class MassIndexingJobWithMultiTenancyIT {
 
 	@Before
 	public void initData() {
-		jobOperator = JobTestUtil.getAndCheckRuntime();
-
 		setupHolder.with( TARGET_TENANT_ID )
 				.runInTransaction( session -> companies.forEach( session::persist ) );
 		setupHolder.with( TARGET_TENANT_ID )
@@ -78,17 +69,12 @@ public class MassIndexingJobWithMultiTenancyIT {
 	public void shouldHandleTenantIds() throws Exception {
 		SessionFactory sessionFactory = setupHolder.sessionFactory();
 
-		long executionId = jobOperator.start(
-				MassIndexingJob.NAME,
+		JobTestUtil.startJobAndWaitForSuccessNoRetry(
 				MassIndexingJob.parameters()
 						.forEntity( Company.class )
 						.tenantId( TARGET_TENANT_ID )
 						.build()
 		);
-
-		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
-		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
-		assertThat( jobExecution.getBatchStatus() ).isEqualTo( BatchStatus.COMPLETED );
 
 		assertThat( findIndexedResultsInTenant( sessionFactory, Company.class, "name", "Google", TARGET_TENANT_ID ) )
 				.hasSize( 1 );
