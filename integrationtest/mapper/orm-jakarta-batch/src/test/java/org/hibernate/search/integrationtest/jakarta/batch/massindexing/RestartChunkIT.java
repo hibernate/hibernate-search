@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.jakarta.batch.massindexing;
 
-import static org.hibernate.search.integrationtest.jakarta.batch.util.JobTestUtil.JOB_TIMEOUT_MS;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
@@ -70,7 +69,7 @@ public class RestartChunkIT {
 	public void initData() {
 		SimulatedFailure.reset();
 		emf = setupHolder.entityManagerFactory();
-		jobOperator = JobTestUtil.getAndCheckRuntime();
+		jobOperator = JobTestUtil.getOperator();
 
 		String[] str = new String[] {
 				"Google",
@@ -148,7 +147,7 @@ public class RestartChunkIT {
 				parameters
 		);
 		JobExecution jobExec1 = jobOperator.getJobExecution( execId1 );
-		JobTestUtil.waitForTermination( jobOperator, jobExec1, JOB_TIMEOUT_MS );
+		JobTestUtil.waitForTermination( jobExec1 );
 		// job will be stopped by the SimulatedFailure
 		assertEquals( BatchStatus.FAILED, getMainStepStatus( execId1 ) );
 
@@ -159,7 +158,7 @@ public class RestartChunkIT {
 		 */
 		long execId2 = jobOperator.restart( execId1, parameters );
 		JobExecution jobExec2 = jobOperator.getJobExecution( execId2 );
-		JobTestUtil.waitForTermination( jobOperator, jobExec2, JOB_TIMEOUT_MS );
+		JobTestUtil.waitForTermination( jobExec2 );
 		assertEquals( BatchStatus.COMPLETED, getMainStepStatus( execId2 ) );
 
 		// search again

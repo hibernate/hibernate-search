@@ -16,11 +16,13 @@ import jakarta.batch.operations.JobOperator;
 import jakarta.batch.runtime.BatchRuntime;
 import jakarta.batch.runtime.BatchStatus;
 import jakarta.batch.runtime.JobExecution;
+import jakarta.batch.runtime.StepExecution;
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.jakarta.batch.core.logging.impl.Log;
+import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJob;
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.EntityTypeDescriptor;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.loading.spi.LoadingTypeContext;
@@ -41,10 +43,24 @@ public final class JobTestUtil {
 	private static final int THREAD_SLEEP_MS = 100;
 	private static final String JAKARTA_BATCH_TYPE_FOR_IDE_TESTS = "jbatch";
 
+	private static volatile JobOperator operator;
+
 	private JobTestUtil() {
 	}
 
-	public static JobOperator getAndCheckRuntime() {
+	public static JobOperator getOperator() {
+		if ( operator == null ) {
+			synchronized (JobTestUtil.class) {
+				if ( operator == null ) {
+					operator = createAndCheckOperator();
+				}
+			}
+		}
+
+		return operator;
+	}
+
+	private static JobOperator createAndCheckOperator() {
 		JobOperator operator = BatchRuntime.getJobOperator();
 		String expectedType = System.getProperty( "org.hibernate.search.integrationtest.jakarta.batch.type" );
 
@@ -59,17 +75,26 @@ public final class JobTestUtil {
 		return operator;
 	}
 
-	public static void startJobAndWait(String jobName, Properties jobParams, int timeoutInMs) throws InterruptedException {
-		JobOperator jobOperator = getAndCheckRuntime();
-		long execId = jobOperator.start( jobName, jobParams );
+	public static JobExecution startJobAndWaitForSuccessNoRetry(Properties jobParams) throws InterruptedException {
+		JobOperator jobOperator = getOperator();
+		long execId = jobOperator.start( MassIndexingJob.NAME, jobParams );
 		JobExecution jobExec = jobOperator.getJobExecution( execId );
-		jobExec = JobTestUtil.waitForTermination( jobOperator, jobExec, timeoutInMs );
-		assertThat( jobExec.getBatchStatus() ).isEqualTo( BatchStatus.COMPLETED );
+		jobExec = JobTestUtil.waitForTermination( jobExec );
+		assertThat( jobExec.getBatchStatus() )
+				.as( "Status of job " + jobExec.getJobName() )
+				.isEqualTo( BatchStatus.COMPLETED );
+		List<StepExecution> stepExecutions = jobOperator.getStepExecutions( jobExec.getExecutionId() );
+		for ( StepExecution stepExecution : stepExecutions ) {
+			assertThat( stepExecution.getBatchStatus() )
+					.as( "Status of step " + stepExecution.getStepName() )
+					.isEqualTo( BatchStatus.COMPLETED );
+		}
+		return jobExec;
 	}
 
-	public static JobExecution waitForTermination(JobOperator jobOperator, JobExecution jobExecution, int timeoutInMs)
+	public static JobExecution waitForTermination(JobExecution jobExecution)
 			throws InterruptedException {
-		long endTime = System.nanoTime() + timeoutInMs * 1_000_000L;
+		long endTime = System.nanoTime() + JOB_TIMEOUT_MS * 1_000_000L;
 
 		while ( !jobExecution.getBatchStatus().equals( BatchStatus.COMPLETED )
 				&& !jobExecution.getBatchStatus().equals( BatchStatus.STOPPED )
@@ -84,7 +109,7 @@ public final class JobTestUtil {
 					THREAD_SLEEP_MS
 			);
 			Thread.sleep( THREAD_SLEEP_MS );
-			jobExecution = jobOperator.getJobExecution( executionId );
+			jobExecution = getOperator().getJobExecution( executionId );
 		}
 
 		return jobExecution;

@@ -6,15 +6,12 @@
  */
 package org.hibernate.search.integrationtest.jakarta.batch.massindexing;
 
-import static org.hibernate.search.integrationtest.jakarta.batch.util.JobTestUtil.JOB_TIMEOUT_MS;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.batch.operations.JobOperator;
-import jakarta.batch.runtime.JobExecution;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
@@ -49,12 +46,10 @@ public class EntityManagerFactoryRetrievalIT {
 
 	private static final String SESSION_FACTORY_NAME = "primary_session_factory";
 
-	protected JobOperator jobOperator;
 	protected EntityManagerFactory emf;
 
 	@Before
 	public void setup() {
-		jobOperator = JobTestUtil.getAndCheckRuntime();
 		List<Company> companies = new ArrayList<>();
 		List<Person> people = new ArrayList<>();
 		List<WhoAmI> whos = new ArrayList<>();
@@ -97,16 +92,13 @@ public class EntityManagerFactoryRetrievalIT {
 		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		assertEquals( 0, companies.size() );
 
-		long executionId = jobOperator.start(
-				MassIndexingJob.NAME,
+		JobTestUtil.startJobAndWaitForSuccessNoRetry(
 				MassIndexingJob.parameters()
 						.forEntity( Company.class )
 						.checkpointInterval( CHECKPOINT_INTERVAL )
 						.entityManagerFactoryReference( getPersistenceUnitName() )
 						.build()
 		);
-		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
-		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 
 		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		assertEquals( INSTANCES_PER_DATA_TEMPLATE, companies.size() );
@@ -117,8 +109,7 @@ public class EntityManagerFactoryRetrievalIT {
 		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		assertEquals( 0, companies.size() );
 
-		long executionId = jobOperator.start(
-				MassIndexingJob.NAME,
+		JobTestUtil.startJobAndWaitForSuccessNoRetry(
 				MassIndexingJob.parameters()
 						.forEntity( Company.class )
 						.checkpointInterval( CHECKPOINT_INTERVAL )
@@ -126,8 +117,6 @@ public class EntityManagerFactoryRetrievalIT {
 						.entityManagerFactoryReference( getPersistenceUnitName() )
 						.build()
 		);
-		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
-		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 
 		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		assertEquals( INSTANCES_PER_DATA_TEMPLATE, companies.size() );
@@ -138,8 +127,7 @@ public class EntityManagerFactoryRetrievalIT {
 		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		assertEquals( 0, companies.size() );
 
-		long executionId = jobOperator.start(
-				MassIndexingJob.NAME,
+		JobTestUtil.startJobAndWaitForSuccessNoRetry(
 				MassIndexingJob.parameters()
 						.forEntity( Company.class )
 						.checkpointInterval( CHECKPOINT_INTERVAL )
@@ -147,8 +135,6 @@ public class EntityManagerFactoryRetrievalIT {
 						.entityManagerFactoryReference( SESSION_FACTORY_NAME )
 						.build()
 		);
-		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
-		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 
 		companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
 		assertEquals( INSTANCES_PER_DATA_TEMPLATE, companies.size() );
