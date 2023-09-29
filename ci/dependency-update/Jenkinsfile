@@ -14,7 +14,6 @@ Map settings() {
 			return [
 					updateProperties: ['version.org.hibernate.orm'],
 					onlyRunTestDependingOn: ['hibernate-search-mapper-orm'],
-					requiresSourceModifications: true,
 					// we need to recompile this module since it has incompatible return type and will result in a build error:
 					additionalMavenArgs: '-pl :hibernate-search-util-internal-integrationtest-mapper-orm'
 			]
@@ -22,20 +21,17 @@ Map settings() {
 			return [
 					updateProperties: ['version.org.apache.lucene'],
 					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
-					requiresSourceModifications: true
 			]
 		case 'lucene9':
 			return [
 					updateProperties: ['version.org.apache.lucene'],
 					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
-					requiresSourceModifications: true,
 					additionalMavenArgs: '-Dtest.elasticsearch.skip=true'
 			]
 		case 'lucene10':
 			return [
 					updateProperties: ['version.org.apache.lucene'],
 					onlyRunTestDependingOn: ['hibernate-search-backend-lucene'],
-					requiresSourceModifications: true,
 					additionalMavenArgs: '-Dtest.elasticsearch.skip=true'
 			]
 		case 'elasticsearch-latest':
@@ -46,7 +42,7 @@ Map settings() {
 					// We want to use the snapshot version of an image from the ES registry since that's where they are publishing their snapshots.
 					additionalMavenArgs: '-Dtest.elasticsearch.run.elastic.image.name=docker.elastic.co/elasticsearch/elasticsearch -Dtest.elasticsearch.run.elastic.image.tag=master-SNAPSHOT',
 					// This job won't change the versions in the pom. We are passing the latest Elasticsearch version through an additional maven argument `-D`
-					requiresSourceModifications: false,
+					skipSourceModifiedCheck: true,
 					additionalMavenArgs: '-Dtest.lucene.skip=true'
 			]
 		default:
@@ -172,7 +168,7 @@ pipeline {
 								sh "ci/dependency-update/perform-update.sh ${env.DEPENDENCY_UPDATE_NAME} '${settings().updateProperties?.join(",") ?: ''}'"
 							}
 							script {
-								if (settings().requiresSourceModifications && 0 != sh(script: "git diff origin/${BRANCH_NAME} | grep -q '.'", returnStatus: true)) {
+								if (!settings().skipSourceModifiedCheck && 0 != sh(script: "git diff origin/${BRANCH_NAME} | grep -q '.'", returnStatus: true)) {
 									error "This job does not seem to update any dependency; perhaps it is misconfigured? The source code has not been updated, neither by merging a WIP branch nor by updating version properties."
 								}
 							}
