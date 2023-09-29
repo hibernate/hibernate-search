@@ -52,8 +52,9 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	@Override
 	public void close() throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( IndexWriterProvider::clear, indexWriterProvider );
+			// Clear the reader first, as it may depend on the writer (see NearRealTimeIndexReaderProvider).
 			closer.push( IndexReaderProvider::clear, indexReaderProvider );
+			closer.push( IndexWriterProvider::clear, indexWriterProvider );
 		}
 	}
 
@@ -94,8 +95,12 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	@Override
 	public void dropIndexIfExisting() {
 		try {
-			// Ensure no one is using the directory
-			clear();
+			// Clear current writer/readers so that they no longer hold on to the directory.
+			// We assume that no operation on the directory is happening concurrently,
+			// so that nobody will try to create new writers/readers concurrently;
+			// if that happens anyway, either this dropping of the index
+			// or the concurrent writes/reads will fail.
+			close();
 
 			Directory directory = directoryHolder.get();
 
@@ -107,16 +112,15 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 			for ( String file : files ) {
 				directory.deleteFile( file );
 			}
+
+			// Clear current writer/readers again, in case someone illegally
+			// tried to perform operations on the directory concurrently:
+			// that could result into writers/readers pointing to missing files.
+			// If nobody did anything illegal, this close() call is a noop.
+			close();
 		}
 		catch (IOException | RuntimeException e) {
 			throw log.unableToDropIndexDirectory( e.getMessage(), eventContext, e );
-		}
-	}
-
-	private synchronized void clear() throws IOException {
-		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( IndexWriterProvider::clear, indexWriterProvider );
-			closer.push( IndexReaderProvider::clear, indexReaderProvider );
 		}
 	}
 
