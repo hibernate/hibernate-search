@@ -104,8 +104,8 @@ See <<search-dsl>> for details.
 2+|Elasticsearch cluster
 
 |Guarantee of index updates
-2+|<<coordination-none-indexing-guarantee,When the commit / `SearchSession.close()` returns (non-transactional)>>
-|<<coordination-outbox-polling-indexing-guarantee,On commit (transactional)>>
+2+|<<coordination-none-indexing-guarantee,Non-transactional, after the database transaction / `SearchSession.close()` returns>>
+|<<coordination-outbox-polling-indexing-guarantee,Transactional, on database transaction commit>>
 
 |Visibility of index updates
 |<<coordination-none-indexing-visibility,Configurable: immediate or eventual>>

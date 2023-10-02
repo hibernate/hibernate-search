@@ -1,0 +1,292 @@
+[[indexing-explicit]]
+= [[mapper-orm-indexing-manual]] [[manual-index-changes]] Explicit indexing
+
+[[indexing-explicit-basics]]
+== [[mapper-orm-indexing-manual-basics]] [[search-batchindex]] Basics
+
+While <<listener-triggered-indexing,listener-triggered indexing>> and
+the <<indexing-massindexer,`MassIndexer`>>
+or <<mapper-orm-indexing-jakarta-batch,the mass indexing job>>
+should take care of most needs,
+it is sometimes necessary to control indexing manually.
+
+The need arises in particular when <<listener-triggered-indexing,listener-triggered indexing>> is <<mapping-annotations,disabled>>
+or simply not supported (e.g. <<mapper-pojo-standalone-indexing-listener-triggered,with the Standalone POJO Mapper>>),
+or when listener-triggered cannot detect entity changes --
+<<limitations-changes-in-session,such as JPQL/SQL `insert`, `update` or `delete` queries>>.
+
+To address these use cases, Hibernate Search exposes several APIs
+explained if the following sections.
+
+[[listener-triggered-indexing-synchronization]]
+== Configuration
+
+As explicit indexing uses <<indexing-plan,indexing plans>> under the hood,
+several configuration options affecting indexing plans will affect explicit indexing as well:
+
+* The <<indexing-plan-synchronization,indexing plan synchronization strategy>>.
+* The <<indexing-plan-filter,indexing plan filter>>.
+
+[[indexing-explicit-plan]]
+== [[mapper-orm-indexing-manual-indexingplan-writes]] [[_deleting_instances_from_the_index]] [[_adding_instances_to_the_index]] Using a `SearchIndexingPlan` manually
+
+Explicit access to the <<indexing-plan,indexing plan>> is done in the context of a <<entrypoints-search-session,`SearchSession`>>
+using the `SearchIndexingPlan` interface.
+This interface represents the (mutable) set of changes
+that are planned in the context of a session,
+and will be applied to indexes upon transaction commit (for the <<mapper-orm,Hibernate ORM integration>>)
+or upon closing the `SearchSession` (for the <<mapper-pojo-standalone,Standalone POJO Mapper>>).
+
+Here is how explicit indexing based on an <<indexing-plan,indexing plan>> works at a high level:
+
+1. When the application wants an index change,
+it calls one of the `add`/`addOrUpdate`/`delete` methods on the indexing plan of the current <<entrypoints-search-session,`SearchSession`>>.
++
+For the <<mapper-orm,Hibernate ORM integration>> the current `SearchSession` is <<entrypoints-search-session-mapper-orm,bound to the Hibernate ORM `Session`>>,
+while for the <<mapper-pojo-standalone,Standalone POJO Mapper>> the `SearchSession` is <<entrypoints-search-session-mapper-pojo-standalone,is created explicitly by the application>>.
+2. Eventually, the application decides changes are complete,
+and the plan processes change events added so far,
+either inferring which entities need to be reindexed and building the corresponding documents (<<coordination-none,no coordination>>)
+or building events to be sent to the outbox (<<coordination-outbox-polling,`outbox-polling` coordination>>).
++
+The application may trigger this explicitly using the indexing plan's `process` method,
+but it is generally not necessary as it happens automatically:
+for the <<mapper-orm,Hibernate ORM integration>> this happens when the Hibernate ORM `Session` gets flushed
+(explicitly or as part of a transaction commit),
+while for the <<mapper-pojo-standalone,Standalone POJO Mapper>> this happens when the `SearchSession` is closed.
+3. Finally the plan gets executed, triggering indexing, potentially asynchronously.
++
+The application may trigger this explicitly using the indexing plan's `execute` method,
+but it is generally not necessary as it happens automatically:
+for the <<mapper-orm,Hibernate ORM integration>> this happens on transaction commit,
+while for the <<mapper-pojo-standalone,Standalone POJO Mapper>> this happens when the `SearchSession` is closed.
+
+The `SearchIndexingPlan` interface offers the following methods:
+
+`add(Object entity)`::
+(Available with the <<mapper-pojo-standalone,Standalone POJO Mapper>> only.)
++
+Add a document to the index if the entity type is mapped to an index (`@Indexed`).
++
+WARNING: This may create duplicates in the index if the document already exists.
+Prefer `addOrUpdate` unless you are really sure of yourself and need a (slight) performance boost.
+`addOrUpdate(Object entity)`::
+Add or update a document in the index if the entity type is mapped to an index (`@Indexed`),
+and re-index documents that embed this entity (through `@IndexedEmbedded` for example).
+`delete(Object entity)`::
+Delete a document from the index if the entity type is mapped to an index (`@Indexed`),
+and re-index documents that embed this entity (through `@IndexedEmbedded` for example).
+`purge(Class<?> entityType, Object id)`::
+Delete the entity from the index,
+but do not try to re-index documents that embed this entity.
++
+Compared to `delete`, this is mainly useful if the entity has already been deleted from the database
+and is not available, even in a detached state, in the session.
+In that case, reindexing associated entities will be the user's responsibility,
+since Hibernate Search cannot know which entities are associated to an entity that no longer exists.
+`purge(String entityName, Object id)`::
+Same as `purge(Class<?> entityType, Object id)`,
+but the entity type is referenced by its name (see `@javax.persistence.Entity#name`).
+`process()``::
+(Available with the <<mapper-orm,Hibernate ORM integration>> only.)
++
+Process change events added so far,
+either inferring which entities need to be reindexed and building the corresponding documents (<<coordination-none,no coordination>>)
+or building events to be sent to the outbox (<<coordination-outbox-polling,`outbox-polling` coordination>>).
++
+This method is generally executed automatically (see the high-level description near top of this section),
+so calling it explicitly is only useful for batching when processing a large number of items,
+as explained in <<mapper-orm-indexing-manual-indexingplan-process-execute>>.
+`execute()`::
+(Available with the <<mapper-orm,Hibernate ORM integration>> only.)
++
+Execute the indexing plan, triggering indexing, potentially asynchronously.
++
+This method is generally executed automatically (see the high-level description near top of this section),
+so calling it explicitly is only useful in very rare cases,
+for batching when processing a large number of items **and transactions are not an option**,
+as explained in <<mapper-orm-indexing-manual-indexingplan-process-execute>>.
+
+Below are examples of using `addOrUpdate` and `delete`.
+
+.Explicitly adding or updating an entity in the index using `SearchIndexingPlan`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=indexing-plan-addOrUpdate]
+----
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
+<2> Get the search session's indexing plan.
+<3> Fetch from the database the `Book` we want to index;
+this could be replaced with any other way of loading an entity when using the <<mapper-pojo-standalone,Standalone POJO Mapper>>.
+<4> Submit the `Book` to the indexing plan for an add-or-update operation.
+The operation won't be executed immediately,
+but will be delayed until the transaction is committed (<<mapper-orm,Hibernate ORM integration>>)
+or until the `SearchSession` is closed (<<mapper-pojo-standalone,Standalone POJO Mapper>>).
+====
+
+.Explicitly deleting an entity from the index using `SearchIndexingPlan`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=indexing-plan-delete]
+----
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
+<2> Get the search session's indexing plan.
+<3> Fetch from the database the `Book` we want to un-index;
+this could be replaced with any other way of loading an entity when using the <<mapper-pojo-standalone,Standalone POJO Mapper>>.
+<4> Submit the `Book` to the indexing plan for a delete operation.
+The operation won't be executed immediately,
+but will be delayed until the transaction is committed (<<mapper-orm,Hibernate ORM integration>>)
+or until the `SearchSession` is closed (<<mapper-pojo-standalone,Standalone POJO Mapper>>).
+====
+
+[TIP]
+====
+Multiple operations can be performed in a single indexing plan.
+The same entity can even be changed multiple times,
+for example added and then removed:
+Hibernate Search will simplify the operation as expected.
+
+This will work fine for any reasonable number of entities,
+but changing or simply loading large numbers of entities in a single session
+requires special care with Hibernate ORM,
+and then some extra care with Hibernate Search.
+See <<mapper-orm-indexing-manual-indexingplan-process-execute>> for more information.
+====
+
+[[mapper-orm-indexing-manual-indexingplan-process-execute]]
+== [[search-batchindex-flushtoindexes]] Hibernate ORM and the periodic "flush-clear" pattern with `SearchIndexingPlan`
+
+include::../components/_mapper-orm-only-note.adoc[]
+
+A fairly common use case when manipulating large datasets with JPA
+is the link:{hibernateDocUrl}#batch-session-batch-insert[periodic "flush-clear" pattern],
+where a loop reads or writes entities for every iteration
+and flushes then clears the session every `n` iterations.
+This pattern allows processing a large number of entities
+while keeping the memory footprint reasonably low.
+
+Below is an example of this pattern to persist a large number of entities
+when not using Hibernate Search.
+
+.A batch process with JPA
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=persist-automatic-indexing-periodic-flush-clear]
+----
+<1> Execute a loop for a large number of elements, inside a transaction.
+<2> For every iteration of the loop, instantiate a new entity and persist it.
+<3> Every `BATCH_SIZE` iterations of the loop, `flush` the entity manager to send the changes to the database-side buffer.
+<4> After a `flush`, `clear` the ORM session to release some memory.
+====
+
+With Hibernate Search 6 (on contrary to Hibernate Search 5 and earlier),
+this pattern will work as expected:
+
+* <<coordination-none,with coordination disabled>> (the default),
+documents will be built on flushes, and sent to the index upon transaction commit.
+* <<coordination-outbox-polling,with outbox-polling coordination>>,
+entity change events will be persisted on flushes, and committed along with the rest of the changes upon transaction commit.
+
+However, each `flush` call will potentially add data to an internal buffer,
+which for large volumes of data may lead to an `OutOfMemoryException`,
+depending on the JVM heap size,
+the <<coordination,coordination strategy>>
+and the complexity and number of documents.
+
+If you run into memory issues,
+the first solution is to break down the batch process
+into multiple transactions, each handling a smaller number of elements:
+the internal document buffer will be cleared after each transaction.
+
+See below for an example.
+
+[IMPORTANT]
+====
+With this pattern, if one transaction fails,
+part of the data will already be in the database and in indexes,
+with no way to roll back the changes.
+
+However, the indexes will be consistent with the database,
+and it will be possible to (manually) restart the process
+from the last transaction that failed.
+====
+
+.A batch process with Hibernate Search using multiple transactions
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=persist-automatic-indexing-multiple-transactions]
+----
+<1> Add an outer loop that creates one transaction per iteration.
+<2> Begin the transaction at the beginning of each iteration of the outer loop.
+<3> Only handle a limited number of elements per transaction.
+<4> For every iteration of the loop, instantiate a new entity and persist it.
+Note we're relying on listener-triggered indexing to index the entity,
+but this would work just as well if listener-triggered indexing was disabled,
+only requiring an extra call to index the entity.
+See <<indexing-plan>>.
+<5> Commit the transaction at the end of each iteration of the outer loop.
+The entities will be flushed and indexed automatically.
+====
+
+[NOTE]
+====
+The multi-transaction solution
+and the original `flush()`/`clear()` loop pattern can be combined,
+breaking down the process in multiple medium-sized transactions,
+and periodically calling `flush`/`clear` inside each transaction.
+
+This combined solution is the most flexible,
+hence the most suitable if you want to fine-tune your batch process.
+====
+
+If breaking down the batch process into multiple transactions is not an option,
+a second solution is to just write to indexes
+after the call to `session.flush()`/`session.clear()`,
+without waiting for the database transaction to be committed:
+the internal document buffer will be cleared after each write to indexes.
+
+This is done by calling the `execute()` method on the indexing plan,
+as shown in the example below.
+
+[IMPORTANT]
+====
+With this pattern, if an exception is thrown,
+part of the data will already be in the index, with no way to roll back the changes,
+while the database changes will have been rolled back.
+The index will thus be inconsistent with the database.
+
+To recover from that situation, you will have to either
+execute the exact same database changes that failed manually
+(to get the database back in sync with the index),
+or <<indexing-plan,reindex the entities>> affected by the transaction manually
+(to get the index back in sync with the database).
+
+Of course, if you can afford to take the indexes offline for a longer period of time,
+a simpler solution would be to wipe the indexes clean
+and <<indexing-massindexer,reindex everything>>.
+====
+
+.A batch process with Hibernate Search using `execute()`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=persist-automatic-indexing-periodic-flush-execute-clear]
+----
+<1> Get the `SearchSession`.
+<2> Get the search session's indexing plan.
+<3> For every iteration of the loop, instantiate a new entity and persist it.
+Note we're relying on listener-triggered indexing to index the entity,
+but this would work just as well if listener-triggered indexing was disabled,
+only requiring an extra call to index the entity.
+See <<indexing-plan>>.
+<4> After a `flush()`/`clear()`, call `indexingPlan.execute()`.
+The entities will be processed and *the changes will be sent to the indexes immediately*.
+Hibernate Search will wait for index changes to be "completed"
+as required by the configured <<indexing-automatic-synchronization,synchronization strategy>>.
+<5> After the loop, commit the transaction.
+The remaining entities that were not flushed/cleared will be flushed and indexed automatically.
+====

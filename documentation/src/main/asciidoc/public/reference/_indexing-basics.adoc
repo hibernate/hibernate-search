@@ -1,0 +1,43 @@
+[[indexing-basics]]
+= Basics
+
+There are multiple ways to index entities in Hibernate Search.
+
+If you want to get to know the most popular ones,
+head directly to the following section:
+
+* To keep indexes synchronized transparently as entities change in a Hibernate ORM `Session`,
+see <<listener-triggered-indexing,listener-triggered indexing>>.
+* To index a large amount of data --
+for example the whole database, when adding Hibernate Search to an existing application --
+see the <<indexing-massindexer,`MassIndexer`>>.
+
+Otherwise, the following table may help you figure out what's best for your use case.
+
+[cols="h,3*^",options="header"]
+.Comparison of indexing methods
+|===
+|Name and link
+|Use case
+|API
+|Mapper
+
+|<<listener-triggered-indexing,Listener-triggered indexing>>
+|Handle incremental changes in application transactions
+|None: works implicitly without API calls
+|<<mapper-orm,Hibernate ORM integration>> only
+
+|<<indexing-massindexer,`MassIndexer`>>
+.2+|Reindex large volumes of data in batches
+|Specific to Hibernate Search
+|<<mapper-orm,Hibernate ORM integration>> or <<mapper-pojo-standalone,Standalone POJO Mapper>>
+
+|<<mapper-orm-indexing-jakarta-batch,Jakarta Batch mass indexing job>>
+|Jakarta EE standard
+|<<mapper-orm,Hibernate ORM integration>> only
+
+|<<indexing-explicit,Explicit indexing>>
+|Anything else
+|Specific to Hibernate Search
+|<<mapper-orm,Hibernate ORM integration>> or <<mapper-pojo-standalone,Standalone POJO Mapper>>
+|===

@@ -1,5 +1,8 @@
 [[mapper-orm-indexing-jakarta-batch]]
-= [[mapper-orm-indexing-jsr352]] [[jsr352-integration]] Reindexing large volumes of data with the Jakarta Batch integration
+= [[mapper-orm-indexing-jsr352]] [[jsr352-integration]] Indexing a large amount of data with the Jakarta Batch integration
+
+[[mapper-orm-indexing-jakarta-batch-basics]]
+== Basics
 
 include::../components/_mapper-orm-only-note.adoc[]
 
@@ -9,9 +12,10 @@ features of Jakarta Batch, such as failure recovery using checkpoints, chunk
 oriented processing, and parallel execution. This batch job accepts different entity type(s) as
 input, loads the relevant entities from the database, then rebuilds the full-text index from these.
 
-However, it requires a batch runtime for the execution. Please notice that we
-don't provide any batch runtime, you are free to choose one that fits you needs, e.g. the default
-batch runtime embedded in your Jakarta EE container. We provide full integration to the JBeret
+Executing this job requires a batch runtime that is not provided by Hibernate Search.
+You are free to choose one that fits your needs, e.g. the default
+batch runtime embedded in your Jakarta EE container.
+Hibernate Search provides full integration to the JBeret
 implementation (see <<mapper-orm-indexing-jakarta-batch-emf-jberet,how to configure it here>>).
 As for other implementations, they can also be used, but will require
 <<mapper-orm-indexing-jakarta-batch-emf-other-implementation,a bit more configuration on your side>>.
