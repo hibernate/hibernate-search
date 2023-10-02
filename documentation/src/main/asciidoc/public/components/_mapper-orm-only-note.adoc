@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
 [NOTE]
 ====
 This feature is only available with the <<mapper-orm,Hibernate ORM integration>>.

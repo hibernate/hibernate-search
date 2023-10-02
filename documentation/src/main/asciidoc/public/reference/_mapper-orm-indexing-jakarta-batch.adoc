@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
 [[mapper-orm-indexing-jakarta-batch]]
 = [[mapper-orm-indexing-jsr352]] [[jsr352-integration]] Indexing a large amount of data with the Jakarta Batch integration
 

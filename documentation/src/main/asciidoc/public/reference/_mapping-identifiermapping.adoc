@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
 [[mapping-identifiermapping]]
 = [[mapper-orm-identifiermapping]] [[id-annotation]] Mapping the document identifier
 
