@@ -21,7 +21,6 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.MappingAssertionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
-import org.hibernate.search.util.impl.test.extension.ExtensionLifecycleUtils;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
@@ -51,20 +50,20 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, BC, 
 		Optional<Extension> setupStrategyTestExtension = backendSetupStrategy.getTestRule();
 		ComposedExtension.FullExtension ownActions = new ComposedExtension.FullExtension.Builder()
 				.withAfterAll( afterAllContext -> {
-					if ( ExtensionLifecycleUtils.isAll( afterAllContext, callOncePerClass ) ) {
+					if ( callOncePerClass ) {
 						cleanUp();
 					}
 				} ).withAfterEach( afterEachContext -> {
-					if ( ExtensionLifecycleUtils.isEach( afterEachContext, !callOncePerClass ) ) {
+					if ( !callOncePerClass ) {
 						cleanUp();
 					}
 				} ).withBeforeAll( beforeAllContext -> {
 					callOncePerClass = true;
-					if ( ExtensionLifecycleUtils.isAll( beforeAllContext, callOncePerClass ) ) {
+					if ( callOncePerClass ) {
 						init();
 					}
 				} ).withBeforeEach( beforeEachContext -> {
-					if ( ExtensionLifecycleUtils.isEach( beforeEachContext, !callOncePerClass ) ) {
+					if ( !callOncePerClass ) {
 						init();
 					}
 				} ).build();

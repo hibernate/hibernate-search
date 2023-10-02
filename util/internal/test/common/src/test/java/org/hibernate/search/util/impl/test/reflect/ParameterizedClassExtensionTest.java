@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedClass;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
 import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-@ParameterizedClass
+@ParameterizedPerClass
 class ParameterizedClassExtensionTest {
 
 	// Arguments for a parameterized class setup.
@@ -42,8 +42,8 @@ class ParameterizedClassExtensionTest {
 	}
 
 	private Context context;
-	private int test1ExecutionCount = 0;
-	private int test2ExecutionCount = 0;
+	private static int test1ExecutionCount = 0;
+	private static int test2ExecutionCount = 0;
 
 
 	// Setup method that will use the params method to configure the test execution
@@ -106,6 +106,15 @@ class ParameterizedClassExtensionTest {
 		@Override
 		public int hashCode() {
 			return Objects.hash( string, number, bool );
+		}
+
+		@Override
+		public String toString() {
+			return "Context{" +
+					"string='" + string + '\'' +
+					", number=" + number +
+					", bool=" + bool +
+					'}';
 		}
 	}
 }

@@ -37,7 +37,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubEntityRefe
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSession;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedClass;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerMethod;
 import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import org.awaitility.Awaitility;
 
-@ParameterizedClass
+@ParameterizedPerMethod
 class IndexIndexingPlanIT {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -78,7 +78,7 @@ class IndexIndexingPlanIT {
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 	private StubSession sessionContext;
 
-	@ParameterizedSetup(ParameterizedSetup.Lifecycle.PER_METHOD)
+	@ParameterizedSetup
 	@MethodSource("params")
 	public void init(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
 			String tenantId) {

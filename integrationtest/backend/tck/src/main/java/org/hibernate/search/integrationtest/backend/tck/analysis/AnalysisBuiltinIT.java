@@ -25,7 +25,7 @@ import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchRes
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SingleFieldDocumentBuilder;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedClass;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerMethod;
 import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Test indexing and searching with built-in analyzer definitions.
  * See {@link AnalyzerNames}.
  */
-@ParameterizedClass
+@ParameterizedPerMethod
 class AnalysisBuiltinIT {
 
 	public static List<? extends Arguments> params() {
@@ -55,7 +55,7 @@ class AnalysisBuiltinIT {
 	public SearchSetupHelper setupHelper = SearchSetupHelper.create();
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@ParameterizedSetup(ParameterizedSetup.Lifecycle.PER_METHOD)
+	@ParameterizedSetup
 	@MethodSource("params")
 	public void init(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
 		setupHelper.start( setupStrategyFunction ).withIndex( index ).setup();

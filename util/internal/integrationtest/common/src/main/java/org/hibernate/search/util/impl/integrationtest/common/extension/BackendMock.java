@@ -36,7 +36,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexCreateContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchWork;
-import org.hibernate.search.util.impl.test.extension.ExtensionLifecycleUtils;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
@@ -73,21 +72,21 @@ public class BackendMock implements BeforeEachCallback, AfterEachCallback, Befor
 
 	@Override
 	public void afterAll(ExtensionContext context) {
-		if ( ExtensionLifecycleUtils.isAll( context, callOncePerClass ) ) {
+		if ( callOncePerClass ) {
 			doAfter( context );
 		}
 	}
 
 	@Override
 	public void beforeEach(ExtensionContext context) {
-		if ( ExtensionLifecycleUtils.isEach( context, !callOncePerClass ) ) {
+		if ( !callOncePerClass ) {
 			doBefore();
 		}
 	}
 
 	@Override
 	public void afterEach(ExtensionContext context) {
-		if ( ExtensionLifecycleUtils.isEach( context, !callOncePerClass ) ) {
+		if ( !callOncePerClass ) {
 			doAfter( context );
 		}
 	}

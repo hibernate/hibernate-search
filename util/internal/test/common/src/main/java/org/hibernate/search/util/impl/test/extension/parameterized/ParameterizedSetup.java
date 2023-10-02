@@ -11,11 +11,9 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.Optional;
 
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.ExtensionContext;
 
 /**
  * Marks the setup method for a parameterized class tests.
@@ -69,15 +67,4 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 @TestTemplate
 @ExtendWith(ParameterizedClassExtension.class)
 public @interface ParameterizedSetup {
-
-	Lifecycle value() default Lifecycle.PER_CONFIGURATION;
-
-	enum Lifecycle {
-		PER_CONFIGURATION,
-		PER_METHOD;
-
-		public static Optional<Lifecycle> getCurrentLifecycle(ExtensionContext context) {
-			return ParameterizedClassLifecycleStateExtension.parameterizedSetupLifecycle( context );
-		}
-	}
 }
