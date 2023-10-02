@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
 [[binding-routingbridge]]
 = [[mapper-orm-bridge-routingbridge]] [[mapper-orm-bridge-routingkeybridge]] Routing bridge
 

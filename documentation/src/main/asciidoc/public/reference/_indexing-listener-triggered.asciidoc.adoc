@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
 [[listener-triggered-indexing]]
 = [[indexing-automatic]] [[mapper-orm-indexing-automatic]] [[_automatic_indexing]] Implicit, listener-triggered indexing
 

@@ -21,6 +21,16 @@
         <property name="fileExtensions" value="xml"/>
     </module>
 
+    <module name="Header">
+        <property name="headerFile" value="classpath:/org/hibernate/search/headers/properties.header"/>
+        <property name="fileExtensions" value="properties"/>
+    </module>
+
+    <module name="Header">
+        <property name="headerFile" value="classpath:/org/hibernate/search/headers/adoc.header"/>
+        <property name="fileExtensions" value="adoc,asciidoc"/>
+    </module>
+
     <module name="TreeWalker">
 
         <module name="SuppressionCommentFilter" />

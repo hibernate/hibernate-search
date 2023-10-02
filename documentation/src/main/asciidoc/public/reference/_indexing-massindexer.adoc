@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
 [[indexing-massindexer]]
 = [[mapper-orm-indexing-massindexer]] [[search-batchindex-massindexer]] Indexing a large amount of data with the `MassIndexer`
 

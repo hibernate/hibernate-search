@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright Red Hat Inc. and Hibernate Authors
 [[schema-management]]
 = [[mapper-orm-schema-management]] Managing the index schema
 
