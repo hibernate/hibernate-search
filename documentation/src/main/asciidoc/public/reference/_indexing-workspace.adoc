@@ -1,5 +1,5 @@
 [[indexing-workspace]]
-== [[mapper-orm-indexing-manual-largescale]] Explicitly altering a whole index
+= [[mapper-orm-indexing-manual-largescale]] Explicitly altering a whole index
 
 Some index operations are not about a specific entity/document,
 but rather about a large number of documents, possibly all of them.
