@@ -44,7 +44,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingImp
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInitiator;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingKey;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
-import org.hibernate.search.util.impl.test.extension.ExtensionLifecycleUtils;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
@@ -85,11 +84,11 @@ public class SearchSetupHelper
 					callOncePerClass = true;
 				} )
 				.withAfterAll( afterAllContext -> {
-					if ( ExtensionLifecycleUtils.isAll( afterAllContext, callOncePerClass ) ) {
+					if ( callOncePerClass ) {
 						cleanUp();
 					}
 				} ).withAfterEach( afterEachContext -> {
-					if ( ExtensionLifecycleUtils.isEach( afterEachContext, !callOncePerClass ) ) {
+					if ( !callOncePerClass ) {
 						cleanUp();
 					}
 				} ).withTestExecutionExceptionHandler( (testExecutionExceptionContext, throwable) -> {

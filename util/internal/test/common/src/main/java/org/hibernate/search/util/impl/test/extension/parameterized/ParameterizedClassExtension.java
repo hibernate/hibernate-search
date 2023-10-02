@@ -9,7 +9,6 @@ package org.hibernate.search.util.impl.test.extension.parameterized;
 import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.stream.StreamSupport.stream;
 import static org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedClassTestMethodDiscoverer.discover;
-import static org.junit.platform.commons.util.AnnotationUtils.findAnnotation;
 import static org.junit.platform.commons.util.AnnotationUtils.isAnnotated;
 
 import java.lang.reflect.Method;
@@ -20,7 +19,7 @@ import java.util.List;
 import java.util.Spliterator;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.InvocationInterceptor;
@@ -33,7 +32,7 @@ import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider;
 
 final class ParameterizedClassExtension
-		implements TestTemplateInvocationContextProvider, AfterTestExecutionCallback, ParameterResolver,
+		implements TestTemplateInvocationContextProvider, ParameterResolver,
 		TestExecutionExceptionHandler {
 	private List<Object[]> envArguments;
 	private int envIndex = 0;
@@ -64,12 +63,9 @@ final class ParameterizedClassExtension
 		// find actual "tests" that we'll invoke via reflection:
 		List<ParameterizedTestMethodInvoker> testMethods = discover( testClass, context );
 
-		ParameterizedSetup parameterizedSetup = findAnnotation(
-				context.getRequiredTestMethod(), ParameterizedSetup.class ).orElseThrow();
-
-		if ( ParameterizedSetup.Lifecycle.PER_METHOD.equals( parameterizedSetup.value() ) ) {
-			reinitOnEachTest = true;
-		}
+		reinitOnEachTest = context.getTestInstanceLifecycle()
+				.map( TestInstance.Lifecycle.PER_METHOD::equals )
+				.orElse( Boolean.FALSE );
 
 		if ( testMethods.isEmpty() ) {
 			throw new IllegalStateException( "No tests to execute were found." );
@@ -78,43 +74,42 @@ final class ParameterizedClassExtension
 		envArguments = new ArrayList<>();
 		ParameterizedClassUtils.findParameters( envArguments, context, context.getRequiredTestMethod() );
 
-		return stream( spliteratorUnknownSize(
-				new Iterator<>() {
+		return stream(
+				spliteratorUnknownSize(
+						new Iterator<>() {
 
-					Iterator<ParameterizedTestMethodInvoker> test = testMethods.iterator();
+							Iterator<ParameterizedTestMethodInvoker> test = testMethods.iterator();
 
-					@Override
-					public boolean hasNext() {
-						if ( test.hasNext() ) {
-							return true;
-						}
-						else {
-							envIndex++;
-							envInitialized = false;
-							envInitializationFailed = false;
-						}
+							@Override
+							public boolean hasNext() {
+								if ( test.hasNext() ) {
+									return true;
+								}
+								else {
+									envIndex++;
+									envInitialized = false;
+									envInitializationFailed = false;
+								}
 
-						if ( envIndex < envArguments.size() ) {
-							test = testMethods.iterator();
-							return test.hasNext();
-						}
-						return false;
-					}
+								if ( envIndex < envArguments.size() ) {
+									test = testMethods.iterator();
+									return test.hasNext();
+								}
+								return false;
+							}
 
-					@Override
-					public TestTemplateInvocationContext next() {
-						ParameterizedTestMethodInvoker testMethod = test.next();
-						write( context, StoreKey.TEST_TO_RUN, testMethod );
+							@Override
+							public TestTemplateInvocationContext next() {
+								ParameterizedTestMethodInvoker testMethod = test.next();
+								write( context, StoreKey.TEST_TO_RUN, testMethod );
 
-						return new ParameterizedClassTestTemplateInvocationContext(
-								testMethod.getName(),
-								envInitialized && !reinitOnEachTest
-										? MethodInterceptor.TEST_EXECUTION_ONLY_INTERCEPTOR
-										: MethodInterceptor.SETUP_AND_TEST_EXECUTION_INTERCEPTOR
-						);
-					}
-				}, Spliterator.NONNULL
-		), false );
+								return new ParameterizedClassTestTemplateInvocationContext(
+										testMethod.getName(),
+										new MethodInterceptor( !envInitialized || reinitOnEachTest )
+								);
+							}
+						}, Spliterator.NONNULL
+				), false );
 	}
 
 	private static void write(ExtensionContext context, StoreKey key, Object value) {
@@ -129,15 +124,6 @@ final class ParameterizedClassExtension
 
 	private static ExtensionContext.Namespace extensionNamespace(ExtensionContext context) {
 		return ExtensionContext.Namespace.create( context.getRequiredTestClass(), ParameterizedClassExtension.class );
-	}
-
-	@Override
-	public void afterTestExecution(ExtensionContext extensionContext) throws Exception {
-		// that's where we actually execute the test or init the env
-		ParameterizedTestMethodInvoker testMethod =
-				read( extensionContext, StoreKey.TEST_TO_RUN, ParameterizedTestMethodInvoker.class );
-		testMethod.invoke( extensionContext.getRequiredTestInstance() );
-		envInitialized = !envInitializationFailed;
 	}
 
 	@Override
@@ -176,10 +162,7 @@ final class ParameterizedClassExtension
 		}
 	}
 
-	private static class MethodInterceptor implements InvocationInterceptor {
-
-		private static final MethodInterceptor SETUP_AND_TEST_EXECUTION_INTERCEPTOR = new MethodInterceptor( true );
-		private static final MethodInterceptor TEST_EXECUTION_ONLY_INTERCEPTOR = new MethodInterceptor( false );
+	private class MethodInterceptor implements InvocationInterceptor {
 
 		private final boolean invoke;
 
@@ -197,6 +180,12 @@ final class ParameterizedClassExtension
 			else {
 				invocation.skip();
 			}
+
+			// that's where we actually execute the test:
+			ParameterizedTestMethodInvoker testMethod =
+					read( extensionContext, StoreKey.TEST_TO_RUN, ParameterizedTestMethodInvoker.class );
+			testMethod.invoke( extensionContext.getRequiredTestInstance() );
+			envInitialized = !envInitializationFailed;
 		}
 	}
 
