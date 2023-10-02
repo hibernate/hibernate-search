@@ -127,6 +127,7 @@
         <version.com.github.tomakehurst.wiremock>3.0.0-beta-10</version.com.github.tomakehurst.wiremock>
         <version.org.apache.commons.lang3>3.13.0</version.org.apache.commons.lang3>
         <version.org.apache.commons.math3>3.6.1</version.org.apache.commons.math3>
+        <!-- When upgrading Avro make sure to create a new payload in EventPayloadSerializationUtilsTest -->
         <version.org.apache.avro>1.11.3</version.org.apache.avro>
         <version.org.jboss.weld>5.1.1.Final</version.org.jboss.weld>
 
