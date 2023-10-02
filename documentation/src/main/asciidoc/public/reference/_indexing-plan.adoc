@@ -1,110 +1,69 @@
 [[indexing-plan]]
-= [[mapper-orm-indexing-manual-indexingplan-writes]] [[_deleting_instances_from_the_index]] [[_adding_instances_to_the_index]] Explicitly indexing on entity change events
+= Indexing plans
 
-When <<listener-triggered-indexing,listener-triggered indexing>> is <<mapping-annotations,disabled>>
-or simply not supported (e.g. <<mapper-pojo-standalone-indexing-listener-triggered,with the Standalone POJO Mapper>>),
-the indexes will start empty and stay that way
-until explicit indexing commands are sent to Hibernate Search.
+[[indexing-plan-basics]]
+== Basics
 
-Explicitly indexing is done in the context of a <<entrypoints-search-session,`SearchSession`>>
-using the `SearchIndexingPlan` interface.
-This interface represents the (mutable) set of changes
-that are planned in the context of a session,
-and will be applied to indexes upon transaction commit (for the <<mapper-orm,Hibernate ORM integration>>)
-or upon closing the `SearchSession` (for the <<mapper-pojo-standalone,Standalone POJO Mapper>>).
+For <<listener-triggered-indexing,listener-triggered indexing>> as well
+as <<indexing-explicit,some forms of explicit indexing>>,
+Hibernate Search relies on an "indexing plan" to aggregate "entity change" events
+and infer the resulting indexing operations to execute.
 
-When indexing explicitly,
-the indexing plan should be used whenever a change event (add, update, delete) occurs on an entity.
-The indexing plan will automatically determine whether the changed entity needs to be reindexed.
-It will even infer which other entities need to be <<mapping-reindexing,reindexed>>
-because their indexed document embeds the changed entity
-(e.g. through <<mapping-indexedembedded,`@IndexedEmbedded`>>).
+NOTE: Indexing plans are not used for the <<indexing-massindexer,`MassIndexer`>>
+or the <<mapper-orm-indexing-jakarta-batch,Jakarta Batch mass indexing job>>:
+those assume all entities they process need to be indexed
+and don't need the more subtle mechanisms of indexing plans.
 
-The `SearchIndexingPlan` interface offers the following methods:
+Here is how indexing plans work at a high level:
 
-`add(Object entity)`::
-(Available with the <<mapper-pojo-standalone,Standalone POJO Mapper>> only.)
+1. While the application performs entity changes,
+entity change events (entity created, updated, deleted) are added to the plan.
 +
-Add a document to the index if the entity type is mapped to an index (`@Indexed`).
+For <<listener-triggered-indexing,listener-triggered indexing>> (<<mapper-orm,Hibernate ORM integration>> only)
+this happens implicitly as changes are performed,
+but it can also be done <<indexing-explicit,explicitly>>.
+2. Eventually, the application decides changes are complete,
+and the plan processes change events added so far,
+either inferring which entities need to be reindexed and building the corresponding documents (<<coordination-none,no coordination>>)
+or building events to be sent to the outbox (<<coordination-outbox-polling,`outbox-polling` coordination>>).
 +
-WARNING: This may create duplicates in the index if the document already exists.
-Prefer `addOrUpdate` unless you are really sure of yourself and need a (slight) performance boost.
-`addOrUpdate(Object entity)`::
-Add or update a document in the index if the entity type is mapped to an index (`@Indexed`),
-and re-index documents that embed this entity (through `@IndexedEmbedded` for example).
-`delete(Object entity)`::
-Delete a document from the index if the entity type is mapped to an index (`@Indexed`),
-and re-index documents that embed this entity (through `@IndexedEmbedded` for example).
-`purge(Class<?> entityType, Object id)`::
-Delete the entity from the index,
-but do not try to re-index documents that embed this entity.
+For the <<mapper-orm,Hibernate ORM integration>> this happens when the Hibernate ORM `Session` gets flushed
+(explicitly or as part of a transaction commit),
+while for the <<mapper-pojo-standalone,Standalone POJO Mapper>> this happens when the `SearchSession` is closed.
+3. Finally the plan gets executed, triggering indexing, potentially asynchronously.
 +
-Compared to `delete`, this is mainly useful if the entity has already been deleted from the database
-and is not available, even in a detached state, in the session.
-In that case, reindexing associated entities will be the user's responsibility,
-since Hibernate Search cannot know which entities are associated to an entity that no longer exists.
-`purge(String entityName, Object id)`::
-Same as `purge(Class<?> entityType, Object id)`,
-but the entity type is referenced by its name (see `@javax.persistence.Entity#name`).
-`process()` and `execute()`::
-(Available with the <<mapper-orm,Hibernate ORM integration>> only.)
-+
-Respectively, process the changes and apply them to indexes.
-+
-These methods will be executed automatically on commit,
-so they are only useful when processing large number of items,
-as explained in <<mapper-orm-indexing-manual-indexingplan-process-execute>>.
+For the <<mapper-orm,Hibernate ORM integration>> this happens on transaction commit,
+while for the <<mapper-pojo-standalone,Standalone POJO Mapper>> this happens when the `SearchSession` is closed.
 
-Below are examples of using `addOrUpdate` and `delete`.
+Below is a summary of key characteristics of indexing plans
+and how they vary depending on the configured <<coordination,coordination strategy>>.
 
-.Explicitly adding or updating an entity in the index using `SearchIndexingPlan`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=indexing-plan-addOrUpdate]
-----
-<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
-<2> Get the search session's indexing plan.
-<3> Fetch from the database the `Book` we want to index;
-this could be replaced with any other way of loading an entity when using the <<mapper-pojo-standalone,Standalone POJO Mapper>>.
-<4> Submit the `Book` to the indexing plan for an add-or-update operation.
-The operation won't be executed immediately,
-but will be delayed until the transaction is committed (<<mapper-orm,Hibernate ORM integration>>)
-or until the `SearchSession` is closed (<<mapper-pojo-standalone,Standalone POJO Mapper>>).
-====
+[cols="h,2*^",options="header"]
+.Comparison of indexing plans depending on the coordination strategy
+|===
+|Coordination strategy
+|<<coordination-none,No coordination>> (default)
+|<<coordination-outbox-polling,Outbox polling>> (<<mapper-orm,Hibernate ORM integration>> only)
 
-.Explicitly deleting an entity from the index using `SearchIndexingPlan`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=indexing-plan-delete]
-----
-<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
-<2> Get the search session's indexing plan.
-<3> Fetch from the database the `Book` we want to un-index;
-this could be replaced with any other way of loading an entity when using the <<mapper-pojo-standalone,Standalone POJO Mapper>>.
-<4> Submit the `Book` to the indexing plan for a delete operation.
-The operation won't be executed immediately,
-but will be delayed until the transaction is committed (<<mapper-orm,Hibernate ORM integration>>)
-or until the `SearchSession` is closed (<<mapper-pojo-standalone,Standalone POJO Mapper>>).
-====
+|Guarantee of indexes updates
+|<<coordination-none-indexing-guarantee,Non-transactional, after the database transaction / `SearchSession.close()` returns>>
+|<<coordination-outbox-polling-indexing-guarantee,Transactional, on database transaction commit>>
 
-[TIP]
-====
-Multiple operations can be performed in a single indexing plan.
-The same entity can even be changed multiple times,
-for example added and then removed:
-Hibernate Search will simplify the operation as expected.
+|Visibility of index updates
+|<<coordination-none-indexing-visibility,Configurable: immediate (poor performance) or eventual>>
+|<<coordination-outbox-polling-indexing-visibility,Eventual>>
 
-This will work fine for any reasonable number of entities,
-but changing or simply loading large numbers of entities in a single session
-requires special care with Hibernate ORM,
-and then some extra care with Hibernate Search.
-See <<mapper-orm-indexing-manual-indexingplan-process-execute>> for more information.
-====
+|Overhead for application threads
+|<<coordination-none-indexing-on-flush,Low to medium>>
+|<<coordination-outbox-polling-indexing-background,Very low>>
+
+|Overhead for the database (<<mapper-orm,Hibernate ORM integration>> only)
+|<<coordination-none-indexing-lazy-loading,Low>>
+|<<coordination-outbox-polling-indexing-full-loading,Low to medium>>
+|===
 
 [[indexing-plan-synchronization]]
-== [[mapper-orm-indexing-automatic-synchronization]] Synchronization with the indexes
+== [[indexing-automatic-synchronization]] [[mapper-orm-indexing-automatic-synchronization]] Synchronization with the indexes
 
 [[indexing-plan-synchronization-basics]]
 === [[mapper-orm-indexing-automatic-synchronization-basics]] Basics
@@ -124,7 +83,7 @@ and doing so will lead to an exception on startup.
 When a transaction is committed (<<mapper-orm,Hibernate ORM integration>>)
 or the `SearchSession` is closed (<<mapper-pojo-standalone,Standalone POJO Mapper>>),
 <<coordination-none,with default coordination settings>>,
-the execution of the indexing plan (<<listener-triggered-indexing,listener-triggered>> or otherwise)
+the execution of the indexing plan (<<listener-triggered-indexing,implicit (listener-triggered)>> or <<indexing-explicit,explicit>>)
 can block the application thread
 until indexing reaches a certain level of completion.
 
@@ -233,3 +192,103 @@ to a <<configuration-bean-reference-parsing,bean reference>> pointing to the cus
 for example `class:com.mycompany.MySynchronizationStrategy`.
 * at the session level by passing an instance of the custom implementation
 to `SearchSession#indexingPlanSynchronizationStrategy(...)`.
+
+[[indexing-plan-filter]]
+== Indexing plan filter
+
+include::../components/_incubating-warning.adoc[]
+
+In some scenarios, it might be helpful to pause the <<architecture-hsearch-indexing,explicit and listener-triggered indexing>> programmatically, for example,
+when importing larger amounts of data. Hibernate Search allows configuring application-wide
+and session-level filters to manage which types are tracked for changes and indexed.
+
+.Configuring an application-wide filter
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/automaticindexing/HibernateOrmIndexingPlanFilterIT.java[tags=application-filter]
+----
+Configuring an application-wide filter requires an instance of the `SearchMapping`.
+
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> Start the declaration of the indexing plan filter.
+<3> Configure included/excluded types through the `SearchIndexingPlanFilter`
+====
+
+.Configuring a session-level filter
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/automaticindexing/HibernateOrmIndexingPlanFilterIT.java[tags=session-filter]
+----
+Configuring a session level filter is available through an instance of the `SearchSession`.
+
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>
+<2> Configure included/excluded types through the `SearchIndexingPlanFilter`
+====
+
+Filter can be defined by providing indexed and contained types as well as their supertypes.
+Interfaces are not allowed and passing an interface class to any of the filter definition methods will result in an exception.
+If dynamic types represented by a `Map` are used then their names must be used to configure the filter.
+Filter rules are:
+
+* If the type `A` is explicitly included by the filter, then a change to an object that is exactly of a type `A` is processed.
+* If the type `A` is explicitly excluded by the filter, then a change to an object that is exactly of a type `A` is ignored.
+* If the type `A` is explicitly included by the filter, then a change to an object that is exactly of a type `B`,
+which is a subtype of the type `A`, is processed unless the filter explicitly excludes a more specific supertype of a type `B`.
+* If the type `A` is excluded by the filter explicitly, then a change to an object that is exactly of a type `B`,
+which is a subtype of type the `A`, is ignored unless the filter explicitly includes a more specific supertype of a type `B`.
+
+A session-level filter takes precedence over an application-wide one. If the session-level filter configuration does not
+either explicitly or through inheritance include/exclude the exact type of an entity, then the decision will be made by
+the application-wide filter. If an application-wide filter also has no explicit configuration for a type, then this type
+is considered to be included.
+
+In some cases we might need to disable the indexing entirely. Listing all entities one by one might be cumbersome,
+but since filter configuration is implicitly applied to subtypes, `.exclude(Object.class)` can be used to exclude all types.
+Conversely, `.include(Object.class)` can be used to enable indexing within a session filter when
+the application-wide filter disables indexing completely.
+
+.Disable all indexing within a session
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/automaticindexing/HibernateOrmIndexingPlanFilterIT.java[tags=session-filter-exclude-all]
+----
+Configuring a session level filter is available through an instance of the `SearchSession`.
+
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>
+<2> Excluding `Object.class` will lead to excluding all its subtypes which means nothing will be included.
+====
+
+.Enable indexing in the session while application-wide indexing is paused
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/automaticindexing/HibernateOrmIndexingPlanFilterIT.java[tags=session-filter-exclude-include-all-application]
+----
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/automaticindexing/HibernateOrmIndexingPlanFilterIT.java[tags=session-filter-exclude-include-all-session]
+----
+
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> An application-wide filter disables any indexing
+<3> <<entrypoints-search-session,Retrieve the `SearchSession`>>
+<4> A session level filter re-enables indexing *for changes happening in current session only*
+====
+
+[NOTE]
+====
+Trying to configure the same type as both included and excluded at the same time by the same filter
+will lead to an exception being thrown.
+====
+
+[NOTE]
+====
+Only an application-wide filter is safe to use when using the <<coordination-database-polling,`outbox-polling` coordination strategy>>.
+When this coordination strategy is in use, entities are loaded and indexed in a different session from
+the one where they were changed. It might lead to unexpected results as the session where events are processed will not
+apply the filter configured by the session in which entities were modified.
+An exception will be thrown if such a filter is configured unless this filter excludes all the types to prevent any
+unexpected consequences of configuring session-level filters with this coordination strategy.
+====

@@ -119,8 +119,9 @@ without Hibernate ORM or Search having any knowledge of which entities are actua
 === Solutions and workarounds
 
 One workaround is to reindex explicitly after you run JPQL/SQL queries,
-either using the <<indexing-massindexer,`MassIndexer`>>
-or <<mapper-orm-indexing-manual,manually>>.
+either using the <<indexing-massindexer,`MassIndexer`>>,
+using the <<mapper-orm-indexing-jakarta-batch,Jakarta Batch mass indexing job>>,
+or <<indexing-explicit,explicitly>>.
 
 [[limitations-changes-in-session-roadmap]]
 === Roadmap
@@ -174,8 +175,9 @@ The following solutions can help circumvent this limitation:
 always update the other side consistently.
 2. When the above is not possible,
 reindex affected entities explicitly after the association update,
-either using the <<indexing-massindexer,`MassIndexer`>>
-or <<mapper-orm-indexing-manual,manually>>.
+either using the <<indexing-massindexer,`MassIndexer`>>,
+using the <<mapper-orm-indexing-jakarta-batch,Jakarta Batch mass indexing job>>,
+or <<indexing-explicit,explicitly>>.
 
 [[limitations-changes-asymmetric-association-updates-roadmap]]
 === Roadmap

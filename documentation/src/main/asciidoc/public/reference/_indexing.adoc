@@ -3,16 +3,18 @@
 
 :leveloffset: +1
 
-include::_indexing-listener-triggered.asciidoc.adoc[]
+include::_indexing-basics.adoc[]
 
 include::_indexing-plan.adoc[]
 
+include::_indexing-listener-triggered.asciidoc.adoc[]
+
 include::_indexing-massindexer.adoc[]
 
-include::_indexing-workspace.adoc[]
-
-include::_mapper-orm-indexing-manual.adoc[]
-
 include::_mapper-orm-indexing-jakarta-batch.adoc[]
+
+include::_indexing-explicit.adoc[]
+
+include::_indexing-workspace.adoc[]
 
 :leveloffset: -1

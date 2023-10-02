@@ -1,20 +1,30 @@
 [[listener-triggered-indexing]]
-= [[indexing-automatic]] [[mapper-orm-indexing-automatic]] [[_automatic_indexing]] Listener-triggered indexing
+= [[indexing-automatic]] [[mapper-orm-indexing-automatic]] [[_automatic_indexing]] Implicit, listener-triggered indexing
+
+[[listener-triggered-indexing-concepts]]
+== [[indexing-automatic-concepts]][[mapper-orm-indexing-automatic-concepts]] Basics
 
 include::../components/_mapper-orm-only-note.adoc[]
 
 By default, every time an entity is changed through a Hibernate ORM Session,
 if that entity is <<mapping-entityindexmapping,mapped to an index>>,
-Hibernate Search updates the relevant index.
+Hibernate Search updates the relevant index transparently.
 
-Exactly how and when the index update happens depends on the <<coordination,coordination strategy>>;
-see <<listener-triggered-indexing-concepts>> for more information.
+Here is how listener-triggered indexing works at a high level:
 
-[[listener-triggered-indexing-concepts]]
-== [[indexing-automatic-concepts]][[mapper-orm-indexing-automatic-concepts]] Overview
+1. When the Hibernate ORM `Session` gets flushed (explicitly or as part of a transaction commit),
+Hibernate ORM determines what changed exactly (entity created, updated, deleted),
+forwards the information to Hibernate Search.
+2. Hibernate Search adds this information to a (session-scoped) <<indexing-plan,indexing plan>>
+and the plan processes change events added so far,
+either inferring which entities need to be reindexed and building the corresponding documents (<<coordination-none,no coordination>>)
+or building events to be sent to the outbox (<<coordination-outbox-polling,`outbox-polling` coordination>>).
+3. On database transaction commit, the plan gets executed,
+either sending the document indexing/deletion request to the backend (<<coordination-none,no coordination>>)
+or sending the events to the database (<<coordination-outbox-polling,`outbox-polling` coordination>>).
 
-Below is a summary of how listener-triggered indexing works depending
-on the configured <<coordination,coordination strategy>>.
+Below is a summary of key characteristics of listener-triggered indexing
+and how they vary depending on the configured <<coordination,coordination strategy>>.
 
 Follow the links for more details.
 
@@ -38,8 +48,8 @@ Follow the links for more details.
 2+|<<indexing-automatic-concepts-dirty-checking,Only relevant changes>>
 
 |Guarantee of indexes updates
-|<<coordination-none-indexing-guarantee,When the commit returns (non-transactional)>>
-|<<coordination-outbox-polling-indexing-guarantee,On commit (transactional)>>
+|<<coordination-none-indexing-guarantee,Non-transactional, after the database transaction / `SearchSession.close()` returns>>
+|<<coordination-outbox-polling-indexing-guarantee,Transactional, on database transaction commit>>
 
 |Visibility of index updates
 |<<coordination-none-indexing-visibility,Configurable: immediate (poor performance) or eventual>>
@@ -59,17 +69,25 @@ Follow the links for more details.
 
 Listener-triggered indexing may be unnecessary if your index is read-only
 or if you update it regularly by reindexing,
-either using the  <<indexing-massindexer,`MassIndexer`>>
-or <<mapper-orm-indexing-manual,manually>>.
+either using the <<indexing-massindexer,`MassIndexer`>>,
+using the <<mapper-orm-indexing-jakarta-batch,Jakarta Batch mass indexing job>>,
+or <<indexing-explicit,explicitly>>.
+
 You can disable listener-triggered indexing by setting the configuration property
 `hibernate.search.indexing.listeners.enabled` to `false`.
+
+As listener-triggered indexing uses <<indexing-plan,indexing plans>> under the hood,
+several configuration options affecting indexing plans will affect listener-triggered indexing as well:
+
+* The <<indexing-plan-synchronization,indexing plan synchronization strategy>>.
+* The <<indexing-plan-filter,indexing plan filter>>.
 
 [[indexing-automatic-concepts-changes-in-session]]
 == [[mapper-orm-indexing-automatic-concepts-changes-in-session]] In-session entity change detection and limitations
 
 Hibernate Search uses internal events of Hibernate ORM in order to detect changes.
 These events will be triggered if you actually manipulate managed entity objects in your code:
-calls o `session.persist(...)`, `session.delete(...)`, to entity setters, etc.
+calls to `session.persist(...)`, `session.delete(...)`, to entity setters, etc.
 
 This works great for most applications, but you need to consider some limitations:
 
@@ -82,110 +100,3 @@ Hibernate Search is aware of the entity properties that are accessed when buildi
 When processing Hibernate ORM entity change events, it is also aware of which properties actually changed.
 Thanks to that knowledge, it is able to detect which entity changes are actually relevant to indexing,
 and to skip reindexing when a property is modified, but does not affect the indexed document.
-
-[[indexing-automatic-synchronization]]
-== Synchronization with the indexes
-
-Listener-triggered indexing is affected by the synchronization strategy in use in the `SearchSession`.
-
-See <<indexing-plan-synchronization,this section>> for more information.
-
-[[indexing-plan-filter]]
-== Indexing plan filter
-
-include::../components/_incubating-warning.adoc[]
-
-In some scenarios, it might be helpful to pause the <<architecture-hsearch-indexing,explicit and listener-triggered indexing>> programmatically, for example,
-when importing larger amounts of data. Hibernate Search allows configuring application-wide
-and session-level filters to manage which types are tracked for changes and indexed.
-
-.Configuring an application-wide filter
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/automaticindexing/HibernateOrmIndexingPlanFilterIT.java[tags=application-filter]
-----
-Configuring an application-wide filter requires an instance of the `SearchMapping`.
-
-<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
-<2> Start the declaration of the indexing plan filter.
-<3> Configure included/excluded types through the `SearchIndexingPlanFilter`
-====
-
-.Configuring a session-level filter
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/automaticindexing/HibernateOrmIndexingPlanFilterIT.java[tags=session-filter]
-----
-Configuring a session level filter is available through an instance of the `SearchSession`.
-
-<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>
-<2> Configure included/excluded types through the `SearchIndexingPlanFilter`
-====
-
-Filter can be defined by providing indexed and contained types as well as their supertypes.
-Interfaces are not allowed and passing an interface class to any of the filter definition methods will result in an exception.
-If dynamic types represented by a `Map` are used then their names must be used to configure the filter.
-Filter rules are:
-
-* If the type `A` is explicitly included by the filter, then a change to an object that is exactly of a type `A` is processed.
-* If the type `A` is explicitly excluded by the filter, then a change to an object that is exactly of a type `A` is ignored.
-* If the type `A` is explicitly included by the filter, then a change to an object that is exactly of a type `B`,
-which is a subtype of the type `A`, is processed unless the filter explicitly excludes a more specific supertype of a type `B`.
-* If the type `A` is excluded by the filter explicitly, then a change to an object that is exactly of a type `B`,
-which is a subtype of type the `A`, is ignored unless the filter explicitly includes a more specific supertype of a type `B`.
-
-A session-level filter takes precedence over an application-wide one. If the session-level filter configuration does not
-either explicitly or through inheritance include/exclude the exact type of an entity, then the decision will be made by
-the application-wide filter. If an application-wide filter also has no explicit configuration for a type, then this type
-is considered to be included.
-
-In some cases we might need to disable the indexing entirely. Listing all entities one by one might be cumbersome,
-but since filter configuration is implicitly applied to subtypes, `.exclude(Object.class)` can be used to exclude all types.
-Conversely, `.include(Object.class)` can be used to enable indexing within a session filter when
-the application-wide filter disables indexing completely.
-
-.Disable all indexing within a session
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/automaticindexing/HibernateOrmIndexingPlanFilterIT.java[tags=session-filter-exclude-all]
-----
-Configuring a session level filter is available through an instance of the `SearchSession`.
-
-<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>
-<2> Excluding `Object.class` will lead to excluding all its subtypes which means nothing will be included.
-====
-
-.Enable indexing in the session while application-wide indexing is paused
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/automaticindexing/HibernateOrmIndexingPlanFilterIT.java[tags=session-filter-exclude-include-all-application]
-----
-----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/automaticindexing/HibernateOrmIndexingPlanFilterIT.java[tags=session-filter-exclude-include-all-session]
-----
-
-<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
-<2> An application-wide filter disables any indexing
-<3> <<entrypoints-search-session,Retrieve the `SearchSession`>>
-<4> A session level filter re-enables indexing *for changes happening in current session only*
-====
-
-[NOTE]
-====
-Trying to configure the same type as both included and excluded at the same time by the same filter
-will lead to an exception being thrown.
-====
-
-[NOTE]
-====
-Only an application-wide filter is safe to use when using the <<coordination-database-polling,`outbox-polling` coordination strategy>>.
-When this coordination strategy is in use, entities are loaded and indexed in a different session from
-the one where they were changed. It might lead to unexpected results as the session where events are processed will not
-apply the filter configured by the session in which entities were modified.
-An exception will be thrown if such a filter is configured unless this filter excludes all the types to prevent any
-unexpected consequences of configuring session-level filters with this coordination strategy.
-====

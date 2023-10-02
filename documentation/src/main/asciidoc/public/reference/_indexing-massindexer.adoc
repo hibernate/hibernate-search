@@ -1,5 +1,5 @@
 [[indexing-massindexer]]
-= [[mapper-orm-indexing-massindexer]] [[search-batchindex-massindexer]] Reindexing large volumes of data with the `MassIndexer`
+= [[mapper-orm-indexing-massindexer]] [[search-batchindex-massindexer]] Indexing a large amount of data with the `MassIndexer`
 
 [[indexing-massindexer-basics]]
 == [[mapper-orm-indexing-massindexer-basics]] Basics

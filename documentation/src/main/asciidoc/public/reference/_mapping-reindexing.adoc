@@ -236,8 +236,9 @@ reindexing thousands of sensors every few milliseconds probably won't perform we
 In this scenario, however, search on sensor value is not considered critical and indexes don't need to be as fresh.
 We can accept indexes to lag behind a few minutes when it comes to a sensor value.
 We can consider setting up a batch process that runs every few seconds
-to reindex all sensors, either through a <<indexing-massindexer,mass indexer>>
-or <<mapper-orm-indexing-manual,other means>>.
+to reindex all sensors, either through a <<indexing-massindexer,mass indexer>>,
+using the <<mapper-orm-indexing-jakarta-batch,Jakarta Batch mass indexing job>>,
+or <<indexing-explicit,explicitly>>.
 So we would really not mind if Hibernate Search just ignored changes to sensor values...
 
 That's what `@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)` is for:
