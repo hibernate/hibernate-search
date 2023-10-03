@@ -91,7 +91,6 @@
             <mapper ref="org.hibernate.search.jakarta.batch.core.massindexing.step.impl.HibernateSearchPartitionMapper">
                 <properties>
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
-                    <property name="idFetchSize" value="#{jobParameters['idFetchSize']}" />
                     <property name="reindexOnlyHql" value="#{jobParameters['reindexOnlyHql']}" />
                     <property name="reindexOnlyParameters" value="#{jobParameters['reindexOnlyParameters']}" />
                     <property name="maxThreads" value="#{jobParameters['maxThreads']}" />

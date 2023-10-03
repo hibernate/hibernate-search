@@ -20,8 +20,6 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.LockModeType;
 
-import org.hibernate.ScrollMode;
-import org.hibernate.ScrollableResults;
 import org.hibernate.StatelessSession;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.query.SelectionQuery;
@@ -64,10 +62,6 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 	private JobContext jobContext;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.ID_FETCH_SIZE)
-	private String serializedIdFetchSize;
-
-	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.REINDEX_ONLY_HQL)
 	private String reindexOnlyHql;
 
@@ -104,7 +98,6 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 	 * Constructor for unit test.
 	 */
 	public HibernateSearchPartitionMapper(
-			String serializedIdFetchSize,
 			String reindexOnlyHql,
 			String serializedReindexOnlyParameters,
 			String serializedMaxThreads,
@@ -113,7 +106,6 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 			String serializedCheckpointInterval,
 			String tenantId,
 			JobContext jobContext) {
-		this.serializedIdFetchSize = serializedIdFetchSize;
 		this.reindexOnlyHql = reindexOnlyHql;
 		this.serializedReindexOnlyParameters = serializedReindexOnlyParameters;
 		this.serializedMaxThreads = serializedMaxThreads;
@@ -143,10 +135,6 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 			);
 			int checkpointInterval =
 					MassIndexingJobParameters.Defaults.checkpointInterval( checkpointIntervalRaw, rowsPerPartition );
-			int idFetchSize = SerializationUtil.parseIntegerParameterOptional(
-					MassIndexingJobParameters.ID_FETCH_SIZE, serializedIdFetchSize,
-					MassIndexingJobParameters.Defaults.ID_FETCH_SIZE
-			);
 			ConditionalExpression reindexOnly =
 					SerializationUtil.parseReindexOnlyParameters( reindexOnlyHql, serializedReindexOnlyParameters );
 
@@ -155,7 +143,7 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 
 			for ( EntityTypeDescriptor<?, ?> entityTypeDescriptor : entityTypeDescriptors ) {
 				partitionBounds.addAll( buildPartitionUnitsFrom( ss, entityTypeDescriptor,
-						maxResults, idFetchSize, rowsPerPartition, reindexOnly ) );
+						maxResults, rowsPerPartition, reindexOnly ) );
 			}
 
 			// Build partition plan
@@ -194,51 +182,45 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 		}
 	}
 
-	private List<PartitionBound> buildPartitionUnitsFrom(StatelessSession ss,
-			EntityTypeDescriptor<?, ?> type,
-			Integer maxResults, int fetchSize, int rowsPerPartition, ConditionalExpression reindexOnly) {
+	private <I> List<PartitionBound> buildPartitionUnitsFrom(StatelessSession ss,
+			EntityTypeDescriptor<?, I> type,
+			Integer maxResults, int rowsPerPartition, ConditionalExpression reindexOnly) {
 		List<PartitionBound> partitionUnits = new ArrayList<>();
 
-		Object lowerID;
-		Object upperID = null;
+		int index = 0;
+		Object lowerBound = null;
+		Object upperBound;
+		// If there are no results or fewer than "rowsPerPartition" results,
+		// we'll just create one partition with two null bounds.
+		do {
+			upperBound = selectNextId( type, reindexOnly, ss, lowerBound, rowsPerPartition );
+			partitionUnits.add( new PartitionBound( type, lowerBound, upperBound ) );
+			index += rowsPerPartition;
+			lowerBound = upperBound;
+		}
+		while ( lowerBound != null && ( maxResults == null || index < maxResults ) );
 
-		SelectionQuery<?> query = type.createIdentifiersQuery( (SharedSessionContractImplementor) ss,
-				reindexOnly == null ? List.of() : List.of( reindexOnly ) )
-				.setFetchSize( fetchSize )
+		return partitionUnits;
+	}
+
+	private <I> I selectNextId(EntityTypeDescriptor<?, I> type, ConditionalExpression reindexOnly,
+			StatelessSession ss, Object lowerId, int offset) {
+		List<ConditionalExpression> conditions = new ArrayList<>();
+		if ( reindexOnly != null ) {
+			conditions.add( reindexOnly );
+		}
+		if ( lowerId != null ) {
+			conditions.add( type.idOrder()
+					.idGreater( "HIBERNATE_SEARCH_PARTITION_LOWER_BOUND_", lowerId ) );
+		}
+		SelectionQuery<I> query = type.createIdentifiersQuery( (SharedSessionContractImplementor) ss, conditions )
+				.setFetchSize( 1 )
 				.setReadOnly( true )
 				.setCacheable( false )
 				.setLockMode( LockModeType.NONE );
-
-		if ( maxResults != null ) {
-			query.setMaxResults( maxResults );
-		}
-
-		try ( ScrollableResults<?> scroll = query.scroll( ScrollMode.SCROLL_SENSITIVE ) ) {
-			/*
-			 * The scroll results are originally positioned *before* the first element,
-			 * so we need to scroll rowsPerPartition + 1 positions to advanced to the
-			 * upper bound of the first partition, whereas for the next partitions
-			 * we need to advance `rowsPerPartition` positions.
-			 * The call to scroll.next() handles the special case of the first partition,
-			 * as well as the special case where there is no data to index.
-			 */
-			if ( !scroll.next() ) {
-				// Nothing to be indexed.
-				return partitionUnits;
-			}
-
-			while ( scroll.scroll( rowsPerPartition ) ) {
-				lowerID = upperID;
-				upperID = scroll.get();
-				partitionUnits.add( new PartitionBound( type, lowerID, upperID ) );
-			}
-
-			// add an additional partition on the tail
-			lowerID = upperID;
-			upperID = null;
-			partitionUnits.add( new PartitionBound( type, lowerID, upperID ) );
-			return partitionUnits;
-		}
+		query.setFirstResult( offset );
+		query.setMaxResults( 1 );
+		return query.getSingleResultOrNull();
 	}
 
 }
