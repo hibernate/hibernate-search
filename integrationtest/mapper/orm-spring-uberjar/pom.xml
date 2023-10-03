@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.hibernate.search</groupId>
-        <artifactId>hibernate-search-integrationtest</artifactId>
+        <artifactId>hibernate-search-parent-springtest</artifactId>
         <version>7.0.0-SNAPSHOT</version>
-        <relativePath>../..</relativePath>
+        <relativePath>../../../build/parents/springtest</relativePath>
     </parent>
     <artifactId>hibernate-search-integrationtest-spring-repackaged</artifactId>
     <packaging>pom</packaging>
@@ -27,42 +27,5 @@
          -->
         <failsafe.jvm.args.hibernate-orm></failsafe.jvm.args.hibernate-orm>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <!-- Override the version of Hibernate ORM pulled by Spring Boot -->
-            <!--
-                Since we are importing a pom and not using it as a parent for this module,
-                we cannot use a version property like:
-                    <hibernate.version>${version.org.hibernate.orm}</hibernate.version>
-                or:
-                    <elasticsearch-client.version>${version.org.elasticsearch.client}</elasticsearch-client.version>
-                to override Spring's dependency version with the one we need. Instead, we are going import our bom to
-                override the versions. Placing it after the Spring bom - doesn't work and dependency versions
-                remain unchanged.
-            -->
-            <dependency>
-                <groupId>org.hibernate.orm</groupId>
-                <artifactId>hibernate-platform</artifactId>
-                <version>${version.org.hibernate.orm}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-bom</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${version.org.springframework.boot}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 </project>
 

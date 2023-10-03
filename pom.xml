@@ -185,6 +185,7 @@
         <module>v5migrationhelper/orm</module>
         <module>util/internal/integrationtest</module>
         <module>build/parents/integrationtest</module>
+        <module>build/parents/springtest</module>
         <module>integrationtest</module>
         <module>documentation</module>
     </modules>
