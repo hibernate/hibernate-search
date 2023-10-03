@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-parent-public</artifactId>
-        <version>6.2.2-SNAPSHOT</version>
+        <version>6.2.2.Final</version>
         <relativePath>../../build/parents/public</relativePath>
     </parent>
     <artifactId>hibernate-search-mapper-pojo-base</artifactId>
