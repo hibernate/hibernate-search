@@ -78,13 +78,11 @@ public class HibernateSearchPartitionMapperComponentIT {
 			}
 		} );
 
-		final String fetchSize = String.valueOf( 200 * 1000 );
 		final String maxThreads = String.valueOf( 1 );
 		final String rowsPerPartition = String.valueOf( 3 );
 
 		mockedJobContext = mock( JobContext.class );
 		partitionMapper = new HibernateSearchPartitionMapper(
-				fetchSize,
 				null, null,
 				maxThreads,
 				null,
@@ -153,7 +151,9 @@ public class HibernateSearchPartitionMapperComponentIT {
 			}
 		}
 
-		// No data => 0 partition
-		assertEquals( 0, compGroupPartitions );
+		// Did not find anything in the ResultSet at index "rowsPerPartition"
+		// => 1 partition covering the whole range.
+		// We'll notice there is no data later, when reading IDs to reindex.
+		assertEquals( 1, compGroupPartitions );
 	}
 }
