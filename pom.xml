@@ -287,7 +287,7 @@
         <version.source.plugin>3.3.0</version.source.plugin>
         <!-- Surefire versions are a minefield of bugs: be careful with upgrades -->
         <version.surefire.plugin>3.1.2</version.surefire.plugin>
-        <version.surefire.plugin.java-version.asm>9.5</version.surefire.plugin.java-version.asm>
+        <version.surefire.plugin.java-version.asm>9.6</version.surefire.plugin.java-version.asm>
         <version.jacoco.plugin>0.8.10</version.jacoco.plugin>
         <version.com.buschmais.jqassistant.plugin>2.0.7</version.com.buschmais.jqassistant.plugin>
         <version.docker.maven.plugin>0.43.4</version.docker.maven.plugin>
