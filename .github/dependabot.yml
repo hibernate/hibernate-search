@@ -59,6 +59,7 @@ updates:
           - "org.skyscreamer:*"
           - "com.github.tomakehurst:*"
           - "org.jsoup:*"
+          - "org.ow2.asm:*" # for Surefire/Failsafe plugins to support builds on latest JDKs
     ignore:
       # These dependencies are updated manually
       - dependency-name: "org.hibernate:*"
