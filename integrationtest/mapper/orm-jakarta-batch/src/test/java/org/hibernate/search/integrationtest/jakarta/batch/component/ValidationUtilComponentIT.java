@@ -18,32 +18,31 @@ import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.Validation
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * @author Mincong Huang
  */
-public class ValidationUtilComponentIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class ValidationUtilComponentIT {
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder =
-			ReusableOrmSetupHolder.withSingleBackend( BackendConfigurations.simple() );
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
-		setupContext.withAnnotatedTypes( Company.class, Person.class )
-				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false );
+	@BeforeAll
+	void setup() {
+		ormSetupHelper.start()
+				.withAnnotatedTypes( Company.class, Person.class )
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
+				.setup();
 	}
 
 	@Test
-	public void validateEntityTypes_whenAllTypesAreAvailableInEMF() throws Exception {
+	void validateEntityTypes_whenAllTypesAreAvailableInEMF() {
 		String serializedEntityTypes = Stream
 				.of( Company.class, Person.class )
 				.map( Class::getName )
@@ -53,7 +52,7 @@ public class ValidationUtilComponentIT {
 	}
 
 	@Test
-	public void validateEntityTypes_whenContainingNonIndexedTypes() throws Exception {
+	void validateEntityTypes_whenContainingNonIndexedTypes() {
 		String serializedEntityTypes = Stream
 				.of( Company.class, Person.class, NotIndexed.class )
 				.map( Class::getName )
@@ -66,54 +65,55 @@ public class ValidationUtilComponentIT {
 	}
 
 	@Test
-	public void validatePositive_valueIsNegative() throws Exception {
+	void validatePositive_valueIsNegative() {
 		assertThatThrownBy( () -> ValidationUtil.validatePositive( "MyParameter", -1 ) )
 				.isInstanceOf( SearchException.class );
 	}
 
 	@Test
-	public void validatePositive_valueIsZero() throws Exception {
+	void validatePositive_valueIsZero() {
 		assertThatThrownBy( () -> ValidationUtil.validatePositive( "MyParameter", 0 ) )
 				.isInstanceOf( SearchException.class );
 	}
 
 	@Test
-	public void validatePositive_valueIsPositive() throws Exception {
+	void validatePositive_valueIsPositive() {
 		ValidationUtil.validatePositive( "MyParameter", 1 );
 		// ok
 	}
 
 	@Test
-	public void validateCheckpointInterval_lessThanRowsPerPartition() throws Exception {
+	void validateCheckpointInterval_lessThanRowsPerPartition() {
 		ValidationUtil.validateCheckpointInterval( 99, 100 );
 		// ok
 	}
 
 	@Test
-	public void validateCheckpointInterval_equalToRowsPerPartition() {
+	void validateCheckpointInterval_equalToRowsPerPartition() {
 		ValidationUtil.validateCheckpointInterval( 100, 100 );
 		// ok
 	}
 
-	@Test(expected = SearchException.class)
-	public void validateCheckpointInterval_greaterThanRowsPerPartition() throws Exception {
-		ValidationUtil.validateCheckpointInterval( 101, 100 );
+	@Test
+	void validateCheckpointInterval_greaterThanRowsPerPartition() {
+		assertThatThrownBy( () -> ValidationUtil.validateCheckpointInterval( 101, 100 ) )
+				.isInstanceOf( SearchException.class );
 	}
 
 	@Test
-	public void validateSessionClearInterval_lessThanCheckpointInterval() throws Exception {
+	void validateSessionClearInterval_lessThanCheckpointInterval() {
 		ValidationUtil.validateEntityFetchSize( 99, 100 );
 		// ok
 	}
 
 	@Test
-	public void validateSessionClearInterval_equalToCheckpointInterval() {
+	void validateSessionClearInterval_equalToCheckpointInterval() {
 		ValidationUtil.validateEntityFetchSize( 100, 100 );
 		// ok
 	}
 
 	@Test
-	public void validateSessionClearInterval_greaterThanCheckpointInterval() throws Exception {
+	void validateSessionClearInterval_greaterThanCheckpointInterval() {
 		assertThatThrownBy( () -> ValidationUtil.validateEntityFetchSize( 101, 100 ) )
 				.isInstanceOf( SearchException.class );
 	}

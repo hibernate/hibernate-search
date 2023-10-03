@@ -14,7 +14,7 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMo
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 @TestForIssue(jiraKey = "HSEARCH-3049")
-public class SearchWorkspacePurgeBaseIT extends AbstractSearchWorkspaceSimpleOperationIT {
+class SearchWorkspacePurgeBaseIT extends AbstractSearchWorkspaceSimpleOperationIT {
 	@Override
 	protected void expectWork(BackendMock backendMock, String indexName, CompletableFuture<?> future) {
 		backendMock.expectIndexScaleWorks( indexName )

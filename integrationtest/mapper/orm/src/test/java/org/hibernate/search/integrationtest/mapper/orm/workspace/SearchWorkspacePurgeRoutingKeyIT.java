@@ -16,7 +16,7 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMo
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 @TestForIssue(jiraKey = "HSEARCH-3049")
-public class SearchWorkspacePurgeRoutingKeyIT extends AbstractSearchWorkspaceSimpleOperationIT {
+class SearchWorkspacePurgeRoutingKeyIT extends AbstractSearchWorkspaceSimpleOperationIT {
 
 	private final Set<String> ROUTING_KEYS = CollectionHelper.asLinkedHashSet( "key1", "key2" );
 

@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.jakarta.batch.component;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -28,47 +29,37 @@ import org.hibernate.search.jakarta.batch.core.massindexing.step.impl.HibernateS
 import org.hibernate.search.jakarta.batch.core.massindexing.util.impl.MassIndexingPartitionProperties;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Single-component test for partition plan validation.
  *
  * @author Mincong Huang
  */
-public class HibernateSearchPartitionMapperComponentIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class HibernateSearchPartitionMapperComponentIT {
 
 	private static final int COMP_ROWS = 3;
 	private static final int PERS_ROWS = 8;
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder =
-			ReusableOrmSetupHolder.withSingleBackend( BackendConfigurations.simple() );
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 	private EntityManagerFactory emf;
 
 	private JobContext mockedJobContext;
 
 	private HibernateSearchPartitionMapper partitionMapper;
 
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
-		setupContext.withAnnotatedTypes( Company.class, Person.class, CompanyGroup.class )
-				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false );
-	}
-
-	@Before
+	@BeforeAll
 	public void init() {
-		emf = setupHolder.entityManagerFactory();
+		emf = ormSetupHelper.start().withAnnotatedTypes( Company.class, Person.class, CompanyGroup.class )
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false ).setup();
 
-		setupHolder.runInTransaction( session -> {
+		with( emf ).runInTransaction( session -> {
 			for ( int i = 1; i <= COMP_ROWS; i++ ) {
 				session.persist( new Company( "C" + i ) );
 			}
@@ -98,7 +89,7 @@ public class HibernateSearchPartitionMapperComponentIT {
 	 * between the rows to index and the max rows per partition.
 	 */
 	@Test
-	public void simple() throws Exception {
+	void simple() throws Exception {
 		JobContextData jobData = new JobContextData();
 		jobData.setEntityManagerFactory( emf );
 		var companyType = JobTestUtil.createEntityTypeDescriptor( emf, Company.class );
@@ -153,6 +144,6 @@ public class HibernateSearchPartitionMapperComponentIT {
 		// Did not find anything in the ResultSet at index "rowsPerPartition"
 		// => 1 partition covering the whole range.
 		// We'll notice there is no data later, when reading IDs to reindex.
-		assertEquals( 1, compGroupPartitions );
+		assertThat( compGroupPartitions ).isEqualTo( 1 );
 	}
 }

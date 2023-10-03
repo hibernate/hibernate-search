@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.jakarta.batch.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.integrationtest.jakarta.batch.util.JobTestUtil.findIndexedResultsInTenant;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,55 +21,45 @@ import org.hibernate.search.jakarta.batch.core.massindexing.MassIndexingJob;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * @author Mincong Huang
  */
-public class MassIndexingJobWithMultiTenancyIT {
+class MassIndexingJobWithMultiTenancyIT {
 
 	private static final String TARGET_TENANT_ID = "targetTenant";
 
 	private static final String UNUSED_TENANT_ID = "unusedTenant";
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder =
-			ReusableOrmSetupHolder.withSingleBackend( BackendConfigurations.simple() );
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+	@RegisterExtension
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private final List<Company> companies = Arrays.asList(
 			new Company( "Google" ),
 			new Company( "Red Hat" ),
 			new Company( "Microsoft" )
 	);
+	private SessionFactory sessionFactory;
 
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
-		setupContext.withAnnotatedTypes( Company.class )
+	@BeforeEach
+	public void setup() {
+		sessionFactory = ormSetupHelper.start().withAnnotatedTypes( Company.class )
 				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
 				.withBackendProperty( "multi_tenancy.strategy", "discriminator" )
-				.tenants( TARGET_TENANT_ID, UNUSED_TENANT_ID );
-	}
-
-	@Before
-	public void initData() {
-		setupHolder.with( TARGET_TENANT_ID )
+				.tenants( TARGET_TENANT_ID, UNUSED_TENANT_ID )
+				.setup();
+		with( sessionFactory, TARGET_TENANT_ID )
 				.runInTransaction( session -> companies.forEach( session::persist ) );
-		setupHolder.with( TARGET_TENANT_ID )
+		with( sessionFactory, TARGET_TENANT_ID )
 				.runNoTransaction( session -> Search.session( session ).workspace( Company.class ).purge() );
 	}
 
 	@Test
 	public void shouldHandleTenantIds() throws Exception {
-		SessionFactory sessionFactory = setupHolder.sessionFactory();
-
 		JobTestUtil.startJobAndWaitForSuccessNoRetry(
 				MassIndexingJob.parameters()
 						.forEntity( Company.class )
