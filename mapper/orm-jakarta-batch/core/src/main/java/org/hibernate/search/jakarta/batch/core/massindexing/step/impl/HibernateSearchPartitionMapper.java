@@ -8,6 +8,7 @@ package org.hibernate.search.jakarta.batch.core.massindexing.step.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -177,7 +178,7 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 				);
 			}
 
-			log.infof( "Partitions: %s", (Object) props );
+			log.debugf( "Partitions: %s", Arrays.toString( props ) );
 
 			PartitionPlan partitionPlan = new PartitionPlanImpl();
 			partitionPlan.setPartitionProperties( props );
