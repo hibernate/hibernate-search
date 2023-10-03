@@ -7,10 +7,10 @@
 package org.hibernate.search.integrationtest.mapper.orm.workspace;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
@@ -18,51 +18,45 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public abstract class AbstractSearchWorkspaceSimpleOperationIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 	private static final String BACKEND2_NAME = "stubBackend2";
 
-	@ClassRule
-	public static BackendMockTestRule defaultBackendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock defaultBackendMock = BackendMock.create();
 
-	@ClassRule
-	public static BackendMockTestRule backend2Mock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backend2Mock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder;
-	static {
-		Map<String, BackendMock> namedBackendMocks = new LinkedHashMap<>();
-		namedBackendMocks.put( BACKEND2_NAME, backend2Mock );
-		setupHolder = ReusableOrmSetupHolder.withBackendMocks( defaultBackendMock, namedBackendMocks );
-	}
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper =
+			OrmSetupHelper.withBackendMocks( defaultBackendMock, Collections.singletonMap( BACKEND2_NAME, backend2Mock ) );
+	private SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@BeforeAll
+	void setup() {
 		defaultBackendMock.expectAnySchema( IndexedEntity1.INDEX_NAME );
 		backend2Mock.expectAnySchema( IndexedEntity2.INDEX_NAME );
-
-		setupContext.withAnnotatedTypes( IndexedEntity1.class, IndexedEntity2.class );
+		sessionFactory = ormSetupHelper.start()
+				.withAnnotatedTypes( IndexedEntity1.class, IndexedEntity2.class ).setup();
 	}
 
 	@Test
-	public void async_success() {
-		setupHolder.runNoTransaction( session -> {
+	void async_success() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
@@ -78,8 +72,8 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void async_failure() {
-		setupHolder.runNoTransaction( session -> {
+	void async_failure() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
@@ -96,8 +90,8 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void sync_success() {
-		setupHolder.runNoTransaction( session -> {
+	void sync_success() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
@@ -110,8 +104,8 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void sync_failure() {
-		setupHolder.runNoTransaction( session -> {
+	void sync_failure() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
@@ -128,8 +122,8 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void multiIndexMultiBackend() {
-		setupHolder.runNoTransaction( session -> {
+	void multiIndexMultiBackend() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchWorkspace workspace = Search.session( session ).workspace();
 
 			CompletableFuture<Object> future1FromBackend = new CompletableFuture<>();
@@ -151,9 +145,9 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void outOfSession() {
+	void outOfSession() {
 		SearchWorkspace workspace;
-		try ( Session session = setupHolder.sessionFactory().openSession() ) {
+		try ( Session session = sessionFactory.openSession() ) {
 			workspace = Search.session( session ).workspace( IndexedEntity1.class );
 		}
 
@@ -169,8 +163,8 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	}
 
 	@Test
-	public void fromMappingWithoutSession() {
-		SearchWorkspace workspace = Search.mapping( setupHolder.sessionFactory() )
+	void fromMappingWithoutSession() {
+		SearchWorkspace workspace = Search.mapping( sessionFactory )
 				.scope( IndexedEntity1.class ).workspace();
 
 		CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();

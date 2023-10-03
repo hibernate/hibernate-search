@@ -37,15 +37,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests that mass indexing job can handle entity having
@@ -54,30 +52,25 @@ import org.junit.rules.MethodRule;
  *
  * @author Mincong Huang
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestForIssue(jiraKey = "HSEARCH-2615")
-public class MassIndexingJobWithCompositeIdIT {
+class MassIndexingJobWithCompositeIdIT {
 
 	private static final LocalDate START = LocalDate.of( 2017, 6, 1 );
 
 	private static final LocalDate END = LocalDate.of( 2017, 8, 1 );
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder =
-			ReusableOrmSetupHolder.withSingleBackend( BackendConfigurations.simple() );
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper =
+			OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory emf;
 
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
-		setupContext.withAnnotatedTypes( EntityWithIdClass.class, EntityWithEmbeddedId.class )
-				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false );
-	}
-
-	@Before
-	public void initData() throws Exception {
-		emf = setupHolder.entityManagerFactory();
+	@BeforeAll
+	void setup() {
+		emf = ormSetupHelper.start().withAnnotatedTypes( EntityWithIdClass.class, EntityWithEmbeddedId.class )
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
+				.setup();
 
 		with( emf ).runInTransaction( entityManager -> {
 			for ( LocalDate d = START; d.isBefore( END ); d = d.plusDays( 1 ) ) {
@@ -91,8 +84,8 @@ public class MassIndexingJobWithCompositeIdIT {
 	}
 
 	@Test
-	@Ignore("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
-	public void canHandleIdClass() throws Exception {
+	@Disabled("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
+	void canHandleIdClass() throws Exception {
 		JobTestUtil.startJobAndWaitForSuccessNoRetry(
 				MassIndexingJob.parameters()
 						.forEntities( EntityWithIdClass.class )
@@ -106,8 +99,8 @@ public class MassIndexingJobWithCompositeIdIT {
 	}
 
 	@Test
-	@Ignore("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
-	public void canHandleIdClass_reindexOnly() throws Exception {
+	@Disabled("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
+	void canHandleIdClass_reindexOnly() throws Exception {
 		JobTestUtil.startJobAndWaitForSuccessNoRetry(
 				MassIndexingJob.parameters()
 						.forEntities( EntityWithIdClass.class )
@@ -123,7 +116,7 @@ public class MassIndexingJobWithCompositeIdIT {
 	}
 
 	@Test
-	public void canHandleEmbeddedId() throws Exception {
+	void canHandleEmbeddedId() throws Exception {
 		JobTestUtil.startJobAndWaitForSuccessNoRetry(
 				MassIndexingJob.parameters()
 						.forEntities( EntityWithEmbeddedId.class )
@@ -138,7 +131,7 @@ public class MassIndexingJobWithCompositeIdIT {
 	}
 
 	@Test
-	public void canHandleEmbeddedId_reindexOnly() throws Exception {
+	void canHandleEmbeddedId_reindexOnly() throws Exception {
 		JobTestUtil.startJobAndWaitForSuccessNoRetry(
 				MassIndexingJob.parameters()
 						.forEntities( EntityWithEmbeddedId.class )

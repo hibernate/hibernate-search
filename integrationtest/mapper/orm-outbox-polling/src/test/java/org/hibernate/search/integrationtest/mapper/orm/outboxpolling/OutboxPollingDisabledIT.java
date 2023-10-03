@@ -8,8 +8,8 @@ package org.hibernate.search.integrationtest.mapper.orm.outboxpolling;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
-import java.util.Arrays;
 import java.util.List;
 
 import jakarta.persistence.Basic;
@@ -17,81 +17,73 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.metamodel.EntityType;
 
+import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Check that even with the outbox-polling JAR in the classpath,
  * disabling Hibernate Search or picking a different coordination strategy
  * will disable the addition of OutboxEvent entities to the Hibernate ORM model.
  */
-@RunWith(Parameterized.class)
+@ParameterizedPerClass
 public class OutboxPollingDisabledIT {
 
-	@Parameterized.Parameters(name = "enabled = {0}, strategy = {1}")
-	public static Object[][] params() {
-		return new Object[][] {
+	private SessionFactory sessionFactory;
+
+	public static List<? extends Arguments> params() {
+		return List.of(
 				// We must not add OutboxEvent to the model if the coordination strategy is "none"
-				{ true, "none" },
+				Arguments.of( true, "none" ),
 				// We must not add OutboxEvent to the model if Hibernate Search is disabled
-				{ false, HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME },
-		};
+				Arguments.of( false, HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME )
+		);
 	}
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock )
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.defaults() );
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	@Parameterized.Parameter
-	public boolean hibernateSearchEnabled;
 
-	@Parameterized.Parameter(1)
-	public String coordinationStrategyName;
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@ParameterizedSetup
+	@MethodSource("params")
+	void setup(boolean hibernateSearchEnabled, String coordinationStrategyName) {
 		if ( hibernateSearchEnabled ) {
 			backendMock.expectSchema( IndexedEntity.NAME, b -> b.field( "indexedField", String.class ) );
 		}
-		setupContext.withAnnotatedTypes( IndexedEntity.class )
+		sessionFactory = ormSetupHelper.start().withAnnotatedTypes( IndexedEntity.class )
 				.withProperty( HibernateOrmMapperSettings.ENABLED, hibernateSearchEnabled )
-				.withProperty( HibernateOrmMapperSettings.COORDINATION_STRATEGY, coordinationStrategyName );
-	}
-
-	@ReusableOrmSetupHolder.SetupParams
-	public List<?> setupParams() {
-		return Arrays.asList( hibernateSearchEnabled, coordinationStrategyName );
+				.withProperty( HibernateOrmMapperSettings.COORDINATION_STRATEGY, coordinationStrategyName )
+				.setup();
 	}
 
 	@Test
-	public void metamodel_onlyUserEntities() {
-		assertThat( setupHolder.sessionFactory().getJpaMetamodel().getEntities() )
+	void metamodel_onlyUserEntities() {
+		assertThat( sessionFactory.unwrap( SessionFactoryImplementor.class ).getJpaMetamodel().getEntities() )
 				.extracting( EntityType::getName )
 				.containsOnly( IndexedEntity.NAME );
 	}
 
 	@Test
-	public void queryOutboxEvent_exception() {
-		setupHolder.runInTransaction( s -> assertThatThrownBy( () -> {
+	void queryOutboxEvent_exception() {
+		with( sessionFactory ).runInTransaction( s -> assertThatThrownBy( () -> {
 			s.getCriteriaBuilder().createQuery( OutboxEvent.class ).from( OutboxEvent.class );
 		} )
 				.isInstanceOf( IllegalArgumentException.class ) );

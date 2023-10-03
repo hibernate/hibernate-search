@@ -7,15 +7,17 @@
 package org.hibernate.search.integrationtest.mapper.orm.outboxpolling;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.metamodel.Type;
 
+import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
@@ -29,94 +31,87 @@ import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test that the outbox polling strategy works fine regardless of how it is
  * referenced in the "coordination strategy" configuration property.
  */
-@RunWith(Parameterized.class)
+@ParameterizedPerClass
 @TestForIssue(jiraKey = "HSEARCH-4182")
 public class OutboxPollingStrategyPropertyValueIT {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<Object> params() {
+	private SessionFactory sessionFactory;
+
+	public static List<? extends Arguments> params() {
 		return Arrays.asList(
-				HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME,
-				"builtin:" + HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME,
-				BeanReference.of(
+				Arguments.of( HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME ),
+				Arguments.of( "builtin:" + HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME ),
+				Arguments.of( BeanReference.of(
 						CoordinationStrategy.class,
 						HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME,
 						BeanRetrieval.BUILTIN
-				)
+				) )
 		);
 	}
 
 	private static final OutboxEventFilter eventFilter = new OutboxEventFilter();
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock )
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@Parameterized.Parameter
-	public Object strategyPropertyValue;
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@ParameterizedSetup
+	@MethodSource("params")
+	void setup(Object strategyPropertyValue) {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 
-		setupContext
-				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
-						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
+		sessionFactory = ormSetupHelper.start()
+				.withProperty(
+						HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
+						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter )
+				)
 				.withProperty( HibernateOrmMapperSettings.COORDINATION_STRATEGY, strategyPropertyValue )
-				.withAnnotatedTypes( IndexedEntity.class );
+				.withAnnotatedTypes( IndexedEntity.class )
+				.setup();
 	}
 
-	@ReusableOrmSetupHolder.SetupParams
-	public List<?> setupParams() {
-		return Collections.singletonList( strategyPropertyValue );
-	}
-
-	@Before
-	public void resetFilter() {
+	@BeforeEach
+	void resetFilter() {
 		eventFilter.reset();
 	}
 
 	@Test
-	public void metamodel_userEntitiesAndOutboxEventAndAgent() {
-		assertThat( setupHolder.sessionFactory().getJpaMetamodel().getEntities() )
+	void metamodel_userEntitiesAndOutboxEventAndAgent() {
+		assertThat( sessionFactory.unwrap( SessionFactoryImplementor.class ).getJpaMetamodel().getEntities() )
 				.<Class<?>>extracting( Type::getJavaType )
 				.containsExactlyInAnyOrder( IndexedEntity.class, OutboxEvent.class, Agent.class );
 	}
 
 	@Test
-	public void insert_createsOutboxEvent() {
-		setupHolder.runInTransaction( session -> {
+	void insert_createsOutboxEvent() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
 			session.persist( indexedPojo );
 		} );
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = eventFilter.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 1 );
