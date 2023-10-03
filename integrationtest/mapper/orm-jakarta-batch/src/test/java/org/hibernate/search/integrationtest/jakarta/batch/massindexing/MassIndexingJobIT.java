@@ -24,6 +24,8 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 
+import org.hibernate.dialect.Dialect;
+import org.hibernate.dialect.MariaDBDialect;
 import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.integrationtest.jakarta.batch.massindexing.entity.Company;
@@ -213,11 +215,12 @@ public class MassIndexingJobIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4487")
 	public void indexedEmbeddedCollection_idFetchSize_entityFetchSize_mysql() throws InterruptedException {
+		Dialect dialect = emf.unwrap( SessionFactoryImplementor.class ).getJdbcServices()
+				.getJdbcEnvironment().getDialect();
 		assumeTrue( "This test only makes sense on MySQL,"
 				+ " which is the only JDBC driver that accepts (and, in a sense, requires)"
 				+ " passing Integer.MIN_VALUE for the JDBC fetch size",
-				emf.unwrap( SessionFactoryImplementor.class ).getJdbcServices()
-						.getJdbcEnvironment().getDialect() instanceof MySQLDialect );
+				dialect instanceof MySQLDialect && !( dialect instanceof MariaDBDialect ) );
 
 		List<CompanyGroup> groupsContainingGoogle =
 				JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Google" );
