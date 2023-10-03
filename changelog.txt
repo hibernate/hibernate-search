@@ -1,6 +1,37 @@
 Hibernate Search Changelog
 ==========================
 
+6.2.2.Final (2023-10-03)
+-------------------------
+
+** Bug
+    * HSEARCH-4983 Concurrency issues in Lucene IndexAccessor/IndexWriterProvider may lead to LockObtainFailedException: Lock held by this virtual machine
+    * HSEARCH-4980 Jakarta Batch job fails for entities with embedded ids
+    * HSEARCH-4947 CodeSource does not work in windows using jar files
+
+** Deprecation
+    * HSEARCH-4937 Deprecate the complement operator (~) in regexp queries
+
+** Improvement
+    * HSEARCH-4984 Upgrade to Avro 1.11.3
+    * HSEARCH-4978 Add compatibility with OpenSearch 2.10.0
+    * HSEARCH-4967 Upgrade to Elasticsearch client 8.10.2 and test against Elasticsearch 8.10.2
+    * HSEARCH-4960 Upgrade -orm6 artifacts to Hibernate ORM 6.2.9.Final
+    * HSEARCH-4958 Upgrade to Elasticsearch client 8.10.1 and test against Elasticsearch 8.10.1
+    * HSEARCH-4957 Upgrade to Jackson 2.15.2
+    * HSEARCH-4946 Upgrade to Elasticsearch client 8.10.0 and test against Elasticsearch 8.10.0
+    * HSEARCH-4941 Upgrade to Elasticsearch client 8.9.2 and test against Elasticsearch 8.9.2
+    * HSEARCH-4933 Upgrade -orm6 artifacts to Hibernate ORM 6.2.8.Final
+    * HSEARCH-4921 Upgrade to Elasticsearch client 8.9.1 and test against Elasticsearch 8.9.1
+
+** Task
+    * HSEARCH-4985 Fix heading level of documentation section "Explicitly altering a whole index"
+    * HSEARCH-4968 Test against latest OpenSearch 1.3.13
+    * HSEARCH-4944 Adjust tests to address ORM changes introduced in a recent ORM 6.3 snapshot
+    * HSEARCH-4943 Document the differences in outbox polling tables when upgrading to Hiberate Search 6.2  with ORM 5 vs ORM 6
+    * HSEARCH-4942 Test against latest Elasticsearch 7.17.13
+    * HSEARCH-4936 Align bytebuddy dependency on Hibernate ORM
+
 6.2.1.Final (2023-08-17)
 -------------------------
 
