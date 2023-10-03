@@ -140,7 +140,7 @@
         <version.org.mariadb.jdbc>3.1.4</version.org.mariadb.jdbc>
         <version.mysql.mysql-connector-j>8.1.0</version.mysql.mysql-connector-j>
         <version.com.ibm.db2.jcc>11.5.8.0</version.com.ibm.db2.jcc>
-        <version.com.oracle.database.jdbc>23.2.0.0</version.com.oracle.database.jdbc>
+        <version.com.oracle.database.jdbc>23.3.0.23.09</version.com.oracle.database.jdbc>
         <version.com.microsoft.sqlserver.mssql-jdbc>12.2.0.jre11</version.com.microsoft.sqlserver.mssql-jdbc>
 
         <!-- >>> Performance tests -->
@@ -150,7 +150,7 @@
         <version.com.ibm.jbatch>2.1.1</version.com.ibm.jbatch>
 
         <!-- >>> Jakarta Batch: JBeret SE dependencies -->
-        <version.org.jboss.marshalling>2.1.2.Final</version.org.jboss.marshalling>
+        <version.org.jboss.marshalling>2.1.3.Final</version.org.jboss.marshalling>
         <version.org.wildfly.security.wildfly-security-manager>1.1.2.Final</version.org.wildfly.security.wildfly-security-manager>
         <version.org.google.guava>32.1.2-jre</version.org.google.guava>
 
