@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Properties;
 
 import jakarta.batch.api.partition.PartitionPlan;
@@ -19,6 +20,7 @@ import jakarta.batch.runtime.context.JobContext;
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.integrationtest.jakarta.batch.massindexing.entity.Company;
+import org.hibernate.search.integrationtest.jakarta.batch.massindexing.entity.CompanyGroup;
 import org.hibernate.search.integrationtest.jakarta.batch.massindexing.entity.Person;
 import org.hibernate.search.integrationtest.jakarta.batch.util.BackendConfigurations;
 import org.hibernate.search.integrationtest.jakarta.batch.util.JobTestUtil;
@@ -59,7 +61,7 @@ public class HibernateSearchPartitionMapperComponentIT {
 
 	@ReusableOrmSetupHolder.Setup
 	public void setup(OrmSetupHelper.SetupContext setupContext) {
-		setupContext.withAnnotatedTypes( Company.class, Person.class )
+		setupContext.withAnnotatedTypes( Company.class, Person.class, CompanyGroup.class )
 				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false );
 	}
 
@@ -99,7 +101,7 @@ public class HibernateSearchPartitionMapperComponentIT {
 	 * between the rows to index and the max rows per partition.
 	 */
 	@Test
-	public void testMapPartitions() throws Exception {
+	public void simple() throws Exception {
 		JobContextData jobData = new JobContextData();
 		jobData.setEntityManagerFactory( emf );
 		var companyType = JobTestUtil.createEntityTypeDescriptor( emf, Company.class );
@@ -131,5 +133,27 @@ public class HibernateSearchPartitionMapperComponentIT {
 		// nbPartitions = rows / rowsPerPartition
 		assertEquals( 1, compPartitions ); // 3 / 3 => 1 partition
 		assertEquals( 3, persPartitions ); // 8 / 3 => 3 partitions
+	}
+
+	@Test
+	public void noData() throws Exception {
+		JobContextData jobData = new JobContextData();
+		jobData.setEntityManagerFactory( emf );
+		var companyGroupType = JobTestUtil.createEntityTypeDescriptor( emf, CompanyGroup.class );
+		jobData.setEntityTypeDescriptors( Collections.singletonList( companyGroupType ) );
+		when( mockedJobContext.getTransientUserData() ).thenReturn( jobData );
+
+		PartitionPlan partitionPlan = partitionMapper.mapPartitions();
+
+		int compGroupPartitions = 0;
+		for ( Properties p : partitionPlan.getPartitionProperties() ) {
+			String entityName = p.getProperty( MassIndexingPartitionProperties.ENTITY_NAME );
+			if ( entityName.equals( companyGroupType.jpaEntityName() ) ) {
+				compGroupPartitions++;
+			}
+		}
+
+		// No data => 0 partition
+		assertEquals( 0, compGroupPartitions );
 	}
 }
