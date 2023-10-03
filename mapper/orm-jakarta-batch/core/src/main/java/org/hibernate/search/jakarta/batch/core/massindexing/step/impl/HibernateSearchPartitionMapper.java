@@ -218,10 +218,14 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 			 * The scroll results are originally positioned *before* the first element,
 			 * so we need to scroll rowsPerPartition + 1 positions to advanced to the
 			 * upper bound of the first partition, whereas for the next partitions
-			 * we only need to advance rowsPerPartition positions.
-			 * This handle the special case of the first partition.
+			 * we need to advance `rowsPerPartition` positions.
+			 * The call to scroll.next() handles the special case of the first partition,
+			 * as well as the special case where there is no data to index.
 			 */
-			scroll.next();
+			if ( !scroll.next() ) {
+				// Nothing to be indexed.
+				return partitionUnits;
+			}
 
 			while ( scroll.scroll( rowsPerPartition ) ) {
 				lowerID = upperID;
