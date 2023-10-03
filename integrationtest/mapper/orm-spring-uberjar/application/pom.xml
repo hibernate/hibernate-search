@@ -62,7 +62,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-loader</artifactId>
-            <version>${version.org.springframework.boot}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
