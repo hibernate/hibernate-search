@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.test.extension.parameterized;
 import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.stream.StreamSupport.stream;
 import static org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedClassTestMethodDiscoverer.discover;
+import static org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedClassTestMethodDiscoverer.discoverBeforeTest;
 import static org.junit.platform.commons.util.AnnotationUtils.isAnnotated;
 
 import java.lang.reflect.Method;
@@ -40,6 +41,8 @@ final class ParameterizedClassExtension
 	private boolean envInitializationFailed = false;
 	private boolean reinitOnEachTest = false;
 
+	private List<ParameterizedTestMethodInvoker> parameterizedSetupBeforeTestInvokers;
+
 	@Override
 	public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
 			throws ParameterResolutionException {
@@ -62,6 +65,8 @@ final class ParameterizedClassExtension
 		Class<?> testClass = context.getTestClass().orElseThrow();
 		// find actual "tests" that we'll invoke via reflection:
 		List<ParameterizedTestMethodInvoker> testMethods = discover( testClass, context );
+
+		this.parameterizedSetupBeforeTestInvokers = discoverBeforeTest( testClass, context );
 
 		reinitOnEachTest = context.getTestInstanceLifecycle()
 				.map( TestInstance.Lifecycle.PER_METHOD::equals )
@@ -183,6 +188,10 @@ final class ParameterizedClassExtension
 			}
 			else {
 				invocation.skip();
+			}
+
+			for ( ParameterizedTestMethodInvoker beforeTestInvoker : parameterizedSetupBeforeTestInvokers ) {
+				beforeTestInvoker.invoke( extensionContext.getRequiredTestInstance() );
 			}
 
 			// that's where we actually execute the test:

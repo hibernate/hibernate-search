@@ -63,13 +63,10 @@ public class ExpectedLog4jLog implements BeforeEachCallback, AfterEachCallback {
 
 	@Override
 	public void beforeEach(ExtensionContext context) {
+		ExpectedLog4jLog.this.expectations.clear();
 		programmaticConfig = new Log4j2ConfigurationAccessor( loggerName );
 		TestAppender appender = new TestAppender( "TestAppender" );
 		programmaticConfig.addAppender( appender );
-
-		for ( LogExpectation expectation : ExpectedLog4jLog.this.expectations ) {
-			appender.addChecker( expectation.createChecker() );
-		}
 		ExpectedLog4jLog.this.currentAppender = appender;
 	}
 

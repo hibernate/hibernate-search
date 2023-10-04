@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +24,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.common.EntityReference;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
@@ -39,24 +41,23 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.common.SearchTimeoutException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.aggregation.impl.StubSearchAggregation;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl.StubSearchPredicate;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.impl.StubSearchSort;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SlowerLoadingListener;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.TimeoutLoadingListener;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.Assertions;
 
@@ -66,7 +67,8 @@ import org.assertj.core.api.Assertions;
  * Does not test sorts and predicates, or other features that only involve the backend.
  * Those should be tested in the backend integration tests.
  */
-public class SearchQueryBaseIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class SearchQueryBaseIT {
 
 	private static final String TITLE_4_3_2_1 = "4 3 2 1";
 	private static final String AUTHOR_4_3_2_1 = "Paul Auster";
@@ -77,27 +79,26 @@ public class SearchQueryBaseIT {
 	private static final String TITLE_AVENUE_OF_MYSTERIES = "Avenue of Mysteries";
 	private static final String AUTHOR_AVENUE_OF_MYSTERIES = "John Irving";
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	private SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectAnySchema( Book.NAME );
 		backendMock.expectAnySchema( Author.NAME );
 
-		setupContext.withAnnotatedTypes( Book.class, Author.class, NotIndexed.class );
-		dataClearConfig.clearOrder( Book.class, Author.class, NotIndexed.class );
+		sessionFactory = ormSetupHelper.start().withAnnotatedTypes( Book.class, Author.class, NotIndexed.class )
+				.dataClearing( config -> config.clearOrder( Book.class, Author.class, NotIndexed.class ) )
+				.setup();
 	}
 
-	@Before
-	public void initData() {
-		setupHolder.runInTransaction( session -> {
+	@BeforeEach
+	void initData() {
+		with( sessionFactory ).runInTransaction( session -> {
 			Author author4321 = new Author( 1, AUTHOR_4_3_2_1 );
 			Author authorCiderHouse = new Author( 2, AUTHOR_CIDER_HOUSE );
 			Author authorAvenueOfMysteries = new Author( 3, AUTHOR_AVENUE_OF_MYSTERIES );
@@ -157,8 +158,8 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void target_byClass_singleType() {
-		setupHolder.runInTransaction( session -> {
+	void target_byClass_singleType() {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book> query = searchSession.search( Book.class )
@@ -186,8 +187,8 @@ public class SearchQueryBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3896")
-	public void target_byClass_singleType_reuseQueryInstance() {
-		setupHolder.runInTransaction( session -> {
+	void target_byClass_singleType_reuseQueryInstance() {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book> query = searchSession.search( Book.class )
@@ -217,8 +218,8 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void target_byClass_multipleTypes() {
-		setupHolder.runInTransaction( session -> {
+	void target_byClass_multipleTypes() {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Object> query = searchSession.search( Arrays.asList( Book.class, Author.class ) )
@@ -243,8 +244,8 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void target_byClass_multipleTypes_entityLoadingTimeout_clientSideTimeout() {
-		setupHolder.runInTransaction( session -> {
+	void target_byClass_multipleTypes_entityLoadingTimeout_clientSideTimeout() {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			SlowerLoadingListener.registerSlowerLoadingListener( session, 100 );
 
@@ -270,8 +271,8 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void target_byClass_multipleTypes_entityLoadingTimeout_jdbcTimeout() {
-		setupHolder.runInTransaction( session -> {
+	void target_byClass_multipleTypes_entityLoadingTimeout_jdbcTimeout() {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			TimeoutLoadingListener.registerTimingOutLoadingListener( session );
 
@@ -297,8 +298,8 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void target_byClass_invalidClass() {
-		setupHolder.runInTransaction( session -> {
+	void target_byClass_invalidClass() {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			Class<?> invalidClass = String.class;
@@ -315,8 +316,8 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void target_byName_singleType() {
-		setupHolder.runInTransaction( session -> {
+	void target_byName_singleType() {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book> query = searchSession.search( searchSession.scope( Book.class, Book.NAME ) )
@@ -343,8 +344,8 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void target_byName_multipleTypes() {
-		setupHolder.runInTransaction( session -> {
+	void target_byName_multipleTypes() {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Object> query = searchSession.search( searchSession.scope(
@@ -371,8 +372,8 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void target_byName_invalidType() {
-		setupHolder.runInTransaction( session -> {
+	void target_byName_invalidType() {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			Class<?> invalidClass = String.class;
@@ -389,8 +390,8 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void target_byName_invalidName() {
-		setupHolder.runInTransaction( session -> {
+	void target_byName_invalidName() {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			String invalidName = "foo";
@@ -415,8 +416,8 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void selectEntity() {
-		setupHolder.runInTransaction( session -> {
+	void selectEntity() {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book> query = searchSession.search( Book.class )
@@ -444,8 +445,8 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void select_searchProjection_single() {
-		setupHolder.runInTransaction( session -> {
+	void select_searchProjection_single() {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
@@ -476,8 +477,8 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void select_searchProjection_multiple() {
-		setupHolder.runInTransaction( session -> {
+	void select_searchProjection_multiple() {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
@@ -548,8 +549,8 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void select_lambda() {
-		setupHolder.runInTransaction( session -> {
+	void select_lambda() {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book_Author_Score> query = searchSession.search( Book.class )
@@ -590,8 +591,8 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void select_compositeAndLoading() {
-		setupHolder.runInTransaction( session -> {
+	void select_compositeAndLoading() {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book_Author_Score> query = searchSession.search( Book.class )
@@ -638,8 +639,8 @@ public class SearchQueryBaseIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3671")
-	public void componentsFromMappingWithoutSession() {
-		SearchMapping mapping = Search.mapping( setupHolder.sessionFactory() );
+	void componentsFromMappingWithoutSession() {
+		SearchMapping mapping = Search.mapping( sessionFactory );
 		SearchScope<Book> scope = mapping.scope( Book.class );
 
 		/*
@@ -664,7 +665,7 @@ public class SearchQueryBaseIT {
 		 * so if a wrong object was passed, the whole query would fail.
 		 */
 		AggregationKey<Map<String, Long>> aggregationKey = AggregationKey.of( "titleAgg" );
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<? extends EntityReference> query = searchSession.search( scope )
@@ -693,8 +694,8 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void select_searchProjection_entityReference() {
-		setupHolder.runInTransaction( session -> {
+	void select_searchProjection_entityReference() {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
@@ -724,8 +725,8 @@ public class SearchQueryBaseIT {
 
 	@Test
 	@SuppressWarnings("deprecation")
-	public void select_searchProjection_entityReference_deprecatedEntityReferenceType() {
-		setupHolder.runInTransaction( session -> {
+	void select_searchProjection_entityReference_deprecatedEntityReferenceType() {
+		with( sessionFactory ).runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
