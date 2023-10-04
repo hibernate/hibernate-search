@@ -48,7 +48,7 @@ public class BytecodeEnhancedTestEngine extends HierarchicalTestEngine<JupiterEn
 		JupiterEngineDescriptor engineDescriptor = new BytecodeEnhancedEngineDescriptor( uniqueId, configuration );
 		new DiscoverySelectorResolver().resolveSelectors( discoveryRequest, engineDescriptor );
 
-		for ( TestDescriptor testDescriptor : engineDescriptor.getChildren() ) {
+		for ( TestDescriptor testDescriptor : new HashSet<>( engineDescriptor.getChildren() ) ) {
 			if ( testDescriptor instanceof ClassBasedTestDescriptor ) {
 				try {
 					ClassBasedTestDescriptor descriptor = (ClassBasedTestDescriptor) testDescriptor;

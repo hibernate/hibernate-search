@@ -23,6 +23,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.util.common.impl.Closer;
@@ -33,7 +34,9 @@ import org.hibernate.search.util.impl.integrationtest.common.extension.MappingSe
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl.MultitenancyTestHelper;
 
-public final class OrmSetupHelper
+import org.junit.jupiter.api.extension.ExtensionContext;
+
+public class OrmSetupHelper
 		extends
 		MappingSetupHelper<OrmSetupHelper.SetupContext,
 				SimpleSessionFactoryBuilder,
@@ -41,7 +44,7 @@ public final class OrmSetupHelper
 				SessionFactory,
 				OrmSetupHelper.SetupVariant> {
 
-	private static final BiConsumer<Boolean, String> JUPITER_ASSUMPTION_CHECK = org.junit.jupiter.api.Assumptions::assumeTrue;
+	protected static final BiConsumer<Boolean, String> JUPITER_ASSUMPTION_CHECK = org.junit.jupiter.api.Assumptions::assumeTrue;
 	private static final BiConsumer<Boolean, String> VINTAGE_ASSUMPTION_CHECK = (b, s) -> assumeTrue( s, b );
 	private static final CoordinationStrategyExpectations DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS;
 	private static final Map<String, Object> DEFAULT_PROPERTIES;
@@ -157,10 +160,11 @@ public final class OrmSetupHelper
 	private final SchemaManagementStrategyName schemaManagementStrategyName;
 	private final OrmAssertionHelper assertionHelper;
 	private final BiConsumer<Boolean, String> assumptionTrueCheck;
-	private CoordinationStrategyExpectations coordinationStrategyExpectations =
-			DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS;
+	private final OrmSetupHelperCleaner ormSetupHelperCleaner;
+	private CoordinationStrategyExpectations coordinationStrategyExpectations = DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS;
+	private SessionFactoryImplementor sessionFactory;
 
-	private OrmSetupHelper(BackendSetupStrategy backendSetupStrategy, Collection<BackendMock> backendMocks,
+	protected OrmSetupHelper(BackendSetupStrategy backendSetupStrategy, Collection<BackendMock> backendMocks,
 			SchemaManagementStrategyName schemaManagementStrategyName,
 			BiConsumer<Boolean, String> assumptionTrueCheck) {
 		super( backendSetupStrategy );
@@ -168,6 +172,7 @@ public final class OrmSetupHelper
 		this.schemaManagementStrategyName = schemaManagementStrategyName;
 		this.assertionHelper = new OrmAssertionHelper( backendSetupStrategy );
 		this.assumptionTrueCheck = assumptionTrueCheck;
+		this.ormSetupHelperCleaner = new OrmSetupHelperCleaner();
 	}
 
 	public OrmSetupHelper coordinationStrategy(CoordinationStrategyExpectations coordinationStrategyExpectations) {
@@ -205,6 +210,16 @@ public final class OrmSetupHelper
 	protected void close(SessionFactory toClose) {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( SessionFactory::close, toClose );
+		}
+	}
+
+	@Override
+	public void afterTestExecution(ExtensionContext context) throws Exception {
+		try {
+			super.afterTestExecution( context );
+		}
+		finally {
+			this.ormSetupHelperCleaner.cleanupData( sessionFactory );
 		}
 	}
 
@@ -266,6 +281,7 @@ public final class OrmSetupHelper
 			if ( coordinationStrategyExpectations.requiresTenantIds ) {
 				withProperty( HibernateOrmMapperSettings.MULTI_TENANCY_TENANT_IDS, String.join( ",", tenants ) );
 			}
+			dataClearing( config -> config.tenants( tenants ) );
 			return thisAsC();
 		}
 
@@ -284,9 +300,19 @@ public final class OrmSetupHelper
 			return withConfiguration( builder -> builder.addAnnotatedClasses( Arrays.asList( annotatedTypes ) ) );
 		}
 
+		public SetupContext dataClearing(Consumer<DataClearConfig> configurer) {
+			return dataClearing( false, configurer );
+		}
+
+		public SetupContext dataClearing(boolean reset, Consumer<DataClearConfig> configurer) {
+			ormSetupHelperCleaner.configure( reset, configurer );
+			return thisAsC();
+		}
+
 		public SessionFactory setup(Class<?>... annotatedTypes) {
 			return withAnnotatedTypes( annotatedTypes ).setup();
 		}
+
 
 		@Override
 		protected SimpleSessionFactoryBuilder createBuilder() {
@@ -301,7 +327,8 @@ public final class OrmSetupHelper
 
 		@Override
 		protected SessionFactory build(SimpleSessionFactoryBuilder builder) {
-			return builder.build();
+			sessionFactory = builder.build().unwrap( SessionFactoryImplementor.class );
+			return sessionFactory;
 		}
 
 		@Override
@@ -313,6 +340,7 @@ public final class OrmSetupHelper
 		protected SetupContext thisAsC() {
 			return this;
 		}
+
 	}
 
 }

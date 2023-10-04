@@ -6,11 +6,9 @@
  */
 package org.hibernate.search.util.impl.test.extension.parameterized;
 
-import java.lang.reflect.InvocationTargetException;
-
 public interface ParameterizedTestMethodInvoker {
 
 	String getName();
 
-	void invoke(Object requiredTestInstance) throws InvocationTargetException, IllegalAccessException;
+	void invoke(Object requiredTestInstance) throws Throwable;
 }

@@ -7,6 +7,7 @@
 package org.hibernate.search.util.impl.test.extension.parameterized;
 
 import static org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedClassUtils.findParameters;
+import static org.junit.platform.commons.util.AnnotationUtils.isAnnotated;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -30,6 +31,27 @@ class ParameterizedClassTestMethodDiscoverer {
 		findTests( testClass, extensionContext, testMethods );
 
 		return testMethods;
+	}
+
+	public static List<ParameterizedTestMethodInvoker> discoverBeforeTest(Class<?> testClass,
+			ExtensionContext extensionContext) {
+		List<ParameterizedTestMethodInvoker> invokers = new ArrayList<>();
+		findBeforeTests( testClass, extensionContext, invokers );
+
+		return invokers;
+	}
+
+	private static void findBeforeTests(Class<?> testClass, ExtensionContext extensionContext,
+			List<ParameterizedTestMethodInvoker> beforeTestMethods) {
+		if ( Object.class.equals( testClass ) ) {
+			return;
+		}
+		for ( Method method : testClass.getDeclaredMethods() ) {
+			if ( isAnnotated( method, ParameterizedSetupBeforeTest.class ) ) {
+				beforeTestMethods.add( toBeforeTestMethods( method, extensionContext ) );
+			}
+		}
+		findBeforeTests( testClass.getSuperclass(), extensionContext, beforeTestMethods );
 	}
 
 	private static void findTests(Class<?> testClass, ExtensionContext extensionContext,
@@ -70,6 +92,16 @@ class ParameterizedClassTestMethodDiscoverer {
 		}
 	}
 
+	private static ParameterizedTestMethodInvoker toBeforeTestMethods(Method method, ExtensionContext extensionContext) {
+		if ( method.getParameterCount() > 0 ) {
+			throw new IllegalStateException( "ParameterizedSetupBeforeTest methods cannot have parameters. " + method );
+		}
+		else {
+			return new TestMethod( method );
+		}
+	}
+
+
 	private static class TestMethod implements ParameterizedTestMethodInvoker {
 		protected final Method method;
 
@@ -84,8 +116,15 @@ class ParameterizedClassTestMethodDiscoverer {
 		}
 
 		@Override
-		public void invoke(Object requiredTestInstance) throws InvocationTargetException, IllegalAccessException {
-			method.invoke( requiredTestInstance );
+		public void invoke(Object requiredTestInstance) throws Throwable {
+			try {
+				method.invoke( requiredTestInstance );
+			}
+			catch (InvocationTargetException e) {
+				// We don't need to wrap an exception in InvocationTargetException.
+				// Especially since we might throw an assumption failure exception that needs to be not wrapped for JUnit to correctly process it.
+				throw e.getCause();
+			}
 		}
 
 		@Override
