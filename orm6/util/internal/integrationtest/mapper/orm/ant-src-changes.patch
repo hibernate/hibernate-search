@@ -47,18 +47,32 @@ index 65d73c4459..58f21b13ed 100644
  						return true;
  					}
 diff --git a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelper.java b/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelper.java
-index ef2ee0d58a..fa1ac5b0fe 100644
+index ef2ee0d58a..1c09fefeb0 100644
 --- a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelper.java
 +++ b/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelper.java
-@@ -8,7 +8,6 @@
+@@ -8,12 +8,12 @@
  
  import static org.junit.Assume.assumeTrue;
  
 -import org.hibernate.MultiTenancyStrategy;
  import org.hibernate.cfg.AvailableSettings;
- import org.hibernate.dialect.Dialect;
+-import org.hibernate.dialect.Dialect;
  import org.hibernate.dialect.H2Dialect;
-@@ -39,7 +38,6 @@ private void attachTo(SimpleSessionFactoryBuilder builder) {
+ import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
+ 
++import org.hibernate.testing.orm.junit.DialectContext;
++
+ /**
+  * Utility to help setting up a test SessionFactory which uses multi-tenancy based
+  * on multiple databases.
+@@ -35,21 +35,17 @@ private MultitenancyTestHelper(String[] tenantIds) {
+ 	}
+ 
+ 	private void attachTo(SimpleSessionFactoryBuilder builder) {
++		assumeTrue( "This test relies on multi-tenancy, which can currently only be set up with H2",
++				DialectContext.getDialect() instanceof H2Dialect );
++
+ 		// Force our own schema management tool which creates the schema for all tenants.
  		builder.onServiceRegistryBuilder( srb -> srb.addInitiator(
  				new MultitenancyTestHelperSchemaManagementTool.Initiator( tenantIds ) ) );
  
@@ -66,6 +80,16 @@ index ef2ee0d58a..fa1ac5b0fe 100644
  		builder.setProperty( AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER,
  				new H2LazyMultiTenantConnectionProvider( tenantIds ) );
  		// any required backend-multi-tenancy property (e.g.:*.backend.multi_tenancy.strategy = discriminator)
+ 		// should be set by the client test
+-
+-		builder.onMetadata( metadataImplementor -> {
+-			Dialect dialect = metadataImplementor.getDatabase().getDialect();
+-			assumeTrue( "This test relies on multi-tenancy, which can currently only be set up with H2",
+-					dialect instanceof H2Dialect );
+-		} );
+ 	}
+ 
+ }
 diff --git a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelperSchemaManagementTool.java b/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelperSchemaManagementTool.java
 index 064f14cc09..c9a7eb2062 100644
 --- a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelperSchemaManagementTool.java
