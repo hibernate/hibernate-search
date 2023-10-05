@@ -43,13 +43,11 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDe
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.bytecodeenhacement.extension.BytecodeEnhanced;
 
-import org.hibernate.testing.bytecode.enhancement.BytecodeEnhancerRunner;
 import org.hibernate.testing.bytecode.enhancement.EnhancementOptions;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test automatic indexing caused by single-valued association updates
@@ -57,9 +55,9 @@ import org.junit.runner.RunWith;
  * with a {@code @OneToOne} association owned by the containing side,
  * and with lazy associations on the contained side.
  */
-@RunWith(BytecodeEnhancerRunner.class) // So that we can have lazy *ToOne associations
+@BytecodeEnhanced // So that we can have lazy *ToOne associations
 @EnhancementOptions(lazyLoading = true)
-public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT
+class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT
 		extends AbstractAutomaticIndexingSingleValuedAssociationBaseIT<
 				AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT.IndexedEntity,
 				AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT.ContainingEntity,
@@ -88,9 +86,7 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT
 	}
 
 	@Override
-	public void setup(OrmSetupHelper.SetupContext setupContext,
-			ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
-		super.setup( setupContext, dataClearConfig );
+	protected OrmSetupHelper.SetupContext additionalSetup(OrmSetupHelper.SetupContext setupContext) {
 		// Avoid problems with deep chains of eager associations in ORM 6
 		// See https://github.com/hibernate/hibernate-orm/blob/6.0/migration-guide.adoc#fetch-circularity-determination
 		// See https://hibernate.zulipchat.com/#narrow/stream/132094-hibernate-orm-dev/topic/lazy.20associations.20with.20ORM.206
@@ -101,14 +97,15 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT
 
 		// We're simulating a mappedBy with two associations (see comments in annotation mapping),
 		// so we need to clear one side before we can delete entities.
-		dataClearConfig.preClear( ContainedEntity.class, contained -> {
+		setupContext.dataClearing( config -> config.preClear( ContainedEntity.class, contained -> {
 			contained.setContainingAsElementCollectionAssociationsIndexedEmbedded( null );
 			contained.setContainingAsElementCollectionAssociationsNonIndexedEmbedded( null );
-		} );
+		} ) );
+		return setupContext;
 	}
 
 	@Test
-	public void testBytecodeEnhancementWorked() {
+	void testBytecodeEnhancementWorked() {
 		assertThat( ContainingEntity.class.getDeclaredMethods() )
 				.extracting( Method::getName )
 				.anyMatch( name -> name.startsWith( "$$_hibernate_" ) );

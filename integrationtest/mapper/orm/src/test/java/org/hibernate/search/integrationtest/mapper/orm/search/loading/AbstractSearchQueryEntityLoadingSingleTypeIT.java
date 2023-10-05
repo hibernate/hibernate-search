@@ -31,24 +31,15 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 		}
 	}
 
-	protected SingleTypeLoadingModel<T> model;
+	protected abstract SingleTypeLoadingModel<T> model();
 
-	protected SingleTypeLoadingMapping mapping;
-
-	AbstractSearchQueryEntityLoadingSingleTypeIT(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
-		init( model, mapping );
-	}
-
-	void init(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
-		this.model = model;
-		this.mapping = mapping;
-	}
+	protected abstract SingleTypeLoadingMapping mapping();
 
 	protected final void persistThatManyEntities(int entityCount) {
 		// We don't care about what is indexed exactly, so use the lenient mode
 		backendMock().inLenientMode( () -> with( sessionFactory() ).runInTransaction( session -> {
 			for ( int i = 0; i < entityCount; i++ ) {
-				session.persist( model.newIndexed( i, mapping ) );
+				session.persist( model().newIndexed( i, mapping() ) );
 			}
 		} ) );
 	}
@@ -70,17 +61,17 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 			Integer timeout, TimeUnit timeUnit) {
 		testLoading(
 				sessionSetup,
-				Collections.singletonList( model.getIndexedClass() ),
-				Collections.singletonList( model.getIndexName() ),
+				Collections.singletonList( model().getIndexedClass() ),
+				Collections.singletonList( model().getIndexName() ),
 				loadingOptionsContributor,
 				c -> {
 					for ( int i = 0; i < entityCount; i++ ) {
-						c.doc( model.getIndexName(), mapping.getDocumentIdForEntityId( i ) );
+						c.doc( model().getIndexName(), mapping().getDocumentIdForEntityId( i ) );
 					}
 				},
 				c -> {
 					for ( int i = 0; i < entityCount; i++ ) {
-						c.entity( model.getIndexedClass(), i );
+						c.entity( model().getIndexedClass(), i );
 					}
 				},
 				(assertions, ignored) -> assertionsContributor.accept( assertions ),
@@ -96,8 +87,8 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 			Consumer<OrmSoftAssertions> assertionsContributor) {
 		testLoading(
 				sessionSetup,
-				Collections.singletonList( model.getIndexedClass() ),
-				Collections.singletonList( model.getIndexName() ),
+				Collections.singletonList( model().getIndexedClass() ),
+				Collections.singletonList( model().getIndexName() ),
 				loadingOptionsContributor,
 				hitDocumentReferencesContributor,
 				expectedLoadedEntitiesContributor,
@@ -113,8 +104,8 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 			BiConsumer<OrmSoftAssertions, List<T>> assertionsContributor) {
 		testLoading(
 				sessionSetup,
-				Collections.singletonList( model.getIndexedClass() ),
-				Collections.singletonList( model.getIndexName() ),
+				Collections.singletonList( model().getIndexedClass() ),
+				Collections.singletonList( model().getIndexName() ),
 				loadingOptionsContributor,
 				hitDocumentReferencesContributor,
 				expectedLoadedEntitiesContributor,

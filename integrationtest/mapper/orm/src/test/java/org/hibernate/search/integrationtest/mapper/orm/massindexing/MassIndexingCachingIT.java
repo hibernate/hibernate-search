@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
 import static org.assertj.core.api.Fail.fail;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -15,6 +16,7 @@ import jakarta.persistence.SharedCacheMode;
 import jakarta.persistence.Table;
 
 import org.hibernate.CacheMode;
+import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -24,57 +26,57 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.stat.Statistics;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.SoftAssertions;
 
-public class MassIndexingCachingIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class MassIndexingCachingIT {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
-
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private Statistics statistics;
+	private SessionFactory sessionFactory;
 
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 
-		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, "false" )
+		sessionFactory = ormSetupHelper.start().withPropertyRadical(
+				HibernateOrmMapperSettings.Radicals.INDEXING_LISTENERS_ENABLED, "false" )
 				.withProperty( AvailableSettings.JAKARTA_SHARED_CACHE_MODE, SharedCacheMode.ALL.name() )
 				.withProperty( AvailableSettings.GENERATE_STATISTICS, "true" )
 				.withProperty( AvailableSettings.USE_SECOND_LEVEL_CACHE, "true" )
-				.withAnnotatedTypes( IndexedEntity.class );
+				.withAnnotatedTypes( IndexedEntity.class )
+				.setup();
 	}
 
-	@Before
-	public void initData() {
+	@BeforeEach
+	void initData() {
 		// This will also add entities to the 2nd level cache
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			session.persist( new IndexedEntity( 1, "text1" ) );
 			session.persist( new IndexedEntity( 2, "text2" ) );
 			session.persist( new IndexedEntity( 3, "text3" ) );
 		} );
 
-		setupHolder.sessionFactory().getCache().evictEntityData( IndexedEntity.class, 1 );
+		sessionFactory.getCache().evictEntityData( IndexedEntity.class, 1 );
 
-		statistics = setupHolder.sessionFactory().getStatistics();
+		statistics = sessionFactory.getStatistics();
 		statistics.setStatisticsEnabled( true );
 		statistics.clear();
 	}
@@ -82,8 +84,8 @@ public class MassIndexingCachingIT {
 	@Test
 	// Note this test used to pass even before fixed HSEARCH-4272, but only because of another bug: HSEARCH-4273
 	@TestForIssue(jiraKey = "HSEARCH-4272")
-	public void default_ignore() {
-		setupHolder.runNoTransaction( session -> {
+	void default_ignore() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();
 
@@ -120,8 +122,8 @@ public class MassIndexingCachingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4273")
-	public void explicit_get() {
-		setupHolder.runNoTransaction( session -> {
+	void explicit_get() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer()
 					.cacheMode( CacheMode.GET );
@@ -158,8 +160,8 @@ public class MassIndexingCachingIT {
 	}
 
 	@Test
-	public void explicit_normal() {
-		setupHolder.runNoTransaction( session -> {
+	void explicit_normal() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer()
 					.cacheMode( CacheMode.NORMAL );

@@ -316,10 +316,10 @@ public class BackendMock implements BeforeEachCallback, AfterEachCallback, Befor
 
 	VerifyingStubBackendBehavior backendBehavior() {
 		if ( !started ) {
-			throw new AssertionFailure( "The backend mock was not configured as a JUnit @Rule/@ClassRule,"
+			throw new AssertionFailure( "The backend mock was not configured as a JUnit Extension,"
 					+ " or its statement wrapper hasn't started executing yet,"
 					+ " or its statement wrapper has finished executing."
-					+ " Double check the @Rule/@ClassRule annotations and the execution order of rules." );
+					+ " Double check the @RegisterExtension annotation and the execution order of extensions." );
 		}
 		return backendBehavior;
 	}

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,50 +19,49 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test automatic indexing based on Hibernate ORM entity events when an association is defined in a MappedSuperclass.
  */
-public class AutomaticIndexingMappedSuperclassIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class AutomaticIndexingMappedSuperclassIT {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	private SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "containedSingle", b2 -> b2
 						.field( "includedInSingle", String.class )
 				)
 		);
 
-		setupContext.withAnnotatedTypes(
+		sessionFactory = ormSetupHelper.start().withAnnotatedTypes(
 				IndexedEntityMappedSuperclass.class,
 				IndexedEntity.class,
 				ContainedEntity.class
-		);
+		).dataClearing( config -> config.clearDatabaseData( false ) ).setup();
 	}
 
 	@Test
-	public void inversePathHandlesMappedSuperclassDefinedAssociations() {
-		setupHolder.runInTransaction( session -> {
+	void inversePathHandlesMappedSuperclassDefinedAssociations() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity indexedEntity = new IndexedEntity();
 			indexedEntity.setId( 1 );
 
@@ -83,7 +84,7 @@ public class AutomaticIndexingMappedSuperclassIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 3 );
 			containedEntity.setIncludedInSingle( "updatedValue" );
 

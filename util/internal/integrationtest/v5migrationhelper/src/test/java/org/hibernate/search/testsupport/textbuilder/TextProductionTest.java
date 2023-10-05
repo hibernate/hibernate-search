@@ -8,7 +8,7 @@ package org.hibernate.search.testsupport.textbuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 /**
  * Tests WordDictionary and WordInventor,

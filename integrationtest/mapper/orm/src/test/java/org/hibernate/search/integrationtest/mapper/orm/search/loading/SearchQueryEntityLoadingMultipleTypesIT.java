@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Arrays;
 import java.util.List;
@@ -51,33 +52,30 @@ import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.mult
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSoftAssertions;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SlowerLoadingListener;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test entity loading when executing a search query
  * for cases involving multiple entity types.
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQueryEntityLoadingIT {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
-
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	private SessionFactory sessionFactory;
 
 	@Override
 	protected BackendMock backendMock() {
@@ -86,11 +84,11 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 
 	@Override
 	protected SessionFactory sessionFactory() {
-		return setupHolder.sessionFactory();
+		return sessionFactory;
 	}
 
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectAnySchema( Hierarchy1_A_B.NAME );
 		backendMock.expectAnySchema( Hierarchy1_A_C.NAME );
 
@@ -119,7 +117,8 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 		backendMock.expectAnySchema( Hierarchy8_A_C_Cacheable.NAME );
 		backendMock.expectAnySchema( Hierarchy8_A_D_Cacheable.NAME );
 
-		setupContext.withProperty( AvailableSettings.JAKARTA_SHARED_CACHE_MODE, SharedCacheMode.ENABLE_SELECTIVE.name() )
+		sessionFactory = ormSetupHelper.start().withProperty(
+				AvailableSettings.JAKARTA_SHARED_CACHE_MODE, SharedCacheMode.ENABLE_SELECTIVE.name() )
 				.withAnnotatedTypes(
 						Hierarchy1_A__Abstract.class,
 						Hierarchy1_A_B.class,
@@ -149,13 +148,13 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 						Hierarchy8_A_B_Cacheable.class,
 						Hierarchy8_A_C_Cacheable.class,
 						Hierarchy8_A_D_Cacheable.class
-				);
+				).setup();
 	}
 
-	@Before
-	public void initData() {
+	@BeforeEach
+	void initData() {
 		// We don't care about what is indexed exactly, so use the lenient mode
-		backendMock.inLenientMode( () -> setupHolder.runInTransaction( session -> {
+		backendMock.inLenientMode( () -> with( sessionFactory ).runInTransaction( session -> {
 			session.persist( new Hierarchy1_A_B( 2 ) );
 			session.persist( new Hierarchy1_A_C( 3 ) );
 
@@ -193,7 +192,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void singleHierarchy() {
+	void singleHierarchy() {
 		testLoading(
 				Arrays.asList(
 						Hierarchy1_A_B.class,
@@ -220,7 +219,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void singleHierarchy_middleMappedSuperClass() {
+	void singleHierarchy_middleMappedSuperClass() {
 		testLoading(
 				Arrays.asList(
 						Hierarchy5_A_B_C.class,
@@ -247,7 +246,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void mixedHierarchies() {
+	void mixedHierarchies() {
 		testLoading(
 				Arrays.asList(
 						Hierarchy1_A_B.class,
@@ -288,7 +287,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	}
 
 	@Test
-	public void mixedHierarchies_entityLoadingTimeout() {
+	void mixedHierarchies_entityLoadingTimeout() {
 		assertThatThrownBy( () -> testLoading(
 				Arrays.asList(
 						Hierarchy1_A_B.class,
@@ -338,7 +337,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3203")
-	public void mixedDocumentIdMapping_entityIdAndProperty_mixedHierarchies() {
+	void mixedDocumentIdMapping_entityIdAndProperty_mixedHierarchies() {
 		testLoading(
 				Arrays.asList(
 						Hierarchy4_A_B__integer1DocumentId.class,
@@ -364,7 +363,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	 */
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3203", "HSEARCH-3349" })
-	public void mixedDocumentIdMapping_entityIdAndProperty_singleHierarchy() {
+	void mixedDocumentIdMapping_entityIdAndProperty_singleHierarchy() {
 		testLoading(
 				Arrays.asList(
 						Hierarchy4_A_B__integer1DocumentId.class,
@@ -391,7 +390,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3203")
-	public void mixedDocumentIdMapping_differentProperty() {
+	void mixedDocumentIdMapping_differentProperty() {
 		testLoading(
 				Arrays.asList(
 						Hierarchy4_A_B__integer1DocumentId.class,
@@ -420,7 +419,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void secondLevelCacheLookup() {
+	void secondLevelCacheLookup() {
 		testLoading(
 				session -> {}, // No particular session setup needed
 				Arrays.asList(
@@ -468,7 +467,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void typeChanged() {
+	void typeChanged() {
 		testLoading(
 				Arrays.asList( Interface1.class ), // Implemented by B and C, but not D
 				Arrays.asList(
@@ -499,7 +498,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void typeChanged_secondLevelCacheLookup() {
+	void typeChanged_secondLevelCacheLookup() {
 		testLoading(
 				session -> {}, // No particular session setup needed
 				Arrays.asList( Interface2.class ), // Implemented by B and C, but not D

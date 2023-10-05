@@ -6,51 +6,53 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.session;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test usage of the session indexing plan with an entity type whose document ID is not the entity ID.
  */
-public class SearchIndexingPlanNonEntityIdDocumentIdIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class SearchIndexingPlanNonEntityIdDocumentIdIT {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	private SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectAnySchema( IndexedEntity.INDEX_NAME );
 
-		setupContext.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
-				.withAnnotatedTypes( IndexedEntity.class );
+		sessionFactory = ormSetupHelper.start().withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
+				.withAnnotatedTypes( IndexedEntity.class )
+				.setup();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3203")
-	public void simple() {
-		setupHolder.runInTransaction( session -> {
+	void simple() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, 41, "number1" );
 			IndexedEntity entity2 = new IndexedEntity( 2, 42, "number2" );
 			IndexedEntity entity3 = new IndexedEntity( 3, 43, "number3" );

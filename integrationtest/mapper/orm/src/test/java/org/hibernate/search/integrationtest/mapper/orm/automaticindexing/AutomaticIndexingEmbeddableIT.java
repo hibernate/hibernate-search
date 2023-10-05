@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,39 +29,38 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeDiffer;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test automatic indexing based on Hibernate ORM entity events when embeddable objects are involved.
  */
-public class AutomaticIndexingEmbeddableIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class AutomaticIndexingEmbeddableIT {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	private SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+	@BeforeAll
+	void setup() {
 		// Embedded deserialization rules in ORM are just weird:
 		// when all columns are empty, an embedded is sometimes deserialized as `null`
 		// (though that can be prevented with hibernate.create_empty_composites.enabled = true),
@@ -110,23 +111,23 @@ public class AutomaticIndexingEmbeddableIT {
 				)
 		);
 
-		setupContext
+		sessionFactory = ormSetupHelper.start()
 				.withAnnotatedTypes(
 						IndexedEntity.class,
 						ContainingEntity.class,
 						ContainedEntity.class
-				);
-
-		dataClearConfig.preClear( ContainedEntity.class, contained -> {
-			contained.getContainingAsElementCollection().clear();
-			contained.getContainingAsSingleWithInverseSideEmbedded().setContainingAsSingle( null );
-		} );
-		dataClearConfig.clearOrder( ContainingEntity.class, IndexedEntity.class, ContainedEntity.class );
+				)
+				.dataClearing( config -> config.preClear( ContainedEntity.class, contained -> {
+					contained.getContainingAsElementCollection().clear();
+					contained.getContainingAsSingleWithInverseSideEmbedded().setContainingAsSingle( null );
+				} )
+						.clearOrder( ContainingEntity.class, IndexedEntity.class, ContainedEntity.class ) )
+				.setup();
 	}
 
 	@Test
-	public void indirectEmbeddedUpdate_embeddedSingle() {
-		setupHolder.runInTransaction( session -> {
+	void indirectEmbeddedUpdate_embeddedSingle() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 
@@ -150,7 +151,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 4 );
 			containedEntity.setIncludedInEmbeddedSingle( "initialValue" );
@@ -177,7 +178,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInEmbeddedSingle( "updatedValue" );
@@ -205,7 +206,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
 			containingEntity1.getContainedEmbeddedSingle().getContainedSingle().getContainingAsEmbeddedSingle().clear();
 			containingEntity1.setContainedEmbeddedSingle( null );
@@ -223,8 +224,8 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_embeddedSingle() {
-		setupHolder.runInTransaction( session -> {
+	void indirectAssociationUpdate_embeddedSingle() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 
@@ -259,7 +260,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInEmbeddedSingle( "updatedValue" );
@@ -287,7 +288,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
 			containingEntity1.getContainedEmbeddedSingle().getContainedSingle().getContainingAsEmbeddedSingle().clear();
 			containingEntity1.getContainedEmbeddedSingle().setContainedSingle( null );
@@ -305,8 +306,8 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectValueUpdate_embeddedSingle() {
-		setupHolder.runInTransaction( session -> {
+	void indirectValueUpdate_embeddedSingle() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 
@@ -341,7 +342,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
 			containedEntity.setIncludedInEmbeddedSingle( "updatedValue" );
 
@@ -361,7 +362,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value that is not included in the @IndexedEmbedded
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
 			containedEntity.setExcludedFromAll( "updatedExcludedValue" );
 
@@ -371,8 +372,8 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectEmbeddedUpdate_embeddedList() {
-		setupHolder.runInTransaction( session -> {
+	void indirectEmbeddedUpdate_embeddedList() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 
@@ -396,7 +397,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 4 );
 			containedEntity.setIncludedInEmbeddedList( "initialValue" );
@@ -423,7 +424,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInEmbeddedList( "updatedValue" );
@@ -451,7 +452,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
 			containingEntity1.getContainedEmbeddedList().getContainedList().get( 0 ).getContainingAsEmbeddedList().clear();
 			containingEntity1.setContainedEmbeddedList( null );
@@ -469,8 +470,8 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_embeddedList() {
-		setupHolder.runInTransaction( session -> {
+	void indirectAssociationUpdate_embeddedList() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 
@@ -494,7 +495,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInEmbeddedList( "firstValue" );
@@ -521,7 +522,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test adding another value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 6 );
 			containedEntity.setIncludedInEmbeddedList( "secondValue" );
@@ -551,7 +552,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
 			ContainedEntity containedEntity = containingEntity1.getContainedEmbeddedList().getContainedList().get( 0 );
 			containedEntity.getContainingAsEmbeddedList().clear();
@@ -574,8 +575,8 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectValueUpdate_embeddedList() {
-		setupHolder.runInTransaction( session -> {
+	void indirectValueUpdate_embeddedList() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 
@@ -610,7 +611,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
 			containedEntity.setIncludedInEmbeddedList( "updatedValue" );
 
@@ -630,7 +631,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value that is not included in the @IndexedEmbedded
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
 			containedEntity.setExcludedFromAll( "updatedExcludedValue" );
 
@@ -640,8 +641,8 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectEmbeddedUpdate_elementCollection() {
-		setupHolder.runInTransaction( session -> {
+	void indirectEmbeddedUpdate_elementCollection() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 
@@ -665,7 +666,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 4 );
 			containedEntity.setIncludedInElementCollection( "firstValue" );
@@ -693,7 +694,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test adding another value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInElementCollection( "secondValue" );
@@ -726,7 +727,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
 			SingleContainingEmbeddable embeddable = containingEntity1.getContainedElementCollection().get( 0 );
 			embeddable.getContainedSingle().getContainingAsElementCollection().clear();
@@ -750,8 +751,8 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_elementCollection() {
-		setupHolder.runInTransaction( session -> {
+	void indirectAssociationUpdate_elementCollection() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 
@@ -783,7 +784,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInElementCollection( "initialValue" );
@@ -823,7 +824,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 6 );
 			containedEntity.setIncludedInElementCollection( "updatedValue" );
@@ -853,7 +854,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
 			SingleContainingEmbeddable embeddable = containingEntity1.getContainedElementCollection().get( 0 );
 			embeddable.getContainedSingle().getContainingAsElementCollection().clear();
@@ -873,8 +874,8 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectValueUpdate_elementCollection() {
-		setupHolder.runInTransaction( session -> {
+	void indirectValueUpdate_elementCollection() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 
@@ -910,7 +911,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
 			containedEntity.setIncludedInElementCollection( "updatedValue" );
 
@@ -931,7 +932,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value that is not included in the @IndexedEmbedded
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
 			containedEntity.setExcludedFromAll( "updatedExcludedValue" );
 
@@ -941,8 +942,8 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_inverseSideEmbedded() {
-		setupHolder.runInTransaction( session -> {
+	void indirectAssociationUpdate_inverseSideEmbedded() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 
@@ -976,7 +977,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInContainedSingleWithInverseSideEmbedded( "updatedValue" );
@@ -987,7 +988,7 @@ public class AutomaticIndexingEmbeddableIT {
 			// Clear the one-to-one association and flush it first, to avoid problems with unique key constraints. See details in HHH-15767
 			containingEntity1.setContainedSingleWithInverseSideEmbedded( null );
 
-			if ( setupHolder.areEntitiesProcessedInSession() ) {
+			if ( ormSetupHelper.areEntitiesProcessedInSession() ) {
 				backendMock.expectWorks( IndexedEntity.INDEX )
 						.addOrUpdate( "1", b -> b
 								.objectField( "child", b2 -> b2
@@ -1019,7 +1020,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
 			containingEntity1.getContainedSingleWithInverseSideEmbedded()
 					.getContainingAsSingleWithInverseSideEmbedded().setContainingAsSingle( null );
@@ -1038,8 +1039,8 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectValueUpdate_inverseSideEmbedded() {
-		setupHolder.runInTransaction( session -> {
+	void indirectValueUpdate_inverseSideEmbedded() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 
@@ -1073,7 +1074,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
 			containedEntity.setIncludedInContainedSingleWithInverseSideEmbedded( "updatedValue" );
 
@@ -1092,7 +1093,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value that is not included in the @IndexedEmbedded
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
 			containedEntity.setExcludedFromAll( "updatedExcludedValue" );
 
@@ -1102,8 +1103,8 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectEmbeddedUpdate_bidirectionalEmbedded() {
-		setupHolder.runInTransaction( session -> {
+	void indirectEmbeddedUpdate_bidirectionalEmbedded() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 
@@ -1127,7 +1128,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 4 );
 			containedEntity.setIncludedInBidirectionalEmbedded( "initialValue" );
@@ -1154,7 +1155,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInBidirectionalEmbedded( "updatedValue" );
@@ -1183,7 +1184,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
 			containingEntity1.getContainedBidirectionalEmbedded().getContainedSingle()
 					.getContainingAsBidirectionalEmbedded().setContainingAsSingle( null );
@@ -1202,8 +1203,8 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_bidirectionalEmbedded() {
-		setupHolder.runInTransaction( session -> {
+	void indirectAssociationUpdate_bidirectionalEmbedded() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 
@@ -1238,7 +1239,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 5 );
 			containedEntity.setIncludedInBidirectionalEmbedded( "updatedValue" );
@@ -1267,7 +1268,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
 			containingEntity1.getContainedBidirectionalEmbedded().getContainedSingle()
 					.getContainingAsBidirectionalEmbedded().setContainingAsSingle( null );
@@ -1286,8 +1287,8 @@ public class AutomaticIndexingEmbeddableIT {
 	}
 
 	@Test
-	public void indirectValueUpdate_bidirectionalEmbedded() {
-		setupHolder.runInTransaction( session -> {
+	void indirectValueUpdate_bidirectionalEmbedded() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 
@@ -1323,7 +1324,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
 			containedEntity.setIncludedInBidirectionalEmbedded( "updatedValue" );
 
@@ -1343,7 +1344,7 @@ public class AutomaticIndexingEmbeddableIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value that is not included in the @IndexedEmbedded
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
 			containedEntity.setExcludedFromAll( "updatedExcludedValue" );
 

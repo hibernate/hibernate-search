@@ -70,6 +70,7 @@ class MassIndexingJobWithCompositeIdIT {
 	void setup() {
 		emf = ormSetupHelper.start().withAnnotatedTypes( EntityWithIdClass.class, EntityWithEmbeddedId.class )
 				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
+				.dataClearing( config -> config.clearDatabaseData( false ).clearIndexData( true ) )
 				.setup();
 
 		with( emf ).runInTransaction( entityManager -> {

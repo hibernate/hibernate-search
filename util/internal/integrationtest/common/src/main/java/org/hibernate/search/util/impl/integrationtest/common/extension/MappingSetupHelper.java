@@ -40,7 +40,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, BC, 
 	private final TestConfigurationProvider configurationProvider;
 	private final BackendSetupStrategy backendSetupStrategy;
 	private final ComposedExtension delegate;
-	private boolean callOncePerClass = false;
+	protected boolean callOncePerClass = false;
 
 	private final List<R> toClose = new ArrayList<>();
 

@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.hibernateormapis;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Arrays;
 
@@ -15,6 +16,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
@@ -22,47 +24,45 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test the compatibility layer between our APIs and Hibernate ORM APIs
  * for the {@link Session} class.
  */
-public class ToHibernateOrmSessionIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class ToHibernateOrmSessionIT {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	private SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectAnySchema( IndexedEntity.NAME );
-		setupContext.withAnnotatedTypes( IndexedEntity.class );
+		sessionFactory = ormSetupHelper.start().withAnnotatedTypes( IndexedEntity.class ).setup();
 	}
 
 	@Test
-	public void toHibernateOrmSessionFactory() {
-		SearchMapping searchMapping = Search.mapping( setupHolder.sessionFactory() );
-		assertThat( searchMapping.toOrmSessionFactory() ).isSameAs( setupHolder.sessionFactory() );
+	void toHibernateOrmSessionFactory() {
+		SearchMapping searchMapping = Search.mapping( sessionFactory );
+		assertThat( searchMapping.toOrmSessionFactory() ).isSameAs( sessionFactory );
 	}
 
 	@Test
-	public void toHibernateOrmSession() {
-		setupHolder.runNoTransaction( session -> {
+	void toHibernateOrmSession() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			assertThat( searchSession.toOrmSession() ).isSameAs( session );
 		} );
@@ -70,8 +70,8 @@ public class ToHibernateOrmSessionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1857")
-	public void reuseSearchSessionAfterOrmSessionIsClosed_noMatching() {
-		Session session = setupHolder.sessionFactory().openSession();
+	void reuseSearchSessionAfterOrmSessionIsClosed_noMatching() {
+		Session session = sessionFactory.openSession();
 		SearchSession searchSession = Search.session( session );
 		// a SearchSession instance is created lazily,
 		// so we need to use it to have an instance of it
@@ -84,8 +84,8 @@ public class ToHibernateOrmSessionIT {
 	}
 
 	@Test
-	public void lazyCreateSearchSessionAfterOrmSessionIsClosed() {
-		Session session = setupHolder.sessionFactory().openSession();
+	void lazyCreateSearchSessionAfterOrmSessionIsClosed() {
+		Session session = sessionFactory.openSession();
 		// Search session is not created, since we don't use it
 		SearchSession searchSession = Search.session( session );
 		session.close();
@@ -97,8 +97,8 @@ public class ToHibernateOrmSessionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1857")
-	public void reuseSearchQueryAfterOrmSessionIsClosed() {
-		Session session = setupHolder.sessionFactory().openSession();
+	void reuseSearchQueryAfterOrmSessionIsClosed() {
+		Session session = sessionFactory.openSession();
 		SearchSession searchSession = Search.session( session );
 		SearchQuery<IndexedEntity> query = createSimpleQuery( searchSession );
 		session.close();

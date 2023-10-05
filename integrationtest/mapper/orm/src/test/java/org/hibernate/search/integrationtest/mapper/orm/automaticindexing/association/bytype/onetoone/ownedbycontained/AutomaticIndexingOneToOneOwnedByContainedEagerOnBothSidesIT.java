@@ -37,7 +37,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDe
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 /**
@@ -76,9 +75,7 @@ public class AutomaticIndexingOneToOneOwnedByContainedEagerOnBothSidesIT
 	}
 
 	@Override
-	public void setup(OrmSetupHelper.SetupContext setupContext,
-			ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
-		super.setup( setupContext, dataClearConfig );
+	protected OrmSetupHelper.SetupContext additionalSetup(OrmSetupHelper.SetupContext setupContext) {
 		// Avoid problems with deep chains of eager associations in ORM 6
 		// See https://github.com/hibernate/hibernate-orm/blob/6.0/migration-guide.adoc#fetch-circularity-determination
 		// See https://hibernate.zulipchat.com/#narrow/stream/132094-hibernate-orm-dev/topic/lazy.20associations.20with.20ORM.206
@@ -86,10 +83,11 @@ public class AutomaticIndexingOneToOneOwnedByContainedEagerOnBothSidesIT
 
 		// We're simulating a mappedBy with two associations (see comments in annotation mapping),
 		// so we need to clear one side before we can delete entities.
-		dataClearConfig.preClear( ContainingEntity.class, containing -> {
+		setupContext.dataClearing( config -> config.preClear( ContainingEntity.class, containing -> {
 			containing.setContainedElementCollectionAssociationsIndexedEmbedded( null );
 			containing.setContainedElementCollectionAssociationsNonIndexedEmbedded( null );
-		} );
+		} ) );
+		return setupContext;
 	}
 
 	@Entity(name = "containing")

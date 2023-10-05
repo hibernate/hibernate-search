@@ -15,14 +15,14 @@ import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 		extends AbstractSearchSchemaManagerSimpleOperationIT {
 
 	@Test
-	public void failure_single() {
-		SearchSchemaManager manager = Search.mapping( setupHolder.sessionFactory() )
+	void failure_single() {
+		SearchSchemaManager manager = Search.mapping( sessionFactory )
 				.scope( Object.class )
 				.schemaManager();
 
@@ -40,8 +40,8 @@ public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 	}
 
 	@Test
-	public void failure_multiple() {
-		SearchSchemaManager manager = Search.mapping( setupHolder.sessionFactory() )
+	void failure_multiple() {
+		SearchSchemaManager manager = Search.mapping( sessionFactory )
 				.scope( Object.class )
 				.schemaManager();
 
@@ -64,8 +64,8 @@ public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 	}
 
 	@Test
-	public void failure_exception() {
-		SearchSchemaManager manager = Search.mapping( setupHolder.sessionFactory() )
+	void failure_exception() {
+		SearchSchemaManager manager = Search.mapping( sessionFactory )
 				.scope( Object.class )
 				.schemaManager();
 

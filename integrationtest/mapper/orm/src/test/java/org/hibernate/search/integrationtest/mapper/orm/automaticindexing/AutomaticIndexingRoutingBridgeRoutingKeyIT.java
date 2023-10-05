@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+
 import java.util.Locale;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
@@ -21,48 +24,46 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class AutomaticIndexingRoutingBridgeRoutingKeyIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class AutomaticIndexingRoutingBridgeRoutingKeyIT {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	private SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, b2 -> b2.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 
-		setupContext.withAnnotatedTypes( IndexedEntity.class );
+		sessionFactory = ormSetupHelper.start().withAnnotatedTypes( IndexedEntity.class ).setup();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4537")
-	public void testLifecycle() {
-		setupHolder.runInTransaction( entityManager -> {
+	void testLifecycle() {
+		with( sessionFactory ).runInTransaction( entityManager -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setText( "Initial" );
 			entity1.setCategory( Category.CAT_1 );
 			entityManager.persist( entity1 );
 
-			if ( !setupHolder.areEntitiesProcessedInSession() ) {
+			if ( !ormSetupHelper.areEntitiesProcessedInSession() ) {
 				// When processing out of session, we don't make a difference between add and addOrUpdate,
 				// and thus we execute some potentially unnecessary deletes
 				// to remove any older versions of the document.
@@ -79,7 +80,7 @@ public class AutomaticIndexingRoutingBridgeRoutingKeyIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = session.getReference( IndexedEntity.class, 1 );
 			entity1.setText( "Updated" );
 
@@ -93,7 +94,7 @@ public class AutomaticIndexingRoutingBridgeRoutingKeyIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = session.getReference( IndexedEntity.class, 1 );
 			entity1.setCategory( Category.CAT_2 );
 
@@ -107,7 +108,7 @@ public class AutomaticIndexingRoutingBridgeRoutingKeyIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = session.getReference( IndexedEntity.class, 1 );
 			entity1.setText( "Updated again" );
 

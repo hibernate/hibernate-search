@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.session;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -14,49 +15,51 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test that Hibernate Search manages to delete entities even when {@code hibernate.use_identifier_rollback=true}.
  */
 @TestForIssue(jiraKey = { "HSEARCH-650", "HSEARCH-3985" })
 @PortedFromSearch5(original = "org.hibernate.search.test.engine.UsingIdentifierRollbackTest")
-public class AutomaticIndexingIdentiferRollbackIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class AutomaticIndexingIdentiferRollbackIT {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	private SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectAnySchema( EntityWithJpaIdAsDocumentId.NAME );
 		backendMock.expectAnySchema( EntityWithNonJpaIdAsDocumentId.NAME );
-		setupContext.withProperty( AvailableSettings.USE_IDENTIFIER_ROLLBACK, "true" )
-				.withAnnotatedTypes( EntityWithJpaIdAsDocumentId.class, EntityWithNonJpaIdAsDocumentId.class );
+		sessionFactory = ormSetupHelper.start().withProperty(
+				AvailableSettings.USE_IDENTIFIER_ROLLBACK, "true" )
+				.withAnnotatedTypes( EntityWithJpaIdAsDocumentId.class, EntityWithNonJpaIdAsDocumentId.class )
+				.setup();
 	}
 
 	@Test
-	public void jpaIdAsDocumentId() {
+	void jpaIdAsDocumentId() {
 		AtomicReference<Integer> entity1Id = new AtomicReference<>();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			EntityWithJpaIdAsDocumentId entity1 = new EntityWithJpaIdAsDocumentId();
 
 			session.persist( entity1 );
@@ -68,7 +71,7 @@ public class AutomaticIndexingIdentiferRollbackIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			EntityWithJpaIdAsDocumentId entity1 = session.getReference( EntityWithJpaIdAsDocumentId.class,
 					entity1Id.get() );
 
@@ -86,10 +89,10 @@ public class AutomaticIndexingIdentiferRollbackIT {
 	}
 
 	@Test
-	public void nonJpaIdAsDocumentId() {
+	void nonJpaIdAsDocumentId() {
 		AtomicReference<Integer> entity1Id = new AtomicReference<>();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			EntityWithNonJpaIdAsDocumentId entity1 = new EntityWithNonJpaIdAsDocumentId();
 			entity1.setDocumentId( "document1" );
 
@@ -102,7 +105,7 @@ public class AutomaticIndexingIdentiferRollbackIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			EntityWithNonJpaIdAsDocumentId entity1 = session.getReference( EntityWithNonJpaIdAsDocumentId.class,
 					entity1Id.get() );
 

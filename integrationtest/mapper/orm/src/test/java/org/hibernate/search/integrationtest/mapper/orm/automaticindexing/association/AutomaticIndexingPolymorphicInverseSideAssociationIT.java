@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association;
 
 import static org.assertj.core.api.Assertions.fail;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,35 +21,34 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Transient;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test automatic indexing based on Hibernate ORM entity events
  * when associations that are polymorphic on the inverse (contained) side are involved.
  */
-public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	private SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "child", b3 -> b3
 						.objectField( "containedSingle", b2 -> b2
@@ -57,7 +57,7 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 				)
 		);
 
-		setupContext.withAnnotatedTypes(
+		sessionFactory = ormSetupHelper.start().withAnnotatedTypes(
 				IndexedEntity.class,
 				ContainingEntity.class,
 				UnrelatedContainingEntity.class,
@@ -65,10 +65,10 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 				FirstMiddleContainingEntity.class,
 				SecondMiddleContainingEntity.class,
 				ContainedEntity.class
-		);
-
-		dataClearConfig.clearOrder( IndexedEntity.class, ContainingEntity.class, UnrelatedContainingEntity.class,
-				FirstMiddleContainingEntity.class, SecondMiddleContainingEntity.class, ContainedEntity.class );
+		).dataClearing( config -> config.clearOrder( IndexedEntity.class, ContainingEntity.class,
+				UnrelatedContainingEntity.class,
+				FirstMiddleContainingEntity.class, SecondMiddleContainingEntity.class, ContainedEntity.class
+		) ).setup();
 	}
 
 	/**
@@ -77,8 +77,8 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 	 * because of their concrete type.
 	 */
 	@Test
-	public void inversePathIgnoresUnrelatedTypes() {
-		setupHolder.runInTransaction( session -> {
+	void inversePathIgnoresUnrelatedTypes() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity indexedEntity = new IndexedEntity();
 			indexedEntity.setId( 1 );
 
@@ -120,7 +120,7 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 5 );
 			containedEntity.setIncludedInSingle( "updatedValue" );
 
@@ -144,8 +144,8 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 	 * the inverse side of this association may be defined differently depending on the concrete subtype.
 	 */
 	@Test
-	public void inversePathDependsOnConcreteType() {
-		setupHolder.runInTransaction( session -> {
+	void inversePathDependsOnConcreteType() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity indexedEntity1 = new IndexedEntity();
 			indexedEntity1.setId( 1 );
 
@@ -203,7 +203,7 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 5 );
 			containedEntity.setIncludedInSingle( "updatedValue" );
 

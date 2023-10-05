@@ -45,7 +45,8 @@ class IdDerivedFromAssociationIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4352")
 	void indexed_withoutDocumentId() {
-		assertThatThrownBy( () -> ormSetupHelper.start().setup( NonIndexedBaseForIndexedDerived.class, IndexedDerived.class ) )
+		assertThatThrownBy( () -> ormSetupHelper.start().setup( NonIndexedBaseForIndexedDerived.class,
+				IndexedDerived.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Unable to define a document identifier for indexed type '"

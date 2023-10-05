@@ -29,6 +29,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.QueryTimeoutException;
 import jakarta.persistence.TypedQuery;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -38,48 +39,45 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextFi
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.common.SearchTimeoutException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test the compatibility layer between our APIs and JPA APIs
  * for the {@link TypedQuery} class.
  */
-public class ToJpaQueryIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class ToJpaQueryIT {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	private SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectAnySchema( IndexedEntity.NAME );
-		setupContext.withProperty( AvailableSettings.JPA_QUERY_COMPLIANCE, true )
-				.withAnnotatedTypes( IndexedEntity.class, ContainedEntity.class );
-
-		dataClearConfig.preClear( ContainedEntity.class, c -> {
-			c.setContainingLazy( null );
-		} );
-		dataClearConfig.clearOrder( IndexedEntity.class, ContainedEntity.class );
+		sessionFactory = ormSetupHelper.start()
+				.withProperty( AvailableSettings.JPA_QUERY_COMPLIANCE, true )
+				.withAnnotatedTypes( IndexedEntity.class, ContainedEntity.class )
+				.dataClearing( config -> config.preClear( ContainedEntity.class, c -> c.setContainingLazy( null ) )
+						.clearOrder( IndexedEntity.class, ContainedEntity.class ) )
+				.setup();
 	}
 
-	@Before
-	public void initData() {
-		with( setupHolder.entityManagerFactory() ).runInTransaction( entityManager -> {
+	@BeforeEach
+	void initData() {
+		with( sessionFactory ).runInTransaction( entityManager -> {
 			IndexedEntity indexed1 = new IndexedEntity();
 			indexed1.setId( 1 );
 			indexed1.setText( "this is text (1)" );
@@ -139,8 +137,8 @@ public class ToJpaQueryIT {
 	}
 
 	@Test
-	public void toJpaQuery() {
-		setupHolder.runNoTransaction( entityManager -> {
+	void toJpaQuery() {
+		with( sessionFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 			assertThat( query ).isNotNull();
@@ -148,8 +146,8 @@ public class ToJpaQueryIT {
 	}
 
 	@Test
-	public void getResultList() {
-		setupHolder.runNoTransaction( entityManager -> {
+	void getResultList() {
+		with( sessionFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -173,8 +171,8 @@ public class ToJpaQueryIT {
 	}
 
 	@Test
-	public void getSingleResult() {
-		setupHolder.runNoTransaction( entityManager -> {
+	void getSingleResult() {
+		with( sessionFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -230,8 +228,8 @@ public class ToJpaQueryIT {
 	}
 
 	@Test
-	public void pagination() {
-		setupHolder.runNoTransaction( entityManager -> {
+	void pagination() {
+		with( sessionFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -257,8 +255,8 @@ public class ToJpaQueryIT {
 	}
 
 	@Test
-	public void timeout_dsl() {
-		setupHolder.runNoTransaction( entityManager -> {
+	void timeout_dsl() {
+		with( sessionFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery(
 					searchSession.search( IndexedEntity.class )
@@ -283,8 +281,8 @@ public class ToJpaQueryIT {
 	}
 
 	@Test
-	public void timeout_jpaHint() {
-		setupHolder.runNoTransaction( entityManager -> {
+	void timeout_jpaHint() {
+		with( sessionFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -306,8 +304,8 @@ public class ToJpaQueryIT {
 	}
 
 	@Test
-	public void timeout_override() {
-		setupHolder.runNoTransaction( entityManager -> {
+	void timeout_override() {
+		with( sessionFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery(
 					searchSession.search( IndexedEntity.class )
@@ -335,8 +333,8 @@ public class ToJpaQueryIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graph_jpaHint_fetch() {
-		setupHolder.runNoTransaction( entityManager -> {
+	void graph_jpaHint_fetch() {
+		with( sessionFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -352,7 +350,7 @@ public class ToJpaQueryIT {
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		setupHolder.runNoTransaction( entityManager -> {
+		with( sessionFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -372,8 +370,8 @@ public class ToJpaQueryIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graph_jpaHint_load() {
-		setupHolder.runNoTransaction( entityManager -> {
+	void graph_jpaHint_load() {
+		with( sessionFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -389,7 +387,7 @@ public class ToJpaQueryIT {
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		setupHolder.runNoTransaction( entityManager -> {
+		with( sessionFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -408,8 +406,8 @@ public class ToJpaQueryIT {
 	}
 
 	@Test
-	public void graph_override_jpaHint() {
-		setupHolder.runNoTransaction( entityManager -> {
+	void graph_override_jpaHint() {
+		with( sessionFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )

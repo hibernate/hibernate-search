@@ -6,46 +6,49 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.session;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-3068")
-public class AutomaticIndexingOutOfTransactionIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class AutomaticIndexingOutOfTransactionIT {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	private SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectAnySchema( IndexedEntity.INDEX_NAME );
-		setupContext.withProperty( AvailableSettings.ALLOW_UPDATE_OUTSIDE_TRANSACTION, true )
-				.withAnnotatedTypes( IndexedEntity.class );
+		sessionFactory = ormSetupHelper.start().withProperty(
+				AvailableSettings.ALLOW_UPDATE_OUTSIDE_TRANSACTION, true )
+				.withAnnotatedTypes( IndexedEntity.class )
+				.setup();
 	}
 
 	@Test
-	public void add() {
-		setupHolder.runNoTransaction( session -> {
+	void add() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "number1" );
 			session.persist( entity1 );
 
@@ -61,8 +64,8 @@ public class AutomaticIndexingOutOfTransactionIT {
 	}
 
 	@Test
-	public void clear() {
-		setupHolder.runNoTransaction( session -> {
+	void clear() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 
 			IndexedEntity entity1 = new IndexedEntity( 1, "number1" );

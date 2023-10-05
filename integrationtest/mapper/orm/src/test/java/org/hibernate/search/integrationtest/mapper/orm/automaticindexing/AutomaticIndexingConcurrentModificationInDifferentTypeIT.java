@@ -6,38 +6,39 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+
 import jakarta.persistence.Basic;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class AutomaticIndexingConcurrentModificationInDifferentTypeIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class AutomaticIndexingConcurrentModificationInDifferentTypeIT {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	private SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectSchema( ParentEntity.NAME, b -> b
 				.field( "name", String.class )
 				.objectField( "child", b2 -> b2
@@ -51,12 +52,14 @@ public class AutomaticIndexingConcurrentModificationInDifferentTypeIT {
 				.field( "name", String.class )
 		);
 
-		setupContext.withAnnotatedTypes( ParentEntity.class, ChildEntity.class, OtherEntity.class );
+		sessionFactory = ormSetupHelper.start()
+				.withAnnotatedTypes( ParentEntity.class, ChildEntity.class, OtherEntity.class )
+				.setup();
 	}
 
-	@Before
-	public void initData() {
-		setupHolder.runInTransaction( session -> {
+	@BeforeEach
+	void initData() {
+		with( sessionFactory ).runInTransaction( session -> {
 			ChildEntity entity1 = new ChildEntity();
 			entity1.setId( 1 );
 			entity1.setName( "edouard" );
@@ -94,8 +97,8 @@ public class AutomaticIndexingConcurrentModificationInDifferentTypeIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3857")
-	public void updateTriggeringReindexingOfPreviouslyUnknownEntityType() {
-		setupHolder.runInTransaction( session -> {
+	void updateTriggeringReindexingOfPreviouslyUnknownEntityType() {
+		with( sessionFactory ).runInTransaction( session -> {
 			ChildEntity entity1 = session.getReference( ChildEntity.class, 1 );
 			entity1.setName( "updated" );
 			// Add another type to the indexing plan so that we're not done iterating over all types

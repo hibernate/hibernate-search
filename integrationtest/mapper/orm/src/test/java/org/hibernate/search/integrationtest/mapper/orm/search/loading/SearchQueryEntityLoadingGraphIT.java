@@ -11,7 +11,6 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedA
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -21,47 +20,41 @@ import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.sing
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingModel;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedPerClass;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetup;
+import org.hibernate.search.util.impl.test.extension.parameterized.ParameterizedSetupBeforeTest;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test setting an entity graph on entity loading options when executing a search query
  * when only a single type is involved.
  */
-@RunWith(Parameterized.class)
+@ParameterizedPerClass
 public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntityLoadingSingleTypeIT<T> {
 
-	@Parameterized.Parameters(name = "{0}, {1}")
-	public static List<Object[]> params() {
-		List<Object[]> result = new ArrayList<>();
+	public static List<? extends Arguments> params() {
+		List<Arguments> result = new ArrayList<>();
 		forAllModelMappingCombinations( (model, mapping) -> {
-			result.add( new Object[] { model, mapping } );
+			result.add( Arguments.of( model, mapping ) );
 		} );
 		return result;
 	}
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	public SearchQueryEntityLoadingGraphIT(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
-		super( model, mapping );
-	}
+	private SessionFactory sessionFactory;
+	private SingleTypeLoadingModel<T> model;
+	private SingleTypeLoadingMapping mapping;
 
 	@Override
 	protected BackendMock backendMock() {
@@ -70,25 +63,33 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 
 	@Override
 	protected SessionFactory sessionFactory() {
-		return setupHolder.sessionFactory();
+		return sessionFactory;
 	}
 
-	@ReusableOrmSetupHolder.SetupParams
-	public List<?> setupParams() {
-		return Arrays.asList( mapping, model );
+	@Override
+	protected SingleTypeLoadingModel<T> model() {
+		return model;
 	}
 
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+	@Override
+	protected SingleTypeLoadingMapping mapping() {
+		return mapping;
+	}
+
+	@ParameterizedSetup
+	@MethodSource("params")
+	void setup(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+		this.model = model;
+		this.mapping = mapping;
 		backendMock.expectAnySchema( model.getIndexName() );
-		setupContext.withConfiguration( c -> mapping.configure( c, model ) );
-
-		dataClearConfig.preClear( model.getIndexedClass(), model::clearContainedEager );
-		dataClearConfig.clearOrder( model.getContainedClass(), model.getIndexedClass() );
+		sessionFactory = ormSetupHelper.start().withConfiguration( c -> mapping.configure( c, model ) )
+				.dataClearing( true, config -> config.preClear( model.getIndexedClass(), model::clearContainedEager )
+						.clearOrder( model.getContainedClass(), model.getIndexedClass() ) )
+				.setup();
 	}
 
-	@Before
-	public void initData() {
+	@ParameterizedSetupBeforeTest
+	void initData() {
 		// We don't care about what is indexed exactly, so use the lenient mode
 		backendMock.inLenientMode( () -> with( sessionFactory() ).runInTransaction( session -> {
 			session.persist( model.newIndexedWithContained( 0, mapping ) );
@@ -99,7 +100,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void defaults() {
+	void defaults() {
 		testLoadingWithEntityGraph(
 				// Do not use any graph
 				null, null,
@@ -110,7 +111,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void eager_fetch() {
+	void eager_fetch() {
 		testLoadingWithEntityGraph(
 				// Use a graph that forces eager loading of all associations
 				// with FETCH semantic, meaning default EAGERs are overridden.
@@ -122,7 +123,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void eager_load() {
+	void eager_load() {
 		testLoadingWithEntityGraph(
 				// Use a graph that forces eager loading of all associations
 				// with LOAD semantic, meaning default EAGERs are NOT overridden.
@@ -134,7 +135,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void lazy_fetch() {
+	void lazy_fetch() {
 		testLoadingWithEntityGraph(
 				// Use a graph that doesn't force loading of any association,
 				// with FETCH semantic, meaning default EAGERs are overridden.
@@ -146,7 +147,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void lazy_load() {
+	void lazy_load() {
 		testLoadingWithEntityGraph(
 				// Use a "lazy" graph that doesn't force loading of any association,
 				// with LOAD semantic, meaning default EAGERs are NOT overridden.
@@ -158,7 +159,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graphName_null() {
+	void graphName_null() {
 		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction(
 				session -> Search.session( session ).search( model.getIndexedClass() )
 						.where( f -> f.matchAll() )
@@ -171,7 +172,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graphName_invalid() {
+	void graphName_invalid() {
 		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction(
 				session -> Search.session( session ).search( model.getIndexedClass() )
 						.where( f -> f.matchAll() )
@@ -184,7 +185,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graphName_graphSemantic_null() {
+	void graphName_graphSemantic_null() {
 		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction(
 				session -> Search.session( session ).search( model.getIndexedClass() )
 						.where( f -> f.matchAll() )
@@ -197,7 +198,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graph_null() {
+	void graph_null() {
 		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction(
 				session -> Search.session( session ).search( model.getIndexedClass() )
 						.where( f -> f.matchAll() )
@@ -210,7 +211,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graph_graphSemantic_null() {
+	void graph_graphSemantic_null() {
 		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction(
 				session -> Search.session( session ).search( model.getIndexedClass() )
 						.where( f -> f.matchAll() )

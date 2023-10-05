@@ -121,13 +121,13 @@ class MassIndexingJobParametersBuilderTest {
 	}
 
 	@Test
-	public void testRestrictedBy_stringNull() {
+	void testRestrictedBy_stringNull() {
 		assertThatThrownBy( () -> MassIndexingJob.parameters().forEntity( String.class ).reindexOnly( null, Map.of() ) )
 				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
-	public void testRestrictedBy_mapNull() {
+	void testRestrictedBy_mapNull() {
 		assertThatThrownBy( () -> MassIndexingJob.parameters().forEntity( String.class ).reindexOnly( "foo", null ) )
 				.isInstanceOf( IllegalArgumentException.class );
 	}
@@ -225,7 +225,7 @@ class MassIndexingJobParametersBuilderTest {
 	}
 
 	@Test
-	public void testEntityFetchSize_zero() throws Exception {
+	void testEntityFetchSize_zero() throws Exception {
 		assertThatThrownBy( () -> MassIndexingJob.parameters()
 				.forEntity( UnusedEntity.class )
 				.entityFetchSize( 0 ) )
@@ -233,7 +233,7 @@ class MassIndexingJobParametersBuilderTest {
 	}
 
 	@Test
-	public void testEntityFetchSize_negative() throws Exception {
+	void testEntityFetchSize_negative() throws Exception {
 		assertThatThrownBy( () -> MassIndexingJob.parameters()
 				.forEntity( UnusedEntity.class )
 				.entityFetchSize( -1 ) )

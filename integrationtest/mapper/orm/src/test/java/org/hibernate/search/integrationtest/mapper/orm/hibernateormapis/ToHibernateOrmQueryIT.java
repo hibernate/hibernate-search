@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedAssert.assertThatManaged;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +26,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.QueryTimeoutException;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -34,47 +36,44 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextFi
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.common.SearchTimeoutException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test the compatibility layer between our APIs and Hibernate ORM APIs
  * for the {@link Query} class.
  */
-public class ToHibernateOrmQueryIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class ToHibernateOrmQueryIT {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	private SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectAnySchema( IndexedEntity.NAME );
-		setupContext.withAnnotatedTypes( IndexedEntity.class, ContainedEntity.class );
-
-		dataClearConfig.preClear( ContainedEntity.class, c -> {
-			c.setContainingLazy( null );
-		} );
-		dataClearConfig.clearOrder( IndexedEntity.class, ContainedEntity.class );
+		sessionFactory = ormSetupHelper.start().withAnnotatedTypes(
+				IndexedEntity.class, ContainedEntity.class )
+				.dataClearing( config -> config.preClear( ContainedEntity.class, c -> c.setContainingLazy( null ) )
+						.clearOrder( IndexedEntity.class, ContainedEntity.class ) )
+				.setup();
 	}
 
-	@Before
-	public void initData() {
-		setupHolder.runInTransaction( session -> {
+	@BeforeEach
+	void initData() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity indexed1 = new IndexedEntity();
 			indexed1.setId( 1 );
 			indexed1.setText( "this is text (1)" );
@@ -134,8 +133,8 @@ public class ToHibernateOrmQueryIT {
 	}
 
 	@Test
-	public void toHibernateOrmQuery() {
-		setupHolder.runNoTransaction( session -> {
+	void toHibernateOrmQuery() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 			assertThat( query ).isNotNull();
@@ -143,8 +142,8 @@ public class ToHibernateOrmQueryIT {
 	}
 
 	@Test
-	public void list() {
-		setupHolder.runNoTransaction( session -> {
+	void list() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -168,8 +167,8 @@ public class ToHibernateOrmQueryIT {
 	}
 
 	@Test
-	public void uniqueResult() {
-		setupHolder.runNoTransaction( session -> {
+	void uniqueResult() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -225,8 +224,8 @@ public class ToHibernateOrmQueryIT {
 	}
 
 	@Test
-	public void pagination() {
-		setupHolder.runNoTransaction( session -> {
+	void pagination() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -252,8 +251,8 @@ public class ToHibernateOrmQueryIT {
 	}
 
 	@Test
-	public void timeout_dsl() {
-		setupHolder.runNoTransaction( session -> {
+	void timeout_dsl() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )
@@ -278,8 +277,8 @@ public class ToHibernateOrmQueryIT {
 	}
 
 	@Test
-	public void timeout_jpaHint() {
-		setupHolder.runNoTransaction( session -> {
+	void timeout_jpaHint() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -301,8 +300,8 @@ public class ToHibernateOrmQueryIT {
 	}
 
 	@Test
-	public void timeout_ormHint() {
-		setupHolder.runNoTransaction( session -> {
+	void timeout_ormHint() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -324,8 +323,8 @@ public class ToHibernateOrmQueryIT {
 	}
 
 	@Test
-	public void timeout_setter() {
-		setupHolder.runNoTransaction( session -> {
+	void timeout_setter() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -347,8 +346,8 @@ public class ToHibernateOrmQueryIT {
 	}
 
 	@Test
-	public void timeout_override_ormHint() {
-		setupHolder.runNoTransaction( session -> {
+	void timeout_override_ormHint() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )
@@ -375,8 +374,8 @@ public class ToHibernateOrmQueryIT {
 	}
 
 	@Test
-	public void timeout_override_setter() {
-		setupHolder.runNoTransaction( session -> {
+	void timeout_override_setter() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )
@@ -404,8 +403,8 @@ public class ToHibernateOrmQueryIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graph_jpaHint_fetch() {
-		setupHolder.runNoTransaction( session -> {
+	void graph_jpaHint_fetch() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -421,7 +420,7 @@ public class ToHibernateOrmQueryIT {
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		setupHolder.runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -441,8 +440,8 @@ public class ToHibernateOrmQueryIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graph_jpaHint_load() {
-		setupHolder.runNoTransaction( session -> {
+	void graph_jpaHint_load() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -458,7 +457,7 @@ public class ToHibernateOrmQueryIT {
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		setupHolder.runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -478,8 +477,8 @@ public class ToHibernateOrmQueryIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graph_setter_fetch() {
-		setupHolder.runNoTransaction( session -> {
+	void graph_setter_fetch() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -495,7 +494,7 @@ public class ToHibernateOrmQueryIT {
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		setupHolder.runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -515,8 +514,8 @@ public class ToHibernateOrmQueryIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graph_setter_load() {
-		setupHolder.runNoTransaction( session -> {
+	void graph_setter_load() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -532,7 +531,7 @@ public class ToHibernateOrmQueryIT {
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		setupHolder.runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -551,8 +550,8 @@ public class ToHibernateOrmQueryIT {
 	}
 
 	@Test
-	public void graph_override_jpaHint() {
-		setupHolder.runNoTransaction( session -> {
+	void graph_override_jpaHint() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )
@@ -577,8 +576,8 @@ public class ToHibernateOrmQueryIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	public void graph_override_setter() {
-		setupHolder.runNoTransaction( session -> {
+	void graph_override_setter() {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )

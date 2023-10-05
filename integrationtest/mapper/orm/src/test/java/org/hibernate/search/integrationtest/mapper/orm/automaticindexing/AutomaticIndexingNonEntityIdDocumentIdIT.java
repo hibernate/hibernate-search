@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,49 +18,48 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test automatic indexing of an entity type whose document ID is not the entity ID.
  * <p>
  * Note we also test collection events because they fetch the entity ID differently.
  */
-public class AutomaticIndexingNonEntityIdDocumentIdIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class AutomaticIndexingNonEntityIdDocumentIdIT {
 
-	@ClassRule
-	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.create();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	private SessionFactory sessionFactory;
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	@BeforeAll
+	void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "indexedField", String.class )
 				.field( "indexedElementCollectionField", String.class, b2 -> b2.multiValued( true ) )
 		);
 
-		setupContext.withAnnotatedTypes( IndexedEntity.class );
+		sessionFactory = ormSetupHelper.start().withAnnotatedTypes( IndexedEntity.class ).setup();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3203")
-	public void directPersistUpdateDelete() {
-		setupHolder.runInTransaction( session -> {
+	void directPersistUpdateDelete() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setDocumentId( 42 );
@@ -78,7 +79,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.setIndexedField( "updatedValue" );
 
@@ -93,7 +94,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 
 			session.remove( entity1 );
@@ -106,8 +107,8 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3203")
-	public void directValueUpdate_indexedElementCollectionField() {
-		setupHolder.runInTransaction( session -> {
+	void directValueUpdate_indexedElementCollectionField() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setDocumentId( 42 );
@@ -127,7 +128,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.getIndexedElementCollectionField().add( "secondValue" );
 
@@ -144,7 +145,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.getIndexedElementCollectionField().remove( 1 );
 
@@ -169,8 +170,8 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3199", "HSEARCH-3203" })
-	public void directValueReplace_indexedElementCollectionField() {
-		setupHolder.runInTransaction( session -> {
+	void directValueReplace_indexedElementCollectionField() {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setDocumentId( 42 );
@@ -189,7 +190,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.setIndexedElementCollectionField( new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"

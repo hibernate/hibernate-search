@@ -27,7 +27,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
@@ -86,9 +85,6 @@ class SpringBeanResolutionIT {
 
 	@RegisterExtension
 	public BackendMock backendMock = BackendMock.create();
-
-	@RegisterExtension
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@RegisterExtension
 	public StaticCounters counters = StaticCounters.create();

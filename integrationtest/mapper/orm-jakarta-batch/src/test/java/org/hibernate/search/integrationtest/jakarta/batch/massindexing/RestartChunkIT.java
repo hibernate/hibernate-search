@@ -7,8 +7,8 @@
 package org.hibernate.search.integrationtest.jakarta.batch.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -32,43 +32,41 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * @author Mincong Huang
  */
-public class RestartChunkIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class RestartChunkIT {
 
 	private static final int CHECKPOINT_INTERVAL = 10;
 
 	protected static final long DB_COMP_ROWS = 150;
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder =
-			ReusableOrmSetupHolder.withSingleBackend( BackendConfigurations.simple() );
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+	@RegisterExtension
+	public static OrmSetupHelper ormSetupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory emf;
 	private JobOperator jobOperator;
 
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
-		setupContext.withAnnotatedTypes( SimulatedFailureCompany.class )
-				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false );
+	@BeforeAll
+	void setup() {
+		emf = ormSetupHelper.start().withAnnotatedTypes( SimulatedFailureCompany.class )
+				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
+				.dataClearing( config -> config.clearIndexData( true ) )
+				.setup();
 	}
 
-	@Before
-	public void initData() {
+	@BeforeEach
+	void initData() {
 		SimulatedFailure.reset();
-		emf = setupHolder.entityManagerFactory();
 		jobOperator = JobTestUtil.getOperator();
 
 		String[] str = new String[] {
@@ -79,7 +77,7 @@ public class RestartChunkIT {
 				"Amazon"
 		};
 
-		setupHolder.runInTransaction( s -> {
+		with( emf ).runInTransaction( s -> {
 			for ( int i = 0; i < DB_COMP_ROWS; i++ ) {
 				s.persist( new SimulatedFailureCompany( str[i % 5] + "-" + i ) );
 			}
@@ -87,47 +85,47 @@ public class RestartChunkIT {
 	}
 
 	@Test
-	public void failureBeforeFirstRead_fullScope() throws InterruptedException, IOException {
+	void failureBeforeFirstRead_fullScope() throws InterruptedException {
 		SimulatedFailure.raiseExceptionOnNextRead();
 		doTest( null, DB_COMP_ROWS, DB_COMP_ROWS / 5 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
-	public void failureDuringFirstCheckpointBetweenTwoWrites_fullScope() throws InterruptedException, IOException {
+	void failureDuringFirstCheckpointBetweenTwoWrites_fullScope() throws InterruptedException {
 		SimulatedFailure.raiseExceptionAfterXWrites( (int) ( CHECKPOINT_INTERVAL * 0.5 ) );
 		doTest( null, DB_COMP_ROWS, DB_COMP_ROWS / 5 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
-	public void failureDuringNonFirstCheckpointBetweenTwoWrites_fullScope() throws InterruptedException, IOException {
+	void failureDuringNonFirstCheckpointBetweenTwoWrites_fullScope() throws InterruptedException {
 		SimulatedFailure.raiseExceptionAfterXWrites( (int) ( CHECKPOINT_INTERVAL * 2.5 ) );
 		doTest( null, DB_COMP_ROWS, DB_COMP_ROWS / 5 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
-	public void failureBeforeFirstRead_hql() throws InterruptedException, IOException {
+	void failureBeforeFirstRead_hql() throws InterruptedException {
 		SimulatedFailure.raiseExceptionOnNextRead();
 		doTest( "name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
-	public void failureDuringFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException, IOException {
+	void failureDuringFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException {
 		SimulatedFailure.raiseExceptionAfterXWrites( (int) ( CHECKPOINT_INTERVAL * 0.5 ) );
 		doTest( "name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
-	public void failureDuringNonFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException, IOException {
+	void failureDuringNonFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException {
 		SimulatedFailure.raiseExceptionAfterXWrites( (int) ( CHECKPOINT_INTERVAL * 2.5 ) );
 		doTest( "name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
 	}
 
-	private void doTest(String reindexOnly, long expectedTotal, long expectedGoogle) throws InterruptedException, IOException {
+	private void doTest(String reindexOnly, long expectedTotal, long expectedGoogle) throws InterruptedException {
 		assertThat( JobTestUtil.nbDocumentsInIndex( emf, SimulatedFailureCompany.class ) ).isZero();
 		List<SimulatedFailureCompany> google =
 				JobTestUtil.findIndexedResults( emf, SimulatedFailureCompany.class, "name", "Google" );

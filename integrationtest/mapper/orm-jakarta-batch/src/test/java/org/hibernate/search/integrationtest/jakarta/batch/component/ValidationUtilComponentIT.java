@@ -38,6 +38,7 @@ class ValidationUtilComponentIT {
 		ormSetupHelper.start()
 				.withAnnotatedTypes( Company.class, Person.class )
 				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
+				.dataClearing( config -> config.clearIndexData( true ) )
 				.setup();
 	}
 

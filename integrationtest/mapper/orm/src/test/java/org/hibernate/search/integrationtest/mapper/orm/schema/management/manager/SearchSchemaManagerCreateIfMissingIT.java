@@ -10,7 +10,7 @@ import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.util.impl.integrationtest.common.extension.SchemaManagementWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 
-public class SearchSchemaManagerCreateIfMissingIT extends AbstractSearchSchemaManagerSimpleOperationIT {
+class SearchSchemaManagerCreateIfMissingIT extends AbstractSearchSchemaManagerSimpleOperationIT {
 
 	@Override
 	protected void execute(SearchSchemaManager manager) {
